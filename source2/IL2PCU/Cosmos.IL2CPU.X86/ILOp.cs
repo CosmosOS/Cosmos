@@ -23,14 +23,13 @@ namespace Cosmos.IL2CPU.X86
 
         protected void Jump_Exception(MethodInfo aMethod) {
           // todo: port to numeric labels
-          new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___EXCEPTION___EXIT" };
+          new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + AssemblerNasm.EndOfMethodLabelNameException };
         }
 
         protected void Jump_End(MethodInfo aMethod)
         {
-#warning todo: Jump_End jumps to ___EXCEPTION___EXIT
-          new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___NORMAL___EXIT" };
-        }
+          new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + AssemblerNasm.EndOfMethodLabelNameNormal };
+       }
 
         protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
 		{
@@ -63,7 +62,7 @@ namespace Cosmos.IL2CPU.X86
             return MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase ) + "__DOT__" + aOpCode.Position.ToString( "X8" ).ToUpper();
 		}
 
-        protected uint Align( uint aSize, uint aAlign )
+        public static uint Align( uint aSize, uint aAlign )
         {
             return aSize % 4 == 0 ? aSize : ( ( aSize / aAlign ) * aAlign ) + 1;
         }

@@ -289,6 +289,9 @@ namespace Cosmos.IL2CPU {
       }
 
       mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, GetMethodUID);
+      mAsmblr.EmitEntrypoint(aStartMethod, (from item in mItems
+                                            where item is MethodBase
+                                            select (MethodBase)item));
       
 //      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
     }

@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86 {
             if (mComNumber > 0) {
                 new Define("DEBUGSTUB");
             }
-            new Label("Kernel_Start");
+            new Label("Kernel_Start") { IsGlobal = true };
             new Comment(this, "MultiBoot-compliant loader (e.g. GRUB or X.exe) provides info in registers: ");
             new Comment( this, "EBX=multiboot_info " );
             new Comment( this, "EAX=0x2BADB002 - check if it's really Multiboot loader " );
@@ -116,7 +116,6 @@ namespace Cosmos.IL2CPU.X86 {
                 new Label("DebugStub_Step");
                 new Return();
             }
-            new Label(EntryPointName);
             //aOutputWriter.WriteLine("section .data");
             DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
             uint xFlags = 0x10003;
@@ -159,11 +158,11 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         public override void FlushText(TextWriter aOutput) {
-            aOutput.WriteLine("use32");
-            //aOutput.WriteLine("%define NASM_COMPILATION 1");
-            //aOutput.WriteLine("global Kernel_Start");
+            //aOutput.WriteLine("use32");
+            aOutput.WriteLine("%define NASM_COMPILATION 1");
+            aOutput.WriteLine("global Kernel_Start");
             //aOutput.WriteLine("[map all main.map]");
-            aOutput.WriteLine("org 0x200000");
+            //aOutput.WriteLine("org 0x200000");
             base.FlushText(aOutput);
         }
 
@@ -201,6 +200,22 @@ namespace Cosmos.IL2CPU.X86 {
 
         protected override int GetVTableEntrySize() {
           return 16; // todo: retrieve from actual type info
+        }
+
+        public override void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods) {
+          new Label(EntryPointName);
+          new Push { DestinationReg = Registers.EBP };
+          new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+          foreach (var xCctor in aMethods) {
+            if (xCctor.Name == ".cctor"
+              && xCctor.IsStatic
+              && xCctor is ConstructorInfo) {
+              Call(xCctor);
+            }
+          }
+          Call(aEntrypoint);
+          new Pop { DestinationReg = Registers.EBP };
+          new Return();
         }
   }
 }

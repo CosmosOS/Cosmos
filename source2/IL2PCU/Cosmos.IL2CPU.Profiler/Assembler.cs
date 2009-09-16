@@ -50,6 +50,10 @@ namespace Cosmos.IL2CPU.Profiler {
     protected override int GetVTableEntrySize() {
       return 0;
     }
+
+    public override void EmitEntrypoint(System.Reflection.MethodBase aEntrypoint, IEnumerable<System.Reflection.MethodBase> aMethods) {
+      throw new NotImplementedException();
+    }
   
   }
 }

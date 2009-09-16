@@ -613,6 +613,8 @@ namespace Cosmos.IL2CPU {
       }      
     }
 
+    public abstract void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods);
+
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
       new Label(aFrom.MethodBase);
       Jump(MethodInfoLabelGenerator.GenerateLabelName(aTo.MethodBase));

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CPUx86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.IL2CPU.X86 {
     public class AssemblerNasm : CosmosAssembler
     {
+      public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
+      public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
 
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
@@ -15,17 +18,125 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
-      if (aMethod.MethodBase.GetFullName() == "System_Void__Cosmos_Kernel_Plugs_Console_Write_System_String_") {
-        Console.Write("");
-      }
       new Label(aMethod.MethodBase);
+      new Push { DestinationReg = Registers.EBP };
+      new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      //new CPUx86.Push("0");
+      //if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
+      //    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
+      //    MethodBase xTempMethod = Engine.GetMethodBase(Engine.GetType("Cosmos.Kernel", "Cosmos.Kernel.Serial"), "Write", "System.Byte", "System.String");
+      //    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
+      //    Engine.QueueMethod(xTempMethod);
+      //}
+      foreach (var xLocal in aMethod.MethodBase.GetMethodBody().LocalVariables) {
+        new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+      }
+      //foreach (var xLocal in aLocals) {
+      //  aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
+      //  for (int i = 0; i < (xLocal.Size / 4); i++) {
+      //    new CPUx86.Push { DestinationValue = 0 };
+      //  }
+      //}
+      //if (aDebugMode && aIsNonDebuggable) {
+      //  new CPUx86.Call { DestinationLabel = "DebugPoint_DebugSuspend" };
+      //}
     }
 
     protected override void MethodEnd(MethodInfo aMethod) {
       base.MethodEnd(aMethod);
-      // TODO: This is a temp hack, disable this when we reenable real exception handling
-      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___EXCEPTION___EXIT");
-      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___NORMAL___EXIT");
+      uint xReturnSize = 0;
+      var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+      if (xMethInfo != null) {
+        xReturnSize = ILOp.SizeOfType(xMethInfo.ReturnType);
+      }
+      if (xReturnSize % 4 > 0) {
+        xReturnSize += 4 - xReturnSize % 4;
+      }
+      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameNormal);
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
+      if (xReturnSize > 0) {
+        //var xArgSize = (from item in aArgs
+        //                let xSize = item.Size + item.Offset
+        //                select xSize).FirstOrDefault();
+        //new Comment(String.Format("ReturnSize = {0}, ArgumentSize = {1}",
+        //                          aReturnSize,
+        //                          xArgSize));
+        //int xOffset = 4;
+        //if(xArgSize>0) {
+        //    xArgSize -= xReturnSize;
+        //    xOffset = xArgSize;
+        //}
+        int xOffset = 4;
+        if (aMethod.MethodBase.GetParameters().Length > 0) {
+          // old code:
+          //xOffset = aArgs.First().Offset + 4;
+          //if (xOffset < 0)
+          //{
+          //    xOffset = 0;
+          //}
+
+          // new code:
+          xOffset = (int)((from item in aMethod.MethodBase.GetParameters()
+                           select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum() + 8);
+        }
+        for (int i = 0; i < xReturnSize / 4; i++) {
+          new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+          new CPUx86.Move {
+            DestinationReg = CPUx86.Registers.EBP,
+            DestinationIsIndirect = true,
+            DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 4 - xReturnSize),
+            SourceReg = Registers.EAX
+          };
+        }
+      }
+      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException);
+      //for (int i = 0; i < aLocAllocItemCount; i++) {
+      //  new CPUx86.Call { DestinationLabel = aHeapFreeLabel };
+      //}
+      //if (aDebugMode && aIsNonDebuggable) {
+      //  new CPUx86.Call { DestinationLabel = "DebugPoint_DebugResume" };
+      //}
+
+      //if ((from xLocal in aLocals
+      //     where xLocal.IsReferenceType
+      //     select 1).Count() > 0 || (from xArg in aArgs
+      //                               where xArg.IsReferenceType
+      //                               select 1).Count() > 0) {
+      //  new CPUx86.Push { DestinationReg = Registers.ECX };
+      //  //foreach (MethodInformation.Variable xLocal in aLocals) {
+      //  //  if (xLocal.IsReferenceType) {
+      //  //    Op.Ldloc(aAssembler,
+      //  //             xLocal,
+      //  //             false,
+      //  //             aGetStorageSizeDelegate(xLocal.VariableType));
+      //  //    new CPUx86.Call { DestinationLabel = aDecRefLabel };
+      //  //  }
+      //  //}
+      //  //foreach (MethodInformation.Argument xArg in aArgs) {
+      //  //  if (xArg.IsReferenceType) {
+      //  //    Op.Ldarg(aAssembler,
+      //  //             xArg,
+      //  //             false);
+      //  //    //,                                 aGetStorageSizeDelegate(xArg.ArgumentType)
+      //  //    new CPUx86.Call { DestinationLabel = aDecRefLabel };
+      //  //  }
+      //  //}
+      //  // todo: add GC code
+      //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+      //}
+      for (int j = aMethod.MethodBase.GetMethodBody().LocalVariables.Count - 1; j >= 0; j--) {
+        int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.GetMethodBody().LocalVariables[j].LocalType), 4);
+        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
+      }
+      //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
+      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
+      var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
+                            select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+      var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
+      if (xRetSize < 0) {
+        xRetSize = 0;
+      }
+      new CPUx86.Return { DestinationValue = (uint)xRetSize };
     }
 
     protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
