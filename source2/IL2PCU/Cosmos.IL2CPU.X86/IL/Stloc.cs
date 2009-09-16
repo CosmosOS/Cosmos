@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 			var xField = aOpCode as ILOpCodes.OpVar;
 			var xFieldInfo = aMethod.MethodBase.GetMethodBody().LocalVariables[xField.Value];
-			var xEBPOffset = GetEBPOffsetForLocal(aMethod, xField);
+			var xEBPOffset = 0 - ((int)GetEBPOffsetForLocal(aMethod, xField));
 			if (!xFieldInfo.LocalType.IsValueType)
 			{
 				new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int) xEBPOffset };
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)( xEBPOffset + (i * 4)), SourceReg = CPUx86.Registers.EAX };
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)( xEBPOffset - (i * 4)), SourceReg = CPUx86.Registers.EAX };
 			}
 			// no need to inc again, items on the transient stack are also counted
 			Assembler.Stack.Pop();

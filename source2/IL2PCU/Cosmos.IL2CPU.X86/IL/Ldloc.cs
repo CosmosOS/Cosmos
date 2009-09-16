@@ -17,13 +17,13 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xOpVar = (OpVar)aOpCode;
 			var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
 			var xStackCount = GetStackCountForLocal(aMethod, xVar);
-			var xEBPOffset = (int)GetEBPOffsetForLocal(aMethod, xOpVar);
+			var xEBPOffset = 0 - ((int)GetEBPOffsetForLocal(aMethod, xOpVar));
 			var xSize = SizeOfType(xVar.LocalType);
 			if (xStackCount > 1)
 			{
 				for (int i = 0; i < xStackCount; i++)
 				{
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(xEBPOffset + (i * 4)) };
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(xEBPOffset - (i * 4)) };
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 				}
 			}
