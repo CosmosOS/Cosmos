@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System.Net {
             return "<IPAddress.ToString() not yet implemented!>";
         }
 
-        [PlugMethod(Signature = "System_Void__System_Net_IPAddress__cctor__")]
+       // [PlugMethod(Signature = "System_Void__System_Net_IPAddress__cctor__")]
         public static void CCtor() {
             // todo: implement
         }

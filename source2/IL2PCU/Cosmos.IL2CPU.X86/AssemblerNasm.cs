@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CPUx86 = Cosmos.IL2CPU.X86;
+using System.Reflection;
+using System.IO;
 
 namespace Cosmos.IL2CPU.X86 {
     public class AssemblerNasm : CosmosAssembler
@@ -72,14 +74,19 @@ namespace Cosmos.IL2CPU.X86 {
         int xOffset = 4;
         xOffset += xTotalArgsSize;
         if ((xTotalArgsSize - xReturnSize) < 0) {
-          xOffset += (int)(0 - (xTotalArgsSize - xReturnSize));
+          //xOffset += (int)(0 - (xTotalArgsSize - xReturnSize));
+          xOffset = 8;
+        }
+        if ((/*aMethod.MethodBase.DeclaringType.Name == "TextScreen" && */aMethod.MethodBase.Name=="NewLine")
+          || MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_String__Indy_IL2CPU_CustomImplementation_System_EnvironmentImpl_GetResourceString_System_String__System_Object___") {
+          Console.Write("");
         }
         for (int i = 0; i < xReturnSize / 4; i++) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
           new CPUx86.Move {
             DestinationReg = CPUx86.Registers.EBP,
             DestinationIsIndirect = true,
-            DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 4 - xReturnSize),
+            DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 0 - xReturnSize),
             SourceReg = Registers.EAX
           };
         }
@@ -120,10 +127,6 @@ namespace Cosmos.IL2CPU.X86 {
       //  // todo: add GC code
       //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
       //}
-      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__System_Array__ctor__") {
-        
-        Console.Write("");
-      }
       for (int j = aMethod.MethodBase.GetMethodBody().LocalVariables.Count - 1; j >= 0; j--) {
         int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.GetMethodBody().LocalVariables[j].LocalType), 4);
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
@@ -134,7 +137,25 @@ namespace Cosmos.IL2CPU.X86 {
       if (xRetSize < 0) {
         xRetSize = 0;
       }
+      WriteDebug(aMethod.MethodBase, (uint)xRetSize, IL.Call.GetStackSizeToReservate(aMethod.MethodBase));
       new CPUx86.Return { DestinationValue = (uint)xRetSize };
+    }
+
+      
+
+    private static HashSet<string> mDebugLines = new HashSet<string>();
+    private static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {
+      var xLine = String.Format("{0}\t{1}\t{2}", MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
+      if (!mDebugLines.Contains(xLine)) {
+        mDebugLines.Add(xLine);
+        File.AppendAllText(@"e:\tempdebug.txt", xLine + "\r\n");
+      }
+    }
+
+    static AssemblerNasm() {
+      if (File.Exists(@"e:\tempdebug.txt")) {
+        File.Delete(@"e:\tempdebug.txt");
+      }
     }
 
     protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
@@ -142,11 +163,18 @@ namespace Cosmos.IL2CPU.X86 {
       new Label(TmpPosLabel(aMethod, aOpCode));
     }
 
+    protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
+      base.AfterOp(aMethod, aOpCode);
+      new Comment("Stack contains " + Stack.Count + " items");
+    }
+
     // These are all temp functions until we move to the new assembler.
     // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
-    public static string TmpPosLabel(MethodInfo aMethod, int xOffset) {
-      //TODO: Change to Hex output, will be smaller and slightly faster for NASM
-      return "POS_" + aMethod.UID + "_" + xOffset;
+    public static string TmpPosLabel(MethodInfo aMethod, int aOffset) {
+      // todo: fix to be small again. 
+      return ILOp.GetLabel(aMethod, aOffset);
+      //TODO: Change to Hex output, will be smaller and slightly faster for NASM      
+      //return "POS_" + aMethod.UID + "_" + aOffset;
     }
 
     public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {

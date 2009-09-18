@@ -19,6 +19,15 @@ namespace Cosmos.IL2CPU {
       return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(aType) + " ASM_IS__" + aType.Assembly.GetName().Name);
     }
 
+
+    public static string GetLabel(MethodInfo aMethod, ILOpCode aOpCode) {
+      return GetLabel(aMethod, aOpCode.Position);
+    }
+
+    public static string GetLabel(MethodInfo aMethod, int aPos) {
+      return MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "__DOT__" + aPos.ToString("X8").ToUpper();
+    }
+
     public static uint SizeOfType(Type aType) {
       if (aType.FullName == "System.Void") {
         return 0;

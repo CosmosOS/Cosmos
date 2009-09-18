@@ -164,8 +164,8 @@ namespace Cosmos.IL2CPU {
           //mLog.WriteLine ( "\t[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
           mLog.WriteLine("\t{0} {1}", Stack.Count, xILOp.GetType().Name);
           mLog.Flush();
-          new Comment(this, "[" + xILOp.ToString() + "]");
           BeforeOp(aMethod, xOpCode);
+          new Comment(this, "[" + xILOp.ToString() + "]");
           var xNextPosition = xOpCode.Position + 1;
           #region Exception handling support code
           ExceptionHandlingClause xCurrentHandler = null;
@@ -290,6 +290,7 @@ namespace Cosmos.IL2CPU {
           string prefix = "\t\t\t";
           Label xLabel = x as Label;
           if (xLabel != null) {
+            aOutput.WriteLine();
             if (xLabel.Name[0] == '.') {
               prefix = "\t\t";
             } else {

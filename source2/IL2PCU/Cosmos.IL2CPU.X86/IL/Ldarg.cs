@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
             }
-            uint xOffset = 12;
+            uint xOffset = 8;
             var xCorrectedOpValValue = xOpVar.Value;
             if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
             {

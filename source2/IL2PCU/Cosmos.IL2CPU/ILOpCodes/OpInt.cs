@@ -7,8 +7,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpInt : ILOpCode {
     public readonly UInt32 Value;
 
-    public OpInt(Code aOpCode, int aPos, UInt32 aValue)
-      : base(aOpCode, aPos) {
+    public OpInt(Code aOpCode, int aPos, int aNextPos, UInt32 aValue)
+      : base(aOpCode, aPos, aNextPos) {
       Value = aValue;
     }
   }

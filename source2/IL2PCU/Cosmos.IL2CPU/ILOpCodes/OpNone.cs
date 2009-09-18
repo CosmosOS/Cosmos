@@ -6,8 +6,8 @@ using System.Text;
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpNone : ILOpCode {
 
-    public OpNone(Code aOpCode, int aPos)
-      : base(aOpCode, aPos) {
+    public OpNone(Code aOpCode, int aPos, int aNextPos)
+      : base(aOpCode, aPos, aNextPos) {
     }
 
   }

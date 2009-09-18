@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86
 		protected uint GetEBPOffsetForLocal(MethodInfo aMethod, OpVar aOp)
 		{
 			var xBody = aMethod.MethodBase.GetMethodBody();
-			uint xOffset = 0;
+			uint xOffset = 4;
 			for(int i = 0; i < xBody.LocalVariables.Count;i++){
 				if (i == aOp.Value)
 				{
@@ -57,10 +57,6 @@ namespace Cosmos.IL2CPU.X86
 			return xOffset;
 		}
 
-		protected string GetLabel(MethodInfo aMethod, ILOpCode aOpCode)
-		{
-            return MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase ) + "__DOT__" + aOpCode.Position.ToString( "X8" ).ToUpper();
-		}
 
         public static uint Align( uint aSize, uint aAlign )
         {

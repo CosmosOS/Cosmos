@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             System.Reflection.MethodBase xMethodIsInstance = Indy.IL2CPU.Compiler.ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
 
-            new Call( Assembler ).Execute( aMethod, new OpMethod( ILOpCode.Code.Call, 0, xMethodIsInstance ) );
+            new Call( Assembler ).Execute( aMethod, new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance) );
 
             new Label( GetLabel( aMethod, aOpCode ) + "_After_IsInstance_Call" );
             Assembler.Stack.Pop();

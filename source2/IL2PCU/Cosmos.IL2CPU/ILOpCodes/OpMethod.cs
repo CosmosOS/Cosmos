@@ -9,8 +9,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     public MethodBase Value;
     public uint ValueUID;
 
-    public OpMethod(Code aOpCode, int aPos, MethodBase aValue)
-      : base(aOpCode, aPos) {
+    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue)
+      : base(aOpCode, aPos, aNextPos) {
       Value = aValue;
     }
   }

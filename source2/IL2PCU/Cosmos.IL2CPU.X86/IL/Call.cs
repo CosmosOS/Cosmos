@@ -9,6 +9,8 @@ using CPU=Cosmos.IL2CPU.X86;
 using CPUx86=Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.X86;
 using System.Reflection;
+using System.Collections.Generic;
+using System.IO;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
 // using Indy.IL2CPU.Compiler;
@@ -32,9 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     }
 
     public static uint GetStackSizeToReservate(MethodBase aMethod) {
-      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod) == "System_UInt32__Cosmos_Kernel_CPU_get_EndOfKernel__") {
-        Console.Write("");
-      }
+      
       var xMethodInfo = aMethod as System.Reflection.MethodInfo;
       uint xReturnSize = 0;
       if (xMethodInfo != null) {
@@ -47,7 +47,10 @@ namespace Cosmos.IL2CPU.X86.IL {
       uint xExtraStackSize = (uint)Align(xReturnSize, 4);
       var xParameters = aMethod.GetParameters();
       foreach (var xItem in xParameters) {
-        xExtraStackSize -= SizeOfType(xItem.GetType());
+        xExtraStackSize -= Align(SizeOfType(xItem.GetType()), 4);
+      }
+      if (!xMethodInfo.IsStatic) {
+        xExtraStackSize -= Align(SizeOfType(xMethodInfo.DeclaringType), 4);
       }
       if (xExtraStackSize > 0) {
         return xExtraStackSize;

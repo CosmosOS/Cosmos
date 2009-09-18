@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
                 new CPUx86.Push { DestinationValue = 0 };
                 //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End( aMethod );
+                //Jump_End( aMethod );
                 new Label( LabelTrue );
                 new CPUx86.Push { DestinationValue = 1 };
 
@@ -66,12 +66,12 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 1 };
                 //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End( aMethod ); 
+                //Jump_End( aMethod ); 
                 new Label( LabelFalse );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 0 };
                 //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End( aMethod );
+                //Jump_End( aMethod );
             }
         }
 

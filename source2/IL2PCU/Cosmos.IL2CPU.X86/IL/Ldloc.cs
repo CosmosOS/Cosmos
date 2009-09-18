@@ -17,13 +17,13 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xOpVar = (OpVar)aOpCode;
 			var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
 			var xStackCount = GetStackCountForLocal(aMethod, xVar);
-			var xEBPOffset = 0 - ((int)GetEBPOffsetForLocal(aMethod, xOpVar));
+			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xOpVar));
 			var xSize = SizeOfType(xVar.LocalType);
 			if (xStackCount > 1)
 			{
 				for (int i = 0; i < xStackCount; i++)
 				{
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(xEBPOffset - (i * 4)) };
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - (xEBPOffset + (i * 4))) };
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 				}
 			}
@@ -35,18 +35,18 @@ namespace Cosmos.IL2CPU.X86.IL
 				{
 					case 1:
 						{
-							new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = xEBPOffset };
+							new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							break;
 						}
 					case 2:
 						{
-							new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = xEBPOffset };
+              new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 
 							break;
 						}
 					case 4:
 						{
-							new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = xEBPOffset };
+              new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							break;
 						}
 				}

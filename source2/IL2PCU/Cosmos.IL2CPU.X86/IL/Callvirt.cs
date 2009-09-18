@@ -45,12 +45,14 @@ namespace Cosmos.IL2CPU.X86.IL
 
 
             //ExtraStackSize = (int)xRoundedSize;
-            uint xExtraStackSize = ( uint )Align( xReturnSize, 4 );
-            var xParameters = xMethodInfo.GetParameters();
+            uint xExtraStackSize = Call.GetStackSizeToReservate(xOpMethod.Value);
             uint xThisOffset = 0;
+            var xParameters = xOpMethod.Value.GetParameters();
             foreach (var xItem in xParameters) {
-              xExtraStackSize -= SizeOfType(xItem.GetType());
-              xThisOffset += SizeOfType(xItem.GetType());
+              xThisOffset += Align(SizeOfType(xItem.GetType()), 4);
+            }
+            if (!xOpMethod.Value.IsStatic) {
+              xThisOffset += Align(SizeOfType(xOpMethod.Value.DeclaringType), 4);
             }
 
             // This is finding offset to self? It looks like we dont need offsets of other
@@ -61,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xExtraStackSize > 0) {
               xThisOffset -= xExtraStackSize;
-                         }
+            }
             new Comment( Assembler, "ThisOffset = " + xThisOffset );
 
             //             Action xEmitCleanup = delegate() {

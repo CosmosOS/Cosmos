@@ -245,8 +245,10 @@ namespace Cosmos.IL2CPU {
     public readonly Code OpCode;
     // Op offset within method. Used for labels etc in assembly.
     public readonly int Position;
+    // position of the next instruction
+    public readonly int NextPosition;
 
-    protected ILOpCode(Code aOpCode, int aPos) {
+    protected ILOpCode(Code aOpCode, int aPos, int aNextPos) {
       OpCode = aOpCode;
       Position = aPos;
     }

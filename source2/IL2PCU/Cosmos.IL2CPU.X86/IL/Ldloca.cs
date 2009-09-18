@@ -13,16 +13,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpVar = (OpVar)aOpCode;
-      uint xAddress = 0;
-      var xBody = aMethod.MethodBase.GetMethodBody();
-      for(int i = 0; i < xOpVar.Value;i++){
-        var xLocal = xBody.LocalVariables[i];
-
-        var xSize = Align(SizeOfType(xLocal.LocalType), 4);
-        xAddress += xSize;
-      }
+      var xAddress = GetEBPOffsetForLocal(aMethod, xOpVar);
+      
       // xAddress contains full size of locals, excluding the actual local
-      xAddress = 4 + xAddress;
+      xAddress = xAddress;
       new CPUx86.Move {
         DestinationReg = CPUx86.Registers.EAX,
         SourceReg = CPUx86.Registers.EBP
