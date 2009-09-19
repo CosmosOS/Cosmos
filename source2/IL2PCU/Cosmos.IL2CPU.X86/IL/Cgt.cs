@@ -30,6 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";
+          var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
             if( xStackItem.Size > 4 )
             {
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESI };
@@ -44,14 +45,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 //value1: ECX:EBX
                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
                 new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
-                //result = value1 - value2
-                //new CPUx86.ConditionalMove(Condition.Greater, "edi", "esi");
-                //new CPUx86.Push { DestinationReg = Registers.EDI };
-
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
                 new CPUx86.Push { DestinationValue = 0 };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                //Jump_End( aMethod );
+                new CPUx86.Jump { DestinationLabel = xNextLabel };
                 new Label( LabelTrue );
                 new CPUx86.Push { DestinationValue = 1 };
 
@@ -65,13 +61,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Label( LabelTrue );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 1 };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                //Jump_End( aMethod ); 
+                new CPUx86.Jump { DestinationLabel = xNextLabel };
                 new Label( LabelFalse );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 0 };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                //Jump_End( aMethod );
             }
         }
 

@@ -18,6 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";
+            var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
 
             if( xSize > 8 )
             {
@@ -34,13 +35,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Label( LabelTrue );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 1 };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End(aMethod);
+                new CPUx86.Jump { DestinationLabel = xNextLabel };
                 new Label( LabelFalse );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 0 };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End(aMethod);
+                new CPUx86.Jump { DestinationLabel = xNextLabel };
                 return;
             }
             if( xSize > 4 )
@@ -60,15 +59,13 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End( aMethod );
+                new CPUx86.Jump { DestinationLabel = xNextLabel };
                 new Label( LabelFalse );
                 //eax = 0
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-                Jump_End( aMethod );
+                new CPUx86.Jump { DestinationLabel = xNextLabel };
                 return;
             }
             throw new Exception( "Case not handled!" );

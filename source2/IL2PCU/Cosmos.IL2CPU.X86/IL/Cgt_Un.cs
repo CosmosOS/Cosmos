@@ -26,6 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 throw new NotImplementedException();
                 return;
             }
+            Assembler.Stack.Pop();
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( bool ) ) );
             string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
             string LabelTrue = BaseLabel + "True";

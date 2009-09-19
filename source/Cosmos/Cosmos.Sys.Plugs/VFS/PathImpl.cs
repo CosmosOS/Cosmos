@@ -24,6 +24,10 @@ namespace Cosmos.Sys.Plugs {
             return aPath.Substring(0, xIndex);
         }
 
+        public static void Cctor() {
+          // todo: implement fully?
+        }
+
         //public static string GetFileName(string aPath)
         //{
         //    int xIndex = aPath.LastIndexOfAny(new char[] { '/', '\\' });

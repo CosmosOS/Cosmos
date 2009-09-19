@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace Cosmos.IL2CPU {
 
-  public class StackContents {
+  public class StackContents: IEnumerable<StackContents.Item> {
     #region class Item
     public sealed class Item {
       public Item(int aSize) {
@@ -89,5 +90,10 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    IEnumerator IEnumerable.GetEnumerator() {
+      foreach (var xItem in mStack) {
+        yield return xItem;
+      }
+    }
   }
 }

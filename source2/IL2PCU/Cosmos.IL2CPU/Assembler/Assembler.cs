@@ -143,10 +143,14 @@ namespace Cosmos.IL2CPU {
       Stack.Clear();
       mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
       mLog.Flush();
-      if (aMethod.PlugMethodAssembler != null) {
+      if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.CPU"
+  && aMethod.MethodBase.Name == "GetAmountOfRAM") {
+        Console.Write("");
+      }
+      if (aMethod.MethodAssembler != null) {
         mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
-        var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.PlugMethodAssembler);
+        var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
         var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;
         if (xNeedsMethodInfo != null) {
           throw new Exception("Plug cant work, because of INeedsMethodInfo");
@@ -626,7 +630,9 @@ namespace Cosmos.IL2CPU {
 
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
 // todo: completely get rid of this kind of trampoline code
-
+      if (MethodInfoLabelGenerator.GenerateLabelName(aFrom.MethodBase) == "System_UInt32__Cosmos_Kernel_CPU_GetAmountOfRAM__") {
+        Console.Write("");
+      }
       MethodBegin(aFrom);
       {
         var xParams = aTo.MethodBase.GetParameters().AsQueryable();

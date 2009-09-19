@@ -17,6 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             OpToken xToken = ( OpToken )aOpCode;
 
+            throw new Exception("Ldtoken not implemented!");
             
 
             //if( mType != null )

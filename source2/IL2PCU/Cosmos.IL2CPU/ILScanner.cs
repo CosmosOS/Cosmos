@@ -124,10 +124,10 @@ namespace Cosmos.IL2CPU {
     protected void ScanPlugs(Dictionary<Type, List<Type>> aPlugs) {
       foreach (var xPlug in aPlugs) {
         var xImpls = xPlug.Value;
+        if (xPlug.Key.FullName == "Cosmos.Kernel.CPU") {
+          Console.Write("");
+        }
         foreach (var xImpl in xImpls) {
-          if (xImpl.FullName == "Indy.IL2CPU.X86.Plugs.CustomImplementations.MS.System.StringImpl") {
-            Console.Write("");
-          }
           #region PlugMethods scan
           foreach (var xMethod in xImpl.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
             PlugMethodAttribute xAttrib = null;
@@ -270,14 +270,14 @@ namespace Cosmos.IL2CPU {
           if (xPlug != null) {
             xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null);
             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-            PlugMethodAttribute xAttrib = null;
-            foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
-              xAttrib = attrib;
-            }
-            if (xAttrib != null) {
-              xPlugAssembler = xAttrib.Assembler;
-            }
-            var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
+            //PlugMethodAttribute xAttrib = null;
+            //foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
+            //  xAttrib = attrib;
+            //}
+            //if (xAttrib != null) {
+            //  xPlugAssembler = xAttrib.Assembler;
+            //}
+            var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo/*, xPlugAssembler*/);
             var xInstructions = mReader.ProcessMethod(xPlug);
             if (xInstructions != null) {
               //ProcessInstructions(xInstructions);
@@ -285,6 +285,14 @@ namespace Cosmos.IL2CPU {
             }
             mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
           } else {
+            PlugMethodAttribute xAttrib = null;
+            foreach (PlugMethodAttribute attrib in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
+              xAttrib = attrib;
+            }
+            if (xAttrib != null) {
+              xPlugAssembler = xAttrib.Assembler;
+            }
+
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
             var xInstructions = mReader.ProcessMethod(xMethod);
             if (xInstructions != null) {
@@ -1000,9 +1008,6 @@ namespace Cosmos.IL2CPU {
       // Check for exact type plugs first, they have precedence
       if (mPlugImpls.TryGetValue(aMethod.DeclaringType, out xImpls)) {
         xResult = ResolvePlug(aMethod.DeclaringType, xImpls, aMethod, aParamTypes);
-      }
-      if (aMethod.DeclaringType.IsSubclassOf(typeof(Delegate))) {
-        Console.Write("");
       }
 
       // Check for inheritable plugs second.

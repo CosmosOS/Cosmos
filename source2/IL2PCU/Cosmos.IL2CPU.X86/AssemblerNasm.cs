@@ -30,10 +30,12 @@ namespace Cosmos.IL2CPU.X86 {
       //    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
       //    Engine.QueueMethod(xTempMethod);
       //}
-      var xBody = aMethod.MethodBase.GetMethodBody();
-      if (xBody != null) {
-        foreach (var xLocal in xBody.LocalVariables) {
-          new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+      if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null) {
+        var xBody = aMethod.MethodBase.GetMethodBody();
+        if (xBody != null) {
+          foreach (var xLocal in xBody.LocalVariables) {
+            new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+          }
         }
       }
       //foreach (var xLocal in aLocals) {
@@ -79,10 +81,6 @@ namespace Cosmos.IL2CPU.X86 {
         if ((xTotalArgsSize - xReturnSize) < 0) {
           //xOffset += (int)(0 - (xTotalArgsSize - xReturnSize));
           xOffset = 8;
-        }
-        if ((/*aMethod.MethodBase.DeclaringType.Name == "TextScreen" && */aMethod.MethodBase.Name=="NewLine")
-          || MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_String__Indy_IL2CPU_CustomImplementation_System_EnvironmentImpl_GetResourceString_System_String__System_Object___") {
-          Console.Write("");
         }
         for (int i = 0; i < xReturnSize / 4; i++) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -130,13 +128,15 @@ namespace Cosmos.IL2CPU.X86 {
       //  // todo: add GC code
       //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
       //}
-     var xBody = aMethod.MethodBase.GetMethodBody();
-     if (xBody != null) {
-       for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--) {
-         int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
-         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
-       }
-     }
+      if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null) {
+        var xBody = aMethod.MethodBase.GetMethodBody();
+        if (xBody != null) {
+          for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--) {
+            int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
+          }
+        }
+      }
       //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
@@ -171,7 +171,15 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
       base.AfterOp(aMethod, aOpCode);
-      new Comment("Stack contains " + Stack.Count + " items");
+      var xContents = "";
+      foreach (var xStackItem in Stack) {
+        xContents += ILOp.Align((uint)xStackItem.Size, 4);
+        xContents += ", ";
+      }
+      if (xContents.EndsWith(", ")) {
+        xContents = xContents.Substring(0, xContents.Length - 2);
+      }
+      new Comment("Stack contains " + Stack.Count + " items: (" + xContents + ")");
     }
 
     // These are all temp functions until we move to the new assembler.
