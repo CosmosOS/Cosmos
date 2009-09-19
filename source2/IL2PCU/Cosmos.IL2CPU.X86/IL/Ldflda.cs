@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,43 +13,43 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            int aExtraOffset = 0;
-            var xType = aMethod.MethodBase.DeclaringType;
-            var xOpCode = ( ILOpCodes.OpField )aOpCode;
-            System.Reflection.FieldInfo xField = xOpCode.Value;
-            bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
-            uint xSize = SizeOfType( xField.FieldType );
+          var xOpCode = (ILOpCodes.OpField)aOpCode;
+          DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName());
+        }
 
-            if( xNeedsGC )
-            {
-                aExtraOffset = 12;
-            }
-            uint xOffset = 0;
+        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField) {
 
-            var xFields = xField.DeclaringType.GetFields();
+          var xFields = GetFieldsInfo(aDeclaringType);
+          var xFieldInfo = (from item in xFields
+                            where item.Id == aField
+                            select item).Single();
 
-            foreach( System.Reflection.FieldInfo xInfo in xFields )
-            {
-                if( xInfo == xField )
-                    break;
+          int xExtraOffset = 0;
+          var xType = aMethod.MethodBase.DeclaringType;
+          bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
 
-                xOffset += SizeOfType( xInfo.FieldType );
-            }
+          if (xNeedsGC) {
+            xExtraOffset = 12;
+          }
+          uint xOffset = 0;
 
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+          var xActualOffset = xFieldInfo.Offset + xExtraOffset;
+          var xSize = xFieldInfo.Size;
 
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( uint )( xOffset + aExtraOffset ) };
-            Assembler.Stack.Pop();
-            Assembler.Stack.Push( new StackContents.Item( 4, xType ) );
+          new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+
+          new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)(xActualOffset) };
+          Assembler.Stack.Pop();
+          Assembler.Stack.Push(new StackContents.Item(4, xType));
 #warning TODO: Implement Plugs
-            //if( aDerefExternalAddress && aField.IsExternalField )
-            //{
-            //    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-            //}
-            //else
-            {
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-            }
+          //if( aDerefExternalAddress && aField.IsExternalField )
+          //{
+          //    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+          //}
+          //else
+          {
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+          }
         }
 
 

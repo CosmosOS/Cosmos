@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             uint xSize = SizeOfType( xType.Value );
 
-            string xTypeID = GetTypeIDLabel(typeof(Array));
+          string xTypeID = GetTypeIDLabel(typeof(Array));
             MethodBase xCtor = typeof( Array ).GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance )[ 0 ];
             string xCtorName = MethodInfoLabelGenerator.GenerateLabelName( xCtor );
 

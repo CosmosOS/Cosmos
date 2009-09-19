@@ -54,6 +54,18 @@ namespace Cosmos.IL2CPU.Profiler {
     public override void EmitEntrypoint(System.Reflection.MethodBase aEntrypoint, IEnumerable<System.Reflection.MethodBase> aMethods) {
       throw new NotImplementedException();
     }
+
+    protected override void Call(MethodInfo aMethod, MethodInfo aTargetMethod) {
+      throw new NotImplementedException();
+    }
+
+    protected override void Ldarg(MethodInfo aMethod, int aIndex) {
+      throw new NotImplementedException();
+    }
+
+    protected override void Ldflda(MethodInfo aMethod, string aFieldId) {
+      throw new NotImplementedException();
+    }
   
   }
 }

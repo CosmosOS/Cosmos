@@ -44,45 +44,45 @@ namespace Cosmos.IL2CPU.X86.IL {
         return 0;
       }
       // todo: implement exception support
-      uint xExtraStackSize = (uint)Align(xReturnSize, 4);
+      int xExtraStackSize = (int)Align(xReturnSize, 4);
       var xParameters = aMethod.GetParameters();
       foreach (var xItem in xParameters) {
-        xExtraStackSize -= Align(SizeOfType(xItem.GetType()), 4);
+        xExtraStackSize -= (int)Align(SizeOfType(xItem.GetType()), 4);
       }
       if (!xMethodInfo.IsStatic) {
-        xExtraStackSize -= Align(SizeOfType(xMethodInfo.DeclaringType), 4);
+        xExtraStackSize -= (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
       }
       if (xExtraStackSize > 0) {
-        return xExtraStackSize;
+        return (uint)xExtraStackSize;
       }
       return 0;
     }
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
-      if (MethodInfoLabelGenerator.GenerateLabelName(xOpMethod.Value) == "System_UInt32__Cosmos_Kernel_CPU_get_EndOfKernel__") {
-        Console.Write("");
+      DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode.Position);
+    }
+
+    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, uint aTargetMethodUID, int aCurrentPosition) {
+      if (aTargetMethod.IsVirtual) {
+        Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
+        return;
       }
-      if( xOpMethod.Value.IsVirtual )
-      {
-          new Callvirt( Assembler ).Execute( aMethod, aOpCode );
-          return;
-      }
-      var xMethodInfo = xOpMethod.Value as System.Reflection.MethodInfo;
-      string xCurrentMethodLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
+      var xMethodInfo = aTargetMethod as System.Reflection.MethodInfo;
+      string xCurrentMethodLabel = MethodInfoLabelGenerator.GenerateLabelName(aCurrentMethod.MethodBase);
 
       // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
       //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
       string xNormalAddress = "";
-      if (xOpMethod.Value.IsStatic || !xOpMethod.Value.IsVirtual || xOpMethod.Value.IsFinal) {
-        xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(xOpMethod.Value);
+      if (aTargetMethod.IsStatic || !aTargetMethod.IsVirtual || aTargetMethod.IsFinal) {
+        xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
       } else {
         throw new Exception("Call: non-concrete method called!");
       }
-      var xParameters = xOpMethod.Value.GetParameters();
+      var xParameters = aTargetMethod.GetParameters();
       int xArgCount = xParameters.Length;
       // todo: implement exception support
-      uint xExtraStackSize = GetStackSizeToReservate(xOpMethod.Value);
+      uint xExtraStackSize = GetStackSizeToReservate(aTargetMethod);
       if (xExtraStackSize > 0) {
         new CPUx86.Sub {
           DestinationReg = CPUx86.Registers.ESP,
@@ -115,14 +115,15 @@ namespace Cosmos.IL2CPU.X86.IL {
       for (int i = 0; i < xParameters.Length; i++) {
         Assembler.Stack.Pop();
       }
+      if (!aTargetMethod.IsStatic) {
+        Assembler.Stack.Pop();
+      }
       if (xMethodInfo == null || SizeOfType(xMethodInfo.ReturnType) == 0) {
         return;
       }
 
       Assembler.Stack.Push((int)SizeOfType(xMethodInfo.ReturnType),
                               xMethodInfo.ReturnType);
-
-
     }
 
     //         public static void EmitExceptionLogic(Assembler.Assembler aAssembler, uint aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup)

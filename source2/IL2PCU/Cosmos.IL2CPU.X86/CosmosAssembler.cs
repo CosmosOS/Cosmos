@@ -217,5 +217,17 @@ namespace Cosmos.IL2CPU.X86 {
           new Pop { DestinationReg = Registers.EBP };
           new Return();
         }
+
+        protected override void Ldarg(MethodInfo aMethod, int aIndex) {
+          IL.Ldarg.DoExecute(this, aMethod, (ushort)aIndex);
+        }
+
+        protected override void Call(MethodInfo aMethod, MethodInfo aTargetMethod) {
+          IL.Call.DoExecute(this, aMethod, aTargetMethod.MethodBase, aTargetMethod.UID, 0);
+        }
+
+        protected override void Ldflda(MethodInfo aMethod, string aFieldId) {
+          IL.Ldflda.DoExecute(this, aMethod, aMethod.MethodBase.DeclaringType, aFieldId);
+        }
   }
 }

@@ -30,8 +30,11 @@ namespace Cosmos.IL2CPU.X86 {
       //    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
       //    Engine.QueueMethod(xTempMethod);
       //}
-      foreach (var xLocal in aMethod.MethodBase.GetMethodBody().LocalVariables) {
-        new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+      var xBody = aMethod.MethodBase.GetMethodBody();
+      if (xBody != null) {
+        foreach (var xLocal in xBody.LocalVariables) {
+          new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+        }
       }
       //foreach (var xLocal in aLocals) {
       //  aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
@@ -127,10 +130,13 @@ namespace Cosmos.IL2CPU.X86 {
       //  // todo: add GC code
       //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
       //}
-      for (int j = aMethod.MethodBase.GetMethodBody().LocalVariables.Count - 1; j >= 0; j--) {
-        int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.GetMethodBody().LocalVariables[j].LocalType), 4);
-        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
-      }
+     var xBody = aMethod.MethodBase.GetMethodBody();
+     if (xBody != null) {
+       for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--) {
+         int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
+       }
+     }
       //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);

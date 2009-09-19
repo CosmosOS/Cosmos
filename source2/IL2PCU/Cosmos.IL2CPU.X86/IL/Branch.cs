@@ -50,7 +50,7 @@ namespace Cosmos.IL2CPU.X86.IL {
           xTestOp = CPU.ConditionalTestEnum.Zero;
           break;
         case ILOpCode.Code.Bge:
-          xTestOp = CPU.ConditionalTestEnum.GreaterThanOrEqualTo;
+          xTestOp = CPU.ConditionalTestEnum.LessThan;
           break;
         case ILOpCode.Code.Bgt:
           xTestOp = CPU.ConditionalTestEnum.GreaterThan;

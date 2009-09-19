@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 // using System.Collections.Generic;
 // using System.IO;
 // 
@@ -44,85 +45,74 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xType = aMethod.MethodBase.DeclaringType;
-            var xOpCode = ( ILOpCodes.OpField )aOpCode;
-            System.Reflection.FieldInfo xField = xOpCode.Value;
+          var xOpCode = (ILOpCodes.OpField)aOpCode;
+          NewMethod(Assembler, xOpCode.Value);
+        }
 
-            Assembler.Stack.Pop();
-            int aExtraOffset = 0;
-            bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
-            uint xSize = SizeOfType( xField.FieldType ); 
-            if( xNeedsGC )
-            {
-                aExtraOffset = 12;
-            }
-            new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+        public static void NewMethod(Assembler Assembler, System.Reflection.FieldInfo xField) {
+          Assembler.Stack.Pop();
+          int xExtraOffset = 0;
+          bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
+          if (xNeedsGC) {
+            xExtraOffset = 12;
+          }
+          new Comment(Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC);
+          new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
-            uint xOffset = 0;
+          var xFields = GetFieldsInfo(xField.DeclaringType);
+          var xFieldInfo = (from item in xFields
+                            where item.Id == xField.GetFullName()
+                            select item).Single();
 
-            var xFields = xField.DeclaringType.GetFields();
+          var xActualOffset = xFieldInfo.Offset + xExtraOffset;
+          var xSize = xFieldInfo.Size;
 
-            foreach( System.Reflection.FieldInfo xInfo in xFields )
-            {
-                if( xInfo == xField )
-                    break;
+          new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
 
-                xOffset += SizeOfType( xInfo.FieldType );  
-            }
-            
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( xOffset + aExtraOffset ) };
+          //throw new NotImplementedException( " Plugs not implemented" );
+          //if( aField.IsExternalField && aDerefExternalField )
+          //{
+          //    new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+          //}
+          //*******
 
-            //throw new NotImplementedException( " Plugs not implemented" );
-            //if( aField.IsExternalField && aDerefExternalField )
-            //{
-            //    new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-            //}
-            //*******
-            
-            for( int i = 1; i <= ( xSize / 4 ); i++ )
-            {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)( xSize - ( i * 4 ) ) };
+          for (int i = 1; i <= (xSize / 4); i++) {
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+          }
+          switch (xSize % 4) {
+            case 1: {
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-            }
-            switch( xSize % 4 )
-            {
-                case 1:
-                    {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                        break;
-                    }
-                case 2:
-                    {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                        break;
-                    }
+                break;
+              }
+            case 2: {
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                break;
+              }
 
-                case 3: //For Release
+            case 3: //For Release
                     {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-                        new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                        break;
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                break;
+              }
+            case 0: {
+                      break;
                     }
-                case 0:
-                    {
-                        break;
-                    }
-                default:
-                    throw new Exception( "Remainder size " + xField.FieldType.ToString() + ( xSize ) + " not supported!" );
-            }
-            if( xNeedsGC )
-            {
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
-            }
-            Assembler.Stack.Push( new StackContents.Item( (int)xSize, xField.FieldType ) );
+            default:
+              throw new Exception("Remainder size " + xField.FieldType.ToString() + (xSize) + " not supported!");
+          }
+          if (xNeedsGC) {
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
+          }
+          Assembler.Stack.Push(new StackContents.Item((int)xSize, xField.FieldType));
         }
 
         // 	public class Ldfld: Op {

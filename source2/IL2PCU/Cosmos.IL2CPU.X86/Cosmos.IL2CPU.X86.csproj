@@ -57,6 +57,7 @@
     <Compile Include="DebugEnums.cs" />
     <Compile Include="Define.cs" />
     <Compile Include="EndIfDefined.cs" />
+    <Compile Include="IL\FieldInfo.cs" />
     <Compile Include="IfDefined.cs" />
     <Compile Include="IfNotDefined.cs" />
     <Compile Include="ILOp.cs" />

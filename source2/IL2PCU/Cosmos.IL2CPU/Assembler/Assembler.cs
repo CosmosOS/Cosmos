@@ -278,7 +278,11 @@ namespace Cosmos.IL2CPU {
         aOutput.WriteLine();
         foreach (DataMember xMember in mDataMembers) {
           aOutput.Write("\t");
-          xMember.WriteText(this, aOutput);
+          if (xMember.IsComment) {
+            aOutput.Write(xMember.Name);
+          } else {
+            xMember.WriteText(this, aOutput);
+          }
           aOutput.WriteLine();
         }
         aOutput.WriteLine();
@@ -616,9 +620,44 @@ namespace Cosmos.IL2CPU {
 
     public abstract void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods);
 
+    protected abstract void Ldarg(MethodInfo aMethod, int aIndex);
+    protected abstract void Ldflda(MethodInfo aMethod, string aFieldId);
+    protected abstract void Call(MethodInfo aMethod, MethodInfo aTargetMethod);
+
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
-      new Label(aFrom.MethodBase);
-      Jump(MethodInfoLabelGenerator.GenerateLabelName(aTo.MethodBase));
+// todo: completely get rid of this kind of trampoline code
+
+      MethodBegin(aFrom);
+      {
+        var xParams = aTo.MethodBase.GetParameters().AsQueryable();
+
+        int xCurParamIdx = 0;
+        if (!aFrom.MethodBase.IsStatic) {
+          Ldarg(aFrom, 0);
+          xParams = xParams.Skip(1);
+          xCurParamIdx++;
+        }
+        foreach (var xParam in xParams) {
+          FieldAccessAttribute xFieldAccessAttrib = null;
+          foreach (var xAttrib in xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true)) {
+            xFieldAccessAttrib = xAttrib as FieldAccessAttribute;
+          }
+
+          if (xFieldAccessAttrib != null) {
+            // field access
+            new Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
+            Ldarg(aFrom, 0);
+            Ldflda(aFrom, xFieldAccessAttrib.Name);
+          } else {
+            // normal field access
+            new Comment("Loading parameter " + xCurParamIdx);
+            Ldarg(aFrom, xCurParamIdx);
+            xCurParamIdx++;
+          }
+        }
+        Call(aFrom, aTo);
+      }
+      MethodEnd(aFrom);
     }
   }
 }

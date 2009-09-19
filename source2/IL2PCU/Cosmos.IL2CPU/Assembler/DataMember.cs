@@ -34,6 +34,11 @@ namespace Cosmos.IL2CPU
                        RawDefaultValue.Length );
         }
 
+        public bool IsComment {
+          get;
+          set;
+        }
+
         public byte[] RawDefaultValue
         {
             get;

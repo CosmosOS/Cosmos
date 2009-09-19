@@ -33,6 +33,10 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
       return "<Exception Message from Native Source>";
     }
 
+    public static void Ctor(Exception aThis, [FieldAccess(Name = "System.String System.Exception._message")]ref string mMessage, string aMessage) {
+      mMessage = aMessage;
+    }
+
     public static string ToString(Exception aThis) {
       return aThis.Message;
     }

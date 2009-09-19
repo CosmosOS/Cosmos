@@ -58,6 +58,9 @@ namespace Cosmos.IL2CPU {
     // descendants. For example, delegates
     protected Dictionary<Type, List<Type>> mPlugImplsInhrt = new Dictionary<Type, List<Type>>();
 
+    // list of field plugs
+    protected IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
+
     // Logging
     // Only use for debugging and profiling.
     protected bool mLogEnabled = false;
@@ -119,8 +122,13 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanPlugs(Dictionary<Type, List<Type>> aPlugs) {
-      foreach (var xImpls in aPlugs.Values) {
+      foreach (var xPlug in aPlugs) {
+        var xImpls = xPlug.Value;
         foreach (var xImpl in xImpls) {
+          if (xImpl.FullName == "Indy.IL2CPU.X86.Plugs.CustomImplementations.MS.System.StringImpl") {
+            Console.Write("");
+          }
+          #region PlugMethods scan
           foreach (var xMethod in xImpl.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
             PlugMethodAttribute xAttrib = null;
             foreach (PlugMethodAttribute x in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false)) {
@@ -137,6 +145,20 @@ namespace Cosmos.IL2CPU {
               }
             }
           }
+          #endregion
+          #region PlugFields scan
+          foreach (var xField in xImpl.GetCustomAttributes(typeof(PlugFieldAttribute), true).Cast<PlugFieldAttribute>()) {
+            IDictionary<string, PlugFieldAttribute> xFields=null;
+            if(!mPlugFields.TryGetValue(xPlug.Key, out xFields)){
+              xFields = new Dictionary<string, PlugFieldAttribute>();
+              mPlugFields.Add(xPlug.Key, xFields);
+            }
+            if (xFields.ContainsKey(xField.FieldId)) {
+              throw new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
+            }
+            xFields.Add(xField.FieldId, xField);
+          }
+          #endregion
         }
       }
     }
@@ -196,6 +218,8 @@ namespace Cosmos.IL2CPU {
       // plugs can use other plugs
       ScanPlugs(mPlugImpls);
       ScanPlugs(mPlugImplsInhrt);
+
+      ILOp.mPlugFields = mPlugFields;
 
       //    // Pull in extra implementations, GC etc.
       Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");

@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stfld )]
@@ -18,26 +21,23 @@ namespace Cosmos.IL2CPU.X86.IL
             System.Reflection.FieldInfo xField = xOpCode.Value;
 
 
-            int aExtraOffset = 0;
+            int xExtraOffset = 0;
             bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
-            uint xSize = SizeOfType( xField.FieldType );
             if( xNeedsGC )
             {
-                aExtraOffset = 12;
+              xExtraOffset = 12;
             }
             new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
 
             uint xOffset = 0;
 
-            var xFields = xField.DeclaringType.GetFields();
+            var xFields = GetFieldsInfo(xField.DeclaringType);
+            var xFieldInfo = (from item in xFields
+                              where item.Id == xField.GetFullName()
+                              select item).Single();
 
-            foreach( System.Reflection.FieldInfo xInfo in xFields )
-            {
-                if( xInfo == xField )
-                    break;
-
-                xOffset += SizeOfType( xInfo.FieldType );
-            }
+            var xActualOffset = xFieldInfo.Offset + xExtraOffset;
+            var xSize = xFieldInfo.Size;
 
             Assembler.Stack.Pop();
             
@@ -48,14 +48,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4 };
                 //Ldfld(aAssembler, aType, aField, false);
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)( xOffset + aExtraOffset ) };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + xExtraOffset) };
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
             }
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
             new CPUx86.Add
             {
                 DestinationReg = CPUx86.Registers.ECX,
-                SourceValue = ( uint )( xOffset + aExtraOffset )
+                SourceValue = (uint)(xOffset + xExtraOffset)
             };
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {

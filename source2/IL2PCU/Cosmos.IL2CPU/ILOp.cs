@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
+    public static IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields;
+
     protected readonly Assembler Assembler;
     protected ILOp(Assembler aAsmblr) {
       Assembler = aAsmblr;
@@ -18,7 +21,6 @@ namespace Cosmos.IL2CPU {
     public static string GetTypeIDLabel(Type aType) {
       return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(aType) + " ASM_IS__" + aType.Assembly.GetName().Name);
     }
-
 
     public static string GetLabel(MethodInfo aMethod, ILOpCode aOpCode) {
       return GetLabel(aMethod, aOpCode.Position);

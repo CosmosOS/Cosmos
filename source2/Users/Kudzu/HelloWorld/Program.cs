@@ -55,11 +55,12 @@ namespace HelloWorld {
       //Console.BackgroundColor = ConsoleColor.Green;
       //TODO: What is this next line for?
       //S.ReallyClearScreen();
-      Console.WriteLine("Congratulations! You just booted C# code.");
-      Console.WriteLine("Edit Program.cs to create your own Operating System.");
-      Console.WriteLine("Press a key to shutdown...");
-      while (true) {
-      }
+      //Console.WriteLine("Congratulations! You just booted C# code.");
+
+      //Console.WriteLine("Edit Program.cs to create your own Operating System.");
+      //Console.WriteLine("Press a key to shutdown...");
+      //while (true) {
+      //}
       if (xTempBool) {
         var xBoot = new Cosmos.Sys.Boot();
         xBoot.Execute();

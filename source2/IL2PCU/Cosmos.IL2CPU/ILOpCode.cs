@@ -251,6 +251,7 @@ namespace Cosmos.IL2CPU {
     protected ILOpCode(Code aOpCode, int aPos, int aNextPos) {
       OpCode = aOpCode;
       Position = aPos;
+      NextPosition = aNextPos;
     }
 
   }

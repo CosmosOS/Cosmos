@@ -14,80 +14,70 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xOpVar = ( OpVar )aOpCode;
-            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
-            uint xReturnSize = 0;
-            if( xMethodInfo != null )
-            {
-                xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
-            }
-            uint xOffset = 8;
-            var xCorrectedOpValValue = xOpVar.Value;
-            if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
-            {
-                // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
-                xCorrectedOpValValue -= 1;
-            }
-            var xParams = aMethod.MethodBase.GetParameters();
-            if( xOpVar.Value == 0 && !aMethod.MethodBase.IsStatic )
-            {
-                // return the this parameter, which is not in .GetParameters()
-                var xCurArgSize = Align( SizeOfType( aMethod.MethodBase.DeclaringType ), 4 );
-                for( int i = xParams.Length - 1; i > xOpVar.Value; i-- )
-                {
-                    var xSize = Align( SizeOfType( xParams[ i ].ParameterType ), 4 );
-                    xOffset += xSize;
-                }
-                uint xExtraSize = 0;
-                if( xReturnSize > xCurArgSize )
-                {
-                    xExtraSize = xCurArgSize - xReturnSize;
-                }
-                xOffset += xExtraSize;
+          var xOpVar = (OpVar)aOpCode;
+          DoExecute(Assembler, aMethod, xOpVar.Value);
+        }
 
-                for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
-                {
-                    new Push
-                    {
-                        DestinationReg = Registers.EBP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
-                    };
-                }
-                Assembler.Stack.Push( ( int )xCurArgSize, aMethod.MethodBase.DeclaringType );
+        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
+          var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+          uint xReturnSize = 0;
+          if (xMethodInfo != null) {
+            xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
+          }
+          uint xOffset = 8;
+          var xCorrectedOpValValue = aParam;
+          if (!aMethod.MethodBase.IsStatic && aParam > 0) {
+            // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
+            xCorrectedOpValValue -= 1;
+          }
+          var xParams = aMethod.MethodBase.GetParameters();
+          if (aParam == 0 && !aMethod.MethodBase.IsStatic) {
+            // return the this parameter, which is not in .GetParameters()
+            var xCurArgSize = Align(SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+            for (int i = xParams.Length - 1; i > aParam; i--) {
+              var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
+              xOffset += xSize;
             }
-            else
-            {
-                for( int i = xParams.Length - 1; i > xCorrectedOpValValue; i-- )
-                {
-                    var xSize = Align( SizeOfType( xParams[ i ].ParameterType ), 4 );
-                    xOffset += xSize;
-                }
-                var xCurArgSize = Align( SizeOfType( xParams[ xCorrectedOpValValue ].ParameterType ), 4 );
-                uint xArgSize = 0;
-                foreach( var xParam in xParams )
-                {
-                    xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
-                }
-                xReturnSize = 0;
-                uint xExtraSize = 0;
-                if( xReturnSize > xArgSize )
-                {
-                    xExtraSize = xArgSize - xReturnSize;
-                }
-                xOffset += xExtraSize;
+            uint xExtraSize = 0;
+            if (xReturnSize > xCurArgSize) {
+              xExtraSize = xCurArgSize - xReturnSize;
+            }
+            xOffset += xExtraSize;
 
-                for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
-                {
-                    new Push
-                    {
-                        DestinationReg = Registers.EBP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = ( int )(xOffset + xCurArgSize - ( ( i + 1 ) * 4 ) )
-                    };
-                }
-                Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );
+            for (int i = 0; i < (xCurArgSize / 4); i++) {
+              new Push {
+                DestinationReg = Registers.EBP,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
+              };
             }
+            Assembler.Stack.Push((int)xCurArgSize, aMethod.MethodBase.DeclaringType);
+          } else {
+            for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--) {
+              var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
+              xOffset += xSize;
+            }
+            var xCurArgSize = Align(SizeOfType(xParams[xCorrectedOpValValue].ParameterType), 4);
+            uint xArgSize = 0;
+            foreach (var xParam in xParams) {
+              xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
+            }
+            xReturnSize = 0;
+            uint xExtraSize = 0;
+            if (xReturnSize > xArgSize) {
+              xExtraSize = xArgSize - xReturnSize;
+            }
+            xOffset += xExtraSize;
+
+            for (int i = 0; i < (xCurArgSize / 4); i++) {
+              new Push {
+                DestinationReg = Registers.EBP,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
+              };
+            }
+            Assembler.Stack.Push((int)xCurArgSize, xParams[xCorrectedOpValValue].ParameterType);
+          }
         }
 
 

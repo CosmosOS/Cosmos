@@ -177,6 +177,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
+              throw new Exception("Not implemented yet: .ctor on value type");
                 /*
                  * Current sitation on stack:
                  *   $ESP       Arg
@@ -241,7 +242,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             uint xSize;
             new Comment( Assembler, "[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]" );
-            for( int i = 1; i < xParams.Length; i++ )
+            for( int i = 0; i < xParams.Length; i++ )
             {
                 xSize = SizeOfType( xParams[ i ].GetType() );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align( xSize, 4 ) };
