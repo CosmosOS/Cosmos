@@ -50,12 +50,21 @@ namespace HelloWorld {
 		//#endregion
 
 		// Main entry point of the kernel
-		public static void Init() {
+		public static unsafe void Init() {
       var xTempBool = false;
       //Console.BackgroundColor = ConsoleColor.Green;
       //TODO: What is this next line for?
       //S.ReallyClearScreen();
-      //Console.WriteLine("Congratulations! You just booted C# code.");
+      //Console.Write("Congratulations! You just booted C# code.");
+
+      byte* xChars = (byte*)0xB8000;
+      xChars[1] = 65;
+      if (true) {
+        xChars[0] = 75;
+      } else {
+        xChars[0] = 78;        
+      }
+      
 
       //Console.WriteLine("Edit Program.cs to create your own Operating System.");
       //Console.WriteLine("Press a key to shutdown...");

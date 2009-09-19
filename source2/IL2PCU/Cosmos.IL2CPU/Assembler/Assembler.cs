@@ -630,9 +630,6 @@ namespace Cosmos.IL2CPU {
 
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
 // todo: completely get rid of this kind of trampoline code
-      if (MethodInfoLabelGenerator.GenerateLabelName(aFrom.MethodBase) == "System_UInt32__Cosmos_Kernel_CPU_GetAmountOfRAM__") {
-        Console.Write("");
-      }
       MethodBegin(aFrom);
       {
         var xParams = aTo.MethodBase.GetParameters().AsQueryable();
@@ -650,7 +647,7 @@ namespace Cosmos.IL2CPU {
           }
 
           if (xFieldAccessAttrib != null) {
-            // field access
+            // field access                                                                                        
             new Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
             Ldarg(aFrom, 0);
             Ldflda(aFrom, xFieldAccessAttrib.Name);

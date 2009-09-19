@@ -151,6 +151,13 @@ namespace Cosmos.Kernel
         {
             Init();
             uint xTemp = mStartAddress;
+            //CPUBus.Write32(0xE9, 0);
+            //CPUBus.Write32(0xE9, mStartAddress);
+            //CPUBus.Write32(0xE9, 0x11111111);
+            //CPUBus.Write32(0xE9, aLength);
+            //CPUBus.Write32(0xE9, 0x22222222);
+            //CPUBus.Write32(0xE9, mStartAddress);
+
             if ((xTemp + aLength) > (mStart + mLength))
             {
                 Console.WriteLine("Too large memory block allocated!");
