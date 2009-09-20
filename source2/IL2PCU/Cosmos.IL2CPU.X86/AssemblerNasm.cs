@@ -139,6 +139,14 @@ namespace Cosmos.IL2CPU.X86 {
         }
       }
       //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
+      //new CPUx86.Compare { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      //new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException + "__2" };
+      //new CPUx86.Xchg { DestinationReg = Registers.BX, SourceReg = Registers.BX };
+      //new CPUx86.Halt();
+      // TODO: not nice coding, still a test
+      new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
+
+      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
       if (xRetSize < 0) {

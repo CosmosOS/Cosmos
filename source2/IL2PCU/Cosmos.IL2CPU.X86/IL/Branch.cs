@@ -45,12 +45,13 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
 
       CPU.ConditionalTestEnum xTestOp;
+      // all conditions are inverted here?
       switch (aOpCode.OpCode) {
         case ILOpCode.Code.Beq:
           xTestOp = CPU.ConditionalTestEnum.Zero;
           break;
         case ILOpCode.Code.Bge:
-          xTestOp = CPU.ConditionalTestEnum.LessThan;
+          xTestOp = CPU.ConditionalTestEnum.GreaterThanOrEqualTo;
           break;
         case ILOpCode.Code.Bgt:
           xTestOp = CPU.ConditionalTestEnum.GreaterThan;
@@ -89,7 +90,7 @@ namespace Cosmos.IL2CPU.X86.IL {
         if (xStackContent.Size <= 4) {
           new CPU.Pop { DestinationReg = CPU.Registers.EAX };
           new CPU.Pop { DestinationReg = CPU.Registers.EBX };
-          new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
+          new CPU.Compare { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EAX };
           new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
         } else {
           new CPU.Pop { DestinationReg = CPU.Registers.EAX };

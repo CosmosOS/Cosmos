@@ -51,7 +51,11 @@ namespace HelloWorld {
 
 		// Main entry point of the kernel
 		public static unsafe void Init() {
-      var xTempBool = false;
+      var xTempBool = true;
+      if (xTempBool) {
+        var xBoot = new Cosmos.Sys.Boot();
+        xBoot.Execute();
+      }
       //Console.BackgroundColor = ConsoleColor.Green;
       //TODO: What is this next line for?
       //S.ReallyClearScreen();
@@ -66,7 +70,8 @@ namespace HelloWorld {
       //  xChars[0] = 78;
       //}
       Console.WriteLine(xMessage);
-      Console.WriteLine(xMessage);
+      var xMyInt = 78625;
+      //Console.WriteLine(xMyInt.ToString());
 
 //      Console.Write(xMessage);      
       //var xTempBool2 = false;
@@ -82,10 +87,7 @@ namespace HelloWorld {
       //Console.WriteLine("Press a key to shutdown...");
       //while (true) {
       //}
-      if (xTempBool) {
-        var xBoot = new Cosmos.Sys.Boot();
-        xBoot.Execute();
-      }
+      
       
       //Console.Read();
       //Cosmos.Sys.Deboot.ShutDown();

@@ -45,6 +45,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
+          if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Int32__System_Collections_Generic_List_1___Cosmos_Hardware_Keyboard_KeyMapping__get_Count__") {
+            Console.Write("");
+          }
           var xOpCode = (ILOpCodes.OpField)aOpCode;
           NewMethod(Assembler, xOpCode.Value);
         }
@@ -52,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public static void NewMethod(Assembler Assembler, System.Reflection.FieldInfo xField) {
           Assembler.Stack.Pop();
           int xExtraOffset = 0;
-          bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
+          bool xNeedsGC = xField.DeclaringType.IsClass && !xField.DeclaringType.IsValueType;
           if (xNeedsGC) {
             xExtraOffset = 12;
           }

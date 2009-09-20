@@ -6490,9 +6490,11 @@ namespace Cosmos.Hardware {
         /// <param name="rDevices">The list of Devices</param>
         private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
             //Console.WriteLine("Enumerate " + aBus ); 
-            for (byte xSlot = 0; xSlot < 32; xSlot++) {                
+            for (byte xSlot = 0; xSlot < 1; xSlot++) {
+              //for (byte xSlot = 0; xSlot < 32; xSlot++) {                
                 byte xMaxFunctions = 1;
-                for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
+                //for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
+                for (byte xFunction = 0; xFunction < 1; xFunction++) {
                     PCIDevice xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
                     if (xPCIDevice.DeviceExists) {
                         if (xPCIDevice.HeaderType == 2) { /* PCIHeaderType.Cardbus */
@@ -6514,6 +6516,7 @@ namespace Cosmos.Hardware {
                         }
                     }
                 }
+                break;
             }
         }
     }

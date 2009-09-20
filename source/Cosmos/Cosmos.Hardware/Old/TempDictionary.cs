@@ -68,7 +68,7 @@ namespace Cosmos.Hardware
 
         public bool ContainsKey(UInt32 key)
         {
-            for (int i = 0; i < items.Count; i++)
+          for (int i = 0; i < items.Count; i++)
             {
                 if (items[i].Key == key)
                 {
