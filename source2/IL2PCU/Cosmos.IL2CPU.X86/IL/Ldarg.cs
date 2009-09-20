@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
           if (aParam == 0 && !aMethod.MethodBase.IsStatic) {
             // return the this parameter, which is not in .GetParameters()
             var xCurArgSize = Align(SizeOfType(aMethod.MethodBase.DeclaringType), 4);
-            for (int i = xParams.Length - 1; i > aParam; i--) {
+            for (int i = xParams.Length - 1; i >= aParam; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
               xOffset += xSize;
             }

@@ -55,15 +55,26 @@ namespace HelloWorld {
       //Console.BackgroundColor = ConsoleColor.Green;
       //TODO: What is this next line for?
       //S.ReallyClearScreen();
-      //Console.Write("Congratulations! You just booted C# code.");
+      var xMessage = "Congratulations! You just booted C# code.";
+      //var xChar = xMessage[0];
+      //var xByte = (byte)xChar;
+      
+      //byte* xChars = (byte*)0xB8000;
+      //if (xByte == 67) {
+      //  xChars[0] = 74;
+      //} else {
+      //  xChars[0] = 78;
+      //}
+      Console.WriteLine(xMessage);
+      Console.WriteLine(xMessage);
 
-      byte* xChars = (byte*)0xB8000;
+//      Console.Write(xMessage);      
       //var xTempBool2 = false;
       //if (xTempBool2) {
-        xChars[1] = 7;
-        xChars[0] = 65;
-        //} else {
-//        xChars[0] = 66;
+      //  xChars[1] = 7;
+      //  xChars[0] = 65;
+      //  } else {
+      //  xChars[0] = 66;
       //}
       
 
