@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86 {
           break;
         }
         var xField = xBody.LocalVariables[i];
-        xOffset += GetStackCountForLocal(aMethod, xField);
+        xOffset += GetStackCountForLocal(aMethod, xField) * 4;
       }
       return xOffset;
     }

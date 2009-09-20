@@ -111,7 +111,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = ( uint )xGCFieldCount, Size = 32 };
                 uint xSize = ( uint )( ( ( from item in xParams
                                            let xQSize = Align( SizeOfType( item.GetType() ), 4 )
-                                           select ( int )xQSize ).Take( xParams.Length - 1 ).Sum() ) );
+                                           select ( int )xQSize ).Take( xParams.Length).Sum() ) );
 
                 foreach( var xParam in xParams )
                 {

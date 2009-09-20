@@ -58,12 +58,13 @@ namespace HelloWorld {
       //Console.Write("Congratulations! You just booted C# code.");
 
       byte* xChars = (byte*)0xB8000;
-      xChars[1] = 65;
-      if (true) {
-        xChars[0] = 75;
-      } else {
-        xChars[0] = 78;        
-      }
+      //var xTempBool2 = false;
+      //if (xTempBool2) {
+        xChars[1] = 7;
+        xChars[0] = 65;
+        //} else {
+//        xChars[0] = 66;
+      //}
       
 
       //Console.WriteLine("Edit Program.cs to create your own Operating System.");

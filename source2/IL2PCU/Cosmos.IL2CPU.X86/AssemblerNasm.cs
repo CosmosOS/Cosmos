@@ -34,6 +34,7 @@ namespace Cosmos.IL2CPU.X86 {
         var xBody = aMethod.MethodBase.GetMethodBody();
         if (xBody != null) {
           foreach (var xLocal in xBody.LocalVariables) {
+            new Comment("Local " + xLocal.LocalIndex);
             new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
           }
         }
