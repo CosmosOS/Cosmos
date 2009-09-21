@@ -1,4 +1,4 @@
-﻿//#define WRITE_TO_DEBUG
+﻿#define WRITE_TO_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -254,7 +254,7 @@ namespace Cosmos.Hardware {
 		public static void WriteSerialString(string aData) {
 #if WRITE_TO_DEBUG
 			for (int i = 0; i < aData.Length; i++) {
-				Serial.WriteSerial(2, (byte)aData[i]);
+				Serial.WriteSerial(1, (byte)aData[i]);
 			}
 #endif
 			//Console.Write(aData);

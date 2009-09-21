@@ -144,7 +144,7 @@ namespace Cosmos.IL2CPU.X86 {
       //new CPUx86.Xchg { DestinationReg = Registers.BX, SourceReg = Registers.BX };
       //new CPUx86.Halt();
       // TODO: not nice coding, still a test
-      new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
+      //new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
 
       new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };

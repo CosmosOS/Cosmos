@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
     public class Interrupts {
@@ -124,6 +125,9 @@ namespace Cosmos.Hardware {
 
         public static void AddIRQHandler(byte IRQ, InterruptDelegate handler)
         {
+          Console.Write("Adding IRQ handler for IRQ");
+          WriteNumber(IRQ, 8);
+          Console.WriteLine("");
             if (mIRQ_Handlers == null)
             {
                 mIRQ_Handlers = new TempDictionary<InterruptDelegate>();
@@ -135,14 +139,19 @@ namespace Cosmos.Hardware {
             } else {
                 mIRQ_Handlers[IRQ] = handler;
             }
+            if (!mIRQ_Handlers.ContainsKey(IRQ)) {
+              Console.WriteLine("ERROR: after adding, it's still not in the list");
+              while (true) { CPU.Halt(); }
+            }
         }
 
         private static void IRQ(uint irq,ref InterruptContext aContext)
         {
             InterruptDelegate callback;
-            if(mIRQ_Handlers.TryGetValue(irq, out callback) == true)
-            {
-                callback(ref aContext);
+            if (mIRQ_Handlers.TryGetValue(irq, out callback) == true) {
+              callback(ref aContext);
+            } else {
+              Console.WriteLine("No handler found for IRQ01");
             }
         }
 
@@ -192,6 +201,7 @@ namespace Cosmos.Hardware {
             //
             // Triggers IL2CPU error
             DebugUtil.LogInterruptOccurred(ref aContext);
+            Console.WriteLine("Handling IRQ01");
             IRQ(1, ref aContext);
             //mIRQ_Handlers[1](ref aContext);
             //
@@ -202,7 +212,7 @@ namespace Cosmos.Hardware {
             //Cosmos.Hardware.PC
             //
             // - End change area
-
+            Console.WriteLine("Signal PIC primary");
             PIC.SignalPrimary();
         }
 
@@ -525,7 +535,7 @@ namespace Cosmos.Hardware {
             #endregion
         }
 
-        private static void WriteNumber(uint aValue,
+        public static void WriteNumber(uint aValue,
                                         byte aBitCount) {
             uint xValue = aValue;
             byte xCurrentBits = aBitCount;

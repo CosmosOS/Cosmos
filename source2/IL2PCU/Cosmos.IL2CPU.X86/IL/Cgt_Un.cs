@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
                 //new CPUx86.Push { DestinationReg = Registers.EDI };
 
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
                 new CPUx86.Push { DestinationValue = 0 };
                 new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                 new Label( LabelTrue );

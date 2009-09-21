@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-          if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Int32__System_Collections_Generic_List_1___Cosmos_Hardware_Keyboard_KeyMapping__get_Count__") {
+          if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__Cosmos_Hardware_TempDictionary_1_DictionaryItem___System_String___ctor_System_UInt32__System_String_") {
             Console.Write("");
           }
           var xOpCode = (ILOpCodes.OpField)aOpCode;

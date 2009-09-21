@@ -29,6 +29,9 @@ namespace Cosmos.Hardware
             public DictionaryItem(UInt32 key, Value avalue)
             {
                 this.key = key;
+                Console.Write("..ctor. this.key = ");
+                Interrupts.WriteNumber(this.key, 32);
+                Console.WriteLine("");
                 this._value = avalue;
             }
         }
@@ -49,11 +52,21 @@ namespace Cosmos.Hardware
 
         public void Add(UInt32 key, Value value)
         {
+          Console.Write("In .Add. key = ");
+          Interrupts.WriteNumber(key, 32);
             items.Add(new TempDictionary<Value>.DictionaryItem(key, value));
+            Console.WriteLine("");
+            Console.Write("  After adding, count is: ");
+            Interrupts.WriteNumber((uint)items.Count, 32);
+            Console.Write(" and key is ");
+            Interrupts.WriteNumber(items[items.Count - 1].Key, 32);
+            Console.WriteLine("");
         }
 
         public bool TryGetValue(UInt32 key, out Value value)
         {
+          //Console.Write("Number of items found: ");
+          //Console.WriteLine(items.Count.ToString());
             for (int i = 0; i < items.Count; i++)
             {
                 if (items[i].Key == key)
@@ -68,8 +81,17 @@ namespace Cosmos.Hardware
 
         public bool ContainsKey(UInt32 key)
         {
+          Console.Write("Number of items found: ");
+          Interrupts.WriteNumber((uint)items.Count, 32);
+          Console.WriteLine("");
           for (int i = 0; i < items.Count; i++)
             {
+            Console.Write("   Item ");
+            Interrupts.WriteNumber((uint)i, 8);
+            Console.Write(" Key ");
+            Interrupts.WriteNumber(items[i].Key, 32);
+            Console.WriteLine("");
+
                 if (items[i].Key == key)
                 {
                     return true;

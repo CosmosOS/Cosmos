@@ -6,6 +6,7 @@ using Indy.IL2CPU.Assembler.X86;
 using S = Cosmos.Hardware.TextScreen;
 using System.IO;
 using Indy.IL2CPU;
+using Cosmos.Hardware;
 
 namespace HelloWorld {
 	class Program {
@@ -51,11 +52,25 @@ namespace HelloWorld {
 
 		// Main entry point of the kernel
 		public static unsafe void Init() {
-      var xTempBool = true;
+      var xTempBool = false;
       if (xTempBool) {
         var xBoot = new Cosmos.Sys.Boot();
         xBoot.Execute();
       }
+
+      var xTempDict = new TempDictionary<string>();
+      var xStr1 = "String 1";
+      var xStr2 = "String 2";
+      xTempDict.Add(1, xStr1);
+      if (!xTempDict.ContainsKey(1)) {
+        Console.WriteLine("Not added!");
+      } else {
+        Console.WriteLine("Added!");
+      }
+
+
+
+      return;
       //Console.BackgroundColor = ConsoleColor.Green;
       //TODO: What is this next line for?
       //S.ReallyClearScreen();
@@ -70,8 +85,8 @@ namespace HelloWorld {
       //  xChars[0] = 78;
       //}
       Console.WriteLine(xMessage);
-      var xMyInt = 78625;
-      //Console.WriteLine(xMyInt.ToString());
+      Console.Write("Read: ");
+      Console.WriteLine(Console.ReadLine());
 
 //      Console.Write(xMessage);      
       //var xTempBool2 = false;

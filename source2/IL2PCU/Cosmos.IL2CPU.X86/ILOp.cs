@@ -70,7 +70,11 @@ namespace Cosmos.IL2CPU.X86 {
 
     private static void DoGetFieldsInfo(Type aType, List<IL.FieldInfo> aFields) {
       var xCurList = new Dictionary<string, IL.FieldInfo>();
-      foreach (var xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+      var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                                orderby item.GetFullName()
+                                select item).ToArray();
+      for(int i = 0; i < xFields.Length;i++){
+        var xField = xFields[i];
         // todo: should be possible to have GetFields only return fields from a given type, thus removing need of next statement
         if (xField.DeclaringType != aType) {
           continue;
