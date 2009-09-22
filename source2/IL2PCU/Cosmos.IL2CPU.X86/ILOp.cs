@@ -71,7 +71,7 @@ namespace Cosmos.IL2CPU.X86 {
     private static void DoGetFieldsInfo(Type aType, List<IL.FieldInfo> aFields) {
       var xCurList = new Dictionary<string, IL.FieldInfo>();
       var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                                orderby item.GetFullName()
+                                orderby item.ToString()
                                 select item).ToArray();
       for(int i = 0; i < xFields.Length;i++){
         var xField = xFields[i];
@@ -112,6 +112,9 @@ namespace Cosmos.IL2CPU.X86 {
       }
     }
     protected static List<IL.FieldInfo> GetFieldsInfo(Type aType) {
+      if (aType.IsGenericType) {
+        Console.Write("");
+      }
       var xResult = new List<IL.FieldInfo>();
       DoGetFieldsInfo(aType,xResult);
       xResult.Reverse();
@@ -121,6 +124,12 @@ namespace Cosmos.IL2CPU.X86 {
         xOffset += xInfo.Size;
       }
       return xResult;
+    }
+
+    protected static uint GetStorageSize(Type aType) {
+      return (from item in GetFieldsInfo(aType)
+              orderby item.Offset descending
+              select item.Offset + item.Size).FirstOrDefault();
     }
   }
 }

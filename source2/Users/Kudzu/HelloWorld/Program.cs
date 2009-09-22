@@ -62,11 +62,11 @@ namespace HelloWorld {
       var xStr1 = "String 1";
       var xStr2 = "String 2";
       xTempDict.Add(1, xStr1);
-      if (!xTempDict.ContainsKey(1)) {
-        Console.WriteLine("Not added!");
-      } else {
-        Console.WriteLine("Added!");
-      }
+      //if (!xTempDict.ContainsKey(1)) {
+      //  Console.WriteLine("Not added!");
+      //} else {
+      //  Console.WriteLine("Added!");
+      //}
 
 
 

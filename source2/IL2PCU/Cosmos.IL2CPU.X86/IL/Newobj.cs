@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     Assembler.Stack.Pop();
                 }
 
-                uint xMemSize = SizeOfType( xType );
+                uint xMemSize = GetStorageSize(xType);
                 int xExtraSize = 20;
                 new CPUx86.Push { DestinationValue = ( uint )( xMemSize + xExtraSize ) };
 

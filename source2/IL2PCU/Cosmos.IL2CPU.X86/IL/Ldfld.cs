@@ -72,8 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
 
-          //throw new NotImplementedException( " Plugs not implemented" );
-          //if( aField.IsExternalField && aDerefExternalField )
+          //if( aField.IsExternalField/* && aDerefExternalField */)
           //{
           //    new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
           //}

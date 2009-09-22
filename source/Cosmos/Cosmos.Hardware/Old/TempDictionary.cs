@@ -59,7 +59,8 @@ namespace Cosmos.Hardware
             Console.Write("  After adding, count is: ");
             Interrupts.WriteNumber((uint)items.Count, 32);
             Console.Write(" and key is ");
-            Interrupts.WriteNumber(items[items.Count - 1].Key, 32);
+            Interrupts.WriteNumber(items[0].Key, 32);
+            //Interrupts.WriteNumber(items[items.Count - 1].Key, 32);
             Console.WriteLine("");
         }
 

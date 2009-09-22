@@ -394,6 +394,7 @@ namespace Indy.IL2CPU.IL.X86
                     }
 
                 case 3: //TODO 
+                    throw new NotImplementedException();
                     break;
                 case 0:
                     {

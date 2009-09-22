@@ -81,6 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
 
                 case 3: //TODO 
+                    throw new NotImplementedException();
                     break;
                 case 0:
                     {

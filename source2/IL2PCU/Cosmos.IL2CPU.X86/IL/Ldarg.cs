@@ -20,6 +20,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
           var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+          if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Int32__System_Collections_Generic_List_1___Cosmos_Hardware_Keyboard_KeyMapping__get_Count__") {
+            Console.Write("");
+          }
           uint xReturnSize = 0;
           if (xMethodInfo != null) {
             xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
