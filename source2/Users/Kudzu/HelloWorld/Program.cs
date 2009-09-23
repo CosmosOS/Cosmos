@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
@@ -8,8 +9,13 @@ using System.IO;
 using Indy.IL2CPU;
 using Cosmos.Hardware;
 
+using Value = System.String;
+
 namespace HelloWorld {
 	class Program {
+    private static void TestMethod(object aSender, EventArgs e) {
+      Console.WriteLine("Callback?");
+    }
 		//#region Cosmos Builder logic
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
@@ -52,21 +58,15 @@ namespace HelloWorld {
 
 		// Main entry point of the kernel
 		public static unsafe void Init() {
-      var xTempBool = false;
+      var xTempBool = true;
       if (xTempBool) {
         var xBoot = new Cosmos.Sys.Boot();
         xBoot.Execute();
       }
+      Console.WriteLine("Done");
 
-      var xTempDict = new TempDictionary<string>();
-      var xStr1 = "String 1";
-      var xStr2 = "String 2";
-      xTempDict.Add(1, xStr1);
-      //if (!xTempDict.ContainsKey(1)) {
-      //  Console.WriteLine("Not added!");
-      //} else {
-      //  Console.WriteLine("Added!");
-      //}
+      var xMethod = new EventHandler(TestMethod);
+      xMethod(null, null);
 
 
 

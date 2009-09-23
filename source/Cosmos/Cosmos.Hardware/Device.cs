@@ -30,11 +30,11 @@ namespace Cosmos.Hardware {
 
         public static void DriversInit()
         {
-            for( int d=0; d<mDriverInits.Count; d++)
-            {
-                InitializeDriver dlgt = mDriverInits[d];
-                dlgt();
-            }
+            //for( int d=0; d<mDriverInits.Count; d++)
+            //{
+            //    InitializeDriver dlgt = mDriverInits[d];
+            //    dlgt();
+            //}
         }
 
 		public Device() {
