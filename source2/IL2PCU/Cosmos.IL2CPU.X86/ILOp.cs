@@ -71,7 +71,7 @@ namespace Cosmos.IL2CPU.X86 {
     private static void DoGetFieldsInfo(Type aType, List<IL.FieldInfo> aFields) {
       var xCurList = new Dictionary<string, IL.FieldInfo>();
       var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                                orderby item.ToString()
+                                orderby item.Name, item.DeclaringType.ToString()
                                 select item).ToArray();
       for(int i = 0; i < xFields.Length;i++){
         var xField = xFields[i];

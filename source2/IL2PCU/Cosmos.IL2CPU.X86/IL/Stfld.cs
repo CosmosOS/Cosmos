@@ -34,11 +34,9 @@ namespace Cosmos.IL2CPU.X86.IL
             var xFieldInfo = (from item in xFields
                               where item.Id == xField.GetFullName()
                               select item).Single();
-            if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__Cosmos_Hardware_TempDictionary_1_DictionaryItem___System_String___ctor_System_UInt32__System_String_"
-              && xField.GetFullName().Contains("key")) {
+            if (GetLabel(aMethod, aOpCode) == "System_Void__System_Collections_Generic_List_1___System_IO_FileInfo__Add_System_IO_FileInfo___DOT__0000002F") {
               Console.Write("");
             }
-
             var xActualOffset = xFieldInfo.Offset + xExtraOffset;
             var xSize = xFieldInfo.Size;
 

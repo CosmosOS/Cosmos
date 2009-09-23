@@ -22,6 +22,25 @@ namespace Cosmos.IL2CPU.X86.IL
       Y.EAX = Y.Reference(xDataName);
       Y.EAX.Push();
       Assembler.Stack.Push(4, typeof(string));
+      // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!
+      var xFields = GetFieldsInfo(typeof(string));
+      if (xFields[0].Id != "$$Storage$$"
+        || xFields[0].Offset != 0) {
+        throw new Exception("Fields changed!");
+      }
+      if (xFields[1].Id != "System.Int32 System.String.m_stringLength"
+        || xFields[1].Offset != 4) {
+        throw new Exception("Fields changed!");
+      }
+      if (xFields[2].Id != "System.Char System.String.m_firstChar"
+        || xFields[2].Offset != 8) {
+        throw new Exception("Fields changed!");
+      }
+      if (xFields[3].Id != "System.Int32 System.String.m_arrayLength"
+        || xFields[3].Offset != 12) {
+        throw new Exception("Fields changed!");
+      }
+      Console.Write("");
     }
 
     public static string GetContentsArrayName(string aLiteral) {
@@ -51,8 +70,8 @@ namespace Cosmos.IL2CPU.X86.IL
       xObjectData[2] = 1;
       xObjectData[3] = ElementReference.New(xDataName + "__Contents");
       xObjectData[4] = aLiteral.Length;
-      xObjectData[5] = aLiteral.Length;
-      xObjectData[6] = ElementReference.New(xDataName + "__Contents", 16);
+      xObjectData[5] = ElementReference.New(xDataName + "__Contents", 16);
+      xObjectData[6] = aLiteral.Length;
       xAsm.DataMembers.Add(new CPU.DataMember(xDataName, xObjectData));
       xAsm.DataMembers.Add(new CPU.DataMember(xDataName + "__Contents", xByteArray));
       //mDataMemberMap.Add(aLiteral, xDataMember);

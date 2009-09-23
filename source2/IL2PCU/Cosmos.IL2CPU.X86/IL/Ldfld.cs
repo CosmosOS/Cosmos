@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-          if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__Cosmos_Hardware_TempDictionary_1_DictionaryItem___System_String___ctor_System_UInt32__System_String_") {
+          if (GetLabel(aMethod, aOpCode) == "System_Void__System_Collections_Generic_List_1___System_IO_FileInfo__Add_System_IO_FileInfo___DOT__00000026") {
             Console.Write("");
           }
           var xOpCode = (ILOpCodes.OpField)aOpCode;
