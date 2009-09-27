@@ -20,7 +20,11 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
-      new Label(aMethod.MethodBase);
+      if (aMethod.PluggedByMethod != null) {
+        new Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedByMethod.MethodBase));
+      } else {
+        new Label(aMethod.MethodBase);
+      }
       new Push { DestinationReg = Registers.EBP };
       new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       //new CPUx86.Push("0");
@@ -57,7 +61,7 @@ namespace Cosmos.IL2CPU.X86 {
       if (xMethInfo != null) {
         xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
       }
-      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameNormal);
+      new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
       new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
       var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                             select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
@@ -94,7 +98,7 @@ namespace Cosmos.IL2CPU.X86 {
         }
         // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
       }
-      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException);
+      new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException);
       //for (int i = 0; i < aLocAllocItemCount; i++) {
       //  new CPUx86.Call { DestinationLabel = aHeapFreeLabel };
       //}
@@ -146,7 +150,7 @@ namespace Cosmos.IL2CPU.X86 {
       // TODO: not nice coding, still a test
       //new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
 
-      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException + "__2");
+      new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
       if (xRetSize < 0) {

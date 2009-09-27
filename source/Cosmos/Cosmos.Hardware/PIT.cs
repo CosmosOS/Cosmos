@@ -305,8 +305,8 @@ namespace Cosmos.Hardware
 
         public static void Init()
         {
-          T0RateGen = true;
-          T0Countdown = _T0Countdown;
+          //T0RateGen = true;
+          //T0Countdown = _T0Countdown;
         }
     }
 }

@@ -51,16 +51,14 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
             }
-
-            //if( mAddresses == null || mAddresses.Length == 0 )
-            //{
-            //    throw new Exception( "No Address Specified!" );
-            //}
-            //for( int i = ( mAddresses.Length - 1 ); i >= 0; i -= 1 )
-            //{
-            //    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            //    new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mAddresses[ i ], SourceReg = CPUx86.Registers.EAX };
-            //}
+            for (int i = xParams.Length - 1; i >= xOpVar.Value; i--) {
+              var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
+              xOffset += xSize;
+            }
+            for (int i = 0; i < (xCurArgSize / 4); i++) {
+              new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+              new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4)), SourceReg = CPUx86.Registers.EAX };
+            }
             Assembler.Stack.Pop();
         }
 

@@ -49,23 +49,22 @@ namespace Cosmos.IL2CPU.X86.IL
             Console.Write("");
           }
           var xOpCode = (ILOpCodes.OpField)aOpCode;
-          NewMethod(Assembler, xOpCode.Value);
+          DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName());
         }
 
-        public static void NewMethod(Assembler Assembler, System.Reflection.FieldInfo xField) {
+        public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId) {
           Assembler.Stack.Pop();
           int xExtraOffset = 0;
-          bool xNeedsGC = xField.DeclaringType.IsClass && !xField.DeclaringType.IsValueType;
+          var xFields = GetFieldsInfo(aDeclaringType);
+          var xFieldInfo = (from item in xFields
+                            where item.Id == xFieldId
+                            select item).Single();
+          bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
           if (xNeedsGC) {
             xExtraOffset = 12;
           }
-          new Comment(Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC);
+          new Comment(Assembler, "Type = '" + xFieldInfo.FieldType.FullName + "', NeedsGC = " + xNeedsGC);
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-
-          var xFields = GetFieldsInfo(xField.DeclaringType);
-          var xFieldInfo = (from item in xFields
-                            where item.Id == xField.GetFullName()
-                            select item).Single();
 
           var xActualOffset = xFieldInfo.Offset + xExtraOffset;
           var xSize = xFieldInfo.Size;
@@ -108,13 +107,13 @@ namespace Cosmos.IL2CPU.X86.IL
                       break;
                     }
             default:
-              throw new Exception("Remainder size " + xField.FieldType.ToString() + (xSize) + " not supported!");
+              throw new Exception("Remainder size " + xFieldInfo.FieldType.ToString() + (xSize) + " not supported!");
           }
           if (xNeedsGC) {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
             new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
           }
-          Assembler.Stack.Push(new StackContents.Item((int)xSize, xField.FieldType));
+          Assembler.Stack.Push(new StackContents.Item((int)xSize, xFieldInfo.FieldType));
         }
 
         // 	public class Ldfld: Op {

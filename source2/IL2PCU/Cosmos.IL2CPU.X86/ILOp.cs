@@ -21,11 +21,11 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected void Jump_Exception(MethodInfo aMethod) {
       // todo: port to numeric labels
-      new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + AssemblerNasm.EndOfMethodLabelNameException };
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AssemblerNasm.EndOfMethodLabelNameException };
     }
 
     protected void Jump_End(MethodInfo aMethod) {
-      new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + AssemblerNasm.EndOfMethodLabelNameNormal };
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AssemblerNasm.EndOfMethodLabelNameNormal };
     }
 
     protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField) {

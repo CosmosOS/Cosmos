@@ -633,10 +633,7 @@ namespace Cosmos.IL2CPU {
       MethodBegin(aFrom);
       {
         var xParams = aTo.MethodBase.GetParameters().AsQueryable();
-        if (MethodInfoLabelGenerator.GenerateLabelName(aFrom.MethodBase) == "System_Char__System_String_get_Chars_System_Int32_") {
-          Console.Write("");
-        }
-
+        
         int xCurParamIdx = 0;
         if (!aFrom.MethodBase.IsStatic) {
           Ldarg(aFrom, 0);

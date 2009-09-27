@@ -222,7 +222,11 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     protected override void Call(MethodInfo aMethod, MethodInfo aTargetMethod) {
-      IL.Call.DoExecute(this, aMethod, aTargetMethod.MethodBase, aTargetMethod.UID, 0);
+      var xSize = IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
+      if (xSize > 0) {
+        new CPU.Sub { DestinationReg = Registers.ESP, SourceValue = xSize };
+      }
+      new CPU.Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
     }
 
     protected override void Ldflda(MethodInfo aMethod, string aFieldId) {

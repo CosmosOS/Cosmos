@@ -25,6 +25,7 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
     public override void AssembleNew(object aAssembler, object aMethodInfo) {
       var xAssembler = (CosmosAssembler)aAssembler;
       var xMethodInfo = (Cosmos.IL2CPU.MethodInfo) aMethodInfo;
+      new Comment("XXXXXXX");
       // param 0 is instance of eventhandler
       // param 1 is sender
       // param 2 is eventargs

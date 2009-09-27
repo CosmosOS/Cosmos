@@ -26,8 +26,16 @@ namespace Cosmos.IL2CPU {
       return GetLabel(aMethod, aOpCode.Position);
     }
 
+    public static string GetMethodLabel(MethodInfo aMethod) {
+      if (aMethod.PluggedByMethod != null) {
+        return "PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedByMethod.MethodBase);
+      } else {
+        return MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
+      }
+    }
+
     public static string GetLabel(MethodInfo aMethod, int aPos) {
-      return MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "__DOT__" + aPos.ToString("X8").ToUpper();
+      return GetMethodLabel(aMethod) + "__DOT__" + aPos.ToString("X8").ToUpper();
     }
 
     public static uint SizeOfType(Type aType) {

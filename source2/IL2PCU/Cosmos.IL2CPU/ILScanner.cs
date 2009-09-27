@@ -270,18 +270,21 @@ namespace Cosmos.IL2CPU {
           if (xPlug != null) {
             xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null);
             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-            //PlugMethodAttribute xAttrib = null;
-            //foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
-            //  xAttrib = attrib;
-            //}
-            //if (xAttrib != null) {
-            //  xPlugAssembler = xAttrib.Assembler;
-            //}
+            PlugMethodAttribute xAttrib = null;
+            foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
+              xAttrib = attrib;
+            }
+            if (xAttrib != null) {
+              xPlugAssembler = xAttrib.Assembler;
+            }
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo/*, xPlugAssembler*/);
-            var xInstructions = mReader.ProcessMethod(xPlug);
-            if (xInstructions != null) {
-              //ProcessInstructions(xInstructions);
-              //mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
+            if (xAttrib != null && xAttrib.IsWildcard) {
+              xPlugInfo.PluggedByMethod = xMethodInfo;
+              var xInstructions = mReader.ProcessMethod(xPlug);
+              if (xInstructions != null) {
+                ProcessInstructions(xInstructions);
+                mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
+              }
             }
             mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
           } else {
@@ -289,8 +292,9 @@ namespace Cosmos.IL2CPU {
             foreach (PlugMethodAttribute attrib in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
               xAttrib = attrib;
             }
-            if (xAttrib != null) {
-              xPlugAssembler = xAttrib.Assembler;
+            if (xAttrib != null && xAttrib.IsWildcard) {
+              continue;
+              //xPlugAssembler = xAttrib.Assembler;
             }
 
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);

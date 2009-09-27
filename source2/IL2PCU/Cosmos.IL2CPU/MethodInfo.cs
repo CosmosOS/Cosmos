@@ -13,6 +13,7 @@ namespace Cosmos.IL2CPU {
     public readonly UInt32 UID;
     public readonly MethodInfo PlugMethod;
     public readonly Type MethodAssembler;
+    public MethodInfo PluggedByMethod;
 
     public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, Type aMethodAssembler):this(aMethodBase, aUID, aType, aPlugMethod) {
       MethodAssembler = aMethodAssembler;

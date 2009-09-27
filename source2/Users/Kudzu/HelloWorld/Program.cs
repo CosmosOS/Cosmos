@@ -9,8 +9,6 @@ using System.IO;
 using Indy.IL2CPU;
 using Cosmos.Hardware;
 
-using Value = System.String;
-
 namespace HelloWorld {
 	class Program {
     private static void TestMethod(object aSender, EventArgs e) {
@@ -56,6 +54,18 @@ namespace HelloWorld {
     }
 		//#endregion
 
+
+    private static void Test(byte aIRQ) {
+      var xDict = new TempDictionary<EventHandler>();
+      var xMethod = new EventHandler(TestMethod);
+      xDict.Add(aIRQ, xMethod);
+      if (xDict.ContainsKey(aIRQ)) {
+        Console.WriteLine("Found!");
+      } else {
+        Console.WriteLine("Not found!");
+      }
+    }
+
 		// Main entry point of the kernel
 		public static unsafe void Init() {
       var xTempBool = true;
@@ -64,9 +74,11 @@ namespace HelloWorld {
         xBoot.Execute();
       }
       Console.WriteLine("Done");
+      Console.ReadLine();
+      
 
-      var xMethod = new EventHandler(TestMethod);
-      xMethod(null, null);
+      //var xMethod = new EventHandler(TestMethod);
+      //xMethod(null, null);
 
 
 

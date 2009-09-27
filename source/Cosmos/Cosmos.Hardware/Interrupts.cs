@@ -131,16 +131,24 @@ namespace Cosmos.Hardware {
             if (mIRQ_Handlers == null)
             {
                 mIRQ_Handlers = new TempDictionary<InterruptDelegate>();
+                Console.WriteLine("Created Dictionary");
             }
+            var xTest = new TempDictionary<string>();
+            xTest.Add(IRQ, "test");
 
             if( mIRQ_Handlers.ContainsKey(IRQ) == false )
             {
                 mIRQ_Handlers.Add(IRQ, handler);
+                Console.WriteLine("Added item");
             } else {
                 mIRQ_Handlers[IRQ] = handler;
+                Console.WriteLine("Changed item");
             }
             if (!mIRQ_Handlers.ContainsKey(IRQ)) {
               Console.WriteLine("ERROR: after adding, it's still not in the list");
+              if (xTest.ContainsKey(IRQ)) {
+                Console.WriteLine("wel in xTest");
+              } else { Console.WriteLine("Niet in xTest"); }
               while (true) { CPU.Halt(); }
             }
         }
@@ -197,22 +205,22 @@ namespace Cosmos.Hardware {
         //public static InterruptDelegate IRQ01;
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         public static void HandleInterrupt_21(ref InterruptContext aContext) {
-            //Change area
-            //
-            // Triggers IL2CPU error
-            DebugUtil.LogInterruptOccurred(ref aContext);
-            Console.WriteLine("Handling IRQ01");
-            IRQ(1, ref aContext);
-            //mIRQ_Handlers[1](ref aContext);
-            //
-            // Old keyboard
-            //Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt();
-            //
-            // New Keyboard
-            //Cosmos.Hardware.PC
-            //
-            // - End change area
-            Console.WriteLine("Signal PIC primary");
+            ////Change area
+            ////
+            //// Triggers IL2CPU error
+          DebugUtil.LogInterruptOccurred(ref aContext);
+          Console.WriteLine("Handling IRQ01");
+          IRQ(1, ref aContext);
+            ////mIRQ_Handlers[1](ref aContext);
+            ////
+            //// Old keyboard
+            ////Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt();
+            ////
+            //// New Keyboard
+            ////Cosmos.Hardware.PC
+            ////
+            //// - End change area
+            //Console.WriteLine("Signal PIC primary");
             PIC.SignalPrimary();
         }
 

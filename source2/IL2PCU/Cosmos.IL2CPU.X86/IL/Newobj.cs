@@ -17,9 +17,6 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             OpMethod xMethod = ( OpMethod )aOpCode;
             string xCurrentLabel = GetLabel( aMethod, aOpCode );
-            if (xCurrentLabel == "System_Void__Cosmos_Hardware_TempDictionary_1___System_String___ctor____DOT__00000001") {
-              Console.Write("");
-            }
             // TODO: enable this again
             // if (DynamicMethodEmit.GetHasDynamicMethod(CtorDef)) {
             //   CtorDef = DynamicMethodEmit.GetDynamicMethod(CtorDef);
