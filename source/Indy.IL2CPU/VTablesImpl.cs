@@ -32,13 +32,13 @@ namespace Indy.IL2CPU {
             }
 		}
 
-		public static void SetTypeInfo(int aType, int aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount) {
-			mTypes[aType] = new VTable();
-			mTypes[aType].BaseTypeIdentifier = aBaseType;
-			mTypes[aType].MethodIndexes = aMethodIndexes;
-			mTypes[aType].MethodAddresses = aMethodAddresses;
-            mTypes[aType].MethodCount = aMethodCount;
-		}
+    public static void SetTypeInfo(int aType, int aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount) {
+      //mTypes[aType] = new VTable();
+      mTypes[aType].BaseTypeIdentifier = aBaseType;
+      mTypes[aType].MethodIndexes = aMethodIndexes;
+      mTypes[aType].MethodAddresses = aMethodAddresses;
+      mTypes[aType].MethodCount = aMethodCount;
+    }
 
 		public static void SetMethodInfo(int aType, int aMethodIndex, int aMethodIdentifier, int aMethodAddress, char[] aName) {
 			mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
@@ -118,25 +118,48 @@ namespace Indy.IL2CPU {
 					}
 				}
 			} else {
-				//Console.WriteLine("Checking for MethodAddress");
-				//Console.Write("    Type = ");
-				//Console.Write(aType.ToString());
-				//Console.Write(", Method = ");
-				//Console.WriteLine(aMethodIndex.ToString());
+				Console.WriteLine("Checking for MethodAddress");
+				Console.Write("    Type = ");
+        WriteNumber((uint)aType, 32);
+				Console.Write(", Method = ");
+        WriteNumber((uint)aMethodIndex, 32);
+				Console.WriteLine("");
 				do {
-					//Console.Write("Checking type ");
-					//Console.WriteLine(aType.ToString());
+					Console.Write("Checking type ");
+          WriteNumber((uint)aType, 32);
+          Console.WriteLine("");
+          Console.Write("  Method count: ");
+          WriteNumber((uint)mTypes[aType].MethodIndexes.Length, 8);
+          Console.WriteLine("");
 					for (int i = 0; i < mTypes[aType].MethodIndexes.Length; i++) {
-						//Console.Write("    ");
-						//Console.WriteLine(mTypes[aType].MethodIndexes[i].ToString());
+						Console.Write("    ");
+            WriteNumber((uint)mTypes[aType].MethodIndexes[i], 16);
+            Console.WriteLine("");
 						if (mTypes[aType].MethodIndexes[i] == aMethodIndex) {
-							//Console.WriteLine("Found!");
+							Console.WriteLine("Found!");
 							return mTypes[aType].MethodAddresses[i];
 						}
 					}
 					aType = mTypes[aType].BaseTypeIdentifier;
+          Console.Write("    Base type = ");
+          WriteNumber((uint)mTypes[aType].BaseTypeIdentifier, 32);
+          Console.WriteLine("");
+          Console.Write("    aType = ");
+          WriteNumber((uint)aType, 32);
+          Console.WriteLine("");
+
+          
 				} while (aType != 0);
 			}
+        Console.Write("Type ");
+        WriteNumber((uint)aType, 32);
+        Console.Write(", MethodIndex = ");
+        WriteNumber((uint)aMethodIndex, 32);
+        Console.WriteLine("");
+        while (true)
+          ;
+        Console.WriteLine("Not FOUND!");
+
 			throw new Exception("Cannot find virtual method!");
 		}
 	}

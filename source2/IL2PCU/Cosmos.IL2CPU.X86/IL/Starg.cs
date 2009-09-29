@@ -21,6 +21,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             //throw new NotImplementedException();
+          if (GetLabel(aMethod, aOpCode) == "System_Int32__Indy_IL2CPU_VTablesImpl_GetMethodAddressForType_System_Int32__System_Int32___DOT__00000170") {
+            Console.Write("");
+          }
  
             OpVar xOpVar = ( OpVar )aOpCode;
             //mAddresses = aMethodInfo.Arguments[ xOpVar.Value ].VirtualAddresses;
@@ -31,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
             }
-            uint xOffset = 12;
+            uint xOffset = 8;
             var xCorrectedOpValValue = xOpVar.Value;
             if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
             {
@@ -51,10 +54,10 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
             }
-            for (int i = xParams.Length - 1; i >= xOpVar.Value; i--) {
-              var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
-              xOffset += xSize;
-            }
+            //for (int i = xParams.Length - 1; i >= xOpVar.Value; i--) {
+            //  var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
+            //  xOffset += xSize;
+            //}
             for (int i = 0; i < (xCurArgSize / 4); i++) {
               new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
               new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4)), SourceReg = CPUx86.Registers.EAX };

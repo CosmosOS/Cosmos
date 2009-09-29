@@ -15,10 +15,14 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpVar = (OpVar)aOpCode;
+          if (GetLabel(aMethod, aOpCode) == "System_Int32__Indy_IL2CPU_VTablesImpl_GetMethodAddressForType_System_Int32__System_Int32___DOT__000001AB") {
+            Console.Write("");
+          }
           DoExecute(Assembler, aMethod, xOpVar.Value);
         }
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
+          
           var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
           uint xReturnSize = 0;
           if (xMethodInfo != null) {

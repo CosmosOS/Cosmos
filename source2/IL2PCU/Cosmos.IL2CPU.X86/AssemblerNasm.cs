@@ -160,7 +160,20 @@ namespace Cosmos.IL2CPU.X86 {
       new CPUx86.Return { DestinationValue = (uint)xRetSize };
     }
 
-      
+
+    protected override void MethodBegin(string aMethodName) {
+      base.MethodBegin(aMethodName);
+      new Label(aMethodName);
+      new Push { DestinationReg = Registers.EBP };
+      new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+    }
+
+    protected override void MethodEnd(string aMethodName) {
+      base.MethodEnd(aMethodName);
+      new Label("_END_OF_" + aMethodName);
+      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
+      new CPUx86.Return();
+    }
 
     private static HashSet<string> mDebugLines = new HashSet<string>();
     private static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {

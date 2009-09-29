@@ -26,6 +26,7 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
       var xAssembler = (CosmosAssembler)aAssembler;
       var xMethodInfo = (Cosmos.IL2CPU.MethodInfo) aMethodInfo;
       new Comment("XXXXXXX");
+      new CPUx86.Halt();
       // param 0 is instance of eventhandler
       // param 1 is sender
       // param 2 is eventargs

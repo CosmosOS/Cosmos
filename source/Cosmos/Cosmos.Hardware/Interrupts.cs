@@ -121,7 +121,7 @@ namespace Cosmos.Hardware {
 
         }
 
-        private static TempDictionary<InterruptDelegate> mIRQ_Handlers;
+        private static InterruptDelegate[] mIRQ_Handlers;
 
         public static void AddIRQHandler(byte IRQ, InterruptDelegate handler)
         {
@@ -130,37 +130,19 @@ namespace Cosmos.Hardware {
           Console.WriteLine("");
             if (mIRQ_Handlers == null)
             {
-                mIRQ_Handlers = new TempDictionary<InterruptDelegate>();
+                mIRQ_Handlers = new InterruptDelegate[256];
                 Console.WriteLine("Created Dictionary");
             }
-            var xTest = new TempDictionary<string>();
-            xTest.Add(IRQ, "test");
-
-            if( mIRQ_Handlers.ContainsKey(IRQ) == false )
-            {
-                mIRQ_Handlers.Add(IRQ, handler);
-                Console.WriteLine("Added item");
-            } else {
-                mIRQ_Handlers[IRQ] = handler;
-                Console.WriteLine("Changed item");
-            }
-            if (!mIRQ_Handlers.ContainsKey(IRQ)) {
-              Console.WriteLine("ERROR: after adding, it's still not in the list");
-              if (xTest.ContainsKey(IRQ)) {
-                Console.WriteLine("wel in xTest");
-              } else { Console.WriteLine("Niet in xTest"); }
-              while (true) { CPU.Halt(); }
-            }
+            
+            mIRQ_Handlers[IRQ] = handler;
         }
 
         private static void IRQ(uint irq,ref InterruptContext aContext)
         {
-            InterruptDelegate callback;
-            if (mIRQ_Handlers.TryGetValue(irq, out callback) == true) {
-              callback(ref aContext);
-            } else {
-              Console.WriteLine("No handler found for IRQ01");
-            }
+          var xCallback = mIRQ_Handlers[irq];
+          if (xCallback != null) {
+            xCallback(ref aContext);
+          }            
         }
 
         public static void HandleInterrupt_Default(ref InterruptContext aContext) {

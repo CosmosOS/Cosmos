@@ -26,6 +26,9 @@ namespace Cosmos.IL2CPU.Profiler {
     protected override void MethodEnd(MethodInfo aMethod) {
     }
 
+    protected override void Pop() {
+      throw new NotImplementedException();
+    }
 
     protected override void Push(uint aValue) {
       throw new NotImplementedException();

@@ -7,6 +7,7 @@ using System.Text;
 using Indy.IL2CPU;
 using Indy.IL2CPU.Plugs;
 using Indy.IL2CPU.IL;
+using SR = System.Reflection;
 
 namespace Cosmos.IL2CPU {
   // This is necessary because HashSet and Dictionary
@@ -254,8 +255,13 @@ namespace Cosmos.IL2CPU {
       // Now everything is scanned, lets assemble
       foreach (var xItem in mItems) {
         if (xItem is MethodBase) {
-          #region Method handling
           var xMethod = (MethodBase)xItem;
+
+          if (xMethod.DeclaringType.FullName == "Cosmos.Kernel.Plugs.CPU"
+  && xMethod.Name == "GetEndOfKernel") {
+            Console.Write("");
+          }
+          #region Method handling
           var xParams = xMethod.GetParameters();
           var xParamTypes = new Type[xParams.Length];
           // Dont use foreach, enum generaly keeps order but
@@ -273,9 +279,6 @@ namespace Cosmos.IL2CPU {
             PlugMethodAttribute xAttrib = null;
             foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
               xAttrib = attrib;
-            }
-            if (xAttrib != null) {
-              xPlugAssembler = xAttrib.Assembler;
             }
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo/*, xPlugAssembler*/);
             if (xAttrib != null && xAttrib.IsWildcard) {
@@ -296,7 +299,9 @@ namespace Cosmos.IL2CPU {
               continue;
               //xPlugAssembler = xAttrib.Assembler;
             }
-
+            if (xAttrib != null) {
+              xPlugAssembler = xAttrib.Assembler;
+            }
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
             var xInstructions = mReader.ProcessMethod(xMethod);
             if (xInstructions != null) {
@@ -326,7 +331,7 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, GetMethodUID);
+      mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, x => GetMethodUID(x, false));
       mAsmblr.EmitEntrypoint(aStartMethod, (from item in mItems
                                             where item is MethodBase
                                             select (MethodBase)item));
@@ -344,7 +349,8 @@ namespace Cosmos.IL2CPU {
         var xOpMethod = xOpCode as ILOpCodes.OpMethod;
         if (xOpMethod != null) {
           xOpMethod.Value = (MethodBase)mItems.GetItemInList(xOpMethod.Value);
-          xOpMethod.ValueUID = (uint)mItemsList.IndexOf(xOpMethod.Value);
+          xOpMethod.ValueUID = (uint)GetMethodUID(xOpMethod.Value, true);
+          xOpMethod.BaseMethodUID = GetMethodUID(xOpMethod.Value, false); 
         }
       }
     }
@@ -564,6 +570,7 @@ namespace Cosmos.IL2CPU {
         // Check to see if method is plugged, if it is we don't scan body
         xPlug = ResolvePlug(aMethod, xParamTypes);
       }
+
       if (xPlug == null) {
         bool xNeedsPlug = false;
         if ((aMethod.Attributes & MethodAttributes.PinvokeImpl) != 0) {
@@ -1034,15 +1041,83 @@ namespace Cosmos.IL2CPU {
       return xResult;
     }
 
-    protected uint GetMethodUID(MethodBase aMethod) {
-      if (!mItems.Contains(aMethod)) {
-        throw new Exception("Cannot get UID of methods which are not queued!");
+    private MethodBase GetUltimateBaseMethod(MethodBase aMethod,
+                                                Type[] aMethodParams,
+                                                Type aCurrentInspectedType) {
+      MethodBase xBaseMethod = null;
+      //try {
+      while (true) {
+        if (aCurrentInspectedType.BaseType == null) {
+          break;
+        }
+        aCurrentInspectedType = aCurrentInspectedType.BaseType;
+        MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
+                                                                  BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                                                                  Type.DefaultBinder,
+                                                                  aMethodParams,
+                                                                  new ParameterModifier[0]);
+        if (xFoundMethod == null) {
+          break;
+        }
+        ParameterInfo[] xParams = xFoundMethod.GetParameters();
+        bool xContinue = true;
+        for (int i = 0; i < xParams.Length; i++) {
+          if (xParams[i].ParameterType != aMethodParams[i]) {
+            xContinue = false;
+            continue;
+          }
+        }
+        if (!xContinue) {
+          continue;
+        }
+        if (xFoundMethod != null) {
+          xBaseMethod = xFoundMethod;
+
+          if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false) {
+            var xFoundMethInfo = xFoundMethod as SR.MethodInfo;
+            var xBaseMethInfo = xBaseMethod as SR.MethodInfo;
+            if (xFoundMethInfo == null && xBaseMethInfo == null) {
+              xBaseMethod = xFoundMethod;
+            }
+            if (xFoundMethInfo != null && xBaseMethInfo != null) {
+              if (xFoundMethInfo.ReturnType.AssemblyQualifiedName.Equals(xBaseMethInfo.ReturnType.AssemblyQualifiedName)) {
+                xBaseMethod = xFoundMethod;
+              }
+            }
+            //xBaseMethod = xFoundMethod;
+          }
+        }
+        //else
+        //{
+        //    xBaseMethod = xFoundMethod;
+        //}
       }
-      if (!mMethodUIDs.ContainsKey(aMethod)) {
-        var xId = (uint)mMethodUIDs.Count;
-        mMethodUIDs.Add(aMethod, xId);
-        return xId;
+      //} catch (Exception) {
+      // todo: try to get rid of the try..catch
+      //}
+      return xBaseMethod ?? aMethod;
+    }
+
+
+
+    protected uint GetMethodUID(MethodBase aMethod, bool aExact) {
+      if (!aExact) {
+        ParameterInfo[] xParams = aMethod.GetParameters();
+        Type[] xParamTypes = new Type[xParams.Length];
+        for (int i = 0; i < xParams.Length; i++) {
+          xParamTypes[i] = xParams[i].ParameterType;
+        }
+        var xBaseMethod = GetUltimateBaseMethod(aMethod, xParamTypes, aMethod.DeclaringType);
+        if (!mMethodUIDs.ContainsKey(xBaseMethod)) {
+          var xId = (uint)mMethodUIDs.Count;
+          mMethodUIDs.Add(xBaseMethod, xId);
+        }
+        return mMethodUIDs[xBaseMethod];
       } else {
+        if (!mMethodUIDs.ContainsKey(aMethod)) {
+          var xId = (uint)mMethodUIDs.Count;
+          mMethodUIDs.Add(aMethod, xId);
+        }
         return mMethodUIDs[aMethod];
       }
     }

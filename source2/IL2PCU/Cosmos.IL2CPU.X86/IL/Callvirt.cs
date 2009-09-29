@@ -27,8 +27,11 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, int aOpPosition) {
-          
+                       
           string xCurrentMethodLabel = GetLabel(aMethod, aOpPosition);
+          if (xCurrentMethodLabel == "System_Void__HelloWorld_Program_Init____DOT__0000002E") {
+            Console.Write("");
+          }
 
           // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
           //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
@@ -61,7 +64,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assembler.Stack.Pop();
           }
           if (!aTargetMethod.IsStatic) {
-            xThisOffset += Align(SizeOfType(aTargetMethod.DeclaringType), 4);
+            //xThisOffset += Align(SizeOfType(aTargetMethod.DeclaringType), 4);
             Assembler.Stack.Pop();
           }
 

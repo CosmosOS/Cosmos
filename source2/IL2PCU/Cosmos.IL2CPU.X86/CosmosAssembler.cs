@@ -179,6 +179,10 @@ namespace Cosmos.IL2CPU.X86 {
       };
     }
 
+    protected override void Pop() {
+      new Add { DestinationReg = Registers.ESP, SourceValue = (uint)Stack.Pop().Size };
+    }
+
     protected override void Push(string aLabelName) {
       new Push {
         DestinationRef = ElementReference.New(aLabelName)
@@ -205,6 +209,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Label(EntryPointName);
       new Push { DestinationReg = Registers.EBP };
       new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Call { DestinationLabel = InitVMTCodeLabel };
       foreach (var xCctor in aMethods) {
         if (xCctor.Name == ".cctor"
           && xCctor.IsStatic

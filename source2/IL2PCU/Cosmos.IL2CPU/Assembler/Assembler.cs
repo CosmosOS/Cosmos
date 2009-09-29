@@ -121,6 +121,15 @@ namespace Cosmos.IL2CPU {
       new Comment(this, "Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
     }
 
+    protected virtual void MethodBegin(string aMethodName) {
+      new Comment(this, "---------------------------------------------------------");
+      new Comment(this, "Name: " + aMethodName);
+    }
+
+    protected virtual void MethodEnd(string aMethodName) {
+      new Comment(this, "End Method: " + aMethodName);
+    }
+
     protected virtual void MethodEnd(MethodInfo aMethod) {
       new Comment(this, "End Method: " + aMethod.MethodBase.Name);
     }
@@ -143,10 +152,6 @@ namespace Cosmos.IL2CPU {
       Stack.Clear();
       mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
       mLog.Flush();
-      if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.CPU"
-  && aMethod.MethodBase.Name == "GetAmountOfRAM") {
-        Console.Write("");
-      }
       if (aMethod.MethodAssembler != null) {
         mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
@@ -344,200 +349,193 @@ namespace Cosmos.IL2CPU {
     protected abstract void Move(string aDestLabelName, int aValue);
     protected abstract void Jump(string aLabelName);
     protected abstract int GetVTableEntrySize();
-
+    public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
     public void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
       // initialization
-      var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
-      var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
-      var xLoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
-      var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
-                                                                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-      // data we need but dont have:
-      
-      // end initialization
-      string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
-      DataMember xDataMember = (from item in Assembler.mCurrentInstance.DataMembers
-                                where item.Name == xTheName
-                                select item).FirstOrDefault();
-      if (xDataMember != null) {
-        Assembler.mCurrentInstance.DataMembers.Remove((from item in Assembler.mCurrentInstance.DataMembers
-                                      where item == xDataMember
-                                      select item).First());
-      }
-      var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
-      var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-      xTemp = BitConverter.GetBytes(0x80000002);
-      Array.Copy(xTemp, 0, xData, 4, 4);
-      xTemp = BitConverter.GetBytes(aTypesSet.Count);
-      Array.Copy(xTemp, 0, xData, 8, 4);
-      xTemp = BitConverter.GetBytes(GetVTableEntrySize());
-      Array.Copy(xTemp, 0, xData, 12, 4);
-      Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-      Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Contents")));
-      Push((uint)aTypesSet.Count);
-      Call(xLoadTypeTableRef);
-      foreach(var xType in aTypesSet){
-        // value contains true if the method is an interface method definition
-        SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
-        foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-          if (aMethodsSet.Contains(xMethod))//) && !xMethod.IsAbstract)
-                            {
-            xEmittedMethods.Add(xMethod, false);
-          }
-        }
-        foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-          if (aMethodsSet.Contains(xCtor))// && !xCtor.IsAbstract)
-                            {
-            xEmittedMethods.Add(xCtor, false);
-          }
-        }
-        foreach (var xIntf in xType.GetInterfaces()) {
-          foreach (var xMethodIntf in xIntf.GetMethods()) {
-            var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
-                                                (from xParam in xMethodIntf.GetParameters()
-                                                 select xParam.ParameterType).ToArray());
+      MethodBegin(InitVMTCodeLabel);
+      {
+        var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
+        var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
+        var xLoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
+        var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
+                                                                           BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        // data we need but dont have:
 
-            if (xActualMethod == null) {
-              // get private implemenation
-              xActualMethod = xType.GetMethod(xMethodIntf.Name,
-                                              (from xParam in xMethodIntf.GetParameters()
-                                               select xParam.ParameterType).ToArray());
-            }
-            if (xActualMethod == null) {
-              try {
-                var xMap = xType.GetInterfaceMap(xIntf);
-                for (int k = 0; k < xMap.InterfaceMethods.Length; k++) {
-                  if (xMap.InterfaceMethods[k] == xMethodIntf) {
-                    xActualMethod = xMap.TargetMethods[k];
-                    break;
-                  }
-                }
-              } catch {
-              }
-            }
-            if (aMethodsSet.Contains(xMethodIntf)) {
-              if (!xEmittedMethods.ContainsKey(xMethodIntf)) {
-                xEmittedMethods.Add(xMethodIntf,
-                                    true);
-              }
-            }
-
-          }
+        // end initialization
+        string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
+        DataMember xDataMember = (from item in Assembler.mCurrentInstance.DataMembers
+                                  where item.Name == xTheName
+                                  select item).FirstOrDefault();
+        if (xDataMember != null) {
+          Assembler.mCurrentInstance.DataMembers.Remove((from item in Assembler.mCurrentInstance.DataMembers
+                                                         where item == xDataMember
+                                                         select item).First());
         }
-        if (!xType.IsInterface) {
-          Push(aGetTypeID(xType));
-        }
-        int? xBaseIndex = null;
-        if (xType.BaseType == null) {
-          xBaseIndex = (int)aGetTypeID(xType);
-        } else {
-          for (int t = 0; t < aTypesSet.Count; t++) {
-            // todo: optimize check
-            var xItem = aTypesSet.Skip(t).First();
-            if (xItem.ToString() == xType.BaseType.ToString()) {
-              xBaseIndex = (int)aGetTypeID(xItem);
-              break;
+        var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
+        var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+        xTemp = BitConverter.GetBytes(0x80000002);
+        Array.Copy(xTemp, 0, xData, 4, 4);
+        xTemp = BitConverter.GetBytes(aTypesSet.Count);
+        Array.Copy(xTemp, 0, xData, 8, 4);
+        xTemp = BitConverter.GetBytes(GetVTableEntrySize());
+        Array.Copy(xTemp, 0, xData, 12, 4);
+        Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
+        Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Contents")));
+        Push((uint)aTypesSet.Count);
+        Call(xLoadTypeTableRef);
+        foreach (var xType in aTypesSet) {
+          // value contains true if the method is an interface method definition
+          SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
+          foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+            if (aMethodsSet.Contains(xMethod))//) && !xMethod.IsAbstract)
+                            {
+              xEmittedMethods.Add(xMethod, false);
             }
           }
-        }
-        if (xBaseIndex == null) {
-          throw new Exception("Base type not found!");
-        }
-        for (int x = xEmittedMethods.Count - 1; x >= 0; x--) {
-          if (!aMethodsSet.Contains(xEmittedMethods.Keys[x])) {
-            xEmittedMethods.RemoveAt(x);
+          foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+            if (aMethodsSet.Contains(xCtor))// && !xCtor.IsAbstract)
+                            {
+              xEmittedMethods.Add(xCtor, false);
+            }
           }
-        }
-        if (!xType.IsInterface) {
-          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
-          Assembler.mCurrentInstance.DataMembers.Add(
-              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
-          Push((uint)xBaseIndex.Value);
-          Push("0" + xEmittedMethods.Count.ToString("X") + "h");
-          xData = new byte[16 + (xEmittedMethods.Count * 4)];
-          xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-          Array.Copy(xTemp, 0, xData, 0, 4);
-          xTemp = BitConverter.GetBytes(0x80000002); // embedded array
-          Array.Copy(xTemp, 0, xData, 4, 4);
-          xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
-          Array.Copy(xTemp, 0, xData, 8, 4);
-          xTemp = BitConverter.GetBytes(4); // embedded array
-          Array.Copy(xTemp, 0, xData, 12, 4);
-          string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
-          Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-          Push(xDataName);
-          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
-          Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-          Push(xDataName);
-          xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
-          xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-          Array.Copy(xTemp, 0, xData, 0, 4);
-          xTemp = BitConverter.GetBytes(0x80000002); // embedded array
-          Array.Copy(xTemp, 0, xData, 4, 4);
-          xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
-          Array.Copy(xTemp, 0, xData, 8, 4);
-          xTemp = BitConverter.GetBytes(2); // embedded array
-          Array.Copy(xTemp, 0, xData, 12, 4);
-          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
-          Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-          Push((uint)xEmittedMethods.Count);
-          //Push("0");
-          Call(xSetTypeInfoRef);
-        }
-        for (int j = 0; j < xEmittedMethods.Count; j++) {
-          MethodBase xMethod = xEmittedMethods.Keys[j];
-          var xMethodId = aGetMethodUID(xMethod);
-          if (!xType.IsInterface) {
-            if (xEmittedMethods.Values[j]) {
-              var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
-                                                  (from xParam in xMethod.GetParameters()
+          foreach (var xIntf in xType.GetInterfaces()) {
+            foreach (var xMethodIntf in xIntf.GetMethods()) {
+              var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
+                                                  (from xParam in xMethodIntf.GetParameters()
                                                    select xParam.ParameterType).ToArray());
 
-              if (xNewMethod == null) {
+              if (xActualMethod == null) {
                 // get private implemenation
-                xNewMethod = xType.GetMethod(xMethod.Name,
-                                                (from xParam in xMethod.GetParameters()
+                xActualMethod = xType.GetMethod(xMethodIntf.Name,
+                                                (from xParam in xMethodIntf.GetParameters()
                                                  select xParam.ParameterType).ToArray());
               }
-              if (xNewMethod == null) {
+              if (xActualMethod == null) {
                 try {
-                  var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                  var xMap = xType.GetInterfaceMap(xIntf);
                   for (int k = 0; k < xMap.InterfaceMethods.Length; k++) {
-                    if (xMap.InterfaceMethods[k] == xMethod) {
-                      xNewMethod = xMap.TargetMethods[k];
+                    if (xMap.InterfaceMethods[k] == xMethodIntf) {
+                      xActualMethod = xMap.TargetMethods[k];
                       break;
                     }
                   }
                 } catch {
                 }
               }
-              xMethod = xNewMethod;
+              if (aMethodsSet.Contains(xMethodIntf)) {
+                if (!xEmittedMethods.ContainsKey(xMethodIntf)) {
+                  xEmittedMethods.Add(xMethodIntf,
+                                      true);
+                }
+              }
+
             }
-            //Move(GetService<IMetaDataInfoService>().GetMethodIdLabel(xMethod), xMethodId);
-            //Assembler.DataMembers.Add(
-            //    new DataMember(GetService<IMetaDataInfoService>().GetMethodIdLabel(xMethod),
-            //                   new int[] { xMethodId }));
+          }
+          if (!xType.IsInterface) {
+            Push(aGetTypeID(xType));
+          }
+          int? xBaseIndex = null;
+          if (xType.BaseType == null) {
+            xBaseIndex = (int)aGetTypeID(xType);
+          } else {
+            for (int t = 0; t < aTypesSet.Count; t++) {
+              // todo: optimize check
+              var xItem = aTypesSet.Skip(t).First();
+              if (xItem.ToString() == xType.BaseType.ToString()) {
+                xBaseIndex = (int)aGetTypeID(xItem);
+                break;
+              }
+            }
+          }
+          if (xBaseIndex == null) {
+            throw new Exception("Base type not found!");
+          }
+          for (int x = xEmittedMethods.Count - 1; x >= 0; x--) {
+            if (!aMethodsSet.Contains(xEmittedMethods.Keys[x])) {
+              xEmittedMethods.RemoveAt(x);
+            }
+          }
+          if (!xType.IsInterface) {
+            Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
+            Assembler.mCurrentInstance.DataMembers.Add(
+                new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
+            Push((uint)xBaseIndex.Value);
+            xData = new byte[16 + (xEmittedMethods.Count * 4)];
+            xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+            Array.Copy(xTemp, 0, xData, 0, 4);
+            xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+            Array.Copy(xTemp, 0, xData, 4, 4);
+            xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
+            Array.Copy(xTemp, 0, xData, 8, 4);
+            xTemp = BitConverter.GetBytes(4); // embedded array
+            Array.Copy(xTemp, 0, xData, 12, 4);
+            string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
+            Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+            Push(xDataName);
+            xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
+            Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+            Push(xDataName);
+            xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
+            xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+            Array.Copy(xTemp, 0, xData, 0, 4);
+            xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+            Array.Copy(xTemp, 0, xData, 4, 4);
+            xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
+            Array.Copy(xTemp, 0, xData, 8, 4);
+            xTemp = BitConverter.GetBytes(2); // embedded array
+            Array.Copy(xTemp, 0, xData, 12, 4);
+            xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
+            Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+            Push("0" + xEmittedMethods.Count.ToString("X") + "h");
+            Call(xSetTypeInfoRef);
+          }
+          for (int j = 0; j < xEmittedMethods.Count; j++) {
+            MethodBase xMethod = xEmittedMethods.Keys[j];
+            var xMethodId = aGetMethodUID(xMethod);
+            if (!xType.IsInterface) {
+              if (xEmittedMethods.Values[j]) {
+                var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
+                                                    (from xParam in xMethod.GetParameters()
+                                                     select xParam.ParameterType).ToArray());
 
-            Push((uint)aGetTypeID(xType));
-            Push((uint)j);
+                if (xNewMethod == null) {
+                  // get private implemenation
+                  xNewMethod = xType.GetMethod(xMethod.Name,
+                                                  (from xParam in xMethod.GetParameters()
+                                                   select xParam.ParameterType).ToArray());
+                }
+                if (xNewMethod == null) {
+                  try {
+                    var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++) {
+                      if (xMap.InterfaceMethods[k] == xMethod) {
+                        xNewMethod = xMap.TargetMethods[k];
+                        break;
+                      }
+                    }
+                  } catch {
+                  }
+                }
+                xMethod = xNewMethod;
+              }
 
-            Push((uint)xMethodId);
-            if (xMethod.IsAbstract) {
-              // abstract methods dont have bodies, oiw, are not emitted
+              Push((uint)aGetTypeID(xType));
+              Push((uint)j);
+
+              Push((uint)xMethodId);
+              if (xMethod.IsAbstract) {
+                // abstract methods dont have bodies, oiw, are not emitted
+                Push(0);
+              } else {
+                Push(ILOp.GetMethodLabel(xMethod));
+              }
               Push(0);
-            } else {
-              //var xTest = GetService<IMetaDataInfoService>().GetMethodInfo(xMethod, false);
-              //Push(xTest.LabelName);
+              Call(VTablesImplRefs.SetMethodInfoRef);
             }
-            //xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
-            //xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
-            //mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-            //Push(xDataName);
-            Push(0);
-            //Call(SetMethodInfoRef);
           }
         }
       }
+      MethodEnd(InitVMTCodeLabel);
     }
 
     public void ProcessField(FieldInfo aField) {
@@ -627,17 +625,23 @@ namespace Cosmos.IL2CPU {
     protected abstract void Ldarg(MethodInfo aMethod, int aIndex);
     protected abstract void Ldflda(MethodInfo aMethod, string aFieldId);
     protected abstract void Call(MethodInfo aMethod, MethodInfo aTargetMethod);
+    protected abstract void Pop();
 
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
 // todo: completely get rid of this kind of trampoline code
       MethodBegin(aFrom);
       {
-        var xParams = aTo.MethodBase.GetParameters().AsQueryable();
+        var xParams = aTo.MethodBase.GetParameters().ToArray();
+        
+        if (aFrom.MethodBase.GetParameters().Length > 0 || !aFrom.MethodBase.IsStatic) {
+          Ldarg(aFrom, 0);
+          Pop();
+        }
         
         int xCurParamIdx = 0;
         if (!aFrom.MethodBase.IsStatic) {
           Ldarg(aFrom, 0);
-          xParams = xParams.Skip(1);
+          xParams = xParams.Skip(1).ToArray();
           xCurParamIdx++;
         }
         foreach (var xParam in xParams) {
