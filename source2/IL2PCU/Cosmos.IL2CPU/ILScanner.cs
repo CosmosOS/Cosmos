@@ -244,6 +244,9 @@ namespace Cosmos.IL2CPU {
 
       var xThrowHelper = Type.GetType("System.ThrowHelper", true);
       Queue(xThrowHelper.GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");
+
+      Queue(typeof(MulticastDelegate).GetMethod("GetInvocationList"), null, "Explicit Entry");
+        //System_Delegate____System_MulticastDelegate_GetInvocationList__
       
       // Start from entry point of this program
       Queue(aStartMethod, null, "Entry Point");
@@ -274,12 +277,16 @@ namespace Cosmos.IL2CPU {
           Type xPlugAssembler = null;
           MethodInfo xPlugInfo = null;
           if (xPlug != null) {
-            xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null);
+
             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
             PlugMethodAttribute xAttrib = null;
             foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
               xAttrib = attrib;
             }
+            if (xAttrib != null) {
+              xPlugAssembler = xAttrib.Assembler;
+            }
+            xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo/*, xPlugAssembler*/);
             if (xAttrib != null && xAttrib.IsWildcard) {
               xPlugInfo.PluggedByMethod = xMethodInfo;
@@ -730,6 +737,9 @@ namespace Cosmos.IL2CPU {
         if (xResult != null) {
           break;
         }
+        if (xImpl.FullName == "Indy.IL2CPU.X86.Plugs.NEW_PLUGS.DelegateImpl") {
+          Console.Write("");
+        }
         // Plugs methods must be static, and public
         // Search for non signature matches first since signature searches are slower
         xResult = xImpl.GetMethod(aMethod.Name, BindingFlags.Static | BindingFlags.Public
@@ -752,7 +762,7 @@ namespace Cosmos.IL2CPU {
               xAttrib = x;
             }
 
-            if (xAttrib != null && xAttrib.IsWildcard) {
+            if (xAttrib != null && (xAttrib.IsWildcard && !xAttrib.WildcardMatchParameters)) {
               MethodBase xTargetMethod = null;
               if (String.Compare(xSigMethod.Name, "Ctor", true) == 0 ||
                  String.Compare(xSigMethod.Name, "Cctor", true) == 0) {

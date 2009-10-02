@@ -14,89 +14,86 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
-        {
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+          var xOpCode = (ILOpCodes.OpField)aOpCode;
+          var xField = xOpCode.Value;
+          DoExecute(Assembler, aMethod, xField);
+        }
+
+        public static void DoExecute(Assembler aAssembler, MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC) {
           
-            var xType = aMethod.MethodBase.DeclaringType;
-            var xOpCode = ( ILOpCodes.OpField )aOpCode;
-            System.Reflection.FieldInfo xField = xOpCode.Value;
+          var xType = aMethod.MethodBase.DeclaringType;
 
+          int xExtraOffset = 0;
+          if (aNeedsGC) {
+            xExtraOffset = 12;
+          }
 
-            int xExtraOffset = 0;
-            bool xNeedsGC = xField.DeclaringType.IsClass && !xField.DeclaringType.IsValueType;
-            if( xNeedsGC )
-            {
-              xExtraOffset = 12;
-            }
-            new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
+          var xFields = GetFieldsInfo(aDeclaringObject);
+          var xFieldInfo = (from item in xFields
+                            where item.Id == aFieldId
+                            select item).Single();
+          var xActualOffset = xFieldInfo.Offset + xExtraOffset;
+          var xSize = xFieldInfo.Size;
 
-            var xFields = GetFieldsInfo(xField.DeclaringType);
-            var xFieldInfo = (from item in xFields
-                              where item.Id == xField.GetFullName()
-                              select item).Single();
-            if (GetLabel(aMethod, aOpCode) == "System_Void__System_Collections_Generic_List_1___System_IO_FileInfo__Add_System_IO_FileInfo___DOT__0000002F") {
-              Console.Write("");
-            }
-            var xActualOffset = xFieldInfo.Offset + xExtraOffset;
-            var xSize = xFieldInfo.Size;
+          aAssembler.Stack.Pop();
 
-            Assembler.Stack.Pop();
-            
-            uint xRoundedSize = Align( xSize, 4);
+          uint xRoundedSize = Align(xSize, 4);
 
-            if( xNeedsGC )
-            {
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4 };
-                //Ldfld(aAssembler, aType, aField, false);
+          if (aNeedsGC) {
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4 };
+            //Ldfld(aAssembler, aType, aField, false);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xActualOffset) };
+            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+          }
+          new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
+          new CPUx86.Add {
+            DestinationReg = CPUx86.Registers.ECX,
+            SourceValue = (uint)(xActualOffset)
+          };
+          for (int i = 0; i < (xSize / 4); i++) {
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+          }
+          switch (xSize % 4) {
+            case 1: {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xActualOffset) };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
-            }
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
-            new CPUx86.Add
-            {
-                DestinationReg = CPUx86.Registers.ECX,
-                SourceValue = (uint)(xActualOffset)
-            };
-            for( int i = 0; i < ( xSize / 4 ); i++ )
-            {
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AL };
+                break;
+              }
+            case 2: {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
-            }
-            switch( xSize % 4 )
-            {
-                case 1:
-                    {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)( ( xSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
-                        break;
-                    }
-                case 2:
-                    {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( xSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
-                        break;
-                    }
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AX };
+                break;
+              }
 
-                case 3: //TODO 
-                    throw new NotImplementedException();
-                    break;
-                case 0:
-                    {
-                        break;
-                    }
-                default:
-                    throw new Exception( "Remainder size " + ( xSize % 4 ) + " not supported!" );
-            }
-            if( xNeedsGC )
-            {
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
-            }
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-            Assembler.Stack.Pop();
+            case 3: //TODO 
+              throw new NotImplementedException();
+              break;
+            case 0: {
+                break;
+              }
+            default:
+              throw new Exception("Remainder size " + (xSize % 4) + " not supported!");
+          }
+          if (aNeedsGC) {
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+          }
+          new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+          aAssembler.Stack.Pop();
+        }
+
+        public static void DoExecute(Assembler aAssembler, MethodInfo aMethod, System.Reflection.FieldInfo aField )
+        {
+
+          bool xNeedsGC = aField.DeclaringType.IsClass && !aField.DeclaringType.IsValueType;
+
+          DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, xNeedsGC);
+         
         }
 
 

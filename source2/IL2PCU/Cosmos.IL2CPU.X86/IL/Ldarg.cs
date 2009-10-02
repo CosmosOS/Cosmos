@@ -22,8 +22,11 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
-          
-          var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+          var xMethodBase = aMethod.MethodBase;
+          if (aMethod.PluggedByMethod != null) {
+            xMethodBase = aMethod.PluggedByMethod.MethodBase;
+          }
+          var xMethodInfo = xMethodBase as System.Reflection.MethodInfo;
           uint xReturnSize = 0;
           if (xMethodInfo != null) {
             xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
@@ -34,10 +37,10 @@ namespace Cosmos.IL2CPU.X86.IL
             // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
             xCorrectedOpValValue -= 1;
           }
-          var xParams = aMethod.MethodBase.GetParameters();
-          if (aParam == 0 && !aMethod.MethodBase.IsStatic) {
+          var xParams = xMethodBase.GetParameters();
+          if (aParam == 0 && !xMethodBase.IsStatic) {
             // return the this parameter, which is not in .GetParameters()
-            var xCurArgSize = Align(SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+            var xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
             for (int i = xParams.Length - 1; i >= aParam; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
               xOffset += xSize;
@@ -55,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
               };
             }
-            Assembler.Stack.Push((int)xCurArgSize, aMethod.MethodBase.DeclaringType);
+            Assembler.Stack.Push((int)xCurArgSize, xMethodBase.DeclaringType);
           } else {
             for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);

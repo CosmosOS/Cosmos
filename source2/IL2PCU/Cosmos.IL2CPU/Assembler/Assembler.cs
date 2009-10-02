@@ -148,6 +148,10 @@ namespace Cosmos.IL2CPU {
         throw new Exception("For now, too much methods");
       }
 
+      if (ILOp.GetMethodLabel(aMethod) == "PLUG_FOR___System_Void__System_EventHandler_Invoke_System_Object__System_EventArgs_") {
+        Console.Write("");
+      }
+
       MethodBegin(aMethod);
       Stack.Clear();
       mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
@@ -160,7 +164,7 @@ namespace Cosmos.IL2CPU {
         if (xNeedsMethodInfo != null) {
           throw new Exception("Plug cant work, because of INeedsMethodInfo");
         }
-        xAssembler.AssembleNew(this, aMethod);
+        xAssembler.AssembleNew(this, aMethod.PluggedByMethod);
       } else {
         foreach (var xOpCode in aOpCodes) {
           uint xOpCodeVal = (uint)xOpCode.OpCode;
@@ -381,8 +385,8 @@ namespace Cosmos.IL2CPU {
         Array.Copy(xTemp, 0, xData, 12, 4);
         Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
         Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Contents")));
-        Push((uint)aTypesSet.Count);
-        Call(xLoadTypeTableRef);
+        //Push((uint)aTypesSet.Count);
+        //Call(xLoadTypeTableRef);
         foreach (var xType in aTypesSet) {
           // value contains true if the method is an interface method definition
           SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
@@ -631,7 +635,14 @@ namespace Cosmos.IL2CPU {
 // todo: completely get rid of this kind of trampoline code
       MethodBegin(aFrom);
       {
+        if (ILOp.GetMethodLabel(aFrom.MethodBase) == "System_Void__System_EventHandler_Invoke_System_Object__System_EventArgs_") {
+          Console.Write("");
+        }
         var xParams = aTo.MethodBase.GetParameters().ToArray();
+
+        if (aTo.MethodAssembler != null) {
+          xParams = aFrom.MethodBase.GetParameters();
+        }
         
         if (aFrom.MethodBase.GetParameters().Length > 0 || !aFrom.MethodBase.IsStatic) {
           Ldarg(aFrom, 0);
@@ -641,8 +652,10 @@ namespace Cosmos.IL2CPU {
         int xCurParamIdx = 0;
         if (!aFrom.MethodBase.IsStatic) {
           Ldarg(aFrom, 0);
-          xParams = xParams.Skip(1).ToArray();
           xCurParamIdx++;
+          if (aTo.MethodAssembler == null) {
+            xParams = xParams.Skip(1).ToArray();
+          }
         }
         foreach (var xParam in xParams) {
           FieldAccessAttribute xFieldAccessAttrib = null;

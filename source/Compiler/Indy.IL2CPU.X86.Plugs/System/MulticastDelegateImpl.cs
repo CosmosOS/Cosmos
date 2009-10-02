@@ -7,7 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
 
   [Plug(Target = typeof(MulticastDelegate))]
-  [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
+//  [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
   public class MulticastDelegateImpl {
 
     // there is no such thing as MulticastDelegate.InvokeMulticase. New scanner is more strict
@@ -21,6 +21,5 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
       // todo: implement MulticastDelegate.Equals(MulticastDelegate)
       return false;
     }
-
   }
 }

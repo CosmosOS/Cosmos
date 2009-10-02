@@ -56,6 +56,7 @@
     <Compile Include="Diagnostics\DebugImplRefs.cs" />
     <Compile Include="Mono\System\StringImpl.cs" />
     <Compile Include="MS\System\StringImpl.cs" />
+    <Compile Include="NEW_PLUGS\CtorImplAssembler.cs" />
     <Compile Include="NEW_PLUGS\DelegateImpl.cs" />
     <Compile Include="NEW_PLUGS\DoubleImpl.cs" />
     <Compile Include="NEW_PLUGS\InvokeImplAssembler.cs" />

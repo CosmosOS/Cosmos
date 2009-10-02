@@ -156,9 +156,10 @@ namespace Indy.IL2CPU {
         Console.Write(", MethodIndex = ");
         WriteNumber((uint)aMethodIndex, 32);
         Console.WriteLine("");
+        Console.WriteLine("Not FOUND!");
         while (true)
           ;
-        Console.WriteLine("Not FOUND!");
+
 
 			throw new Exception("Cannot find virtual method!");
 		}

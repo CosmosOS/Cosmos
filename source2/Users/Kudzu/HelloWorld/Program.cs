@@ -78,15 +78,12 @@ namespace HelloWorld {
       //var xLine = Console.ReadLine();
       //Console.Write("Given text was: ");
       //Console.WriteLine(xLine);
-      
 
-      //var xMethod = new EventHandler(TestMethod);
-      //xMethod(null, null);
 
-      Console.WriteLine("Done");
-      Base xObj = new Derived();
-      xObj.Test();
-      
+      var xMethod = new EventHandler(TestMethod);
+      xMethod(null, null);
+
+      Console.WriteLine("Closing");      
 
       return;
       //Console.BackgroundColor = ConsoleColor.Green;

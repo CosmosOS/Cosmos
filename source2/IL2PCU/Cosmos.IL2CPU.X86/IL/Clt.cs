@@ -20,6 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xStackItem = Assembler.Stack.Pop();
+            Assembler.Stack.Pop();
             if( xStackItem.IsFloat )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Clt: Floats not yet supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel );

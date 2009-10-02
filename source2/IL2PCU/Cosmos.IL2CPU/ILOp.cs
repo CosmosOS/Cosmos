@@ -22,7 +22,13 @@ namespace Cosmos.IL2CPU {
       return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(aType) + " ASM_IS__" + aType.Assembly.GetName().Name);
     }
 
-
+    public static uint Align(uint aSize, uint aAlign) {
+      var xSize = aSize;
+      if ((xSize % aAlign) != 0) {
+        xSize += aAlign - (xSize % aAlign);
+      }
+      return xSize;
+    }
 
     public static string GetLabel(MethodInfo aMethod, ILOpCode aOpCode) {
       return GetLabel(aMethod, aOpCode.Position);

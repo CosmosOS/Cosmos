@@ -51,13 +51,7 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
 
-    public static uint Align(uint aSize, uint aAlign) {
-      var xSize = aSize;
-      if ((xSize % aAlign) != 0) {
-        xSize += aAlign - (xSize % aAlign);
-      }
-      return xSize;
-    }
+
 
     protected void ThrowNotImplementedException(string aMessage) {
       new CPU.Push {
@@ -112,7 +106,7 @@ namespace Cosmos.IL2CPU.X86 {
       }
     }
     protected static List<IL.FieldInfo> GetFieldsInfo(Type aType) {
-      if (aType.IsGenericType) {
+      if (aType == typeof(EventHandler)) {
         Console.Write("");
       }
       var xResult = new List<IL.FieldInfo>();

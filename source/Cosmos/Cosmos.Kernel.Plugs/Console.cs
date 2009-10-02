@@ -139,21 +139,22 @@ namespace Cosmos.Kernel.Plugs
         {
             for (int i = 0; i < aText.Length; i++)
             {
-                if (aText[i] == '\n')
-                {
-                    TextScreen.NewLine();
-                    continue;
-                }
-                if (aText[i] == '\r')
-                {
-                    continue;
-                }
-                if (aText[i] == '\t')
-                {
-                    Write("    ");
-                    continue;
-                }
+                //if (aText[i] == '\n')
+                //{
+                //    TextScreen.NewLine();
+                //    continue;
+                //}
+                //if (aText[i] == '\r')
+                //{
+                //    continue;
+                //}
+                //if (aText[i] == '\t')
+                //{
+                //    Write("    ");
+                //    continue;
+                //}
                 TextScreen.WriteChar(aText[i]);
+                break;
             }
         }
 

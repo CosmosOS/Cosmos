@@ -56,6 +56,9 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodEnd(MethodInfo aMethod) {
       base.MethodEnd(aMethod);
+      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__System_Object__ctor__") {
+        Console.Write("");
+      }
       uint xReturnSize = 0;
       var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
       if (xMethInfo != null) {
@@ -67,6 +70,19 @@ namespace Cosmos.IL2CPU.X86 {
                             select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
       if (!aMethod.MethodBase.IsStatic) {
         xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+      }
+
+      if (aMethod.PlugMethod != null) {
+        xReturnSize = 0;
+        xMethInfo = aMethod.PlugMethod.MethodBase as System.Reflection.MethodInfo;
+        if (xMethInfo != null) {
+          xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
+        }
+        xTotalArgsSize = (from item in aMethod.PlugMethod.MethodBase.GetParameters()
+                          select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+        if (!aMethod.PlugMethod.MethodBase.IsStatic) {
+          xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.PlugMethod.MethodBase.DeclaringType), 4);
+        }
       }
 
       if (xReturnSize > 0) {
