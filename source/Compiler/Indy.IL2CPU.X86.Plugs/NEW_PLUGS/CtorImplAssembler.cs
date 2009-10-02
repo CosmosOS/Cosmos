@@ -37,13 +37,13 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
       Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodBase.DeclaringType, true);
       new Comment("Saving ArgSize to field");
       uint xSize = 0;
-      foreach (var xArg in xMethodInfo.MethodBase.GetParameters().Skip(2)) {
+      foreach (var xArg in xMethodInfo.MethodBase.GetParameters()) {
         xSize += ILOp.Align(ILOp.SizeOfType(xArg.ParameterType), 4);
       }
       new Comment("-- ldarg 0");
       Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
-      new CPUx86.Push { DestinationValue = xSize };
       new Comment("-- push argsize");
+      new CPUx86.Push { DestinationValue = xSize };
       xAssembler.Stack.Push((int)ILOp.SizeOfType(typeof(int)), typeof(int));
       new Comment("-- stfld ArgSize");
       Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true);

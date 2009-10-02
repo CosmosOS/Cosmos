@@ -82,7 +82,6 @@ namespace HelloWorld {
 
       var xMethod = new EventHandler(TestMethod);
       xMethod(null, null);
-
       Console.WriteLine("Closing");      
 
       return;

@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
           DoExecute(Assembler, aMethod, xOpVar.Value);
         }
 
-        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
+        public static int GetArgumentDisplacement(MethodInfo aMethod, ushort aParam) {
           var xMethodBase = aMethod.MethodBase;
           if (aMethod.PluggedMethod != null) {
             xMethodBase = aMethod.PluggedMethod.MethodBase;
@@ -51,14 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             xOffset += xExtraSize;
 
-            for (int i = 0; i < (xCurArgSize / 4); i++) {
-              new Push {
-                DestinationReg = Registers.EBP,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
-              };
-            }
-            Assembler.Stack.Push((int)xCurArgSize, xMethodBase.DeclaringType);
+            return (int)(xOffset + xCurArgSize - 4);
           } else {
             for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
@@ -76,55 +69,72 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             xOffset += xExtraSize;
 
-            for (int i = 0; i < (xCurArgSize / 4); i++) {
-              new Push {
-                DestinationReg = Registers.EBP,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
-              };
-            }
-            Assembler.Stack.Push((int)xCurArgSize, xParams[xCorrectedOpValValue].ParameterType);
+            return (int)(xOffset + xCurArgSize - 4);
           }
         }
 
+        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
+          uint xArgSize = 0;
+          var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
+          Type xArgType;
+          if (aMethod.MethodBase.IsStatic) {
+            xArgType = aMethod.MethodBase.GetParameters()[aParam].ParameterType;
+          } else {
+            if (aParam == 0) {
+              xArgType = aMethod.MethodBase.DeclaringType;
+            } else {
+              xArgType = aMethod.MethodBase.GetParameters()[aParam - 1].ParameterType;
+            }
+          }
+          xArgSize = Align(SizeOfType(xArgType), 4);
+          for (int i = 0; i < (xArgSize / 4); i++) {
+            new Push {
+              DestinationReg = Registers.EBP,
+              DestinationIsIndirect = true,
+              DestinationDisplacement = (int)(xDisplacement - ((i) * 4))
+            };
+          }
+          Assembler.Stack.Push((int)xArgSize, xArgType);
+        }
 
-        // using System;
-        // using System.Collections.Generic;
-        // using System.IO;
-        // 
-        // using CPU = Cosmos.IL2CPU.X86;
-        // 
-        // namespace Indy.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldarg)]
-        // 	public class Ldarg: Op {
-        // 		private MethodInformation.Argument mArgument;
-        // 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
-        // 			mArgument = aMethodInfo.Arguments[aIndex];
-        // 		}
-        // 
-        // 		public Ldarg(MethodInformation aMethodInfo, int aIndex)
-        // 			: base(null, aMethodInfo) {
-        // 			SetArgIndex(aIndex, aMethodInfo);
-        // 		}
-        // 
-        // 		public Ldarg(ILReader aReader, MethodInformation aMethodInfo)
-        // 			: base(aReader, aMethodInfo) {
-        // 			int xArgIndex;
-        // 			if (aReader != null) {
-        // 				xArgIndex = aReader.OperandValueInt32;
-        // 				SetArgIndex(xArgIndex, aMethodInfo);
-        // 				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
-        // 				//if (xParam != null) {
-        // 				//    SetArgIndex(xParam.Sequence - 1, aMethodInfo);
-        // 				//}
-        // 			}
-        // 		}
-        // 
-        // 		public override void DoAssemble() {
-        // 			Ldarg(Assembler, mArgument);
-        // 		}
-        // 	}
-        // }
+
+      // using System;
+      // using System.Collections.Generic;
+      // using System.IO;
+      // 
+      // using CPU = Cosmos.IL2CPU.X86;
+      // 
+      // namespace Indy.IL2CPU.IL.X86 {
+      // 	[OpCode(OpCodeEnum.Ldarg)]
+      // 	public class Ldarg: Op {
+      // 		private MethodInformation.Argument mArgument;
+      // 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
+      // 			mArgument = aMethodInfo.Arguments[aIndex];
+      // 		}
+      // 
+      // 		public Ldarg(MethodInformation aMethodInfo, int aIndex)
+      // 			: base(null, aMethodInfo) {
+      // 			SetArgIndex(aIndex, aMethodInfo);
+      // 		}
+      // 
+      // 		public Ldarg(ILReader aReader, MethodInformation aMethodInfo)
+      // 			: base(aReader, aMethodInfo) {
+      // 			int xArgIndex;
+      // 			if (aReader != null) {
+      // 				xArgIndex = aReader.OperandValueInt32;
+      // 				SetArgIndex(xArgIndex, aMethodInfo);
+      // 				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
+      // 				//if (xParam != null) {
+      // 				//    SetArgIndex(xParam.Sequence - 1, aMethodInfo);
+      // 				//}
+      // 			}
+      // 		}
+      // 
+      // 		public override void DoAssemble() {
+      // 			Ldarg(Assembler, mArgument);
+      // 		}
+      // 	}
+      // }
 
     }
 }

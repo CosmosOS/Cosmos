@@ -23,12 +23,112 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
     }
 
     public override void AssembleNew(object aAssembler, object aMethodInfo) {
+      var xAssembler = (CosmosAssembler)aAssembler;
+      var xMethodInfo = (Cosmos.IL2CPU.MethodInfo)aMethodInfo;
+      var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
+      if (xMethodBaseAsInfo.ReturnType != typeof(void)) {
+        throw new Exception("Events with return type not yet supported!");
+      }
+      new Comment("XXXXXXX");
       new CPUx86.Xchg { DestinationReg = CPUx86.Registers.BX, SourceReg = CPUx86.Registers.BX, Size = 16 };
-      new CPUx86.Noop();
+
+      /*
+ * EAX contains the GetInvocationList() array at the index at which it was last used
+ * EDX contains the index at which the EAX is
+ * EBX contains the number of items in the array
+ * ECX contains the argument size
+ */
+      //new CPU.Label("____DEBUG_FOR_MULTICAST___");
+      new CPU.Comment("move address of delgate to eax");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
+      var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
+      new CPU.Comment("push address of delgate to stack");
+      new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };//addrof this
+      new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(xGetInvocationListMethod) };
+      new CPU.Comment("get address from return value -> eax");
+      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+      ;//list
+      new CPU.Comment("eax+=8 is where the offset where an array's count is");
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };//addrof list.count??
+      new CPU.Comment("store count in ebx");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };//list.count
+      new CPU.Comment("eax+=8 is where the offset where an array's items start");
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };//why? -- start of list i think? MtW: the array's .Length is at +8
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
+      new CPU.Comment("ecx = ptr to delegate object");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };//addrof the delegate
+      new CPU.Comment("ecx points to the size of the delegated methods arguments");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ArgSize$$") };//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
+      new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+      ;//make sure edx is 0
+      new CPU.Label(".BEGIN_OF_LOOP");
+      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBX };//are we at the end of this list
+      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
+      new CPUx86.Pushad();
+      new CPU.Comment("esi points to where we will copy the methods argumetns from");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP };
+      new CPU.Comment("edi = ptr to delegate object");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
+      new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target") };
+      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
+      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
+      new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
+
+      new CPU.Label(".NO_THIS");
+
+      new CPU.Comment("make space for us to copy the arguments too");
+      new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.ECX };
+      new CPU.Comment("move the current delegate to edi");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+      new CPU.Comment("move the methodptr from that delegate to edi ");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr") };//
+      new CPU.Comment("save methodptr on the stack");
+      new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
+      new CPU.Comment("move location to copy args to");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP };
+      new CPU.Comment("get above the saved methodptr");
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
+      //we allocated the argsize on the stack once, and it we need to get above the original args
+      new CPU.Comment("we allocated argsize on the stack once");
+      new CPU.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 52 };
+      new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
+      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
+      new CPUx86.Call { DestinationReg = CPUx86.Registers.EDI };
+      new CPU.Comment("store return -- return stored into edi after popad");
+      new CPU.Comment("edi = ptr to delegate object");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
+      new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target") };//i really dont get the +12, MtW: that's for the object header
+      new CPU.Label(".noTHIStoPop");
+      new CPUx86.Popad();
+      new CPUx86.Inc { DestinationReg = CPUx86.Registers.EDX };
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
+      new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
+      new CPU.Label(".END_OF_INVOKE_");
+      new CPU.Comment("get the return value");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };//addrof the delegate
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$") };
+      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
+      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".noReturn" };
+      //may have to expand the return... idk
+      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EDX };
+      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
+      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
+      new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };//ebp
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDI };
+      new CPU.Label(".noReturn");
+    }
+
+    #region OLD attempt
+    //    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+//      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.BX, SourceReg = CPUx86.Registers.BX, Size = 16 };
+//      new CPUx86.Noop();
 //      var xAssembler = (CosmosAssembler)aAssembler;
-//      var xMethodInfo = (Cosmos.IL2CPU.MethodInfo) aMethodInfo;
-//      var xMethodBaseAsInfo= xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
-//      if(xMethodBaseAsInfo.ReturnType!=typeof(void)){
+//      var xMethodInfo = (Cosmos.IL2CPU.MethodInfo)aMethodInfo;
+//      var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
+//      if (xMethodBaseAsInfo.ReturnType != typeof(void)) {
 //        throw new Exception("Events with return type not yet supported!");
 //      }
 //      new Comment("XXXXXXX");
@@ -56,7 +156,6 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
 //       */
 //      //new CPU.Label("____DEBUG_FOR_MULTICAST___");
 //      //            new CPUx86.Cli();//DEBUG ONLY
-//      //#warning reenable interupts when issue is fixed!!!
 //      new CPU.Comment("push address of delgate to stack");
 //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
 //      var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
@@ -72,11 +171,14 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
 //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };//why? -- start of list i think? MtW: the array's .Length is at +8
 //      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
 //      new CPU.Comment("ecx = ptr to delegate object");
-//      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
+
+////      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
+//      new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 //      // make ecx point to the size of arguments
 //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
 //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "$$ArgSize$$");
 //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+//      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 //      new CPU.Comment("ecx points to the size of the delegated methods arguments");
 //      new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
 //      ;//make sure edx is 0
@@ -93,9 +195,11 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
 //      new CPU.Comment("esi points to where we will copy the methods arguments from");
 //      new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP };
 //      new CPU.Comment("edi = ptr to delegate object");
-//      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);                         
+//      new CPUx86.Pushad();
+//      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
 //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target");
 //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
+//      new CPUx86.Popad();
 //      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
 //      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
 //      new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
@@ -103,13 +207,15 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
 //      new CPU.Label(".NO_THIS");
 
 //      new CPU.Comment("make space for us to copy the arguments too");
-//      new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.ECX };
+//      new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EBX };
 //      new CPU.Comment("move the current delegate to edi");
 //      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
 //      new CPU.Comment("move the methodptr from that delegate to the stack ");
+//      new CPUx86.Pushad();
 //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
 //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr");
 //      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP };
+      
 //      new CPU.Comment("get above the saved methodptr");
 //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
 //      //we allocated the argsize on the stack once, and it we need to get above the original args
@@ -153,6 +259,9 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
 //      new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
 //      new CPU.Label(".END_OF_INVOKE_");
 //      new CPU.Comment("get the return value");
+//      // TEMP!!!
+//     // new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+//      // END OF TEMP!!
 //      //new CPUx86.Pop("eax");
 //      //Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
 //      //Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$");
@@ -178,15 +287,16 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
 
 //      //							new CPUx86.Pop(CPUx86.Registers_Old.EAX);
 //      //new CPUx86.Move("esp", "ebp");
-      
+
 //      //new CPUx86.Push {
 //      //  DestinationRef = ElementReference.New(LdStr.GetContentsArrayName("Events not yet implemented"))
 //      //};
 //      //new CPUx86.Call {
 //      //  DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
 //      //};
-////      throw new NotImplementedException();
+//      //      throw new NotImplementedException();
 
-      }
+    //      }
+    #endregion
   }
 }

@@ -40,6 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
           uint xRoundedSize = Align(xSize, 4);
 
+#if! SKIP_GC_CODE
           if (aNeedsGC) {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4 };
             //Ldfld(aAssembler, aType, aField, false);
@@ -47,6 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xActualOffset) };
             new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
           }
+#endif
           new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
           new CPUx86.Add {
             DestinationReg = CPUx86.Registers.ECX,
@@ -77,12 +79,14 @@ namespace Cosmos.IL2CPU.X86.IL
             default:
               throw new Exception("Remainder size " + (xSize % 4) + " not supported!");
           }
+#if! SKIP_GC_CODE
           if (aNeedsGC) {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
             new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
           }
+#endif
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
           aAssembler.Stack.Pop();
         }

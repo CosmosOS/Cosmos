@@ -45,31 +45,35 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-          if (GetLabel(aMethod, aOpCode) == "System_Void__System_Collections_Generic_List_1___System_IO_FileInfo__Add_System_IO_FileInfo___DOT__00000026") {
-            Console.Write("");
-          }
           var xOpCode = (ILOpCodes.OpField)aOpCode;
           DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName());
         }
-
-        public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId) {
-          Assembler.Stack.Pop();
+        public static int GetFieldOffset(Type aDeclaringType, string aFieldId) {
           int xExtraOffset = 0;
           var xFields = GetFieldsInfo(aDeclaringType);
           var xFieldInfo = (from item in xFields
-                            where item.Id == xFieldId
+                            where item.Id == aFieldId
                             select item).Single();
           bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
           if (xNeedsGC) {
             xExtraOffset = 12;
           }
-          new Comment(Assembler, "Type = '" + xFieldInfo.FieldType.FullName + "', NeedsGC = " + xNeedsGC);
+          return (int)(xExtraOffset + xFieldInfo.Offset);
+        }
+
+        public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId) {
+          Assembler.Stack.Pop();
+          var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
+          var xFields = GetFieldsInfo(aDeclaringType);
+          var xFieldInfo = (from item in xFields
+                            where item.Id == xFieldId
+                            select item).Single();
+          
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
-          var xActualOffset = xFieldInfo.Offset + xExtraOffset;
           var xSize = xFieldInfo.Size;
 
-          new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
+          new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset) };
 
           //if( aField.IsExternalField/* && aDerefExternalField */)
           //{
@@ -109,10 +113,12 @@ namespace Cosmos.IL2CPU.X86.IL
             default:
               throw new Exception("Remainder size " + xFieldInfo.FieldType.ToString() + (xSize) + " not supported!");
           }
+#if! SKIP_GC_CODE
           if (xNeedsGC) {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
             new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
           }
+#endif
           Assembler.Stack.Push(new StackContents.Item((int)xSize, xFieldInfo.FieldType));
         }
 
