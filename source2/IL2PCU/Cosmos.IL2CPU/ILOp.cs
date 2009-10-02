@@ -39,8 +39,8 @@ namespace Cosmos.IL2CPU {
     }
 
     public static string GetMethodLabel(MethodInfo aMethod) {
-      if (aMethod.PluggedByMethod != null) {
-        return "PLUG_FOR___" + GetMethodLabel(aMethod.PluggedByMethod.MethodBase);
+      if (aMethod.PluggedMethod != null) {
+        return "PLUG_FOR___" + GetMethodLabel(aMethod.PluggedMethod.MethodBase);
       } else {
         return GetMethodLabel(aMethod.MethodBase);
       }

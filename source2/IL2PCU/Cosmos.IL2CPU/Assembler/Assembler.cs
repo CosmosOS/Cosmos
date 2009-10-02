@@ -164,7 +164,7 @@ namespace Cosmos.IL2CPU {
         if (xNeedsMethodInfo != null) {
           throw new Exception("Plug cant work, because of INeedsMethodInfo");
         }
-        xAssembler.AssembleNew(this, aMethod.PluggedByMethod);
+        xAssembler.AssembleNew(this, aMethod.PluggedMethod);
       } else {
         foreach (var xOpCode in aOpCodes) {
           uint xOpCodeVal = (uint)xOpCode.OpCode;

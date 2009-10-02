@@ -289,7 +289,7 @@ namespace Cosmos.IL2CPU {
             xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo/*, xPlugAssembler*/);
             if (xAttrib != null && xAttrib.IsWildcard) {
-              xPlugInfo.PluggedByMethod = xMethodInfo;
+              xPlugInfo.PluggedMethod = xMethodInfo;
               var xInstructions = mReader.ProcessMethod(xPlug);
               if (xInstructions != null) {
                 ProcessInstructions(xInstructions);

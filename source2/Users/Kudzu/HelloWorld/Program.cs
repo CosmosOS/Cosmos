@@ -60,7 +60,7 @@ namespace HelloWorld {
       var xMethod = new EventHandler(TestMethod);
       xDict.Add(aIRQ, xMethod);
       if (xDict.ContainsKey(aIRQ)) {
-        Console.WriteLine("Found!");
+        Console.WriteLine("Found! ie, inside event handler!");
       } else {
         Console.WriteLine("Not found!");
       }

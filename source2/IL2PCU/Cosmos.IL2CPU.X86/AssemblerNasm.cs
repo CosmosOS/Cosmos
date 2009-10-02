@@ -20,8 +20,8 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
-      if (aMethod.PluggedByMethod != null) {
-        new Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedByMethod.MethodBase));
+      if (aMethod.PluggedMethod != null) {
+        new Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
       } else {
         new Label(aMethod.MethodBase);
       }
@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodEnd(MethodInfo aMethod) {
       base.MethodEnd(aMethod);
-      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__System_Object__ctor__") {
+      if (ILOp.GetMethodLabel(aMethod) == "PLUG_FOR___System_Void__System_EventHandler_Invoke_System_Object__System_EventArgs_") {
         Console.Write("");
       }
       uint xReturnSize = 0;
@@ -72,16 +72,16 @@ namespace Cosmos.IL2CPU.X86 {
         xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
       }
 
-      if (aMethod.PlugMethod != null) {
+      if (aMethod.PluggedMethod != null) {
         xReturnSize = 0;
-        xMethInfo = aMethod.PlugMethod.MethodBase as System.Reflection.MethodInfo;
+        xMethInfo = aMethod.PluggedMethod.MethodBase as System.Reflection.MethodInfo;
         if (xMethInfo != null) {
           xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
         }
-        xTotalArgsSize = (from item in aMethod.PlugMethod.MethodBase.GetParameters()
+        xTotalArgsSize = (from item in aMethod.PluggedMethod.MethodBase.GetParameters()
                           select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
-        if (!aMethod.PlugMethod.MethodBase.IsStatic) {
-          xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.PlugMethod.MethodBase.DeclaringType), 4);
+        if (!aMethod.PluggedMethod.MethodBase.IsStatic) {
+          xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.PluggedMethod.MethodBase.DeclaringType), 4);
         }
       }
 
@@ -165,7 +165,9 @@ namespace Cosmos.IL2CPU.X86 {
       //new CPUx86.Halt();
       // TODO: not nice coding, still a test
       //new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
-
+      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Int32__System_String_get_Length__") {
+        Console.Write("");
+      }
       new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);

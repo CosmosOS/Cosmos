@@ -23,8 +23,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
           var xMethodBase = aMethod.MethodBase;
-          if (aMethod.PluggedByMethod != null) {
-            xMethodBase = aMethod.PluggedByMethod.MethodBase;
+          if (aMethod.PluggedMethod != null) {
+            xMethodBase = aMethod.PluggedMethod.MethodBase;
           }
           var xMethodInfo = xMethodBase as System.Reflection.MethodInfo;
           uint xReturnSize = 0;
