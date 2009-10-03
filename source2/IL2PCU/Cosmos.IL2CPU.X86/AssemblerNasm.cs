@@ -5,6 +5,9 @@ using System.Text;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Reflection;
 using System.IO;
+using Indy.IL2CPU;
+using System.Diagnostics.SymbolStore;
+using Microsoft.Samples.Debugging.CorSymbolStore;
 
 namespace Cosmos.IL2CPU.X86 {
     public class AssemblerNasm : CosmosAssembler
@@ -16,7 +19,7 @@ namespace Cosmos.IL2CPU.X86 {
       InitILOps(typeof(ILOp));
     }
 
-    public AssemblerNasm() : base( 0 ) { }
+    public AssemblerNasm(byte aComNumber) : base(aComNumber) { }
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
@@ -170,14 +173,50 @@ namespace Cosmos.IL2CPU.X86 {
       }
       WriteDebug(aMethod.MethodBase, (uint)xRetSize, IL.Call.GetStackSizeToReservate(aMethod.MethodBase));
       new CPUx86.Return { DestinationValue = (uint)xRetSize };
+        #region Load CodeOffset
+      if (DebugMode == DebugMode.Source)
+      {
+          var xSymbolReader = GetSymbolReaderForAssembly(aMethod.MethodBase.DeclaringType.Assembly);
+          if (xSymbolReader != null)
+          {
+              var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(aMethod.MethodBase.MetadataToken));
+              // This gets the Sequence Points.
+              // Sequence Points are spots that identify what the compiler/debugger says is a spot
+              // that a breakpoint can occur one. Essentially, an atomic source line in C#
+              if (xSmbMethod != null)
+              {
+                  xCodeOffsets = new int[xSmbMethod.SequencePointCount];
+                  var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+                  var xCodeLines = new int[xSmbMethod.SequencePointCount];
+                  var xCodeColumns = new int[xSmbMethod.SequencePointCount];
+                  var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+                  var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+                  xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
+                   , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+              }
+          }
+      }
+        #endregion
     }
 
+    private static ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly)
+    {
+        try
+        {
+            return SymbolAccess.GetReaderForFile(aAssembly.Location);
+        }
+        catch (NotSupportedException)
+        {
+            return null;
+        }
+    }
 
     protected override void MethodBegin(string aMethodName) {
       base.MethodBegin(aMethodName);
       new Label(aMethodName);
       new Push { DestinationReg = Registers.EBP };
       new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+        xCodeOffsets = new int[0];
     }
 
     protected override void MethodEnd(string aMethodName) {
@@ -196,11 +235,129 @@ namespace Cosmos.IL2CPU.X86 {
     static AssemblerNasm() {
     }
 
-    protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
-      base.BeforeOp(aMethod, aOpCode);
-      new Label(TmpPosLabel(aMethod, aOpCode));
+    private List<MLDebugSymbol> mSymbols = new List<MLDebugSymbol>();
+
+    protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode)
+    {
+        base.BeforeOp(aMethod, aOpCode);
+        new Label(TmpPosLabel(aMethod, aOpCode));
+        #region Collection debug information
+        if (mSymbols != null)
+        {
+            var xMLSymbol = new MLDebugSymbol();
+            xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
+            int xStackSize = (from item in Stack
+                              let xSize = (item.Size % 4 == 0)
+                                              ? item.Size
+                                              : (item.Size + (4 - (item.Size % 4)))
+                              select xSize).Sum();
+            xMLSymbol.StackDifference = -1;
+            if (aMethod.MethodBase != null)
+            {
+                var xBody = aMethod.MethodBase.GetMethodBody();
+                if (xBody != null)
+                {
+                    var xLocalsSize = (from item in xBody.LocalVariables
+                                       select (int)ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
+                    xMLSymbol.StackDifference = xLocalsSize + xStackSize;
+                }
+            }
+            try
+            {
+                xMLSymbol.AssemblyFile = aMethod.MethodBase.DeclaringType.Assembly.Location;
+            }
+            catch (NotSupportedException)
+            {
+                xMLSymbol.AssemblyFile = "DYNAMIC: " + aMethod.MethodBase.DeclaringType.Assembly.FullName;
+            }
+            xMLSymbol.MethodToken = aMethod.MethodBase.MetadataToken;
+            xMLSymbol.TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken;
+            xMLSymbol.ILOffset = aOpCode.Position;
+            mSymbols.Add(xMLSymbol);
+        }
+        #endregion
+        EmitTracer(aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
     }
 
+    public TraceAssemblies TraceAssemblies;
+    public DebugMode DebugMode;
+
+    protected void EmitTracer(ILOpCode aOp, string aNamespace, int[] aCodeOffsets)
+    {
+        // NOTE - These if statemens can be optimized down - but clarity is
+        // more importnat the optimizations would not offer much benefit
+
+        // Determine if a new DebugStub should be emitted
+        //bool xEmit = false;
+        // Skip NOOP's so we dont have breakpoints on them
+        //TODO: Each IL op should exist in IL, and descendants in IL.X86.
+        // Because of this we have this hack
+        if (aOp.OpCode == ILOpCode.Code.Nop)
+        {
+            return;
+        }
+        else if (DebugMode == DebugMode.None)
+        {
+            return;
+        }
+        else if (DebugMode == DebugMode.Source)
+        {
+            // If the current position equals one of the offsets, then we have
+            // reached a new atomic C# statement
+            if (aCodeOffsets != null)
+            {
+                if (aCodeOffsets.Contains(aOp.Position) == false)
+                {
+                    return;
+                }
+            }
+        }
+
+        // Check options for Debug Level
+        // Set based on TracedAssemblies
+        if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User)
+        {
+            if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+            else if (aNamespace.ToLower() == "system")
+            {
+                return;
+            }
+            else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+        }
+        if (TraceAssemblies == TraceAssemblies.User)
+        {
+            //TODO: Maybe an attribute that could be used to turn tracing on and off
+            //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user 
+            // could do Cosmos.KernelMine and it will fail. Need to fix this
+            if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+            else if (aNamespace.StartsWith("Cosmos.Sys", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+            else if (aNamespace.StartsWith("Cosmos.Hardware", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+            else if (aNamespace.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+        }
+        // If we made it this far, emit the Tracer
+        new CPUx86.Call { DestinationLabel = "DebugStub_TracerEntry" };
+    }
+
+
+    private int[] xCodeOffsets;
     protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
       base.AfterOp(aMethod, aOpCode);
       var xContents = "";
@@ -231,12 +388,18 @@ namespace Cosmos.IL2CPU.X86 {
       return TmpPosLabel(aMethod, ((ILOpCodes.OpBranch)aOpCode).Value);
     }
 
-    public override void FlushText(TextWriter aOutput)
+    public void FlushText(TextWriter aOutput, string aDebugFile)
     {
         aOutput.WriteLine("use32");
         aOutput.WriteLine("org 0x200000");
         base.FlushText(aOutput);
+        if (mSymbols.Count > 0)
+        {
+            MLDebugSymbol.WriteSymbolsListToFile(mSymbols, aDebugFile);
+        }
     }
+
+
 
   }
 }

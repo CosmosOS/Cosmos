@@ -40,7 +40,7 @@ namespace HelloWorld {
       //TODO: Move new build logic into "new sort".
       // Build stuff is all UI, launching QEMU, making ISO etc.
       // IL2CPU should only contain scanning and assembling of binary files
-      var xAsmblr = new Cosmos.IL2CPU.X86.AssemblerNasm();
+      var xAsmblr = new Cosmos.IL2CPU.X86.AssemblerNasm(0);
       try {
         xAsmblr.Initialize();
 

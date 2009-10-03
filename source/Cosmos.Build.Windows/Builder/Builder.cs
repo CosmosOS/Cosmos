@@ -210,9 +210,7 @@ namespace Cosmos.Compiler.Builder
 
             if (options.dotNETFrameworkImplementation == dotNETFrameworkImplementationEnum.Microsoft)
             {
-                var xEntryAsm = Assembly.GetEntryAssembly();
-                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init");
-                RunEngine(xInitMethod);
+                RunEngine(options);
             }
             else
             {
@@ -425,14 +423,23 @@ namespace Cosmos.Compiler.Builder
             try
             {
                 LogTime("Engine execute started");
-                var xInitMethod = (MethodBase)aParam;
-                var xAsm = new AssemblerNasm();
+                var xOptions = (BuildOptions)aParam;
+                var xEntryAsm = Assembly.GetEntryAssembly();
+                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init");
+                byte xDebugCom = 0;
+                if (xOptions.DebugMode != DebugMode.None)
+                {
+                    xDebugCom = 1;
+                }
+                var xAsm = new AssemblerNasm(xDebugCom);
+                xAsm.DebugMode = xOptions.DebugMode;
+                xAsm.TraceAssemblies = xOptions.TraceAssemblies;
                 xAsm.Initialize();
                 var xScanner = new ILScanner(xAsm);
                 xScanner.Execute(xInitMethod);
                 using (var xOut = new StreamWriter(Path.Combine(AsmPath, "main.asm"), false))
                 {
-                    xAsm.FlushText(xOut);
+                    xAsm.FlushText(xOut, Path.Combine(AsmPath, "debug.cxdb"));
                 }
 
                 LogTime("Engine execute finished");
