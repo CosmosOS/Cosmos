@@ -68,21 +68,19 @@ namespace HelloWorld {
 
 		// Main entry point of the kernel
 		public static unsafe void Init() {
-      var xTempBool = false;
+      var xTempBool = true;
       if (xTempBool) {
         var xBoot = new Cosmos.Sys.Boot();
         xBoot.Execute();
       }
       //Test(1);
-      //Console.WriteLine("Done");
-      //var xLine = Console.ReadLine();
-      //Console.Write("Given text was: ");
-      //Console.WriteLine(xLine);
+      Console.WriteLine("Done");
+      var xLine = Console.ReadLine();
+      Console.Write("Given text was: ");
+      Console.WriteLine(xLine);
 
 
-      var xMethod = new EventHandler(TestMethod);
-      xMethod(null, null);
-      Console.WriteLine("Closing");      
+      
 
       return;
       //Console.BackgroundColor = ConsoleColor.Green;

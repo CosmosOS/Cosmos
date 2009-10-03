@@ -14,29 +14,29 @@ namespace Cosmos.Hardware
         public static void Initialize()
         {
 
-            //enable mouse
-            WaitSignal();
-            CPUBus.Write8(0x64, 0xA8);
+            ////enable mouse
+            //WaitSignal();
+            //CPUBus.Write8(0x64, 0xA8);
 
-            // enable interrupt
-            WaitSignal();
-            CPUBus.Write8(0x64, 0x20);
-            WaitData();
-            byte status = (byte)(CPUBus.Read8(0x60) | 2);
-            WaitSignal();
-            CPUBus.Write8(0x64, 0x60);
-            WaitSignal();
-            CPUBus.Write8(0x60, status);
+            //// enable interrupt
+            //WaitSignal();
+            //CPUBus.Write8(0x64, 0x20);
+            //WaitData();
+            //byte status = (byte)(CPUBus.Read8(0x60) | 2);
+            //WaitSignal();
+            //CPUBus.Write8(0x64, 0x60);
+            //WaitSignal();
+            //CPUBus.Write8(0x60, status);
 
-            //default 
-            Write(0xF6);
-            Read();  //Acknowledge
+            ////default 
+            //Write(0xF6);
+            //Read();  //Acknowledge
 
-            //Enable the mouse
-            Write(0xF4);
-            Read();  //Acknowledge
+            ////Enable the mouse
+            //Write(0xF4);
+            //Read();  //Acknowledge
 
-            Interrupts.AddIRQHandler(12, new Interrupts.InterruptDelegate(HandleMouse));
+            //Interrupts.AddIRQHandler(12, new Interrupts.InterruptDelegate(HandleMouse));
 
         }
 

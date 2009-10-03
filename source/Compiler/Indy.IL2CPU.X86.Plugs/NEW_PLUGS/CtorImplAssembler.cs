@@ -37,11 +37,14 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
       Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodBase.DeclaringType, true);
       new Comment("Saving ArgSize to field");
       uint xSize = 0;
-      foreach (var xArg in xMethodInfo.MethodBase.GetParameters()) {
+      foreach (var xArg in xMethodInfo.MethodBase.DeclaringType.GetMethod("Invoke").GetParameters()) {
         xSize += ILOp.Align(ILOp.SizeOfType(xArg.ParameterType), 4);
       }
       new Comment("-- ldarg 0");
       Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
+      if (xMethodInfo.MethodBase.DeclaringType.FullName.Contains("InterruptDelegate")) {
+        Console.Write("");
+      }
       new Comment("-- push argsize");
       new CPUx86.Push { DestinationValue = xSize };
       xAssembler.Stack.Push((int)ILOp.SizeOfType(typeof(int)), typeof(int));

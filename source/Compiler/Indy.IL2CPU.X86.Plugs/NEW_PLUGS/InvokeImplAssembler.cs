@@ -38,6 +38,8 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
  * EBX contains the number of items in the array
  * ECX contains the argument size
  */
+      new CPUx86.ClrInterruptFlag();
+      new CPU.Label(".DEBUG");
       //new CPU.Label("____DEBUG_FOR_MULTICAST___");
       new CPU.Comment("move address of delgate to eax");
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
@@ -119,6 +121,7 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };//ebp
       new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDI };
       new CPU.Label(".noReturn");
+      new CPUx86.Sti();
     }
 
     #region OLD attempt
