@@ -26,10 +26,6 @@ namespace Cosmos.IL2CPU
 
         public Label( string aName )
         {
-            if( aName == "System_UInt32__Indy_IL2CPU_RuntimeEngine_Heap_AllocNewObject_System_UInt32_" )
-            {
-                Console.Write( "" );
-            }
             mName = aName;
             if( !aName.StartsWith( "." ) )
             {

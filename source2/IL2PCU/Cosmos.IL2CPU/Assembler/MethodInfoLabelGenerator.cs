@@ -131,7 +131,7 @@ namespace Cosmos.IL2CPU
                 {
                     xSB.Append( GetFullName( xArgs[ i ] ) );
                     xSB.Append( ", " );
-                } if( xArgs.Length == 0 ) { Console.Write( "" ); }
+                }
                 xSB.Append( GetFullName( xArgs.Last() ) );
                 xSB.Append( ">" );
             }

@@ -21,10 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             //throw new NotImplementedException();
-          if (GetLabel(aMethod, aOpCode) == "System_Int32__Indy_IL2CPU_VTablesImpl_GetMethodAddressForType_System_Int32__System_Int32___DOT__00000170") {
-            Console.Write("");
-          }
- 
+          
             OpVar xOpVar = ( OpVar )aOpCode;
             //mAddresses = aMethodInfo.Arguments[ xOpVar.Value ].VirtualAddresses;
 

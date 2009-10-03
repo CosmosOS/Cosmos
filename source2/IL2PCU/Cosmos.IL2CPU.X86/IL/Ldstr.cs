@@ -40,7 +40,6 @@ namespace Cosmos.IL2CPU.X86.IL
         || xFields[3].Offset != 12) {
         throw new Exception("Fields changed!");
       }
-      Console.Write("");
     }
 
     public static string GetContentsArrayName(string aLiteral) {

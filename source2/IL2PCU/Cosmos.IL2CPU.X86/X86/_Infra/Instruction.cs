@@ -198,9 +198,6 @@ namespace Cosmos.IL2CPU.X86 {
                 return false;
             }
             aEncodingOption = null;
-            if (aInstruction.ToString() == "mov dword EAX, 0x0") {
-                Console.Write("");
-            }
             for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
                 var xEncodingOption = aInstructionData.EncodingOptions[i];
                 if(aInstructionWithSize!=null) {

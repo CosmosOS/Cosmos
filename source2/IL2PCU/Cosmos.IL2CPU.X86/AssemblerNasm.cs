@@ -56,9 +56,6 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodEnd(MethodInfo aMethod) {
       base.MethodEnd(aMethod);
-      if (ILOp.GetMethodLabel(aMethod) == "PLUG_FOR___System_Void__System_EventHandler_Invoke_System_Object__System_EventArgs_") {
-        Console.Write("");
-      }
       uint xReturnSize = 0;
       var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
       if (xMethInfo != null) {
@@ -165,9 +162,6 @@ namespace Cosmos.IL2CPU.X86 {
       //new CPUx86.Halt();
       // TODO: not nice coding, still a test
       //new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
-      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Int32__System_String_get_Length__") {
-        Console.Write("");
-      }
       new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);

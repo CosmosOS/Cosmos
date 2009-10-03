@@ -148,10 +148,6 @@ namespace Cosmos.IL2CPU {
         throw new Exception("For now, too much methods");
       }
 
-      if (ILOp.GetMethodLabel(aMethod) == "PLUG_FOR___System_Void__System_EventHandler_Invoke_System_Object__System_EventArgs_") {
-        Console.Write("");
-      }
-
       MethodBegin(aMethod);
       Stack.Clear();
       mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
@@ -635,9 +631,6 @@ namespace Cosmos.IL2CPU {
 // todo: completely get rid of this kind of trampoline code
       MethodBegin(aFrom);
       {
-        if (ILOp.GetMethodLabel(aFrom.MethodBase) == "System_Void__System_EventHandler_Invoke_System_Object__System_EventArgs_") {
-          Console.Write("");
-        }
         var xParams = aTo.MethodBase.GetParameters().ToArray();
 
         if (aTo.MethodAssembler != null) {

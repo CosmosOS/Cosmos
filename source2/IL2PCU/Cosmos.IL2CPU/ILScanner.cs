@@ -131,9 +131,6 @@ namespace Cosmos.IL2CPU {
     protected void ScanPlugs(Dictionary<Type, List<Type>> aPlugs) {
       foreach (var xPlug in aPlugs) {
         var xImpls = xPlug.Value;
-        if (xPlug.Key.FullName == "Cosmos.Kernel.CPU") {
-          Console.Write("");
-        }
         foreach (var xImpl in xImpls) {
           #region PlugMethods scan
           foreach (var xMethod in xImpl.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
@@ -266,10 +263,6 @@ namespace Cosmos.IL2CPU {
         if (xItem is MethodBase) {
           var xMethod = (MethodBase)xItem;
 
-          if (xMethod.DeclaringType.FullName == "Cosmos.Kernel.Plugs.CPU"
-  && xMethod.Name == "GetEndOfKernel") {
-            Console.Write("");
-          }
           #region Method handling
           var xParams = xMethod.GetParameters();
           var xParamTypes = new Type[xParams.Length];
@@ -742,9 +735,6 @@ namespace Cosmos.IL2CPU {
         // TODO: cleanup this loop, next statement shouldnt be neccessary
         if (xResult != null) {
           break;
-        }
-        if (xImpl.FullName == "Indy.IL2CPU.X86.Plugs.NEW_PLUGS.DelegateImpl") {
-          Console.Write("");
         }
         // Plugs methods must be static, and public
         // Search for non signature matches first since signature searches are slower

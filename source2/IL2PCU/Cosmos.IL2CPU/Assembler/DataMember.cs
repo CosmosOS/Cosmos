@@ -103,11 +103,6 @@ namespace Cosmos.IL2CPU
         public DataMember( string aName, params int[] aDefaultValue )
         {
             Name = aName;
-
-            if( Name.Equals( "System__DOT__Object__mscorlib__Version_2__DOT__0__DOT__0__DOT__0__Culture_neutral__PublicKeyToken_b77a5c561934e089__TYPE_ID", StringComparison.InvariantCultureIgnoreCase ) )
-            {
-                Console.Write( "" );
-            }
             //RawDefaultValue = new byte[aDefaultValue.Length * 4];
             //for (int i = 0; i < aDefaultValue.Length; i++) {
             //    Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,

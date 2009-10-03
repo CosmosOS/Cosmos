@@ -106,11 +106,7 @@ namespace Cosmos.IL2CPU.X86 {
       }
     }
 
-    private static int? LastCheckValue = null;
     protected static List<IL.FieldInfo> GetFieldsInfo(Type aType) {
-      if (aType == typeof(EventHandler)) {
-        Console.Write("");
-      }
       var xResult = new List<IL.FieldInfo>();
       DoGetFieldsInfo(aType,xResult);
       xResult.Reverse();
@@ -118,17 +114,6 @@ namespace Cosmos.IL2CPU.X86 {
       foreach (var xInfo in xResult) {
         xInfo.Offset = xOffset;
         xOffset += xInfo.Size;
-      }
-      if (aType == typeof(EventHandler)) {
-        var xTestOffset = (from item in xResult
-                       where item.Id == "$$ArgSize$$"
-                       select item.Offset).Single();
-        if (LastCheckValue.HasValue) {
-          if (xTestOffset != LastCheckValue) {
-            Console.Write("");
-          }
-        }
-        LastCheckValue = (int)xTestOffset;
       }
       return xResult;
     }
