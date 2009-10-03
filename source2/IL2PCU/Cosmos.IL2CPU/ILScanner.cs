@@ -98,12 +98,6 @@ namespace Cosmos.IL2CPU {
       //mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");
     }
 
-    static ILScanner()
-    {
-
-      
-    }
-
     public void EnableLogging(string aPathname) {
       mLogMap = new Dictionary<object, List<LogItem>>();
       mMapPathname = aPathname;
