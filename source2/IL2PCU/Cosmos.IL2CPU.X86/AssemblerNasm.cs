@@ -196,16 +196,10 @@ namespace Cosmos.IL2CPU.X86 {
     private static HashSet<string> mDebugLines = new HashSet<string>();
     private static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {
       var xLine = String.Format("{0}\t{1}\t{2}", MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
-      if (!mDebugLines.Contains(xLine)) {
-        mDebugLines.Add(xLine);
-        File.AppendAllText(@"e:\tempdebug.txt", xLine + "\r\n");
-      }
+
     }
 
     static AssemblerNasm() {
-      if (File.Exists(@"e:\tempdebug.txt")) {
-        File.Delete(@"e:\tempdebug.txt");
-      }
     }
 
     protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
