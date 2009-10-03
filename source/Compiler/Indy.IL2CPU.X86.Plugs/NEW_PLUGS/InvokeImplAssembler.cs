@@ -94,7 +94,10 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
       //we allocated the argsize on the stack once, and it we need to get above the original args
       new CPU.Comment("we allocated argsize on the stack once");
       new CPU.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
-      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 52 };
+      //uint xToAdd = 32; // skip pushad data
+      //xToAdd += 4; // method pointer
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP };
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 8 }; // ebp+8 is first argument
       new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
       new CPUx86.Call { DestinationReg = CPUx86.Registers.EDI };

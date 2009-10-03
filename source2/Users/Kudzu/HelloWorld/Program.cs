@@ -11,8 +11,14 @@ using Cosmos.Hardware;
 
 namespace HelloWorld {
 	class Program {
-    private static void TestMethod(object aSender, EventArgs e) {
+    private static void TestMethod(uint a, uint b) {
       Console.WriteLine("Callback?");
+      Console.Write("  A: ");
+      Interrupts.WriteNumber(a, 32);
+      Console.WriteLine("");
+      Console.Write("  B: ");
+      Interrupts.WriteNumber(b, 32);
+      Console.WriteLine("");
     }
 		//#region Cosmos Builder logic
 		// Most users wont touch this. This will call the Cosmos Build tool
@@ -55,25 +61,17 @@ namespace HelloWorld {
 		//#endregion
 
 
-    private static void Test(byte aIRQ) {
-      var xDict = new TempDictionary<EventHandler>();
-      var xMethod = new EventHandler(TestMethod);
-      xDict.Add(aIRQ, xMethod);
-      if (xDict.ContainsKey(aIRQ)) {
-        Console.WriteLine("Found! ie, inside event handler!");
-      } else {
-        Console.WriteLine("Not found!");
-      }
-    }
-
-		// Main entry point of the kernel
+    // Main entry point of the kernel
 		public static unsafe void Init() {
       var xTempBool = true;
       if (xTempBool) {
         var xBoot = new Cosmos.Sys.Boot();
         xBoot.Execute();
       }
-      //Test(1);
+
+      var xDelegate = new Action<uint, uint>(TestMethod);
+      xDelegate(0x11223344, 0x55667788);
+
       Console.WriteLine("Done");
       var xLine = Console.ReadLine();
       Console.Write("Given text was: ");

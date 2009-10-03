@@ -38,6 +38,7 @@ namespace Cosmos.Hardware
 
         public static void HandleKeyboardInterrupt(ref Interrupts.InterruptContext aContext)
         {
+        //  Console.WriteLine("Handling KeyboardInterrupt");
           if (mHandleKeyboardKey != null) {
             byte xScanCode = IOReadByte(0x60);
             bool xReleased = (xScanCode & 0x80) == 0x80;
@@ -124,6 +125,9 @@ namespace Cosmos.Hardware
                                 char xTheChar;
                                 if (!GetCharValue(xTheScancode, out xTheChar))
                                 {
+                                  Console.Write("Error getting scancode character: ");
+                                  Interrupts.WriteNumber(xTheScancode, 32);
+                                  Console.WriteLine("");
                                     //DebugUtil.SendError("Keyboard", "error while getting scancode character!");
                                 }
                                 else
@@ -176,7 +180,7 @@ namespace Cosmos.Hardware
 
         private static void CreateDefaultKeymap()
         {
-            mKeys = new List<KeyMapping>(128);
+            mKeys = new List<KeyMapping>(164);
 
             //TODO: fn (for laptops)
 
@@ -339,25 +343,30 @@ namespace Cosmos.Hardware
 
             AddKeyWithShift(0x37, '*', ConsoleKey.Multiply);
             #endregion
+            Console.Write("KeyCount: ");
+            Interrupts.WriteNumber(KeyCount, 32);
+            Console.WriteLine("");
         }
+
+        private static uint KeyCount = 0;
 
         private static void AddKey(uint p, char p_2, ConsoleKey p_3)
         {
             mKeys.Add(new KeyMapping(p, p_2, p_3));
+            KeyCount++;
         }
         private static void AddKeyWithShift(uint p, char p_2, ConsoleKey p_3)
         {
-            mKeys.Add(new KeyMapping(p, p_2, p_3));
-            mKeys.Add(new KeyMapping(p << 16, p_2, p_3));
+          AddKey(p, p_2, p_3);
+          AddKey(p << 16, p_2, p_3);
         }
         private static void AddKey(uint p, ConsoleKey p_3)
         {
-            mKeys.Add(new KeyMapping(p, p_3));
+          AddKey(p, '\0', p_3);
         }
         private static void AddKeyWithShift(uint p, ConsoleKey p_3)
         {
-            mKeys.Add(new KeyMapping(p, p_3));
-            mKeys.Add(new KeyMapping(p << 16, p_3));
+          AddKeyWithShift(p, '\0', p_3);
         }
 
         public static void ChangeKeyMap(List<KeyMapping> aKeys)
@@ -367,8 +376,17 @@ namespace Cosmos.Hardware
 
         public static bool GetCharValue(uint aScanCode, out char aValue)
         {
+          //Console.Write("Key count: ");
+          //Interrupts.WriteNumber((uint)mKeys.Count, 32);
+          //Console.WriteLine("");
+
             for (int i = 0; i < mKeys.Count; i++)
             {
+              //if (i == 0) {
+              //  Console.Write("ScanCode in KeyMapping: ");
+              //  Interrupts.WriteNumber(mKeys[i].Scancode, 32);
+              //  Console.WriteLine("");
+              //}
                 if (mKeys[i].Scancode == aScanCode)
                 {
                     if (mKeys[i].Value != '\0')
@@ -378,14 +396,23 @@ namespace Cosmos.Hardware
                     }
                     else
                     {
-                        DebugUtil.SendError("Keyboard", "Char not mapped for scancode '" + aScanCode.ToHex() + "' with key '" + mKeys[i].Key.ToString() + "'!");
+                        //DebugUtil.SendError("Keyboard", "Char not mapped for scancode '" + aScanCode.ToHex() + "' with key '" + mKeys[i].Key.ToString() + "'!");
+                      Console.Write("ScanCode not mapped to char: ");
+                      Interrupts.WriteNumber(aScanCode, 32);
+                      Console.WriteLine("");
+                      Console.Write("  Value was '");
+                      Interrupts.WriteNumber((ushort) mKeys[i].Value, 16);
+                      Console.WriteLine("");
 
                         goto Failure;
                     }
                 }
             }
 
-            DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
+            Console.Write("ScanCode not found: ");
+            Interrupts.WriteNumber(aScanCode, 32);
+            Console.WriteLine("");
+            //DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
 
         Failure:
             aValue = '\0';
@@ -402,7 +429,11 @@ namespace Cosmos.Hardware
                 }
             }
 
-            DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
+            //DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
+            Console.WriteLine("ScanCode Not Mapped!");
+            Console.Write("  ScanCode: ");
+            Interrupts.WriteNumber(aScanCode, 32);
+            Console.WriteLine("");
 
             aValue = ConsoleKey.NoName;
             return false;
@@ -411,6 +442,7 @@ namespace Cosmos.Hardware
         {
             for (int i = 0;i < mKeys.Count;i++)
             {
+
                 if (mKeys[i].Scancode == aScanCode)
                 {
                     aValue = mKeys[i];

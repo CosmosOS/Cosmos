@@ -125,13 +125,9 @@ namespace Cosmos.Hardware {
 
         public static void AddIRQHandler(byte IRQ, InterruptDelegate handler)
         {
-          Console.Write("Adding IRQ handler for IRQ");
-          WriteNumber(IRQ, 8);
-          Console.WriteLine("");
             if (mIRQ_Handlers == null)
             {
                 mIRQ_Handlers = new InterruptDelegate[256];
-                Console.WriteLine("Created Dictionary");
             }
             
             mIRQ_Handlers[IRQ] = handler;
@@ -191,7 +187,6 @@ namespace Cosmos.Hardware {
             ////
             //// Triggers IL2CPU error
           DebugUtil.LogInterruptOccurred(ref aContext);
-          Console.WriteLine("Handling IRQ01");
           IRQ(1, ref aContext);
             ////mIRQ_Handlers[1](ref aContext);
             ////
