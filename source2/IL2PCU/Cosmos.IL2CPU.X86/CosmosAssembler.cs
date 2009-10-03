@@ -157,11 +157,11 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     public override void FlushText(TextWriter aOutput) {
-      //aOutput.WriteLine("use32");
-      aOutput.WriteLine("%define NASM_COMPILATION 1");
+      aOutput.WriteLine("use32");
+      //aOutput.WriteLine("%define NASM_COMPILATION 1");
       aOutput.WriteLine("global Kernel_Start");
-      //aOutput.WriteLine("[map all main.map]");
-      //aOutput.WriteLine("org 0x200000");
+      aOutput.WriteLine("[map all main.map]");
+      aOutput.WriteLine("org 0x200000");
       base.FlushText(aOutput);
     }
 

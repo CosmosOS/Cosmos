@@ -14,8 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.IO;
-using Indy.IL2CPU;
 using Cosmos.Compiler.Debug;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Compiler.Builder {
     public partial class DebugWindow : Window {

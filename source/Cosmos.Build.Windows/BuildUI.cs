@@ -6,7 +6,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Interop;
 using Microsoft.Win32;
-using Indy.IL2CPU;
 using System.Threading;
 
 namespace Cosmos.Compiler.Builder

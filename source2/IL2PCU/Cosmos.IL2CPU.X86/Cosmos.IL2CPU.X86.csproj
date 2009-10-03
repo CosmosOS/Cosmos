@@ -54,7 +54,6 @@
     <Compile Include="CosmosAssembler.cs" />
     <Compile Include="AssemblerBin.cs" />
     <Compile Include="AssemblerNasm.cs" />
-    <Compile Include="DebugEnums.cs" />
     <Compile Include="Define.cs" />
     <Compile Include="EndIfDefined.cs" />
     <Compile Include="IL\FieldInfo.cs" />
@@ -350,6 +349,10 @@
     <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
       <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
       <Name>Indy.IL2CPU.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+      <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
+      <Name>Cosmos.Compiler.Debug</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>

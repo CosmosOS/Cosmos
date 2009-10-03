@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
+
 namespace Cosmos.Compiler.Builder
 {
     interface IBuilder

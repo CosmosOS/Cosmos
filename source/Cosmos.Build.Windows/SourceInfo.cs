@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Indy.IL2CPU;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
-using Indy.IL2CPU.IL;
 using System.IO;
+using Indy.IL2CPU;
 
 namespace Cosmos.Compiler.Builder {
 	public class SourceInfos: SortedList<uint, SourceInfo> {

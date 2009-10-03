@@ -4,13 +4,12 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using Indy.IL2CPU.Assembler.X86;
-using Indy.IL2CPU.IL.X86;
 using Microsoft.Win32;
-using Indy.IL2CPU;
 //using Indy.IL2CPU.IL.X86;
 using IL2CPU;
 using System.IO.Pipes;
+using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.X86;
 
 namespace Cosmos.Compiler.Builder
 {
@@ -24,7 +23,6 @@ namespace Cosmos.Compiler.Builder
                 
         public readonly string ToolsPath;
         public readonly string AsmPath;
-        public readonly Engine Engine = new Engine();
 
         public event Action CompileCompleted;
         public event Action BuildCompleted;
@@ -45,12 +43,19 @@ namespace Cosmos.Compiler.Builder
             ToolsPath = BuildPath + @"Tools\";
             AsmPath = ToolsPath + @"asm\";
             // MtW: leave this here, otherwise VS wont copy required dependencies!
-            typeof(X86OpCodeMap).Equals(null);
+            //typeof(X86OpCodeMap).Equals(null);
 
             //TODO static hack
             BuilderStep.Completed += new Action<string, object>(BuilderStep_Completed);
             BuilderStep.Started += new Action<string>(BuilderStep_Started);
 
+            // enforce assembly linking:
+            var xTheType = typeof(Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
+            xTheType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
+            xTheType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
+            xTheType = typeof(Cosmos.Sys.Plugs.Deboot);
+
+            // end enforce assembly linking
 
 
         }
@@ -199,15 +204,21 @@ namespace Cosmos.Compiler.Builder
         protected void ThreadExecute(object aParam)
         {
             var options = aParam as BuildOptions;
-            var xEngineParams = BuildOptionsToEngineParam(options);
-
-
+            //var xEngineParams = BuildOptionsToEngineParam(options);
+            
             LogTime("Thread execute start");
 
             if (options.dotNETFrameworkImplementation == dotNETFrameworkImplementationEnum.Microsoft)
-                RunEngine(xEngineParams);
+            {
+                var xEntryAsm = Assembly.GetEntryAssembly();
+                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init");
+                RunEngine(xInitMethod);
+            }
             else
-                MonoCompile(xEngineParams); 
+            {
+                throw new NotImplementedException();
+            }
+            //    MonoCompile(xEngineParams); 
 
             //SIGNAL END COMPILE
             OnCompileCompleted();
@@ -302,22 +313,22 @@ namespace Cosmos.Compiler.Builder
             } return xQEMU;
         }
 
-        [Obsolete("Dont use")]
-        private PassedEngineValue BuildOptionsToEngineParam(BuildOptions options) {
-            DebugMode aDebugMode = options.DebugMode; //TODO fix if not needed
-            byte aDebugComport = options.DebugPortId;
-            bool aGDB = options.UseGDB;
+        //[Obsolete("Dont use")]
+        //private PassedEngineValue BuildOptionsToEngineParam(BuildOptions options) {
+        //    DebugMode aDebugMode = options.DebugMode; //TODO fix if not needed
+        //    byte aDebugComport = options.DebugPortId;
+        //    bool aGDB = options.UseGDB;
 
-            if (!Directory.Exists(AsmPath)) {
-                Directory.CreateDirectory(AsmPath);
-            }
-            string[] xPlugs = GetPlugs();
+        //    if (!Directory.Exists(AsmPath)) {
+        //        Directory.CreateDirectory(AsmPath);
+        //    }
+        //    string[] xPlugs = GetPlugs();
 
-            //TODO sort out
-            var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
-                , xPlugs, aDebugMode, aDebugComport, aGDB, AsmPath, options.TraceAssemblies);
-            return xEngineParams;
-        }
+        //    //TODO sort out
+        //    var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
+        //        , xPlugs, aDebugMode, aDebugComport, aGDB, AsmPath, options.TraceAssemblies);
+        //    return xEngineParams;
+        //}
 
 
         private void ProcessDebug(BuildOptions options, ref DebugWindowController xDebugWindow, ref Process xQEMU)
@@ -411,42 +422,64 @@ namespace Cosmos.Compiler.Builder
         //TODO make a build step by cleaning up the engine params
         private void RunEngine(object aParam)
         {
-            var xParam = (PassedEngineValue)aParam;
-            Engine.TraceAssemblies = xParam.TraceAssemblies;
-            Engine.CompilingMethods += OnCompilingMethods;
-            Engine.CompilingStaticFields += OnCompilingStaticFields;
             try
             {
-                Engine.DebugLog += OnLogMessage;
+                LogTime("Engine execute started");
+                var xInitMethod = (MethodBase)aParam;
+                var xAsm = new AssemblerNasm();
+                xAsm.Initialize();
+                var xScanner = new ILScanner(xAsm);
+                xScanner.Execute(xInitMethod);
+                using (var xOut = new StreamWriter(Path.Combine(AsmPath, "main.asm"), false))
+                {
+                    xAsm.FlushText(xOut);
+                }
 
-                LogTime("Engine execute start");
-                currentProgress.Step = "Engine Execute";
-                Engine.Execute(xParam.aAssembly,
-                               xParam.aTargetPlatform,
-                               g => Path.Combine(AsmPath, g + ".asm"),
-                               xParam.aPlugs,
-                               xParam.aDebugMode,
-                               xParam.GDBDebug,
-                               //xParam.aDebugComNumber,
-                               1,
-                               xParam.aOutputDir,
-                               (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler,
-                               new Indy.IL2CPU.IL.X86.X86OpCodeMap(),
-                                new CosmosAssembler(((xParam.aDebugMode != DebugMode.None) && (xParam.aDebugMode != DebugMode.MLUsingGDB))
-                                                                            ? xParam.aDebugComNumber
-                                                                            : (byte)0)); //HACK
-                LogTime("Engine execute finish");
+                LogTime("Engine execute finished");
             }
-            catch (Exception E)
+            catch(Exception E)
             {
-                OnLogMessage(LogSeverityEnum.Error, E.ToString());
+                OnLogMessage(LogSeverityEnum.Error, E.ToString());             
             }
-            finally
-            {
-                Engine.CompilingMethods -= OnCompilingMethods;
-                Engine.CompilingStaticFields -= OnCompilingStaticFields;
+            #region Old code
+            //var xParam = (PassedEngineValue)aParam;
 
-            }
+            //Engine.TraceAssemblies = xParam.TraceAssemblies;
+            //Engine.CompilingMethods += OnCompilingMethods;
+            //Engine.CompilingStaticFields += OnCompilingStaticFields;
+            //try
+            //{
+            //    Engine.DebugLog += OnLogMessage;
+
+            //    LogTime("Engine execute start");
+            //    currentProgress.Step = "Engine Execute";
+            //    Engine.Execute(xParam.aAssembly,
+            //                   xParam.aTargetPlatform,
+            //                   g => Path.Combine(AsmPath, g + ".asm"),
+            //                   xParam.aPlugs,
+            //                   xParam.aDebugMode,
+            //                   xParam.GDBDebug,
+            //                   //xParam.aDebugComNumber,
+            //                   1,
+            //                   xParam.aOutputDir,
+            //                   (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler,
+            //                   new Indy.IL2CPU.IL.X86.X86OpCodeMap(),
+            //                    new CosmosAssembler(((xParam.aDebugMode != DebugMode.None) && (xParam.aDebugMode != DebugMode.MLUsingGDB))
+            //                                                                ? xParam.aDebugComNumber
+            //                                                                : (byte)0)); //HACK
+            //    LogTime("Engine execute finish");
+            //}
+            //catch (Exception E)
+            //{
+            //    OnLogMessage(LogSeverityEnum.Error, E.ToString());
+            //}
+            //finally
+            //{
+            //    Engine.CompilingMethods -= OnCompilingMethods;
+            //    Engine.CompilingStaticFields -= OnCompilingStaticFields;
+
+            //}
+            #endregion
         }
 
         private string GetMonoExeFilename()
@@ -477,115 +510,115 @@ namespace Cosmos.Compiler.Builder
         //    RunBuildPhase();
         //}
 
-        private void MonoCompile(PassedEngineValue xParam)
-        {
-            var xExeParamsBuilder = new StringBuilder();
-            xExeParamsBuilder.AppendFormat("\"{0}\" ",
-                                           typeof(IL2CPU.Program).Assembly.Location);
-            xExeParamsBuilder.AppendFormat("/assembly \"{0}\" ",
-                                           xParam.aAssembly);
-            if (xParam.aOutputDir.EndsWith("\\"))
-            {
-                xExeParamsBuilder.AppendFormat("/output \"{0}\\\" ",
-                                            xParam.aOutputDir);
-            }
-            else
-            {
-                xExeParamsBuilder.AppendFormat("/output \"{0}\" ",
-                                               xParam.aOutputDir);
-            }
-            xExeParamsBuilder.AppendFormat("/trace \"{0}\" ",
-                                           xParam.TraceAssemblies.ToString());
-            xExeParamsBuilder.AppendFormat("/target X86 ");
-            xExeParamsBuilder.AppendFormat("/comport 1 ");
-            foreach (var xPlug in xParam.aPlugs)
-            {
-                xExeParamsBuilder.AppendFormat("/plug \"{0}\" ",
-                                               xPlug);
-            }
-            xExeParamsBuilder.AppendFormat("/logpipe CosmosCompileLog");
-            //var xProcess = Process.Start(@"C:\Program Files\Mono-2.0.1\bin\mono.exe",
-            //                             xExeParamsBuilder.ToString());
-            var xProcessStartInfo = new ProcessStartInfo(GetMonoExeFilename());
-            //var xProcessStartInfo = new ProcessStartInfo(typeof(IL2CPU.Program).Assembly.Location);
-            xProcessStartInfo.Arguments = xExeParamsBuilder.ToString();
-            xProcessStartInfo.RedirectStandardError = true;
-            xProcessStartInfo.RedirectStandardInput = true;
-            xProcessStartInfo.RedirectStandardOutput = true;
-            xProcessStartInfo.EnvironmentVariables.Add("MONO_PATH", GetMonoLibDir());
-            xProcessStartInfo.UseShellExecute = false;
-            using (var xLogStream = new System.IO.Pipes.NamedPipeServerStream("CosmosCompileLog", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.WriteThrough))
-            {
-                AutoResetEvent xWaitForConEvent = new AutoResetEvent(false);
-                var xAsyncCookie = xLogStream.BeginWaitForConnection(delegate { xWaitForConEvent.Set(); }, null);
-                var xProcess = Process.Start(xProcessStartInfo);
-                try
-                {
-                    while (!xProcess.HasExited)
-                    {
-                        if (xWaitForConEvent.WaitOne(100))
-                        {
-                            break;
-                        }
-                    }
-                    xLogStream.EndWaitForConnection(xAsyncCookie);
-                    bool xRunning = true;
-                    do
-                    {
-                        //while (!xLogStream.DataAvailable) { Thread.Sleep(15); }
-                        var xBuff = new byte[1];
-                        if (xLogStream.Read(xBuff, 0, 1) != 1) { throw new Exception("No Command received!"); }
-                        switch (xBuff[0])
-                        {
-                            case (byte)LogChannelCommand.CompilingMethods:
-                                {
-                                    xBuff = new byte[8];
-                                    if (xLogStream.Read(xBuff, 0, 8) != 8) { throw new Exception("No complete CompilingMethods data received!"); }
-                                    var xCurrent = BitConverter.ToInt32(xBuff, 0);
-                                    var xMax = BitConverter.ToInt32(xBuff, 4);
-                                    OnCompilingMethods(xCurrent, xMax);
-                                    break;
-                                }
-                            case (byte)LogChannelCommand.CompilingFields:
-                                {
-                                    xBuff = new byte[8];
-                                    if (xLogStream.Read(xBuff, 0, 8) != 8) { throw new Exception("No complete CompilingFields data received!"); }
-                                    var xCurrent = BitConverter.ToInt32(xBuff, 0);
-                                    var xMax = BitConverter.ToInt32(xBuff, 4);
-                                    OnCompilingStaticFields(xCurrent, xMax);
-                                    break;
-                                }
-                            case (byte)LogChannelCommand.LogMessage:
-                                {
-                                    xBuff = new byte[5];
-                                    if (xLogStream.Read(xBuff, 0, 5) != 5) { throw new Exception("No complete LogMessage data received!"); }
-                                    var xSeverity = (LogSeverityEnum)xBuff[0];
-                                    var xStringLength = BitConverter.ToInt32(xBuff, 1);
-                                    xBuff = new byte[xStringLength];
-                                    if (xLogStream.Read(xBuff, 0, xStringLength) != xStringLength) { throw new Exception("No complete LogMessage data received! (2)"); }
-                                    var xMessage = Encoding.Unicode.GetString(xBuff);
-                                    OnLogMessage(xSeverity, xMessage);
-                                    break;
-                                }
-                            case (byte)LogChannelCommand.EndOfProcessing:
-                                {
-                                    xRunning = false;
-                                    break;
-                                }
-                        }
-                    } while (!xProcess.HasExited && xRunning);
-                }
-                catch (Exception E)
-                {
-                    if (xLogStream.IsConnected && !xProcess.HasExited)
-                    {
-                        throw new Exception("Error while processing log command", E);
-                    }
-                }
-                if (!xProcess.HasExited) { xProcess.Kill(); }
-            }
-            // at the end:
-        }
+        //private void MonoCompile(PassedEngineValue xParam)
+        //{
+        //    var xExeParamsBuilder = new StringBuilder();
+        //    xExeParamsBuilder.AppendFormat("\"{0}\" ",
+        //                                   typeof(IL2CPU.Program).Assembly.Location);
+        //    xExeParamsBuilder.AppendFormat("/assembly \"{0}\" ",
+        //                                   xParam.aAssembly);
+        //    if (xParam.aOutputDir.EndsWith("\\"))
+        //    {
+        //        xExeParamsBuilder.AppendFormat("/output \"{0}\\\" ",
+        //                                    xParam.aOutputDir);
+        //    }
+        //    else
+        //    {
+        //        xExeParamsBuilder.AppendFormat("/output \"{0}\" ",
+        //                                       xParam.aOutputDir);
+        //    }
+        //    xExeParamsBuilder.AppendFormat("/trace \"{0}\" ",
+        //                                   xParam.TraceAssemblies.ToString());
+        //    xExeParamsBuilder.AppendFormat("/target X86 ");
+        //    xExeParamsBuilder.AppendFormat("/comport 1 ");
+        //    foreach (var xPlug in xParam.aPlugs)
+        //    {
+        //        xExeParamsBuilder.AppendFormat("/plug \"{0}\" ",
+        //                                       xPlug);
+        //    }
+        //    xExeParamsBuilder.AppendFormat("/logpipe CosmosCompileLog");
+        //    //var xProcess = Process.Start(@"C:\Program Files\Mono-2.0.1\bin\mono.exe",
+        //    //                             xExeParamsBuilder.ToString());
+        //    var xProcessStartInfo = new ProcessStartInfo(GetMonoExeFilename());
+        //    //var xProcessStartInfo = new ProcessStartInfo(typeof(IL2CPU.Program).Assembly.Location);
+        //    xProcessStartInfo.Arguments = xExeParamsBuilder.ToString();
+        //    xProcessStartInfo.RedirectStandardError = true;
+        //    xProcessStartInfo.RedirectStandardInput = true;
+        //    xProcessStartInfo.RedirectStandardOutput = true;
+        //    xProcessStartInfo.EnvironmentVariables.Add("MONO_PATH", GetMonoLibDir());
+        //    xProcessStartInfo.UseShellExecute = false;
+        //    using (var xLogStream = new System.IO.Pipes.NamedPipeServerStream("CosmosCompileLog", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.WriteThrough))
+        //    {
+        //        AutoResetEvent xWaitForConEvent = new AutoResetEvent(false);
+        //        var xAsyncCookie = xLogStream.BeginWaitForConnection(delegate { xWaitForConEvent.Set(); }, null);
+        //        var xProcess = Process.Start(xProcessStartInfo);
+        //        try
+        //        {
+        //            while (!xProcess.HasExited)
+        //            {
+        //                if (xWaitForConEvent.WaitOne(100))
+        //                {
+        //                    break;
+        //                }
+        //            }
+        //            xLogStream.EndWaitForConnection(xAsyncCookie);
+        //            bool xRunning = true;
+        //            do
+        //            {
+        //                //while (!xLogStream.DataAvailable) { Thread.Sleep(15); }
+        //                var xBuff = new byte[1];
+        //                if (xLogStream.Read(xBuff, 0, 1) != 1) { throw new Exception("No Command received!"); }
+        //                switch (xBuff[0])
+        //                {
+        //                    case (byte)LogChannelCommand.CompilingMethods:
+        //                        {
+        //                            xBuff = new byte[8];
+        //                            if (xLogStream.Read(xBuff, 0, 8) != 8) { throw new Exception("No complete CompilingMethods data received!"); }
+        //                            var xCurrent = BitConverter.ToInt32(xBuff, 0);
+        //                            var xMax = BitConverter.ToInt32(xBuff, 4);
+        //                            OnCompilingMethods(xCurrent, xMax);
+        //                            break;
+        //                        }
+        //                    case (byte)LogChannelCommand.CompilingFields:
+        //                        {
+        //                            xBuff = new byte[8];
+        //                            if (xLogStream.Read(xBuff, 0, 8) != 8) { throw new Exception("No complete CompilingFields data received!"); }
+        //                            var xCurrent = BitConverter.ToInt32(xBuff, 0);
+        //                            var xMax = BitConverter.ToInt32(xBuff, 4);
+        //                            OnCompilingStaticFields(xCurrent, xMax);
+        //                            break;
+        //                        }
+        //                    case (byte)LogChannelCommand.LogMessage:
+        //                        {
+        //                            xBuff = new byte[5];
+        //                            if (xLogStream.Read(xBuff, 0, 5) != 5) { throw new Exception("No complete LogMessage data received!"); }
+        //                            var xSeverity = (LogSeverityEnum)xBuff[0];
+        //                            var xStringLength = BitConverter.ToInt32(xBuff, 1);
+        //                            xBuff = new byte[xStringLength];
+        //                            if (xLogStream.Read(xBuff, 0, xStringLength) != xStringLength) { throw new Exception("No complete LogMessage data received! (2)"); }
+        //                            var xMessage = Encoding.Unicode.GetString(xBuff);
+        //                            OnLogMessage(xSeverity, xMessage);
+        //                            break;
+        //                        }
+        //                    case (byte)LogChannelCommand.EndOfProcessing:
+        //                        {
+        //                            xRunning = false;
+        //                            break;
+        //                        }
+        //                }
+        //            } while (!xProcess.HasExited && xRunning);
+        //        }
+        //        catch (Exception E)
+        //        {
+        //            if (xLogStream.IsConnected && !xProcess.HasExited)
+        //            {
+        //                throw new Exception("Error while processing log command", E);
+        //            }
+        //        }
+        //        if (!xProcess.HasExited) { xProcess.Kill(); }
+        //    }
+        //    // at the end:
+        //}
 
         // MtW: added as field, so that it can be reused by the test runner
         public Assembly TargetAssembly = Assembly.GetEntryAssembly();

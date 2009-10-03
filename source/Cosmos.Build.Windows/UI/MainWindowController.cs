@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Compiler.Builder
 {
@@ -61,7 +61,7 @@ namespace Cosmos.Compiler.Builder
                // xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
        
                 mBuilder.CompileCompleted+=new Action(mBuilder_CompileCompleted); 
-                mBuilder.LogMessage+=new Action<Indy.IL2CPU.LogSeverityEnum,string>(mBuilder_LogMessage);
+                mBuilder.LogMessage+=new Action<LogSeverityEnum,string>(mBuilder_LogMessage);
 
 
                 mBuilder.BeginCompile(options);

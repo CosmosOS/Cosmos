@@ -13,9 +13,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Indy.IL2CPU;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Compiler.Builder
 {

@@ -98,6 +98,12 @@ namespace Cosmos.IL2CPU {
       //mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");
     }
 
+    static ILScanner()
+    {
+
+      
+    }
+
     public void EnableLogging(string aPathname) {
       mLogMap = new Dictionary<object, List<LogItem>>();
       mMapPathname = aPathname;
@@ -164,7 +170,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public void Execute(System.Reflection.MethodInfo aStartMethod) {
+    public void Execute(System.Reflection.MethodBase aStartMethod) {
       // TODO: Investigate using MS CCI
       // Need to check license, as well as in profiler
       // http://cciast.codeplex.com/

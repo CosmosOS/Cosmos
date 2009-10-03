@@ -237,5 +237,12 @@ namespace Cosmos.IL2CPU.X86 {
       return TmpPosLabel(aMethod, ((ILOpCodes.OpBranch)aOpCode).Value);
     }
 
+    public override void FlushText(TextWriter aOutput)
+    {
+        aOutput.WriteLine("use32");
+        aOutput.WriteLine("org 0x200000");
+        base.FlushText(aOutput);
+    }
+
   }
 }

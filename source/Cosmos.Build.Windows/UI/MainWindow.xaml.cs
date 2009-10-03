@@ -10,7 +10,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Indy.IL2CPU;
 using System.Threading;
 
 namespace Cosmos.Compiler.Builder

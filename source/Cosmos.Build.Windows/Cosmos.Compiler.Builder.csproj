@@ -127,6 +127,7 @@
     <Compile Include="DebugConnectorSerial.cs" />
     <Compile Include="DebugConnectorStream.cs" />
     <Compile Include="DebugConnectorTCPServer.cs" />
+    <Compile Include="DebugSymbol.cs" />
     <Compile Include="KeyState.cs" />
     <Compile Include="ObjDump.cs" />
     <Compile Include="BuildUI.cs" />
@@ -190,13 +191,29 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
-      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
-      <Name>Indy.IL2CPU.Assembler</Name>
+    <ProjectReference Include="..\..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
+      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
+      <Name>Cosmos.IL2CPU.X86</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
-      <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
-      <Name>Indy.IL2CPU.X86</Name>
+    <ProjectReference Include="..\..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Compiler\Indy.IL2CPU.X86.Plugs\Indy.IL2CPU.X86.Plugs.csproj">
+      <Project>{169DBC91-DA34-40CE-B58B-8587CEE3217A}</Project>
+      <Name>Indy.IL2CPU.X86.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
+      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
+      <Name>Cosmos.Hardware.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
+      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
+      <Name>Cosmos.Kernel.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
+      <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
+      <Name>Cosmos.Sys.Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
@@ -205,10 +222,6 @@
     <ProjectReference Include="..\IL2CPU\IL2CPU\IL2CPU.csproj">
       <Project>{8142656B-0A4B-4E05-BBE4-AA31CE7B18FA}</Project>
       <Name>IL2CPU %28Compiler\IL2CPU%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

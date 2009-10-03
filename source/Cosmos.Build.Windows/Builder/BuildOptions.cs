@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Microsoft.Win32;
-using Indy.IL2CPU;
 using System.Collections;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Compiler.Builder
 {
@@ -120,7 +120,7 @@ namespace Cosmos.Compiler.Builder
             BuildPath = ReadValue(xDoc, "BuildPath", "");
             TraceAssemblies = ReadEnum(xDoc,
                                        "DebugTraceAssemblies",
-                                       Indy.IL2CPU.TraceAssemblies.Cosmos);
+                                       TraceAssemblies.Cosmos);
             DebugMode = ReadEnum(xDoc,
                                  "DebugMode",
                                  DebugMode.Source);

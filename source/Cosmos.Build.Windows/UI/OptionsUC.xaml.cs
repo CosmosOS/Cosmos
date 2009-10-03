@@ -13,8 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
-using Indy.IL2CPU;
 using System.Collections;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Compiler.Builder
 {
