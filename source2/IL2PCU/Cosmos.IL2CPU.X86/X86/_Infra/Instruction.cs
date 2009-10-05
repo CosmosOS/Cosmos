@@ -125,35 +125,35 @@ namespace Cosmos.IL2CPU.X86 {
 
         private static SortedList<Type, InstructionData> mInstructionDatas;
         static Instruction() {
-                mInstructionDatas = new SortedList<Type, InstructionData>(new TypeComparer());
-                foreach (Type xType in typeof(Instruction).Assembly.GetTypes()) {
-                    if (!xType.IsSubclassOf(typeof(Instruction))) {
-                        continue;
-                    }
-                    if (!xType.Namespace.StartsWith(typeof(Instruction).Namespace)) {
-                        continue;
-                    }
-                    if (xType.IsAbstract) {
-                        continue;
-                    }
-                    var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute;
-                    if (xAttrib == null) {
-                        continue;
-                    }
-                    var xNewInstructionData = new InstructionData();
-                    mInstructionDatas.Add(xType, xNewInstructionData);
-                    if (xType.IsSubclassOf(typeof(InstructionWithDestination))) {
-                        xNewInstructionData.HasDestinationOperand = true;
-                    }
-                    if (xType.IsSubclassOf(typeof(InstructionWithDestinationAndSource))) {
-                        xNewInstructionData.HasDestinationOperand = true;
-                        xNewInstructionData.HasSourceOperand = true;
-                    }
-                    var xMethod = xType.GetMethod("InitializeEncodingData", new Type[] { typeof(InstructionData) });
-                    if (xMethod != null) {
-                        xMethod.Invoke(null, new object[] { xNewInstructionData });
-                    }
-                }
+                //mInstructionDatas = new SortedList<Type, InstructionData>(new TypeComparer());
+                //foreach (Type xType in typeof(Instruction).Assembly.GetTypes()) {
+                //    if (!xType.IsSubclassOf(typeof(Instruction))) {
+                //        continue;
+                //    }
+                //    if (!xType.Namespace.StartsWith(typeof(Instruction).Namespace)) {
+                //        continue;
+                //    }
+                //    if (xType.IsAbstract) {
+                //        continue;
+                //    }
+                //    var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute;
+                //    if (xAttrib == null) {
+                //        continue;
+                //    }
+                //    var xNewInstructionData = new InstructionData();
+                //    mInstructionDatas.Add(xType, xNewInstructionData);
+                //    if (xType.IsSubclassOf(typeof(InstructionWithDestination))) {
+                //        xNewInstructionData.HasDestinationOperand = true;
+                //    }
+                //    if (xType.IsSubclassOf(typeof(InstructionWithDestinationAndSource))) {
+                //        xNewInstructionData.HasDestinationOperand = true;
+                //        xNewInstructionData.HasSourceOperand = true;
+                //    }
+                //    var xMethod = xType.GetMethod("InitializeEncodingData", new Type[] { typeof(InstructionData) });
+                //    if (xMethod != null) {
+                //        xMethod.Invoke(null, new object[] { xNewInstructionData });
+                //    }
+                //}
         }
 
         protected Instruction() {
