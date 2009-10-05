@@ -20,13 +20,18 @@ namespace Cosmos.Compiler.Builder
             Init();
 
             buildFileUtils.RemoveFile(BuildPath + "output.obj");
-            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f bin -o \"{0}\" \"{1}\"", BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
+            var xFormat = "bin";
+            if (IsELF)
+            {
+                xFormat = "elf";
+            }
+            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f {0} -o \"{1}\" \"{2}\"", xFormat, BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
 
             Finish();
         }
 
 
-
+        public bool IsELF { get; set; }
 
 
     }

@@ -55,6 +55,30 @@ namespace Cosmos.IL2CPU.X86 {
       //if (aDebugMode && aIsNonDebuggable) {
       //  new CPUx86.Call { DestinationLabel = "DebugPoint_DebugSuspend" };
       //}
+      #region Load CodeOffset
+      if (DebugMode == DebugMode.Source)
+      {
+          var xSymbolReader = GetSymbolReaderForAssembly(aMethod.MethodBase.DeclaringType.Assembly);
+          if (xSymbolReader != null)
+          {
+              var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(aMethod.MethodBase.MetadataToken));
+              // This gets the Sequence Points.
+              // Sequence Points are spots that identify what the compiler/debugger says is a spot
+              // that a breakpoint can occur one. Essentially, an atomic source line in C#
+              if (xSmbMethod != null)
+              {
+                  xCodeOffsets = new int[xSmbMethod.SequencePointCount];
+                  var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+                  var xCodeLines = new int[xSmbMethod.SequencePointCount];
+                  var xCodeColumns = new int[xSmbMethod.SequencePointCount];
+                  var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+                  var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+                  xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
+                   , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+              }
+          }
+      }
+      #endregion
     }
 
     protected override void MethodEnd(MethodInfo aMethod) {
@@ -173,30 +197,6 @@ namespace Cosmos.IL2CPU.X86 {
       }
       WriteDebug(aMethod.MethodBase, (uint)xRetSize, IL.Call.GetStackSizeToReservate(aMethod.MethodBase));
       new CPUx86.Return { DestinationValue = (uint)xRetSize };
-        #region Load CodeOffset
-      if (DebugMode == DebugMode.Source)
-      {
-          var xSymbolReader = GetSymbolReaderForAssembly(aMethod.MethodBase.DeclaringType.Assembly);
-          if (xSymbolReader != null)
-          {
-              var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(aMethod.MethodBase.MetadataToken));
-              // This gets the Sequence Points.
-              // Sequence Points are spots that identify what the compiler/debugger says is a spot
-              // that a breakpoint can occur one. Essentially, an atomic source line in C#
-              if (xSmbMethod != null)
-              {
-                  xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                  var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                  var xCodeLines = new int[xSmbMethod.SequencePointCount];
-                  var xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                  var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                  var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
-                  xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
-                   , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-              }
-          }
-      }
-        #endregion
     }
 
     private static ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly)
@@ -276,14 +276,18 @@ namespace Cosmos.IL2CPU.X86 {
             mSymbols.Add(xMLSymbol);
         }
         #endregion
-        EmitTracer(aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
+        EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
     }
 
     public TraceAssemblies TraceAssemblies;
     public DebugMode DebugMode;
 
-    protected void EmitTracer(ILOpCode aOp, string aNamespace, int[] aCodeOffsets)
+    protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets)
     {
+        if (TmpPosLabel(aMethod, aOp) == "System_Void__MatthijsTest_Program_Init____DOT__0000000D")
+        {
+            Console.Write("");
+        }
         // NOTE - These if statemens can be optimized down - but clarity is
         // more importnat the optimizations would not offer much benefit
 
@@ -390,8 +394,13 @@ namespace Cosmos.IL2CPU.X86 {
 
     public void FlushText(TextWriter aOutput, string aDebugFile)
     {
-        aOutput.WriteLine("use32");
-        aOutput.WriteLine("org 0x200000");
+        if (!EmitELF)
+        {
+            aOutput.WriteLine("use32");
+            aOutput.WriteLine("org 0x200000");
+            aOutput.WriteLine("[map all main.map]");
+        }
+        aOutput.WriteLine("global Kernel_Start");
         base.FlushText(aOutput);
         if (mSymbols.Count > 0)
         {
@@ -399,7 +408,11 @@ namespace Cosmos.IL2CPU.X86 {
         }
     }
 
-
+    public bool EmitELF
+    {
+        get;
+        set;
+    }
 
   }
 }

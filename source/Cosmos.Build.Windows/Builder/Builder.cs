@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define OUTPUT_ELF
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -228,8 +229,18 @@ namespace Cosmos.Compiler.Builder
                 if (options.UseInternalAssembler == false)
                 {
                     //  ShowWindow(mConsoleWindow, 1); //HACK remove show and hide console we can put a command to the UI via an event if needed but its quick! 
-                    new AssembleStep(options).Execute();
-                    new LinkStep(options).Execute();
+                    new AssembleStep(options)
+                    {
+#if OUTPUT_ELF
+                        IsELF = true
+#endif
+                    }.Execute();
+                    new LinkStep(options)
+                    {
+#if OUTPUT_ELF
+                        IsELF = true
+#endif
+                    }.Execute();
                     //  ShowWindow(mConsoleWindow, 0); //Hide!
                 }
             }
@@ -434,6 +445,9 @@ namespace Cosmos.Compiler.Builder
                 var xAsm = new AssemblerNasm(xDebugCom);
                 xAsm.DebugMode = xOptions.DebugMode;
                 xAsm.TraceAssemblies = xOptions.TraceAssemblies;
+#if OUTPUT_ELF
+                xAsm.EmitELF = true;
+#endif
                 xAsm.Initialize();
                 var xScanner = new ILScanner(xAsm);
                 xScanner.Execute(xInitMethod);
@@ -656,28 +670,6 @@ namespace Cosmos.Compiler.Builder
                 xThread.Start(options);
 
         }
-
-        [Obsolete]
-        public void BeginCompile(DebugMode mode , byte portId , bool useGDB , string target)
-        {
-            var options = Cosmos.Compiler.Builder.BuildOptions.Load();
-            options.DebugMode = mode;
-            options.DebugPortId = portId;
-            options.UseGDB = useGDB;
-            options.Target = target;
-            
-            BeginCompile(options);
-        }
-
-
-
-      
-
-
-
-
-      
-       
 
           public string BuildPath
         {

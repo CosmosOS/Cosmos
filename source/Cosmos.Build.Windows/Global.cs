@@ -38,7 +38,8 @@ namespace Cosmos.Compiler.Builder {
             }
 
             if (aWait || (aCapture && xProcess.HasExited)) {
-                if (!xProcess.WaitForExit(120 * 1000) || xProcess.ExitCode != 0) {
+                var xIsQemu = aEXEPathname.Contains("qemu.exe");
+                if (!xProcess.WaitForExit(120 * 1000) || xIsQemu|| xProcess.ExitCode != 0) {
                     //TODO: Fix
                     if (aCapture) {
                         Console.ForegroundColor = ConsoleColor.Red;

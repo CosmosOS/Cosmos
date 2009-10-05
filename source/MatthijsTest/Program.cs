@@ -26,8 +26,15 @@ namespace MatthijsTest
 
 					var xBoot = new Cosmos.Sys.Boot();
 			xBoot.Execute();
-			TCPIPStack.Init();
-			Console.WriteLine("Initialized!");
+            Console.WriteLine("Echoing started.");
+            do
+            {
+                var xString = Console.ReadLine();
+                if (xString.Length > 2)
+                {
+                    Console.WriteLine(xString);
+                }
+            } while (true);
 		}
 
 	}
