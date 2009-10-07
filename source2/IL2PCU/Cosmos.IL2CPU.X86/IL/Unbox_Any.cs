@@ -57,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             Assembler.Stack.Push( new StackContents.Item( ( int )xTypeSize, xType.Value ) );
             //new CPUx86.Jump { DestinationLabel = mNextOpLabel };
-            Jump_End( aMethod ); 
+            new Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
             new Label( mReturnNullLabel );
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
             new CPUx86.Push { DestinationValue = 0 };
