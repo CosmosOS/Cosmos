@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Reflection;
 using System.Diagnostics;
 using Cosmos.Sys.Network;
+using Cosmos.Hardware;
 
 namespace MatthijsTest
 {
@@ -26,16 +27,28 @@ namespace MatthijsTest
 
 					var xBoot = new Cosmos.Sys.Boot();
 			xBoot.Execute();
-            Console.WriteLine("Echoing started.");
-            do
+
+            //TCPIPStack.Init();
+
+            //TCPIPStack.ConfigIP(
+            var xCount = 0;
+            for (int i = 0; i < Device.Devices.Count; i++)
             {
-                var xString = Console.ReadLine();
-                if (xString.Length > 2)
+                var xItem = Device.Devices[i];
+                if (xItem == null)
                 {
-                    Console.WriteLine(xString);
+                    Console.WriteLine("NULL item!");
+                    continue;
                 }
-            } while (true);
+                var xType = Device.Devices[i].Type;
+                if (Device.Devices[i].Type == Device.DeviceType.Network)
+                {
+                    xCount++;
+                }
+            }
+            Console.Write("Network cards found: ");
+            Console.WriteLine(xCount.ToString());
 		}
 
-	}
+    }
 }

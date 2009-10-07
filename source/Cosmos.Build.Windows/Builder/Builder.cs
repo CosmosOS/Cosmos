@@ -1,4 +1,5 @@
-﻿//#define OUTPUT_ELF
+﻿// leave the use of the following directive in: it eases a LOT during development, as it lets you use gdb for debugging
+#define OUTPUT_ELF
 using System;
 using System.Diagnostics;
 using System.IO;

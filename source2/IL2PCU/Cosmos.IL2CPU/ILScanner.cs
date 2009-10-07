@@ -543,6 +543,10 @@ namespace Cosmos.IL2CPU {
         if (xVirtMethod != null) {
           Queue(xVirtMethod, aMethod, "Virtual Base");
           mVirtuals.Add(xVirtMethod);
+          if (aMethod.Name == "ToString")
+          {
+              Console.Write("");
+          }
 
           // List changes as we go, cant be foreach
           for (int i = 0; i < mItemsList.Count; i++) {

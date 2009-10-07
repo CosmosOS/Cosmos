@@ -64,10 +64,10 @@ namespace Cosmos.IL2CPU.X86.IL {
     }
 
     public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, uint aTargetMethodUID, int aCurrentPosition) {
-      if (aTargetMethod.IsVirtual) {
-        Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
-        return;
-      }
+      //if (aTargetMethod.IsVirtual) {
+      //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
+      //  return;
+      //}
       var xMethodInfo = aTargetMethod as System.Reflection.MethodInfo;
       string xCurrentMethodLabel = MethodInfoLabelGenerator.GenerateLabelName(aCurrentMethod.MethodBase);
 
@@ -77,7 +77,8 @@ namespace Cosmos.IL2CPU.X86.IL {
       if (aTargetMethod.IsStatic || !aTargetMethod.IsVirtual || aTargetMethod.IsFinal) {
         xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
       } else {
-        throw new Exception("Call: non-concrete method called!");
+          xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
+        //throw new Exception("Call: non-concrete method called!");
       }
       var xParameters = aTargetMethod.GetParameters();
       int xArgCount = xParameters.Length;
