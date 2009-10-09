@@ -23,6 +23,10 @@ namespace Cosmos.Compiler.Builder
         {
             Init();
             var aDrive = options.USBDevice;
+            if (aDrive.EndsWith(":\\"))
+            {
+                aDrive = aDrive.Substring(0, 1);
+            }
 
             string xPath = BuildPath + @"USB\";
             buildFileUtils.RemoveFile(xPath + @"output.bin");

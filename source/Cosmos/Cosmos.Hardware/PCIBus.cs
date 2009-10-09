@@ -6777,8 +6777,15 @@ namespace Cosmos.Hardware {
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
                 {
-                    UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) + 1;
-                    IOMaps[i] = new Kernel.IOAddressSpace(address-1, size);
+                    UInt32 size = (~(PCI_BASE_ADDRESS_IO_MASK & flags)) & 0xFF;
+                    IOMaps[i] = new Kernel.IOAddressSpace(address-1, ((uint)(byte)size));
+                    Console.Write("IOSpace IO. Size = ");
+                    Interrupts.WriteNumber(size, 32);
+                    Console.Write(", Address = ");
+                    Interrupts.WriteNumber(address - 1, 32);
+                    Console.Write(", flags = ");
+                    Interrupts.WriteNumber(flags, 32);
+                    Console.WriteLine("");
                     NeedsIO = true;
                 }
             }

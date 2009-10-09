@@ -30,9 +30,6 @@ namespace Cosmos.Hardware {
 
         public static void DriversInit()
         {
-            Console.Write("Initializing devices. Count = ");
-            Interrupts.WriteNumber((uint)mDriverInits.Count, 32);
-            Console.WriteLine("");
             for (int d = 0; d < mDriverInits.Count; d++)
             {
                 InitializeDriver dlgt = mDriverInits[d];

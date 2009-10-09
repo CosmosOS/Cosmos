@@ -24,8 +24,8 @@ namespace Cosmos.Hardware {
             //Console.WriteLine("    Init ACPI");
             //ACPIManager.Init();
 
-            Console.WriteLine("    Init PCIBus");
-            PCIBus.Init();
+            //Console.WriteLine("    Init PCIBus");
+            //PCIBus.Init();
 
             Console.WriteLine("    Init PIT");
             PIT.Init();
@@ -41,9 +41,9 @@ namespace Cosmos.Hardware {
             //Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
 
-            Network.Devices.RTL8139.RTL8139.InitDriver();
-            Network.Devices.AMDPCNetII.AMDPCNet.InitDriver();
-            Network.Devices.ViaRhine.VT6102.InitDriver();
+            //Network.Devices.RTL8139.RTL8139.InitDriver();
+            //Network.Devices.AMDPCNetII.AMDPCNet.InitDriver();
+            //Network.Devices.ViaRhine.VT6102.InitDriver();
 
             Console.WriteLine("    Init Device Drivers");
             Device.DriversInit();
