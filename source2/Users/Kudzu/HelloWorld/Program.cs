@@ -10,7 +10,7 @@ using Indy.IL2CPU;
 using Cosmos.Hardware;
 
 namespace HelloWorld {
-	class Program {
+	public class Program {
     private static void TestMethod(uint a, uint b) {
       Console.WriteLine("Callback?");
       Console.Write("  A: ");
@@ -68,14 +68,6 @@ namespace HelloWorld {
         var xBoot = new Cosmos.Sys.Boot();
         xBoot.Execute();
       }
-
-      var xDelegate = new Action<uint, uint>(TestMethod);
-      xDelegate(0x11223344, 0x55667788);
-
-      Console.WriteLine("Done");
-      var xLine = Console.ReadLine();
-      Console.Write("Given text was: ");
-      Console.WriteLine(xLine);
 
 
       

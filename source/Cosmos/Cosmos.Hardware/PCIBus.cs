@@ -6459,6 +6459,18 @@ namespace Cosmos.Hardware {
             get { return mDevices; }
         }
 
+        public static void DoTest()
+        {
+            Console.WriteLine("------------------------");
+            Console.Write("Via mDevices: ");
+            Interrupts.WriteNumber((uint)mDevices.Length, 32);
+            Console.WriteLine("");
+            Console.Write("Via Devices: ");
+            Interrupts.WriteNumber((uint)Devices.Length, 32);
+            Console.WriteLine("");
+
+        }
+
         protected static bool mEnumerationCompleted = false;
 
         public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function) {
@@ -6477,9 +6489,16 @@ namespace Cosmos.Hardware {
         }
 
         public static void Init() {
-            var xDevices = new List<PCIDevice>();
+            var xDevices = new List<PCIDevice>(16);
             EnumerateBus(0, ref xDevices);
+            Console.WriteLine("Converting devices list to array.");
+            Console.Write("Count: ");
+            Interrupts.WriteNumber((uint)xDevices.Count, 32);
+            Console.WriteLine("");
             mDevices = xDevices.ToArray();
+            Console.Write("Length: ");
+            Interrupts.WriteNumber((uint)mDevices.Length, 32);
+            Console.WriteLine("");
             mEnumerationCompleted = true;
         }
 
@@ -6489,12 +6508,9 @@ namespace Cosmos.Hardware {
         /// <param name="aBus">The bus number to enumerate</param>
         /// <param name="rDevices">The list of Devices</param>
         private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
-            //Console.WriteLine("Enumerate " + aBus ); 
-            for (byte xSlot = 0; xSlot < 1; xSlot++) {
-              //for (byte xSlot = 0; xSlot < 32; xSlot++) {                
+              for (byte xSlot = 0; xSlot < 32; xSlot++) {                
                 byte xMaxFunctions = 1;
-                //for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
-                for (byte xFunction = 0; xFunction < 1; xFunction++) {
+                for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
                     PCIDevice xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
                     if (xPCIDevice.DeviceExists) {
                         if (xPCIDevice.HeaderType == 2) { /* PCIHeaderType.Cardbus */
@@ -6504,19 +6520,16 @@ namespace Cosmos.Hardware {
                         if (xPCIDevice.HeaderType == 1) { /* PCIHeaderType.Bridge */
                             xPCIDevice = new PCIDeviceBridge(aBus, xSlot, xFunction);
                         }
-
-                        rDevices.Add(xPCIDevice);
                         if (xPCIDevice is PCIDeviceBridge)
                         {
                             EnumerateBus(((PCIDeviceBridge)xPCIDevice).SecondaryBus, ref rDevices);
                         }
-
+                        rDevices.Add(xPCIDevice);
                         if (xPCIDevice.IsMultiFunction) {
                             xMaxFunctions = 8;
                         }
                     }
                 }
-                break;
             }
         }
     }

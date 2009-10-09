@@ -30,17 +30,17 @@ namespace Cosmos.Hardware {
 
         public static void DriversInit()
         {
-            //for( int d=0; d<mDriverInits.Count; d++)
-            //{
-            //    InitializeDriver dlgt = mDriverInits[d];
-            //    dlgt();
-            //}
+            for (int d = 0; d < mDriverInits.Count; d++)
+            {
+                InitializeDriver dlgt = mDriverInits[d];
+                dlgt();
+            }
         }
 
 		public Device() {
 		}
 
-		static protected List<Device> mDevices = new List<Device>(4);
+		static protected List<Device> mDevices = new List<Device>(16);
 		static public List<Device> Devices {
 			get {
 				return mDevices;
@@ -53,6 +53,7 @@ namespace Cosmos.Hardware {
             {
                 throw new ArgumentNullException("aDevice");
             }
+            Console.WriteLine("Adding device");
             mDevices.Add(aDevice);
         }
 
