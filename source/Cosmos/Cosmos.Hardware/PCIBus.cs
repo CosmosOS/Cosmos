@@ -6779,8 +6779,6 @@ namespace Cosmos.Hardware {
                 {
                     UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) + 1;
                     IOMaps[i] = new Kernel.IOAddressSpace(address-1, size);
-                    //Console.WriteLine("register " + i + " - " + size + "b io");
-
                     NeedsIO = true;
                 }
             }

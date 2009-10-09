@@ -45,6 +45,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             // Enable the card
             pciCard.EnableDevice();
 
+            Console.Write("AddressSpace size = ");
+            Interrupts.WriteNumber(io.Size, 32);
+
             // Turn on the card
             io.Write8(0x52, 0x01);
 
@@ -87,15 +90,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         public static void FindAll()
         {
             Console.WriteLine("Scanning for Realtek 8139 cards...");
-            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
+            for(int i = 0; i < PCIBus.Devices.Length; i++)
             {
+                var xDevice = PCIBus.Devices[i];
                 //DebugWriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
-                if ((device.VendorID == 0x10EC) && (device.DeviceID == 0x8139) && (device.Claimed == false))
+                if ((xDevice.VendorID == 0x10EC) && (xDevice.DeviceID == 0x8139) && (xDevice.Claimed == false))
                 {
-                    RTL8139 nic = new RTL8139(device);
+                    RTL8139 nic = new RTL8139(xDevice);
 
-                    Console.WriteLine("Found RTL8139 NIC on PCI " + device.Bus + ":" + device.Slot + ":" + device.Function);
-                    Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+                    Console.WriteLine("Found RTL8139 NIC on PCI " + xDevice.Bus + ":" + xDevice.Slot + ":" + xDevice.Function);
+                    Console.WriteLine("NIC IRQ: " + xDevice.InterruptLine);
                     Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
 
                     NetworkDevice.Add(nic);
