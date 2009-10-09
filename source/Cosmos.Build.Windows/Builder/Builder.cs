@@ -7,8 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.Win32;
-//using Indy.IL2CPU.IL.X86;
-using IL2CPU;
 using System.IO.Pipes;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;

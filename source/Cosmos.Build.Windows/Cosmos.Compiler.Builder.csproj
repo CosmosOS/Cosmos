@@ -219,10 +219,6 @@
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IL2CPU\IL2CPU\IL2CPU.csproj">
-      <Project>{8142656B-0A4B-4E05-BBE4-AA31CE7B18FA}</Project>
-      <Name>IL2CPU %28Compiler\IL2CPU%29</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Cosmos.ico" />
