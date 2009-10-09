@@ -38,11 +38,15 @@ namespace Cosmos.Compiler.Builder
             File.Copy(xPath + @"mboot.c32", aDrive + @":\mboot.c32");
             buildFileUtils.RemoveFile(aDrive + @":\syslinux.cfg");
             File.Copy(xPath + @"syslinux.cfg", aDrive + @":\syslinux.cfg");
+        
             // Set MBR
             //TODO: Hangs on Windows 2008 - maybe needs admin permissions? Or maybe its not compat?
             // Runs from command line ok in Windows 2008.....
 
-            Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true);
+            // Windows 7 - error here about eleveation if we set syslinux to run as admin
+            //http://vbdotnetforum.com/index.php?/topic/797-issue-of-changing-ipaddress-programatically-in-windows-vista/
+            // How can solve this without modifying every exe, and without needing to modify syslinux to run as admin?
+            Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true, true);
 
             Finish();
         }

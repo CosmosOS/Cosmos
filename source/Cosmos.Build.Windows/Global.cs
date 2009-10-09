@@ -7,11 +7,23 @@ using System.Threading;
 
 namespace Cosmos.Compiler.Builder {
     public class Global {
-        public static void Call(string aEXEPathname, string aArgLine, string aWorkDir) {
-            Call(aEXEPathname, aArgLine, aWorkDir, true, true);
+        public static void Call(string aEXEPathname, string aArgLine, string aWorkDir)
+        {
+            Call(aEXEPathname, aArgLine, aWorkDir, true, true, false);
         }
 
-        public static Process Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait, bool aCapture) {
+        public static void Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aElevate)
+        {
+            Call(aEXEPathname, aArgLine, aWorkDir, true, true, aElevate);
+        }
+
+        public static Process Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait, bool aCapture)
+        {
+            return Call(aEXEPathname, aArgLine, aWorkDir, aWait, aCapture, false);
+        }
+
+        public static Process Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait, bool aCapture, bool aElevate)
+        {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = aEXEPathname;
             xStartInfo.Arguments = aArgLine;
@@ -20,6 +32,17 @@ namespace Cosmos.Compiler.Builder {
             xStartInfo.UseShellExecute = !aCapture;
             xStartInfo.RedirectStandardError = aCapture;
             xStartInfo.RedirectStandardOutput = aCapture;
+            if (aElevate)
+            {
+                //TODO: May need to check for XP, and if XP not do this.
+                //TODO: CsUAC at http://cfx.codeplex.com/sourcecontrol/changeset/view/25903?projectName=cfx#604822
+                xStartInfo.UseShellExecute = true;
+                xStartInfo.Verb = "runas";
+                // The Process object must have the UseShellExecute property set to false in order to redirect IO streams.
+                // So for now we cant capture output of elevated callees
+                xStartInfo.RedirectStandardError = false;
+                xStartInfo.RedirectStandardOutput = false;
+            }
             var xProcess = Process.Start(xStartInfo);
             Console.WriteLine();
             Console.WriteLine("Executing:");
