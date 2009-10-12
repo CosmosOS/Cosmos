@@ -15,13 +15,15 @@ namespace CosmosBoot {
 		public static void Init() {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
-            Console.BackgroundColor = ConsoleColor.Green;
+
+            //Console.BackgroundColor = ConsoleColor.Blue;
             //TODO: What is this next line for?
             S.ReallyClearScreen();
             Console.WriteLine("Congratulations! You just booted C# code.");
             Console.WriteLine("Edit Program.cs to create your own Operating System.");
             Console.WriteLine("Press a key to shutdown...");
             Console.Read();
+
             Cosmos.Sys.Deboot.ShutDown();
 		}
 	}
