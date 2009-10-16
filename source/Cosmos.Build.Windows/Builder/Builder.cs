@@ -190,7 +190,21 @@ namespace Cosmos.Compiler.Builder
             }
            
             if (LogMessage != null) { LogMessage(aSeverity, aMessage); }
+            if (aSeverity == LogSeverityEnum.Error)
+            {
+                mHasErrors = true;
+            }
         }
+
+        private bool mHasErrors = false;
+        public bool HasErrors
+        {
+            get
+            {
+                return mHasErrors;
+            }
+        }
+        
 
         private void LogTime(string text)
         {
@@ -220,6 +234,8 @@ namespace Cosmos.Compiler.Builder
 
             //SIGNAL END COMPILE
             OnCompileCompleted();
+
+            
 
             if (options.CompileIL)
             {

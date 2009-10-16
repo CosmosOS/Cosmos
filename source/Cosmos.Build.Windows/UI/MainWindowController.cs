@@ -92,10 +92,12 @@ namespace Cosmos.Compiler.Builder
 
         void mBuilder_BuildCompleted()
         {
-            mainWindow.Dispatcher.Invoke(new Action(PostBuildUI)); 
-           
+            mainWindow.Dispatcher.Invoke(new Action(PostBuildUI));
 
-            mainWindow.ThreadedClose();  //HACK //TODO consider making the controller survive the window. 
+            if (!mBuilder.HasErrors)
+            {
+                mainWindow.ThreadedClose();  //HACK //TODO consider making the controller survive the window. 
+            }
         }
 
 

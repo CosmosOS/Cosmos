@@ -81,7 +81,7 @@ namespace Cosmos.Kernel.Plugs {
             new DebuggerAsm().Break();
         }
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
-          throw new NotImplementedException();
+            new DebuggerAsm().Break();
         }
     }
 

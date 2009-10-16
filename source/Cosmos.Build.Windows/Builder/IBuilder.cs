@@ -21,6 +21,7 @@ namespace Cosmos.Compiler.Builder
         string BuildPath {get;}
 
         DebugWindowController DebugWindow { get; }   //HACK pass in event
+        bool HasErrors { get; }
 
 
         //string[] GetPlugs();
