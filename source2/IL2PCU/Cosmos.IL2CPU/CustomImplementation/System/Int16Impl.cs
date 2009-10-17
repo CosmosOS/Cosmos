@@ -40,7 +40,12 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             {
                 Int16 ind = (Int16)digits.IndexOf(s[i]);
                 if (ind == -1)
+                {
+                    Console.Write("Digit '");
+                    Console.Write(s[i]);
+                    Console.WriteLine("' not found!");
                     throw new FormatException();
+                }
                 result = (short)((result * 10) + ind);
             }
 

@@ -102,7 +102,19 @@ namespace Cosmos.IL2CPU.CustomImplementation.System {
     }
 
     public static int IndexOf(string aThis, char value, int startIndex, int count) {
-      throw new Exception("Not implemented");
+        var xEndIndex = aThis.Length;
+        if((startIndex + count) < xEndIndex){
+            xEndIndex=(startIndex + count);
+        }
+        for (int i = startIndex; i < xEndIndex; i++)
+        {
+            if (aThis[i] == value)
+            {
+                return i;
+            }
+        }
+
+        return -1;     
     }
 
     [PlugMethod(Enabled = false)]

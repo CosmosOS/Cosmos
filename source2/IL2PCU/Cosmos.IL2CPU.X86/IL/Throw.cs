@@ -24,6 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
           new CPUx86.Halt();
             Assembler.Stack.Pop();
 
+
         }
 
         // namespace Cosmos.IL2CPU.IL.X86 {

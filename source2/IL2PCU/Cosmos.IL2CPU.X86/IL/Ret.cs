@@ -12,6 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       //TODO: Return
+        Jump_End(aMethod);
       // Need to jump to end of method. Assembler can emit this label for now
       //new CPU.Jump { DestinationLabel = MethodFooterOp.EndOfMethodLabelNameNormal };
     }
