@@ -9,7 +9,6 @@ using System.Xml;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
-using Indy.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;

@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL;
-using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
@@ -127,28 +126,30 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod) {
-			PlugMethodAttribute xResult = ((PlugMethodAttribute[])aMethod.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true)).FirstOrDefault();
-			if (xResult != null) {
-				return xResult.Assembler != null;
-			}
-			return false;
+            //PlugMethodAttribute xResult = ((PlugMethodAttribute[])aMethod.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true)).FirstOrDefault();
+            //if (xResult != null) {
+            //    return xResult.Assembler != null;
+            //}
+            //return false;
+            throw new NotImplementedException();
 		}
 
         public virtual void ScanCustomAssembleImplementation(MethodInformation aMethod) {
         }
 
 	    public virtual void DoCustomAssembleImplementation(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			PlugMethodAttribute xAttrib = aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
-			if (xAttrib != null) {
-				Type xAssemblerType = xAttrib.Assembler;
-				if (xAssemblerType != null) {
-					var xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
-				    var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;
-                    if (xNeedsMethodInfo != null) {
-                        xNeedsMethodInfo.MethodInfo = aMethodInfo; }
-					xAssembler.Assemble(aAssembler);
-				}
-			}
+            //PlugMethodAttribute xAttrib = aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
+            //if (xAttrib != null) {
+            //    Type xAssemblerType = xAttrib.Assembler;
+            //    if (xAssemblerType != null) {
+            //        var xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
+            //        var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;
+            //        if (xNeedsMethodInfo != null) {
+            //            xNeedsMethodInfo.MethodInfo = aMethodInfo; }
+            //        xAssembler.Assemble(aAssembler);
+            //    }
+            //}
+            throw new NotImplementedException();
 		} 
 
 		public virtual void PostProcess(Assembler.Assembler aAssembler) {

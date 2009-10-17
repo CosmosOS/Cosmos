@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Div)]
         // 	public class Div: Op {
         //         private string mNextLabel;

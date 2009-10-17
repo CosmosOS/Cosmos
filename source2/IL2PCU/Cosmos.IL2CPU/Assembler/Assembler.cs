@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading;
 using System.IO;
 using System.Reflection;
-using Indy.IL2CPU;
-using Indy.IL2CPU.IL;
+using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.IL;
 using System.Runtime.InteropServices;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
 
@@ -156,10 +156,6 @@ namespace Cosmos.IL2CPU {
         mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
         var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
-        var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;
-        if (xNeedsMethodInfo != null) {
-          throw new Exception("Plug cant work, because of INeedsMethodInfo");
-        }
         xAssembler.AssembleNew(this, aMethod.PluggedMethod);
       } else {
         foreach (var xOpCode in aOpCodes) {

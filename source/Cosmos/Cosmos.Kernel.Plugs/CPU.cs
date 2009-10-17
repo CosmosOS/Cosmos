@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Indy.IL2CPU.Assembler.X86;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs {

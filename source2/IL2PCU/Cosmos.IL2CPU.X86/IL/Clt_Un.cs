@@ -76,7 +76,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Clt_Un)]
         // 	public class Clt_Un: Op {
         // 		private readonly string NextInstructionLabel;

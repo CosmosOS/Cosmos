@@ -25,10 +25,10 @@ namespace HelloWorld {
 		[STAThread]
 		static void Main(string[] args) {
       // enforce assembly linking:
-      var xTheType = typeof(Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
-      xTheType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
-      xTheType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
-      xTheType = typeof(Cosmos.Sys.Plugs.Deboot);
+      //var xTheType = typeof(Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
+      //xTheType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
+      //xTheType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
+      //xTheType = typeof(Cosmos.Sys.Plugs.Deboot);
       
       // end enforce assembly linking
       //Indy.IL2CPU.Engine.Execute()

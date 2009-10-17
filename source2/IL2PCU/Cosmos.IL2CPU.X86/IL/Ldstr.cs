@@ -1,9 +1,10 @@
 using System;
 using CPU = Cosmos.IL2CPU;
 using System.Text;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.X;
 using Cosmos.IL2CPU.ILOpCodes;
+using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -86,7 +87,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Asm = Assembler;
 		// using System.Collections.Generic;
 		// 
-		// namespace Indy.IL2CPU.IL.X86 {
+		// namespace Cosmos.IL2CPU.IL.X86 {
 		//     [OpCode(OpCodeEnum.Ldstr)]
 		//     public class LdStr : Op {
 		//         //private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();

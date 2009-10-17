@@ -6,9 +6,9 @@ using CPU = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
 using Cosmos.IL2CPU.X86.IL;
-using Indy.IL2CPU.IL;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.IL;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.X86 {
   public abstract class ILOp: Cosmos.IL2CPU.ILOp {

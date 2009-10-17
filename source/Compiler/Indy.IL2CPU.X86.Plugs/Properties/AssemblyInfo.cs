@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Indy.IL2CPU.X86.Plugs")]
+[assembly: AssemblyTitle("Cosmos.IL2CPU.X86.Plugs")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Indy.IL2CPU.X86.Plugs")]
+[assembly: AssemblyProduct("Cosmos.IL2CPU.X86.Plugs")]
 [assembly: AssemblyCopyright("Copyright ©  2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

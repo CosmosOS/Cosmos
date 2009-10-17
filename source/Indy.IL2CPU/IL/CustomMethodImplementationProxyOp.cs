@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class CustomMethodImplementationProxyOp: Op {
@@ -25,31 +24,32 @@ Console.Write("");
 		protected abstract void Ldloc(int index);
 
 		public sealed override void DoAssemble() {
-			bool isFirst = true;
-			int curIndex = 0;
-			ParameterInfo[] xParams = ProxiedMethod.GetParameters();
-			foreach (var xParam in xParams) {
-				if (isFirst && (!MethodInfo.Method.IsStatic)) {
-					isFirst = false;
-					Ldarg(curIndex++);
-				} else {
-					FieldAccessAttribute xFieldAccess = (FieldAccessAttribute)xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true).FirstOrDefault();
-					if (xFieldAccess != null) {
-						Ldarg(0);
-                        if(MethodInfo==null || MethodInfo.TypeInfo==null || MethodInfo.TypeInfo.Fields==null||xFieldAccess==null)
-                        {
-                            Console.Write("");
-                        }
-					    if (!MethodInfo.TypeInfo.Fields.ContainsKey(xFieldAccess.Name)) {
-							throw new Exception("Field '" + xFieldAccess.Name + "' not found!");
-						}
-						Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldAccess.Name]);
-					} else {
-						Ldarg(curIndex++);
-					}
-				}
-			}
-			CallProxiedMethod();
+            //bool isFirst = true;
+            //int curIndex = 0;
+            //ParameterInfo[] xParams = ProxiedMethod.GetParameters();
+            //foreach (var xParam in xParams) {
+            //    if (isFirst && (!MethodInfo.Method.IsStatic)) {
+            //        isFirst = false;
+            //        Ldarg(curIndex++);
+            //    } else {
+            //        FieldAccessAttribute xFieldAccess = (FieldAccessAttribute)xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true).FirstOrDefault();
+            //        if (xFieldAccess != null) {
+            //            Ldarg(0);
+            //            if(MethodInfo==null || MethodInfo.TypeInfo==null || MethodInfo.TypeInfo.Fields==null||xFieldAccess==null)
+            //            {
+            //                Console.Write("");
+            //            }
+            //            if (!MethodInfo.TypeInfo.Fields.ContainsKey(xFieldAccess.Name)) {
+            //                throw new Exception("Field '" + xFieldAccess.Name + "' not found!");
+            //            }
+            //            Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldAccess.Name]);
+            //        } else {
+            //            Ldarg(curIndex++);
+            //        }
+            //    }
+            //}
+            //CallProxiedMethod();
+            throw new NotImplementedException();
 		}
 	}
 }

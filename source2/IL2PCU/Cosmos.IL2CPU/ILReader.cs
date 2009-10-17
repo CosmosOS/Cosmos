@@ -291,7 +291,7 @@ namespace Cosmos.IL2CPU {
 
           // The operand is a FieldRef, MethodRef, or TypeRef token.
           case OperandType.InlineTok:
-            xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, xOpPos, xPos + 4, ReadUInt32(xIL, xPos));
+            xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, xOpPos, xPos + 4, ReadUInt32(xIL, xPos), aMethod.Module, xTypeGenArgs, xMethodGenArgs);
             xPos = xPos + 4;
             break;
 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Indy.IL2CPU.IL;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.IL;
+using Cosmos.IL2CPU.Plugs;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.X86.IL;
 using CPU = Cosmos.IL2CPU;
@@ -12,12 +12,8 @@ using MethodBase = System.Reflection.MethodBase;
 using Cosmos.IL2CPU;
 using CosmosAssembler = Cosmos.IL2CPU.X86.CosmosAssembler;
 
-namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
+namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
   public class InvokeImplAssembler: AssemblerMethod {
-    public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-      throw new NotImplementedException();
-    }                                                                 
-
     private uint GetArgumentStartOffset(MethodBase aMethod, int aArgument) {
       return 0;
     }

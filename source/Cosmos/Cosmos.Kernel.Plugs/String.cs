@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs {
     //TODO: Move this and other FCL plugs to Cosmos.Plugs assembly. some plugs like Console need hardware

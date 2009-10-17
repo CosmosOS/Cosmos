@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
 	public static class ObjectImplRefs {
 		public static readonly Assembly RuntimeAssemblyDef;
 

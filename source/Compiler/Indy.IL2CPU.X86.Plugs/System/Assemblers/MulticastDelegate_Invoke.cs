@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Indy.IL2CPU.IL;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.IL;
+using Cosmos.IL2CPU.Plugs;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using CPU = Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
+using Cosmos.IL2CPU.X86.IL;
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 {
-	public class MulticastDelegate_Invoke : AssemblerMethod, INeedsMethodInfo
+	public class MulticastDelegate_Invoke : AssemblerMethod
 	{
 		/// <summary>
 		/// <para>This method implements Multicast Invoke. This means that it should call all delegates
@@ -20,7 +21,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 		/// <param name="aAssembler"></param>
 		public override void AssembleNew(object aAssembler, object aMethodInfo)
 		{
-			if (MethodInfo == null)
+			if (aMethodInfo == null)
 			{
 				throw new Exception("This AssemblerMethod needs MethodInfo!");
 			}
@@ -30,11 +31,14 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			 * EBX contains the number of items in the array
 			 * ECX contains the argument size
 			 */
+            var xMethodInfo = (MethodInfo)aMethodInfo;
 			new CPU.Label("____DEBUG_FOR_MULTICAST___");
             //            new CPUx86.Cli();//DEBUG ONLY
             //#warning reenable interupts when issue is fixed!!!
 			new CPU.Comment("move address of delgate to eax");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true,
+                              SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0)
+            };
 			var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
 			new CPU.Comment("push address of delgate to stack");
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };//addrof this
@@ -49,9 +53,9 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
             new CPUx86.Add { DestinationReg = Registers.EAX, SourceValue = 8 };//why? -- start of list i think? MtW: the array's .Length is at +8
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
 			new CPU.Comment("ecx = ptr to delegate object");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };//addrof the delegate
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };//addrof the delegate
 			new CPU.Comment("ecx points to the size of the delegated methods arguments");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) };//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ArgSize$$")) };//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
             new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX }; ;//make sure edx is 0
 			new CPU.Label(".BEGIN_OF_LOOP");
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBX };//are we at the end of this list
@@ -66,9 +70,9 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			new CPU.Comment("esi points to where we will copy the methods argumetns from");
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP };
 			new CPU.Comment("edi = ptr to delegate object");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
 			new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = (MethodInfo.Arguments[0].TypeInfo.Fields["System.Object System.Delegate._target"].Offset + 12) };//i really dont get the +12. MtW: +12 because of extra header of the type (object type, object id, field count)
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = (Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target")) };//i really dont get the +12. MtW: +12 because of extra header of the type (object type, object id, field count)
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
             new CPUx86.Push { DestinationReg = Registers.EDI };
@@ -80,7 +84,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			new CPU.Comment("move the current delegate to edi");
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
 			new CPU.Comment("move the methodptr from that delegate to edi ");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = (MethodInfo.Arguments[0].TypeInfo.Fields["System.IntPtr System.Delegate._methodPtr"].Offset + 12) };//
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr") };//
 			new CPU.Comment("save methodptr on the stack");
             new CPUx86.Push { DestinationReg = Registers.EDI };
 			new CPU.Comment("move location to copy args to");
@@ -103,9 +107,9 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			//new CPUx86.Move("[esp+0x20]", Registers_Old.EAX);
 			//new CPU.Label(".getReturn");
 			new CPU.Comment("edi = ptr to delegate object");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
 			new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = (MethodInfo.Arguments[0].TypeInfo.Fields["System.Object System.Delegate._target"].Offset + 12) };//i really dont get the +12, MtW: that's for the object header
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target") };//i really dont get the +12, MtW: that's for the object header
             //new CPUx86.Compare("edi", "0");
             //new CPUx86.JumpIfEqual(".noTHIStoPop");
             //new CPUx86.Move("edx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
@@ -129,8 +133,8 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			new CPU.Label(".END_OF_INVOKE_");
 			new CPU.Comment("get the return value");
 			//new CPUx86.Pop("eax");
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };//addrof the delegate
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true, SourceDisplacement = (MethodInfo.Arguments[0].TypeInfo.Fields["$$ReturnsValue$$"].Offset + 12) };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };//addrof the delegate
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$") };
             new CPUx86.Compare { DestinationReg = Registers.EDX, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".noReturn" };
 			//may have to expand the return... idk
@@ -146,16 +150,6 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			//            new CPUx86.Move("ebx", "[eax + " + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) + "]");
 
 			//new CPUx86.Move("eax", CPUx86.Registers_Old.
-		}
-
-    public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-      throw new NotImplementedException();
-    }
-
-		public MethodInformation MethodInfo
-		{
-			get;
-			set;
 		}
 	}
 }

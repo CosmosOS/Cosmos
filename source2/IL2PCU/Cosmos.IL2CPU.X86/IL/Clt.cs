@@ -1,5 +1,5 @@
 using System;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using CPU = Cosmos.IL2CPU.X86;
@@ -85,7 +85,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Clt)]
         // 	public class Clt: Op {
         // 		private readonly string NextInstructionLabel;

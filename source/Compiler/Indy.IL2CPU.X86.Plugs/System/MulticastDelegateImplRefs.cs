@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
 	public static class MulticastDelegateImplRefs {
 		public static readonly Assembly RuntimeAssemblyDef;
 

@@ -4,11 +4,11 @@ using System;
 using CPU = Cosmos.IL2CPU.X86;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using System.Reflection;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
-// using Indy.IL2CPU.Compiler;
+// using Cosmos.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -177,10 +177,10 @@ namespace Cosmos.IL2CPU.X86.IL
                */
 
               //new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( uint )ObjectImpl.FieldDataOffset };
+
               //public const int FieldDataOffset = 12; // ObjectImpl says that. so..
               new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 12 };
-
-              new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xThisOffset, SourceReg = CPUx86.Registers.EAX };
+              new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xThisOffset, SourceReg = CPUx86.Registers.EAX};
               /*
                * On the stack now:
                * $esp                 Params

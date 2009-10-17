@@ -2,7 +2,7 @@ using System;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using CPU = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
 
-            System.Reflection.MethodBase xMethodIsInstance = Indy.IL2CPU.Compiler.ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
+            System.Reflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
 
             new Call( Assembler ).Execute( aMethod, new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance) );
 
@@ -54,9 +54,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         //     [OpCode(OpCodeEnum.Isinst)]
         //     public class Isinst : Op {
         //         private string mTypeId;

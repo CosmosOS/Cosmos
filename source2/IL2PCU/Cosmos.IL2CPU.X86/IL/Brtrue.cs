@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Brtrue)]
         // 	public class Brtrue: Op {
         // 		public readonly string TargetLabel;

@@ -5,9 +5,9 @@ using CPU = Cosmos.IL2CPU.X86;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.X86;
-using Indy.IL2CPU.Compiler;
 using Cosmos.IL2CPU.ILOpCodes;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Castclass )]
@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
-            System.Reflection.MethodBase xMethodIsInstance = Indy.IL2CPU.Compiler.ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
+            System.Reflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
             new Call( Assembler ).Execute( aMethod, new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance ) );
             new Label( xCurrentMethodLabel + "_After_IsInstance_Call" );
             Assembler.Stack.Pop();
@@ -74,9 +74,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Castclass)]
         // 	public class Castclass: Op {
         // 		private string mTypeId;

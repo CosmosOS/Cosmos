@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPU = Cosmos.IL2CPU.X86;
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldelem_U4)]
         // 	public class Ldelem_U4: Op {
         //         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {

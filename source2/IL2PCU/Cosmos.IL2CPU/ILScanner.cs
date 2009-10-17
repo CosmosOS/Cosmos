@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Indy.IL2CPU;
-using Indy.IL2CPU.Plugs;
-using Indy.IL2CPU.IL;
+using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
 
 namespace Cosmos.IL2CPU {
@@ -443,10 +443,10 @@ namespace Cosmos.IL2CPU {
       // and is substituted on the fly? Plug scanner would direct all access to that
       // class and throw an exception if any method, field, member etc is missing.
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
-        if (xAsm.GetName().Name == "Indy.IL2CPU.X86") {
+        if (xAsm.GetName().Name == "Cosmos.IL2CPU.X86") {
           // skip this assembly for now. at the moment we introduced the AssemblerMethod.AssembleNew method, for allowing those to work
-          // with the Cosmos.IL2CPU* stack, we found we could not use the Indy.IL2CPU.X86 plugs, as they contained some AssemblerMethods. 
-          // This would result in a circular reference, thus we copied them to a new assembly. While the Indy.IL2CPU.X86 assembly is being
+          // with the Cosmos.IL2CPU* stack, we found we could not use the Cosmos.IL2CPU.X86 plugs, as they contained some AssemblerMethods. 
+          // This would result in a circular reference, thus we copied them to a new assembly. While the Cosmos.IL2CPU.X86 assembly is being
           // referenced, we need to skip it here.
           continue;
         }
@@ -459,7 +459,14 @@ namespace Cosmos.IL2CPU {
             // This is needed in cross assembly references where the
             // plug cannot reference the assembly of the target type
             if (xTargetType == null) {
-              xTargetType = Type.GetType(xAttrib.TargetName, true, false);
+                try
+                {
+                    xTargetType = Type.GetType(xAttrib.TargetName, true, false);
+                }
+                catch (Exception E)
+                {
+                    throw new Exception("Error", E);
+                }
             }
             // Only keep this plug if its for MS.NET.
             // TODO: Integrate with builder options to allow Mono support again.
@@ -618,6 +625,23 @@ namespace Cosmos.IL2CPU {
                 // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
                 Queue(xOpField.Value, aMethod, "OpCode Value");
               }
+            } else if (xOpCode is ILOpCodes.OpToken)
+            {
+                var xTokenOp = (ILOpCodes.OpToken)xOpCode;
+                if (xTokenOp.ValueIsType)
+                {
+                    Queue(xTokenOp.ValueType, aMethod, "OpCode Value");
+                }
+                if (xTokenOp.ValueIsField)
+                {
+                    Queue(xTokenOp.ValueField.DeclaringType, aMethod, "OpCode Value");
+                    if (xTokenOp.ValueField.IsStatic)
+                    {
+                        //TODO: Why do we add static fields, but not instance?
+                        // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
+                        Queue(xTokenOp.ValueField, aMethod, "OpCode Value");
+                    }
+                }
             }
           }
         }

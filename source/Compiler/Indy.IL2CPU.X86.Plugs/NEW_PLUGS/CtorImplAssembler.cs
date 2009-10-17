@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
 using NewAssembler = Cosmos.IL2CPU.Assembler;
 
-namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
+namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
   public class CtorImplAssembler: AssemblerMethod {
-    public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-      throw new NotImplementedException();
-    }
-
     public override void AssembleNew(object aAssembler, object aMethodInfo) {
       // method signature: $this, object @object, IntPtr method
       var xMethodInfo = (MethodInfo)aMethodInfo;

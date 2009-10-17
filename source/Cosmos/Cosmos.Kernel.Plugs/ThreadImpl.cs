@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using System.Threading;
 
 namespace Cosmos.Kernel.Plugs {

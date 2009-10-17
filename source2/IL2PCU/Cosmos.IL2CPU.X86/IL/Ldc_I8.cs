@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Cosmos.IL2CPU.X86;
 		// using System.Diagnostics;
 		// 
-		// namespace Indy.IL2CPU.IL.X86 {
+		// namespace Cosmos.IL2CPU.IL.X86 {
 		// 	[OpCode(OpCodeEnum.Ldc_I8)]
 		// 	public class Ldc_I8: Op {
 		// 		private readonly long mValue;

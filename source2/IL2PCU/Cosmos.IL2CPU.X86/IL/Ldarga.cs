@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarga )]
@@ -79,7 +79,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPU = Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldarga)]
         // 	public class Ldarga: Op {
         // 		private int mAddress;

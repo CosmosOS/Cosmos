@@ -5,7 +5,7 @@ using System.Linq;
 // 
 // using CPU = Cosmos.IL2CPU.X86;
 // using System.Reflection;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL

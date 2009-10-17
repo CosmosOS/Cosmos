@@ -5,9 +5,9 @@ using CPU = Cosmos.IL2CPU.X86;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.X86;
-using Indy.IL2CPU.Compiler;
 using Cosmos.IL2CPU.ILOpCodes;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Starg )]
@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Starg)]
         // 	public class Starg: Op {
         // 		private int[] mAddresses;

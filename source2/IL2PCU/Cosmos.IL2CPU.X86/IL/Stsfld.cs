@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stsfld )]
@@ -86,9 +86,9 @@ namespace Cosmos.IL2CPU.X86.IL
     // 
     // using CPUx86 = Cosmos.IL2CPU.X86;
     // using System.Reflection;
-    // using Indy.IL2CPU.Compiler;
+    // using Cosmos.IL2CPU.Compiler;
     // 
-    // namespace Indy.IL2CPU.IL.X86 {
+    // namespace Cosmos.IL2CPU.IL.X86 {
     // 	[OpCode(OpCodeEnum.Stsfld)]
     // 	public class Stsfld: Op {
     // 		private string mDataName;

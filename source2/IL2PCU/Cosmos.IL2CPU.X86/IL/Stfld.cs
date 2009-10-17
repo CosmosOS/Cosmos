@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 
 using CPUx86 = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -109,9 +109,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPU = Cosmos.IL2CPU.X86;
         // using System.Reflection;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Stfld)]
         // 	public class Stfld: Op {
         // 		private TypeInformation.Field mField;

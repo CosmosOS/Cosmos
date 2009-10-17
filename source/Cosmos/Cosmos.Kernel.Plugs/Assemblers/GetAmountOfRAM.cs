@@ -1,17 +1,13 @@
 ﻿using System;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
-using Assembler = Indy.IL2CPU.Assembler.Assembler;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPUAll = Indy.IL2CPU.Assembler;
-
-using CosAssembler = Cosmos.IL2CPU.Assembler;
-using CosCPUAll = Cosmos.IL2CPU;
-using CosCPUx86 = Cosmos.IL2CPU.X86;
+using Assembler = Cosmos.IL2CPU.Assembler;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUAll = Cosmos.IL2CPU;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class GetAmountOfRAM: AssemblerMethod {
-    public override void Assemble(Assembler aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
       new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1024 };
@@ -20,13 +16,5 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
     }
 
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
-      new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EAX, SourceRef = CosCPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
-      new CosCPUx86.Xor { DestinationReg = CosCPUx86.Registers.EDX, SourceReg = CosCPUx86.Registers.EDX };
-      new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.ECX, SourceValue = 1024 };
-      new CosCPUx86.Divide { DestinationReg = CosCPUx86.Registers.ECX };
-      new CosCPUx86.Add { DestinationReg = CosCPUx86.Registers.EAX, SourceValue = 1 };
-      new CosCPUx86.Push { DestinationReg = CosCPUx86.Registers.EAX };
-    } 
   }
 }

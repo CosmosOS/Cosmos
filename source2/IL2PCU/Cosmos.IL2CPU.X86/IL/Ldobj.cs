@@ -53,9 +53,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.X86;
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         //     [OpCode(OpCodeEnum.Ldobj)]
         //     public class Ldobj : Op {
         //         private Type xType;

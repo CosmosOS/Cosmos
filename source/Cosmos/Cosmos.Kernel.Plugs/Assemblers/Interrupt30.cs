@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Indy.IL2CPU.Assembler;
-using Indy.IL2CPU.Plugs;
-using CPU = Indy.IL2CPU.Assembler;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.Plugs;
+using CPU = Cosmos.IL2CPU;
+using CPUx86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public class Interrupt30 : AssemblerMethod {
@@ -14,10 +14,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
          *   ref uint aECX  : ebp - 12
          *   ref uint aEDX  : ebp - 8
          */
-
-        public override void Assemble(Assembler aAssembler) {
-            
-        }
 
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
           

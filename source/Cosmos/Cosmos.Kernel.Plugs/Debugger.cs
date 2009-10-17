@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Indy.IL2CPU.Plugs;
-using Asm = Indy.IL2CPU.Assembler;
-using X86 = Indy.IL2CPU.Assembler.X86;
+using Cosmos.IL2CPU.Plugs;
+using Asm = Cosmos.IL2CPU;
+using X86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Cosmos.Debug.Debugger))]
@@ -58,39 +58,26 @@ namespace Cosmos.Kernel.Plugs {
     // Maybe could merge this into the same unit as the plug
     public class DebugTraceOff : AssemblerMethod {
         //TODO: Make a new AssemblerMethod option that can use x# more direct somehow
-        public override void Assemble(Asm.Assembler aAssembler) {
-            new DebuggerAsm().TraceOff();
-        }
-
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
-          throw new NotImplementedException();
+            new DebuggerAsm().TraceOff();
         }
     }
 
     public class DebugTraceOn : AssemblerMethod {
-        public override void Assemble(Asm.Assembler aAssembler) {
-            new DebuggerAsm().TraceOn();
-        }
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
-          throw new NotImplementedException();
+            new DebuggerAsm().TraceOn();
         }
     }
 
     public class DebugBreak : AssemblerMethod {
-        public override void Assemble(Asm.Assembler aAssembler) {
-            new DebuggerAsm().Break();
-        }
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
             new DebuggerAsm().Break();
         }
     }
 
     public class DebugSend : AssemblerMethod {
-        public override void Assemble(Asm.Assembler aAssembler) {
-            new DebuggerAsm().SendText();
-        }
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
-          throw new NotImplementedException();
+            new DebuggerAsm().SendText();
         }
     }
 }

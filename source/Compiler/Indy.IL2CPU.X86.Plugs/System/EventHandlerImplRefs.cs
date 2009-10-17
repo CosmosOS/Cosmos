@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
 	public static class EventHandlerImplRefs {
 		public static readonly Assembly RuntimeAssemblyDef;
 		public static readonly MethodBase CtorRef;

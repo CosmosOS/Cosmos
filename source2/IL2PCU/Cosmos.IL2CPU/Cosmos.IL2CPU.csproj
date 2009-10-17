@@ -27,6 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +45,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -62,12 +64,64 @@
     <Compile Include="Assembler\DataIfNotDefined.cs" />
     <Compile Include="Assembler\DataMember.cs" />
     <Compile Include="Assembler\ElementReference.cs" />
+    <Compile Include="CustomImplementation\AssemblerImpl.cs" />
+    <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />
+    <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
+    <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
+    <Compile Include="CustomImplementation\System\BooleanImpl.cs" />
+    <Compile Include="CustomImplementation\System\ByteImpl.cs" />
+    <Compile Include="CustomImplementation\System\CharImpl.cs" />
+    <Compile Include="CustomImplementation\System\DelegateImpl.cs" />
+    <Compile Include="CustomImplementation\System\Drawing1\ColorImpl.cs" />
+    <Compile Include="CustomImplementation\System\Drawing1\SRImpl.cs" />
+    <Compile Include="CustomImplementation\System\EnumImpl.cs" />
+    <Compile Include="CustomImplementation\System\EnvironmentImpl.cs">
+      <SubType>
+      </SubType>
+    </Compile>
+    <Compile Include="CustomImplementation\System\GCImpl.cs" />
+    <Compile Include="CustomImplementation\System\Globalization\CultureInfoImpl.cs" />
+    <Compile Include="CustomImplementation\System\Globalization\NumberFormatInfoImpl.cs" />
+    <Compile Include="CustomImplementation\System\Int16Impl.cs" />
+    <Compile Include="CustomImplementation\System\Int32Impl.cs" />
+    <Compile Include="CustomImplementation\System\Int64Impl.cs" />
+    <Compile Include="CustomImplementation\System\IntPtrImpl.cs" />
+    <Compile Include="CustomImplementation\System\MulticastDelegateImpl.cs" />
+    <Compile Include="CustomImplementation\System\Net\IPAddressImpl.cs" />
+    <Compile Include="CustomImplementation\System\Net\SocketAddressImpl.cs" />
+    <Compile Include="CustomImplementation\System\NumberImpl.cs" />
+    <Compile Include="CustomImplementation\System\ObjectImpl.cs">
+      <SubType>
+      </SubType>
+    </Compile>
+    <Compile Include="CustomImplementation\System\ObjectImplRefs.cs" />
+    <Compile Include="CustomImplementation\System\Resource\ResourceManager.cs" />
+    <Compile Include="CustomImplementation\System\RuntimeType.cs" />
+    <Compile Include="CustomImplementation\System\RuntimeType.RuntimeTypeCache.cs" />
+    <Compile Include="CustomImplementation\System\RuntimeTypeHandle.cs" />
+    <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
+    <Compile Include="CustomImplementation\System\Runtime\InteropServices\SafeHandleImpl.cs" />
+    <Compile Include="CustomImplementation\System\Security\Cryptography\Utils.cs" />
+    <Compile Include="CustomImplementation\System\SingleImpl.cs" />
+    <Compile Include="CustomImplementation\System\SRImpl.cs" />
+    <Compile Include="CustomImplementation\System\StringImpl.cs" />
+    <Compile Include="CustomImplementation\System\StringImplRefs.cs" />
+    <Compile Include="CustomImplementation\System\Threading\Interlocked.cs" />
+    <Compile Include="CustomImplementation\System\UInt16Impl.cs" />
+    <Compile Include="CustomImplementation\System\UInt32Impl.cs" />
+    <Compile Include="CustomImplementation\System\UInt64Impl.cs" />
+    <Compile Include="DebugSymbol.cs" />
     <Compile Include="ElfHash.cs" />
     <Compile Include="Assembler\IDefine.cs" />
     <Compile Include="Assembler\IEndIfDefined.cs" />
     <Compile Include="Assembler\IIfDefined.cs" />
     <Compile Include="Assembler\IIfNotDefined.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="GCImplementation.cs" />
+    <Compile Include="GCImplementationRefs.cs" />
+    <Compile Include="Heap.cs" />
     <Compile Include="ILOp.cs" />
     <Compile Include="ILOpCode.cs" />
     <Compile Include="ILOpCodes\OpBranch.cs" />
@@ -89,28 +143,32 @@
     <Compile Include="Assembler\Instruction.cs" />
     <Compile Include="Assembler\Label.cs" />
     <Compile Include="Assembler\MethodAndTypeLabelsHolder.cs" />
+    <Compile Include="MethodBaseComparer.cs" />
     <Compile Include="MethodInfo.cs" />
     <Compile Include="Assembler\MethodInfoLabelGenerator.cs" />
+    <Compile Include="ObjectUtilities.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="OurHashSet.cs" />
     <Compile Include="PlugInfo.cs" />
+    <Compile Include="Plugs\AssemblerMethod.cs" />
+    <Compile Include="Plugs\FieldAccessAttribute.cs" />
+    <Compile Include="Plugs\PlugAttribute.cs" />
+    <Compile Include="Plugs\PlugFieldAttribute.cs" />
+    <Compile Include="Plugs\PlugMethodAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ILScanner.cs" />
+    <Compile Include="ReflectionUtilities.cs" />
+    <Compile Include="RuntimeEngineImpl.cs" />
+    <Compile Include="RuntimeEngineRefs.cs" />
     <Compile Include="StackContents.cs" />
     <Compile Include="Assembler\TypeComparer.cs" />
+    <Compile Include="VTablesImpl.cs" />
+    <Compile Include="VTablesImplRefs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
-      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
-      <Name>Indy.IL2CPU.Assembler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
-      <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
-      <Name>Indy.IL2CPU.X86</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
@@ -118,10 +176,6 @@
     <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

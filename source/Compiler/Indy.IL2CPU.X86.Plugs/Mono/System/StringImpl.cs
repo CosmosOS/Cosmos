@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.Mono.System {
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.Mono.System {
 	[Plug(Target = typeof(String), IsMonoOnly = true)]
 	[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
 	[PlugField(FieldId = "System.Char System.String.start_char", IsExternalValue = true)]

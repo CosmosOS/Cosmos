@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using System.IO;
 using Cosmos.Sys.FileSystem;
 

@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldind_U1)]
         // 	public class Ldind_U1: Op {
         // 		public Ldind_U1(ILReader aReader, MethodInformation aMethodInfo)

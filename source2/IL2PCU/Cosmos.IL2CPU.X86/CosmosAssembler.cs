@@ -5,10 +5,8 @@ using System.Linq;
 using CPU = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.X86;
 using System.Reflection;
-using Cosmos.IL2CPU.X86;
-using Indy.IL2CPU.Compiler;
 using Cosmos.IL2CPU.ILOpCodes;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.IL2CPU.X86 {
   // TODO: I think we need to later elminate this class

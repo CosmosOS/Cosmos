@@ -1,5 +1,5 @@
 using System;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
@@ -111,9 +111,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // using System.Reflection;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldsfld)]
         // 	public class Ldsfld: Op {
         // 		private string mDataName;

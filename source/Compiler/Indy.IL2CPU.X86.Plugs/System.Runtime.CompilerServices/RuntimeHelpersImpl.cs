@@ -5,9 +5,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Cosmos.IL2CPU;
 using CPUx86 = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices {
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices {
 	[Plug(Target = typeof(RuntimeHelpers))]
 	public static class RuntimeHelpersImpl {
 //		[PlugMethod(Signature = "System_Void__System_Runtime_CompilerServices_RuntimeHelpers__cctor__")]
@@ -49,8 +49,5 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerSer
 			new Label(".EndLoop");
 		}
 
-    public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-      throw new NotImplementedException();
-    }
 	}
 }

@@ -5,7 +5,7 @@ using System.Text;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Reflection;
 using System.IO;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 
@@ -351,7 +351,7 @@ namespace Cosmos.IL2CPU.X86 {
             {
                 return;
             }
-            else if (aNamespace.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase))
+            else if (aNamespace.StartsWith("Cosmos.IL2CPU", StringComparison.InvariantCultureIgnoreCase))
             {
                 return;
             }

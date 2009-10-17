@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
+using Cosmos.IL2CPU.IL.CustomImplementations.System;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newobj )]
@@ -55,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             //TODO: What is this for?
             //             if (aCtorDef != null) {
-            //                 //if (!aCtorDef.DeclaringType.FullName.StartsWith("Indy.IL2CPU.MultiArrayEmit.ContType"))
+            //                 //if (!aCtorDef.DeclaringType.FullName.StartsWith("Cosmos.IL2CPU.MultiArrayEmit.ContType"))
             //                 //    Engine.QueueMethod(aCtorDef);
             //             } else {
             //                 throw new ArgumentNullException("aCtorDef");
@@ -259,9 +260,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86=Cosmos.IL2CPU.X86;
         // using Asm=Cosmos.IL2CPU.X86;
         // using Assembler=Assembler;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86
+        // namespace Cosmos.IL2CPU.IL.X86
         // {
         //     [OpCode(OpCodeEnum.Newobj)]
         //     public class Newobj : Op

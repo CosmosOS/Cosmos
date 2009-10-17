@@ -1,6 +1,6 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Indy.IL2CPU.IL;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using Cosmos.IL2CPU.IL;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I4)]

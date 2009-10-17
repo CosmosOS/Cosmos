@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPU = Cosmos.IL2CPU.X86;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Calli)]
         // 	public class Calli: Op {
         // 		public Calli(ILReader aReader, MethodInformation aMethodInfo)

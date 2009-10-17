@@ -1,7 +1,8 @@
 using System;
 using CPUx86 = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.ILOpCodes;
+using Cosmos.IL2CPU.IL.CustomImplementations.System;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelema )]
@@ -42,9 +43,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPU = Cosmos.IL2CPU.X86;
         // using CPUx86 = Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldelema)]
         // 	public class Ldelema: Op {
         //         private Type mType;

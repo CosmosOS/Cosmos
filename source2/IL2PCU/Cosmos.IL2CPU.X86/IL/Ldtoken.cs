@@ -2,7 +2,7 @@ using System;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using CPU = Cosmos.IL2CPU.X86;
-using Indy.IL2CPU;
+using Cosmos.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldtoken )]
@@ -16,16 +16,28 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             OpToken xToken = ( OpToken )aOpCode;
-
-            throw new Exception("Ldtoken not implemented!");
+            string xTokenAddress = null;
             
+            if (xToken.ValueIsType)
+            {
+                xTokenAddress = ILOp.GetTypeIDLabel(xToken.ValueType);
+            }
+            if (xToken.ValueIsField)
+            {
+                xTokenAddress= DataMember.GetStaticFieldName(xToken.ValueField);
+            }
+
+            if (String.IsNullOrEmpty(xTokenAddress))
+            {
+                throw new Exception("Ldtoken not implemented!");
+            }
 
             //if( mType != null )
             //{
             //    mTokenAddress = GetService<IMetaDataInfoService>().GetTypeIdLabel( mType );
             //}
-            new CPUx86.Push { DestinationValue = xToken.Value };
-            //new CPU.Push { DestinationRef = ElementReference.New( mTokenAddress ) };
+            //new CPUx86.Push { DestinationValue = xToken.Value };
+            new CPU.Push { DestinationRef = ElementReference.New( xTokenAddress ) };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
         }
 
@@ -38,9 +50,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // using CPU = Cosmos.IL2CPU.X86;
         // using System.Reflection;
-        // using Indy.IL2CPU.Compiler;
+        // using Cosmos.IL2CPU.Compiler;
         // 
-        // namespace Indy.IL2CPU.IL.X86 {
+        // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldtoken)]
         // 	public class Ldtoken: Op {
         // 		private string mTokenAddress;

@@ -346,21 +346,9 @@
     <Compile Include="X86\_Infra\InstructionWithSize.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
-      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
-      <Name>Indy.IL2CPU.Assembler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
-      <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
-      <Name>Indy.IL2CPU.X86</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>

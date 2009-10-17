@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
-namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 	[Plug(Target = typeof(String), IsMicrosoftdotNETOnly = true)]
 	[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
 	[PlugField(FieldId = "System.Char System.String.m_firstChar", IsExternalValue = true)]
@@ -76,7 +76,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 	}
 
   //StringImpl2 plugs StringImpl which is also a plug????
-	//[Plug(Target = typeof(Indy.IL2CPU.CustomImplementation.System.StringImpl))]
+	//[Plug(Target = typeof(Cosmos.IL2CPU.CustomImplementation.System.StringImpl))]
 	public static class StringImpl2 {
 		public static unsafe uint GetStorage(uint* aStringPtr, [FieldAccess(Name = "$$Storage$$")]ref uint aStorage) {
 			return aStorage;
