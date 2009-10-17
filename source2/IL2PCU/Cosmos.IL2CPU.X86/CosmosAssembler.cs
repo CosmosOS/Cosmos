@@ -198,11 +198,39 @@ namespace Cosmos.IL2CPU.X86 {
       return 16; // todo: retrieve from actual type info
     }
 
-    public override void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods) {
-      new Label(EntryPointName);
+      private const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
+
+
+    public override void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods)
+    {
+        #region Literal strings fixup code
+        // at the time the datamembers for literal strings are created, the type id for string is not yet determined. 
+        // for now, we fix this at runtime.
+        new Label(InitStringIDsLabel);
+        new Push { DestinationReg = Registers.EBP };
+        new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+        new Move{DestinationReg = Registers.EAX, SourceRef= ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect=true};
+        foreach (var xDataMember in DataMembers)
+        {
+            if (!xDataMember.Name.StartsWith("StringLiteral"))
+            {
+                continue;
+            }
+            if (xDataMember.Name.EndsWith("__Contents"))
+            {
+                continue;
+            }
+            new Move { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+        }
+        new Pop { DestinationReg = Registers.EBP };
+        new Return();
+        #endregion
+        new Label(EntryPointName);
       new Push { DestinationReg = Registers.EBP };
       new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       new Call { DestinationLabel = InitVMTCodeLabel };
+      new Call { DestinationLabel = InitStringIDsLabel };
+
       foreach (var xCctor in aMethods) {
         if (xCctor.Name == ".cctor"
           && xCctor.IsStatic

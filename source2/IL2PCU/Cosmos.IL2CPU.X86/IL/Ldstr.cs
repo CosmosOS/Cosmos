@@ -24,6 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
       Y.EAX.Push();
       Assembler.Stack.Push(4, typeof(string));
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!
+      #region Debug verification
       var xFields = GetFieldsInfo(typeof(string));
       if (xFields[0].Id != "$$Storage$$"
         || xFields[0].Offset != 0) {
@@ -40,7 +41,8 @@ namespace Cosmos.IL2CPU.X86.IL
       if (xFields[3].Id != "System.Int32 System.String.m_arrayLength"
         || xFields[3].Offset != 12) {
         throw new Exception("Fields changed!");
-      }
+        }
+      #endregion
     }
 
     public static string GetContentsArrayName(string aLiteral) {
@@ -65,7 +67,7 @@ namespace Cosmos.IL2CPU.X86.IL
       //{
       string xDataName = xAsm.GetIdentifier("StringLiteral");
       object[] xObjectData = new object[7];
-      //xObjectData[0] = ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String")));
+      xObjectData[0] = -1;//ElementReference.New(ILOp.GetTypeIDLabel(typeof(String)), 0);
       xObjectData[1] = ((uint)InstanceTypeEnum.StaticEmbeddedObject);
       xObjectData[2] = 1;
       xObjectData[3] = ElementReference.New(xDataName + "__Contents");

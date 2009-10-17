@@ -19,7 +19,7 @@ namespace Cosmos.Sys {
         /// However if no properties are changed from defaults, and Execute is called it should
         /// perform a default boot.
         /// </summary>
-        public void Execute() {
+        public void Execute(bool aCleanScreen) {
             //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
             Console.Clear();
 
@@ -28,7 +28,14 @@ namespace Cosmos.Sys {
             Sys.Global.Init();
 
             // Clear again in case debug information has been written out
-            //Console.Clear();
+            if (aCleanScreen)
+            {
+                Console.Clear();
+            }
+        }
+
+        public void Execute() {
+            Execute(true);
         }
 
         public void MtWExecute() {
