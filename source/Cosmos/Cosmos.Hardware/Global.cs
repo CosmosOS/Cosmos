@@ -18,7 +18,7 @@ namespace Cosmos.Hardware {
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
             Console.WriteLine("    Init IRQ");
             Interrupts.Init();
-            Kernel.CPU.CreateIDT(true);
+            Kernel.CPU.CreateIDT(false);
 
             //Doku: See ACPIManager class
             //Console.WriteLine("    Init ACPI");

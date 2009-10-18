@@ -40,7 +40,9 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
-            Jump_End( aMethod );
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+            new CPUx86.Push { DestinationValue = 1 };
+            new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
             new Label( mReturnNullLabel );
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
             new CPUx86.Push { DestinationValue = 0 };
