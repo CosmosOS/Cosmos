@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using Mono.Terminal;
 
 namespace mono_curses.Plugs

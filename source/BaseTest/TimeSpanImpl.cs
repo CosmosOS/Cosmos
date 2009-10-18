@@ -1,5 +1,5 @@
 ﻿using System;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 
 [Plug(Target = typeof(System.TimeSpan))]
 class TimeSpanImpl

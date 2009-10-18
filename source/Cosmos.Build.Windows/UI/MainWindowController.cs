@@ -20,8 +20,6 @@ namespace Cosmos.Compiler.Builder
         {
             this.mainWindow = mainWindow; 
         }
-
-
         internal void Init()
         {
             BuildOptions options = BuildOptions.Load();

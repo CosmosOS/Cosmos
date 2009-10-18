@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Indy.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using Mono.Terminal;
 
 namespace mono_curses.Plugs {
