@@ -161,7 +161,8 @@ namespace Cosmos.Kernel
             if ((xTemp + aLength) > (mStart + mLength))
             {
                 Console.WriteLine("Too large memory block allocated!");
-                System.Diagnostics.Debugger.Break();
+                while (true)
+                    ;
             }
             mStartAddress += aLength;
             UpdateDebugDisplay();

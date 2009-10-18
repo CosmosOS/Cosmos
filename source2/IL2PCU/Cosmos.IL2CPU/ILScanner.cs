@@ -1037,6 +1037,12 @@ namespace Cosmos.IL2CPU {
 
     protected MethodBase ResolvePlug(MethodBase aMethod, Type[] aParamTypes) {
       MethodBase xResult = null;
+      if (aMethod.DeclaringType.Name == "Console"
+          && aMethod.Name == "Beep"
+          && aMethod.GetParameters().Length > 0)
+      {
+          Console.Write("");
+      }
 
       // TODO: Right now plugs are copmiled in, even if they are not needed.
       // Maybe change this so plugs that are not needed are not compiled in?

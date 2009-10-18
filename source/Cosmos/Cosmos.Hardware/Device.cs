@@ -57,7 +57,7 @@ namespace Cosmos.Hardware {
             mDevices.Add(aDevice);
         }
 
-        private static string DeviceTypeToString(DeviceType aType) {
+        public static string DeviceTypeToString(DeviceType aType) {
             switch (aType) {
                 case DeviceType.Keyboard:
                     return "Keyboard";
@@ -69,6 +69,8 @@ namespace Cosmos.Hardware {
                     return "Other";
                 case DeviceType.Unknown:
                     return "Unknown";
+                case DeviceType.Network:
+                    return "Network";
                 default:
                     return "<Value Unimplemented>";
             }

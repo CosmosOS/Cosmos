@@ -126,17 +126,29 @@ namespace Cosmos.Hardware.Network
                 (bytes[4] << 8) | (bytes[5] << 0));
         }
 
+        private static void PutByte(char[] aChars, int aIndex, byte aByte)
+        {
+            string xChars = "0123456789ABCDEF";
+            aChars[aIndex + 0] = xChars[(aByte >> 4) & 0xF];
+            aChars[aIndex + 1] = xChars[aByte & 0xF];
+        }
+
         public override string ToString()
         {
-            string address = string.Empty;
-
-            foreach (byte i in bytes)
-                address = address + i.ToHex(2) + ":";
-            
-            
-            address = address.TrimEnd(':');
-
-            return address;
+            // mac address consists of 6 2chars pairs, delimited by :
+            var xChars = new char[17];
+            PutByte(xChars, 0, bytes[0]);
+            xChars[2] = ':';
+            PutByte(xChars, 3, bytes[1]);
+            xChars[5] = ':';
+            PutByte(xChars, 6, bytes[2]);
+            xChars[8] = ':';
+            PutByte(xChars, 9, bytes[3]);
+            xChars[11] = ':';
+            PutByte(xChars, 12, bytes[4]);
+            xChars[14] = ':';
+            PutByte(xChars, 15, bytes[5]);
+            return new String(xChars);
         }
     }
 }

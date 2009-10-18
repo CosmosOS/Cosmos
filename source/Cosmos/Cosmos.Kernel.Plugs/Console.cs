@@ -34,7 +34,7 @@ namespace Cosmos.Kernel.Plugs
             TextScreen.SetColors(_foreground, _background);
         }
 
-        public static void Beep(uint aFrequency, int aDuration)
+        public static void Beep(int aFrequency, int aDuration)
         {
             if (aFrequency < 37 || aFrequency > 32767)
                 throw new ArgumentOutOfRangeException("Frequency must be between 37 and 32767Hz");
@@ -43,7 +43,7 @@ namespace Cosmos.Kernel.Plugs
                 throw new ArgumentOutOfRangeException("Duration must be more than 0");
 
             PIT.EnableSound();
-            PIT.T2Frequency = aFrequency;
+            PIT.T2Frequency = (uint)aFrequency;
             PIT.Wait((uint)aDuration);
             PIT.DisableSound();
         }

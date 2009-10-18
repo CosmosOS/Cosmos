@@ -97,11 +97,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
                 if ((xDevice.VendorID == 0x10EC) && (xDevice.DeviceID == 0x8139) && (xDevice.Claimed == false))
                 {
                     RTL8139 nic = new RTL8139(xDevice);
-
-                    Console.WriteLine("Found RTL8139 NIC on PCI " + xDevice.Bus + ":" + xDevice.Slot + ":" + xDevice.Function);
-                    Console.WriteLine("NIC IRQ: " + xDevice.InterruptLine);
-                    Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
-
                     NetworkDevice.Add(nic);
                 }
             }
