@@ -1,5 +1,5 @@
 ﻿// leave the use of the following directive in: it eases a LOT during development, as it lets you use gdb for debugging
-#define OUTPUT_ELF
+//#define OUTPUT_ELF
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -51,6 +51,7 @@ namespace Cosmos.Compiler.Builder
 
             // enforce assembly linking:
             var xTheType = typeof(Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
+            xTheType = typeof(Cosmos.IL2CPU.CustomImplementation.System.StringImpl);
             xTheType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
             xTheType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
             xTheType = typeof(Cosmos.Sys.Plugs.Deboot);
@@ -235,42 +236,43 @@ namespace Cosmos.Compiler.Builder
             //SIGNAL END COMPILE
             OnCompileCompleted();
 
-            
-
-            if (options.CompileIL)
+            if (!HasErrors)
             {
-                // We always show the window now since when its shown its
-                // for a short time and not in "paralell" as it was before.
-                if (options.UseInternalAssembler == false)
+
+                if (options.CompileIL)
                 {
-                    //  ShowWindow(mConsoleWindow, 1); //HACK remove show and hide console we can put a command to the UI via an event if needed but its quick! 
-                    new AssembleStep(options)
+                    // We always show the window now since when its shown its
+                    // for a short time and not in "paralell" as it was before.
+                    if (options.UseInternalAssembler == false)
                     {
+                        //  ShowWindow(mConsoleWindow, 1); //HACK remove show and hide console we can put a command to the UI via an event if needed but its quick! 
+                        new AssembleStep(options)
+                        {
 #if OUTPUT_ELF
-                        IsELF = true
+                            IsELF = true
 #endif
-                    }.Execute();
-                    new LinkStep(options)
-                    {
+                        }.Execute();
+                        new LinkStep(options)
+                        {
 #if OUTPUT_ELF
-                        IsELF = true
+                            IsELF = true
 #endif
-                    }.Execute();
-                    //  ShowWindow(mConsoleWindow, 0); //Hide!
+                        }.Execute();
+                        //  ShowWindow(mConsoleWindow, 0); //Hide!
+                    }
                 }
+
+
+                Process xQEMU = null;
+
+                //TODO factor debug out and then fold into one method
+                if (options.DebugMode != DebugMode.None)
+                    ProcessDebug(options, ref xDebugWindow, ref xQEMU);
+                else
+                    xQEMU = ProcessNonDebugBuilds(options, xQEMU);
+
+
             }
-
-           
-            Process xQEMU = null;
-
-            //TODO factor debug out and then fold into one method
-            if (options.DebugMode != DebugMode.None)
-                ProcessDebug(options, ref xDebugWindow, ref xQEMU);
-            else
-                xQEMU = ProcessNonDebugBuilds(options, xQEMU);
-
-            
-
             LogTime("Thread execute finish"); 
 
             //SIGNAL END
@@ -464,13 +466,15 @@ namespace Cosmos.Compiler.Builder
                 xAsm.EmitELF = true;
 #endif
                 xAsm.Initialize();
-                var xScanner = new ILScanner(xAsm);
-                xScanner.Execute(xInitMethod);
-                using (var xOut = new StreamWriter(Path.Combine(AsmPath, "main.asm"), false))
+                using (var xScanner = new ILScanner(xAsm))
                 {
-                    xAsm.FlushText(xOut, Path.Combine(AsmPath, "debug.cxdb"));
+                    xScanner.EnableLogging(Path.Combine(AsmPath, "assembler.html"));
+                    xScanner.Execute(xInitMethod);
+                    using (var xOut = new StreamWriter(Path.Combine(AsmPath, "main.asm"), false))
+                    {
+                        xAsm.FlushText(xOut, Path.Combine(AsmPath, "debug.cxdb"));
+                    }
                 }
-
                 LogTime("Engine execute finished");
             }
             catch(Exception E)

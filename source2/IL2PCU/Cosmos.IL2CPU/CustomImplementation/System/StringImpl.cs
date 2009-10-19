@@ -117,6 +117,11 @@ namespace Cosmos.IL2CPU.CustomImplementation.System {
         return -1;     
     }
 
+    public static char[] ToCharArray(string aThis)
+    {
+        return GetStorageArray(aThis);
+    }
+
     [PlugMethod(Enabled = false)]
     public static uint GetStorage(string aString) {
       return 0;

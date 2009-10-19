@@ -21,11 +21,5 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
     public static void Invoke() {
       throw new NotImplementedException("Implemented by method assembler");
     }
-
-      [PlugMethod(Assembler = typeof(GetMulticastInvokeAssembler))]
-    public static IntPtr GetMulticastInvoke(Delegate aThis)
-    {
-        return IntPtr.Zero;
-    }
   }
 }

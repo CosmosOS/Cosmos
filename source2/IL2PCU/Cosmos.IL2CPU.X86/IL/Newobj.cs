@@ -178,7 +178,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-              throw new Exception("Not implemented yet: .ctor on value type");
+              //throw new Exception("Not implemented yet: .ctor on value type");
                 /*
                  * Current sitation on stack:
                  *   $ESP       Arg

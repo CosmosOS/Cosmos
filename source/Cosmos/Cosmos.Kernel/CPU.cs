@@ -153,6 +153,11 @@ namespace Cosmos.Kernel {
             // plugged
         }
 
+        public static void EnableInterrupts()
+        {
+            // plugged
+        }
+
         // plugged
         public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
             aEAX = 0;

@@ -66,6 +66,11 @@ namespace Cosmos.Kernel.Plugs {
         public static void DisableInterrupts() {
         }
 
+        [PlugMethod(Assembler = typeof(Assemblers.EnableInterrupts))]
+        public static void EnableInterrupts()
+        {
+        }
+
         [PlugMethod(Assembler = typeof(Assemblers.Interrupt30))]
         public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
             aEAX = 0;

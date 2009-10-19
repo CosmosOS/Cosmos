@@ -27,6 +27,7 @@
     <DefineConstants>TRACE;DEBUG;SKIP_GC_CODE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -249,6 +250,33 @@
     <Compile Include="IL\Unbox_Any.cs" />
     <Compile Include="IL\Volatile.cs" />
     <Compile Include="IL\Xor.cs" />
+    <Compile Include="Plugs\Diagnostics\BreakAssembler.cs" />
+    <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
+    <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
+    <Compile Include="Plugs\Diagnostics\DebugImplRefs.cs" />
+    <Compile Include="Plugs\Mono\System\StringImpl.cs" />
+    <Compile Include="Plugs\MS\System\StringImpl.cs" />
+    <Compile Include="Plugs\NEW_PLUGS\CtorImplAssembler.cs" />
+    <Compile Include="Plugs\NEW_PLUGS\DelegateImpl.cs" />
+    <Compile Include="Plugs\NEW_PLUGS\DoubleImpl.cs" />
+    <Compile Include="Plugs\NEW_PLUGS\GetMulticastInvokeAssembler.cs" />
+    <Compile Include="Plugs\NEW_PLUGS\InvokeImplAssembler.cs" />
+    <Compile Include="Plugs\NEW_PLUGS\NormalDelegateImpl.cs" />
+    <Compile Include="Plugs\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
+    <Compile Include="Plugs\System\ArrayImpl.cs" />
+    <Compile Include="Plugs\System\Assemblers\Array_InternalCopy.cs" />
+    <Compile Include="Plugs\System\Assemblers\Buffer_BlockCopy.cs" />
+    <Compile Include="Plugs\System\Assemblers\MulticastDelegate_Invoke.cs" />
+    <Compile Include="Plugs\System\Buffer.cs" />
+    <Compile Include="Plugs\System\DelegateImpl.cs" />
+    <Compile Include="Plugs\System\EnumImpl.cs" />
+    <Compile Include="Plugs\System\EventHandlerImpl.cs" />
+    <Compile Include="Plugs\System\EventHandlerImplRefs.cs" />
+    <Compile Include="Plugs\System\ExceptionImpl.cs" />
+    <Compile Include="Plugs\System\MulticastDelegateImpl.cs" />
+    <Compile Include="Plugs\System\MulticastDelegateImplRefs.cs" />
+    <Compile Include="Plugs\System\ObjectImplRefs.cs" />
+    <Compile Include="Plugs\System\OutOfMemoryExceptionImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="X86\286AndUp\Lgdt.cs" />
     <Compile Include="X86\286AndUp\Lidt.cs" />
@@ -379,6 +407,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Plugs\Generic\" />
     <Folder Include="X86\186-188AndUp\" />
     <Folder Include="X86\286Exclusive\" />
     <Folder Include="X86\386Exclusive\" />

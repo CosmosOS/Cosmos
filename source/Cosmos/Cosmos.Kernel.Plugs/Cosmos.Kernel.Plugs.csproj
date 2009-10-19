@@ -76,6 +76,7 @@
     <Compile Include="Assemblers\DisablePaging.cs" />
     <Compile Include="Assemblers\DisablePSE.cs" />
     <Compile Include="Assemblers\DoTest.cs" />
+    <Compile Include="Assemblers\EnableInterrupts.cs" />
     <Compile Include="Assemblers\EnablePaging.cs" />
     <Compile Include="Assemblers\EnablePSE.cs" />
     <Compile Include="Assemblers\GetAmountOfRAM.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="GCImplementationImpl.cs" />
     <Compile Include="Hardware\PC\Bus\CPUBus.cs" />
     <Compile Include="HeapImpl.cs" />
+    <Compile Include="Interlocked.cs" />
     <Compile Include="PagingUtilityImpl.cs" />
     <Compile Include="String.cs" />
     <Compile Include="Console.cs" />

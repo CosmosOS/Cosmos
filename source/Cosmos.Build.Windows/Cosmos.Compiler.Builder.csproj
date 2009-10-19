@@ -219,10 +219,6 @@
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Compiler\Indy.IL2CPU.X86.Plugs\Indy.IL2CPU.X86.Plugs.csproj">
-      <Project>{169DBC91-DA34-40CE-B58B-8587CEE3217A}</Project>
-      <Name>Indy.IL2CPU.X86.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
       <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
       <Name>Cosmos.Hardware.Plugs</Name>
