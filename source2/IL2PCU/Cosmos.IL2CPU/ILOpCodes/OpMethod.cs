@@ -11,8 +11,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     public MethodBase BaseMethod;
     public uint BaseMethodUID;
 
-    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue)
-      : base(aOpCode, aPos, aNextPos) {
+    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
     }
   }

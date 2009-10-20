@@ -15,13 +15,12 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
 #warning TODO: Implement exception
-//            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-//            new CPUx86.Move { DestinationRef = ElementReference.New( DataMember.GetStaticFieldName( Assembler.Assembler.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationRef = ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
             //new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
-            //new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
-            //Call.EmitExceptionLogic( Assembler, ( uint )aCurrentILOffset, aMethodInfo, null, false, null );
-          new CPUx86.ClrInterruptFlag();
-          new CPUx86.Halt();
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
+            Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
+          
             Assembler.Stack.Pop();
 
 

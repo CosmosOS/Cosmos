@@ -19,12 +19,12 @@ namespace Cosmos.IL2CPU.X86 {
       Assembler = (Assembler)aAsmblr;
     }
 
-    protected void Jump_Exception(MethodInfo aMethod) {
+    protected static void Jump_Exception(MethodInfo aMethod) {
       // todo: port to numeric labels
       new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AssemblerNasm.EndOfMethodLabelNameException };
     }
 
-    protected void Jump_End(MethodInfo aMethod) {
+    protected static void Jump_End(MethodInfo aMethod) {
       new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AssemblerNasm.EndOfMethodLabelNameNormal };
     }
 
@@ -122,6 +122,75 @@ namespace Cosmos.IL2CPU.X86 {
       return (from item in GetFieldsInfo(aType)
               orderby item.Offset descending
               select item.Offset + item.Size).FirstOrDefault();
+    }
+
+    public static void EmitExceptionLogic(Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup)
+    {
+        string xJumpTo = null;
+        if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null)
+        {
+            // todo add support for nested handlers, see comment in Engine.cs
+            //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
+            new Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
+            if (aCurrentOpCode.CurrentExceptionHandler.HandlerOffset > aCurrentOpCode.Position)
+            {
+                switch (aCurrentOpCode.CurrentExceptionHandler.Flags)
+                {
+                    case ExceptionHandlingClauseOptions.Clause:
+                        {
+                            xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                            break;
+                        }
+                    case ExceptionHandlingClauseOptions.Finally:
+                        {
+                            xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                            break;
+                        }
+                    default:
+                        {
+                            throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionHandler.Flags.ToString() + "' not supported yet!");
+                        }
+                }
+            }
+        }
+        if (!aDoTest)
+        {
+            //new CPUx86.Call("_CODE_REQUESTED_BREAK_");
+            if (xJumpTo == null)
+            {
+                Jump_End(aMethodInfo);
+            }
+            else
+            {
+                new CPUx86.Jump { DestinationLabel = xJumpTo };
+            }
+
+        }
+        else
+        {
+            new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
+
+            if (aCleanup != null)
+            {
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition) };
+                aCleanup();
+                if (xJumpTo == null)
+                {
+                    Jump_End(aMethodInfo);
+                }
+                else
+                { new CPUx86.Jump { DestinationLabel = xJumpTo }; }
+            }
+            else
+            {
+                if (xJumpTo == null)
+                {
+                    Jump_End(aMethodInfo);
+                }
+                else
+                { new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo }; }
+            }
+        }
     }
   }
 }

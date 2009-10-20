@@ -38,6 +38,19 @@ namespace MatthijsTest
 		#endregion
 
 		public static void Init(){
+            try
+            {
+                Console.WriteLine("Try");
+                throw new Exception("Error message");
+            }
+            catch(Exception E)
+            {
+                Console.Write("Error: ");
+                Console.WriteLine(E.ToString());
+            }
+            Console.WriteLine("Klaar");
+            while (true)
+                ;
             var xInit = true;
             if (xInit)
             {

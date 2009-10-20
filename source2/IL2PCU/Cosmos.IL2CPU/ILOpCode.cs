@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SR = System.Reflection;
 
 namespace Cosmos.IL2CPU {
   // ILOpcode represents the opcode during for scanning. 
@@ -248,10 +249,13 @@ namespace Cosmos.IL2CPU {
     // position of the next instruction
     public readonly int NextPosition;
 
-    protected ILOpCode(Code aOpCode, int aPos, int aNextPos) {
+    public readonly SR.ExceptionHandlingClause CurrentExceptionHandler;
+
+    protected ILOpCode(Code aOpCode, int aPos, int aNextPos, SR.ExceptionHandlingClause aCurrentExceptionHandler) {
       OpCode = aOpCode;
       Position = aPos;
       NextPosition = aNextPos;
+      CurrentExceptionHandler = aCurrentExceptionHandler;
     }
 
   }

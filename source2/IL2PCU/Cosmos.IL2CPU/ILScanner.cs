@@ -243,6 +243,7 @@ namespace Cosmos.IL2CPU {
       Queue(xThrowHelper.GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");
 
       Queue(typeof(MulticastDelegate).GetMethod("GetInvocationList"), null, "Explicit Entry");
+      Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
         //System_Delegate____System_MulticastDelegate_GetInvocationList__
       
       // Start from entry point of this program
