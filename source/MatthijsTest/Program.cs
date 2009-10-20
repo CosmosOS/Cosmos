@@ -38,7 +38,6 @@ namespace MatthijsTest
 		#endregion
 
 		public static void Init(){
-           
             var xInit = true;
             if (xInit)
             {

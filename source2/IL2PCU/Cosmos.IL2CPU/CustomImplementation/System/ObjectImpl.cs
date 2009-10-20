@@ -18,14 +18,15 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
 	public static class ObjectImpl {
 		public static string ToString(object aThis)
         {
-            try
-            {
-                return (string)aThis;
-            }
-            catch
-            {
-                return "--object--";
-            }
+            //try
+            //{
+            //    return (string)aThis;
+            //}
+            //catch
+            //{
+            //    return "--object--";
+            //}
+            return "<Object.ToString not yet implemented!>";
 		}
 
 		public static bool InternalEquals(object a, object b) {

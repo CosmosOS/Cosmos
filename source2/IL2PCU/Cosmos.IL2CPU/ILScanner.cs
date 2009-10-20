@@ -653,6 +653,10 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanType(Type aType) {
+        if (aType.IsArray)
+        {
+            Console.Write("");
+        }
       // Add immediate ancestor type
       // We dont need to crawl up farther, when the BaseType is scanned 
       // it will add its BaseType, and so on.

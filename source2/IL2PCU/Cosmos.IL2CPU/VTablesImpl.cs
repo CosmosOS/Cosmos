@@ -111,22 +111,19 @@ namespace Cosmos.IL2CPU {
 		}
 
 		public static int GetMethodAddressForType(int aType, int aMethodIndex) {
-			if (aType == 0) {
-				for (int i = 0; i < mTypes[0].MethodIndexes.Length; i++) {
-					if (mTypes[0].MethodIndexes[i] == aMethodIndex) {
-						return mTypes[0].MethodAddresses[i];
-					}
-				}
-			} else {
-				do {
+            	do {
 					for (int i = 0; i < mTypes[aType].MethodIndexes.Length; i++) {
 						if (mTypes[aType].MethodIndexes[i] == aMethodIndex) {
 							return mTypes[aType].MethodAddresses[i];
 						}
 					}
+                    if (aType == mTypes[aType].BaseTypeIdentifier)
+                    {
+                        break;
+                    }
 					aType = mTypes[aType].BaseTypeIdentifier;
-				} while (aType != 0);
-			}
+				} while (true);
+			//}
         Console.Write("Type ");
         WriteNumber((uint)aType, 32);
         Console.Write(", MethodIndex = ");
