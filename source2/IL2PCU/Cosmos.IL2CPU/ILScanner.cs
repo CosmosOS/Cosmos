@@ -162,6 +162,10 @@ namespace Cosmos.IL2CPU {
     }
 
     public void Execute(System.Reflection.MethodBase aStartMethod) {
+        if (aStartMethod == null)
+        {
+            throw new ArgumentNullException("aStartMethod");
+        }
       // TODO: Investigate using MS CCI
       // Need to check license, as well as in profiler
       // http://cciast.codeplex.com/

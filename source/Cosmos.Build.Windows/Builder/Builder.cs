@@ -452,8 +452,8 @@ namespace Cosmos.Compiler.Builder
             {
                 LogTime("Engine execute started");
                 var xOptions = (BuildOptions)aParam;
-                var xEntryAsm = Assembly.GetEntryAssembly();
-                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init");
+                var xEntryAsm = TargetAssembly;
+                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                 byte xDebugCom = 0;
                 if (xOptions.DebugMode != DebugMode.None)
                 {

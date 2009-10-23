@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 using Cosmos.Compiler.Builder;
-using Indy.IL2CPU;
 using CommandEnum = Cosmos.TestKernelHelpers.TestReporter.CommandEnum;
 using Cosmos.IL2CPU;
 
@@ -41,6 +40,7 @@ namespace Cosmos.TestRunner
             try
             {
                 Initialize();
+                var xBuildOptions = BuildOptions.Load();
                 List<TestResults> xResults = new List<TestResults>();
                 foreach (var xItem in TestKernels)
                 {
@@ -49,11 +49,7 @@ namespace Cosmos.TestRunner
                     bool xReturn;
                     try
                     {
-                        var xBuilder = new Builder()
-                        {
-                            //BuildPath = xBuilder.B,
-                            //UseInternalAssembler = false
-                        };
+                        var xBuilder = new Builder();
                         Console.WriteLine("BuildPath = '{0}'", xBuilder.BuildPath);
                         xBuilder.TargetAssembly = xItem.Key.Assembly;
                         var xEvent = new AutoResetEvent(false);
