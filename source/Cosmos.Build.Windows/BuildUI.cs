@@ -53,8 +53,15 @@ namespace Cosmos.Compiler.Builder
 
         public static void Run()
         {
-            var xBuildUI = new BuildUI();
-            xBuildUI.Execute();
+            if (IntPtr.Size == 8)
+            {
+                MessageBox.Show("Please set your application to use x86 as CPU target");
+            }
+            else
+            {
+                var xBuildUI = new BuildUI();
+                xBuildUI.Execute();
+            }
         }
     }
 }
