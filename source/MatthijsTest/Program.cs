@@ -48,29 +48,10 @@ namespace MatthijsTest
                 xBoot.Execute(true);
             }
 
-            for (int i = 0; i < Device.Devices.Count; i++)
-            {
-                if (Device.Devices[i].Type == Device.DeviceType.Network)
-                {
-                    mNet = (NetworkDevice)Device.Devices[i];
-                    break;
-                }
-            }
-            if (mNet == null)
-            {
-                Console.WriteLine("NIC not found!");
-                while (true) ;
-            }
-            TCPIPStack.Init();
             
-            TCPIPStack.ConfigIP(mNet, new IPv4Config(new IPv4Address(10, 0, 0, 2), new IPv4Address(255, 255, 255, 0)));
-            var xDest = new IPv4Address(10, 0, 0, 1);
-            TCPIPStack.Ping(xDest);
-//                TCPIPStack.SendUDP(xDest, 632, 643, new byte[0]);
-            //while (true) { TCPIPStack.Update(); }
 
-            SendString("ABBA");
-            Console.WriteLine("Klaar");
+            //SendString("ABBA");
+            
             
 		}
 
