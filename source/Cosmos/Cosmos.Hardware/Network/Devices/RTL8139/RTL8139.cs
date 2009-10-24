@@ -270,8 +270,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
                 data[b] = buffer[b + offset];
             }
 
+            Console.WriteLine("Try sending");
+
             if (SendBytes(ref data) == false)
             {
+                Console.WriteLine("Queuing");
                 mTransmitBuffer.Enqueue(data);
             }
 

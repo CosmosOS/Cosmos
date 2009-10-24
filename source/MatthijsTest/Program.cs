@@ -37,52 +37,65 @@ namespace MatthijsTest
 		}
 		#endregion
 
+        private static NetworkDevice mNet;
+
 		public static void Init(){
-            try
-            {
-                Console.WriteLine("Try");
-                throw new Exception("Error message");
-            }
-            catch(Exception E)
-            {
-                Console.Write("Error: ");
-                Console.WriteLine(E.ToString());
-            }
-            Console.WriteLine("Klaar");
-            while (true)
-                ;
+            
             var xInit = true;
             if (xInit)
             {
                 var xBoot = new Cosmos.Sys.Boot();
-                xBoot.Execute(false);
+                xBoot.Execute(true);
             }
 
-            TCPIPStack.Init();
-            NetworkDevice xNet = null;
             for (int i = 0; i < Device.Devices.Count; i++)
             {
                 if (Device.Devices[i].Type == Device.DeviceType.Network)
                 {
-                    xNet = (NetworkDevice)Device.Devices[i];
+                    mNet = (NetworkDevice)Device.Devices[i];
                     break;
                 }
             }
-            if (xNet == null)
+            if (mNet == null)
             {
                 Console.WriteLine("NIC not found!");
                 while (true) ;
             }
-            TCPIPStack.ConfigIP(xNet, new IPv4Config(new IPv4Address(10, 0, 0, 1), new IPv4Address(255, 0, 0, 0)));
-            var xDest = new IPv4Address(10, 255, 255, 255);
-            TCPIPStack.SendUDP(xDest, 8365, 8654, new byte[] { 65, 65, 65, 65, 1, 2, 3, 4, 5, 66, 66, 66, 66 });
+            TCPIPStack.Init();
+            
+            TCPIPStack.ConfigIP(mNet, new IPv4Config(new IPv4Address(10, 0, 0, 2), new IPv4Address(255, 255, 255, 0)));
+            var xDest = new IPv4Address(10, 0, 0, 1);
+            TCPIPStack.Ping(xDest);
+//                TCPIPStack.SendUDP(xDest, 632, 643, new byte[0]);
+            //while (true) { TCPIPStack.Update(); }
+
+            SendString("ABBA");
             Console.WriteLine("Klaar");
-            while (true)
-            {
-                TCPIPStack.Update();
-            }
             
 		}
+
+        private static void SendString(string aStr)
+        {
+            Console.WriteLine("In SendString");
+            var xData = new byte[aStr.Length];
+            Console.WriteLine("Array created");
+            for (int i = 0; i < aStr.Length; i++)
+            {
+                Console.WriteLine("In loop");
+                xData[i] = (byte)aStr[i];
+                Console.WriteLine("  After move");
+            }
+            Console.WriteLine("Create UDP package");
+            var xUDP = new UDPPacket(xData);
+            Console.WriteLine("Set DestAddr");
+            xUDP.DestinationAddress = 0x0A000001;
+            Console.WriteLine("Set Dest Port");
+            xUDP.DestinationPort = 643;
+            Console.WriteLine("GetData");
+            var xTheData = xUDP.GetData();
+            Console.WriteLine("Send");
+            mNet.QueueBytes(xTheData);
+        }
 
     }
 }

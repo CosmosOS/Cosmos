@@ -67,7 +67,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.Mono.System {
 
 
 
-		public static void cctor() {
-		}
+        //public static void cctor() {
+        //}
 	}
 }

@@ -69,11 +69,6 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 				dmem[i] = smem[i];
 			}
 		}
-
-
-
-		public static void cctor() {
-		}
 	}
 
   //StringImpl2 plugs StringImpl which is also a plug????
