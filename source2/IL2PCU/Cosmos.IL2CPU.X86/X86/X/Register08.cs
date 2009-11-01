@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public void Test(byte aValue) {
-            new X86.Test { DestinationReg = GetId(), SourceValue = aValue, Size = Registers.GetSize(GetId()) };
+            new Test { DestinationReg = GetId(), SourceValue = aValue, Size = Registers.GetSize(GetId()) };
         }
     }
 }

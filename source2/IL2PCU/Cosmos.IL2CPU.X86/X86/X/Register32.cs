@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public void Test(UInt32 aValue) {
-            new X86.Test { DestinationReg = GetId(), SourceValue = aValue, Size = 32 };
+            new Test { DestinationReg = GetId(), SourceValue = aValue, Size = 32 };
         }
     }
 }

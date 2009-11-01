@@ -7,7 +7,7 @@ namespace Cosmos.Demo.Pacman.Sounds
 {
     class Intro
     {
-        public static void Play(float nothing)
+        public static void Play()
         {
             Console.Beep(516, 10);
             Console.Beep(559, 50);

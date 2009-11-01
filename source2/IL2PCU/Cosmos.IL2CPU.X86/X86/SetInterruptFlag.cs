@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
     [OpCode("sti")]
-	public class Sti: X86.Instruction {
+	public class Sti: Instruction {
         public static void InitializeEncodingData(Instruction.InstructionData aData)
         {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption

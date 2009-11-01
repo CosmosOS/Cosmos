@@ -16,8 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xSize = Assembler.Stack.Pop();
             if( xSize.IsFloat )
             {
-                //EmitNotSupportedException( Assembler, GetServiceProvider(), "Floats not yet supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                //throw new NotImplementedException();
+                //new CPUx86.SSE.XorPS
             }
             if( xSize.Size == 8 )
             {

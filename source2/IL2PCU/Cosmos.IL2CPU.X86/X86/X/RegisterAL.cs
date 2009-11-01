@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public static implicit operator RegisterAL(PortNumber aPort) {
-            new X86.In { DestinationReg = Registers.AL };
+            new In { DestinationReg = Registers.AL };
             return Instance;
         }
 

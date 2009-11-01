@@ -137,10 +137,10 @@ namespace Cosmos.IL2CPU.X86
             ECX.Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_SendTextExit");
             Call("WriteByteToComPort");
-            new X86.Dec { DestinationReg = Registers.ECX };
+            new Dec { DestinationReg = Registers.ECX };
             // We are storing as 16 bits, but for now I will transmit 8 bits
             // So we inc again to skip the 0
-            new X86.Inc { DestinationReg = Registers.ESI };
+            new Inc { DestinationReg = Registers.ESI };
             Jump("DebugStub_SendTextWriteChar");
    
             Label = "DebugStub_SendTextExit";

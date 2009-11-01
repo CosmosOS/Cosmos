@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler.X86.SSE;
 
 namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
     partial class InvalidOpcodeTester {

@@ -30,12 +30,12 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public static MemoryAction operator ++(MemoryAction aTarget) {
-            aTarget.ApplyToDest(new X86.Inc());
+            aTarget.ApplyToDest(new Inc());
             return null;
         }
 
         public static MemoryAction operator --(MemoryAction aTarget) {
-            aTarget.ApplyToDest(new X86.Dec());
+            aTarget.ApplyToDest(new Dec());
             return null;
         }
 

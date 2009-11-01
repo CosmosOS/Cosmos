@@ -19,20 +19,20 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         protected void Move(uint aAddress) {
-            new X86.Move { DestinationReg = GetId(), SourceValue = aAddress, Size=Registers.GetSize(GetId())};
+            new Move { DestinationReg = GetId(), SourceValue = aAddress, Size=Registers.GetSize(GetId())};
         }
 
         protected void Move(MemoryAction aAction) {
-            new X86.Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
+            new Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
         }
 
         protected void Move(RegistersEnum aRegister)
         {
-            new X86.Move { DestinationReg = GetId(), SourceReg = aRegister, Size = Registers.GetSize(GetId()) };
+            new Move { DestinationReg = GetId(), SourceReg = aRegister, Size = Registers.GetSize(GetId()) };
         }
 
         protected void Move(ElementReference aReference) {
-            new X86.Move { DestinationReg = GetId(), SourceRef = aReference, Size = Registers.GetSize(GetId())};
+            new Move { DestinationReg = GetId(), SourceRef = aReference, Size = Registers.GetSize(GetId())};
         }
 
         public string GetName() {

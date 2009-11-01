@@ -40,14 +40,14 @@ namespace Cosmos.IL2CPU.X86.X {
 
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new X86.Move { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
-                            new X86.Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
                     } else {
                         var xAddrIndirect = aAddress as AddressIndirect;
                         if (xAddrIndirect != null) {
-                                new X86.Move { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                                new Move { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             throw new Exception("Invalid Address type!");
                         }
@@ -56,14 +56,14 @@ namespace Cosmos.IL2CPU.X86.X {
                     var xAddrDirect = aAddress as AddressDirect;
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new X86.Move { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
-                            new X86.Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
                     } else {
                         var xAddrIndirect = aAddress as AddressIndirect;
                         if (xAddrIndirect != null) {
-                            new X86.Move { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Move { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             throw new Exception("Invalid Address type!");
                         }
@@ -89,7 +89,7 @@ namespace Cosmos.IL2CPU.X86.X {
                         var xAddrDirect = aAddress as AddressDirect;
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
-                                new X86.Move {
+                                new Move {
                                     DestinationRef = ElementReference.New(xAddrDirect.Label),
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
@@ -98,7 +98,7 @@ namespace Cosmos.IL2CPU.X86.X {
                                     SourceIsIndirect = value.IsIndirect
                                 };
                             } else {
-                                new X86.Move {
+                                new Move {
                                     DestinationValue = xAddrDirect.Address,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
@@ -110,7 +110,7 @@ namespace Cosmos.IL2CPU.X86.X {
                         } else {
                             var xAddrIndirect = aAddress as AddressIndirect;
                             if (xAddrIndirect != null) {
-                                new X86.Move {
+                                new Move {
                                     DestinationRef = xAddrIndirect.Reference,
                                     DestinationDisplacement = xAddrIndirect.Displacement,
                                     DestinationValue = xAddrIndirect.Address,
@@ -130,7 +130,7 @@ namespace Cosmos.IL2CPU.X86.X {
                         var xAddrDirect = aAddress as AddressDirect;
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
-                                new X86.Move {
+                                new Move {
                                     DestinationRef = ElementReference.New(xAddrDirect.Label),
                                     DestinationIsIndirect=true,
                                     SourceValue = value.Value.GetValueOrDefault(),
@@ -140,7 +140,7 @@ namespace Cosmos.IL2CPU.X86.X {
                                     SourceIsIndirect = value.IsIndirect
                                 };
                             } else {
-                                new X86.Move {
+                                new Move {
                                     DestinationValue = xAddrDirect.Address,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
@@ -152,7 +152,7 @@ namespace Cosmos.IL2CPU.X86.X {
                         } else {
                             var xAddrIndirect = aAddress as AddressIndirect;
                             if (xAddrIndirect != null) {
-                                new X86.Move {
+                                new Move {
                                     DestinationRef = xAddrIndirect.Reference,
                                     DestinationDisplacement = xAddrIndirect.Displacement,
                                     DestinationValue = xAddrIndirect.Address,

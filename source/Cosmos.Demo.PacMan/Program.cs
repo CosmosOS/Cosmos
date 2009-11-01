@@ -38,8 +38,7 @@ namespace Cosmos.Demo.Pacman
             Console.WriteLine(@"Namco/Midway 1980(R)                          ");
             S.SetColors(ConsoleColor.White, ConsoleColor.Black);
             Console.WriteLine(@"Thanks to DarthDie for the Snake project I've based on");
-            float nothing = 0;
-            Sounds.Intro.Play(nothing);
+            Sounds.Intro.Play();
 
             
         }

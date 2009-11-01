@@ -12,11 +12,7 @@ namespace Cosmos.IL2CPU.X86.SSE
         {
             aData.EncodingOptions.Add( new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0x0F, 0x58 },
-                NeedsModRMByte = true,
-                InitialModRMByteValue = 0x08,
-                DestinationMemory = true,
-                ReverseRegisters = true
+                OpCode = new byte[] { 0xF3, 0x0F, 0x58 }
             } );
         }
     }

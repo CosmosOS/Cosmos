@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public void Call(string aLabel) {
-            new X86.Call { DestinationLabel = aLabel };
+            new Call { DestinationLabel = aLabel };
         }
 
 
@@ -80,18 +80,18 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public void Jump(string aLabel) {
-            new X86.Jump { DestinationLabel = aLabel };
+            new Jump { DestinationLabel = aLabel };
         }
 
         public void JumpIf(Flags aFlags, string aLabel) {
             switch (aFlags) {
                 case Flags.Zero:
                 case Flags.Equal:
-                    new X86.ConditionalJump { Condition = X86.ConditionalTestEnum.Zero, DestinationLabel = aLabel };
+                    new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = aLabel };
                     break;
                 case Flags.NotZero:
                 case Flags.NotEqual:
-                    new X86.ConditionalJump { Condition = X86.ConditionalTestEnum.NotZero, DestinationLabel = aLabel };
+                    new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = aLabel };
                     break;
             }
         }
@@ -105,19 +105,19 @@ namespace Cosmos.IL2CPU.X86.X {
         }
         
         public void Return() {
-            new X86.Return();
+            new Return();
         }
         
         public void Return(UInt16 aBytes) {
-            new X86.Return { DestinationValue = aBytes };
+            new Return { DestinationValue = aBytes };
         }
 
         public void EnableInterrupts() {
-            new X86.Sti();
+            new Sti();
         }
 
         public void DisableInterrupts() {
-            new X86.ClrInterruptFlag();
+            new ClrInterruptFlag();
         }
 
         public ElementReference Reference(string aDataName) {

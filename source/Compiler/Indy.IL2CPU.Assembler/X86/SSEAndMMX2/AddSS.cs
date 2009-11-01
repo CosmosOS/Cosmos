@@ -5,19 +5,15 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.SSE
 {
-    [OpCode( "addss" )]
+    [OpCode("addss")]
     public class AddSS : InstructionWithDestinationAndSource
     {
-        public static void InitializeEncodingData( Instruction.InstructionData aData )
+        public static void InitializeEncodingData(Instruction.InstructionData aData)
         {
-            aData.EncodingOptions.Add( new InstructionData.InstructionEncodingOption
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0x0F, 0x58 },
-                NeedsModRMByte = true,
-                InitialModRMByteValue = 0x08,
-                DestinationMemory = true,
-                ReverseRegisters = true
-            } );
+                OpCode = new byte[] { 0xF3, 0x0F, 0x58 }
+            });
         }
     }
 }

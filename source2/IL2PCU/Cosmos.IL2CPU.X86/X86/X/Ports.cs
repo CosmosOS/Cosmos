@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.X {
             }
             set {
                 if (value.Register == Registers.EAX || value.Register == Registers.AX || value.Register == Registers.AL)
-                    new X86.Out { DestinationReg = value.Register };
+                    new Out { DestinationReg = value.Register };
                 else
                     throw new Exception("Invalid destination register for OUT");
             }
