@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 using System.Drawing;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Drawing {
-    [Plug(TargetName = "System.Drawing.Color, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
+    [Plug(Target = typeof(Color))]
 	public static class ColorImpl {       
 		public static string ToString(ref Color aThis) {
 
@@ -41,6 +41,10 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Drawing {
              //* */
         }
 
+        public static long get_Value(ref Color aThis)
+        {
+            return 0;
+        }
 
 	}
 }
