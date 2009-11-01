@@ -191,6 +191,10 @@
     <Content Include="Templates\Projects\CosmosProject\Kernel.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
+      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
+      <Name>Cosmos.Compiler.Builder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>

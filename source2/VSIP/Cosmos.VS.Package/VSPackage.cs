@@ -87,6 +87,7 @@ namespace Cosmos.VS.Package {
           Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
           base.Initialize();
           this.RegisterProjectFactory(new VSProjectFactory(this));
+          Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Exiting Initialize() of: {0}", this.ToString()));
         }
 
     }

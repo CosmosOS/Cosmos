@@ -4,16 +4,20 @@ using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Cosmos.Build.Common;
+using Cosmos.Compiler.Builder;
+using Cosmos.IL2CPU;
+using System.IO;
 
 namespace Cosmos.Build.MSBuild {
-	
-  public class BuildImage : Task {
+
+    public class BuildImage : AppDomainIsolatedTask
+    {
 
 		private Boolean buildFailed;
 
 		public override bool Execute()
 		{
-			buildFailed = false;
+            buildFailed = false;
 
 			Log.LogMessage(MessageImportance.High, "Building Cosmos System Image");
 
@@ -39,46 +43,41 @@ namespace Cosmos.Build.MSBuild {
 			Log.LogMessage(MessageImportance.High, "Framework: {0}", buildFramework);
 			Log.LogMessage(MessageImportance.High, "Target: {0}", buildTarget);
 
-			//System.Reflection.Assembly kernelAssembly;
+			System.Reflection.Assembly kernelAssembly;
 
-			//var builtEvent = new System.Threading.AutoResetEvent(false);
-			//var builder = new Builder();
+			var builtEvent = new System.Threading.AutoResetEvent(false);
+			var builder = new Builder();
+            var xOptions = BuildOptions.Load();
+            xOptions.Target = "ISO";            
+            
 
 			//builder.UseInternalAssembler = this.UseInternalAssembler;
 
-			//builder.CompileCompleted += delegate { builtEvent.Set(); };
-			//builder.LogMessage += delegate(Indy.IL2CPU.LogSeverityEnum aSeverity, string aMessage)
-			//          {
-			//    switch (aSeverity)
-			//    {
-			//      case Indy.IL2CPU.LogSeverityEnum.Informational:
-			//        Log.LogMessage(aMessage);
-			//        break;
-			//      case Indy.IL2CPU.LogSeverityEnum.Warning:
-			//        Log.LogWarning(aMessage);
-			//        break;
-			//      case Indy.IL2CPU.LogSeverityEnum.Error:
-			//        Log.LogError(aMessage);
-			//        this.buildFailed = true;
-			//        break;
-			//    }
+			builder.CompileCompleted += delegate { builtEvent.Set(); };
+            builder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage)
+                      {
+                          switch (aSeverity)
+                          {
+                              case LogSeverityEnum.Informational:
+                                  Log.LogMessage(aMessage);
+                                  break;
+                              case LogSeverityEnum.Warning:
+                                  Log.LogWarning(aMessage);
+                                  break;
+                              case LogSeverityEnum.Error:
+                                  Log.LogError(aMessage);
+                                  this.buildFailed = true;
+                                  break;
+                          }
 
-			//          };
+                      };
 
-			//kernelAssembly = System.Reflection.Assembly.LoadFile(this.KernelAssemblyFile);
-			//builder.TargetAssembly = kernelAssembly;
+            kernelAssembly = System.Reflection.Assembly.LoadFile(Path.Combine(buildOutputPath, this.KernelAssembly));
+			builder.TargetAssembly = kernelAssembly;
 
-			//builder.BeginCompile(compileDebugMode, this.DebugComPort, this.GDB);
-			//builtEvent.WaitOne();
-
-			//if (this.buildFailed == true)
-			//{
-			//  builder.Assemble();
-			//  builder.Link();
-			//  builder.MakeISO();
-			//}
-
-			return (this.buildFailed == false);
+			builder.BeginCompile(xOptions);
+			builtEvent.WaitOne();
+            return (this.buildFailed == false) && !builder.HasErrors;
 		}
 
 		[Required]
