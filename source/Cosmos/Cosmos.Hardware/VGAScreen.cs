@@ -346,7 +346,7 @@ namespace Cosmos.Hardware
             {
                 for (uint x = 0; x < PixelWidth; x++)
                 {
-                    *(byte*)(0xa0000 + y * 320 + x) = (byte)(colour) ;
+                    *(byte*)(0xa0000 + (y * 320) + x) = (byte)(colour & 0xFF) ;
                 }
             }
         }
