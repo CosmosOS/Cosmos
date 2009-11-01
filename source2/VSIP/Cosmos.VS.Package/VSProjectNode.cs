@@ -72,6 +72,6 @@ namespace Cosmos.VS.Package {
 
       this.FileTemplateProcessor.UntokenFile(source, target);
       this.FileTemplateProcessor.Reset();
-    }
+    } 
   }
 }

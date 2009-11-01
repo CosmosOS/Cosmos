@@ -130,6 +130,12 @@ namespace Cosmos.Debug.VSDebugEngine
 
             return VSConstants.S_OK;
         }
+
+        internal static void Send(AD7Engine engine, AD7Module aModule, bool fLoad)
+        {
+            var eventObject = new AD7ModuleLoadEvent(aModule, fLoad);
+            engine.Callback.Send(eventObject, IID, null);
+        }
     }
 
     // This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a program has run to completion
@@ -160,6 +166,11 @@ namespace Cosmos.Debug.VSDebugEngine
     sealed class AD7ThreadCreateEvent : AD7AsynchronousEvent, IDebugThreadCreateEvent2
     {
         public const string IID = "2090CCFC-70C5-491D-A5E8-BAD2DD9EE3EA";
+        internal static void Send(AD7Engine engine)
+        {
+            var eventObject = new AD7ThreadCreateEvent();
+            engine.Callback.Send(eventObject, IID, null);
+        }
     }
 
     // This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a thread has exited.
@@ -192,6 +203,12 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public AD7LoadCompleteEvent()
         {
+        }
+
+        internal static void Send(AD7Engine aEngine)
+        {
+            var xMessage = new AD7LoadCompleteEvent();
+            aEngine.Callback.Send(xMessage, IID, null);
         }
     }
 

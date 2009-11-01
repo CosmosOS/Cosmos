@@ -83,6 +83,7 @@
     <Compile Include="AD7.Impl\AD7Enums.cs" />
     <Compile Include="AD7.Impl\AD7Events.cs" />
     <Compile Include="AD7.Impl\AD7Expression.cs" />
+    <Compile Include="AD7.Impl\AD7Process.cs" />
     <Compile Include="AD7.Impl\AD7ProgramProvider.cs" />
     <Compile Include="AD7.Impl\AD7StackFrame.cs" />
     <Compile Include="AD7.Impl\AD7MemoryAddress.cs" />
@@ -103,6 +104,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ResourceStrings.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ResourceStrings.resx">

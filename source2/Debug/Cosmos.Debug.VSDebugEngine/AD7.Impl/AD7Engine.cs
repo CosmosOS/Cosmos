@@ -22,7 +22,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     //
     // IDebugEngineProgram2: This interface provides simultanious debugging of multiple threads in a debuggee.
     
-    [ComVisible(true)]
+    [ComVisible(false)]
     [Guid("D3788C06-09DE-46b3-B61B-A8A56ADA8B99")]
     public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
@@ -41,20 +41,23 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         // A unique identifier for the program being debugged.
         Guid m_ad7ProgramId;
-        
-        public static string ID;
+
+        public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
 
         static AD7Engine() {
-            ID = Cosmos.Debug.Common.Consts.EngineGUID;
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
         }
 
         public AD7Engine() {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             m_breakpointManager = new BreakpointManager(this);
             //Worker.Initialize();
         }
 
         ~AD7Engine() {
-            if (m_pollThread != null) {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+            if (m_pollThread != null)
+            {
                 m_pollThread.Close();
             }
         }
@@ -71,7 +74,8 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         public string GetAddressDescription(uint ip)
         {
-        //    DebuggedModule module = m_debuggedProcess.ResolveAddress(ip);
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+            //    DebuggedModule module = m_debuggedProcess.ResolveAddress(ip);
 
             return "";// EngineUtils.GetAddressDescription(module, ip);
         }
@@ -81,6 +85,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Attach the debug engine to a program. 
         int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, uint dwReason)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             System.Diagnostics.Debug.Assert(m_ad7ProgramId == Guid.Empty);
 
@@ -153,6 +158,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // When the break is complete, an AsyncBreakComplete event will be sent back to the debugger.
         int IDebugEngine2.CauseBreak()
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             return ((IDebugProgram2)this).CauseBreak();
         }
@@ -162,6 +168,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // It responds to that event by shutting down the engine.
         int IDebugEngine2.ContinueFromSynchronousEvent(IDebugEvent2 eventObject)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             try
@@ -196,6 +203,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // a location in the debuggee.
         int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             System.Diagnostics.Debug.Assert(m_breakpointManager != null);
             ppPendingBP = null;
 
@@ -215,6 +223,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // clean up all references to the program and send a program destroy event.
         int IDebugEngine2.DestroyProgram(IDebugProgram2 pProgram)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // Tell the SDM that the engine knows that the program is exiting, and that the
             // engine will send a program destroy. We do this because the Win32 debug api will always
             // tell us that the process exited, and otherwise we have a race condition.
@@ -224,6 +233,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         // Gets the GUID of the DE.
         int IDebugEngine2.GetEngineId(out Guid guidEngine) {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             guidEngine = new Guid(ID);
             return VSConstants.S_OK;
         }
@@ -232,6 +242,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The sample engine does not support exceptions in the debuggee so this method is not actually implemented.
         int IDebugEngine2.RemoveAllSetExceptions(ref Guid guidType)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             return VSConstants.S_OK;
         }
 
@@ -239,6 +251,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The sample engine does not support exceptions in the debuggee so this method is not actually implemented.       
         int IDebugEngine2.RemoveSetException(EXCEPTION_INFO[] pException)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample engine will always stop on all exceptions.
 
             return VSConstants.S_OK;
@@ -247,7 +260,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Specifies how the DE should handle a given exception.
         // The sample engine does not support exceptions in the debuggee so this method is not actually implemented.
         int IDebugEngine2.SetException(EXCEPTION_INFO[] pException)
-        {           
+        {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             return VSConstants.S_OK;
         }
 
@@ -256,6 +270,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // strings returned by the DE are properly localized. The sample engine is not localized so this is not implemented.
         int IDebugEngine2.SetLocale(ushort wLangID)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             return VSConstants.S_OK;
         }
 
@@ -263,6 +278,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // This method can forward the call to the appropriate form of the Debugging SDK Helpers function, SetMetric.
         int IDebugEngine2.SetMetric(string pszMetric, object varValue)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample engine does not need to understand any metric settings.
             return VSConstants.S_OK;
         }
@@ -271,6 +287,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // This allows the debugger to tell the engine where that location is.
         int IDebugEngine2.SetRegistryRoot(string pszRegistryRoot)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample engine does not read settings from the registry.
             return VSConstants.S_OK;
         }
@@ -282,6 +299,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Determines if a process can be terminated.
         int IDebugEngineLaunch2.CanTerminateProcess(IDebugProcess2 process)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             //System.Diagnostics.Debug.Assert(m_pollThread != null);
             //System.Diagnostics.Debug.Assert(m_engineCallback != null);
@@ -317,6 +335,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
         int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aExe, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess) {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             //System.Diagnostics.Debug.Assert(m_pollThread == null);
             //System.Diagnostics.Debug.Assert(m_engineCallback == null);
@@ -334,16 +353,26 @@ namespace Cosmos.Debug.VSDebugEngine {
               // Complete the win32 attach on the poll thread
               //m_pollThread.RunOperation(new Operation(delegate
               //{
-                //  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
+              //   var  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
               //}));
 
               var xTarget = new Cosmos.Build.Launch.Target.QEMU();
 
-              var xProcessID = new AD_PROCESS_ID();
-              xProcessID.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+              var xProcess = new AD7Process(aExe);
+              aProcess = xProcess;
+              m_ad7ProgramId = xProcess.mID;
+              //var xProcessID = new AD_PROCESS_ID();
+              //xProcessID.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
               //adProcessId.dwProcessId = (uint)m_debuggedProcess.Id;
+              AD7EngineCreateEvent.Send(this);
+              AD7ProgramCreateEvent.Send(this);
+              mThread = new AD7Thread(this);
+              AD7ThreadCreateEvent.Send(this);
+              mModule = new AD7Module();
+              AD7ModuleLoadEvent.Send(this, mModule, true);
+              Callback.OnLoadComplete(mThread);
 
-              EngineUtils.RequireOk(aPort.GetProcess(xProcessID, out aProcess));
+              //EngineUtils.RequireOk(aPort.GetProcess(xProcessID, out aProcess));
 
               return VSConstants.S_OK;
             }
@@ -352,9 +381,13 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
         }
 
+        private AD7Module mModule;
+        private AD7Thread mThread;
+
         // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
         int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 process)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             //System.Diagnostics.Debug.Assert(m_pollThread != null);
             //System.Diagnostics.Debug.Assert(m_engineCallback != null);
@@ -410,6 +443,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The debugger will call IDebugEngineLaunch2::CanTerminateProcess before calling this method.
         int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 process)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             //System.Diagnostics.Debug.Assert(m_pollThread != null);
             //System.Diagnostics.Debug.Assert(m_engineCallback != null);
@@ -444,6 +478,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Determines if a debug engine (DE) can detach from the program.
         public int CanDetach()
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample engine always supports detach
             return VSConstants.S_OK;
         }
@@ -452,6 +487,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // breakmode. 
         public int CauseBreak()
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             m_pollThread.RunOperation(new Operation(delegate
@@ -467,6 +503,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // and the debugger does not want to actually enter break mode.
         public int Continue(IDebugThread2 pThread)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             AD7Thread thread = (AD7Thread)pThread;           
@@ -483,6 +520,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // or when one of the Detach commands are executed in the UI.
         public int Detach()
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             m_breakpointManager.ClearBoundBreakpoints();
@@ -498,6 +536,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Enumerates the code contexts for a given position in a source file.
         public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             throw new Exception("The method or operation is not implemented.");
         }
 
@@ -505,6 +545,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // function to step into. This is not something that the SampleEngine supports.
         public int EnumCodePaths(string hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             pathEnum = null;
             safetyContext = null;
             return VSConstants.E_NOTIMPL;
@@ -513,6 +554,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // EnumModules is called by the debugger when it needs to enumerate the modules in the program.
         public int EnumModules(out IEnumDebugModules2 ppEnum)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             //DebuggedModule[] modules = m_debuggedProcess.GetModules();
@@ -531,6 +573,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // EnumThreads is called by the debugger when it needs to enumerate the threads in the program.
         public int EnumThreads(out IEnumDebugThreads2 ppEnum)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             //DebuggedThread[] threads = m_debuggedProcess.GetThreads();
@@ -555,6 +598,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The sample engine does not support this
         public int GetDebugProperty(out IDebugProperty2 ppProperty)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             throw new Exception("The method or operation is not implemented.");
         }
 
@@ -562,6 +606,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The sample engine does not support dissassembly so it returns E_NOTIMPL
         public int GetDisassemblyStream(uint dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             disassemblyStream = null;
             return VSConstants.E_NOTIMPL;
         }
@@ -569,6 +614,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
         public int GetENCUpdate(out object update)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample engine does not participate in managed edit & continue.
             update = null;
             return VSConstants.S_OK;            
@@ -577,6 +623,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Gets the name and identifier of the debug engine (DE) running this program.
         public int GetEngineInfo(out string engineName, out Guid engineGuid)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             engineName = ResourceStrings.EngineName;
             engineGuid = new Guid(AD7Engine.ID);
             return VSConstants.S_OK;
@@ -586,6 +633,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // that was allocated when the program was executed.
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             throw new Exception("The method or operation is not implemented.");
         }
 
@@ -593,6 +641,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The name returned by this method is always a friendly, user-displayable name that describes the program.
         public int GetName(out string programName)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The Sample engine uses default transport and doesn't need to customize the name of the program,
             // so return NULL.
             programName = null;
@@ -602,6 +651,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
         // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
         public int GetProgramId(out Guid guidProgramId) {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
 
             guidProgramId = m_ad7ProgramId;
@@ -611,12 +661,16 @@ namespace Cosmos.Debug.VSDebugEngine {
         // This method is deprecated. Use the IDebugProcess3::Step method instead.
         public int Step(IDebugThread2 pThread, uint sk, uint Step)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             return VSConstants.S_OK;
         }
 
         // Terminates the program.
         public int Terminate()
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             // Because the sample engine is a native debugger, it implements IDebugEngineLaunch2, and will terminate
             // the process in IDebugEngineLaunch2.TerminateProcess
             return VSConstants.S_OK;
@@ -625,6 +679,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Writes a dump to a file.
         public int WriteDump(uint DUMPTYPE, string pszDumpUrl)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample debugger does not support creating or reading mini-dumps.
             return VSConstants.E_NOTIMPL;
         }
@@ -637,6 +692,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // stepping state cleared.
         public int ExecuteOnThread(IDebugThread2 pThread)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             //AD7Thread thread = (AD7Thread)pThread;
@@ -662,6 +718,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The sample engine only supports debugging native applications and therefore only has one program per-process
         public int Stop()
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             throw new Exception("The method or operation is not implemented.");
         }
 
@@ -670,6 +728,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // to do here.
         public int WatchForExpressionEvaluationOnThread(IDebugProgram2 pOriginatingProgram, uint dwTid, uint dwEvalFlags, IDebugEventCallback2 pExprCallback, int fWatch)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             return VSConstants.S_OK;
         }
 
@@ -677,6 +737,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The sample engine doesn't cooperate with other engines, so it has nothing to do here.
         public int WatchForThreadStep(IDebugProgram2 pOriginatingProgram, uint dwTid, int fWatch, uint dwFrame)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
             return VSConstants.S_OK;
         }
 

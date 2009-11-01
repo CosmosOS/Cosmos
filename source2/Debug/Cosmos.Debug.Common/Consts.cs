@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Cosmos.Debug.Common {
     public class Consts {
-        public const string EngineGUID = "{DFE8F1F6-691C-4c08-8FFA-54551AD8FEAF}";
+        public const string EngineGUID = "DFE8F1F6-691C-4c08-8FFA-54551AD8FEAF";
     }
 }

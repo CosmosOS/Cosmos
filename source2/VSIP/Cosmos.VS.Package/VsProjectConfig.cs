@@ -30,12 +30,9 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        string xProp = GetConfigurationProperty("StartProgram", true);
-        if (string.IsNullOrEmpty(xProp)) {
-          xInfo.bstrExe = ProjectMgr.GetOutputAssembly(this.ConfigName);
-        } else {
-          xInfo.bstrExe = xProp;
-        }
+
+        xInfo.bstrExe = ProjectMgr.GetOutputAssembly(this.ConfigName);
+        xInfo.bstrExe = Path.Combine(Path.GetDirectoryName(xInfo.bstrExe), Path.GetFileNameWithoutExtension(xInfo.bstrExe) + ".iso");
 
         // Select the debugger
         // Managed debugger
