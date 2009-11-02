@@ -34,8 +34,6 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
         // api requires thread affinity to several operations.
-        WorkerThread m_pollThread;
-
         // This object manages breakpoints in the sample engine.
         BreakpointManager m_breakpointManager;
 
@@ -56,10 +54,6 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         ~AD7Engine() {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-            if (m_pollThread != null)
-            {
-                m_pollThread.Close();
-            }
         }
 
         internal EngineCallback Callback
@@ -106,22 +100,22 @@ namespace Cosmos.Debug.VSDebugEngine {
 
                 // Attach can either be called to attach to a new process, or to complete an attach
                 // to a launched process
-                if (m_pollThread == null)
-                {
-                    // We are being asked to debug a process when we currently aren't debugging anything
-                    m_pollThread = new WorkerThread();
+                //if (m_pollThread == null)
+                //{
+                //    // We are being asked to debug a process when we currently aren't debugging anything
+                //    m_pollThread = new WorkerThread();
 
-                    m_engineCallback = new EngineCallback(this, ad7Callback);
+                //    m_engineCallback = new EngineCallback(this, ad7Callback);
 
-                    // Complete the win32 attach on the poll thread
-                    m_pollThread.RunOperation(new Operation(delegate
-                    {
-                        //m_debuggedProcess = Worker.AttachToProcess(m_engineCallback, processId);
-                    }));
+                //    // Complete the win32 attach on the poll thread
+                //    m_pollThread.RunOperation(new Operation(delegate
+                //    {
+                //        //m_debuggedProcess = Worker.AttachToProcess(m_engineCallback, processId);
+                //    }));
 
-                    //m_pollThread.SetDebugProcess(m_debuggedProcess);
-                }
-                else
+                //    //m_pollThread.SetDebugProcess(m_debuggedProcess);
+                //}
+                //else
                 {
                     //if (processId != m_debuggedProcess.Id)
                     {
@@ -136,10 +130,10 @@ namespace Cosmos.Debug.VSDebugEngine {
                 AD7ProgramCreateEvent.Send(this);
 
                 // start polling for debug events on the poll thread
-                m_pollThread.RunOperationAsync(new Operation(delegate
-                {
-                    //m_debuggedProcess.ResumeEventPump();
-                }));
+                //m_pollThread.RunOperationAsync(new Operation(delegate
+                //{
+                //    //m_debuggedProcess.ResumeEventPump();
+                //}));
 
                 return VSConstants.S_OK;
             }
@@ -175,16 +169,14 @@ namespace Cosmos.Debug.VSDebugEngine {
             {
                 if (eventObject is AD7ProgramDestroyEvent)
                 {
-                    WorkerThread pollThread = m_pollThread;
                     //DebuggedProcess debuggedProcess = m_debuggedProcess;
 
                     m_engineCallback = null;
                     //m_debuggedProcess = null;
-                    m_pollThread = null;
+                    //m_pollThread = null;
                     m_ad7ProgramId = Guid.Empty;
-
-                    //debuggedProcess.Close();
-                    pollThread.Close();
+                    mThread = null;
+                    mProgNode = null;
                 }
                 else
                 {
@@ -349,7 +341,7 @@ namespace Cosmos.Debug.VSDebugEngine {
               //string commandLine = EngineUtils.BuildCommandLine(exe, args);
               //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
               // We are being asked to debug a process when we currently aren't debugging anything
-              m_pollThread = new WorkerThread();
+              //m_pollThread = new WorkerThread();
               // Complete the win32 attach on the poll thread
               //m_pollThread.RunOperation(new Operation(delegate
               //{
@@ -358,19 +350,25 @@ namespace Cosmos.Debug.VSDebugEngine {
 
               var xTarget = new Cosmos.Build.Launch.Target.QEMU();
 
-              var xProcess = new AD7Process(aExe);
+              mThread = new AD7Thread(this);
+              var xProcess = new AD7Process(aExe, m_engineCallback, mThread, this);
               aProcess = xProcess;
               m_ad7ProgramId = xProcess.mID;
               //var xProcessID = new AD_PROCESS_ID();
               //xProcessID.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
               //adProcessId.dwProcessId = (uint)m_debuggedProcess.Id;
               AD7EngineCreateEvent.Send(this);
-              AD7ProgramCreateEvent.Send(this);
-              mThread = new AD7Thread(this);
-              AD7ThreadCreateEvent.Send(this);
-              mModule = new AD7Module();
-              AD7ModuleLoadEvent.Send(this, mModule, true);
-              Callback.OnLoadComplete(mThread);
+              //AD7ProgramCreateEvent.Send(this);
+              AD7ThreadCreateEvent.Send(this, mThread);
+              //mModule = new AD7Module();
+              //AD7ModuleLoadEvent.Send(this, mModule, true);
+              mISO = aExe;
+              //var xPortNotify =  (IDebugPortNotify2) aPort;
+              //if (xPortNotify != null) { 
+              //    mProgNode = new AD7ProgramNode(3);
+              //    xPortNotify.AddProgramNode(mProgNode);
+              //}
+              //Callback.OnLoadComplete(mThread);
 
               //EngineUtils.RequireOk(aPort.GetProcess(xProcessID, out aProcess));
 
@@ -383,7 +381,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         private AD7Module mModule;
         private AD7Thread mThread;
-
+        private AD7ProgramNode mProgNode;
         // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
         int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 process)
         {
@@ -405,27 +403,20 @@ namespace Cosmos.Debug.VSDebugEngine {
 
                 // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
                 // which will complete the hookup with AD7
-                IDebugPort2 port;
-                EngineUtils.RequireOk(process.GetPort(out port));
-                
-                IDebugDefaultPort2 defaultPort = (IDebugDefaultPort2)port;
-                
-                IDebugPortNotify2 portNotify;
-                EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
-
-                //EngineUtils.RequireOk(portNotify.AddProgramNode(new AD7ProgramNode(m_debuggedProcess.Id)));
-
-                if (m_ad7ProgramId == Guid.Empty)
+                var xProcess = process as AD7Process;
+                if (xProcess == null)
                 {
-                    System.Diagnostics.Debug.Fail("Unexpected problem -- IDebugEngine2.Attach wasn't called");
-                    return VSConstants.E_FAIL;
+                    Trace.WriteLine("No AD7Process retrieved!");
+                    return VSConstants.E_INVALIDARG;
                 }
-
+                xProcess.ResumeFromLaunch();
+                
+                
                 // Resume the threads in the debuggee process
-                m_pollThread.RunOperation(new Operation(delegate
-                {
+                //m_pollThread.RunOperation(new Operation(delegate
+                //{
                     //m_debuggedProcess.ResumeFromLaunch();
-                }));
+                //}));
 
                 return VSConstants.S_OK;
             }
@@ -458,6 +449,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 }
 
 //                m_debuggedProcess.Terminate();
+                m_engineCallback.OnProcessExit(0);
 
                 return VSConstants.S_OK;
             }
@@ -490,10 +482,10 @@ namespace Cosmos.Debug.VSDebugEngine {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
-            m_pollThread.RunOperation(new Operation(delegate
-            {
-                //m_debuggedProcess.Break();
-            }));
+            //m_pollThread.RunOperation(new Operation(delegate
+            //{
+            //    //m_debuggedProcess.Break();
+            //}));
 
             return VSConstants.S_OK;
         }
@@ -508,10 +500,10 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             AD7Thread thread = (AD7Thread)pThread;           
            
-            m_pollThread.RunOperation(new Operation(delegate
-            {
-                //m_debuggedProcess.Continue(thread.GetDebuggedThread());
-            }));
+            //m_pollThread.RunOperation(new Operation(delegate
+            //{
+            //    //m_debuggedProcess.Continue(thread.GetDebuggedThread());
+            //}));
 
             return VSConstants.S_OK;
         }
@@ -525,10 +517,10 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             m_breakpointManager.ClearBoundBreakpoints();
 
-            m_pollThread.RunOperation(new Operation(delegate
-            {
-                //m_debuggedProcess.Detach();
-            }));
+            //m_pollThread.RunOperation(new Operation(delegate
+            //{
+            //    //m_debuggedProcess.Detach();
+            //}));
             
             return VSConstants.S_OK;
         }
@@ -652,7 +644,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
         public int GetProgramId(out Guid guidProgramId) {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-            System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
+            //System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
 
             guidProgramId = m_ad7ProgramId;
             return VSConstants.S_OK;
@@ -777,6 +769,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         #endregion
+
+        private string mISO;
       
     }
 }

@@ -166,10 +166,10 @@ namespace Cosmos.Debug.VSDebugEngine
     sealed class AD7ThreadCreateEvent : AD7AsynchronousEvent, IDebugThreadCreateEvent2
     {
         public const string IID = "2090CCFC-70C5-491D-A5E8-BAD2DD9EE3EA";
-        internal static void Send(AD7Engine engine)
+        internal static void Send(AD7Engine engine, IDebugThread2 aThread)
         {
             var eventObject = new AD7ThreadCreateEvent();
-            engine.Callback.Send(eventObject, IID, null);
+            engine.Callback.Send(eventObject, IID, aThread);
         }
     }
 
@@ -191,6 +191,10 @@ namespace Cosmos.Debug.VSDebugEngine
             exitCode = m_exitCode;
             
             return VSConstants.S_OK;
+        }
+        internal static void Send(AD7Engine aEngine, IDebugThread2 aThread, uint aExitCode){
+            var xObj = new AD7ThreadDestroyEvent(aExitCode);
+            aEngine.Callback.Send(xObj, IID, aThread);
         }
 
         #endregion

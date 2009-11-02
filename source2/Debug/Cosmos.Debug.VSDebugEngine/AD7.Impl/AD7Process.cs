@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
+using System.Diagnostics;
+
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -11,9 +13,21 @@ namespace Cosmos.Debug.VSDebugEngine
     {
         private string mISO;
         internal Guid mID = Guid.NewGuid();
-        public AD7Process(string aISOFile)
+        private Process mProcess;
+        private ProcessStartInfo mProcessStartInfo;
+        private EngineCallback mCallback;
+        private AD7Thread mThread;
+        private AD7Engine mEngine;
+        internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Thread aThread, AD7Engine aEngine)
         {
             mISO = aISOFile;
+            mProcessStartInfo = new ProcessStartInfo(@"e:\Cosmos\Build\Tools\qemu\qemu.exe");
+            mProcessStartInfo.Arguments = @"-L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/') + "\" -boot d";
+            mProcessStartInfo.CreateNoWindow = true;
+            mProcessStartInfo.UseShellExecute = false;
+            mCallback = aCallback;
+            mEngine = aEngine;
+            mThread = aThread;
         }
 
 
@@ -68,12 +82,20 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             pProcessId[0].dwProcessId = (uint)mISO.Length;
             pProcessId[0].guidProcessId = mID;
+            pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
             return VSConstants.S_OK;
         }
 
+        private AD7Port mPort = null;
+
         public int GetPort(out IDebugPort2 ppPort)
         {
-            throw new NotImplementedException();
+            if (mPort == null)
+            {
+                mPort = new AD7Port();
+            }
+            ppPort = mPort;
+            return VSConstants.S_OK;
         }
 
         public int GetProcessId(out Guid pguidProcessId)
@@ -93,5 +115,28 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         #endregion
+
+        internal void ResumeFromLaunch()
+        {
+            mProcessStartInfo.RedirectStandardError = true;
+            mProcessStartInfo.RedirectStandardOutput = true;
+            mProcess = Process.Start(mProcessStartInfo);
+            mProcess.EnableRaisingEvents = true;
+            mProcess.Exited += new EventHandler(mProcess_Exited);
+            if (mProcess.HasExited)
+            {
+                Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
+                Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+            }
+        }
+
+        void mProcess_Exited(object sender, EventArgs e)
+        {
+            Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
+            Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+            AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
+            mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
+            mCallback.OnProcessExit((uint)mProcess.ExitCode);
+        }
     }
 }
