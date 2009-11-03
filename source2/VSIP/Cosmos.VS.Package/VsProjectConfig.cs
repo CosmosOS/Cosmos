@@ -9,6 +9,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Cosmos.Debug.VSDebugEngine;
 
 namespace Cosmos.VS.Package {
 
@@ -38,7 +39,7 @@ namespace Cosmos.VS.Package {
         // Managed debugger
         //xInfo.clsidCustom = VSConstants.CLSID_ComPlusOnlyDebugEngine;
         // Our debugger - a work in progress
-        xInfo.clsidCustom = new Guid(Cosmos.Debug.Common.Consts.EngineGUID);
+        xInfo.clsidCustom = typeof(AD7Engine).GUID;
         // Sample Debug Engine
         //xInfo.clsidCustom = new Guid("{D951924A-4999-42a0-9217-1EB5233D1D5A}"); 
 

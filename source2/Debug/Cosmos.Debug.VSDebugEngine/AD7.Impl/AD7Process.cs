@@ -21,10 +21,22 @@ namespace Cosmos.Debug.VSDebugEngine
         internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Thread aThread, AD7Engine aEngine)
         {
             mISO = aISOFile;
-            mProcessStartInfo = new ProcessStartInfo(@"e:\Cosmos\Build\Tools\qemu\qemu.exe");
-            mProcessStartInfo.Arguments = @"-L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/') + "\" -boot d";
+            
+            mProcessStartInfo = new ProcessStartInfo(typeof(Cosmos.Debug.HostProcess.Program).Assembly.Location);
+            mProcessStartInfo.Arguments = @"d:\data\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L d:/data/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d";
             mProcessStartInfo.CreateNoWindow = true;
             mProcessStartInfo.UseShellExecute = false;
+            mProcessStartInfo.RedirectStandardInput = true;
+            mProcessStartInfo.RedirectStandardError = true;
+            mProcessStartInfo.RedirectStandardOutput = true;
+            mProcess = Process.Start(mProcessStartInfo);
+            mProcess.EnableRaisingEvents = true;
+            mProcess.Exited += new EventHandler(mProcess_Exited);
+            if (mProcess.HasExited)
+            {
+                Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
+                Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+            }
             mCallback = aCallback;
             mEngine = aEngine;
             mThread = aThread;
@@ -80,9 +92,8 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
-            pProcessId[0].dwProcessId = (uint)mISO.Length;
-            pProcessId[0].guidProcessId = mID;
-            pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+            pProcessId[0].dwProcessId = (uint)mProcess.Id;
+            pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
             return VSConstants.S_OK;
         }
 
@@ -118,25 +129,16 @@ namespace Cosmos.Debug.VSDebugEngine
 
         internal void ResumeFromLaunch()
         {
-            mProcessStartInfo.RedirectStandardError = true;
-            mProcessStartInfo.RedirectStandardOutput = true;
-            mProcess = Process.Start(mProcessStartInfo);
-            mProcess.EnableRaisingEvents = true;
-            mProcess.Exited += new EventHandler(mProcess_Exited);
-            if (mProcess.HasExited)
-            {
-                Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
-                Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-            }
+            mProcess.StandardInput.WriteLine("");
         }
 
         void mProcess_Exited(object sender, EventArgs e)
         {
             Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
             Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-            AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
-            mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
-            mCallback.OnProcessExit((uint)mProcess.ExitCode);
+            //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
+            //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
+            //mCallback.OnProcessExit((uint)mProcess.ExitCode);
         }
     }
 }

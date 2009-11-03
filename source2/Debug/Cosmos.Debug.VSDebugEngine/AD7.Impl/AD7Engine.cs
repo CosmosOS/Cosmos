@@ -348,30 +348,16 @@ namespace Cosmos.Debug.VSDebugEngine {
               //   var  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
               //}));
 
-              var xTarget = new Cosmos.Build.Launch.Target.QEMU();
+              //var xTarget = new Cosmos.Build.Launch.Target.QEMU();
+                
 
               mThread = new AD7Thread(this);
               var xProcess = new AD7Process(aExe, m_engineCallback, mThread, this);
               aProcess = xProcess;
               m_ad7ProgramId = xProcess.mID;
-              //var xProcessID = new AD_PROCESS_ID();
-              //xProcessID.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-              //adProcessId.dwProcessId = (uint)m_debuggedProcess.Id;
               AD7EngineCreateEvent.Send(this);
-              //AD7ProgramCreateEvent.Send(this);
               AD7ThreadCreateEvent.Send(this, mThread);
-              //mModule = new AD7Module();
-              //AD7ModuleLoadEvent.Send(this, mModule, true);
               mISO = aExe;
-              //var xPortNotify =  (IDebugPortNotify2) aPort;
-              //if (xPortNotify != null) { 
-              //    mProgNode = new AD7ProgramNode(3);
-              //    xPortNotify.AddProgramNode(mProgNode);
-              //}
-              //Callback.OnLoadComplete(mThread);
-
-              //EngineUtils.RequireOk(aPort.GetProcess(xProcessID, out aProcess));
-
               return VSConstants.S_OK;
             }
             catch (Exception e) {

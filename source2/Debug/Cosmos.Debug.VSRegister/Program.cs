@@ -33,7 +33,7 @@ namespace Cosmos.Debugger.VSRegister {
         RegistryKey xKey;
 
         xKey = xVSKey.CreateSubKey(@"AD7Metrics\Engine");
-        xKey = xKey.CreateSubKey(Cosmos.Debug.Common.Consts.EngineGUID);
+        xKey = xKey.CreateSubKey(GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7Engine)));
         xKey.SetValue("CLSID", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7Engine)));
         xKey.SetValue("ProgramProvider", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7ProgramProvider)));
         xKey.SetValue("Attach", 1);
@@ -43,7 +43,7 @@ namespace Cosmos.Debugger.VSRegister {
         xKey.SetValue("Name", "Cosmos Debug Engine");
         // Default VS Port Supplier. I think we bypass this anyways? Or it reads from DebugEngine?
         // I think the former
-        xKey.SetValue("PortSupplier", typeof(AD7PortSupplier).GUID.ToString("b"));
+        xKey.SetValue("PortSupplier", "{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
 
         xKey = xKey.CreateSubKey("IncompatibleList");
         xKey.SetValue("guidCOMPlusNativeEng", "{92EF0900-2251-11D2-B72E-0000F87572EF}");
@@ -51,21 +51,16 @@ namespace Cosmos.Debugger.VSRegister {
         xKey.SetValue("guidNativeOnlyEng", "{449EC4CC-30D2-4032-9256-EE18EB41B62B}");
         xKey.SetValue("guidScriptEng", "{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}");
 
-          xKey = xVSKey.CreateSubKey(@"AD7Metrics\Engine");
-        xKey = xKey.CreateSubKey(GuidStr(typeof(AD7PortSupplier)));
-        xKey.SetValue("CLSID", GuidStr(typeof(AD7PortSupplier)));
-        xKey.SetValue("Name", "Cosmos Debug Engine");
-
         RegisterCLSID(xVSKey, "Cosmos.Debug.VSDebugEngine", typeof(Cosmos.Debug.VSDebugEngine.AD7Engine));
         RegisterCLSID(xVSKey, "Cosmos.Debug.VSDebugEngine", typeof(Cosmos.Debug.VSDebugEngine.AD7ProgramProvider));
-        RegisterCLSID(xVSKey, "Cosmos.Debug.VSDebugEngine", typeof(Cosmos.Debug.VSDebugEngine.AD7PortSupplier));
       }
 
       // Note: On x64 some registry paths are different. This routine does not
       // currently handle them.
       static public void Register() {
           RegisterRoot(Registry.LocalMachine, "9.0");
-          RegisterRoot(Registry.CurrentUser, @"9.0exp\Configuration");
+          //RegisterRoot(Registry.CurrentUser, @"9.0Exp\Configuration");
+          RegisterRoot(Registry.CurrentUser, @"9.0Exp\Configuration");
       }
     }
 }
