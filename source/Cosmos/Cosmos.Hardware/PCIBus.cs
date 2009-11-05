@@ -6484,7 +6484,7 @@ namespace Cosmos.Hardware {
                     dev.Function == function)
                     return dev;
             }
-
+            
             return null;
         }
 
