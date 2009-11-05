@@ -350,7 +350,6 @@
     <Compile Include="X86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="X86\SSEAndMMX2\DivPS.cs" />
     <Compile Include="X86\SSEAndMMX2\DivSS.cs" />
-    <Compile Include="X86\SSEAndMMX2\FloatLoad.cs" />
     <Compile Include="X86\SSEAndMMX2\FXSave.cs" />
     <Compile Include="X86\SSEAndMMX2\FXStore.cs" />
     <Compile Include="X86\SSEAndMMX2\MoveSS.cs" />
