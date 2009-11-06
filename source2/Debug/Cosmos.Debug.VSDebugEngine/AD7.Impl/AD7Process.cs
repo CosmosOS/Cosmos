@@ -23,7 +23,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mISO = aISOFile;
             
             mProcessStartInfo = new ProcessStartInfo(typeof(Cosmos.Debug.HostProcess.Program).Assembly.Location);
-            mProcessStartInfo.Arguments = @"d:\data\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L d:/data/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d";
+            mProcessStartInfo.Arguments = @"e:\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d";
             mProcessStartInfo.CreateNoWindow = true;
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;

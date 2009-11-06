@@ -7,6 +7,7 @@ using Cosmos.Build.Common;
 using Cosmos.Compiler.Builder;
 using Cosmos.IL2CPU;
 using System.IO;
+using System.Reflection;
 
 namespace Cosmos.Build.MSBuild {
 
@@ -17,6 +18,7 @@ namespace Cosmos.Build.MSBuild {
 
 		public override bool Execute()
 		{
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
             buildFailed = false;
 
             Log.LogMessage(MessageImportance.High, "Building Cosmos System Image");
@@ -83,6 +85,30 @@ namespace Cosmos.Build.MSBuild {
             //return true;
 		}
 
+        System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            foreach (var xAssembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (xAssembly.FullName == args.Name)
+                {
+                    return xAssembly;
+                }
+            }
+            var xAsmName = args.Name;
+            if (xAsmName.Contains(","))
+            {
+                xAsmName = xAsmName.Substring(0, xAsmName.IndexOf(','));
+            }
+            var xBasePath = Path.Combine(CosmosDir, "Build\\Tools\\Cosmos.Hardware");
+            if(File.Exists(Path.Combine(xBasePath, xAsmName + ".dll"))){
+                return Assembly.LoadFile(Path.Combine(xBasePath, xAsmName + ".dll"));
+            }
+            if(File.Exists(Path.Combine(xBasePath, xAsmName + ".exe"))){
+                return Assembly.LoadFile(Path.Combine(xBasePath, xAsmName + ".exe"));
+            }
+            return null;
+        }
+
 		[Required]
 		public string KernelAssembly
 		{ get; set; }
@@ -99,6 +125,13 @@ namespace Cosmos.Build.MSBuild {
 
 		public string Framework
 		{ get; set; }
+
+        [Required]
+        public string CosmosDir
+        {
+            get;
+            set;
+        }
 
 	}
 		

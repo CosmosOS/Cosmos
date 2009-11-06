@@ -79,7 +79,7 @@ namespace Cosmos.IL2CPU
 
         public DataMember( string aName, params ushort[] aDefaultValue )
         {
-            Name = aName;
+           Name = aName;
             RawDefaultValue = new byte[ aDefaultValue.Length * 2 ];
             for( int i = 0; i < aDefaultValue.Length; i++ )
             {
@@ -91,7 +91,7 @@ namespace Cosmos.IL2CPU
 
         public DataMember( string aName, params uint[] aDefaultValue )
         {
-            Name = aName;
+Name = aName;
             //RawDefaultValue = new byte[aDefaultValue.Length * 4];
             //for (int i = 0; i < aDefaultValue.Length; i++) {
             //    Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,

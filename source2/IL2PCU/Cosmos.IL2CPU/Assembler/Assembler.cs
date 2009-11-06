@@ -1,5 +1,5 @@
 ﻿// please leave the next directive (and related code) in, just disable the directive
-//#define VMT_DEBUG
+#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Linq;

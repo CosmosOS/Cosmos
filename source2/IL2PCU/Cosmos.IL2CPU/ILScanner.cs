@@ -106,6 +106,7 @@ namespace Cosmos.IL2CPU {
 
     protected void Queue(object aItem, object aSrc, string aSrcType) {
       var xMemInfo = aItem as MemberInfo;
+        // todo: fix this, as each label/symbol should also contain an assembly specifier.
       if (xMemInfo != null
         && xMemInfo.DeclaringType != null
         && xMemInfo.DeclaringType.FullName == "System.ThrowHelper"
@@ -336,10 +337,25 @@ namespace Cosmos.IL2CPU {
         }
       }
 
+      // do dup check
+      foreach (var xItem in xTypes)
+      {
+          var xType = xItem as Type;
+          if (xType != null)
+          {
+              if (xType.FullName == "Cosmos.Kernel.Heap")
+              {
+                  Console.WriteLine("{0} - {1}", xType.FullName, xType.GetHashCode());
+              }
+          }
+      }
+
       mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, x => GetMethodUID(x, false));
       mAsmblr.EmitEntrypoint(aStartMethod, (from item in mItems
                                             where item is MethodBase
                                             select (MethodBase)item));
+
+        
 //      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
     }
 
