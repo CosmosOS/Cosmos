@@ -105,7 +105,7 @@ namespace Cosmos.Debug.VSDebugEngine
             //Send(eventObject, AD7ThreadDestroyEvent.IID, ad7Thread);
         }
 
-        public void OnThreadStart()//DebuggedThread debuggedThread)
+        public void OnThreadStart(AD7Thread debuggedThread)
         {
             // This will get called when the entrypoint breakpoint is fired because the engine sends a thread start event
             // for the main thread of the application.
@@ -114,15 +114,19 @@ namespace Cosmos.Debug.VSDebugEngine
             //    System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
             //}
 
-            //AD7Thread ad7Thread = new AD7Thread(m_engine, debuggedThread);
-            //debuggedThread.Client = ad7Thread;
-            
-            //AD7ThreadCreateEvent eventObject = new AD7ThreadCreateEvent();
-            //Send(eventObject, AD7ThreadCreateEvent.IID, ad7Thread);
+            AD7ThreadCreateEvent eventObject = new AD7ThreadCreateEvent();
+            Send(eventObject, AD7ThreadCreateEvent.IID, debuggedThread);
+        }
+
+        public void OnBreak(AD7Thread aThread)
+        {
+            var mBreak = new AD7BreakEvent();
+            Send(mBreak, AD7BreakEvent.IID, aThread);
         }
 
         public void OnBreakpoint()//DebuggedThread thread, ReadOnlyCollection<object> clients, uint address)
         {
+            //AD7brea
             //IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
 
             //int i = 0;
@@ -206,5 +210,10 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         #endregion
+    }
+
+    internal class AD7BreakEvent : AD7StoppingEvent, IDebugBreakEvent2
+    {
+        public const string IID = "C7405D1D-E24B-44E0-B707-D8A5A4E1641B";
     }
 }
