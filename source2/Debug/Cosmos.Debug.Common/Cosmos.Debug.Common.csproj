@@ -55,10 +55,15 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="corapi, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ebb8d478f63174c0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\source\libraries\MDbg\corapi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -69,8 +74,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CDebugger\DebugConnector.cs" />
+    <Compile Include="CDebugger\DebugConnectorPipeClient.cs" />
+    <Compile Include="CDebugger\DebugConnectorPipeServer.cs" />
+    <Compile Include="CDebugger\DebugConnectorSerial.cs" />
+    <Compile Include="CDebugger\DebugConnectorStream.cs" />
+    <Compile Include="CDebugger\DebugConnectorTCPClient.cs" />
+    <Compile Include="CDebugger\DebugConnectorTCPServer.cs" />
+    <Compile Include="CDebugger\DebugEngine.cs" />
+    <Compile Include="CDebugger\DebugSymbol.cs" />
+    <Compile Include="CDebugger\Global.cs" />
+    <Compile Include="CDebugger\KeyState.cs" />
+    <Compile Include="CDebugger\ObjDump.cs" />
+    <Compile Include="CDebugger\SourceInfo.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+      <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
+      <Name>Cosmos.Compiler.Debug</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

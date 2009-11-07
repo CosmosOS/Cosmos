@@ -13,10 +13,12 @@ namespace Cosmos.Debug.VSDebugEngine
         readonly AD7Engine m_engine;
         //readonly DebuggedThread m_debuggedThread;
         const string ThreadNameString = "Sample Engine Thread";
+        private AD7Process mProcess;
 
-        public AD7Thread(AD7Engine engine)//, DebuggedThread debuggedThread)
+        public AD7Thread(AD7Engine engine, AD7Process aProcess)//, DebuggedThread debuggedThread)
         {
             m_engine = engine;
+            aProcess = mProcess;
             //m_debuggedThread = debuggedThread;
         }      
         

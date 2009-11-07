@@ -51,6 +51,7 @@ namespace Cosmos.Build.MSBuild {
             var builder = new Builder();
             var xOptions = BuildOptions.Load();
             xOptions.Target = "ISO";
+            xOptions.DebugMode = DebugMode.Source;
             //builder.UseInternalAssembler = this.UseInternalAssembler;
             builder.BuildCompleted += delegate { builtEvent.Set(); };
             builder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage)

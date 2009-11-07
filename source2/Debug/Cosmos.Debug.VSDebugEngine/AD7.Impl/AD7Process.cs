@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using System.Diagnostics;
+using Cosmos.Debug.Common.CDebugger;
 
 
 namespace Cosmos.Debug.VSDebugEngine
@@ -18,17 +19,24 @@ namespace Cosmos.Debug.VSDebugEngine
         private EngineCallback mCallback;
         private AD7Thread mThread;
         private AD7Engine mEngine;
-        internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Thread aThread, AD7Engine aEngine)
+        private DebugEngine mDebugEngine;
+
+        internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine)
         {
             mISO = aISOFile;
             
             mProcessStartInfo = new ProcessStartInfo(typeof(Cosmos.Debug.HostProcess.Program).Assembly.Location);
-            mProcessStartInfo.Arguments = @"e:\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d";
+            mProcessStartInfo.Arguments = @"e:\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d -serial tcp:127.0.0.1:4444";
             mProcessStartInfo.CreateNoWindow = true;
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
+            mDebugEngine = new DebugEngine();
+            mDebugEngine.DebugConnector = new DebugConnectorTCPServer();
+            mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
+            mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
+            System.Threading.Thread.Sleep(250);
             mProcess = Process.Start(mProcessStartInfo);
             mProcess.EnableRaisingEvents = true;
             mProcess.Exited += new EventHandler(mProcess_Exited);
@@ -39,7 +47,39 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             mCallback = aCallback;
             mEngine = aEngine;
-            mThread = aThread;
+            mThread = new AD7Thread(aEngine, this);
+            mCallback.OnThreadStart(mThread);
+        }
+
+        void mDebugEngine_TextReceived(string obj)
+        {
+            mCallback.OnOutputString(obj);
+        }
+
+        internal AD7Thread Thread
+        {
+            get
+            {
+                return mThread;
+            }
+        }
+
+        void mDebugEngine_TraceReceived(Cosmos.Compiler.Debug.MsgType arg1, uint arg2)
+        {
+            switch (arg1)
+            {
+                case Cosmos.Compiler.Debug.MsgType.BreakPoint:
+                    {
+                        //((IDebugBreakEvent2)null).
+
+                        //mEngine.Callback.OnAsyncBreakComplete();
+                        mEngine.Callback.OnBreak(mThread);
+                        break;
+                    }
+                default:
+                    Console.WriteLine("TraceReceived: {0}", arg1);
+                    break;
+            }
         }
 
 
@@ -70,9 +110,12 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new NotImplementedException();
         }
 
+
         public int EnumThreads(out IEnumDebugThreads2 ppEnum)
         {
-            throw new NotImplementedException();
+            var xEnum = new AD7ThreadEnum(new IDebugThread2[] { mThread });
+            ppEnum = xEnum;
+            return VSConstants.S_OK;
         }
 
         public int GetAttachedSessionName(out string pbstrSessionName)

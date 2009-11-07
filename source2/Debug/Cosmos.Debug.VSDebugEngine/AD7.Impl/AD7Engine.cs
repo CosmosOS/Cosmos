@@ -351,12 +351,11 @@ namespace Cosmos.Debug.VSDebugEngine {
               //var xTarget = new Cosmos.Build.Launch.Target.QEMU();
                 
 
-              mThread = new AD7Thread(this);
-              var xProcess = new AD7Process(aExe, m_engineCallback, mThread, this);
+              var xProcess = new AD7Process(aExe, m_engineCallback, this);
               aProcess = xProcess;
               m_ad7ProgramId = xProcess.mID;
               AD7EngineCreateEvent.Send(this);
-              AD7ThreadCreateEvent.Send(this, mThread);
+              AD7ThreadCreateEvent.Send(this,xProcess.Thread);
               mISO = aExe;
               return VSConstants.S_OK;
             }

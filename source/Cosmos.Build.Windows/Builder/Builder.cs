@@ -1,5 +1,5 @@
 ﻿// leave the use of the following directive in: it eases a LOT during development, as it lets you use gdb for debugging
-#define OUTPUT_ELF
+//#define OUTPUT_ELF
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -424,11 +424,17 @@ namespace Cosmos.Compiler.Builder
                         xDebugConnector = new DebugConnectorSerial(options.DebugPortId);
                         break;
 
+                    case "ISO":
+                        new MakeISOStep(options).Execute();
+                        break;
                     default:
                         throw new Exception("Debug mode not supported: " + options.DebugMode.ToString());
 
                 }
-
+                if (xDebugConnector == null)
+                {
+                    return;
+                }
                 //TODO handle passing to UI better
                 xDebugWindow = new DebugWindowController();
                 xDebugWindow.mSourceMappings = xSourceMappings; 
