@@ -16,7 +16,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7Engine m_engine;
         private BreakpointManager m_bpManager;
 
-        private System.Collections.Generic.List<AD7BoundBreakpoint> m_boundBreakpoints;
+        internal System.Collections.Generic.List<AD7BoundBreakpoint> m_boundBreakpoints;
 
         private bool m_enabled;
         private bool m_deleted;       

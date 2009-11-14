@@ -15,10 +15,10 @@ namespace Cosmos.Build.MSBuild {
     {
 
 		private Boolean buildFailed;
+        private static string mBasePath;
 
 		public override bool Execute()
 		{
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
             buildFailed = false;
 
             Log.LogMessage(MessageImportance.High, "Building Cosmos System Image");
@@ -33,7 +33,9 @@ namespace Cosmos.Build.MSBuild {
             { buildOutputPath = (new System.IO.DirectoryInfo(this.OutputPath)).FullName; }
             else
             { buildOutputPath = this.OutputPath; }
-
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            mBasePath = buildOutputPath;
+            
             buildKernelAssemblyPath = System.IO.Path.Combine(buildOutputPath, this.KernelAssembly);
             buildUseInternalAssembler = this.UseInternalAssembler;
             buildFramework = EnumValue.Parse(this.Framework, Cosmos.Build.Common.Framework.MicrosoftNET);
@@ -107,6 +109,16 @@ namespace Cosmos.Build.MSBuild {
             if(File.Exists(Path.Combine(xBasePath, xAsmName + ".exe"))){
                 return Assembly.LoadFile(Path.Combine(xBasePath, xAsmName + ".exe"));
             }
+            xBasePath = mBasePath;
+            if (File.Exists(Path.Combine(xBasePath, xAsmName + ".dll")))
+            {
+                return Assembly.LoadFile(Path.Combine(xBasePath, xAsmName + ".dll"));
+            }
+            if (File.Exists(Path.Combine(xBasePath, xAsmName + ".exe")))
+            {
+                return Assembly.LoadFile(Path.Combine(xBasePath, xAsmName + ".exe"));
+            }
+
             return null;
         }
 

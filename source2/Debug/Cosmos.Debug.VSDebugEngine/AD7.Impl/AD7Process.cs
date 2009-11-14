@@ -6,13 +6,15 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using System.Diagnostics;
 using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Compiler.Builder;
+using System.Collections.ObjectModel;
 
 
 namespace Cosmos.Debug.VSDebugEngine
 {
     public class AD7Process: IDebugProcess2
     {
-        private string mISO;
+        internal string mISO;
         internal Guid mID = Guid.NewGuid();
         private Process mProcess;
         private ProcessStartInfo mProcessStartInfo;
@@ -20,6 +22,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7Thread mThread;
         private AD7Engine mEngine;
         private DebugEngine mDebugEngine;
+        internal Cosmos.Debug.Common.CDebugger.SourceInfos mSourceMappings;
 
         internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine)
         {
@@ -32,8 +35,12 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcessStartInfo.RedirectStandardInput = true;
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
+            var xOptions = BuildOptions.Load();
+            var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ParseFile(xOptions.BuildPath);
+            var mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping
+               , xOptions.BuildPath + "Tools/asm/debug.cxdb");
             mDebugEngine = new DebugEngine();
-            mDebugEngine.DebugConnector = new DebugConnectorTCPServer();
+            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
             System.Threading.Thread.Sleep(250);
@@ -72,8 +79,18 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         //((IDebugBreakEvent2)null).
 
-                        //mEngine.Callback.OnAsyncBreakComplete();
-                        mEngine.Callback.OnBreak(mThread);
+                        //var xSourceInfo = mSourceMappings[arg2];
+                        
+                        //mCallback.OnOutputString("Try to break now");
+                        var xActionPoints = new List<object>();
+                        //foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)
+                        //{
+                        //    xBP.
+                        //}
+                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<object>(new List<object>()), arg2);
+                        //mEngine.Callback.OnBreakComplete(mThread, );
+                        mEngine.AfterBreak = true;
+                        //mEngine.Callback.OnBreak(mThread);
                         break;
                     }
                 default:
@@ -173,7 +190,8 @@ namespace Cosmos.Debug.VSDebugEngine
         internal void ResumeFromLaunch()
         {
             mProcess.StandardInput.WriteLine("");
-        }
+            //AD7EntrypointEvent.Send(mEngine);
+         }
 
         void mProcess_Exited(object sender, EventArgs e)
         {

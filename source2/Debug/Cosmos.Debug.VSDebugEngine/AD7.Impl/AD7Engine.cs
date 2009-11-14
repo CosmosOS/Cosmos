@@ -35,7 +35,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
         // api requires thread affinity to several operations.
         // This object manages breakpoints in the sample engine.
-        BreakpointManager m_breakpointManager;
+        internal BreakpointManager m_breakpointManager;
 
         // A unique identifier for the program being debugged.
         Guid m_ad7ProgramId;
@@ -356,6 +356,45 @@ namespace Cosmos.Debug.VSDebugEngine {
               m_ad7ProgramId = xProcess.mID;
               AD7EngineCreateEvent.Send(this);
               AD7ThreadCreateEvent.Send(this,xProcess.Thread);
+              mModule = new AD7Module();
+              
+
+            //           DebuggedModule^ module = m_moduleList->First->Value;		
+
+            //CComBSTR bstrModuleName;
+            //CComBSTR bstrSymbolPath;
+            //bstrModuleName.Attach((BSTR)(System::Runtime::InteropServices::Marshal::StringToBSTR(module->Name).ToInt32()));
+
+            //// Load symbols for the application's exe. This is the only symbol file the sample engine will load.
+            //if (m_pSymbolEngine->LoadSymbolsForModule(bstrModuleName, &bstrSymbolPath))
+            //{
+            //    module->SymbolsLoaded = true;
+            //    module->SymbolPath = gcnew String(bstrSymbolPath);
+            //}	
+
+            //m_entrypointModule = module;
+            //DebuggedThread^ thread = CreateThread(m_lastDebugEvent.dwThreadId, m_lastDebugEvent.u.CreateProcessInfo.hThread, (DWORD_PTR)m_lastDebugEvent.u.CreateProcessInfo.lpStartAddress);
+
+            //if (m_debugMethod == Launch)
+            //{
+            //    // Because of Com-re-entrancy, the engine must wait to send the fake mod-load and thread create events until after the
+            //    // launch is complete. Save these references so the call to ResumeFromLaunch can send the events.
+            //    m_entrypointModule = module;
+            //    m_entrypointThread = thread;
+
+            //    // Do not continue the create process event until after the call to ResumeFromLaunch.
+            //    fContinue = false;
+            //}
+            //else
+            //{
+            //    // This is an attach.
+            //    // Fake up a thread create event for the entrypoint module and the first thread in the process for attach
+                //m_callback->OnModuleLoad(module);
+
+                //m_callback->OnSymbolSearch(module, module->SymbolPath, module->SymbolsLoaded);
+            //    m_callback->OnThreadStart(thread);
+            //}
+
               mISO = aExe;
               return VSConstants.S_OK;
             }
@@ -381,11 +420,6 @@ namespace Cosmos.Debug.VSDebugEngine {
             {
                 int processId = EngineUtils.GetProcessId(process);
 
-                //if (processId != m_debuggedProcess.Id)
-                {
-                    //return VSConstants.S_FALSE;
-                }
-
                 // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
                 // which will complete the hookup with AD7
                 var xProcess = process as AD7Process;
@@ -395,7 +429,10 @@ namespace Cosmos.Debug.VSDebugEngine {
                     return VSConstants.E_INVALIDARG;
                 }
                 xProcess.ResumeFromLaunch();
-                
+                Callback.OnModuleLoad(mModule);
+                Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 0);
+                Callback.OnThreadStart(mThread);
+                AD7EntrypointEvent.Send(this);
                 
                 // Resume the threads in the debuggee process
                 //m_pollThread.RunOperation(new Operation(delegate
@@ -490,8 +527,15 @@ namespace Cosmos.Debug.VSDebugEngine {
             //    //m_debuggedProcess.Continue(thread.GetDebuggedThread());
             //}));
 
+            if (AfterBreak)
+            {
+                Console.Write("");
+                //Callback.OnBreak(thread);
+            }
             return VSConstants.S_OK;
         }
+
+        public bool AfterBreak = false;
 
         // Detach is called when debugging is stopped and the process was attached to (as opposed to launched)
         // or when one of the Detach commands are executed in the UI.
@@ -534,15 +578,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
-            //DebuggedModule[] modules = m_debuggedProcess.GetModules();
-
-            //AD7Module[] moduleObjects = new AD7Module[modules.Length];
-            //for (int i = 0; i < modules.Length; i++)
-            //{
-            //    moduleObjects[i] = new AD7Module(modules[i]);
-            //}
-
-            ppEnum = null;// new Cosmos.Debugger.VSDebugEngine.AD7ModuleEnum(moduleObjects);
+            ppEnum = new AD7ModuleEnum(new [] {  mModule});
 
             return VSConstants.S_OK;
         }
@@ -562,7 +598,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             //    threadObjects[i] = (AD7Thread)threads[i].Client;
             //}
 
-            ppEnum = null; // new Cosmos.Debugger.VSDebugEngine.AD7ThreadEnum(threadObjects);
+            ppEnum = new AD7ThreadEnum(new []{mThread});
             
             return VSConstants.S_OK;
         }

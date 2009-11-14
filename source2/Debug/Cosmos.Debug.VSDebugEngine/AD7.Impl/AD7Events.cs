@@ -329,4 +329,14 @@ namespace Cosmos.Debug.VSDebugEngine
 
         #endregion
     }
+
+    sealed class AD7EntrypointEvent : AD7StoppingEvent, IDebugEntryPointEvent2
+    {
+        public const string IID = "E8414A3E-1642-48EC-829E-5F4040E16DA9";
+
+        public static void Send(AD7Engine aEngine)
+        {
+            aEngine.Callback.Send(new AD7EntrypointEvent(), IID, null);
+        }
+    }
 }

@@ -43,7 +43,7 @@ namespace Cosmos.Debug.VSDebugEngine
             // The sample engine doesn't take advantage of this.
         }
 
-        public void OnModuleLoad()//DebuggedModule debuggedModule)
+        public void OnModuleLoad(AD7Module aModule)
         {
             // This will get called when the entrypoint breakpoint is fired because the engine sends a mod-load event
             // for the exe.
@@ -52,15 +52,9 @@ namespace Cosmos.Debug.VSDebugEngine
             //    System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
             //}
 
-            //AD7Module ad7Module = new AD7Module(debuggedModule);
-            //AD7ModuleLoadEvent eventObject = new AD7ModuleLoadEvent(ad7Module, true /* this is a module load */);
+            AD7ModuleLoadEvent eventObject = new AD7ModuleLoadEvent(aModule, true /* this is a module load */);
 
-            //debuggedModule.Client = ad7Module;
-
-            //// The sample engine does not support binding breakpoints as modules load since the primary exe is the only module
-            //// symbols are loaded for. A production debugger will need to bind breakpoints when a new module is loaded.
-
-            //Send(eventObject, AD7ModuleLoadEvent.IID, null);
+            Send(eventObject, AD7ModuleLoadEvent.IID, null);
         }
 
         public void OnModuleUnload()//DebuggedModule debuggedModule)
@@ -124,28 +118,28 @@ namespace Cosmos.Debug.VSDebugEngine
             Send(mBreak, AD7BreakEvent.IID, aThread);
         }
 
-        public void OnBreakpoint()//DebuggedThread thread, ReadOnlyCollection<object> clients, uint address)
+        public void OnBreakpoint(AD7Thread thread, ReadOnlyCollection<object> clients, uint address)
         {
             //AD7brea
-            //IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
+            IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
 
-            //int i = 0;
-            //foreach (object objCurrentBreakpoint in clients)
-            //{
-            //    boundBreakpoints[i] = (IDebugBoundBreakpoint2)objCurrentBreakpoint;
-            //    i++;
-            //}
+            int i = 0;
+            foreach (object objCurrentBreakpoint in clients)
+            {
+                boundBreakpoints[i] = (IDebugBoundBreakpoint2)objCurrentBreakpoint;
+                i++;
+            }
 
-            //// An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
-            //// should notify each bound breakpoint that it has been hit and evaluate conditions here.
-            //// The sample engine does not support these features.
+            // An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
+            // should notify each bound breakpoint that it has been hit and evaluate conditions here.
+            // The sample engine does not support these features.
 
-            //AD7BoundBreakpointsEnum boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
+            AD7BoundBreakpointsEnum boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
+            
+            AD7BreakpointEvent eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
 
-            //AD7BreakpointEvent eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
-
-            //AD7Thread ad7Thread = (AD7Thread)thread.Client;
-            //Send(eventObject, AD7BreakpointEvent.IID, ad7Thread);
+            AD7Thread ad7Thread = (AD7Thread)thread;
+            Send(eventObject, AD7BreakpointEvent.IID, ad7Thread);
         }
 
         public void OnException()//DebuggedThread thread, uint code)
@@ -161,12 +155,14 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public void OnAsyncBreakComplete()//DebuggedThread thread)
+        public void OnAsyncBreakComplete(AD7Thread aThread)
         {
             // This will get called when the engine receives the breakpoint event that is created when the user
             // hits the pause button in vs.
             //System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
 
+            var xEvent = new AD7AsyncBreakCompleteEvent();
+            Send(xEvent, AD7AsyncBreakCompleteEvent.IID, aThread);
             //AD7Thread ad7Thread = (AD7Thread)thread.Client;
             //AD7AsyncBreakCompleteEvent eventObject = new AD7AsyncBreakCompleteEvent();
             //Send(eventObject, AD7AsyncBreakCompleteEvent.IID, ad7Thread);
@@ -189,13 +185,12 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Engines notify the debugger about the results of a symbol serach by sending an instance
         // of IDebugSymbolSearchEvent2
-        public void OnSymbolSearch()//DebuggedModule module, string status, uint dwStatusFlags)
+        public void OnSymbolSearch(AD7Module module, string status, uint dwStatusFlags)
         {
-            //string statusString = (dwStatusFlags == 1 ? "Symbols Loaded - " : "No symbols loaded") + status;
+            string statusString = (dwStatusFlags == 1 ? "Symbols Loaded - " : "No symbols loaded") + status;
 
-            //AD7Module ad7Module = new AD7Module(module);
-            //AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(ad7Module, statusString, dwStatusFlags);
-            //Send(eventObject, AD7SymbolSearchEvent.IID, null);
+            AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(module, statusString, dwStatusFlags);
+            Send(eventObject, AD7SymbolSearchEvent.IID, null);
         }
 
         // Engines notify the debugger that a breakpoint has bound through the breakpoint bound event.

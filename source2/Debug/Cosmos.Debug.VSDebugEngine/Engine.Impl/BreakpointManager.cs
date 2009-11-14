@@ -7,7 +7,7 @@ namespace Cosmos.Debug.VSDebugEngine
     class BreakpointManager
     {
         private AD7Engine m_engine;
-        private System.Collections.Generic.List<AD7PendingBreakpoint> m_pendingBreakpoints;
+        internal System.Collections.Generic.List<AD7PendingBreakpoint> m_pendingBreakpoints;
 
         public BreakpointManager(AD7Engine engine)
         {
