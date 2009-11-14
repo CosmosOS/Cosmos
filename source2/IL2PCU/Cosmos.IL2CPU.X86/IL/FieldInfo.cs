@@ -11,7 +11,25 @@ namespace Cosmos.IL2CPU.X86.IL {
     /// <summary>
     /// Does NOT include any kind of method header!
     /// </summary>
-    public uint Offset;
+    private uint mOffset;
+    public bool IsOffsetSet = false;
+    public uint Offset
+    {
+        get
+        {
+            if (!IsOffsetSet)
+            {
+                throw new Exception("Offset is being used, but hasnt been set yet!");
+            }
+            return mOffset;
+        }
+        set
+        {
+            IsOffsetSet = true;
+            mOffset = value;
+        }
+    }
+
     public readonly Type DeclaringType;
     public Type FieldType;
     public uint Size;

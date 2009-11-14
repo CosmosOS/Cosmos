@@ -9,6 +9,7 @@ using Cosmos.IL2CPU.X86.IL;
 using Cosmos.IL2CPU.IL;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.Plugs;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.IL2CPU.X86 {
   public abstract class ILOp: Cosmos.IL2CPU.ILOp {
@@ -76,6 +77,11 @@ namespace Cosmos.IL2CPU.X86 {
 
         var xId = xField.GetFullName();
         var xInfo = new IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
+        var xFieldOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
+        if (xFieldOffsetAttrib != null)
+        {
+            xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
+        }
         aFields.Add(xInfo);
         xCurList.Add(xId, xInfo);
       }
@@ -112,7 +118,10 @@ namespace Cosmos.IL2CPU.X86 {
       xResult.Reverse();
       uint xOffset = 0;
       foreach (var xInfo in xResult) {
-        xInfo.Offset = xOffset;
+          if (!xInfo.IsOffsetSet)
+          {
+              xInfo.Offset = xOffset;
+          }
         xOffset += xInfo.Size;
       }
       return xResult;
