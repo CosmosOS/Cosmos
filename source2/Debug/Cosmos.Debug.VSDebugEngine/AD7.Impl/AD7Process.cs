@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DEBUG_CONNECTOR_TCP_CLIENT
+//#define DEBUG_CONNECTOR_TCP_SERVER
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +14,7 @@ using System.Collections.ObjectModel;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    public class AD7Process: IDebugProcess2
+    public class AD7Process : IDebugProcess2
     {
         internal string mISO;
         internal Guid mID = Guid.NewGuid();
@@ -27,9 +29,15 @@ namespace Cosmos.Debug.VSDebugEngine
         internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine)
         {
             mISO = aISOFile;
-            
+
             mProcessStartInfo = new ProcessStartInfo(typeof(Cosmos.Debug.HostProcess.Program).Assembly.Location);
-            mProcessStartInfo.Arguments = @"e:\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d -serial tcp:127.0.0.1:4444";
+#if DEBUG_CONNECTOR_TCP_SERVER
+            var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
+#endif
+#if DEBUG_CONNECTOR_TCP_CLIENT
+            var xDebugConnectorStr = "-serial tcp::4444,server";
+#endif
+            mProcessStartInfo.Arguments = @"e:\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d " + xDebugConnectorStr;
             mProcessStartInfo.CreateNoWindow = true;
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
@@ -40,7 +48,9 @@ namespace Cosmos.Debug.VSDebugEngine
             var mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping
                , xOptions.BuildPath + "Tools/asm/debug.cxdb");
             mDebugEngine = new DebugEngine();
+#if DEBUG_CONNECTOR_TCP_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
+#endif
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
             System.Threading.Thread.Sleep(250);
@@ -80,7 +90,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         //((IDebugBreakEvent2)null).
 
                         //var xSourceInfo = mSourceMappings[arg2];
-                        
+
                         //mCallback.OnOutputString("Try to break now");
                         var xActionPoints = new List<object>();
                         //foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)
@@ -189,9 +199,15 @@ namespace Cosmos.Debug.VSDebugEngine
 
         internal void ResumeFromLaunch()
         {
+#if DEBUG_CONNECTOR_TCP_SERVER
             mProcess.StandardInput.WriteLine("");
-            //AD7EntrypointEvent.Send(mEngine);
-         }
+#endif
+#if DEBUG_CONNECTOR_TCP_CLIENT
+            mProcess.StandardInput.WriteLine("");
+            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPClient();
+#endif
+
+        }
 
         void mProcess_Exited(object sender, EventArgs e)
         {

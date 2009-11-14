@@ -349,12 +349,12 @@ namespace Cosmos.Debug.VSDebugEngine {
               //}));
 
               //var xTarget = new Cosmos.Build.Launch.Target.QEMU();
-                
 
+
+              AD7EngineCreateEvent.Send(this);
               var xProcess = new AD7Process(aExe, m_engineCallback, this);
               aProcess = xProcess;
               m_ad7ProgramId = xProcess.mID;
-              AD7EngineCreateEvent.Send(this);
               AD7ThreadCreateEvent.Send(this,xProcess.Thread);
               mModule = new AD7Module();
               
@@ -432,7 +432,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 Callback.OnModuleLoad(mModule);
                 Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 0);
                 Callback.OnThreadStart(mThread);
-                AD7EntrypointEvent.Send(this);
+                //AD7EntrypointEvent.Send(this);
                 
                 // Resume the threads in the debuggee process
                 //m_pollThread.RunOperation(new Operation(delegate
