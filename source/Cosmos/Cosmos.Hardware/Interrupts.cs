@@ -186,7 +186,7 @@ namespace Cosmos.Hardware {
             ////Change area
             ////
             //// Triggers IL2CPU error
-          DebugUtil.LogInterruptOccurred(ref aContext);
+          //DebugUtil.LogInterruptOccurred(ref aContext);
           IRQ(1, ref aContext);
             ////mIRQ_Handlers[1](ref aContext);
             ////

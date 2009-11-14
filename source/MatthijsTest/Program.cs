@@ -15,19 +15,6 @@ using Cosmos.Kernel;
 
 namespace MatthijsTest
 {
-    public struct MyTest
-    {
-        public MyTest(int a, int b)
-        {
-            A = a;
-            B = b;
-            Sum = a + b;
-        }
-
-        public int A;
-        public int B;
-        public int Sum;
-    }
 	public class Program
 	{
 		#region Cosmos Builder logic
@@ -41,7 +28,7 @@ namespace MatthijsTest
 
         private static NetworkDevice mNet;
 
-		public static void Init(){
+		public static unsafe void Init(){
             
             var xInit = true;
             if (xInit)
@@ -51,38 +38,38 @@ namespace MatthijsTest
             }
 
             Heap.EnableDebug = false;
-
-            VGAScreen.SetMode320x200x8();
-
-            VGAScreen.SetPaletteEntry(0, 0x00, 0x00, 0x00); //Black  (Background)
-            VGAScreen.SetPaletteEntry(1, 0xFF, 0xFF, 0xFF); //White  (Walls)
-            VGAScreen.SetPaletteEntry(2, 0xFF, 0xBB, 0xBB); //Peach  (Dead Snake)
-            VGAScreen.SetPaletteEntry(3, 0x00, 0xFF, 0x00); //Green  (Player 1's Snake)
-            VGAScreen.SetPaletteEntry(4, 0x00, 0x00, 0xFF); //Blue   (Player 2's Snake)
-            VGAScreen.SetPaletteEntry(5, 0xFF, 0x00, 0x00); //Red    (Player 3's Snake)
-            VGAScreen.SetPaletteEntry(6, 0xFF, 0xFF, 0x00); //Yellow (Player 4's Snake)
-
-//            VGAScreen.Clear(1);
-
-            uint xColor = 0;
-            for (uint x = 0; x < 320; x++)
+            DebugUtil.SendNumber("Program", "DeviceCount", (uint)Device.Devices.Count, 32);
+            PCIDevice xVGADev = null;
+            for (int i = 0; i < PCIBus.Devices.Length; i++)
             {
-                if ((x % 4) == 0)
+                var xPCIDev = PCIBus.Devices[i];
+                if (xPCIDev.ClassCode == 3 && xPCIDev.SubClass == 0)
                 {
-                    if (xColor == 0)
-                    {
-                        xColor = 2;
-                    }
-                    else
-                    {
-                        xColor = 0;
-                    }
-                }
-                for (uint y = 0; y < 200; y++)
-                {
-                    VGAScreen.SetPixel320x200x8(x, y, xColor);
+                    xVGADev = xPCIDev;
+                    break;
                 }
             }
+            if (xVGADev == null)
+            {
+                DebugUtil.SendError("Program", "No VGA device found");
+                goto Klaar;
+            }
+            DebugUtil.SendNumber("Program", "MBI Address", CPU.GetMBIAddress(), 32);
+
+            var xMBIStruct = ((MultiBootInfoStruct*)(byte*)CPU.GetMBIAddress());
+            DebugUtil.SendNumber("Program", "MBI Addr (2)", (uint)xMBIStruct, 32);
+            DebugUtil.SendNumber("MBI", "Flags", xMBIStruct->Flags, 32);
+            DebugUtil.SendNumber("MBI", "VbeControlInfo", xMBIStruct->VbeControlInfo, 32);
+            DebugUtil.SendNumber("MBI", "VbeModeInfo", xMBIStruct->VbeModeInfo, 32);
+            DebugUtil.SendNumber("MBI", "VbeMode", xMBIStruct->VbeMode, 16);
+            DebugUtil.SendNumber("MBI", "VbeInterfaceSeg", xMBIStruct->VbeInterfaceSeg, 16);
+            DebugUtil.SendNumber("MBI", "VbeInterfaceOff", xMBIStruct->VbeInterfaceOff, 16);
+            DebugUtil.SendNumber("MBI", "VbeInterfaceLen", xMBIStruct->VbeInterfaceLen, 16);
+
+
+
+            Klaar:
+            Console.WriteLine("Ready");
             while (true) ;
 
             
@@ -91,29 +78,81 @@ namespace MatthijsTest
             
             
 		}
+    }
 
-        private static void SendString(string aStr)
-        {
-            Console.WriteLine("In SendString");
-            var xData = new byte[aStr.Length];
-            Console.WriteLine("Array created");
-            for (int i = 0; i < aStr.Length; i++)
-            {
-                Console.WriteLine("In loop");
-                xData[i] = (byte)aStr[i];
-                Console.WriteLine("  After move");
-            }
-            Console.WriteLine("Create UDP package");
-            var xUDP = new UDPPacket(xData);
-            Console.WriteLine("Set DestAddr");
-            xUDP.DestinationAddress = 0x0A000001;
-            Console.WriteLine("Set Dest Port");
-            xUDP.DestinationPort = 643;
-            Console.WriteLine("GetData");
-            var xTheData = xUDP.GetData();
-            Console.WriteLine("Send");
-            mNet.QueueBytes(xTheData);
-        }
+    [StructLayout(LayoutKind.Explicit)]
+    public struct MultiBootInfoStruct
+    {
+        [FieldOffset(0)]
+        public uint Flags;
 
+        [FieldOffset(4)]
+        public uint MemLower;
+
+        [FieldOffset(8)]
+        public uint MemUpper;
+
+        [FieldOffset(12)]
+        public uint BootDevice;
+
+        [FieldOffset(16)]
+        public uint CmdLine;
+
+        [FieldOffset(20)]
+        public uint ModsCount;
+
+        [FieldOffset(24)]
+        public uint ModsAddr;
+
+        [FieldOffset(28)]
+        public uint Syms0;
+
+        [FieldOffset(32)]
+        public uint Syms1;
+
+        [FieldOffset(36)]
+        public uint Syms2;
+
+        [FieldOffset(40)]
+        public uint Syms3;
+
+        [FieldOffset(44)]
+        public uint MMapLength;
+
+        [FieldOffset(48)]
+        public uint MMapAddr;
+
+        [FieldOffset(52)]
+        public uint DrivesLength;
+
+        [FieldOffset(56)]
+        public uint DrivesAddr;
+
+        [FieldOffset(60)]
+        public uint ConfigTable;
+
+        [FieldOffset(64)]
+        public uint BootLoaderName;
+
+        [FieldOffset(68)]
+        public uint ApmTable;
+
+        [FieldOffset(72)]
+        public uint VbeControlInfo;
+
+        [FieldOffset(76)]
+        public uint VbeModeInfo;
+
+        [FieldOffset(80)]
+        public ushort VbeMode;
+
+        [FieldOffset(82)]
+        public ushort VbeInterfaceSeg;
+
+        [FieldOffset(84)]
+        public ushort VbeInterfaceOff;
+
+        [FieldOffset(86)]
+        public ushort VbeInterfaceLen;
     }
 }

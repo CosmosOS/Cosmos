@@ -1,4 +1,4 @@
-﻿//#define WRITE_TO_DEBUG
+﻿#define WRITE_TO_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,51 +6,51 @@ using System.Text;
 namespace Cosmos.Hardware {
 	public static class DebugUtil {
         public static void LogInterruptOccurred(ref Interrupts.InterruptContext aContext) {
-            StartLogging();
-            WriteSerialString("<InterruptOccurred Interrupt=\"");
-            WriteNumber(aContext.Interrupt,
-                        32);
-            WriteSerialString("\" CS=\"");
-            WriteNumber(aContext.CS,
-                        32);
-            WriteSerialString("\" ESI=\"");
-            WriteNumber(aContext.ESI,
-                        32);
-            WriteSerialString("\" EDI=\"");
-            WriteNumber(aContext.EDI,
-                        32);
-            WriteSerialString("\" EBP=\"");
-            WriteNumber(aContext.EBP,
-                        32);
-            WriteSerialString("\" ESP=\"");
-            WriteNumber(aContext.ESP,
-                        32);
-            WriteSerialString("\" EAX=\"");
-            WriteNumber(aContext.EAX,
-                        32);
-            WriteSerialString("\" EBX=\"");
-            WriteNumber(aContext.EBX,
-                        32);
-            WriteSerialString("\" ECX=\"");
-            WriteNumber(aContext.ECX,
-                        32);
-            WriteSerialString("\" EDX=\"");
-            WriteNumber(aContext.EDX,
-                        32);
-            WriteSerialString("\" Param=\"");
-            WriteNumber(aContext.Param,
-                        32);
-            WriteSerialString("\" EFlags=\"");
-            WriteNumber((uint)aContext.EFlags,
-                        32);
-            WriteSerialString("\" UserESP=\"");
-            WriteNumber(aContext.UserESP,
-                        32);
-            WriteSerialString("\" EIP=\"");
-            WriteNumber(aContext.EIP,
-                        32);
-            WriteSerialString("\"/>\r\n");
-            EndLogging();
+            //StartLogging();
+            //WriteSerialString("<InterruptOccurred Interrupt=\"");
+            //WriteNumber(aContext.Interrupt,
+            //            32);
+            //WriteSerialString("\" CS=\"");
+            //WriteNumber(aContext.CS,
+            //            32);
+            //WriteSerialString("\" ESI=\"");
+            //WriteNumber(aContext.ESI,
+            //            32);
+            //WriteSerialString("\" EDI=\"");
+            //WriteNumber(aContext.EDI,
+            //            32);
+            //WriteSerialString("\" EBP=\"");
+            //WriteNumber(aContext.EBP,
+            //            32);
+            //WriteSerialString("\" ESP=\"");
+            //WriteNumber(aContext.ESP,
+            //            32);
+            //WriteSerialString("\" EAX=\"");
+            //WriteNumber(aContext.EAX,
+            //            32);
+            //WriteSerialString("\" EBX=\"");
+            //WriteNumber(aContext.EBX,
+            //            32);
+            //WriteSerialString("\" ECX=\"");
+            //WriteNumber(aContext.ECX,
+            //            32);
+            //WriteSerialString("\" EDX=\"");
+            //WriteNumber(aContext.EDX,
+            //            32);
+            //WriteSerialString("\" Param=\"");
+            //WriteNumber(aContext.Param,
+            //            32);
+            //WriteSerialString("\" EFlags=\"");
+            //WriteNumber((uint)aContext.EFlags,
+            //            32);
+            //WriteSerialString("\" UserESP=\"");
+            //WriteNumber(aContext.UserESP,
+            //            32);
+            //WriteSerialString("\" EIP=\"");
+            //WriteNumber(aContext.EIP,
+            //            32);
+            //WriteSerialString("\"/>\r\n");
+            //EndLogging();
         }
 
 	    public static void Initialize() {
