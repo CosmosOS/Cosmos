@@ -430,7 +430,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 }
                 xProcess.ResumeFromLaunch();
                 Callback.OnModuleLoad(mModule);
-                Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 0);
+                Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 1);
                 Callback.OnThreadStart(mThread);
                 //AD7EntrypointEvent.Send(this);
                 
