@@ -10,34 +10,35 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-        if( Assembler.Stack.Peek().IsFloat )
+        var xSource = Assembler.Stack.Peek();
+        if (xSource.IsFloat)
         {
-            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: Floats are not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-            throw new NotImplementedException();
+            new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
+            new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
         }
-        int xSource = Assembler.Stack.Peek().Size;
-        switch( xSource )
+        Assembler.Stack.Pop();
+        switch( xSource.Size )
         {
             case 1:
             case 2:
             case 4:
                 {
-                    Assembler.Stack.Pop();
+
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Push { DestinationValue = 0 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                    Assembler.Stack.Push( 8, typeof( ulong ) );
                     break;
                 }
             case 8:
                 {
-                    new CPUx86.Noop();
                     break;
                 }
             default:
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                 throw new NotImplementedException();
         }
+        Assembler.Stack.Push(8, typeof(ulong));
     }
 
     

@@ -28,6 +28,9 @@ namespace Cosmos.Kernel {
         // Plugged
         public static void CreateGDT() { }
 
+        //Plugged
+        public static void InitFloat() { }
+
         public static uint AmountOfMemory {
 			get {
 				return GetAmountOfRAM();

@@ -13,16 +13,17 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSource = Assembler.Stack.Pop();
-            if( xSource.IsFloat )
+            var xSource = Assembler.Stack.Peek();
+            if (xSource.IsFloat)
             {
-                //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: Floats not yet implemented", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                throw new NotImplementedException(); 
+                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
+                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             }
+            Assembler.Stack.Pop();
             switch( xSource.Size )
             {
                 case 1:
-                    new CPUx86.Noop();
                     break;
                 case 2:
                 case 4:
@@ -30,8 +31,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.SignExtendAX { Size = 8 };
                     new CPUx86.SignExtendAX { Size = 16 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+
                     break;
                 case 8:
+                    Assembler.Stack.Pop();
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                     new CPUx86.SignExtendAX { Size = 8 };
@@ -42,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException(); 
             }
-            Assembler.Stack.Push( 1, true, false, true ) ;
+            Assembler.Stack.Push(1, true, false, true);
         }
 
 

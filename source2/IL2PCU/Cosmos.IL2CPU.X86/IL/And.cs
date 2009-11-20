@@ -16,8 +16,6 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xStackContent = Assembler.Stack.Peek();
 
-            if( xStackContent.IsFloat )
-                throw new NotImplementedException( "Floats not yet supported!" );
             
             int xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
             if( xSize > 8 )

@@ -16,27 +16,33 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException(); 
-            var xValue = Assembler.Stack.Pop();
-            if( xValue.Size > 4 )
-            {
-                //EmitNotImplementedException( Assembler, aServiceProvider, "Doubles not yet supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
-                throw new NotImplementedException();
-            }
-            else
-            {
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.SSE.AddSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.XMM1 };
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM0 };
-            }
-
-            if( xValue.Size > 8 )
+            var xValue = Assembler.Stack.Peek();
+            if (xValue.Size > 8)
             {
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
                 throw new NotImplementedException();
             }
+            if (!xValue.IsFloat)
+            {
+                new CPUx86.Move { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+                new CPUx86.SSE.ConvertSI2SS { SourceReg = CPUx86.Registers.EAX, DestinationReg = CPUx86.Registers.XMM0 };
+                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+            }
+            Assembler.Stack.Pop();
+            switch (xValue.Size)
+            {
+                case 1:
+                case 2:
+                case 4:
+                    break;
+                case 8:
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    break;
+                default:
+                    //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+                    throw new NotImplementedException();
+            }
+            Assembler.Stack.Push(4, true, true, false);
         }
 
 

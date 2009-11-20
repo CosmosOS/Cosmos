@@ -13,13 +13,15 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             // todo: WARNING: not implemented correctly!
-            var xStackItem = Assembler.Stack.Pop();
-            if( xStackItem.IsFloat )
+            var xSource = Assembler.Stack.Peek();
+            if (xSource.IsFloat)
             {
-                //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U4: Floats not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                throw new NotImplementedException();
+                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
+                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             }
-            switch( xStackItem.Size )
+            Assembler.Stack.Pop();
+            switch( xSource.Size )
             {
                 case 1:
                 case 2:
@@ -36,14 +38,13 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 case 4:
                     {
-                        new CPUx86.Noop();
                         break;
                     }
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U4: SourceSize " + xStackItem.Size + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-            Assembler.Stack.Push(4, typeof( uint ) ) ;
+            Assembler.Stack.Push(4, typeof(uint));
         }
 
 

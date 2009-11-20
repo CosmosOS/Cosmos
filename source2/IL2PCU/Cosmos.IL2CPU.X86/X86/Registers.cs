@@ -48,7 +48,15 @@ namespace Cosmos.IL2CPU.X86 {
         XMM4,
         XMM5,
         XMM6,
-        XMM7
+        XMM7,
+        ST0,
+        ST1,
+        ST2,
+        ST3,
+        ST4,
+        ST5,
+        ST6,
+        ST7
     }
     public static class Registers {
         public const RegistersEnum EAX = RegistersEnum.EAX;
@@ -94,7 +102,14 @@ namespace Cosmos.IL2CPU.X86 {
         public const RegistersEnum XMM5 = RegistersEnum.XMM5;
         public const RegistersEnum XMM6 = RegistersEnum.XMM6;
         public const RegistersEnum XMM7 = RegistersEnum.XMM7;
-
+        public const RegistersEnum ST0 = RegistersEnum.ST0;
+        public const RegistersEnum ST1 = RegistersEnum.ST1;
+        public const RegistersEnum ST2 = RegistersEnum.ST2;
+        public const RegistersEnum ST3 = RegistersEnum.ST3;
+        public const RegistersEnum ST4 = RegistersEnum.ST4;
+        public const RegistersEnum ST5 = RegistersEnum.ST5;
+        public const RegistersEnum ST6 = RegistersEnum.ST6;
+        public const RegistersEnum ST7 = RegistersEnum.ST7;
         /// <summary>
         /// Key = 32bit (eg EAX), value = 16 bit (eg AX)
         /// </summary>
@@ -172,7 +187,14 @@ namespace Cosmos.IL2CPU.X86 {
             mRegToName.Add(XMM5, "XMM5");
             mRegToName.Add(XMM6, "XMM6");
             mRegToName.Add(XMM7, "XMM7");
-
+            mRegToName.Add(ST0, "ST0");
+            mRegToName.Add(ST1, "ST1");
+            mRegToName.Add(ST2, "ST");
+            mRegToName.Add(ST3, "ST3");
+            mRegToName.Add(ST4, "ST4");
+            mRegToName.Add(ST5, "ST5");
+            mRegToName.Add(ST6, "ST6");
+            mRegToName.Add(ST7, "ST7");
             mNameToReg.Add("EAX", EAX);
             mNameToReg.Add("AX", AX);
             mNameToReg.Add("AH", AH);
@@ -216,6 +238,14 @@ namespace Cosmos.IL2CPU.X86 {
             mNameToReg.Add("XMM5", XMM5);
             mNameToReg.Add("XMM6", XMM6);
             mNameToReg.Add("XMM7", XMM7);
+            mNameToReg.Add("ST0", ST0);
+            mNameToReg.Add("ST1", ST1);
+            mNameToReg.Add("ST2", ST2);
+            mNameToReg.Add("ST3", ST3);
+            mNameToReg.Add("ST4", ST4);
+            mNameToReg.Add("ST5", ST5);
+            mNameToReg.Add("ST6", ST6);
+            mNameToReg.Add("ST7", ST7);
         }
 
         public static RegistersEnum? Get8BitRegistersForRegister(RegistersEnum aReg)
@@ -411,6 +441,20 @@ namespace Cosmos.IL2CPU.X86 {
             registers.Add(XMM5);
             registers.Add(XMM6);
             registers.Add(XMM7);
+            return registers;
+        }
+
+        public static List<RegistersEnum> getSTs()
+        {
+            var registers = new List<RegistersEnum>();
+            registers.Add(ST0);
+            registers.Add(ST1);
+            registers.Add(ST2);
+            registers.Add(ST3);
+            registers.Add(ST4);
+            registers.Add(ST5);
+            registers.Add(ST6);
+            registers.Add(ST7);
             return registers;
         }
 

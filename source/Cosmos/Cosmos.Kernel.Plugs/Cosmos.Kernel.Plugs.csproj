@@ -85,6 +85,7 @@
     <Compile Include="Assemblers\GetEndOfStack.cs" />
     <Compile Include="Assemblers\GetMBIAddress.cs" />
     <Compile Include="Assemblers\Halt.cs" />
+    <Compile Include="Assemblers\InitFloat.cs" />
     <Compile Include="Assemblers\Interrupt30.cs" />
     <Compile Include="Assemblers\InvalidatePage.cs" />
     <Compile Include="Assemblers\IORead16.cs" />

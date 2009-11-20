@@ -13,17 +13,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSource = Assembler.Stack.Pop();
-            if( xSource.IsFloat )
+            var xSource = Assembler.Stack.Peek();
+            if (xSource.IsFloat)
             {
-                //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I2: Floats not yet implemented", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                throw new NotImplementedException(); 
+                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
+                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             }
+            Assembler.Stack.Pop();
             switch( xSource.Size )
             {
                 case 1:
                 case 2:
-                    new CPUx86.Noop();
                     break;
                 case 4:
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -38,7 +39,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new NotImplementedException( "SourceSize " + xSource + " not supported!" );
             }
-            Assembler.Stack.Push( 2, true, false, true ) ;
+            Assembler.Stack.Push(2, true, false, true);
         }
 
 

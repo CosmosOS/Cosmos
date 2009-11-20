@@ -17,10 +17,6 @@ namespace Cosmos.IL2CPU.X86.IL
             string xLabelName = AssemblerNasm.TmpPosLabel( aMethod, aOpCode );
             var xStackItem_ShiftAmount = Assembler.Stack.Pop();
             var xStackItem_Value = Assembler.Stack.Pop();
-            if( xStackItem_Value.IsFloat )
-            {
-                throw new NotImplementedException( "Floats not yet supported!" );
-            }
             if( xStackItem_Value.Size <= 4 )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount

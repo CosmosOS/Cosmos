@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.SSE
 {
+    [OpCode("xorps")]
     public class XorPS : InstructionWithDestinationAndSource
     {
         public static void InitializeEncodingData(Instruction.InstructionData aData)

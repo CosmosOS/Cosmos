@@ -14,10 +14,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            if( Assembler.Stack.Peek().IsFloat )
-            {
-                throw new NotImplementedException( "Floats not supported" );
-            }
             int xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };

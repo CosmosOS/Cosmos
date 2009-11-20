@@ -14,29 +14,49 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSize = Assembler.Stack.Pop();
-            if( xSize.IsFloat )
-            {
-                //new CPUx86.SSE.XorPS
-            }
             if( xSize.Size == 8 )
             {
                 //TODO: implement proper div support for 8byte values!
-                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
-                //new CPUx86.Push("0");
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-
+                if (xSize.IsFloat)
+                {
+                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                    new CPUx86.SSE.DivSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.XMM1 };
+                    new CPUx86.Push { DestinationValue = 0 };
+                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM1, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                }
+                else
+                {
+                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
+                    //new CPUx86.Push("0");
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                }
             }
             else
             {
-                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                if (xSize.IsFloat)
+                {
+                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.SSE.DivSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0 };
+                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM1 };
+                }
+                else
+                {
+                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                }
             }
         }
 

@@ -12,8 +12,15 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackContent = Assembler.Stack.Pop();
-            switch( xStackContent.Size )
+            var xSource = Assembler.Stack.Peek();
+            if (xSource.IsFloat)
+            {
+                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
+                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+            }
+            Assembler.Stack.Pop();
+            switch( xSource.Size )
             {
                 case 1:
                 case 2:

@@ -94,6 +94,7 @@
     <Compile Include="CustomImplementation\System\CharImpl.cs" />
     <Compile Include="CustomImplementation\System\DelegateHelper.cs" />
     <Compile Include="CustomImplementation\System\DelegateImpl.cs" />
+    <Compile Include="CustomImplementation\System\DoubleImpl.cs" />
     <Compile Include="CustomImplementation\System\Drawing1\ColorImpl.cs" />
     <Compile Include="CustomImplementation\System\Drawing1\SRImpl.cs" />
     <Compile Include="CustomImplementation\System\EnumImpl.cs" />
