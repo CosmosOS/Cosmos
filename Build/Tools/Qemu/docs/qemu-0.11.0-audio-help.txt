@@ -1,0 +1,105 @@
+Audio options:
+  QEMU_AUDIO_DAC_FIXED_SETTINGS: boolean, default = 1
+    Use fixed settings for host DAC
+  QEMU_AUDIO_DAC_FIXED_FREQ: integer, default = 44100
+    Frequency for fixed host DAC
+  QEMU_AUDIO_DAC_FIXED_FMT: format, default = S16, (one of: U8 S8 U16 S16 U32 S32)
+    Format for fixed host DAC
+  QEMU_AUDIO_DAC_FIXED_CHANNELS: integer, default = 2
+    Number of channels for fixed DAC (1 - mono, 2 - stereo)
+  QEMU_AUDIO_DAC_VOICES: integer, default = 1
+    Number of voices for DAC
+  QEMU_AUDIO_ADC_FIXED_SETTINGS: boolean, default = 1
+    Use fixed settings for host ADC
+  QEMU_AUDIO_ADC_FIXED_FREQ: integer, default = 44100
+    Frequency for fixed host ADC
+  QEMU_AUDIO_ADC_FIXED_FMT: format, default = S16, (one of: U8 S8 U16 S16 U32 S32)
+    Format for fixed host ADC
+  QEMU_AUDIO_ADC_FIXED_CHANNELS: integer, default = 2
+    Number of channels for fixed ADC (1 - mono, 2 - stereo)
+  QEMU_AUDIO_ADC_VOICES: integer, default = 1
+    Number of voices for ADC
+  QEMU_AUDIO_TIMER_PERIOD: integer, default = 250
+    Timer period in HZ (0 - use lowest possible)
+  QEMU_AUDIO_PLIVE: boolean, default = 0
+    (undocumented)
+  QEMU_AUDIO_LOG_TO_MONITOR: boolean, default = 0
+    print logging messages to monitor instead of stderr
+
+Available drivers:
+Name: dsound
+Description: DirectSound http://wikipedia.org/wiki/DirectSound
+Theoretically supports many playback voices
+One capture voice
+Options:
+  QEMU_DSOUND_LOCK_RETRIES: integer, default = 1
+    Number of times to attempt locking the buffer
+  QEMU_DSOUND_RESTOURE_RETRIES: integer, default = 1
+    Number of times to attempt restoring the buffer
+  QEMU_DSOUND_GETSTATUS_RETRIES: integer, default = 1
+    Number of times to attempt getting status of the buffer
+  QEMU_DSOUND_SET_PRIMARY: boolean, default = 0
+    Set the parameters of primary buffer
+  QEMU_DSOUND_LATENCY_MILLIS: integer, default = 10
+    (undocumented)
+  QEMU_DSOUND_PRIMARY_FREQ: integer, default = 44100
+    Primary buffer frequency
+  QEMU_DSOUND_PRIMARY_CHANNELS: integer, default = 2
+    Primary buffer number of channels (1 - mono, 2 - stereo)
+  QEMU_DSOUND_PRIMARY_FMT: format, default = S16, (one of: U8 S8 U16 S16 U32 S32)
+    Primary buffer format
+  QEMU_DSOUND_BUFSIZE_OUT: integer, default = 16384
+    (undocumented)
+  QEMU_DSOUND_BUFSIZE_IN: integer, default = 16384
+    (undocumented)
+
+Name: sdl
+Description: SDL http://www.libsdl.org
+One playback voice
+Does not support capture
+Options:
+  QEMU_SDL_SAMPLES: integer, default = 1024
+    Size of SDL buffer in samples
+
+Name: fmod
+Description: FMOD 3.xx http://www.fmod.org
+Theoretically supports many playback voices
+Theoretically supports many capture voices
+Options:
+  QEMU_FMOD_DRV: string, default = (not set)
+    FMOD driver
+  QEMU_FMOD_FREQ: integer, default = 44100
+    Default frequency
+  QEMU_FMOD_SAMPLES: integer, default = 4096
+    Buffer size in samples
+  QEMU_FMOD_CHANNELS: integer, default = 2
+    Number of default channels (1 - mono, 2 - stereo)
+  QEMU_FMOD_BUFSIZE: integer, default = 0
+    (undocumented)
+
+Name: none
+Description: Timer based audio emulation
+Theoretically supports many playback voices
+Theoretically supports many capture voices
+No options
+
+Name: wav
+Description: WAV renderer http://wikipedia.org/wiki/WAV
+One playback voice
+Does not support capture
+Options:
+  QEMU_WAV_FREQUENCY: integer, default = 44100
+    Frequency
+  QEMU_WAV_FORMAT: format, default = S16, (one of: U8 S8 U16 S16 U32 S32)
+    Format
+  QEMU_WAV_DAC_FIXED_CHANNELS: integer, default = 2
+    Number of channels (1 - mono, 2 - stereo)
+  QEMU_WAV_PATH: string, default = qemu.wav
+    Path to wave file
+
+Options are settable through environment variables.
+Example:
+  set QEMU_AUDIO_DRV=wav
+  set QEMU_WAV_PATH=c:\tune.wav
+  qemu ...
+

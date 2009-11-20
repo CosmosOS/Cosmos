@@ -1,0 +1,10 @@
+Valid sound card names (comma separated):
+pcspk       PC speaker
+sb16        Creative Sound Blaster 16
+cs4231a     CS4231A
+adlib       Yamaha YM3812 (OPL2)
+gus         Gravis Ultrasound GF1
+ac97        Intel 82801AA AC97 Audio
+es1370      ENSONIQ AudioPCI ES1370
+
+-soundhw all will enable all of the above

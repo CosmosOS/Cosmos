@@ -1,0 +1,151 @@
+QEMU PC emulator version 0.11.0, Copyright (c) 2003-2008 Fabrice Bellard
+usage: qemu [options] [disk_image]
+
+'disk_image' is a raw hard image image for IDE hard disk 0
+
+Standard options:
+-h or -help     display this help and exit
+-version        display version information and exit
+-M machine      select emulated machine (-M ? for list)
+-cpu cpu        select CPU (-cpu ? for list)
+-smp n          set the number of CPUs to 'n' [default=1]
+-numa node[,mem=size][,cpus=cpu[-cpu]][,nodeid=node]
+-fda/-fdb file  use 'file' as floppy disk 0/1 image
+-hda/-hdb file  use 'file' as IDE hard disk 0/1 image
+-hdc/-hdd file  use 'file' as IDE hard disk 2/3 image
+-cdrom file     use 'file' as IDE cdrom image (cdrom is ide1 master)
+-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]
+       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]
+       [,cache=writethrough|writeback|none][,format=f][,serial=s]
+       [,addr=A]
+                use 'file' as a drive image
+-mtdblock file  use 'file' as on-board Flash memory image
+-sd file        use 'file' as SecureDigital card image
+-pflash file    use 'file' as a parallel flash image
+-boot [order=drives][,once=drives][,menu=on|off]
+                'drives': floppy (a), hard disk (c), CD-ROM (d), network (n)
+-snapshot       write to temporary files instead of disk image files
+-m megs         set virtual RAM size to megs MB [default=128]
+-k language     use keyboard layout (for example 'fr' for French)
+-audio-help     print list of audio drivers and their options
+-soundhw c1,... enable audio support
+                and only specified sound cards (comma separated list)
+                use -soundhw ? to get the list of supported cards
+                use -soundhw all to enable all of them
+-usb            enable the USB driver (will be the default soon)
+-usbdevice name add the host or guest USB device 'name'
+-name string1[,process=string2]    set the name of the guest
+            string1 sets the window title and string2 the process name (on Linux)
+-uuid %08x-%04x-%04x-%04x-%012x
+                specify machine UUID
+
+Display options:
+-nographic      disable graphical output and redirect serial I/Os to console
+-no-frame       open SDL window without a frame and window decorations
+-alt-grab       use Ctrl-Alt-Shift to grab mouse (instead of Ctrl-Alt)
+-no-quit        disable SDL window close capability
+-sdl            enable SDL
+-portrait       rotate graphical output 90 deg left (only PXA LCD)
+-vga [std|cirrus|vmware|xenfb|none]
+                select video card type
+-full-screen    start in full screen
+-vnc display    start a VNC server on display
+
+1 target only:
+-win2k-hack     use it when installing Windows 2000 to avoid a disk full bug
+-rtc-td-hack    use it to fix time drift in Windows ACPI HAL
+-no-fd-bootchk  disable boot signature checking for floppy disks
+-no-acpi        disable ACPI
+-no-hpet        disable HPET
+-balloon none   disable balloon device
+-balloon virtio[,addr=str]
+                enable virtio balloon device (default)
+-acpitable [sig=str][,rev=n][,oem_id=str][,oem_table_id=str][,oem_rev=n][,asl_compiler_id=str][,asl_compiler_rev=n][,data=file1[:file2]...]
+                ACPI table description
+-smbios file=binary
+                Load SMBIOS entry from binary file
+-smbios type=0[,vendor=str][,version=str][,date=str][,release=%d.%d]
+                Specify SMBIOS type 0 fields
+-smbios type=1[,manufacturer=str][,product=str][,version=str][,serial=str]
+              [,uuid=uuid][,sku=str][,family=str]
+                Specify SMBIOS type 1 fields
+
+Network options:
+-net nic[,vlan=n][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]
+                create a new Network Interface Card and connect it to VLAN 'n'
+-net user[,vlan=n][,name=str][,net=addr[/mask]][,host=addr][,restrict=y|n]
+         [,hostname=host][,dhcpstart=addr][,dns=addr][,tftp=dir][,bootfile=f]
+         [,hostfwd=rule][,guestfwd=rule]                connect the user mode network stack to VLAN 'n', configure its
+                DHCP server and enabled optional services
+-net tap[,vlan=n][,name=str],ifname=name
+                connect the host TAP network interface to VLAN 'n'
+-net socket[,vlan=n][,name=str][,fd=h][,listen=[host]:port][,connect=host:port]
+                connect the vlan 'n' to another VLAN using a socket connection
+-net socket[,vlan=n][,name=str][,fd=h][,mcast=maddr:port]
+                connect the vlan 'n' to multicast maddr and port
+-net dump[,vlan=n][,file=f][,len=n]
+                dump traffic on vlan 'n' to file 'f' (max n bytes per packet)
+-net none       use it alone to have zero network devices; if no -net option
+                is provided, the default is '-net nic -net user'
+
+-bt hci,null    dumb bluetooth HCI - doesn't respond to commands
+-bt hci,host[:id]
+                use host's HCI with the given name
+-bt hci[,vlan=n]
+                emulate a standard HCI in virtual scatternet 'n'
+-bt vhci[,vlan=n]
+                add host computer to virtual scatternet 'n' using VHCI
+-bt device:dev[,vlan=n]
+                emulate a bluetooth device 'dev' in scatternet 'n'
+
+Linux/Multiboot boot specific:
+-kernel bzImage use 'bzImage' as kernel image
+-append cmdline use 'cmdline' as kernel command line
+-initrd file    use 'file' as initial ram disk
+
+Debug/Expert options:
+-serial dev     redirect the serial port to char device 'dev'
+-parallel dev   redirect the parallel port to char device 'dev'
+-monitor dev    redirect the monitor to char device 'dev'
+-pidfile file   write PID to 'file'
+-singlestep   always run in singlestep mode
+-S              freeze CPU at startup (use 'c' to start execution)
+-gdb dev        wait for gdb connection on 'dev'
+-s              shorthand for -gdb tcp::1234
+-d item1,...    output log to /tmp/qemu.log (use -d ? for a list of log items)
+-hdachs c,h,s[,t]
+                force hard disk 0 physical geometry and the optional BIOS
+                translation (t=none or lba) (usually qemu can guess them)
+-L path         set the directory for the BIOS, VGA BIOS and keymaps
+-bios file      set the filename for the BIOS
+-kernel-kqemu   enable KQEMU full virtualization (default is user mode only)
+-enable-kqemu   enable KQEMU kernel module usage
+-no-reboot      exit instead of rebooting
+-no-shutdown    stop before shutdown
+-loadvm [tag|id]
+                start right away with a saved state (loadvm in monitor)
+-option-rom rom load a file, rom, into the option ROM space
+-clock          force the use of the given methods for timer alarm.
+                To see what timers are available use -clock ?
+-localtime      set the real time clock to local time [default=utc]
+-startdate      select initial date of the clock
+-icount [N|auto]
+                enable virtual instruction counter with 2^N clock ticks per
+                instruction
+-watchdog i6300esb|ib700
+                enable virtual hardware watchdog [default=none]
+-watchdog-action reset|shutdown|poweroff|pause|debug|none
+                action when watchdog fires [default=reset]
+-echr chr       set terminal escape character instead of ctrl-a
+-virtioconsole c
+                set virtio console
+-show-cursor    show cursor
+-tb-size n      set TB size
+-incoming p     prepare for incoming migration, listen on port p
+
+During emulation, the following keys are useful:
+ctrl-alt-f      toggle full screen
+ctrl-alt-n      switch to virtual console 'n'
+ctrl-alt        toggle mouse and keyboard grab
+
+When using -nographic, press 'ctrl-a h' to get some help.
