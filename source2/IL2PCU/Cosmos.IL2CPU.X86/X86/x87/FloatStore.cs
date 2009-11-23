@@ -3,9 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.IL2CPU.X86.X86.x87
+namespace Cosmos.IL2CPU.X86.x87
 {
-    class FloatStore
+    [OpCode("fst")]
+    public class FloatStore : InstructionWithDestinationAndSize
     {
+        public static void InitializeEncodingData(Instruction.InstructionData aData)
+        {
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
+            {
+                OpCode = new byte[] { 0xD9 },
+                NeedsModRMByte = true,
+                InitialModRMByteValue = 2,
+                DestinationMemory = true,
+                DestinationImmediate = false,
+                DestinationReg = null,
+                AllowedSizes = InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
+            {
+                OpCode = new byte[] { 0xDD },
+                NeedsModRMByte = true,
+                InitialModRMByteValue = 2,
+                DestinationMemory = true,
+                DestinationImmediate = false,
+                DestinationReg = null,
+                AllowedSizes = InstructionSizes.QWord,
+                DefaultSize = InstructionSize.QWord
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
+            {
+                OpCode = new byte[] { 0xDD, 0xD0 },
+                DestinationMemory = true,
+                DestinationImmediate = false,
+                DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7 
+            });
+        }
     }
 }

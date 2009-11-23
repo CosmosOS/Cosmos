@@ -16,7 +16,8 @@ namespace Cosmos.IL2CPU.X86 {
             set;
         }
 
-        uint? SourceValue {
+        uint? SourceValue
+        {
             get;
             set;
         }
@@ -27,6 +28,11 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         int SourceDisplacement {
+            get;
+            set;
+        }
+        bool SourceEmpty
+        {
             get;
             set;
         }

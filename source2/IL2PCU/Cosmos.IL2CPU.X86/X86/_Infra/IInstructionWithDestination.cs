@@ -16,7 +16,8 @@ namespace Cosmos.IL2CPU.X86 {
             set;
         }
 
-        uint? DestinationValue {
+        uint? DestinationValue
+        {
             get;
             set;
         }
@@ -27,6 +28,12 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         int DestinationDisplacement {
+            get;
+            set;
+        }
+
+        bool DestinationEmpty
+        {
             get;
             set;
         }

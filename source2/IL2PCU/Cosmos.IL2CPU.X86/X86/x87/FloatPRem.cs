@@ -5,15 +5,14 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.x87
 {
-    [OpCode("fucomip")]
-    public class FloatCompareOrderSetAndPop : InstructionWithDestination
+    [OpCode("fprem")]
+    public class FloatPRem : Instruction
     {
         public static void InitializeEncodingData(Instruction.InstructionData aData)
         {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDF, 0xE8 },
-                DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7
+                OpCode = new byte[] { 0xD9, 0xF8 }
             });
         }
     }

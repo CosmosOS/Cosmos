@@ -17,10 +17,7 @@ namespace Cosmos.IL2CPU.X86.x87
                 InitialModRMByteValue = 2,
                 DestinationImmediate = false,
                 DestinationMemory = true,
-                DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false
+                DestinationReg = null
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
@@ -29,10 +26,7 @@ namespace Cosmos.IL2CPU.X86.x87
                 InitialModRMByteValue = 2,
                 DestinationImmediate = false,
                 DestinationMemory = true,
-                DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false
+                DestinationReg = null
             });
         }
     }

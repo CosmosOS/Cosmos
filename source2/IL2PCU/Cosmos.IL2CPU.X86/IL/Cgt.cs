@@ -29,26 +29,11 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackItem.IsFloat)
                 {
-                    new CPUx86.SSE.XorPS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.XMM0 };
-                    new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
-                    new CPUx86.MoveD { DestinationReg = CPUx86.Registers.XMM1, SourceReg= CPUx86.Registers.ESI};
-                    new CPUx86.SSE.AddSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.XMM1 };
-                    new CPUx86.SSE.XorPS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM1 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM2, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM3, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM4, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM5, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.SubSS { DestinationReg = CPUx86.Registers.XMM4, SourceReg = CPUx86.Registers.XMM2};
-                    new CPUx86.SSE.SubSS { DestinationReg = CPUx86.Registers.XMM5, SourceReg = CPUx86.Registers.XMM3 };
-                    new CPUx86.LoadStatusFlags { };
-                    new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.AH };
-                    new CPUx86.And { SourceValue = 0x1, DestinationReg = CPUx86.Registers.EBX };
-                    new CPUx86.MoveD { SourceReg = Registers.EBX, DestinationReg = Registers.XMM0 };
-                    new CPUx86.SSE.SubSS { DestinationReg = CPUx86.Registers.XMM5, SourceReg = CPUx86.Registers.XMM2 };
+                    new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                    new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP , DestinationIsIndirect=true};
+                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                    new CPUx86.x87.FloatDecTopPointer();
                 }
                 else
                 {

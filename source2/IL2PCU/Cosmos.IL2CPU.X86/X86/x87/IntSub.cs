@@ -5,28 +5,32 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.x87
 {
-    [OpCode("ficomp")]
-    public class IntCompareAndPop : InstructionWithDestination
+    [OpCode("fisub")]
+    public class IntSub : InstructionWithDestinationAndSize
     {
         public static void InitializeEncodingData(Instruction.InstructionData aData)
         {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDE },
+                OpCode = new byte[] { 0xDA },
                 NeedsModRMByte = true,
-                InitialModRMByteValue = 3,
+                InitialModRMByteValue = 4,
                 DestinationImmediate = false,
                 DestinationMemory = true,
-                DestinationReg = null
+                DestinationReg = null,
+                AllowedSizes = InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDA },
+                OpCode = new byte[] { 0xDE },
                 NeedsModRMByte = true,
-                InitialModRMByteValue = 3,
+                InitialModRMByteValue = 4,
                 DestinationImmediate = false,
                 DestinationMemory = true,
-                DestinationReg = null
+                DestinationReg = null,
+                AllowedSizes = InstructionSizes.Word,
+                DefaultSize = InstructionSize.Word
             });
         }
     }

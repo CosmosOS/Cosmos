@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.x87
 {
-    [OpCode("fadd")]
-    public class FloatAdd : InstructionWithDestinationAndSourceAndSize
+    [OpCode("fsub")]
+    public class FloatSub : InstructionWithDestinationAndSourceAndSize
     {
         public static void InitializeEncodingData(Instruction.InstructionData aData)
         {
@@ -14,39 +14,39 @@ namespace Cosmos.IL2CPU.X86.x87
             {
                 OpCode = new byte[] { 0xD8 },
                 NeedsModRMByte = true,
-                InitialModRMByteValue = 0,
+                InitialModRMByteValue = 4,
                 DestinationImmediate = false,
                 DestinationMemory = true,
                 DestinationReg = null,
-                DefaultSize = InstructionSize.DWord,
+                SourceEmpty=true,
                 AllowedSizes = InstructionSizes.DWord,
-                SourceEmpty=true
+                DefaultSize = InstructionSize.DWord
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
                 OpCode = new byte[] { 0xDC },
                 NeedsModRMByte = true,
-                InitialModRMByteValue = 0,
+                InitialModRMByteValue = 4,
                 DestinationImmediate = false,
                 DestinationMemory = true,
                 DestinationReg = null,
-                DefaultSize = InstructionSize.QWord,
+                SourceEmpty=true,
                 AllowedSizes = InstructionSizes.QWord,
-                SourceEmpty = true,
+                DefaultSize = InstructionSize.QWord
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xD8, 0xC0 },
+                OpCode = new byte[] { 0xD8, 0xE0 },
                 DestinationReg = RegistersEnum.ST0,
                 SourceReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7,
-                SourceImmediate=false,
-                SourceMemory=false,
-                DestinationMemory=false,
-                DestinationImmediate=false
+                SourceImmediate = false,
+                SourceMemory = false,
+                DestinationMemory = false,
+                DestinationImmediate = false
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDC, 0xC0 },
+                OpCode = new byte[] { 0xDC, 0xE8 },
                 SourceReg = RegistersEnum.ST0,
                 DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7,
                 SourceImmediate = false,

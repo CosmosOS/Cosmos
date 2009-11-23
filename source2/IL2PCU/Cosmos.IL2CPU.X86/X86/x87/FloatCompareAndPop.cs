@@ -18,9 +18,6 @@ namespace Cosmos.IL2CPU.X86.x87
                 DestinationImmediate = false,
                 DestinationMemory = true,
                 DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false,
                 AllowedSizes = InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord
             });
@@ -32,9 +29,6 @@ namespace Cosmos.IL2CPU.X86.x87
                 DestinationImmediate = false,
                 DestinationMemory = true,
                 DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false,
                 AllowedSizes = InstructionSizes.QWord,
                 DefaultSize = InstructionSize.QWord
             });
@@ -45,22 +39,14 @@ namespace Cosmos.IL2CPU.X86.x87
                 InitialModRMByteValue = 2,
                 DestinationImmediate = false,
                 DestinationMemory = false,
-                DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false
+                DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
                 OpCode = new byte[] { 0xD8, 0xD9 },
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 2,
-                DestinationImmediate = false,
-                DestinationMemory = false,
-                DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false
+                DestinationEmpty=true
             });
         }
     }

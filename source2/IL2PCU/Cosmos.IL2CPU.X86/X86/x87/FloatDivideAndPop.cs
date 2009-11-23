@@ -13,6 +13,7 @@ namespace Cosmos.IL2CPU.X86.x87
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
                 OpCode = new byte[] { 0xDE, 0xF9 },
+                DestinationEmpty=true
 
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
@@ -20,8 +21,6 @@ namespace Cosmos.IL2CPU.X86.x87
                 OpCode = new byte[] { 0xDE, 0xF8 },
                 SourceReg = RegistersEnum.ST0,
                 DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7,
-                SourceImmediate = false,
-                SourceMemory = false,
                 DestinationMemory = false,
                 DestinationImmediate = false
             });

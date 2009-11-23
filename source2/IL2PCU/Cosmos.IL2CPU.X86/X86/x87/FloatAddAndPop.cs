@@ -12,12 +12,13 @@ namespace Cosmos.IL2CPU.X86.x87
         {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDE, 0xC0 },
-
+                OpCode = new byte[] { 0xDE, 0xC1 },
+                SourceEmpty = true,
+                DestinationEmpty = true
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDE, 0xC1 },
+                OpCode = new byte[] { 0xDE, 0xC0 },
                 SourceReg = RegistersEnum.ST0,
                 DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7,
                 SourceImmediate = false,

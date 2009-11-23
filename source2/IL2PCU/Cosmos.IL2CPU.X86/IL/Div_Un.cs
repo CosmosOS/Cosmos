@@ -18,14 +18,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 //TODO: implement proper div support for 8byte values!
                 if (xStackItem.IsFloat)
                 {
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-                    new CPUx86.SSE.DivSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.XMM1 };
-                    new CPUx86.Push { DestinationValue = 0 };
-                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM1, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                    new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    new CPUx86.Add { DestinationReg = Registers.ESP, Size = 8 };
+                    new CPUx86.x87.FloatDivide { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+                    new CPUx86.x87.FloatStore { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
                 }
                 else
                 {

@@ -5,27 +5,16 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.x87
 {
-    [OpCode("fisttp")]
-    public class IntStoreWithTrunc : InstructionWithDestinationAndSize
+    [OpCode("fld")]
+    public class FloatLoad : InstructionWithDestinationAndSize
     {
         public static void InitializeEncodingData(Instruction.InstructionData aData)
         {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
-           {
-               OpCode = new byte[] { 0xDF },
-               NeedsModRMByte = true,
-               InitialModRMByteValue = 1,
-               DestinationMemory = true,
-               DestinationImmediate = false,
-               DestinationReg = null,
-               AllowedSizes = InstructionSizes.Word,
-               DefaultSize = InstructionSize.Word
-           });
-            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
-                OpCode = new byte[] { 0xDB },
+                OpCode = new byte[] { 0xD9 },
                 NeedsModRMByte = true,
-                InitialModRMByteValue = 1,
+                InitialModRMByteValue = 0,
                 DestinationMemory = true,
                 DestinationImmediate = false,
                 DestinationReg = null,
@@ -36,12 +25,19 @@ namespace Cosmos.IL2CPU.X86.x87
             {
                 OpCode = new byte[] { 0xDD },
                 NeedsModRMByte = true,
-                InitialModRMByteValue = 1,
+                InitialModRMByteValue = 0,
                 DestinationMemory = true,
                 DestinationImmediate = false,
                 DestinationReg = null,
                 AllowedSizes = InstructionSizes.QWord,
                 DefaultSize = InstructionSize.QWord
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
+            {
+                OpCode = new byte[] { 0xD9, 0xC0 },
+                DestinationMemory = true,
+                DestinationImmediate = false,
+                DestinationReg = RegistersEnum.ST0 | RegistersEnum.ST1 | RegistersEnum.ST2 | RegistersEnum.ST3 | RegistersEnum.ST4 | RegistersEnum.ST5 | RegistersEnum.ST6 | RegistersEnum.ST7
             });
         }
     }

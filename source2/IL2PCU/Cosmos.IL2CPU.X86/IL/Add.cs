@@ -23,21 +23,20 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xSize.Size > 4)
                 {
-                   new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                   new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-                   if (xSize.IsFloat)
-                   {
-                       //sum the fraction
-
-                       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-                       new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-
-                   }
-                   else
-                   {
-                       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-                       new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
-                   }
+                    if (xSize.IsFloat)
+                    {
+                        new CPUx86.x87.FloatLoad { DestinationReg=Registers.ESP,Size=64, DestinationIsIndirect=true };
+                        new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                        new CPUx86.x87.FloatAdd { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect=true, Size=64 };
+                        new CPUx86.x87.FloatStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    }
+                    else
+                    {
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                        new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
+                    }
                 }
                 else
                 {

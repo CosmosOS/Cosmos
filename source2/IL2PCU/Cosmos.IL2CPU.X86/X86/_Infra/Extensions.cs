@@ -18,7 +18,8 @@ namespace Cosmos.IL2CPU.X86 {
                 if (aThis.DestinationReg != null) {
                     xDest = Registers.GetRegisterName(aThis.DestinationReg.Value);
                 } else {
-                    xDest = "0x" + aThis.DestinationValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
+                    if (aThis.DestinationValue.HasValue)
+                        xDest = "0x" + aThis.DestinationValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
             }
             if (aThis.DestinationDisplacement != 0) {

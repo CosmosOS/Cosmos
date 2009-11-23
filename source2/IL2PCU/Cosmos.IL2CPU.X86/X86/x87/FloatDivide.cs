@@ -18,9 +18,7 @@ namespace Cosmos.IL2CPU.X86.x87
                 DestinationImmediate = false,
                 DestinationMemory = true,
                 DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false,
+                SourceEmpty=true,
                 AllowedSizes = InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord
             });
@@ -29,12 +27,8 @@ namespace Cosmos.IL2CPU.X86.x87
                 OpCode = new byte[] { 0xDC },
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 6,
-                DestinationImmediate = false,
-                DestinationMemory = true,
-                DestinationReg = null,
-                SourceImmediate = false,
-                SourceReg = null,
-                SourceMemory = false,
+                DestinationEmpty=true,
+                SourceEmpty=true,
                 AllowedSizes = InstructionSizes.QWord,
                 DefaultSize = InstructionSize.QWord
             });
@@ -58,6 +52,10 @@ namespace Cosmos.IL2CPU.X86.x87
                 DestinationMemory = false,
                 DestinationImmediate = false
             });
+        }
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+
         }
     }
 }

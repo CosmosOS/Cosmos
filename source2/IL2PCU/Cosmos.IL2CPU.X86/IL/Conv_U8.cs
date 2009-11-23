@@ -10,28 +10,37 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-        var xSource = Assembler.Stack.Peek();
-        if (xSource.IsFloat)
-        {
-            new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-            new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-        }
-        Assembler.Stack.Pop();
+        var xSource = Assembler.Stack.Pop();
         switch( xSource.Size )
         {
             case 1:
             case 2:
             case 4:
                 {
-
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.Push { DestinationValue = 0 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    if (xSource.IsFloat)
+                    {
+                        new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 32, DestinationIsIndirect = true };
+                        new CPUx86.x87.FloatABS();
+                        new CPUx86.x87.FloatRound();
+                        new CPUx86.x87.FloatStore { DestinationReg = Registers.ESP, Size = 32, DestinationIsIndirect = true };
+                    }
+                    else
+                    {
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Push { DestinationValue = 0 };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    }
                     break;
                 }
             case 8:
                 {
+                    if (xSource.IsFloat)
+                    {
+                        new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                        new CPUx86.x87.FloatABS();
+                        new CPUx86.x87.FloatRound();
+                        new CPUx86.x87.FloatStore { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    }
                     break;
                 }
             default:

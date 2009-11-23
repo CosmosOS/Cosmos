@@ -111,6 +111,9 @@ namespace Cosmos.IL2CPU.X86 {
                 public bool SourceImmediate;
                 public InstructionSize SourceImmediateSize = InstructionSize.None;
 
+                public bool SourceEmpty;
+                public bool DestinationEmpty;
+
             }
 
             public bool HasDestinationOperand;

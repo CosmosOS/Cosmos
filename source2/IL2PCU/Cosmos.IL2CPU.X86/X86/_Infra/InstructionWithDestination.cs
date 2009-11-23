@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
-    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination {
+    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination{
         public ElementReference DestinationRef {
             get;
             set;
@@ -16,7 +16,8 @@ namespace Cosmos.IL2CPU.X86 {
             set;
         }
 
-        public uint? DestinationValue {
+        public uint? DestinationValue
+        {
             get;
             set;
         }
@@ -27,6 +28,12 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         public int DestinationDisplacement {
+            get;
+            set;
+        }
+
+        public bool DestinationEmpty
+        {
             get;
             set;
         }
@@ -64,8 +71,12 @@ namespace Cosmos.IL2CPU.X86 {
         public override void WriteText( Cosmos.IL2CPU.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);
-            aOutput.Write(" ");
-            aOutput.Write(this.GetDestinationAsString());
+            String destination = this.GetDestinationAsString();
+            if (!(DestinationEmpty && destination.Equals("")))
+            {
+                aOutput.Write(" ");
+                aOutput.Write(destination);
+            }
         }
     }
 }

@@ -24,8 +24,11 @@ namespace Cosmos.IL2CPU.X86 {
             aOutput.Write(mMnemonic);
             aOutput.Write(" ");
             aOutput.Write(SizeToString(Size));
-            aOutput.Write(" ");
-            aOutput.Write(this.GetDestinationAsString());
+            if (!DestinationEmpty)
+            {
+                aOutput.Write(" ");
+                aOutput.Write(this.GetDestinationAsString());
+            }
         }
     }
 }

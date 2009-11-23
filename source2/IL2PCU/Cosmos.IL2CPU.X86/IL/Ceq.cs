@@ -61,25 +61,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 if (xStackItem.IsFloat)
                 {
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.SSE.CompareSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.XMM1, pseudoOpcode = (byte)CPUx86.SSE.ComparePseudoOpcodes.NotEqual };
-                    new CPUx86.MoveD { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.And { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Move { SourceValue = 0x1, DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.MoveD { SourceReg = CPUx86.Registers.EAX, DestinationReg = CPUx86.Registers.XMM1 };
-
+                    new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                    new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP , DestinationIsIndirect=true};
+                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                    new CPUx86.x87.FloatDecTopPointer();
                 }
                 else
                 {
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
-
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                }
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = LabelFalse };
                     new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
@@ -95,7 +88,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Jump { DestinationLabel = xNextLabel };
-                }
             }
             else
                 throw new Exception( "Case not handled!" );

@@ -16,7 +16,8 @@ namespace Cosmos.IL2CPU.X86 {
             set;
         }
 
-        public uint? SourceValue {
+        public uint? SourceValue
+        {
             get;
             set;
         }
@@ -31,6 +32,11 @@ namespace Cosmos.IL2CPU.X86 {
             set;
         }
 
+        public bool SourceEmpty
+        {
+            get;
+            set;
+        }
         protected string GetSourceAsString() {
             string xDest = "";
             if ((SourceValue.HasValue || SourceRef != null) &&
@@ -44,7 +50,8 @@ namespace Cosmos.IL2CPU.X86 {
                 if (SourceReg != null) {
                     xDest = Registers.GetRegisterName(SourceReg.Value);
                 } else {
-                    xDest = "0x" + SourceValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
+                    if (SourceValue.HasValue)
+                        xDest = "0x" + SourceValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
             }
             if (SourceDisplacement != 0) {
@@ -87,10 +94,16 @@ namespace Cosmos.IL2CPU.X86 {
         public override void WriteText( Cosmos.IL2CPU.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);
-            aOutput.Write(" ");
-            aOutput.Write(this.GetDestinationAsString());
-            aOutput.Write(", ");
-            aOutput.Write(this.GetSourceAsString());
+            String destination=this.GetDestinationAsString();
+            if (!destination.Equals("")){
+                aOutput.Write(" ");
+                aOutput.Write(destination);
+                string source = this.GetSourceAsString();
+                if (!(SourceEmpty && source.Equals(""))){
+                    aOutput.Write(", ");
+                    aOutput.Write(source);
+                 }
+            }
         }
     }
 }

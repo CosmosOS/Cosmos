@@ -21,8 +21,8 @@ namespace Cosmos.IL2CPU.X86.x87
                 SourceImmediate = false,
                 SourceReg = null,
                 SourceMemory = false,
-                AllowedSizes = InstructionSizes.QWord,
-                DefaultSize = InstructionSize.QWord
+                AllowedSizes = InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
@@ -35,8 +35,8 @@ namespace Cosmos.IL2CPU.X86.x87
                 SourceImmediate = false,
                 SourceReg = null,
                 SourceMemory = false,
-                AllowedSizes = InstructionSizes.DWord,
-                DefaultSize = InstructionSize.DWord
+                AllowedSizes = InstructionSizes.QWord,
+                DefaultSize = InstructionSize.QWord
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
             {
