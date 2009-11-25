@@ -217,8 +217,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS", "C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landmann", "{2DF5F17F-4890-4856-ADFD-4DE23282C3B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Generator", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86\Cosmos.Assembler.X86.Generator.csproj", "{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.X86.Plugs", "Compiler\Indy.IL2CPU.X86.Plugs\Indy.IL2CPU.X86.Plugs.csproj", "{169DBC91-DA34-40CE-B58B-8587CEE3217A}"
@@ -235,7 +233,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.HostProcess", 
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 73
+		SccNumberOfProjects = 72
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -515,18 +513,14 @@ Global
 		SccProjectTopLevelParentUniqueName69 = Cosmos.sln
 		SccProjectName69 = NewPagingTest
 		SccLocalPath69 = NewPagingTest
-		SccProjectUniqueName70 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.Generator.csproj
+		SccProjectUniqueName70 = Playgrounds\\Matthijs\\DebugListener\\DebugListener.csproj
 		SccProjectTopLevelParentUniqueName70 = Cosmos.sln
-		SccProjectName70 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86
-		SccLocalPath70 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86
-		SccProjectUniqueName71 = Playgrounds\\Matthijs\\DebugListener\\DebugListener.csproj
+		SccProjectName70 = Playgrounds/Matthijs/DebugListener
+		SccLocalPath70 = Playgrounds\\Matthijs\\DebugListener
+		SccProjectUniqueName71 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess\\Cosmos.Debug.HostProcess.csproj
 		SccProjectTopLevelParentUniqueName71 = Cosmos.sln
-		SccProjectName71 = Playgrounds/Matthijs/DebugListener
-		SccLocalPath71 = Playgrounds\\Matthijs\\DebugListener
-		SccProjectUniqueName72 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess\\Cosmos.Debug.HostProcess.csproj
-		SccProjectTopLevelParentUniqueName72 = Cosmos.sln
-		SccProjectName72 = ../source2/Debug/Cosmos.Debug.HostProcess
-		SccLocalPath72 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
+		SccProjectName71 = ../source2/Debug/Cosmos.Debug.HostProcess
+		SccLocalPath71 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -537,12 +531,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|x86.ActiveCfg = Debug|x86
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|x86.Build.0 = Debug|x86
+		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|x86.ActiveCfg = Release|x86
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|x86.Build.0 = Release|x86
+		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|x86.ActiveCfg = Release|Any CPU
 		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Debug|x86.ActiveCfg = Debug|x86
@@ -1049,12 +1041,6 @@ Global
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|x86.ActiveCfg = Release|x86
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|x86.Build.0 = Release|x86
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Release|x86.ActiveCfg = Release|Any CPU
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Debug|x86.ActiveCfg = Debug|x86
@@ -1204,7 +1190,6 @@ Global
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
-		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{0F641748-FF03-4DA7-981B-1E9268330EE5} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
 		{D89DE0D3-FF3E-4F63-B15F-7302D998845E} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
