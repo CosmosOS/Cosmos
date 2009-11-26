@@ -62,6 +62,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
 		public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable) {
 		}
 
+        [PlugMethod(Assembler = typeof(Assemblers.Array_get_Length))]
 		public static int get_Length(Array aThis) {
       //aThis += 2;
       //return *aThis;

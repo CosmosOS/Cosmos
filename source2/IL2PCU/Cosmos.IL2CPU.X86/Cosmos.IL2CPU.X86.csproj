@@ -265,6 +265,7 @@
     <Compile Include="Plugs\NEW_PLUGS\NormalDelegateImpl.cs" />
     <Compile Include="Plugs\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
     <Compile Include="Plugs\System\ArrayImpl.cs" />
+    <Compile Include="Plugs\System\Assemblers\Array_get_Length.cs" />
     <Compile Include="Plugs\System\Assemblers\Array_InternalCopy.cs" />
     <Compile Include="Plugs\System\Assemblers\Buffer_BlockCopy.cs" />
     <Compile Include="Plugs\System\Assemblers\MulticastDelegate_Invoke.cs" />

@@ -24,12 +24,12 @@ namespace MatthijsTest
 		{
 			Cosmos.Compiler.Builder.BuildUI.Run();
 		}
-		#endregion
+        #endregion
 
         private static NetworkDevice mNet;
 
 		public static unsafe void Init(){
-            
+
             var xInit = true;
             if (xInit)
             {
@@ -37,44 +37,70 @@ namespace MatthijsTest
                 xBoot.Execute(true);
             }
 
-            Heap.EnableDebug = false;
-            DebugUtil.SendNumber("Program", "DeviceCount", (uint)Device.Devices.Count, 32);
-            PCIDevice xVGADev = null;
-            for (int i = 0; i < PCIBus.Devices.Length; i++)
+            for (int i = 0; i < Device.Devices.Count; i++)
             {
-                var xPCIDev = PCIBus.Devices[i];
-                if (xPCIDev.ClassCode == 3 && xPCIDev.SubClass == 0)
+                if (Device.Devices[i].Type == Device.DeviceType.Network)
                 {
-                    xVGADev = xPCIDev;
+                    mNet = (NetworkDevice)Device.Devices[i];
                     break;
                 }
             }
-            if (xVGADev == null)
+            if (mNet != null)
             {
-                DebugUtil.SendError("Program", "No VGA device found");
-                goto Klaar;
+                mNet.Enable();
+                var xPkt = new UDPPacket(0x0A000002, 15, 0x0A000001, 16, new byte[] { 65, 66, 67, 68, 69 });
+                var xEPkt = new EthernetPacket(xPkt.GetData());
+                mNet.QueueBytes(xEPkt.GetData());
             }
-            DebugUtil.SendNumber("Program", "MBI Address", CPU.GetMBIAddress(), 32);
+            Console.WriteLine("Done!");
+            while (true)
+            {
+                if (mNet != null)
+                {
+                    TCPIPStack.Update();
+                }
+            }
 
-            var xMBIStruct = ((MultiBootInfoStruct*)(byte*)CPU.GetMBIAddress());
-            DebugUtil.SendNumber("Program", "MBI Addr (2)", (uint)xMBIStruct, 32);
-            DebugUtil.SendNumber("MBI", "Flags", xMBIStruct->Flags, 32);
-            DebugUtil.SendNumber("MBI", "VbeControlInfo", xMBIStruct->VbeControlInfo, 32);
-            DebugUtil.SendNumber("MBI", "VbeModeInfo", xMBIStruct->VbeModeInfo, 32);
-            DebugUtil.SendNumber("MBI", "VbeMode", xMBIStruct->VbeMode, 16);
-            DebugUtil.SendNumber("MBI", "VbeInterfaceSeg", xMBIStruct->VbeInterfaceSeg, 16);
-            DebugUtil.SendNumber("MBI", "VbeInterfaceOff", xMBIStruct->VbeInterfaceOff, 16);
-            DebugUtil.SendNumber("MBI", "VbeInterfaceLen", xMBIStruct->VbeInterfaceLen, 16);
+            //Heap.EnableDebug = false;
+            //DebugUtil.SendNumber("Program", "DeviceCount", (uint)Device.Devices.Count, 32);
+            //PCIDevice xVGADev = null;
+            //for (int i = 0; i < PCIBus.Devices.Length; i++)
+            //{
+            //    var xPCIDev = PCIBus.Devices[i];
+            //    if (xPCIDev.ClassCode == 3 && xPCIDev.SubClass == 0)
+            //    {
+            //        xVGADev = xPCIDev;
+            //        break;
+            //    }
+            //}
+            //if (xVGADev == null)
+            //{
+            //    DebugUtil.SendError("Program", "No VGA device found");
+            //    goto Klaar;
+            //}
+            //DebugUtil.SendNumber("Program", "MBI Address", CPU.GetMBIAddress(), 32);
+
+            //var xMBIStruct = ((MultiBootInfoStruct*)(byte*)CPU.GetMBIAddress());
+            //DebugUtil.SendNumber("Program", "MBI Addr (2)", (uint)xMBIStruct, 32);
+            //DebugUtil.SendNumber("MBI", "Flags", xMBIStruct->Flags, 32);
+            //DebugUtil.SendNumber("MBI", "VbeControlInfo", xMBIStruct->VbeControlInfo, 32);
+            //DebugUtil.SendNumber("MBI", "VbeModeInfo", xMBIStruct->VbeModeInfo, 32);
+            //DebugUtil.SendNumber("MBI", "VbeMode", xMBIStruct->VbeMode, 16);
+            //DebugUtil.SendNumber("MBI", "VbeInterfaceSeg", xMBIStruct->VbeInterfaceSeg, 16);
+            //DebugUtil.SendNumber("MBI", "VbeInterfaceOff", xMBIStruct->VbeInterfaceOff, 16);
+            //DebugUtil.SendNumber("MBI", "VbeInterfaceLen", xMBIStruct->VbeInterfaceLen, 16);
 
 
 
-            Klaar:
-            Console.WriteLine("Ready");
-            while (true) ;
+            //Klaar:
+            //Console.WriteLine("Ready");
+            //while (true) ;
 
             
 
-            //SendString("ABBA");
+            ////SendString("ABBA");
+
+            //Cosmos.
             
             
 		}
