@@ -34,8 +34,8 @@ namespace Cosmos.Debug.VSDebugEngine
         int IDebugProgramNode2.GetHostPid(AD_PROCESS_ID[] pHostProcessId)
         {
             // Return the process id of the debugged process
-            pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-            pHostProcessId[0].dwProcessId = (uint)m_processId;
+            pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+            pHostProcessId[0].guidProcessId = new Guid(AD7Engine.ID);
 
             return VSConstants.S_OK;
         }

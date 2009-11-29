@@ -26,7 +26,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private DebugEngine mDebugEngine;
         internal Cosmos.Debug.Common.CDebugger.SourceInfos mSourceMappings;
 
-        internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine)
+        internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
             mISO = aISOFile;
 
@@ -66,6 +66,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mEngine = aEngine;
             mThread = new AD7Thread(aEngine, this);
             mCallback.OnThreadStart(mThread);
+            mPort = aPort;
         }
 
         void mDebugEngine_TextReceived(string obj)
@@ -167,13 +168,13 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        private AD7Port mPort = null;
+        private IDebugPort2 mPort = null;
 
         public int GetPort(out IDebugPort2 ppPort)
         {
             if (mPort == null)
             {
-                mPort = new AD7Port();
+                throw new Exception("Error");
             }
             ppPort = mPort;
             return VSConstants.S_OK;

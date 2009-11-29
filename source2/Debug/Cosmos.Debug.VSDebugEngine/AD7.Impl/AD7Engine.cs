@@ -7,7 +7,8 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Cosmos.Debug.VSDebugEngine {
+namespace Cosmos.Debug.VSDebugEngine
+{
     // AD7Engine is the primary entrypoint object for the sample engine. 
     //
     // It implements:
@@ -21,12 +22,13 @@ namespace Cosmos.Debug.VSDebugEngine {
     // process only contains one program, it is implemented on the engine.
     //
     // IDebugEngineProgram2: This interface provides simultanious debugging of multiple threads in a debuggee.
-    
+
     [ComVisible(false)]
     [Guid("D3788C06-09DE-46b3-B61B-A8A56ADA8B99")]
-    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
+    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2
+    {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
-        EngineCallback m_engineCallback; 
+        EngineCallback m_engineCallback;
 
         // The sample debug engine is split into two parts: a managed front-end and a mixed-mode back end. DebuggedProcess is the primary
         // object in the back-end. AD7Engine holds a reference to it.
@@ -42,17 +44,20 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
 
-        static AD7Engine() {
+        static AD7Engine()
+        {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
         }
 
-        public AD7Engine() {
+        public AD7Engine()
+        {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             m_breakpointManager = new BreakpointManager(this);
             //Worker.Initialize();
         }
 
-        ~AD7Engine() {
+        ~AD7Engine()
+        {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
         }
 
@@ -83,7 +88,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             System.Diagnostics.Debug.Assert(m_ad7ProgramId == Guid.Empty);
 
-            if (celtPrograms != 1) {
+            if (celtPrograms != 1)
+            {
                 System.Diagnostics.Debug.Fail("SampleEngine only expects to see one program in a process");
                 throw new ArgumentException();
             }
@@ -119,12 +125,12 @@ namespace Cosmos.Debug.VSDebugEngine {
                 {
                     //if (processId != m_debuggedProcess.Id)
                     {
-                        System.Diagnostics.Debug.Fail("Asked to attach to a process while we are debugging");
-                        return VSConstants.E_FAIL;
+                        //System.Diagnostics.Debug.Fail("Asked to attach to a process while we are debugging");
+                        //return VSConstants.E_FAIL;
                     }
 
                     //m_pollThread.SetDebugProcess(m_debuggedProcess);
-                }             
+                }
 
                 AD7EngineCreateEvent.Send(this);
                 AD7ProgramCreateEvent.Send(this);
@@ -224,7 +230,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         // Gets the GUID of the DE.
-        int IDebugEngine2.GetEngineId(out Guid guidEngine) {
+        int IDebugEngine2.GetEngineId(out Guid guidEngine)
+        {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             guidEngine = new Guid(ID);
             return VSConstants.S_OK;
@@ -326,7 +333,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
         // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
-        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aExe, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess) {
+        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aExe, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess)
+        {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             //System.Diagnostics.Debug.Assert(m_pollThread == null);
@@ -335,70 +343,73 @@ namespace Cosmos.Debug.VSDebugEngine {
             //System.Diagnostics.Debug.Assert(m_ad7ProgramId == Guid.Empty);
 
             aProcess = null;
-            try {
-              m_engineCallback = new EngineCallback(this, aAD7Callback);
-              
-              //string commandLine = EngineUtils.BuildCommandLine(exe, args);
-              //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
-              // We are being asked to debug a process when we currently aren't debugging anything
-              //m_pollThread = new WorkerThread();
-              // Complete the win32 attach on the poll thread
-              //m_pollThread.RunOperation(new Operation(delegate
-              //{
-              //   var  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
-              //}));
+            try
+            {
+                m_engineCallback = new EngineCallback(this, aAD7Callback);
 
-              //var xTarget = new Cosmos.Build.Launch.Target.QEMU();
+                //string commandLine = EngineUtils.BuildCommandLine(exe, args);
+                //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
+                // We are being asked to debug a process when we currently aren't debugging anything
+                //m_pollThread = new WorkerThread();
+                // Complete the win32 attach on the poll thread
+                //m_pollThread.RunOperation(new Operation(delegate
+                //{
+                //   var  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
+                //}));
+
+                //var xTarget = new Cosmos.Build.Launch.Target.QEMU();
 
 
-              AD7EngineCreateEvent.Send(this);
-              var xProcess = new AD7Process(aExe, m_engineCallback, this);
-              aProcess = xProcess;
-              m_ad7ProgramId = xProcess.mID;
-              AD7ThreadCreateEvent.Send(this,xProcess.Thread);
-              mModule = new AD7Module();
-              
+                AD7EngineCreateEvent.Send(this);
+                var xProcess = new AD7Process(aExe, m_engineCallback, this, aPort);
+                aProcess = xProcess;
+                m_ad7ProgramId = xProcess.mID;
+                //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
+                mModule = new AD7Module();
+                mProgNode = new AD7ProgramNode(1);
 
-            //           DebuggedModule^ module = m_moduleList->First->Value;		
 
-            //CComBSTR bstrModuleName;
-            //CComBSTR bstrSymbolPath;
-            //bstrModuleName.Attach((BSTR)(System::Runtime::InteropServices::Marshal::StringToBSTR(module->Name).ToInt32()));
+                //           DebuggedModule^ module = m_moduleList->First->Value;		
 
-            //// Load symbols for the application's exe. This is the only symbol file the sample engine will load.
-            //if (m_pSymbolEngine->LoadSymbolsForModule(bstrModuleName, &bstrSymbolPath))
-            //{
-            //    module->SymbolsLoaded = true;
-            //    module->SymbolPath = gcnew String(bstrSymbolPath);
-            //}	
+                //CComBSTR bstrModuleName;
+                //CComBSTR bstrSymbolPath;
+                //bstrModuleName.Attach((BSTR)(System::Runtime::InteropServices::Marshal::StringToBSTR(module->Name).ToInt32()));
 
-            //m_entrypointModule = module;
-            //DebuggedThread^ thread = CreateThread(m_lastDebugEvent.dwThreadId, m_lastDebugEvent.u.CreateProcessInfo.hThread, (DWORD_PTR)m_lastDebugEvent.u.CreateProcessInfo.lpStartAddress);
+                //// Load symbols for the application's exe. This is the only symbol file the sample engine will load.
+                //if (m_pSymbolEngine->LoadSymbolsForModule(bstrModuleName, &bstrSymbolPath))
+                //{
+                //    module->SymbolsLoaded = true;
+                //    module->SymbolPath = gcnew String(bstrSymbolPath);
+                //}	
 
-            //if (m_debugMethod == Launch)
-            //{
-            //    // Because of Com-re-entrancy, the engine must wait to send the fake mod-load and thread create events until after the
-            //    // launch is complete. Save these references so the call to ResumeFromLaunch can send the events.
-            //    m_entrypointModule = module;
-            //    m_entrypointThread = thread;
+                //m_entrypointModule = module;
+                //DebuggedThread^ thread = CreateThread(m_lastDebugEvent.dwThreadId, m_lastDebugEvent.u.CreateProcessInfo.hThread, (DWORD_PTR)m_lastDebugEvent.u.CreateProcessInfo.lpStartAddress);
 
-            //    // Do not continue the create process event until after the call to ResumeFromLaunch.
-            //    fContinue = false;
-            //}
-            //else
-            //{
-            //    // This is an attach.
-            //    // Fake up a thread create event for the entrypoint module and the first thread in the process for attach
+                //if (m_debugMethod == Launch)
+                //{
+                //    // Because of Com-re-entrancy, the engine must wait to send the fake mod-load and thread create events until after the
+                //    // launch is complete. Save these references so the call to ResumeFromLaunch can send the events.
+                //    m_entrypointModule = module;
+                //    m_entrypointThread = thread;
+
+                //    // Do not continue the create process event until after the call to ResumeFromLaunch.
+                //    fContinue = false;
+                //}
+                //else
+                //{
+                //    // This is an attach.
+                //    // Fake up a thread create event for the entrypoint module and the first thread in the process for attach
                 //m_callback->OnModuleLoad(module);
 
                 //m_callback->OnSymbolSearch(module, module->SymbolPath, module->SymbolsLoaded);
-            //    m_callback->OnThreadStart(thread);
-            //}
+                //    m_callback->OnThreadStart(thread);
+                //}
 
-              mISO = aExe;
-              return VSConstants.S_OK;
+                mISO = aExe;
+                return VSConstants.S_OK;
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return EngineUtils.UnexpectedException(e);
             }
         }
@@ -428,16 +439,23 @@ namespace Cosmos.Debug.VSDebugEngine {
                     Trace.WriteLine("No AD7Process retrieved!");
                     return VSConstants.E_INVALIDARG;
                 }
-                xProcess.ResumeFromLaunch();
-                Callback.OnModuleLoad(mModule);
-                Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 1);
-                Callback.OnThreadStart(mThread);
-                //AD7EntrypointEvent.Send(this);
+                IDebugPort2 xPort;
+                EngineUtils.CheckOk(process.GetPort(out xPort));
+                var xDefPort = (IDebugDefaultPort2)xPort;
+                IDebugPortNotify2 xNotify;
+                EngineUtils.CheckOk(xDefPort.GetPortNotify(out xNotify));
+                EngineUtils.RequireOk(xNotify.AddProgramNode(mProgNode));
                 
+                //xProcess.ResumeFromLaunch();
+                //Callback.OnModuleLoad(mModule);
+                //Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 1);
+                //Callback.OnThreadStart(mThread);
+                //AD7EntrypointEvent.Send(this);
+
                 // Resume the threads in the debuggee process
                 //m_pollThread.RunOperation(new Operation(delegate
                 //{
-                    //m_debuggedProcess.ResumeFromLaunch();
+                //m_debuggedProcess.ResumeFromLaunch();
                 //}));
 
                 return VSConstants.S_OK;
@@ -465,12 +483,12 @@ namespace Cosmos.Debug.VSDebugEngine {
             try
             {
                 int processId = EngineUtils.GetProcessId(process);
-//                if (processId != m_debuggedProcess.Id)
+                //                if (processId != m_debuggedProcess.Id)
                 {
-//                    return VSConstants.S_FALSE;
+                    //                    return VSConstants.S_FALSE;
                 }
 
-//                m_debuggedProcess.Terminate();
+                //                m_debuggedProcess.Terminate();
                 m_engineCallback.OnProcessExit(0);
 
                 return VSConstants.S_OK;
@@ -520,8 +538,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
-            AD7Thread thread = (AD7Thread)pThread;           
-           
+            AD7Thread thread = (AD7Thread)pThread;
+
             //m_pollThread.RunOperation(new Operation(delegate
             //{
             //    //m_debuggedProcess.Continue(thread.GetDebuggedThread());
@@ -550,7 +568,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             //{
             //    //m_debuggedProcess.Detach();
             //}));
-            
+
             return VSConstants.S_OK;
         }
 
@@ -578,7 +596,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
-            ppEnum = new AD7ModuleEnum(new [] {  mModule});
+            ppEnum = new AD7ModuleEnum(new[] { mModule });
 
             return VSConstants.S_OK;
         }
@@ -598,8 +616,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             //    threadObjects[i] = (AD7Thread)threads[i].Client;
             //}
 
-            ppEnum = new AD7ThreadEnum(new []{mThread});
-            
+            ppEnum = new AD7ThreadEnum(new[] { mThread });
+
             return VSConstants.S_OK;
         }
 
@@ -630,7 +648,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample engine does not participate in managed edit & continue.
             update = null;
-            return VSConstants.S_OK;            
+            return VSConstants.S_OK;
         }
 
         // Gets the name and identifier of the debug engine (DE) running this program.
@@ -663,7 +681,8 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
         // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
-        public int GetProgramId(out Guid guidProgramId) {
+        public int GetProgramId(out Guid guidProgramId)
+        {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
 
@@ -792,6 +811,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         #endregion
 
         private string mISO;
-      
+
     }
 }
