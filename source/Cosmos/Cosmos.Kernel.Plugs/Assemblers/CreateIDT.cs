@@ -125,7 +125,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         // store floating point data
         new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
         new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 512 }; // fxsave needs 512 bytes
-        new CPUx86.SSE.FXSave { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true }; // save the registers
+        new CPUx86.x87.FXSave { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true }; // save the registers
         new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESP };
 
         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; // 
@@ -144,7 +144,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         }
         new CPUx86.Call { DestinationLabel = CPUAll.MethodInfoLabelGenerator.GenerateLabelName(xHandler) };
         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-        new CPUx86.SSE.FXStore { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+        new CPUx86.x87.FXStore { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
         new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX }; // this restores the stack for the FX stuff, except the pointer to the FX data
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 }; // "pop" the pointer
