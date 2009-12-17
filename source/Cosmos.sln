@@ -233,7 +233,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.HostProcess", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ch2845", "ch2845", "{1DB35C80-00E4-41DE-AF1E-4A3ED148C352}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "..\source2\Users\ch2845\CosmosBoot\test.csproj", "{05222195-9A40-4C1A-8527-050AB3580AF6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{673EFE0A-176C-40CA-B4C3-F5328F838696}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -525,10 +525,10 @@ Global
 		SccProjectTopLevelParentUniqueName71 = Cosmos.sln
 		SccProjectName71 = ../source2/Debug/Cosmos.Debug.HostProcess
 		SccLocalPath71 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
-		SccProjectUniqueName72 = ..\\source2\\Users\\ch2845\\CosmosBoot\\test.csproj
+		SccProjectUniqueName72 = ConsoleApplication1\\ConsoleApplication1.csproj
 		SccProjectTopLevelParentUniqueName72 = Cosmos.sln
-		SccProjectName72 = ../source2/Users/ch2845/CosmosBoot
-		SccLocalPath72 = ..\\source2\\Users\\ch2845\\CosmosBoot
+		SccProjectName72 = ConsoleApplication1
+		SccLocalPath72 = ConsoleApplication1
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1093,14 +1093,12 @@ Global
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|x86.ActiveCfg = Release|Any CPU
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Debug|x86.ActiveCfg = Debug|x86
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Debug|x86.Build.0 = Debug|x86
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Release|x86.ActiveCfg = Release|x86
-		{05222195-9A40-4C1A-8527-050AB3580AF6}.Release|x86.Build.0 = Release|x86
+		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Release|Any CPU.Build.0 = Release|Any CPU
+		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1210,6 +1208,6 @@ Global
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{0F641748-FF03-4DA7-981B-1E9268330EE5} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
 		{D89DE0D3-FF3E-4F63-B15F-7302D998845E} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
-		{05222195-9A40-4C1A-8527-050AB3580AF6} = {1DB35C80-00E4-41DE-AF1E-4A3ED148C352}
+		{673EFE0A-176C-40CA-B4C3-F5328F838696} = {1DB35C80-00E4-41DE-AF1E-4A3ED148C352}
 	EndGlobalSection
 EndGlobal
