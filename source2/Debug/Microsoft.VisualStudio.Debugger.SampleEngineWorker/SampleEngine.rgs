@@ -1,0 +1,59 @@
+HKLM
+{
+   NoRemove SOFTWARE
+   {
+       NoRemove Microsoft
+       {
+           NoRemove VisualStudio
+           {
+               NoRemove 9.0
+               {
+                   NoRemove AD7Metrics
+                   {
+                       NoRemove Engine
+                       {
+                           '{D951924A-4999-42a0-9217-1EB5233D1D5A}' = s 'guidDebuggingSampleEngine'
+                           {
+                                val 'CLSID' = s '{8355452D-6D2F-41b0-89B8-BB2AA2529E94}'
+                                val 'ProgramProvider' = s '{FF3E23A2-DA7E-4fa7-AF47-6EDEDE4E922E}'
+                                val 'Attach' = d '1'
+                                val 'AddressBP' = d '0'
+                                val 'AutoSelectPriority' = d '4'
+                                val 'CallstackBP' =  d '1'
+                                val 'Name' = s 'Sample Debug Engine'
+                                val 'PortSupplier' = s '{708C1ECA-FF48-11D2-904F-00C04FA302A1}'
+                                
+                                'IncompatibleList'
+                                {
+                                    val 'guidCOMPlusNativeEng' = s '{92EF0900-2251-11D2-B72E-0000F87572EF}'
+                                    val 'guidCOMPlusOnlyEng' = s '{449EC4CC-30D2-4032-9256-EE18EB41B62B}'
+                                    val 'guidNativeOnlyEng' = s '{449EC4CC-30D2-4032-9256-EE18EB41B62B}'
+                                    val 'guidScriptEng' = s '{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}'
+                                }
+                           }
+                       }
+                   }
+                   
+                   NoRemove CLSID
+                   {
+                       '{8355452D-6D2F-41b0-89B8-BB2AA2529E94}'
+                       {
+                            val 'Assembly' = s 'Microsoft.VisualStudio.Debugger.SampleEngine'
+                            val 'Class' = s 'Microsoft.VisualStudio.Debugger.SampleEngine.AD7Engine'
+                            val 'InprocServer32' = s 'c:\windows\system32\mscoree.dll'   
+                            val 'CodeBase' = s '%WORKERPATH%\Microsoft.VisualStudio.Debugger.SampleEngine.dll'
+                       }
+                       
+                       '{FF3E23A2-DA7E-4fa7-AF47-6EDEDE4E922E}'
+                       {
+                            val 'Assembly' = s 'Microsoft.VisualStudio.Debugger.SampleEngine'
+                            val 'Class' = s 'Microsoft.VisualStudio.Debugger.SampleEngine.AD7ProgramProvider'
+                            val 'InprocServer32' = s 'c:\windows\system32\mscoree.dll'
+                            val 'CodeBase' = s '%WORKERPATH%\Microsoft.VisualStudio.Debugger.SampleEngine.dll'
+                       }               
+                   }
+               }
+           }
+       }
+   }
+}
