@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
+using Microsoft.VisualStudio;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -15,7 +15,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7PendingBreakpoint m_pendingBreakpoint;
         private AD7BreakpointResolution m_breakpointResolution;
         private AD7Engine m_engine;
-        private uint m_address;
+        private uint m_address;                                                                                               
 
         private bool m_enabled;
         private bool m_deleted;
@@ -35,12 +35,9 @@ namespace Cosmos.Debug.VSDebugEngine
         // Called when the breakpoint is being deleted by the user.
         int IDebugBoundBreakpoint2.Delete()
         {
-            //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-
             if (!m_deleted)
             {
                 m_deleted = true;
-                //m_engine.DebuggedProcess.RemoveBreakpoint(m_address, this);
                 m_pendingBreakpoint.OnBoundBreakpointDeleted(this);
             }
 
@@ -50,8 +47,6 @@ namespace Cosmos.Debug.VSDebugEngine
         // Called by the debugger UI when the user is enabling or disabling a breakpoint.
         int IDebugBoundBreakpoint2.Enable(int fEnable)
         {
-            //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-
             bool enabled = fEnable == 0 ? false : true;
             if (m_enabled != enabled)
             {

@@ -33,7 +33,8 @@ namespace Cosmos.Debugger.VSRegister {
         RegistryKey xKey;
 
         xKey = xVSKey.CreateSubKey(@"AD7Metrics\Engine");
-        xKey = xKey.CreateSubKey(GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7Engine)));
+        xKey = xKey.CreateSubKey("{" + AD7Engine.ID + "}");
+        xKey.SetValue(null, "guidCosmosDebugEngine");
         xKey.SetValue("CLSID", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7Engine)));
         xKey.SetValue("ProgramProvider", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7ProgramProvider)));
         xKey.SetValue("Attach", 1);
@@ -58,7 +59,7 @@ namespace Cosmos.Debugger.VSRegister {
       // Note: On x64 some registry paths are different. This routine does not
       // currently handle them.
       static public void Register() {
-          RegisterRoot(Registry.LocalMachine, "9.0");
+          //RegisterRoot(Registry.LocalMachine, "9.0");
           //RegisterRoot(Registry.CurrentUser, @"9.0Exp\Configuration");
           RegisterRoot(Registry.CurrentUser, @"9.0Exp\Configuration");
       }

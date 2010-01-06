@@ -23,17 +23,18 @@ namespace Cosmos.Debug.VSDebugEngine
     //
     // IDebugEngineProgram2: This interface provides simultanious debugging of multiple threads in a debuggee.
 
-    [ComVisible(false)]
-    [Guid("D3788C06-09DE-46b3-B61B-A8A56ADA8B99")]
+    [ComVisible(true)]
+    [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
     public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2
     {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         EngineCallback m_engineCallback;
+        private AD7Process mProcess;
 
         // The sample debug engine is split into two parts: a managed front-end and a mixed-mode back end. DebuggedProcess is the primary
         // object in the back-end. AD7Engine holds a reference to it.
         //DebuggedProcess m_debuggedProcess;
-
+                                           
         // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
         // api requires thread affinity to several operations.
         // This object manages breakpoints in the sample engine.
@@ -86,8 +87,6 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-            System.Diagnostics.Debug.Assert(m_ad7ProgramId == Guid.Empty);
-
             if (celtPrograms != 1)
             {
                 System.Diagnostics.Debug.Fail("SampleEngine only expects to see one program in a process");
@@ -134,7 +133,16 @@ namespace Cosmos.Debug.VSDebugEngine
 
                 AD7EngineCreateEvent.Send(this);
                 AD7ProgramCreateEvent.Send(this);
-
+                mProcess.ResumeFromLaunch();
+                System.Threading.ThreadPool.QueueUserWorkItem(new WaitCallback(delegate {
+                    Thread.Sleep(500);
+                    AD7ModuleLoadEvent.Send(this, mModule, true);
+                    mThread = new AD7Thread(this, mProcess);
+                    AD7LoadCompleteEvent.Send(this, mThread);
+                
+                }));
+                                
+                
                 // start polling for debug events on the poll thread
                 //m_pollThread.RunOperationAsync(new Operation(delegate
                 //{
@@ -363,10 +371,11 @@ namespace Cosmos.Debug.VSDebugEngine
                 AD7EngineCreateEvent.Send(this);
                 var xProcess = new AD7Process(aExe, m_engineCallback, this, aPort);
                 aProcess = xProcess;
+                mProcess = xProcess;
                 m_ad7ProgramId = xProcess.mID;
                 //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
                 mModule = new AD7Module();
-                mProgNode = new AD7ProgramNode(1);
+                mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
 
 
                 //           DebuggedModule^ module = m_moduleList->First->Value;		
@@ -440,10 +449,10 @@ namespace Cosmos.Debug.VSDebugEngine
                     return VSConstants.E_INVALIDARG;
                 }
                 IDebugPort2 xPort;
-                EngineUtils.CheckOk(process.GetPort(out xPort));
+                EngineUtils.RequireOk(process.GetPort(out xPort));
                 var xDefPort = (IDebugDefaultPort2)xPort;
                 IDebugPortNotify2 xNotify;
-                EngineUtils.CheckOk(xDefPort.GetPortNotify(out xNotify));
+                EngineUtils.RequireOk(xDefPort.GetPortNotify(out xNotify));
                 EngineUtils.RequireOk(xNotify.AddProgramNode(mProgNode));
                 
                 //xProcess.ResumeFromLaunch();

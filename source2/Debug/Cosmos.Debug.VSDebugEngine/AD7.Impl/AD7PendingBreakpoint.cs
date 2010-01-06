@@ -26,7 +26,8 @@ namespace Cosmos.Debug.VSDebugEngine
             m_pBPRequest = pBPRequest;
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo((uint)enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
-            m_bpRequestInfo = requestInfo[0]; 
+            m_bpRequestInfo = requestInfo[0];
+            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo((uint)enum_BPREQI_FIELDS.BPREQI_THREAD, requestInfo));
 
             m_engine = engine;
             m_bpManager = bpManager;

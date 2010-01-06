@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System.Diagnostics;
 
 namespace Cosmos.Debug.VSDebugEngine
 {

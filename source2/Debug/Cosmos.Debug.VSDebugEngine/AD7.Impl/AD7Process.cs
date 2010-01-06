@@ -1,5 +1,5 @@
-﻿#define DEBUG_CONNECTOR_TCP_CLIENT
-//#define DEBUG_CONNECTOR_TCP_SERVER
+﻿//#define DEBUG_CONNECTOR_TCP_CLIENT
+#define DEBUG_CONNECTOR_TCP_SERVER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,6 +115,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             throw new NotImplementedException();
         }
 
@@ -152,8 +153,9 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         public int GetInfo(uint Fields, PROCESS_INFO[] pProcessInfo)
-        {
-            throw new NotImplementedException();
+        {                  throw new NotImplementedException();
+        Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+        throw new NotImplementedException();
         }
 
         public int GetName(uint gnType, out string pbstrName)
@@ -163,6 +165,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             pProcessId[0].dwProcessId = (uint)mProcess.Id;
             pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
             return VSConstants.S_OK;
@@ -182,6 +185,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public int GetProcessId(out Guid pguidProcessId)
         {
+            Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             pguidProcessId = mID;
             return VSConstants.S_OK;
         }
@@ -202,12 +206,13 @@ namespace Cosmos.Debug.VSDebugEngine
         {
 #if DEBUG_CONNECTOR_TCP_SERVER
             mProcess.StandardInput.WriteLine("");
+            mCallback.OnOutputString("Test message");
 #endif
 #if DEBUG_CONNECTOR_TCP_CLIENT
             mProcess.StandardInput.WriteLine("");
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPClient();
 #endif
-
+           
         }
 
         void mProcess_Exited(object sender, EventArgs e)

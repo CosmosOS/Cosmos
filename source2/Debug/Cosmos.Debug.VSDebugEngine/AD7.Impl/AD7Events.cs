@@ -209,10 +209,10 @@ namespace Cosmos.Debug.VSDebugEngine
         {
         }
 
-        internal static void Send(AD7Engine aEngine)
+        internal static void Send(AD7Engine aEngine, AD7Thread aThread)
         {
             var xMessage = new AD7LoadCompleteEvent();
-            aEngine.Callback.Send(xMessage, IID, null);
+            aEngine.Callback.Send(xMessage, IID, aThread);
         }
     }
 
