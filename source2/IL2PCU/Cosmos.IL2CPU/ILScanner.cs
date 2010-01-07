@@ -162,16 +162,30 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    public event Action<string> TempDebug;
+    private void DoTempDebug(string message)
+    {
+        if (TempDebug != null)
+        {
+            TempDebug(message);
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+    }
+
     public void Execute(System.Reflection.MethodBase aStartMethod) {
         if (aStartMethod == null)
         {
             throw new ArgumentNullException("aStartMethod");
         }
-      // TODO: Investigate using MS CCI
+        // TODO: Investigate using MS CCI
       // Need to check license, as well as in profiler
-      // http://cciast.codeplex.com/
+        // http://cciast.codeplex.com/
 
-      // Methodology
+        #region Description
+        // Methodology
       //
       // Ok - we've done the scanner enough times to know it needs to be
       // documented super well so that future changes won't inadvertently
@@ -213,14 +227,18 @@ namespace Cosmos.IL2CPU {
       //  2 lists.
       //    -Known Types and Methods
       //    -Types and Methods in Queue - to be scanned
-      // -Finally, do compilation
-
-      FindPlugImpls();
+        // -Finally, do compilation
+        #endregion
+        FindPlugImpls();
       // Now that we found all plugs, scan them.
       // We have to scan them after we find all plugs, but because
       // plugs can use other plugs
       ScanPlugs(mPlugImpls);
       ScanPlugs(mPlugImplsInhrt);
+      foreach (var xPlug in mPlugImpls)
+      {
+          DoTempDebug(String.Format("Plug found: '{0}'", xPlug.Key.FullName));
+      }
 
       ILOp.mPlugFields = mPlugFields;
 

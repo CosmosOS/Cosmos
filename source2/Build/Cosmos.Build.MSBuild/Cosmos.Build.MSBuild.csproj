@@ -65,13 +65,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildImage.cs" />
+    <Compile Include="IL2CPU.cs" />
+    <Compile Include="Old\BuildImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Compiler.Builder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
+      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
+      <Name>Cosmos.Hardware.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
+      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
+      <Name>Cosmos.Kernel.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
+      <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
+      <Name>Cosmos.Sys.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
+      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
+      <Name>Cosmos.IL2CPU.X86</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
