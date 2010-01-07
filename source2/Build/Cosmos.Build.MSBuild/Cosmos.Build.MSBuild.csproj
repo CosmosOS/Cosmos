@@ -65,7 +65,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseToolTask.cs" />
     <Compile Include="IL2CPU.cs" />
+    <Compile Include="MakeISO.cs" />
     <Compile Include="NAsm.cs" />
     <Compile Include="Old\BuildImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

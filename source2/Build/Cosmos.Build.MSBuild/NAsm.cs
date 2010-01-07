@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild
 {
-    public class NAsm : Task
+    public class NAsm : BaseToolTask
     {
         #region Property
         [Required]
@@ -31,7 +31,6 @@ namespace Cosmos.Build.MSBuild
             get;
             set;
         }
-
 
         [Required]
         public string ExePath
@@ -62,40 +61,11 @@ namespace Cosmos.Build.MSBuild
             {
                 xFormat = "elf";
             }
-
-            var xProcessStartInfo = new ProcessStartInfo();
-            xProcessStartInfo.WorkingDirectory = Path.GetDirectoryName(OutputFile);
-            xProcessStartInfo.FileName = ExePath;
-            xProcessStartInfo.Arguments = String.Format("-g -f {0} -o \"{1}\" \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile));
-            xProcessStartInfo.UseShellExecute = false;
-            xProcessStartInfo.RedirectStandardOutput = true;
-            xProcessStartInfo.RedirectStandardError = true;
-            using (var xProcess = Process.Start(xProcessStartInfo))
-            {
-                if (!xProcess.WaitForExit(30 * 1000) || xProcess.ExitCode != 0)
-                {
-                    if (!xProcess.HasExited)
-                    {
-                        xProcess.Kill();
-                        Log.LogError("NAsm assembler timed out.");
-                    }
-                    else
-                    {
-                        Log.LogError("Error occurred while invoking nasm");
-                    }
-                    while (!xProcess.StandardOutput.EndOfStream)
-                    {
-                        Log.LogMessage("NAsm output: {0}", xProcess.StandardOutput.ReadLine());
-                    }
-                    while (!xProcess.StandardError.EndOfStream)
-                    {
-                        Log.LogMessage("NAsm error: {0}", xProcess.StandardError.ReadLine());
-                    }
-                    return false;
-                }
-            }
-
-            return true;
+            return ExecuteTool(
+                Path.GetDirectoryName(OutputFile),
+                ExePath,
+                String.Format("-g -f {0} -o \"{1}\" \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile)),
+                "NAsm");
         }
 
 
