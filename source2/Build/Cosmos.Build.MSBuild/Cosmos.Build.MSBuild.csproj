@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IL2CPU.cs" />
+    <Compile Include="NAsm.cs" />
     <Compile Include="Old\BuildImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -130,7 +130,6 @@ namespace Cosmos.Build.MSBuild
             xAsm.Initialize();
             using (var xScanner = new ILScanner(xAsm))
             {
-                xScanner.TempDebug += new Action<string>(x => Log.LogWarning(x));
                 if (!String.IsNullOrEmpty(LogFile))
                 {
                     xScanner.EnableLogging(LogFile);
