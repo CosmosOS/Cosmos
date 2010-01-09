@@ -53,6 +53,12 @@ namespace Cosmos.Debug.VSDebugEngine
 #endif
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
+#if!DEBUG_CONNECTOR_TCP_SERVER
+            throw new NotImplementedException();
+#else
+            mDebugEngine.DebugConnector.ConnectionLost = new Action<Exception>(delegate { mEngine.Callback.OnProcessExit(0); });
+#endif
+
             System.Threading.Thread.Sleep(250);
             mProcess = Process.Start(mProcessStartInfo);
             mProcess.EnableRaisingEvents = true;
@@ -71,7 +77,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         void mDebugEngine_TextReceived(string obj)
         {
-            mCallback.OnOutputString(obj);
+            mCallback.OnOutputString(obj + "\r\n");
         }
 
         internal AD7Thread Thread
@@ -206,7 +212,6 @@ namespace Cosmos.Debug.VSDebugEngine
         {
 #if DEBUG_CONNECTOR_TCP_SERVER
             mProcess.StandardInput.WriteLine("");
-            mCallback.OnOutputString("Test message");
 #endif
 #if DEBUG_CONNECTOR_TCP_CLIENT
             mProcess.StandardInput.WriteLine("");
