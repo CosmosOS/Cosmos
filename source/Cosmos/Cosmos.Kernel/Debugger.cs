@@ -8,11 +8,12 @@ namespace Cosmos.Debug {
         public static unsafe void Send(int aLength, char* aText) { } // Plugged
         public static void TraceOff() { } // Plugged
         public static void TraceOn() { } // Plugged
+        public static void SendPtr(object aObject) { } // plugged
         
         public static unsafe void Send(string aText) {
             var xChars = aText.ToCharArray();
             fixed(char* xPtr = &xChars[0]) {
-                Send(aText.Length, xPtr);
+                Send(xChars.Length, xPtr);
             }
         }
 

@@ -14,6 +14,9 @@ namespace Cosmos.Kernel.Plugs {
 		[PlugMethod(Assembler = typeof(DebugSend))]
         public static unsafe void Send(int aLength, char* aText) { }
 
+        [PlugMethod(Assembler = typeof(DebugSendPtr))]
+        public static unsafe void SendPtr(object aPtr) { }
+
 		[PlugMethod(Assembler = typeof(DebugTraceOff))]
         public static void TraceOff() { }
 
@@ -32,6 +35,15 @@ namespace Cosmos.Kernel.Plugs {
             IfDefined("DEBUGSTUB");
             PushAll32();
             Call("DebugStub_SendText");
+            PopAll32();
+            EndIfDefined(); // DEBUGSTUB
+        }
+
+        public void SendPtr()
+        {
+            IfDefined("DEBUGSTUB");
+            PushAll32();
+            Call("DebugStub_SendPtr");
             PopAll32();
             EndIfDefined(); // DEBUGSTUB
         }
@@ -78,6 +90,14 @@ namespace Cosmos.Kernel.Plugs {
     public class DebugSend : AssemblerMethod {
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
             new DebuggerAsm().SendText();
+        }
+    }
+
+    public class DebugSendPtr : AssemblerMethod
+    {
+        public override void AssembleNew(object aAssembler, object aMethodInfo)
+        {
+            new DebuggerAsm().SendPtr();
         }
     }
 }

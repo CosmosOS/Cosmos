@@ -13,6 +13,7 @@ namespace Cosmos.Compiler.Builder {
         public Action<Exception> ConnectionLost;
         public Action<MsgType, UInt32> CmdTrace;
         public Action<string> CmdText;
+        public Action<uint> CmdPointer;
         
         protected MsgType mCurrentMsgType;
         
@@ -20,6 +21,7 @@ namespace Cosmos.Compiler.Builder {
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
         protected abstract void PacketTracePoint(byte[] aPacket);
         protected abstract void PacketText(byte[] aPacket);
+        protected abstract void PacketPointer(byte[] aPacket);
     
         public void SendCommand(byte aCmd) {
             var xData = new byte[1];
@@ -51,6 +53,9 @@ namespace Cosmos.Compiler.Builder {
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
                     Next(1, PacketCommand);
+                    break;
+                case MsgType.Pointer:
+                    Next(4, PacketPointer);
                     break;
                 default:
                     throw new Exception("Unknown debug command");

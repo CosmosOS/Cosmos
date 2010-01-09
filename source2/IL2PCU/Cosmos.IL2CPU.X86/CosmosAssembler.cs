@@ -133,7 +133,6 @@ namespace Cosmos.IL2CPU.X86
                 new Label("DebugStub_Step");
                 new Return();
             }
-            //aOutputWriter.WriteLine("section .data");
             DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
             uint xFlags = 0x10003;
             DataMembers.Add(new DataMember("MultibootSignature",
@@ -157,6 +156,7 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("MultibootChecksum",
                                                (int)(0 - (xFlags + 0x1BADB002))));
             DataMembers.Add(new DataEndIfDefined());
+
             DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
             DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
             DataMembers.Add(new DataMember("Before_Kernel_Stack",

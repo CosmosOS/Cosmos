@@ -120,20 +120,20 @@ namespace Cosmos.IL2CPU.CustomImplementation.System {
         return -1;     
     }
 
-    public static char[] ToCharArray(string aThis)
-    {
-        return GetStorageArray(aThis);
-    }
+    //public static char[] ToCharArray(string aThis)
+    //{
+    //    return GetStorageArray(aThis);
+    //}
 
     [PlugMethod(Enabled = false)]
     public static uint GetStorage(string aString) {
       return 0;
     }
 
-    [PlugMethod(Enabled = false)]
-    public static char[] GetStorageArray(string aString) {
-      return null;
-    }
+    //[PlugMethod(Enabled = false)]
+    //public static char[] GetStorageArray(string aString) {
+    //  return null;
+    //}
 
     public static int IndexOf(string aThis, string aSubstring, int aIdx, int aLength, StringComparison aComparison){
       throw new Exception("Not implemented");

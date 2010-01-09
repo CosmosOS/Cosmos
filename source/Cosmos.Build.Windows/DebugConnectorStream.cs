@@ -38,6 +38,12 @@ namespace Cosmos.Compiler.Builder {
             CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
             Next(1, PacketCommand);
         }
+
+        protected override void PacketPointer(byte[] aPacket)
+        {
+            CmdPointer(GetUInt32(aPacket, 0));
+            Next(1, PacketCommand);
+        }
         
         protected override void Next(int aPacketSize, Action<byte[]> aCompleted) {
             var xIncoming = new Incoming() {

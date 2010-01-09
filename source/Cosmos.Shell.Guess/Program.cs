@@ -23,6 +23,7 @@ namespace Cosmos.Demo.Guess {
             // Divide by 100, get remainder
             Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
             int xMagicNo = xRandom.Next() % 100;
+            Debugger.Send("Test");
             Debugger.Send("Magic Number is " + xMagicNo);
             while (true) {
                 Console.ForegroundColor = ConsoleColor.Blue;

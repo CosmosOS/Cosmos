@@ -147,6 +147,29 @@ namespace Cosmos.IL2CPU.X86
             Return();
         }
 
+        
+        // Input: Stack
+        // Output: None
+        // Modifies: EAX, ECX, EDX, ESI
+        protected void SendPtr()
+        {
+            Label = "DebugStub_SendPtr";
+
+            // Write the type
+            AL = (int)MsgType.Pointer;
+            Call("WriteALToComPort");
+
+            // pointer value
+            ESI = Memory[EBP + 8];
+
+            Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
+            
+            Return();
+        }
+
         // Input AL
         // Output: None
         // Modifies: EAX, EDX, ESI
@@ -213,6 +236,7 @@ namespace Cosmos.IL2CPU.X86
             Executing();
             SendTrace();
             SendText();
+            SendPtr();
             WriteALToComPort();
             WriteByteToComPort();
             DebugSuspend();

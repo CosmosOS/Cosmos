@@ -30,36 +30,40 @@ namespace MatthijsTest
 
 		public static unsafe void Init(){
 
-            var xInit = true;
+            var xInit = false;
             if (xInit)
             {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute(true);
             }
 
-            for (int i = 0; i < Device.Devices.Count; i++)
-            {
-                if (Device.Devices[i].Type == Device.DeviceType.Network)
-                {
-                    mNet = (NetworkDevice)Device.Devices[i];
-                    break;
-                }
-            }
-            if (mNet != null)
-            {
-                mNet.Enable();
-                var xPkt = new UDPPacket(0x0A000002, 15, 0x0A000001, 16, new byte[] { 65, 66, 67, 68, 69 });
-                var xEPkt = new EthernetPacket(xPkt.GetData());
-                mNet.QueueBytes(xEPkt.GetData());
-            }
-            Console.WriteLine("Done!");
+            Cosmos.Debug.Debugger.Send("Hello, World!");
             while (true)
-            {
-                if (mNet != null)
-                {
-                    TCPIPStack.Update();
-                }
-            }
+                ;
+
+            //for (int i = 0; i < Device.Devices.Count; i++)
+            //{
+            //    if (Device.Devices[i].Type == Device.DeviceType.Network)
+            //    {
+            //        mNet = (NetworkDevice)Device.Devices[i];
+            //        break;
+            //    }
+            //}
+            //if (mNet != null)
+            //{
+            //    mNet.Enable();
+            //    var xPkt = new UDPPacket(0x0A000002, 15, 0x0A000001, 16, new byte[] { 65, 66, 67, 68, 69 });
+            //    var xEPkt = new EthernetPacket(xPkt.GetData());
+            //    mNet.QueueBytes(xEPkt.GetData());
+            //}
+            //Console.WriteLine("Done!");
+            //while (true)
+            //{
+            //    if (mNet != null)
+            //    {
+            //        TCPIPStack.Update();
+            //    }
+            //}
 
             //Heap.EnableDebug = false;
             //DebugUtil.SendNumber("Program", "DeviceCount", (uint)Device.Devices.Count, 32);

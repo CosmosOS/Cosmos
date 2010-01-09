@@ -44,6 +44,11 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 			return aStorage[aIndex];
 		}
 
+        public static char[] ToCharArray(string aThis, [FieldAccess(Name = "$$Storage$$")] ref char[] aChars)
+        {
+            return aChars;
+        }
+
 		public static string FastAllocateString(int length) {
 			return new String(new char[length]);
 		}
@@ -74,14 +79,19 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
   //StringImpl2 plugs StringImpl which is also a plug????
 	//[Plug(Target = typeof(Cosmos.IL2CPU.CustomImplementation.System.StringImpl))]
 	public static class StringImpl2 {
-		public static unsafe uint GetStorage(uint* aStringPtr, [FieldAccess(Name = "$$Storage$$")]ref uint aStorage) {
+        //System_Int32__System_String_get_Length__
+        [PlugMethod(Enabled=false)]
+        public static unsafe uint GetStorage(uint* aStringPtr, [FieldAccess(Name = "$$Storage$$")]ref uint aStorage) {
 			return aStorage;
 		}
 
-		public static char[] GetStorageArray(string aThis, [FieldAccess(Name = "$$Storage$$")]ref char[] aStorage) {
-			return aStorage;
-		}
+        [PlugMethod(Signature = "System_Char____Cosmos_IL2CPU_CustomImplementation_System_GetStorageArray_System_String__")]
+        public static char[] GetStorageArray(string aThis, [FieldAccess(Name = "$$Storage$$")]ref char[] aStorage)
+        {
+            return aStorage;
+        }
 
+        [PlugMethod(Enabled = false)]
 		public static void FakeMethod() {
 			//char[] xThis = null;
 			//CustomImplementation.System.StringImpl.Ctor(null, ref xThis, null);

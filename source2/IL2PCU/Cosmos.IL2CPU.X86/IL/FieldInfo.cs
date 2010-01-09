@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 
 namespace Cosmos.IL2CPU.X86.IL {
-  [DebuggerDisplay("Field '{Id}'")]
+  [DebuggerDisplay("Field = '{Id}', Offset = {Offset}, Size = {Size}")]
   public class FieldInfo {
     public readonly string Id;
     /// <summary>

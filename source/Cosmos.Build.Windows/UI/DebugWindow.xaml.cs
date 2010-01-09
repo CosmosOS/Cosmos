@@ -163,11 +163,21 @@ namespace Cosmos.Compiler.Builder {
             mDebugConnector.ConnectionLost += ConnectionLost;
             mDebugConnector.CmdTrace += CmdTrace;
             mDebugConnector.CmdText += CmdText;
+            mDebugConnector.CmdPointer += CmdPointer;
         }
 
         protected void CmdText(string aText) {
             var xAction = (Action)delegate() {
                 Log(MsgType.Message, aText);
+            };
+            Dispatcher.BeginInvoke(xAction);
+        }
+
+        protected void CmdPointer(uint aPointer)
+        {
+            var xAction = (Action)delegate
+            {
+                Log(MsgType.Pointer, "0x" + aPointer.ToString("X8").ToUpper());
             };
             Dispatcher.BeginInvoke(xAction);
         }
