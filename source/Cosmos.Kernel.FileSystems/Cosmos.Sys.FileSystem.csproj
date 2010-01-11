@@ -65,6 +65,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugUtil.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="FAT32\FileSystemInfo32.cs" />
     <Compile Include="Filesystem.cs" />
     <Compile Include="FileSystem_Old.cs" />
+    <Compile Include="ISO9660\ISO9660.Structs.cs" />
     <Compile Include="MBR.cs" />
     <Compile Include="MBT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
