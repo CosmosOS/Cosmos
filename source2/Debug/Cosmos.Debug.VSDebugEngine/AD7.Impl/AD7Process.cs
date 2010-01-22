@@ -8,8 +8,8 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using System.Diagnostics;
 using Cosmos.Debug.Common.CDebugger;
-using Cosmos.Compiler.Builder;
 using System.Collections.ObjectModel;
+using System.IO;
 
 
 namespace Cosmos.Debug.VSDebugEngine
@@ -24,7 +24,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7Thread mThread;
         private AD7Engine mEngine;
         private DebugEngine mDebugEngine;
-        internal Cosmos.Debug.Common.CDebugger.SourceInfos mSourceMappings;
+        internal ReverseSourceInfos mSourceMappings;
 
         internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
@@ -43,10 +43,9 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcessStartInfo.RedirectStandardInput = true;
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
-            var xOptions = BuildOptions.Load();
-            var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ParseFile(xOptions.BuildPath);
-            var mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping
-               , xOptions.BuildPath + "Tools/asm/debug.cxdb");
+            var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ParseFile(Path.GetDirectoryName(aISOFile));
+            var xSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping, Path.ChangeExtension(aISOFile, ".cxdb"));
+            mSourceMappings = new ReverseSourceInfos(xSourceMappings);
             mDebugEngine = new DebugEngine();
 #if DEBUG_CONNECTOR_TCP_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();

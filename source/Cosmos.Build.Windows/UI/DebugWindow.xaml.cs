@@ -282,8 +282,19 @@ namespace Cosmos.Compiler.Builder {
              mDebugConnector.SendCommand((int)Command.Step);
         }
 
-        private void ExecuteTestCommand(object sender, ExecutedRoutedEventArgs e) {
-
+        private void ExecuteTestCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            uint xAddress = 0;
+            if (!uint.TryParse(tbxAddress.Text, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out xAddress))
+            {
+                MessageBox.Show("Invalid number format!", "", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            mDebugConnector.SendCommand((byte)Command.BreakOnAddress);
+            foreach (var xByte in BitConverter.GetBytes(xAddress))
+            {
+                mDebugConnector.SendCommand(xByte);
+            }
         }
 
         private void ExecuteTraceCommand(object sender, ExecutedRoutedEventArgs e) {

@@ -80,7 +80,6 @@
     <Compile Include="FAT32\FileSystemInfo32.cs" />
     <Compile Include="Filesystem.cs" />
     <Compile Include="FileSystem_Old.cs" />
-    <Compile Include="ISO9660\ISO9660.Structs.cs" />
     <Compile Include="MBR.cs" />
     <Compile Include="MBT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,6 +92,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ISO9660\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

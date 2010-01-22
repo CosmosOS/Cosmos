@@ -29,7 +29,7 @@ namespace Cosmos.Debug.VSDebugEngine
     {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         EngineCallback m_engineCallback;
-        private AD7Process mProcess;
+        internal AD7Process mProcess;
 
         // The sample debug engine is split into two parts: a managed front-end and a mixed-mode back end. DebuggedProcess is the primary
         // object in the back-end. AD7Engine holds a reference to it.

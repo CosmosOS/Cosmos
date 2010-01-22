@@ -284,10 +284,6 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets)
     {
-        if (TmpPosLabel(aMethod, aOp) == "System_Void__MatthijsTest_Program_Init____DOT__0000000D")
-        {
-            Console.Write("");
-        }
         // NOTE - These if statemens can be optimized down - but clarity is
         // more importnat the optimizations would not offer much benefit
 

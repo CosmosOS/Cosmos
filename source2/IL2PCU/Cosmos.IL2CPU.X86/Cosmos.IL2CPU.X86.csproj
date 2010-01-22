@@ -440,6 +440,7 @@
     <Compile Include="X86\X\Address.cs" />
     <Compile Include="X86\X\AddressDirect.cs" />
     <Compile Include="X86\X\AddressIndirect.cs" />
+    <Compile Include="X86\X\RegisterEDI.cs" />
     <Compile Include="X86\X\Memory.cs" />
     <Compile Include="X86\X\MemoryAction.cs" />
     <Compile Include="X86\X\PortNumber.cs" />

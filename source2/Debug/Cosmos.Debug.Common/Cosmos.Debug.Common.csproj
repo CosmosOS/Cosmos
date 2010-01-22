@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CDebugger\ReverseSourceInfo.cs" />
     <Compile Include="CDebugger\DebugConnector.cs" />
     <Compile Include="CDebugger\DebugConnectorPipeClient.cs" />
     <Compile Include="CDebugger\DebugConnectorPipeServer.cs" />

@@ -45,6 +45,11 @@ namespace Cosmos.Debug.VSDebugEngine
                 return false;
             }
 
+            if (m_engine.mProcess == null)
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -107,6 +112,13 @@ namespace Cosmos.Debug.VSDebugEngine
                     TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
                     EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
 
+                    uint xAddress = 0;
+                    if( m_engine.mProcess.mSourceMappings.FindAddressForSourceLocation(documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn, out xAddress)){
+                        var xBPR = new AD7BreakpointResolution(m_engine, xAddress, GetDocumentContext(xAddress));
+                        var xBBP = new AD7BoundBreakpoint(m_engine, xAddress, this, xBPR);
+                        m_boundBreakpoints.Add(xBBP);
+                        //m_bpManager.mProcess.SetBreakpoint
+                    }
 
                     // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
                     //uint[] addresses = m_engine.DebuggedProcess.GetAddressesForSourceLocation(null, 

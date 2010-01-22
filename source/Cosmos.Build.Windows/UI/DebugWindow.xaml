@@ -62,7 +62,9 @@
                     <Separator/>
                     <Button Name="butnTrace" ToolTip="Ctrl-T" Command="{StaticResource TraceCommand}">Trace</Button>
                     <Separator/>
-                    <Button Visibility="Hidden" Name="butnTest" Command="{StaticResource TestCommand}">Test</Button>
+                    <Button Name="butnTest" Command="{StaticResource TestCommand}">Test</Button>
+                    <Separator/>
+                    <TextBox Name="tbxAddress" Width="150"/>
                 </ToolBar>
             </ToolBarTray>
             <Label Name="lablSourceFilename" DockPanel.Dock="Top">Source File Name</Label>

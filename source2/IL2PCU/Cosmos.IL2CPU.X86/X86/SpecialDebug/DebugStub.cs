@@ -35,6 +35,8 @@ namespace Cosmos.IL2CPU.X86
                 new DataMember("InterruptsEnabledFlag", 0),
                 // If set to 1, on next trace a break will occur
                 new DataMember("DebugBreakOnNextTrace", 0),
+                // breakpoint address
+                new DataMember("DebugBreakpointAddress", 0)
              });
         }
 
@@ -50,6 +52,31 @@ namespace Cosmos.IL2CPU.X86
             Label = "DebugStub_Step";
             Memory["DebugBreakOnNextTrace", 32] = 1;
             Return();
+        }
+
+        protected void BreakOnAddress()
+        {
+            Label = "DebugStub_BreakOnAddress";
+            PushAll32();
+
+            new Push { DestinationValue = 0 };
+            EDI = ESP;
+            //Label = "DebugStub_BreakOnAddress2";
+            //Jump("DebugStub_BreakOnAddress2");
+            //new Sub { DestinationReg = RegistersEnum.EDI, SourceValue = 3 };
+
+            // read address
+            Call("ReadByteFromComPort");
+            Call("ReadByteFromComPort");
+            Call("ReadByteFromComPort");
+            Call("ReadByteFromComPort");
+
+            new Pop { DestinationReg = RegistersEnum.EAX };
+            Memory["DebugBreakpointAddress", 32] = EAX;
+
+            PopAll32();
+            Return();
+
         }
 
         protected void Break() {
@@ -219,6 +246,31 @@ namespace Cosmos.IL2CPU.X86
             Return();
         }
 
+        // input: EDI
+        // Modified: EAX, EDX, EDI (-1)
+        //
+        // Reads a byte into [EDI] and does EDI - 1
+        protected void ReadByteFromComPort()
+        {
+            Label = "ReadByteFromComPort";
+            DX = mComStatusAddr;
+            
+            // wait for port to be ready
+            Label = "ReadByteFromComPort_Wait";
+            AL = Port[DX];
+            AL.Test(1);
+            /**/JumpIf(Flags.Zero, "ReadByteFromComPort_Wait");
+
+            // set address of port
+            DX = mComAddr;
+            // read byte
+            AL = 0;
+            AL = Port[DX];
+            Memory[EDI, 8] = AL;
+            new Inc { DestinationReg = Registers.EDI };
+            Return();
+        }
+
         protected void DebugSuspend() {
             Label = "DebugPoint_DebugSuspend";
             Memory["DebugSuspendLevel", 32]++;
@@ -239,14 +291,32 @@ namespace Cosmos.IL2CPU.X86
             SendPtr();
             WriteALToComPort();
             WriteByteToComPort();
+            ReadByteFromComPort();
+
             DebugSuspend();
             DebugResume();
             Break();
+            BreakOnAddress();
         }
 
         protected void Executing() {
             Label = "DebugStub_Executing";
+
+            new Compare{ DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect = true,
+                SourceValue = 0, Size = 32 };
+            JumpIf(Flags.Equal, "DebugStub_Executing_AfterBreakOnAddress");
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect=true };
+            new Sub { DestinationReg = Registers.EAX, SourceValue = 5 };
             
+            // if there's a pending BreakOnAddress, compare it to the original
+            new Compare
+            {
+                DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect=true,
+                SourceReg = Registers.EAX};
+                JumpIf(Flags.Equal, "DebugStub_Break");
+
+                Label = "DebugStub_Executing_AfterBreakOnAddress";
+
             // See if there is a requested break
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
             Memory["DebugBreakOnNextTrace", 32].Compare(1);
@@ -263,6 +333,7 @@ namespace Cosmos.IL2CPU.X86
             AL.Test(0x01);
             JumpIf(Flags.Zero, "DebugStub_Executing_Exit");
 
+            Label = "DebugStub_Executing_CommandComingIn";
             // Process command
             DX = mComAddr;
             AL = Port[DX];
@@ -272,6 +343,8 @@ namespace Cosmos.IL2CPU.X86
                 JumpIf(Flags.Equal, "DebugStub_TraceOn");
             AL.Compare((byte)Command.Break);
                 JumpIf(Flags.Equal, "DebugStub_Break");
+            AL.Compare((byte)Command.BreakOnAddress);
+            JumpIf(Flags.Equal, "DebugStub_BreakOnAddress");
 
             Label = "DebugStub_Executing_Exit";
             Return();

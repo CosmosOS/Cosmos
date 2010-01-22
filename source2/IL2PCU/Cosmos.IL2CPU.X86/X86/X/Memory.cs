@@ -91,6 +91,7 @@ namespace Cosmos.IL2CPU.X86.X {
                             if (xAddrDirect.Label != null) {
                                 new Move {
                                     DestinationRef = ElementReference.New(xAddrDirect.Label),
+                                    DestinationIsIndirect = true,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
                                     SourceReg = value.Register,
@@ -113,7 +114,7 @@ namespace Cosmos.IL2CPU.X86.X {
                                 new Move {
                                     DestinationRef = xAddrIndirect.Reference,
                                     DestinationDisplacement = xAddrIndirect.Displacement,
-                                    DestinationValue = xAddrIndirect.Address,
+                                    DestinationValue = (xAddrIndirect.Address != 0 ? (uint?)xAddrIndirect.Address : (uint?)null),
                                     DestinationReg = xAddrIndirect.Register,
                                     DestinationIsIndirect = true,
                                     SourceValue = value.Value.GetValueOrDefault(),

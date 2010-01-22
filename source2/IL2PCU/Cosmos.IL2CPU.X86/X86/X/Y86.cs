@@ -24,6 +24,7 @@ namespace Cosmos.IL2CPU.X86.X {
         public RegisterEBP EBP = RegisterEBP.Instance;
         public RegisterESP ESP = RegisterESP.Instance;
         public RegisterESI ESI = RegisterESI.Instance;
+        public RegisterEDI EDI = RegisterEDI.Instance;
 
         public readonly Ports Port = new Ports();
         public readonly Memory Memory = new Memory();
