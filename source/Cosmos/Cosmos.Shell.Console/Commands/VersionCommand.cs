@@ -31,12 +31,12 @@ namespace Cosmos.Shell.Console.Commands
         private void DisplayVersion()
         {
             System.Console.ForegroundColor = ConsoleColor.Red;
-            System.Console.WriteLine("Cosmos Copyright 2008 The Cosmos Project");
+            System.Console.WriteLine("Cosmos Copyright 2010 The Cosmos Project");
             System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             System.Console.ForegroundColor = ConsoleColor.White;
-            System.Console.Write("Version 0.0.0.1 - ");
+            System.Console.Write("Cosmos ");
             System.Console.ForegroundColor = ConsoleColor.Green;
-            System.Console.WriteLine("Milestone 1");
+            System.Console.WriteLine("Milestone 4");
             System.Console.ForegroundColor = ConsoleColor.White;
             System.Console.WriteLine();
         }

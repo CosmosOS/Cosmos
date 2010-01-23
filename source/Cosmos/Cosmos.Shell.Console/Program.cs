@@ -22,7 +22,9 @@ namespace Cosmos.Demo.Shell {
 			try {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
-                System.Console.WriteLine("Sorry - the Cosmos.Shell.Console is currently not working.");
+                //System.Console.WriteLine("Sorry - the Cosmos.Shell.Console is currently not working.");
+                Prompter pmt = new Prompter();
+                pmt.Initialize();
 				//stages.Enqueue(new Prompter());
 
 			} catch (Exception E) {
