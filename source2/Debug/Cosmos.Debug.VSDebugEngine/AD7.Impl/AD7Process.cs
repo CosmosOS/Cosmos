@@ -10,6 +10,7 @@ using System.Diagnostics;
 using Cosmos.Debug.Common.CDebugger;
 using System.Collections.ObjectModel;
 using System.IO;
+using Cosmos.Compiler.Debug;
 
 
 namespace Cosmos.Debug.VSDebugEngine
@@ -74,6 +75,11 @@ namespace Cosmos.Debug.VSDebugEngine
             mPort = aPort;
         }
 
+        public void SetBreakpointAddress(uint aAddress)
+        {
+            mDebugEngine.DebugConnector.SetBreakpointAddress(aAddress);
+        }
+
         void mDebugEngine_TextReceived(string obj)
         {
             mCallback.OnOutputString(obj + "\r\n");
@@ -98,12 +104,22 @@ namespace Cosmos.Debug.VSDebugEngine
                         //var xSourceInfo = mSourceMappings[arg2];
 
                         //mCallback.OnOutputString("Try to break now");
+                        var xActualAddress = arg2 - 5; // - 5 to correct the addres:
+                        // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
+
                         var xActionPoints = new List<object>();
-                        //foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)
-                        //{
-                        //    xBP.
-                        //}
-                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<object>(new List<object>()), arg2);
+                        var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
+                        foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)
+                        {
+                            foreach(var xBBP in xBP.m_boundBreakpoints){
+                                if (xBBP.m_address == xActualAddress)
+                                {
+                                    xBoundBreakpoints.Add(xBBP);
+                                }
+                            }
+                        }
+                        //mCallback.onb
+                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), arg2);
                         //mEngine.Callback.OnBreakComplete(mThread, );
                         mEngine.AfterBreak = true;
                         //mEngine.Callback.OnBreak(mThread);
@@ -226,6 +242,11 @@ namespace Cosmos.Debug.VSDebugEngine
             //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
             //mCallback.OnProcessExit((uint)mProcess.ExitCode);
+        }
+
+        internal void Continue()
+        {
+            mDebugEngine.DebugConnector.SendCommand((byte)Command.Break);
         }
     }
 }

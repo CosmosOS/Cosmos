@@ -8,7 +8,7 @@ using Cosmos.Compiler.Debug;
 namespace Cosmos.Debug.Common.CDebugger
 {
     public abstract class DebugConnectorStream : DebugConnector {
-        protected Stream mStream;
+        private Stream mStream;
         
         protected class Incoming {
             public Stream Stream;
@@ -18,13 +18,29 @@ namespace Cosmos.Debug.Common.CDebugger
             public int CurrentPos = 0;
             public Action<byte[]> Completed;
         }
- 
-        protected override void SendData(byte[] aBytes) {
-            mStream.Write(aBytes, 0, aBytes.Length);
+
+        protected override void SendData(byte[] aBytes)
+        {
+            if (mStream != null)
+            {
+                mStream.Write(aBytes, 0, aBytes.Length);
+            }
+            else
+            {
+                mPendingSend = (byte[])aBytes.Clone();
+            }
         }
-        
-        protected void Start(Stream aStream) {
+
+        private byte[] mPendingSend = null;
+
+        protected void Start(Stream aStream)
+        {
             mStream = aStream;
+            if (mPendingSend != null)
+            {
+                SendData(mPendingSend);
+                mPendingSend = null;
+            }
             // Request first command
             Next(1, PacketCommand);
         }

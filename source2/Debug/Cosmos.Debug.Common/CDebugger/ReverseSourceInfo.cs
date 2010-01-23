@@ -18,20 +18,23 @@ namespace Cosmos.Debug.Common.CDebugger
 
         public bool FindAddressForSourceLocation(string documentName, uint aLine, uint aColumn, out uint aAddress)
         {
+            aAddress = UInt32.MaxValue;
             foreach (var xItem in mSourceInfos)
             {
                 if (!documentName.Equals(xItem.Value.SourceFile, StringComparison.InvariantCultureIgnoreCase))
                 {
                     continue;
                 }
+                // todo: improve check to also consider column
                 if (xItem.Value.Line == aLine)
                 {
-                    aAddress= xItem.Key;
-                    return true;
+                    if (aAddress > xItem.Key)
+                    {
+                        aAddress = xItem.Key;
+                    }
                 }
             }
-            aAddress = 0;
-            return false;
+            return aAddress < UInt32.MaxValue;
         }
     }
 }

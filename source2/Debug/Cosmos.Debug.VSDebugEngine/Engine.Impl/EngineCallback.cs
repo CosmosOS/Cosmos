@@ -118,15 +118,15 @@ namespace Cosmos.Debug.VSDebugEngine
             Send(mBreak, AD7BreakEvent.IID, aThread);
         }
 
-        public void OnBreakpoint(AD7Thread thread, ReadOnlyCollection<object> clients, uint address)
+        public void OnBreakpoint(AD7Thread thread, ReadOnlyCollection<IDebugBoundBreakpoint2> clients, uint address)
         {
             //AD7brea
             IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
 
             int i = 0;
-            foreach (object objCurrentBreakpoint in clients)
+            foreach (var objCurrentBreakpoint in clients)
             {
-                boundBreakpoints[i] = (IDebugBoundBreakpoint2)objCurrentBreakpoint;
+                boundBreakpoints[i] = objCurrentBreakpoint;
                 i++;
             }
 

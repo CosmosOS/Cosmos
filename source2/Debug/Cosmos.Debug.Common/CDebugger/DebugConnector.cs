@@ -28,6 +28,14 @@ namespace Cosmos.Debug.Common.CDebugger
             SendData(xData);
         }
 
+        public void SetBreakpointAddress(uint aAddress)
+        {
+            var xData = new byte[5];
+            xData[0] = (byte)Command.BreakOnAddress;
+            Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 1, 4);
+            SendData(xData);
+        }
+
         protected UInt32 GetUInt32(byte[] aBytes, int aOffset) {
            return (UInt32)((aBytes[aOffset + 3] << 24) | (aBytes[aOffset + 2] << 16)
               | (aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);

@@ -15,7 +15,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7PendingBreakpoint m_pendingBreakpoint;
         private AD7BreakpointResolution m_breakpointResolution;
         private AD7Engine m_engine;
-        private uint m_address;                                                                                               
+        internal uint m_address;                                                                                               
 
         private bool m_enabled;
         private bool m_deleted;
@@ -28,6 +28,7 @@ namespace Cosmos.Debug.VSDebugEngine
             m_breakpointResolution = breakpointResolution;
             m_enabled = true;
             m_deleted = false;
+            m_engine.mProcess.SetBreakpointAddress(address);
         }
 
         #region IDebugBoundBreakpoint2 Members

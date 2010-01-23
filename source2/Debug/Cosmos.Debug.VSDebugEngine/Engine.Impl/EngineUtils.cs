@@ -116,7 +116,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public static int UnexpectedException(Exception e)
         {
-            System.Diagnostics.Debug.Fail("Unexpected exception during Attach");
+            System.Diagnostics.Debug.Fail("Unexpected exception during Attach", e.ToString());
             return 0;// Constants.RPC_E_SERVERFAULT;
         }
 

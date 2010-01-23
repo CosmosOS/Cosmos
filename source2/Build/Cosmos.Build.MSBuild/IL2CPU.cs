@@ -87,6 +87,7 @@ namespace Cosmos.Build.MSBuild
                     Log.LogError("Invalid DebugMode specified");
                     return false;
                 }
+                mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             }
             if (String.IsNullOrEmpty(TraceAssemblies))
             {
@@ -99,6 +100,7 @@ namespace Cosmos.Build.MSBuild
                     Log.LogError("Invalid TraceAssemblies specified");
                     return false;
                 }
+                mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
             return true;
         }

@@ -734,6 +734,7 @@ namespace Cosmos.Debug.VSDebugEngine
         public int ExecuteOnThread(IDebugThread2 pThread)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+            mProcess.Continue();
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
             //AD7Thread thread = (AD7Thread)pThread;

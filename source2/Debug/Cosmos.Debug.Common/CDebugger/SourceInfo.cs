@@ -42,7 +42,7 @@ namespace Cosmos.Debug.Common.CDebugger
 		}
         public static SortedList<uint,String> ParseFile(String buildPath)
         {
-            var xSourceStrings = File.ReadAllLines(buildPath + "main.map");
+            var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
             SortedList<uint,String> xSource = new SortedList<uint,String>();
             uint xIndex = 0;
             for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++)
