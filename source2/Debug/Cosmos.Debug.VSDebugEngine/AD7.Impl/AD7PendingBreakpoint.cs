@@ -113,7 +113,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
 
                     uint xAddress = 0;
-                    if( m_engine.mProcess.mSourceMappings.FindAddressForSourceLocation(documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn, out xAddress)){
+                    if( m_engine.mProcess.mReverseSourceMappings.FindAddressForSourceLocation(documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn, out xAddress)){
                         var xBPR = new AD7BreakpointResolution(m_engine, xAddress, GetDocumentContext(xAddress));
                         var xBBP = new AD7BoundBreakpoint(m_engine, xAddress, this, xBPR);
                         m_boundBreakpoints.Add(xBBP);

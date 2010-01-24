@@ -72,8 +72,8 @@ namespace Cosmos.Debug.VSDebugEngine
                 {
                     // failed to walk any frames. Only return the top frame.
                     frameInfoArray = new FRAMEINFO[1];
-                    //AD7StackFrame frame = new AD7StackFrame(m_engine, this, GetThreadContext());
-                    //frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[0]);
+                    AD7StackFrame frame = new AD7StackFrame(m_engine, this);
+                    frame.SetFrameInfo((enum_FRAMEINFO_FLAGS)dwFieldSpec, out frameInfoArray[0]);
                 }
                 //else
                 {

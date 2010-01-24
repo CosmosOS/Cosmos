@@ -423,7 +423,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        private AD7Module mModule;
+        internal AD7Module mModule;
         private AD7Thread mThread;
         private AD7ProgramNode mProgNode;
         // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended

@@ -46,6 +46,7 @@ namespace Cosmos.Debug.Common.CDebugger
 								xWriter.WriteAttributeString("TypeToken", item.TypeToken.ToString());
 								xWriter.WriteAttributeString("MethodToken", item.MethodToken.ToString());
 								xWriter.WriteAttributeString("ILOffset", item.ILOffset.ToString());
+                                xWriter.WriteAttributeString("MethodName", item.MethodName);
 							}
 							xWriter.WriteEndElement();
 						}
@@ -68,6 +69,7 @@ namespace Cosmos.Debug.Common.CDebugger
 								   TypeToken = (int)item.Attribute("TypeToken"),
 								   MethodToken = (int)item.Attribute("MethodToken"),
 								   ILOffset = (int)item.Attribute("ILOffset"),
+                                   MethodName = (string)item.Attribute("MethodName")
 							   }));
 		}
 
@@ -102,5 +104,11 @@ namespace Cosmos.Debug.Common.CDebugger
 			get;
 			set;
 		}
+
+        public string MethodName
+        {
+            get;
+            set;
+        }
 	}
 }

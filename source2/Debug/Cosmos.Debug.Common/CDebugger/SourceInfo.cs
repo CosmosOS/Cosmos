@@ -20,6 +20,12 @@ namespace Cosmos.Debug.Common.CDebugger
 		}
 	}
 	public class SourceInfo {
+        public string MethodName
+        {
+            get;
+            set;
+        }
+
 		public string SourceFile {
 			get;
 			set;
@@ -147,13 +153,15 @@ namespace Cosmos.Debug.Common.CDebugger
 						uint xAddress = aAddressLabelMappings.Keys[xIndex];
 						//try {
 						int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOffset);
-						var xSourceInfo = new SourceInfo() {
-							SourceFile = xCodeDocuments[xIdx].URL,
-							Line = xCodeLines[xIdx],
-							LineEnd = xCodeEndLines[xIdx],
-							Column = xCodeColumns[xIdx],
-							ColumnEnd = xCodeEndColumns[xIdx]
-						};
+                        var xSourceInfo = new SourceInfo()
+                        {
+                            SourceFile = xCodeDocuments[xIdx].URL,
+                            Line = xCodeLines[xIdx],
+                            LineEnd = xCodeEndLines[xIdx],
+                            Column = xCodeColumns[xIdx],
+                            ColumnEnd = xCodeEndColumns[xIdx],
+                            MethodName=xSymbol.MethodName
+                        };
 						xResult.Add(xAddress, xSourceInfo);
 					}
 				}

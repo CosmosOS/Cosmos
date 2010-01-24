@@ -15,7 +15,7 @@ namespace Cosmos.Debug.VSDebugEngine
         readonly AD7Thread m_thread;
         //readonly X86ThreadContext m_threadContext;
 
-        private string m_documentName;       
+        private string m_documentName;
         private string m_functionName;
         private uint m_lineNum;
         private bool m_hasSource;
@@ -33,16 +33,17 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             m_engine = engine;
             m_thread = thread;
-            //m_threadContext = threadContext;
-
-            // Try to get source information for this location. If symbols for this file have not been found, this will fail.
-            //m_hasSource = m_engine.DebuggedProcess.GetSourceInformation(
-            //                                                m_threadContext.eip, 
-            //                                                ref m_documentName, 
-            //                                                ref m_functionName, 
-            //                                                ref m_lineNum,
-            //                                                ref m_numParameters,
-            //                                                ref m_numLocals);
+            var xProcess = m_engine.mProcess;
+            m_hasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceMappings.ContainsKey(xProcess.mCurrentAddress.Value);
+            if (m_hasSource)
+            {
+                var xSourceMapping = xProcess.mSourceMappings[xProcess.mCurrentAddress.Value];
+                m_documentName = xSourceMapping.SourceFile;
+                m_functionName = xSourceMapping.MethodName;
+                m_lineNum = (uint)xSourceMapping.Line;
+            m_numLocals = 0;
+                m_numParameters = 0;
+            }
 
             // If source information is available, create the collections of locals and parameters and populate them with
             // values from the debuggee.
@@ -65,7 +66,7 @@ namespace Cosmos.Debug.VSDebugEngine
         #region Non-interface methods
 
         // Construct a FRAMEINFO for this stack frame with the requested information.
-        public void SetFrameInfo(uint dwFieldSpec, out FRAMEINFO frameInfo)
+        public void SetFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, out FRAMEINFO frameInfo)
         {
             frameInfo = new FRAMEINFO();
 
@@ -75,21 +76,23 @@ namespace Cosmos.Debug.VSDebugEngine
             // The debugger is asking for the formatted name of the function which is displayed in the callstack window.
             // There are several optional parts to this name including the module, argument types and values, and line numbers.
             // The optional information is requested by setting flags in the dwFieldSpec parameter.
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME))
             {
                 // If there is source information, construct a string that contains the module name, function name, and optionally argument names and values.
                 if (m_hasSource)
                 {
                     frameInfo.m_bstrFuncName = "";
 
-                    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE) != 0)
+                    if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE))
                     {
+//                        m_
                         //frameInfo.m_bstrFuncName = System.IO.Path.GetFileName(module.Name) + "!";
+                        frameInfo.m_bstrFuncName = "module!";
                     }
 
                     frameInfo.m_bstrFuncName += m_functionName;
 
-                    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS) != 0 && m_numParameters > 0)
+                    if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS) && m_numParameters > 0)
                     {
                         frameInfo.m_bstrFuncName += "(";
                         //for (int i = 0; i < m_parameters.Length; i++)
@@ -117,15 +120,15 @@ namespace Cosmos.Debug.VSDebugEngine
                         frameInfo.m_bstrFuncName += ")";
                     }
 
-                    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_LINES) != 0)
+                    if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_LINES))
                     {
                         frameInfo.m_bstrFuncName += " Line:" + m_lineNum.ToString();
                     }
                 }
                 else
-                {                   
+                {
                     // No source information, so only return the module name and the instruction pointer.
-                    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE) != 0)
+                    if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE))
                     {
                         //frameInfo.m_bstrFuncName = EngineUtils.GetAddressDescription(module, ip);
                     }
@@ -138,15 +141,15 @@ namespace Cosmos.Debug.VSDebugEngine
             }
 
             // The debugger is requesting the name of the module for this stack frame.
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_MODULE) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_MODULE))
             {
-                //frameInfo.m_bstrModule = module.Name;
+                frameInfo.m_bstrModule = "module";
                 frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_MODULE;
             }
 
             // The debugger is requesting the range of memory addresses for this frame.
             // For the sample engine, this is the contents of the frame pointer.
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_STACKRANGE) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_STACKRANGE))
             {
                 //frameInfo.m_addrMin = m_threadContext.ebp;
                 //frameInfo.m_addrMax = m_threadContext.ebp;
@@ -154,35 +157,33 @@ namespace Cosmos.Debug.VSDebugEngine
             }
 
             // The debugger is requesting the IDebugStackFrame2 value for this frame info.
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FRAME) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FRAME))
             {
                 frameInfo.m_pFrame = this;
                 frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_FRAME;
             }
-            
+
             // Does this stack frame of symbols loaded?
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO))
             {
                 frameInfo.m_fHasDebugInfo = m_hasSource ? 1 : 0;
                 frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO;
             }
 
             // Is this frame stale?
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_STALECODE) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_STALECODE))
             {
                 frameInfo.m_fStaleCode = 0;
                 frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_STALECODE;
             }
 
             // The debugger would like a pointer to the IDebugModule2 that contains this stack frame.
-            if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP) != 0)
+            if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP))
             {
-                //if (module != null)
+                if (m_engine.mModule != null)
                 {
-                    //AD7Module ad7Module = (AD7Module)module.Client;
-                    //System.Diagnostics.Debug.Assert(ad7Module != null);
-                    //frameInfo.m_pModule = ad7Module;
-                    //frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
+                    frameInfo.m_pModule = m_engine.mModule;
+                    frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
                 }
             }
         }
@@ -270,12 +271,12 @@ namespace Cosmos.Debug.VSDebugEngine
 
             elementsReturned = 0;
             enumObject = null;
-            
+
             try
             {
                 if (guidFilter == AD7Guids.guidFilterLocalsPlusArgs ||
                         guidFilter == AD7Guids.guidFilterAllLocalsPlusArgs ||
-                        guidFilter == AD7Guids.guidFilterAllLocals)        
+                        guidFilter == AD7Guids.guidFilterAllLocals)
                 {
                     CreateLocalsPlusArgsProperties(out elementsReturned, out enumObject);
                     hr = VSConstants.S_OK;
@@ -303,7 +304,7 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 return EngineUtils.UnexpectedException(e);
             }
-            
+
             return hr;
         }
 
@@ -383,7 +384,7 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             try
             {
-                SetFrameInfo(dwFieldSpec, out pFrameInfo[0]);
+                SetFrameInfo((enum_FRAMEINFO_FLAGS)dwFieldSpec, out pFrameInfo[0]);
 
                 return VSConstants.S_OK;
             }
@@ -401,8 +402,8 @@ namespace Cosmos.Debug.VSDebugEngine
         // In this sample, all the supported stack frames are C++
         int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
-            pbstrLanguage = "C++";
-            pguidLanguage = AD7Guids.guidLanguageCpp;
+            pbstrLanguage = "CSharp";
+            pguidLanguage = AD7Guids.guidLanguageCSharp;
             return VSConstants.S_OK;
         }
 
@@ -458,11 +459,11 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Parses a text-based expression for evaluation.
         // The engine sample only supports locals and parameters so the only task here is to check the names in those collections.
-        int IDebugExpressionContext2.ParseText(string pszCode, 
-                                                uint dwFlags, 
-                                                uint nRadix, 
-                                                out IDebugExpression2 ppExpr, 
-                                                out string pbstrError, 
+        int IDebugExpressionContext2.ParseText(string pszCode,
+                                                uint dwFlags,
+                                                uint nRadix,
+                                                out IDebugExpression2 ppExpr,
+                                                out string pbstrError,
                                                 out uint pichError)
         {
             pbstrError = "";
@@ -470,7 +471,7 @@ namespace Cosmos.Debug.VSDebugEngine
             ppExpr = null;
 
             try
-            {               
+            {
                 //if (m_parameters != null)
                 {
                     //foreach (VariableInformation currVariable in m_parameters)

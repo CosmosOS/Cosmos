@@ -25,7 +25,9 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7Thread mThread;
         private AD7Engine mEngine;
         private DebugEngine mDebugEngine;
-        internal ReverseSourceInfos mSourceMappings;
+        internal ReverseSourceInfos mReverseSourceMappings;
+        internal SourceInfos mSourceMappings;
+        internal uint? mCurrentAddress = null;
 
         internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
@@ -45,8 +47,8 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
             var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ParseFile(Path.GetDirectoryName(aISOFile));
-            var xSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping, Path.ChangeExtension(aISOFile, ".cxdb"));
-            mSourceMappings = new ReverseSourceInfos(xSourceMappings);
+            mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping, Path.ChangeExtension(aISOFile, ".cxdb"));
+            mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             mDebugEngine = new DebugEngine();
 #if DEBUG_CONNECTOR_TCP_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
@@ -118,8 +120,10 @@ namespace Cosmos.Debug.VSDebugEngine
                                 }
                             }
                         }
+
+                        mCurrentAddress = xActualAddress;
                         //mCallback.onb
-                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), arg2);
+                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), xActualAddress);
                         //mEngine.Callback.OnBreakComplete(mThread, );
                         mEngine.AfterBreak = true;
                         //mEngine.Callback.OnBreak(mThread);
@@ -246,6 +250,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         internal void Continue()
         {
+            mCurrentAddress = null;
             mDebugEngine.DebugConnector.SendCommand((byte)Command.Break);
         }
     }

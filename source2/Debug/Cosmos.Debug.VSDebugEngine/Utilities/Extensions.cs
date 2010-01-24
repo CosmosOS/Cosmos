@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace System
 {
@@ -118,6 +119,11 @@ namespace System
             //xSB.Append(", ");
             //xSB.Append(aType.Assembly.FullName);
             return xSB.ToString();
+        }
+
+        public static bool HasFlag(this enum_FRAMEINFO_FLAGS aThis, enum_FRAMEINFO_FLAGS aFlag)
+        {
+            return ((aThis & aFlag) == aFlag);
         }
     }
 }

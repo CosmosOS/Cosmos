@@ -8,6 +8,7 @@ using System.IO;
 using Cosmos.IL2CPU;
 using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
+using Cosmos.Debug.Common.CDebugger;
 
 namespace Cosmos.IL2CPU.X86 {
     public class AssemblerNasm : CosmosAssembler
@@ -246,6 +247,7 @@ namespace Cosmos.IL2CPU.X86 {
         {
             var xMLSymbol = new MLDebugSymbol();
             xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
+            xMLSymbol.MethodName = aMethod.MethodBase.GetFullName();
             int xStackSize = (from item in Stack
                               let xSize = (item.Size % 4 == 0)
                                               ? item.Size

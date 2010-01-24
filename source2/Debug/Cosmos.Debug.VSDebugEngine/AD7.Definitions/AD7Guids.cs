@@ -50,5 +50,7 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             get { return _guidLanguageCpp; }
         }
+
+        public static readonly Guid guidLanguageCSharp = new Guid("{3F5162F8-07C6-11D3-9053-00C04FA302A1}");
     }
 }
