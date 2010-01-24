@@ -222,6 +222,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public int Terminate()
         {
+            mProcess.Kill();
             return VSConstants.S_OK;
         }
 
@@ -252,6 +253,11 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             mCurrentAddress = null;
             mDebugEngine.DebugConnector.SendCommand((byte)Command.Break);
+        }
+
+        internal void Step()
+        {
+            mDebugEngine.DebugConnector.SendCommand((byte)Command.Step);
         }
     }
 }

@@ -498,6 +498,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
 
                 //                m_debuggedProcess.Terminate();
+                mProcess.Terminate();
                 m_engineCallback.OnProcessExit(0);
 
                 return VSConstants.S_OK;
@@ -703,6 +704,7 @@ namespace Cosmos.Debug.VSDebugEngine
         public int Step(IDebugThread2 pThread, uint sk, uint Step)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+            mProcess.Step();
 
             return VSConstants.S_OK;
         }
