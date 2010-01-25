@@ -92,6 +92,14 @@ namespace Cosmos.Kernel.Plugs {
             return new global::System.String(xChars);
         }
 
+        public static bool Contains(string aThis, string value)
+        {
+            if (aThis.IndexOf(value) != -1)
+                return true;
+            else
+                return false;
+        }
+
         public static int IndexOf(string aThis, string aSubStr, int aStart, int aLength, StringComparison aComparison) {
             int xEndIdx = aStart + aLength;
             for (int i = aStart; i < xEndIdx; i++) {
@@ -221,6 +229,52 @@ namespace Cosmos.Kernel.Plugs {
                 return 0;
             else
                 return -1;
+        }
+
+        public static string PadLeft(string aThis, int totalWidth)
+        {
+            return PadLeft(aThis, totalWidth, ' ');
+        }
+
+        public static string PadLeft(string aThis, int totalWidth, char paddingChar)
+        {
+            if (aThis.Length >= totalWidth)
+                return aThis;
+
+            for (int i = 0; i < totalWidth - aThis.Length; i++)
+                aThis = paddingChar.ToString() + aThis;
+
+            return aThis;
+        }
+
+        public static string PadRight(string aThis, int totalWidth)
+        {
+            return PadRight(aThis, totalWidth, ' ');
+        }
+
+        public static string PadRight(string aThis, int totalWidth, char paddingChar)
+        {
+            if (aThis.Length >= totalWidth)
+                return aThis;
+
+            for (int i = 0; i < totalWidth - aThis.Length; i++)
+                aThis += paddingChar.ToString();
+
+            return aThis;
+        }
+
+        public static string Replace(string aThis, char oldChar, char newChar)
+        {
+            string nString = "";
+            for (int i = 0; i < aThis.Length; i++)
+            {
+                if (aThis[i] == oldChar)
+                    nString += newChar.ToString();
+                else
+                    nString += aThis[i];
+            }
+
+            return nString;
         }
 
         public static bool StartsWith(string aThis, string aSubStr, StringComparison aComparison)
