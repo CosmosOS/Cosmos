@@ -192,10 +192,6 @@
     <Content Include="Templates\Projects\CosmosProject\Kernel.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
-      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
-      <Name>Cosmos.Compiler.Builder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
@@ -207,6 +203,10 @@
     <ProjectReference Include="..\..\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj">
       <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>
       <Name>Cosmos.Debug.VSDebugEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

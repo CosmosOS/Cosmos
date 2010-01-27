@@ -8,6 +8,7 @@ using System.Reflection;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
 using System.IO;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -78,7 +79,7 @@ namespace Cosmos.Build.MSBuild
         {
             if (String.IsNullOrEmpty(DebugMode))
             {
-                mDebugMode = Cosmos.IL2CPU.DebugMode.None;
+                mDebugMode = Cosmos.Build.Common.DebugMode.None;
             }
             else
             {
@@ -91,7 +92,7 @@ namespace Cosmos.Build.MSBuild
             }
             if (String.IsNullOrEmpty(TraceAssemblies))
             {
-                mTraceAssemblies = Cosmos.IL2CPU.TraceAssemblies.All;
+                mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
             }
             else
             {
@@ -105,9 +106,9 @@ namespace Cosmos.Build.MSBuild
             return true;
         }
 
-        
-        private Cosmos.IL2CPU.DebugMode  mDebugMode = Cosmos.IL2CPU.DebugMode.None;
-        private TraceAssemblies mTraceAssemblies = Cosmos.IL2CPU.TraceAssemblies.All;
+
+        private DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.None;
+        private TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
         private void LogTime(string message)
         {
             //

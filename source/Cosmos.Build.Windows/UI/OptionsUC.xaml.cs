@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Collections;
 using Cosmos.IL2CPU;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Compiler.Builder
 {

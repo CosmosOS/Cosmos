@@ -10,6 +10,7 @@ using System.Xml;
 using Cosmos.Compiler.Builder;
 using CommandEnum = Cosmos.TestKernelHelpers.TestReporter.CommandEnum;
 using Cosmos.IL2CPU;
+using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner
 {

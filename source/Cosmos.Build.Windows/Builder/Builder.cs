@@ -10,6 +10,7 @@ using Microsoft.Win32;
 using System.IO.Pipes;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Compiler.Builder
 {

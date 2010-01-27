@@ -124,10 +124,6 @@ namespace Cosmos.IL2CPU.X86 {
           }
         xOffset += xInfo.Size;
       }
-      if (aType == typeof(string))
-      {
-          Console.WriteLine("");
-      }
       return xResult;
     }
 

@@ -7,6 +7,29 @@ namespace Cosmos.Build.Common
 {
 	public class DebugQemuProperties : PropertiesBase
 	{
+        public TraceAssemblies TraceAssemblies
+        {
+            get
+            {
+                return GetProperty("TraceAssemblies", TraceAssemblies.User);
+            }
+            set
+            {
+                SetProperty("TraceAssemblies", value);
+            }
+        }
+
+        public DebugMode DebugMode
+        {
+            get
+            {
+                return GetProperty("DebugMode", DebugMode.None);
+            }
+            set
+            {
+                SetProperty("DebugMode", value);
+            }
+        }
 
 		public DebugQemuCommunication Communication
 		{

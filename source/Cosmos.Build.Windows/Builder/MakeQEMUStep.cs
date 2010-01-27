@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using Cosmos.IL2CPU;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Compiler.Builder
 {

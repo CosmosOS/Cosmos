@@ -19,6 +19,8 @@ namespace Cosmos.VS.Package
 			InitializeComponent();
 
 			this.comboCommunication.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugQemuCommunication)));
+            this.comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode)));
+            comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies)));
 
 			this.projProperties = new DebugQemuProperties();
 
@@ -36,6 +38,24 @@ namespace Cosmos.VS.Package
 					this.IsDirty = true;
 				}
 			};
+            this.comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
+            {
+                var value = (DebugMode)((EnumValue)this.comboDebugMode.SelectedItem).Value;
+                if (value != this.PageProperties.DebugMode)
+                {
+                    this.PageProperties.DebugMode = value;
+                    this.IsDirty = true;
+                }
+            };
+            this.comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
+            {
+                var value = (TraceAssemblies)((EnumValue)this.comboTraceMode.SelectedItem).Value;
+                if (value != this.PageProperties.TraceAssemblies)
+                {
+                    this.PageProperties.TraceAssemblies = value;
+                    this.IsDirty = true;
+                }
+            };
 		}
 
 		public override PropertiesBase Properties
@@ -54,5 +74,10 @@ namespace Cosmos.VS.Package
 
 			this.comboCommunication.SelectedItem = EnumValue.Find(this.comboCommunication.Items, this.PageProperties.Communication);
 		}
+
+        private void tableDebugQemu_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
 	}
 }

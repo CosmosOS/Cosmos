@@ -18,6 +18,7 @@ namespace Cosmos.Build.MSBuild
             xProcessStartInfo.UseShellExecute = false;
             xProcessStartInfo.RedirectStandardOutput = true;
             xProcessStartInfo.RedirectStandardError = true;
+            xProcessStartInfo.CreateNoWindow = true;
             using (var xProcess = Process.Start(xProcessStartInfo))
             {
                 if (!xProcess.WaitForExit(30 * 1000) || xProcess.ExitCode != 0)

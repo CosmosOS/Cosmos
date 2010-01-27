@@ -9,6 +9,7 @@ using Cosmos.IL2CPU;
 using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Build.Common;
 
 namespace Cosmos.IL2CPU.X86 {
     public class AssemblerNasm : CosmosAssembler

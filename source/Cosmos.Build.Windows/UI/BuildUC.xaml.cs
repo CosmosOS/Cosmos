@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using Cosmos.IL2CPU;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Compiler.Builder
 {

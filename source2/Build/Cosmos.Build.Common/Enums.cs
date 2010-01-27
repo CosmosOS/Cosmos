@@ -59,6 +59,13 @@ namespace Cosmos.Build.Common {
 		NamedPipeClient
 	}
 
+    public enum LogSeverityEnum : byte
+    {
+        Warning = 0, Error = 1, Informational = 2, Performance = 3
+    }
+    public enum TraceAssemblies { All, Cosmos, User };
+    public enum DebugMode { None, IL, Source, MLUsingGDB }
+
 	public class DescriptionAttribute : Attribute
 	{
 		public static String GetDescription(object value)
