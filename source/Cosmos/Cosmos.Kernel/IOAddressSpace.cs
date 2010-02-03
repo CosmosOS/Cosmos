@@ -15,6 +15,11 @@ namespace Cosmos.Kernel
                 throw new ArgumentOutOfRangeException( "offset or size" );
         }
 
+        public override string ToString()
+        {
+            return String.Concat("IOAddressSpace, offset = ", Offset.ToHex(), ", size = ", Size.ToHex());
+        }
+
         public override byte Read8( UInt32 offset )
         {
             if( offset < 0 || offset > Size )

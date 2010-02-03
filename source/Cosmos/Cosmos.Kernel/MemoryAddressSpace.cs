@@ -12,6 +12,11 @@ namespace Cosmos.Kernel
             : base( offset, size )
         { }
 
+        public override string ToString()
+        {
+            return String.Concat("MemoryAddressSpace, offset = ", Offset.ToHex(), ", size = ", Size.ToHex());
+        }
+
         public override byte Read8( UInt32 offset )
         {
             if( offset > Size )

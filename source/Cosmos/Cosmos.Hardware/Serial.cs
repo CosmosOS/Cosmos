@@ -9,13 +9,13 @@ namespace Cosmos.Hardware {
 		private static bool[] _serialInited = new []{false, false};
 
 		private static ushort GetSerialAddr(byte aSerialIdx) {
-            if (aSerialIdx == 1) {
+            if (aSerialIdx == 0) {
                 return COM1;
             }
-            if(aSerialIdx==2) {
+//            if(aSerialIdx==1) {
                 return COM2;
-            }
-            throw new Exception("Serial port not available");
+            //}
+            //throw new Exception("Serial port not available");
 		}
 
 		public static void InitSerial(byte aSerialIdx) {
