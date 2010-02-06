@@ -8,6 +8,7 @@ namespace MatthijsTest
     [Flags]
     public enum RegularStatusFlagsEnum : byte
     {
+        None = 0,
         /// <summary>
         /// ERR
         /// </summary>
@@ -31,5 +32,13 @@ namespace MatthijsTest
     public enum CommandEnum : byte
     {
         Identify = 0xEC
+    }
+
+    public static class EnumExtensions
+    {
+        public static bool HasFlags(this RegularStatusFlagsEnum @this, RegularStatusFlagsEnum flags)
+        {
+            return (@this & flags) == flags;
+        }
     }
 }

@@ -36,39 +36,75 @@ namespace MatthijsTest
                 xBoot.Execute(true);
             }
 
-            DebugUtil.Write("PCI Device count: ");
-            DebugUtil.WriteLine(PCIBus.Devices.Length.ToHex());
-            PCIDevice xDevice = null;
+            //DebugUtil.Write("PCI Device count: ");
+            //DebugUtil.WriteLine(PCIBus.Devices.Length.ToHex());
+            //PCIDevice xDevice = null;
 
-            for (int i = 0; i < PCIBus.Devices.Length; i++)
+            //for (int i = 0; i < PCIBus.Devices.Length; i++)
+            //{
+            //     xDevice = PCIBus.Devices[i];
+            //    DebugUtil.Write("  ");
+            //    DebugUtil.WriteUIntAsHex((uint)i);
+            //    DebugUtil.Write(": ");
+            //    DebugUtil.WriteLine(xDevice.GetClassInfo());
+            //    DebugUtil.Write("  Address count: ");
+            //    var xAddresses = xDevice.NumberOfBaseAddresses();
+            //    xDevice.EnableDevice();
+            //    DebugUtil.WriteUIntAsHex((uint)xAddresses);
+            //    DebugUtil.WriteLine("");
+            //    for (int j = 0; j < xAddresses; j++)
+            //    {
+            //        DebugUtil.Write("    ");
+            //        DebugUtil.WriteUIntAsHex((uint)j);
+            //        DebugUtil.Write(": ");
+            //        var xAddressSpace = xDevice.GetAddressSpace((byte)j);
+            //        if (xAddressSpace == null)
+            //        {
+            //            DebugUtil.WriteLine(" **NULL**");
+            //            continue;
+            //        }
+            //        DebugUtil.Write("Offset = ");
+            //        DebugUtil.WriteUIntAsHex(xAddressSpace.Offset);
+            //        DebugUtil.Write(", size = ");
+            //        DebugUtil.WriteUIntAsHex(xAddressSpace.Size);
+            //        DebugUtil.WriteLine("");
+            //    }
+            //}
+            MyATAController.Scan();
+            MyATADevice xDevice = null;
+            for (int i = 0; i < Device.Devices.Count; i++)
             {
-                 xDevice = PCIBus.Devices[i];
-                DebugUtil.Write("  ");
-                DebugUtil.WriteUIntAsHex((uint)i);
-                DebugUtil.Write(": ");
-                DebugUtil.WriteLine(xDevice.GetClassInfo());
-                DebugUtil.Write("  Address count: ");
-                var xAddresses = xDevice.NumberOfBaseAddresses();
-                xDevice.EnableDevice();
-                DebugUtil.WriteUIntAsHex((uint)xAddresses);
-                DebugUtil.WriteLine("");
-                for (int j = 0; j < xAddresses; j++)
+                if (Device.Devices[i] is MyATADevice)
                 {
-                    DebugUtil.Write("    ");
-                    DebugUtil.WriteUIntAsHex((uint)j);
-                    DebugUtil.Write(": ");
-                    var xAddressSpace = xDevice.GetAddressSpace((byte)j);
-                    if (xAddressSpace == null)
-                    {
-                        DebugUtil.WriteLine(" **NULL**");
-                        continue;
-                    }
-                    DebugUtil.Write("Offset = ");
-                    DebugUtil.WriteUIntAsHex(xAddressSpace.Offset);
-                    DebugUtil.Write(", size = ");
-                    DebugUtil.WriteUIntAsHex(xAddressSpace.Size);
-                    DebugUtil.WriteLine("");
+                    xDevice = (MyATADevice)Device.Devices[i];
+                    break;
                 }
+            }
+            if (xDevice != null)
+            {
+                Console.WriteLine("Drive found!");
+                Console.Write("Supports LBA28: ");
+                if (xDevice.SupportsLBA28)
+                {
+                    Console.WriteLine("Yes");
+                }
+                else
+                {
+                    Console.WriteLine("No");
+                }
+                Console.Write("Supported UDMA: ");
+                Interrupts.WriteNumber(xDevice.SupportedUDMA, 8);
+                Console.WriteLine();
+                Console.Write("Sector count: ");
+                Interrupts.WriteNumber((uint)xDevice.BlockCount, 32);
+                Console.WriteLine();
+
+                var xDataToSend = new byte[512];
+                for(int i = 0; i < 512;i++){
+                    xDataToSend[i]= (byte)(i % 256);
+                }
+                xDevice.WriteBlock(1, xDataToSend);
+
             }
             Console.WriteLine("Done");
             while (true)
