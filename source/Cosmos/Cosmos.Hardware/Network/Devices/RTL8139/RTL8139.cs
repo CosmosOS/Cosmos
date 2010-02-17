@@ -378,7 +378,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
             else
             {
-                txBuffer = new ManagedMemorySpace(ref aData);
+                txBuffer = new ManagedMemorySpace(aData);
             }
 
             switch (txd)

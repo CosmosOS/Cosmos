@@ -7,10 +7,11 @@ namespace Cosmos.Sys.FileSystem {
 	public static class MBT {
 		private class MBTPartition: BlockDevice {
 			private readonly BlockDevice mBackend;
-			private readonly ulong mBlockStart;
-			private readonly ulong mBlockCount;
+			private readonly uint mBlockStart;
+            private readonly uint mBlockCount;
 			private readonly string mName;
-			public MBTPartition(BlockDevice aBackend, ulong aBlockStart, ulong aBlockCount, string aName) {
+            public MBTPartition(BlockDevice aBackend, uint aBlockStart, uint aBlockCount, string aName)
+            {
 				mBlockStart = aBlockStart;
 				mBlockCount = aBlockCount;
 				mBackend = aBackend;
@@ -23,21 +24,25 @@ namespace Cosmos.Sys.FileSystem {
 				}
 			}
 
-			public override ulong BlockCount {
+            public override uint BlockCount
+            {
 				get {
 					return mBlockCount;
 				}
 			}
 
-			private ulong GetActualBlock(ulong aBlock) {
+            private uint GetActualBlock(uint aBlock)
+            {
 				return aBlock + mBlockStart;
 			}
 
-			public override void ReadBlock(ulong aBlock, byte[] aBuffer) {
+            public override void ReadBlock(uint aBlock, byte[] aBuffer)
+            {
 				mBackend.ReadBlock(GetActualBlock(aBlock), aBuffer);
 			}
 
-			public override void WriteBlock(ulong aBlock, byte[] aContents) {
+            public override void WriteBlock(uint aBlock, byte[] aContents)
+            {
 				mBackend.WriteBlock(GetActualBlock(aBlock), aContents);
 			}
 

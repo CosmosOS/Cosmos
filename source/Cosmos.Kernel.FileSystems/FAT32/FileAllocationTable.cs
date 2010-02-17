@@ -52,7 +52,7 @@ namespace Cosmos.Sys.FileSystem.FAT32
         {
             byte[] b = new byte[fat32.BootSector.BytesPerSec];
             for (int i = 0; i < fat32.BootSector.FATsz16; i++)
-                p.WriteBlock((ulong)(FirstSector + i), b);
+                p.WriteBlock((uint)(FirstSector + i), b);
 
             b[0] = fat32.BootSector.Media;
             b[1] = 0xff;

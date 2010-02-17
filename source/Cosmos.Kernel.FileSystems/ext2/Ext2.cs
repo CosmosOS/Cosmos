@@ -69,10 +69,10 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             }
         }
 
-        private bool GetBitState(ulong aBitmapStart,
+        private bool GetBitState(uint aBitmapStart,
                                  int aIndex) {
             var xPhyBlock = aBitmapStart * 8;
-            xPhyBlock += (ulong)aIndex % 4096;
+            xPhyBlock += (uint)aIndex % 4096;
             mBackend.ReadBlock(xPhyBlock,
                                mBuffer);
             aIndex /= 4096;
@@ -264,7 +264,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                                     32);
             aBlockId *= xPhyBlocksPerFSBlock;
             for (var i = 0; i < xPhyBlocksPerFSBlock; i++) {
-                mBackend.ReadBlock((ulong)(aBlockId + i),
+                mBackend.ReadBlock((uint)(aBlockId + i),
                                    mBuffer);
                 Array.Copy(mBuffer,
                            0,

@@ -25,10 +25,10 @@ namespace Cosmos.Kernel
         /// <remarks>This can only be used for unaligned buffers.</remarks>
         /// </summary>
         /// <param name="buffer">Existing byte buffer</param>
-        public ManagedMemorySpace(ref byte[] buffer)
+        public ManagedMemorySpace(byte[] buffer)
             : base(0, (uint)buffer.Length)
         {
-            fixed (byte* bodystart = buffer)
+            fixed (byte* bodystart = &buffer[0])
             {
                 this.Offset = (UInt32)bodystart;
             }

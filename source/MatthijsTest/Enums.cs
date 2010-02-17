@@ -31,6 +31,8 @@ namespace MatthijsTest
 
     public enum CommandEnum : byte
     {
+        ReadSectors = 0x20,
+        WriteSectors = 0x30,
         Identify = 0xEC
     }
 

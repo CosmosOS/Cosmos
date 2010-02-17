@@ -18,7 +18,7 @@ namespace MatthijsTest
             }
         }
 
-        public override ulong BlockCount
+        public override uint BlockCount
         {
             get
             {
@@ -26,14 +26,35 @@ namespace MatthijsTest
             }
         }
 
-        public override void ReadBlock(ulong aBlock, byte[] aContents)
-        {
+        public override void ReadBlock(uint aBlock, byte[] aContents)
+        {                                   
             throw new NotImplementedException();
         }
 
-        public override void WriteBlock(ulong aBlock, byte[] aContents)
+        public override unsafe void WriteBlock(uint aBlock, byte[] aContents)
         {
-            throw new NotImplementedException();
+            AddressSpace xAddrSpace;
+            fixed (byte* xContents = &aContents[0])
+            {
+                xAddrSpace = new ManagedMemorySpace(aContents);
+                Console.Write("Correct offset: ");
+                Interrupts.WriteNumber((uint)xContents, 32);
+                Console.WriteLine("");
+                Console.Write("Guessed offset: ");
+                Interrupts.WriteNumber(xAddrSpace.Offset, 32);
+                Console.WriteLine("");
+
+                if (xAddrSpace.Offset != ((uint)xContents))
+                {
+                    Console.WriteLine("Offset not correct");
+                }
+            }
+            //var xAddrSpace = new MemoryAddressSpace(xAddr, 512);
+            //for (uint i = 0; i < 512; i++)
+            //{
+            //    xAddrSpace.Write8(i, aContents[i]);
+            //}
+            mController.WriteSector_LBA28(mIsMaster, aBlock, xAddrSpace);
         }
 
         public override string Name
@@ -48,26 +69,22 @@ namespace MatthijsTest
         #endregion
 
         #region Initialization
-        internal MyATADevice(MyATAController controller, string name)
+        internal MyATADevice(MyATAController controller, string name, bool isMaster)
         {
             mName = name;
             mController = controller;
+            mIsMaster = isMaster;
             Initialize();
         }
 
         private void Initialize()
         {
             var xMemSpace = new ManagedMemorySpace(512);
-            mController.RealReadBlock(xMemSpace);
+            mController.RealReadBlock_PIO(xMemSpace);
             SupportsLBA48 = (xMemSpace.Read16(83 * 2) & 1 << 10) != 0; // byte 10 of word 83 specifies if LBA48 is supported
             SupportedUDMA = xMemSpace.Read8(88 * 2);
             mSectorCount = xMemSpace.Read32(60 * 2); // word 60 & 61 contain the number of LBA28 sectors
             SupportsLBA28 = mSectorCount != 0;
-        }
-
-        private static ushort TestFix(ushort value)
-        {
-            return (ushort)((value << 8) | (value >> 8));
         }
 
         public byte SupportedUDMA
@@ -91,6 +108,7 @@ namespace MatthijsTest
         private uint mSectorCount;
         
         private readonly MyATAController mController;
+        private readonly bool mIsMaster;
         #endregion
     }
-}//http://wiki.osdev.org/opensearch_desc.php
+}

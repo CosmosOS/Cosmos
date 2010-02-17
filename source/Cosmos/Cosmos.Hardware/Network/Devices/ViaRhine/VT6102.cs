@@ -280,7 +280,7 @@ namespace Cosmos.Hardware.Network.Devices.ViaRhine
 
             uint xOffset = (uint)(txd * 16);
             UInt32 status = mTxDescriptors.Read32(xOffset);
-            ManagedMemorySpace txBuffer = new ManagedMemorySpace(ref aData);
+            ManagedMemorySpace txBuffer = new ManagedMemorySpace(aData);
             if (((txBuffer.Offset % 4) != 0) || (txBuffer.Size < 64) )
             {
                 txBuffer = new ManagedMemorySpace((uint)(aData.Length < 64 ? 64 : aData.Length), 4);

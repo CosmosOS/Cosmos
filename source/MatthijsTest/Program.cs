@@ -36,40 +36,6 @@ namespace MatthijsTest
                 xBoot.Execute(true);
             }
 
-            //DebugUtil.Write("PCI Device count: ");
-            //DebugUtil.WriteLine(PCIBus.Devices.Length.ToHex());
-            //PCIDevice xDevice = null;
-
-            //for (int i = 0; i < PCIBus.Devices.Length; i++)
-            //{
-            //     xDevice = PCIBus.Devices[i];
-            //    DebugUtil.Write("  ");
-            //    DebugUtil.WriteUIntAsHex((uint)i);
-            //    DebugUtil.Write(": ");
-            //    DebugUtil.WriteLine(xDevice.GetClassInfo());
-            //    DebugUtil.Write("  Address count: ");
-            //    var xAddresses = xDevice.NumberOfBaseAddresses();
-            //    xDevice.EnableDevice();
-            //    DebugUtil.WriteUIntAsHex((uint)xAddresses);
-            //    DebugUtil.WriteLine("");
-            //    for (int j = 0; j < xAddresses; j++)
-            //    {
-            //        DebugUtil.Write("    ");
-            //        DebugUtil.WriteUIntAsHex((uint)j);
-            //        DebugUtil.Write(": ");
-            //        var xAddressSpace = xDevice.GetAddressSpace((byte)j);
-            //        if (xAddressSpace == null)
-            //        {
-            //            DebugUtil.WriteLine(" **NULL**");
-            //            continue;
-            //        }
-            //        DebugUtil.Write("Offset = ");
-            //        DebugUtil.WriteUIntAsHex(xAddressSpace.Offset);
-            //        DebugUtil.Write(", size = ");
-            //        DebugUtil.WriteUIntAsHex(xAddressSpace.Size);
-            //        DebugUtil.WriteLine("");
-            //    }
-            //}
             MyATAController.Scan();
             MyATADevice xDevice = null;
             for (int i = 0; i < Device.Devices.Count; i++)
@@ -100,10 +66,11 @@ namespace MatthijsTest
                 Console.WriteLine();
 
                 var xDataToSend = new byte[512];
-                for(int i = 0; i < 512;i++){
-                    xDataToSend[i]= (byte)(i % 256);
+                for (int i = 0; i < 512; i++)
+                {
+                    xDataToSend[i] = (byte)(i % 256);
                 }
-                xDevice.WriteBlock(1, xDataToSend);
+                xDevice.WriteBlock(2, xDataToSend);
 
             }
             Console.WriteLine("Done");
@@ -122,7 +89,8 @@ namespace MatthijsTest
             }
         }
 
-        private static void Write(char data){
+        private static void Write(char data)
+        {
             Serial.WriteSerial(0, (byte)data);
         }
 
