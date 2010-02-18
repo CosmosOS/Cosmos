@@ -1,0 +1,10 @@
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Capabilities\bin\Debug\Ben.Kernel.Capabilities.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Capabilities\bin\Debug\Ben.Kernel.Capabilities.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Capabilities\obj\Debug\Ben.Kernel.Capabilities.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Capabilities\obj\Debug\Ben.Kernel.Capabilities.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Capabilities\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\Capabilities\Cosmos.Capabilities\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\Capabilities\Cosmos.Capabilities\obj\Debug\Ben.Kernel.Capabilities.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\Capabilities\Cosmos.Capabilities\bin\Debug\Ben.Kernel.Capabilities.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\Capabilities\Cosmos.Capabilities\bin\Debug\Ben.Kernel.Capabilities.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\Capabilities\Cosmos.Capabilities\obj\Debug\Ben.Kernel.Capabilities.dll

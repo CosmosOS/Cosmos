@@ -1,0 +1,6 @@
+﻿See the design document but since we are in uncharted waters with managed IPC 
+we will try several and optomize them, this means the initial implimentation may be a bit heavy especially in the use of some virtual calls .
+I have tried to mimize these as well as dependence between IPC and the Scheduler/ Memory ( though obviously this requires more indirections which conteaditcs the first statement)  
+this allows many different options eg Aysnc queued with efficient cache vs fast ping as the service desires and all clients will be compatible which may outweigh the cost.
+
+Anyway while its certain we will need to improve and maybe hand code ( assembly) IPC we wont prematurely optomize and check a number of algorithms first.

@@ -1,0 +1,5 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\arch\HAL.WindowsEmulator\bin\Debug\HAL.WindowsEmulator.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\arch\HAL.WindowsEmulator\bin\Debug\HAL.WindowsEmulator.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\arch\HAL.WindowsEmulator\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\arch\HAL.WindowsEmulator\obj\Debug\HAL.WindowsEmulator.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\arch\HAL.WindowsEmulator\obj\Debug\HAL.WindowsEmulator.pdb

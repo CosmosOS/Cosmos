@@ -1,0 +1,5 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\bin\Debug\Util.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\bin\Debug\Util.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\obj\Debug\Util.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\obj\Debug\Util.pdb

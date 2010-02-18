@@ -1,0 +1,5 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\bin\Release\Scheduler.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\bin\Release\Scheduler.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\obj\Release\Scheduler.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\obj\Release\Scheduler.pdb

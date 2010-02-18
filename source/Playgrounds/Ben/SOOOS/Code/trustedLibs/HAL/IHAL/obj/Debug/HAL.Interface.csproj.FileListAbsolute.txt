@@ -1,0 +1,5 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\IHAL\bin\Debug\IHAL.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\IHAL\bin\Debug\IHAL.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\IHAL\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\IHAL\obj\Debug\IHAL.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\HAL\IHAL\obj\Debug\IHAL.pdb

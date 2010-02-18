@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6F9EF4AA-D8AE-4AF6-99AE-FD47AB48E054}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CoreLib</RootNamespace>
+    <AssemblyName>CoreLib</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;REFCOUNTED</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Capabilities\CapabilityBase.cs" />
+    <Compile Include="Capabilities\ICapability.cs" />
+    <Compile Include="Capabilities\NullCapability.cs" />
+    <Compile Include="Capabilities\TODO\AllocatorSpaceCapability.cs" />
+    <Compile Include="Collections\CircularFifoQueue.cs" />
+    <Compile Include="Collections\CircularFifoQueueWithWait.cs" />
+    <Compile Include="Collections\ExpandableSpinQueue.cs" />
+    <Compile Include="Collections\SpinQueueWithWait.cs" />
+    <Compile Include="Collections\SpinQueue2.cs" />
+    <Compile Include="Collections\IQueueWithWait.cs" />
+    <Compile Include="Collections\SafeCircularFifoQueue.cs" />
+    <Compile Include="Collections\IQueue.cs" />
+    <Compile Include="Compiler\StaticCompatability.cs" />
+    <Compile Include="Compiler\RefCounted.cs" />
+    <Compile Include="Compiler\ExternalEntry.cs" />
+    <Compile Include="Compiler\Trusted.cs" />
+    <Compile Include="Compiler\IPCStructCall.cs" />
+    <Compile Include="Compiler\NoHeapAllocation.cs" />
+    <Compile Include="Compiler\InlineAttribute.cs" />
+    <Compile Include="GC\CollectorDomainContext.cs" />
+    <Compile Include="GC\ICollector.cs" />
+    <Compile Include="GC\GCFixedAttribute.cs" />
+    <Compile Include="Capabilities\TODO\ProcessorCapability.cs" />
+    <Compile Include="Capabilities\TODO\ThreadCapability.cs" />
+    <Compile Include="Class1.cs" />
+    <Compile Include="Compiler\IPCStruct.cs" />
+    <Compile Include="Compiler\ImmutableAttribute.cs" />
+    <Compile Include="Diagnostics\SystemException.cs" />
+    <Compile Include="GC\IAllocator.cs" />
+    <Compile Include="HalInterface.cs" />
+    <Compile Include="IPC\BufferManager\BufferManager.cs" />
+    <Compile Include="IPC\BufferManager\Buffer.cs" />
+    <Compile Include="IPC\BufferManager\Streamer.cs" />
+    <Compile Include="IPC\BufferManager\ZeroCopyStream.cs" />
+    <Compile Include="IPC\IIPCSTPExtention.cs" />
+    <Compile Include="IPC\IPC.Messaging\AsyncLocklessQueued\AsyncLocklessQueuedMessageReader.cs" />
+    <Compile Include="IPC\IPC.Messaging\AsyncLocklessQueued\AsyncLocklessQueuedMessageWriter.cs" />
+    <Compile Include="IPC\IPC.Messaging\AsyncSharedQueued\AsyncLocklessSharedQueuedMessageReader.cs" />
+    <Compile Include="IPC\IPC.Messaging\AsyncSharedQueued\AsyncLocklessSharedQueuedMessageWriter.cs" />
+    <Compile Include="IPC\IPC.Messaging\Minix\MinixIPCExtention.cs" />
+    <Compile Include="IPC\IPC.Messaging\Minix\MinixMessageReader.cs" />
+    <Compile Include="IPC\IPC.Messaging\Minix\MinixMessageWriter.cs" />
+    <Compile Include="IPC\IPC.Messaging\SyncRendevouz\SyncNonQueuedMessageWriter.cs" />
+    <Compile Include="IPC\IPC.Messaging\SyncRendevouz\SyncNonQueuedMessageReader.cs" />
+    <Compile Include="IPC\IPC.Messaging\IIPCClient.cs" />
+    <Compile Include="IPC\IPC.Messaging\IIPCMessageWriter.cs" />
+    <Compile Include="IPC\IPC.Messaging\IIPCMessageReader.cs" />
+    <Compile Include="IPC\IPC.Messaging\IIPCMessage.cs" />
+    <Compile Include="IPC\IPC.Messaging\IIPCMessageStuct.cs" />
+    <Compile Include="IPC\IPC.Messaging\IPCMessageHolder.cs" />
+    <Compile Include="IPC\IPC.Messaging\Old\IPCManager.cs" />
+    <Compile Include="IPC\IPC.Messaging\Reply\IIPCMessageWithReply.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IPC\ITube.cs" />
+    <Compile Include="ProcessModel\SIA.cs" />
+    <Compile Include="ProcessModel\STP.cs" />
+    <Compile Include="ProcessModel\Thread.cs" />
+    <Compile Include="ProcessModel\ThreadState.cs" />
+    <Compile Include="Threading\CheckedSpinLock.cs" />
+    <Compile Include="Threading\FastResourceLock.cs" />
+    <Compile Include="Threading\Interlocked.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SIA\Services\ServiceBase.cs" />
+    <Compile Include="Threading\NativeMethods.cs" />
+    <Compile Include="Threading\SpinLock.cs" />
+    <Compile Include="Threading\SpinLockType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MetaData\" />
+    <Folder Include="SIA\DeviceDrivers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\trustedLibs\HAL\IHAL\HAL.Interface.csproj">
+      <Project>{293E7BD1-D08F-48F6-B706-30262D6B61D0}</Project>
+      <Name>HAL.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Util\Util.csproj">
+      <Project>{158FC19F-D5CA-4240-A371-B16347B765E0}</Project>
+      <Name>Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IPC\Events\Eventing.txt" />
+    <Content Include="IPC\IPCDesign.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

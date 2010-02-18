@@ -1,0 +1,7 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Debug\CoreLib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Debug\CoreLib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\obj\Debug\CoreLib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\obj\Debug\CoreLib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Debug\Util.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Debug\Util.pdb

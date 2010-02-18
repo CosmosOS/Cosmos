@@ -1,0 +1,10 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\ChessTest.exe.config
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\ChessTest.exe
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\ChessTest.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\CoreLib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\CoreLib.Test.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\CoreLib.Test.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\bin\Debug\CoreLib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\obj\x86\Debug\ChessTest.exe
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\ChessTest\obj\x86\Debug\ChessTest.pdb

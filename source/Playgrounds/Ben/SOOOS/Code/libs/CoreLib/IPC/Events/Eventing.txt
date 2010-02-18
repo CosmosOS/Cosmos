@@ -1,0 +1,8 @@
+﻿
+//Uses IPC struct messages so is a wrapper 
+
+
+//when recived creates and fires events ...
+
+//Probably works best with the First STP of an app is a manager 
+( communicates with outside threads and receives events though nothing prevents this being offloaded to new STPs for high performance scenarios) .

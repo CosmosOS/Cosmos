@@ -1,0 +1,346 @@
+{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Courier New;}{\f1\fmodern\fprq1\fcharset0 Consolas;}{\f2\fnil\fcharset2 Symbol;}}
+{\*\generator Msftedit 5.41.21.2508;}\viewkind4\uc1\pard\lang3081\b\f0\fs20 Cross Domain Communication  (CDC)\par
+\par
+\par
+Address Space\par
+\b0 No such concept ..\par
+\par
+\par
+An application Domain consists of a number of threads \par
+an App domain has an Allocator and a Collector and a limit to the memory it can allocate.\par
+\par
+\b Why not a global collector\b0\par
+\par
+I dont believe a global GC is viable . However  multiple apps could share a Collector if desired and hence have less CDC issues. eg They are tightly coupled then and have no issues interacting. \par
+\par
+However System services and device drivers will be more loosely coupled and have their own Collector. Though they may share a single system Real time Collector. Which will probably be the first tri colour collector we use.  \par
+\par
+The main issues with a sharing a Collector are  \par
+ - Different behaviour required for server , real time , user apps   and device drivers. A larger nursery could help some apps at the cost of more memory.\par
+ - Stop the world generational implementations ( which are the most common) would stop for extended periods eg for 10M+ objects it could be in the range of seconds. Note the stop time is about equal to all the small collectors added together. \par
+- One app could generate significant collections and flood the nursery affecting other apps. ( Note this app would run faster\par
+- Idle apps cant be collected / compacted.\par
+\par
+\par
+\b Sharing data .\b0\par
+\par
+A thread may be part of more than 1 app domain ( this affects the Collector scanning the Threads Stack and suspending the thread for collections) .  But only the prime allocator thread is used for allocations.  The prime allocator can be changed in a using block. For an external thread to create objects in the destination this must be done.\par
+\par
+\par
+\b What is require to share data \b0\par
+- a pointer is submitted to the App Domain with a name which represents the root of the tree which is externally accessible.\par
+\par
+- The types must be in a non root assembly and caller should have access to it \par
+\par
+- It is recommended that applications create an external interface and an Assembly with the Interfaces to allow other applications to compile against it. \par
+\par
+- It is important to remember the allocator.\par
+\par
+\par
+\f1\fs21 Using ( externalAppDOmain.OpenShareForWrite("App1Shared")    // will change allocator and register threads for collection\par
+\{\par
+\tab Create message data objects\par
+\tab Create message \par
+\par
+\tab Send message( message)  ; // ie lock queue and add to queue. Note the queue may expand but the Allocator is teh receiver so no issue.\par
+       \par
+\}\par
+\par
+\f0\fs20\par
+Note the policy here is Sender creates the object in the receiver.\par
+Developers must be VERY carefull not set references in the destination to the source unless they are sharing a Collector. \par
+\par
+\par
+\b How does the reply work \b0\par
+\par
+Just as it was sent.  Note events can be used to check if the message has been processed especially for void returns this is very efficient.  \par
+\par
+\b Thread pool optomization.\b0\par
+\par
+A lot of threadpools work on a small scope of objects it is advisable for high performance scenarios to create a new domain for this. As collections are likely to be small and the work wont be stopped when the main application collects.  \par
+\par
+\b An SOA style message passing style is recommended .\b0\par
+\par
+eg Messages are strongly typed  , Types available should be in interfaces or abstract base classes.  ( Note this is more extreme than WCF but WCF has XML as its underlying type. \par
+\par
+The main reason for this is \par
+\pard{\pntext\f2\'B7\tab}{\*\pn\pnlvlblt\pnf2\pnindent0{\pntxtb\'B7}}\fi-720\li720 The API can be changed without all other applications referencing the assembly failing and you dont get API bloat ( which you get with lots of API interfaces) . \par
+{\pntext\f2\'B7\tab}Single point of entry. This helps security and checking\par
+{\pntext\f2\'B7\tab}Messages can be queued for bulk processing.\par
+{\pntext\f2\'B7\tab}Breaks the chain and hence denies external access to large parts of the application tree.\par
+{\pntext\f2\'B7\tab}Messages can be prioritized\par
+{\pntext\f2\'B7\tab}Devs needs to read the API instead of just using an API call and get weird memory issues.\par
+{\pntext\f2\'B7\tab}Need to hand of to a new thread. Executing the code of the receiver is possible but should in most cases be limited for security and performance reasons ( locking contention , worse cache coherency compared to a thread processing a queue) . The RPC style and block is pointless.  Though we may write a wrapper which does this to make it easier.  \par
+\pard\par
+Events are also highly recommended but remember information in EventArgs will belong to the sender GC .\par
+\b\par
+Static Main \b0\par
+\par
+The entry point assembly will be entirely private eg no methods and types are exposed for  other assemblies to link to.\par
+\par
+\par
+\b Public Static\par
+\par
+\b0 Public statics are globally visible ie the whole OS. They should not be exposed in the shared assembly ( data is exposed by registering them) \par
+\par
+\par
+\par
+\b Object storage changes  [TODO move following to Allocator/collector]\b0\par
+\par
+We need to store a bit with each type to determine if it has no submembers and hence does not need to be scanned in the collector. \par
+\par
+We can add this to the 2 bits we need for the GC coloured sweep. \par
+\par
+Note the type is probably not a good field for this even though it has room ( even 24-26 bits would be fine ) it is probably used so frequently that the extra mask is not worth  the storing saving.\par
+\par
+Probably best to use a Synchblock field bits. \par
+\par
+\b Tricolour Mark Collector\par
+\par
+\b0 By using a tri colour scheme we can use a multi threaded mark. We still need to stop all Mutator threads since the  mark may occured in between a pointer changing ( note for a ref counting GC the program can continue to run except for the stack scan) .  This will significantly reduce the impact of the GC  on application performance in multi threaded systems eg if the cost is 10 % in a normal Mark  in a Tri colour Mark it will be 2.5% in a quad core. Sweeps can be done while  the heap mutators are running compaction also needs to stop the world.  With this in mind the GC will not be a major issue as compaction only needs to be done when under heavy memory pressure.\b\par
+\b0\par
+\par
+\par
+\b Write barrier / Read only pointers. \par
+\par
+\b0 At the moment we have VERY fast allocation doing any work on allocation or on putting write barriers on changing reference will significantly impact performance especially since many small string allocations occur in C# apps. Though these techniques could be use to enhance security and allow threads to run while doing a mark.\par
+\par
+Note the compiler CAN do reference counting for setting / changing references . This would be very usefull for Device Drivers and real time code since then the program would not need to be stopped for the Mark . I suggest we do this on a case by case basis eg if The assembly is marked include ReferenceCounting include the code though the GC will also need to be set to a ref counting one. \b\par
+\b0\par
+\par
+\b Where is the security  ?\par
+\par
+\b0 - Types cant be exposed unless A shared assembly is available to compile against ( note this could be forged as an assembly could be created from hand or from meta data) \par
+- Internals and private members , methods , fields and properties are not available to the calling party. Note it is quite valid to have a type with public get properties and methods but a private or internal constructor. This mechanism can be used to protect data but references to the type cant be forged . Note they can be exchanged for other objects of the same type the caller has access to.  \par
+\par
+\b How to enforce non forgeable references  \b0\par
+\par
+Make the constructor of these type or the type internal hence references can only be forged within the assembly. Be carefull of base type and interface cast pointers  as these may not be secure unless the base types are also internal.\par
+\par
+\b This seems hard how to help developers write secure code ?\par
+\par
+\b0 The message passing abstraction helps as types are not available and the data created by the sender.  This needs more thought. Keeping key things private / internal and providing public copies to users will also help.  eg Thread  will be an internal object to the scheduler.  ThreadView ( or UserThread ) will be handed out when requesting Thread information ( eg System.Threading.Thread will be a ThreadView) . ThreadView can interact with Thread . \par
+\par
+Note it would be possible to expose Thread and public properties directly and is a legitimate way however the view class is more mistake proof. This is similar to how collections return a array new collection when getting the values rather than exposing the internal representation. \par
+\par
+\b How is the GC called\b0\par
+\par
+The GC is called via Thread.Current.Allocator. This is set when a thread enlists in an app domain. Allocations to the nursery should be just a few cycles and inlined.  eg the following for a NUMA design \par
+\par
+Mov R1 , DWORD [ObjectSize]\par
+LOCK XADD [GCNurseryPtr]   , R1    ; is the LOCK needed ?\par
+;Note R1 contains the old value of the pointer but this instruction is thread safe\par
+ADD  R1, DWORD [ObjectSize]\par
+\par
+\par
+The GC is called directly by the appropriate thread without CDC.\par
+\par
+\par
+\b How does the GC work on private classes and capabilities ? \par
+\par
+\b0 It uses pointers and walks the heap.\b\par
+\par
+Service types\par
+\par
+\b0 A Service is any App Domain that receives communication from another App Domain.  Device Drivers are services as they at least communicate with the HAL.  By Implementing ISystemService they can be managed by the system ( eg , stopped , started , monitored , restarted if not responding etc)\par
+\par
+\par
+3 Types \par
+\par
+1) Asynch Messaging with Task Switch. The system has in build messaging for more secure communication. This involves exposing a public interface which the caller uses.  ( Since messages require exposing a queue and access requires a granted reference running them on the caller thread is not viable ( since the read from queue is not made public) .\par
+2) RPC with no Task Switch. It is possible to communicate by directly modifying objects accessed through either  public static or which are exposed via the App Domain. Locking must be used and great care in terms of gardbage collecting . Recommended for simple apps that dont require security or servers that dont require a lot of threads. eg a Cache Service which is called by the file system.\par
+3) RPC  with Task Switch . When the caller calls ( as per 2) , a thread of the service is called with the paramaters ( which may be pointers) on the stack . Shared data must be locked. \par
+\par
+The OS mainly uses 1) . \par
+\par
+\b System Assemblies. \b0  \par
+\par
+This is a special case as its not an app domain but a Re-Entrant Assembly can be called from any thread with no risk.  The GC functions as one ( though its nor re-entrant) \par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+Thread and Allocator \par
+\par
+\par
+What code does thread have access to .. \par
+\par
+, Launch entry point.\par
+\par
+\par
+\par
+\par
+\par
+What data does a  thread have access to \par
+\par
+Anything it created. Via an AppDomain. \par
+\par
+\par
+\par
+\par
+\par
+AppDOmain\par
+Code Entry Point.\par
+Allocator\par
+[Threads] \par
+\par
+\par
+\par
+Why tie treads to appDomain ? \par
+\par
+\par
+Just have \par
+\par
+\par
+Thread\par
+ domain ->\par
+ capability->  ( in most cases a pointer to the key ring in the app domain) \par
+\par
+\par
+can be null etc ..If a thread does no heap allocations it does not need to be in an app domain! This can apply to some worker threads which can then have Capabilities set to the minimum set for execution. \par
+\par
+\par
+How to kill / manage a process \par
+You kill a thread. \par
+A kill requires all threads sharing the same app domain to die. \par
+A domainless thread would have no issue if it was killed. \par
+\par
+\par
+Pause a service will cause all threads in a service loop to not process messages. This avoids locking issues by  pausing a thread.\par
+\par
+\par
+\par
+\par
+\par
+Security \par
+\par
+Cap for referenced Assemblies is needed. Hence very few apps can directly access a kernel dll.  \par
+\par
+\par
+\par
+Starting an app and visability .\par
+\par
+\par
+\b How do you run an app ?\b0\par
+\par
+The loader loads the file ( file system checks rights)  ( if not already loaded) \par
+\par
+It is checked if the user has a execute capability to the Assembly and all referenced assemblies ( dif from file) \par
+\par
+If the file is not loaded the system will patch the actual memory addresses of referenced assemblies and call addresses. ( Elf loader does a lot) \par
+\par
+A thread and App domain are created with appropriate capabilies \par
+The thread jmp to the entry point. \par
+\par
+\b Are Code Assemblies global ?\par
+\par
+\b0 Yes and managed by the loader. But the data for each thread is different. Static data for an assembly is only relevant within the same AppDomain . Hence a new app domain is effectively a reload.\par
+\par
+\b How do you install a new Assembly ?\par
+\par
+\b0 That is part of installing a program which compiles it. The system does NOT support 2 DLLs that are different but have the same version if so the new install will fail.  If the versions are different the new Assembly will be installed and if applications reference \par
+\par
+\b Where are compiled assemblies , Capabilities and application meta data stored?\par
+\b0\par
+In a special directory to which few app have rights. This is similar to the registry and if we implement it through  SQL there would be some benefit ( eg roll back configuration etc) . However this is probably too optomistic and we are betetr of relying on .Net config files at first. \par
+\par
+\par
+\b Isnt there a security risk with shared data?\b0\par
+\par
+Yes , sharing an app domain provides some efficiencies but allows static data to be shared.  It is best for applications that intend to share data create a seperate Share App Domain , and expose an end point. The Shared data should not have any statics .\par
+\par
+The Assembly loader itself is a services so is not as easy to corrupt. \par
+\par
+Single thread vs App domain\par
+\par
+Why not just single threads?\par
+\par
+Because they become bloated . Threads need to be light weight.  \par
+Why not\par
+\par
+Process\par
+\tab AllocatorPool\par
+\tab Collector\par
+\tab LWthread\par
+ ( note 1!) \par
+\tab Capability Keyring\par
+\par
+I think this is best . \par
+No app domains. ( An Appdomain is a number of threads sharing an Allocator Pool) \par
+\par
+\par
+Static variables are created on the heap and are relevant to that AllocatorPool\par
+\par
+Threads/Processes  are capability type objects and managed /created by the appropriate service.  As they are not allocated by the allocatorpool we can swap an allocator pool to disk and restore it when a thread needs to go active . ( eg its waiting on something) .\par
+\par
+\par
+\par
+\par
+\par
+\par
+Send Message will be done via queues!\par
+\par
+These queues will be fixed length ( in receiver app Meta data) and senders will block when it is full ( allong with a warning) \par
+\par
+The implementation of the queue is a ring buffer.\par
+The send mechanism works on 2 pointers in the queue the start and the end.\par
+The sender controls the end of the queue.\par
+The receiver controls the start of the queue.\par
+\par
+An interlocked compare on an owner bit ( sener/receiver) ensures thread safety.  However some optomizations can be made.\par
+\par
+[Ensure that receiver ALWAYS releases this bit after removing message this should be very short duration so sender rarely has a lock on the queue\par
+\par
+http://f-cpu.seul.org/new/michael98nonblocking.pdf\par
+\par
+\par
+\par
+c#\par
+\par
+http://code.google.com/p/zeroflag/source/browse/trunk/Threading/LocklessQueue.cs\par
+\par
+\par
+eg\par
+for(;;)\par
+\{\par
+var listToProcess = new List<Message>(); \par
+queue.Get()\par
+listToProcess.Add(queue.RemoveAll())\par
+queue.Release();\par
+process(msg)\par
+\par
+\}\par
+\par
+\par
+the follwoing is real bad since if the destination is asleep processing sender cannot send.\par
+for(;;)\par
+\{\par
+Message msg\par
+queue.Get()\par
+msg = queue.Remove()\par
+process(msg)\par
+queue.Release();\par
+\}\par
+\par
+If lock not available sender will Idle until set which should schedule the receiver. . \par
+while (queue.GetLock == false)\par
+\tab Sleep(100); \par
+\par
+\par
+http://code.google.com/p/zeroflag/source/browse/trunk/Threading/LocklessQueue.cs\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+}
+ 

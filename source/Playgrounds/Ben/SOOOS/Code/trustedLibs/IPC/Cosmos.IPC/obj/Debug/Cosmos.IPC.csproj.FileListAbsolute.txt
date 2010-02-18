@@ -1,0 +1,7 @@
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Cosmos.IPC.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Cosmos.IPC.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Cosmos.Kernel.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Cosmos.Kernel.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\obj\Debug\ResolveAssemblyReference.cache
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\obj\Debug\Cosmos.IPC.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\obj\Debug\Cosmos.IPC.pdb

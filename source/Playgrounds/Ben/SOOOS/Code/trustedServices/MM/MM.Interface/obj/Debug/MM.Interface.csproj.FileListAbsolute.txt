@@ -1,0 +1,7 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\bin\Debug\MM.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\bin\Debug\MM.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\bin\Debug\CoreLib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\bin\Debug\CoreLib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\obj\Debug\MM.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Interface\obj\Debug\MM.pdb

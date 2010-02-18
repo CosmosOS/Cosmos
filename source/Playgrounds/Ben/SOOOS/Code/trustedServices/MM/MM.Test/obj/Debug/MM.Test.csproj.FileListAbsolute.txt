@@ -1,0 +1,13 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\MM.Test.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\MM.Test.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\CoreLib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\MM.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\MM.Simple.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\Syslib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\CoreLib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\MM.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\MM.Simple.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\bin\Debug\Syslib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\obj\Debug\MM.Test.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Test\obj\Debug\MM.Test.pdb

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="SOOOS">
+</Property><Property Name="Solution File" Value="C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\SOOOS.sln">
+</Property><Property Name="Date" Value="Sunday, December 20, 2009">
+</Property><Property Name="Time" Value="18:01:56 PM">
+</Property><Property Name="Log Number" Value="4">
+</Property></Properties><Event ErrorLevel="0" Project="Ben.Services.MM" Source="trustedServices\Cosmos.MM\Ben.Services.MM.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="Ben.Services.MM" Source="trustedServices\Cosmos.MM\Ben.Services.MM.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="Ben.Services.MM" Source="trustedServices\Cosmos.MM\Ben.Services.MM.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>

@@ -1,0 +1,436 @@
+{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Courier New;}{\f1\fswiss\fprq2\fcharset0 @Arial Unicode MS;}}
+{\*\generator Msftedit 5.41.21.2508;}\viewkind4\uc1\pard\lang3081\b\f0\fs28 IPC Design \b0\fs20\par
+\par
+Write up \par
+\par
+\b Overriding Goals\b0\par
+- Fast \par
+- Easy to maintain / Flexible \par
+- Reliable \par
+- Secure\par
+- Multi platform\par
+\par
+\par
+\par
+\b Key design points\b0\par
+Strongly Typed Messages inherited from base class\par
+Point to Point queues ( eg no routing /addressing) \par
+Priority in queues . \par
+Message may activate sleeping destination ( if destination desires) \par
+All messaging is Asynchronous. \par
+User apps , Kernel and Services are treated identically. \par
+64 bit first class citizen support\par
+First class NUMA multi processor support. \par
+Heavy degree of isolation ( eg internal data types and very moduler)\par
+A Heavy setup cost low run cost approach \par
+Solid OO/modular design\par
+App to App is a 1 st class citizen\par
+\par
+\par
+\par
+\par
+\b More specifically how does this achieve our goals. \b0\par
+\par
+\par
+\b - Fast \b0\par
+\par
+We want to achieve an order of magnitude performance over Linux in IPC call.  \par
+At this level the performance of the messenging system becomes less relevant ( accept for malloc see below) \par
+and we trade it for a more secure and flexible system. \par
+\par
+We do however allow a service waiting for a message to be immediately scheduled.\par
+\par
+Asynchronous nature allows fast low latency traversal if services are scheduled. \par
+( As Synch callers are never scheduled , in this cases they can be services and get immeditaely scheduled when a reply arives) \par
+\par
+Alternatively it can provide high latency high troughput , by not scheduling immediately and then processing a large number of messages. \par
+As the clients are Asynch we dont need to reply immediately. \par
+\par
+Many OS have fast kernel calls but slow IPC , this is a killer for Micro kernels.\par
+\par
+\par
+\b - Easy to maintain / Flexible\b0  \par
+\par
+Having a single uniform IPC ( eg everything uses it app to app , app to kernel etc)  is far easier to maintain than seperate ABI and IPC.\par
+Less code is always good.\par
+\par
+Again having no special rules for services and kernel makes IPC more simple and uniform.  \par
+\par
+Messages are strongly typed to reduce potential errors( If performance does matter we can use UintPtr instead but a strongly typed system will result in less errors ) \par
+\par
+A single entry point into a service allows all messages to be validated and common code applied without having to call these in every method. \par
+\par
+By using messages we never need to change the code for new implementations as the base class will always be SystemMessage. \par
+\par
+Asynch systems by nature are more flexible , messages may be queued , or services may be moved to a different machine etc. Its even possible for 1 app to send and another app to receive.\par
+\par
+Naturally integrates with networks . eg a P2P message app would send the messages via UDP . \par
+\par
+\par
+\b - Reliable \b0\par
+\par
+Reliability is increased by using strong typing and ensuring only one writer has access to shared data. \par
+If the writer fails the data can be corrupt or in an undefined state  , if a reader fails there is no issue with the shared data. \par
+\par
+Also system reliability can be improved by using queues for a service and ordering requests this prevents task  freezing out high priority tasks due to sending large amounts of work  ( eg bring up task manage when your machine is paging to death) , \par
+with Messages the high priority processes can be serviced first this also enables better real time support. \par
+\par
+\b - Secure\b0\par
+\par
+The queue system with capability guarantees who the sender is and provides for a lot of security , this is assisted by treating everything as a user process preventing the exploitation of services commonly seen in most hacks \par
+. \par
+\par
+Typed messeges also allow for more security and less tampering. \par
+\par
+Treating everything as a user app encourages Principal of Least Privelage. \par
+\par
+\par
+\b If there is no ABI how do applications start ?\b0\par
+\par
+There is at least a send Message call. When launching an applications a loader passes the information ( with a user key) to the OS which creates the process allong with queues and a key. \par
+\par
+\par
+\par
+\b Why is the GC not part of the IPC system ( ie a seperate service) ?\b0\par
+\par
+The GC needs to be in process , ANY overhead would be extermely costly ( eg creating lots of strings for a web site) . \par
+Its worth noting the GC which is in process communicates to the MM via IPC but these are chunky calls requesting many or large pages. \par
+In fact we hope the allocation of the GC is simply \par
+\par
+Mov R1 , DWORD [ObjectSize]\par
+LOCK XADD [GCNurseryPtr]   , R1    ; is the LOCK needed ?\par
+;Note R1 contains the old value of the pointer but this instruction is thread safe\par
+ADD  R1, DWORD [ObjectSize]\par
+\par
+; there may be a better way  but this is thread safe even for NUMA architectures\par
+; where other CPUs may update the memory.  So an add and then read is not thread safe,\par
+\par
+\par
+\par
+\par
+\b Are the Messages routed ? \b0\par
+\par
+To avoid complex and weighty dispatching all messages are sent point to point ( direct to the destination) . \par
+To get a new destination you must request it and have the appropriate Capability. By default an app has a queue to the MM system and the Security Capability system. These queues are located on the capability.\par
+While the startup cost is higher it means \par
+ - No routing needed\par
+ - Messages do not need to carry the sender and receiver this quickly becomes a major benefit. \par
+ - Its more secure as the connection is point to point we can identify the sender and it cant be forged.  \par
+ - Applications dont need to talk to the kernel .\par
+\par
+\par
+\b Why not route all messages ?\b0\par
+Basically while with routing you could prioritize better , you create a single bottleneck with locks and threading this would be an issue .  \par
+In addition its easier to create deadlock loops. There may also need to be a kernel thread processing this queue ( or you have even more locking issues) which brings a whole range of issues.\par
+\par
+With regard to prioritization busy services will be able to do plenty in their own queues and since they understand the nature of their callers \par
+are better able to serve/ prioritize them . \par
+\par
+Anyway the queue system allows a client to send to any point they just have to ask first . This is more secure and just as flexible. \par
+\par
+\par
+\b\par
+How do we ensure that messages passed around do not violate address space of apps ?\b0\par
+\par
+The only thing passed around is a pointer to the message. The Message is located in the shared address space when a request is made to create a message it creates it on a shared Heap.\par
+\par
+\b\par
+What other options were considered for hangling messages?\b0\par
+\par
+Option1 . Have a single ABI call (everything else messages) that creates the messge on  the shared mem Heap , objects referenced in the message will need to be copied. Note this does not need to be a system call.\par
+Option2 . Copy the message and objects on send ( and the address on the stack) ( Minix, Mach , L3/L4  apporach)\par
+\par
+Option 3 is really the same as Option 1 and 2 just the ABI is in the GC . I dont like the copy messages on send . \par
+Even though it CAN be very efficient for small messages it doesnt support shared memory. The main reason its used by those OS is due to the high IPC costs.\par
+By using a shared heap we can send quite large objects via reference this means we DONT need to copy data from the network driver to the higher layers. \par
+The NIC can place the data immediately in the shared memory Heap.\par
+\par
+\par
+\b Why 64 bit and NUMA support ?\b0  \par
+\par
+All PCs built in the future will be 64 bit and multi core. It is trivial to add this now but a real pain later. \par
+\par
+\b How do the Queues work.\b0\par
+\par
+When an application is created it has 3 sets of queues  . Each set consists of a SendMessage method which maps to a receiving queuue at the receiver as well as a queue to receive messages from the receiver. \par
+By default an application has a set for the following\par
+        - Security \par
+        - Memory Manager\par
+        - Dispatcher\par
+        \par
+ Additional queue pairs maybe created to ANY process however a strong security check is done at the time of creation. Messages are created in shared memory and hence can map directly to large amounts of data eg a 1G file .       \par
+\par
+\par
+\par
+\b\par
+How does the IPC actually work ?\b0\par
+\par
+The hard part is the last question , basically the message pointer is passed in a mem location, and its a pointer to the shared memory heap. \par
+We cant use the stack here unless we copy it which involves an intermediatery copying it. \par
+\par
+In more detail\par
+Client Thread\par
+    UserCode \par
+        Create Message via CreateMessageAPI [Cosmos.GC]\par
+            Message Created on Shared Memory Heap [Cosmos.SharedMemory]\par
+\par
+\par
+\tab queue.SendMessage(message, bool yield) (Ben.IPC)\par
+\tab     \tab\tab ProcessMessage(message)\par
+\tab\tab if ( yield) \par
+            \tab Jump to dispatcher.yieldcurrentThread.       \par
+        \par
+   \par
+   \par
+       ProcessMessage\par
+                \{\par
+                    If ( receiver is blocked wait ing for message) \par
+                    \{\par
+                        Set Receiver current message to message\par
+                        Set Receiver current message sender to send capability. \par
+                        Schedule Receiver                \par
+                    \}\par
+                    else\par
+                    \{\par
+                       block caller\par
+\tab\tab\tab\tab Set GC of thread to destination\par
+                       if ( high priority) \par
+                            Add message to front of destination queue) \par
+                       else\par
+                            Add message to back of destination queue\par
+                        \par
+\tab\tab\tab\tab Restore GC. \par
+                    \}\par
+                    return; // end Syscall\par
+                \}\par
+  \par
+        \par
+Receiver\par
+Option 1) Good for VERY busy services\par
+\par
+    foreach (var queue in input queues) // by priority\par
+        if (queue.Count != 0)\par
+            ProcessMessage ( queue.SenderKey , queue.Dequeue())\par
+            \par
+    \par
+    \par
+Option 2)  Override Add to queue , good for most apps \par
+OnAddToQueue(Message)\par
+    AddMessageToSingleQueue ( queue.SenderKey , Message) \par
+\par
+\par
+\b How is scheduling done ?\b0\par
+After a message is sent an application is automatically stopped . However if their is quanta left it is placed at the head of the queue. It should be noted  the only case for normally sending multiple messages is multiple calls or a broadcast , we support this by allowing a 2nd Syscall which sends multiple messages ( or the same) \par
+\par
+Why does the system use pointers for this ?\par
+Not performance. The main reason is a lot of items require stack which is a not allowed in an int handler.\par
+\par
+\par
+\b Where is the receiver queue  in terms of address space ?\b0\par
+\par
+The receiver queue is in the applications memory space.  ( and yes IPC assembly does have the right to write there) \par
+\par
+\par
+\b How to handle assembly references to new Messages when building strong typed clients ? \b0\par
+\par
+Apps ( especially services) should provide a seperate assembly with all the messages they require.\par
+\par
+\b Why is thread safety required for sending when its point to point ?\b0\par
+\par
+The receiver doesnt really need it , and if a sender is a single thread app or uses one thread for messaging than its not needed either. \par
+However there can be multiple senders and hence thread safety is an issue.\par
+\par
+\b Do receivers have a single queue or 1 queue per sender ?\b0\par
+\par
+This is under consideration. A single queue would be faster to parse for messages. Multiple queues allow for better checking of priviledged instructions and prevent some issues (DOS) .\par
+\par
+Note you can really have a single queue at the IPC level ( since it would remove the sender information. ) The question is on what to expose to the higher API.\par
+I suspect some sort of single priority orders Queue with messages containing the sender information after validation and checking \par
+but this is dependent on the app stack not IPC.\par
+\par
+\b Stack per thread ?\b0\par
+\par
+Obviously each thread has its own stack . Calling another app will get a new stack\par
+\par
+\b Why do we need a syscall and cant do a  simple call? \b0\par
+\par
+You will always need to do  a Syscall as the destination will have a different stack and thread and a dispatch in between would be very  bad.\par
+\par
+\par
+\b Do we need  a Monitor or Mutex on the shared memory ?\b0\par
+\par
+Neither , there can only be one writer and the compiler will prevent writes to shared objects without getting write rights first.  Partial updates are possible  ( but very unlikely for messages) , if this is an issue we can use some sort of update mechanism.\par
+\par
+\par
+\b Do we need to make a syscall to create the message and hence 2 syscalls for every message. \par
+\b0\par
+No , I dont think so. Apps can directly access shared memory. If not we would have to do something like SendMessage ( Type MessageType , params paramaters);\par
+\par
+\par
+\b Web Services Sample .\b0\par
+\par
+TODO \par
+\par
+\par
+\b In the example you show TCP and IP as seperate Why ? \b0\par
+\par
+In most OS the high IPC/Cintext switch cost  means its  necesity to merge things together however\par
+from a software management and security point of view its better to have small services. eg you could allow people \par
+to use Sockets or TCP but not make your own/read IP packets. While this  may not be the best case it does show that \par
+traditional boundaries  are not appropriate to a managed OS.\par
+\par
+\par
+\b Does the kernel actually exist ? Where is it .\b0\par
+\par
+This is almost a kerneless OS , the only thing in the kernel is the Shared Memory Heap , IPC (though its more glue between apps) and the HAL .\par
+\par
+\b Why use C# structures like queues ?\b0\par
+\par
+Basically a GC is always available ( Kernel or client) and for readability and extention purposes these structures work best.  Also implementing most things as pointer lists / queues is really premature optomization. I think for the majority of these things the easy abbility to just plug in a new class and hence algorithm will outweigh the benefits of an optomized pointer algortihm . Did i mention less bugs with mature code...\par
+\par
+\b What happens if the queue needs to grow durring a syscall ?\b0\par
+\par
+This may be an issue. As the GC is the target process. We can change the GC used or it may be better to use a structure that wont do an allocate.\par
+\par
+\par
+\b Will a a Micro Kernel deliver reasonable performance the paper \f1\fs24 "The Cost of IPC: an Architectural Analysis" \f0\fs20 seems to say no. \par
+\b0\par
+The paper which contradicts  Liedtke's earlier work is based on the following \par
+- Heavy message copy costs \par
+\tab We dont copy messages.\par
+- Heavy context swith cost especially by mapping memory and the TLB flush cost.\par
+\tab We dont remap memory and dont need to flush the TLB , more importantly the cost of a context switch is low. \par
+- LOts of short messages for a few pieces of data.\par
+Our messages are not fixed size. \par
+- Memory is getting slower\par
+We should be able to keep memory use down to a minimum.\par
+\par
+The paper does state Micro kernels deliver a more secure and reliable OS which does apply :-)\par
+\par
+\b\par
+Why not a pure Capability OS?\b0\par
+Because i dont understand it well enough. We do use capabilies though just not do the OS call on a capability.  eg ProcessorCapability.Yield()\par
+\par
+\par
+\par
+\b What is a capability?\b0\par
+http://www.eros-os.org/essays/capintro.html\par
+http://en.wikipedia.org/wiki/Capability-based_security\par
+\par
+\b\par
+Why strongly typed messages ?\b0\par
+\par
+In no order . \par
+\par
+    /// \par
+    /// 1. Better checking of security and policy.  This can be placed at the entry point of a system rather than every method. It can also be fine grained eg service xyz cant talk to service abc.  Many exploits have come from lesser services  (eg Blaster worm via  SQL service )  , Media , and Web service then comprimising more fundamental system services like task scheduling. \par
+    /// 2. ! APIs never need to change and service changes are backward competible. \par
+    /// 3. ! Can invoke the destination thread waiting on a message without this code being in every method !!!\par
+    /// 4. Can log and debug easier with a single point of entry.  Exceptions can be thrown but before leaving the scope of the service ( or app) can be logged and converted to a more flexible error message\par
+    /// 5. ! Can be prioritized , allowing high thread priority tasks to jump the queue instead of blocking on a lock etc , \par
+    ///         this really helps provide better realtime support. High priority tasks ALWAYS win not like NT and Linux. (if Subsystes use priority ) \par
+    /// 6. Allow cross machine kernel to kernel messages \par
+    /// 7  Encourages fewer but chunkier calls in API design between services , instead of lots of small calls.\par
+    /// 8. Allows easier Asynch calls which provide significant performance benefits\par
+    /// 9. While a small perf hit in simple OS loop test in more complicated scenarios performance is better and more efficient due to Asynch nature.\par
+    /// 10. Encourages non dependent call structures\par
+    /// 11. Internal details are hidden and can be all internal ( or private)\par
+    /// 12. Facilitates lego block design.\par
+    /// 13. Prevent forging of information as 1) caller doenst create security (OS does)  , 2) we can clone on send. ( prevents other issues with direct call ) \par
+    /// 14. ErrorMessages can  be adjusted to suit the language and culture of the caller , while leaving the messages withing the subsystem english\par
+    /// 15. Subsystems can be changed and restarted very easily. \par
+\par
+    /// \par
+    /// The negatives \par
+    /// 1. Requires an API wrapper for Synch operations \par
+    /// 2. It can be slower especially in tiny not real world benchmarks\par
+\tab ///\tab 3.  When looking at the big picture apears more complex.\par
+\b\tab\par
+\tab API's\b0\par
+\tab\par
+\b\tab ABI Required \b0\par
+\tab\par
+\tab Send Message\par
+\tab\par
+\tab\par
+\tab\b Other API needed\b0  ( non kernel calls) , all within user app address\par
+\tab\par
+\tab Shared Memory\par
+\tab     AllocateObject\par
+\tab     CreateSharedRegion\par
+\tab     ShareRegion\par
+\tab     Change Owner\par
+\tab   \par
+\tab  GC\par
+\tab     Alloc \par
+\tab     DeAlloc\par
+\tab      \par
+\tab     \par
+\tab Mutex  \par
+\tab     We can use a spin lock around shared memory and hence no Kernel call. Or use cpu lock around a shared memory structure.\par
+\tab    \par
+\tab    \par
+\par
+\tab\par
+\tab\par
+\tab\b Internal kernel calls\b0  ( eg called from user thread but running priveledge code)\par
+\tab     \par
+   \tab Schedule\par
+\tab         Save current thread \par
+\tab         Call Scheduler  \par
+\tab         Schedule process  \par
+\tab         Block current process  \par
+\tab         \par
+\tab         \par
+\tab         \par
+\tab  Kernel Message API  \par
+\tab         MM \par
+\tab         \par
+\tab         Scheduler \par
+\tab             Yield \par
+\par
+\par
+\b Comparison with other OS\b0\par
+\par
+I believe the architectire above can deliver superior performance and be simpler , secure and more reliable than Windows and Linux. \par
+\par
+The key is in other OS calls to another Thread must be Asynch. The only thing we are doing is making all calls Asynch so MM and Sheduler suffer. That being said \par
+\par
+- Our MM commands are infrequent ( 1M page size and GC does the hard work)\par
+- Scheduling calls are rare. \par
+\par
+\par
+eg \par
+Windows Services Have their own thread and comms must be IPC  and blocking.  \par
+\par
+Other "services" such as MM and scheduler run in user threads but not always eg Part of the file system runs in user thread but whenin needs to call a device it blocks the user thread and create kernel worker threads which talk to the device driver.\par
+\par
+\par
+Windows Devices Drivers im not sure  but prob have their own thread as the caller must block .  \par
+\par
+http://msdn.microsoft.com/en-us/library/ms795837.aspx\par
+\par
+Note it is no conincidence that high performance system Web servers , SQL Servers and the File system all adopt the same strategy . That is block the caller thread and manage seperate IO threads - This design will do this by default.\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+}
+ 

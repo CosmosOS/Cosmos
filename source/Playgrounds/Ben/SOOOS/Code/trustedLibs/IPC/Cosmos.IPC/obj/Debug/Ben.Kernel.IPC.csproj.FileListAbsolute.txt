@@ -1,0 +1,18 @@
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Ben.Kernel.IPC.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Ben.Kernel.IPC.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Cosmos.Kernel.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Cosmos.Kernel.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\obj\Debug\ResolveAssemblyReference.cache
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\obj\Debug\Ben.Kernel.IPC.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\obj\Debug\Ben.Kernel.IPC.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Ben.Kernel.Capabilities.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Ben.Kernel.Capabilities.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Ben.RunTime.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.IPC\bin\Debug\Ben.RunTime.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\obj\Debug\Ben.Kernel.IPC.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\bin\Debug\Ben.Kernel.IPC.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\bin\Debug\Ben.Kernel.IPC.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\bin\Debug\Ben.Kernel.Capabilities.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\bin\Debug\Ben.Kernel.Capabilities.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\Cosmos.IPC\obj\Debug\Ben.Kernel.IPC.dll

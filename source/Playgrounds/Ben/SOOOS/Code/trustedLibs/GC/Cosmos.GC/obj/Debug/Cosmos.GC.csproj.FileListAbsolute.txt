@@ -1,0 +1,5 @@
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.GC\bin\Debug\Cosmos.GC.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.GC\bin\Debug\Cosmos.GC.pdb
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.GC\obj\Debug\ResolveAssemblyReference.cache
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.GC\obj\Debug\Cosmos.GC.dll
+C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.GC\obj\Debug\Cosmos.GC.pdb

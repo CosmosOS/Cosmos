@@ -1,0 +1,9 @@
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\bin\Debug\MM.Service.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\bin\Debug\MM.Service.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\bin\Debug\CoreLib.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\bin\Debug\MM.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\bin\Debug\CoreLib.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\bin\Debug\MM.pdb
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\obj\Debug\MM.Service.dll
+C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM.Service\obj\Debug\MM.Service.pdb
