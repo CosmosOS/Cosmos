@@ -1,4 +1,5 @@
-rem %windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln
+@echo off
+%windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet
 
 xcopy /Y ..\Tools\Cosmos.Hardware\Cosmos.Build.Common.* .
 xcopy /Y ..\Tools\Cosmos.Hardware\Cosmos.IL2CPU.* .
