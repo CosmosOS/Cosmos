@@ -59,8 +59,7 @@ namespace Cosmos.Debugger.VSRegister {
       // Note: On x64 some registry paths are different. This routine does not
       // currently handle them.
       static public void Register() {
-          //RegisterRoot(Registry.LocalMachine, "9.0");
-          //RegisterRoot(Registry.CurrentUser, @"9.0Exp\Configuration");
+          RegisterRoot(Registry.LocalMachine, "9.0");
           RegisterRoot(Registry.CurrentUser, @"9.0Exp\Configuration");
       }
     }
