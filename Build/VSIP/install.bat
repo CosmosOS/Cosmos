@@ -1,5 +1,10 @@
 @echo off
+
+REM Necessary to set dir when running as admin
+cd %~dp0
+
 echo Compiling cosmos
+
 %windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet /nologo
 
 echo Copying files
