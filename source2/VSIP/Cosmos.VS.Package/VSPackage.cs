@@ -36,7 +36,7 @@ namespace Cosmos.VS.Package {
     // package needs to have a valid load key (it can be requested at 
     // http://msdn.microsoft.com/vstudio/extend/). This attributes tells the shell that this 
     // package has a load key embedded in its resources.
-    [ProvideLoadKey("Standard", "1.0", "Cosmos Visual Studio Integration Package", "Cosmos", 1)]
+    [ProvideLoadKey("Standard", "1.0", "Cosmos Visual Studio Integration Package", "Cosmos", 100)]
     [ProvideProjectFactory(
       typeof(VSProjectFactory),
       "Cosmos", // This is the overall group name in new project on left side
