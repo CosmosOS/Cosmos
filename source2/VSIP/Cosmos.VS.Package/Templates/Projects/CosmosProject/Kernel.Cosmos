@@ -7,14 +7,24 @@
     <RootNamespace>Cosmos.User.Kernel</RootNamespace>
     <AssemblyName>CosmosKernel</AssemblyName>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <Name>Project2</Name>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <BuildTarget>QEMU</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
+    <QemuNetworkCard>RealtekRTL8139</QemuNetworkCard>
+    <QemuAudioCard>
+    </QemuAudioCard>
+    <QemuNetworkTAP>True</QemuNetworkTAP>
+    <QemuEnableGDB>
+    </QemuEnableGDB>
+    <QemuCommunication>
+    </QemuCommunication>
+    <DebugMode>Source</DebugMode>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -40,29 +50,7 @@
   </ItemGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 
   <Target Name="BeforeBuild">
-  </Target>
-
-  <!-- 
-  We have to read from registry becasue MSBuild process wont see changes to 
-  env variables. But by reading the env var key, we allow support for both env
-  var and registry as some scenarios we can read env var but not registry
-  (ie .bat files)
-  -->
-  <PropertyGroup>
-    <Cosmos>$(Registry:HKEY_CURRENT_USER\Environment@Cosmos)</Cosmos>
-  </PropertyGroup>
-  <UsingTask TaskName="Cosmos.Build.MSBuild.BuildImage" AssemblyFile="$(Cosmos)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
-  <Target Name="AfterBuild">
-    <Message Text="Using Cosmos Path: $(Cosmos)" Importance="high" />
-	<BuildImage
-		KernelAssembly="$(AssemblyName).$(OutputType)"
-		OutputPath="$(BaseOutputPath)$(OutputPath)"
-		BuildTarget="$(BuildTarget)"
-		Framework="$(Framework)"
-		UseInternalAssembler="$(UseInternalAssembler)"
-	/>
-  </Target>
-
-</Project>
+  </Target></Project>
