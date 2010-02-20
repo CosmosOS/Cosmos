@@ -15,4 +15,4 @@ xcopy /Y ..\..\source2\Debug\Cosmos.Debug.VSRegister\bin\Debug\Cosmos.Debug.VSRe
 xcopy /Y ..\..\source2\Debug\Cosmos.Debug.VSRegister\bin\Debug\Cosmos.Debug.VSRegister.exe .
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\Debug\Cosmos.VS.Package.* .
 
-
+pause
