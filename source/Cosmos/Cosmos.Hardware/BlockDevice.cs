@@ -12,14 +12,15 @@ namespace Cosmos.Hardware {
             get;
         }
 
-        public abstract uint BlockCount {
+        public abstract ulong BlockCount
+        {
             get;
         }
 
-        public abstract void ReadBlock(uint aBlock,
+        public abstract void ReadBlock(ulong aBlock,
                                        byte[] aContents);
 
-        public abstract void WriteBlock(uint aBlock,
+        public abstract void WriteBlock(ulong aBlock,
                                         byte[] aContents);
 
         /// <summary>

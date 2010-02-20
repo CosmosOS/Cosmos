@@ -229,17 +229,17 @@ namespace Cosmos.Sys.FileSystem
                 get { return blockDev.BlockSize; }
             }
 
-            public override uint BlockCount
+            public override ulong BlockCount
             {
                 get { return Length; }
             }
 
-            public override void ReadBlock(uint aBlock, byte[] aBuffer)
+            public override void ReadBlock(ulong aBlock, byte[] aBuffer)
             {
                 blockDev.ReadBlock(aBlock + Start, aBuffer);
             }
 
-            public override void WriteBlock(uint aBlock, byte[] aContents)
+            public override void WriteBlock(ulong aBlock, byte[] aContents)
             {
                 blockDev.WriteBlock(aBlock + Start, aContents);
             }

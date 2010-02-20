@@ -36,43 +36,43 @@ namespace MatthijsTest
                 xBoot.Execute(true);
             }
 
-            MyATAController.Scan();
-            MyATADevice xDevice = null;
-            for (int i = 0; i < Device.Devices.Count; i++)
-            {
-                if (Device.Devices[i] is MyATADevice)
-                {
-                    xDevice = (MyATADevice)Device.Devices[i];
-                    break;
-                }
-            }
-            if (xDevice != null)
-            {
-                Console.WriteLine("Drive found!");
-                Console.Write("Supports LBA28: ");
-                if (xDevice.SupportsLBA28)
-                {
-                    Console.WriteLine("Yes");
-                }
-                else
-                {
-                    Console.WriteLine("No");
-                }
-                Console.Write("Supported UDMA: ");
-                Interrupts.WriteNumber(xDevice.SupportedUDMA, 8);
-                Console.WriteLine();
-                Console.Write("Sector count: ");
-                Interrupts.WriteNumber((uint)xDevice.BlockCount, 32);
-                Console.WriteLine();
+            //MyATAController.Scan();
+            //MyATADevice xDevice = null;
+            //for (int i = 0; i < Device.Devices.Count; i++)
+            //{
+            //    if (Device.Devices[i] is MyATADevice)
+            //    {
+            //        xDevice = (MyATADevice)Device.Devices[i];
+            //        break;
+            //    }
+            //}
+            //if (xDevice != null)
+            //{
+            //    Console.WriteLine("Drive found!");
+            //    Console.Write("Supports LBA28: ");
+            //    if (xDevice.SupportsLBA28)
+            //    {
+            //        Console.WriteLine("Yes");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("No");
+            //    }
+            //    Console.Write("Supported UDMA: ");
+            //    Interrupts.WriteNumber(xDevice.SupportedUDMA, 8);
+            //    Console.WriteLine();
+            //    Console.Write("Sector count: ");
+            //    Interrupts.WriteNumber((uint)xDevice.BlockCount, 32);
+            //    Console.WriteLine();
 
-                var xDataToSend = new byte[512];
-                for (int i = 0; i < 512; i++)
-                {
-                    xDataToSend[i] = (byte)(i % 256);
-                }
-                xDevice.WriteBlock(2, xDataToSend);
+            //    var xDataToSend = new byte[512];
+            //    for (int i = 0; i < 512; i++)
+            //    {
+            //        xDataToSend[i] = (byte)(i % 256);
+            //    }
+            //    xDevice.WriteBlock(2, xDataToSend);
 
-            }
+            //}
             Console.WriteLine("Done");
             while (true)
                 ;

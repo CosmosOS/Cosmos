@@ -24,24 +24,24 @@ namespace Cosmos.Sys.FileSystem {
 				}
 			}
 
-            public override uint BlockCount
+            public override ulong BlockCount
             {
 				get {
 					return mBlockCount;
 				}
 			}
 
-            private uint GetActualBlock(uint aBlock)
+            private ulong GetActualBlock(ulong aBlock)
             {
 				return aBlock + mBlockStart;
 			}
 
-            public override void ReadBlock(uint aBlock, byte[] aBuffer)
+            public override void ReadBlock(ulong aBlock, byte[] aBuffer)
             {
 				mBackend.ReadBlock(GetActualBlock(aBlock), aBuffer);
 			}
 
-            public override void WriteBlock(uint aBlock, byte[] aContents)
+            public override void WriteBlock(ulong aBlock, byte[] aContents)
             {
 				mBackend.WriteBlock(GetActualBlock(aBlock), aContents);
 			}

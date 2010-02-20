@@ -293,9 +293,9 @@ namespace Cosmos.Hardware.Storage.ATA
             }
         }
 
-        private readonly uint mBlockCount;
+        private readonly ulong mBlockCount;
 
-        public override uint BlockCount
+        public override ulong BlockCount
         {
             get
             {
@@ -316,7 +316,7 @@ namespace Cosmos.Hardware.Storage.ATA
 #define CB_ASTAT 8   // alternate status in     pio_base_addr2+6
 #define CB_DC    8   // device control      out pio_base_addr2+6
 #define CB_DA    9   // device address   in     pio_base_addr2+7*/
-        public override void ReadBlock(uint aBlock, byte[] aBuffer)
+        public override void ReadBlock(ulong aBlock, byte[] aBuffer)
         {
             // 1) Read the status register of the primary or the secondary IDE controller. 
             // 2) The BSY and DRQ bits must be zero if the controller is ready. 
@@ -403,7 +403,7 @@ namespace Cosmos.Hardware.Storage.ATA
             DebugUtil.SendATA_BlockReceived(mControllerIndex, mDrive, (uint)aBlock, aBuffer);
         }
 
-        public override void WriteBlock(uint aBlock, byte[] aContents)
+        public override void WriteBlock(ulong aBlock, byte[] aContents)
         {
             uint xSleepCount = Timeout;
             while (((IOReadByte(mController_Command) & 0x80) == 0x80) && xSleepCount > 0)
