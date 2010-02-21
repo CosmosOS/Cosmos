@@ -96,9 +96,34 @@ namespace Cosmos.Kernel.Plugs
             TextScreen.WriteChar(aChar);
         }
 
+        public static void Write(byte aByte)
+        {
+            Write(aByte.ToString());
+        }
+
+        public static void Write(UInt32 aInt)
+        {
+            Write(aInt.ToString());
+        }
+
         public static void Write(Int32 aInt)
         {
             Write(aInt.ToString());
+        }
+
+        public static void Write(UInt16 aInt)
+        {
+            Write(aInt.ToString());
+        }
+
+        public static void Write(Int16 aInt)
+        {
+            Write(aInt.ToString());
+        }
+
+        public static void Write(UInt64 aLong)
+        {
+            Write(aLong.ToString());
         }
 
         public static void Write(Int64 aLong)
@@ -182,19 +207,49 @@ namespace Cosmos.Kernel.Plugs
             WriteLine();
         }
 
+        public static void WriteLine(byte aByte)
+        {
+            Write(aByte);
+            WriteLine();
+        }
+
         public static void WriteLine(string aLine)
         {
             Write(aLine);
             WriteLine();
         }
 
-        public static void WriteLine(uint aValue)
+        public static void WriteLine(UInt16 aValue)
         {
             Write(aValue);
             WriteLine();
         }
 
-        public static void WriteLine(int aValue)
+        public static void WriteLine(Int16 aValue)
+        {
+            Write(aValue);
+            WriteLine();
+        }
+
+        public static void WriteLine(UInt32 aValue)
+        {
+            Write(aValue);
+            WriteLine();
+        }
+
+        public static void WriteLine(Int32 aValue)
+        {
+            Write(aValue);
+            WriteLine();
+        }
+
+        public static void WriteLine(UInt64 aValue)
+        {
+            Write(aValue);
+            WriteLine();
+        }
+
+        public static void WriteLine(Int64 aValue)
         {
             Write(aValue);
             WriteLine();
