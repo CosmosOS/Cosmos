@@ -31,7 +31,8 @@ namespace Cosmos.VS.Package {
     [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\9.0")]
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration(false, "#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration(false, "Visual Studio Integration Package", "www.gocosmos.org", "1.0", IconResourceID = 400, 
+                LanguageIndependentName = "Visual Studio Integration Package")]
     // In order be loaded inside Visual Studio in a machine that has not the VS SDK installed, 
     // package needs to have a valid load key (it can be requested at 
     // http://msdn.microsoft.com/vstudio/extend/). This attributes tells the shell that this 
