@@ -36,6 +36,12 @@ namespace MatthijsTest
                 xBoot.Execute(true);
             }
 
+            ulong a = 1;
+            ulong b = 2;
+            var c = a + b;
+            Interrupts.WriteNumber((uint)c, 32);
+            Console.WriteLine("");
+
             //MyATAController.Scan();
             //MyATADevice xDevice = null;
             //for (int i = 0; i < Device.Devices.Count; i++)
