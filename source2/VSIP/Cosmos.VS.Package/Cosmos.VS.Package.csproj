@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.VS.Package</RootNamespace>
     <AssemblyName>Cosmos.VS.Package</AssemblyName>
-    <SignAssembly>False</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <ProjectGuid>{61535AF6-4A1E-4691-B2BC-039851EF4850}</ProjectGuid>
@@ -133,7 +133,7 @@
     <Compile Include="VsProjectConfig.cs" />
     <Compile Include="VSProjectFactory.cs" />
     <Compile Include="VSProjectNode.cs" />
-    <Compile Include="VSPackage.cs" />
+    <Compile Include="VSProject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
     <None Include="Templates\Projects\CosmosProject\Program.cs" />
