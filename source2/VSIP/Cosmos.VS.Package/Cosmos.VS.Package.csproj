@@ -147,6 +147,7 @@
   <ItemGroup>
     <None Include="bin\Images\alert.png" />
     <None Include="bin\Images\alert1.png" />
+    <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
     <EmbeddedResource Include="BuildOptionsPropertyPage.resx">
       <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
