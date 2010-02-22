@@ -136,6 +136,14 @@ namespace Cosmos.Kernel.Plugs
             Write(aBool.ToString());
         }
 
+        public static void Write(object value)
+        {
+            if (value != null)
+            {
+                Write(value.ToString());
+            }
+        }
+
         public static void Write(char[] aBuffer, int aIndex, int aCount)
         {
             if (aBuffer == null)
@@ -187,6 +195,12 @@ namespace Cosmos.Kernel.Plugs
         public static void WriteLine()
         {
             TextScreen.NewLine();
+        }
+
+        public static void WriteLine(object value)
+        {
+            Write(value);
+            WriteLine();
         }
 
         public static void WriteLine(char[] buffer)

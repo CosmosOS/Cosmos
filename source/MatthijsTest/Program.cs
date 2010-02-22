@@ -29,18 +29,26 @@ namespace MatthijsTest
         public static unsafe void Init()
         {
 
-            var xInit = true;
+            var xInit = false;
             if (xInit)
             {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute(true);
             }
 
-            ulong a = 1;
-            ulong b = 2;
-            var c = a + b;
-            Interrupts.WriteNumber((uint)c, 32);
-            Console.WriteLine("");
+            int xValue = 43;
+            Console.Write("Value = ");
+            Console.WriteLine((object)xValue);
+            Console.Write("Value2 = ");
+            Console.WriteLine(xValue.ToString());
+            Console.Write("Value2 = ");
+            Console.WriteLine(xValue);
+
+            //ulong a = 1;
+            //ulong b = 2;
+            //var c = a + b;
+            //Interrupts.WriteNumber((uint)c, 32);
+            //Console.WriteLine("");
 
             //MyATAController.Scan();
             //MyATADevice xDevice = null;

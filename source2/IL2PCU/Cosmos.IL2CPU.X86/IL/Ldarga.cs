@@ -1,6 +1,7 @@
 using System;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.ILOpCodes;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarga )]
@@ -13,62 +14,76 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Cosmos.IL2CPU.ILOpCodes.OpVar xOpVar = ( Cosmos.IL2CPU.ILOpCodes.OpVar )aOpCode;
-            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
-            uint xReturnSize = 0;
-            if( xMethodInfo != null )
-            {
-                xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
-            }
-            uint xOffset = 8;
-            var xCorrectedOpValValue = xOpVar.Value;
-            if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
-            {
-                // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
-                xCorrectedOpValValue -= 1;
-            }
-            var xParams = aMethod.MethodBase.GetParameters();
-            for( int i = xParams.Length - 1; i > xCorrectedOpValValue; i-- )
-            {
-                var xSize = Align( SizeOfType( xParams[ i ].ParameterType ), 4 );
-                xOffset += xSize;
-            }
-            var xCurArgSize = Align( SizeOfType( xParams[ xCorrectedOpValValue ].ParameterType ), 4 );
-            uint xArgSize = 0;
-            foreach( var xParam in xParams )
-            {
-                xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
-            }
-            xReturnSize = 0;
-            uint xExtraSize = 0;
-            if( xReturnSize > xArgSize )
-            {
-                xExtraSize = xArgSize - xReturnSize;
-            }
-            xOffset += xExtraSize;
-#warning TODO: check this
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP };
+            var xOpVar = (OpVar)aOpCode;
+            var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
+            new Move {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
+            new Move{DestinationReg = RegistersEnum.EAX, SourceReg=RegistersEnum.EBP };
+            new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
+            new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
 
-            for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
-            {
-                new CPUx86.Push { DestinationValue = ( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ) };
-            }
-            Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );
+            Assembler.Stack.Push(4, typeof(uint));
+//            if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.Console"
+//                && aMethod.MethodBase.Name == "Write"
+//                && aMethod.MethodBase.GetParameters()[0].ParameterType == typeof(int))
+//            {
+//                Console.Write("");
+//            }
+//            Cosmos.IL2CPU.ILOpCodes.OpVar xOpVar = ( Cosmos.IL2CPU.ILOpCodes.OpVar )aOpCode;
+//            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+//            uint xReturnSize = 0;
+//            if( xMethodInfo != null )
+//            {
+//                xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
+//            }
+//            uint xOffset = 8;
+//            var xCorrectedOpValValue = xOpVar.Value;
+//            if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
+//            {
+//                // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
+//                xCorrectedOpValValue -= 1;
+//            }
+//            var xParams = aMethod.MethodBase.GetParameters();
+//            for( int i = xParams.Length - 1; i > xCorrectedOpValValue; i-- )
+//            {
+//                var xSize = Align( SizeOfType( xParams[ i ].ParameterType ), 4 );
+//                xOffset += xSize;
+//            }
+//            var xCurArgSize = Align( SizeOfType( xParams[ xCorrectedOpValValue ].ParameterType ), 4 );
+//            uint xArgSize = 0;
+//            foreach( var xParam in xParams )
+//            {
+//                xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
+//            }
+//            xReturnSize = 0;
+//            uint xExtraSize = 0;
+//            if( xReturnSize > xArgSize )
+//            {
+//                xExtraSize = xArgSize - xReturnSize;
+//            }
+//            xOffset += xExtraSize;
+//#warning TODO: check this
+//            new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP };
 
-            //for( int i = 0; i < ( mSize / 4 ); i++ )
-            //{
-            //    mVirtualAddresses[ i ] = ( mOffset + ( ( i + 1 ) * 4 ) + 4 );
-            //}
-            //mAddress = aMethodInfo.Arguments[ aIndex ].VirtualAddresses.First();
+//            for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
+//            {
+//                new CPUx86.Push { DestinationValue = ( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ) };
+//            }
+//            Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );
+
+//            //for( int i = 0; i < ( mSize / 4 ); i++ )
+//            //{
+//            //    mVirtualAddresses[ i ] = ( mOffset + ( ( i + 1 ) * 4 ) + 4 );
+//            //}
+//            //mAddress = aMethodInfo.Arguments[ aIndex ].VirtualAddresses.First();
 
 
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
+//            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
 
-            //new CPUx86.Push { DestinationValue = ( uint )mAddress };
-            //
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
+//            //new CPUx86.Push { DestinationValue = ( uint )mAddress };
+//            //
+//            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
 
-            new Add( Assembler ).Execute( aMethod, aOpCode );
+//            new Add( Assembler ).Execute( aMethod, aOpCode );
         }
 
 

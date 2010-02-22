@@ -25,7 +25,7 @@ namespace Cosmos.Playground.SSchocke
                     string xVendor = xPCIDevice.VendorID.ToHex(4);
                 //}
 
-                Console.Write(xPCIDevice.Bus + "-" + xPCIDevice.Slot + "-" + xPCIDevice.Function);
+                    Console.Write(xPCIDevice.Bus + "-" + xPCIDevice.Slot + "-" + xPCIDevice.Function);
                 Console.Write(" " + xVendor + ":" + xPCIDevice.DeviceID.ToHex(4));
                 Console.WriteLine(" Type: " + xPCIDevice.HeaderType + " IRQ: " + xPCIDevice.InterruptLine);
                 //                                /*Enum.GetName(typeof(PCIHeaderType), */ xPCIDevice.HeaderType/*) */);
@@ -34,8 +34,7 @@ namespace Cosmos.Playground.SSchocke
                 //                            Console.WriteLine(" Command: " + xPCIDevice.Command + " " +
                 //                                /*Enum.GetName(typeof(PCICommand), */xPCIDevice.Command /* ) */);
                 uint xClass = (UInt32)((xPCIDevice.ClassCode << 8) | xPCIDevice.SubClass);
-                System.Console.Write(" Class [" + xClass.ToHex(4) + "] " + xPCIDevice.GetClassInfo());
-                System.Console.WriteLine(" Memory: ");
+                System.Console.WriteLine(" Class [" + xClass.ToHex(4) + "] " + xPCIDevice.GetClassInfo() + ", Memory: ");
 
                 for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++) {
                     var a = xPCIDevice.GetAddressSpace(i);
@@ -49,8 +48,8 @@ namespace Cosmos.Playground.SSchocke
                         }
                     }
                 }
-                System.Console.WriteLine();
-                System.Console.WriteLine();
+//                System.Console.WriteLine();
+//                System.Console.WriteLine();
                 Console.Read();
             }
         }

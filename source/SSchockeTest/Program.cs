@@ -23,12 +23,11 @@ namespace Cosmos.Playground.SSchocke {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
-            Console.WriteLine("Congratulations! You just booted SSchocke's C# code.");
-
-            //PCITest.Test();
+            PCITest.Test();
             //NetworkTest.Test();
             //FloatTest.Test();
-            VMWareSVGA.Test();
+            //VMWareSVGA.Test();
+            while (true) ;
 
             Cosmos.Sys.Deboot.ShutDown();
 		}

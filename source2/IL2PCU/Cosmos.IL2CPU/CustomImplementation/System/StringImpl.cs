@@ -33,10 +33,26 @@ namespace Cosmos.IL2CPU.CustomImplementation.System {
       throw new NotImplementedException();
     }
 
-    public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded) {
-        Console.Write("PadHelper, totalWidth = ");
-        WriteNumber((uint)totalWidth, 32);
-        Console.WriteLine("");
+      public static string ConcatArray(string[] values, int totalLength){
+          char[] xResult = new char[totalLength];
+          int xCurPos = 0;
+          for (int i = 0; i < values.Length; i++)
+          {
+              var xStr = values[i];
+              for (int j = 0; j < xStr.Length; j++)
+              {
+                  xResult[xCurPos] = xStr[j];
+                  xCurPos++;
+              }
+          }
+          return new String(xResult);
+      }
+
+      public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
+      {
+        //Console.Write("PadHelper, totalWidth = ");
+        //WriteNumber((uint)totalWidth, 32);
+        //Console.WriteLine("");
       char[] cs = new char[totalWidth];
 
       int pos = aThis.Length;
