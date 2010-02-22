@@ -50,7 +50,8 @@ namespace Cosmos.Playground.SSchocke
 
             Console.WriteLine("Initializing TCP Port 80...");
             TCPIPStack.AddTcpListener(80, WebServerConnect);
-            //TCPIPStack.AddTcpListener(5900, VNCServerConnect);
+            TCPIPStack.AddTcpListener(5900, VNCServerConnect);
+            Console.WriteLine("Servers initialized");
 
             #region Setup WebServer strings
             webPage = "<html><body><h1>It works! This is a web page being hosted by your Cosmos Operating System</h1></body></html>";
@@ -144,23 +145,33 @@ namespace Cosmos.Playground.SSchocke
 
             if (vnc.ClientStatus == VncClient.Status.CONNECTED)
             {
-                StringBuilder sb = new StringBuilder(data.Length);
+                int xLength = 0;
+                var xChars = new char[data.Length + 10];
                 for (int b = 0; b < data.Length; b++)
                 {
                     if (data[b] == 0x0A)
                     {
-                        sb.Append("<LF>");
+                        xChars[xLength] ='<';
+                        xChars[xLength+1] ='L';
+                        xChars[xLength+2] ='F';
+                        xChars[xLength+3] ='>';
+                        xLength += 4;
                     }
                     else if (data[b] == 0x0D)
                     {
-                        sb.Append("<CR>");
+                        xChars[xLength] ='<';
+                        xChars[xLength+1] ='C';
+                        xChars[xLength+2] ='R';
+                        xChars[xLength+3] ='>';
+                        xLength += 4;
                     }
                     else
                     {
-                        sb.Append((char)data[b]);
+                        xChars[xLength] = (char)data[b];
+                        xLength++;
                     }
                 }
-                String dataString = sb.ToString();
+                String dataString = new String(xChars, 0, xLength);
                 if (dataString == "RFB 003.008<LF>")
                 {
                     vnc.ClientStatus = VncClient.Status.RECVD_VERSION;
