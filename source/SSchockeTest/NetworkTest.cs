@@ -50,7 +50,7 @@ namespace Cosmos.Playground.SSchocke
 
             Console.WriteLine("Initializing TCP Port 80...");
             TCPIPStack.AddTcpListener(80, WebServerConnect);
-            TCPIPStack.AddTcpListener(5900, VNCServerConnect);
+            //TCPIPStack.AddTcpListener(5900, VNCServerConnect);
 
             #region Setup WebServer strings
             webPage = "<html><body><h1>It works! This is a web page being hosted by your Cosmos Operating System</h1></body></html>";
@@ -69,6 +69,7 @@ namespace Cosmos.Playground.SSchocke
             error404 += "Content-Type: text/html\r\n\r\n";
             error404 += "<html><body>404 URL Not found</html>";
             #endregion
+            Console.WriteLine("Done. Handling requests");
 
             //TcpClient client = new TcpClient(new IPv4Address(192, 168, 20, 100), 80);
             bool requestDone = false;
@@ -117,12 +118,12 @@ namespace Cosmos.Playground.SSchocke
         private static void WebServer_RecvData(TcpClient client, byte[] data)
         {
             Console.WriteLine("Received request from " + client.RemoteEndpoint.ToString());
-            StringBuilder sb = new StringBuilder(data.Length);
+            var xDataChars = new char[data.Length];
             for (int b = 0; b < data.Length; b++)
             {
-                sb.Append((char)data[b]);
+                xDataChars[b] = ((char)data[b]);
             }
-            String dataString = sb.ToString();
+            String dataString = new String(xDataChars);
 
             Console.WriteLine("Request : " + dataString);
             if (dataString.StartsWith("GET / ") == true)

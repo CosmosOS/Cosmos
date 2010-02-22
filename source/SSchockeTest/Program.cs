@@ -23,8 +23,8 @@ namespace Cosmos.Playground.SSchocke {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
-            PCITest.Test();
-            //NetworkTest.Test();
+            //PCITest.Test();
+            NetworkTest.Test();
             //FloatTest.Test();
             //VMWareSVGA.Test();
             while (true) ;
