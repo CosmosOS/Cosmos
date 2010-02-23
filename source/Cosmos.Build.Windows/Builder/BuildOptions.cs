@@ -38,7 +38,7 @@ namespace Cosmos.Compiler.Builder
             //QEmuAudioCard.Add("Adlib", "adlib");
             QEmuNetworkCard.Add("Realtek RTL8139", "rtl8139");
             //QEmuAudioCard.Add("ISA NE2000","ne2k_pci"
-            //QEmuAudioCard.Add("PCnet","pcnet");
+            QEmuNetworkCard.Add("PCnet", "pcnet");
             QEmuDebugComType.Add("Named pipe: Cosmos Debugger as client, QEmu as server", "-serial pipe:CosmosDebug");
             QEmuDebugComType.Add("Named pipe: Cosmos Debugger as server, QEmu as client", "-serial pipe_client:CosmosDebug");
             QEmuDebugComType.Add("TCP: Cosmos Debugger as client, QEmu as server on port 4444", "-serial tcp:127.0.0.1:4444,server");

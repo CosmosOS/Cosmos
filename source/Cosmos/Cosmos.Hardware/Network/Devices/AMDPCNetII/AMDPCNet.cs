@@ -38,11 +38,9 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
-            io = pciCard.GetAddressSpace(0) as Kernel.IOAddressSpace;
-
+            io = (Kernel.IOAddressSpace)pciCard.GetAddressSpace(0);
             // Enable the card
             pciCard.EnableDevice();
-
             // Set the device into 32-bit mode
             io.Write32(0x10, 0);
 
