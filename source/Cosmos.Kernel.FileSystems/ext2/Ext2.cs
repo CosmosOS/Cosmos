@@ -21,21 +21,29 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         }
 
         private void Initialize() {
+            Console.WriteLine("Start Ext2.Initialize");
             mBuffer = new byte[mBackend.BlockSize];
             fixed (byte* xBufferAddress = &mBuffer[0]) {
                 mBufferAddress = xBufferAddress;
             }
             // first get the superblock;
             var mBufferAsSuperblock = (SuperBlock*)mBufferAddress;
+            Console.WriteLine("Start reading superblock");
             mBackend.ReadBlock(2,
                                mBuffer);
+            Console.WriteLine("End reading");
             mSuperblock = *mBufferAsSuperblock;
             DebugUtil.Send_Ext2SuperBlock(mSuperblock);
             // read the group descriptors
+            Console.WriteLine("INodeCount: " + mSuperblock.INodesCount);
+            Console.WriteLine("INodesPerGRoup: " + mSuperblock.INodesPerGroup);
             uint xGroupDescriptorCount = mSuperblock.INodesCount / mSuperblock.INodesPerGroup;
             mGroupDescriptors = new GroupDescriptor[xGroupDescriptorCount];
             var xDescriptorPtr = (GroupDescriptor*)mBufferAddress;
+            Console.WriteLine("Process GroupDescriptors: " + xGroupDescriptorCount);
+            Console.ReadLine();
             for (int i = 0; i < xGroupDescriptorCount; i++) {
+                Console.WriteLine("Processing GroupDescriptor " + i);
                 uint xATABlock ;
 
                 if ( BlockSize == 1024 )
@@ -49,11 +57,15 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
 
                 xATABlock += (uint)(i / 16);
                 if ((i % 16) == 0) {
+                    Console.WriteLine("Read new GroupDescriptorBlock");
                     mBackend.ReadBlock(xATABlock,
                                        mBuffer);
+                    Console.WriteLine("End Read");
                 }
                 mGroupDescriptors[i] = xDescriptorPtr[i % 16];
+                Console.WriteLine("End of GroupDescriptor check");
             }
+            Console.WriteLine("Send GroupDescriptors to log");
             DebugUtil.Send_Ext2GroupDescriptors(mGroupDescriptors);
         }
 
@@ -301,12 +313,22 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 // todo: implement better detection
                 aDevice.ReadBlock(2,
                                   xBuffer);
+                Console.WriteLine("Block read");
                 Hardware.DebugUtil.WriteBinary("Ext2",
                                                "Detecting Ext2 (1)",
                                                xBuffer,
                                                55,
                                                4);
-                return xBuffer[56] == 0x53 && xBuffer[57] == 0xEF;
+                bool xResult = (xBuffer[56] == 0x53 && xBuffer[57] == 0xEF);
+                if (xResult)
+                {
+                    Console.WriteLine("Ext2 valid!");
+                }
+                else
+                {
+                    Console.WriteLine("Ext2 not valid!");
+                }
+                return xResult;
             }
             return false;
         }

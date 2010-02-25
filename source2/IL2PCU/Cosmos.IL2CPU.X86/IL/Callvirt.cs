@@ -72,9 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
           // Can we add this method info somehow to the data passed in?
           // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
-          if (xExtraStackSize > 0) {                
-            //xThisOffset -= xExtraStackSize;
-          }
+          
           new Comment(Assembler, "ThisOffset = " + xThisOffset);
 
           //             Action xEmitCleanup = delegate() {
@@ -122,7 +120,6 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Call {
               DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef)
             };
-
             if (xExtraStackSize > 0)
             {
                 xThisOffset -= xExtraStackSize;

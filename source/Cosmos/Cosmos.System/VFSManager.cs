@@ -17,8 +17,11 @@ namespace Cosmos.Sys {
             private static void DetectFilesystem(BlockDevice aDevice) {
             #region Ext2
             if (Ext2.BlockDeviceContainsExt2(aDevice)) {
+                Console.WriteLine("Ext2 detected ok");
                 aDevice.Used = true;
+                Console.WriteLine("Create Ext2 fs");
                 var xFS = new Ext2(aDevice);
+                Console.WriteLine("Creation went ok");
                 mFilesystems.Add(xFS);
             }
 
@@ -42,13 +45,22 @@ namespace Cosmos.Sys {
                 }
                 Console.WriteLine("Detect Filesystem");
                 DetectFilesystem(xStorageDevice);
+                Console.WriteLine("Detection went ok");
             }
+            Console.WriteLine("Checked all devices");
             Hardware.DebugUtil.SendNumber("VFS",
                                           "Registered Filesystems",
                                           (uint)mFilesystems.Count,
                                           32);
+            Console.WriteLine("End check");
             if (mFilesystems.Count == 0)
+            {
                 Console.WriteLine("WARNING: No filesystems found in VFS init!");
+            }
+            else
+            {
+                Console.WriteLine("  Found " + mFilesystems.Count + " filesystems!");
+            }
         }
 
         //Path examples:
