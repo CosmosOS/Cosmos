@@ -295,10 +295,10 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         }
 
         public static bool BlockDeviceContainsExt2(BlockDevice aDevice) {
-            byte[] xBuffer = new byte[aDevice.BlockSize];
-            // todo: implement better detection
-            try
+            if (aDevice.BlockCount > 3)
             {
+                byte[] xBuffer = new byte[aDevice.BlockSize];
+                // todo: implement better detection
                 aDevice.ReadBlock(2,
                                   xBuffer);
                 Hardware.DebugUtil.WriteBinary("Ext2",
@@ -308,9 +308,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                                                4);
                 return xBuffer[56] == 0x53 && xBuffer[57] == 0xEF;
             }
-            catch {
-                return false;
-            }
+            return false;
         }
     }
 }

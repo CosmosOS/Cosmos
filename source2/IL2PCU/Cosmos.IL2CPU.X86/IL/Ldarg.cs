@@ -79,11 +79,19 @@ namespace Cosmos.IL2CPU.X86.IL
           } else {
             if (aParam == 0) {
               xArgType = aMethod.MethodBase.DeclaringType;
+              if (xArgType.IsValueType)
+              {
+                  xArgType = xArgType.MakeByRefType();
+              }
             } else {
               xArgType = aMethod.MethodBase.GetParameters()[aParam - 1].ParameterType;
             }
           }
+          new Comment("Ldarg");
+          new Comment("Arg idx = " + aParam);
           xArgSize = Align(SizeOfType(xArgType), 4);
+          new Comment("Arg type = " + xArgType.ToString());
+            new Comment("Arg size = " + xArgSize);
           for (int i = 0; i < (xArgSize / 4); i++) {
             new Push {
               DestinationReg = Registers.EBP,

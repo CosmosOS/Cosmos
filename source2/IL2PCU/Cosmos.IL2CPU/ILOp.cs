@@ -56,6 +56,10 @@ namespace Cosmos.IL2CPU {
       } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
         return 4;
       }
+      if (aType.IsByRef)
+      {
+          return 4;
+      }
       switch (aType.FullName) {
         case "System.Char":
           return 2;

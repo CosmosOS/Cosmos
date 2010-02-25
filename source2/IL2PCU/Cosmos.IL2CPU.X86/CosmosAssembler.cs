@@ -297,7 +297,7 @@ namespace Cosmos.IL2CPU.X86
 
         protected override void Ldflda(MethodInfo aMethod, string aFieldId)
         {
-            IL.Ldflda.DoExecute(this, aMethod, aMethod.MethodBase.DeclaringType, aFieldId);
+            IL.Ldflda.DoExecute(this, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
         }
 
         //// todo: remove when everything goes fine

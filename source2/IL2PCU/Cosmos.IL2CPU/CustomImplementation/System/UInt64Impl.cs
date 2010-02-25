@@ -6,7 +6,7 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
   // Not supported yet
-	//[Plug(Target = typeof(UInt64))]
+	[Plug(Target = typeof(UInt64))]
 	public class UInt64Impl {
 		public static string ToString(ref ulong aThis) {
       return UInt64Impl2.GetNumberString(aThis, false);

@@ -23,6 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpMethod = aOpCode as OpMethod;
+          string xCurrentMethodLabel = GetLabel(aMethod, aOpCode.Position);
           DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode.Position);
         }
 
@@ -57,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
           uint xThisOffset = 0;
           var xParameters = aTargetMethod.GetParameters();
           foreach (var xItem in xParameters) {
-            xThisOffset += Align(SizeOfType(xItem.GetType()), 4);
+            xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
             Assembler.Stack.Pop();
           }
           if (!aTargetMethod.IsStatic) {
@@ -71,8 +72,8 @@ namespace Cosmos.IL2CPU.X86.IL
           // Can we add this method info somehow to the data passed in?
           // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
-          if (xExtraStackSize > 0) {
-            xThisOffset -= xExtraStackSize;
+          if (xExtraStackSize > 0) {                
+            //xThisOffset -= xExtraStackSize;
           }
           new Comment(Assembler, "ThisOffset = " + xThisOffset);
 
@@ -122,6 +123,10 @@ namespace Cosmos.IL2CPU.X86.IL
               DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef)
             };
 
+            if (xExtraStackSize > 0)
+            {
+                xThisOffset -= xExtraStackSize;
+            }
             /*
              * On the stack now:
              * $esp                 Params

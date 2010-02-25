@@ -84,6 +84,10 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     protected override void MethodEnd(MethodInfo aMethod) {
+        if (Label.GetFullName(aMethod.MethodBase) == "System_String__System_Int64_ToString__")
+        {
+            Console.Write("");
+        }
       base.MethodEnd(aMethod);
       uint xReturnSize = 0;
       var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
@@ -95,7 +99,14 @@ namespace Cosmos.IL2CPU.X86 {
       var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                             select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
       if (!aMethod.MethodBase.IsStatic) {
-        xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+          if (aMethod.MethodBase.DeclaringType.IsValueType)
+          {
+              xTotalArgsSize += 4; // only a reference is passed
+          }
+          else
+          {
+              xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+          }
       }
 
       if (aMethod.PluggedMethod != null) {
@@ -107,7 +118,14 @@ namespace Cosmos.IL2CPU.X86 {
         xTotalArgsSize = (from item in aMethod.PluggedMethod.MethodBase.GetParameters()
                           select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
         if (!aMethod.PluggedMethod.MethodBase.IsStatic) {
-          xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.PluggedMethod.MethodBase.DeclaringType), 4);
+            if (aMethod.PluggedMethod.MethodBase.DeclaringType.IsValueType)
+            {
+                xTotalArgsSize += 4; // only a reference is passed
+            }
+            else
+            {
+                xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.PluggedMethod.MethodBase.DeclaringType), 4);
+            }
         }
       }
 
@@ -123,20 +141,21 @@ namespace Cosmos.IL2CPU.X86 {
         //    xArgSize -= xReturnSize;
         //    xOffset = xArgSize;
         //}
-        int xOffset = 4;
-        xOffset += xTotalArgsSize;
-        if ((xTotalArgsSize - xReturnSize) < 0) {
-          //xOffset += (int)(0 - (xTotalArgsSize - xReturnSize));
-          xOffset = 8;
-        }
+          var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
         for (int i = 0; i < xReturnSize / 4; i++) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
           new CPUx86.Move {
             DestinationReg = CPUx86.Registers.EBP,
             DestinationIsIndirect = true,
-            DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 0 - xReturnSize),
+            DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)),
             SourceReg = Registers.EAX
           };
+            //        new CPUx86.Move {
+            //            DestinationReg = CPUx86.Registers.EBP,
+            //            DestinationIsIndirect = true,
+            //            DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 4 - xReturnSize),
+            //            SourceReg = Registers.EAX
+            //        };
         }
         // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
       }
@@ -199,6 +218,17 @@ namespace Cosmos.IL2CPU.X86 {
       }
       WriteDebug(aMethod.MethodBase, (uint)xRetSize, IL.Call.GetStackSizeToReservate(aMethod.MethodBase));
       new CPUx86.Return { DestinationValue = (uint)xRetSize };
+    }
+
+    public static uint GetResultCodeOffset(uint aResultSize, uint aTotalArgumentSize)
+    {
+        uint xOffset = 8;
+        if ((aTotalArgumentSize > 0) && (aTotalArgumentSize >= aResultSize))
+        {
+            xOffset += aTotalArgumentSize;
+            xOffset -= aResultSize;
+        }
+        return xOffset;
     }
 
     private static ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly)

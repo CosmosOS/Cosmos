@@ -31,17 +31,16 @@ namespace Cosmos.Sys {
             }
             mFilesystems = new List<Filesystem>(4);
             for (int i = 0; i < Device.Devices.Count; i++) {
+                Console.WriteLine("Check device: " + i);
                 var xDevice = Device.Devices[i];
                 if (xDevice.Type != Device.DeviceType.Storage) {
                     continue;
                 }
-                var xStorageDevice = xDevice as BlockDevice;
-                if (xStorageDevice == null) {
-                    continue;
-                }
+                var xStorageDevice = (BlockDevice)xDevice;
                 if (xStorageDevice.Used) {
                     continue;
                 }
+                Console.WriteLine("Detect Filesystem");
                 DetectFilesystem(xStorageDevice);
             }
             Hardware.DebugUtil.SendNumber("VFS",

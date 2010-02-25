@@ -20,12 +20,12 @@ namespace Cosmos.Hardware {
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
             Console.WriteLine("    Init IRQ");
             Interrupts.Init();
-            Kernel.CPU.CreateIDT(true);
+            Kernel.CPU.CreateIDT(false);
 
             //Doku: See ACPIManager class
             //Console.WriteLine("    Init ACPI");
             //ACPIManager.Init();
-
+                                                                                
             Console.WriteLine("    Init PCIBus");
             PCIBus.Init();
 
@@ -40,7 +40,7 @@ namespace Cosmos.Hardware {
             Mouse.Initialize();
             // New
             Console.WriteLine("    Init ATA");
-            //Storage.ATA.ATA.Initialize();
+            Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
 
             Network.Devices.RTL8139.RTL8139.InitDriver();

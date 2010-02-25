@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpCode = (ILOpCodes.OpField)aOpCode;
-          DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName());
+          DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
         }
         public static int GetFieldOffset(Type aDeclaringType, string aFieldId) {
           int xExtraOffset = 0;
@@ -61,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
           return (int)(xExtraOffset + xFieldInfo.Offset);
         }
 
-        public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId) {
+        public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
           Assembler.Stack.Pop();
           var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
           var xFields = GetFieldsInfo(aDeclaringType);
@@ -75,12 +75,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset) };
 
-          //if( aField.IsExternalField/* && aDerefExternalField */)
-          //{
-          //    new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-          //}
-          //*******
-
+          if( xFieldInfo.IsExternalValue && aDerefExternalField)
+          {
+              new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+          }
+          
           for (int i = 1; i <= (xSize / 4); i++) {
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };

@@ -274,8 +274,8 @@ namespace Cosmos.Hardware.Storage.ATA
                     // end wait 400ns
                     if (IOReadByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_STATUS)) == 0x50)
                     {
-                        ATA xATA;
-                        Device.Add(xATA = new ATA(String.Concat(mControllerNumbers[xControllerBaseAIdx], " ", mDriveNames[xDrive]), xControllerBaseAIdx, xDrive));
+                        ATA xATA = xATA = new ATA(String.Concat(mControllerNumbers[xControllerBaseAIdx], " ", mDriveNames[xDrive]), xControllerBaseAIdx, xDrive);
+                        Device.Add(xATA);
 
                         DebugUtil.SendNumber("ATA", "Device Size", (uint)xATA.BlockCount, 32);
                         Console.WriteLine(" Found");

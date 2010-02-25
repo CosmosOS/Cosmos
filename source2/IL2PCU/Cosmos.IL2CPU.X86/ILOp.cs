@@ -42,10 +42,11 @@ namespace Cosmos.IL2CPU.X86 {
       var xBody = aMethod.MethodBase.GetMethodBody();
       uint xOffset = 4;
       for (int i = 0; i < xBody.LocalVariables.Count; i++) {
-        if (i == aOp.Value) {
-          break;
-        }
-        var xField = xBody.LocalVariables[i];
+          if (i == aOp.Value)
+          {
+              break;
+          }
+          var xField = xBody.LocalVariables[i];
         xOffset += GetStackCountForLocal(aMethod, xField) * 4;
       }
       return xOffset;

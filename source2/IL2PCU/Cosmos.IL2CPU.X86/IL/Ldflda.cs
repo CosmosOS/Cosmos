@@ -14,10 +14,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpCode = (ILOpCodes.OpField)aOpCode;
-          DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName());
+          DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
         }
 
-        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField) {
+        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue) {
 
           var xFields = GetFieldsInfo(aDeclaringType);
           var xFieldInfo = (from item in xFields
@@ -41,12 +41,11 @@ namespace Cosmos.IL2CPU.X86.IL
           new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)(xActualOffset) };
           Assembler.Stack.Pop();
           Assembler.Stack.Push(new StackContents.Item(4, xType));
-#warning TODO: Implement Plugs
-          //if( aDerefExternalAddress && aField.IsExternalField )
-          //{
-          //    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-          //}
-          //else
+          if(aDerefValue && xFieldInfo.IsExternalValue )
+          {
+              new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+          }
+          else
           {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
           }

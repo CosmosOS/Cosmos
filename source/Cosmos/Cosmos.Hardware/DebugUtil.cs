@@ -1,4 +1,4 @@
-﻿//#define WRITE_TO_DEBUG
+﻿#define WRITE_TO_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Text;

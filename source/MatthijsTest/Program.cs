@@ -24,25 +24,41 @@ namespace MatthijsTest
         }
         #endregion
 
-        private static NetworkDevice mNet;
+        public class TestBase
+        {
+            public virtual long GetValue(){
+                return 43;
+            }
+        }
+
+        public class TestDerived: TestBase
+        {
+            public override long GetValue()
+            {
+                return 86;
+            }
+        }
 
         public static unsafe void Init()
         {
 
-            var xInit = false;
+            var xInit = true;
             if (xInit)
             {
                 var xBoot = new Cosmos.Sys.Boot();
-                xBoot.Execute(true);
+                xBoot.Execute(false);
             }
 
-            int xValue = 43;
-            Console.Write("Value = ");
-            Console.WriteLine((object)xValue);
-            Console.Write("Value2 = ");
-            Console.WriteLine(xValue.ToString());
-            Console.Write("Value2 = ");
-            Console.WriteLine(xValue);
+            //int xCount = 0;
+            //for (int i = 0; i < Device.Devices.Count; i++)
+            //{
+            //    if (Device.Devices[i] is BlockDevice)
+            //    {
+            //        xCount++;
+            //    }
+            //}
+
+            //Console.WriteLine("Number of BlockDevices: " + xCount);
 
             //ulong a = 1;
             //ulong b = 2;

@@ -12,9 +12,13 @@ namespace Cosmos.IL2CPU.X86.IL {
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpVar = (OpVar)aOpCode;
       var xAddress = GetEBPOffsetForLocal(aMethod, xOpVar);
+      if (aMethod.MethodBase.Name == "Init" && aMethod.MethodBase.DeclaringType.Name == "Program")
+      {
+          Console.Write("");
+      }
+      xAddress += (GetStackCountForLocal(aMethod, aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value]) - 1) * 4;
 
       // xAddress contains full size of locals, excluding the actual local
-      xAddress = xAddress;
       new CPUx86.Move {
         DestinationReg = CPUx86.Registers.EAX,
         SourceReg = CPUx86.Registers.EBP

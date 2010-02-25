@@ -702,10 +702,10 @@ namespace Cosmos.IL2CPU {
           xParams = aFrom.MethodBase.GetParameters();
         }
         
-        if (aFrom.MethodBase.GetParameters().Length > 0 || !aFrom.MethodBase.IsStatic) {
-          Ldarg(aFrom, 0);
-          Pop();
-        }
+        //if (aFrom.MethodBase.GetParameters().Length > 0 || !aFrom.MethodBase.IsStatic) {
+        //  Ldarg(aFrom, 0);
+        //  Pop();
+        //}
         
         int xCurParamIdx = 0;
         if (!aFrom.MethodBase.IsStatic) {

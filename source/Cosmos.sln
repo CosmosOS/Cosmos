@@ -239,6 +239,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempVSIP", "..\source2\VSIP
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reynaldo", "Reynaldo", "{B8406314-B724-410E-8C79-E2C187ACDC65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests", "..\source2\IL2PCU\Cosmos.IL2CPU.X86.Tests\Cosmos.IL2CPU.X86.Tests.csproj", "{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KebinuChiousu", "KebinuChiousu", "{22BCACD7-7E12-47D3-B3F2-77B8C0D0CB6F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.UnitTests.Kernel", "Cosmos.UnitTests.Kernel\Cosmos.UnitTests.Kernel.csproj", "{75CEC24E-04AB-4CF4-A0CE-1400E78CDE8C}"
@@ -247,7 +249,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.UnitTests", "Cosmos.
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 74
+		SccNumberOfProjects = 75
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -543,6 +545,10 @@ Global
 		SccProjectTopLevelParentUniqueName73 = Cosmos.sln
 		SccProjectName73 = ../source2/VSIP/TempVSIP
 		SccLocalPath73 = ..\\source2\\VSIP\\TempVSIP
+		SccProjectUniqueName74 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests\\Cosmos.IL2CPU.X86.Tests.csproj
+		SccProjectTopLevelParentUniqueName74 = Cosmos.sln
+		SccProjectName74 = ../source2/IL2PCU/Cosmos.IL2CPU.X86.Tests
+		SccLocalPath74 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1119,6 +1125,12 @@ Global
 		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Release|x86.ActiveCfg = Release|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|x86.ActiveCfg = Release|Any CPU
 		{75CEC24E-04AB-4CF4-A0CE-1400E78CDE8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{75CEC24E-04AB-4CF4-A0CE-1400E78CDE8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75CEC24E-04AB-4CF4-A0CE-1400E78CDE8C}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -1240,6 +1252,7 @@ Global
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{0F641748-FF03-4DA7-981B-1E9268330EE5} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
 		{D89DE0D3-FF3E-4F63-B15F-7302D998845E} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
