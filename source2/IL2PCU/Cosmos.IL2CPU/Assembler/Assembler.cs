@@ -659,7 +659,7 @@ namespace Cosmos.IL2CPU {
           //string theType = "db";
           Type xFieldTypeDef = aField.FieldType;
           if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
-            xTheSize = ILOp.SizeOfType(aField.FieldType);
+            xTheSize = GetSizeOfType(aField.FieldType);
           } else {
             xTheSize = 4;
           }
@@ -684,6 +684,8 @@ namespace Cosmos.IL2CPU {
         }
       }      
     }
+
+    public abstract uint GetSizeOfType(Type aType);
 
     public abstract void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods);
 

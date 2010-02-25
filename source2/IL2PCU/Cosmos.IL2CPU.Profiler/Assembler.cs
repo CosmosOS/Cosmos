@@ -69,6 +69,10 @@ namespace Cosmos.IL2CPU.Profiler {
     protected override void Ldflda(MethodInfo aMethod, string aFieldId) {
       throw new NotImplementedException();
     }
-  
+
+    public override uint GetSizeOfType(Type aType)
+    {
+        throw new NotImplementedException();
+    }
   }
 }

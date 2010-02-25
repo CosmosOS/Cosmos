@@ -24,18 +24,34 @@ namespace MatthijsTest
         }
         #endregion
 
-        public class TestBase
+        public class TEst
         {
-            public virtual long GetValue(){
-                return 43;
-            }
-        }
-
-        public class TestDerived: TestBase
-        {
-            public override long GetValue()
+            public struct MyStruct
             {
-                return 86;
+                public int a;
+                public int b;
+            }
+
+            public MyStruct mStruct;
+
+            public void SetA(int a)
+            {
+                mStruct.a = a;
+            }
+
+            public void SetB(int b)
+            {
+                mStruct.b = b;
+            }
+
+            public int GetA()
+            {
+                return mStruct.a;
+            }
+
+            public int GetB()
+            {
+                return mStruct.b;
             }
         }
 
@@ -48,6 +64,29 @@ namespace MatthijsTest
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute(false);
             }
+
+            var xObj = new TEst();
+            xObj.SetA(5);
+            xObj.SetB(33);
+            Console.WriteLine("A: " + xObj.GetA());
+            Console.WriteLine("B: " + xObj.GetB());
+
+            int[] xTest = new int[] { 33, 5 };
+            fixed (int* xTestAddr = &xTest[0])
+            {
+                Console.WriteLine("Int1: " + xTestAddr[0]);
+                Console.WriteLine("Int2: " + xTestAddr[1]);
+                var xStruct = *(TEst.MyStruct*)xTestAddr;
+                var xStruct2 = xStruct;
+                Console.WriteLine("StructInt1: " + xStruct.a);
+                Console.WriteLine("StructInt2: " + xStruct.b);
+                Console.WriteLine("StructInt3: " + xStruct2.a);
+                Console.WriteLine("StructInt4: " + xStruct2.b);
+                xObj.mStruct = *(TEst.MyStruct*)xTestAddr;
+            }
+
+            Console.WriteLine("A: " + xObj.GetA());
+            Console.WriteLine("B: " + xObj.GetB());
 
             //int xCount = 0;
             //for (int i = 0; i < Device.Devices.Count; i++)

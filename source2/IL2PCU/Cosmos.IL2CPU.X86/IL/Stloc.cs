@@ -27,10 +27,11 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 			}
 #endif
+            new Comment("EBPOffset = " + xEBPOffset);
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)(0 - (xEBPOffset + (i * 4))), SourceReg = CPUx86.Registers.EAX };
+				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)((0 - (xEBPOffset + (i * 4)))), SourceReg = CPUx86.Registers.EAX };
 			}
 			// no need to inc again, items on the transient stack are also counted
 			Assembler.Stack.Pop();

@@ -28,6 +28,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             }
             // first get the superblock;
             var mBufferAsSuperblock = (SuperBlock*)mBufferAddress;
+            int xAddr = (int)mBufferAddress;
+            Console.WriteLine("Buffer address: " + xAddr);
             Console.WriteLine("Start reading superblock");
             mBackend.ReadBlock(2,
                                mBuffer);
@@ -36,7 +38,17 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             DebugUtil.Send_Ext2SuperBlock(mSuperblock);
             // read the group descriptors
             Console.WriteLine("INodeCount: " + mSuperblock.INodesCount);
-            Console.WriteLine("INodesPerGRoup: " + mSuperblock.INodesPerGroup);
+            Console.WriteLine("INode#1: " + mBufferAddress[0]);
+            Console.WriteLine("INode#2: " + mBufferAddress[1]);
+            Console.WriteLine("INode#3: " + mBufferAddress[2]);
+            Console.WriteLine("INode#4: " + mBufferAddress[3]);
+
+            Console.WriteLine("BlockCount: " + mSuperblock.BlockCount);
+            Console.WriteLine("INodesPerGroup: " + (int)mSuperblock.INodesPerGroup);
+            if (mSuperblock.INodesPerGroup == 0x4000)
+            {
+                Console.WriteLine("INodesPerGroup has correct value!");
+            }
             uint xGroupDescriptorCount = mSuperblock.INodesCount / mSuperblock.INodesPerGroup;
             mGroupDescriptors = new GroupDescriptor[xGroupDescriptorCount];
             var xDescriptorPtr = (GroupDescriptor*)mBufferAddress;

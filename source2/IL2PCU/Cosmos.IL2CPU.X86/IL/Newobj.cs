@@ -18,6 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             OpMethod xMethod = ( OpMethod )aOpCode;
             string xCurrentLabel = GetLabel( aMethod, aOpCode );
+            #region Old code, todo..
             // TODO: enable this again
             // if (DynamicMethodEmit.GetHasDynamicMethod(CtorDef)) {
             //   CtorDef = DynamicMethodEmit.GetDynamicMethod(CtorDef);
@@ -61,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //             } else {
             //                 throw new ArgumentNullException("aCtorDef");
             //             }
-
+            #endregion
             var xType = xMethod.Value.DeclaringType;
 
             // If not ValueType, then we need gc

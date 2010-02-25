@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Cosmos.Sys.FileSystem.Ext2 {
     partial class Ext2 {
-        [StructLayout(LayoutKind.Explicit)]
+        [StructLayout(LayoutKind.Explicit, Size = 84)]
         internal struct SuperBlock {
             /// <summary>
             /// Indicates the total number of INodes, both used and free, in the filesystem.

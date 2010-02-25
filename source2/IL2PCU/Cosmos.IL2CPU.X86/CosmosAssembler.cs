@@ -325,5 +325,10 @@ namespace Cosmos.IL2CPU.X86
         //  new Label(xLabel);
 
         //}
+
+        public override uint GetSizeOfType(Type aType)
+        {
+            return ILOp.SizeOfType(aType);
+        }
     }
 }

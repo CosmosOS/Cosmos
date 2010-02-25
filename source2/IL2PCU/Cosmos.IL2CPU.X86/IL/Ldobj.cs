@@ -16,12 +16,13 @@ namespace Cosmos.IL2CPU.X86.IL
             var xSize = Assembler.Stack.Pop();
             OpType xType = ( OpType )aOpCode;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            for( int i = 1; i <= ( xSize.Size / 4 ); i++ )
+            var xObjSize = GetStorageSize(xType.Value);
+            for (int i = 1; i <= (xObjSize / 4); i++)
             {
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize.Size - ( i * 4 ) ) };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xObjSize - (i * 4)) };
             }
 
-            switch( xSize.Size % 4 )
+            switch (xObjSize % 4)
             {
                 case 1:
                     {
@@ -45,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         throw new Exception( "Remainder not supported!" );
             }
             //TODO: Push type not number
-            Assembler.Stack.Push( new StackContents.Item( ( int )xSize.Size, xType.Value  ) );
+            Assembler.Stack.Push(new StackContents.Item((int)xObjSize, xType.Value));
         }
 
 
