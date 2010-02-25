@@ -61,9 +61,9 @@ namespace Cosmos.IL2CPU.X86.IL
             DestinationReg = CPUx86.Registers.ECX,
             SourceValue = (uint)(xActualOffset)
           };
-          for (int i = 1; i <= (xSize / 4); i++) {
+          for (int i = 0; i < (xSize / 4); i++) {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize - (i * 4)), SourceReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.Registers.EAX };
           }
           switch (xSize % 4) {
             case 1: {

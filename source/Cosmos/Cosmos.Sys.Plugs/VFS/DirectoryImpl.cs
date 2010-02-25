@@ -41,17 +41,18 @@ namespace Cosmos.Sys.Plugs {
             return VFSManager.InternalGetFileDirectoryNames(path, userPathOriginal, searchPattern, includeFiles, includeDirs, searchOption);
         }
 
-        //public static string[] GetFiles(string aDir)
-        //{
-        //    List<string> xFileNames = new List<string>();
-        //    foreach (FilesystemEntry xFile in VFSManager.GetFiles(aDir))
-        //    {
-        //        xFileNames.Add(xFile.Name);
-        //    }
-        //    return xFileNames.ToArray();
+        public static string[] GetFiles(string aDir)
+        {
+            List<string> xFileNames = new List<string>();
+            var xFileEntries = VFSManager.GetFiles(aDir);
+            for (int i = 0; i < xFileEntries.Length; i++)
+            {
+                xFileNames.Add(xFileEntries[i].Name);
+            }
+            return xFileNames.ToArray();
 
-        //    //return (from xFileName in VFSManager.GetFiles(aDir) select xFileName.Name).ToArray();
-        //}
+            //return (from xFileName in VFSManager.GetFiles(aDir) select xFileName.Name).ToArray();
+        }
 
         public static string[] GetLogicalDrives()
         {

@@ -119,6 +119,7 @@ namespace Cosmos.Sys {
         /// <param name="aPath">Absolute path</param>
         /// <returns></returns>
         public static FilesystemEntry GetDirectoryEntry(string aPath) {
+            Console.WriteLine("In GetDirectoryEntry");
             if (String.IsNullOrEmpty(aPath)) 
                 throw new ArgumentNullException("aPath");
 
@@ -129,18 +130,21 @@ namespace Cosmos.Sys {
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "aPath is 1 long!");
                 return null;
             } else {
+                Console.WriteLine("Splitting path");
                 string[] xPathParts = SplitPath(aPath);
+                Console.WriteLine("  Parts: " + xPathParts.Length);
 
                 // first get the correct FS
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Searching for filesystem: " + xPathParts[0]);
-                var xFS = GetFileSystemFromPath(xPathParts[0], 0);
+                var xFS = GetFileSystemFromPath(ParseStringToInt(xPathParts[0]));
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found filesystem " + xFS.RootId.ToString());
 
                 var xCurrentFSEntryId = xFS.RootId;
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
                 if (xPathParts.Length == 1) {
                     Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Returning root entry");
-                    return GetVolumeEntry(ParseStringToInt(xPathParts[0], 0));
+                    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "String parsed");
+                    return GetVolumeEntry(ParseStringToInt(xPathParts[0]));
                     //return null;
                 }
                 for (int i = 1; i < (xPathParts.Length); i++) {
@@ -190,7 +194,7 @@ namespace Cosmos.Sys {
 
             //var xFS = GetFileSystemFromPath(aPath, 1);
             //return xFS.GetDirectoryListing(xFS.RootId);
-
+            Console.WriteLine("GetDirectoryListing");
             if (aPath.Length == 1)
             {
                 return GetVolumes();
@@ -212,8 +216,10 @@ namespace Cosmos.Sys {
                 //    var xFS = GetFileSystemFromPath(aPath, 1);
                 //    return xFS.GetDirectoryListing(xFS.RootId);
                 //}
-
-                return xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
+                Console.WriteLine("ParentItem found");
+                var xResult= xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
+                Console.WriteLine("Listing found");
+                return xResult;
             }
             
         }
@@ -224,7 +230,8 @@ namespace Cosmos.Sys {
         /// </summary>
         public static FilesystemEntry GetVolumeEntry(int volumeId)
         {
-            var xFS = GetFileSystemFromPath(volumeId.ToString(), 0);
+            var xFS = GetFileSystemFromPath(volumeId);
+            Console.WriteLine("FS found");
 
             return new FilesystemEntry()
             {
@@ -270,22 +277,21 @@ namespace Cosmos.Sys {
         /// </summary>
         /// <param name="aPath">The posistion of the drive number in the path.</param>
         /// <returns>A filesystem</returns>
-        private static Filesystem GetFileSystemFromPath(string aPath, int aOffset)
+        private static Filesystem GetFileSystemFromPath(int aPath)
         {
-            Cosmos.Hardware.DebugUtil.SendMessage("GetFileSystemFromPath", aPath + " with offset " + aOffset.ToString());
+            Cosmos.Hardware.DebugUtil.SendMessage("GetFileSystemFromPath", aPath.ToString());
             if (mFilesystems.Count == 0)
                 throw new Exception("No filesystems found");
             else
             {
-                int xId = ParseStringToInt(aPath, aOffset);
+                int xId = aPath;
                 return mFilesystems[xId];
             }
         }
 
-        private static int ParseStringToInt(string aString,
-                                            int aOffset) {
+        private static int ParseStringToInt(string aString) {
             int xResult = 0;
-            for (int i = aOffset; i < aString.Length; i++) {
+            for (int i = 0; i < aString.Length; i++) {
                 if (i > 0) {
                     xResult *= 10;
                 }
@@ -537,6 +543,7 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         public static FilesystemEntry[] GetFiles(string aDir)
         {
+            Console.WriteLine("GetFiles of VFSManager");
             if (aDir == null)
                 throw new ArgumentNullException("aDir is null");
 
@@ -563,12 +570,20 @@ namespace Cosmos.Sys {
             //if (!Directory.Exists(aDir))
             //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
 
+            Console.WriteLine("Before new List");
             List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
-            var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
+            Console.WriteLine("Before GetDirName");
+            var xDirName = Path.GetDirectoryName(aDir);
+            Console.WriteLine("Before GetListing");
+            var xEntries = VFSManager.GetDirectoryListing(xDirName);
 
-            foreach (FilesystemEntry entry in xEntries)
+            Console.WriteLine("Data retrieved");
+            for (int i = 0; i < xEntries.Length; i++)
+            {
+                var entry = xEntries[i];
                 if (!entry.IsDirectory)
                     xFiles.Add(entry);
+            }
 
             return xFiles.ToArray();
 
