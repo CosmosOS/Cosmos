@@ -167,7 +167,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             public uint Padding3;
         }
 
-        [StructLayout(LayoutKind.Explicit)]
+        [StructLayout(LayoutKind.Explicit, Size = 128)]
         internal struct INode {
             [FieldOffset(0)]
             public INodeModeEnum Mode;

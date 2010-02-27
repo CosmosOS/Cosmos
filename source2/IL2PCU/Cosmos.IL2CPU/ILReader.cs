@@ -137,8 +137,10 @@ namespace Cosmos.IL2CPU {
         ILOpCode xILOpCode = null;
         switch (xOpCode.OperandType) {
           // No operand.
-          case OperandType.InlineNone: {
-              // These shortcut translation regions expand shortcut ops into full ops
+          case OperandType.InlineNone:
+                {
+                    #region Inline none options
+                    // These shortcut translation regions expand shortcut ops into full ops
               // This elminates the amount of code required in the assemblers
               // by allowing them to ignore the shortcuts
               switch (xOpCodeVal) {
@@ -211,66 +213,71 @@ namespace Cosmos.IL2CPU {
                 default:
                   xILOpCode = new ILOpCodes.OpNone(xOpCodeVal, xOpPos, xPos, xCurrentHandler);
                   break;
-            }
-            break;
+              }
+                    #endregion
+              break;
           }
 
-          case OperandType.ShortInlineBrTarget: {
-              // By calculating target, we assume all branches are within a method
-              // So far at least wtih csc, its true. We check it with CheckBranch
-              // just in case.
-              int xTarget = xPos + 1 + (sbyte)xIL[xPos];
-              CheckBranch(xTarget, xIL.Length);
-              switch (xOpCodeVal) {
-                case ILOpCode.Code.Beq_S:
-                      xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Beq, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Bge_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Bge_Un_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Bgt_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Bgt_Un_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Ble_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Ble_Un_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Blt_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Blt_Un_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Bne_Un_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bne_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Br_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Br, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Brfalse_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brfalse, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Brtrue_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brtrue, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                case ILOpCode.Code.Leave_S:
-                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Leave, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-                default:
-                  xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 1, xTarget, xCurrentHandler);
-                  break;
-              }
-              xPos = xPos + 1;
-              break;
-            }
+          case OperandType.ShortInlineBrTarget:
+                {
+                    #region Inline branch
+                    // By calculating target, we assume all branches are within a method
+                    // So far at least wtih csc, its true. We check it with CheckBranch
+                    // just in case.
+                    int xTarget = xPos + 1 + (sbyte)xIL[xPos];
+                    CheckBranch(xTarget, xIL.Length);
+                    switch (xOpCodeVal)
+                    {
+                        case ILOpCode.Code.Beq_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Beq, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Bge_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Bge_Un_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Bgt_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Bgt_Un_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Ble_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Ble_Un_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Blt_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Blt_Un_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Bne_Un_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bne_Un, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Br_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Br, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Brfalse_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brfalse, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Brtrue_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brtrue, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        case ILOpCode.Code.Leave_S:
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Leave, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                        default:
+                            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 1, xTarget, xCurrentHandler);
+                            break;
+                    }
+                    xPos = xPos + 1;
+                    break;
+                    #endregion
+                }
           case OperandType.InlineBrTarget: {
               int xTarget = xPos + 4 + (Int32)ReadUInt32(xIL, xPos);
               CheckBranch(xTarget, xIL.Length);
@@ -414,9 +421,11 @@ namespace Cosmos.IL2CPU {
     }
 
     private UInt64 ReadUInt64(byte[] aBytes, int aPos) {
-      return (UInt64)(
-        aBytes[aPos + 7] << 56 | aBytes[aPos + 6] << 48 | aBytes[aPos + 5] << 40 | aBytes[aPos + 4] << 32
-        | aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
+      //return (UInt64)(
+      //  aBytes[aPos + 7] << 56 | aBytes[aPos + 6] << 48 | aBytes[aPos + 5] << 40 | aBytes[aPos + 4] << 32
+      //  | aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
+
+        return BitConverter.ToUInt64(aBytes, aPos);
     }
 
   }

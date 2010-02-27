@@ -89,7 +89,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
 
         public override ulong RootId {
             get {
-                return 2;
+                return 3;
             }
         }
 
@@ -114,6 +114,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             INode xINode;
             GetINode(xBaseINodeNumber,
                      out xINode);
+            Console.Write("INode read");
+            return new FilesystemEntry[0];
             byte[] xFSBuffer = new byte[BlockSize];
             var xResult = new List<FilesystemEntry>(10);
             var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
@@ -121,6 +123,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             while (ReadINodeBlock(xINode,
                                   xBlockId,
                                   xFSBuffer)) {
+                                      Console.WriteLine("Read INode block");
                 HW.DebugUtil.WriteBinary("Ext2",
                                          "Directory Entry binary",
                                          xFSBuffer,
@@ -169,6 +172,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                          out xTheINode);
                 xResult[i].Size = xTheINode.Size;
             }
+            Console.WriteLine("Returning list of items: " + xResult.Count);
             return xResult.ToArray();
         }
 
@@ -213,7 +217,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                                     32);
             mBackend.ReadBlock(xTableBlock,
                                mBuffer);
-            INode xINode;
+            INode xINode=new INode();
             fixed (byte* xTempAddress = &mBuffer[0]) {
                 var xINodeAddress = (INode*)xTempAddress;
                 xINode = xINodeAddress[(int)xTableBlockOffset];

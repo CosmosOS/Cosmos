@@ -24,6 +24,27 @@ namespace MatthijsTest
         }
         #endregion
 
+        private struct MyStruct
+        {
+            public int Value1;
+            public int Value2;
+        }
+
+        private struct TestStruct
+        {
+            public int Value;
+        }
+
+        private static unsafe void DoTest()
+        {
+            ulong xValue = 0x0102030405060708;
+            ulong* xAddr = &xValue;
+            {
+                var xIntPtr = (TestStruct*)xAddr;
+                Console.WriteLine("Second integer: " + xIntPtr[1].Value);
+            }
+        }
+
         public static unsafe void Init()
         {
 
@@ -33,13 +54,30 @@ namespace MatthijsTest
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute(false);
             }
-            Console.WriteLine("Klaar");
+            
+
+            //DoTest();
 
             var xDirs = Directory.GetDirectories("/0/");
+            Console.WriteLine("Directories: " + xDirs.Length);
             for (int i = 0; i < xDirs.Length; i++)
             {
                 Console.WriteLine(xDirs[i]);
             }
+var xFiles = Directory.GetFiles("/0/");
+Console.WriteLine("Files: " + xFiles.Length);
+for (int i = 0; i < xFiles.Length; i++)
+{
+    Console.Write("  ");
+    Console.WriteLine(xFiles[i]);
+}
+
+            Console.WriteLine("Klaar");
+
+            //MyStruct xTest;
+            //DoTest(out xTest);
+            //Console.WriteLine("Value1: " + xTest.Value1);
+            //Console.WriteLine("Value2: " + xTest.Value2);
 
             //var xFiles = Directory.GetFiles(@"/0");
             //Console.WriteLine("Iteraten: " + xFiles.Length);

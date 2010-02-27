@@ -216,7 +216,7 @@ namespace Cosmos.Sys {
                 //    var xFS = GetFileSystemFromPath(aPath, 1);
                 //    return xFS.GetDirectoryListing(xFS.RootId);
                 //}
-                Console.WriteLine("ParentItem found");
+                Console.WriteLine("ParentItem found()");
                 var xResult= xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
                 Console.WriteLine("Listing found");
                 return xResult;
