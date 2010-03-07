@@ -125,7 +125,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         /// Each represents a single "block group" within the filesystem and the information
         /// within any on of them is pertinent only to the group it is describing.
         /// </summary>
-        [StructLayout(LayoutKind.Explicit)]
+        [StructLayout(LayoutKind.Explicit, Size = 32)]
         internal struct GroupDescriptor {
             /// <summary>
             /// Block id of the first block of the "block bitmap" for the group represented.

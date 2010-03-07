@@ -14,6 +14,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
+            if (GetLabel(aMethod, aOpCode) == "System_Void__MatthijsTest_Program_DoTest_MatthijsTest_Program_Test___DOT__00000006")
+            {
+                Console.Write("");
+            }
             var xOpVar = (OpVar)aOpCode;
             var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
             new Move {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };

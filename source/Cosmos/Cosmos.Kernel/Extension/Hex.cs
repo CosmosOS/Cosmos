@@ -107,7 +107,7 @@ namespace Cosmos.Kernel {
             return xHex;
         }
 
-        private static string SingleDigitToHex(byte d)
+        public static string SingleDigitToHex(byte d)
         {
             switch (d)
             {

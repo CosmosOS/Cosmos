@@ -63,31 +63,34 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
                     new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
-                    new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP , DestinationIsIndirect=true};
+                    new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
                     new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
                     new CPUx86.x87.FloatDecTopPointer();
+                    throw new NotImplementedException();
                 }
                 else
                 {
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                }
+
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = LabelFalse };
-                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+                    new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
 
-                //they are equal, eax == 0
+                    //they are equal, eax == 0
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    //new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
+                    new CPUx86.Push { DestinationValue =1 };
                     new CPUx86.Jump { DestinationLabel = xNextLabel };
-                    new Label( LabelFalse );
-                //eax = 0
+                    new Label(LabelFalse);
+                    //eax = 0
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    //new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
+                    new CPUx86.Push { DestinationValue = 0 };
                     new CPUx86.Jump { DestinationLabel = xNextLabel };
+                }
             }
             else
                 throw new Exception( "Case not handled!" );

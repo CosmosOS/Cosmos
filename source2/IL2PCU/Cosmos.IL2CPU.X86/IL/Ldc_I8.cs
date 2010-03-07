@@ -14,9 +14,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
           //TODO: Fix for 64 bit
             var xOp = (OpInt64)aOpCode;
-            new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 0) };
             new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 4) };
-            Assembler.Stack.Push(8, typeof( long ));
+            new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 0) };
+            Assembler.Stack.Push(8, typeof(long));
         }
 
     }

@@ -89,7 +89,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
 
         public override ulong RootId {
             get {
-                return 3;
+                return 2;
             }
         }
 
@@ -115,7 +115,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             GetINode(xBaseINodeNumber,
                      out xINode);
             Console.Write("INode read");
-            return new FilesystemEntry[0];
             byte[] xFSBuffer = new byte[BlockSize];
             var xResult = new List<FilesystemEntry>(10);
             var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
@@ -250,9 +249,11 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                                     "BlockId",
                                     aBlockId,
                                     32);
+            HW.DebugUtil.SendNumber("Ext2", "Block[0]", aINode.Block, 32);
             uint* xBlocks = &aINode.Block;
             if (aBlockId >= 0 && aBlockId <= 11) {
                 var xBlockId = xBlocks[aBlockId];
+                HW.DebugUtil.SendNumber("Ext2", "Blocknr on disk", xBlockId, 32);
                 if (xBlockId == 0) {
                     return false;
                 }

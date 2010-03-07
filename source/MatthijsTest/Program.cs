@@ -24,24 +24,24 @@ namespace MatthijsTest
         }
         #endregion
 
-        private struct MyStruct
+        private static void TestValue(ulong aTest)
         {
-            public int Value1;
-            public int Value2;
-        }
-
-        private struct TestStruct
-        {
-            public int Value;
-        }
-
-        private static unsafe void DoTest()
-        {
-            ulong xValue = 0x0102030405060708;
-            ulong* xAddr = &xValue;
+            if (aTest == 0x0102030405060708L)
             {
-                var xIntPtr = (TestStruct*)xAddr;
-                Console.WriteLine("Second integer: " + xIntPtr[1].Value);
+                Console.WriteLine("Value is correct");
+            }
+            else
+            {
+                Console.WriteLine("Value is incorrect");
+            }
+            aTest = 0x0102030405060708L;
+            if (aTest == 0x0102030405060708L)
+            {
+                Console.WriteLine("Value is correct");
+            }
+            else
+            {
+                Console.WriteLine("Value is incorrect");
             }
         }
 
@@ -54,9 +54,10 @@ namespace MatthijsTest
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute(false);
             }
-            
 
-            //DoTest();
+            //ulong xVal = 0x0102030405060708L;
+            //TestValue(xVal);
+            //TestValue(0x0102030405060708L);
 
             var xDirs = Directory.GetDirectories("/0/");
             Console.WriteLine("Directories: " + xDirs.Length);
@@ -64,15 +65,13 @@ namespace MatthijsTest
             {
                 Console.WriteLine(xDirs[i]);
             }
-var xFiles = Directory.GetFiles("/0/");
-Console.WriteLine("Files: " + xFiles.Length);
-for (int i = 0; i < xFiles.Length; i++)
-{
-    Console.Write("  ");
-    Console.WriteLine(xFiles[i]);
-}
-
-            Console.WriteLine("Klaar");
+            //var xFiles = Directory.GetFiles("/0/");
+            //Console.WriteLine("Files: " + xFiles.Length);
+            //for (int i = 0; i < xFiles.Length; i++)
+            //{
+            //    Console.Write("  ");
+            //    Console.WriteLine(xFiles[i]);
+            //}
 
             //MyStruct xTest;
             //DoTest(out xTest);
