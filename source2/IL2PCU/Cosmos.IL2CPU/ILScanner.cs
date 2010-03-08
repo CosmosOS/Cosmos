@@ -377,10 +377,10 @@ namespace Cosmos.IL2CPU {
 //      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
 
         // dump all methods to temp file.
-      File.WriteAllLines(@"e:\methods.txt", (from item in mItems
-                                             let xMethod = item as MethodBase
-                                             where xMethod != null
-                                             select Label.GetFullName(xMethod)).ToArray());
+      //File.WriteAllLines(@"e:\methods.txt", (from item in mItems
+      //                                       let xMethod = item as MethodBase
+      //                                       where xMethod != null
+      //                                       select Label.GetFullName(xMethod)).ToArray());
     }
 
     /// <summary>
