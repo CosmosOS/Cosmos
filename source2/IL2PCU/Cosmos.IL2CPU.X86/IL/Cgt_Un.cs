@@ -33,8 +33,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
                     new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
                     new CPUx86.x87.FloatDecTopPointer();
-                    // no compare is done!!
-                    throw new NotImplementedException();
                 }
                 else
                 {
@@ -48,17 +46,13 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     //value1: ECX:EBX
-                    //new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
-                    new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
-                    new ConditionalJump { Condition=ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
-                    //new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
-                    new CPUx86.Compare { DestinationReg = Registers.ECX, SourceReg = Registers.EDX };
+                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
+                    new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
                     //result = value1 - value2
                     //new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
                     //new CPUx86.Push { DestinationReg = Registers.EDI };
                 }
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
-                new Label(LabelFalse);
                 new CPUx86.Push { DestinationValue = 0 };
                 new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                 new Label( LabelTrue );
