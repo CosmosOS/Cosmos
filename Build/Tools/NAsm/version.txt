@@ -1,3 +1,3 @@
-0.98.38
+2.7
 
-before updating, test..
+latest stable version (last checked 9th of Februray 2010)
