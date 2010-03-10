@@ -132,7 +132,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             while (ReadINodeBlock(ref xINode,
                                   xBlockId,
                                   xFSBuffer)) {
-                                      Console.WriteLine("Read INode block");
                 //HW.DebugUtil.WriteBinary("Ext2",
                 //                         "Directory Entry binary",
                 //                         xFSBuffer,
@@ -374,7 +373,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 // todo: implement better detection
                 aDevice.ReadBlock(2,
                                   xBuffer);
-                Console.WriteLine("Block read");
                 Hardware.DebugUtil.WriteBinary("Ext2",
                                                "Detecting Ext2 (1)",
                                                xBuffer,

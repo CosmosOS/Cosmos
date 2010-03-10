@@ -17,11 +17,8 @@ namespace Cosmos.Sys {
             private static void DetectFilesystem(BlockDevice aDevice) {
             #region Ext2
             if (Ext2.BlockDeviceContainsExt2(aDevice)) {
-                Console.WriteLine("Ext2 detected ok");
                 aDevice.Used = true;
-                Console.WriteLine("Create Ext2 fs");
                 var xFS = new Ext2(aDevice);
-                Console.WriteLine("Creation went ok");
                 mFilesystems.Add(xFS);
             }
 
@@ -119,7 +116,6 @@ namespace Cosmos.Sys {
         /// <param name="aPath">Absolute path</param>
         /// <returns></returns>
         public static FilesystemEntry GetDirectoryEntry(string aPath) {
-            Console.WriteLine("In GetDirectoryEntry");
             if (String.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException("aPath");
@@ -134,10 +130,8 @@ namespace Cosmos.Sys {
             }
             else
             {
-                Console.WriteLine("Splitting path");
                 string[] xPathParts = SplitPath(aPath);
-                Console.WriteLine("  Parts: " + xPathParts.Length);
-
+            
                 // first get the correct FS
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Searching for filesystem: " + xPathParts[0]);
                 var xFS = GetFileSystemFromPath(ParseStringToInt(xPathParts[0]));
@@ -204,7 +198,6 @@ namespace Cosmos.Sys {
 
             //var xFS = GetFileSystemFromPath(aPath, 1);
             //return xFS.GetDirectoryListing(xFS.RootId);
-            Console.WriteLine("GetDirectoryListing");
             if (aPath.Length == 1)
             {
                 return GetVolumes();
@@ -226,9 +219,7 @@ namespace Cosmos.Sys {
                 //    var xFS = GetFileSystemFromPath(aPath, 1);
                 //    return xFS.GetDirectoryListing(xFS.RootId);
                 //}
-                Console.WriteLine("ParentItem found()");
                 var xResult= xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
-                Console.WriteLine("Listing found");
                 return xResult;
             }
             
@@ -241,8 +232,7 @@ namespace Cosmos.Sys {
         public static FilesystemEntry GetVolumeEntry(int volumeId)
         {
             var xFS = GetFileSystemFromPath(volumeId);
-            Console.WriteLine("FS found");
-
+            
             return new FilesystemEntry()
             {
                 Name = volumeId.ToString(),
@@ -400,9 +390,6 @@ namespace Cosmos.Sys {
                 //Read the block
                 if (!xFS.ReadBlock(xFile.Id, i, xSingleBlockBuffer))
                 {
-                    Console.Write("Error while processing file! (");
-                    Console.Write(((uint)xFile.Id).ToString());
-                    Console.WriteLine(")");
                     return "";
                 }
                 Hardware.DebugUtil.SendMessage("ReadFile", "After ReadBlock");
@@ -567,7 +554,6 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         public static FilesystemEntry[] GetFiles(string aDir)
         {
-            Console.WriteLine("GetFiles of VFSManager");
             if (aDir == null)
                 throw new ArgumentNullException("aDir is null");
 
@@ -594,14 +580,10 @@ namespace Cosmos.Sys {
             //if (!Directory.Exists(aDir))
             //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
 
-            Console.WriteLine("Before new List");
             List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
-            Console.WriteLine("Before GetDirName");
             var xDirName = Path.GetDirectoryName(aDir);
-            Console.WriteLine("Before GetListing");
             var xEntries = VFSManager.GetDirectoryListing(xDirName);
 
-            Console.WriteLine("Data retrieved");
             for (int i = 0; i < xEntries.Length; i++)
             {
                 var entry = xEntries[i];

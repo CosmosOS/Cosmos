@@ -73,7 +73,7 @@ namespace MatthijsTest
             if (xInit)
             {
                 var xBoot = new Cosmos.Sys.Boot();
-                xBoot.Execute(false);
+                xBoot.Execute(true);
 
                 var xDirs = Directory.GetDirectories("/0/");
                 Console.WriteLine("Directories: " + xDirs.Length);
