@@ -25,6 +25,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
             Console.Write("Getting resource: '");
             Console.Write(aResource);
             Console.WriteLine("'");
+            Console.ReadLine();
             return aResource;
         }
 

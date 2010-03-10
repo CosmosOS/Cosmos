@@ -33,6 +33,11 @@ namespace Cosmos.IL2CPU.CustomImplementation.System {
       throw new NotImplementedException();
     }
 
+    public static string Concat(string a, string b, string c)
+    {
+        return ConcatArray(new string[] { a, b, c }, a.Length + b.Length + c.Length);
+    }
+
       public static string ConcatArray(string[] values, int totalLength){
           char[] xResult = new char[totalLength];
           int xCurPos = 0;

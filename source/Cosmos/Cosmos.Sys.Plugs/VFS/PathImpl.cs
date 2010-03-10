@@ -16,6 +16,10 @@ namespace Cosmos.Sys.Plugs {
         /// <returns></returns>
         public static string GetDirectoryName(string aPath)
         {
+            if (aPath == null || aPath.Length <= 1)
+            {
+                return "/";
+            }
             int xIndex = aPath.LastIndexOfAny(new char[] { '/', '\\' });
             if (xIndex == -1)
             {

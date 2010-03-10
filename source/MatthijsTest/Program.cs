@@ -45,6 +45,27 @@ namespace MatthijsTest
             }
         }
 
+        [StructLayout(LayoutKind.Explicit, Size = 8)]
+        public struct MyValueType
+        {
+            [FieldOffset(0)]
+            public int Value1;
+            [FieldOffset(4)]
+            public int Value2;
+        }
+
+        public static unsafe void Dump(int* values)
+        {
+            Console.WriteLine("Val1: " + values[0]);
+            Console.WriteLine("Val2: " + values[1]);
+        }
+
+        public static void Dump(MyValueType xVal)
+        {
+            Console.WriteLine("Val1: " + xVal.Value1);
+            Console.WriteLine("Val2: " + xVal.Value2);
+        }
+
         public static unsafe void Init()
         {
 
@@ -53,26 +74,34 @@ namespace MatthijsTest
             {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute(false);
+
+                var xDirs = Directory.GetDirectories("/0/");
+                Console.WriteLine("Directories: " + xDirs.Length);
+                for (int i = 0; i < xDirs.Length; i++)
+                {
+                    Console.WriteLine(xDirs[i]);
+                }
+                var xFiles = Directory.GetFiles("/0/");
+                Console.WriteLine("Files: " + xFiles.Length);
+                for (int i = 0; i < xFiles.Length; i++)
+                {
+                    Console.Write("  ");
+                    Console.WriteLine(xFiles[i]);
+                }
             }
-
-            //ulong xVal = 0x0102030405060708L;
-            //TestValue(xVal);
-            //TestValue(0x0102030405060708L);
-
-            var xDirs = Directory.GetDirectories("/0/");
-            Console.WriteLine("Directories: " + xDirs.Length);
-            for (int i = 0; i < xDirs.Length; i++)
+            else
             {
-                Console.WriteLine(xDirs[i]);
+                //var xVal = new MyValueType();
+                //xVal.Value1 = 11;
+                //xVal.Value2 = 22;
+                //Dump(xVal);
+                //Console.WriteLine("--");
+                //MyValueType* xValPtr = &xVal;
+                //{
+                //    int* xValues = (int*)xValPtr;
+                //    Dump(xValues);
+                //}
             }
-            //var xFiles = Directory.GetFiles("/0/");
-            //Console.WriteLine("Files: " + xFiles.Length);
-            //for (int i = 0; i < xFiles.Length; i++)
-            //{
-            //    Console.Write("  ");
-            //    Console.WriteLine(xFiles[i]);
-            //}
-
             //MyStruct xTest;
             //DoTest(out xTest);
             //Console.WriteLine("Value1: " + xTest.Value1);

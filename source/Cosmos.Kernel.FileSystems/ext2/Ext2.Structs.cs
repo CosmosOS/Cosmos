@@ -4,10 +4,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Cosmos.Sys.FileSystem.Ext2 {
-    partial class Ext2 {
+namespace Cosmos.Sys.FileSystem.Ext2
+{
+    partial class Ext2
+    {
         [StructLayout(LayoutKind.Explicit, Size = 84)]
-        internal struct SuperBlock {
+        internal struct SuperBlock
+        {
             /// <summary>
             /// Indicates the total number of INodes, both used and free, in the filesystem.
             /// </summary>
@@ -116,7 +119,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             [FieldOffset(82)]
             public ushort DefResGID;
 
-            public void DoSomething() {
+            public void DoSomething()
+            {
             }
         }
 
@@ -126,7 +130,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         /// within any on of them is pertinent only to the group it is describing.
         /// </summary>
         [StructLayout(LayoutKind.Explicit, Size = 32)]
-        internal struct GroupDescriptor {
+        internal struct GroupDescriptor
+        {
             /// <summary>
             /// Block id of the first block of the "block bitmap" for the group represented.
             /// </summary>
@@ -168,7 +173,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 128)]
-        internal struct INode {
+        internal struct INode
+        {
             [FieldOffset(0)]
             public INodeModeEnum Mode;
 
@@ -205,7 +211,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             [FieldOffset(36)]
             public uint OSD1;
 
-            [FieldOffset(40)]
+            [FieldOffset(INodeConsts.BlockOffset)]
             public uint Block;
 
             [FieldOffset(100)]
@@ -231,7 +237,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         }
 
         [Flags]
-        public enum INodeModeEnum : ushort {
+        public enum INodeModeEnum : ushort
+        {
             FormatMask = 0xF000,
             Socket = 0xC000,
             SymbolicLink = 0xA000,
@@ -258,7 +265,8 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         }
 
         [StructLayout(LayoutKind.Explicit)]
-        internal struct DirectoryEntry {
+        internal struct DirectoryEntry
+        {
             /// <summary>
             /// INode number of the entry. A value of <c>0</c> indicates that the entry is not used.
             /// </summary>
@@ -277,5 +285,10 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             [FieldOffset(8)]
             public byte FirstNameChar;
         }
+    }
+
+    public static class INodeConsts
+    {
+        public const int BlockOffset = 40;
     }
 }

@@ -57,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //}
             for (int i = 0; i < (xCurArgSize / 4); i++) {
               new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-              new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4)), SourceReg = CPUx86.Registers.EAX };
+              new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + /*xCurArgSize -*/ ((i/* + 1*/) * 4)), SourceReg = CPUx86.Registers.EAX };
             }
             Assembler.Stack.Pop();
         }

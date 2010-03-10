@@ -25,15 +25,30 @@ namespace Cosmos.Sys.Plugs {
             mCurrentDirectory = aDir;
         }
 
-        //public static string[] GetDirectories(string aDir)
-        //{
+        public static string[] GetDirectories(string aDir)
+        {
+            var xEntries = VFSManager.GetDirectoryListing(aDir);
+            //var xResult = new string[xEntries.Length];
+            var xResult = new List<string>();
+            for (int i = 0; i < xEntries.Length; i++)
+            {
+            ////var i = 0;
+                if (xEntries[i].IsDirectory)
+                {
+                    xResult.Add(xEntries[i].Name);
+                    //xResult[i] = xEntries[i].Name;
+                }
+            }
+            //var xResult = new string[1];
+            //xResult[0] = "TempDir";
+            return xResult.ToArray();
         //    List<string> xDirectoryNames = new List<string>();
         //    foreach (FilesystemEntry xDirectory in VFSManager.GetDirectories(aDir))
         //        xDirectoryNames.Add(xDirectory.Name);
 
         //    return xDirectoryNames.ToArray();
         //    //return (from xDirectoryName in VFSManager.GetDirectories(aDir) select xDirectoryName.Name).ToArray();
-        //}
+        }
 
         //Plugs Directory.InternalGetFileDirectoryNames which is used by 6 methods (in Directory and DirectoryInfo)
         public static string[] InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)

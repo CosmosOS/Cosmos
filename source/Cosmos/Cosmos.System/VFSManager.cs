@@ -120,16 +120,20 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         public static FilesystemEntry GetDirectoryEntry(string aPath) {
             Console.WriteLine("In GetDirectoryEntry");
-            if (String.IsNullOrEmpty(aPath)) 
+            if (String.IsNullOrEmpty(aPath))
+            {
                 throw new ArgumentNullException("aPath");
+            }
+            if (!aPath.IsAbsolutePath())
+                throw new ArgumentException("Path must be absolute, not relative");
 
-            //if (!aPath.IsAbsolutePath())
-            //    throw new ArgumentException("Path must be absolute, not relative");
-            
-            if (aPath.Length == 1) { //Uber-root (/)
+            if (aPath.Length == 1)
+            { //Uber-root (/)
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "aPath is 1 long!");
                 return null;
-            } else {
+            }
+            else
+            {
                 Console.WriteLine("Splitting path");
                 string[] xPathParts = SplitPath(aPath);
                 Console.WriteLine("  Parts: " + xPathParts.Length);
@@ -141,20 +145,25 @@ namespace Cosmos.Sys {
 
                 var xCurrentFSEntryId = xFS.RootId;
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
-                if (xPathParts.Length == 1) {
+                if (xPathParts.Length == 1)
+                {
                     Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Returning root entry");
                     Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "String parsed");
                     return GetVolumeEntry(ParseStringToInt(xPathParts[0]));
                     //return null;
                 }
-                for (int i = 1; i < (xPathParts.Length); i++) {
+                for (int i = 1; i < (xPathParts.Length); i++)
+                {
                     var xListing = xFS.GetDirectoryListing(xCurrentFSEntryId);
                     bool xFound = false;
-                    for (int j = 0; j < xListing.Length; j++) {
-                        Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry","Checking if " + xListing[j].Name + " equals " + xPathParts[i]);
-                        if (xListing[j].Name.Equals(xPathParts[i])) {
+                    for (int j = 0; j < xListing.Length; j++)
+                    {
+                        Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Checking if " + xListing[j].Name + " equals " + xPathParts[i]);
+                        if (xListing[j].Name.Equals(xPathParts[i]))
+                        {
                             xCurrentFSEntryId = xListing[j].Id;
-                            if (i == (xPathParts.Length - 1)) {
+                            if (i == (xPathParts.Length - 1))
+                            {
                                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found match! : " + xListing[j].Name);
                                 return xListing[j];
                             }
@@ -162,7 +171,8 @@ namespace Cosmos.Sys {
                             break;
                         }
                     }
-                    if (!xFound) {
+                    if (!xFound)
+                    {
                         Cosmos.Hardware.DebugUtil.SendError("GetDirectoryEntry", "Path not found(1)");
                         throw new Exception("Path not found: " + aPath);
                     }
@@ -269,6 +279,7 @@ namespace Cosmos.Sys {
 
             var xFS = aDirectory.Filesystem;
             //Cosmos.Hardware.DebugUtil.SendMessage("GetDirectorylisting", "ID is " + aDirectory.Id);
+            //aDirectory.
             return xFS.GetDirectoryListing(aDirectory.Id);
         }
 
@@ -471,32 +482,45 @@ namespace Cosmos.Sys {
         /// </summary>
         /// <param name="aDir"></param>
         /// <returns></returns>
-        public static FilesystemEntry[] GetDirectories(string aDir)
-        {
-            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "Checking for nullreference");
-            if (aDir == null)
-                throw new ArgumentNullException("aDir is null");
+        //public static FilesystemEntry[] GetDirectories(string aDir)
+        //{
+        //    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "Checking for nullreference");
+        //    if (aDir == null)
+        //    {
+        //        throw new ArgumentNullException("aDir is null");
+        //    }
 
-            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "Checking if " + aDir + " exists");
-            if (!Directory.Exists(aDir))
-                throw new DirectoryNotFoundException("Unable to find directory " + aDir);
+        //    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "Checking if " + aDir + " exists");
+        //    //if (!Directory.Exists(aDir))
+        //    //{
+        //    //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
+        //    //}
 
-            List<FilesystemEntry> xDirectories = new List<FilesystemEntry>();
-            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "About to GetDirectoryListing");
+        //    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "About to GetDirectoryListing");
 
-            var xDir = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aDir));
-            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", xDir.Name + " with ID " + xDir.Id.ToString());
-            var xEntries = VFSManager.GetDirectoryListing(xDir);
-            //var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
+        //    var xDir = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aDir));
+        //    ///Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", xDir.Name + " with ID " + xDir.Id.ToString());
+        //    var xEntries = VFSManager.GetDirectoryListing(xDir);
+        //    //var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
+        //    //List<FilesystemEntry> xDirectories = new List<FilesystemEntry>();
+        //    //for (int i = 0; i < xEntries.Length; i++)
+        //    //{
+        //    //    if (xEntries[i].IsDirectory)
+        //    //    {
+        //    //        xDirectories.Add(xEntries[0]);
+        //    //    }
+        //    //}
+            
+        //    ////foreach (FilesystemEntry entry in xEntries)
+        //    ////    if (entry.IsDirectory)
+        //    ////        xDirectories.Add(entry);
 
-            foreach (FilesystemEntry entry in xEntries)
-                if (entry.IsDirectory)
-                    xDirectories.Add(entry);
 
-            //return (from xEntry in GetDirectoryListing(aDir) where xEntry.IsDirectory select xEntry).ToArray();
-            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "Returning");
-            return xDirectories.ToArray();
-        }
+        //    ////return (from xEntry in GetDirectoryListing(aDir) where xEntry.IsDirectory select xEntry).ToArray();
+        //    //Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "Returning");
+        //    //return xDirectories.ToArray();
+        //    return new FilesystemEntry[0];
+        //}
 
 
         /// <summary>
