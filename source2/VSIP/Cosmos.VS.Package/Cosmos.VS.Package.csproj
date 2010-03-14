@@ -135,9 +135,9 @@
     <Compile Include="VSProjectNode.cs" />
     <Compile Include="VSProject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
-    <None Include="Templates\Projects\CosmosProject\Program.cs" />
-    <None Include="Templates\Projects\CosmosProject\Kernel.Cosmos" />
+    <ZipProject Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
+    <ZipProject Include="Templates\Projects\CosmosProject\Program.cs" />
+    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
@@ -150,6 +150,7 @@
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
+    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.ico" />
     <EmbeddedResource Include="BuildOptionsPropertyPage.resx">
       <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -181,7 +182,8 @@
     <EmbeddedResource Include="VMOptionsQemu.resx">
       <DependentUpon>VMOptionsQemu.cs</DependentUpon>
     </EmbeddedResource>
-    <Content Include="Templates\Projects\CosmosProject\Kernel.ico" />
+    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.vstemplate" />
+    <ZipProject Include="Templates\Projects\CosmosProject\Kernel.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">

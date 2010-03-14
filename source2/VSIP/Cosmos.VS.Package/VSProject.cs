@@ -43,10 +43,9 @@ namespace Cosmos.VS.Package {
       "Cosmos", // This is the overall group name in new project on left side
       "Cosmos Project Files (*.Cosmos);*.Cosmos",
       "Cosmos", "Cosmos",
-      @"..\..\Templates\Projects\CosmosProject"
+      @"..\Templates\Projects\CosmosProject"
       , LanguageVsTemplate = "CosmosProject"
       , NewProjectRequireNewFolderVsTemplate = false)]
-
   // Property Pages
 	//[ProvideObject(typeof(PropPageEnvironment), RegisterUsing = RegistrationMethod.CodeBase)]
 	//[ProvideObject(typeof(PropPageTest), RegisterUsing = RegistrationMethod.CodeBase)]
