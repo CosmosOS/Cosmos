@@ -16,6 +16,13 @@ namespace Cosmos.Build.MSBuild
     {
         public IL2CPU()
         {
+            AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
+            DoInitTypes();
+            
+        }
+
+        private void DoInitTypes()
+        {
             var xType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
             xType = typeof(Cosmos.Sys.Plugs.Deboot);
             xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);

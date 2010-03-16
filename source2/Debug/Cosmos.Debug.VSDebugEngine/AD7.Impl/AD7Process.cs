@@ -33,14 +33,14 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             mISO = aISOFile;
 
-            mProcessStartInfo = new ProcessStartInfo(typeof(Cosmos.Debug.HostProcess.Program).Assembly.Location);
+            mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
 #if DEBUG_CONNECTOR_TCP_SERVER
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
 #endif
 #if DEBUG_CONNECTOR_TCP_CLIENT
             var xDebugConnectorStr = "-serial tcp::4444,server";
 #endif
-            mProcessStartInfo.Arguments = @"e:\Cosmos\Build\Tools\qemu\qemu.exe" + @" -L e:/Cosmos/Build/Tools/qemu -cdrom " + '"' + mISO.Replace('\\', '/').Replace(" ", "\\ ") + "\" -boot d " + xDebugConnectorStr;
+            mProcessStartInfo.Arguments = String.Format("\"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/").Replace(" ", "\\ "), xDebugConnectorStr);
             mProcessStartInfo.CreateNoWindow = true;
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
@@ -69,6 +69,8 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
                 Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+                Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
+                throw new Exception("Error while starting application");
             }
             mCallback = aCallback;
             mEngine = aEngine;

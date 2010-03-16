@@ -68,13 +68,14 @@ namespace Cosmos.VS.Package {
         // This is used in the MSBuild files to locate Cosmos tasks
         // Will likely be used by other things in the future as well
         private void SetCosmosVar() {
-            Trace.WriteLine("Todo: implement set cosmos var, or find something else for it..");
+            // MtW: we can just use typeof(VSProject).Assembly.Location
+            //Trace.WriteLine("Todo: implement set cosmos var, or find something else for it..");
           //string xPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
           //int xPos = xPath.LastIndexOf(@"\source2\", StringComparison.InvariantCultureIgnoreCase);
           //xPath = xPath.Substring(0, xPos);
 
-            var xPath = @"E:\Cosmos";
-          System.Environment.SetEnvironmentVariable("Cosmos", xPath, EnvironmentVariableTarget.User);
+          //  var xPath = @"E:\Cosmos";
+          //System.Environment.SetEnvironmentVariable("Cosmos", xPath, EnvironmentVariableTarget.User);
         }
 
         /////////////////////////////////////////////////////////////////////////////

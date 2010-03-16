@@ -7,16 +7,22 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <CosmosDir>$(Registry:HKEY_CURRENT_USER\Environment@Cosmos)</CosmosDir>
+    <CosmosDir>$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
     <NasmFile>$(CosmosDir)\Build\Tools\Nasm\nasm.exe</NasmFile>
     <FullAssemblyName>$(OutputPath)$(AssemblyName)</FullAssemblyName>
     <AssemblyFile>$(FullAssemblyName).exe</AssemblyFile>
     <ISOFile>$(FullAssemblyName).iso</ISOFile>
   </PropertyGroup>
 
+  <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
+
+<!-- devkit version:
   <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosDir)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosDir)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosDir)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
+-->
 
   <Target Name="CosmosBuild" 
           Inputs="$(AssemblyFile)"

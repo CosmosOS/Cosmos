@@ -16,7 +16,12 @@ namespace Cosmos.Debug.HostProcess
             Console.ReadLine();
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = args[0];
-            xStartInfo.Arguments = String.Join(" ", args.Skip(1).ToArray());
+            var xArgSB = new StringBuilder();
+            foreach (var arg in args.Skip(1))
+            {
+                xArgSB.AppendFormat("\"{0}\" ", arg);
+            }
+            xStartInfo.Arguments = xArgSB.ToString();
             xStartInfo.RedirectStandardError = true;
             xStartInfo.RedirectStandardOutput = true;
             xStartInfo.UseShellExecute = false;
