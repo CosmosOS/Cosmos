@@ -38,6 +38,9 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
+    <Reference Include="Cosmos.Hardware"/>
+    <Reference Include="Cosmos.Kernel"/>
+    <Reference Include="Cosmos.Sys"/>
   </ItemGroup>
 
   <ItemGroup>

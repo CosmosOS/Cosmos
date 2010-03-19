@@ -108,6 +108,10 @@ Source: .\Build\Tools\Cosmos.Kernel.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.
 Source: .\Build\Tools\Cosmos.Sys.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.Sys.Plugs; Flags: recursesubdirs createallsubdirs
 Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs
 Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos;
+Source: .\source\Cosmos\Cosmos.Kernel\bin\x86\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel;
 
 ; gac-ed assemblies:
 Source: .\Build\VSIP\Cosmos.Build.Common.dll;         DestDir: {app}\Build\GAC; StrongAssemblyName: "Cosmos.Build.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, ProcessorArchitecture=MSIL"; Flags: gacinstall
@@ -124,6 +128,9 @@ Source: .\Build\VSIP\Cosmos.VS.Package.dll;           DestDir: {app}\Build\GAC; 
 
 
 [Registry]
+Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\ Flags: uninsdeletekey
+
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ; ValueData: Cosmos Visual Studio Integration Package; Flags: uninsdeletevalue uninsdeletekeyifempty
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: dword; ValueName: UseRegNameAsSplashName; ValueData: $00000001; Flags: uninsdeletevalue uninsdeletekeyifempty

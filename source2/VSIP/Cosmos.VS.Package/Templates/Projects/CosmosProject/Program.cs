@@ -6,7 +6,11 @@ namespace $nameSpace$
 {
     public class $className$
     {
-        static void Main(string[] args)
+	public static void Init()
+	{
+		Main();
+	}
+        static void Main()
         {
             Console.WriteLine("Hello VSX!!!");
             Console.ReadKey();
