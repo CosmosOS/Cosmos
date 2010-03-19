@@ -143,11 +143,11 @@ namespace Cosmos.IL2CPU.X86
                                                (int)(0 - (xFlags + 0x1BADB002))));
             DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
             DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadEndAddr", 0));
-            DataMembers.Add(new DataMember("MultibootBSSEndAddr", 0));
+            DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
             DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
             DataMembers.Add(new DataEndIfDefined());
-            DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));
+            DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));                                                    
             xFlags = 0x00003;
             DataMembers.Add(new DataMember("MultibootSignature",
                                    new uint[] { 0x1BADB002 }));
