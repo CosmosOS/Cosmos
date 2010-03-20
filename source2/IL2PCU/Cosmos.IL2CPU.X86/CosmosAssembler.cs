@@ -1,4 +1,6 @@
-﻿using System;
+﻿// uncomment the next line to enable LFB access, for now hardcoded at 1024x768x8b
+//#define LFB_1024_8
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,6 +72,16 @@ namespace Cosmos.IL2CPU.X86
                 DestinationReg = Registers.ESP,
                 SourceRef = ElementReference.New("Kernel_Stack")
             };
+#if LFB_1024_8
+            new Comment("Set graphics fields");
+            new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 72 };
+            new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 76 };
+            new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeModeInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 80 };
+            new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+#endif
             new Comment(this, "some more startups todo");
             new ClrInterruptFlag();
             if (mComNumber > 0)
@@ -133,6 +145,7 @@ namespace Cosmos.IL2CPU.X86
                 new Label("DebugStub_Step");
                 new Return();
             }
+#if !LFB_1024_8
             DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
             uint xFlags = 0x10003;
             DataMembers.Add(new DataMember("MultibootSignature",
@@ -156,7 +169,42 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("MultibootChecksum",
                                                (int)(0 - (xFlags + 0x1BADB002))));
             DataMembers.Add(new DataEndIfDefined());
+#else
+            DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
+            uint xFlags = 0x10007;
+            DataMembers.Add(new DataMember("MultibootSignature",
+                                   new uint[] { 0x1BADB002 }));
+            DataMembers.Add(new DataMember("MultibootFlags",
+                           xFlags));
+            DataMembers.Add(new DataMember("MultibootChecksum",
+                                               (int)(0 - (xFlags + 0x1BADB002))));
+            DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
+            // graphics fields
+            DataMembers.Add(new DataMember("MultibootGraphicsMode", 0));
+            DataMembers.Add(new DataMember("MultibootGraphicsWidth", 1024));
+            DataMembers.Add(new DataMember("MultibootGraphicsHeight", 768));
+            DataMembers.Add(new DataMember("MultibootGraphicsDepth", 8));
+            DataMembers.Add(new DataEndIfDefined());
+            DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));
+            xFlags = 0x00003;
+            DataMembers.Add(new DataMember("MultibootSignature",
+                                   new uint[] { 0x1BADB002 }));
+            DataMembers.Add(new DataMember("MultibootFlags",
+                           xFlags));
+            DataMembers.Add(new DataMember("MultibootChecksum",
+                                               (int)(0 - (xFlags + 0x1BADB002))));
+            DataMembers.Add(new DataEndIfDefined());
 
+#endif
+            // graphics info fields 
+            DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
+            DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
+            DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
+            // memory
             DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
             DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
             DataMembers.Add(new DataMember("Before_Kernel_Stack",

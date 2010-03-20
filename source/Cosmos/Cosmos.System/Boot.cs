@@ -49,5 +49,7 @@ namespace Cosmos.Sys {
             // Clear again in case debug information has been written out
             Console.Clear();
         }
+
+
     }
 }

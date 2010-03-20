@@ -73,8 +73,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assemblers\GetVbeModeAssembler.cs" />
+    <Compile Include="Assemblers\GetVbeModeInfoAssembler.cs" />
+    <Compile Include="Assemblers\GetVbeControlInfoAssembler.cs" />
     <Compile Include="Assemblers\Reboot.cs" />
     <Compile Include="Assemblers\Shutdown.cs" />
+    <Compile Include="BootInfo.cs" />
     <Compile Include="Deboot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VFS\DirectoryImpl.cs" />

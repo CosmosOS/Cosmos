@@ -63,9 +63,12 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Boot.cs" />
+    <Compile Include="BootInfo.cs" />
     <Compile Include="Deboot.cs" />
     <Compile Include="Network\IPv4Address.cs" />
     <Compile Include="Network\IPv4Config.cs" />

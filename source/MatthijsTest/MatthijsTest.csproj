@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enms.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Graphics\GraphicsEngine.cs" />
     <Compile Include="MyATAController.cs" />
