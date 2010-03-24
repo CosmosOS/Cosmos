@@ -11,7 +11,7 @@
     <ProvideDefaultName>true</ProvideDefaultName>
   </TemplateData>
   <TemplateContent>
-    <Project File="Kernel.Cosmos" ReplaceParameters="true">
+    <Project File="CosmosProject.Cosmos" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">Program.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="false">AssemblyInfo.cs</ProjectItem>
     </Project>

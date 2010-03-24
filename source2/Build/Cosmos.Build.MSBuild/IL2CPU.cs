@@ -9,16 +9,76 @@ using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
 using System.IO;
 using Cosmos.Build.Common;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.MSBuild
 {
     public class IL2CPU : AppDomainIsolatedTask
     {
+        private static bool mFirstTime = true;
         public IL2CPU()
         {
-            AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
-            DoInitTypes();
+//            CheckFirstTime();
+
             
+        }
+
+        private static void CheckFirstTime()
+        {
+            if (mFirstTime)
+            {
+//                mFirstTime = false;
+                var xSearchDirs = new List<string>();
+                xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
+
+                using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false))
+                {
+                    var xPath = (string)xReg.GetValue(null);
+                    xSearchDirs.Add(xPath);
+                    xSearchDirs.Add(Path.Combine(xPath, "Kernel"));
+                }
+                mSearchDirs = xSearchDirs.ToArray();
+
+		File.AppendAllText(@"e:\debug.txt", "SearchDirs\r\n");
+                foreach (var xDir in mSearchDirs)
+                {
+                    File.AppendAllText(@"e:\debug.txt", "SearchDir: " + xDir + "\r\n");
+                }
+
+                AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+
+                Assembly.LoadWithPartialName("Cosmos.Sys");
+                Assembly.LoadWithPartialName("Cosmos.Hardware");
+                Assembly.LoadWithPartialName("Cosmos.Kernel");
+                Assembly.LoadWithPartialName("Cosmos.Sys.FileSystem");
+            }
+        }
+
+        private static string[] mSearchDirs = new string[0];
+
+        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var xShortName = args.Name;
+            if (xShortName.Contains(','))
+            {
+                xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
+                // TODO: remove following statement if it proves unnecessary
+                if (xShortName.Contains(','))
+                {
+File.AppendAllText(@"e:\debug.txt", String.Format("Algo Error: '{0}'\r\n", xShortName));
+                    throw new Exception("Algo error");
+                }
+            }
+            foreach (var xDir in mSearchDirs)
+            {
+                var xPath = Path.Combine(xDir, xShortName + ".dll");
+                if (File.Exists(xPath))
+                {
+                    return Assembly.LoadFrom(xPath);
+                }
+            }
+File.AppendAllText(@"e:\debug.txt", String.Format("Resolving failed: '{0}'\r\n", args.Name));
+            return null;
         }
 
         private void DoInitTypes()
@@ -83,7 +143,8 @@ namespace Cosmos.Build.MSBuild
         #endregion
 
         private bool Initialize()
-        {
+        {CheckFirstTime();            DoInitTypes();
+
             if (String.IsNullOrEmpty(DebugMode))
             {
                 mDebugMode = Cosmos.Build.Common.DebugMode.None;
@@ -110,6 +171,7 @@ namespace Cosmos.Build.MSBuild
                 }
                 mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
+            AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(InputAssembly));
             return true;
         }
 
@@ -122,44 +184,56 @@ namespace Cosmos.Build.MSBuild
         }
         public override bool Execute()
         {
-            Log.LogMessage("Executing IL2CPU on assembly");
-            if (!Initialize())
+            try
             {
-                return false;
-            }
-            
-            LogTime("Engine execute started");
-            var xEntryAsm = Assembly.LoadFrom(InputAssembly);
-            var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            var xAsm = new AssemblerNasm(DebugCom);
-            xAsm.DebugMode = mDebugMode;
-            xAsm.TraceAssemblies = mTraceAssemblies;
+                Log.LogMessage("Executing IL2CPU on assembly");
+                if (!Initialize())
+                {
+                    return false;
+                }
+
+                LogTime("Engine execute started");
+                var xEntryAsm = Assembly.LoadFrom(InputAssembly);
+                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                var xAsm = new AssemblerNasm(DebugCom);
+                xAsm.DebugMode = mDebugMode;
+                xAsm.TraceAssemblies = mTraceAssemblies;
 #if OUTPUT_ELF
                 xAsm.EmitELF = true;
 #endif
-            xAsm.Initialize();
-            using (var xScanner = new ILScanner(xAsm))
-            {
-                if (!String.IsNullOrEmpty(LogFile))
+                xAsm.Initialize();
+                using (var xScanner = new ILScanner(xAsm))
                 {
-                    xScanner.EnableLogging(LogFile);
-                }
-                xScanner.Execute(xInitMethod);
+                    if (!String.IsNullOrEmpty(LogFile))
+                    {
+                        xScanner.EnableLogging(LogFile);
+                    }
+                    xScanner.Execute(xInitMethod);
 
-                using (var xOut = new StreamWriter(OutputFile, false))
-                {
-                    if (!String.IsNullOrEmpty(DebugSymbolsFile))
+                    using (var xOut = new StreamWriter(OutputFile, false))
                     {
-                        xAsm.FlushText(xOut, DebugSymbolsFile);
-                    }
-                    else
-                    {
-                        xAsm.FlushText(xOut);
+                        if (!String.IsNullOrEmpty(DebugSymbolsFile))
+                        {
+                            xAsm.FlushText(xOut, DebugSymbolsFile);
+                        }
+                        else
+                        {
+                            xAsm.FlushText(xOut);
+                        }
                     }
                 }
+                LogTime("Engine execute finished");
+                return true;
             }
-            LogTime("Engine execute finished");
-            return true;
+            catch (Exception E)
+            {
+                Log.LogMessage("Loaded assemblies: ");
+                foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    Log.LogMessage(xAsm.Location);
+                }
+                throw;
+            }
         }
     }
 }

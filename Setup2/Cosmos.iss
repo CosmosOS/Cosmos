@@ -14,7 +14,7 @@ DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
 OutputBaseFilename=CosmosUserKit5
-Compression=lzma/ultra64
+Compression=lzma/fast
 SolidCompression=true
 SourceDir=..
 ;Left Image should be 164x314
@@ -22,12 +22,14 @@ WizardImageFile=.\setup\images\cosmos.bmp
 ;Small Image should be 55x55
 WizardSmallImageFile=.\setup\images\cosmos_small.bmp
 
-
 ; If you want all languages to be listed in the "Select Setup Language"
 ; dialog, even those that can't be displayed in the active code page,
 ; uncomment the following two lines.
-InternalCompressLevel=ultra64
+InternalCompressLevel=fast
 UninstallLogMode=overwrite
+
+#include "Code.inc"
+
 [LangOptions]
 LanguageCodePage=0
 
@@ -97,6 +99,9 @@ en.BeveledLabel=English
 ;cn.BeveledLabel=Chinese Simplified
 ;tw.BeveledLabel=Chinese Traditional
 
+[Dirs]
+Name: "{code:VSNET2008_PATH|}\ProjectTemplates\Cosmos"; Flags: uninsalwaysuninstall
+
 [Files]
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm
@@ -107,11 +112,13 @@ Source: .\Build\Tools\Cosmos.Hardware.Plugs\*; DestDir: {app}\Build\Tools\Cosmso
 Source: .\Build\Tools\Cosmos.Kernel.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.Kernel.Plugs; Flags: recursesubdirs createallsubdirs
 Source: .\Build\Tools\Cosmos.Sys.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.Sys.Plugs; Flags: recursesubdirs createallsubdirs
 Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs
+Source: .\source\libraries\MDbg\raw.dll; DestDir: {app}\Build\VSIP\;
 Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos;
 Source: .\source\Cosmos\Cosmos.Kernel\bin\x86\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel;
 Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel;
 Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel;
 Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel;
+Source: .\Build\VSIP\CosmosProject.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos;
 
 ; gac-ed assemblies:
 Source: .\Build\VSIP\Cosmos.Build.Common.dll;         DestDir: {app}\Build\GAC; StrongAssemblyName: "Cosmos.Build.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, ProcessorArchitecture=MSIL"; Flags: gacinstall
@@ -129,7 +136,7 @@ Source: .\Build\VSIP\Cosmos.VS.Package.dll;           DestDir: {app}\Build\GAC; 
 
 [Registry]
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\ Flags: uninsdeletekey
+Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue
 
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ; ValueData: Cosmos Visual Studio Integration Package; Flags: uninsdeletevalue uninsdeletekeyifempty
@@ -214,3 +221,9 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45
 ; AssemblyFolder
 Root: HKLM; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: "{app}"
+
+[Run]
+Filename: "{code:VSNET2008_PATH|}\devenv.exe"; Parameters: "/setup"; Flags: waituntilterminated
+
+[UninstallRun]
+Filename: "{code:VSNET2008_PATH|}\devenv.exe"; Parameters: "/setup"; Flags: waituntilterminated

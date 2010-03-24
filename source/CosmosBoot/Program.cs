@@ -16,9 +16,9 @@ namespace CosmosBoot {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
-            float x;
-            x=10.5F;
-            x = x / 2;
+            Console.WriteLine("Cosmos Booted Succesfully!");
+            while (true)
+                ;
 
             Cosmos.Sys.Deboot.ShutDown();
 		}

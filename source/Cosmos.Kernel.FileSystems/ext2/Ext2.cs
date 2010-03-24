@@ -53,7 +53,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             mGroupDescriptors = new GroupDescriptor[xGroupDescriptorCount];
             var xDescriptorPtr = (GroupDescriptor*)mBufferAddress;
             Console.WriteLine("Process GroupDescriptors: " + xGroupDescriptorCount);
-            Console.ReadLine();
+            //Console.ReadLine();
             for (int i = 0; i < xGroupDescriptorCount; i++) {
                 Console.WriteLine("Processing GroupDescriptor " + i);
                 uint xATABlock ;
