@@ -76,7 +76,7 @@ namespace Cosmos.Debugger.VSRegister
             WriteValue(aOut, null, "guidCosmosDebugEngine");
             WriteValue(aOut, "CLSID", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7Engine)));
             WriteValue(aOut, "ProgramProvider", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7ProgramProvider)));
-            WriteValue(aOut, "Attach", 1);
+            WriteValue(aOut, "Attach", 0);
             WriteValue(aOut, "AddressBP", 0);
             WriteValue(aOut, "AutoSelectPriority", 4);
             WriteValue(aOut, "CallstackBP", 1);

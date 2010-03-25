@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System.Diagnostics;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -99,8 +100,10 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             try
             {
+                Trace.WriteLine("Try to bind breakpoint");
                 if (CanBind())
                 {
+                    Trace.WriteLine("Succeeded");
                     IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(m_bpRequestInfo.bpLocation.unionmember2));
 
                     // Get the name of the document that the breakpoint was put in
@@ -140,6 +143,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else
                 {
+                    Trace.WriteLine("Not succesful!");
                     // The breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
                     // The sample engine does not support this, but a real world engine will want to send an instance of IDebugBreakpointErrorEvent2 to the
                     // UI and return a valid instance of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then
