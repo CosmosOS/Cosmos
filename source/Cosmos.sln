@@ -249,7 +249,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.UnitTests", "Cosmos.
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 75
+		SccNumberOfProjects = 78
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -549,6 +549,18 @@ Global
 		SccProjectTopLevelParentUniqueName74 = Cosmos.sln
 		SccProjectName74 = ../source2/IL2PCU/Cosmos.IL2CPU.X86.Tests
 		SccLocalPath74 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests
+		SccProjectUniqueName75 = Cosmos.UnitTests.Kernel\\Cosmos.UnitTests.Kernel.csproj
+		SccProjectTopLevelParentUniqueName75 = Cosmos.sln
+		SccProjectName75 = Cosmos.UnitTests.Kernel
+		SccLocalPath75 = Cosmos.UnitTests.Kernel
+		SccProjectUniqueName76 = Cosmos.UnitTests\\Cosmos.UnitTests.csproj
+		SccProjectTopLevelParentUniqueName76 = Cosmos.sln
+		SccProjectName76 = Cosmos.UnitTests
+		SccLocalPath76 = Cosmos.UnitTests
+		SccProjectUniqueName77 = Ext2.Test\\Ext2.Test.csproj
+		SccProjectTopLevelParentUniqueName77 = Cosmos.sln
+		SccProjectName77 = Ext2.Test
+		SccLocalPath77 = Ext2.Test
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
