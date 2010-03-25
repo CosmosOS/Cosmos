@@ -1,0 +1,1 @@
+Copyright © 2007-2009 The Cosmos Project
