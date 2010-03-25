@@ -1,3 +1,4 @@
+
 ; Cosmos Registry key
 ; Install assemblies
 ; Delete old user kit installer and task asm
@@ -113,10 +114,10 @@ Source: .\Build\Tools\Cosmos.Kernel.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.
 Source: .\Build\Tools\Cosmos.Sys.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.Sys.Plugs; Flags: recursesubdirs createallsubdirs
 Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs
 Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos;
-Source: .\source\Cosmos\Cosmos.Kernel\bin\x86\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel;
-Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel;
-Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel;
-Source: .\source\Cosmos\Cosmos.System\bin\x86\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel;
+Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel;
 Source: .\Build\VSIP\CosmosProject.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos;
 
 ; gac-ed assemblies:
