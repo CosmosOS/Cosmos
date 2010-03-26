@@ -39,12 +39,6 @@ namespace Cosmos.Build.MSBuild
                 }
                 mSearchDirs = xSearchDirs.ToArray();
 
-		File.AppendAllText(@"e:\debug.txt", "SearchDirs\r\n");
-                foreach (var xDir in mSearchDirs)
-                {
-                    File.AppendAllText(@"e:\debug.txt", "SearchDir: " + xDir + "\r\n");
-                }
-
                 AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
                 Assembly.LoadWithPartialName("Cosmos.Sys");
@@ -65,7 +59,6 @@ namespace Cosmos.Build.MSBuild
                 // TODO: remove following statement if it proves unnecessary
                 if (xShortName.Contains(','))
                 {
-File.AppendAllText(@"e:\debug.txt", String.Format("Algo Error: '{0}'\r\n", xShortName));
                     throw new Exception("Algo error");
                 }
             }
@@ -77,7 +70,6 @@ File.AppendAllText(@"e:\debug.txt", String.Format("Algo Error: '{0}'\r\n", xShor
                     return Assembly.LoadFrom(xPath);
                 }
             }
-File.AppendAllText(@"e:\debug.txt", String.Format("Resolving failed: '{0}'\r\n", args.Name));
             return null;
         }
 
