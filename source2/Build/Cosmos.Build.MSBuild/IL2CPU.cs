@@ -224,7 +224,8 @@ namespace Cosmos.Build.MSBuild
                 {
                     Log.LogMessage(xAsm.Location);
                 }
-                throw;
+                Log.LogErrorFromException(E, true);
+                return false;
             }
         }
     }
