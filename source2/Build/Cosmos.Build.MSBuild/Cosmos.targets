@@ -37,9 +37,9 @@
              OutputFile="$(FullAssemblyName).asm" />
     <NAsm    InputFile="$(FullAssemblyName).asm" 
              OutputFile="$(FullAssemblyName).obj" 
-             ExePath="$(Cosmos)\Build\Tools\Nasm\nasm.exe" />
+             ExePath="$(NasmFile)" />
     <MakeISO InputFile="$(FullAssemblyName).obj" 
              OutputFile="$(ISOFile)" 
-             CosmosBuildDir="$(Cosmos)\Build" />
+             CosmosBuildDir="$(CosmosDir)\Build" />
   </Target>
 </Project>

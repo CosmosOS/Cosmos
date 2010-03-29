@@ -51,7 +51,7 @@ namespace Cosmos.Build.MSBuild
             return ExecuteTool(
                 xPath,
                 Path.Combine(CosmosBuildDir, "Tools\\mkisofs.exe"),
-                String.Format("-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o {0} .", Path.Combine(Environment.CurrentDirectory, OutputFile)),
+                String.Format("-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o \"{0}\" .", Path.Combine(Environment.CurrentDirectory, OutputFile)),
                 "mkisofs");
         }
     }

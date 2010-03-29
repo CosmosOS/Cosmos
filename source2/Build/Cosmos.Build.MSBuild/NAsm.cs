@@ -53,7 +53,7 @@ namespace Cosmos.Build.MSBuild
             }
             if (!File.Exists(ExePath))
             {
-                Log.LogError("Exe file not found!");
+                Log.LogError("Exe file not found! (File = '" + ExePath + "')");
                 return false;
             }
             var xFormat = "bin";

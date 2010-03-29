@@ -40,7 +40,7 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_TCP_CLIENT
             var xDebugConnectorStr = "-serial tcp::4444,server";
 #endif
-            mProcessStartInfo.Arguments = String.Format("\"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/").Replace(" ", "\\ "), xDebugConnectorStr);
+            mProcessStartInfo.Arguments = String.Format("\"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/"), xDebugConnectorStr);
             mProcessStartInfo.CreateNoWindow = true;
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
@@ -65,6 +65,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcess = Process.Start(mProcessStartInfo);
             mProcess.EnableRaisingEvents = true;
             mProcess.Exited += new EventHandler(mProcess_Exited);
+            System.Threading.Thread.Sleep(250);
             if (mProcess.HasExited)
             {
                 Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
