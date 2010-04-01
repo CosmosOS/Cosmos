@@ -91,7 +91,6 @@ namespace Cosmos.Debug.VSDebugEngine
         public void SetBreakpointAddress(uint aAddress)
         {
             mDebugEngine.DebugConnector.SetBreakpointAddress(aAddress);
-            //wrong code.
         }
 
         void mDebugEngine_TextReceived(string obj)
