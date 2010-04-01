@@ -47,7 +47,15 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
             var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ParseFile(Path.GetDirectoryName(aISOFile));
+            if (xLabelByAddressMapping.Count == 0)
+            {
+                throw new Exception("Debug data not found: LabelByAddressMapping");
+            }
             mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping, Path.ChangeExtension(aISOFile, ".cxdb"));
+            if (mSourceMappings.Count == 0)
+            {
+                throw new Exception("Debug data not found: SourceMappings");
+            }
             mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             mDebugEngine = new DebugEngine();
 #if DEBUG_CONNECTOR_TCP_SERVER
@@ -83,6 +91,7 @@ namespace Cosmos.Debug.VSDebugEngine
         public void SetBreakpointAddress(uint aAddress)
         {
             mDebugEngine.DebugConnector.SetBreakpointAddress(aAddress);
+            wrong code.
         }
 
         void mDebugEngine_TextReceived(string obj)
@@ -111,7 +120,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         //mCallback.OnOutputString("Try to break now");
                         var xActualAddress = arg2 - 5; // - 5 to correct the addres:
                         // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
-
+                        mEngine.Callback.OnOutputString("Hit Breakpoint 0x" + xActualAddress.ToString("X8").ToUpper());
                         var xActionPoints = new List<object>();
                         var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
                         foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)

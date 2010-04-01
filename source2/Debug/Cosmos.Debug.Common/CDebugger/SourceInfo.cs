@@ -119,8 +119,9 @@ namespace Cosmos.Debug.Common.CDebugger
 			int? xOldMethodToken = null;
 			ISymbolMethod xMethodSymbol = null;
 			foreach (var xSymbol in xSymbolsList) {
-				if (!xSymbol.AssemblyFile.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
+                if (!xSymbol.AssemblyFile.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
 					try {
+                        xMethodSymbol = null;
 						xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.AssemblyFile);
 					} catch {
 						xSymbolReader = null;
