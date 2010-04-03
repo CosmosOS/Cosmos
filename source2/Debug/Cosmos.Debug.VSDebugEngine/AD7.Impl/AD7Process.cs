@@ -190,8 +190,6 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public int GetInfo(uint Fields, PROCESS_INFO[] pProcessInfo)
         {                  throw new NotImplementedException();
-        Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-        throw new NotImplementedException();
         }
 
         public int GetName(uint gnType, out string pbstrName)

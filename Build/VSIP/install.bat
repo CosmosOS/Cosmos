@@ -5,7 +5,7 @@ cd %~dp0
 
 echo Compiling cosmos
 
-%windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet /nologo
+%windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet /nologo /p:Configuration=Debug /p:Platform=x86
 
 echo Copying files
 
