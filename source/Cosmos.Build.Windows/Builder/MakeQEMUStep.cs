@@ -18,8 +18,6 @@ namespace Cosmos.Compiler.Builder
         {
         }
 
-
-
         override public void Execute()
         {
             Init();
@@ -30,8 +28,6 @@ namespace Cosmos.Compiler.Builder
 
             object aNetworkCard = (String)options.QEmuNetworkCard[options.NetworkCard];
             object aAudioCard = (String)options.QEmuAudioCard[options.AudioCard];
-
-
 
             new MakeISOStep(options).Execute();  //TODO shouldnt builder make this ?
 
@@ -103,17 +99,13 @@ namespace Cosmos.Compiler.Builder
                     , ToolsPath + @"qemu\", false, false);
             }
 
-
             Finish(); //note could pass via result
         }
 
         public Process Result
         {
             get { return result; }
-
         }
-
-
 
     }
 }

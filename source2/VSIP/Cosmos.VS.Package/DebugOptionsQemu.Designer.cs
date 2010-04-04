@@ -33,9 +33,9 @@
             this.labelCommunication = new System.Windows.Forms.Label();
             this.titleGeneral = new Cosmos.VS.Package.TitleDivision();
             this.comboCommunication = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.comboDebugMode = new System.Windows.Forms.ComboBox();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.tableDebugQemu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,7 +58,7 @@
             this.tableDebugQemu.Name = "tableDebugQemu";
             this.tableDebugQemu.RowCount = 9;
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -75,7 +75,7 @@
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(39, 80);
+            this.label2.Location = new System.Drawing.Point(39, 87);
             this.label2.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(224, 21);
@@ -87,12 +87,12 @@
             // 
             this.labelCommunication.Dock = System.Windows.Forms.DockStyle.Fill;
             this.labelCommunication.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCommunication.Location = new System.Drawing.Point(39, 53);
+            this.labelCommunication.Location = new System.Drawing.Point(39, 60);
             this.labelCommunication.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.labelCommunication.Name = "labelCommunication";
             this.labelCommunication.Size = new System.Drawing.Size(224, 21);
             this.labelCommunication.TabIndex = 17;
-            this.labelCommunication.Text = "Communication Mode:";
+            this.labelCommunication.Text = "Communication:";
             this.labelCommunication.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // titleGeneral
@@ -113,10 +113,22 @@
             // 
             this.comboCommunication.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboCommunication.FormattingEnabled = true;
-            this.comboCommunication.Location = new System.Drawing.Point(266, 53);
+            this.comboCommunication.Location = new System.Drawing.Point(266, 60);
             this.comboCommunication.Name = "comboCommunication";
             this.comboCommunication.Size = new System.Drawing.Size(223, 21);
             this.comboCommunication.TabIndex = 16;
+            // 
+            // label1
+            // 
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(39, 33);
+            this.label1.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(224, 21);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "Debug Mode:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // comboDebugMode
             // 
@@ -131,22 +143,10 @@
             // 
             this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboTraceMode.FormattingEnabled = true;
-            this.comboTraceMode.Location = new System.Drawing.Point(266, 80);
+            this.comboTraceMode.Location = new System.Drawing.Point(266, 87);
             this.comboTraceMode.Name = "comboTraceMode";
             this.comboTraceMode.Size = new System.Drawing.Size(223, 21);
             this.comboTraceMode.TabIndex = 15;
-            // 
-            // label1
-            // 
-            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(39, 33);
-            this.label1.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(224, 14);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "Debug Mode:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // DebugOptionsQemu
             // 
