@@ -58,13 +58,14 @@ namespace Cosmos.IL2CPU.X86
             Label = "DebugStub_BreakOnAddress";
             PushAll32();
 
-            new Push { DestinationValue = 0 };
-            EDI = ESP;
-            //Label = "DebugStub_BreakOnAddress2";
-            //Jump("DebugStub_BreakOnAddress2");
-            //new Sub { DestinationReg = RegistersEnum.EDI, SourceValue = 3 };
+            //TODO: Make embeddable ASM routines.. that is call them and they emit reused ASM.
 
-            // Read address to stack
+            // Make room on the stack for the address
+            new Push { DestinationValue = 0 };
+            // ReadByteFromComPort writes to EDI, then increments
+            EDI = ESP;
+
+            // Read address to stack via EDI
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
@@ -77,7 +78,6 @@ namespace Cosmos.IL2CPU.X86
 
             PopAll32();
             Return();
-
         }
 
         protected void Break() {
