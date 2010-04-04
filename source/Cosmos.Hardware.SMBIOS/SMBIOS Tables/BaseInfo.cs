@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 
-using Cosmos.TestKernelHelpers;
 using Cosmos.Compiler.Builder;
 using Cosmos.Kernel;
 

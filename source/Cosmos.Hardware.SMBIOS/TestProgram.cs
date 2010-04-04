@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.TestKernelHelpers;
 using Cosmos.Compiler.Builder;
 
 using Cosmos.Hardware.SMBIOS.Table;
