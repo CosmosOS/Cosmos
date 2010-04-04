@@ -241,6 +241,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // Gets the state of this pending breakpoint.
         int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState)
         {
+            pState[0].state = (uint)enum_BP_STATE.BPS_DISABLED;
             if (m_deleted)
             {
                 pState[0].state = (uint)enum_BP_STATE.BPS_DELETED;
