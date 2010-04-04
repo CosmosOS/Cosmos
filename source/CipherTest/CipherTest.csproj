@@ -78,10 +78,6 @@
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Compiler.Builder</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.GdbClient\Cosmos.GdbClient.csproj">
-      <Project>{5784365C-ED22-42EB-BB8A-F3E09428D5B8}</Project>
-      <Name>Cosmos.GdbClient</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Shell.Guess\Cosmos.Demo.Guess.csproj">
       <Project>{C97DE890-58D2-41A1-86D0-A2E919E6DD80}</Project>
       <Name>Cosmos.Demo.Guess</Name>
@@ -89,10 +85,6 @@
     <ProjectReference Include="..\CosmosBoot\CosmosBoot.csproj">
       <Project>{E2C54C80-75F3-4249-93B4-0003A4AF705F}</Project>
       <Name>CosmosBoot</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cosmos\Cosmos.Kernel.LogTail\Cosmos.Kernel.LogTail.csproj">
-      <Project>{7BAB58BF-E8A1-4623-B6BF-4B90A0505226}</Project>
-      <Name>Cosmos.Kernel.LogTail</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
       <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
