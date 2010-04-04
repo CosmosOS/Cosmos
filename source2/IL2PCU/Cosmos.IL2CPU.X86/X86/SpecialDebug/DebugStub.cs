@@ -249,25 +249,24 @@ namespace Cosmos.IL2CPU.X86
             Return();
         }
 
-        // input: EDI
-        // Modified: EAX, EDX, EDI (-1)
+        // Input: EDI
+        // Output: [EDI]
+        // Modified: AL, DX, EDI (+1)
         //
-        // Reads a byte into [EDI] and does EDI - 1
-        protected void ReadByteFromComPort()
-        {
+        // Reads a byte into [EDI] and does EDI + 1
+        protected void ReadByteFromComPort() {
             Label = "ReadByteFromComPort";
             DX = mComStatusAddr;
             
-            // wait for port to be ready
+            // Wait for port to be ready
             Label = "ReadByteFromComPort_Wait";
             AL = Port[DX];
             AL.Test(1);
-            /**/JumpIf(Flags.Zero, "ReadByteFromComPort_Wait");
+                JumpIf(Flags.Zero, "ReadByteFromComPort_Wait");
 
-            // set address of port
+            // Set address of port
             DX = mComAddr;
-            // read byte
-            AL = 0;
+            // Read byte
             AL = Port[DX];
             Memory[EDI, 8] = AL;
             new Inc { DestinationReg = Registers.EDI };
@@ -368,44 +367,43 @@ namespace Cosmos.IL2CPU.X86
             // IRQ's are disabled between Compare and JumpIf so an IRQ cant
             // happen in between them which could then cause double entry again
             DisableInterrupts();
+                Memory["DebugSuspendLevel", 32].Compare(0);
+                JumpIf(Flags.Equal, "DebugStub_Running");
+                    Memory["InterruptsEnabledFlag", 32].Compare(0);
+                    JumpIf(Flags.Equal, "DebugStub_Return");
+                    EnableInterrupts();
+                    Jump("DebugStub_Return");
 
-            Memory["DebugSuspendLevel", 32].Compare(0);
-            JumpIf(Flags.Equal, "DebugStub_Running");
+                Label = "DebugStub_Running";
+                Memory["DebugRunning", 32].Compare(0);
+                JumpIf(Flags.Equal, "DebugStub_Start");
+                    Memory["InterruptsEnabledFlag", 32].Compare(0);
+                    JumpIf(Flags.Equal, "DebugStub_Return");
+                    EnableInterrupts();
+                    Jump("DebugStub_Return");
+
+                Label = "DebugStub_Start";
+                Memory["DebugRunning", 32] = 1;
                 Memory["InterruptsEnabledFlag", 32].Compare(0);
-                JumpIf(Flags.Equal, "DebugStub_Return");
-                EnableInterrupts();
-                Jump("DebugStub_Return");
-
-            Label = "DebugStub_Running";
-            Memory["DebugRunning", 32].Compare(0);
-            JumpIf(Flags.Equal, "DebugStub_Start");
-                Memory["InterruptsEnabledFlag", 32].Compare(0);
-                JumpIf(Flags.Equal, "DebugStub_Return");
-                EnableInterrupts();
-                Jump("DebugStub_Return");
-
-            Label = "DebugStub_Start";
-            Memory["DebugRunning", 32] = 1;
-            Memory["InterruptsEnabledFlag", 32].Compare(0);
-            JumpIf(Flags.Equal, "DebugStub_NoSTI");
+                JumpIf(Flags.Equal, "DebugStub_NoSTI");
             EnableInterrupts();
-            Label = "DebugStub_NoSTI";
-            //
-            PushAll32();
-            EBP = ESP;
-            EBP.Add(32);
-            //
-            EAX = Memory[EBP];
-            Memory["DebugEIP"] = EAX;
-
-            //if tracemode = 4
-            //   SendTrace
-            //   Wait for some command that continues
-            //else
-            Call("DebugStub_Executing");
             
+            Label = "DebugStub_NoSTI";
+            PushAll32();
+                EBP = ESP;
+                EBP.Add(32);
+                //
+                EAX = Memory[EBP];
+                Memory["DebugEIP"] = EAX;
+
+                //if tracemode = 4
+                //   SendTrace
+                //   Wait for some command that continues
+                //else
+                Call("DebugStub_Executing");
             PopAll32();
             Memory["DebugRunning", 32] = 0;
+
             Label = "DebugStub_Return";
             Return();
         }

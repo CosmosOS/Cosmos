@@ -247,9 +247,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.UnitTests.Kernel", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.UnitTests", "Cosmos.UnitTests\Cosmos.UnitTests.csproj", "{668899F8-AAE0-41DE-B1CC-EF712E1234D7}"
 EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Breakpoints.Cosmos", "{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 78
+		SccNumberOfProjects = 79
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -561,6 +563,10 @@ Global
 		SccProjectTopLevelParentUniqueName77 = Cosmos.sln
 		SccProjectName77 = Ext2.Test
 		SccLocalPath77 = Ext2.Test
+		SccProjectUniqueName78 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Breakpoints.Cosmos
+		SccProjectTopLevelParentUniqueName78 = Cosmos.sln
+		SccProjectName78 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath78 = ..\\source2\\Users\\Kudzu\\Breakpoints
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1155,6 +1161,12 @@ Global
 		{668899F8-AAE0-41DE-B1CC-EF712E1234D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{668899F8-AAE0-41DE-B1CC-EF712E1234D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{668899F8-AAE0-41DE-B1CC-EF712E1234D7}.Release|x86.ActiveCfg = Release|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1257,6 +1269,7 @@ Global
 		{1DB35C80-00E4-41DE-AF1E-4A3ED148C352} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{22BCACD7-7E12-47D3-B3F2-77B8C0D0CB6F} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{28D7710D-5930-40BE-BB71-D30F01294EDF} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{54C786E5-FD14-4036-92AE-E9F25B71534B} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
