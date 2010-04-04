@@ -1,0 +1,1018 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on February, 7 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>QEMU Internals: </title>
+
+<meta name="description" content="QEMU Internals: ">
+<meta name="keywords" content="QEMU Internals: ">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Top"></a>
+<a name="SEC_Top"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="settitle">QEMU Internals
+</h1>
+
+
+
+<h2> Table of Contents</h2>
+<div class="contents">
+
+<ul class="toc">
+  <li><a name="TOC1" href="#SEC1">1. Introduction</a>
+  <ul class="toc">
+    <li><a name="TOC2" href="#SEC2">1.1 Features</a></li>
+    <li><a name="TOC3" href="#SEC3">1.2 x86 emulation</a></li>
+    <li><a name="TOC4" href="#SEC4">1.3 ARM emulation</a></li>
+    <li><a name="TOC5" href="#SEC5">1.4 PowerPC emulation</a></li>
+    <li><a name="TOC6" href="#SEC6">1.5 SPARC emulation</a></li>
+  </ul></li>
+  <li><a name="TOC7" href="#SEC7">2. QEMU Internals</a>
+  <ul class="toc">
+    <li><a name="TOC8" href="#SEC8">2.1 QEMU compared to other emulators</a></li>
+    <li><a name="TOC9" href="#SEC9">2.2 Portable dynamic translation</a></li>
+    <li><a name="TOC10" href="#SEC10">2.3 Register allocation</a></li>
+    <li><a name="TOC11" href="#SEC11">2.4 Condition code optimisations</a></li>
+    <li><a name="TOC12" href="#SEC12">2.5 CPU state optimisations</a></li>
+    <li><a name="TOC13" href="#SEC13">2.6 Translation cache</a></li>
+    <li><a name="TOC14" href="#SEC14">2.7 Direct block chaining</a></li>
+    <li><a name="TOC15" href="#SEC15">2.8 Self-modifying code and translated code invalidation</a></li>
+    <li><a name="TOC16" href="#SEC16">2.9 Exception support</a></li>
+    <li><a name="TOC17" href="#SEC17">2.10 MMU emulation</a></li>
+    <li><a name="TOC18" href="#SEC18">2.11 Hardware interrupts</a></li>
+    <li><a name="TOC19" href="#SEC19">2.12 User emulation specific details</a>
+    <ul class="toc">
+      <li><a name="TOC20" href="#SEC20">2.12.1 Linux system call translation</a></li>
+      <li><a name="TOC21" href="#SEC21">2.12.2 Linux signals</a></li>
+      <li><a name="TOC22" href="#SEC22">2.12.3 clone() system call and threads</a></li>
+      <li><a name="TOC23" href="#SEC23">2.12.4 Self-virtualization</a></li>
+    </ul></li>
+    <li><a name="TOC24" href="#SEC24">2.13 Bibliography</a></li>
+  </ul></li>
+  <li><a name="TOC25" href="#SEC25">3. Regression Tests</a>
+  <ul class="toc">
+    <li><a name="TOC26" href="#SEC26">3.1 <tt>`test-i386'</tt></a></li>
+    <li><a name="TOC27" href="#SEC27">3.2 <tt>`linux-test'</tt></a></li>
+    <li><a name="TOC28" href="#SEC28">3.3 <tt>`qruncom.c'</tt></a></li>
+  </ul></li>
+  <li><a name="TOC29" href="#SEC29">4. Index</a></li>
+</ul>
+</div>
+<hr size="1">
+<a name="Introduction"></a>
+<a name="SEC1"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC_Top" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 1. Introduction </h1>
+<ul>
+<a href="#SEC2">1.1 Features</a> <br>
+<a href="#SEC3">1.2 x86 emulation</a> <br>
+<a href="#SEC4">1.3 ARM emulation</a> <br>
+<a href="#SEC5">1.4 PowerPC emulation</a> <br>
+<a href="#SEC6">1.5 SPARC emulation</a> <br>
+</ul>
+
+
+<hr size="2">
+<a name="intro_005ffeatures"></a>
+<a name="SEC2"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC1" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC3" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 1.1 Features </h2>
+
+<p>QEMU is a FAST! processor emulator using a portable dynamic
+translator.
+</p>
+<p>QEMU has two operating modes:
+</p>
+<ul class="toc">
+<li>- 
+Full system emulation. In this mode, QEMU emulates a full system
+(usually a PC), including a processor and various peripherals. It can
+be used to launch an different Operating System without rebooting the
+PC or to debug system code.
+
+</li><li>- 
+User mode emulation (Linux host only). In this mode, QEMU can launch
+Linux processes compiled for one CPU on another CPU. It can be used to
+launch the Wine Windows API emulator (<a href="http://www.winehq.org">http://www.winehq.org</a>) or
+to ease cross-compilation and cross-debugging.
+
+</li></ul>
+
+<p>As QEMU requires no host kernel driver to run, it is very safe and
+easy to use.
+</p>
+<p>QEMU generic features:
+</p>
+<ul class="toc">
+<li> User space only or full system emulation.
+
+</li><li> Using dynamic translation to native code for reasonable speed.
+
+</li><li> Working on x86 and PowerPC hosts. Being tested on ARM, Sparc32, Alpha and S390.
+
+</li><li> Self-modifying code support.
+
+</li><li> Precise exceptions support.
+
+</li><li> The virtual CPU is a library (<code>libqemu</code>) which can be used 
+in other projects (look at <tt>`qemu/tests/qruncom.c'</tt> to have an
+example of user mode <code>libqemu</code> usage).
+
+</li></ul>
+
+<p>QEMU user mode emulation features:
+</p><ul class="toc">
+<li> Generic Linux system call converter, including most ioctls.
+
+</li><li> clone() emulation using native CPU clone() to use Linux scheduler for threads.
+
+</li><li> Accurate signal handling by remapping host signals to target signals. 
+</li></ul>
+
+<p>QEMU full system emulation features:
+</p><ul class="toc">
+<li> QEMU can either use a full software MMU for maximum portability or use the host system call mmap() to simulate the target MMU.
+</li></ul>
+
+<hr size="2">
+<a name="intro_005fx86_005femulation"></a>
+<a name="SEC3"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC2" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC4" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 1.2 x86 emulation </h2>
+
+<p>QEMU x86 target features:
+</p>
+<ul class="toc">
+<li> The virtual x86 CPU supports 16 bit and 32 bit addressing with segmentation. 
+LDT/GDT and IDT are emulated. VM86 mode is also supported to run DOSEMU.
+
+</li><li> Support of host page sizes bigger than 4KB in user mode emulation.
+
+</li><li> QEMU can emulate itself on x86.
+
+</li><li> An extensive Linux x86 CPU test program is included <tt>`tests/test-i386'</tt>. 
+It can be used to test other x86 virtual CPUs.
+
+</li></ul>
+
+<p>Current QEMU limitations:
+</p>
+<ul class="toc">
+<li> No SSE/MMX support (yet).
+
+</li><li> No x86-64 support.
+
+</li><li> IPC syscalls are missing.
+
+</li><li> The x86 segment limits and access rights are not tested at every 
+memory access (yet). Hopefully, very few OSes seem to rely on that for
+normal use.
+
+</li><li> On non x86 host CPUs, <code>double</code>s are used instead of the non standard 
+10 byte <code>long double</code>s of x86 for floating point emulation to get
+maximum performances.
+
+</li></ul>
+
+<hr size="2">
+<a name="intro_005farm_005femulation"></a>
+<a name="SEC4"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC3" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC5" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 1.3 ARM emulation </h2>
+
+<ul class="toc">
+<li> Full ARM 7 user emulation.
+
+</li><li> NWFPE FPU support included in user Linux emulation.
+
+</li><li> Can run most ARM Linux binaries.
+
+</li></ul>
+
+<hr size="2">
+<a name="intro_005fppc_005femulation"></a>
+<a name="SEC5"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC4" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC6" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 1.4 PowerPC emulation </h2>
+
+<ul class="toc">
+<li> Full PowerPC 32 bit emulation, including privileged instructions, 
+FPU and MMU.
+
+</li><li> Can run most PowerPC Linux binaries.
+
+</li></ul>
+
+<hr size="2">
+<a name="intro_005fsparc_005femulation"></a>
+<a name="SEC6"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC5" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC7" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 1.5 SPARC emulation </h2>
+
+<ul class="toc">
+<li> Somewhat complete SPARC V8 emulation, including privileged
+instructions, FPU and MMU. SPARC V9 emulation includes most privileged
+instructions, FPU and I/D MMU, but misses VIS instructions.
+
+</li><li> Can run some 32-bit SPARC Linux binaries.
+
+</li></ul>
+
+<p>Current QEMU limitations:
+</p>
+<ul class="toc">
+<li> Tagged add/subtract instructions are not supported, but they are
+probably not used.
+
+</li><li> IPC syscalls are missing.
+
+</li><li> 128-bit floating point operations are not supported, though none of the
+real CPUs implement them either. FCMPE[SD] are not correctly
+implemented.  Floating point exception support is untested.
+
+</li><li> Alignment is not enforced at all.
+
+</li><li> Atomic instructions are not correctly implemented.
+
+</li><li> Sparc64 emulators are not usable for anything yet.
+
+</li></ul>
+
+<hr size="2">
+<a name="QEMU-Internals"></a>
+<a name="SEC7"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC6" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC8" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 2. QEMU Internals </h1>
+<ul>
+<a href="#SEC8">2.1 QEMU compared to other emulators</a> <br>
+<a href="#SEC9">2.2 Portable dynamic translation</a> <br>
+<a href="#SEC10">2.3 Register allocation</a> <br>
+<a href="#SEC11">2.4 Condition code optimisations</a> <br>
+<a href="#SEC12">2.5 CPU state optimisations</a> <br>
+<a href="#SEC13">2.6 Translation cache</a> <br>
+<a href="#SEC14">2.7 Direct block chaining</a> <br>
+<a href="#SEC15">2.8 Self-modifying code and translated code invalidation</a> <br>
+<a href="#SEC16">2.9 Exception support</a> <br>
+<a href="#SEC17">2.10 MMU emulation</a> <br>
+<a href="#SEC18">2.11 Hardware interrupts</a> <br>
+<a href="#SEC19">2.12 User emulation specific details</a> <br>
+<ul>
+<a href="#SEC20">2.12.1 Linux system call translation</a> <br>
+<a href="#SEC21">2.12.2 Linux signals</a> <br>
+<a href="#SEC22">2.12.3 clone() system call and threads</a> <br>
+<a href="#SEC23">2.12.4 Self-virtualization</a> <br>
+</ul>
+<a href="#SEC24">2.13 Bibliography</a> <br>
+</ul>
+
+
+<hr size="2">
+<a name="QEMU-compared-to-other-emulators"></a>
+<a name="SEC8"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC7" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC9" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.1 QEMU compared to other emulators </h2>
+
+<p>Like bochs [3], QEMU emulates an x86 CPU. But QEMU is much faster than
+bochs as it uses dynamic compilation. Bochs is closely tied to x86 PC
+emulation while QEMU can emulate several processors.
+</p>
+<p>Like Valgrind [2], QEMU does user space emulation and dynamic
+translation. Valgrind is mainly a memory debugger while QEMU has no
+support for it (QEMU could be used to detect out of bound memory
+accesses as Valgrind, but it has no support to track uninitialised data
+as Valgrind does). The Valgrind dynamic translator generates better code
+than QEMU (in particular it does register allocation) but it is closely
+tied to an x86 host and target and has no support for precise exceptions
+and system emulation.
+</p>
+<p>EM86 [4] is the closest project to user space QEMU (and QEMU still uses
+some of its code, in particular the ELF file loader). EM86 was limited
+to an alpha host and used a proprietary and slow interpreter (the
+interpreter part of the FX!32 Digital Win32 code translator [5]).
+</p>
+<p>TWIN [6] is a Windows API emulator like Wine. It is less accurate than
+Wine but includes a protected mode x86 interpreter to launch x86 Windows
+executables. Such an approach has greater potential because most of the
+Windows API is executed natively but it is far more difficult to develop
+because all the data structures and function parameters exchanged
+between the API and the x86 code must be converted.
+</p>
+<p>User mode Linux [7] was the only solution before QEMU to launch a
+Linux kernel as a process while not needing any host kernel
+patches. However, user mode Linux requires heavy kernel patches while
+QEMU accepts unpatched Linux kernels. The price to pay is that QEMU is
+slower.
+</p>
+<p>The new Plex86 [8] PC virtualizer is done in the same spirit as the
+qemu-fast system emulator. It requires a patched Linux kernel to work
+(you cannot launch the same kernel on your PC), but the patches are
+really small. As it is a PC virtualizer (no emulation is done except
+for some priveledged instructions), it has the potential of being
+faster than QEMU. The downside is that a complicated (and potentially
+unsafe) host kernel patch is needed.
+</p>
+<p>The commercial PC Virtualizers (VMWare [9], VirtualPC [10], TwoOStwo
+[11]) are faster than QEMU, but they all need specific, proprietary
+and potentially unsafe host drivers. Moreover, they are unable to
+provide cycle exact simulation as an emulator can.
+</p>
+<hr size="2">
+<a name="Portable-dynamic-translation"></a>
+<a name="SEC9"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC8" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC10" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.2 Portable dynamic translation </h2>
+
+<p>QEMU is a dynamic translator. When it first encounters a piece of code,
+it converts it to the host instruction set. Usually dynamic translators
+are very complicated and highly CPU dependent. QEMU uses some tricks
+which make it relatively easily portable and simple while achieving good
+performances.
+</p>
+<p>The basic idea is to split every x86 instruction into fewer simpler
+instructions. Each simple instruction is implemented by a piece of C
+code (see <tt>`target-i386/op.c'</tt>). Then a compile time tool
+(<tt>`dyngen'</tt>) takes the corresponding object file (<tt>`op.o'</tt>)
+to generate a dynamic code generator which concatenates the simple
+instructions to build a function (see <tt>`op.h:dyngen_code()'</tt>).
+</p>
+<p>In essence, the process is similar to [1], but more work is done at
+compile time. 
+</p>
+<p>A key idea to get optimal performances is that constant parameters can
+be passed to the simple operations. For that purpose, dummy ELF
+relocations are generated with gcc for each constant parameter. Then,
+the tool (<tt>`dyngen'</tt>) can locate the relocations and generate the
+appriopriate C code to resolve them when building the dynamic code.
+</p>
+<p>That way, QEMU is no more difficult to port than a dynamic linker.
+</p>
+<p>To go even faster, GCC static register variables are used to keep the
+state of the virtual CPU.
+</p>
+<hr size="2">
+<a name="Register-allocation"></a>
+<a name="SEC10"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC9" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC11" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.3 Register allocation </h2>
+
+<p>Since QEMU uses fixed simple instructions, no efficient register
+allocation can be done. However, because RISC CPUs have a lot of
+register, most of the virtual CPU state can be put in registers without
+doing complicated register allocation.
+</p>
+<hr size="2">
+<a name="Condition-code-optimisations"></a>
+<a name="SEC11"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC10" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC12" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.4 Condition code optimisations </h2>
+
+<p>Good CPU condition codes emulation (<code>EFLAGS</code> register on x86) is a
+critical point to get good performances. QEMU uses lazy condition code
+evaluation: instead of computing the condition codes after each x86
+instruction, it just stores one operand (called <code>CC_SRC</code>), the
+result (called <code>CC_DST</code>) and the type of operation (called
+<code>CC_OP</code>).
+</p>
+<p><code>CC_OP</code> is almost never explicitely set in the generated code
+because it is known at translation time.
+</p>
+<p>In order to increase performances, a backward pass is performed on the
+generated simple instructions (see
+<code>target-i386/translate.c:optimize_flags()</code>). When it can be proved that
+the condition codes are not needed by the next instructions, no
+condition codes are computed at all.
+</p>
+<hr size="2">
+<a name="CPU-state-optimisations"></a>
+<a name="SEC12"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC11" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC13" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.5 CPU state optimisations </h2>
+
+<p>The x86 CPU has many internal states which change the way it evaluates
+instructions. In order to achieve a good speed, the translation phase
+considers that some state information of the virtual x86 CPU cannot
+change in it. For example, if the SS, DS and ES segments have a zero
+base, then the translator does not even generate an addition for the
+segment base.
+</p>
+<p>[The FPU stack pointer register is not handled that way yet].
+</p>
+<hr size="2">
+<a name="Translation-cache"></a>
+<a name="SEC13"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC12" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC14" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.6 Translation cache </h2>
+
+<p>A 16 MByte cache holds the most recently used translations. For
+simplicity, it is completely flushed when it is full. A translation unit
+contains just a single basic block (a block of x86 instructions
+terminated by a jump or by a virtual CPU state change which the
+translator cannot deduce statically).
+</p>
+<hr size="2">
+<a name="Direct-block-chaining"></a>
+<a name="SEC14"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC13" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC15" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.7 Direct block chaining </h2>
+
+<p>After each translated basic block is executed, QEMU uses the simulated
+Program Counter (PC) and other cpu state informations (such as the CS
+segment base value) to find the next basic block.
+</p>
+<p>In order to accelerate the most common cases where the new simulated PC
+is known, QEMU can patch a basic block so that it jumps directly to the
+next one.
+</p>
+<p>The most portable code uses an indirect jump. An indirect jump makes
+it easier to make the jump target modification atomic. On some host
+architectures (such as x86 or PowerPC), the <code>JUMP</code> opcode is
+directly patched so that the block chaining has no overhead.
+</p>
+<hr size="2">
+<a name="Self_002dmodifying-code-and-translated-code-invalidation"></a>
+<a name="SEC15"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC14" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC16" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.8 Self-modifying code and translated code invalidation </h2>
+
+<p>Self-modifying code is a special challenge in x86 emulation because no
+instruction cache invalidation is signaled by the application when code
+is modified.
+</p>
+<p>When translated code is generated for a basic block, the corresponding
+host page is write protected if it is not already read-only (with the
+system call <code>mprotect()</code>). Then, if a write access is done to the
+page, Linux raises a SEGV signal. QEMU then invalidates all the
+translated code in the page and enables write accesses to the page.
+</p>
+<p>Correct translated code invalidation is done efficiently by maintaining
+a linked list of every translated block contained in a given page. Other
+linked lists are also maintained to undo direct block chaining. 
+</p>
+<p>Although the overhead of doing <code>mprotect()</code> calls is important,
+most MSDOS programs can be emulated at reasonnable speed with QEMU and
+DOSEMU.
+</p>
+<p>Note that QEMU also invalidates pages of translated code when it detects
+that memory mappings are modified with <code>mmap()</code> or <code>munmap()</code>.
+</p>
+<p>When using a software MMU, the code invalidation is more efficient: if
+a given code page is invalidated too often because of write accesses,
+then a bitmap representing all the code inside the page is
+built. Every store into that page checks the bitmap to see if the code
+really needs to be invalidated. It avoids invalidating the code when
+only data is modified in the page.
+</p>
+<hr size="2">
+<a name="Exception-support"></a>
+<a name="SEC16"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC15" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC17" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.9 Exception support </h2>
+
+<p>longjmp() is used when an exception such as division by zero is
+encountered. 
+</p>
+<p>The host SIGSEGV and SIGBUS signal handlers are used to get invalid
+memory accesses. The exact CPU state can be retrieved because all the
+x86 registers are stored in fixed host registers. The simulated program
+counter is found by retranslating the corresponding basic block and by
+looking where the host program counter was at the exception point.
+</p>
+<p>The virtual CPU cannot retrieve the exact <code>EFLAGS</code> register because
+in some cases it is not computed because of condition code
+optimisations. It is not a big concern because the emulated code can
+still be restarted in any cases.
+</p>
+<hr size="2">
+<a name="MMU-emulation"></a>
+<a name="SEC17"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC16" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC18" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.10 MMU emulation </h2>
+
+<p>For system emulation, QEMU uses the mmap() system call to emulate the
+target CPU MMU. It works as long the emulated OS does not use an area
+reserved by the host OS (such as the area above 0xc0000000 on x86
+Linux).
+</p>
+<p>In order to be able to launch any OS, QEMU also supports a soft
+MMU. In that mode, the MMU virtual to physical address translation is
+done at every memory access. QEMU uses an address translation cache to
+speed up the translation.
+</p>
+<p>In order to avoid flushing the translated code each time the MMU
+mappings change, QEMU uses a physically indexed translation cache. It
+means that each basic block is indexed with its physical address. 
+</p>
+<p>When MMU mappings change, only the chaining of the basic blocks is
+reset (i.e. a basic block can no longer jump directly to another one).
+</p>
+<hr size="2">
+<a name="Hardware-interrupts"></a>
+<a name="SEC18"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC17" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC19" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.11 Hardware interrupts </h2>
+
+<p>In order to be faster, QEMU does not check at every basic block if an
+hardware interrupt is pending. Instead, the user must asynchrously
+call a specific function to tell that an interrupt is pending. This
+function resets the chaining of the currently executing basic
+block. It ensures that the execution will return soon in the main loop
+of the CPU emulator. Then the main loop can test if the interrupt is
+pending and handle it.
+</p>
+<hr size="2">
+<a name="User-emulation-specific-details"></a>
+<a name="SEC19"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC18" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC20" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.12 User emulation specific details </h2>
+<ul>
+<a href="#SEC20">2.12.1 Linux system call translation</a> <br>
+<a href="#SEC21">2.12.2 Linux signals</a> <br>
+<a href="#SEC22">2.12.3 clone() system call and threads</a> <br>
+<a href="#SEC23">2.12.4 Self-virtualization</a> <br>
+</ul>
+
+<hr size="2">
+<a name="SEC20"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC19" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC21" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 2.12.1 Linux system call translation </h3>
+
+<p>QEMU includes a generic system call translator for Linux. It means that
+the parameters of the system calls can be converted to fix the
+endianness and 32/64 bit issues. The IOCTLs are converted with a generic
+type description system (see <tt>`ioctls.h'</tt> and <tt>`thunk.c'</tt>).
+</p>
+<p>QEMU supports host CPUs which have pages bigger than 4KB. It records all
+the mappings the process does and try to emulated the <code>mmap()</code>
+system calls in cases where the host <code>mmap()</code> call would fail
+because of bad page alignment.
+</p>
+<hr size="2">
+<a name="SEC21"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC20" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC22" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 2.12.2 Linux signals </h3>
+
+<p>Normal and real-time signals are queued along with their information
+(<code>siginfo_t</code>) as it is done in the Linux kernel. Then an interrupt
+request is done to the virtual CPU. When it is interrupted, one queued
+signal is handled by generating a stack frame in the virtual CPU as the
+Linux kernel does. The <code>sigreturn()</code> system call is emulated to return
+from the virtual signal handler.
+</p>
+<p>Some signals (such as SIGALRM) directly come from the host. Other
+signals are synthetized from the virtual CPU exceptions such as SIGFPE
+when a division by zero is done (see <code>main.c:cpu_loop()</code>).
+</p>
+<p>The blocked signal mask is still handled by the host Linux kernel so
+that most signal system calls can be redirected directly to the host
+Linux kernel. Only the <code>sigaction()</code> and <code>sigreturn()</code> system
+calls need to be fully emulated (see <tt>`signal.c'</tt>).
+</p>
+<hr size="2">
+<a name="SEC22"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC21" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC23" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 2.12.3 clone() system call and threads </h3>
+
+<p>The Linux clone() system call is usually used to create a thread. QEMU
+uses the host clone() system call so that real host threads are created
+for each emulated thread. One virtual CPU instance is created for each
+thread.
+</p>
+<p>The virtual x86 CPU atomic operations are emulated with a global lock so
+that their semantic is preserved.
+</p>
+<p>Note that currently there are still some locking issues in QEMU. In
+particular, the translated cache flush is not protected yet against
+reentrancy.
+</p>
+<hr size="2">
+<a name="SEC23"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC22" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC24" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 2.12.4 Self-virtualization </h3>
+
+<p>QEMU was conceived so that ultimately it can emulate itself. Although
+it is not very useful, it is an important test to show the power of the
+emulator.
+</p>
+<p>Achieving self-virtualization is not easy because there may be address
+space conflicts. QEMU solves this problem by being an executable ELF
+shared object as the ld-linux.so ELF interpreter. That way, it can be
+relocated at load time.
+</p>
+<hr size="2">
+<a name="Bibliography"></a>
+<a name="SEC24"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC23" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC25" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.13 Bibliography </h2>
+
+<dl compact="compact">
+<dt> [1] </dt>
+<dd><p><a href="http://citeseer.nj.nec.com/piumarta98optimizing.html">http://citeseer.nj.nec.com/piumarta98optimizing.html</a>, Optimizing
+direct threaded code by selective inlining (1998) by Ian Piumarta, Fabio
+Riccardi.
+</p>
+</dd>
+<dt> [2]</dt>
+<dd><p><a href="http://developer.kde.org/~sewardj/">http://developer.kde.org/~sewardj/</a>, Valgrind, an open-source
+memory debugger for x86-GNU/Linux, by Julian Seward.
+</p>
+</dd>
+<dt> [3]</dt>
+<dd><p><a href="http://bochs.sourceforge.net/">http://bochs.sourceforge.net/</a>, the Bochs IA-32 Emulator Project,
+by Kevin Lawton et al.
+</p>
+</dd>
+<dt> [4]</dt>
+<dd><p><a href="http://www.cs.rose-hulman.edu/~donaldlf/em86/index.html">http://www.cs.rose-hulman.edu/~donaldlf/em86/index.html</a>, the EM86
+x86 emulator on Alpha-Linux.
+</p>
+</dd>
+<dt> [5]</dt>
+<dd><p><a href="http://www.usenix.org/publications/library/proceedings/usenix-nt97/full_papers/chernoff/chernoff.pdf">http://www.usenix.org/publications/library/proceedings/usenix-nt97/full_papers/chernoff/chernoff.pdf</a>,
+DIGITAL FX!32: Running 32-Bit x86 Applications on Alpha NT, by Anton
+Chernoff and Ray Hookway.
+</p>
+</dd>
+<dt> [6]</dt>
+<dd><p><a href="http://www.willows.com/">http://www.willows.com/</a>, Windows API library emulation from
+Willows Software.
+</p>
+</dd>
+<dt> [7]</dt>
+<dd><p><a href="http://user-mode-linux.sourceforge.net/">http://user-mode-linux.sourceforge.net/</a>, 
+The User-mode Linux Kernel.
+</p>
+</dd>
+<dt> [8]</dt>
+<dd><p><a href="http://www.plex86.org/">http://www.plex86.org/</a>, 
+The new Plex86 project.
+</p>
+</dd>
+<dt> [9]</dt>
+<dd><p><a href="http://www.vmware.com/">http://www.vmware.com/</a>, 
+The VMWare PC virtualizer.
+</p>
+</dd>
+<dt> [10]</dt>
+<dd><p><a href="http://www.microsoft.com/windowsxp/virtualpc/">http://www.microsoft.com/windowsxp/virtualpc/</a>, 
+The VirtualPC PC virtualizer.
+</p>
+</dd>
+<dt> [11]</dt>
+<dd><p><a href="http://www.twoostwo.org/">http://www.twoostwo.org/</a>, 
+The TwoOStwo PC virtualizer.
+</p>
+</dd>
+</dl>
+
+<hr size="2">
+<a name="Regression-Tests"></a>
+<a name="SEC25"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC24" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC26" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 3. Regression Tests </h1>
+<ul>
+<a href="#SEC26">3.1 <tt>`test-i386'</tt></a> <br>
+<a href="#SEC27">3.2 <tt>`linux-test'</tt></a> <br>
+<a href="#SEC28">3.3 <tt>`qruncom.c'</tt></a> <br>
+</ul>
+
+<p>In the directory <tt>`tests/'</tt>, various interesting testing programs
+are available. There are used for regression testing.
+</p>
+
+<hr size="2">
+<a name="test_002di386"></a>
+<a name="SEC26"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC25" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC27" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.1 <tt>`test-i386'</tt> </h2>
+
+<p>This program executes most of the 16 bit and 32 bit x86 instructions and
+generates a text output. It can be compared with the output obtained with
+a real CPU or another emulator. The target <code>make test</code> runs this
+program and a <code>diff</code> on the generated output.
+</p>
+<p>The Linux system call <code>modify_ldt()</code> is used to create x86 selectors
+to test some 16 bit addressing and 32 bit with segmentation cases.
+</p>
+<p>The Linux system call <code>vm86()</code> is used to test vm86 emulation.
+</p>
+<p>Various exceptions are raised to test most of the x86 user space
+exception reporting.
+</p>
+<hr size="2">
+<a name="linux_002dtest"></a>
+<a name="SEC27"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC26" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC28" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.2 <tt>`linux-test'</tt> </h2>
+
+<p>This program tests various Linux system calls. It is used to verify
+that the system call parameters are correctly converted between target
+and host CPUs.
+</p>
+<hr size="2">
+<a name="qruncom_002ec"></a>
+<a name="SEC28"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC27" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.3 <tt>`qruncom.c'</tt> </h2>
+
+<p>Example of usage of <code>libqemu</code> to emulate a user mode i386 CPU.
+</p>
+<hr size="2">
+<a name="Index"></a>
+<a name="SEC29"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC28" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[ &gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 4. Index </h1>
+
+<hr size="2">
+<h2> Table of Contents</h2>
+<div class="contents">
+
+<ul class="toc">
+  <li><a name="TOC1" href="#SEC1">1. Introduction</a>
+  <ul class="toc">
+    <li><a name="TOC2" href="#SEC2">1.1 Features</a></li>
+    <li><a name="TOC3" href="#SEC3">1.2 x86 emulation</a></li>
+    <li><a name="TOC4" href="#SEC4">1.3 ARM emulation</a></li>
+    <li><a name="TOC5" href="#SEC5">1.4 PowerPC emulation</a></li>
+    <li><a name="TOC6" href="#SEC6">1.5 SPARC emulation</a></li>
+  </ul></li>
+  <li><a name="TOC7" href="#SEC7">2. QEMU Internals</a>
+  <ul class="toc">
+    <li><a name="TOC8" href="#SEC8">2.1 QEMU compared to other emulators</a></li>
+    <li><a name="TOC9" href="#SEC9">2.2 Portable dynamic translation</a></li>
+    <li><a name="TOC10" href="#SEC10">2.3 Register allocation</a></li>
+    <li><a name="TOC11" href="#SEC11">2.4 Condition code optimisations</a></li>
+    <li><a name="TOC12" href="#SEC12">2.5 CPU state optimisations</a></li>
+    <li><a name="TOC13" href="#SEC13">2.6 Translation cache</a></li>
+    <li><a name="TOC14" href="#SEC14">2.7 Direct block chaining</a></li>
+    <li><a name="TOC15" href="#SEC15">2.8 Self-modifying code and translated code invalidation</a></li>
+    <li><a name="TOC16" href="#SEC16">2.9 Exception support</a></li>
+    <li><a name="TOC17" href="#SEC17">2.10 MMU emulation</a></li>
+    <li><a name="TOC18" href="#SEC18">2.11 Hardware interrupts</a></li>
+    <li><a name="TOC19" href="#SEC19">2.12 User emulation specific details</a>
+    <ul class="toc">
+      <li><a name="TOC20" href="#SEC20">2.12.1 Linux system call translation</a></li>
+      <li><a name="TOC21" href="#SEC21">2.12.2 Linux signals</a></li>
+      <li><a name="TOC22" href="#SEC22">2.12.3 clone() system call and threads</a></li>
+      <li><a name="TOC23" href="#SEC23">2.12.4 Self-virtualization</a></li>
+    </ul></li>
+    <li><a name="TOC24" href="#SEC24">2.13 Bibliography</a></li>
+  </ul></li>
+  <li><a name="TOC25" href="#SEC25">3. Regression Tests</a>
+  <ul class="toc">
+    <li><a name="TOC26" href="#SEC26">3.1 <tt>`test-i386'</tt></a></li>
+    <li><a name="TOC27" href="#SEC27">3.2 <tt>`linux-test'</tt></a></li>
+    <li><a name="TOC28" href="#SEC28">3.3 <tt>`qruncom.c'</tt></a></li>
+  </ul></li>
+  <li><a name="TOC29" href="#SEC29">4. Index</a></li>
+</ul>
+</div>
+<hr size="1">
+<p>
+ <font size="-1">
+  This document was generated on <i>February, 7 2007</i> using <a href="http://texi2html.cvshome.org/"><i>texi2html 1.76</i></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>
