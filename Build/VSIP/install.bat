@@ -30,11 +30,10 @@ xcopy /Y ..\..\source\Cosmos.Kernel.FileSystems\bin\debug\Cosmos.Sys.FileSystem.
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\debug\Cosmos.VS.Package.* .
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject.zip .
 
+echo Creating setup.exe
+ISCC /Q ..\..\Setup2\Cosmos.iss
+
+..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
 
-
-
-rem echo Create msbuild file
-rem md "%ProgramFiles%\MSBuild\Cosmos\"
-rem xcopy /Y .\cosmos.targets "%ProgramFiles%\MSBuild\Cosmos\"
 pause
