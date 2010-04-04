@@ -54,12 +54,7 @@ namespace Cosmos.IL2CPU.X86
             Return();
         }
 
-        protected void BreakOnAddress() {
-            Label = "DebugStub_BreakOnAddress";
-            PushAll32();
-
-            //TODO: Make embeddable ASM routines.. that is call them and they emit reused ASM.
-
+        protected void ReadComPortX32toEAX() {
             // Make room on the stack for the address
             new Push { DestinationValue = 0 };
             // ReadByteFromComPort writes to EDI, then increments
@@ -73,6 +68,13 @@ namespace Cosmos.IL2CPU.X86
 
             // Pop of 4 bytes read from port to stack as EAX
             new Pop { DestinationReg = RegistersEnum.EAX };
+        }
+
+        protected void BreakOnAddress() {
+            Label = "DebugStub_BreakOnAddress";
+            PushAll32();
+
+            ReadComPortX32toEAX();
             // Set it to our breakpoint address
             Memory["DebugBreakpointAddress", 32] = EAX;
 
