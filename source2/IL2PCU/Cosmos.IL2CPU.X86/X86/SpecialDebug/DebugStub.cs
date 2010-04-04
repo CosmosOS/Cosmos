@@ -54,8 +54,7 @@ namespace Cosmos.IL2CPU.X86
             Return();
         }
 
-        protected void BreakOnAddress()
-        {
+        protected void BreakOnAddress() {
             Label = "DebugStub_BreakOnAddress";
             PushAll32();
 
@@ -65,13 +64,15 @@ namespace Cosmos.IL2CPU.X86
             //Jump("DebugStub_BreakOnAddress2");
             //new Sub { DestinationReg = RegistersEnum.EDI, SourceValue = 3 };
 
-            // read address
+            // Read address to stack
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
 
+            // Pop of 4 bytes read from port to stack as EAX
             new Pop { DestinationReg = RegistersEnum.EAX };
+            // Set it to our breakpoint address
             Memory["DebugBreakpointAddress", 32] = EAX;
 
             PopAll32();
@@ -344,7 +345,7 @@ namespace Cosmos.IL2CPU.X86
             AL.Compare((byte)Command.Break);
                 JumpIf(Flags.Equal, "DebugStub_Break");
             AL.Compare((byte)Command.BreakOnAddress);
-            JumpIf(Flags.Equal, "DebugStub_BreakOnAddress");
+                JumpIf(Flags.Equal, "DebugStub_BreakOnAddress");
 
             Label = "DebugStub_Executing_Exit";
             Return();
