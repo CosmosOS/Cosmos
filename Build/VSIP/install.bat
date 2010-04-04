@@ -31,7 +31,9 @@ xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\debug\Cosmos.VS.Package.* .
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject.zip .
 
 echo Creating setup.exe
-ISCC /Q ..\..\Setup2\Cosmos.iss
+REM Try one, then if not there the other for x64
+"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
+"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
 
 ..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
