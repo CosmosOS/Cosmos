@@ -49,13 +49,13 @@ namespace Cosmos.Build.Common {
 	public enum DebugQemuCommunication
 	{
 		None,
-		[Description("TCP: QEMU as server, Cosmos as client")] 
+		[Description("TCP: Cosmos client, QEMU server")] 
 		TCPListener,
-		[Description("TCP: QEMU as client, Cosmos as server")] 
+		[Description("TCP: QEMU client, Cosmos server")] 
 		TCPClient,
-		[Description("Named Pipe: QEMU as server, Cosmos as client")]
+        [Description("Pipe: Cosmos client, QEMU server")]
 		NamedPipeListener,
-		[Description("Named Pipe: QEMU as client, Cosmos as server")]
+		[Description("Pipe: QEMU client, Cosmos server")]
 		NamedPipeClient
 	}
 
@@ -64,7 +64,7 @@ namespace Cosmos.Build.Common {
         Warning = 0, Error = 1, Informational = 2, Performance = 3
     }
     public enum TraceAssemblies { All, Cosmos, User };
-    public enum DebugMode { None, IL, Source, MLUsingGDB }
+    public enum DebugMode { None, IL, Source, GDB }
 
 	public class DescriptionAttribute : Attribute
 	{
