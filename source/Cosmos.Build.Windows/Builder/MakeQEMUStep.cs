@@ -86,7 +86,7 @@ namespace Cosmos.Compiler.Builder
                 // COM2
                 + " -serial file:" + buildPath + "COM2-output.dbg"
                 // Enable acceleration if we are not using GDB
-                //+ (options.UseGDB ? " -S -s" : " -kernel-kqemu")
+                + (options.UseGDB ? " -S -s" : " -kernel-kqemu")
                 // Ethernet card
                 + (String.IsNullOrEmpty(aNetworkCard as String) ? "" : string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", aNetworkCard))
                 //+ " -redir tcp:5555::23" //use f.instance 'telnet localhost 5555' or 'http://localhost:5555/' to access machine
