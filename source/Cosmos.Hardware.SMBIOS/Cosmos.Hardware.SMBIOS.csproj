@@ -83,10 +83,6 @@
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Compiler.Builder</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.TestKernelHelpers\Cosmos.TestKernelHelpers.csproj">
-      <Project>{C93F0CB0-9E3B-40CB-A6E5-9BE5FDA83338}</Project>
-      <Name>Cosmos.TestKernelHelpers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
@@ -109,7 +105,7 @@
   -->
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.None" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" />
+      <UserProperties BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_BuildVersioningStyle="None.None.Increment.None" BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

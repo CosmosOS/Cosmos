@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
-using Indy.IL2CPU.Assembler.X86;
 using S = Cosmos.Hardware.TextScreen;
 using System.IO;
 using Indy.IL2CPU;

@@ -84,10 +84,6 @@
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

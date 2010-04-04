@@ -138,14 +138,6 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
-      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
-      <Name>Indy.IL2CPU.Assembler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
