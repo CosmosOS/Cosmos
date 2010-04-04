@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
 
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition="$(Language) == 'CSharp'" />
 
   <PropertyGroup>
     <CoreBuildDependsOn>$(CoreBuildDependsOn);CosmosBuild</CoreBuildDependsOn>

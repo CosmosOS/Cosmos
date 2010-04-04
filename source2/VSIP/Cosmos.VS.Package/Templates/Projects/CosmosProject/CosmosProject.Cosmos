@@ -9,6 +9,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Name>Project2</Name>
+    <Language>CSharp</Language>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,8 +53,6 @@
     </Compile>
   </ItemGroup>
 
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 
-  <Target Name="BeforeBuild">
-  </Target></Project>
+</Project>
