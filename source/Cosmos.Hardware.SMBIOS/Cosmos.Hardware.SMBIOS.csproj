@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Hardware.SMBIOS</RootNamespace>
     <AssemblyName>Cosmos.Hardware.SMBIOS</AssemblyName>
@@ -16,7 +16,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <StartupObject>Cosmos.Hardware.SMBIOS.TestProgram</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,10 +80,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
-      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
-      <Name>Cosmos.Compiler.Builder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
@@ -105,7 +102,7 @@
   -->
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_BuildVersioningStyle="None.None.Increment.None" BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" />
+      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.None" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

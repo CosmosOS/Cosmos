@@ -1,5 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\bin\Release\Util.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\bin\Release\Util.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\obj\Release\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\obj\Release\Util.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\Util\obj\Release\Util.pdb

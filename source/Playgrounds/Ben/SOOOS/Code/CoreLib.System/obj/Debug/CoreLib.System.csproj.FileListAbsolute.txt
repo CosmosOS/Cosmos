@@ -1,5 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.System\bin\Debug\CoreLib.System.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.System\bin\Debug\CoreLib.System.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.System\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.System\obj\Debug\CoreLib.System.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.System\obj\Debug\CoreLib.System.pdb

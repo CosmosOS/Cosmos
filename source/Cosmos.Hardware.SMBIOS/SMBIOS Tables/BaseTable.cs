@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 
-using Cosmos.Compiler.Builder;
 using Cosmos.Kernel;
 
 namespace Cosmos.Hardware.SMBIOS

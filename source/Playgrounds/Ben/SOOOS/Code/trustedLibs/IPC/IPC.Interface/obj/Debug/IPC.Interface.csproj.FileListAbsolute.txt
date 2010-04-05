@@ -1,5 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\IPC.Interface\bin\Debug\IPC.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\IPC.Interface\bin\Debug\IPC.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\IPC.Interface\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\IPC.Interface\obj\Debug\IPC.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedLibs\IPC\IPC.Interface\obj\Debug\IPC.pdb

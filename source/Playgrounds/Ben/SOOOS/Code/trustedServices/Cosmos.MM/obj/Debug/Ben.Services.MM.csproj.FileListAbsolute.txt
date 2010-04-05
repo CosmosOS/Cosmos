@@ -1,2 +1,0 @@
-C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\apps\services\Cosmos.MM\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\Cosmos.MM\obj\Debug\ResolveAssemblyReference.cache

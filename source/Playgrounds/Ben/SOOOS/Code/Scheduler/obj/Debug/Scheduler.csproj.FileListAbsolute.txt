@@ -1,5 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\bin\Debug\Scheduler.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\bin\Debug\Scheduler.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\obj\Debug\Scheduler.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\Scheduler\obj\Debug\Scheduler.pdb

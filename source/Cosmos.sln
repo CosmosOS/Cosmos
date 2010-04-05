@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Shell", "Cosmos\Cosmos.Shell.Console\Cosmos.Demo.Shell.csproj", "{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{0D558E33-78B0-47DB-B5EF-B7C2F3114D75}"
@@ -24,75 +22,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{E16DB75B-0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Boot", "Boot", "{21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Builder", "Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj", "{1F0EDE86-F6D4-4355-9A97-10E90457770C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosBoot", "CosmosBoot\CosmosBoot.csproj", "{E2C54C80-75F3-4249-93B4-0003A4AF705F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Guess", "Cosmos.Shell.Guess\Cosmos.Demo.Guess.csproj", "{C97DE890-58D2-41A1-86D0-A2E919E6DD80}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSuite", "Boot\TestSuite\TestSuite.csproj", "{FF431742-6490-46B8-A9F6-734477D0725D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Playgrounds", "Playgrounds", "{EBF602FE-8AFC-408D-A9F1-560C35651090}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatthijsTest", "MatthijsTest\MatthijsTest.csproj", "{605F8D53-66FA-4BEC-844E-F63209B855C9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestKernel", "TestKernel\TestKernel.csproj", "{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteveKernel", "SteveKernel\SteveKernel.csproj", "{8C566493-DBA5-45DD-93D4-89D4486CAAB6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrodeTest", "FrodeTest\FrodeTest.csproj", "{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4DE8EC69-B412-41C4-BCD9-1E032984E888}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MohammedTest", "MohammedTest\MohammedTest.csproj", "{1240EAB3-D6B1-463A-BA83-436607A1F18E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RsenkTest", "RsenkTest\RsenkTest.csproj", "{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys", "Cosmos\Cosmos.System\Cosmos.Sys.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.FileSystems.Test", "Boot\Cosmos.FileSystems.Test\Cosmos.FileSystems.Test.csproj", "{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu-SourceView", "Boot\Playgrounds\Kudzu\Kudzu-SourceView\Kudzu-SourceView.csproj", "{1E31A694-81BB-4628-B704-DA190E7E94CA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Playground.Kudzu", "Boot\Playgrounds\Kudzu\KudzuTest\Cosmos.Playground.Kudzu.csproj", "{30057B5B-8BEE-4712-8243-9A42DF8A0C76}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ralf", "Ralf", "{079D6377-44C2-4155-B73A-E634E8F1BF6E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsxTest", "Playgrounds\Ralf\EsxTest\EsxTest.csproj", "{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.Plugs", "Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj", "{6110AD07-EB07-4A99-BB73-7A69AF5732F1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cipher", "Cipher", "{97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CipherTest", "CipherTest\CipherTest.csproj", "{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCIHelper", "Playgrounds\Ralf\PCIHelper\PCIHelper.csproj", "{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frode", "Frode", "{55682BBB-A596-4C97-BED5-8BCCBAD81439}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokuTest", "DokuTest\DokuTest.csproj", "{77DE5600-A012-49E5-8877-67CDB0304B0A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs", "Matthijs", "{B2F8734A-DA5C-4F65-BD67-B9E717DC510E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3P Plugs", "3P Plugs", "{232C5793-FC68-4617-9BB0-2059B6C48784}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mono-curses.Plugs", "3PLibraryPlugs\mono-curses.Plugs\mono-curses.Plugs.csproj", "{F215BFCA-3280-497B-B186-2E097DFB4551}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Nibbles", "Cosmos.Demos.NibblesCS\Cosmos.Demo.Nibbles.csproj", "{301BAFD2-D15B-4B95-8C59-65D7D0390A76}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGAFontMaker", "VGAFontMaker\VGAFontMaker.csproj", "{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Plugs", "Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj", "{BCB66614-20FE-4184-B214-FD42844AD8A6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demos.Snake", "Cosmos.Demos.Snake\Cosmos.Demos.Snake.csproj", "{A38CF66E-A15A-417E-B958-48EF357D7AB3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Pacman", "Cosmos.Demo.Pacman\Cosmos.Demo.Pacman.csproj", "{A9B31697-9530-4D85-8123-0508A4E1EA70}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
 EndProject
@@ -100,31 +42,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hardware", "Hardware", "{F1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sys", "Sys", "{0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.RemoteRocketLauncher", "Cosmos.Demo.RemoteRocketLauncher\Cosmos.Demo.RemoteRocketLauncher.csproj", "{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BE896274-5F06-430F-AAC4-D74CAEEB28F5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Kernels", "Test Kernels", "{94175DA3-84AF-4DBD-9B2A-791DD0F0BC13}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Core", "_Core", "{D508601F-A6A6-4F6C-9C45-0B660F6D0189}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "feal87", "feal87", "{CB908020-B801-4058-BEAD-C4E374768E73}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseTest", "BaseTest\BaseTest.csproj", "{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sschocke", "sschocke", "{E5644B8E-ABD7-4B71-B7B6-C9F6CE7B1D94}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSchockeTest", "SSchockeTest\SSchockeTest.csproj", "{8F9928DB-836A-4FD8-90C7-831C4739C846}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosViewer", "CosmosViewer\CosmosViewer.csproj", "{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiArrays", "XenniTest\MultiArrays.csproj", "{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xenni", "Xenni", "{12EC019C-B585-490F-84D6-16F000DC4CDB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TxUI", "TxUI\TxUI.csproj", "{16D4E345-DF23-4095-A6D5-80D0538FC904}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steve", "Steve", "{9FDB0A12-6D62-41CF-917F-62A94A03472D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "New Sort (source2)", "New Sort (source2)", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
 EndProject
@@ -157,27 +79,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C
 		..\source2\Users\Kudzu\HelloWorld\Test Compile w NASM.bat = ..\source2\Users\Kudzu\HelloWorld\Test Compile w NASM.bat
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{9A806542-A3FE-479B-83C2-E3380BC372F3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{74E81F2A-F4BD-4532-803B-3003378BA2F1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VSIP", "VSIP", "{CD3F5E45-8B24-424F-ADF1-0211712F4CB7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Albert", "Albert", "{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Albert", "..\source2\Users\Albert\Albert\Albert.csproj", "{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jdguzman", "Jdguzman", "{54DD5F71-82C3-44D7-99F0-A93B54C220F7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ext2.Test", "Ext2.Test\Ext2.Test.csproj", "{54ACC512-D568-4F7C-9204-E1A4A285EFF2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyboardTest", "KeyboardTest\KeyboardTest.csproj", "{B85E1686-9ADC-4B97-9E6B-482479698D7B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.VGASnake", "Cosmos.Demo.VGASnake\Cosmos.Demo.VGASnake.csproj", "{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagingTest", "PagingTest\PagingTest.csproj", "{EBC60CB1-1726-4348-A05F-D92D856366C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{35CABD9D-5C85-419A-B6C9-561EAD97A553}"
 EndProject
@@ -187,39 +93,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Profiler", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86", "..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj", "{63F7BFB9-419E-4965-B580-304B9C9FA7D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "..\source2\Users\Kudzu\HelloWorld\HelloWorld.csproj", "{28D7710D-5930-40BE-BB71-D30F01294EDF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS", "Cosmos.Hardware.SMBIOS\Cosmos.Hardware.SMBIOS.csproj", "{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landmann", "{2DF5F17F-4890-4856-ADFD-4DE23282C3B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xenni", "Xenni", "{856EAFB8-D13E-4690-9ED8-6B5622D6AA41}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewKeyboardTest", "NewKeyboardTest\NewKeyboardTest.csproj", "{0F641748-FF03-4DA7-981B-1E9268330EE5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewPagingTest", "NewPagingTest\NewPagingTest.csproj", "{D89DE0D3-FF3E-4F63-B15F-7302D998845E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugListener", "Playgrounds\Matthijs\DebugListener\DebugListener.csproj", "{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.HostProcess", "..\source2\Debug\Cosmos.Debug.HostProcess\Cosmos.Debug.HostProcess.csproj", "{4266FA56-F6FE-4E9B-BAE3-B6910183884C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ch2845", "ch2845", "{1DB35C80-00E4-41DE-AF1E-4A3ED148C352}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{673EFE0A-176C-40CA-B4C3-F5328F838696}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reynaldo", "Reynaldo", "{B8406314-B724-410E-8C79-E2C187ACDC65}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests", "..\source2\IL2PCU\Cosmos.IL2CPU.X86.Tests\Cosmos.IL2CPU.X86.Tests.csproj", "{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KebinuChiousu", "KebinuChiousu", "{22BCACD7-7E12-47D3-B3F2-77B8C0D0CB6F}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Breakpoints.Cosmos", "{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 63
+		SccNumberOfProjects = 24
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -235,242 +123,86 @@ Global
 		SccProjectTopLevelParentUniqueName3 = Cosmos.sln
 		SccProjectName3 = Cosmos/Cosmos.Kernel.Plugs
 		SccLocalPath3 = Cosmos\\Cosmos.Kernel.Plugs
-		SccProjectUniqueName4 = CosmosBoot\\CosmosBoot.csproj
+		SccProjectUniqueName4 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
 		SccProjectTopLevelParentUniqueName4 = Cosmos.sln
-		SccProjectName4 = CosmosBoot
-		SccLocalPath4 = CosmosBoot
-		SccProjectUniqueName5 = Boot\\TestSuite\\TestSuite.csproj
+		SccProjectName4 = Cosmos/Cosmos.System
+		SccLocalPath4 = Cosmos\\Cosmos.System
+		SccProjectUniqueName5 = Cosmos\\Cosmos.Sys.Plugs\\Cosmos.Sys.Plugs.csproj
 		SccProjectTopLevelParentUniqueName5 = Cosmos.sln
-		SccProjectName5 = Boot/TestSuite
-		SccLocalPath5 = Boot\\TestSuite
-		SccProjectUniqueName6 = MatthijsTest\\MatthijsTest.csproj
+		SccProjectName5 = Cosmos/Cosmos.Sys.Plugs
+		SccLocalPath5 = Cosmos\\Cosmos.Sys.Plugs
+		SccProjectUniqueName6 = Cosmos.Kernel.FileSystems\\Cosmos.Sys.FileSystem.csproj
 		SccProjectTopLevelParentUniqueName6 = Cosmos.sln
-		SccProjectName6 = MatthijsTest
-		SccLocalPath6 = MatthijsTest
-		SccProjectUniqueName7 = TestKernel\\TestKernel.csproj
+		SccProjectName6 = Cosmos.Kernel.FileSystems
+		SccLocalPath6 = Cosmos.Kernel.FileSystems
+		SccProjectUniqueName7 = Cosmos.Hardware.Plugs\\Cosmos.Hardware.Plugs.csproj
 		SccProjectTopLevelParentUniqueName7 = Cosmos.sln
-		SccProjectName7 = TestKernel
-		SccLocalPath7 = TestKernel
-		SccProjectUniqueName8 = SteveKernel\\SteveKernel.csproj
+		SccProjectName7 = Cosmos.Hardware.Plugs
+		SccLocalPath7 = Cosmos.Hardware.Plugs
+		SccProjectUniqueName8 = IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.Compiler.Debug.csproj
 		SccProjectTopLevelParentUniqueName8 = Cosmos.sln
-		SccProjectName8 = SteveKernel
-		SccLocalPath8 = SteveKernel
-		SccProjectUniqueName9 = FrodeTest\\FrodeTest.csproj
+		SccProjectName8 = IL2CPU/Cosmos.IL2CPU.Debug
+		SccLocalPath8 = IL2CPU\\Cosmos.IL2CPU.Debug
+		SccProjectUniqueName9 = ..\\source2\\Build\\Cosmos.Build.Common\\Cosmos.Build.Common.csproj
 		SccProjectTopLevelParentUniqueName9 = Cosmos.sln
-		SccProjectName9 = FrodeTest
-		SccLocalPath9 = FrodeTest
-		SccProjectUniqueName10 = MohammedTest\\MohammedTest.csproj
+		SccProjectName9 = ../source2/Build/Cosmos.Build.Common
+		SccLocalPath9 = ..\\source2\\Build\\Cosmos.Build.Common
+		SccProjectUniqueName10 = ..\\source2\\Build\\Cosmos.Build.Launch\\Cosmos.Build.Launch.csproj
 		SccProjectTopLevelParentUniqueName10 = Cosmos.sln
-		SccProjectName10 = MohammedTest
-		SccLocalPath10 = MohammedTest
-		SccProjectUniqueName11 = RsenkTest\\RsenkTest.csproj
+		SccProjectName10 = ../source2/Build/Cosmos.Build.Launch
+		SccLocalPath10 = ..\\source2\\Build\\Cosmos.Build.Launch
+		SccProjectUniqueName11 = ..\\source2\\Build\\Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
 		SccProjectTopLevelParentUniqueName11 = Cosmos.sln
-		SccProjectName11 = RsenkTest
-		SccLocalPath11 = RsenkTest
-		SccProjectUniqueName12 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
+		SccProjectName11 = ../source2/Build/Cosmos.Build.MSBuild
+		SccLocalPath11 = ..\\source2\\Build\\Cosmos.Build.MSBuild
+		SccProjectUniqueName12 = ..\\source2\\Debug\\Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
 		SccProjectTopLevelParentUniqueName12 = Cosmos.sln
-		SccProjectName12 = Cosmos/Cosmos.System
-		SccLocalPath12 = Cosmos\\Cosmos.System
-		SccProjectUniqueName13 = Boot\\Cosmos.FileSystems.Test\\Cosmos.FileSystems.Test.csproj
+		SccProjectName12 = ../source2/Debug/Cosmos.Debug.Common
+		SccLocalPath12 = ..\\source2\\Debug\\Cosmos.Debug.Common
+		SccProjectUniqueName13 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine\\Cosmos.Debug.VSDebugEngine.csproj
 		SccProjectTopLevelParentUniqueName13 = Cosmos.sln
-		SccProjectName13 = Boot/Cosmos.FileSystems.Test
-		SccLocalPath13 = Boot\\Cosmos.FileSystems.Test
-		SccProjectUniqueName14 = Boot\\Playgrounds\\Kudzu\\Kudzu-SourceView\\Kudzu-SourceView.csproj
+		SccProjectName13 = ../source2/Debug/Cosmos.Debug.VSDebugEngine
+		SccLocalPath13 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine
+		SccProjectUniqueName14 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister\\Cosmos.Debug.VSRegister.csproj
 		SccProjectTopLevelParentUniqueName14 = Cosmos.sln
-		SccProjectName14 = Boot/Playgrounds/Kudzu/Kudzu-SourceView
-		SccLocalPath14 = Boot\\Playgrounds\\Kudzu\\Kudzu-SourceView
-		SccProjectUniqueName15 = Playgrounds\\Ralf\\EsxTest\\EsxTest.csproj
+		SccProjectName14 = ../source2/Debug/Cosmos.Debug.VSRegister
+		SccLocalPath14 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister
+		SccProjectUniqueName15 = ..\\source2\\VSIP\\Cosmos.VS.Package\\Cosmos.VS.Package.csproj
 		SccProjectTopLevelParentUniqueName15 = Cosmos.sln
-		SccProjectName15 = Playgrounds/Ralf/EsxTest
-		SccLocalPath15 = Playgrounds\\Ralf\\EsxTest
-		SccProjectUniqueName16 = Cosmos\\Cosmos.Sys.Plugs\\Cosmos.Sys.Plugs.csproj
+		SccProjectName15 = ../source2/VSIP/Cosmos.VS.Package
+		SccLocalPath15 = ..\\source2\\VSIP\\Cosmos.VS.Package
+		SccProjectUniqueName16 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
 		SccProjectTopLevelParentUniqueName16 = Cosmos.sln
-		SccProjectName16 = Cosmos/Cosmos.Sys.Plugs
-		SccLocalPath16 = Cosmos\\Cosmos.Sys.Plugs
-		SccProjectUniqueName17 = CipherTest\\CipherTest.csproj
+		SccProjectName16 = ../source2/IL2PCU/Cosmos.IL2CPU
+		SccLocalPath16 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU
+		SccProjectUniqueName17 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
 		SccProjectTopLevelParentUniqueName17 = Cosmos.sln
-		SccProjectName17 = CipherTest
-		SccLocalPath17 = CipherTest
-		SccProjectUniqueName18 = Playgrounds\\Ralf\\PCIHelper\\PCIHelper.csproj
+		SccProjectName17 = ../source2/IL2PCU/Cosmos.IL2CPU.Profiler
+		SccLocalPath17 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler
+		SccProjectUniqueName18 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86\\Cosmos.IL2CPU.X86.csproj
 		SccProjectTopLevelParentUniqueName18 = Cosmos.sln
-		SccProjectName18 = Playgrounds/Ralf/PCIHelper
-		SccLocalPath18 = Playgrounds\\Ralf\\PCIHelper
-		SccProjectUniqueName19 = DokuTest\\DokuTest.csproj
+		SccProjectName18 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
+		SccLocalPath18 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86
+		SccProjectUniqueName19 = Cosmos.Hardware.SMBIOS\\Cosmos.Hardware.SMBIOS.csproj
 		SccProjectTopLevelParentUniqueName19 = Cosmos.sln
-		SccProjectName19 = DokuTest
-		SccLocalPath19 = DokuTest
-		SccProjectUniqueName20 = 3PLibraryPlugs\\mono-curses.Plugs\\mono-curses.Plugs.csproj
+		SccProjectName19 = Cosmos.Hardware.SMBIOS
+		SccLocalPath19 = Cosmos.Hardware.SMBIOS
+		SccProjectUniqueName20 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero\\Cosmos.Assembler.X86.Gero.csproj
 		SccProjectTopLevelParentUniqueName20 = Cosmos.sln
-		SccProjectName20 = 3PLibraryPlugs/mono-curses.Plugs
-		SccLocalPath20 = 3PLibraryPlugs\\mono-curses.Plugs
-		SccProjectUniqueName21 = VGAFontMaker\\VGAFontMaker.csproj
+		SccProjectName20 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86.Gero
+		SccLocalPath20 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero
+		SccProjectUniqueName21 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess\\Cosmos.Debug.HostProcess.csproj
 		SccProjectTopLevelParentUniqueName21 = Cosmos.sln
-		SccProjectName21 = VGAFontMaker
-		SccLocalPath21 = VGAFontMaker
-		SccProjectUniqueName22 = Cosmos.Shell.Guess\\Cosmos.Demo.Guess.csproj
+		SccProjectName21 = ../source2/Debug/Cosmos.Debug.HostProcess
+		SccLocalPath21 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
+		SccProjectUniqueName22 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests\\Cosmos.IL2CPU.X86.Tests.csproj
 		SccProjectTopLevelParentUniqueName22 = Cosmos.sln
-		SccProjectName22 = Cosmos.Shell.Guess
-		SccLocalPath22 = Cosmos.Shell.Guess
-		SccProjectUniqueName23 = Cosmos.Demos.NibblesCS\\Cosmos.Demo.Nibbles.csproj
+		SccProjectName22 = ../source2/IL2PCU/Cosmos.IL2CPU.X86.Tests
+		SccLocalPath22 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests
+		SccProjectUniqueName23 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Breakpoints.Cosmos
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
-		SccProjectName23 = Cosmos.Demos.NibblesCS
-		SccLocalPath23 = Cosmos.Demos.NibblesCS
-		SccProjectUniqueName24 = Cosmos\\Cosmos.Shell.Console\\Cosmos.Demo.Shell.csproj
-		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
-		SccProjectName24 = Cosmos/Cosmos.Shell.Console
-		SccLocalPath24 = Cosmos\\Cosmos.Shell.Console
-		SccProjectUniqueName25 = Boot\\Playgrounds\\Kudzu\\KudzuTest\\Cosmos.Playground.Kudzu.csproj
-		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
-		SccProjectName25 = Boot/Playgrounds/Kudzu/KudzuTest
-		SccLocalPath25 = Boot\\Playgrounds\\Kudzu\\KudzuTest
-		SccProjectUniqueName26 = Cosmos.Kernel.FileSystems\\Cosmos.Sys.FileSystem.csproj
-		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
-		SccProjectName26 = Cosmos.Kernel.FileSystems
-		SccLocalPath26 = Cosmos.Kernel.FileSystems
-		SccProjectUniqueName27 = Cosmos.Hardware.Plugs\\Cosmos.Hardware.Plugs.csproj
-		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
-		SccProjectName27 = Cosmos.Hardware.Plugs
-		SccLocalPath27 = Cosmos.Hardware.Plugs
-		SccProjectUniqueName28 = Cosmos.Demos.Snake\\Cosmos.Demos.Snake.csproj
-		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
-		SccProjectName28 = Cosmos.Demos.Snake
-		SccLocalPath28 = Cosmos.Demos.Snake
-		SccProjectUniqueName29 = Cosmos.Demo.Pacman\\Cosmos.Demo.Pacman.csproj
-		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
-		SccProjectName29 = Cosmos.Demo.Pacman
-		SccLocalPath29 = Cosmos.Demo.Pacman
-		SccProjectUniqueName30 = IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.Compiler.Debug.csproj
-		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
-		SccProjectName30 = IL2CPU/Cosmos.IL2CPU.Debug
-		SccLocalPath30 = IL2CPU\\Cosmos.IL2CPU.Debug
-		SccProjectUniqueName31 = Cosmos.Build.Windows\\Cosmos.Compiler.Builder.csproj
-		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
-		SccProjectName31 = Cosmos.Build.Windows
-		SccLocalPath31 = Cosmos.Build.Windows
-		SccProjectUniqueName32 = Cosmos.Demo.RemoteRocketLauncher\\Cosmos.Demo.RemoteRocketLauncher.csproj
-		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
-		SccProjectName32 = Cosmos.Demo.RemoteRocketLauncher
-		SccLocalPath32 = Cosmos.Demo.RemoteRocketLauncher
-		SccProjectUniqueName33 = BaseTest\\BaseTest.csproj
-		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
-		SccProjectName33 = BaseTest
-		SccLocalPath33 = BaseTest
-		SccProjectUniqueName34 = SSchockeTest\\SSchockeTest.csproj
-		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
-		SccProjectName34 = SSchockeTest
-		SccLocalPath34 = SSchockeTest
-		SccProjectUniqueName35 = CosmosViewer\\CosmosViewer.csproj
-		SccProjectTopLevelParentUniqueName35 = Cosmos.sln
-		SccProjectName35 = CosmosViewer
-		SccLocalPath35 = CosmosViewer
-		SccProjectUniqueName36 = XenniTest\\MultiArrays.csproj
-		SccProjectTopLevelParentUniqueName36 = Cosmos.sln
-		SccProjectName36 = XenniTest
-		SccLocalPath36 = XenniTest
-		SccProjectUniqueName37 = TxUI\\TxUI.csproj
-		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
-		SccProjectName37 = TxUI
-		SccLocalPath37 = TxUI
-		SccProjectUniqueName38 = ..\\source2\\Build\\Cosmos.Build.Common\\Cosmos.Build.Common.csproj
-		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
-		SccProjectName38 = ../source2/Build/Cosmos.Build.Common
-		SccLocalPath38 = ..\\source2\\Build\\Cosmos.Build.Common
-		SccProjectUniqueName39 = ..\\source2\\Build\\Cosmos.Build.Launch\\Cosmos.Build.Launch.csproj
-		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
-		SccProjectName39 = ../source2/Build/Cosmos.Build.Launch
-		SccLocalPath39 = ..\\source2\\Build\\Cosmos.Build.Launch
-		SccProjectUniqueName40 = ..\\source2\\Build\\Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
-		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
-		SccProjectName40 = ../source2/Build/Cosmos.Build.MSBuild
-		SccLocalPath40 = ..\\source2\\Build\\Cosmos.Build.MSBuild
-		SccProjectUniqueName41 = ..\\source2\\Debug\\Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
-		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
-		SccProjectName41 = ../source2/Debug/Cosmos.Debug.Common
-		SccLocalPath41 = ..\\source2\\Debug\\Cosmos.Debug.Common
-		SccProjectUniqueName42 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine\\Cosmos.Debug.VSDebugEngine.csproj
-		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
-		SccProjectName42 = ../source2/Debug/Cosmos.Debug.VSDebugEngine
-		SccLocalPath42 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine
-		SccProjectUniqueName43 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister\\Cosmos.Debug.VSRegister.csproj
-		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
-		SccProjectName43 = ../source2/Debug/Cosmos.Debug.VSRegister
-		SccLocalPath43 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister
-		SccProjectUniqueName44 = ..\\source2\\VSIP\\Cosmos.VS.Package\\Cosmos.VS.Package.csproj
-		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
-		SccProjectName44 = ../source2/VSIP/Cosmos.VS.Package
-		SccLocalPath44 = ..\\source2\\VSIP\\Cosmos.VS.Package
-		SccProjectUniqueName45 = ..\\source2\\Users\\Albert\\Albert\\Albert.csproj
-		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = ../source2/Users/Albert/Albert
-		SccLocalPath45 = ..\\source2\\Users\\Albert\\Albert
-		SccProjectUniqueName46 = KeyboardTest\\KeyboardTest.csproj
-		SccProjectTopLevelParentUniqueName46 = Cosmos.sln
-		SccProjectName46 = KeyboardTest
-		SccLocalPath46 = KeyboardTest
-		SccProjectUniqueName47 = Cosmos.Demo.VGASnake\\Cosmos.Demo.VGASnake.csproj
-		SccProjectTopLevelParentUniqueName47 = Cosmos.sln
-		SccProjectName47 = Cosmos.Demo.VGASnake
-		SccLocalPath47 = Cosmos.Demo.VGASnake
-		SccProjectUniqueName48 = PagingTest\\PagingTest.csproj
-		SccProjectTopLevelParentUniqueName48 = Cosmos.sln
-		SccProjectName48 = PagingTest
-		SccLocalPath48 = PagingTest
-		SccProjectUniqueName49 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
-		SccProjectTopLevelParentUniqueName49 = Cosmos.sln
-		SccProjectName49 = ../source2/IL2PCU/Cosmos.IL2CPU
-		SccLocalPath49 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU
-		SccProjectUniqueName50 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
-		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
-		SccProjectName50 = ../source2/IL2PCU/Cosmos.IL2CPU.Profiler
-		SccLocalPath50 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler
-		SccProjectUniqueName51 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86\\Cosmos.IL2CPU.X86.csproj
-		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
-		SccProjectName51 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
-		SccLocalPath51 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86
-		SccProjectUniqueName52 = ..\\source2\\Users\\Kudzu\\HelloWorld\\HelloWorld.csproj
-		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
-		SccProjectName52 = ../source2/Users/Kudzu/HelloWorld
-		SccLocalPath52 = ..\\source2\\Users\\Kudzu\\HelloWorld
-		SccProjectUniqueName53 = Cosmos.Hardware.SMBIOS\\Cosmos.Hardware.SMBIOS.csproj
-		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
-		SccProjectName53 = Cosmos.Hardware.SMBIOS
-		SccLocalPath53 = Cosmos.Hardware.SMBIOS
-		SccProjectUniqueName54 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero\\Cosmos.Assembler.X86.Gero.csproj
-		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
-		SccProjectName54 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86.Gero
-		SccLocalPath54 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero
-		SccProjectUniqueName55 = NewKeyboardTest\\NewKeyboardTest.csproj
-		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
-		SccProjectName55 = NewKeyboardTest
-		SccLocalPath55 = NewKeyboardTest
-		SccProjectUniqueName56 = NewPagingTest\\NewPagingTest.csproj
-		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
-		SccProjectName56 = NewPagingTest
-		SccLocalPath56 = NewPagingTest
-		SccProjectUniqueName57 = Playgrounds\\Matthijs\\DebugListener\\DebugListener.csproj
-		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
-		SccProjectName57 = Playgrounds/Matthijs/DebugListener
-		SccLocalPath57 = Playgrounds\\Matthijs\\DebugListener
-		SccProjectUniqueName58 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess\\Cosmos.Debug.HostProcess.csproj
-		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
-		SccProjectName58 = ../source2/Debug/Cosmos.Debug.HostProcess
-		SccLocalPath58 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
-		SccProjectUniqueName59 = ConsoleApplication1\\ConsoleApplication1.csproj
-		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
-		SccProjectName59 = ConsoleApplication1
-		SccLocalPath59 = ConsoleApplication1
-		SccProjectUniqueName60 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests\\Cosmos.IL2CPU.X86.Tests.csproj
-		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
-		SccProjectName60 = ../source2/IL2PCU/Cosmos.IL2CPU.X86.Tests
-		SccLocalPath60 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86.Tests
-		SccProjectUniqueName61 = Ext2.Test\\Ext2.Test.csproj
-		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
-		SccProjectName61 = Ext2.Test
-		SccLocalPath61 = Ext2.Test
-		SccProjectUniqueName62 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Breakpoints.Cosmos
-		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
-		SccProjectName62 = ../source2/Users/Kudzu/Breakpoints
-		SccLocalPath62 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectName23 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath23 = ..\\source2\\Users\\Kudzu\\Breakpoints
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -479,12 +211,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Release|x86.ActiveCfg = Release|Any CPU
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|x86.ActiveCfg = Debug|x86
@@ -509,62 +235,6 @@ Global
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|x86.ActiveCfg = Release|x86
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|x86.Build.0 = Release|x86
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Debug|x86.ActiveCfg = Debug|x86
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Debug|x86.Build.0 = Debug|x86
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Release|x86.ActiveCfg = Release|x86
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Release|x86.Build.0 = Release|x86
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Debug|x86.ActiveCfg = Debug|x86
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Debug|x86.Build.0 = Debug|x86
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Release|x86.ActiveCfg = Release|x86
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Release|x86.Build.0 = Release|x86
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|x86.ActiveCfg = Debug|x86
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|x86.Build.0 = Debug|x86
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|x86.ActiveCfg = Release|x86
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|x86.Build.0 = Release|x86
-		{FF431742-6490-46B8-A9F6-734477D0725D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF431742-6490-46B8-A9F6-734477D0725D}.Debug|x86.ActiveCfg = Debug|x86
-		{FF431742-6490-46B8-A9F6-734477D0725D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF431742-6490-46B8-A9F6-734477D0725D}.Release|x86.ActiveCfg = Release|x86
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Debug|x86.ActiveCfg = Debug|x86
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Debug|x86.Build.0 = Debug|x86
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Release|x86.ActiveCfg = Release|x86
-		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Release|x86.Build.0 = Release|x86
-		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Debug|x86.ActiveCfg = Debug|x86
-		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Release|x86.ActiveCfg = Release|x86
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Debug|x86.ActiveCfg = Debug|x86
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Debug|x86.Build.0 = Debug|x86
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Release|x86.ActiveCfg = Release|x86
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Release|x86.Build.0 = Release|x86
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Debug|x86.ActiveCfg = Debug|x86
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Debug|x86.Build.0 = Debug|x86
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Release|x86.ActiveCfg = Release|x86
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Release|x86.Build.0 = Release|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|x86.ActiveCfg = Debug|x86
@@ -573,22 +243,6 @@ Global
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|x86.ActiveCfg = Release|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|x86.Build.0 = Release|x86
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|x86.ActiveCfg = Debug|x86
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|x86.Build.0 = Debug|x86
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|x86.ActiveCfg = Release|x86
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|x86.Build.0 = Release|x86
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|x86.ActiveCfg = Debug|x86
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|x86.Build.0 = Debug|x86
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|x86.ActiveCfg = Release|x86
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|x86.Build.0 = Release|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Debug|x86.ActiveCfg = Debug|x86
@@ -597,38 +251,6 @@ Global
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|x86.ActiveCfg = Release|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|x86.Build.0 = Release|x86
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Debug|x86.ActiveCfg = Debug|x86
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Debug|x86.Build.0 = Debug|x86
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Release|x86.ActiveCfg = Release|x86
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}.Release|x86.Build.0 = Release|x86
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Debug|x86.ActiveCfg = Debug|x86
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Debug|x86.Build.0 = Debug|x86
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Release|x86.ActiveCfg = Release|x86
-		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Release|x86.Build.0 = Release|x86
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|x86.ActiveCfg = Debug|x86
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|x86.Build.0 = Debug|x86
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|x86.ActiveCfg = Release|x86
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|x86.Build.0 = Release|x86
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Debug|x86.ActiveCfg = Debug|x86
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Debug|x86.Build.0 = Debug|x86
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Release|x86.ActiveCfg = Release|x86
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85}.Release|x86.Build.0 = Release|x86
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Debug|x86.ActiveCfg = Debug|x86
@@ -637,54 +259,6 @@ Global
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Release|x86.ActiveCfg = Release|x86
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Release|x86.Build.0 = Release|x86
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|x86.ActiveCfg = Debug|x86
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|x86.Build.0 = Debug|x86
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|x86.ActiveCfg = Release|x86
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|x86.Build.0 = Release|x86
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Debug|x86.ActiveCfg = Debug|x86
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Debug|x86.Build.0 = Debug|x86
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Release|x86.ActiveCfg = Release|x86
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Release|x86.Build.0 = Release|x86
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Debug|x86.ActiveCfg = Debug|x86
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Debug|x86.Build.0 = Debug|x86
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Release|x86.ActiveCfg = Release|x86
-		{77DE5600-A012-49E5-8877-67CDB0304B0A}.Release|x86.Build.0 = Release|x86
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Debug|x86.ActiveCfg = Debug|x86
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Debug|x86.Build.0 = Debug|x86
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Release|x86.ActiveCfg = Release|x86
-		{F215BFCA-3280-497B-B186-2E097DFB4551}.Release|x86.Build.0 = Release|x86
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Debug|x86.ActiveCfg = Debug|x86
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Debug|x86.Build.0 = Debug|x86
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Release|Any CPU.Build.0 = Release|Any CPU
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Release|x86.ActiveCfg = Release|x86
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Release|x86.Build.0 = Release|x86
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Debug|x86.ActiveCfg = Debug|x86
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Debug|x86.Build.0 = Debug|x86
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Release|x86.ActiveCfg = Release|x86
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Release|x86.Build.0 = Release|x86
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Debug|x86.ActiveCfg = Debug|x86
@@ -693,22 +267,6 @@ Global
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Release|x86.ActiveCfg = Release|x86
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Release|x86.Build.0 = Release|x86
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Debug|x86.ActiveCfg = Debug|x86
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Debug|x86.Build.0 = Debug|x86
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Release|x86.ActiveCfg = Release|x86
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Release|x86.Build.0 = Release|x86
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Debug|x86.ActiveCfg = Debug|x86
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Debug|x86.Build.0 = Debug|x86
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Release|x86.ActiveCfg = Release|x86
-		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Release|x86.Build.0 = Release|x86
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|x86.ActiveCfg = Debug|x86
@@ -717,54 +275,6 @@ Global
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Release|x86.ActiveCfg = Release|x86
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Release|x86.Build.0 = Release|x86
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Debug|x86.ActiveCfg = Debug|x86
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Debug|x86.Build.0 = Debug|x86
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Release|x86.ActiveCfg = Release|x86
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187}.Release|x86.Build.0 = Release|x86
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Debug|x86.ActiveCfg = Debug|x86
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Debug|x86.Build.0 = Debug|x86
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Release|x86.ActiveCfg = Release|x86
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64}.Release|x86.Build.0 = Release|x86
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Debug|x86.ActiveCfg = Debug|x86
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Debug|x86.Build.0 = Debug|x86
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Release|x86.ActiveCfg = Release|x86
-		{8F9928DB-836A-4FD8-90C7-831C4739C846}.Release|x86.Build.0 = Release|x86
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Debug|x86.ActiveCfg = Debug|x86
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Debug|x86.Build.0 = Debug|x86
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Release|x86.ActiveCfg = Release|x86
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10}.Release|x86.Build.0 = Release|x86
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Debug|x86.ActiveCfg = Debug|x86
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Debug|x86.Build.0 = Debug|x86
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Release|x86.ActiveCfg = Release|x86
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B}.Release|x86.Build.0 = Release|x86
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Debug|x86.ActiveCfg = Debug|x86
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Debug|x86.Build.0 = Debug|x86
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Release|Any CPU.Build.0 = Release|Any CPU
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Release|x86.ActiveCfg = Release|x86
-		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Release|x86.Build.0 = Release|x86
 		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|x86.ActiveCfg = Debug|x86
@@ -819,44 +329,6 @@ Global
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.Build.0 = Release|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|x86.ActiveCfg = Release|Any CPU
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Debug|x86.ActiveCfg = Debug|x86
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Debug|x86.Build.0 = Debug|x86
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Release|x86.ActiveCfg = Release|x86
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Release|x86.Build.0 = Release|x86
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Debug|x86.ActiveCfg = Debug|x86
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Debug|x86.Build.0 = Debug|x86
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Release|x86.ActiveCfg = Release|x86
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2}.Release|x86.Build.0 = Release|x86
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Debug|x86.ActiveCfg = Debug|x86
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Debug|x86.Build.0 = Debug|x86
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Release|x86.ActiveCfg = Release|x86
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Release|x86.Build.0 = Release|x86
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|x86.ActiveCfg = Release|Any CPU
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|x86.ActiveCfg = Debug|x86
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|x86.Build.0 = Debug|x86
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|x86.ActiveCfg = Release|x86
-		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|x86.Build.0 = Release|x86
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|x86.ActiveCfg = Debug|x86
@@ -881,14 +353,6 @@ Global
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|x86.ActiveCfg = Release|x86
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|x86.Build.0 = Release|x86
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|x86.ActiveCfg = Debug|x86
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|x86.Build.0 = Debug|x86
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|x86.ActiveCfg = Release|x86
-		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|x86.Build.0 = Release|x86
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|x86.ActiveCfg = Debug|x86
@@ -905,40 +369,12 @@ Global
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Release|x86.ActiveCfg = Release|x86
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Release|x86.Build.0 = Release|x86
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Debug|x86.ActiveCfg = Debug|x86
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Debug|x86.Build.0 = Debug|x86
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Release|x86.ActiveCfg = Release|x86
-		{0F641748-FF03-4DA7-981B-1E9268330EE5}.Release|x86.Build.0 = Release|x86
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Debug|x86.ActiveCfg = Debug|x86
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Debug|x86.Build.0 = Debug|x86
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Release|x86.ActiveCfg = Release|x86
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E}.Release|x86.Build.0 = Release|x86
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB}.Release|x86.ActiveCfg = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|x86.ActiveCfg = Release|Any CPU
-		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Release|Any CPU.Build.0 = Release|Any CPU
-		{673EFE0A-176C-40CA-B4C3-F5328F838696}.Release|x86.ActiveCfg = Release|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -956,12 +392,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1F0EDE86-F6D4-4355-9A97-10E90457770C} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
-		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
-		{BE896274-5F06-430F-AAC4-D74CAEEB28F5} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
-		{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
-		{4DE8EC69-B412-41C4-BCD9-1E032984E888} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
-		{EBF602FE-8AFC-408D-A9F1-560C35651090} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{F18343D8-D22D-485B-A583-83C09A0C92B1} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{A1F83D9F-2D44-4264-A08B-416797123018} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
@@ -969,53 +399,15 @@ Global
 		{BCB66614-20FE-4184-B214-FD42844AD8A6} = {F18343D8-D22D-485B-A583-83C09A0C92B1}
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755} = {F18343D8-D22D-485B-A583-83C09A0C92B1}
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367} = {F18343D8-D22D-485B-A583-83C09A0C92B1}
-		{E2C54C80-75F3-4249-93B4-0003A4AF705F} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{C97DE890-58D2-41A1-86D0-A2E919E6DD80} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{301BAFD2-D15B-4B95-8C59-65D7D0390A76} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{A38CF66E-A15A-417E-B958-48EF357D7AB3} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{A9B31697-9530-4D85-8123-0508A4E1EA70} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{1DDD56E7-84AB-47D3-82C9-77CACEA0F187} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
-		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
-		{FF431742-6490-46B8-A9F6-734477D0725D} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
-		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
-		{B2F8734A-DA5C-4F65-BD67-B9E717DC510E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{9FDB0A12-6D62-41CF-917F-62A94A03472D} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{55682BBB-A596-4C97-BED5-8BCCBAD81439} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{1240EAB3-D6B1-463A-BA83-436607A1F18E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{079D6377-44C2-4155-B73A-E634E8F1BF6E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{77DE5600-A012-49E5-8877-67CDB0304B0A} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{CB908020-B801-4058-BEAD-C4E374768E73} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{E5644B8E-ABD7-4B71-B7B6-C9F6CE7B1D94} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{12EC019C-B585-490F-84D6-16F000DC4CDB} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{54DD5F71-82C3-44D7-99F0-A93B54C220F7} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{B8406314-B724-410E-8C79-E2C187ACDC65} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{605F8D53-66FA-4BEC-844E-F63209B855C9} = {B2F8734A-DA5C-4F65-BD67-B9E717DC510E}
-		{5DFA2459-EE37-4EC6-B543-3C7D8E757FFB} = {B2F8734A-DA5C-4F65-BD67-B9E717DC510E}
-		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4} = {9FDB0A12-6D62-41CF-917F-62A94A03472D}
-		{8C566493-DBA5-45DD-93D4-89D4486CAAB6} = {9FDB0A12-6D62-41CF-917F-62A94A03472D}
-		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01} = {55682BBB-A596-4C97-BED5-8BCCBAD81439}
+		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
+		{BE896274-5F06-430F-AAC4-D74CAEEB28F5} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
+		{4DE8EC69-B412-41C4-BCD9-1E032984E888} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
+		{EBF602FE-8AFC-408D-A9F1-560C35651090} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
+		{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94} = {0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1} = {0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4} = {0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}
-		{1E31A694-81BB-4628-B704-DA190E7E94CA} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
-		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
-		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
-		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D} = {97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4}
-		{F215BFCA-3280-497B-B186-2E097DFB4551} = {232C5793-FC68-4617-9BB0-2059B6C48784}
 		{D508601F-A6A6-4F6C-9C45-0B660F6D0189} = {94175DA3-84AF-4DBD-9B2A-791DD0F0BC13}
-		{C67A9ECC-DCDC-4E78-829E-6F329FAD9D64} = {CB908020-B801-4058-BEAD-C4E374768E73}
-		{8F9928DB-836A-4FD8-90C7-831C4739C846} = {E5644B8E-ABD7-4B71-B7B6-C9F6CE7B1D94}
-		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10} = {E5644B8E-ABD7-4B71-B7B6-C9F6CE7B1D94}
-		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
-		{16D4E345-DF23-4095-A6D5-80D0538FC904} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
-		{B85E1686-9ADC-4B97-9E6B-482479698D7B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
-		{EBC60CB1-1726-4348-A05F-D92D856366C2} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{D95021E1-A2C9-4829-819E-ED433AF13162} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{FF5BAFDE-AE9D-438D-935A-86B33EE0A758} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{1698DD83-72A3-44CD-B088-4320A4014A95} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
@@ -1033,24 +425,13 @@ Global
 		{678E7BC5-0C17-44D6-9BF7-52EE5A6CD22A} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
-		{9A806542-A3FE-479B-83C2-E3380BC372F3} = {A4478219-065D-4928-BB4D-4358CAD39A03}
-		{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{2DF5F17F-4890-4856-ADFD-4DE23282C3B7} = {A4478219-065D-4928-BB4D-4358CAD39A03}
-		{856EAFB8-D13E-4690-9ED8-6B5622D6AA41} = {A4478219-065D-4928-BB4D-4358CAD39A03}
-		{1DB35C80-00E4-41DE-AF1E-4A3ED148C352} = {A4478219-065D-4928-BB4D-4358CAD39A03}
-		{22BCACD7-7E12-47D3-B3F2-77B8C0D0CB6F} = {A4478219-065D-4928-BB4D-4358CAD39A03}
-		{28D7710D-5930-40BE-BB71-D30F01294EDF} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
-		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
-		{54ACC512-D568-4F7C-9204-E1A4A285EFF2} = {54DD5F71-82C3-44D7-99F0-A93B54C220F7}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
-		{0F641748-FF03-4DA7-981B-1E9268330EE5} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
-		{D89DE0D3-FF3E-4F63-B15F-7302D998845E} = {856EAFB8-D13E-4690-9ED8-6B5622D6AA41}
-		{673EFE0A-176C-40CA-B4C3-F5328F838696} = {1DB35C80-00E4-41DE-AF1E-4A3ED148C352}
 	EndGlobalSection
 EndGlobal

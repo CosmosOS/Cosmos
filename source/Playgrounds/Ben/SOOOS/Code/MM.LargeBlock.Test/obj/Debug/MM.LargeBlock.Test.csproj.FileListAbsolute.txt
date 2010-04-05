@@ -1,9 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\bin\Debug\MM.LargeBlock.Test.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\bin\Debug\MM.LargeBlock.Test.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\bin\Debug\MM.LargeBlock.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\bin\Debug\MM.LargeBlock.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\bin\Debug\MM.LargeBlock_Accessor.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\bin\Debug\MM.LargeBlock_Accessor.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\obj\Debug\MM.LargeBlock.Test.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\MM.LargeBlock.Test\obj\Debug\MM.LargeBlock.Test.pdb

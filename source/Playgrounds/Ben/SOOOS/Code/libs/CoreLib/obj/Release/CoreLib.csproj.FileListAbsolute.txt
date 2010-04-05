@@ -1,9 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Release\CoreLib.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Release\CoreLib.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Release\Util.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Release\Util.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\obj\Release\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\obj\Release\CoreLib.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\obj\Release\CoreLib.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Release\IHAL.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\libs\CoreLib\bin\Release\IHAL.pdb

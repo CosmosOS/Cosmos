@@ -1,5 +1,0 @@
-C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Util\bin\Debug\Cosmos.Util.dll
-C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Util\bin\Debug\Cosmos.Util.pdb
-C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Util\obj\Debug\ResolveAssemblyReference.cache
-C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Util\obj\Debug\Cosmos.Util.dll
-C:\dev\OS\CosmosAlwaysClean2\IL2CPU\source\Playgrounds\Ben\os\kernel\Cosmos.Util\obj\Debug\Cosmos.Util.pdb

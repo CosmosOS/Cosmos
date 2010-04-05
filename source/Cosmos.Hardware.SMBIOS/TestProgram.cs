@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Compiler.Builder;
 
 using Cosmos.Hardware.SMBIOS.Table;
 
@@ -9,14 +8,6 @@ namespace Cosmos.Hardware.SMBIOS
 {
     public class TestProgram
     {
-        [STAThread]
-        static void Main(string[] args)
-        {
-
-
-            BuildUI.Run();
-        }
-
         public static void DumpBytes( uint from, uint count, uint column )
         {
             Cosmos.Kernel.MemoryAddressSpace Memory = new Cosmos.Kernel.MemoryAddressSpace( 0, 0 );

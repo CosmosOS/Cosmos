@@ -1,5 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM\MM.LargeBlock\bin\Debug\MM.LargeBlock.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM\MM.LargeBlock\bin\Debug\MM.LargeBlock.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM\MM.LargeBlock\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM\MM.LargeBlock\obj\Debug\MM.LargeBlock.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\trustedServices\MM\MM\MM.LargeBlock\obj\Debug\MM.LargeBlock.pdb

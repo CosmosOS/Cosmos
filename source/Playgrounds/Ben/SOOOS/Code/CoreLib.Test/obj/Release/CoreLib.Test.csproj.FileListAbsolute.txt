@@ -1,9 +1,0 @@
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\bin\Release\CoreLib.Test.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\bin\Release\CoreLib.Test.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\bin\Release\CoreLib.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\bin\Release\Util.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\bin\Release\CoreLib.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\bin\Release\Util.pdb
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\obj\Release\ResolveAssemblyReference.cache
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\obj\Release\CoreLib.Test.dll
-C:\Users\Ben\Documents\Visual Studio 10\Projects\SOOOS\CoreLib.Test\obj\Release\CoreLib.Test.pdb

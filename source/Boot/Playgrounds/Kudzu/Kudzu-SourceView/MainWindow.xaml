@@ -1,8 +1,0 @@
-﻿<Window x:Class="Kudzu_SourceView.Window1"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Window1" Height="300" Width="300">
-    <Grid>
-        <Button Height="23" HorizontalAlignment="Left" Margin="4,13,0,0" Name="button1" VerticalAlignment="Top" Width="75">Button</Button>
-    </Grid>
-</Window>
