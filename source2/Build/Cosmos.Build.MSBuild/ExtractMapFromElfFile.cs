@@ -70,7 +70,16 @@ namespace Cosmos.Build.MSBuild
                 {
                     continue;
                 }
-                uint xAddress = UInt32.Parse(xLine.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
+                uint xAddress;
+                try
+                {
+                    xAddress = UInt32.Parse(xLine.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
+                }
+                catch (Exception)
+                {
+                    Log.LogError("Error processing line '" + xLine + "'");
+                    throw;
+                }
                 if (xResult.ContainsKey(xAddress))
                 {
                     continue;
