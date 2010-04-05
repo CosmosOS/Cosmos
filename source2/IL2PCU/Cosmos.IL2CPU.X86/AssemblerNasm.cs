@@ -423,12 +423,13 @@ namespace Cosmos.IL2CPU.X86 {
 
     public void FlushText(TextWriter aOutput, string aDebugFile)
     {
-        if (!EmitELF)
+        aOutput.WriteLine("%ifndef ELF_COMPILATION");
         {
             aOutput.WriteLine("use32");
             aOutput.WriteLine("org 0x200000");
             aOutput.WriteLine("[map all main.map]");
         }
+        aOutput.WriteLine("%endif");
         aOutput.WriteLine("global Kernel_Start");
         base.FlushText(aOutput);
         if (mSymbols.Count > 0)

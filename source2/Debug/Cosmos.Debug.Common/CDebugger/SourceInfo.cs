@@ -46,7 +46,35 @@ namespace Cosmos.Debug.Common.CDebugger
 			get;
 			set;
 		}
-        public static SortedList<uint,String> ParseFile(String buildPath)
+
+        public static void WriteToFile(SortedList<uint, String> aMap, string outFile)
+        {
+            using (var xOut = new StreamWriter(outFile, false))
+            {
+                foreach (var xItem in aMap)
+                {
+                    xOut.WriteLine("{0}\t{1}", xItem.Key, xItem.Value);
+                }
+            }
+        }
+
+        public static SortedList<uint, string> ReadFromFile(string aFile)
+        {
+            var xResult = new SortedList<uint, string>();
+            foreach (var xLine in File.ReadAllLines(aFile))
+            {
+                if (!xLine.Contains('\t'))
+                {
+                    continue;
+                }
+                var xPart1 = xLine.Substring(0, xLine.IndexOf('\t'));
+                var xPart2 = xLine.Substring(xLine.IndexOf('\t') + 1);
+                xResult.Add(UInt32.Parse(xPart1), xPart2);
+            }
+            return xResult;
+        }
+
+        public static SortedList<uint,String> ParseMapFile(String buildPath)
         {
             var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
             SortedList<uint,String> xSource = new SortedList<uint,String>();

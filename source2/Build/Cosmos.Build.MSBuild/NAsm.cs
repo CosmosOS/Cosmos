@@ -38,6 +38,7 @@ namespace Cosmos.Build.MSBuild
             get;
             set;
         }
+
         #endregion
 
         public override bool Execute()
@@ -64,7 +65,7 @@ namespace Cosmos.Build.MSBuild
             return ExecuteTool(
                 Path.GetDirectoryName(OutputFile),
                 ExePath,
-                String.Format("-g -f {0} -o \"{1}\" \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile)),
+                String.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile), xFormat.ToUpper()),
                 "NAsm");
         }
 

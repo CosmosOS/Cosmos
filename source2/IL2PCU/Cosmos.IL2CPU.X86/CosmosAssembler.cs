@@ -146,7 +146,7 @@ namespace Cosmos.IL2CPU.X86
                 new Return();
             }
 #if !LFB_1024_8
-            DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
+            DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
             uint xFlags = 0x10003;
             DataMembers.Add(new DataMember("MultibootSignature",
                                    new uint[] { 0x1BADB002 }));
@@ -160,7 +160,7 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
             DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
             DataMembers.Add(new DataEndIfDefined());
-            DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));                                                    
+            DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));                                                    
             xFlags = 0x00003;
             DataMembers.Add(new DataMember("MultibootSignature",
                                    new uint[] { 0x1BADB002 }));
@@ -170,7 +170,7 @@ namespace Cosmos.IL2CPU.X86
                                                (int)(0 - (xFlags + 0x1BADB002))));
             DataMembers.Add(new DataEndIfDefined());
 #else
-            DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
+            DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
             uint xFlags = 0x10007;
             DataMembers.Add(new DataMember("MultibootSignature",
                                    new uint[] { 0x1BADB002 }));
@@ -189,7 +189,7 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("MultibootGraphicsHeight", 768));
             DataMembers.Add(new DataMember("MultibootGraphicsDepth", 8));
             DataMembers.Add(new DataEndIfDefined());
-            DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));
+            DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
             xFlags = 0x00003;
             DataMembers.Add(new DataMember("MultibootSignature",
                                    new uint[] { 0x1BADB002 }));

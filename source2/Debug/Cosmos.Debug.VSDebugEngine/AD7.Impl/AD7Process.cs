@@ -46,7 +46,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcessStartInfo.RedirectStandardInput = true;
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
-            var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ParseFile(Path.GetDirectoryName(aISOFile));
+            var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(aISOFile, "cmap"));
             if (xLabelByAddressMapping.Count == 0)
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
