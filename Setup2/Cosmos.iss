@@ -183,7 +183,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: Language(VsTemplate); ValueData: CosmosProject
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: string; ValueName: ; ValueData: Cosmos
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: dword; ValueName: SortPriority; ValueData: $00000064
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: string; ValueName: TemplatesDir; ValueData: {app}\build\vsip\..\Templates\Projects\CosmosProject
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: string; ValueName: TemplatesDir; ValueData: {app}\build\Templates\Projects\CosmosProject
 
 ; Debug engine
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ; ValueData: guidCosmosDebugEngine
@@ -207,28 +207,30 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7ProgramProvider
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ; ValueData: guidCosmosDebugEngine
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: CLSID; ValueData: {{8355452D-6D2F-41B0-89B8-BB2AA2529E94}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ProgramProvider; ValueData: {{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: Attach; ValueData: $00000000
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: AddressBP; ValueData: $00000000
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: AutoSelectPriority; ValueData: $00000004
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: CallstackBP; ValueData: $00000001
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: Name; ValueData: Cosmos Debug Engine
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: PortSupplier; ValueData: {{708C1ECA-FF48-11D2-904F-00C04FA302A1}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidCOMPlusNativeEng; ValueData: {{92EF0900-2251-11D2-B72E-0000F87572EF}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidCOMPlusOnlyEng; ValueData: {{449EC4CC-30D2-4032-9256-EE18EB41B62B}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidNativeOnlyEng; ValueData: {{449EC4CC-30D2-4032-9256-EE18EB41B62B}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidScriptEng; ValueData: {{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7ProgramProvider
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ; ValueData: guidCosmosDebugEngine
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: CLSID; ValueData: {{8355452D-6D2F-41B0-89B8-BB2AA2529E94}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ProgramProvider; ValueData: {{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: Attach; ValueData: $00000000
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: AddressBP; ValueData: $00000000
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: AutoSelectPriority; ValueData: $00000004
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: dword; ValueName: CallstackBP; ValueData: $00000001
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: Name; ValueData: Cosmos Debug Engine
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: PortSupplier; ValueData: {{708C1ECA-FF48-11D2-904F-00C04FA302A1}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidCOMPlusNativeEng; ValueData: {{92EF0900-2251-11D2-B72E-0000F87572EF}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidCOMPlusOnlyEng; ValueData: {{449EC4CC-30D2-4032-9256-EE18EB41B62B}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidNativeOnlyEng; ValueData: {{449EC4CC-30D2-4032-9256-EE18EB41B62B}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: guidScriptEng; ValueData: {{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7ProgramProvider
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
+;Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
 
+; mark our msbuild file as safe
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos
 [Run]
 Filename: {code:VSNET2008_PATH|}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 
