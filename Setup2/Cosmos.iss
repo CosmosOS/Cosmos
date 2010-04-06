@@ -12,6 +12,7 @@ AppPublisher=Cosmos Project
 AppPublisherURL=http://www.gocosmos.org/
 AppSupportURL=http://www.gocosmos.org/
 AppUpdatesURL=http://www.gocosmos.org/
+AppVersion=0.5
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
