@@ -70,17 +70,9 @@
       <Project>{719B5067-62CD-43A9-924D-BAD46C4AD192}</Project>
       <Name>MonoCecilToEcmaCil1</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NewCompiler.Plugs\NewCompiler.Plugs.csproj">
-      <Project>{BC386B9E-672F-4659-B8BD-3C10D9FDCDA9}</Project>
-      <Name>NewCompiler.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FileToEcmaCilTests\SimpleClass2Test\SimpleClass2Test.csproj">
       <Project>{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}</Project>
       <Name>SimpleClass2Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TempPlugs\TempPlugs.csproj">
-      <Project>{1A11A211-137D-43F9-8B6A-F93A6CEB58CB}</Project>
-      <Name>TempPlugs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
