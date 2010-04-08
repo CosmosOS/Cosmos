@@ -74,7 +74,7 @@
       <Project>{BC386B9E-672F-4659-B8BD-3C10D9FDCDA9}</Project>
       <Name>NewCompiler.Plugs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SimpleClass2Test\SimpleClass2Test.csproj">
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleClass2Test\SimpleClass2Test.csproj">
       <Project>{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}</Project>
       <Name>SimpleClass2Test</Name>
     </ProjectReference>
