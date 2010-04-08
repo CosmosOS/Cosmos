@@ -5,25 +5,23 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BCB66614-20FE-4184-B214-FD42844AD8A6}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Hardware.Plugs</RootNamespace>
-    <AssemblyName>Cosmos.Hardware.Plugs</AssemblyName>
+    <RootNamespace>TestApp</RootNamespace>
+    <AssemblyName>TestApp</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\build\Tools\Cosmos.Hardware.Plugs\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -35,53 +33,55 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\build\Tools\Cosmos.Hardware.Plugs\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FCL\System\Console.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source2\IL2PCU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest.csproj">
+      <Project>{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}</Project>
+      <Name>SimpleClassTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
-      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
-      <Name>Cosmos.IL2CPU</Name>
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest.csproj">
+      <Project>{B47ED632-1ACE-4516-9576-81E38BA092F1}</Project>
+      <Name>SimpleMethodsTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
-      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware</Name>
+    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
+      <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>
+      <Name>EcmaCil</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Cosmos.snk" />
+    <ProjectReference Include="..\MonoCecilToEcmaCil1\MonoCecilToEcmaCil1.csproj">
+      <Project>{719B5067-62CD-43A9-924D-BAD46C4AD192}</Project>
+      <Name>MonoCecilToEcmaCil1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NewCompiler.Plugs\NewCompiler.Plugs.csproj">
+      <Project>{BC386B9E-672F-4659-B8BD-3C10D9FDCDA9}</Project>
+      <Name>NewCompiler.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleClass2Test\SimpleClass2Test.csproj">
+      <Project>{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}</Project>
+      <Name>SimpleClass2Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TempPlugs\TempPlugs.csproj">
+      <Project>{1A11A211-137D-43F9-8B6A-F93A6CEB58CB}</Project>
+      <Name>TempPlugs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -102,9 +102,35 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests", "
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Breakpoints.Cosmos", "{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCecilToEcmaCil1", "..\source2\Users\Matthijs ter Woord\Testing\MonoCecilToEcmaCil1\MonoCecilToEcmaCil1.csproj", "{719B5067-62CD-43A9-924D-BAD46C4AD192}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCecilToEcmaCil1.Tests", "..\source2\Users\Matthijs ter Woord\Testing\MonoCecilToEcmaCil1.Tests\MonoCecilToEcmaCil1.Tests.csproj", "{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "..\source2\Users\Matthijs ter Woord\Testing\TestApp\TestApp.csproj", "{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityClasses", "..\source2\Users\Matthijs ter Woord\Testing\UtilityClasses\UtilityClasses.csproj", "{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IRs", "IRs", "{0D9C1BC2-E743-4E13-8A93-11174DBCB433}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcmaCil", "..\source2\Users\Matthijs ter Woord\Testing\IRs\EcmaCil\EcmaCil.csproj", "{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileToEcmaCilTests", "FileToEcmaCilTests", "{3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClass2Test", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleClass2Test\SimpleClass2Test.csproj", "{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClassTest", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest.csproj", "{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMethodsTest", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest.csproj", "{B47ED632-1ACE-4516-9576-81E38BA092F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source2\IL2PCU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 24
+		SccNumberOfProjects = 33
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -200,6 +226,42 @@ Global
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
 		SccProjectName23 = ../source2/Users/Kudzu/Breakpoints
 		SccLocalPath23 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName24 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\MonoCecilToEcmaCil1\\MonoCecilToEcmaCil1.csproj
+		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
+		SccProjectName24 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/MonoCecilToEcmaCil1
+		SccLocalPath24 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\MonoCecilToEcmaCil1
+		SccProjectUniqueName25 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\MonoCecilToEcmaCil1.Tests\\MonoCecilToEcmaCil1.Tests.csproj
+		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
+		SccProjectName25 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/MonoCecilToEcmaCil1.Tests
+		SccLocalPath25 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\MonoCecilToEcmaCil1.Tests
+		SccProjectUniqueName26 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\TestApp\\TestApp.csproj
+		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
+		SccProjectName26 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/TestApp
+		SccLocalPath26 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\TestApp
+		SccProjectUniqueName27 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\UtilityClasses\\UtilityClasses.csproj
+		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
+		SccProjectName27 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/UtilityClasses
+		SccLocalPath27 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\UtilityClasses
+		SccProjectUniqueName28 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\IRs\\EcmaCil\\EcmaCil.csproj
+		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
+		SccProjectName28 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/IRs/EcmaCil
+		SccLocalPath28 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\IRs\\EcmaCil
+		SccProjectUniqueName29 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleClass2Test\\SimpleClass2Test.csproj
+		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
+		SccProjectName29 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/FileToEcmaCilTests/SimpleClass2Test
+		SccLocalPath29 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleClass2Test
+		SccProjectUniqueName30 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleClassTest\\SimpleClassTest.csproj
+		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
+		SccProjectName30 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/FileToEcmaCilTests/SimpleClassTest
+		SccLocalPath30 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleClassTest
+		SccProjectUniqueName31 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleMethodsTest\\SimpleMethodsTest.csproj
+		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
+		SccProjectName31 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/FileToEcmaCilTests/SimpleMethodsTest
+		SccLocalPath31 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleMethodsTest
+		SccProjectUniqueName32 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Plugs\\Cosmos.IL2CPU.Plugs.csproj
+		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
+		SccProjectName32 = ../source2/IL2PCU/Cosmos.IL2CPU.Plugs
+		SccLocalPath32 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Plugs
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -326,6 +388,7 @@ Global
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.Build.0 = Release|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|x86.ActiveCfg = Release|Any CPU
+		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|x86.Build.0 = Release|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|x86.ActiveCfg = Debug|x86
@@ -372,18 +435,84 @@ Global
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|x86.ActiveCfg = Release|Any CPU
+		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Release|x86.Build.0 = Release|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|x86.ActiveCfg = Release|Any CPU
+		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}.Release|x86.Build.0 = Release|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|x86.ActiveCfg = Release|Any CPU
+		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|x86.Build.0 = Release|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Release|x86.ActiveCfg = Release|Any CPU
+		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Release|x86.Build.0 = Release|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Release|x86.ActiveCfg = Release|Any CPU
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Release|x86.Build.0 = Release|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Release|x86.ActiveCfg = Release|Any CPU
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}.Release|x86.Build.0 = Release|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Release|x86.ActiveCfg = Release|Any CPU
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}.Release|x86.Build.0 = Release|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Release|x86.ActiveCfg = Release|Any CPU
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}.Release|x86.Build.0 = Release|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Release|x86.ActiveCfg = Release|Any CPU
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}.Release|x86.Build.0 = Release|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Release|x86.ActiveCfg = Release|Any CPU
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}.Release|x86.Build.0 = Release|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Release|x86.ActiveCfg = Release|Any CPU
+		{B47ED632-1ACE-4516-9576-81E38BA092F1}.Release|x86.Build.0 = Release|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|x86.ActiveCfg = Release|Any CPU
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -423,12 +552,25 @@ Global
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{2DF5F17F-4890-4856-ADFD-4DE23282C3B7} = {A4478219-065D-4928-BB4D-4358CAD39A03}
+		{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
+		{3C6DFC2F-DE70-4B1C-A938-A9D3FE890520} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
+		{719B5067-62CD-43A9-924D-BAD46C4AD192} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{47B9E5D3-A800-4402-AD6A-315FAF4E82F4} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{0D9C1BC2-E743-4E13-8A93-11174DBCB433} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA} = {0D9C1BC2-E743-4E13-8A93-11174DBCB433}
+		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D} = {3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23}
+		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62} = {3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23}
+		{B47ED632-1ACE-4516-9576-81E38BA092F1} = {3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23}
 	EndGlobalSection
 EndGlobal

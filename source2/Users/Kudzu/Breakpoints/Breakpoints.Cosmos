@@ -36,6 +36,10 @@
     <BuildTarget>QEMU</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
+    <QemuCommunication>
+    </QemuCommunication>
+    <TraceAssemblies>All</TraceAssemblies>
+    <DebugMode>None</DebugMode>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

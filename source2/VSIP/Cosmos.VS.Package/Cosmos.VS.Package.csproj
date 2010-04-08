@@ -33,7 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblerMethod.cs" />
     <Compile Include="BuildOptionsPropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -178,12 +179,12 @@
     <EmbeddedResource Include="VMOptionsQemu.resx">
       <DependentUpon>VMOptionsQemu.cs</DependentUpon>
     </EmbeddedResource>
-    <ZipProject Include="Templates\Projects\CosmosProject\AssemblyInfo.cs"/>
-    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos"/>
-    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.ico"/>
-    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.vstemplate"/>
-    <ZipProject Include="Templates\Projects\CosmosProject\Kernel.ico"/>
-    <ZipProject Include="Templates\Projects\CosmosProject\Program.cs"/>
+    <ZipProject Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
+    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos" />
+    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.ico" />
+    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.vstemplate" />
+    <ZipProject Include="Templates\Projects\CosmosProject\Kernel.ico" />
+    <ZipProject Include="Templates\Projects\CosmosProject\Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
