@@ -8,8 +8,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <CosmosDir>$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
-    <NasmFile>$(CosmosDir)\Build\Tools\Nasm\nasm.exe</NasmFile>
+    <CosmosDir Condition="$(CosmosDir) == ''">$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
+    <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
+    <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
     <FullAssemblyName>$(OutputPath)$(AssemblyName)</FullAssemblyName>
     <AssemblyFile>$(FullAssemblyName).exe</AssemblyFile>
     <ISOFile>$(FullAssemblyName).iso</ISOFile>
