@@ -135,7 +135,9 @@ namespace Cosmos.Build.MSBuild
         #endregion
 
         private bool Initialize()
-        {CheckFirstTime();            DoInitTypes();
+        {
+            CheckFirstTime();            
+            DoInitTypes();
 
             if (String.IsNullOrEmpty(DebugMode))
             {
@@ -196,6 +198,7 @@ namespace Cosmos.Build.MSBuild
                 xAsm.Initialize();
                 using (var xScanner = new ILScanner(xAsm))
                 {
+                    xScanner.TempDebug += x => Log.LogMessage(x);
                     if (!String.IsNullOrEmpty(LogFile))
                     {
                         xScanner.EnableLogging(LogFile);
