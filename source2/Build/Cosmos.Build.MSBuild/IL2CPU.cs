@@ -70,14 +70,23 @@ namespace Cosmos.Build.MSBuild
                     return Assembly.LoadFrom(xPath);
                 }
             }
+            if (mStaticLog != null)
+            {
+                mStaticLog("Assembly '" + args.Name + "' not resolved!");
+            }
             return null;
         }
+
+        private static Action<string> mStaticLog = null;
 
         private void DoInitTypes()
         {
             var xType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
+            Log.LogMessage("Console plug loaded: {0}", xType.FullName);
             xType = typeof(Cosmos.Sys.Plugs.Deboot);
+            Log.LogMessage("Deboot plug loaded: {0}", xType.FullName);
             xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
+            Log.LogMessage("ArrayList plug loaded: {0}", xType.FullName);
         }
 
         #region properties
