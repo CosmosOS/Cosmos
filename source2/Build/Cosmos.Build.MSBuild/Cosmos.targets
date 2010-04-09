@@ -10,6 +10,7 @@
   <PropertyGroup>
     <CosmosDir Condition="$(CosmosDir) == ''">$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
+    <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
     <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
     <FullAssemblyName>$(OutputPath)$(AssemblyName)</FullAssemblyName>
     <AssemblyFile>$(FullAssemblyName).exe</AssemblyFile>
@@ -18,12 +19,12 @@
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
   </PropertyGroup>
 
-  <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToCosmosMap" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(CosmosDir)\Build\VSIP\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToCosmosMap" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
   
 
   <!-- devkit version:
