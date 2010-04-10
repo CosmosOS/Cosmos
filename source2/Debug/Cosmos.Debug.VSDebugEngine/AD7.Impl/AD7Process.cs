@@ -34,8 +34,12 @@ namespace Cosmos.Debug.VSDebugEngine
             mISO = aISOFile;
 
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
+            //TODO: We dont need these choices. Just reduce it down to pipe server only. If we do need choices, why ifdef and not project option instead?
 #if DEBUG_CONNECTOR_TCP_SERVER
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
+#endif
+#if DEBUG_CONNECTOR_PIPE_SERVER
+            // The pipe name is \\.\pipe\com_1
 #endif
 #if DEBUG_CONNECTOR_TCP_CLIENT
             var xDebugConnectorStr = "-serial tcp::4444,server";
