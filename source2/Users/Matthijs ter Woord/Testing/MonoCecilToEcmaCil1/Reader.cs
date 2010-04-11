@@ -11,11 +11,11 @@ namespace MonoCecilToEcmaCil1
 {
     public partial class Reader : IDisposable
     {
-        private static Dictionary<QueuedMethod, EcmaCil.MethodMeta> mMethods = new Dictionary<QueuedMethod, EcmaCil.MethodMeta>();
-        private static Dictionary<QueuedType, EcmaCil.TypeMeta> mTypes = new Dictionary<QueuedType, EcmaCil.TypeMeta>();
-        private static Dictionary<QueuedArrayType, EcmaCil.ArrayTypeMeta> mArrayTypes = new Dictionary<QueuedArrayType, EcmaCil.ArrayTypeMeta>();
-        private static Dictionary<QueuedPointerType, EcmaCil.PointerTypeMeta> mPointerTypes = new Dictionary<QueuedPointerType, EcmaCil.PointerTypeMeta>();
-        private static Dictionary<QueuedMethod, EcmaCil.MethodMeta> mVirtuals = new Dictionary<QueuedMethod, EcmaCil.MethodMeta>();
+        private Dictionary<QueuedMethod, EcmaCil.MethodMeta> mMethods = new Dictionary<QueuedMethod, EcmaCil.MethodMeta>();
+        private Dictionary<QueuedType, EcmaCil.TypeMeta> mTypes = new Dictionary<QueuedType, EcmaCil.TypeMeta>();
+        private Dictionary<QueuedArrayType, EcmaCil.ArrayTypeMeta> mArrayTypes = new Dictionary<QueuedArrayType, EcmaCil.ArrayTypeMeta>();
+        private Dictionary<QueuedPointerType, EcmaCil.PointerTypeMeta> mPointerTypes = new Dictionary<QueuedPointerType, EcmaCil.PointerTypeMeta>();
+        private Dictionary<QueuedMethod, EcmaCil.MethodMeta> mVirtuals = new Dictionary<QueuedMethod, EcmaCil.MethodMeta>();
 
 
         #region queueing system

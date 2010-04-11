@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B47ED632-1ACE-4516-9576-81E38BA092F1}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{FD4B2006-B518-4884-B196-C2EF2B83FD6F}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleMethodsTest</RootNamespace>
-    <AssemblyName>SimpleMethodsTest</AssemblyName>
+    <RootNamespace>ReflectionToEcmaCil</RootNamespace>
+    <AssemblyName>ReflectionToEcmaCil</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -49,11 +49,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="OurHashset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reader.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SimpleMethodsTests.xml" />
+    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
+      <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>
+      <Name>EcmaCil</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

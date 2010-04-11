@@ -7,14 +7,14 @@ using EcmaCil;
 using System.IO;
 using System.Xml;
 
-namespace MonoCecilToEcmaCil1.Tests
+namespace ReflectionToEcmaCil.Tests
 {
     public class BaseTest
     {
-        protected void AssertCompilationSame(string refName, Type baseType)
+        protected void AssertCompilationSame(string refName, Type baseTYpe)
         {
             var xReader = new Reader();
-            var xResult = xReader.Execute(baseType.Assembly.Location);
+            var xResult = xReader.Execute(baseTYpe.Assembly.Location);
             string xActualOutput;
             using (var xStringWriter = new StringWriter())
             {
@@ -27,7 +27,7 @@ namespace MonoCecilToEcmaCil1.Tests
                 }
             }
 
-            var xExpectedOutput = ReadAllTextFromStream(baseType.Assembly.GetManifestResourceStream(baseType.Namespace + "." + refName + ".xml"));
+            var xExpectedOutput = ReadAllTextFromStream(typeof(BaseTest).Assembly.GetManifestResourceStream(typeof(BaseTest).Namespace + "." + refName + ".xml"));
             Assert.AreEqual(xExpectedOutput, xActualOutput);
         }
 

@@ -112,9 +112,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMethodsTest", "..\sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source2\IL2PCU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionToEcmaCil", "..\source2\Users\Matthijs ter Woord\Testing\ReflectionToEcmaCil\ReflectionToEcmaCil.csproj", "{FD4B2006-B518-4884-B196-C2EF2B83FD6F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionToEcmaCil.Tests", "..\source2\Users\Matthijs ter Woord\Testing\ReflectionToEcmaCil.Tests\ReflectionToEcmaCil.Tests.csproj", "{0D162A82-CBC1-4A39-916D-E1079B212DDE}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 33
+		SccNumberOfProjects = 35
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -246,6 +250,14 @@ Global
 		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
 		SccProjectName32 = ../source2/IL2PCU/Cosmos.IL2CPU.Plugs
 		SccLocalPath32 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Plugs
+		SccProjectUniqueName33 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\ReflectionToEcmaCil\\ReflectionToEcmaCil.csproj
+		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
+		SccProjectName33 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/ReflectionToEcmaCil
+		SccLocalPath33 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\ReflectionToEcmaCil
+		SccProjectUniqueName34 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\ReflectionToEcmaCil.Tests\\ReflectionToEcmaCil.Tests.csproj
+		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
+		SccProjectName34 = ../source2/Users/Matthijs\u0020ter\u0020Woord/Testing/ReflectionToEcmaCil.Tests
+		SccLocalPath34 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\ReflectionToEcmaCil.Tests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -628,6 +640,24 @@ Global
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|x86.ActiveCfg = Release|Any CPU
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}.Release|x86.Build.0 = Release|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Release|x86.ActiveCfg = Release|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -678,6 +708,8 @@ Global
 		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{0D9C1BC2-E743-4E13-8A93-11174DBCB433} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{FD4B2006-B518-4884-B196-C2EF2B83FD6F} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
+		{0D162A82-CBC1-4A39-916D-E1079B212DDE} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA} = {0D9C1BC2-E743-4E13-8A93-11174DBCB433}
 		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D} = {3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23}
 		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62} = {3FAC94DC-A2A1-44C9-86C3-35D8D9BDDF23}
