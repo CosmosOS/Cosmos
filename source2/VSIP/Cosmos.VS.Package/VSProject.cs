@@ -63,6 +63,12 @@ namespace Cosmos.VS.Package {
         /// </summary>
         public VSProject() {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+            // fake compiler?
+            var xType = typeof(Cosmos.Debug.VSDebugEngine.AD7Engine);
+            if (xType.FullName.Length == 0)
+            {
+                throw new Exception("No fullname!");
+            }
         }
 
         // This is used in the MSBuild files to locate Cosmos tasks

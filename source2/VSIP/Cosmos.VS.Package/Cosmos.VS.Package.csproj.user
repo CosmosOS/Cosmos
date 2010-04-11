@@ -2,7 +2,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartAction>Program</StartAction>
     <StartProgram>$(ProgramFiles)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe</StartProgram>
-    <StartArguments>/log</StartArguments>
+    <StartArguments>/ranu /rootsuffix Exp</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <StartAction>Program</StartAction>
