@@ -13,22 +13,23 @@ namespace ReflectionToEcmaCil.Tests
     {
         protected void AssertCompilationSame(string refName, Type baseTYpe)
         {
-            var xReader = new Reader();
-            var xResult = xReader.Execute(baseTYpe.Assembly.Location);
-            string xActualOutput;
-            using (var xStringWriter = new StringWriter())
-            {
-                using (var xXmlOut = XmlWriter.Create(xStringWriter))
-                {
-                    Dump.DumpTypes(xResult, xXmlOut);
-                    xXmlOut.Flush();
-                    xStringWriter.Flush();
-                    xActualOutput = xStringWriter.ToString();
-                }
-            }
+            //var xReader = new Reader();
+            //var xResult = xReader.Execute(baseTYpe.Assembly.Location);
+            //string xActualOutput;
+            //using (var xStringWriter = new StringWriter())
+            //{
+            //    using (var xXmlOut = XmlWriter.Create(xStringWriter))
+            //    {
+            //        Dump.DumpTypes(xResult, xXmlOut);
+            //        xXmlOut.Flush();
+            //        xStringWriter.Flush();
+            //        xActualOutput = xStringWriter.ToString();
+            //    }
+            //}
 
-            var xExpectedOutput = ReadAllTextFromStream(typeof(BaseTest).Assembly.GetManifestResourceStream(typeof(BaseTest).Namespace + "." + refName + ".xml"));
-            Assert.AreEqual(xExpectedOutput, xActualOutput);
+            //var xExpectedOutput = ReadAllTextFromStream(typeof(BaseTest).Assembly.GetManifestResourceStream(typeof(BaseTest).Namespace + "." + refName + ".xml"));
+            //Assert.AreEqual(xExpectedOutput, xActualOutput);
+            Assert.Fail("Not implemented yet!");
         }
 
         private static string ReadAllTextFromStream(Stream aStream)
