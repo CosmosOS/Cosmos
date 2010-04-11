@@ -3,8 +3,8 @@
 #define DEBUG_CONNECTOR_TCP_SERVER
 //#define DEBUG_CONNECTOR_PIPE_SERVER
 //
-#define VM_QEMU
-//#define VM_VMWare
+//#define VM_QEMU
+#define VM_VMWare
 
 using System;
 using System.Collections.Generic;
@@ -37,9 +37,7 @@ namespace Cosmos.Debug.VSDebugEngine
         internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
             mISO = aISOFile;
-
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
-
 #if DEBUG_CONNECTOR_TCP_SERVER
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
 #endif
@@ -49,21 +47,16 @@ namespace Cosmos.Debug.VSDebugEngine
 
 #if VM_QEMU
             // Start QEMU
-            mProcessStartInfo.Arguments = String.Format("\"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/"), xDebugConnectorStr);
+            mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/"), xDebugConnectorStr);
+#endif
+#if VM_VMWare
+            mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
+#endif
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
             mProcessStartInfo.RedirectStandardError = true;
             mProcessStartInfo.RedirectStandardOutput = true;
             mProcessStartInfo.CreateNoWindow = true;
-#endif
-#if VM_VMWare
-            mProcessStartInfo.Arguments = @"C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
-            mProcessStartInfo.UseShellExecute = true;
-            mProcessStartInfo.RedirectStandardInput = false;
-            mProcessStartInfo.RedirectStandardError = false;
-            mProcessStartInfo.RedirectStandardOutput = false;
-            mProcessStartInfo.CreateNoWindow = false;
-#endif
 
             var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(aISOFile, "cmap"));
             if (xLabelByAddressMapping.Count == 0)
@@ -91,8 +84,6 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcess.EnableRaisingEvents = true;
             mProcess.Exited += new EventHandler(mProcess_Exited);
             System.Threading.Thread.Sleep(250);
-//TODO: Make redirection non VM specific, and a boolean. Others besides QEMU might use it although VMWare does not.
-#if VM_QEMU
             if (mProcess.HasExited)
             {
                 Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
@@ -100,7 +91,6 @@ namespace Cosmos.Debug.VSDebugEngine
                 Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
                 throw new Exception("Error while starting application");
             }
-#endif
             mCallback = aCallback;
             mEngine = aEngine;
             mThread = new AD7Thread(aEngine, this);
@@ -260,16 +250,15 @@ namespace Cosmos.Debug.VSDebugEngine
         internal void ResumeFromLaunch()
         {
 #if DEBUG_CONNECTOR_TCP_SERVER
-            //mProcess.StandardInput.WriteLine("");
+            // This unpauses our debug host
+            mProcess.StandardInput.WriteLine("");
 #endif
         }
 
         void mProcess_Exited(object sender, EventArgs e)
         {
-#if VM_QEMU
             Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
             Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-#endif
             //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
             //mCallback.OnProcessExit((uint)mProcess.ExitCode);

@@ -13,22 +13,32 @@ namespace Cosmos.Debug.HostProcess
     {
         static int Main(string[] args)
         {
+            // This is here to allow this process to start, but pause till the caller tells it to continue. 
             Console.ReadLine();
+
+            // Arg[0] - ShellExecute
+            bool xShellExecute = (string.Compare(args[0], "true", true) == 0);
+
+            // Arg[1] - Target exe or file
             var xStartInfo = new ProcessStartInfo();
-            xStartInfo.FileName = args[0];
+            xStartInfo.FileName = args[1];
             var xArgSB = new StringBuilder();
-            foreach (var arg in args.Skip(1))
+
+            // Skip first (shellexecute bool) and second (Target exe)
+            foreach (var arg in args.Skip(2))
             {
                 xArgSB.AppendFormat("\"{0}\" ", arg);
             }
             xStartInfo.Arguments = xArgSB.ToString();
-            xStartInfo.RedirectStandardError = true;
-            xStartInfo.RedirectStandardOutput = true;
-            xStartInfo.UseShellExecute = false;
+            xStartInfo.RedirectStandardError = !xShellExecute;
+            xStartInfo.RedirectStandardOutput = !xShellExecute;
+            xStartInfo.UseShellExecute = xShellExecute;
             var xProcess = Process.Start(xStartInfo);
             xProcess.WaitForExit();
-            Console.WriteLine(xProcess.StandardError.ReadToEnd());
-            Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
+            if (!xShellExecute) {
+                Console.WriteLine(xProcess.StandardError.ReadToEnd());
+                Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
+            }
             return xProcess.ExitCode;
         }
     }
