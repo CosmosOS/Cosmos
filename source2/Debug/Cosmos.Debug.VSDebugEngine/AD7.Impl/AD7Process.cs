@@ -65,6 +65,7 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
             }
+            //TODO: This next line takes a long time. See if we can speed it up.
             mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping, Path.ChangeExtension(aISOFile, ".cxdb"));
             if (mSourceMappings.Count == 0)
             {
