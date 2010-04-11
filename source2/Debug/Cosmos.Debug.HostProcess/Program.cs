@@ -19,12 +19,12 @@ namespace Cosmos.Debug.HostProcess
             // Arg[0] - ShellExecute
             bool xShellExecute = (string.Compare(args[0], "true", true) == 0);
 
-            // Arg[1] - Target exe or file
+            // Arg[2] - Target exe or file
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = args[1];
             var xArgSB = new StringBuilder();
 
-            // Skip first (shellexecute bool) and second (Target exe)
+            // Skip other arguments and "rearg" the rest
             foreach (var arg in args.Skip(2))
             {
                 xArgSB.AppendFormat("\"{0}\" ", arg);
@@ -34,6 +34,7 @@ namespace Cosmos.Debug.HostProcess
             xStartInfo.RedirectStandardOutput = !xShellExecute;
             xStartInfo.UseShellExecute = xShellExecute;
             var xProcess = Process.Start(xStartInfo);
+
             xProcess.WaitForExit();
             if (!xShellExecute) {
                 Console.WriteLine(xProcess.StandardError.ReadToEnd());

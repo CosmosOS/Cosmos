@@ -1,10 +1,12 @@
 ﻿//TODO: Move both of these to project options...
 // In fact also eliminate TCP server and keep only Pipes
-#define DEBUG_CONNECTOR_TCP_SERVER
-//#define DEBUG_CONNECTOR_PIPE_SERVER
+// Keep a note about servers.. we want to use servers and not clients, because we dont always know when the other side is ready
+// and with a server, we are ready and its ready whenever... but sometime after us for sure.
+//#define DEBUG_CONNECTOR_TCP_SERVER
+#define DEBUG_CONNECTOR_PIPE_SERVER
 //
-//#define VM_QEMU
-#define VM_VMWare
+#define VM_QEMU
+//#define VM_VMWare
 
 using System;
 using System.Collections.Generic;
@@ -38,14 +40,14 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             mISO = aISOFile;
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
+
+#if VM_QEMU
 #if DEBUG_CONNECTOR_TCP_SERVER
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
 #endif
 #if DEBUG_CONNECTOR_PIPE_SERVER
-            // The pipe name is \\.\pipe\com_1
+            var xDebugConnectorStr = @"-serial pipe:\\.\pipe\CosmosDebug";
 #endif
-
-#if VM_QEMU
             // Start QEMU
             mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/"), xDebugConnectorStr);
 #endif
@@ -73,16 +75,25 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_TCP_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
 #endif
+#if DEBUG_CONNECTOR_PIPE_SERVER
+            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
+#endif
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
-#if DEBUG_CONNECTOR_TCP_SERVER
-            mDebugEngine.DebugConnector.ConnectionLost = new Action<Exception>(delegate { mEngine.Callback.OnProcessExit(0); });
-#endif
+            mDebugEngine.DebugConnector.ConnectionLost = new Action<Exception>(
+                delegate { 
+                    mEngine.Callback.OnProcessExit(0);
+                }
+                );
 
             System.Threading.Thread.Sleep(250);
             mProcess = Process.Start(mProcessStartInfo);
+
             mProcess.EnableRaisingEvents = true;
             mProcess.Exited += new EventHandler(mProcess_Exited);
+
+            // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
+            // if so, why not hook before start? 
             System.Threading.Thread.Sleep(250);
             if (mProcess.HasExited)
             {
@@ -91,6 +102,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
                 throw new Exception("Error while starting application");
             }
+
             mCallback = aCallback;
             mEngine = aEngine;
             mThread = new AD7Thread(aEngine, this);
@@ -249,10 +261,8 @@ namespace Cosmos.Debug.VSDebugEngine
 
         internal void ResumeFromLaunch()
         {
-#if DEBUG_CONNECTOR_TCP_SERVER
             // This unpauses our debug host
             mProcess.StandardInput.WriteLine("");
-#endif
         }
 
         void mProcess_Exited(object sender, EventArgs e)

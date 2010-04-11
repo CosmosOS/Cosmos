@@ -12,6 +12,7 @@ namespace Cosmos.Debug.VSDebugEngine
     {
         readonly AD7Engine m_engine;
         //readonly DebuggedThread m_debuggedThread;
+        //TODO: Can we safely change this?
         const string ThreadNameString = "Sample Engine Thread";
         private AD7Process mProcess;
 
