@@ -26,7 +26,14 @@ namespace Cosmos.Build.MSBuild
 
         public override bool Execute()
         {
-            SourceInfo.WriteToFile(SourceInfo.ParseMapFile(InputBaseDir), OutputFile);
+            var xSourceInfos = SourceInfo.ParseMapFile(InputBaseDir);
+            if (xSourceInfos.Count == 0)
+            {
+                Log.LogError("No SourceInfos found!");
+                return false;
+            }
+            SourceInfo.WriteToFile(xSourceInfos, OutputFile);
+            
             return true;
         }
     }

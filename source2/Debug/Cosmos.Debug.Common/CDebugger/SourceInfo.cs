@@ -81,15 +81,22 @@ namespace Cosmos.Debug.Common.CDebugger
             uint xIndex = 0;
             for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++)
             {
-                if (xSourceStrings[xIndex].StartsWith("Real      Virtual   Name"))
+                if (xSourceStrings[xIndex].StartsWith("Real "))
                 {
+                    // further check it:
+                    //Virtual   Name"))
+                    if (!xSourceStrings[xIndex].Substring(4).TrimStart().StartsWith("Virtual ")
+                        ||!xSourceStrings[xIndex].EndsWith(" Name"))
+                    {
+                        continue;
+                    }
                     xIndex++;
                     break;
                 }
             }
             for (; xIndex < xSourceStrings.Length; xIndex++)
             {
-                    var xLine = xSourceStrings[xIndex];
+                    var xLine = xSourceStrings[xIndex].Trim();
                     if (xLine.Length > 21)
                     {
                         uint xAddress = UInt32.Parse(xLine.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
