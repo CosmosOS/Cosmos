@@ -2,8 +2,8 @@
 // In fact also eliminate TCP server and keep only Pipes
 // Keep a note about servers.. we want to use servers and not clients, because we dont always know when the other side is ready
 // and with a server, we are ready and its ready whenever... but sometime after us for sure.
-//#define DEBUG_CONNECTOR_TCP_SERVER
-#define DEBUG_CONNECTOR_PIPE_SERVER
+#define DEBUG_CONNECTOR_TCP_SERVER
+//#define DEBUG_CONNECTOR_PIPE_SERVER
 //
 #define VM_QEMU
 //#define VM_VMWare
@@ -46,7 +46,7 @@ namespace Cosmos.Debug.VSDebugEngine
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
 #endif
 #if DEBUG_CONNECTOR_PIPE_SERVER
-            var xDebugConnectorStr = @"-serial pipe:\\.\pipe\CosmosDebug";
+            var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
 #endif
             // Start QEMU
             mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/"), xDebugConnectorStr);
@@ -102,6 +102,9 @@ namespace Cosmos.Debug.VSDebugEngine
                 Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
                 throw new Exception("Error while starting application");
             }
+
+            //TODO: Change to pipe client only
+            // then we have to connect, wait, try again... then we know that the other side is ready...
 
             mCallback = aCallback;
             mEngine = aEngine;
