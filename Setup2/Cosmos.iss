@@ -232,6 +232,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45
 
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets
+Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets
 [Run]
 Filename: {code:VSNET2008_PATH|}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 
