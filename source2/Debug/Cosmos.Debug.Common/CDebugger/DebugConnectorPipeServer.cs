@@ -21,5 +21,8 @@ namespace Cosmos.Debug.Common.CDebugger
             Start(xPipe);
         }
 
+        public override void WaitConnect() {
+            throw new NotImplementedException();
+        }
     }
 }

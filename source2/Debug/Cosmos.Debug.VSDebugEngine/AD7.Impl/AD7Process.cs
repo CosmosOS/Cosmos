@@ -2,8 +2,8 @@
 // In fact also eliminate TCP server and keep only Pipes
 // Keep a note about servers.. we want to use servers and not clients, because we dont always know when the other side is ready
 // and with a server, we are ready and its ready whenever... but sometime after us for sure.
-#define DEBUG_CONNECTOR_TCP_SERVER
-//#define DEBUG_CONNECTOR_PIPE_SERVER
+//#define DEBUG_CONNECTOR_TCP_SERVER
+#define DEBUG_CONNECTOR_PIPE_CLIENT
 //
 #define VM_QEMU
 //#define VM_VMWare
@@ -45,7 +45,7 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_TCP_SERVER
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
 #endif
-#if DEBUG_CONNECTOR_PIPE_SERVER
+#if DEBUG_CONNECTOR_PIPE_CLIENT
             var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
 #endif
             // Start QEMU
@@ -75,8 +75,8 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_TCP_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
 #endif
-#if DEBUG_CONNECTOR_PIPE_SERVER
-            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
+#if DEBUG_CONNECTOR_PIPE_CLIENT
+            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeClient();
 #endif
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
@@ -103,8 +103,8 @@ namespace Cosmos.Debug.VSDebugEngine
                 throw new Exception("Error while starting application");
             }
 
-            //TODO: Change to pipe client only
-            // then we have to connect, wait, try again... then we know that the other side is ready...
+            // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
+            mDebugEngine.DebugConnector.WaitConnect();
 
             mCallback = aCallback;
             mEngine = aEngine;

@@ -16,6 +16,9 @@ namespace Cosmos.Debug.Common.CDebugger
         public Action<string> CmdText;
         
         protected MsgType mCurrentMsgType;
+
+        //TODO: Change all servers and clients to use this. Servers can start earlier, but this will wait for an inbound connection
+        public abstract void WaitConnect();
         
         protected abstract void SendData(byte[] aBytes);
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        

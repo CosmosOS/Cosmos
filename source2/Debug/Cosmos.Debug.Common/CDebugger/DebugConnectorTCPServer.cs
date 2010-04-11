@@ -21,8 +21,11 @@ namespace Cosmos.Debug.Common.CDebugger
             var xClient = xListener.EndAcceptTcpClient(aResult);
             Console.WriteLine("TcpClient accepted");
             Start(xClient.GetStream());
-            
         }
-        
+
+        public override void WaitConnect() {
+            throw new NotImplementedException();
+        }
+
     }
 }

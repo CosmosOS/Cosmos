@@ -14,5 +14,9 @@ namespace Cosmos.Debug.Common.CDebugger
             var xTCPClient = new TcpClient("localhost", 4444);
             Start(xTCPClient.GetStream());
         }
+
+        public override void WaitConnect() {
+            throw new NotImplementedException();
+        }
     }
 }
