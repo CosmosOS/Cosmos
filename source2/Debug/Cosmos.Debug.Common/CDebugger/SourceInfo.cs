@@ -96,14 +96,16 @@ namespace Cosmos.Debug.Common.CDebugger
             }
             for (; xIndex < xSourceStrings.Length; xIndex++)
             {
-                    var xLine = xSourceStrings[xIndex].Trim();
-                    if (xLine.Length > 21)
-                    {
-                        uint xAddress = UInt32.Parse(xLine.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
-                        if (!xSource.ContainsKey(xAddress))
-                            xSource.Add(xAddress, xLine.Substring(20));
-                        else continue;
-                    }
+                var xLine = xSourceStrings[xIndex];//.Trim();
+                var xLineParts = xLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (xLineParts.Length == 3)
+                {
+                    uint xAddress = UInt32.Parse(xLineParts[0], System.Globalization.NumberStyles.HexNumber);
+                    if (!xSource.ContainsKey(xAddress))
+                        xSource.Add(xAddress, xLineParts[2]);
+                    else continue;
+                }
             }
             return xSource;
         }
