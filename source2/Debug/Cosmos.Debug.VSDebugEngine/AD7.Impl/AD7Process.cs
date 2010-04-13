@@ -104,9 +104,6 @@ namespace Cosmos.Debug.VSDebugEngine
                 throw new Exception("Error while starting application");
             }
 
-            // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
-            mDebugEngine.DebugConnector.WaitConnect();
-
             mCallback = aCallback;
             mEngine = aEngine;
             mThread = new AD7Thread(aEngine, this);
@@ -266,7 +263,11 @@ namespace Cosmos.Debug.VSDebugEngine
         internal void ResumeFromLaunch()
         {
             // This unpauses our debug host
-            mProcess.StandardInput.WriteLine("");
+            mProcess.StandardInput.WriteLine();
+
+            // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
+            // We have to do this after we release the debug host though.
+            mDebugEngine.DebugConnector.WaitConnect();
         }
 
         void mProcess_Exited(object sender, EventArgs e)
