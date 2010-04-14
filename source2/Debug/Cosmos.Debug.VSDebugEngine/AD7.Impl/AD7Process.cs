@@ -263,6 +263,8 @@ namespace Cosmos.Debug.VSDebugEngine
         internal void ResumeFromLaunch()
         {
             // This unpauses our debug host
+            // We do this because VS requires a start, and then a resume after. So we have debughost which is a stub
+            // that allows VS to "see" that. Here we resume it.
             mProcess.StandardInput.WriteLine();
 
             // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
