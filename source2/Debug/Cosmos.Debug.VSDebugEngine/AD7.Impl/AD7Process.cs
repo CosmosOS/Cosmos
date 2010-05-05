@@ -60,13 +60,19 @@ namespace Cosmos.Debug.VSDebugEngine
             mProcessStartInfo.RedirectStandardOutput = true;
             mProcessStartInfo.CreateNoWindow = true;
 
-            var xLabelByAddressMapping = Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(aISOFile, "cmap"));
-            if (xLabelByAddressMapping.Count == 0)
+            IDictionary<uint, string> xAddressLabelMappings;
+            IDictionary<string, uint> xLabelAddressMappings;
+            Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(aISOFile, "cmap"), out xAddressLabelMappings, out xLabelAddressMappings);
+            if (xAddressLabelMappings.Count == 0)
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
             }
             //TODO: This next line takes a long time. See if we can speed it up.
-            mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xLabelByAddressMapping, Path.ChangeExtension(aISOFile, ".cxdb"));
+            var xSW = new Stopwatch();
+            xSW.Start();
+            mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(aISOFile, ".cxdb"));
+            xSW.Stop();
+            Trace.WriteLine("GetSourceInfo took: " + xSW.Elapsed);
             if (mSourceMappings.Count == 0)
             {
                 throw new Exception("Debug data not found: SourceMappings");

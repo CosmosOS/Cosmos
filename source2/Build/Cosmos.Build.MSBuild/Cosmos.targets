@@ -55,8 +55,6 @@
              OutputFile="$(FullAssemblyName).obj" 
              IsELF="$(IsELF)"
              ExePath="$(NasmFile)" />
-
-    <Message Importance="High" Text="IsELF: $(IsELF)"/>
     
     <!--  ELF only -->
     <Ld      CosmosBuildDir="$(CosmosDir)\Build"

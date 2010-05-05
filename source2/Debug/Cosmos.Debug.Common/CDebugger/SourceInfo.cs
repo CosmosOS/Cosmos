@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using System.IO;
+using System.Diagnostics;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
@@ -58,9 +59,10 @@ namespace Cosmos.Debug.Common.CDebugger
             }
         }
 
-        public static SortedList<uint, string> ReadFromFile(string aFile)
+        public static void ReadFromFile(string aFile, out IDictionary<uint, string> oAddressLabelMappings, out IDictionary<string, uint> oLabelAddressMappings)
         {
-            var xResult = new SortedList<uint, string>();
+            oAddressLabelMappings = new Dictionary<uint, string>();
+            oLabelAddressMappings = new Dictionary<string, uint>();
             foreach (var xLine in File.ReadAllLines(aFile))
             {
                 if (!xLine.Contains('\t'))
@@ -69,9 +71,10 @@ namespace Cosmos.Debug.Common.CDebugger
                 }
                 var xPart1 = xLine.Substring(0, xLine.IndexOf('\t'));
                 var xPart2 = xLine.Substring(xLine.IndexOf('\t') + 1);
-                xResult.Add(UInt32.Parse(xPart1), xPart2);
+                var xAddr = UInt32.Parse(xPart1);
+                oAddressLabelMappings.Add(xAddr, xPart2);
+                oLabelAddressMappings.Add(xPart2, xAddr);
             }
-            return xResult;
         }
 
         public static SortedList<uint,String> ParseMapFile(String buildPath)
@@ -121,10 +124,17 @@ namespace Cosmos.Debug.Common.CDebugger
 			return xIdx;
 		}
 
-		public static SourceInfos GetSourceInfo(SortedList<uint, string> aAddressLabelMappings, string aDebugFile) {
+		public static SourceInfos GetSourceInfo(IDictionary<uint, string> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, string aDebugFile) {
 			var xSymbolsList = new List<MLDebugSymbol>();
+            var xSW = new Stopwatch();
+            xSW.Start();
 			MLDebugSymbol.ReadSymbolsListFromFile(xSymbolsList, aDebugFile);
-			xSymbolsList.Sort(delegate(MLDebugSymbol a, MLDebugSymbol b) {
+            xSW.Stop();
+            System.Diagnostics.Trace.WriteLine("Loading SymbolsList took: " + xSW.Elapsed);
+            xSW.Reset();
+            xSW.Start();
+            #region sort
+            xSymbolsList.Sort(delegate(MLDebugSymbol a, MLDebugSymbol b) {
 				if (a == null) {
 					throw new ArgumentNullException("a");
 				}
@@ -144,7 +154,13 @@ namespace Cosmos.Debug.Common.CDebugger
 				}
 				return xCompareResult;
 			});
-			var xResult = new SourceInfos();
+            #endregion
+            xSW.Stop();
+            System.Diagnostics.Trace.WriteLine("Sorting SymbolsList took: " + xSW.Elapsed);
+            MLDebugSymbol.WriteSymbolsListToFile(xSymbolsList, aDebugFile + ".sorted");
+            xSW.Reset();
+            xSW.Start();
+            var xResult = new SourceInfos();
 			string xOldAssembly = null;
 			ISymbolReader xSymbolReader = null;
 			int[] xCodeOffsets = null;
@@ -186,9 +202,8 @@ namespace Cosmos.Debug.Common.CDebugger
 					xOldMethodToken = xSymbol.MethodToken;
 				}
 				if (xMethodSymbol != null) {
-					int xIndex = aAddressLabelMappings.IndexOfValue(xSymbol.LabelName);
-					if (xIndex != -1) {
-						uint xAddress = aAddressLabelMappings.Keys[xIndex];
+                    if(aLabelAddressMappings.ContainsKey(xSymbol.LabelName)){
+						uint xAddress = aLabelAddressMappings[xSymbol.LabelName];
 						//try {
 						int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOffset);
                         var xSourceInfo = new SourceInfo()
@@ -204,6 +219,8 @@ namespace Cosmos.Debug.Common.CDebugger
 					}
 				}
 			}
+            xSW.Stop();
+            System.Diagnostics.Trace.WriteLine("Loading PDB info took: " + xSW.Elapsed);
 			return xResult;
 		}
 	}
