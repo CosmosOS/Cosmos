@@ -19,3 +19,6 @@ _ReSharper.*/
 
 # Misc Ignores
 Thumbs.db
+
+# COSMOS related stuffs
+Build/Tools/Cosmos.*
