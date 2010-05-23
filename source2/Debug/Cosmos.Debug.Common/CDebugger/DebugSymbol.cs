@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using System.IO;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
@@ -31,46 +32,39 @@ namespace Cosmos.Debug.Common.CDebugger
 
 	public class MLDebugSymbol {
 		public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile) {
-			using (XmlWriter xWriter = XmlWriter.Create(aFile)) {
-				xWriter.WriteStartDocument();
-				{
-					xWriter.WriteStartElement("MSILInstructions");
-					{
-						foreach (var item in aSymbols) {
-							xWriter.WriteStartElement("Instruction");
-							{
-								xWriter.WriteAttributeString("Label", item.LabelName);
-								xWriter.WriteAttributeString("Address", item.Address.ToString());
-								xWriter.WriteAttributeString("StackDifference", item.StackDifference.ToString());
-								xWriter.WriteAttributeString("AssemblyFile", item.AssemblyFile);
-								xWriter.WriteAttributeString("TypeToken", item.TypeToken.ToString());
-								xWriter.WriteAttributeString("MethodToken", item.MethodToken.ToString());
-								xWriter.WriteAttributeString("ILOffset", item.ILOffset.ToString());
-                                xWriter.WriteAttributeString("MethodName", item.MethodName);
-							}
-							xWriter.WriteEndElement();
-						}
-					}
-					xWriter.WriteEndElement();
-				}
-				xWriter.WriteEndDocument();
-			}
+            using (var xWriter = new BinaryWriter(new FileStream(aFile, FileMode.Create), Encoding.ASCII))
+            {
+                foreach(var xItem in aSymbols){
+                    xWriter.Write(xItem.LabelName);
+                    xWriter.Write(xItem.Address);
+                    xWriter.Write(xItem.StackDifference);
+                    xWriter.Write(xItem.AssemblyFile);
+                    xWriter.Write(xItem.TypeToken);
+                    xWriter.Write(xItem.MethodToken);
+                    xWriter.Write(xItem.ILOffset);
+                    xWriter.Write(xItem.MethodName);
+                }
+            }
 		}
 
 		public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile) {
-			var xDoc = XDocument.Load(aFile);
-			aSymbols.Clear();
-			aSymbols.AddRange((from item in xDoc.Descendants("Instruction")
-							   select new MLDebugSymbol() {
-								   LabelName = item.Attribute("Label").Value,
-								   Address = (uint)item.Attribute("Address"),
-								   StackDifference = (int)item.Attribute("StackDifference"),
-								   AssemblyFile = (string)item.Attribute("AssemblyFile"),
-								   TypeToken = (int)item.Attribute("TypeToken"),
-								   MethodToken = (int)item.Attribute("MethodToken"),
-								   ILOffset = (int)item.Attribute("ILOffset"),
-                                   MethodName = (string)item.Attribute("MethodName")
-							   }));
+            using (var xReader = new BinaryReader(new FileStream(aFile, FileMode.Open), Encoding.ASCII))
+            {
+                while (xReader.BaseStream.Position < xReader.BaseStream.Length)
+                {
+                    aSymbols.Add(new MLDebugSymbol
+                    {
+                        LabelName = xReader.ReadString(),
+                        Address = xReader.ReadUInt32(),
+                        StackDifference=xReader.ReadInt32(),
+                        AssemblyFile = xReader.ReadString(),
+                        TypeToken = xReader.ReadInt32(),
+                        MethodToken = xReader.ReadInt32(),
+                        ILOffset = xReader.ReadInt32(),
+                        MethodName = xReader.ReadString()
+                    });
+                }
+            }
 		}
 
 		public string LabelName {
