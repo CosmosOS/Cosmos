@@ -49,7 +49,7 @@ namespace Cosmos.Debug.VSDebugEngine
             var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
 #endif
             // Start QEMU
-            mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe").Replace('\\', '/'), PathUtilities.GetQEmuDir(), mISO.Replace("\\", "/"), xDebugConnectorStr);
+            mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe"), PathUtilities.GetQEmuDir().Replace('\\', '/'), mISO.Replace("\\", "/"), xDebugConnectorStr);
 #endif
 #if VM_VMWare
             mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
