@@ -19,12 +19,13 @@ using Cosmos.Debug.Common.CDebugger;
 using System.Collections.ObjectModel;
 using System.IO;
 using Cosmos.Compiler.Debug;
+using System.Collections.Specialized;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
     public class AD7Process : IDebugProcess2
     {
-        internal string mISO;
         internal Guid mID = Guid.NewGuid();
         private Process mProcess;
         private ProcessStartInfo mProcessStartInfo;
@@ -35,11 +36,17 @@ namespace Cosmos.Debug.VSDebugEngine
         internal ReverseSourceInfos mReverseSourceMappings;
         internal SourceInfos mSourceMappings;
         internal uint? mCurrentAddress = null;
+        internal string mISO;
+        private readonly NameValueCollection mDebugInfo;
 
-        internal AD7Process(string aISOFile, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
+        internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
-            mISO = aISOFile;
+            mDebugInfo = new NameValueCollection();
+            NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
+            mISO = mDebugInfo["ISOFile"];
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
+            var xGDBDebugStub = false;
+            Boolean.TryParse(mDebugInfo["QemuEnableGDB"], out xGDBDebugStub);
 
 #if VM_QEMU
 #if DEBUG_CONNECTOR_TCP_SERVER
@@ -48,8 +55,14 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_PIPE_CLIENT
             var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
 #endif
+            var xArgsBuilder = new StringBuilder();
+            xArgsBuilder.AppendFormat("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe"), PathUtilities.GetQEmuDir().Replace('\\', '/'), mISO.Replace("\\", "/"), xDebugConnectorStr);
+            if (xGDBDebugStub)
+            {
+                xArgsBuilder.Append(" -s -S");
+            }
             // Start QEMU
-            mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe"), PathUtilities.GetQEmuDir().Replace('\\', '/'), mISO.Replace("\\", "/"), xDebugConnectorStr);
+            mProcessStartInfo.Arguments = xArgsBuilder.ToString();
 #endif
 #if VM_VMWare
             mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
@@ -62,7 +75,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
             IDictionary<uint, string> xAddressLabelMappings;
             IDictionary<string, uint> xLabelAddressMappings;
-            Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(aISOFile, "cmap"), out xAddressLabelMappings, out xLabelAddressMappings);
+            Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(mISO, "cmap"), out xAddressLabelMappings, out xLabelAddressMappings);
             if (xAddressLabelMappings.Count == 0)
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
@@ -70,7 +83,7 @@ namespace Cosmos.Debug.VSDebugEngine
             //TODO: This next line takes a long time. See if we can speed it up.
             var xSW = new Stopwatch();
             xSW.Start();
-            mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(aISOFile, ".cxdb"));
+            mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(mISO, ".cxdb"));
             xSW.Stop();
             Trace.WriteLine("GetSourceInfo took: " + xSW.Elapsed);
             if (mSourceMappings.Count == 0)

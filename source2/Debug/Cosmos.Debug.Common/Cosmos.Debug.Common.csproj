@@ -91,6 +91,7 @@
     <Compile Include="CDebugger\ObjDump.cs" />
     <Compile Include="CDebugger\SourceInfo.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="NameValueCollectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

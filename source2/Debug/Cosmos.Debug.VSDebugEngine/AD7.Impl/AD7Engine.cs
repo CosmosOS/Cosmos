@@ -341,7 +341,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
         // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
-        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aExe, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess)
+        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
@@ -369,7 +369,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
 
                 AD7EngineCreateEvent.Send(this);
-                var xProcess = new AD7Process(aExe, m_engineCallback, this, aPort);
+                var xProcess = new AD7Process(aDebugInfo, m_engineCallback, this, aPort);
                 aProcess = xProcess;
                 mProcess = xProcess;
                 m_ad7ProgramId = xProcess.mID;
@@ -413,8 +413,6 @@ namespace Cosmos.Debug.VSDebugEngine
                 //m_callback->OnSymbolSearch(module, module->SymbolPath, module->SymbolsLoaded);
                 //    m_callback->OnThreadStart(thread);
                 //}
-
-                mISO = aExe;
                 return VSConstants.S_OK;
             }
             catch (Exception e)
@@ -821,8 +819,5 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         #endregion
-
-        private string mISO;
-
     }
 }
