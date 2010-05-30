@@ -15,7 +15,11 @@ namespace Cosmos.IL2CPU.X86.X {
         // But it would conflict with C#'s resolution of [EBP + 4] becuase
         // C# on operator overloads does not look at return type, only argument types
         public void Add(UInt32 aValue) {
-            new Add { DestinationReg = GetId(), SourceValue=aValue };
+            new Add { DestinationReg = GetId(), SourceValue = aValue };
+        }
+
+        public void Sub(UInt32 aValue) {
+            new Sub { DestinationReg = GetId(), SourceValue = aValue };
         }
 
         public void Compare(UInt32 aValue) {

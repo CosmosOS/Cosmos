@@ -70,6 +70,9 @@ namespace Cosmos.IL2CPU.X86 {
             new Pop { DestinationReg = RegistersEnum.EAX };
         }
 
+        // Sets a breakpoint
+        // Serial Params:
+        //   1: x32 - EIP to break on, or 0 to disable breakpoint.
         protected void BreakOnAddress() {
             Label = "DebugStub_BreakOnAddress";
             PushAll32();
@@ -285,6 +288,9 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
+        // This does not run during Cosmos execution
+        // This is only used by the compiler to force emission of each of our routines.
+        // Each routine must be listed here, else it wont be emitted.
         protected void Emit() {
             Commands();
             Executing();
@@ -301,24 +307,28 @@ namespace Cosmos.IL2CPU.X86 {
             BreakOnAddress();
         }
 
+        // This is the secondary stub routine. After the primary (main) has decided we should do some debug
+        // activities, this one is called.
         protected void Executing() {
             Label = "DebugStub_Executing";
 
-            new Compare{ DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect = true,
-                SourceValue = 0, Size = 32 };
+            // Check to see if breakpoint is disabled. If so, skip all breakpoint checking code.
+            new Compare{ 
+                DestinationRef = ElementReference.New("DebugBreakpointAddress")
+                , DestinationIsIndirect = true
+                , SourceValue = 0
+                , Size = 32 
+            };
             JumpIf(Flags.Equal, "DebugStub_Executing_AfterBreakOnAddress");
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect=true };
-            new Sub { DestinationReg = Registers.EAX, SourceValue = 5 };
-            
+
             // if there's a pending BreakOnAddress, compare it to the original
-            new Compare
-            {
-                DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect=true,
-                SourceReg = Registers.EAX};
+            new Compare {
+                DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect = true,
+                SourceReg = Registers.EAX
+            };
                 JumpIf(Flags.Equal, "DebugStub_Break");
 
-                Label = "DebugStub_Executing_AfterBreakOnAddress";
-
+            Label = "DebugStub_Executing_AfterBreakOnAddress";
             // See if there is a requested break
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
             Memory["DebugBreakOnNextTrace", 32].Compare(1);
@@ -352,6 +362,10 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
+        // This is the main debug stub routine. The parameter is used to generate it and 
+        // the code is embedded.
+        // This routine is called repeatedly by Cosmos code and it checks various flags
+        // to decide the state and what to do.
         public void Main(UInt16 aComAddr) {
             mComAddr = aComAddr;
             mComStatusAddr = (UInt16)(aComAddr + 5);
@@ -366,42 +380,62 @@ namespace Cosmos.IL2CPU.X86 {
             // We arent multi threaded yet, so this works fine.
             // IRQ's are disabled between Compare and JumpIf so an IRQ cant
             // happen in between them which could then cause double entry again
-            DisableInterrupts();
+            DisableInterrupts();           
                 Memory["DebugSuspendLevel", 32].Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_Running");
+                    // DebugStub is not enabled, so exit.
+                    // But we need to see if IRQs are diabled.
+                    // If IRQ disabled, we dont reenable them after our disable
+                    // in this routine.
                     Memory["InterruptsEnabledFlag", 32].Compare(0);
                     JumpIf(Flags.Equal, "DebugStub_Return");
                     EnableInterrupts();
                     Jump("DebugStub_Return");
-
+                
                 Label = "DebugStub_Running";
                 Memory["DebugRunning", 32].Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_Start");
+                    // DebugStub is already running, so exit.
+                    // But we need to see if IRQs are diabled.
+                    // If IRQ disabled, we dont reenable them after our disable
+                    // in this routine.
                     Memory["InterruptsEnabledFlag", 32].Compare(0);
                     JumpIf(Flags.Equal, "DebugStub_Return");
                     EnableInterrupts();
                     Jump("DebugStub_Return");
 
+                // All clear, mark that we are entering the debug stub
                 Label = "DebugStub_Start";
                 Memory["DebugRunning", 32] = 1;
                 Memory["InterruptsEnabledFlag", 32].Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_NoSTI");
             EnableInterrupts();
-            
+
+            // IRQ reenabled, call secondary debug stub
             Label = "DebugStub_NoSTI";
             PushAll32();
+                // We just pushed all registers to the stack so we can use them
+                // So we get the stack pointer and add 32. This skips over the
+                // registers we just pushed.
                 EBP = ESP;
                 EBP.Add(32);
-                //
+                // Get actual EIP of caller.
                 EAX = Memory[EBP];
+                // Subtract 5 becuase the EIP is actually the EIP of our debug stub
+                // call routine. 5 is the size of our call op code and data, so -5
+                // gives us the EIP of the opcode before the debug caller which is
+                // what IL2CPU knows.
+                EAX.Sub(5);
+                // Store it for later use.
+                // Secondary stub also uses EAX, so keep EAX valid till we call
+                // secondary debug stub.
+                // Currently "DebugEIP" is not used as EAX is used instead, but 
+                // this might change in the future so we leave it for now.
                 Memory["DebugEIP"] = EAX;
-
-                //if tracemode = 4
-                //   SendTrace
-                //   Wait for some command that continues
-                //else
+                // Call secondary stub
                 Call("DebugStub_Executing");
             PopAll32();
+            // Complete, mark that DebugStub is complete
             Memory["DebugRunning", 32] = 0;
 
             Label = "DebugStub_Return";

@@ -31,6 +31,7 @@ namespace Cosmos.User.Kernel {
         //  -Run or step
 
         // DebugStub is at new sort/IL2CPU/Cosmos.IL2CPU.X86/X86/SpecialDebug/DebugStub.cs
+        // Matthijs ter Woord: btw, the point where we will send stuff over to qemu is in AD7Process.ResumeFromLaunch, i think
 
         static void Main() {
             // boot the Cosmos kernel:

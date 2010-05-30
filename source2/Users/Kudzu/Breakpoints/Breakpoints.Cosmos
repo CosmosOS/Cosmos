@@ -26,7 +26,7 @@
     <QemuAudioCard>
     </QemuAudioCard>
     <QemuNetworkTAP>True</QemuNetworkTAP>
-    <QemuEnableGDB>True</QemuEnableGDB>
+    <QemuEnableGDB>False</QemuEnableGDB>
     <QemuCommunication>TCPListener</QemuCommunication>
     <DebugMode>GDB</DebugMode>
   </PropertyGroup>
