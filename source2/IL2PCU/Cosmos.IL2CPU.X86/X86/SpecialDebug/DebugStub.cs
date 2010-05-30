@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Cosmos.Compiler.Debug; 
+using Cosmos.IL2CPU;
+
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
 // We will later optimize this
-using Cosmos.IL2CPU;
-namespace Cosmos.IL2CPU.X86
-{
+namespace Cosmos.IL2CPU.X86 {
     public class DebugStub : X.Y86 {
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
@@ -35,7 +34,8 @@ namespace Cosmos.IL2CPU.X86
                 new DataMember("InterruptsEnabledFlag", 0),
                 // If set to 1, on next trace a break will occur
                 new DataMember("DebugBreakOnNextTrace", 0),
-                // breakpoint address
+
+                // Breakpoint address
                 new DataMember("DebugBreakpointAddress", 0)
              });
         }

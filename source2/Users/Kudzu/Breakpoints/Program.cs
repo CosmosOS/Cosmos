@@ -30,6 +30,8 @@ namespace Cosmos.User.Kernel {
         //    -Remote GDB Debugger (Can also check set as default debugger), OK
         //  -Run or step
 
+        // DebugStub is at new sort/IL2CPU/Cosmos.IL2CPU.X86/X86/SpecialDebug/DebugStub.cs
+
         static void Main() {
             // boot the Cosmos kernel:
             Cosmos.Sys.Boot xBoot = new Cosmos.Sys.Boot();
