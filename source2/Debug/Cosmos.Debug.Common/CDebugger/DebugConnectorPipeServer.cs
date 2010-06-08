@@ -4,25 +4,31 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
     public class DebugConnectorPipeServer : DebugConnectorStream {
     
         public DebugConnectorPipeServer() {
-            NamedPipeServerStream xPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
+            mPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
              , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            xPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), xPipe);
+            mPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), mPipe);
+
         }
+
+        private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
+        private NamedPipeServerStream mPipe;
 
         public void DoWaitForConnection(IAsyncResult aResult) {
             var xPipe = (NamedPipeServerStream)aResult.AsyncState;
             xPipe.EndWaitForConnection(aResult);
-            Start(xPipe);
+            mWaitConnectEvent.Set();
+            Start(mPipe);
         }
 
         public override void WaitConnect() {
-            throw new NotImplementedException();
+            mWaitConnectEvent.WaitOne();
         }
     }
 }

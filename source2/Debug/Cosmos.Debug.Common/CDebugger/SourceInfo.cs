@@ -157,7 +157,7 @@ namespace Cosmos.Debug.Common.CDebugger
             #endregion
             xSW.Stop();
             System.Diagnostics.Trace.WriteLine("Sorting SymbolsList took: " + xSW.Elapsed);
-            MLDebugSymbol.WriteSymbolsListToFile(xSymbolsList, aDebugFile + ".sorted");
+            //MLDebugSymbol.WriteSymbolsListToFile(xSymbolsList, aDebugFile + ".sorted");
             xSW.Reset();
             xSW.Start();
             var xResult = new SourceInfos();

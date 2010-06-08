@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
@@ -16,15 +17,17 @@ namespace Cosmos.Debug.Common.CDebugger
             xTCPListener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), xTCPListener);
         }
 
+        private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
+
         public void DoAcceptTcpClientCallback(IAsyncResult aResult) {
             var xListener = (TcpListener) aResult.AsyncState;
             var xClient = xListener.EndAcceptTcpClient(aResult);
-            Console.WriteLine("TcpClient accepted");
             Start(xClient.GetStream());
+            mWaitConnectEvent.Set();
         }
 
         public override void WaitConnect() {
-            throw new NotImplementedException();
+            mWaitConnectEvent.WaitOne();
         }
 
     }

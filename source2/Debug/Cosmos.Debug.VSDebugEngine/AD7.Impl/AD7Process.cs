@@ -2,8 +2,9 @@
 // In fact also eliminate TCP server and keep only Pipes
 // Keep a note about servers.. we want to use servers and not clients, because we dont always know when the other side is ready
 // and with a server, we are ready and its ready whenever... but sometime after us for sure.
-//#define DEBUG_CONNECTOR_TCP_SERVER
-#define DEBUG_CONNECTOR_PIPE_CLIENT
+#define DEBUG_CONNECTOR_TCP_SERVER
+//#define DEBUG_CONNECTOR_PIPE_CLIENT
+//#define DEBUG_CONNECTOR_PIPE_SERVER
 //
 #define VM_QEMU
 //#define VM_VMWare
@@ -55,14 +56,11 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_PIPE_CLIENT
             var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
 #endif
-            var xArgsBuilder = new StringBuilder();
-            xArgsBuilder.AppendFormat("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe"), PathUtilities.GetQEmuDir().Replace('\\', '/'), mISO.Replace("\\", "/"), xDebugConnectorStr);
-            if (xGDBDebugStub)
-            {
-                xArgsBuilder.Append(" -s -S");
-            }
+#if DEBUG_CONNECTOR_PIPE_SERVER
+            var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+#endif
             // Start QEMU
-            mProcessStartInfo.Arguments = xArgsBuilder.ToString();
+            mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe"), PathUtilities.GetQEmuDir().Replace("\\", "/"), mISO.Replace("\\", "/"), xDebugConnectorStr);
 #endif
 #if VM_VMWare
             mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
@@ -97,6 +95,9 @@ namespace Cosmos.Debug.VSDebugEngine
 #endif
 #if DEBUG_CONNECTOR_PIPE_CLIENT
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeClient();
+#endif
+#if DEBUG_CONNECTOR_PIPE_SERVER
+            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
 #endif
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
