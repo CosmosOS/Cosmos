@@ -421,10 +421,9 @@ namespace Cosmos.IL2CPU.X86 {
                 EBP.Add(32);
                 // Get actual EIP of caller.
                 EAX = Memory[EBP];
-                // Subtract 5 becuase the EIP is actually the EIP of our debug stub
-                // call routine. 5 is the size of our call op code and data, so -5
-                // gives us the EIP of the opcode before the debug caller which is
-                // what IL2CPU knows.
+                // EIP is pointer to op after our call. We subtract 5 (the size of our call + address)
+                // so we get the EIP as IL2CPU records it. Its also useful for when we will
+                // be changing ops that call the stub.
                 EAX.Sub(5);
                 // Store it for later use.
                 // Secondary stub also uses EAX, so keep EAX valid till we call

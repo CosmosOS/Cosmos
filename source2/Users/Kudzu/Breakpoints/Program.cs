@@ -8,6 +8,8 @@ namespace Cosmos.User.Kernel {
 		    Main();
 	    }
 
+        // Current status. GDB is not running with QEMU.. waiting response from Matthijs regarding missing code in AD7Process.cs
+
         // If VSIP / Debugger has changed
         //  -Close VS
         //  -Run \Build\VSIP\install.bat - Builds all and installs
@@ -17,6 +19,7 @@ namespace Cosmos.User.Kernel {
         //  -Open a Cosmos project in the hive.
         //  -Run it
         // To use IDA
+        //  -Turn on GDB for target project
         //  -Build target project
         //  -Start VMWare or QEMU
         //    -\Build\Run QEMU Manually for IDA.bat

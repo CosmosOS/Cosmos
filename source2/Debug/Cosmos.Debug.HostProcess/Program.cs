@@ -19,7 +19,7 @@ namespace Cosmos.Debug.HostProcess
             // Arg[0] - ShellExecute
             bool xShellExecute = (string.Compare(args[0], "true", true) == 0);
 
-            // Arg[2] - Target exe or file
+            // Target exe or file
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = args[1];
             var xArgSB = new StringBuilder();

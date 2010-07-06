@@ -59,12 +59,24 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_PIPE_SERVER
             var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
 #endif
+
             // Start QEMU
-            mProcessStartInfo.Arguments = String.Format("false \"{0}\" -L \"{1}\" -cdrom \"{2}\" -boot d {3}", Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe"), PathUtilities.GetQEmuDir().Replace("\\", "/"), mISO.Replace("\\", "/"), xDebugConnectorStr);
+            // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
+            // Here we actually call our dummy/proxy program (Cosmos.Debug.HostProcess.exe) which in turn calls QEMU.
+            mProcessStartInfo.Arguments = 
+                "false" // Tells proxy to use ShellExecute or not (In this case, not, ie false)
+                // Rest of arguments are used to launch another process and its arguments.
+                + " " + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") // Program for our proxy to run
+                + " -L " + PathUtilities.GetQEmuDir().Replace("\\", "/") // Directory for the BIOS, VGA BIOS and keymaps
+                + " -cdrom " + mISO.Replace("\\", "/") // CDRom image
+                + " -boot d" // Boot from the CDRom
+                + " " + xDebugConnectorStr;
+
 #endif
 #if VM_VMWare
             mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
 #endif
+
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
             mProcessStartInfo.RedirectStandardError = true;
@@ -78,11 +90,13 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
             }
+            
             //TODO: This next line takes a long time. See if we can speed it up.
             var xSW = new Stopwatch();
             xSW.Start();
             mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(mISO, ".cxdb"));
             xSW.Stop();
+
             Trace.WriteLine("GetSourceInfo took: " + xSW.Elapsed);
             if (mSourceMappings.Count == 0)
             {
@@ -90,6 +104,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             mDebugEngine = new DebugEngine();
+
 #if DEBUG_CONNECTOR_TCP_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
 #endif
@@ -99,6 +114,7 @@ namespace Cosmos.Debug.VSDebugEngine
 #if DEBUG_CONNECTOR_PIPE_SERVER
             mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
 #endif
+
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
             mDebugEngine.DebugConnector.ConnectionLost = new Action<Exception>(
