@@ -50,15 +50,15 @@ namespace Cosmos.Debug.VSDebugEngine
             Boolean.TryParse(mDebugInfo["QemuEnableGDB"], out xGDBDebugStub);
 
 #if VM_QEMU
-#if DEBUG_CONNECTOR_TCP_SERVER
-            var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
-#endif
-#if DEBUG_CONNECTOR_PIPE_CLIENT
-            var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
-#endif
-#if DEBUG_CONNECTOR_PIPE_SERVER
-            var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
-#endif
+    #if DEBUG_CONNECTOR_TCP_SERVER
+                var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
+    #endif
+    #if DEBUG_CONNECTOR_PIPE_CLIENT
+                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+    #endif
+    #if DEBUG_CONNECTOR_PIPE_SERVER
+                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+    #endif
 
             // Start QEMU
             // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
@@ -71,6 +71,13 @@ namespace Cosmos.Debug.VSDebugEngine
                 + " -cdrom " + mISO.Replace("\\", "/") // CDRom image
                 + " -boot d" // Boot from the CDRom
                 + " " + xDebugConnectorStr;
+
+            if (xGDBDebugStub)
+            {
+                mProcessStartInfo.Arguments += " -s -S";
+            }
+
+
 
 #endif
 #if VM_VMWare
