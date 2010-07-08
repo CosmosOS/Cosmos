@@ -60,24 +60,22 @@ namespace Cosmos.Debug.VSDebugEngine
                 var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
     #endif
 
+            var xQT = "\"";
             // Start QEMU
             // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
             // Here we actually call our dummy/proxy program (Cosmos.Debug.HostProcess.exe) which in turn calls QEMU.
             mProcessStartInfo.Arguments = 
                 "false" // Tells proxy to use ShellExecute or not (In this case, not, ie false)
                 // Rest of arguments are used to launch another process and its arguments.
-                + " " + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") // Program for our proxy to run
-                + " -L " + PathUtilities.GetQEmuDir().Replace("\\", "/") // Directory for the BIOS, VGA BIOS and keymaps
-                + " -cdrom " + mISO.Replace("\\", "/") // CDRom image
+                + " " + xQT + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") + xQT // Program for our proxy to run
+                + " -L " + xQT + PathUtilities.GetQEmuDir().Replace("\\", "/") + xQT // Directory for the BIOS, VGA BIOS and keymaps
+                + " -cdrom " + xQT + mISO.Replace("\\", "/") + xQT // CDRom image
                 + " -boot d" // Boot from the CDRom
                 + " " + xDebugConnectorStr;
 
-            if (xGDBDebugStub)
-            {
+            if (xGDBDebugStub) {
                 mProcessStartInfo.Arguments += " -s -S";
             }
-
-
 
 #endif
 #if VM_VMWare
