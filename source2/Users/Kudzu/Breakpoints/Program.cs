@@ -8,7 +8,8 @@ namespace Cosmos.User.Kernel {
 		    Main();
 	    }
 
-        // Current status. GDB is not running with QEMU.. waiting response from Matthijs regarding missing code in AD7Process.cs
+        // Current status. 
+        //  -Matthijs - add post build action so we can launch IDA etc
 
         // If VSIP / Debugger has changed
         //  -Close VS
@@ -18,12 +19,15 @@ namespace Cosmos.User.Kernel {
         //  -Set startup project to /source2/VSIP/Cosmos.VS.Package
         //  -Open a Cosmos project in the hive.
         //  -Run it
+        //
         // To use IDA
         //  -Turn on GDB for target project
-        //  -Build target project
-        //  -Start VMWare or QEMU
-        //    -\Build\Run QEMU Manually for IDA.bat
-        //      -NOTE: This bat is hardcoded for Kudzu.Breakpoints to run
+        //  -Run
+        //    -If builder is currently broken, follow these manual steps instead:
+        //      -Build target project
+        //        -Start VMWare or QEMU 
+        //        -\Build\Run QEMU Manually for IDA.bat
+        //          -NOTE: This bat is hardcoded for Kudzu.Breakpoints to run
         //  -IDA Method 1 - No symbols
         //    -Debugger, Attach, Remote GDB, 127.0.0.1:1234, Select ID 0 
         //  -IDA Method 2 - Symbols
