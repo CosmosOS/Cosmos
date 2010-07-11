@@ -65,6 +65,8 @@ namespace Cosmos.Debug.GDB {
         protected void Disassemble() {
             var xResult = SendCmd("disassemble");
             lboxDisassemble.Items.Clear();
+            xResult.RemoveAt(0);
+            xResult.RemoveAt(xResult.Count - 1);
             lboxDisassemble.Items.AddRange(xResult.ToArray());
         }
 
@@ -85,16 +87,19 @@ namespace Cosmos.Debug.GDB {
             mGDBProcess.StandardInput.AutoFlush = true;
 
             GetResponse();
-            SendCmd("file CosmosKernel.obj");
+            SendCmd("symbol-file CosmosKernel.obj");
+            //SendCmd("file output.bin");
             SendCmd("target remote :1234");
+            SendCmd("set architecture i386");
+            SendCmd("set language asm");
             SendCmd("set disassembly-flavor intel");
             SendCmd("break Kernel_Start");
             SendCmd("continue");
-            Disassemble();
+            Update();
         }
 
         private void butnStepOne_Click(object sender, EventArgs e) {
-            SendCmd("ni");
+            SendCmd("stepi");
             Update();
         }
 
@@ -124,10 +129,11 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected void SetRegLabels(Label a32, Label a16, Label a8H, Label a8L, UInt32 aValue) {
-            a32.Text = aValue.ToString("X8");
-            a16.Text = aValue.ToString("X4");
-            a8H.Text = aValue.ToString("X4").Substring(0, 2);
-            a8L.Text = aValue.ToString("X2");
+            string xHex = aValue.ToString("X8");
+            a32.Text = xHex;
+            a16.Text = xHex.Substring(4);
+            a8H.Text = xHex.Substring(4, 2);
+            a8L.Text = xHex.Substring(6);
         }
 
         protected void GetRegisters() {
@@ -148,28 +154,34 @@ namespace Cosmos.Debug.GDB {
                     SetRegLabels(lablECX, lablCX, lablCH, lablCL, xReg.mValue);
                 } else if (xReg.mName == "EDX") {
                     SetRegLabels(lablEDX, lablDX, lablDH, lablDL, xReg.mValue);
+                } else if (xReg.mName == "EIP") {
+                    lablEIP.Text = xReg.mValue.ToString("X8");
+                    lablEIPText.Text = xReg.mText;
+                } else if (xReg.mName == "EFLAGS") {
+                    lablFlags.Text = xReg.mValue.ToString("X8");
+                    lablFlagsText.Text = xReg.mText;
+                } else if (xReg.mName == "ESP") {
+                    lablESP.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "EBP") {
+                    lablEBP.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "ESI") {
+                    lablESI.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "EDI") {
+                    lablEDI.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "SS") {
+                    lablSS.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "CS") {
+                    lablCS.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "DS") {
+                    lablDS.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "ES") {
+                    lablES.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "FS") {
+                    lablFS.Text = xReg.mValue.ToString("X8");
+                } else if (xReg.mName == "GS") {
+                    lablGS.Text = xReg.mValue.ToString("X8");
                 }
             }
-
-            /*
-            esp            0x550010
-            ebp            0x550010
-            esi            0x0
-            edi            0x0
-             
-            eip            0x5a0365
-	            0x5a0365 <___INIT__VMT__CODE____+533>
-        
-            eflags         0x2
-	            [ ]
-              
-            cs             0x20
-            ss             0x28
-            ds             0x28
-            es             0x28
-            fs             0x18
-            gs             0x18
-            */
         }
 
         protected void Update() {
@@ -193,5 +205,7 @@ namespace Cosmos.Debug.GDB {
             }
             Clipboard.SetText(xSB.ToString());
         }
+
+
     }
 }
