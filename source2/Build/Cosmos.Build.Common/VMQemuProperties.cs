@@ -26,11 +26,5 @@ namespace Cosmos.Build.Common
 			set { this.SetProperty("QemuAudioCard", value); }
 		}
 
-		public Boolean EnableGDB
-		{
-			get { return this.GetProperty("QemuEnableGDB", false); }
-			set { this.SetProperty("QemuEnableGDB", value); }
-		}
-
 	}
 }

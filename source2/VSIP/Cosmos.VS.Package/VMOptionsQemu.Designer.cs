@@ -30,8 +30,6 @@
 		{
             this.tableVMQemu = new System.Windows.Forms.TableLayoutPanel();
             this.tableAdvanced = new System.Windows.Forms.TableLayoutPanel();
-            this.checkEnableGDB = new System.Windows.Forms.CheckBox();
-            this.titleAdvanced = new Cosmos.VS.Package.TitleDivision();
             this.titleDevices = new Cosmos.VS.Package.TitleDivision();
             this.tableDevices = new System.Windows.Forms.TableLayoutPanel();
             this.labelNetworkCard = new System.Windows.Forms.Label();
@@ -44,7 +42,6 @@
             this.comboNetworkCard = new System.Windows.Forms.ComboBox();
             this.comboAudioCard = new System.Windows.Forms.ComboBox();
             this.tableVMQemu.SuspendLayout();
-            this.tableAdvanced.SuspendLayout();
             this.tableDevices.SuspendLayout();
             this.tableHardDisk.SuspendLayout();
             this.panelNetwork.SuspendLayout();
@@ -55,7 +52,6 @@
             this.tableVMQemu.ColumnCount = 1;
             this.tableVMQemu.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableVMQemu.Controls.Add(this.tableAdvanced, 0, 3);
-            this.tableVMQemu.Controls.Add(this.titleAdvanced, 0, 2);
             this.tableVMQemu.Controls.Add(this.titleDevices, 0, 0);
             this.tableVMQemu.Controls.Add(this.tableDevices, 0, 1);
             this.tableVMQemu.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -76,9 +72,8 @@
             this.tableAdvanced.ColumnCount = 2;
             this.tableAdvanced.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableAdvanced.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableAdvanced.Controls.Add(this.checkEnableGDB, 0, 0);
             this.tableAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableAdvanced.Location = new System.Drawing.Point(22, 180);
+            this.tableAdvanced.Location = new System.Drawing.Point(22, 141);
             this.tableAdvanced.Margin = new System.Windows.Forms.Padding(22, 0, 0, 0);
             this.tableAdvanced.Name = "tableAdvanced";
             this.tableAdvanced.RowCount = 3;
@@ -87,29 +82,6 @@
             this.tableAdvanced.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableAdvanced.Size = new System.Drawing.Size(470, 56);
             this.tableAdvanced.TabIndex = 4;
-            // 
-            // checkEnableGDB
-            // 
-            this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkEnableGDB.Location = new System.Drawing.Point(3, 3);
-            this.checkEnableGDB.Name = "checkEnableGDB";
-            this.checkEnableGDB.Size = new System.Drawing.Size(219, 20);
-            this.checkEnableGDB.TabIndex = 9;
-            this.checkEnableGDB.Text = "Enable QEMU\'s GDB support.";
-            this.checkEnableGDB.UseVisualStyleBackColor = true;
-            // 
-            // titleAdvanced
-            // 
-            this.titleAdvanced.BackColor = System.Drawing.Color.Transparent;
-            this.titleAdvanced.Dock = System.Windows.Forms.DockStyle.Top;
-            this.titleAdvanced.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.titleAdvanced.LineColor = System.Drawing.SystemColors.ControlDark;
-            this.titleAdvanced.Location = new System.Drawing.Point(3, 153);
-            this.titleAdvanced.Margin = new System.Windows.Forms.Padding(3, 12, 3, 12);
-            this.titleAdvanced.Name = "titleAdvanced";
-            this.titleAdvanced.Size = new System.Drawing.Size(486, 15);
-            this.titleAdvanced.TabIndex = 3;
-            this.titleAdvanced.Title = "Advanced";
             // 
             // titleDevices
             // 
@@ -250,7 +222,6 @@
             this.Name = "VMOptionsQemu";
             this.Size = new System.Drawing.Size(492, 288);
             this.tableVMQemu.ResumeLayout(false);
-            this.tableAdvanced.ResumeLayout(false);
             this.tableDevices.ResumeLayout(false);
             this.tableHardDisk.ResumeLayout(false);
             this.panelNetwork.ResumeLayout(false);
@@ -269,12 +240,10 @@
 		private System.Windows.Forms.ComboBox comboAudioCard;
 		private System.Windows.Forms.TableLayoutPanel tableHardDisk;
 		private System.Windows.Forms.Label labelInternalAssembler;
-		private System.Windows.Forms.CheckBox checkEnableDiskImages;
-		private System.Windows.Forms.CheckBox checkEnableGDB;
+        private System.Windows.Forms.CheckBox checkEnableDiskImages;
 		private System.Windows.Forms.Panel panelNetwork;
 		private System.Windows.Forms.CheckBox checkNetworkTAP;
-		private System.Windows.Forms.ComboBox comboNetworkCard;
-		private TitleDivision titleAdvanced;
+        private System.Windows.Forms.ComboBox comboNetworkCard;
         private System.Windows.Forms.TableLayoutPanel tableAdvanced;
 	}
 }

@@ -56,7 +56,14 @@ namespace Cosmos.VS.Package
                     this.IsDirty = true;
                 }
             };
-		}
+            this.checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+                Boolean value = this.checkEnableGDB.Checked;
+                if (value != this.PageProperties.EnableGDB) {
+                    this.PageProperties.EnableGDB = value;
+                    this.IsDirty = true;
+                }
+            };
+        }
 
 		public override PropertiesBase Properties
 		{ get { return this.projProperties; } }
@@ -67,13 +74,11 @@ namespace Cosmos.VS.Package
 		public override void FillProperties()
 		{
 			base.FillProperties();
-
 			this.PageProperties.Reset();
-
 			this.PageProperties.SetProperty("QemuCommunication", this.GetConfigProperty("QemuCommunication"));
-
 			this.comboCommunication.SelectedItem = EnumValue.Find(this.comboCommunication.Items, this.PageProperties.Communication);
-		}
+            this.checkEnableGDB.Checked = this.PageProperties.EnableGDB;
+        }
 
         private void tableDebugQemu_Paint(object sender, PaintEventArgs e)
         {

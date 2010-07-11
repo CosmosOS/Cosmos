@@ -44,7 +44,7 @@ namespace Cosmos.VS.Package
                 xValues.Add("QemuNetworkCard", this.GetConfigurationProperty("QemuNetworkCard", true));
                 xValues.Add("QemuAudioCard", this.GetConfigurationProperty("QemuAudioCard", true));
                 xValues.Add("QemuNetworkTAP", this.GetConfigurationProperty("QemuNetworkTAP", true));
-                xValues.Add("QemuEnableGDB", this.GetConfigurationProperty("QemuEnableGDB", true));
+                xValues.Add("EnableGDB", this.GetConfigurationProperty("EnableGDB", true));
                 xValues.Add("QemuCommunication", this.GetConfigurationProperty("QemuCommunication", true));
                 xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", true));
                 xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", true));

@@ -21,8 +21,8 @@
     <QemuAudioCard>
     </QemuAudioCard>
     <QemuNetworkTAP>True</QemuNetworkTAP>
-    <QemuEnableGDB>
-    </QemuEnableGDB>
+    <EnableGDB>
+    </EnableGDB>
     <QemuCommunication>
     </QemuCommunication>
     <DebugMode>Source</DebugMode>

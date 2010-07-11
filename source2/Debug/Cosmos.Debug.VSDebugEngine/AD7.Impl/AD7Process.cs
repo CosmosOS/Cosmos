@@ -47,7 +47,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mISO = mDebugInfo["ISOFile"];
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
             var xGDBDebugStub = false;
-            Boolean.TryParse(mDebugInfo["QemuEnableGDB"], out xGDBDebugStub);
+            Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
 
 #if VM_QEMU
     #if DEBUG_CONNECTOR_TCP_SERVER
@@ -74,7 +74,9 @@ namespace Cosmos.Debug.VSDebugEngine
                 + " " + xDebugConnectorStr;
 
             if (xGDBDebugStub) {
-                mProcessStartInfo.Arguments += " -s -S";
+                mProcessStartInfo.Arguments 
+                    += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
+                    + "-S"; // Pause on startup, wait for GDB to connect and control
             }
 
 #endif

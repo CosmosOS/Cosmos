@@ -36,6 +36,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.comboDebugMode = new System.Windows.Forms.ComboBox();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
+            this.checkEnableGDB = new System.Windows.Forms.CheckBox();
+            this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.tableDebugQemu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,6 +47,7 @@
             this.tableDebugQemu.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 39F));
             this.tableDebugQemu.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.66887F));
             this.tableDebugQemu.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.33113F));
+            this.tableDebugQemu.Controls.Add(this.titleDivision1, 0, 8);
             this.tableDebugQemu.Controls.Add(this.label2, 1, 3);
             this.tableDebugQemu.Controls.Add(this.labelCommunication, 1, 2);
             this.tableDebugQemu.Controls.Add(this.titleGeneral, 0, 0);
@@ -52,11 +55,12 @@
             this.tableDebugQemu.Controls.Add(this.label1, 1, 1);
             this.tableDebugQemu.Controls.Add(this.comboDebugMode, 2, 1);
             this.tableDebugQemu.Controls.Add(this.comboTraceMode, 2, 3);
+            this.tableDebugQemu.Controls.Add(this.checkEnableGDB, 1, 9);
             this.tableDebugQemu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableDebugQemu.Location = new System.Drawing.Point(0, 0);
             this.tableDebugQemu.Margin = new System.Windows.Forms.Padding(0);
             this.tableDebugQemu.Name = "tableDebugQemu";
-            this.tableDebugQemu.RowCount = 9;
+            this.tableDebugQemu.RowCount = 11;
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -66,6 +70,8 @@
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 128F));
+            this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableDebugQemu.Size = new System.Drawing.Size(492, 288);
             this.tableDebugQemu.TabIndex = 0;
             this.tableDebugQemu.Paint += new System.Windows.Forms.PaintEventHandler(this.tableDebugQemu_Paint);
@@ -107,7 +113,7 @@
             this.titleGeneral.Name = "titleGeneral";
             this.titleGeneral.Size = new System.Drawing.Size(257, 15);
             this.titleGeneral.TabIndex = 0;
-            this.titleGeneral.Title = "General";
+            this.titleGeneral.Title = "Source";
             // 
             // comboCommunication
             // 
@@ -148,6 +154,30 @@
             this.comboTraceMode.Size = new System.Drawing.Size(223, 21);
             this.comboTraceMode.TabIndex = 15;
             // 
+            // checkEnableGDB
+            // 
+            this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkEnableGDB.Location = new System.Drawing.Point(42, 143);
+            this.checkEnableGDB.Name = "checkEnableGDB";
+            this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
+            this.checkEnableGDB.TabIndex = 20;
+            this.checkEnableGDB.Text = "Enable GDB Debugger";
+            this.checkEnableGDB.UseVisualStyleBackColor = true;
+            // 
+            // titleDivision1
+            // 
+            this.titleDivision1.BackColor = System.Drawing.Color.Transparent;
+            this.tableDebugQemu.SetColumnSpan(this.titleDivision1, 2);
+            this.titleDivision1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.titleDivision1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.titleDivision1.LineColor = System.Drawing.SystemColors.ControlDark;
+            this.titleDivision1.Location = new System.Drawing.Point(3, 114);
+            this.titleDivision1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
+            this.titleDivision1.Name = "titleDivision1";
+            this.titleDivision1.Size = new System.Drawing.Size(257, 14);
+            this.titleDivision1.TabIndex = 21;
+            this.titleDivision1.Title = "Assembly";
+            // 
             // DebugOptionsQemu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -172,5 +202,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comboDebugMode;
         private System.Windows.Forms.Label label1;
+        private TitleDivision titleDivision1;
+        private System.Windows.Forms.CheckBox checkEnableGDB;
 	}
 }

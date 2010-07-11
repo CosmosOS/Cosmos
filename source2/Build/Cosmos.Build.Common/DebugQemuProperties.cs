@@ -37,5 +37,10 @@ namespace Cosmos.Build.Common
 			set { this.SetProperty("QemuCommunication", value); }
 		}
 
-	}
+        public Boolean EnableGDB {
+            get { return this.GetProperty("EnableGDB", false); }
+            set { this.SetProperty("EnableGDB", value); }
+        }
+
+    }
 }

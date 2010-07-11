@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Cosmos.Build.Launch.Target {
   public class QEMU : Target {
+      //TODO: This is the old QEMU stuff, need to remove during cleanup
     public override void Execute() {
       string xBuildPath = @"C:\source\Cosmos\Build\";
       string xToolsPath = xBuildPath + @"Tools\";
