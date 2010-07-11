@@ -44,10 +44,13 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             mDebugInfo = new NameValueCollection();
             NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
+
             mISO = mDebugInfo["ISOFile"];
-            mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
+
             var xGDBDebugStub = false;
             Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
+
+            mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
 
 #if VM_QEMU
     #if DEBUG_CONNECTOR_TCP_SERVER
