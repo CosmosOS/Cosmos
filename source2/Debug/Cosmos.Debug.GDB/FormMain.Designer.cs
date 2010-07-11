@@ -163,10 +163,12 @@
             // lboxDisassemble
             // 
             this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxDisassemble.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lboxDisassemble.FormattingEnabled = true;
+            this.lboxDisassemble.ItemHeight = 19;
             this.lboxDisassemble.Location = new System.Drawing.Point(3, 3);
             this.lboxDisassemble.Name = "lboxDisassemble";
-            this.lboxDisassemble.Size = new System.Drawing.Size(696, 628);
+            this.lboxDisassemble.Size = new System.Drawing.Size(696, 612);
             this.lboxDisassemble.TabIndex = 3;
             // 
             // panel3
@@ -857,6 +859,7 @@
             this.Controls.Add(this.panel1);
             this.Name = "FormMain";
             this.Text = "Cosmos GDB Debugger";
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.panel1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

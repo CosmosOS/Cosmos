@@ -24,6 +24,11 @@ namespace Cosmos.Debug.GDB {
         // watches
         // View stack
 
+        protected string Unescape(string aInput) {
+            // Remove surrounding ", /n, then unescape and trim
+            return Regex.Unescape(aInput.Substring(1, aInput.Length - 2).Replace('\n', ' ').Trim());
+        }
+
         protected List<string> GetResponse() {
             var xResult = new List<string>();
 
@@ -42,7 +47,7 @@ namespace Cosmos.Debug.GDB {
                     // ^ ?
                     xLine = xLine.Remove(0, 1);
                     if ((xType == '~') || (xType == '&')) {
-                        xLine = Regex.Unescape(xLine.Substring(1, xLine.Length - 2));
+                        xLine = Unescape(xLine);
                     }
                     lboxDebug.Items.Add(xLine);
                     if (xType == '~') {
@@ -65,14 +70,38 @@ namespace Cosmos.Debug.GDB {
         protected void Disassemble() {
             var xResult = SendCmd("disassemble");
             lboxDisassemble.Items.Clear();
+            // In some cases GDB might return no results. This is common when no symbols are loaded.
             if (xResult.Count > 0) {
-                xResult.RemoveAt(0);
-                xResult.RemoveAt(xResult.Count - 1);
-                lboxDisassemble.Items.AddRange(xResult.ToArray());
+                // 1 and -2 to eliminate header and footer line
+                for (int i = 1; i <= xResult.Count - 2; i++) {
+                    var s = Unescape(xResult[i]);
+                    //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
+                    var xSplit1 = s.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    
+                    var xSplit2 = xSplit1[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    string xAddr = xSplit2[0].Substring(2).ToUpper();
+                    string xLabel;
+                    if (xSplit2.Length > 1) {
+                        xLabel = xSplit2[1];
+                    }
+
+                    xSplit2 = xSplit1[1].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    string xOp = xSplit2[0];
+                    string xData = "";
+                    if (xSplit2.Length > 1) {
+                        for (int j = 1; j < xSplit2.Length; j++) {
+                            xData += xSplit2[j] + " ";
+                        }
+                        xData = xData.TrimEnd();
+                    }
+
+                    lboxDisassemble.Items.Add((xAddr + ":  " + xOp + " " + xData).TrimEnd());
+                }
             }
         }
 
         private void butnConnect_Click(object sender, EventArgs e) {
+            butnConnect.Enabled = false;
             var xStartInfo = new ProcessStartInfo();
             //TODO: Make path dynamic
             xStartInfo.FileName = @"D:\source\Cosmos\Build\Tools\gdb.exe";
@@ -90,11 +119,9 @@ namespace Cosmos.Debug.GDB {
 
             GetResponse();
             SendCmd("symbol-file CosmosKernel.obj");
-            //SendCmd("file output.bin");
             
             //
-            //SendCmd("target remote :1234"); // QEMU
-            SendCmd("target remote :8832"); // VMWare
+            SendCmd("target remote :8832"); // 
 
             SendCmd("set architecture i386");
             SendCmd("set language asm");
@@ -116,7 +143,7 @@ namespace Cosmos.Debug.GDB {
             public string mText;
 
             public CPUReg(List<string> aInput, ref int rIndex) {
-                var xParts = aInput[rIndex].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var xParts = aInput[rIndex].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 mName = xParts[0].ToUpper();
                 // Substring(2) is to remove the 0x which is required according to .NET docs and experimentation
                 mValue = UInt32.Parse(xParts[1].Substring(2), NumberStyles.HexNumber);
@@ -209,6 +236,12 @@ namespace Cosmos.Debug.GDB {
                 xSB.AppendLine(x);
             }
             Clipboard.SetText(xSB.ToString());
+        }
+
+        private void FormMain_Shown(object sender, EventArgs e) {
+            if (butnConnect.Enabled) {
+                butnConnect.PerformClick();
+            }
         }
 
 
