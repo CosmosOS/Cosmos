@@ -62,8 +62,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.lboxRegisters = new System.Windows.Forms.ListBox();
-            this.lboxDisassemble = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.lboxDebug = new System.Windows.Forms.ListBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -98,6 +96,7 @@
             this.lablFlagsText = new System.Windows.Forms.Label();
             this.lablFlags = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
+            this.lboxDisassemble = new System.Windows.Forms.ListBox();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -151,8 +150,8 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.panel3);
             this.tabPage1.Controls.Add(this.lboxDisassemble);
+            this.tabPage1.Controls.Add(this.panel3);
             this.tabPage1.Location = new System.Drawing.Point(4, 4);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -222,8 +221,7 @@
             this.panel3.Controls.Add(this.label4);
             this.panel3.Controls.Add(this.label3);
             this.panel3.Controls.Add(this.label2);
-            this.panel3.Controls.Add(this.lboxRegisters);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel3.Location = new System.Drawing.Point(699, 3);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(314, 629);
@@ -526,24 +524,6 @@
             this.label2.Size = new System.Drawing.Size(60, 13);
             this.label2.TabIndex = 2;
             this.label2.Text = "Registers";
-            // 
-            // lboxRegisters
-            // 
-            this.lboxRegisters.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lboxRegisters.FormattingEnabled = true;
-            this.lboxRegisters.Location = new System.Drawing.Point(0, 391);
-            this.lboxRegisters.Name = "lboxRegisters";
-            this.lboxRegisters.Size = new System.Drawing.Size(314, 238);
-            this.lboxRegisters.TabIndex = 1;
-            // 
-            // lboxDisassemble
-            // 
-            this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lboxDisassemble.FormattingEnabled = true;
-            this.lboxDisassemble.Location = new System.Drawing.Point(3, 3);
-            this.lboxDisassemble.Name = "lboxDisassemble";
-            this.lboxDisassemble.Size = new System.Drawing.Size(696, 628);
-            this.lboxDisassemble.TabIndex = 0;
             // 
             // tabPage2
             // 
@@ -859,6 +839,15 @@
             this.label11.TabIndex = 58;
             this.label11.Text = "Flags";
             // 
+            // lboxDisassemble
+            // 
+            this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxDisassemble.FormattingEnabled = true;
+            this.lboxDisassemble.Location = new System.Drawing.Point(3, 3);
+            this.lboxDisassemble.Name = "lboxDisassemble";
+            this.lboxDisassemble.Size = new System.Drawing.Size(696, 628);
+            this.lboxDisassemble.TabIndex = 3;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -886,7 +875,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.ListBox lboxDisassemble;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button butnStep;
         private System.Windows.Forms.ListBox lboxDebug;
@@ -895,7 +883,6 @@
         private System.Windows.Forms.TextBox textSendCmd;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button butnDebugLogClear;
-        private System.Windows.Forms.ListBox lboxRegisters;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label lablAH;
         private System.Windows.Forms.Label lablAX;
@@ -957,6 +944,7 @@
         private System.Windows.Forms.Label lablFlagsText;
         private System.Windows.Forms.Label lablFlags;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.ListBox lboxDisassemble;
     }
 }
 

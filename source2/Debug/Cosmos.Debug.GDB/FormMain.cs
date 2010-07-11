@@ -65,9 +65,11 @@ namespace Cosmos.Debug.GDB {
         protected void Disassemble() {
             var xResult = SendCmd("disassemble");
             lboxDisassemble.Items.Clear();
-            xResult.RemoveAt(0);
-            xResult.RemoveAt(xResult.Count - 1);
-            lboxDisassemble.Items.AddRange(xResult.ToArray());
+            if (xResult.Count > 0) {
+                xResult.RemoveAt(0);
+                xResult.RemoveAt(xResult.Count - 1);
+                lboxDisassemble.Items.AddRange(xResult.ToArray());
+            }
         }
 
         private void butnConnect_Click(object sender, EventArgs e) {
@@ -89,11 +91,16 @@ namespace Cosmos.Debug.GDB {
             GetResponse();
             SendCmd("symbol-file CosmosKernel.obj");
             //SendCmd("file output.bin");
-            SendCmd("target remote :1234");
+            
+            //
+            //SendCmd("target remote :1234"); // QEMU
+            SendCmd("target remote :8832"); // VMWare
+
             SendCmd("set architecture i386");
             SendCmd("set language asm");
             SendCmd("set disassembly-flavor intel");
             SendCmd("break Kernel_Start");
+            //SendCmd("break *0x0056d2b9");
             SendCmd("continue");
             Update();
         }
@@ -139,9 +146,6 @@ namespace Cosmos.Debug.GDB {
         protected void GetRegisters() {
             var xResult = SendCmd("info registers");
 
-            lboxRegisters.Items.Clear();
-            lboxRegisters.Items.AddRange(xResult.ToArray());
-
             int i = 0;
             CPUReg xReg;
             while (i < xResult.Count - 1) {
@@ -158,6 +162,7 @@ namespace Cosmos.Debug.GDB {
                     lablEIP.Text = xReg.mValue.ToString("X8");
                     lablEIPText.Text = xReg.mText;
                 } else if (xReg.mName == "EFLAGS") {
+                    // http://en.wikipedia.org/wiki/FLAGS_register_%28computing%29
                     lablFlags.Text = xReg.mValue.ToString("X8");
                     lablFlagsText.Text = xReg.mText;
                 } else if (xReg.mName == "ESP") {
