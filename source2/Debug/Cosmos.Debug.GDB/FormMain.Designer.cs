@@ -39,17 +39,18 @@
             // 
             // lboxDebug
             // 
+            this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Right;
             this.lboxDebug.FormattingEnabled = true;
-            this.lboxDebug.Location = new System.Drawing.Point(393, 56);
+            this.lboxDebug.Location = new System.Drawing.Point(504, 0);
             this.lboxDebug.Name = "lboxDebug";
-            this.lboxDebug.Size = new System.Drawing.Size(221, 394);
+            this.lboxDebug.Size = new System.Drawing.Size(539, 667);
             this.lboxDebug.TabIndex = 1;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(650, 475);
+            this.ClientSize = new System.Drawing.Size(1043, 675);
             this.Controls.Add(this.lboxDebug);
             this.Controls.Add(this.butnConnect);
             this.Name = "FormMain";
