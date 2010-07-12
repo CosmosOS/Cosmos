@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SettingsDS" targetNamespace="http://tempuri.org/SettingsDS.xsd" xmlns:mstns="http://tempuri.org/SettingsDS.xsd" xmlns="http://tempuri.org/SettingsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="SettingsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="SettingsDS" msprop:Generator_UserDSName="SettingsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Breakpoint" msprop:Generator_UserTableName="Breakpoint" msprop:Generator_RowDeletedName="BreakpointRowDeleted" msprop:Generator_TableClassName="BreakpointDataTable" msprop:Generator_RowChangedName="BreakpointRowChanged" msprop:Generator_RowClassName="BreakpointRow" msprop:Generator_RowChangingName="BreakpointRowChanging" msprop:Generator_RowEvArgName="BreakpointRowChangeEvent" msprop:Generator_RowEvHandlerName="BreakpointRowChangeEventHandler" msprop:Generator_TablePropName="Breakpoint" msprop:Generator_TableVarName="tableBreakpoint" msprop:Generator_RowDeletingName="BreakpointRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Label" msprop:Generator_UserColumnName="Label" msprop:Generator_ColumnPropNameInRow="Label" msprop:Generator_ColumnVarNameInTable="columnLabel" msprop:Generator_ColumnPropNameInTable="LabelColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Watch" msprop:Generator_UserTableName="Watch" msprop:Generator_RowDeletedName="WatchRowDeleted" msprop:Generator_TableClassName="WatchDataTable" msprop:Generator_RowChangedName="WatchRowChanged" msprop:Generator_RowClassName="WatchRow" msprop:Generator_RowChangingName="WatchRowChanging" msprop:Generator_RowEvArgName="WatchRowChangeEvent" msprop:Generator_RowEvHandlerName="WatchRowChangeEventHandler" msprop:Generator_TablePropName="Watch" msprop:Generator_TableVarName="tableWatch" msprop:Generator_RowDeletingName="WatchRowDeleting">
+          <xs:complexType>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
