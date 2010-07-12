@@ -130,6 +130,8 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.lablCurrentFunction = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.menuCallStack = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuCallStackGoto = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.menuDisassembly.SuspendLayout();
@@ -146,6 +148,7 @@
             this.panel7.SuspendLayout();
             this.panel8.SuspendLayout();
             this.panel4.SuspendLayout();
+            this.menuCallStack.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -1133,6 +1136,7 @@
             // 
             // lboxCallStack
             // 
+            this.lboxCallStack.ContextMenuStrip = this.menuCallStack;
             this.lboxCallStack.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lboxCallStack.FormattingEnabled = true;
             this.lboxCallStack.HorizontalScrollbar = true;
@@ -1140,6 +1144,7 @@
             this.lboxCallStack.Name = "lboxCallStack";
             this.lboxCallStack.Size = new System.Drawing.Size(276, 329);
             this.lboxCallStack.TabIndex = 68;
+            this.lboxCallStack.DoubleClick += new System.EventHandler(this.lboxCallStack_DoubleClick);
             // 
             // panel8
             // 
@@ -1192,6 +1197,21 @@
             this.label5.TabIndex = 0;
             this.label5.Text = "Current Function:";
             // 
+            // menuCallStack
+            // 
+            this.menuCallStack.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuCallStackGoto});
+            this.menuCallStack.Name = "menuCallStack";
+            this.menuCallStack.Size = new System.Drawing.Size(215, 26);
+            // 
+            // menuCallStackGoto
+            // 
+            this.menuCallStackGoto.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.menuCallStackGoto.Name = "menuCallStackGoto";
+            this.menuCallStackGoto.Size = new System.Drawing.Size(214, 22);
+            this.menuCallStackGoto.Text = "&Go To (Disassemble Only)";
+            this.menuCallStackGoto.Click += new System.EventHandler(this.menuCallStackGoto_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1227,6 +1247,7 @@
             this.panel8.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            this.menuCallStack.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1340,6 +1361,8 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Label lablCurrentFunction;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ContextMenuStrip menuCallStack;
+        private System.Windows.Forms.ToolStripMenuItem menuCallStackGoto;
     }
 }
 

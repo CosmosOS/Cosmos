@@ -48,7 +48,7 @@ namespace Cosmos.Debug.GDB {
                     // ^ done
                     xLine = xLine.Remove(0, 1);
                     if ((xType == '~') || (xType == '&')) {
-                        xLine = FormMain.Unescape(xLine);
+                        xLine = Unescape(xLine);
                     }
                     Log(xType + xLine);
                     if (xType == '~') {
@@ -71,6 +71,10 @@ namespace Cosmos.Debug.GDB {
             return GetResponse();
         }
 
+        static protected UInt32 FromHex(string aValue) {
+            return UInt32.Parse(aValue.Substring(2), NumberStyles.HexNumber);
+        }
+
         protected class AsmLine {
             public readonly UInt32 mAddr;
             public readonly string mLabel;
@@ -79,11 +83,11 @@ namespace Cosmos.Debug.GDB {
 
             public AsmLine(string aInput) {
                 //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
-                var s = FormMain.Unescape(aInput);
+                var s = Unescape(aInput);
                 var xSplit1 = s.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
                 var xSplit2 = xSplit1[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                mAddr = UInt32.Parse(xSplit2[0].Substring(2), NumberStyles.HexNumber);
+                mAddr = FromHex(xSplit2[0]);
                 string xLabel;
                 if (xSplit2.Length > 1) {
                     xLabel = xSplit2[1];
@@ -105,11 +109,11 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        protected void Disassemble() {
+        protected void Disassemble(string aLabel) {
             lablCurrentFunction.Text = "";
             lablCurrentFunction.Visible = true;
 
-            var xResult = SendCmd("disassemble");
+            var xResult = SendCmd(("disassemble " + aLabel).Trim());
             lboxDisassemble.BeginUpdate();
             try {
                 lboxDisassemble.Items.Clear();
@@ -195,10 +199,12 @@ namespace Cosmos.Debug.GDB {
                     xEIP = xReg;
                     SetAddress(lablEIP, xReg);
                     lablEIPText.Text = xReg.mText;
+                    lablEIPText.Visible = true;
                 } else if (xReg.mName == "EFLAGS") {
                     // http://en.wikipedia.org/wiki/FLAGS_register_%28computing%29
                     SetAddress(lablFlags, xReg);
                     lablFlagsText.Text = xReg.mText;
+                    lablFlagsText.Visible = true;
                 } else if (xReg.mName == "ESP") {
                     SetAddress(lablESP, xReg);
                 } else if (xReg.mName == "EBP") {
@@ -231,18 +237,38 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        protected class CallStack {
+            public readonly UInt32 Address;
+            public readonly string Label;
+
+            public CallStack(string aInput) {
+                var xSplit = aInput.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                Address = FromHex(xSplit[1]);
+                Label = xSplit[3];
+            }
+
+            public override string ToString() {
+                if (Label.Length > 0) {
+                    return Label;
+                }
+                return Address.ToString("X8");
+            }
+        }
+
         protected void GetCallStack() {
             var xResult = SendCmd("where");
             lboxCallStack.BeginUpdate();
             try {
                 lboxCallStack.Items.Clear();
-                //#0  0x0056d5df in DebugStub_Start ()
-                //#1  0x0057572b in System_Void__Cosmos_User_Kernel_Program_Init____DOT__00000001 ()
-                //#2  0x00550018 in Before_Kernel_Stack ()
-                //#3  0x005a5427 in __ENGINE_ENTRYPOINT__ ()
-                //~Backtrace stopped: frame did not save the PC
                 foreach (var x in xResult) {
-                    lboxCallStack.Items.Add(x);
+                    //#0  0x0056d5df in DebugStub_Start ()
+                    //#1  0x0057572b in System_Void__Cosmos_User_Kernel_Program_Init____DOT__00000001 ()
+                    //#2  0x00550018 in Before_Kernel_Stack ()
+                    //#3  0x005a5427 in __ENGINE_ENTRYPOINT__ ()
+                    //~Backtrace stopped: frame did not save the PC
+                    if (x.StartsWith("#")) {
+                        lboxCallStack.Items.Add(new CallStack(x));
+                    }
                 }
             } finally {
                 lboxCallStack.EndUpdate();
@@ -250,7 +276,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected void Update() {
-            Disassemble();
+            Disassemble("");
             GetRegisters();
             GetCallStack();
             tabControl1.SelectedIndex = 0;
@@ -326,6 +352,39 @@ namespace Cosmos.Debug.GDB {
             }
 
             Update();
+        }
+
+        protected void ResetRegisters() {
+            lablEAX.Visible = false;
+            lablAX.Visible = false;
+            lablAH.Visible = false;
+            lablAL.Visible = false;
+            lablEBX.Visible = false;
+            lablBX.Visible = false;
+            lablBH.Visible = false;
+            lablBL.Visible = false;
+            lablECX.Visible = false;
+            lablCX.Visible = false;
+            lablCH.Visible = false;
+            lablCL.Visible = false;
+            lablEDX.Visible = false;
+            lablDX.Visible = false;
+            lablDH.Visible = false;
+            lablDL.Visible = false;
+            lablEIP.Visible = false;
+            lablEIPText.Visible = false;
+            lablFlags.Visible = false;
+            lablFlagsText.Visible = false;
+            lablESP.Visible = false;
+            lablEBP.Visible = false;
+            lablESI.Visible = false;
+            lablEDI.Visible = false;
+            lablSS.Visible = false;
+            lablCS.Visible = false;
+            lablDS.Visible = false;
+            lablES.Visible = false;
+            lablFS.Visible = false;
+            lablGS.Visible = false;
         }
 
         private void mitmRefresh_Click(object sender, EventArgs e) {
@@ -420,6 +479,19 @@ namespace Cosmos.Debug.GDB {
             if (System.IO.File.Exists(ConfigPathname)) {
                 Settings.ReadXml(ConfigPathname, System.Data.XmlReadMode.IgnoreSchema);
             }
+        }
+
+        private void menuCallStackGoto_Click(object sender, EventArgs e) {
+            var x = (CallStack)lboxCallStack.SelectedItem;
+            if (x != null) {
+                ResetRegisters();
+                // Address doesn't work for some reason
+                Disassemble(x.Label);
+            }
+        }
+
+        private void lboxCallStack_DoubleClick(object sender, EventArgs e) {
+            menuCallStackGoto.PerformClick();
         }
 
     }
