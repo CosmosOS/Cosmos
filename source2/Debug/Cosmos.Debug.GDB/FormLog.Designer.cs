@@ -23,22 +23,14 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.lboxDebug = new System.Windows.Forms.ListBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmClear = new System.Windows.Forms.ToolStripMenuItem();
+            this.lboxCmd = new System.Windows.Forms.ListBox();
+            this.lboxDebug = new System.Windows.Forms.ListBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // lboxDebug
-            // 
-            this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lboxDebug.FormattingEnabled = true;
-            this.lboxDebug.Location = new System.Drawing.Point(0, 24);
-            this.lboxDebug.Name = "lboxDebug";
-            this.lboxDebug.Size = new System.Drawing.Size(284, 238);
-            this.lboxDebug.TabIndex = 5;
             // 
             // menuStrip1
             // 
@@ -46,7 +38,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(284, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(489, 24);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -75,16 +67,38 @@
             this.mitmClear.Text = "C&lear";
             this.mitmClear.Click += new System.EventHandler(this.mitmClear_Click);
             // 
+            // lboxCmd
+            // 
+            this.lboxCmd.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lboxCmd.FormattingEnabled = true;
+            this.lboxCmd.Location = new System.Drawing.Point(0, 24);
+            this.lboxCmd.Name = "lboxCmd";
+            this.lboxCmd.Size = new System.Drawing.Size(120, 342);
+            this.lboxCmd.TabIndex = 7;
+            // 
+            // lboxDebug
+            // 
+            this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxDebug.FormattingEnabled = true;
+            this.lboxDebug.Location = new System.Drawing.Point(120, 24);
+            this.lboxDebug.Name = "lboxDebug";
+            this.lboxDebug.Size = new System.Drawing.Size(369, 342);
+            this.lboxDebug.TabIndex = 8;
+            // 
             // FormLog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ClientSize = new System.Drawing.Size(489, 374);
             this.Controls.Add(this.lboxDebug);
+            this.Controls.Add(this.lboxCmd);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormLog";
+            this.ShowInTaskbar = false;
             this.Text = "Debug Log";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormLog_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -94,10 +108,11 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox lboxDebug;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;
         private System.Windows.Forms.ToolStripMenuItem mitmClear;
+        private System.Windows.Forms.ListBox lboxCmd;
+        private System.Windows.Forms.ListBox lboxDebug;
     }
 }

@@ -30,5 +30,10 @@ namespace Cosmos.Debug.GDB {
             lboxDebug.Items.Clear();
         }
 
+        private void FormLog_FormClosing(object sender, FormClosingEventArgs e) {
+            e.Cancel = true;
+            Hide();
+        }
+
     }
 }

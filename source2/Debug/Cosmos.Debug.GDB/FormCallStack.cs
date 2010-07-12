@@ -63,5 +63,10 @@ namespace Cosmos.Debug.GDB {
         private void lboxCallStack_DoubleClick(object sender, EventArgs e) {
             menuCallStackGoto.PerformClick();
         }
+
+        private void FormCallStack_FormClosing(object sender, FormClosingEventArgs e) {
+            e.Cancel = true;
+            Hide();
+        }
     }
 }

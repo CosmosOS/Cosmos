@@ -122,7 +122,6 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
-            this.Settings = new Cosmos.Debug.GDB.SettingsDS();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.panel8.SuspendLayout();
@@ -136,7 +135,6 @@
             this.tabPage2.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Settings)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -1098,11 +1096,6 @@
             this.mitmMainViewWatches.Text = "&Watches";
             this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
             // 
-            // Settings
-            // 
-            this.Settings.DataSetName = "SettingsDS";
-            this.Settings.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1114,7 +1107,10 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
             this.Text = "Cosmos GDB Debugger";
+            this.TopMost = true;
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.panel8.ResumeLayout(false);
@@ -1133,7 +1129,6 @@
             this.panel2.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Settings)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1164,7 +1159,6 @@
         private System.Windows.Forms.ContextMenuStrip menuBreakpoints;
         private System.Windows.Forms.ToolStripMenuItem mitmBreakpointDelete;
         private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
-        private SettingsDS Settings;
         private System.Windows.Forms.Panel panlBreakpoints;
         private System.Windows.Forms.ListBox lboxBreakpoints;
         private System.Windows.Forms.Panel panel6;

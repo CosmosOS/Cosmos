@@ -66,7 +66,9 @@
             this.Controls.Add(this.panel3);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "FormWatches";
+            this.ShowInTaskbar = false;
             this.Text = "Watches";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormWatches_FormClosing);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.ResumeLayout(false);

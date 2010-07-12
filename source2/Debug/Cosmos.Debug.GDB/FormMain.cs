@@ -212,14 +212,14 @@ namespace Cosmos.Debug.GDB {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
+            Windows.RestorePositions();
             GDB.Connect();
 
-            LoadSettings();
-            foreach (SettingsDS.BreakpointRow xBP in Settings.Breakpoint.Rows) {
+            foreach (SettingsDS.BreakpointRow xBP in Settings.DS.Breakpoint.Rows) {
                 AddBreakpoint(xBP.Label);
             }
 
-            Update();
+            Windows.UpdateAllWindows();
         }
 
         public void ResetRegisters() {
@@ -301,10 +301,10 @@ namespace Cosmos.Debug.GDB {
                 // We dont add address types, as most of them change between compiles.
                 if (!xLabel.StartsWith("*")) {
                     // Add here and not in AddBreakpoint, because during load we call AddBreakpoint
-                    var xBP = Settings.Breakpoint.NewBreakpointRow();
+                    var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
                     xBP.Label = xLabel;
-                    Settings.Breakpoint.AddBreakpointRow(xBP);
-                    SaveSettings();
+                    Settings.DS.Breakpoint.AddBreakpointRow(xBP);
+                    Settings.Save();
                 }
             }
         }
@@ -335,26 +335,21 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        //TODO: Not supposed to be in app dir, but unless we release this as a standalone project
-        //it doesnt matter. If we do that we have to create project types anyways.
-        protected string ConfigPathname = Application.ExecutablePath + ".Settings";
-
-        protected void SaveSettings() {
-            Settings.WriteXml(ConfigPathname, System.Data.XmlWriteMode.IgnoreSchema);
-        }
-
-        protected void LoadSettings() {
-            if (System.IO.File.Exists(ConfigPathname)) {
-                Settings.ReadXml(ConfigPathname, System.Data.XmlReadMode.IgnoreSchema);
-            }
-        }
-
         private void mitmMainViewCallStack_Click(object sender, EventArgs e) {
             Windows.Show(Windows.mCallStackForm);
         }
 
         private void mitmMainViewWatches_Click(object sender, EventArgs e) {
             Windows.Show(Windows.mWatchesForm);
+        }
+
+        private void FormMain_Load(object sender, EventArgs e) {
+            Windows.mMainForm = this;
+            Settings.Load();
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
+            Settings.Save();
         }
 
     }

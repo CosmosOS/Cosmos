@@ -8,14 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
-    public partial class FormWatches : Form {
-        public FormWatches() {
+    public partial class SettingsForm : Form {
+        public SettingsForm() {
             InitializeComponent();
-        }
-
-        private void FormWatches_FormClosing(object sender, FormClosingEventArgs e) {
-            e.Cancel = true;
-            Hide();
         }
     }
 }

@@ -29,6 +29,8 @@ namespace Cosmos.Debug.GDB {
         
         private WatchDataTable tableWatch;
         
+        private WindowDataTable tableWindow;
+        
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -60,6 +62,9 @@ namespace Cosmos.Debug.GDB {
                 }
                 if ((ds.Tables["Watch"] != null)) {
                     base.Tables.Add(new WatchDataTable(ds.Tables["Watch"]));
+                }
+                if ((ds.Tables["Window"] != null)) {
+                    base.Tables.Add(new WindowDataTable(ds.Tables["Window"]));
                 }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
@@ -94,6 +99,15 @@ namespace Cosmos.Debug.GDB {
         public WatchDataTable Watch {
             get {
                 return this.tableWatch;
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.ComponentModel.Browsable(false)]
+        [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
+        public WindowDataTable Window {
+            get {
+                return this.tableWindow;
             }
         }
         
@@ -162,6 +176,9 @@ namespace Cosmos.Debug.GDB {
                 if ((ds.Tables["Watch"] != null)) {
                     base.Tables.Add(new WatchDataTable(ds.Tables["Watch"]));
                 }
+                if ((ds.Tables["Window"] != null)) {
+                    base.Tables.Add(new WindowDataTable(ds.Tables["Window"]));
+                }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
                 this.Namespace = ds.Namespace;
@@ -204,6 +221,12 @@ namespace Cosmos.Debug.GDB {
                     this.tableWatch.InitVars();
                 }
             }
+            this.tableWindow = ((WindowDataTable)(base.Tables["Window"]));
+            if ((initTable == true)) {
+                if ((this.tableWindow != null)) {
+                    this.tableWindow.InitVars();
+                }
+            }
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -217,6 +240,8 @@ namespace Cosmos.Debug.GDB {
             base.Tables.Add(this.tableBreakpoint);
             this.tableWatch = new WatchDataTable();
             base.Tables.Add(this.tableWatch);
+            this.tableWindow = new WindowDataTable();
+            base.Tables.Add(this.tableWindow);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -226,6 +251,11 @@ namespace Cosmos.Debug.GDB {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         private bool ShouldSerializeWatch() {
+            return false;
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        private bool ShouldSerializeWindow() {
             return false;
         }
         
@@ -285,6 +315,8 @@ namespace Cosmos.Debug.GDB {
         public delegate void BreakpointRowChangeEventHandler(object sender, BreakpointRowChangeEvent e);
         
         public delegate void WatchRowChangeEventHandler(object sender, WatchRowChangeEvent e);
+        
+        public delegate void WindowRowChangeEventHandler(object sender, WindowRowChangeEvent e);
         
         /// <summary>
         ///Represents the strongly named DataTable class.
@@ -392,6 +424,7 @@ namespace Cosmos.Debug.GDB {
             private void InitClass() {
                 this.columnLabel = new global::System.Data.DataColumn("Label", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLabel);
+                this.columnLabel.AllowDBNull = false;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -720,6 +753,291 @@ namespace Cosmos.Debug.GDB {
         }
         
         /// <summary>
+        ///Represents the strongly named DataTable class.
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
+        [global::System.Serializable()]
+        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
+        public partial class WindowDataTable : global::System.Data.TypedTableBase<WindowRow> {
+            
+            private global::System.Data.DataColumn columnName;
+            
+            private global::System.Data.DataColumn columnLeft;
+            
+            private global::System.Data.DataColumn columnTop;
+            
+            private global::System.Data.DataColumn columnWidth;
+            
+            private global::System.Data.DataColumn columnHeight;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowDataTable() {
+                this.TableName = "Window";
+                this.BeginInit();
+                this.InitClass();
+                this.EndInit();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            internal WindowDataTable(global::System.Data.DataTable table) {
+                this.TableName = table.TableName;
+                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
+                    this.CaseSensitive = table.CaseSensitive;
+                }
+                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
+                    this.Locale = table.Locale;
+                }
+                if ((table.Namespace != table.DataSet.Namespace)) {
+                    this.Namespace = table.Namespace;
+                }
+                this.Prefix = table.Prefix;
+                this.MinimumCapacity = table.MinimumCapacity;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected WindowDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+                    base(info, context) {
+                this.InitVars();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn NameColumn {
+                get {
+                    return this.columnName;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn LeftColumn {
+                get {
+                    return this.columnLeft;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn TopColumn {
+                get {
+                    return this.columnTop;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn WidthColumn {
+                get {
+                    return this.columnWidth;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn HeightColumn {
+                get {
+                    return this.columnHeight;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.ComponentModel.Browsable(false)]
+            public int Count {
+                get {
+                    return this.Rows.Count;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowRow this[int index] {
+                get {
+                    return ((WindowRow)(this.Rows[index]));
+                }
+            }
+            
+            public event WindowRowChangeEventHandler WindowRowChanging;
+            
+            public event WindowRowChangeEventHandler WindowRowChanged;
+            
+            public event WindowRowChangeEventHandler WindowRowDeleting;
+            
+            public event WindowRowChangeEventHandler WindowRowDeleted;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void AddWindowRow(WindowRow row) {
+                this.Rows.Add(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowRow AddWindowRow(string Name, int Left, int Top, int Width, int Height) {
+                WindowRow rowWindowRow = ((WindowRow)(this.NewRow()));
+                object[] columnValuesArray = new object[] {
+                        Name,
+                        Left,
+                        Top,
+                        Width,
+                        Height};
+                rowWindowRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowWindowRow);
+                return rowWindowRow;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowRow FindByName(string Name) {
+                return ((WindowRow)(this.Rows.Find(new object[] {
+                            Name})));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public override global::System.Data.DataTable Clone() {
+                WindowDataTable cln = ((WindowDataTable)(base.Clone()));
+                cln.InitVars();
+                return cln;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override global::System.Data.DataTable CreateInstance() {
+                return new WindowDataTable();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            internal void InitVars() {
+                this.columnName = base.Columns["Name"];
+                this.columnLeft = base.Columns["Left"];
+                this.columnTop = base.Columns["Top"];
+                this.columnWidth = base.Columns["Width"];
+                this.columnHeight = base.Columns["Height"];
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            private void InitClass() {
+                this.columnName = new global::System.Data.DataColumn("Name", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnName);
+                this.columnLeft = new global::System.Data.DataColumn("Left", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnLeft);
+                this.columnTop = new global::System.Data.DataColumn("Top", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnTop);
+                this.columnWidth = new global::System.Data.DataColumn("Width", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnWidth);
+                this.columnHeight = new global::System.Data.DataColumn("Height", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnHeight);
+                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
+                                this.columnName}, true));
+                this.columnName.AllowDBNull = false;
+                this.columnName.Unique = true;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowRow NewWindowRow() {
+                return ((WindowRow)(this.NewRow()));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
+                return new WindowRow(builder);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override global::System.Type GetRowType() {
+                return typeof(WindowRow);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanged(e);
+                if ((this.WindowRowChanged != null)) {
+                    this.WindowRowChanged(this, new WindowRowChangeEvent(((WindowRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanging(e);
+                if ((this.WindowRowChanging != null)) {
+                    this.WindowRowChanging(this, new WindowRowChangeEvent(((WindowRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleted(e);
+                if ((this.WindowRowDeleted != null)) {
+                    this.WindowRowDeleted(this, new WindowRowChangeEvent(((WindowRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleting(e);
+                if ((this.WindowRowDeleting != null)) {
+                    this.WindowRowDeleting(this, new WindowRowChangeEvent(((WindowRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void RemoveWindowRow(WindowRow row) {
+                this.Rows.Remove(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
+                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
+                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
+                SettingsDS ds = new SettingsDS();
+                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
+                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
+                any1.MinOccurs = new decimal(0);
+                any1.MaxOccurs = decimal.MaxValue;
+                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any1);
+                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
+                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
+                any2.MinOccurs = new decimal(1);
+                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any2);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute1.Name = "namespace";
+                attribute1.FixedValue = ds.Namespace;
+                type.Attributes.Add(attribute1);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute2.Name = "tableTypeName";
+                attribute2.FixedValue = "WindowDataTable";
+                type.Attributes.Add(attribute2);
+                type.Particle = sequence;
+                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
+                if (xs.Contains(dsSchema.TargetNamespace)) {
+                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
+                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
+                    try {
+                        global::System.Xml.Schema.XmlSchema schema = null;
+                        dsSchema.Write(s1);
+                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
+                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
+                            s2.SetLength(0);
+                            schema.Write(s2);
+                            if ((s1.Length == s2.Length)) {
+                                s1.Position = 0;
+                                s2.Position = 0;
+                                for (; ((s1.Position != s1.Length) 
+                                            && (s1.ReadByte() == s2.ReadByte())); ) {
+                                    ;
+                                }
+                                if ((s1.Position == s1.Length)) {
+                                    return type;
+                                }
+                            }
+                        }
+                    }
+                    finally {
+                        if ((s1 != null)) {
+                            s1.Close();
+                        }
+                        if ((s2 != null)) {
+                            s2.Close();
+                        }
+                    }
+                }
+                xs.Add(dsSchema);
+                return type;
+            }
+        }
+        
+        /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
@@ -736,26 +1054,11 @@ namespace Cosmos.Debug.GDB {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public string Label {
                 get {
-                    try {
-                        return ((string)(this[this.tableBreakpoint.LabelColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Label\' in table \'Breakpoint\' is DBNull.", e);
-                    }
+                    return ((string)(this[this.tableBreakpoint.LabelColumn]));
                 }
                 set {
                     this[this.tableBreakpoint.LabelColumn] = value;
                 }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public bool IsLabelNull() {
-                return this.IsNull(this.tableBreakpoint.LabelColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public void SetLabelNull() {
-                this[this.tableBreakpoint.LabelColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -771,6 +1074,131 @@ namespace Cosmos.Debug.GDB {
             internal WatchRow(global::System.Data.DataRowBuilder rb) : 
                     base(rb) {
                 this.tableWatch = ((WatchDataTable)(this.Table));
+            }
+        }
+        
+        /// <summary>
+        ///Represents strongly named DataRow class.
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
+        public partial class WindowRow : global::System.Data.DataRow {
+            
+            private WindowDataTable tableWindow;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            internal WindowRow(global::System.Data.DataRowBuilder rb) : 
+                    base(rb) {
+                this.tableWindow = ((WindowDataTable)(this.Table));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public string Name {
+                get {
+                    return ((string)(this[this.tableWindow.NameColumn]));
+                }
+                set {
+                    this[this.tableWindow.NameColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public int Left {
+                get {
+                    try {
+                        return ((int)(this[this.tableWindow.LeftColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Left\' in table \'Window\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableWindow.LeftColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public int Top {
+                get {
+                    try {
+                        return ((int)(this[this.tableWindow.TopColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Top\' in table \'Window\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableWindow.TopColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public int Width {
+                get {
+                    try {
+                        return ((int)(this[this.tableWindow.WidthColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Width\' in table \'Window\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableWindow.WidthColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public int Height {
+                get {
+                    try {
+                        return ((int)(this[this.tableWindow.HeightColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Height\' in table \'Window\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableWindow.HeightColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsLeftNull() {
+                return this.IsNull(this.tableWindow.LeftColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetLeftNull() {
+                this[this.tableWindow.LeftColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsTopNull() {
+                return this.IsNull(this.tableWindow.TopColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetTopNull() {
+                this[this.tableWindow.TopColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsWidthNull() {
+                return this.IsNull(this.tableWindow.WidthColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetWidthNull() {
+                this[this.tableWindow.WidthColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsHeightNull() {
+                return this.IsNull(this.tableWindow.HeightColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetHeightNull() {
+                this[this.tableWindow.HeightColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -823,6 +1251,37 @@ namespace Cosmos.Debug.GDB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public WatchRow Row {
+                get {
+                    return this.eventRow;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataRowAction Action {
+                get {
+                    return this.eventAction;
+                }
+            }
+        }
+        
+        /// <summary>
+        ///Row event argument class
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
+        public class WindowRowChangeEvent : global::System.EventArgs {
+            
+            private WindowRow eventRow;
+            
+            private global::System.Data.DataRowAction eventAction;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowRowChangeEvent(WindowRow row, global::System.Data.DataRowAction action) {
+                this.eventRow = row;
+                this.eventAction = action;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public WindowRow Row {
                 get {
                     return this.eventRow;
                 }

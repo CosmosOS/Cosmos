@@ -65,7 +65,9 @@
             this.Controls.Add(this.lboxCallStack);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "FormCallStack";
+            this.ShowInTaskbar = false;
             this.Text = "CallStack";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormCallStack_FormClosing);
             this.menuCallStack.ResumeLayout(false);
             this.ResumeLayout(false);
 
