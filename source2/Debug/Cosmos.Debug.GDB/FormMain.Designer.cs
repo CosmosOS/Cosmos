@@ -27,37 +27,19 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.panel8 = new System.Windows.Forms.Panel();
+            this.lboxDisassemble = new System.Windows.Forms.ListBox();
             this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuBreakpoints = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.mitmBreakpointDelete = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.lboxDebug = new System.Windows.Forms.ListBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.butnCopyDebugLogToClipboard = new System.Windows.Forms.Button();
-            this.butnDebugLogClear = new System.Windows.Forms.Button();
-            this.butnSendCmd = new System.Windows.Forms.Button();
-            this.textSendCmd = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmConnect = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmRefresh = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.mitmExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.executeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmStepInto = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmStepOver = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.continueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Settings = new Cosmos.Debug.GDB.SettingsDS();
-            this.panlBreakpoints = new System.Windows.Forms.Panel();
-            this.lboxBreakpoints = new System.Windows.Forms.ListBox();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.butnBreakpointAdd = new System.Windows.Forms.Button();
-            this.textBreakpoint = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.lablCurrentFunction = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.panlRegisters = new System.Windows.Forms.Panel();
+            this.lboxCallStack = new System.Windows.Forms.ListBox();
+            this.menuCallStack = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuCallStackGoto = new System.Windows.Forms.ToolStripMenuItem();
+            this.panel7 = new System.Windows.Forms.Panel();
+            this.label16 = new System.Windows.Forms.Label();
             this.panel5 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.lablFlagsText = new System.Windows.Forms.Label();
@@ -118,37 +100,55 @@
             this.lablBL = new System.Windows.Forms.Label();
             this.lablCL = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
+            this.panlBreakpoints = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.panel7 = new System.Windows.Forms.Panel();
-            this.label16 = new System.Windows.Forms.Label();
-            this.lboxCallStack = new System.Windows.Forms.ListBox();
-            this.panel8 = new System.Windows.Forms.Panel();
-            this.lboxDisassemble = new System.Windows.Forms.ListBox();
-            this.panel4 = new System.Windows.Forms.Panel();
-            this.lablCurrentFunction = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.menuCallStack = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.menuCallStackGoto = new System.Windows.Forms.ToolStripMenuItem();
+            this.lboxBreakpoints = new System.Windows.Forms.ListBox();
+            this.menuBreakpoints = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mitmBreakpointDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.butnBreakpointAdd = new System.Windows.Forms.Button();
+            this.textBreakpoint = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lboxDebug = new System.Windows.Forms.ListBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.butnCopyDebugLogToClipboard = new System.Windows.Forms.Button();
+            this.butnDebugLogClear = new System.Windows.Forms.Button();
+            this.butnSendCmd = new System.Windows.Forms.Button();
+            this.textSendCmd = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmConnect = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmRefresh = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.mitmExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.executeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmStepInto = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmStepOver = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.continueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Settings = new Cosmos.Debug.GDB.SettingsDS();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.panel8.SuspendLayout();
             this.menuDisassembly.SuspendLayout();
+            this.panel4.SuspendLayout();
+            this.panlRegisters.SuspendLayout();
+            this.menuCallStack.SuspendLayout();
+            this.panel7.SuspendLayout();
+            this.panel5.SuspendLayout();
+            this.panlBreakpoints.SuspendLayout();
+            this.panel3.SuspendLayout();
             this.menuBreakpoints.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Settings)).BeginInit();
-            this.panlBreakpoints.SuspendLayout();
-            this.panel6.SuspendLayout();
-            this.panlRegisters.SuspendLayout();
-            this.panel5.SuspendLayout();
-            this.panel3.SuspendLayout();
-            this.panel7.SuspendLayout();
-            this.panel8.SuspendLayout();
-            this.panel4.SuspendLayout();
-            this.menuCallStack.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -185,6 +185,28 @@
             this.tabPage1.Text = "Main";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // panel8
+            // 
+            this.panel8.Controls.Add(this.lboxDisassemble);
+            this.panel8.Controls.Add(this.panel4);
+            this.panel8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel8.Location = new System.Drawing.Point(3, 3);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(500, 629);
+            this.panel8.TabIndex = 9;
+            // 
+            // lboxDisassemble
+            // 
+            this.lboxDisassemble.ContextMenuStrip = this.menuDisassembly;
+            this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxDisassemble.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lboxDisassemble.FormattingEnabled = true;
+            this.lboxDisassemble.ItemHeight = 19;
+            this.lboxDisassemble.Location = new System.Drawing.Point(0, 32);
+            this.lboxDisassemble.Name = "lboxDisassemble";
+            this.lboxDisassemble.Size = new System.Drawing.Size(500, 593);
+            this.lboxDisassemble.TabIndex = 8;
+            // 
             // menuDisassembly
             // 
             this.menuDisassembly.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -199,257 +221,34 @@
             this.mitemDisassemblyAddBreakpoint.Text = "&Add Breakpoint";
             this.mitemDisassemblyAddBreakpoint.Click += new System.EventHandler(this.mitemDisassemblyAddBreakpoint_Click);
             // 
-            // menuBreakpoints
+            // panel4
             // 
-            this.menuBreakpoints.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mitmBreakpointDelete});
-            this.menuBreakpoints.Name = "menuBreakpoints";
-            this.menuBreakpoints.Size = new System.Drawing.Size(108, 26);
+            this.panel4.Controls.Add(this.lablCurrentFunction);
+            this.panel4.Controls.Add(this.label5);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel4.Location = new System.Drawing.Point(0, 0);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(500, 32);
+            this.panel4.TabIndex = 7;
             // 
-            // mitmBreakpointDelete
+            // lablCurrentFunction
             // 
-            this.mitmBreakpointDelete.Name = "mitmBreakpointDelete";
-            this.mitmBreakpointDelete.Size = new System.Drawing.Size(107, 22);
-            this.mitmBreakpointDelete.Text = "&Delete";
-            this.mitmBreakpointDelete.Click += new System.EventHandler(this.mitmBreakpointDelete_Click);
+            this.lablCurrentFunction.AutoSize = true;
+            this.lablCurrentFunction.Location = new System.Drawing.Point(102, 7);
+            this.lablCurrentFunction.Name = "lablCurrentFunction";
+            this.lablCurrentFunction.Size = new System.Drawing.Size(35, 13);
+            this.lablCurrentFunction.TabIndex = 1;
+            this.lablCurrentFunction.Text = "label9";
+            this.lablCurrentFunction.Visible = false;
             // 
-            // tabPage2
+            // label5
             // 
-            this.tabPage2.Controls.Add(this.lboxDebug);
-            this.tabPage2.Controls.Add(this.panel2);
-            this.tabPage2.Location = new System.Drawing.Point(4, 4);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1016, 611);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Debug Log";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // lboxDebug
-            // 
-            this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lboxDebug.FormattingEnabled = true;
-            this.lboxDebug.Location = new System.Drawing.Point(3, 36);
-            this.lboxDebug.Name = "lboxDebug";
-            this.lboxDebug.Size = new System.Drawing.Size(1010, 563);
-            this.lboxDebug.TabIndex = 4;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.butnCopyDebugLogToClipboard);
-            this.panel2.Controls.Add(this.butnDebugLogClear);
-            this.panel2.Controls.Add(this.butnSendCmd);
-            this.panel2.Controls.Add(this.textSendCmd);
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(3, 3);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1010, 33);
-            this.panel2.TabIndex = 3;
-            // 
-            // butnCopyDebugLogToClipboard
-            // 
-            this.butnCopyDebugLogToClipboard.Location = new System.Drawing.Point(565, 7);
-            this.butnCopyDebugLogToClipboard.Name = "butnCopyDebugLogToClipboard";
-            this.butnCopyDebugLogToClipboard.Size = new System.Drawing.Size(143, 23);
-            this.butnCopyDebugLogToClipboard.TabIndex = 4;
-            this.butnCopyDebugLogToClipboard.Text = "Copy Log to Clipboard";
-            this.butnCopyDebugLogToClipboard.UseVisualStyleBackColor = true;
-            this.butnCopyDebugLogToClipboard.Click += new System.EventHandler(this.butnCopyDebugLogToClipboard_Click);
-            // 
-            // butnDebugLogClear
-            // 
-            this.butnDebugLogClear.Location = new System.Drawing.Point(484, 7);
-            this.butnDebugLogClear.Name = "butnDebugLogClear";
-            this.butnDebugLogClear.Size = new System.Drawing.Size(75, 23);
-            this.butnDebugLogClear.TabIndex = 3;
-            this.butnDebugLogClear.Text = "Clear Log";
-            this.butnDebugLogClear.UseVisualStyleBackColor = true;
-            this.butnDebugLogClear.Click += new System.EventHandler(this.butnDebugLogClear_Click);
-            // 
-            // butnSendCmd
-            // 
-            this.butnSendCmd.Location = new System.Drawing.Point(315, 7);
-            this.butnSendCmd.Name = "butnSendCmd";
-            this.butnSendCmd.Size = new System.Drawing.Size(137, 23);
-            this.butnSendCmd.TabIndex = 2;
-            this.butnSendCmd.Text = "Send Command";
-            this.butnSendCmd.UseVisualStyleBackColor = true;
-            this.butnSendCmd.Click += new System.EventHandler(this.butnSendCmd_Click);
-            // 
-            // textSendCmd
-            // 
-            this.textSendCmd.Location = new System.Drawing.Point(45, 7);
-            this.textSendCmd.Name = "textSendCmd";
-            this.textSendCmd.Size = new System.Drawing.Size(264, 20);
-            this.textSendCmd.TabIndex = 1;
-            this.textSendCmd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textSendCmd_KeyPress);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(4, 10);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.executeToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
-            this.menuStrip1.TabIndex = 5;
-            this.menuStrip1.Text = "E&xecute";
-            // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mitmConnect,
-            this.mitmRefresh,
-            this.toolStripMenuItem2,
-            this.mitmExit});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "&File";
-            // 
-            // mitmConnect
-            // 
-            this.mitmConnect.Name = "mitmConnect";
-            this.mitmConnect.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.mitmConnect.Size = new System.Drawing.Size(162, 22);
-            this.mitmConnect.Text = "&Connect";
-            this.mitmConnect.Click += new System.EventHandler(this.mitmConnect_Click);
-            // 
-            // mitmRefresh
-            // 
-            this.mitmRefresh.Name = "mitmRefresh";
-            this.mitmRefresh.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.mitmRefresh.Size = new System.Drawing.Size(162, 22);
-            this.mitmRefresh.Text = "Refresh";
-            this.mitmRefresh.Click += new System.EventHandler(this.mitmRefresh_Click);
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(159, 6);
-            // 
-            // mitmExit
-            // 
-            this.mitmExit.Name = "mitmExit";
-            this.mitmExit.Size = new System.Drawing.Size(162, 22);
-            this.mitmExit.Text = "E&xit";
-            this.mitmExit.Click += new System.EventHandler(this.mitmExit_Click);
-            // 
-            // executeToolStripMenuItem
-            // 
-            this.executeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mitmStepInto,
-            this.mitmStepOver,
-            this.toolStripMenuItem1,
-            this.continueToolStripMenuItem});
-            this.executeToolStripMenuItem.Name = "executeToolStripMenuItem";
-            this.executeToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
-            this.executeToolStripMenuItem.Text = "&Run";
-            // 
-            // mitmStepInto
-            // 
-            this.mitmStepInto.Name = "mitmStepInto";
-            this.mitmStepInto.ShortcutKeys = System.Windows.Forms.Keys.F11;
-            this.mitmStepInto.Size = new System.Drawing.Size(150, 22);
-            this.mitmStepInto.Text = "Step &Into";
-            this.mitmStepInto.Click += new System.EventHandler(this.mitmStepInto_Click);
-            // 
-            // mitmStepOver
-            // 
-            this.mitmStepOver.Name = "mitmStepOver";
-            this.mitmStepOver.ShortcutKeys = System.Windows.Forms.Keys.F10;
-            this.mitmStepOver.Size = new System.Drawing.Size(150, 22);
-            this.mitmStepOver.Text = "Step &Over";
-            this.mitmStepOver.Click += new System.EventHandler(this.mitmStepOver_Click);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 6);
-            // 
-            // continueToolStripMenuItem
-            // 
-            this.continueToolStripMenuItem.Name = "continueToolStripMenuItem";
-            this.continueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.continueToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
-            this.continueToolStripMenuItem.Text = "&Continue";
-            this.continueToolStripMenuItem.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
-            // 
-            // Settings
-            // 
-            this.Settings.DataSetName = "SettingsDS";
-            this.Settings.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
-            // 
-            // panlBreakpoints
-            // 
-            this.panlBreakpoints.Controls.Add(this.panel3);
-            this.panlBreakpoints.Controls.Add(this.lboxBreakpoints);
-            this.panlBreakpoints.Controls.Add(this.panel6);
-            this.panlBreakpoints.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panlBreakpoints.Location = new System.Drawing.Point(779, 3);
-            this.panlBreakpoints.Name = "panlBreakpoints";
-            this.panlBreakpoints.Size = new System.Drawing.Size(234, 629);
-            this.panlBreakpoints.TabIndex = 6;
-            // 
-            // lboxBreakpoints
-            // 
-            this.lboxBreakpoints.ContextMenuStrip = this.menuBreakpoints;
-            this.lboxBreakpoints.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lboxBreakpoints.FormattingEnabled = true;
-            this.lboxBreakpoints.Location = new System.Drawing.Point(0, 51);
-            this.lboxBreakpoints.Name = "lboxBreakpoints";
-            this.lboxBreakpoints.Size = new System.Drawing.Size(234, 212);
-            this.lboxBreakpoints.Sorted = true;
-            this.lboxBreakpoints.TabIndex = 65;
-            // 
-            // panel6
-            // 
-            this.panel6.Controls.Add(this.butnBreakpointAdd);
-            this.panel6.Controls.Add(this.textBreakpoint);
-            this.panel6.Controls.Add(this.label9);
-            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel6.Location = new System.Drawing.Point(0, 0);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(234, 51);
-            this.panel6.TabIndex = 64;
-            // 
-            // butnBreakpointAdd
-            // 
-            this.butnBreakpointAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.butnBreakpointAdd.Location = new System.Drawing.Point(203, 19);
-            this.butnBreakpointAdd.Name = "butnBreakpointAdd";
-            this.butnBreakpointAdd.Size = new System.Drawing.Size(24, 23);
-            this.butnBreakpointAdd.TabIndex = 5;
-            this.butnBreakpointAdd.Text = "+";
-            this.butnBreakpointAdd.UseVisualStyleBackColor = true;
-            // 
-            // textBreakpoint
-            // 
-            this.textBreakpoint.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBreakpoint.Location = new System.Drawing.Point(9, 19);
-            this.textBreakpoint.Name = "textBreakpoint";
-            this.textBreakpoint.Size = new System.Drawing.Size(188, 20);
-            this.textBreakpoint.TabIndex = 4;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(6, 3);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(74, 13);
-            this.label9.TabIndex = 3;
-            this.label9.Text = "Breakpoints";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 7);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Current Function:";
             // 
             // panlRegisters
             // 
@@ -461,6 +260,52 @@
             this.panlRegisters.Name = "panlRegisters";
             this.panlRegisters.Size = new System.Drawing.Size(276, 629);
             this.panlRegisters.TabIndex = 8;
+            // 
+            // lboxCallStack
+            // 
+            this.lboxCallStack.ContextMenuStrip = this.menuCallStack;
+            this.lboxCallStack.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxCallStack.FormattingEnabled = true;
+            this.lboxCallStack.HorizontalScrollbar = true;
+            this.lboxCallStack.Location = new System.Drawing.Point(0, 290);
+            this.lboxCallStack.Name = "lboxCallStack";
+            this.lboxCallStack.Size = new System.Drawing.Size(276, 329);
+            this.lboxCallStack.TabIndex = 68;
+            this.lboxCallStack.DoubleClick += new System.EventHandler(this.lboxCallStack_DoubleClick);
+            // 
+            // menuCallStack
+            // 
+            this.menuCallStack.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuCallStackGoto});
+            this.menuCallStack.Name = "menuCallStack";
+            this.menuCallStack.Size = new System.Drawing.Size(215, 26);
+            // 
+            // menuCallStackGoto
+            // 
+            this.menuCallStackGoto.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.menuCallStackGoto.Name = "menuCallStackGoto";
+            this.menuCallStackGoto.Size = new System.Drawing.Size(214, 22);
+            this.menuCallStackGoto.Text = "&Go To (Disassemble Only)";
+            this.menuCallStackGoto.Click += new System.EventHandler(this.menuCallStackGoto_Click);
+            // 
+            // panel7
+            // 
+            this.panel7.Controls.Add(this.label16);
+            this.panel7.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel7.Location = new System.Drawing.Point(0, 262);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(276, 28);
+            this.panel7.TabIndex = 67;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Location = new System.Drawing.Point(6, 3);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(65, 13);
+            this.label16.TabIndex = 3;
+            this.label16.Text = "Call Stack";
             // 
             // panel5
             // 
@@ -1075,6 +920,17 @@
             this.label26.TabIndex = 31;
             this.label26.Text = "CL";
             // 
+            // panlBreakpoints
+            // 
+            this.panlBreakpoints.Controls.Add(this.panel3);
+            this.panlBreakpoints.Controls.Add(this.lboxBreakpoints);
+            this.panlBreakpoints.Controls.Add(this.panel6);
+            this.panlBreakpoints.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panlBreakpoints.Location = new System.Drawing.Point(779, 3);
+            this.panlBreakpoints.Name = "panlBreakpoints";
+            this.panlBreakpoints.Size = new System.Drawing.Size(234, 629);
+            this.panlBreakpoints.TabIndex = 6;
+            // 
             // panel3
             // 
             this.panel3.Controls.Add(this.button1);
@@ -1115,102 +971,246 @@
             this.label13.TabIndex = 3;
             this.label13.Text = "Watches";
             // 
-            // panel7
+            // lboxBreakpoints
             // 
-            this.panel7.Controls.Add(this.label16);
-            this.panel7.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel7.Location = new System.Drawing.Point(0, 262);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(276, 28);
-            this.panel7.TabIndex = 67;
+            this.lboxBreakpoints.ContextMenuStrip = this.menuBreakpoints;
+            this.lboxBreakpoints.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lboxBreakpoints.FormattingEnabled = true;
+            this.lboxBreakpoints.Location = new System.Drawing.Point(0, 51);
+            this.lboxBreakpoints.Name = "lboxBreakpoints";
+            this.lboxBreakpoints.Size = new System.Drawing.Size(234, 212);
+            this.lboxBreakpoints.Sorted = true;
+            this.lboxBreakpoints.TabIndex = 65;
             // 
-            // label16
+            // menuBreakpoints
             // 
-            this.label16.AutoSize = true;
-            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.Location = new System.Drawing.Point(6, 3);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(65, 13);
-            this.label16.TabIndex = 3;
-            this.label16.Text = "Call Stack";
+            this.menuBreakpoints.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mitmBreakpointDelete});
+            this.menuBreakpoints.Name = "menuBreakpoints";
+            this.menuBreakpoints.Size = new System.Drawing.Size(108, 26);
             // 
-            // lboxCallStack
+            // mitmBreakpointDelete
             // 
-            this.lboxCallStack.ContextMenuStrip = this.menuCallStack;
-            this.lboxCallStack.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lboxCallStack.FormattingEnabled = true;
-            this.lboxCallStack.HorizontalScrollbar = true;
-            this.lboxCallStack.Location = new System.Drawing.Point(0, 290);
-            this.lboxCallStack.Name = "lboxCallStack";
-            this.lboxCallStack.Size = new System.Drawing.Size(276, 329);
-            this.lboxCallStack.TabIndex = 68;
-            this.lboxCallStack.DoubleClick += new System.EventHandler(this.lboxCallStack_DoubleClick);
+            this.mitmBreakpointDelete.Name = "mitmBreakpointDelete";
+            this.mitmBreakpointDelete.Size = new System.Drawing.Size(107, 22);
+            this.mitmBreakpointDelete.Text = "&Delete";
+            this.mitmBreakpointDelete.Click += new System.EventHandler(this.mitmBreakpointDelete_Click);
             // 
-            // panel8
+            // panel6
             // 
-            this.panel8.Controls.Add(this.lboxDisassemble);
-            this.panel8.Controls.Add(this.panel4);
-            this.panel8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel8.Location = new System.Drawing.Point(3, 3);
-            this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(500, 629);
-            this.panel8.TabIndex = 9;
+            this.panel6.Controls.Add(this.butnBreakpointAdd);
+            this.panel6.Controls.Add(this.textBreakpoint);
+            this.panel6.Controls.Add(this.label9);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel6.Location = new System.Drawing.Point(0, 0);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(234, 51);
+            this.panel6.TabIndex = 64;
             // 
-            // lboxDisassemble
+            // butnBreakpointAdd
             // 
-            this.lboxDisassemble.ContextMenuStrip = this.menuDisassembly;
-            this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lboxDisassemble.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lboxDisassemble.FormattingEnabled = true;
-            this.lboxDisassemble.ItemHeight = 19;
-            this.lboxDisassemble.Location = new System.Drawing.Point(0, 32);
-            this.lboxDisassemble.Name = "lboxDisassemble";
-            this.lboxDisassemble.Size = new System.Drawing.Size(500, 593);
-            this.lboxDisassemble.TabIndex = 8;
+            this.butnBreakpointAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.butnBreakpointAdd.Location = new System.Drawing.Point(203, 19);
+            this.butnBreakpointAdd.Name = "butnBreakpointAdd";
+            this.butnBreakpointAdd.Size = new System.Drawing.Size(24, 23);
+            this.butnBreakpointAdd.TabIndex = 5;
+            this.butnBreakpointAdd.Text = "+";
+            this.butnBreakpointAdd.UseVisualStyleBackColor = true;
             // 
-            // panel4
+            // textBreakpoint
             // 
-            this.panel4.Controls.Add(this.lablCurrentFunction);
-            this.panel4.Controls.Add(this.label5);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel4.Location = new System.Drawing.Point(0, 0);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(500, 32);
-            this.panel4.TabIndex = 7;
+            this.textBreakpoint.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBreakpoint.Location = new System.Drawing.Point(9, 19);
+            this.textBreakpoint.Name = "textBreakpoint";
+            this.textBreakpoint.Size = new System.Drawing.Size(188, 20);
+            this.textBreakpoint.TabIndex = 4;
             // 
-            // lablCurrentFunction
+            // label9
             // 
-            this.lablCurrentFunction.AutoSize = true;
-            this.lablCurrentFunction.Location = new System.Drawing.Point(102, 7);
-            this.lablCurrentFunction.Name = "lablCurrentFunction";
-            this.lablCurrentFunction.Size = new System.Drawing.Size(35, 13);
-            this.lablCurrentFunction.TabIndex = 1;
-            this.lablCurrentFunction.Text = "label9";
-            this.lablCurrentFunction.Visible = false;
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(6, 3);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(74, 13);
+            this.label9.TabIndex = 3;
+            this.label9.Text = "Breakpoints";
             // 
-            // label5
+            // tabPage2
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 7);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(88, 13);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Current Function:";
+            this.tabPage2.Controls.Add(this.lboxDebug);
+            this.tabPage2.Controls.Add(this.panel2);
+            this.tabPage2.Location = new System.Drawing.Point(4, 4);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1016, 635);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Debug Log";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // menuCallStack
+            // lboxDebug
             // 
-            this.menuCallStack.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuCallStackGoto});
-            this.menuCallStack.Name = "menuCallStack";
-            this.menuCallStack.Size = new System.Drawing.Size(215, 26);
+            this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxDebug.FormattingEnabled = true;
+            this.lboxDebug.Location = new System.Drawing.Point(3, 36);
+            this.lboxDebug.Name = "lboxDebug";
+            this.lboxDebug.Size = new System.Drawing.Size(1010, 589);
+            this.lboxDebug.TabIndex = 4;
             // 
-            // menuCallStackGoto
+            // panel2
             // 
-            this.menuCallStackGoto.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.menuCallStackGoto.Name = "menuCallStackGoto";
-            this.menuCallStackGoto.Size = new System.Drawing.Size(214, 22);
-            this.menuCallStackGoto.Text = "&Go To (Disassemble Only)";
-            this.menuCallStackGoto.Click += new System.EventHandler(this.menuCallStackGoto_Click);
+            this.panel2.Controls.Add(this.butnCopyDebugLogToClipboard);
+            this.panel2.Controls.Add(this.butnDebugLogClear);
+            this.panel2.Controls.Add(this.butnSendCmd);
+            this.panel2.Controls.Add(this.textSendCmd);
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(3, 3);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1010, 33);
+            this.panel2.TabIndex = 3;
+            // 
+            // butnCopyDebugLogToClipboard
+            // 
+            this.butnCopyDebugLogToClipboard.Location = new System.Drawing.Point(565, 7);
+            this.butnCopyDebugLogToClipboard.Name = "butnCopyDebugLogToClipboard";
+            this.butnCopyDebugLogToClipboard.Size = new System.Drawing.Size(143, 23);
+            this.butnCopyDebugLogToClipboard.TabIndex = 4;
+            this.butnCopyDebugLogToClipboard.Text = "Copy Log to Clipboard";
+            this.butnCopyDebugLogToClipboard.UseVisualStyleBackColor = true;
+            this.butnCopyDebugLogToClipboard.Click += new System.EventHandler(this.butnCopyDebugLogToClipboard_Click);
+            // 
+            // butnDebugLogClear
+            // 
+            this.butnDebugLogClear.Location = new System.Drawing.Point(484, 7);
+            this.butnDebugLogClear.Name = "butnDebugLogClear";
+            this.butnDebugLogClear.Size = new System.Drawing.Size(75, 23);
+            this.butnDebugLogClear.TabIndex = 3;
+            this.butnDebugLogClear.Text = "Clear Log";
+            this.butnDebugLogClear.UseVisualStyleBackColor = true;
+            this.butnDebugLogClear.Click += new System.EventHandler(this.butnDebugLogClear_Click);
+            // 
+            // butnSendCmd
+            // 
+            this.butnSendCmd.Location = new System.Drawing.Point(315, 7);
+            this.butnSendCmd.Name = "butnSendCmd";
+            this.butnSendCmd.Size = new System.Drawing.Size(137, 23);
+            this.butnSendCmd.TabIndex = 2;
+            this.butnSendCmd.Text = "Send Command";
+            this.butnSendCmd.UseVisualStyleBackColor = true;
+            this.butnSendCmd.Click += new System.EventHandler(this.butnSendCmd_Click);
+            // 
+            // textSendCmd
+            // 
+            this.textSendCmd.Location = new System.Drawing.Point(45, 7);
+            this.textSendCmd.Name = "textSendCmd";
+            this.textSendCmd.Size = new System.Drawing.Size(264, 20);
+            this.textSendCmd.TabIndex = 1;
+            this.textSendCmd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textSendCmd_KeyPress);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(4, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "label1";
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.executeToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
+            this.menuStrip1.TabIndex = 5;
+            this.menuStrip1.Text = "E&xecute";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mitmConnect,
+            this.mitmRefresh,
+            this.toolStripMenuItem2,
+            this.mitmExit});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "&File";
+            // 
+            // mitmConnect
+            // 
+            this.mitmConnect.Name = "mitmConnect";
+            this.mitmConnect.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this.mitmConnect.Size = new System.Drawing.Size(162, 22);
+            this.mitmConnect.Text = "&Connect";
+            this.mitmConnect.Click += new System.EventHandler(this.mitmConnect_Click);
+            // 
+            // mitmRefresh
+            // 
+            this.mitmRefresh.Name = "mitmRefresh";
+            this.mitmRefresh.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.mitmRefresh.Size = new System.Drawing.Size(162, 22);
+            this.mitmRefresh.Text = "Refresh";
+            this.mitmRefresh.Click += new System.EventHandler(this.mitmRefresh_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(159, 6);
+            // 
+            // mitmExit
+            // 
+            this.mitmExit.Name = "mitmExit";
+            this.mitmExit.Size = new System.Drawing.Size(162, 22);
+            this.mitmExit.Text = "E&xit";
+            this.mitmExit.Click += new System.EventHandler(this.mitmExit_Click);
+            // 
+            // executeToolStripMenuItem
+            // 
+            this.executeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mitmStepInto,
+            this.mitmStepOver,
+            this.toolStripMenuItem1,
+            this.continueToolStripMenuItem});
+            this.executeToolStripMenuItem.Name = "executeToolStripMenuItem";
+            this.executeToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this.executeToolStripMenuItem.Text = "&Run";
+            // 
+            // mitmStepInto
+            // 
+            this.mitmStepInto.Name = "mitmStepInto";
+            this.mitmStepInto.ShortcutKeys = System.Windows.Forms.Keys.F11;
+            this.mitmStepInto.Size = new System.Drawing.Size(150, 22);
+            this.mitmStepInto.Text = "Step &Into";
+            this.mitmStepInto.Click += new System.EventHandler(this.mitmStepInto_Click);
+            // 
+            // mitmStepOver
+            // 
+            this.mitmStepOver.Name = "mitmStepOver";
+            this.mitmStepOver.ShortcutKeys = System.Windows.Forms.Keys.F10;
+            this.mitmStepOver.Size = new System.Drawing.Size(150, 22);
+            this.mitmStepOver.Text = "Step &Over";
+            this.mitmStepOver.Click += new System.EventHandler(this.mitmStepOver_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 6);
+            // 
+            // continueToolStripMenuItem
+            // 
+            this.continueToolStripMenuItem.Name = "continueToolStripMenuItem";
+            this.continueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.continueToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.continueToolStripMenuItem.Text = "&Continue";
+            this.continueToolStripMenuItem.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
+            // 
+            // Settings
+            // 
+            this.Settings.DataSetName = "SettingsDS";
+            this.Settings.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // FormMain
             // 
@@ -1226,28 +1226,28 @@
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.panel8.ResumeLayout(false);
             this.menuDisassembly.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
+            this.panlRegisters.ResumeLayout(false);
+            this.menuCallStack.ResumeLayout(false);
+            this.panel7.ResumeLayout(false);
+            this.panel7.PerformLayout();
+            this.panel5.ResumeLayout(false);
+            this.panel5.PerformLayout();
+            this.panlBreakpoints.ResumeLayout(false);
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             this.menuBreakpoints.ResumeLayout(false);
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Settings)).EndInit();
-            this.panlBreakpoints.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
-            this.panlRegisters.ResumeLayout(false);
-            this.panel5.ResumeLayout(false);
-            this.panel5.PerformLayout();
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
-            this.panel7.ResumeLayout(false);
-            this.panel7.PerformLayout();
-            this.panel8.ResumeLayout(false);
-            this.panel4.ResumeLayout(false);
-            this.panel4.PerformLayout();
-            this.menuCallStack.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -52,11 +52,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormBreakpoints.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormBreakpoints.Designer.cs">
+      <DependentUpon>FormBreakpoints.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCallStack.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCallStack.Designer.cs">
+      <DependentUpon>FormCallStack.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormDisassembly.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDisassembly.Designer.cs">
+      <DependentUpon>FormDisassembly.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormRegisters.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormRegisters.Designer.cs">
+      <DependentUpon>FormRegisters.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormWatches.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormWatches.Designer.cs">
+      <DependentUpon>FormWatches.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
