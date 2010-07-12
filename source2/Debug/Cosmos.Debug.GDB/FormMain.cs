@@ -231,9 +231,29 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        protected void GetCallStack() {
+            var xResult = SendCmd("where");
+            lboxCallStack.BeginUpdate();
+            try {
+                lboxCallStack.Items.Clear();
+                //#0  0x0056d5df in DebugStub_Start ()
+                //#1  0x0057572b in System_Void__Cosmos_User_Kernel_Program_Init____DOT__00000001 ()
+                //#2  0x00550018 in Before_Kernel_Stack ()
+                //#3  0x005a5427 in __ENGINE_ENTRYPOINT__ ()
+                //~Backtrace stopped: frame did not save the PC
+                foreach (var x in xResult) {
+                    lboxCallStack.Items.Add(x);
+                }
+            } finally {
+                lboxCallStack.EndUpdate();
+            }
+        }
+
         protected void Update() {
             Disassemble();
             GetRegisters();
+            GetCallStack();
+            tabControl1.SelectedIndex = 0;
         }
 
         private void butnSendCmd_Click(object sender, EventArgs e) {
@@ -292,22 +312,24 @@ namespace Cosmos.Debug.GDB {
 
             GetResponse();
             SendCmd("symbol-file CosmosKernel.obj");
-
-            //
-            SendCmd("target remote :8832"); // 
-
+            SendCmd("target remote :8832"); 
             SendCmd("set architecture i386");
             SendCmd("set language asm");
             SendCmd("set disassembly-flavor intel");
             SendCmd("break Kernel_Start");
             SendCmd("continue");
             SendCmd("delete 1");
+
+            LoadSettings();
+            foreach (SettingsDS.BreakpointRow xBP in Settings.Breakpoint.Rows) {
+                AddBreakpoint(xBP.Label);
+            }
+
             Update();
         }
 
         private void mitmRefresh_Click(object sender, EventArgs e) {
             Update();
-            tabControl1.SelectedIndex = 0;
         }
 
         private void textSendCmd_KeyPress(object sender, KeyPressEventArgs e) {
@@ -330,22 +352,34 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        protected void AddBreakpoint(string aLabel) {
+        protected bool AddBreakpoint(string aLabel) {
             string s = aLabel.Trim();
             if (s.Length > 0) {
                 var xResult = SendCmd("break " + s);
                 var xSplit = xResult[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 if (xSplit[0] == "Breakpoint") {
                     lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(s, int.Parse(xSplit[1])));
-                } else {
-                    MessageBox.Show(xResult[0]);
-                }
+                    return true;
+                } 
+                MessageBox.Show(xResult[0]);
             }
+            return false;
         }
 
         private void butnBreakpointAdd_Click(object sender, EventArgs e) {
-            AddBreakpoint(textBreakpoint.Text);
-            textBreakpoint.Clear();
+            string xLabel = textBreakpoint.Text.Trim();
+            if (AddBreakpoint(xLabel)) {
+                textBreakpoint.Clear();
+
+                // We dont add address types, as most of them change between compiles.
+                if (!xLabel.StartsWith("*")) {
+                    // Add here and not in AddBreakpoint, because during load we call AddBreakpoint
+                    var xBP = Settings.Breakpoint.NewBreakpointRow();
+                    xBP.Label = xLabel;
+                    Settings.Breakpoint.AddBreakpointRow(xBP);
+                    SaveSettings();
+                }
+            }
         }
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -374,6 +408,19 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        //TODO: Not supposed to be in app dir, but unless we release this as a standalone project
+        //it doesnt matter. If we do that we have to create project types anyways.
+        protected string ConfigPathname = Application.ExecutablePath + ".Settings";
+
+        protected void SaveSettings() {
+            Settings.WriteXml(ConfigPathname, System.Data.XmlWriteMode.IgnoreSchema);
+        }
+
+        protected void LoadSettings() {
+            if (System.IO.File.Exists(ConfigPathname)) {
+                Settings.ReadXml(ConfigPathname, System.Data.XmlReadMode.IgnoreSchema);
+            }
+        }
 
     }
 }
