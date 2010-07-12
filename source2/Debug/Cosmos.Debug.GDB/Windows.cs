@@ -7,19 +7,22 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.GDB {
     public class Windows {
         static public FormMain mMainForm;
+        //
         static public FormCallStack mCallStackForm;
         static public FormWatches mWatchesForm;
         static public FormLog mLogForm;
 
+        static protected List<Form> mForms = new List<Form>();
+
         static public void CreateForms() {
-            mCallStackForm = new FormCallStack();
-            mCallStackForm.Show();
+            mForms.Add(mCallStackForm = new FormCallStack());
+            mForms.Add(mWatchesForm = new FormWatches());
+            mForms.Add(mLogForm = new FormLog());
 
-            mWatchesForm = new FormWatches();
-            mWatchesForm.Show();
-
-            mLogForm = new FormLog();
-            mLogForm.Show();
+            foreach (var x in mForms) {
+                // On load the often end up behind other apps, so we do this to force them up on first show
+                Show(x);
+            }
         }
 
         static public void Show(Form aForm) {
@@ -30,7 +33,9 @@ namespace Cosmos.Debug.GDB {
         }
 
         static public void RestorePositions() {
-            RestoreWindow(mCallStackForm);
+            foreach (var x in mForms) {
+                RestoreWindow(x);
+            }
         }
 
         static protected void RestoreWindow(Form aForm) {
@@ -65,7 +70,9 @@ namespace Cosmos.Debug.GDB {
 
         static public void SavePositions() {
             Settings.DS.Window.Clear();
-            SaveWindow(mCallStackForm);
+            foreach (var x in mForms) {
+                SaveWindow(x);
+            }
         }
 
         static public void UpdateAllWindows() {
@@ -74,5 +81,28 @@ namespace Cosmos.Debug.GDB {
             Windows.mCallStackForm.Update();
         }
 
+        static protected List<Form> mVisibleWindows = new List<Form>();
+
+        static protected void SaveWindowState(Form aForm) {
+            if (aForm.Visible) {
+                mVisibleWindows.Add(aForm);
+            }
+        }
+
+        static public void Hide() {
+            foreach (var x in mForms) {
+                if (x.Visible) {
+                    mVisibleWindows.Add(x);
+                    x.Hide();
+                }
+            }
+        }
+
+        static public void Reshow() {
+            foreach (var x in mVisibleWindows) {
+                x.Show();
+            }
+            mVisibleWindows.Clear();
+        }
     }
 }

@@ -352,5 +352,17 @@ namespace Cosmos.Debug.GDB {
             Settings.Save();
         }
 
+        protected FormWindowState mLastWindowState = FormWindowState.Normal;
+        private void FormMain_Resize(object sender, EventArgs e) {
+            if (WindowState == FormWindowState.Minimized) {
+                // Window is begin minimized
+                Windows.Hide();
+            } else if ((mLastWindowState == FormWindowState.Minimized) && (WindowState != FormWindowState.Minimized)) {
+                // Window is being restored
+                Windows.Reshow();
+            }
+            mLastWindowState = WindowState;
+        }
+
     }
 }
