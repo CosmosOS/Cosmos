@@ -35,11 +35,6 @@
             this.lablCurrentFunction = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.panlRegisters = new System.Windows.Forms.Panel();
-            this.lboxCallStack = new System.Windows.Forms.ListBox();
-            this.menuCallStack = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.menuCallStackGoto = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel7 = new System.Windows.Forms.Panel();
-            this.label16 = new System.Windows.Forms.Label();
             this.panel5 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.lablFlagsText = new System.Windows.Forms.Label();
@@ -101,10 +96,6 @@
             this.lablCL = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.panlBreakpoints = new System.Windows.Forms.Panel();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label13 = new System.Windows.Forms.Label();
             this.lboxBreakpoints = new System.Windows.Forms.ListBox();
             this.menuBreakpoints = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mitmBreakpointDelete = new System.Windows.Forms.ToolStripMenuItem();
@@ -113,10 +104,7 @@
             this.textBreakpoint = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.lboxDebug = new System.Windows.Forms.ListBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.butnCopyDebugLogToClipboard = new System.Windows.Forms.Button();
-            this.butnDebugLogClear = new System.Windows.Forms.Button();
             this.butnSendCmd = new System.Windows.Forms.Button();
             this.textSendCmd = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -131,6 +119,9 @@
             this.mitmStepOver = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.continueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.Settings = new Cosmos.Debug.GDB.SettingsDS();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -138,11 +129,8 @@
             this.menuDisassembly.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panlRegisters.SuspendLayout();
-            this.menuCallStack.SuspendLayout();
-            this.panel7.SuspendLayout();
             this.panel5.SuspendLayout();
             this.panlBreakpoints.SuspendLayout();
-            this.panel3.SuspendLayout();
             this.menuBreakpoints.SuspendLayout();
             this.panel6.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -252,60 +240,12 @@
             // 
             // panlRegisters
             // 
-            this.panlRegisters.Controls.Add(this.lboxCallStack);
-            this.panlRegisters.Controls.Add(this.panel7);
             this.panlRegisters.Controls.Add(this.panel5);
             this.panlRegisters.Dock = System.Windows.Forms.DockStyle.Right;
             this.panlRegisters.Location = new System.Drawing.Point(503, 3);
             this.panlRegisters.Name = "panlRegisters";
             this.panlRegisters.Size = new System.Drawing.Size(276, 629);
             this.panlRegisters.TabIndex = 8;
-            // 
-            // lboxCallStack
-            // 
-            this.lboxCallStack.ContextMenuStrip = this.menuCallStack;
-            this.lboxCallStack.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lboxCallStack.FormattingEnabled = true;
-            this.lboxCallStack.HorizontalScrollbar = true;
-            this.lboxCallStack.Location = new System.Drawing.Point(0, 290);
-            this.lboxCallStack.Name = "lboxCallStack";
-            this.lboxCallStack.Size = new System.Drawing.Size(276, 329);
-            this.lboxCallStack.TabIndex = 68;
-            this.lboxCallStack.DoubleClick += new System.EventHandler(this.lboxCallStack_DoubleClick);
-            // 
-            // menuCallStack
-            // 
-            this.menuCallStack.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuCallStackGoto});
-            this.menuCallStack.Name = "menuCallStack";
-            this.menuCallStack.Size = new System.Drawing.Size(215, 26);
-            // 
-            // menuCallStackGoto
-            // 
-            this.menuCallStackGoto.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.menuCallStackGoto.Name = "menuCallStackGoto";
-            this.menuCallStackGoto.Size = new System.Drawing.Size(214, 22);
-            this.menuCallStackGoto.Text = "&Go To (Disassemble Only)";
-            this.menuCallStackGoto.Click += new System.EventHandler(this.menuCallStackGoto_Click);
-            // 
-            // panel7
-            // 
-            this.panel7.Controls.Add(this.label16);
-            this.panel7.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel7.Location = new System.Drawing.Point(0, 262);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(276, 28);
-            this.panel7.TabIndex = 67;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label16.Location = new System.Drawing.Point(6, 3);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(65, 13);
-            this.label16.TabIndex = 3;
-            this.label16.Text = "Call Stack";
             // 
             // panel5
             // 
@@ -922,7 +862,6 @@
             // 
             // panlBreakpoints
             // 
-            this.panlBreakpoints.Controls.Add(this.panel3);
             this.panlBreakpoints.Controls.Add(this.lboxBreakpoints);
             this.panlBreakpoints.Controls.Add(this.panel6);
             this.panlBreakpoints.Dock = System.Windows.Forms.DockStyle.Right;
@@ -930,46 +869,6 @@
             this.panlBreakpoints.Name = "panlBreakpoints";
             this.panlBreakpoints.Size = new System.Drawing.Size(234, 629);
             this.panlBreakpoints.TabIndex = 6;
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.button1);
-            this.panel3.Controls.Add(this.textBox1);
-            this.panel3.Controls.Add(this.label13);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel3.Location = new System.Drawing.Point(0, 263);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(234, 51);
-            this.panel3.TabIndex = 66;
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(203, 19);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(24, 23);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "+";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(9, 19);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(188, 20);
-            this.textBox1.TabIndex = 4;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(6, 3);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(57, 13);
-            this.label13.TabIndex = 3;
-            this.label13.Text = "Watches";
             // 
             // lboxBreakpoints
             // 
@@ -1038,7 +937,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.lboxDebug);
             this.tabPage2.Controls.Add(this.panel2);
             this.tabPage2.Location = new System.Drawing.Point(4, 4);
             this.tabPage2.Name = "tabPage2";
@@ -1048,19 +946,8 @@
             this.tabPage2.Text = "Debug Log";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // lboxDebug
-            // 
-            this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lboxDebug.FormattingEnabled = true;
-            this.lboxDebug.Location = new System.Drawing.Point(3, 36);
-            this.lboxDebug.Name = "lboxDebug";
-            this.lboxDebug.Size = new System.Drawing.Size(1010, 589);
-            this.lboxDebug.TabIndex = 4;
-            // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.butnCopyDebugLogToClipboard);
-            this.panel2.Controls.Add(this.butnDebugLogClear);
             this.panel2.Controls.Add(this.butnSendCmd);
             this.panel2.Controls.Add(this.textSendCmd);
             this.panel2.Controls.Add(this.label1);
@@ -1069,26 +956,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1010, 33);
             this.panel2.TabIndex = 3;
-            // 
-            // butnCopyDebugLogToClipboard
-            // 
-            this.butnCopyDebugLogToClipboard.Location = new System.Drawing.Point(565, 7);
-            this.butnCopyDebugLogToClipboard.Name = "butnCopyDebugLogToClipboard";
-            this.butnCopyDebugLogToClipboard.Size = new System.Drawing.Size(143, 23);
-            this.butnCopyDebugLogToClipboard.TabIndex = 4;
-            this.butnCopyDebugLogToClipboard.Text = "Copy Log to Clipboard";
-            this.butnCopyDebugLogToClipboard.UseVisualStyleBackColor = true;
-            this.butnCopyDebugLogToClipboard.Click += new System.EventHandler(this.butnCopyDebugLogToClipboard_Click);
-            // 
-            // butnDebugLogClear
-            // 
-            this.butnDebugLogClear.Location = new System.Drawing.Point(484, 7);
-            this.butnDebugLogClear.Name = "butnDebugLogClear";
-            this.butnDebugLogClear.Size = new System.Drawing.Size(75, 23);
-            this.butnDebugLogClear.TabIndex = 3;
-            this.butnDebugLogClear.Text = "Clear Log";
-            this.butnDebugLogClear.UseVisualStyleBackColor = true;
-            this.butnDebugLogClear.Click += new System.EventHandler(this.butnDebugLogClear_Click);
             // 
             // butnSendCmd
             // 
@@ -1121,7 +988,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.executeToolStripMenuItem});
+            this.executeToolStripMenuItem,
+            this.viewToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
@@ -1207,6 +1075,29 @@
             this.continueToolStripMenuItem.Text = "&Continue";
             this.continueToolStripMenuItem.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
             // 
+            // viewToolStripMenuItem
+            // 
+            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mitmMainViewCallStack,
+            this.mitmMainViewWatches});
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.viewToolStripMenuItem.Text = "&View";
+            // 
+            // mitmMainViewCallStack
+            // 
+            this.mitmMainViewCallStack.Name = "mitmMainViewCallStack";
+            this.mitmMainViewCallStack.Size = new System.Drawing.Size(122, 22);
+            this.mitmMainViewCallStack.Text = "&CallStack";
+            this.mitmMainViewCallStack.Click += new System.EventHandler(this.mitmMainViewCallStack_Click);
+            // 
+            // mitmMainViewWatches
+            // 
+            this.mitmMainViewWatches.Name = "mitmMainViewWatches";
+            this.mitmMainViewWatches.Size = new System.Drawing.Size(122, 22);
+            this.mitmMainViewWatches.Text = "&Watches";
+            this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
+            // 
             // Settings
             // 
             this.Settings.DataSetName = "SettingsDS";
@@ -1231,14 +1122,9 @@
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             this.panlRegisters.ResumeLayout(false);
-            this.menuCallStack.ResumeLayout(false);
-            this.panel7.ResumeLayout(false);
-            this.panel7.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             this.panlBreakpoints.ResumeLayout(false);
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
             this.menuBreakpoints.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
             this.panel6.PerformLayout();
@@ -1259,13 +1145,10 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.ListBox lboxDebug;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button butnSendCmd;
         private System.Windows.Forms.TextBox textSendCmd;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button butnDebugLogClear;
-        private System.Windows.Forms.Button butnCopyDebugLogToClipboard;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mitmExit;
@@ -1349,20 +1232,14 @@
         private System.Windows.Forms.Label lablBL;
         private System.Windows.Forms.Label lablCL;
         private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.Panel panel7;
-        private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.ListBox lboxCallStack;
         private System.Windows.Forms.Panel panel8;
         private System.Windows.Forms.ListBox lboxDisassemble;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Label lablCurrentFunction;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ContextMenuStrip menuCallStack;
-        private System.Windows.Forms.ToolStripMenuItem menuCallStackGoto;
+        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mitmMainViewCallStack;
+        private System.Windows.Forms.ToolStripMenuItem mitmMainViewWatches;
     }
 }
 

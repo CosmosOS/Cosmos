@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
     public partial class FormMain : Form {
-        protected System.Diagnostics.Process mGDBProcess;
-        protected System.IO.StreamReader mGDB;
         protected string mFuncName;
 
         public FormMain() {
@@ -25,56 +21,6 @@ namespace Cosmos.Debug.GDB {
         // watches
         // View stack
 
-        static protected string Unescape(string aInput) {
-            // Remove surrounding ", /n, then unescape and trim
-            return Regex.Unescape(aInput.Substring(1, aInput.Length - 2).Replace('\n', ' ').Trim());
-        }
-
-        protected List<string> GetResponse() {
-            var xResult = new List<string>();
-
-            //TODO: Cant find a better way than peek... 
-            while (!mGDBProcess.HasExited) {
-                var xLine = mGDB.ReadLine();
-                // Null occurs after quit
-                if (xLine == null) {
-                    break;
-                } else if (xLine.Trim() == "(gdb)") {
-                    break;
-                } else {
-                    var xType = xLine[0];
-                    // & echo of a command
-                    // ~ text response
-                    // ^ done
-                    xLine = xLine.Remove(0, 1);
-                    if ((xType == '~') || (xType == '&')) {
-                        xLine = Unescape(xLine);
-                    }
-                    Log(xType + xLine);
-                    if (xType == '~') {
-                        xResult.Add(xLine);
-                    }
-                }
-                Application.DoEvents();
-            }
-
-            Log("-----");
-            return xResult;
-        }
-
-        protected void Log(string aMsg) {
-            lboxDebug.SelectedIndex = lboxDebug.Items.Add(aMsg);
-        }
-
-        protected List<string> SendCmd(string aCmd) {
-            mGDBProcess.StandardInput.WriteLine(aCmd);
-            return GetResponse();
-        }
-
-        static protected UInt32 FromHex(string aValue) {
-            return UInt32.Parse(aValue.Substring(2), NumberStyles.HexNumber);
-        }
-
         protected class AsmLine {
             public readonly UInt32 mAddr;
             public readonly string mLabel;
@@ -83,11 +29,11 @@ namespace Cosmos.Debug.GDB {
 
             public AsmLine(string aInput) {
                 //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
-                var s = Unescape(aInput);
+                var s = GDB.Unescape(aInput);
                 var xSplit1 = s.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
                 var xSplit2 = xSplit1[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                mAddr = FromHex(xSplit2[0]);
+                mAddr = Global.FromHex(xSplit2[0]);
                 string xLabel;
                 if (xSplit2.Length > 1) {
                     xLabel = xSplit2[1];
@@ -109,17 +55,17 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        protected void Disassemble(string aLabel) {
+        public void Disassemble(string aLabel) {
             lablCurrentFunction.Text = "";
             lablCurrentFunction.Visible = true;
 
-            var xResult = SendCmd(("disassemble " + aLabel).Trim());
+            var xResult = GDB.SendCmd(("disassemble " + aLabel).Trim());
             lboxDisassemble.BeginUpdate();
             try {
                 lboxDisassemble.Items.Clear();
                 // In some cases GDB might return no results. This is common when no symbols are loaded.
                 if (xResult.Count > 0) {
-                    var xSplit = Unescape(xResult[1]).Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    var xSplit = GDB.Unescape(xResult[1]).Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     mFuncName = xSplit[xSplit.Length - 1];
                     lablCurrentFunction.Text = mFuncName;
 
@@ -179,8 +125,8 @@ namespace Cosmos.Debug.GDB {
             aLabel.Visible = true;
         }
 
-        protected void GetRegisters() {
-            var xResult = SendCmd("info registers");
+        public void GetRegisters() {
+            var xResult = GDB.SendCmd("info registers");
 
             int i = 0;
             CPUReg xReg;
@@ -237,66 +183,9 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        protected class CallStack {
-            public readonly UInt32 Address;
-            public readonly string Label;
-
-            public CallStack(string aInput) {
-                var xSplit = aInput.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                Address = FromHex(xSplit[1]);
-                Label = xSplit[3];
-            }
-
-            public override string ToString() {
-                if (Label.Length > 0) {
-                    return Label;
-                }
-                return Address.ToString("X8");
-            }
-        }
-
-        protected void GetCallStack() {
-            var xResult = SendCmd("where");
-            lboxCallStack.BeginUpdate();
-            try {
-                lboxCallStack.Items.Clear();
-                foreach (var x in xResult) {
-                    //#0  0x0056d5df in DebugStub_Start ()
-                    //#1  0x0057572b in System_Void__Cosmos_User_Kernel_Program_Init____DOT__00000001 ()
-                    //#2  0x00550018 in Before_Kernel_Stack ()
-                    //#3  0x005a5427 in __ENGINE_ENTRYPOINT__ ()
-                    //~Backtrace stopped: frame did not save the PC
-                    if (x.StartsWith("#")) {
-                        lboxCallStack.Items.Add(new CallStack(x));
-                    }
-                }
-            } finally {
-                lboxCallStack.EndUpdate();
-            }
-        }
-
-        protected void Update() {
-            Disassemble("");
-            GetRegisters();
-            GetCallStack();
-            tabControl1.SelectedIndex = 0;
-        }
-
         private void butnSendCmd_Click(object sender, EventArgs e) {
-            SendCmd(textSendCmd.Text);
+            GDB.SendCmd(textSendCmd.Text);
             textSendCmd.Clear();
-        }
-
-        private void butnDebugLogClear_Click(object sender, EventArgs e) {
-            lboxDebug.Items.Clear();
-        }
-
-        private void butnCopyDebugLogToClipboard_Click(object sender, EventArgs e) {
-            var xSB = new StringBuilder();
-            foreach (string x in lboxDebug.Items) {
-                xSB.AppendLine(x);
-            }
-            Clipboard.SetText(xSB.ToString());
         }
 
         private void FormMain_Shown(object sender, EventArgs e) {
@@ -310,41 +199,20 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmStepInto_Click(object sender, EventArgs e) {
-            SendCmd("stepi");
+            GDB.SendCmd("stepi");
             Update();
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
-            SendCmd("nexti");
+            GDB.SendCmd("nexti");
             Update();
         }
 
         private void mitmConnect_Click(object sender, EventArgs e) {
             mitmConnect.Enabled = false;
-            var xStartInfo = new ProcessStartInfo();
-            //TODO: Make path dynamic
-            xStartInfo.FileName = @"D:\source\Cosmos\Build\Tools\gdb.exe";
-            xStartInfo.Arguments = @"--interpreter=mi2";
-            //TODO: Make path dynamic
-            xStartInfo.WorkingDirectory = @"D:\source\Cosmos\source2\Users\Kudzu\Breakpoints\bin\debug";
-            xStartInfo.CreateNoWindow = true;
-            xStartInfo.UseShellExecute = false;
-            xStartInfo.RedirectStandardError = true;
-            xStartInfo.RedirectStandardOutput = true;
-            xStartInfo.RedirectStandardInput = true;
-            mGDBProcess = System.Diagnostics.Process.Start(xStartInfo);
-            mGDB = mGDBProcess.StandardOutput;
-            mGDBProcess.StandardInput.AutoFlush = true;
 
-            GetResponse();
-            SendCmd("symbol-file CosmosKernel.obj");
-            SendCmd("target remote :8832"); 
-            SendCmd("set architecture i386");
-            SendCmd("set language asm");
-            SendCmd("set disassembly-flavor intel");
-            SendCmd("break Kernel_Start");
-            SendCmd("continue");
-            SendCmd("delete 1");
+            Windows.CreateForms();
+            GDB.Connect();
 
             LoadSettings();
             foreach (SettingsDS.BreakpointRow xBP in Settings.Breakpoint.Rows) {
@@ -354,7 +222,7 @@ namespace Cosmos.Debug.GDB {
             Update();
         }
 
-        protected void ResetRegisters() {
+        public void ResetRegisters() {
             lablEAX.Visible = false;
             lablAX.Visible = false;
             lablAH.Visible = false;
@@ -414,7 +282,7 @@ namespace Cosmos.Debug.GDB {
         protected bool AddBreakpoint(string aLabel) {
             string s = aLabel.Trim();
             if (s.Length > 0) {
-                var xResult = SendCmd("break " + s);
+                var xResult = GDB.SendCmd("break " + s);
                 var xSplit = xResult[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 if (xSplit[0] == "Breakpoint") {
                     lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(s, int.Parse(xSplit[1])));
@@ -442,7 +310,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
-            SendCmd("continue");
+            GDB.SendCmd("continue");
             Update();
         }
 
@@ -455,7 +323,7 @@ namespace Cosmos.Debug.GDB {
         private void mitmBreakpointDelete_Click(object sender, EventArgs e) {
             var x = (Breakpoint)lboxBreakpoints.SelectedItem;
             if (x != null) {
-                SendCmd("delete " + x.Index);
+                GDB.SendCmd("delete " + x.Index);
                 lboxBreakpoints.Items.Remove(x);
             }
         }
@@ -481,17 +349,12 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        private void menuCallStackGoto_Click(object sender, EventArgs e) {
-            var x = (CallStack)lboxCallStack.SelectedItem;
-            if (x != null) {
-                ResetRegisters();
-                // Address doesn't work for some reason
-                Disassemble(x.Label);
-            }
+        private void mitmMainViewCallStack_Click(object sender, EventArgs e) {
+            Windows.Show(Windows.mCallStackForm);
         }
 
-        private void lboxCallStack_DoubleClick(object sender, EventArgs e) {
-            menuCallStackGoto.PerformClick();
+        private void mitmMainViewWatches_Click(object sender, EventArgs e) {
+            Windows.Show(Windows.mWatchesForm);
         }
 
     }
