@@ -27,9 +27,16 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmClear = new System.Windows.Forms.ToolStripMenuItem();
-            this.lboxCmd = new System.Windows.Forms.ListBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.butnSendCmd = new System.Windows.Forms.Button();
+            this.textSendCmd = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.lboxDebug = new System.Windows.Forms.ListBox();
+            this.lboxCmd = new System.Windows.Forms.ListBox();
             this.menuStrip1.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -67,31 +74,82 @@
             this.mitmClear.Text = "C&lear";
             this.mitmClear.Click += new System.EventHandler(this.mitmClear_Click);
             // 
-            // lboxCmd
+            // panel2
             // 
-            this.lboxCmd.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lboxCmd.FormattingEnabled = true;
-            this.lboxCmd.Location = new System.Drawing.Point(0, 24);
-            this.lboxCmd.Name = "lboxCmd";
-            this.lboxCmd.Size = new System.Drawing.Size(120, 342);
-            this.lboxCmd.TabIndex = 7;
+            this.panel2.Controls.Add(this.butnSendCmd);
+            this.panel2.Controls.Add(this.textSendCmd);
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 24);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(489, 33);
+            this.panel2.TabIndex = 10;
+            // 
+            // butnSendCmd
+            // 
+            this.butnSendCmd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.butnSendCmd.Location = new System.Drawing.Point(438, 5);
+            this.butnSendCmd.Name = "butnSendCmd";
+            this.butnSendCmd.Size = new System.Drawing.Size(47, 23);
+            this.butnSendCmd.TabIndex = 2;
+            this.butnSendCmd.Text = "Send";
+            this.butnSendCmd.UseVisualStyleBackColor = true;
+            this.butnSendCmd.Click += new System.EventHandler(this.butnSendCmd_Click);
+            // 
+            // textSendCmd
+            // 
+            this.textSendCmd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textSendCmd.Location = new System.Drawing.Point(63, 7);
+            this.textSendCmd.Name = "textSendCmd";
+            this.textSendCmd.Size = new System.Drawing.Size(370, 20);
+            this.textSendCmd.TabIndex = 1;
+            this.textSendCmd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textSendCmd_KeyPress);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(4, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(57, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Command:";
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.lboxDebug);
+            this.panel1.Controls.Add(this.lboxCmd);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 57);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(489, 317);
+            this.panel1.TabIndex = 11;
             // 
             // lboxDebug
             // 
             this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lboxDebug.FormattingEnabled = true;
-            this.lboxDebug.Location = new System.Drawing.Point(120, 24);
+            this.lboxDebug.Location = new System.Drawing.Point(118, 0);
             this.lboxDebug.Name = "lboxDebug";
-            this.lboxDebug.Size = new System.Drawing.Size(369, 342);
-            this.lboxDebug.TabIndex = 8;
+            this.lboxDebug.Size = new System.Drawing.Size(371, 316);
+            this.lboxDebug.TabIndex = 9;
+            // 
+            // lboxCmd
+            // 
+            this.lboxCmd.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lboxCmd.FormattingEnabled = true;
+            this.lboxCmd.Location = new System.Drawing.Point(0, 0);
+            this.lboxCmd.Name = "lboxCmd";
+            this.lboxCmd.Size = new System.Drawing.Size(118, 316);
+            this.lboxCmd.TabIndex = 7;
             // 
             // FormLog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(489, 374);
-            this.Controls.Add(this.lboxDebug);
-            this.Controls.Add(this.lboxCmd);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MainMenuStrip = this.menuStrip1;
@@ -101,6 +159,9 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormLog_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -112,7 +173,12 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;
         private System.Windows.Forms.ToolStripMenuItem mitmClear;
-        private System.Windows.Forms.ListBox lboxCmd;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button butnSendCmd;
+        private System.Windows.Forms.TextBox textSendCmd;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ListBox lboxDebug;
+        private System.Windows.Forms.ListBox lboxCmd;
     }
 }

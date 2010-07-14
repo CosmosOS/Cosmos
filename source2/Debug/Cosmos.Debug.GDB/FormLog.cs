@@ -35,5 +35,16 @@ namespace Cosmos.Debug.GDB {
             Hide();
         }
 
+        private void butnSendCmd_Click(object sender, EventArgs e) {
+            GDB.SendCmd(textSendCmd.Text);
+            textSendCmd.Clear();
+        }
+
+        private void textSendCmd_KeyPress(object sender, KeyPressEventArgs e) {
+            if (e.KeyChar == '\r') {
+                butnSendCmd.PerformClick();
+            }
+        }
+
     }
 }

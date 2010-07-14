@@ -34,11 +34,6 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.lablCurrentFunction = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.butnSendCmd = new System.Windows.Forms.Button();
-            this.textSendCmd = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmConnect = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,8 +53,6 @@
             this.panel8.SuspendLayout();
             this.menuDisassembly.SuspendLayout();
             this.panel4.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,20 +61,19 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1043, 32);
+            this.panel1.Size = new System.Drawing.Size(775, 32);
             this.panel1.TabIndex = 3;
             // 
             // tabControl1
             // 
             this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Right;
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 56);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1043, 643);
+            this.tabControl1.Size = new System.Drawing.Size(775, 360);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
@@ -90,7 +82,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 4);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1016, 635);
+            this.tabPage1.Size = new System.Drawing.Size(748, 352);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Main";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -102,7 +94,7 @@
             this.panel8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel8.Location = new System.Drawing.Point(3, 3);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(1010, 629);
+            this.panel8.Size = new System.Drawing.Size(742, 346);
             this.panel8.TabIndex = 9;
             // 
             // lboxDisassemble
@@ -114,7 +106,7 @@
             this.lboxDisassemble.ItemHeight = 19;
             this.lboxDisassemble.Location = new System.Drawing.Point(0, 32);
             this.lboxDisassemble.Name = "lboxDisassemble";
-            this.lboxDisassemble.Size = new System.Drawing.Size(1010, 593);
+            this.lboxDisassemble.Size = new System.Drawing.Size(742, 308);
             this.lboxDisassemble.TabIndex = 8;
             // 
             // menuDisassembly
@@ -138,7 +130,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(0, 0);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(1010, 32);
+            this.panel4.Size = new System.Drawing.Size(742, 32);
             this.panel4.TabIndex = 7;
             // 
             // lablCurrentFunction
@@ -160,55 +152,6 @@
             this.label5.TabIndex = 0;
             this.label5.Text = "Current Function:";
             // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.panel2);
-            this.tabPage2.Location = new System.Drawing.Point(4, 4);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1016, 635);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Debug Log";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.butnSendCmd);
-            this.panel2.Controls.Add(this.textSendCmd);
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(3, 3);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1010, 33);
-            this.panel2.TabIndex = 3;
-            // 
-            // butnSendCmd
-            // 
-            this.butnSendCmd.Location = new System.Drawing.Point(315, 7);
-            this.butnSendCmd.Name = "butnSendCmd";
-            this.butnSendCmd.Size = new System.Drawing.Size(137, 23);
-            this.butnSendCmd.TabIndex = 2;
-            this.butnSendCmd.Text = "Send Command";
-            this.butnSendCmd.UseVisualStyleBackColor = true;
-            this.butnSendCmd.Click += new System.EventHandler(this.butnSendCmd_Click);
-            // 
-            // textSendCmd
-            // 
-            this.textSendCmd.Location = new System.Drawing.Point(45, 7);
-            this.textSendCmd.Name = "textSendCmd";
-            this.textSendCmd.Size = new System.Drawing.Size(264, 20);
-            this.textSendCmd.TabIndex = 1;
-            this.textSendCmd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textSendCmd_KeyPress);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(4, 10);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
-            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -217,7 +160,7 @@
             this.viewToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(775, 24);
             this.menuStrip1.TabIndex = 5;
             this.menuStrip1.Text = "E&xecute";
             // 
@@ -327,10 +270,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1043, 699);
+            this.ClientSize = new System.Drawing.Size(775, 416);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
             this.Text = "Cosmos GDB Debugger";
@@ -345,9 +289,6 @@
             this.menuDisassembly.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -360,11 +301,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Button butnSendCmd;
-        private System.Windows.Forms.TextBox textSendCmd;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mitmExit;

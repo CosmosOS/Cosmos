@@ -79,11 +79,6 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        private void butnSendCmd_Click(object sender, EventArgs e) {
-            GDB.SendCmd(textSendCmd.Text);
-            textSendCmd.Clear();
-        }
-
         private void FormMain_Shown(object sender, EventArgs e) {
             if (mitmConnect.Enabled) {
                 mitmConnect.PerformClick();
@@ -125,12 +120,6 @@ namespace Cosmos.Debug.GDB {
 
         private void mitmRefresh_Click(object sender, EventArgs e) {
             Update();
-        }
-
-        private void textSendCmd_KeyPress(object sender, KeyPressEventArgs e) {
-            if (e.KeyChar == '\r') {
-                butnSendCmd.PerformClick();
-            }
         }
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
