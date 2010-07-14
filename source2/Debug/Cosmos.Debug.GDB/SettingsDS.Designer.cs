@@ -770,6 +770,8 @@ namespace Cosmos.Debug.GDB {
             
             private global::System.Data.DataColumn columnHeight;
             
+            private global::System.Data.DataColumn columnVisible;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public WindowDataTable() {
                 this.TableName = "Window";
@@ -836,6 +838,13 @@ namespace Cosmos.Debug.GDB {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn VisibleColumn {
+                get {
+                    return this.columnVisible;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -864,14 +873,15 @@ namespace Cosmos.Debug.GDB {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public WindowRow AddWindowRow(string Name, int Left, int Top, int Width, int Height) {
+            public WindowRow AddWindowRow(string Name, int Left, int Top, int Width, int Height, bool Visible) {
                 WindowRow rowWindowRow = ((WindowRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Name,
                         Left,
                         Top,
                         Width,
-                        Height};
+                        Height,
+                        Visible};
                 rowWindowRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowWindowRow);
                 return rowWindowRow;
@@ -902,6 +912,7 @@ namespace Cosmos.Debug.GDB {
                 this.columnTop = base.Columns["Top"];
                 this.columnWidth = base.Columns["Width"];
                 this.columnHeight = base.Columns["Height"];
+                this.columnVisible = base.Columns["Visible"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -916,6 +927,8 @@ namespace Cosmos.Debug.GDB {
                 base.Columns.Add(this.columnWidth);
                 this.columnHeight = new global::System.Data.DataColumn("Height", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnHeight);
+                this.columnVisible = new global::System.Data.DataColumn("Visible", typeof(bool), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnVisible);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnName}, true));
                 this.columnName.AllowDBNull = false;
@@ -1162,6 +1175,21 @@ namespace Cosmos.Debug.GDB {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool Visible {
+                get {
+                    try {
+                        return ((bool)(this[this.tableWindow.VisibleColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Visible\' in table \'Window\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableWindow.VisibleColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public bool IsLeftNull() {
                 return this.IsNull(this.tableWindow.LeftColumn);
             }
@@ -1199,6 +1227,16 @@ namespace Cosmos.Debug.GDB {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public void SetHeightNull() {
                 this[this.tableWindow.HeightColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsVisibleNull() {
+                return this.IsNull(this.tableWindow.VisibleColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetVisibleNull() {
+                this[this.tableWindow.VisibleColumn] = global::System.Convert.DBNull;
             }
         }
         

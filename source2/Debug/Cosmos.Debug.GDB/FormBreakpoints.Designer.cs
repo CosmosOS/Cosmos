@@ -101,6 +101,7 @@
             this.Name = "FormBreakpoints";
             this.ShowInTaskbar = false;
             this.Text = "Breakpoints";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormBreakpoints_FormClosing);
             this.panel6.ResumeLayout(false);
             this.panel6.PerformLayout();
             this.menuBreakpoints.ResumeLayout(false);

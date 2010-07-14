@@ -31,7 +31,7 @@ namespace Cosmos.Debug.GDB {
             InitializeComponent();
         }
 
-        public void Update() {
+        public void Redo() {
             var xResult = GDB.SendCmd("where");
             lboxCallStack.BeginUpdate();
             try {
@@ -54,7 +54,7 @@ namespace Cosmos.Debug.GDB {
         private void menuCallStackGoto_Click(object sender, EventArgs e) {
             var x = (CallStack)lboxCallStack.SelectedItem;
             if (x != null) {
-                Windows.mMainForm.ResetRegisters();
+                Windows.mRegistersForm.ResetRegisters();
                 // Address doesn't work for some reason
                 Windows.mMainForm.Disassemble(x.Label);
             }

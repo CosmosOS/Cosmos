@@ -77,5 +77,10 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        private void FormBreakpoints_FormClosing(object sender, FormClosingEventArgs e) {
+            e.Cancel = true;
+            Hide();
+        }
+
     }
 }

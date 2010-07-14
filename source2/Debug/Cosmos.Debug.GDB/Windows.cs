@@ -12,6 +12,7 @@ namespace Cosmos.Debug.GDB {
         static public FormWatches mWatchesForm;
         static public FormLog mLogForm;
         static public FormBreakpoints mBreakpointsForm;
+        static public FormRegisters mRegistersForm;
 
         static protected List<Form> mForms = new List<Form>();
 
@@ -20,11 +21,7 @@ namespace Cosmos.Debug.GDB {
             mForms.Add(mWatchesForm = new FormWatches());
             mForms.Add(mLogForm = new FormLog());
             mForms.Add(mBreakpointsForm = new FormBreakpoints());
-
-            foreach (var x in mForms) {
-                // On load the often end up behind other apps, so we do this to force them up on first show
-                Show(x);
-            }
+            mForms.Add(mRegistersForm = new FormRegisters());
         }
 
         static public void Show(Form aForm) {
@@ -41,6 +38,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         static protected void RestoreWindow(Form aForm) {
+            bool xShowForm = true;
             //http://social.msdn.microsoft.com/forums/en-US/winforms/thread/72b2edaf-0719-4d22-885e-48d643dc626b
             var x = Settings.DS.Window.FindByName(aForm.GetType().Name);
             if (x != null) {
@@ -56,6 +54,13 @@ namespace Cosmos.Debug.GDB {
                 if (!x.IsHeightNull()) {
                     aForm.Height = x.Height;
                 }
+                // On load the often end up behind other apps, so we do this to force them up on first show
+                if (!x.IsVisibleNull()) {
+                    xShowForm = x.Visible;
+                }
+            }
+            if (xShowForm) {
+                Show(aForm);
             }
         }
 
@@ -67,6 +72,7 @@ namespace Cosmos.Debug.GDB {
             xRow.Top = aForm.Top;
             xRow.Width = aForm.Width;
             xRow.Height = aForm.Height;
+            xRow.Visible = aForm.Visible;
             x.AddWindowRow(xRow);
         }
 
@@ -79,8 +85,8 @@ namespace Cosmos.Debug.GDB {
 
         static public void UpdateAllWindows() {
             Windows.mMainForm.Disassemble("");
-            Windows.mMainForm.GetRegisters();
-            Windows.mCallStackForm.Update();
+            Windows.mRegistersForm.Redo();
+            Windows.mCallStackForm.Redo();
         }
 
         static protected List<Form> mVisibleWindows = new List<Form>();

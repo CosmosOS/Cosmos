@@ -15,7 +15,7 @@
         <xs:element name="Breakpoint" msprop:Generator_UserTableName="Breakpoint" msprop:Generator_RowDeletedName="BreakpointRowDeleted" msprop:Generator_RowChangedName="BreakpointRowChanged" msprop:Generator_RowClassName="BreakpointRow" msprop:Generator_RowChangingName="BreakpointRowChanging" msprop:Generator_RowEvArgName="BreakpointRowChangeEvent" msprop:Generator_RowEvHandlerName="BreakpointRowChangeEventHandler" msprop:Generator_TableClassName="BreakpointDataTable" msprop:Generator_TableVarName="tableBreakpoint" msprop:Generator_RowDeletingName="BreakpointRowDeleting" msprop:Generator_TablePropName="Breakpoint">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Label" msprop:Generator_UserColumnName="Label" msprop:Generator_ColumnVarNameInTable="columnLabel" msprop:Generator_ColumnPropNameInRow="Label" msprop:Generator_ColumnPropNameInTable="LabelColumn" type="xs:string" />
+              <xs:element name="Label" msprop:Generator_UserColumnName="Label" msprop:Generator_ColumnPropNameInRow="Label" msprop:Generator_ColumnVarNameInTable="columnLabel" msprop:Generator_ColumnPropNameInTable="LabelColumn" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -23,14 +23,15 @@
           <xs:complexType>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Window" msprop:Generator_UserTableName="Window" msprop:Generator_RowDeletedName="WindowRowDeleted" msprop:Generator_TableClassName="WindowDataTable" msprop:Generator_RowChangedName="WindowRowChanged" msprop:Generator_RowClassName="WindowRow" msprop:Generator_RowChangingName="WindowRowChanging" msprop:Generator_RowEvArgName="WindowRowChangeEvent" msprop:Generator_RowEvHandlerName="WindowRowChangeEventHandler" msprop:Generator_TablePropName="Window" msprop:Generator_TableVarName="tableWindow" msprop:Generator_RowDeletingName="WindowRowDeleting">
+        <xs:element name="Window" msprop:Generator_UserTableName="Window" msprop:Generator_RowDeletedName="WindowRowDeleted" msprop:Generator_RowChangedName="WindowRowChanged" msprop:Generator_RowClassName="WindowRow" msprop:Generator_RowChangingName="WindowRowChanging" msprop:Generator_RowEvArgName="WindowRowChangeEvent" msprop:Generator_RowEvHandlerName="WindowRowChangeEventHandler" msprop:Generator_TableClassName="WindowDataTable" msprop:Generator_TableVarName="tableWindow" msprop:Generator_RowDeletingName="WindowRowDeleting" msprop:Generator_TablePropName="Window">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInTable="NameColumn" type="xs:string" />
-              <xs:element name="Left" msprop:Generator_UserColumnName="Left" msprop:Generator_ColumnPropNameInRow="Left" msprop:Generator_ColumnVarNameInTable="columnLeft" msprop:Generator_ColumnPropNameInTable="LeftColumn" type="xs:int" minOccurs="0" />
-              <xs:element name="Top" msprop:Generator_UserColumnName="Top" msprop:Generator_ColumnPropNameInRow="Top" msprop:Generator_ColumnVarNameInTable="columnTop" msprop:Generator_ColumnPropNameInTable="TopColumn" type="xs:int" minOccurs="0" />
-              <xs:element name="Width" msprop:Generator_UserColumnName="Width" msprop:Generator_ColumnPropNameInRow="Width" msprop:Generator_ColumnVarNameInTable="columnWidth" msprop:Generator_ColumnPropNameInTable="WidthColumn" type="xs:int" minOccurs="0" />
-              <xs:element name="Height" msprop:Generator_UserColumnName="Height" msprop:Generator_ColumnPropNameInRow="Height" msprop:Generator_ColumnVarNameInTable="columnHeight" msprop:Generator_ColumnPropNameInTable="HeightColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" type="xs:string" />
+              <xs:element name="Left" msprop:Generator_UserColumnName="Left" msprop:Generator_ColumnVarNameInTable="columnLeft" msprop:Generator_ColumnPropNameInRow="Left" msprop:Generator_ColumnPropNameInTable="LeftColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Top" msprop:Generator_UserColumnName="Top" msprop:Generator_ColumnVarNameInTable="columnTop" msprop:Generator_ColumnPropNameInRow="Top" msprop:Generator_ColumnPropNameInTable="TopColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Width" msprop:Generator_UserColumnName="Width" msprop:Generator_ColumnVarNameInTable="columnWidth" msprop:Generator_ColumnPropNameInRow="Width" msprop:Generator_ColumnPropNameInTable="WidthColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Height" msprop:Generator_UserColumnName="Height" msprop:Generator_ColumnVarNameInTable="columnHeight" msprop:Generator_ColumnPropNameInRow="Height" msprop:Generator_ColumnPropNameInTable="HeightColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Visible" msprop:Generator_UserColumnName="Visible" msprop:Generator_ColumnPropNameInRow="Visible" msprop:Generator_ColumnVarNameInTable="columnVisible" msprop:Generator_ColumnPropNameInTable="VisibleColumn" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

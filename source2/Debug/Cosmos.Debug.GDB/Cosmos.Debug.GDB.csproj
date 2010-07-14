@@ -123,6 +123,9 @@
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormRegisters.resx">
+      <DependentUpon>FormRegisters.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormWatches.resx">
       <DependentUpon>FormWatches.cs</DependentUpon>
     </EmbeddedResource>
