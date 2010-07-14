@@ -215,10 +215,6 @@ namespace Cosmos.Debug.GDB {
             Windows.RestorePositions();
             GDB.Connect();
 
-            foreach (SettingsDS.BreakpointRow xBP in Settings.DS.Breakpoint.Rows) {
-                AddBreakpoint(xBP.Label);
-            }
-
             Windows.UpdateAllWindows();
         }
 
@@ -265,73 +261,15 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        protected class Breakpoint {
-            public readonly string Label;
-            public readonly int Index;
-
-            public Breakpoint(string aLabel, int aIndex) {
-                Label = aLabel;
-                Index = aIndex;
-            }
-
-            public override string ToString() {
-                return Index.ToString("00") + " " + Label;
-            }
-        }
-
-        protected bool AddBreakpoint(string aLabel) {
-            string s = aLabel.Trim();
-            if (s.Length > 0) {
-                var xResult = GDB.SendCmd("break " + s);
-                var xSplit = xResult[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                if (xSplit[0] == "Breakpoint") {
-                    lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(s, int.Parse(xSplit[1])));
-                    return true;
-                } 
-                MessageBox.Show(xResult[0]);
-            }
-            return false;
-        }
-
-        private void butnBreakpointAdd_Click(object sender, EventArgs e) {
-            string xLabel = textBreakpoint.Text.Trim();
-            if (AddBreakpoint(xLabel)) {
-                textBreakpoint.Clear();
-
-                // We dont add address types, as most of them change between compiles.
-                if (!xLabel.StartsWith("*")) {
-                    // Add here and not in AddBreakpoint, because during load we call AddBreakpoint
-                    var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
-                    xBP.Label = xLabel;
-                    Settings.DS.Breakpoint.AddBreakpointRow(xBP);
-                    Settings.Save();
-                }
-            }
-        }
-
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
             GDB.SendCmd("continue");
             Update();
         }
 
-        private void textBreakpoint_KeyPress(object sender, KeyPressEventArgs e) {
-            if (e.KeyChar == '\r') {
-                butnBreakpointAdd.PerformClick();
-            }
-        }
-
-        private void mitmBreakpointDelete_Click(object sender, EventArgs e) {
-            var x = (Breakpoint)lboxBreakpoints.SelectedItem;
-            if (x != null) {
-                GDB.SendCmd("delete " + x.Index);
-                lboxBreakpoints.Items.Remove(x);
-            }
-        }
-
         private void mitemDisassemblyAddBreakpoint_Click(object sender, EventArgs e) {
             var x = (AsmLine)lboxDisassemble.SelectedItem;
             if (x != null) {
-                AddBreakpoint("*0x" + x.mAddr.ToString("X8"));
+                Windows.mBreakpointsForm.AddBreakpoint("*0x" + x.mAddr.ToString("X8"));
             }
         }
 

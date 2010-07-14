@@ -96,13 +96,6 @@
             this.lablCL = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.panlBreakpoints = new System.Windows.Forms.Panel();
-            this.lboxBreakpoints = new System.Windows.Forms.ListBox();
-            this.menuBreakpoints = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.mitmBreakpointDelete = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.butnBreakpointAdd = new System.Windows.Forms.Button();
-            this.textBreakpoint = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel2 = new System.Windows.Forms.Panel();
             this.butnSendCmd = new System.Windows.Forms.Button();
@@ -129,9 +122,6 @@
             this.panel4.SuspendLayout();
             this.panlRegisters.SuspendLayout();
             this.panel5.SuspendLayout();
-            this.panlBreakpoints.SuspendLayout();
-            this.menuBreakpoints.SuspendLayout();
-            this.panel6.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -860,78 +850,11 @@
             // 
             // panlBreakpoints
             // 
-            this.panlBreakpoints.Controls.Add(this.lboxBreakpoints);
-            this.panlBreakpoints.Controls.Add(this.panel6);
             this.panlBreakpoints.Dock = System.Windows.Forms.DockStyle.Right;
             this.panlBreakpoints.Location = new System.Drawing.Point(779, 3);
             this.panlBreakpoints.Name = "panlBreakpoints";
             this.panlBreakpoints.Size = new System.Drawing.Size(234, 629);
             this.panlBreakpoints.TabIndex = 6;
-            // 
-            // lboxBreakpoints
-            // 
-            this.lboxBreakpoints.ContextMenuStrip = this.menuBreakpoints;
-            this.lboxBreakpoints.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lboxBreakpoints.FormattingEnabled = true;
-            this.lboxBreakpoints.Location = new System.Drawing.Point(0, 51);
-            this.lboxBreakpoints.Name = "lboxBreakpoints";
-            this.lboxBreakpoints.Size = new System.Drawing.Size(234, 212);
-            this.lboxBreakpoints.Sorted = true;
-            this.lboxBreakpoints.TabIndex = 65;
-            // 
-            // menuBreakpoints
-            // 
-            this.menuBreakpoints.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mitmBreakpointDelete});
-            this.menuBreakpoints.Name = "menuBreakpoints";
-            this.menuBreakpoints.Size = new System.Drawing.Size(108, 26);
-            // 
-            // mitmBreakpointDelete
-            // 
-            this.mitmBreakpointDelete.Name = "mitmBreakpointDelete";
-            this.mitmBreakpointDelete.Size = new System.Drawing.Size(107, 22);
-            this.mitmBreakpointDelete.Text = "&Delete";
-            this.mitmBreakpointDelete.Click += new System.EventHandler(this.mitmBreakpointDelete_Click);
-            // 
-            // panel6
-            // 
-            this.panel6.Controls.Add(this.butnBreakpointAdd);
-            this.panel6.Controls.Add(this.textBreakpoint);
-            this.panel6.Controls.Add(this.label9);
-            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel6.Location = new System.Drawing.Point(0, 0);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(234, 51);
-            this.panel6.TabIndex = 64;
-            // 
-            // butnBreakpointAdd
-            // 
-            this.butnBreakpointAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.butnBreakpointAdd.Location = new System.Drawing.Point(203, 19);
-            this.butnBreakpointAdd.Name = "butnBreakpointAdd";
-            this.butnBreakpointAdd.Size = new System.Drawing.Size(24, 23);
-            this.butnBreakpointAdd.TabIndex = 5;
-            this.butnBreakpointAdd.Text = "+";
-            this.butnBreakpointAdd.UseVisualStyleBackColor = true;
-            // 
-            // textBreakpoint
-            // 
-            this.textBreakpoint.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBreakpoint.Location = new System.Drawing.Point(9, 19);
-            this.textBreakpoint.Name = "textBreakpoint";
-            this.textBreakpoint.Size = new System.Drawing.Size(188, 20);
-            this.textBreakpoint.TabIndex = 4;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(6, 3);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(74, 13);
-            this.label9.TabIndex = 3;
-            this.label9.Text = "Breakpoints";
             // 
             // tabPage2
             // 
@@ -1121,10 +1044,6 @@
             this.panlRegisters.ResumeLayout(false);
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
-            this.panlBreakpoints.ResumeLayout(false);
-            this.menuBreakpoints.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -1157,15 +1076,8 @@
         private System.Windows.Forms.ToolStripMenuItem mitmRefresh;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ContextMenuStrip menuDisassembly;
-        private System.Windows.Forms.ContextMenuStrip menuBreakpoints;
-        private System.Windows.Forms.ToolStripMenuItem mitmBreakpointDelete;
         private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
         private System.Windows.Forms.Panel panlBreakpoints;
-        private System.Windows.Forms.ListBox lboxBreakpoints;
-        private System.Windows.Forms.Panel panel6;
-        private System.Windows.Forms.Button butnBreakpointAdd;
-        private System.Windows.Forms.TextBox textBreakpoint;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Panel panlRegisters;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Label label2;

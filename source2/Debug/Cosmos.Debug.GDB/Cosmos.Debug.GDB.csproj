@@ -96,6 +96,12 @@
     </Compile>
     <Compile Include="GDB.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="History.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="History.Designer.cs">
+      <DependentUpon>History.cs</DependentUpon>
+    </Compile>
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -105,6 +111,9 @@
     <Compile Include="Windows.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormBreakpoints.resx">
+      <DependentUpon>FormBreakpoints.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormCallStack.resx">
       <DependentUpon>FormCallStack.cs</DependentUpon>
     </EmbeddedResource>

@@ -21,6 +21,8 @@ namespace Cosmos.Debug.GDB {
         static public void Load() {
             if (File.Exists(ConfigPathname)) {
                 DS.ReadXml(ConfigPathname, System.Data.XmlReadMode.IgnoreSchema);
+
+                Windows.mBreakpointsForm.LoadSession();
             }
         }
     }

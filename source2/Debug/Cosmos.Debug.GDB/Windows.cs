@@ -11,6 +11,7 @@ namespace Cosmos.Debug.GDB {
         static public FormCallStack mCallStackForm;
         static public FormWatches mWatchesForm;
         static public FormLog mLogForm;
+        static public FormBreakpoints mBreakpointsForm;
 
         static protected List<Form> mForms = new List<Form>();
 
@@ -18,6 +19,7 @@ namespace Cosmos.Debug.GDB {
             mForms.Add(mCallStackForm = new FormCallStack());
             mForms.Add(mWatchesForm = new FormWatches());
             mForms.Add(mLogForm = new FormLog());
+            mForms.Add(mBreakpointsForm = new FormBreakpoints());
 
             foreach (var x in mForms) {
                 // On load the often end up behind other apps, so we do this to force them up on first show
