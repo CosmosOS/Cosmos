@@ -56,7 +56,7 @@ namespace Cosmos.Debug.GDB {
             if (x != null) {
                 Windows.mRegistersForm.ResetRegisters();
                 // Address doesn't work for some reason
-                Windows.mMainForm.Disassemble(x.Label);
+                Windows.mDisassemblyForm.Disassemble(x.Label);
             }
         }
 

@@ -117,6 +117,9 @@
     <EmbeddedResource Include="FormCallStack.resx">
       <DependentUpon>FormCallStack.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormDisassembly.resx">
+      <DependentUpon>FormDisassembly.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormLog.resx">
       <DependentUpon>FormLog.cs</DependentUpon>
     </EmbeddedResource>

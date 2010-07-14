@@ -13,6 +13,7 @@ namespace Cosmos.Debug.GDB {
         static public FormLog mLogForm;
         static public FormBreakpoints mBreakpointsForm;
         static public FormRegisters mRegistersForm;
+        static public FormDisassembly mDisassemblyForm;
 
         static protected List<Form> mForms = new List<Form>();
 
@@ -22,6 +23,7 @@ namespace Cosmos.Debug.GDB {
             mForms.Add(mLogForm = new FormLog());
             mForms.Add(mBreakpointsForm = new FormBreakpoints());
             mForms.Add(mRegistersForm = new FormRegisters());
+            mForms.Add(mDisassemblyForm = new FormDisassembly());
         }
 
         static public void Show(Form aForm) {
@@ -84,7 +86,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         static public void UpdateAllWindows() {
-            Windows.mMainForm.Disassemble("");
+            Windows.mDisassemblyForm.Disassemble("");
             Windows.mRegistersForm.Redo();
             Windows.mCallStackForm.Redo();
         }

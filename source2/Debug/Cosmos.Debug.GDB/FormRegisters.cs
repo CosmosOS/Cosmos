@@ -68,7 +68,7 @@ namespace Cosmos.Debug.GDB {
                 }
             }
             if (xEIP != null) {
-                Windows.mMainForm.SetEIP(xEIP.mValue);
+                Windows.mDisassemblyForm.SetEIP(xEIP.mValue);
             }
         }
 
