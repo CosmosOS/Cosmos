@@ -8,8 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
-    public partial class SettingsForm : Form {
-        public SettingsForm() {
+    public partial class FormHistory : Form {
+        public FormHistory() {
             InitializeComponent();
         }
     }

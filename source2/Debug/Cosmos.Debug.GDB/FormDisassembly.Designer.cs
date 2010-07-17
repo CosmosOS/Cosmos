@@ -79,7 +79,7 @@
             this.menuDisassembly.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mitemDisassemblyAddBreakpoint});
             this.menuDisassembly.Name = "menuDisassembly";
-            this.menuDisassembly.Size = new System.Drawing.Size(157, 48);
+            this.menuDisassembly.Size = new System.Drawing.Size(157, 26);
             // 
             // mitemDisassemblyAddBreakpoint
             // 

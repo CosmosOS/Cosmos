@@ -1,5 +1,5 @@
 ﻿namespace Cosmos.Debug.GDB {
-    partial class History {
+    partial class FormSettings {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -25,7 +25,7 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "History";
+            this.Text = "SettingsForm";
         }
 
         #endregion
