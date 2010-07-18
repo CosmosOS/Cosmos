@@ -81,8 +81,8 @@ namespace Cosmos.Debug.VSDebugEngine
                     += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
                     + "-S"; // Pause on startup, wait for GDB to connect and control
             }
-
 #endif
+
 #if VM_VMWare
             mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
 #endif
