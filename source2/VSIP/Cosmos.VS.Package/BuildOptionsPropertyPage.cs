@@ -146,5 +146,22 @@ namespace Cosmos.VS.Package
 			{ textOutputPath.Text = dialog.SelectedPath; }
 		}
 
+        private void comboTarget_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var xEnumValue = (EnumValue)comboTarget.SelectedItem;
+                var xValue = (TargetHost)xEnumValue.Value;
+                if (!(xValue == TargetHost.VMWareWorkstation || xValue == TargetHost.QEMU))
+                {
+                    MessageBox.Show("The selected Target is not supported!");
+                }
+            }
+            catch (Exception E)
+            {
+                File.AppendAllText(@"e:\cosmoserrors.txt", "ERROR\r\n" + E.ToString() + "\r\n\r\n\r\n");
+            }
+        }
+
 	}
 }

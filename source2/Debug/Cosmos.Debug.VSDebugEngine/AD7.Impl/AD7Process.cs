@@ -51,41 +51,50 @@ namespace Cosmos.Debug.VSDebugEngine
             Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
 
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
-
-#if VM_QEMU
-    #if DEBUG_CONNECTOR_TCP_SERVER
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu"))
+            {
                 var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
-    #endif
-    #if DEBUG_CONNECTOR_PIPE_CLIENT
-                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
-    #endif
-    #if DEBUG_CONNECTOR_PIPE_SERVER
-                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
-    #endif
+                var xQT = "\"";
+                // Start QEMU
+                // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
+                // Here we actually call our dummy/proxy program (Cosmos.Debug.HostProcess.exe) which in turn calls QEMU.
+                mProcessStartInfo.Arguments =
+                    "false" // Tells proxy to use ShellExecute or not (In this case, not, ie false)
+                    // Rest of arguments are used to launch another process and its arguments.
+                    + " " + xQT + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") + xQT // Program for our proxy to run
+                    + " -L " + xQT + PathUtilities.GetQEmuDir().Replace("\\", "/") + xQT // Directory for the BIOS, VGA BIOS and keymaps
+                    + " -cdrom " + xQT + mISO.Replace("\\", "/") + xQT // CDRom image
+                    + " -boot d" // Boot from the CDRom
+                    + " " + xDebugConnectorStr;
 
-            var xQT = "\"";
-            // Start QEMU
-            // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
-            // Here we actually call our dummy/proxy program (Cosmos.Debug.HostProcess.exe) which in turn calls QEMU.
-            mProcessStartInfo.Arguments = 
-                "false" // Tells proxy to use ShellExecute or not (In this case, not, ie false)
-                // Rest of arguments are used to launch another process and its arguments.
-                + " " + xQT + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") + xQT // Program for our proxy to run
-                + " -L " + xQT + PathUtilities.GetQEmuDir().Replace("\\", "/") + xQT // Directory for the BIOS, VGA BIOS and keymaps
-                + " -cdrom " + xQT + mISO.Replace("\\", "/") + xQT // CDRom image
-                + " -boot d" // Boot from the CDRom
-                + " " + xDebugConnectorStr;
-
-            if (xGDBDebugStub) {
-                mProcessStartInfo.Arguments 
-                    += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
-                    + "-S"; // Pause on startup, wait for GDB to connect and control
+                if (xGDBDebugStub)
+                {
+                    mProcessStartInfo.Arguments
+                        += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
+                        + "-S"; // Pause on startup, wait for GDB to connect and control
+                }
+                //#if VM_QEMU
+                //    #if DEBUG_CONNECTOR_TCP_SERVER
+                //                var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
+                //    #endif
+                //    #if DEBUG_CONNECTOR_PIPE_CLIENT
+                //                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+                //    #endif
+                //    #if DEBUG_CONNECTOR_PIPE_SERVER
+                //                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+                //    #endif
             }
-#endif
-
-#if VM_VMWare
-            mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
-#endif
+            else
+            {
+                if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWareWorkstation"))
+                {
+                    mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
+                }
+                else
+                {
+                    throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
+                }
+            }
 
             mProcessStartInfo.UseShellExecute = false;
             mProcessStartInfo.RedirectStandardInput = true;
@@ -115,15 +124,21 @@ namespace Cosmos.Debug.VSDebugEngine
             mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             mDebugEngine = new DebugEngine();
 
-#if DEBUG_CONNECTOR_TCP_SERVER
-            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
-#endif
-#if DEBUG_CONNECTOR_PIPE_CLIENT
-            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeClient();
-#endif
-#if DEBUG_CONNECTOR_PIPE_SERVER
-            mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
-#endif
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu"))
+            {
+                mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
+            }
+            else
+            {
+                if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmwareworkstation"))
+                {
+                    mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
+                }
+                else
+                {
+                    throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
+                }
+            }
 
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);

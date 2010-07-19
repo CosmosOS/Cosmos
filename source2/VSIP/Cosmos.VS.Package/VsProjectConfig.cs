@@ -48,6 +48,7 @@ namespace Cosmos.VS.Package
                 xValues.Add("QemuCommunication", this.GetConfigurationProperty("QemuCommunication", true));
                 xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", true));
                 xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", true));
+                xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", true));
 
                 xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
