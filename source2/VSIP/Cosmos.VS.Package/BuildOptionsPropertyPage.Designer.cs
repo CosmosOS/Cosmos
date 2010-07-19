@@ -91,6 +91,7 @@
             this.titleCompiler.Size = new System.Drawing.Size(486, 15);
             this.titleCompiler.TabIndex = 3;
             this.titleCompiler.Title = "Compiler";
+            this.titleCompiler.Visible = false;
             // 
             // titleOutput
             // 
@@ -164,6 +165,7 @@
             this.labelFramework.TabIndex = 4;
             this.labelFramework.Text = "Framework:";
             this.labelFramework.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelFramework.Visible = false;
             // 
             // comboFramework
             // 
@@ -173,6 +175,7 @@
             this.comboFramework.Name = "comboFramework";
             this.comboFramework.Size = new System.Drawing.Size(143, 21);
             this.comboFramework.TabIndex = 8;
+            this.comboFramework.Visible = false;
             // 
             // labelTarget
             // 
@@ -212,6 +215,7 @@
             this.checkUseInternalAssembler.TabIndex = 10;
             this.checkUseInternalAssembler.Text = "Use Internal Assembler";
             this.checkUseInternalAssembler.UseVisualStyleBackColor = true;
+            this.checkUseInternalAssembler.Visible = false;
             // 
             // labelInternalAssembler
             // 
@@ -223,6 +227,7 @@
             this.labelInternalAssembler.TabIndex = 6;
             this.labelInternalAssembler.Text = "Use Cosmos\'s internally developed assembler, otherwise use NASM (Currently in exp" +
                 "erimental stage, recommended to use NASM).";
+            this.labelInternalAssembler.Visible = false;
             // 
             // BuildOptionsPropertyPage
             // 

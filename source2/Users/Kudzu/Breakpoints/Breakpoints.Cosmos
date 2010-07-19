@@ -28,7 +28,7 @@
     <QemuNetworkTAP>True</QemuNetworkTAP>
     <QemuEnableGDB>True</QemuEnableGDB>
     <QemuCommunication>TCPListener</QemuCommunication>
-    <DebugMode>GDB</DebugMode>
+    <DebugMode>Source</DebugMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>false</DebugSymbols>

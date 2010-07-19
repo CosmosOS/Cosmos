@@ -47,7 +47,9 @@ namespace Cosmos.Build.Common {
 
 			List<EnumValue> list = new List<EnumValue>();
 
-			foreach (Object value in Enum.GetValues(enumType))
+			foreach (Object value in (from item in Enum.GetValues(enumType).OfType<object>()
+                                      orderby item.ToString()
+                                      select item))
 			{ list.Add(new EnumValue((Enum)value)); }
 
 			return list.ToArray();

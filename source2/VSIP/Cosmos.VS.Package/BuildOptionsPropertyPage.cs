@@ -154,7 +154,7 @@ namespace Cosmos.VS.Package
                 var xValue = (TargetHost)xEnumValue.Value;
                 if (!(xValue == TargetHost.VMWareWorkstation || xValue == TargetHost.QEMU))
                 {
-                    MessageBox.Show("The selected Target is not supported!");
+                    MessageBox.Show("The selected Target is temporarily not supported!");
                 }
             }
             catch (Exception E)

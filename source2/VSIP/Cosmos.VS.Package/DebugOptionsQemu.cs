@@ -18,8 +18,7 @@ namespace Cosmos.VS.Package
 		{
 			InitializeComponent();
 
-			this.comboCommunication.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugQemuCommunication)));
-            this.comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode)));
+			this.comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode)));
             comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies)));
 
 			this.projProperties = new DebugQemuProperties();
@@ -29,16 +28,7 @@ namespace Cosmos.VS.Package
 
 		private void CreateUIMonitorEvents()
 		{
-			this.comboCommunication.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-			{
-				DebugQemuCommunication value = (DebugQemuCommunication)((EnumValue)this.comboCommunication.SelectedItem).Value;
-				if (value != this.PageProperties.Communication)
-				{
-					this.PageProperties.Communication = value;
-					this.IsDirty = true;
-				}
-			};
-            this.comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
+			this.comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
             {
                 var value = (DebugMode)((EnumValue)this.comboDebugMode.SelectedItem).Value;
                 if (value != this.PageProperties.DebugMode)
@@ -76,8 +66,7 @@ namespace Cosmos.VS.Package
 			base.FillProperties();
 			this.PageProperties.Reset();
 			this.PageProperties.SetProperty("QemuCommunication", this.GetConfigProperty("QemuCommunication"));
-			this.comboCommunication.SelectedItem = EnumValue.Find(this.comboCommunication.Items, this.PageProperties.Communication);
-            this.checkEnableGDB.Checked = this.PageProperties.EnableGDB;
+			this.checkEnableGDB.Checked = this.PageProperties.EnableGDB;
         }
 
         private void tableDebugQemu_Paint(object sender, PaintEventArgs e)

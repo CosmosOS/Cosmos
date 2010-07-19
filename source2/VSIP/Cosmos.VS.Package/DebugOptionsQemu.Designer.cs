@@ -29,15 +29,13 @@
 		private void InitializeComponent()
 		{
             this.tableDebugQemu = new System.Windows.Forms.TableLayoutPanel();
+            this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.label2 = new System.Windows.Forms.Label();
-            this.labelCommunication = new System.Windows.Forms.Label();
             this.titleGeneral = new Cosmos.VS.Package.TitleDivision();
-            this.comboCommunication = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.comboDebugMode = new System.Windows.Forms.ComboBox();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
             this.checkEnableGDB = new System.Windows.Forms.CheckBox();
-            this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.tableDebugQemu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,9 +47,7 @@
             this.tableDebugQemu.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.33113F));
             this.tableDebugQemu.Controls.Add(this.titleDivision1, 0, 8);
             this.tableDebugQemu.Controls.Add(this.label2, 1, 3);
-            this.tableDebugQemu.Controls.Add(this.labelCommunication, 1, 2);
             this.tableDebugQemu.Controls.Add(this.titleGeneral, 0, 0);
-            this.tableDebugQemu.Controls.Add(this.comboCommunication, 2, 2);
             this.tableDebugQemu.Controls.Add(this.label1, 1, 1);
             this.tableDebugQemu.Controls.Add(this.comboDebugMode, 2, 1);
             this.tableDebugQemu.Controls.Add(this.comboTraceMode, 2, 3);
@@ -76,30 +72,32 @@
             this.tableDebugQemu.TabIndex = 0;
             this.tableDebugQemu.Paint += new System.Windows.Forms.PaintEventHandler(this.tableDebugQemu_Paint);
             // 
+            // titleDivision1
+            // 
+            this.titleDivision1.BackColor = System.Drawing.Color.Transparent;
+            this.tableDebugQemu.SetColumnSpan(this.titleDivision1, 2);
+            this.titleDivision1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.titleDivision1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.titleDivision1.LineColor = System.Drawing.SystemColors.ControlDark;
+            this.titleDivision1.Location = new System.Drawing.Point(3, 87);
+            this.titleDivision1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
+            this.titleDivision1.Name = "titleDivision1";
+            this.titleDivision1.Size = new System.Drawing.Size(257, 15);
+            this.titleDivision1.TabIndex = 21;
+            this.titleDivision1.Title = "Assembly";
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(39, 87);
+            this.label2.Location = new System.Drawing.Point(39, 60);
             this.label2.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(224, 21);
             this.label2.TabIndex = 18;
             this.label2.Text = "Tracing:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // labelCommunication
-            // 
-            this.labelCommunication.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelCommunication.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCommunication.Location = new System.Drawing.Point(39, 60);
-            this.labelCommunication.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-            this.labelCommunication.Name = "labelCommunication";
-            this.labelCommunication.Size = new System.Drawing.Size(224, 21);
-            this.labelCommunication.TabIndex = 17;
-            this.labelCommunication.Text = "Communication:";
-            this.labelCommunication.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // titleGeneral
             // 
@@ -114,15 +112,6 @@
             this.titleGeneral.Size = new System.Drawing.Size(257, 15);
             this.titleGeneral.TabIndex = 0;
             this.titleGeneral.Title = "Source";
-            // 
-            // comboCommunication
-            // 
-            this.comboCommunication.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboCommunication.FormattingEnabled = true;
-            this.comboCommunication.Location = new System.Drawing.Point(266, 60);
-            this.comboCommunication.Name = "comboCommunication";
-            this.comboCommunication.Size = new System.Drawing.Size(223, 21);
-            this.comboCommunication.TabIndex = 16;
             // 
             // label1
             // 
@@ -149,7 +138,7 @@
             // 
             this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboTraceMode.FormattingEnabled = true;
-            this.comboTraceMode.Location = new System.Drawing.Point(266, 87);
+            this.comboTraceMode.Location = new System.Drawing.Point(266, 60);
             this.comboTraceMode.Name = "comboTraceMode";
             this.comboTraceMode.Size = new System.Drawing.Size(223, 21);
             this.comboTraceMode.TabIndex = 15;
@@ -163,20 +152,6 @@
             this.checkEnableGDB.TabIndex = 20;
             this.checkEnableGDB.Text = "Enable GDB Debugger";
             this.checkEnableGDB.UseVisualStyleBackColor = true;
-            // 
-            // titleDivision1
-            // 
-            this.titleDivision1.BackColor = System.Drawing.Color.Transparent;
-            this.tableDebugQemu.SetColumnSpan(this.titleDivision1, 2);
-            this.titleDivision1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.titleDivision1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.titleDivision1.LineColor = System.Drawing.SystemColors.ControlDark;
-            this.titleDivision1.Location = new System.Drawing.Point(3, 114);
-            this.titleDivision1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
-            this.titleDivision1.Name = "titleDivision1";
-            this.titleDivision1.Size = new System.Drawing.Size(257, 14);
-            this.titleDivision1.TabIndex = 21;
-            this.titleDivision1.Title = "Assembly";
             // 
             // DebugOptionsQemu
             // 
@@ -197,8 +172,6 @@
 		private System.Windows.Forms.TableLayoutPanel tableDebugQemu;
         private TitleDivision titleGeneral;
         private System.Windows.Forms.ComboBox comboTraceMode;
-        private System.Windows.Forms.Label labelCommunication;
-        private System.Windows.Forms.ComboBox comboCommunication;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comboDebugMode;
         private System.Windows.Forms.Label label1;
