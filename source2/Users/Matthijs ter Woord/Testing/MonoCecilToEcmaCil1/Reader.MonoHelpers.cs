@@ -43,11 +43,11 @@ namespace MonoCecilToEcmaCil1
             {
                 throw new NotSupportedException("Reader.ResolveType doesnt support PointerTypes");
             }
-            var xReference = aRef as ReferenceType;
-            if (xReference != null)
-            {
-                throw new NotSupportedException("Reader.ResolveType doesnt support ReferenceTypes");
-            }
+            //var xReference = aRef as ReferenceType;
+            //if (xReference != null)
+            //{
+            //    throw new NotSupportedException("Reader.ResolveType doesnt support ReferenceTypes");
+            //}
 #endif
             return aRef.Resolve();
         }

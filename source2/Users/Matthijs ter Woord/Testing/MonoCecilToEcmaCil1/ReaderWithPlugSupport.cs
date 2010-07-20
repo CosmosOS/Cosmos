@@ -11,7 +11,7 @@ namespace MonoCecilToEcmaCil1
     {
         public void AddPlugAssembly(string path)
         {
-            var xAssembly = AssemblyFactory.GetAssembly(path);
+            var xAssembly = AssemblyDefinition.ReadAssembly(path);
             foreach (ModuleDefinition xModule in xAssembly.Modules)
             {
                 foreach (TypeDefinition xType in xModule.Types)
