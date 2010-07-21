@@ -63,8 +63,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILStreamPositionReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reader.cs" />
+    <Compile Include="Reader.Queueing.cs" />
+    <Compile Include="Reader.ScanLog.cs" />
+    <Compile Include="Reader.Scanning.cs" />
     <Compile Include="_QueueItems\QueuedArrayType.cs" />
     <Compile Include="_QueueItems\QueuedMethod.cs" />
     <Compile Include="_QueueItems\QueuedPointerType.cs" />

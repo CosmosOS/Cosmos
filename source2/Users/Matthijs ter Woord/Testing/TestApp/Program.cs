@@ -12,9 +12,17 @@ namespace TestApp
     {
         public static void Main(string[] args)
         {
-            using (var xReader = new ReflectionToEcmaCil.Reader())
+            try
             {
-                //xReader.
+                using (var xReader = new ReflectionToEcmaCil.Reader())
+                {
+                    var xResult = xReader.Execute(typeof(SimpleMethodsTest.Program).Assembly.Location);
+                    //xReader.
+                }
+            }
+            catch (Exception E)
+            {
+                Console.WriteLine("Error: " + E.ToString());
             }
             //using (var xReader = new MonoCecilToEcmaCil1.ReaderWithPlugSupport())
             //{
