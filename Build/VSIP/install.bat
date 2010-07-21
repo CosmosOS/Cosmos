@@ -35,10 +35,12 @@ echo .
 echo .
 echo .
 echo Creating setup.exe
-echo You will see an error about an invalid path. This is normal.
 REM Try one, then if not there the other for x64
-"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
-"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
+IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
+	"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
+) ELSE (
+	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
+)
 
 ..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
