@@ -88,7 +88,7 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWareWorkstation"))
                 {
-                    mProcessStartInfo.Arguments = @"true C:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
+                    mProcessStartInfo.Arguments = @"true m:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
                 }
                 else
                 {

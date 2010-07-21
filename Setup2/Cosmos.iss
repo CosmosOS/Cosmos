@@ -9,9 +9,9 @@ AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit Milestone 5
 AppCopyright=Copyright © 2007-2010 The Cosmos Project
 AppPublisher=Cosmos Project
-AppPublisherURL=http://www.gocosmos.org/
-AppSupportURL=http://www.gocosmos.org/
-AppUpdatesURL=http://www.gocosmos.org/
+AppPublisherURL=http://www.goCosmos.org/
+AppSupportURL=http://www.goCosmos.org/
+AppUpdatesURL=http://www.goCosmos.org/
 AppVersion=0.5
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
@@ -148,7 +148,7 @@ Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData
 ; VSIP package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ; ValueData: Cosmos Visual Studio Integration Package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: dword; ValueName: UseRegNameAsSplashName; ValueData: $00000001
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ProductDetails; ValueData: www.gocosmos.org
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ProductDetails; ValueData: www.goCosmos.org
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: PID; ValueData: 1.0
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.VSProject, Cosmos.VS.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL

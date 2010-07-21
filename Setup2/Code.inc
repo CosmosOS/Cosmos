@@ -6,7 +6,6 @@ var
   __NET_FRAMEWORK4_INSTALLED,
   __NET_FRAMEWORK_SDK_INSTALLED,
   __NET_FRAMEWORK_64BIT_INSTALLED,
-  __VSNET2005,
   __VSNET2008,
   __VSNET2010,
   __PathsInitialized: Boolean;
@@ -16,10 +15,8 @@ var
   __SDK2_INSTALL_ROOT,
   __REGASM,
   __REGASM64,
-  __VSNET2005_PATH,
   __VSNET2008_PATH,
   __VSNET2010_PATH,
-  __VSNET2005_BASE_PATH,
   __VSNET2008_BASE_PATH,
   __VSNET2010_BASE_PATH: string;
   
@@ -54,14 +51,10 @@ __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETF
   __NET_FRAMEWORK_64BIT_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework,Enable64Bit|0}') = '1';
   __NET_FRAMEWORK_64BIT_INSTALLED := __NET_FRAMEWORK_64BIT_INSTALLED or ((__RegAsm64<> '') and FileExists(__RegAsm64));
 
-  __VSNET2005_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\8.0,InstallDir|}');
   __VSNET2008_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\9.0,InstallDir|}');
   __VSNET2010_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\10.0,InstallDir|}');
-  __VSNET2005 := __VSNET2005_PATH <> '';
   __VSNET2008 := __VSNET2008_PATH <> '';
   __VSNET2010 := __VSNET2010_PATH <> '';
-  if __VSNET2005 then
-  __VSNET2005_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2005_PATH)+'..\..');
   if __VSNET2008 then
   __VSNET2008_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2008_PATH)+'..\..');
   if __VSNET2010 then
@@ -72,14 +65,6 @@ end;
 procedure DeInitializePaths;
 begin
   __PathsInitialized := False;
-end;
-
-
-
-function VSNET2005: Boolean;
-begin
-  InitializePaths;
-  Result := __VSNET2005;
 end;
 
 function VSNET2008: Boolean;
@@ -94,11 +79,6 @@ begin
   Result := __VSNET2010;
 end;
 
-function VSNET2005UP: Boolean;
-begin
-  Result := VSNET2005 or VSNET2008 or VSNET2010;
-end;
-
 function VSNET2008UP: Boolean;
 begin
   Result := VSNET2008 or VSNET2010;
@@ -109,18 +89,11 @@ begin
   Result := VSNET2010;
 end;
 
-function VSNET2005_PATH(dummy: string): string;
-begin
-  InitializePaths;
-  result := __VSNET2005_PATH;
-end;
-
 function VSNET2008_PATH(dummy: string): string;
 begin
   InitializePaths;
   result := __VSNET2008_PATH;
 end;
-
 
 function VSNET2010_PATH(dummy: string): string;
 begin
@@ -140,11 +113,6 @@ begin
   result := __FRAMEWORK64_INSTALL_ROOT;
 end;
 
-function Vb2005_Installed: Boolean;
-begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\8.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
-end;
-
 function Vb2008_Installed: Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
@@ -155,11 +123,6 @@ begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
-function csharp2005_Installed: Boolean;
-begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\8.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
-end;
-
 function csharp2008_Installed: Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
@@ -168,11 +131,6 @@ end;
 function csharp2010_Installed: Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
-end;
-
-function VS2005_REGISTRY_HIVE(dummy: string): string;
-begin
-  Result := '8.0';
 end;
 
 function VS2008_REGISTRY_HIVE(dummy: string): string;
@@ -193,12 +151,6 @@ end;
 function VS10_REGISTRY_HIVE(dummy: string): string;
 begin
   Result := '10.0';
-end;
-
-function VSNET2005_BASE_PATH(dummy: string): string;
-begin
-  InitializePaths;
-  result := __VSNET2005_BASE_PATH;
 end;
 
 function VSNET2008_BASE_PATH(dummy: string): string;
