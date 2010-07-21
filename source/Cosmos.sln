@@ -13,10 +13,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{4070490F-A3FD-4E97-A89D-A1C96EF7BD37}"
-	ProjectSection(SolutionItems) = preProject
-		Plugs.html = Plugs.html
-		ReadMe.html = ReadMe.html
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
 EndProject
