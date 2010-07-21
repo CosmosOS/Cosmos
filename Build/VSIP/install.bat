@@ -23,7 +23,8 @@ xcopy /Y ..\..\Build\Tools\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.* .
 xcopy /Y ..\..\source2\IL2PCU\Cosmos.IL2CPU\bin\debug\Cosmos.IL2CPU.* .
 xcopy /Y ..\..\source2\IL2PCU\Cosmos.IL2CPU.x86\bin\debug\Cosmos.IL2CPU.X86.* .
 xcopy /Y ..\..\source\Cosmos\Cosmos.Kernel\bin\debug\Cosmos.Kernel.* .
-xcopy /Y ..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.* .
+xcopy /Y ..\..\Build\Tools\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.* .
+rem xcopy /Y ..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.* .
 xcopy /Y ..\..\source\Cosmos\Cosmos.System\bin\debug\Cosmos.Sys.* .
 xcopy /Y ..\..\Build\Tools\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.* .
 xcopy /Y ..\..\source\Cosmos.Kernel.FileSystems\bin\debug\Cosmos.Sys.FileSystem.* .
