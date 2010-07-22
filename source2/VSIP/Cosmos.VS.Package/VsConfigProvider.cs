@@ -15,7 +15,7 @@ namespace Cosmos.VS.Package {
         {
             return new VsProjectConfig(ProjectMgr, configName);
         }finally{
-            LogUtility.LogString("Exiting Cosmos.VS.Package.VsConfigProvider.CreateProjectConfiguration(string)";
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VsConfigProvider.CreateProjectConfiguration(string)");
         }
     }
   
