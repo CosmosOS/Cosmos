@@ -10,7 +10,13 @@ namespace Cosmos.VS.Package {
     public VsConfigProvider(ProjectNode manager) : base(manager) {}
 
     protected override ProjectConfig CreateProjectConfiguration(string configName) {
-      return new VsProjectConfig(ProjectMgr, configName);
+        LogUtility.LogString("Entering Cosmos.VS.Package.VsConfigProvider.CreateProjectConfiguration('{0}')", configName);
+        try
+        {
+            return new VsProjectConfig(ProjectMgr, configName);
+        }finally{
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VsConfigProvider.CreateProjectConfiguration(string)";
+        }
     }
   
   }

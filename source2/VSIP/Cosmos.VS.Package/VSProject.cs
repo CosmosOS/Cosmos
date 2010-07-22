@@ -62,12 +62,23 @@ namespace Cosmos.VS.Package {
         /// initialization is the Initialize method.
         /// </summary>
         public VSProject() {
-            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-            // fake compiler?
-            var xType = typeof(Cosmos.Debug.VSDebugEngine.AD7Engine);
-            if (xType.FullName.Length == 0)
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProject.ctor()");
+            try
             {
-                throw new Exception("No fullname!");
+                // fake compiler?
+                var xType = typeof(Cosmos.Debug.VSDebugEngine.AD7Engine);
+                if (xType.FullName.Length == 0)
+                {
+                    throw new Exception("No fullname!");
+                }
+            }
+            catch (Exception E)
+            {
+                LogUtility.LogException(E);
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProject.ctor()");
             }
         }
 
@@ -92,11 +103,21 @@ namespace Cosmos.VS.Package {
         /// where you can put all the initilaization code that rely on services provided by VisualStudio.
         /// </summary>
         protected override void Initialize() {
-          Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-          SetCosmosVar();
-          base.Initialize();
-          this.RegisterProjectFactory(new VSProjectFactory(this));
-          Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Exiting Initialize() of: {0}", this.ToString()));
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProject.Initialize()");
+            try
+            {
+                SetCosmosVar();
+                base.Initialize();
+                this.RegisterProjectFactory(new VSProjectFactory(this));
+            }
+            catch (Exception E)
+            {
+                LogUtility.LogException(E);
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProject.Initialize()");
+            }
         }
 
     }

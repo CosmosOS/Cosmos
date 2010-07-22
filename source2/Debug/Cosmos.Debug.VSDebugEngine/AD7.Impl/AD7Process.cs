@@ -379,7 +379,7 @@ namespace Cosmos.Debug.VSDebugEngine
             Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
             //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
-            //mCallback.OnProcessExit((uint)mProcess.ExitCode);
+            mCallback.OnProcessExit((uint)mProcess.ExitCode);
         }
 
         internal void Continue()

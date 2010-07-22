@@ -67,7 +67,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblerMethod.cs" />
     <Compile Include="BuildOptionsPropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -100,6 +99,7 @@
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="LogUtility.cs" />
     <Compile Include="SubPropertyPageBase.cs">
       <SubType>UserControl</SubType>
     </Compile>

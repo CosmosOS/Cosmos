@@ -15,19 +15,40 @@ namespace Cosmos.VS.Package {
     private VSProject package;
 
     public VSProjectNode(VSProject package) {
-      this.package = package;
+        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject");
+        try
+        {
+            this.package = package;
 
-      imageIndex = this.ImageHandler.ImageList.Images.Count;
+            imageIndex = this.ImageHandler.ImageList.Images.Count;
 
-      foreach (Image img in imageList.Images) {
-        this.ImageHandler.AddImage(img);
-      }
+            foreach (Image img in imageList.Images)
+            {
+                this.ImageHandler.AddImage(img);
+            }
+        }
+        catch (Exception E)
+        {
+            LogUtility.LogException(E);
+        }
+        finally
+        {
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
+        }
     }
 
     private static ImageList imageList;
 
     protected override ConfigProvider CreateConfigProvider() {
-      return new VsConfigProvider(this);
+        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
+        try
+        {
+            return new VsConfigProvider(this);
+        }
+        finally
+        {
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
+        }
     }
 
     protected override Guid[] GetConfigurationIndependentPropertyPages() {
@@ -40,13 +61,21 @@ namespace Cosmos.VS.Package {
       //031911C8-6148-4E25-B1B1-44BCA9A0C45C - Reference Paths
       //F8D6553F-F752-4DBF-ACB6-F291B744A792 - Signing
       //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
-      return new Guid[] {
+        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
+        try
+        {
+            return new Guid[] {
          // typeof(PropPageEnvironment).GUID,
           //typeof(PropPageTest).GUID,
 		  typeof(BuildOptionsPropertyPage).GUID,
 		  typeof(DebugOptionsPropertyPage).GUID,
 		  typeof(VMOptionsPropertyPage).GUID,
       };
+        }
+        finally
+        {
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
+        }
     }
 
     static VSProjectNode() {
@@ -63,15 +92,27 @@ namespace Cosmos.VS.Package {
 
     public override void AddFileFromTemplate(
         string source, string target) {
-      string nameSpace =
-          this.FileTemplateProcessor.GetFileNamespace(target, this);
-      string className = Path.GetFileNameWithoutExtension(target);
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.AddFileFromTemplate('{0}', '{1}')", source, target);
+            try
+            {
+                string nameSpace =
+                    this.FileTemplateProcessor.GetFileNamespace(target, this);
+                string className = Path.GetFileNameWithoutExtension(target);
 
-      this.FileTemplateProcessor.AddReplace("$nameSpace$", nameSpace);
-      this.FileTemplateProcessor.AddReplace("$className$", className);
+                this.FileTemplateProcessor.AddReplace("$nameSpace$", nameSpace);
+                this.FileTemplateProcessor.AddReplace("$className$", className);
 
-      this.FileTemplateProcessor.UntokenFile(source, target);
-      this.FileTemplateProcessor.Reset();
+                this.FileTemplateProcessor.UntokenFile(source, target);
+                this.FileTemplateProcessor.Reset();
+            }
+            catch (Exception E)
+            {
+                LogUtility.LogException(E);
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.AddFileFromTemplate");
+            }
     } 
   }
 }

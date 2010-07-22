@@ -12,15 +12,32 @@ namespace Cosmos.VS.Package {
     private VSProject package;
 
     public VSProjectFactory(VSProject package)
-      : base(package) {
-      this.package = package;
+        : base(package)
+    {
+        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectFactory.ctor(VSProject)");
+        this.package = package;
+        LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectFactory.ctor(VSProject)");
     }
 
     protected override ProjectNode CreateProject() {
-      VSProjectNode project = new VSProjectNode(this.package);
+        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectFactory.CreateProject()");
+        try
+        {
+            VSProjectNode project = new VSProjectNode(this.package);
 
-      project.SetSite((IOleServiceProvider)((IServiceProvider)this.package).GetService(typeof(IOleServiceProvider)));
-      return project;
+            project.SetSite((IOleServiceProvider)((IServiceProvider)this.package).GetService(typeof(IOleServiceProvider)));
+            LogUtility.LogString("(Result == null) == {0}", project == null);
+            return project;
+        }
+        catch (Exception E)
+        {
+            LogUtility.LogException(E);
+            throw;
+        }
+        finally
+        {
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectFactory.CreateProject()");
+        }
     }
   }
 }

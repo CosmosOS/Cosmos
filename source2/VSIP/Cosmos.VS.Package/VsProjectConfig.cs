@@ -19,10 +19,14 @@ namespace Cosmos.VS.Package
     public class VsProjectConfig : ProjectConfig
     {
 
-        public VsProjectConfig(ProjectNode project, string configuration) : base(project, configuration) { }
+        public VsProjectConfig(ProjectNode project, string configuration) : base(project, configuration) {
+            LogUtility.LogString("Entering Cosmos.VS.Package.VsProjectConfig.ctor(project, '{0}')", configuration);
+            LogUtility.LogString("Exiting Cosmos.VS.Package.VsProjectConfig.ctor(project, configuration)");
+        }
 
         public override int DebugLaunch(uint aLaunch)
         {
+            LogUtility.LogString("Entering Cosmos.VS.Package.VsProjectConfig.DebugLaunch({0})", aLaunch);
             try
             {
                 // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
@@ -52,6 +56,8 @@ namespace Cosmos.VS.Package
 
                 xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
+                LogUtility.LogString("Parameters = '{0}'", xInfo.bstrExe);
+
                 // Select the debugger
                 // Managed debugger
                 //xInfo.clsidCustom = VSConstants.CLSID_ComPlusOnlyDebugEngine;
@@ -62,11 +68,17 @@ namespace Cosmos.VS.Package
                 //xInfo.clsidCustom = new Guid("{D951924A-4999-42a0-9217-1EB5233D1D5A}"); 
 
                 VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
+                LogUtility.LogString("Returning VSConstants.S_OK");
                 return VSConstants.S_OK;
             }
             catch (Exception e)
             {
+                LogUtility.LogString("Error: " + e.ToString());
                 return Marshal.GetHRForException(e);
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VsProjectConfig.DebugLaunch");
             }
         }
 
