@@ -3,11 +3,6 @@
 // Keep a note about servers.. we want to use servers and not clients, because we dont always know when the other side is ready
 // and with a server, we are ready and its ready whenever... but sometime after us for sure.
 #define DEBUG_CONNECTOR_TCP_SERVER
-//#define DEBUG_CONNECTOR_PIPE_CLIENT
-//#define DEBUG_CONNECTOR_PIPE_SERVER
-//
-#define VM_QEMU
-//#define VM_VMWare
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +17,7 @@ using System.IO;
 using Cosmos.Compiler.Debug;
 using System.Collections.Specialized;
 using Cosmos.Debug.Common;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -39,6 +35,70 @@ namespace Cosmos.Debug.VSDebugEngine
         internal uint? mCurrentAddress = null;
         internal string mISO;
         private readonly NameValueCollection mDebugInfo;
+        protected TargetHost mTargetHost;
+
+        protected void LaunchQEMU(bool aGDB) {
+            var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
+            var xQT = "\"";
+
+            // Start QEMU
+            // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
+            // Here we actually call our dummy/proxy program (Cosmos.Debug.HostProcess.exe) which in turn calls QEMU.
+            mProcessStartInfo.Arguments =
+                "false" // Tells proxy to use ShellExecute or not (In this case, not, ie false)
+                // Rest of arguments are used to launch another process and its arguments.
+                + " " + xQT + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") + xQT // Program for our proxy to run
+                + " -L " + xQT + PathUtilities.GetQEmuDir().Replace("\\", "/") + xQT // Directory for the BIOS, VGA BIOS and keymaps
+                + " -cdrom " + xQT + mISO.Replace("\\", "/") + xQT // CDRom image
+                + " -boot d" // Boot from the CDRom
+                + " " + xDebugConnectorStr;
+
+            if (aGDB) {
+                mProcessStartInfo.Arguments
+                    += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
+                    + "-S"; // Pause on startup, wait for GDB to connect and control
+            }
+            //#if VM_QEMU
+            //    #if DEBUG_CONNECTOR_TCP_SERVER
+            //                var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
+            //    #endif
+            //    #if DEBUG_CONNECTOR_PIPE_CLIENT
+            //                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+            //    #endif
+            //    #if DEBUG_CONNECTOR_PIPE_SERVER
+            //                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
+            //    #endif
+        }
+
+        protected void LaunchVMWareWorkstation(bool aGDB) {
+            //TODO: Change to use Cosmos path
+            string xPath = @"m:\source\Cosmos\Build\VMWare\Workstation\";
+            using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
+               using (var xDest = new StreamWriter(xPath + "Debug.vmx")) {
+                   string xLine;
+                   while ((xLine = xSrc.ReadLine()) != null) {
+                       var xParts = xLine.Split('=');
+                       if (xParts.Length == 2) {
+                           string xName = xParts[0].Trim();
+                           string xValue = xParts[1].Trim();
+
+                           // We delete uuid entries so VMWare doenst ask the user "Did you move or copy" the file
+                           if ((xName == "uuid.location") || (xName == "uuid.bios")) {
+                               xValue = null;
+                           }
+
+                           //TODO: Update ISO to selected project
+
+                           if (xValue != null) {
+                               xDest.WriteLine(xName + " = " + xValue);
+                           }
+                       }
+                   }
+               }
+            }
+
+            mProcessStartInfo.Arguments = "true " + xPath + "Debug.vmx";
+        }
 
         internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
@@ -51,49 +111,14 @@ namespace Cosmos.Debug.VSDebugEngine
             Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
 
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
-            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu"))
-            {
-                var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
-                var xQT = "\"";
-                // Start QEMU
-                // QEMU Command Line docs: http://wiki.qemu.org/download/qemu-doc.html#sec_005finvocation
-                // Here we actually call our dummy/proxy program (Cosmos.Debug.HostProcess.exe) which in turn calls QEMU.
-                mProcessStartInfo.Arguments =
-                    "false" // Tells proxy to use ShellExecute or not (In this case, not, ie false)
-                    // Rest of arguments are used to launch another process and its arguments.
-                    + " " + xQT + Path.Combine(PathUtilities.GetQEmuDir(), "qemu.exe") + xQT // Program for our proxy to run
-                    + " -L " + xQT + PathUtilities.GetQEmuDir().Replace("\\", "/") + xQT // Directory for the BIOS, VGA BIOS and keymaps
-                    + " -cdrom " + xQT + mISO.Replace("\\", "/") + xQT // CDRom image
-                    + " -boot d" // Boot from the CDRom
-                    + " " + xDebugConnectorStr;
-
-                if (xGDBDebugStub)
-                {
-                    mProcessStartInfo.Arguments
-                        += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
-                        + "-S"; // Pause on startup, wait for GDB to connect and control
-                }
-                //#if VM_QEMU
-                //    #if DEBUG_CONNECTOR_TCP_SERVER
-                //                var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
-                //    #endif
-                //    #if DEBUG_CONNECTOR_PIPE_CLIENT
-                //                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
-                //    #endif
-                //    #if DEBUG_CONNECTOR_PIPE_SERVER
-                //                var xDebugConnectorStr = @"-serial pipe:CosmosDebug";
-                //    #endif
-            }
-            else
-            {
-                if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWareWorkstation"))
-                {
-                    mProcessStartInfo.Arguments = @"true m:\source\Cosmos\Build\VMWare\Workstation\Cosmos.vmx";
-                }
-                else
-                {
-                    throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
-                }
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu")) {
+                mTargetHost = TargetHost.QEMU;
+                LaunchQEMU(xGDBDebugStub);
+            } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWareWorkstation")) {
+                mTargetHost = TargetHost.VMWareWorkstation;
+                LaunchVMWareWorkstation(xGDBDebugStub);
+            } else {
+                throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
             }
 
             mProcessStartInfo.UseShellExecute = false;
@@ -328,9 +353,11 @@ namespace Cosmos.Debug.VSDebugEngine
             // that allows VS to "see" that. Here we resume it.
             mProcess.StandardInput.WriteLine();
 
-            // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
-            // We have to do this after we release the debug host though.
-            mDebugEngine.DebugConnector.WaitConnect();
+            if (mTargetHost == TargetHost.QEMU) {
+                // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
+                // We have to do this after we release the debug host though.
+                mDebugEngine.DebugConnector.WaitConnect();
+            }
         }
 
         void mProcess_Exited(object sender, EventArgs e)
