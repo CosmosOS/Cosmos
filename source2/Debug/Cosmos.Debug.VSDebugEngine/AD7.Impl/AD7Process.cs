@@ -72,9 +72,13 @@ namespace Cosmos.Debug.VSDebugEngine
 
         protected void LaunchVMWareWorkstation(bool aGDB) {
             //TODO: Change to use Cosmos path
-            string xPath = @"m:\source\Cosmos\Build\VMWare\Workstation\";
+            //TODO: App Roaming doesnt have the vmx.. need to update the insaller
+            //string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
+            string xPath = @"M:\source\Cosmos\Build\VMWare\Workstation\";
+
             using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
-               using (var xDest = new StreamWriter(xPath + "Debug.vmx")) {
+                // This copy process also leaves the VMX writeable. VMWare doesnt like them read only.
+                using (var xDest = new StreamWriter(xPath + "Debug.vmx")) {
                    string xLine;
                    while ((xLine = xSrc.ReadLine()) != null) {
                        var xParts = xLine.Split('=');
@@ -85,16 +89,25 @@ namespace Cosmos.Debug.VSDebugEngine
                            // We delete uuid entries so VMWare doenst ask the user "Did you move or copy" the file
                            if ((xName == "uuid.location") || (xName == "uuid.bios")) {
                                xValue = null;
+                           } else if (xName == "ide1:0.fileName") {
+                               //TODO: Update ISO to selected project
+                               //xValue = @"m:\source\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\CosmosKernel.iso";
+                               xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
                            }
-
-                           //TODO: Update ISO to selected project
 
                            if (xValue != null) {
                                xDest.WriteLine(xName + " = " + xValue);
                            }
                        }
                    }
-               }
+                   if (aGDB) {
+                       xDest.WriteLine();
+                       xDest.WriteLine("debugStub.listen.guest32 = \"TRUE\"");
+                       xDest.WriteLine("debugStub.hideBreakpoints = \"TRUE\"");
+                       xDest.WriteLine("monitor.debugOnStartGuest32 = \"TRUE\"");
+                       xDest.WriteLine("debugStub.listen.guest32.remote = \"TRUE\"");
+                   }
+                }
             }
 
             mProcessStartInfo.Arguments = "true " + xPath + "Debug.vmx";
