@@ -9,7 +9,7 @@ rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAss
 del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
-%windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet /nologo /p:Configuration=Debug /p:Platform=x86
+%windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:normal /nologo /p:Configuration=Debug /p:Platform=x86 /p:BuildCmd=Rebuild
 
 echo Copying files
 xcopy /Y ..\..\Source\libraries\MDbg\raw.* .
