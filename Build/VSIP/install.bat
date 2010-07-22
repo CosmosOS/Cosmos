@@ -6,7 +6,7 @@ cd %~dp0
 echo Killing old stuff - Need to modify not to be user specific
 del /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies\*.*"
 rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies"
-del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\Cosmos.VS.Package.*"
+del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
 %windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet /nologo /p:Configuration=Debug /p:Platform=x86
