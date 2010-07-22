@@ -3,12 +3,15 @@
 REM Necessary to set dir when running as admin
 cd %~dp0
 
-echo Compiling cosmos
+echo Killing old stuff - Need to modify not to be user specific
+del /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies\*.*"
+rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies"
+del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\Cosmos.VS.Package.*"
 
+echo Compiling cosmos
 %windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:quiet /nologo /p:Configuration=Debug /p:Platform=x86
 
 echo Copying files
-
 xcopy /Y ..\..\Source\libraries\MDbg\raw.* .
 xcopy /Y ..\..\Source\libraries\MDbg\corapi.* .
 xcopy /Y ..\..\source2\Build\Cosmos.Build.MSBuild\Cosmos.targets .
