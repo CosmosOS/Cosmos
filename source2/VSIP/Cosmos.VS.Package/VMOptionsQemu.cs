@@ -7,12 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Cosmos.Build.Common;
+//using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
 	public partial class VMOptionsQemu : SubPropertyPageBase
 	{
-		private VMQemuProperties projProperties;
+		private Cosmos.Build.Common.VMQemuProperties projProperties;
 
 		public VMOptionsQemu()
 		{

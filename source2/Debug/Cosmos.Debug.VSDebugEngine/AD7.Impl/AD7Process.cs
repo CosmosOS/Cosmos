@@ -17,7 +17,7 @@ using System.IO;
 using Cosmos.Compiler.Debug;
 using System.Collections.Specialized;
 using Cosmos.Debug.Common;
-using Cosmos.Build.Common;
+//using Cosmos.Build.Common;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -35,7 +35,7 @@ namespace Cosmos.Debug.VSDebugEngine
         internal uint? mCurrentAddress = null;
         internal string mISO;
         private readonly NameValueCollection mDebugInfo;
-        protected TargetHost mTargetHost;
+        //protected TargetHost mTargetHost;
 
         protected void LaunchQEMU(bool aGDB) {
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
@@ -125,10 +125,10 @@ namespace Cosmos.Debug.VSDebugEngine
 
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu")) {
-                mTargetHost = TargetHost.QEMU;
+//                mTargetHost = TargetHost.QEMU;
                 LaunchQEMU(xGDBDebugStub);
             } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWareWorkstation")) {
-                mTargetHost = TargetHost.VMWareWorkstation;
+                //assemblyref://FSharp.CoremTargetHost = TargetHost.VMWareWorkstation;
                 LaunchVMWareWorkstation(xGDBDebugStub);
             } else {
                 throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
@@ -366,11 +366,11 @@ namespace Cosmos.Debug.VSDebugEngine
             // that allows VS to "see" that. Here we resume it.
             mProcess.StandardInput.WriteLine();
 
-            if (mTargetHost == TargetHost.QEMU) {
-                // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
-                // We have to do this after we release the debug host though.
-                mDebugEngine.DebugConnector.WaitConnect();
-            }
+            //if (mTargetHost == TargetHost.QEMU) {
+            //    // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
+            //    // We have to do this after we release the debug host though.
+            //    mDebugEngine.DebugConnector.WaitConnect();
+            //}
         }
 
         void mProcess_Exited(object sender, EventArgs e)

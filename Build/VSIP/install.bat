@@ -9,7 +9,9 @@ rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAss
 del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
-%windir%\Microsoft.NET\Framework\V3.5\msbuild ..\..\source\Cosmos.sln /verbosity:normal /nologo /p:Configuration=Debug /p:Platform=x86 /p:BuildCmd=Rebuild
+cd "..\..\source"
+%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /t:Rebuild > out
+cd ..\Build\VSIP\
 
 echo Copying files
 xcopy /Y ..\..\Source\libraries\MDbg\raw.* .
@@ -31,7 +33,7 @@ rem xcopy /Y ..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plu
 xcopy /Y ..\..\source\Cosmos\Cosmos.System\bin\debug\Cosmos.Sys.* .
 xcopy /Y ..\..\Build\Tools\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.* .
 xcopy /Y ..\..\source\Cosmos.Kernel.FileSystems\bin\debug\Cosmos.Sys.FileSystem.* .
-xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\debug\Cosmos.VS.Package.* .
+xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\Debug\Cosmos.VS.Package.* .
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject.zip .
 
 echo .
@@ -45,7 +47,7 @@ IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
 	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
 )
 
-..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
+REM ..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
 rem Relaunch VS
-..\..\source\Cosmos.sln
+REM ..\..\source\Cosmos.sln
