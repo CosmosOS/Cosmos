@@ -3,14 +3,16 @@
 REM Necessary to set dir when running as admin
 cd %~dp0
 
-echo Killing old stuff - Need to modify not to be user specific
-del /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies\*.*"
-rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies"
-del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
+rem Prob not needed at all anymore, can delete
+rem echo Killing old stuff - Need to modify not to be user specific
+rem del /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies\*.*"
+rem rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies"
+rem del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
 cd "..\..\source"
-%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /t:Rebuild > out
+%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86
+rem /t:Rebuild
 cd ..\Build\VSIP\
 
 echo Copying files
