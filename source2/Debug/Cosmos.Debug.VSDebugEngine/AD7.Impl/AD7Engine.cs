@@ -205,14 +205,12 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         // Creates a pending breakpoint in the engine. A pending breakpoint is contains all the information needed to bind a breakpoint to 
         // a location in the debuggee.
-        int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
-        {
+        int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             System.Diagnostics.Debug.Assert(m_breakpointManager != null);
             ppPendingBP = null;
 
-            try
-            {
+            try {
                 m_breakpointManager.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
             }
             catch (Exception e)
