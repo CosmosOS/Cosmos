@@ -19,7 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
-    <BuildTarget>QEMU</BuildTarget>
+    <BuildTarget>VMWareWorkstation</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <QemuNetworkCard>RealtekRTL8139</QemuNetworkCard>

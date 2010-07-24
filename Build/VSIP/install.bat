@@ -49,7 +49,7 @@ IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
 	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss
 )
 
-REM ..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
+..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
 rem Relaunch VS
-REM ..\..\source\Cosmos.sln
+..\..\source\Cosmos.sln
