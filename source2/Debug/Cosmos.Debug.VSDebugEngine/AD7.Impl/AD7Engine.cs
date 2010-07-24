@@ -7,8 +7,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Cosmos.Debug.VSDebugEngine
-{
+namespace Cosmos.Debug.VSDebugEngine {
     // AD7Engine is the primary entrypoint object for the sample engine. 
     //
     // It implements:
@@ -25,8 +24,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
     [ComVisible(true)]
     [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
-    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2
-    {
+    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         EngineCallback m_engineCallback;
         internal AD7Process mProcess;

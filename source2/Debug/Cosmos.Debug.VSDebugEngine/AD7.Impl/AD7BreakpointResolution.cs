@@ -5,37 +5,29 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Debug.VSDebugEngine
-{
+namespace Cosmos.Debug.VSDebugEngine {
     // This class represents the information that describes a bound breakpoint.
-    class AD7BreakpointResolution : IDebugBreakpointResolution2
-    {
+    class AD7BreakpointResolution : IDebugBreakpointResolution2 {
         private AD7Engine m_engine;
         private uint m_address;
         private AD7DocumentContext m_documentContext;
 
-        public AD7BreakpointResolution(AD7Engine engine, uint address, AD7DocumentContext documentContext)
-        {
+        public AD7BreakpointResolution(AD7Engine engine, uint address, AD7DocumentContext documentContext) {
             m_engine = engine;
             m_address = address;
             m_documentContext = documentContext;
         }
 
-        #region IDebugBreakpointResolution2 Members
-
         // Gets the type of the breakpoint represented by this resolution. 
-        int IDebugBreakpointResolution2.GetBreakpointType(out uint pBPType)
-        {
+        int IDebugBreakpointResolution2.GetBreakpointType(out uint pBPType) {
             // The sample engine only supports code breakpoints.
             pBPType = (uint)enum_BP_TYPE.BPT_CODE;
             return VSConstants.S_OK;
         }
 
         // Gets the breakpoint resolution information that describes this breakpoint.
-        int IDebugBreakpointResolution2.GetResolutionInfo(uint dwFields, BP_RESOLUTION_INFO[] pBPResolutionInfo)
-        {
-	        if ((dwFields & (uint)enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != 0) 
-            {
+        int IDebugBreakpointResolution2.GetResolutionInfo(uint dwFields, BP_RESOLUTION_INFO[] pBPResolutionInfo) {
+	        if ((dwFields & (uint)enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != 0) { 
                 // The sample engine only supports code breakpoints.
                 BP_RESOLUTION_LOCATION location = new BP_RESOLUTION_LOCATION();
                 location.bpType = (uint)enum_BP_TYPE.BPT_CODE;
@@ -47,11 +39,9 @@ namespace Cosmos.Debug.VSDebugEngine
                 location.unionmember1 = Marshal.GetComInterfaceForObject(codeContext, typeof(IDebugCodeContext2));
                 pBPResolutionInfo[0].bpResLocation = location;
                 pBPResolutionInfo[0].dwFields |= (uint)enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION;
-
             }
 	        
-            if ((dwFields & (uint)enum_BPRESI_FIELDS.BPRESI_PROGRAM) != 0) 
-            {
+            if ((dwFields & (uint)enum_BPRESI_FIELDS.BPRESI_PROGRAM) != 0) {
                 pBPResolutionInfo[0].pProgram = (IDebugProgram2)m_engine;
                 pBPResolutionInfo[0].dwFields |= (uint)enum_BPRESI_FIELDS.BPRESI_PROGRAM;
             }
@@ -59,20 +49,15 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        #endregion
     }
 
-    class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2
-    {
-        #region IDebugErrorBreakpointResolution2 Members
+    class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2 {
 
-        int IDebugErrorBreakpointResolution2.GetBreakpointType(out uint pBPType)
-        {
+        int IDebugErrorBreakpointResolution2.GetBreakpointType(out uint pBPType) {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        int IDebugErrorBreakpointResolution2.GetResolutionInfo(uint dwFields, BP_ERROR_RESOLUTION_INFO[] pErrorResolutionInfo)
-        {
+        int IDebugErrorBreakpointResolution2.GetResolutionInfo(uint dwFields, BP_ERROR_RESOLUTION_INFO[] pErrorResolutionInfo) {
             if ((dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_BPRESLOCATION) != 0) {}
             if ((dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_PROGRAM) != 0) {}
             if ((dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_THREAD) != 0) {}
@@ -82,7 +67,6 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new Exception("The method or operation is not implemented.");
         }
 
-        #endregion
     }
 
 }

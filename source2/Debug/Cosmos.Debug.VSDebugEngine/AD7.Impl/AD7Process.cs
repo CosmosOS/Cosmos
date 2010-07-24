@@ -90,8 +90,6 @@ namespace Cosmos.Debug.VSDebugEngine
                            if ((xName == "uuid.location") || (xName == "uuid.bios")) {
                                xValue = null;
                            } else if (xName == "ide1:0.fileName") {
-                               //TODO: Update ISO to selected project
-                               //xValue = @"m:\source\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\CosmosKernel.iso";
                                xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
                            }
 
