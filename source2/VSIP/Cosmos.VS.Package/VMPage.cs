@@ -11,16 +11,13 @@ using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
-	[Guid(Guids.DebugPage)]
-	public partial class DebugOptionsPropertyPage : ConfigurationBase
+	[Guid(Guids.VMPage)]
+	public partial class VMPage : ConfigurationBase
 	{
-
 		private SubPropertyPageBase pageSubPage;
 
-		public DebugOptionsPropertyPage() : base()
-		{
+		public VMPage() {
 			InitializeComponent();
-
 			BuildPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
 		}
 
@@ -59,10 +56,10 @@ namespace Cosmos.VS.Package
 			switch (target)
 			{
 				case TargetHost.QEMU:
-					if ((this.pageSubPage is DebugPage) == false)
+					if ((this.pageSubPage is VMPageQemu) == false)
 					{
 						subpageChanged = true;
-						this.pageSubPage = new DebugPage();
+						this.pageSubPage = new VMPageQemu();
 					}
 					break;
 				default:
@@ -71,7 +68,7 @@ namespace Cosmos.VS.Package
 					break;
 			}
 
-			if( subpageChanged == true)
+			if (subpageChanged == true)
 			{
 				this.panelSubPage.SuspendLayout();
 
@@ -94,7 +91,8 @@ namespace Cosmos.VS.Package
 					}
 
 					this.panelSubPage.Visible = true;
-				} else {
+				} else
+				{
 					this.panelSubPage.Visible = false;
 				}
 
@@ -122,5 +120,6 @@ namespace Cosmos.VS.Package
 				return null;
 			}
 		}
+		
 	}
 }

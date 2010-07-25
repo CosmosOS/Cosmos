@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class VMOptionsPropertyPage
+	partial class VMPage
 	{
 		/// <summary> 
 		/// Required designer variable.

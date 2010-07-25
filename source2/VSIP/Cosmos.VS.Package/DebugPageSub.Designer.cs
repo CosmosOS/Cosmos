@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class DebugPage
+	partial class DebugPageSub
 	{
 		/// <summary> 
 		/// Required designer variable.

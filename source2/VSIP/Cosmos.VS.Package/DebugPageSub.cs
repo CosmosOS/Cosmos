@@ -10,11 +10,11 @@ using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
-	public partial class DebugPage : SubPropertyPageBase 
+	public partial class DebugPageSub : SubPropertyPageBase 
 	{
 		private DebugQemuProperties projProperties;
 
-		public DebugPage()
+		public DebugPageSub()
 		{
 			InitializeComponent();
 

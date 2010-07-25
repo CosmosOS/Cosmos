@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class VMOptionsQemu
+	partial class VMPageQemu
 	{
 		/// <summary> 
 		/// Required designer variable.

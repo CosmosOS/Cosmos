@@ -11,18 +11,16 @@ using Cosmos.Build.Common;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 
-namespace Cosmos.VS.Package
-{
+namespace Cosmos.VS.Package {
 	[Guid(Guids.BuildPage)]
-	public partial class BuildPage : ConfigurationBase
-	{
+	public partial class BuildPage : ConfigurationBase {
 		public static TargetHost CurrentBuildTarget = (TargetHost)(-1);
 		public static event EventHandler BuildTargetChanged;
 
-		protected static void OnBuildTargetChanged(Object sender, EventArgs e)
-		{
-			if (BuildPage.BuildTargetChanged != null)
-			{ BuildPage.BuildTargetChanged(sender, e); }
+		protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
+			if (BuildPage.BuildTargetChanged != null) { 
+                BuildPage.BuildTargetChanged(sender, e); 
+            }
 		}
 
 		private BuildProperties projProperties;
@@ -31,12 +29,12 @@ namespace Cosmos.VS.Package
 		{
 			InitializeComponent();
 
-			this.comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost)));
-			this.comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework)));
+			comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost)));
+			comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework)));
 
-			this.projProperties = new BuildProperties();
+			projProperties = new BuildProperties();
 
-			this.CreateUIMonitorEvents();
+			CreateUIMonitorEvents();
 		}
 
 		private void CreateUIMonitorEvents()
@@ -46,8 +44,8 @@ namespace Cosmos.VS.Package
 				String value = this.textOutputPath.Text;
 				if (String.Equals(value, this.PageProperties.OutputPath, StringComparison.InvariantCultureIgnoreCase) == false)
 				{
-					this.PageProperties.OutputPath = this.textOutputPath.Text;
-					this.IsDirty = true;
+					PageProperties.OutputPath = this.textOutputPath.Text;
+					IsDirty = true;
 				}
 			};
 
@@ -56,8 +54,8 @@ namespace Cosmos.VS.Package
 				TargetHost value = (TargetHost)((EnumValue)this.comboTarget.SelectedItem).Value;
 				if( value != this.PageProperties.Target)
 				{
-					this.PageProperties.Target = value;
-					this.IsDirty = true;
+					PageProperties.Target = value;
+					IsDirty = true;
 
 					BuildPage.CurrentBuildTarget = value;
 					BuildPage.OnBuildTargetChanged(this, EventArgs.Empty);
@@ -69,8 +67,8 @@ namespace Cosmos.VS.Package
 				Framework value = (Framework)((EnumValue)this.comboFramework.SelectedItem).Value;
 				if (value != this.PageProperties.Framework)
 				{
-					this.PageProperties.Framework = value;
-					this.IsDirty = true;
+					PageProperties.Framework = value;
+					IsDirty = true;
 				}
 			};
 
@@ -79,8 +77,8 @@ namespace Cosmos.VS.Package
 				Boolean value = this.checkUseInternalAssembler.Checked;
 				if (value != this.PageProperties.UseInternalAssembler)
 				{
-					this.PageProperties.UseInternalAssembler = value;
-					this.IsDirty = true;
+					PageProperties.UseInternalAssembler = value;
+					IsDirty = true;
 				}
 			};
 		}
@@ -95,31 +93,29 @@ namespace Cosmos.VS.Package
 		{
 			base.FillProperties();
 
-			this.PageProperties.Reset();
+			PageProperties.Reset();
+            PageProperties.SetProperty("OutputPath", this.GetConfigProperty("OutputPath"));
+			PageProperties.SetProperty("BuildTarget", this.GetConfigProperty("BuildTarget"));
+			PageProperties.SetProperty("Framework", this.GetConfigProperty("Framework"));
+			PageProperties.SetProperty("UseInternalAssembler", this.GetConfigProperty("UseInternalAssembler"));
 
-			this.PageProperties.SetProperty("OutputPath", this.GetConfigProperty("OutputPath"));
-			this.PageProperties.SetProperty("BuildTarget", this.GetConfigProperty("BuildTarget"));
-			this.PageProperties.SetProperty("Framework", this.GetConfigProperty("Framework"));
-			this.PageProperties.SetProperty("UseInternalAssembler", this.GetConfigProperty("UseInternalAssembler"));
-
-			this.textOutputPath.Text = this.PageProperties.OutputPath;
-			this.comboTarget.SelectedItem = EnumValue.Find(this.comboTarget.Items, this.PageProperties.Target);
-			this.comboFramework.SelectedItem = EnumValue.Find(this.comboFramework.Items, this.PageProperties.Framework);
-			this.checkUseInternalAssembler.Checked = this.PageProperties.UseInternalAssembler;
+			textOutputPath.Text = this.PageProperties.OutputPath;
+			comboTarget.SelectedItem = EnumValue.Find(this.comboTarget.Items, this.PageProperties.Target);
+			comboFramework.SelectedItem = EnumValue.Find(this.comboFramework.Items, this.PageProperties.Framework);
+			checkUseInternalAssembler.Checked = this.PageProperties.UseInternalAssembler;
 		}
 
 		private void OutputBrowse_Click(object sender, EventArgs e)
 		{
 			String folderPath = String.Empty;
-			FolderBrowserDialog dialog;
-			dialog = new FolderBrowserDialog();
+			var dialog = new FolderBrowserDialog();
 			dialog.ShowNewFolderButton = true;
 
 			folderPath = textOutputPath.Text;
-			if ((String.IsNullOrEmpty(folderPath) == false) && (folderPath.IndexOfAny(System.IO.Path.GetInvalidPathChars()) == -1))
-			{
-				if (System.IO.Path.IsPathRooted(folderPath) == false)
-				{ folderPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Project.FullName), folderPath); }
+			if ((String.IsNullOrEmpty(folderPath) == false) && (folderPath.IndexOfAny(System.IO.Path.GetInvalidPathChars()) == -1)) {
+				if (System.IO.Path.IsPathRooted(folderPath) == false) { 
+                    folderPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Project.FullName), folderPath); 
+                }
 
 				while ((System.IO.Directory.Exists(folderPath) == false) && (String.IsNullOrEmpty(folderPath) == false))
 				{
@@ -128,14 +124,16 @@ namespace Cosmos.VS.Package
 					if (index > -1)
 					{
 						folderPath = folderPath.Substring(0, index - 1);
-					} else { folderPath = String.Empty; }
+					} else { 
+                        folderPath = String.Empty; 
+                    }
 				}
 
-				if (String.IsNullOrEmpty(folderPath) == true)
-				{ folderPath = System.IO.Path.GetDirectoryName(this.Project.FullName); }
-			} else
-			{
-				folderPath = System.IO.Path.GetDirectoryName(this.Project.FullName);
+				if (String.IsNullOrEmpty(folderPath) == true) {
+                    folderPath = System.IO.Path.GetDirectoryName(Project.FullName);
+                }
+			} else {
+				folderPath = System.IO.Path.GetDirectoryName(Project.FullName);
 			}
 
 			dialog.SelectedPath = folderPath;
@@ -146,20 +144,11 @@ namespace Cosmos.VS.Package
             }
 		}
 
-        private void comboTarget_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                var xEnumValue = (EnumValue)comboTarget.SelectedItem;
-                var xValue = (TargetHost)xEnumValue.Value;
-                if (!(xValue == TargetHost.VMWareWorkstation || xValue == TargetHost.QEMU))
-                {
-                    MessageBox.Show("The selected Target is temporarily not supported!");
-                }
-            }
-            catch (Exception E)
-            {
-                File.AppendAllText(@"e:\cosmoserrors.txt", "ERROR\r\n" + E.ToString() + "\r\n\r\n\r\n");
+        private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
+            var xEnumValue = (EnumValue)comboTarget.SelectedItem;
+            var xValue = (TargetHost)xEnumValue.Value;
+            if (!(xValue == TargetHost.VMWareWorkstation || xValue == TargetHost.QEMU)) {
+                MessageBox.Show("This type is temporarily unsupported.");
             }
         }
 

@@ -85,17 +85,17 @@
     <Compile Include="CustomPropertyPage.Designer.cs">
       <DependentUpon>CustomPropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="DebugOptionsPropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DebugOptionsPropertyPage.Designer.cs">
-      <DependentUpon>DebugOptionsPropertyPage.cs</DependentUpon>
-    </Compile>
     <Compile Include="DebugPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="DebugPage.Designer.cs">
       <DependentUpon>DebugPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugPageSub.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugPageSub.Designer.cs">
+      <DependentUpon>DebugPageSub.cs</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -118,17 +118,17 @@
     <Compile Include="UnsavedConfigChangesDialog.Designer.cs">
       <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="VMOptionsPropertyPage.cs">
+    <Compile Include="VMPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="VMOptionsPropertyPage.Designer.cs">
-      <DependentUpon>VMOptionsPropertyPage.cs</DependentUpon>
+    <Compile Include="VMPage.Designer.cs">
+      <DependentUpon>VMPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="VMOptionsQemu.cs">
+    <Compile Include="VMPageQemu.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="VMOptionsQemu.Designer.cs">
-      <DependentUpon>VMOptionsQemu.cs</DependentUpon>
+    <Compile Include="VMPageQemu.Designer.cs">
+      <DependentUpon>VMPageQemu.cs</DependentUpon>
     </Compile>
     <Compile Include="VsConfigProvider.cs" />
     <Compile Include="VsProjectConfig.cs" />
@@ -157,11 +157,11 @@
     <EmbeddedResource Include="CustomPropertyPage.resx">
       <DependentUpon>CustomPropertyPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DebugOptionsPropertyPage.resx">
-      <DependentUpon>DebugOptionsPropertyPage.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DebugPage.resx">
       <DependentUpon>DebugPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugPageSub.resx">
+      <DependentUpon>DebugPageSub.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="SubPropertyPageBase.resx">
@@ -173,11 +173,11 @@
     <EmbeddedResource Include="UnsavedConfigChangesDialog.resx">
       <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VMOptionsPropertyPage.resx">
-      <DependentUpon>VMOptionsPropertyPage.cs</DependentUpon>
+    <EmbeddedResource Include="VMPage.resx">
+      <DependentUpon>VMPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VMOptionsQemu.resx">
-      <DependentUpon>VMOptionsQemu.cs</DependentUpon>
+    <EmbeddedResource Include="VMPageQemu.resx">
+      <DependentUpon>VMPageQemu.cs</DependentUpon>
     </EmbeddedResource>
     <ZipProject Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
     <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos" />
