@@ -21,7 +21,7 @@ namespace Cosmos.VS.Package
 		{
 			InitializeComponent();
 
-			BuildOptionsPropertyPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
+			BuildPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
 		}
 
 		/// <summary> 
@@ -35,7 +35,7 @@ namespace Cosmos.VS.Package
 				components.Dispose();
 			}
 
-			BuildOptionsPropertyPage.BuildTargetChanged -= new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
+			BuildPage.BuildTargetChanged -= new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
 
 			base.Dispose(disposing);
 		}
@@ -59,10 +59,10 @@ namespace Cosmos.VS.Package
 			switch (target)
 			{
 				case TargetHost.QEMU:
-					if ((this.pageSubPage is DebugOptionsQemu) == false)
+					if ((this.pageSubPage is DebugPage) == false)
 					{
 						subpageChanged = true;
-						this.pageSubPage = new DebugOptionsQemu();
+						this.pageSubPage = new DebugPage();
 					}
 					break;
 				default:
@@ -107,7 +107,7 @@ namespace Cosmos.VS.Package
 		{
 			base.FillProperties();
 
-			this.SetSubPropertyPage(BuildOptionsPropertyPage.CurrentBuildTarget);
+			this.SetSubPropertyPage(BuildPage.CurrentBuildTarget);
 
 			if (this.pageSubPage != null)
 			{ this.pageSubPage.FillProperties(); }

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class DebugOptionsQemu
+	partial class DebugPage
 	{
 		/// <summary> 
 		/// Required designer variable.
@@ -66,7 +66,7 @@
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 128F));
+            this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 149F));
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableDebugQemu.Size = new System.Drawing.Size(492, 288);
             this.tableDebugQemu.TabIndex = 0;
@@ -84,7 +84,7 @@
             this.titleDivision1.Name = "titleDivision1";
             this.titleDivision1.Size = new System.Drawing.Size(257, 15);
             this.titleDivision1.TabIndex = 21;
-            this.titleDivision1.Title = "Assembly";
+            this.titleDivision1.Title = "Machine Level";
             // 
             // label2
             // 
@@ -111,7 +111,7 @@
             this.titleGeneral.Name = "titleGeneral";
             this.titleGeneral.Size = new System.Drawing.Size(257, 15);
             this.titleGeneral.TabIndex = 0;
-            this.titleGeneral.Title = "Source";
+            this.titleGeneral.Title = "Visual Studio";
             // 
             // label1
             // 
@@ -122,7 +122,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(224, 21);
             this.label1.TabIndex = 14;
-            this.label1.Text = "Debug Mode:";
+            this.label1.Text = "Debug Level:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // comboDebugMode
@@ -146,7 +146,7 @@
             // checkEnableGDB
             // 
             this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkEnableGDB.Location = new System.Drawing.Point(42, 143);
+            this.checkEnableGDB.Location = new System.Drawing.Point(42, 122);
             this.checkEnableGDB.Name = "checkEnableGDB";
             this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
             this.checkEnableGDB.TabIndex = 20;

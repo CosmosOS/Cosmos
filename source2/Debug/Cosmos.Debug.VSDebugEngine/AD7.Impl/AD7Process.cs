@@ -211,7 +211,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             // program run.
             foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
                 foreach (var xBBP in xBP.mBoundBPs) {
-                    DebugMsg("Setting BP @ " + xBBP.m_address);
+                    DebugMsg("Setting BP @ " + xBBP.m_address.ToString("X8").ToUpper());
                     SetBreakpointAddress(xBBP.m_address);
                 }
             }
@@ -235,7 +235,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
                     var xActualAddress = arg2 - 5; // - 5 to correct the addres:
-                    DebugMsg("BP hit @ 0x" + xActualAddress.ToString("X8").ToUpper());
+                    DebugMsg("BP hit @ " + xActualAddress.ToString("X8").ToUpper());
 
                     // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
                     var xActionPoints = new List<object>();

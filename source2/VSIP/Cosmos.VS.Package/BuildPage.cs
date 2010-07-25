@@ -14,20 +14,20 @@ using Microsoft.VisualStudio;
 namespace Cosmos.VS.Package
 {
 	[Guid(Guids.BuildOptionsPropertyPage)]
-	public partial class BuildOptionsPropertyPage : ConfigurationBase
+	public partial class BuildPage : ConfigurationBase
 	{
 		public static TargetHost CurrentBuildTarget = (TargetHost)(-1);
 		public static event EventHandler BuildTargetChanged;
 
 		protected static void OnBuildTargetChanged(Object sender, EventArgs e)
 		{
-			if (BuildOptionsPropertyPage.BuildTargetChanged != null)
-			{ BuildOptionsPropertyPage.BuildTargetChanged(sender, e); }
+			if (BuildPage.BuildTargetChanged != null)
+			{ BuildPage.BuildTargetChanged(sender, e); }
 		}
 
 		private BuildProperties projProperties;
 
-		public BuildOptionsPropertyPage()
+		public BuildPage()
 		{
 			InitializeComponent();
 
@@ -59,8 +59,8 @@ namespace Cosmos.VS.Package
 					this.PageProperties.Target = value;
 					this.IsDirty = true;
 
-					BuildOptionsPropertyPage.CurrentBuildTarget = value;
-					BuildOptionsPropertyPage.OnBuildTargetChanged(this, EventArgs.Empty);
+					BuildPage.CurrentBuildTarget = value;
+					BuildPage.OnBuildTargetChanged(this, EventArgs.Empty);
 				}
 			};
 

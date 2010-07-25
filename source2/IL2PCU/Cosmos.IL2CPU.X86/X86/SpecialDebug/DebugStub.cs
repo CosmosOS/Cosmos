@@ -328,21 +328,17 @@ namespace Cosmos.IL2CPU.X86 {
             Call("WriteALToComPort"); 
             Label = "DebugStub_AfterReady";
             
-            // Check to see if breakpoint is disabled. If so, skip all breakpoint checking code.
-            new Compare{ 
-                DestinationRef = ElementReference.New("DebugBreakpointAddress")
-                , DestinationIsIndirect = true
-                , SourceValue = 0
-                , Size = 32 
-            };
+            // If BP is disabled (0), skip BP checking code.
+            Memory["DebugBreakpointAddress", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_Executing_AfterBreakOnAddress");
 
-            // if there's a pending BreakOnAddress, compare it to the original
+            // BP is active
+            EAX = Memory["DebugEIP"];
             new Compare {
                 DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect = true,
                 SourceReg = Registers.EAX
             };
-                JumpIf(Flags.Equal, "DebugStub_Break");
+            JumpIf(Flags.Equal, "DebugStub_Break");
 
             Label = "DebugStub_Executing_AfterBreakOnAddress";
             // See if there is a requested break
@@ -442,10 +438,6 @@ namespace Cosmos.IL2CPU.X86 {
                 // be changing ops that call the stub.
                 EAX.Sub(5);
                 // Store it for later use.
-                // Secondary stub also uses EAX, so keep EAX valid till we call
-                // secondary debug stub.
-                // Currently "DebugEIP" is not used as EAX is used instead, but 
-                // this might change in the future so we leave it for now.
                 Memory["DebugEIP"] = EAX;
                 // Call secondary stub
                 Call("DebugStub_Executing");

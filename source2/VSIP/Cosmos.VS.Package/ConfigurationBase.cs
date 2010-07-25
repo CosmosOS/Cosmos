@@ -104,7 +104,7 @@ namespace Cosmos.VS.Package
 						this.projCurrentConfig = null;
 
 						ConfigurationBase.CurrentConfigurationIndex = comboConfiguration.SelectedIndex;
-						BuildOptionsPropertyPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU);
+						BuildPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU);
 						ConfigurationBase.OnConfigurationChanged(this, EventArgs.Empty);
 
 						this.IgnoreDirty = true;
@@ -157,8 +157,8 @@ namespace Cosmos.VS.Package
 
 			this.comboArchitecture.SelectedIndex = 0;
 
-			if ((Int32)BuildOptionsPropertyPage.CurrentBuildTarget < 0)
-			{ BuildOptionsPropertyPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU); }
+			if ((Int32)BuildPage.CurrentBuildTarget < 0)
+			{ BuildPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU); }
 		}
 
 		public override void SetConfigProperty(String name, String value)

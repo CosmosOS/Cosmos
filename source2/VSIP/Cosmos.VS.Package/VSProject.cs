@@ -49,7 +49,7 @@ namespace Cosmos.VS.Package {
   // Property Pages
 	//[ProvideObject(typeof(PropPageEnvironment), RegisterUsing = RegistrationMethod.CodeBase)]
 	//[ProvideObject(typeof(PropPageTest), RegisterUsing = RegistrationMethod.CodeBase)]
-	[ProvideObject(typeof(BuildOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
+	[ProvideObject(typeof(BuildPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[ProvideObject(typeof(DebugOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[ProvideObject(typeof(VMOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[Guid(Guids.guidProjectPkgString)]

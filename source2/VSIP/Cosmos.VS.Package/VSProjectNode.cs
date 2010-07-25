@@ -67,7 +67,7 @@ namespace Cosmos.VS.Package {
             return new Guid[] {
          // typeof(PropPageEnvironment).GUID,
           //typeof(PropPageTest).GUID,
-		  typeof(BuildOptionsPropertyPage).GUID,
+		  typeof(BuildPage).GUID,
 		  typeof(DebugOptionsPropertyPage).GUID,
 		  typeof(VMOptionsPropertyPage).GUID,
       };

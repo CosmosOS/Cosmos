@@ -67,11 +67,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildOptionsPropertyPage.cs">
+    <Compile Include="BuildPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="BuildOptionsPropertyPage.Designer.cs">
-      <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
+    <Compile Include="BuildPage.Designer.cs">
+      <DependentUpon>BuildPage.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfigurationBase.cs">
       <SubType>UserControl</SubType>
@@ -91,11 +91,11 @@
     <Compile Include="DebugOptionsPropertyPage.Designer.cs">
       <DependentUpon>DebugOptionsPropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="DebugOptionsQemu.cs">
+    <Compile Include="DebugPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="DebugOptionsQemu.Designer.cs">
-      <DependentUpon>DebugOptionsQemu.cs</DependentUpon>
+    <Compile Include="DebugPage.Designer.cs">
+      <DependentUpon>DebugPage.cs</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -148,8 +148,8 @@
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
-    <EmbeddedResource Include="BuildOptionsPropertyPage.resx">
-      <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
+    <EmbeddedResource Include="BuildPage.resx">
+      <DependentUpon>BuildPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfigurationBase.resx">
       <DependentUpon>ConfigurationBase.cs</DependentUpon>
@@ -160,8 +160,8 @@
     <EmbeddedResource Include="DebugOptionsPropertyPage.resx">
       <DependentUpon>DebugOptionsPropertyPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DebugOptionsQemu.resx">
-      <DependentUpon>DebugOptionsQemu.cs</DependentUpon>
+    <EmbeddedResource Include="DebugPage.resx">
+      <DependentUpon>DebugPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="SubPropertyPageBase.resx">

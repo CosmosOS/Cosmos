@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class BuildOptionsPropertyPage
+	partial class BuildPage
 	{
 		/// <summary> 
 		/// Required designer variable.
@@ -90,8 +90,7 @@
             this.titleCompiler.Name = "titleCompiler";
             this.titleCompiler.Size = new System.Drawing.Size(486, 15);
             this.titleCompiler.TabIndex = 3;
-            this.titleCompiler.Title = "Compiler";
-            this.titleCompiler.Visible = false;
+            this.titleCompiler.Title = "Compilation";
             // 
             // titleOutput
             // 
@@ -105,7 +104,7 @@
             this.titleOutput.Name = "titleOutput";
             this.titleOutput.Size = new System.Drawing.Size(486, 15);
             this.titleOutput.TabIndex = 0;
-            this.titleOutput.Title = "Output";
+            this.titleOutput.Title = "Target";
             // 
             // label2
             // 
@@ -135,11 +134,11 @@
             // buttonOutputBrowse
             // 
             this.buttonOutputBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOutputBrowse.Location = new System.Drawing.Point(304, 4);
+            this.buttonOutputBrowse.Location = new System.Drawing.Point(321, 4);
             this.buttonOutputBrowse.Name = "buttonOutputBrowse";
-            this.buttonOutputBrowse.Size = new System.Drawing.Size(38, 23);
+            this.buttonOutputBrowse.Size = new System.Drawing.Size(21, 23);
             this.buttonOutputBrowse.TabIndex = 1;
-            this.buttonOutputBrowse.Text = "...";
+            this.buttonOutputBrowse.Text = "..";
             this.buttonOutputBrowse.UseVisualStyleBackColor = true;
             this.buttonOutputBrowse.Click += new System.EventHandler(this.OutputBrowse_Click);
             // 
@@ -149,7 +148,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.textOutputPath.Location = new System.Drawing.Point(4, 4);
             this.textOutputPath.Name = "textOutputPath";
-            this.textOutputPath.Size = new System.Drawing.Size(294, 22);
+            this.textOutputPath.Size = new System.Drawing.Size(311, 22);
             this.textOutputPath.TabIndex = 0;
             // 
             // labelFramework
@@ -165,17 +164,16 @@
             this.labelFramework.TabIndex = 4;
             this.labelFramework.Text = "Framework:";
             this.labelFramework.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.labelFramework.Visible = false;
             // 
             // comboFramework
             // 
             this.comboFramework.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboFramework.Enabled = false;
             this.comboFramework.FormattingEnabled = true;
             this.comboFramework.Location = new System.Drawing.Point(150, 129);
             this.comboFramework.Name = "comboFramework";
             this.comboFramework.Size = new System.Drawing.Size(143, 21);
             this.comboFramework.TabIndex = 8;
-            this.comboFramework.Visible = false;
             // 
             // labelTarget
             // 
@@ -186,9 +184,9 @@
             this.labelTarget.Location = new System.Drawing.Point(22, 63);
             this.labelTarget.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
             this.labelTarget.Name = "labelTarget";
-            this.labelTarget.Size = new System.Drawing.Size(44, 21);
+            this.labelTarget.Size = new System.Drawing.Size(78, 21);
             this.labelTarget.TabIndex = 11;
-            this.labelTarget.Text = "Target:";
+            this.labelTarget.Text = "Environment:";
             this.labelTarget.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // comboTarget
@@ -207,6 +205,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)));
             this.checkUseInternalAssembler.AutoSize = true;
             this.tableBuildOptions.SetColumnSpan(this.checkUseInternalAssembler, 2);
+            this.checkUseInternalAssembler.Enabled = false;
             this.checkUseInternalAssembler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkUseInternalAssembler.Location = new System.Drawing.Point(22, 165);
             this.checkUseInternalAssembler.Margin = new System.Windows.Forms.Padding(22, 12, 3, 3);
@@ -215,7 +214,6 @@
             this.checkUseInternalAssembler.TabIndex = 10;
             this.checkUseInternalAssembler.Text = "Use Internal Assembler";
             this.checkUseInternalAssembler.UseVisualStyleBackColor = true;
-            this.checkUseInternalAssembler.Visible = false;
             // 
             // labelInternalAssembler
             // 
@@ -223,18 +221,17 @@
             this.labelInternalAssembler.Location = new System.Drawing.Point(44, 187);
             this.labelInternalAssembler.Margin = new System.Windows.Forms.Padding(44, 0, 3, 0);
             this.labelInternalAssembler.Name = "labelInternalAssembler";
-            this.labelInternalAssembler.Size = new System.Drawing.Size(290, 43);
+            this.labelInternalAssembler.Size = new System.Drawing.Size(401, 43);
             this.labelInternalAssembler.TabIndex = 6;
-            this.labelInternalAssembler.Text = "Use Cosmos\'s internally developed assembler, otherwise use NASM (Currently in exp" +
-                "erimental stage, recommended to use NASM).";
-            this.labelInternalAssembler.Visible = false;
+            this.labelInternalAssembler.Text = "Experimental. Leave unchecked unless you like debugging deep level assembly code." +
+                "";
             // 
-            // BuildOptionsPropertyPage
+            // BuildPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableBuildOptions);
-            this.Name = "BuildOptionsPropertyPage";
+            this.Name = "BuildPage";
             this.Title = "Build";
             this.Controls.SetChildIndex(this.tableBuildOptions, 0);
             this.tableBuildOptions.ResumeLayout(false);
