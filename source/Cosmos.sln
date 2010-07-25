@@ -57,6 +57,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}"
 	ProjectSection(SolutionItems) = preProject
 		..\source2\Users\Kudzu\Notes.html = ..\source2\Users\Kudzu\Notes.html
+		..\source2\Users\Kudzu\Old-IDANotes.html = ..\source2\Users\Kudzu\Old-IDANotes.html
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{74E81F2A-F4BD-4532-803B-3003378BA2F1}"
