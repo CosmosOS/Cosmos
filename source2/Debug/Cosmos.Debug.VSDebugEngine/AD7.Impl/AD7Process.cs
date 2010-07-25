@@ -19,10 +19,8 @@ using System.Collections.Specialized;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 
-namespace Cosmos.Debug.VSDebugEngine
-{
-    public class AD7Process : IDebugProcess2
-    {
+namespace Cosmos.Debug.VSDebugEngine {
+    public class AD7Process : IDebugProcess2 {
         internal Guid mID = Guid.NewGuid();
         private Process mProcess;
         private ProcessStartInfo mProcessStartInfo;
@@ -90,6 +88,8 @@ namespace Cosmos.Debug.VSDebugEngine
                            if ((xName == "uuid.location") || (xName == "uuid.bios")) {
                                xValue = null;
                            } else if (xName == "ide1:0.fileName") {
+                               //TODO: Update ISO to selected project
+                               //xValue = @"m:\source\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\CosmosKernel.iso";
                                xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
                            }
 
@@ -153,29 +153,20 @@ namespace Cosmos.Debug.VSDebugEngine
             xSW.Stop();
 
             Trace.WriteLine("GetSourceInfo took: " + xSW.Elapsed);
-            if (mSourceMappings.Count == 0)
-            {
+            if (mSourceMappings.Count == 0) {
                 throw new Exception("Debug data not found: SourceMappings");
             }
             mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
+            
             mDebugEngine = new DebugEngine();
-
-            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu"))
-            {
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu")) {
                 mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
+            } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmwareworkstation")) {
+                mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
+            } else {
+                throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
             }
-            else
-            {
-                if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmwareworkstation"))
-                {
-                    mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
-                }
-                else
-                {
-                    throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
-                }
-            }
-
+            
             mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
             mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
             mDebugEngine.DebugConnector.ConnectionLost = new Action<Exception>(
@@ -193,8 +184,7 @@ namespace Cosmos.Debug.VSDebugEngine
             // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
             // if so, why not hook before start? 
             System.Threading.Thread.Sleep(250);
-            if (mProcess.HasExited)
-            {
+            if (mProcess.HasExited) {
                 Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
                 Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
                 Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
@@ -208,8 +198,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mPort = aPort;
         }
 
-        public void SetBreakpointAddress(uint aAddress)
-        {
+        public void SetBreakpointAddress(uint aAddress) {
             mDebugEngine.DebugConnector.SetBreakpointAddress(aAddress);
         }
 
@@ -242,9 +231,11 @@ namespace Cosmos.Debug.VSDebugEngine
                         mEngine.Callback.OnOutputString("Hit Breakpoint 0x" + xActualAddress.ToString("X8").ToUpper());
                         var xActionPoints = new List<object>();
                         var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
-                        foreach (var xBP in mEngine.m_breakpointManager.mPendingBreakpoints) {
-                            foreach(var xBBP in xBP.m_boundBreakpoints) {
-                                if (xBBP.m_address == xActualAddress) {
+                        foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)
+                        {
+                            foreach(var xBBP in xBP.m_boundBreakpoints){
+                                if (xBBP.m_address == xActualAddress)
+                                {
                                     xBoundBreakpoints.Add(xBBP);
                                 }
                             }
