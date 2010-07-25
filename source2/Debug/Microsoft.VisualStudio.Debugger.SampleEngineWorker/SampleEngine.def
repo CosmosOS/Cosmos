@@ -1,5 +1,0 @@
-LIBRARY	"Microsoft.VisualStudio.Debugger.SampleEngineWorker"
-
-EXPORTS
-DllRegisterServer	PRIVATE
-DllUnregisterServer	PRIVATE
