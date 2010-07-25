@@ -78,11 +78,9 @@
   <ItemGroup>
     <Compile Include="CDebugger\ReverseSourceInfo.cs" />
     <Compile Include="CDebugger\DebugConnector.cs" />
-    <Compile Include="CDebugger\DebugConnectorPipeClient.cs" />
     <Compile Include="CDebugger\DebugConnectorPipeServer.cs" />
     <Compile Include="CDebugger\DebugConnectorSerial.cs" />
     <Compile Include="CDebugger\DebugConnectorStream.cs" />
-    <Compile Include="CDebugger\DebugConnectorTCPClient.cs" />
     <Compile Include="CDebugger\DebugConnectorTCPServer.cs" />
     <Compile Include="CDebugger\DebugEngine.cs" />
     <Compile Include="CDebugger\DebugSymbol.cs" />
@@ -101,6 +99,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>

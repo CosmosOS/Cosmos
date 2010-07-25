@@ -17,7 +17,6 @@ namespace Cosmos.Debug.Common.CDebugger
         
         protected MsgType mCurrentMsgType;
 
-        //TODO: Change all servers and clients to use this. Servers can start earlier, but this will wait for an inbound connection
         public abstract void WaitConnect();
         
         protected abstract void SendData(byte[] aBytes);
@@ -57,11 +56,15 @@ namespace Cosmos.Debug.Common.CDebugger
                     Next(4, PacketTracePoint);            
                     break;
                 case MsgType.Message:
-                    Next(2, PacketTextSize);            
+                    Next(2, PacketTextSize);
                     break;
-                case (MsgType)0:
+                case MsgType.Ready:
+                    //Next(2, PacketTextSize);
+                    break;
+                case MsgType.Noop:
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
+                    // Kudzu: Made a Noop command to handle this
                     Next(1, PacketCommand);
                     break;
                 default:

@@ -202,8 +202,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             mDebugEngine.DebugConnector.SetBreakpointAddress(aAddress);
         }
 
-        void mDebugEngine_TextReceived(string obj)
-        {
+        void mDebugEngine_TextReceived(string obj) {
             mCallback.OnOutputString(obj + "\r\n");
         }
 
@@ -215,10 +214,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
         }
 
-        void mDebugEngine_TraceReceived(Cosmos.Compiler.Debug.MsgType arg1, uint arg2)
-        {
-            switch (arg1)
-            {
+        void mDebugEngine_TraceReceived(Cosmos.Compiler.Debug.MsgType arg1, uint arg2) {
+            switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint:
                     {
                         //((IDebugBreakEvent2)null).

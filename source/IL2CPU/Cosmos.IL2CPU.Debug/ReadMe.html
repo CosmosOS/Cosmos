@@ -6,11 +6,9 @@
 	<body>
 	
 	    <p>
-            Cosmos.Debug contains common classes and enums used by:</p>
-        <ul>
-            <li>Client debugger in Cosmos.Compiler.Builder</li>
-            <li>IL2CPU in IL2CPU.Assembler.X86</li>
-        </ul>
+            Cosmos.Debug contains common classes and enums that runs on both Windows and 
+            Cosmos. The Debugger uses it to receive messages from the debugstub in Cosmos, 
+            and Cosmos uses it to compile into the debug stub.</p>
         <p>
             Because of this extreme care must be take of which assemblies are linked and 
             this assembly should not link in any other Cosmos assemblies.</p>
