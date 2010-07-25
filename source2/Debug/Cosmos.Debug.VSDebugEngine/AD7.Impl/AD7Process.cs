@@ -192,9 +192,23 @@ namespace Cosmos.Debug.VSDebugEngine {
             mPort = aPort;
         }
 
-        protected void DbgCmdReady() {
+        // Shows a message in the output window of VS. Needs special treatment, 
+        // because normally VS only shows msgs from debugged process, not internal
+        // stuff like us.
+        public void DebugMsg(string aMsg) {
+            mCallback.OnOutputString(aMsg + "\n");
+        }
 
-            System.Diagnostics.Debug.WriteLine("Remote Debugger: Ready");
+        protected void DbgCmdReady() {
+            DebugMsg("RmtDbg: Ready");
+            // OK, now debugger is ready. Send it a list of breakpoints that were set before
+            // program run.
+            foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
+                foreach (var xBBP in xBP.mBoundBPs) {
+                    DebugMsg("Setting BP @ " + xBBP.m_address);
+                    SetBreakpointAddress(xBBP.m_address);
+                }
+            }
         }
 
         public void SetBreakpointAddress(uint aAddress) {
@@ -205,44 +219,38 @@ namespace Cosmos.Debug.VSDebugEngine {
             mCallback.OnOutputString(obj + "\r\n");
         }
 
-        internal AD7Thread Thread
-        {
-            get
-            {
+        internal AD7Thread Thread {
+            get {
                 return mThread;
             }
         }
 
         void DbgCmdTrace(Cosmos.Compiler.Debug.MsgType arg1, uint arg2) {
             switch (arg1) {
-                case Cosmos.Compiler.Debug.MsgType.BreakPoint:
-                    {
-                        //((IDebugBreakEvent2)null).
-
-                        //var xSourceInfo = mSourceMappings[arg2];
-
-                        //mCallback.OnOutputString("Try to break now");
-                        var xActualAddress = arg2 - 5; // - 5 to correct the addres:
-                        // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
-                        mEngine.Callback.OnOutputString("Hit Breakpoint 0x" + xActualAddress.ToString("X8").ToUpper());
-                        var xActionPoints = new List<object>();
-                        var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
-                        foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
-                            foreach (var xBBP in xBP.mBoundBPs) { 
-                                if (xBBP.m_address == xActualAddress) {
-                                    xBoundBreakpoints.Add(xBBP);
-                                }
+                case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
+                    var xActualAddress = arg2 - 5; // - 5 to correct the addres:
+                    // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
+                    mEngine.Callback.OnOutputString("Hit Breakpoint 0x" + xActualAddress.ToString("X8").ToUpper());
+                    var xActionPoints = new List<object>();
+                    var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
+                    
+                    // Search the BPs and find the ones that match our address
+                    foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
+                        foreach (var xBBP in xBP.mBoundBPs) { 
+                            if (xBBP.m_address == xActualAddress) {
+                                xBoundBreakpoints.Add(xBBP);
                             }
                         }
-
-                        mCurrentAddress = xActualAddress;
-                        //mCallback.onb
-                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), xActualAddress);
-                        //mEngine.Callback.OnBreakComplete(mThread, );
-                        mEngine.AfterBreak = true;
-                        //mEngine.Callback.OnBreak(mThread);
-                        break;
                     }
+
+                    mCurrentAddress = xActualAddress;
+                    //mCallback.onb
+                    mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), xActualAddress);
+                    //mEngine.Callback.OnBreakComplete(mThread, );
+                    mEngine.AfterBreak = true;
+                    //mEngine.Callback.OnBreak(mThread);
+                    break;
+                }
                 default:
                     Console.WriteLine("TraceReceived: {0}", arg1);
                     break;

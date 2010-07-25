@@ -45,13 +45,11 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
 
-        static AD7Engine()
-        {
+        static AD7Engine() {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
         }
 
-        public AD7Engine()
-        {
+        public AD7Engine() {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             m_breakpointManager = new BreakpointManager(this);
             //Worker.Initialize();
