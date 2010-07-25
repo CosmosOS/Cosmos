@@ -96,13 +96,10 @@ namespace Cosmos.Debug.VSDebugEngine
         #region IDebugPendingBreakpoint2 Members
 
         // Binds this pending breakpoint to one or more code locations.
-        int IDebugPendingBreakpoint2.Bind()
-        {
-            try
-            {
+        int IDebugPendingBreakpoint2.Bind() {
+            try {
                 Trace.WriteLine("Try to bind breakpoint");
-                if (CanBind())
-                {
+                if (CanBind()) {
                     Trace.WriteLine("Succeeded");
                     IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(m_bpRequestInfo.bpLocation.unionmember2));
 
