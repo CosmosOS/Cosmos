@@ -320,12 +320,12 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_Executing";
 
             // The very first time, we want to send a one time Ready signal back to the host
-            //Memory["DebugReadySent", 32].Compare(1);
-            //JumpIf(Flags.Equal, "DebugStub_AfterReady");
-            //Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again
-            //AL = (int)MsgType.Ready; // Send the actual Ready signal
-            //Call("WriteALToComPort"); 
-            //Label = "DebugStub_AfterReady";
+            Memory["DebugReadySent", 32].Compare(1);
+            JumpIf(Flags.Equal, "DebugStub_AfterReady");
+            Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again
+            AL = (int)MsgType.Ready; // Send the actual Ready signal
+            Call("WriteALToComPort"); 
+            Label = "DebugStub_AfterReady";
             
             // Check to see if breakpoint is disabled. If so, skip all breakpoint checking code.
             new Compare{ 
