@@ -6,9 +6,11 @@ using Cosmos.Compiler.Debug;
 using Cosmos.IL2CPU;
 
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
-// We will later optimize this
+// Later we can optimize it.
 namespace Cosmos.IL2CPU.X86 {
     public class DebugStub : X.Y86 {
+        //TODO: We never init the com port. Whats its default speed? 9600 N81 ?
+        // We should init it and set the speed
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
         protected enum Tracing { Off = 0, On = 1 };
@@ -18,6 +20,9 @@ namespace Cosmos.IL2CPU.X86 {
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
             Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
+                // 0 on start, set to 1 after Ready signal is sent.
+                new DataMember("DebugReadySent", 0),
+
                 // Tracing: 0=Off, 1=On
                 new DataMember("DebugTraceMode", 0),
                 // enum Status
@@ -180,12 +185,10 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
-        
         // Input: Stack
         // Output: None
         // Modifies: EAX, ECX, EDX, ESI
-        protected void SendPtr()
-        {
+        protected void SendPtr() {
             Label = "DebugStub_SendPtr";
 
             // Write the type
@@ -257,6 +260,10 @@ namespace Cosmos.IL2CPU.X86 {
         // Modified: AL, DX, EDI (+1)
         //
         // Reads a byte into [EDI] and does EDI + 1
+        // http://wiki.osdev.org/Serial_ports
+        // We dont worry about byte over writing because:
+        //  -The UART will handle flow control for us
+        //  -All modern UARTs have at least a 16 byte buffer.
         protected void ReadByteFromComPort() {
             Label = "ReadByteFromComPort";
             DX = mComStatusAddr;
@@ -312,6 +319,14 @@ namespace Cosmos.IL2CPU.X86 {
         protected void Executing() {
             Label = "DebugStub_Executing";
 
+            // The very first time, we want to send a one time Ready signal back to the host
+            //Memory["DebugReadySent", 32].Compare(1);
+            //JumpIf(Flags.Equal, "DebugStub_AfterReady");
+            //Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again
+            //AL = (int)MsgType.Ready; // Send the actual Ready signal
+            //Call("WriteALToComPort"); 
+            //Label = "DebugStub_AfterReady";
+            
             // Check to see if breakpoint is disabled. If so, skip all breakpoint checking code.
             new Compare{ 
                 DestinationRef = ElementReference.New("DebugBreakpointAddress")
@@ -383,7 +398,7 @@ namespace Cosmos.IL2CPU.X86 {
             DisableInterrupts();           
                 Memory["DebugSuspendLevel", 32].Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_Running");
-                    // DebugStub is not enabled, so exit.
+                    // DebugStub is already running, so exit.
                     // But we need to see if IRQs are diabled.
                     // If IRQ disabled, we dont reenable them after our disable
                     // in this routine.
