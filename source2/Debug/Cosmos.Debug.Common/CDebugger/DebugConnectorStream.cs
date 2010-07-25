@@ -5,8 +5,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 
-namespace Cosmos.Debug.Common.CDebugger
-{
+namespace Cosmos.Debug.Common.CDebugger {
     public abstract class DebugConnectorStream : DebugConnector {
         private Stream mStream;
         
@@ -19,25 +18,19 @@ namespace Cosmos.Debug.Common.CDebugger
             public Action<byte[]> Completed;
         }
 
-        protected override void SendData(byte[] aBytes)
-        {
-            if (mStream != null)
-            {
+        protected override void SendData(byte[] aBytes) {
+            if (mStream != null) {
                 mStream.Write(aBytes, 0, aBytes.Length);
-            }
-            else
-            {
+            } else {
                 mPendingSend = (byte[])aBytes.Clone();
             }
         }
 
         private byte[] mPendingSend = null;
 
-        protected void Start(Stream aStream)
-        {
+        protected void Start(Stream aStream) {
             mStream = aStream;
-            if (mPendingSend != null)
-            {
+            if (mPendingSend != null) {
                 SendData(mPendingSend);
                 mPendingSend = null;
             }

@@ -4,20 +4,15 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 
-namespace Cosmos.Debug.Common.CDebugger
-{
-    public class DebugEngine
-    {
+namespace Cosmos.Debug.Common.CDebugger {
+    public class DebugEngine {
         private DebugConnector mDebugConnector;
-        public DebugConnector DebugConnector
-        {
-            get
-            {
+        public DebugConnector DebugConnector {
+            get {
                 return mDebugConnector;
             }
-            set
-            {
-                if(mDebugConnector!=null){
+            set {
+                if (mDebugConnector != null) {
                     throw new Exception("Cannot set debug connector after it has already been set!");
                 }
                 mDebugConnector = value;
@@ -26,16 +21,13 @@ namespace Cosmos.Debug.Common.CDebugger
             }
         }
 
-
-        private void OnText(string aText)
-        {
-            if (TextReceived != null)
-            {
+        private void OnText(string aText) {
+            if (TextReceived != null) {
                 TextReceived(aText);
             }
         }
-        private void OnTrace(MsgType aMessage, UInt32 aData)
-        {
+
+        private void OnTrace(MsgType aMessage, UInt32 aData) {
             if (TraceReceived != null)
             {
                 TraceReceived(aMessage, aData);
