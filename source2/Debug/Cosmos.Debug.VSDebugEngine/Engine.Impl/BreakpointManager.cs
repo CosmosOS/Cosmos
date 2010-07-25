@@ -1,31 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System.Diagnostics;
 
-namespace Cosmos.Debug.VSDebugEngine {
+namespace Cosmos.Debug.VSDebugEngine
+{
     // This class manages breakpoints for the engine. 
-    // Breakpoint types: http://msdn.microsoft.com/en-us/library/bb161312%28VS.80%29.aspx\
-    // Binding breakpoints: http://msdn.microsoft.com/en-us/library/bb146593%28v=VS.80%29.aspx
-    class BreakpointManager {
-        private AD7Engine mEngine;
-        internal List<AD7PendingBreakpoint> mPendingBreakpoints = new List<AD7PendingBreakpoint>();
+    class BreakpointManager
+    {
+        private AD7Engine m_engine;
+        internal System.Collections.Generic.List<AD7PendingBreakpoint> m_pendingBreakpoints;
 
-        public BreakpointManager(AD7Engine aEngine) {
-            mEngine = aEngine;
+        public BreakpointManager(AD7Engine engine)
+        {
+            m_engine = engine;
+            m_pendingBreakpoints = new System.Collections.Generic.List<AD7PendingBreakpoint>();
         }
       
         // A helper method used to construct a new pending breakpoint.
-        public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, mEngine, this);
+        public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
+        {
+            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, m_engine, this);
             ppPendingBP = (IDebugPendingBreakpoint2)pendingBreakpoint;
-            mPendingBreakpoints.Add(pendingBreakpoint);
+            m_pendingBreakpoints.Add(pendingBreakpoint);
         }
 
         // Called from the engine's detach method to remove the debugger's breakpoint instructions.
-        public void ClearBoundBreakpoints() {
-            foreach (var xBP in mPendingBreakpoints) {
-                xBP.ClearBoundBreakpoints();
+        public void ClearBoundBreakpoints()
+        {
+            foreach (AD7PendingBreakpoint pendingBreakpoint in m_pendingBreakpoints)
+            {
+                pendingBreakpoint.ClearBoundBreakpoints();
             }
         }
     }
