@@ -13,7 +13,7 @@ using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package
 {
-	[Guid(Guids.BuildOptionsPropertyPage)]
+	[Guid(Guids.BuildPage)]
 	public partial class BuildPage : ConfigurationBase
 	{
 		public static TargetHost CurrentBuildTarget = (TargetHost)(-1);
@@ -139,11 +139,11 @@ namespace Cosmos.VS.Package
 			}
 
 			dialog.SelectedPath = folderPath;
+            dialog.Description = "Select build output path";
 
-			dialog.Description = "Select build output path";
-
-			if (dialog.ShowDialog() == DialogResult.OK)
-			{ textOutputPath.Text = dialog.SelectedPath; }
+			if (dialog.ShowDialog() == DialogResult.OK) {
+                textOutputPath.Text = dialog.SelectedPath; 
+            }
 		}
 
         private void comboTarget_SelectedIndexChanged(object sender, EventArgs e)

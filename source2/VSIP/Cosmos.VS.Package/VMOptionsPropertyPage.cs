@@ -16,10 +16,8 @@ namespace Cosmos.VS.Package
 	{
 		private SubPropertyPageBase pageSubPage;
 
-		public VMOptionsPropertyPage()
-		{
+		public VMOptionsPropertyPage() {
 			InitializeComponent();
-
 			BuildPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
 		}
 

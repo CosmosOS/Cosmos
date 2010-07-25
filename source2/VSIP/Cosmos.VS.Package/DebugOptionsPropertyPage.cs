@@ -11,7 +11,7 @@ using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
-	[Guid(Guids.DebugOptionsPropertyPage)]
+	[Guid(Guids.DebugPage)]
 	public partial class DebugOptionsPropertyPage : ConfigurationBase
 	{
 

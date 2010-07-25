@@ -11,10 +11,9 @@ namespace Cosmos.VS.Package {
 
     protected override ProjectConfig CreateProjectConfiguration(string configName) {
         LogUtility.LogString("Entering Cosmos.VS.Package.VsConfigProvider.CreateProjectConfiguration('{0}')", configName);
-        try
-        {
+        try {
             return new VsProjectConfig(ProjectMgr, configName);
-        }finally{
+        } finally {
             LogUtility.LogString("Exiting Cosmos.VS.Package.VsConfigProvider.CreateProjectConfiguration(string)");
         }
     }

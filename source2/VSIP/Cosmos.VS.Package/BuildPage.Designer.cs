@@ -83,6 +83,7 @@
             this.titleCompiler.BackColor = System.Drawing.Color.Transparent;
             this.tableBuildOptions.SetColumnSpan(this.titleCompiler, 2);
             this.titleCompiler.Dock = System.Windows.Forms.DockStyle.Top;
+            this.titleCompiler.Enabled = false;
             this.titleCompiler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.titleCompiler.LineColor = System.Drawing.SystemColors.ControlDark;
             this.titleCompiler.Location = new System.Drawing.Point(3, 99);
@@ -156,6 +157,7 @@
             this.labelFramework.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)));
             this.labelFramework.AutoSize = true;
+            this.labelFramework.Enabled = false;
             this.labelFramework.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelFramework.Location = new System.Drawing.Point(22, 129);
             this.labelFramework.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
@@ -218,6 +220,7 @@
             // labelInternalAssembler
             // 
             this.tableBuildOptions.SetColumnSpan(this.labelInternalAssembler, 2);
+            this.labelInternalAssembler.Enabled = false;
             this.labelInternalAssembler.Location = new System.Drawing.Point(44, 187);
             this.labelInternalAssembler.Margin = new System.Windows.Forms.Padding(44, 0, 3, 0);
             this.labelInternalAssembler.Name = "labelInternalAssembler";

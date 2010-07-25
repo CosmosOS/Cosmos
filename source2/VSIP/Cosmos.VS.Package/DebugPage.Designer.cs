@@ -70,7 +70,6 @@
             this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableDebugQemu.Size = new System.Drawing.Size(492, 288);
             this.tableDebugQemu.TabIndex = 0;
-            this.tableDebugQemu.Paint += new System.Windows.Forms.PaintEventHandler(this.tableDebugQemu_Paint);
             // 
             // titleDivision1
             // 

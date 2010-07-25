@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Cosmos.Build.Common;
-//using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
@@ -70,9 +69,5 @@ namespace Cosmos.VS.Package
 			this.checkEnableGDB.Checked = this.PageProperties.EnableGDB;
         }
 
-        private void tableDebugQemu_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
 	}
 }
