@@ -102,7 +102,13 @@ namespace Cosmos.Debug.VSDebugEngine {
                 }
             }
 
-            mProcessStartInfo.Arguments = "true " + xPath + "Debug.vmx";
+            //TODO: Find this in code. This is hardcoded to default location right now.
+            string xVmwPath = @"C:\Program Files (x86)\VMware\VMware Workstation\";
+            //mProcessStartInfo.Arguments = "true \"" + xPath + "Debug.vmx\" -x -q";
+            // -x: Auto power on VM. Must be small x, big X means something else.
+            // -q: Close VMWare when VM is powered off.
+            // Options must come beore the vmx, and cannot use shellexecute
+            mProcessStartInfo.Arguments = "false \"" + xVmwPath + "vmware.exe" + "\" -x -q \"" + xPath + "Debug.vmx\"";
         }
 
         internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
@@ -229,8 +235,9 @@ namespace Cosmos.Debug.VSDebugEngine {
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
                     var xActualAddress = arg2 - 5; // - 5 to correct the addres:
+                    DebugMsg("BP hit @ 0x" + xActualAddress.ToString("X8").ToUpper());
+
                     // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
-                    mEngine.Callback.OnOutputString("Hit Breakpoint 0x" + xActualAddress.ToString("X8").ToUpper());
                     var xActionPoints = new List<object>();
                     var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
                     
@@ -251,38 +258,35 @@ namespace Cosmos.Debug.VSDebugEngine {
                     //mEngine.Callback.OnBreak(mThread);
                     break;
                 }
-                default:
-                    Console.WriteLine("TraceReceived: {0}", arg1);
+
+                default: {
+                    DebugMsg("TraceReceived: " + arg1);
                     break;
+                }
             }
         }
 
 
         #region IDebugProcess2 Members
 
-        public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
-        {
+        public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach) {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             throw new NotImplementedException();
         }
 
-        public int CanDetach()
-        {
+        public int CanDetach() {
             throw new NotImplementedException();
         }
 
-        public int CauseBreak()
-        {
+        public int CauseBreak() {
             throw new NotImplementedException();
         }
 
-        public int Detach()
-        {
+        public int Detach() {
             throw new NotImplementedException();
         }
 
-        public int EnumPrograms(out IEnumDebugPrograms2 ppEnum)
-        {
+        public int EnumPrograms(out IEnumDebugPrograms2 ppEnum) {
             throw new NotImplementedException();
         }
 

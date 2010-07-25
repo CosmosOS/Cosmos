@@ -23,7 +23,7 @@ namespace Cosmos.User.Kernel {
             Cosmos.Sys.Boot xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
             
-            Console.WriteLine("2 Cosmos booted successfully. Type a line of text to get it echoed back:");
+            Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back:");
             string xResult = Console.ReadLine();
             // when Qemu shows you the above text, put a breakpoint on the next line, then type a line 
             // of text in qemu. you'll see that Visual Studio breaks on the breakpoint.

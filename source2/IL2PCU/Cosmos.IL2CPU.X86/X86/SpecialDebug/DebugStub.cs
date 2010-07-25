@@ -38,10 +38,11 @@ namespace Cosmos.IL2CPU.X86 {
                 new DataMember("DebugEIP", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
                 // If set to 1, on next trace a break will occur
-                new DataMember("DebugBreakOnNextTrace", 0),
+                new DataMember("DebugBreakOnNextTrace", 0)
 
                 // Breakpoint address
-                new DataMember("DebugBreakpointAddress", 0)
+                , new DataMember("DebugBreakpointAddress", 0)
+                , new DataMember("DebugBPs", new int[256])
              });
         }
 
