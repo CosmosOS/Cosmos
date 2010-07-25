@@ -106,6 +106,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
+            System.Diagnostics.Debug.WriteLine("Test message");
             mDebugInfo = new NameValueCollection();
             NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
 
@@ -192,6 +193,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         protected void DbgCmdReady() {
+
             System.Diagnostics.Debug.WriteLine("Remote Debugger: Ready");
         }
 
