@@ -227,11 +227,9 @@ namespace Cosmos.Debug.VSDebugEngine {
                         mEngine.Callback.OnOutputString("Hit Breakpoint 0x" + xActualAddress.ToString("X8").ToUpper());
                         var xActionPoints = new List<object>();
                         var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
-                        foreach (var xBP in mEngine.m_breakpointManager.m_pendingBreakpoints)
-                        {
-                            foreach(var xBBP in xBP.m_boundBreakpoints){
-                                if (xBBP.m_address == xActualAddress)
-                                {
+                        foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
+                            foreach (var xBBP in xBP.mBoundBPs) { 
+                                if (xBBP.m_address == xActualAddress) {
                                     xBoundBreakpoints.Add(xBBP);
                                 }
                             }
