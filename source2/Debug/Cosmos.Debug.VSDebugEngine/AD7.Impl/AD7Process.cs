@@ -27,7 +27,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         private EngineCallback mCallback;
         private AD7Thread mThread;
         private AD7Engine mEngine;
-        private DebugEngine mDebugEngine;
+        private DebugConnector mDbgConnector;
         internal ReverseSourceInfos mReverseSourceMappings;
         internal SourceInfos mSourceMappings;
         internal uint? mCurrentAddress = null;
@@ -158,22 +158,21 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
             mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             
-            mDebugEngine = new DebugEngine();
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu")) {
-                mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
+                mDbgConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
             } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmwareworkstation")) {
-                mDebugEngine.DebugConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
+                mDbgConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
             } else {
                 throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
             }
-            
-            mDebugEngine.TraceReceived += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
-            mDebugEngine.TextReceived += new Action<string>(mDebugEngine_TextReceived);
-            mDebugEngine.DebugConnector.ConnectionLost = new Action<Exception>(
+
+            mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
+            mDbgConnector.CmdText += new Action<string>(mDebugEngine_TextReceived);
+            mDbgConnector.ConnectionLost = new Action<Exception>(
                 delegate { 
                     mEngine.Callback.OnProcessExit(0);
                 }
-                );
+            );
 
             System.Threading.Thread.Sleep(250);
             mProcess = Process.Start(mProcessStartInfo);
@@ -199,7 +198,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         public void SetBreakpointAddress(uint aAddress) {
-            mDebugEngine.DebugConnector.SetBreakpointAddress(aAddress);
+            mDbgConnector.SetBreakpointAddress(aAddress);
         }
 
         void mDebugEngine_TextReceived(string obj) {
@@ -353,12 +352,11 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (mTargetHost == TargetHost.QEMU) {
                // QEMU and Pipes - QEMU will stop and wait till we connect. It will not even show until we do.
                // We have to do this after we release the debug host though.
-               mDebugEngine.DebugConnector.WaitConnect();
+                mDbgConnector.WaitConnect();
             }
         }
 
-        void mProcess_Exited(object sender, EventArgs e)
-        {
+        void mProcess_Exited(object sender, EventArgs e) {
             Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
             Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
             //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
@@ -366,15 +364,13 @@ namespace Cosmos.Debug.VSDebugEngine {
             mCallback.OnProcessExit((uint)mProcess.ExitCode);
         }
 
-        internal void Continue()
-        {
+        internal void Continue() {
             mCurrentAddress = null;
-            mDebugEngine.DebugConnector.SendCommand((byte)Command.Break);
+            mDbgConnector.SendCommand((byte)Command.Break);
         }
 
-        internal void Step()
-        {
-            mDebugEngine.DebugConnector.SendCommand((byte)Command.Step);
+        internal void Step() {
+            mDbgConnector.SendCommand((byte)Command.Step);
         }
     }
 }

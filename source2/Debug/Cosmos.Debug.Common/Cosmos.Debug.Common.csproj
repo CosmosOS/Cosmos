@@ -82,7 +82,6 @@
     <Compile Include="CDebugger\DebugConnectorSerial.cs" />
     <Compile Include="CDebugger\DebugConnectorStream.cs" />
     <Compile Include="CDebugger\DebugConnectorTCPServer.cs" />
-    <Compile Include="CDebugger\DebugEngine.cs" />
     <Compile Include="CDebugger\DebugSymbol.cs" />
     <Compile Include="CDebugger\Global.cs" />
     <Compile Include="CDebugger\KeyState.cs" />
