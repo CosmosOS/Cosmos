@@ -1,21 +1,15 @@
-﻿//TODO: Move both of these to project options...
-// In fact also eliminate TCP server and keep only Pipes
-// Keep a note about servers.. we want to use servers and not clients, because we dont always know when the other side is ready
-// and with a server, we are ready and its ready whenever... but sometime after us for sure.
-#define DEBUG_CONNECTOR_TCP_SERVER
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using System.Diagnostics;
-using Cosmos.Debug.Common.CDebugger;
 using System.Collections.ObjectModel;
 using System.IO;
-using Cosmos.Compiler.Debug;
 using System.Collections.Specialized;
+using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Compiler.Debug;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 
@@ -111,8 +105,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             mProcessStartInfo.Arguments = "true " + xPath + "Debug.vmx";
         }
 
-        internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
-        {
+        internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
             mDebugInfo = new NameValueCollection();
             NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
 
@@ -166,8 +159,9 @@ namespace Cosmos.Debug.VSDebugEngine {
                 throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
             }
 
-            mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(mDebugEngine_TraceReceived);
-            mDbgConnector.CmdText += new Action<string>(mDebugEngine_TextReceived);
+            mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(DbgCmdTrace);
+            mDbgConnector.CmdText += new Action<string>(DbgCmdText);
+            mDbgConnector.CmdReady += new Action(DbgCmdReady);
             mDbgConnector.ConnectionLost = new Action<Exception>(
                 delegate { 
                     mEngine.Callback.OnProcessExit(0);
@@ -197,11 +191,15 @@ namespace Cosmos.Debug.VSDebugEngine {
             mPort = aPort;
         }
 
+        protected void DbgCmdReady() {
+            System.Diagnostics.Debug.WriteLine("Remote Debugger: Ready");
+        }
+
         public void SetBreakpointAddress(uint aAddress) {
             mDbgConnector.SetBreakpointAddress(aAddress);
         }
 
-        void mDebugEngine_TextReceived(string obj) {
+        void DbgCmdText(string obj) {
             mCallback.OnOutputString(obj + "\r\n");
         }
 
@@ -213,7 +211,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
         }
 
-        void mDebugEngine_TraceReceived(Cosmos.Compiler.Debug.MsgType arg1, uint arg2) {
+        void DbgCmdTrace(Cosmos.Compiler.Debug.MsgType arg1, uint arg2) {
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint:
                     {

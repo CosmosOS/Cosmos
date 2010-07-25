@@ -14,6 +14,7 @@ namespace Cosmos.Debug.Common.CDebugger
         public Action<Exception> ConnectionLost;
         public Action<MsgType, UInt32> CmdTrace;
         public Action<string> CmdText;
+        public Action CmdReady;
         
         protected MsgType mCurrentMsgType;
 
@@ -58,7 +59,7 @@ namespace Cosmos.Debug.Common.CDebugger
                     Next(2, PacketTextSize);
                     break;
                 case MsgType.Ready:
-                    //Next(2, PacketTextSize);
+                    CmdReady();
                     break;
                 case MsgType.Noop:
                     // MtW: When implementing Serial support for debugging on real hardware, it appears

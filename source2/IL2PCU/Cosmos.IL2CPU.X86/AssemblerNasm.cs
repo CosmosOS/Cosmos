@@ -315,9 +315,8 @@ namespace Cosmos.IL2CPU.X86 {
     public TraceAssemblies TraceAssemblies;
     public DebugMode DebugMode;
 
-    protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets)
-    {
-        // NOTE - These if statemens can be optimized down - but clarity is
+    protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets) {
+        // NOTE - These if statements can be optimized down - but clarity is
         // more importnat the optimizations would not offer much benefit
 
         // Determine if a new DebugStub should be emitted
@@ -325,22 +324,15 @@ namespace Cosmos.IL2CPU.X86 {
         // Skip NOOP's so we dont have breakpoints on them
         //TODO: Each IL op should exist in IL, and descendants in IL.X86.
         // Because of this we have this hack
-        if (aOp.OpCode == ILOpCode.Code.Nop)
-        {
+        if (aOp.OpCode == ILOpCode.Code.Nop) {
             return;
-        }
-        else if (DebugMode == DebugMode.None)
-        {
+        } else if (DebugMode == DebugMode.None) {
             return;
-        }
-        else if (DebugMode == DebugMode.Source)
-        {
+        } else if (DebugMode == DebugMode.Source) {
             // If the current position equals one of the offsets, then we have
             // reached a new atomic C# statement
-            if (aCodeOffsets != null)
-            {
-                if (aCodeOffsets.Contains(aOp.Position) == false)
-                {
+            if (aCodeOffsets != null) {
+                if (aCodeOffsets.Contains(aOp.Position) == false) {
                     return;
                 }
             }
@@ -388,7 +380,6 @@ namespace Cosmos.IL2CPU.X86 {
         // If we made it this far, emit the Tracer
         new CPUx86.Call { DestinationLabel = "DebugStub_TracerEntry" };
     }
-
 
     private int[] xCodeOffsets;
     protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
