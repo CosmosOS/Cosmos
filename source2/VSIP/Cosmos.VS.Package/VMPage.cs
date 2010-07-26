@@ -9,11 +9,9 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Cosmos.Build.Common;
 
-namespace Cosmos.VS.Package
-{
+namespace Cosmos.VS.Package {
 	[Guid(Guids.VMPage)]
-	public partial class VMPage : ConfigurationBase
-	{
+	public partial class VMPage : ConfigurationBase {
 		private SubPropertyPageBase pageSubPage;
 
 		public VMPage() {
@@ -21,8 +19,7 @@ namespace Cosmos.VS.Package
 			BuildPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
         }
 
-		protected override void Dispose(bool disposing)
-		{
+		protected override void Dispose(bool disposing) {
 			if (disposing && (components != null))
 			{
 				components.Dispose();

@@ -41,8 +41,8 @@ namespace Cosmos.VS.Package {
                     mProps.Target = value;
 					IsDirty = true;
 
-					BuildPage.CurrentBuildTarget = value;
-					BuildPage.OnBuildTargetChanged(this, EventArgs.Empty);
+					CurrentBuildTarget = value;
+					OnBuildTargetChanged(this, EventArgs.Empty);
 				}
 			};
 
@@ -73,14 +73,21 @@ namespace Cosmos.VS.Package {
 			base.FillProperties();
 
             mProps.Reset();
+            
             mProps.SetProperty("OutputPath", GetConfigProperty("OutputPath"));
-            mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
-            mProps.SetProperty("Framework", GetConfigProperty("Framework"));
-            mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
-
             textOutputPath.Text = mProps.OutputPath;
+
+            mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
             comboTarget.SelectedItem = EnumValue.Find(comboTarget.Items, mProps.Target);
+            // We need to manually trigger it once, because the indexchanged event compares
+            // it against the source, and they will of course be the same.
+            CurrentBuildTarget = (TargetHost)((EnumValue)comboTarget.SelectedItem).Value;
+            OnBuildTargetChanged(this, EventArgs.Empty);
+
+            mProps.SetProperty("Framework", GetConfigProperty("Framework"));
             comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
+
+            mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
             checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
 		}
 
