@@ -21,6 +21,9 @@ namespace Cosmos.VS.Package {
 			InitializeComponent();
 
 			BuildPage.BuildTargetChanged += new EventHandler(BuildPage_BuildTargetChanged);
+            // Not sure if we need it, but it seems not always called and we have 
+            // force it one time. Maybe it has to do with order of creation etc.
+            FillProperties(); 
 		}
 
 		protected override void Dispose(bool disposing) {
@@ -37,9 +40,9 @@ namespace Cosmos.VS.Package {
         }
 
 		private void ClearSubPage() {
-			foreach (Control control in panelSubPage.Controls) {
-				panelSubPage.Controls.Remove(control);
-				control.Dispose();
+			foreach (Control x in panelSubPage.Controls) {
+				panelSubPage.Controls.Remove(x);
+				x.Dispose();
 			}
 		}
 
@@ -47,7 +50,7 @@ namespace Cosmos.VS.Package {
 			switch (target) {
                 case TargetHost.VMWareWorkstation:
 				case TargetHost.QEMU:
-					if ((pageSubPage is DebugPageSub) == false) {
+					if (!(pageSubPage is DebugPageSub)) {
 						pageSubPage = new DebugPageSub();
 					}
 					break;

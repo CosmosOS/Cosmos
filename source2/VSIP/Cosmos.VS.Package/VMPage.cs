@@ -19,12 +19,11 @@ namespace Cosmos.VS.Package
 		public VMPage() {
 			InitializeComponent();
 			BuildPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
-		}
+            // Not sure if we need it, but it seems not always called and we have 
+            // force it one time. Maybe it has to do with order of creation etc.
+            FillProperties();
+        }
 
-		/// <summary> 
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing && (components != null))
@@ -38,65 +37,63 @@ namespace Cosmos.VS.Package
 		}
 
 		void BuildOptionsPropertyPage_BuildTargetChanged(object sender, EventArgs e)
-		{ this.FillProperties(); }
+		{ FillProperties(); }
 
 		private void ClearSubPage()
 		{
-			foreach (Control control in this.panelSubPage.Controls)
+			foreach (Control control in panelSubPage.Controls)
 			{
-				this.panelSubPage.Controls.Remove(control);
+				panelSubPage.Controls.Remove(control);
 				control.Dispose();
 			}
 		}
 
 		private void SetSubPropertyPage(TargetHost target)
 		{
-			Boolean subpageChanged = false;
+			bool subpageChanged = false;
 
-			switch (target)
-			{
+			switch (target) {
 				case TargetHost.QEMU:
-					if ((this.pageSubPage is VMPageQemu) == false)
-					{
+					if (!(pageSubPage is VMPageQemu)) {
 						subpageChanged = true;
-						this.pageSubPage = new VMPageQemu();
+						pageSubPage = new VMPageQemu();
 					}
 					break;
 				default:
 					subpageChanged = true;
-					this.pageSubPage = null;
+					pageSubPage = null;
 					break;
 			}
 
 			if (subpageChanged == true)
 			{
-				this.panelSubPage.SuspendLayout();
+				panelSubPage.SuspendLayout();
 
-				this.ClearSubPage();
-				if (this.pageSubPage != null)
+				ClearSubPage();
+				if (pageSubPage != null)
 				{
-					this.pageSubPage.SetOwner(this);
-					this.panelSubPage.Controls.Add(pageSubPage);
+					pageSubPage.SetOwner(this);
+					panelSubPage.Controls.Add(pageSubPage);
 
-					this.pageSubPage.Location = new Point(0, 0);
-					this.pageSubPage.Anchor = AnchorStyles.Top;
+					pageSubPage.Location = new Point(0, 0);
+					pageSubPage.Anchor = AnchorStyles.Top;
 
-					this.pageSubPage.Size = new Size(this.ClientSize.Width, this.pageSubPage.Size.Height);
-					this.pageSubPage.Anchor = this.pageSubPage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
+					pageSubPage.Size = new Size(ClientSize.Width, pageSubPage.Size.Height);
+					pageSubPage.Anchor = pageSubPage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
 
-					if (this.pageSubPage.Size.Height <= this.ClientSize.Height)
+					if (pageSubPage.Size.Height <= ClientSize.Height)
 					{
-						this.pageSubPage.Size = new Size(this.pageSubPage.Size.Width, this.ClientSize.Height);
-						this.pageSubPage.Anchor = this.pageSubPage.Anchor | AnchorStyles.Bottom;
+						pageSubPage.Size = new Size(pageSubPage.Size.Width, ClientSize.Height);
+						pageSubPage.Anchor = pageSubPage.Anchor | AnchorStyles.Bottom;
 					}
 
-					this.panelSubPage.Visible = true;
+					panelSubPage.Visible = true;
 				} else
 				{
-					this.panelSubPage.Visible = false;
+					panelSubPage.Visible = false;
 				}
 
-				this.panelSubPage.ResumeLayout();
+				panelSubPage.ResumeLayout();
 			}
 
 		}
@@ -105,10 +102,10 @@ namespace Cosmos.VS.Package
 		{
 			base.FillProperties();
 
-			this.SetSubPropertyPage(BuildPage.CurrentBuildTarget);
+			SetSubPropertyPage(BuildPage.CurrentBuildTarget);
 
-			if (this.pageSubPage != null)
-			{ this.pageSubPage.FillProperties(); }
+			if (pageSubPage != null)
+			{ pageSubPage.FillProperties(); }
 		}
 
 		public override PropertiesBase Properties

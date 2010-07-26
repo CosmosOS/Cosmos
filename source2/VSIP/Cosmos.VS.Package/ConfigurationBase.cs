@@ -10,10 +10,9 @@ using System.Windows.Forms;
 using Cosmos.Build.Common;
 using Microsoft.VisualStudio.Project;
 
-namespace Cosmos.VS.Package
+namespace Cosmos.VS.Package 
 {
-	public partial class ConfigurationBase : CustomPropertyPage
-	{
+	public partial class ConfigurationBase : CustomPropertyPage {
 		protected static int CurrentConfigurationIndex = 0;
 		protected static event EventHandler ConfigurationChanged;
 
@@ -37,14 +36,11 @@ namespace Cosmos.VS.Package
 			ConfigurationBase.ConfigurationChanged -= new EventHandler(ConfigurationBase_ConfigurationChanged);
 		}
 
-		void ConfigurationBase_ConfigurationChanged(object sender, EventArgs e)
-		{
-			if (Object.ReferenceEquals(sender, this) == false)
-			{
+		void ConfigurationBase_ConfigurationChanged(object sender, EventArgs e) {
+			if (!Object.ReferenceEquals(sender, this)) {
 				projCurrentConfig = null;
 
-				if (comboConfiguration.Items.Count > 0)
-				{
+				if (comboConfiguration.Items.Count > 0) {
 					System.Diagnostics.Debug.Print(String.Format("{0}->ConfigurationBase_ConfigurationChanged", GetType().Name));
 					comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex;
 					
@@ -174,13 +170,8 @@ namespace Cosmos.VS.Package
 			}
 		}
 
-		public override String GetConfigProperty(String name)
-		{
-			String value;
-
-			value = CurrentConfiguration.GetConfigurationProperty(name, true);
-
-			return value;
+		public override String GetConfigProperty(String name) {
+			return CurrentConfiguration.GetConfigurationProperty(name, true);
 		}
 
 	}
