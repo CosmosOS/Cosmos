@@ -73,6 +73,15 @@ namespace Cosmos.Debug.GDB {
             SendCmd("symbol-file CosmosKernel.obj");
 
             SendCmd("target remote :8832");
+            //&target remote :8832
+            //&:8832: No connection could be made because the target machine actively refused it.
+            //^error,msg=":8832: No connection could be made because the target machine actively refused it."
+            
+            //&target remote :8832
+            //~Remote debugging using :8832
+            //~[New Thread 1]
+            //~0x000ffff0 in ?? ()
+            //^done
 
             SendCmd("set architecture i386");
             SendCmd("set language asm");

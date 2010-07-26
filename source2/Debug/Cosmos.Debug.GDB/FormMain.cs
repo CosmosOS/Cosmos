@@ -19,12 +19,6 @@ namespace Cosmos.Debug.GDB {
         // watches
         // View stack
 
-        private void FormMain_Shown(object sender, EventArgs e) {
-            if (mitmConnect.Enabled) {
-                Connect(true);
-            }
-        }
-
         private void mitmExit_Click(object sender, EventArgs e) {
             Close();
         }
@@ -70,11 +64,6 @@ namespace Cosmos.Debug.GDB {
             Windows.Show(Windows.mWatchesForm);
         }
 
-        private void FormMain_Load(object sender, EventArgs e) {
-            Windows.mMainForm = this;
-            Settings.Load();
-        }
-
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
             Settings.Save();
         }
@@ -89,6 +78,18 @@ namespace Cosmos.Debug.GDB {
                 Windows.Reshow();
             }
             mLastWindowState = WindowState;
+        }
+
+        private void mitmViewLog_Click(object sender, EventArgs e) {
+            Windows.Show(Windows.mLogForm);
+        }
+
+        private void FormMain_Load(object sender, EventArgs e) {
+            Windows.mMainForm = this;
+            Settings.Load();
+            if (mitmConnect.Enabled) {
+                Connect(true);
+            }
         }
 
     }
