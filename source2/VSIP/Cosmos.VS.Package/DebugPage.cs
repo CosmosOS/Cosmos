@@ -21,9 +21,6 @@ namespace Cosmos.VS.Package {
 			InitializeComponent();
 
 			BuildPage.BuildTargetChanged += new EventHandler(BuildPage_BuildTargetChanged);
-            // Not sure if we need it, but it seems not always called and we have 
-            // force it one time. Maybe it has to do with order of creation etc.
-            FillProperties(); 
 		}
 
 		protected override void Dispose(bool disposing) {
