@@ -74,7 +74,7 @@ namespace Cosmos.Debug.GDB {
             lablCurrentFunction.Text = "";
             lablCurrentFunction.Visible = true;
 
-            var xResult = GDB.SendCmd(("disassemble " + aLabel).Trim());
+            var xResult = GDB.SendCmd(("disassemble " + aLabel).Trim()).Text;
             lboxDisassemble.BeginUpdate();
             try {
                 lboxDisassemble.Items.Clear();

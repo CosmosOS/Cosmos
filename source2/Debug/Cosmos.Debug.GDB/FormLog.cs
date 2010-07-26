@@ -13,8 +13,8 @@ namespace Cosmos.Debug.GDB {
             InitializeComponent();
         }
 
-        public void Log(string aMsg) {
-            lboxDebug.SelectedIndex = lboxDebug.Items.Add(aMsg);
+        public void Log(GDB.Response aResponse) {
+            lboxCmd.SelectedIndex = lboxCmd.Items.Add(aResponse);
             Application.DoEvents();
         }
 
@@ -43,6 +43,21 @@ namespace Cosmos.Debug.GDB {
         private void textSendCmd_KeyPress(object sender, KeyPressEventArgs e) {
             if (e.KeyChar == '\r') {
                 butnSendCmd.PerformClick();
+            }
+        }
+
+        private void lboxCmd_SelectedIndexChanged(object sender, EventArgs e) {
+            var xResponse = (GDB.Response)lboxCmd.SelectedItem;
+            lboxDebug.Items.Clear();
+
+            lboxDebug.Items.Add(xResponse.Command);
+            if (xResponse.Error) {
+                lboxDebug.Items.Add("ERROR: " + xResponse.ErrorMsg);
+            }
+            lboxDebug.Items.Add("");
+
+            foreach (var x in xResponse.Text) {
+                lboxDebug.Items.Add(x);
             }
         }
 

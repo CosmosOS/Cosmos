@@ -7,16 +7,33 @@ using System.Text;
 
 namespace Cosmos.Debug.GDB {
     public class GDB {
+        public class Response {
+            public string Command = "";
+            public bool Error = false;
+            public string ErrorMsg = "";
+            public List<string> Text = new List<string>();
+
+            public override string ToString() {
+                return Command;
+            }
+        }
+
         static protected System.Diagnostics.Process mGDBProcess;
         static protected System.IO.StreamReader mGDB;
 
         static public string Unescape(string aInput) {
             // Remove surrounding ", /n, then unescape and trim
-            return Regex.Unescape(aInput.Substring(1, aInput.Length - 2).Replace('\n', ' ').Trim());
+            string xResult = aInput;
+            if (xResult.StartsWith("\"")) {
+                xResult = xResult.Substring(1, aInput.Length - 2);
+                xResult = xResult.Replace('\n', ' ');
+                xResult = Regex.Unescape(xResult);
+            }
+            return xResult.Trim();
         }
 
-        static public  List<string> GetResponse() {
-            var xResult = new List<string>();
+        static public Response GetResponse() {
+            var xResult = new Response();
 
             //TODO: Cant find a better way than peek... 
             while (!mGDBProcess.HasExited) {
@@ -31,24 +48,36 @@ namespace Cosmos.Debug.GDB {
                     // & echo of a command
                     // ~ text response
                     // ^ done
-                    xLine = xLine.Remove(0, 1);
-                    if ((xType == '~') || (xType == '&')) {
-                        xLine = Unescape(xLine);
-                    }
-                    Windows.mLogForm.Log(xType + xLine);
-                    if (xType == '~') {
-                        xResult.Add(xLine);
+
+                    //&target remote :8832
+                    //&:8832: No connection could be made because the target machine actively refused it.
+                    //^error,msg=":8832: No connection could be made because the target machine actively refused it."
+
+                    //&target remote :8832
+                    //~Remote debugging using :8832
+                    //~[New Thread 1]
+                    //~0x000ffff0 in ?? ()
+                    //^done
+
+                    xLine = Unescape(xLine.Substring(1));
+                    if (xType == '&') {
+                    } else if (xType == '^') {
+                        xResult.Error = xLine != "done";
+                    } else if (xType == '~') {
+                        xResult.Text.Add(Unescape(xLine));
                     }
                 }
             }
 
-            Windows.mLogForm.Log("-----");
             return xResult;
         }
 
-        static public List<string> SendCmd(string aCmd) {
+        static public Response SendCmd(string aCmd) {
             mGDBProcess.StandardInput.WriteLine(aCmd);
-            return GetResponse();
+            var xResult = GetResponse();
+            xResult.Command = aCmd;
+            Windows.mLogForm.Log(xResult);
+            return xResult;
         }
 
         //TODO: Make path dynamic
@@ -58,7 +87,6 @@ namespace Cosmos.Debug.GDB {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
             xStartInfo.Arguments = @"--interpreter=mi2";
-            //TODO: Make path dynamic
             xStartInfo.WorkingDirectory = mCosmosPath + @"source2\Users\Kudzu\Breakpoints\bin\debug";
             xStartInfo.CreateNoWindow = true;
             xStartInfo.UseShellExecute = false;
@@ -73,15 +101,6 @@ namespace Cosmos.Debug.GDB {
             SendCmd("symbol-file CosmosKernel.obj");
 
             SendCmd("target remote :8832");
-            //&target remote :8832
-            //&:8832: No connection could be made because the target machine actively refused it.
-            //^error,msg=":8832: No connection could be made because the target machine actively refused it."
-            
-            //&target remote :8832
-            //~Remote debugging using :8832
-            //~[New Thread 1]
-            //~0x000ffff0 in ?? ()
-            //^done
 
             SendCmd("set architecture i386");
             SendCmd("set language asm");

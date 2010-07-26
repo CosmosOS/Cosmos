@@ -129,9 +129,9 @@
             // 
             this.lboxDebug.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lboxDebug.FormattingEnabled = true;
-            this.lboxDebug.Location = new System.Drawing.Point(118, 0);
+            this.lboxDebug.Location = new System.Drawing.Point(188, 0);
             this.lboxDebug.Name = "lboxDebug";
-            this.lboxDebug.Size = new System.Drawing.Size(371, 316);
+            this.lboxDebug.Size = new System.Drawing.Size(301, 316);
             this.lboxDebug.TabIndex = 9;
             // 
             // lboxCmd
@@ -140,8 +140,9 @@
             this.lboxCmd.FormattingEnabled = true;
             this.lboxCmd.Location = new System.Drawing.Point(0, 0);
             this.lboxCmd.Name = "lboxCmd";
-            this.lboxCmd.Size = new System.Drawing.Size(118, 316);
+            this.lboxCmd.Size = new System.Drawing.Size(188, 316);
             this.lboxCmd.TabIndex = 7;
+            this.lboxCmd.SelectedIndexChanged += new System.EventHandler(this.lboxCmd_SelectedIndexChanged);
             // 
             // FormLog
             // 
