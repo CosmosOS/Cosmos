@@ -8,65 +8,47 @@ using System.Text;
 using System.Windows.Forms;
 using Cosmos.Build.Common;
 
-namespace Cosmos.VS.Package
-{
-	public partial class DebugPageSub : SubPropertyPageBase 
-	{
-		private DebugQemuProperties projProperties;
-
-		public DebugPageSub()
-		{
+namespace Cosmos.VS.Package {
+	public partial class DebugPageSub : SubPropertyPageBase {
+		public DebugPageSub() {
 			InitializeComponent();
 
-			this.comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode)));
-            comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies)));
-
-			this.projProperties = new DebugQemuProperties();
-
-			this.CreateUIMonitorEvents();
-		}
-
-		private void CreateUIMonitorEvents()
-		{
-			this.comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-            {
-                var value = (DebugMode)((EnumValue)this.comboDebugMode.SelectedItem).Value;
-                if (value != this.PageProperties.DebugMode)
-                {
-                    this.PageProperties.DebugMode = value;
-                    this.IsDirty = true;
+            comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode), false));
+            comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+                var x = (DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
+                if (x != mProps.DebugMode) {
+                    mProps.DebugMode = x;
+                    IsDirty = true;
                 }
             };
-            this.comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-            {
-                var value = (TraceAssemblies)((EnumValue)this.comboTraceMode.SelectedItem).Value;
-                if (value != this.PageProperties.TraceAssemblies)
-                {
-                    this.PageProperties.TraceAssemblies = value;
-                    this.IsDirty = true;
+
+            comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
+            comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+                var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
+                if (x != mProps.TraceAssemblies) {
+                    mProps.TraceAssemblies = x;
+                    IsDirty = true;
                 }
             };
-            this.checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
-                Boolean value = this.checkEnableGDB.Checked;
-                if (value != this.PageProperties.EnableGDB) {
-                    this.PageProperties.EnableGDB = value;
-                    this.IsDirty = true;
+
+            checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+                bool x = checkEnableGDB.Checked;
+                if (x != mProps.EnableGDB) {
+                    mProps.EnableGDB = x;
+                    IsDirty = true;
                 }
             };
         }
 
-		public override PropertiesBase Properties
-		{ get { return this.projProperties; } }
+        protected DebugProperties mProps = new DebugProperties();
+        public override PropertiesBase Properties {
+            get { return mProps; } 
+        }
 
-		protected DebugQemuProperties PageProperties
-		{ get { return (DebugQemuProperties)this.Properties; } }
-
-		public override void FillProperties()
-		{
+		public override void FillProperties() {
 			base.FillProperties();
-			this.PageProperties.Reset();
-			this.PageProperties.SetProperty("QemuCommunication", this.GetConfigProperty("QemuCommunication"));
-			this.checkEnableGDB.Checked = this.PageProperties.EnableGDB;
+			mProps.Reset();
+			checkEnableGDB.Checked = mProps.EnableGDB;
         }
 
 	}

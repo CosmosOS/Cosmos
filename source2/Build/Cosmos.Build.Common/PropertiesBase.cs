@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Build.Common
-{
-	public abstract class PropertiesBase
-	{
-
+namespace Cosmos.Build.Common {
+	public abstract class PropertiesBase {
 		private Dictionary<String, String> propertiesTable;
 
-		public PropertiesBase()
-		{
+		public PropertiesBase() {
 			propertiesTable = new Dictionary<String, String>();
 		}
 
-		public void Reset()
-		{
+		public void Reset() {
 			propertiesTable.Clear();
 		}
 
@@ -94,7 +89,7 @@ namespace Cosmos.Build.Common
 						if (UInt64.TryParse(stringValue, out newValue) == true)
 						{ value = (T)((Object)newValue); }
 
-					}else{
+					} else {
 							throw new ArgumentException("Unsupported value type.", "T");
 					}
 				}

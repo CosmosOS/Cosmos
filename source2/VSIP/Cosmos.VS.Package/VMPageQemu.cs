@@ -19,8 +19,8 @@ namespace Cosmos.VS.Package
 		{
 			InitializeComponent();
 
-			this.comboNetworkCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuNetworkCard)));
-			this.comboAudioCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuAudioCard)));
+			this.comboNetworkCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuNetworkCard), true));
+			this.comboAudioCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuAudioCard), true));
 
 			this.projProperties = new VMQemuProperties();
 

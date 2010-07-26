@@ -40,23 +40,30 @@ namespace Cosmos.Build.Common {
 			return null;
 		}
 
-		public static EnumValue[] GetEnumValues(Type enumType)
-		{
-			if (enumType.IsEnum == false)
-			{ throw new Exception("Invalid type, only enum types allowed."); }
+		public static EnumValue[] GetEnumValues(Type enumType, bool aSort) {
+			if (!enumType.IsEnum) { 
+                throw new Exception("Invalid type, only enum types allowed."); 
+            }
 
-			List<EnumValue> list = new List<EnumValue>();
+			var xList = new List<EnumValue>();
+            IEnumerable<object> xQry;
+            if (aSort) {
+                xQry = from x in Enum.GetValues(enumType).OfType<object>()
+                       orderby x.ToString()
+                       select x;
+            } else {
+                xQry = from x in Enum.GetValues(enumType).OfType<object>()
+                       select x;
+            }
+            foreach (var x in xQry) {
+                xList.Add(new EnumValue((Enum)x)); 
+            }
 
-			foreach (Object value in (from item in Enum.GetValues(enumType).OfType<object>()
-                                      orderby item.ToString()
-                                      select item))
-			{ list.Add(new EnumValue((Enum)value)); }
-
-			return list.ToArray();
+            return xList.ToArray();
 		}
 
-		public EnumValue()
-		{ }
+		public EnumValue() {
+        }
 
 		public EnumValue(Enum value)
 		{ this.Value = value; }

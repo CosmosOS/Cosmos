@@ -23,7 +23,7 @@ namespace Cosmos.VS.Package
 		public ConfigurationBase()
 		{
 			InitializeComponent();
-			this.comboArchitecture.Items.AddRange(EnumValue.GetEnumValues(typeof(Architecture)));
+			this.comboArchitecture.Items.AddRange(EnumValue.GetEnumValues(typeof(Architecture), false));
 
 			this.comboConfiguration.SelectedIndexChanged += new EventHandler(comboConfiguration_SelectedIndexChanged);
 			ConfigurationBase.ConfigurationChanged += new EventHandler(ConfigurationBase_ConfigurationChanged);

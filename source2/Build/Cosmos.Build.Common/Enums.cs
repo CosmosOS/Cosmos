@@ -6,8 +6,7 @@ using System.Reflection;
 
 namespace Cosmos.Build.Common {
 
-	public enum TargetHost
-	{
+	public enum TargetHost {
 	  [Description("VMWare Workstation")]
 	  VMWareWorkstation,
 	  [Description("VMWare Server")]
@@ -19,35 +18,29 @@ namespace Cosmos.Build.Common {
 	  ISO
 	}
 
-	public enum Architecture
-	{
-	  x86
-	  //x64
-	}
+	public enum Architecture { 
+        x86 //, x64 
+    }
 
-	public enum Framework
-	{
+	public enum Framework {
 		[Description("Microsoft .NET")]
 		MicrosoftNET,
 		Mono
 	}
 
-	public enum VMQemuNetworkCard
-	{
+	public enum VMQemuNetworkCard {
 		None,
 		[Description("Realtek RTL8139")]
 		RealtekRTL8139,
 	}
 
-	public enum VMQemuAudioCard
-	{
+	public enum VMQemuAudioCard {
 		None,
 		[Description("PC Speaker")]
 		PCSpeaker
 	}
 
-	public enum DebugQemuCommunication
-	{
+	public enum DebugQemuCommunication {
 		None,
 		[Description("TCP: Cosmos client, QEMU server")] 
 		TCPListener,
@@ -59,52 +52,44 @@ namespace Cosmos.Build.Common {
 		NamedPipeClient
 	}
 
-    public enum LogSeverityEnum : byte
-    {
+    public enum LogSeverityEnum : byte {
         Warning = 0, Error = 1, Informational = 2, Performance = 3
     }
     public enum TraceAssemblies { All, Cosmos, User };
     public enum DebugMode { None, IL, Source }
 
-	public class DescriptionAttribute : Attribute
-	{
-		public static String GetDescription(object value)
-		{
+	public class DescriptionAttribute : Attribute {
+		public static String GetDescription(object value) {
 			Type valueType = value.GetType();
 			MemberInfo[] valueMemberInfo;
 			Object[] valueMemberAttribute;
 
-			if (valueType.IsEnum == true)
-				{
-					valueMemberInfo = valueType.GetMember(value.ToString());
+			if (valueType.IsEnum) {
+				valueMemberInfo = valueType.GetMember(value.ToString());
 
-					if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0))
+				if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0)) {
+					valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute),false);
+					if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
 					{
-						valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute),false);
-						if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
-						{
-							return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-						}
+						return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
 					}
 				}
+			}
 
-				valueMemberAttribute = valueType.GetCustomAttributes(typeof(DescriptionAttribute),false);
-				if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
-				{
-					return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-				}
+			valueMemberAttribute = valueType.GetCustomAttributes(typeof(DescriptionAttribute),false);
+			if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0)) {
+				return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
+			}
 
-				return value.ToString();
+			return value.ToString();
 		}
 
 		private string emDescription;
-
-		public DescriptionAttribute(String description)
-		{
-			this.emDescription = description;
+        public DescriptionAttribute(String description) {
+			emDescription = description;
 		}
 
 		public String Description
-		{ get { return this.emDescription; } }
+		{ get { return emDescription; } }
 	}
 }

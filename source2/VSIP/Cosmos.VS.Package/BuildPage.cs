@@ -14,7 +14,7 @@ using Microsoft.VisualStudio;
 namespace Cosmos.VS.Package {
 	[Guid(Guids.BuildPage)]
 	public partial class BuildPage : ConfigurationBase {
-		public static TargetHost CurrentBuildTarget = (TargetHost)(-1);
+        public static TargetHost CurrentBuildTarget = TargetHost.QEMU;
 		public static event EventHandler BuildTargetChanged;
 
 		protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
@@ -23,38 +23,22 @@ namespace Cosmos.VS.Package {
             }
 		}
 
-		private BuildProperties projProperties;
-
-		public BuildPage()
-		{
+		public BuildPage() {
 			InitializeComponent();
 
-			comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost)));
-			comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework)));
-
-			projProperties = new BuildProperties();
-
-			CreateUIMonitorEvents();
-		}
-
-		private void CreateUIMonitorEvents()
-		{
-			this.textOutputPath.TextChanged += delegate(Object sender, EventArgs e)
-			{
-				String value = this.textOutputPath.Text;
-				if (String.Equals(value, this.PageProperties.OutputPath, StringComparison.InvariantCultureIgnoreCase) == false)
-				{
-					PageProperties.OutputPath = this.textOutputPath.Text;
+			textOutputPath.TextChanged += delegate(Object sender, EventArgs e) {
+				string value = textOutputPath.Text;
+                if (!string.Equals(value, mProps.OutputPath, StringComparison.InvariantCultureIgnoreCase)) {
+                    mProps.OutputPath = textOutputPath.Text;
 					IsDirty = true;
 				}
 			};
 
-			this.comboTarget.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-			{
-				TargetHost value = (TargetHost)((EnumValue)this.comboTarget.SelectedItem).Value;
-				if( value != this.PageProperties.Target)
-				{
-					PageProperties.Target = value;
+            comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost), true));
+            comboTarget.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+				var value = (TargetHost)((EnumValue)comboTarget.SelectedItem).Value;
+                if (value != mProps.Target) {
+                    mProps.Target = value;
 					IsDirty = true;
 
 					BuildPage.CurrentBuildTarget = value;
@@ -62,67 +46,59 @@ namespace Cosmos.VS.Package {
 				}
 			};
 
-			this.comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-			{
-				Framework value = (Framework)((EnumValue)this.comboFramework.SelectedItem).Value;
-				if (value != this.PageProperties.Framework)
-				{
-					PageProperties.Framework = value;
+            comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
+            comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+				var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
+                if (value != mProps.Framework) {
+                    mProps.Framework = value;
 					IsDirty = true;
 				}
 			};
 
-			this.checkUseInternalAssembler.CheckedChanged += delegate(Object sender, EventArgs e)
-			{
-				Boolean value = this.checkUseInternalAssembler.Checked;
-				if (value != this.PageProperties.UseInternalAssembler)
-				{
-					PageProperties.UseInternalAssembler = value;
+            checkUseInternalAssembler.CheckedChanged += delegate(Object sender, EventArgs e) {
+				bool value = checkUseInternalAssembler.Checked;
+                if (value != mProps.UseInternalAssembler) {
+                    mProps.UseInternalAssembler = value;
 					IsDirty = true;
 				}
 			};
 		}
 
-		public override PropertiesBase Properties
-		{ get { return this.projProperties; } }
+		protected BuildProperties mProps = new BuildProperties();
+		public override PropertiesBase Properties { 
+            get { return mProps; } 
+        }
 
-		protected BuildProperties PageProperties
-		{ get { return (BuildProperties)this.Properties; } }
-
-		protected override void FillProperties()
-		{
+		protected override void FillProperties() {
 			base.FillProperties();
 
-			PageProperties.Reset();
-            PageProperties.SetProperty("OutputPath", this.GetConfigProperty("OutputPath"));
-			PageProperties.SetProperty("BuildTarget", this.GetConfigProperty("BuildTarget"));
-			PageProperties.SetProperty("Framework", this.GetConfigProperty("Framework"));
-			PageProperties.SetProperty("UseInternalAssembler", this.GetConfigProperty("UseInternalAssembler"));
+            mProps.Reset();
+            mProps.SetProperty("OutputPath", GetConfigProperty("OutputPath"));
+            mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
+            mProps.SetProperty("Framework", GetConfigProperty("Framework"));
+            mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
 
-			textOutputPath.Text = this.PageProperties.OutputPath;
-			comboTarget.SelectedItem = EnumValue.Find(this.comboTarget.Items, this.PageProperties.Target);
-			comboFramework.SelectedItem = EnumValue.Find(this.comboFramework.Items, this.PageProperties.Framework);
-			checkUseInternalAssembler.Checked = this.PageProperties.UseInternalAssembler;
+            textOutputPath.Text = mProps.OutputPath;
+            comboTarget.SelectedItem = EnumValue.Find(comboTarget.Items, mProps.Target);
+            comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
+            checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
 		}
 
-		private void OutputBrowse_Click(object sender, EventArgs e)
-		{
-			String folderPath = String.Empty;
+		private void OutputBrowse_Click(object sender, EventArgs e) {
+			string folderPath = String.Empty;
 			var dialog = new FolderBrowserDialog();
 			dialog.ShowNewFolderButton = true;
 
 			folderPath = textOutputPath.Text;
 			if ((String.IsNullOrEmpty(folderPath) == false) && (folderPath.IndexOfAny(System.IO.Path.GetInvalidPathChars()) == -1)) {
 				if (System.IO.Path.IsPathRooted(folderPath) == false) { 
-                    folderPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Project.FullName), folderPath); 
+                    folderPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Project.FullName), folderPath); 
                 }
 
-				while ((System.IO.Directory.Exists(folderPath) == false) && (String.IsNullOrEmpty(folderPath) == false))
-				{
-					Int32 index = -1;
+				while ((System.IO.Directory.Exists(folderPath) == false) && (String.IsNullOrEmpty(folderPath) == false)) {
+					int index = -1;
 					index = folderPath.IndexOfAny(new Char[] { System.IO.Path.PathSeparator, System.IO.Path.AltDirectorySeparatorChar });
-					if (index > -1)
-					{
+					if (index > -1) {
 						folderPath = folderPath.Substring(0, index - 1);
 					} else { 
                         folderPath = String.Empty; 
