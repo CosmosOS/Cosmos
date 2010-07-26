@@ -48,7 +48,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (aGDB) {
                 mProcessStartInfo.Arguments
                     += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
-                    + "-S"; // Pause on startup, wait for GDB to connect and control
+                    + " -S"; // Pause on startup, wait for GDB to connect and control
             }
             //#if VM_QEMU
             //    #if DEBUG_CONNECTOR_TCP_SERVER
@@ -112,7 +112,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
-            System.Diagnostics.Debug.WriteLine("Test message");
+            mCallback = aCallback; 
             mDebugInfo = new NameValueCollection();
             NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
 
@@ -176,6 +176,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             );
 
             System.Threading.Thread.Sleep(250);
+            System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
             mProcess = Process.Start(mProcessStartInfo);
 
             mProcess.EnableRaisingEvents = true;
@@ -183,6 +184,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
             // if so, why not hook before start? 
+            // MtW: we do this for the potential situation where it might exit before the Exited event is hooked. Iirc i had this situation before..
             System.Threading.Thread.Sleep(250);
             if (mProcess.HasExited) {
                 Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
@@ -191,7 +193,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 throw new Exception("Error while starting application");
             }
 
-            mCallback = aCallback;
+            
             mEngine = aEngine;
             mThread = new AD7Thread(aEngine, this);
             mCallback.OnThreadStart(mThread);
@@ -369,6 +371,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         void mProcess_Exited(object sender, EventArgs e) {
             Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
             Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+            Trace.WriteLine(String.Format("Process Exit Code: {0}", mProcess.ExitCode));
             //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
             mCallback.OnProcessExit((uint)mProcess.ExitCode);
