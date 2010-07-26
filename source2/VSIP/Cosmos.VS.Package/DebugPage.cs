@@ -44,38 +44,43 @@ namespace Cosmos.VS.Package {
 		}
 
 		private void SetSubPropertyPage(TargetHost target) {
+            bool xPageChange = false;
 			switch (target) {
                 case TargetHost.VMWareWorkstation:
 				case TargetHost.QEMU:
 					if (!(pageSubPage is DebugPageSub)) {
 						pageSubPage = new DebugPageSub();
+                        xPageChange = true;
 					}
 					break;
 				default:
-					pageSubPage = null;
+                    xPageChange = true;
+                    pageSubPage = null;
 					break;
 			}
 
-			panelSubPage.SuspendLayout();
+            if (xPageChange) {
+                panelSubPage.SuspendLayout();
 
-			ClearSubPage();
-            panelSubPage.Visible = pageSubPage != null;
-            if (panelSubPage.Visible) {
-				pageSubPage.SetOwner(this);
-				panelSubPage.Controls.Add(pageSubPage);
+                ClearSubPage();
+                panelSubPage.Visible = pageSubPage != null;
+                if (panelSubPage.Visible) {
+                    pageSubPage.SetOwner(this);
+                    panelSubPage.Controls.Add(pageSubPage);
 
-				pageSubPage.Location = new Point(0, 0);
-				pageSubPage.Anchor = AnchorStyles.Top;
+                    pageSubPage.Location = new Point(0, 0);
+                    pageSubPage.Anchor = AnchorStyles.Top;
 
-				pageSubPage.Size = new Size(ClientSize.Width, pageSubPage.Size.Height);
-				pageSubPage.Anchor = pageSubPage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
+                    pageSubPage.Size = new Size(ClientSize.Width, pageSubPage.Size.Height);
+                    pageSubPage.Anchor = pageSubPage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
 
-				if (pageSubPage.Size.Height <= ClientSize.Height) {
-					pageSubPage.Size = new Size(pageSubPage.Size.Width, ClientSize.Height);
-					pageSubPage.Anchor = pageSubPage.Anchor | AnchorStyles.Bottom;
-				}
-			}
-			panelSubPage.ResumeLayout();
+                    if (pageSubPage.Size.Height <= ClientSize.Height) {
+                        pageSubPage.Size = new Size(pageSubPage.Size.Width, ClientSize.Height);
+                        pageSubPage.Anchor = pageSubPage.Anchor | AnchorStyles.Bottom;
+                    }
+                }
+                panelSubPage.ResumeLayout();
+            }
 		}
 
 		protected override void FillProperties() {
