@@ -13,7 +13,7 @@ namespace Cosmos.VS.Package
 {
 	public partial class VMPageQemu : SubPropertyPageBase
 	{
-		private Cosmos.Build.Common.VMQemuProperties projProperties;
+		private Cosmos.Build.Common.VMProperties projProperties;
 
 		public VMPageQemu()
 		{
@@ -22,7 +22,7 @@ namespace Cosmos.VS.Package
 			this.comboNetworkCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuNetworkCard), true));
 			this.comboAudioCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuAudioCard), true));
 
-			this.projProperties = new VMQemuProperties();
+			this.projProperties = new VMProperties();
 
 			this.CreateUIMonitorEvents();
 		}
@@ -63,8 +63,8 @@ namespace Cosmos.VS.Package
 		public override PropertiesBase Properties
 		{ get { return this.projProperties; } }
 
-		protected VMQemuProperties PageProperties
-		{ get { return (VMQemuProperties)this.projProperties; } }
+		protected VMProperties PageProperties
+		{ get { return (VMProperties)this.projProperties; } }
 
 		public override void FillProperties()
 		{

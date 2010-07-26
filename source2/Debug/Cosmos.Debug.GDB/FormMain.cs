@@ -21,7 +21,7 @@ namespace Cosmos.Debug.GDB {
 
         private void FormMain_Shown(object sender, EventArgs e) {
             if (mitmConnect.Enabled) {
-                mitmConnect.PerformClick();
+                Connect(true);
             }
         }
 
@@ -39,14 +39,18 @@ namespace Cosmos.Debug.GDB {
             Update();
         }
 
-        private void mitmConnect_Click(object sender, EventArgs e) {
+        protected void Connect(bool aRetry) {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
             Windows.RestorePositions();
-            GDB.Connect();
+            GDB.Connect(aRetry);
 
             Windows.UpdateAllWindows();
+        }
+
+        private void mitmConnect_Click(object sender, EventArgs e) {
+            Connect(false);
         }
 
         private void mitmRefresh_Click(object sender, EventArgs e) {

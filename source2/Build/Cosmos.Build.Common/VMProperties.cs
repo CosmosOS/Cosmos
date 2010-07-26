@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Build.Common
 {
-	public class VMQemuProperties : PropertiesBase
+	public class VMProperties : PropertiesBase
 	{
 
 		public VMQemuNetworkCard NetworkCard
