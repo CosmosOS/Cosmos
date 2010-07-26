@@ -5,11 +5,11 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
     static class Program {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main() {
+            var xCLine = System.Environment.GetCommandLineArgs();
+            Settings.Filename = xCLine[1];
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormMain());

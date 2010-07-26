@@ -157,14 +157,13 @@ namespace Cosmos.VS.Package
 			{ BuildPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), TargetHost.QEMU); }
 		}
 
-		public override void SetConfigProperty(String name, String value)
-		{
+		public override void SetConfigProperty(String name, String value) {
 			CCITracing.TraceCall();
-			if (value == null)
-			{ value = String.Empty; }
+			if (value == null) { 
+                value = String.Empty; 
+            }
 
-			if (ProjectMgr != null)
-			{
+			if (ProjectMgr != null) {
 				CurrentConfiguration.SetConfigurationProperty(name, value);
 				ProjectMgr.SetProjectFileDirty(true);
 			}

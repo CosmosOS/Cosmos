@@ -48,8 +48,14 @@ namespace Cosmos.VS.Package {
 		public override void FillProperties() {
 			base.FillProperties();
 			mProps.Reset();
-			checkEnableGDB.Checked = mProps.EnableGDB;
+
+            mProps.SetProperty("EnableGDB", GetConfigProperty("EnableGDB"));
+            checkEnableGDB.Checked = mProps.EnableGDB;
+
+            mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
             comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
+
+            mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
             comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
         }
 

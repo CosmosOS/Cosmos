@@ -34,7 +34,7 @@ namespace Cosmos.VS.Package {
 			_project = null;
             _site = null; 
             _dirty = false;
-			this.IgnoreDirty = false;
+			IgnoreDirty = false;
             _title = string.Empty; 
             _helpKeyword = string.Empty;
 
@@ -135,46 +135,38 @@ namespace Cosmos.VS.Package {
 				System.Diagnostics.Debug.Print(String.Format("{0}->FillConfigs", this.GetType().Name));
             }
 	 
-	        public void ApplyChanges()
-	        {
+	        public void ApplyChanges() {
 				System.Diagnostics.Debug.Print(String.Format("{0}->ApplyChanges", this.GetType().Name));
 
-				if (this.Properties != null)
-				{
-					Dictionary<String, String> properties = this.Properties.GetProperties();
+				if (this.Properties != null) {
+					var properties = Properties.GetProperties();
 
-					foreach (KeyValuePair<String, String> pair in properties)
-					{ this.SetConfigProperty(pair.Key, pair.Value); }
+					foreach (KeyValuePair<String, String> pair in properties) { 
+                        SetConfigProperty(pair.Key, pair.Value); 
+                    }
 
 					this.IsDirty = false;
 				}
 			}
 
-			public virtual void SetConfigProperty(String name, String value)
-			{
+			public virtual void SetConfigProperty(String name, String value) {
 				CCITracing.TraceCall();
-				if (value == null)
-				{ value = String.Empty; }
+				if (value == null) { 
+                    value = String.Empty; 
+                }
 
-				if (this.ProjectMgr != null)
-				{
+				if (this.ProjectMgr != null) {
 					foreach (ProjectConfig config in this.ProjectConfigs)
 					{ config.SetConfigurationProperty(name, value); }
 					this.ProjectMgr.SetProjectFileDirty(true);
 				}
 			}
 
-			public virtual String GetConfigProperty(String name)
-			{
-				String value;
-
-				value = this.ProjectConfigs[0].GetConfigurationProperty(name, true);
-
-				return value;
+			public virtual String GetConfigProperty(String name) {
+                return ProjectConfigs[0].GetConfigurationProperty(name, true);
 			}
 	 
-	        protected virtual void Initialize() 
-	        {
+	        protected virtual void Initialize() {
 				System.Diagnostics.Debug.Print(String.Format("{0}->Initialize", this.GetType().Name));
 			} 
 	 
@@ -186,7 +178,7 @@ namespace Cosmos.VS.Package {
 	            IsDirty = true; 
 	        }
 
-        protected string GetComboValue(ComboBox comboBox) 
+            protected string GetComboValue(ComboBox comboBox) 
 	        { 
 	            string selectedItem = comboBox.SelectedItem as string; 
 	            if (selectedItem != null) 
@@ -225,8 +217,7 @@ namespace Cosmos.VS.Package {
 	            _site = pPageSite;
 	        } 
 	 
-	        void IPropertyPage.Activate(IntPtr hWndParent, RECT[] pRect, int bModal) 
-	        {
+	        void IPropertyPage.Activate(IntPtr hWndParent, RECT[] pRect, int bModal) {
 				System.Diagnostics.Debug.Print(String.Format("{0}->Activate", this.GetType().Name));
 
 	            CreateControl(); 
@@ -267,8 +258,7 @@ namespace Cosmos.VS.Package {
 	            pPageInfo[0] = info; 
 	        } 
 	 
-	        void IPropertyPage.SetObjects(uint count, object[] punk)
-			{
+	        void IPropertyPage.SetObjects(uint count, object[] punk) {
 				System.Diagnostics.Debug.Print(String.Format("{0}->SetObjects", this.GetType().Name));
 
 	            if (count > 0) { 
@@ -283,7 +273,7 @@ namespace Cosmos.VS.Package {
 	                    } 
 	                    _projectConfigs = (ProjectConfig[])configs.ToArray(typeof(ProjectConfig)); 
 
-                  // For ProjectNodes we will get one of these
+                    // For ProjectNodes we will get one of these
 	                } else if (punk[0] is NodeProperties) { 
 	                    if (_projectMgr == null) { 
 	                        _projectMgr = (punk[0] as NodeProperties).Node.ProjectMgr; 

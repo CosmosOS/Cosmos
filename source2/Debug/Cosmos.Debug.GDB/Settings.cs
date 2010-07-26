@@ -7,20 +7,22 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
     public class Settings {
-        //TODO: Not supposed to be in app dir, but unless we release this as a standalone project
-        //it doesnt matter. If we do that we have to create project types anyways.
-        static protected string ConfigPathname = Application.ExecutablePath + ".Settings";
+        static protected string mFilename;
+        static public string Filename {
+            get { return mFilename; }
+            set { mFilename = value; }
+        }
 
         static public SettingsDS DS = new SettingsDS();
 
         static public void Save() {
             Windows.SavePositions();
-            DS.WriteXml(ConfigPathname, System.Data.XmlWriteMode.IgnoreSchema);
+            DS.WriteXml(Filename, System.Data.XmlWriteMode.IgnoreSchema);
         }
 
         static public void Load() {
-            if (File.Exists(ConfigPathname)) {
-                DS.ReadXml(ConfigPathname, System.Data.XmlReadMode.IgnoreSchema);
+            if (File.Exists(Filename)) {
+                DS.ReadXml(Filename, System.Data.XmlReadMode.IgnoreSchema);
 
                 Windows.mBreakpointsForm.LoadSession();
             }

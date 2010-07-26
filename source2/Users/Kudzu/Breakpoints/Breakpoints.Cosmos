@@ -26,9 +26,10 @@
     <QemuAudioCard>
     </QemuAudioCard>
     <QemuNetworkTAP>True</QemuNetworkTAP>
-    <QemuEnableGDB>True</QemuEnableGDB>
-    <QemuCommunication>TCPListener</QemuCommunication>
     <DebugMode>Source</DebugMode>
+    <EnableGDB>True</EnableGDB>
+    <TraceMode>
+    </TraceMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>false</DebugSymbols>

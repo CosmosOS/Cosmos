@@ -74,6 +74,7 @@ namespace Cosmos.VS.Package {
 
             mProps.Reset();
             
+            //TODO: Why are we copying these one by one instead of automatic?
             mProps.SetProperty("OutputPath", GetConfigProperty("OutputPath"));
             textOutputPath.Text = mProps.OutputPath;
 
