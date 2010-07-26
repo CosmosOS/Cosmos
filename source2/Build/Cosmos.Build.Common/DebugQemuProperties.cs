@@ -11,7 +11,7 @@ namespace Cosmos.Build.Common {
         }
 
         public DebugMode DebugMode {
-            get { return GetProperty("DebugMode", DebugMode.None); }
+            get { return GetProperty("DebugMode", DebugMode.Source); }
             set { SetProperty("DebugMode", value); }
         }
 

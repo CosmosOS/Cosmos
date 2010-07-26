@@ -14,26 +14,26 @@ namespace Cosmos.VS.Package
 {
 	public partial class ConfigurationBase : CustomPropertyPage
 	{
-		protected static Int32 CurrentConfigurationIndex = 0;
+		protected static int CurrentConfigurationIndex = 0;
 		protected static event EventHandler ConfigurationChanged;
 
-		protected static void OnConfigurationChanged(Object sender, EventArgs e)
-		{ ConfigurationBase.ConfigurationChanged(sender, e); }
+		protected static void OnConfigurationChanged(Object sender, EventArgs e) {
+            ConfigurationBase.ConfigurationChanged(sender, e); 
+        }
 	
-		public ConfigurationBase()
-		{
+		public ConfigurationBase() {
 			InitializeComponent();
-			this.comboArchitecture.Items.AddRange(EnumValue.GetEnumValues(typeof(Architecture), false));
-
-			this.comboConfiguration.SelectedIndexChanged += new EventHandler(comboConfiguration_SelectedIndexChanged);
-			ConfigurationBase.ConfigurationChanged += new EventHandler(ConfigurationBase_ConfigurationChanged);
+			
+            comboArchitecture.Items.AddRange(EnumValue.GetEnumValues(typeof(Architecture), false));
+            comboConfiguration.SelectedIndexChanged += new EventHandler(comboConfiguration_SelectedIndexChanged);
+			
+            ConfigurationBase.ConfigurationChanged += new EventHandler(ConfigurationBase_ConfigurationChanged);
 		}
 
-		protected override void Dispose(bool disposing)
-		{
+		protected override void Dispose(bool disposing) {
 			base.Dispose(disposing);
 
-			this.comboConfiguration.SelectedIndexChanged -= new EventHandler(comboConfiguration_SelectedIndexChanged);
+			comboConfiguration.SelectedIndexChanged -= new EventHandler(comboConfiguration_SelectedIndexChanged);
 			ConfigurationBase.ConfigurationChanged -= new EventHandler(ConfigurationBase_ConfigurationChanged);
 		}
 
@@ -41,16 +41,16 @@ namespace Cosmos.VS.Package
 		{
 			if (Object.ReferenceEquals(sender, this) == false)
 			{
-				this.projCurrentConfig = null;
+				projCurrentConfig = null;
 
 				if (comboConfiguration.Items.Count > 0)
 				{
-					System.Diagnostics.Debug.Print(String.Format("{0}->ConfigurationBase_ConfigurationChanged", this.GetType().Name));
+					System.Diagnostics.Debug.Print(String.Format("{0}->ConfigurationBase_ConfigurationChanged", GetType().Name));
 					comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex;
 					
-					this.IgnoreDirty = true;
-					this.FillProperties();
-					this.IgnoreDirty = false;
+					IgnoreDirty = true;
+					FillProperties();
+					IgnoreDirty = false;
 				}
 			}
 		}
@@ -61,7 +61,7 @@ namespace Cosmos.VS.Package
 			{
 				if (comboConfiguration.SelectedIndex != ConfigurationBase.CurrentConfigurationIndex)
 				{
-					System.Diagnostics.Debug.Print(String.Format("{0}->comboConfiguration_SelectedIndexChanged", this.GetType().Name));
+					System.Diagnostics.Debug.Print(String.Format("{0}->comboConfiguration_SelectedIndexChanged", GetType().Name));
 
 					Boolean hasUnsavedChanges = false;
 					CustomPropertyPage[] propPages = CustomPropertyPage.Pages;
@@ -101,15 +101,15 @@ namespace Cosmos.VS.Package
 
 					if (hasUnsavedChanges == false)
 					{
-						this.projCurrentConfig = null;
+						projCurrentConfig = null;
 
 						ConfigurationBase.CurrentConfigurationIndex = comboConfiguration.SelectedIndex;
-						BuildPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU);
+						BuildPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), TargetHost.QEMU);
 						ConfigurationBase.OnConfigurationChanged(this, EventArgs.Empty);
 
-						this.IgnoreDirty = true;
-						this.FillProperties();
-						this.IgnoreDirty = false;
+						IgnoreDirty = true;
+						FillProperties();
+						IgnoreDirty = false;
 					}
 				}
 			}
@@ -124,22 +124,22 @@ namespace Cosmos.VS.Package
 				if (index > 0)
 				{
 					index--;
-					return this.ProjectConfigs[index];
+					return ProjectConfigs[index];
 				} else {
-					if( this.projCurrentConfig == null )
+					if( projCurrentConfig == null )
 					{
-						String activeConfig = this.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName;
-						foreach (ProjectConfig config in this.ProjectConfigs)
+						String activeConfig = Project.ConfigurationManager.ActiveConfiguration.ConfigurationName;
+						foreach (ProjectConfig config in ProjectConfigs)
 						{
 							if (String.Equals(config.ConfigName, activeConfig, StringComparison.InvariantCulture) == true)
 							{
-								this.projCurrentConfig = config;
+								projCurrentConfig = config;
 								break;
 							}
 						}
 					}
 
-					return this.projCurrentConfig;
+					return projCurrentConfig;
 				}
 			}
 		}
@@ -148,17 +148,17 @@ namespace Cosmos.VS.Package
 		{
 			base.FillConfigurations();
 
-			this.comboConfiguration.Items.Add(String.Format("Active ({0})", base.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName));
+			comboConfiguration.Items.Add(String.Format("Active ({0})", base.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName));
 			foreach( ProjectConfig config in base.ProjectConfigs )
-			{ this.comboConfiguration.Items.Add(config.ConfigName); }
+			{ comboConfiguration.Items.Add(config.ConfigName); }
 
-			if (this.comboConfiguration.SelectedIndex != ConfigurationBase.CurrentConfigurationIndex)
-			{ this.comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex; }
+			if (comboConfiguration.SelectedIndex != ConfigurationBase.CurrentConfigurationIndex)
+			{ comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex; }
 
-			this.comboArchitecture.SelectedIndex = 0;
+			comboArchitecture.SelectedIndex = 0;
 
 			if ((Int32)BuildPage.CurrentBuildTarget < 0)
-			{ BuildPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU); }
+			{ BuildPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), TargetHost.QEMU); }
 		}
 
 		public override void SetConfigProperty(String name, String value)
@@ -167,10 +167,10 @@ namespace Cosmos.VS.Package
 			if (value == null)
 			{ value = String.Empty; }
 
-			if (this.ProjectMgr != null)
+			if (ProjectMgr != null)
 			{
-				this.CurrentConfiguration.SetConfigurationProperty(name, value);
-				this.ProjectMgr.SetProjectFileDirty(true);
+				CurrentConfiguration.SetConfigurationProperty(name, value);
+				ProjectMgr.SetProjectFileDirty(true);
 			}
 		}
 
@@ -178,7 +178,7 @@ namespace Cosmos.VS.Package
 		{
 			String value;
 
-			value = this.CurrentConfiguration.GetConfigurationProperty(name, true);
+			value = CurrentConfiguration.GetConfigurationProperty(name, true);
 
 			return value;
 		}

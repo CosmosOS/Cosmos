@@ -49,6 +49,8 @@ namespace Cosmos.VS.Package {
 			base.FillProperties();
 			mProps.Reset();
 			checkEnableGDB.Checked = mProps.EnableGDB;
+            comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
+            comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
         }
 
 	}
