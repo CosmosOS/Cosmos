@@ -7,6 +7,7 @@ namespace ReflectionToEcmaCil
 {
     public class ILStreamPositionReader
     {
+
         /// <summary>
         /// .Key contains stream index, .Value contains instruction (logical) index
         /// </summary>

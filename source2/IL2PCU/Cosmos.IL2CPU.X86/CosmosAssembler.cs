@@ -95,7 +95,7 @@ namespace Cosmos.IL2CPU.X86
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x80 };
                 new Out { DestinationReg = Registers.AL }; // Enable DLAB (set baud rate divisor)
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0xC };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x1 };
                 new Out { DestinationReg = Registers.AL }; // Set divisor (lo byte)
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x0 };

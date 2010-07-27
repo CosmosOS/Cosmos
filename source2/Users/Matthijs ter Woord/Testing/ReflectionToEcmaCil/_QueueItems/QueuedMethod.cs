@@ -53,7 +53,7 @@ namespace ReflectionToEcmaCil
         }
         public bool Equals(QueuedMethod qm)
         {
-            if (!qm.type.Equals(type) || !qm.method.Equals(method) || qm.Args.Length != Args.Length || qm.returnType.Equals(returnType))
+            if (!qm.type.Equals(type) || !qm.method.Equals(method) || qm.Args.Length != Args.Length || !qm.returnType.Equals(returnType))
                 return false;
             for (int i = Args.Length - 1; i >= 0; i--)
             {
