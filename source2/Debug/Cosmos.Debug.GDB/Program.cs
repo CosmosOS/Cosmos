@@ -7,8 +7,13 @@ namespace Cosmos.Debug.GDB {
     static class Program {
         [STAThread]
         static void Main() {
-            var xCLine = System.Environment.GetCommandLineArgs();
-            Settings.Filename = xCLine[1];
+            var xArgs = System.Environment.GetCommandLineArgs();
+            if (xArgs.Length > 1) {
+                Settings.Filename = xArgs[1];
+            }
+            if (xArgs.Length > 2) {
+                Settings.AutoConnect = string.Compare(xArgs[2], "/Connect", true) == 0;
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

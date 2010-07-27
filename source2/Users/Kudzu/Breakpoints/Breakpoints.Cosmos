@@ -57,6 +57,11 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Breakpoints.cgdb">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
   </Target>

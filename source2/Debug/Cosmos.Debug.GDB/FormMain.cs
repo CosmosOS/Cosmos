@@ -86,8 +86,10 @@ namespace Cosmos.Debug.GDB {
 
         private void FormMain_Load(object sender, EventArgs e) {
             Windows.mMainForm = this;
-            Settings.Load();
-            if (mitmConnect.Enabled) {
+            if (Settings.Filename != "") {
+                Settings.Load();
+            }
+            if (Settings.AutoConnect) {
                 Connect(true);
             }
         }

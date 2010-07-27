@@ -7,10 +7,16 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
     public class Settings {
-        static protected string mFilename;
+        static protected string mFilename = "";
         static public string Filename {
             get { return mFilename; }
             set { mFilename = value; }
+        }
+
+        static protected bool mAutoConnect = false;
+        static public bool AutoConnect {
+            get { return mAutoConnect; }
+            set { mAutoConnect = value; }
         }
 
         static public SettingsDS DS = new SettingsDS();
