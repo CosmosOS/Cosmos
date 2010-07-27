@@ -26,6 +26,7 @@
             this.lablNum = new System.Windows.Forms.Label();
             this.cboxEnabled = new System.Windows.Forms.CheckBox();
             this.lablName = new System.Windows.Forms.Label();
+            this.lablDelete = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lablNum
@@ -40,7 +41,7 @@
             // cboxEnabled
             // 
             this.cboxEnabled.AutoSize = true;
-            this.cboxEnabled.Location = new System.Drawing.Point(3, 3);
+            this.cboxEnabled.Location = new System.Drawing.Point(3, 4);
             this.cboxEnabled.Name = "cboxEnabled";
             this.cboxEnabled.Size = new System.Drawing.Size(15, 14);
             this.cboxEnabled.TabIndex = 1;
@@ -52,14 +53,30 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.lablName.Location = new System.Drawing.Point(58, 4);
             this.lablName.Name = "lablName";
-            this.lablName.Size = new System.Drawing.Size(184, 13);
+            this.lablName.Size = new System.Drawing.Size(175, 13);
             this.lablName.TabIndex = 2;
             this.lablName.Text = "Breakpoint Name";
+            // 
+            // lablDelete
+            // 
+            this.lablDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lablDelete.AutoSize = true;
+            this.lablDelete.BackColor = System.Drawing.SystemColors.Control;
+            this.lablDelete.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lablDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lablDelete.ForeColor = System.Drawing.Color.Red;
+            this.lablDelete.Location = new System.Drawing.Point(239, 5);
+            this.lablDelete.Name = "lablDelete";
+            this.lablDelete.Size = new System.Drawing.Size(17, 15);
+            this.lablDelete.TabIndex = 3;
+            this.lablDelete.Text = "X";
+            this.lablDelete.Click += new System.EventHandler(this.lablDelete_Click);
             // 
             // BreakpointUC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lablDelete);
             this.Controls.Add(this.lablName);
             this.Controls.Add(this.cboxEnabled);
             this.Controls.Add(this.lablNum);
@@ -75,6 +92,7 @@
         public System.Windows.Forms.Label lablNum;
         public System.Windows.Forms.CheckBox cboxEnabled;
         public System.Windows.Forms.Label lablName;
+        public System.Windows.Forms.Label lablDelete;
 
     }
 }

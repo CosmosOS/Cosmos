@@ -37,11 +37,12 @@ namespace Cosmos.Debug.GDB {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
+            GDB.Connect(aRetry);
             // Must be after Connect for now as it depends on Widnows being created
+            // Also sets saved breakpoints, so GDB needs to be connected
             if (Settings.Filename != "") {
                 Settings.Load();
             }
-            GDB.Connect(aRetry);
 
             Windows.UpdateAllWindows();
         }
