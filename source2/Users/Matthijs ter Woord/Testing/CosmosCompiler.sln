@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCecilToEcmaCil1", "MonoCecilToEcmaCil1\MonoCecilToEcmaCil1.csproj", "{719B5067-62CD-43A9-924D-BAD46C4AD192}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCecilToEcmaCil1.Tests", "MonoCecilToEcmaCil1.Tests\MonoCecilToEcmaCil1.Tests.csproj", "{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}"
@@ -77,11 +77,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{719B5067-62CD-43A9-924D-BAD46C4AD192}.Release|Any CPU.Build.0 = Release|Any CPU
 		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{027876DC-D1CA-4DBF-8DE5-E175BB69F3E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FD4B2006-B518-4884-B196-C2EF2B83FD6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
