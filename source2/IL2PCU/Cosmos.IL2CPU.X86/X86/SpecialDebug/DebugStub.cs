@@ -102,8 +102,8 @@ namespace Cosmos.IL2CPU.X86 {
             Call("DebugStub_SendTrace");
 
             // Wait for a command
-            DX = mComStatusAddr;
             Label = "DebugStub_WaitCmd";
+            DX = mComStatusAddr;
             AL = Port[DX];
             AL.Test(0x01);
             JumpIf(Flags.Zero, "DebugStub_WaitCmd");
@@ -325,7 +325,8 @@ namespace Cosmos.IL2CPU.X86 {
             JumpIf(Flags.Equal, "DebugStub_AfterReady");
             Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again
             AL = (int)MsgType.Ready; // Send the actual Ready signal
-            Call("WriteALToComPort"); 
+            Call("WriteALToComPort");
+            Jump("DebugStub_WaitCmd");
             Label = "DebugStub_AfterReady";
             
             // If BP is disabled (0), skip BP checking code.

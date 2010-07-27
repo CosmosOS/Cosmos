@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.User.Kernel {
-    public class Program {
-	    public static void Init() {
-		    Main();
-	    }
+namespace Cosmos.User.Kernel
+{
+    public class Program
+    {
+        public static void Init()
+        {
+            Main();
+        }
 
         // If VSIP / Debugger has changed
         //  -Close VS
@@ -18,12 +21,15 @@ namespace Cosmos.User.Kernel {
         //  -Run it
         //
 
-        static void Main() {
+        static void Main()
+        {
             // boot the Cosmos kernel:
             Cosmos.Sys.Boot xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
-            
+
+            Console.WriteLine("Test");
             Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back.");
+            Console.WriteLine("Test");
             while (true)
             {
                 Console.Write("Input: ");

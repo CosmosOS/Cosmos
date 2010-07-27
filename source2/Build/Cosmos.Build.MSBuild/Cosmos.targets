@@ -2,10 +2,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
 
   <PropertyGroup>
-    <PrepareForRunDependsOn>$(PrepareForRunDependsOn);CosmosBuild</PrepareForRunDependsOn>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <CosmosDir Condition="$(CosmosDir) == ''">$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
@@ -14,13 +10,17 @@
     <AssemblyFile>$(FullAssemblyName).exe</AssemblyFile>
     <ISOFile>$(FullAssemblyName).iso</ISOFile>
     
-    <!-- make sure vs doesn't recompile if not needed -->
+    <!-- make sure vs doesn't recompile if not needed 
     <UseHostCompilerIfAvailable>false</UseHostCompilerIfAvailable>
-
+-->
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
   </PropertyGroup>
   
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition="$(Language) == 'CSharp'"/>
+  
+  <PropertyGroup>
+    <CompileDependsOn>$(CompileDependsOn);CosmosBuild</CompileDependsOn>
+  </PropertyGroup>
 
   <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
@@ -36,9 +36,10 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosDir)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
 -->
 
-  <Target Name="CosmosBuild" 
-          Inputs="$(IntermediateOutputPath)$(TargetName).exe"
-          Outputs="$(TargetPath)$(TargetName).iso">
+  <Target Name="CosmosBuild" >
+          <!--Inputs="$(AssemblyFile)"
+          Outputs="$(ISOFile)">-->
+          <Message Importance="high" Text="Test"/>
     <CreateProperty Value="true" Condition="$(BinFormat) == 'elf'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
     </CreateProperty>
