@@ -89,9 +89,6 @@ namespace Cosmos.Debug.GDB {
 
         private void FormMain_Load(object sender, EventArgs e) {
             Windows.mMainForm = this;
-            if (Settings.AutoConnect) {
-                Connect(30);
-            }
         }
 
         private void mitmViewBreakpoints_Click(object sender, EventArgs e) {
@@ -104,6 +101,19 @@ namespace Cosmos.Debug.GDB {
 
         private void mitmRegisters_Click(object sender, EventArgs e) {
             Windows.Show(Windows.mRegistersForm);
+        }
+
+        private void FormMain_Shown(object sender, EventArgs e) {
+            // Dont put this in load. Load happens in main call from Main.cs and on exceptions just
+            // goes out, no message. 
+            // Also we want to show other forms after main form, not before.
+            // We also only want to run this once, not on each possible show.
+            if (mitmConnect.Enabled) {
+                if (Settings.AutoConnect) {
+                    Connect(30);
+                }
+            }
+
         }
 
     }

@@ -40,6 +40,13 @@ namespace Cosmos.Debug.GDB {
                 var xSplit = xResult[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 if (xSplit[0] == "Breakpoint") {
                     lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(s, int.Parse(xSplit[1])));
+
+                    var xUC = new BreakpointUC();
+                    xUC.Dock = DockStyle.Top;
+                    xUC.cboxEnabled.Checked = true;
+                    xUC.lablNum.Text = xSplit[1];
+                    xUC.lablName.Text = s;
+                    panl.Controls.Add(xUC);
                     return true;
                 }
                 MessageBox.Show(xResult[0]);

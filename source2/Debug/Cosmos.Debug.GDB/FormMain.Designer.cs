@@ -38,10 +38,10 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmViewBreakpoints = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmViewLog = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmViewDisassembly = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmViewLog = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmRegisters = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -160,44 +160,44 @@
             // mitmViewBreakpoints
             // 
             this.mitmViewBreakpoints.Name = "mitmViewBreakpoints";
-            this.mitmViewBreakpoints.Size = new System.Drawing.Size(152, 22);
+            this.mitmViewBreakpoints.Size = new System.Drawing.Size(139, 22);
             this.mitmViewBreakpoints.Text = "&Breakpoints";
             this.mitmViewBreakpoints.Click += new System.EventHandler(this.mitmViewBreakpoints_Click);
             // 
             // mitmMainViewCallStack
             // 
             this.mitmMainViewCallStack.Name = "mitmMainViewCallStack";
-            this.mitmMainViewCallStack.Size = new System.Drawing.Size(152, 22);
+            this.mitmMainViewCallStack.Size = new System.Drawing.Size(139, 22);
             this.mitmMainViewCallStack.Text = "&CallStack";
             this.mitmMainViewCallStack.Click += new System.EventHandler(this.mitmMainViewCallStack_Click);
-            // 
-            // mitmViewLog
-            // 
-            this.mitmViewLog.Name = "mitmViewLog";
-            this.mitmViewLog.Size = new System.Drawing.Size(152, 22);
-            this.mitmViewLog.Text = "&Log";
-            this.mitmViewLog.Click += new System.EventHandler(this.mitmViewLog_Click);
-            // 
-            // mitmMainViewWatches
-            // 
-            this.mitmMainViewWatches.Name = "mitmMainViewWatches";
-            this.mitmMainViewWatches.Size = new System.Drawing.Size(152, 22);
-            this.mitmMainViewWatches.Text = "&Watches";
-            this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
             // 
             // mitmViewDisassembly
             // 
             this.mitmViewDisassembly.Name = "mitmViewDisassembly";
-            this.mitmViewDisassembly.Size = new System.Drawing.Size(152, 22);
+            this.mitmViewDisassembly.Size = new System.Drawing.Size(139, 22);
             this.mitmViewDisassembly.Text = "&Disassembly";
             this.mitmViewDisassembly.Click += new System.EventHandler(this.mitmViewDisassembly_Click);
+            // 
+            // mitmViewLog
+            // 
+            this.mitmViewLog.Name = "mitmViewLog";
+            this.mitmViewLog.Size = new System.Drawing.Size(139, 22);
+            this.mitmViewLog.Text = "&Log";
+            this.mitmViewLog.Click += new System.EventHandler(this.mitmViewLog_Click);
             // 
             // mitmRegisters
             // 
             this.mitmRegisters.Name = "mitmRegisters";
-            this.mitmRegisters.Size = new System.Drawing.Size(152, 22);
+            this.mitmRegisters.Size = new System.Drawing.Size(139, 22);
             this.mitmRegisters.Text = "&Registers";
             this.mitmRegisters.Click += new System.EventHandler(this.mitmRegisters_Click);
+            // 
+            // mitmMainViewWatches
+            // 
+            this.mitmMainViewWatches.Name = "mitmMainViewWatches";
+            this.mitmMainViewWatches.Size = new System.Drawing.Size(139, 22);
+            this.mitmMainViewWatches.Text = "&Watches";
+            this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
             // 
             // FormMain
             // 
@@ -213,6 +213,7 @@
             this.Text = "Cosmos GDB Debugger";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.FormMain_Load);
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Resize += new System.EventHandler(this.FormMain_Resize);
             this.menuStrip1.ResumeLayout(false);

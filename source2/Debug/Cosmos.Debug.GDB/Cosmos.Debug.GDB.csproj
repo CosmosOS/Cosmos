@@ -72,6 +72,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BreakpointUC.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BreakpointUC.Designer.cs">
+      <DependentUpon>BreakpointUC.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormBreakpoints.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -131,6 +137,9 @@
     <Compile Include="Windows.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="BreakpointUC.resx">
+      <DependentUpon>BreakpointUC.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormBreakpoints.resx">
       <DependentUpon>FormBreakpoints.cs</DependentUpon>
     </EmbeddedResource>
