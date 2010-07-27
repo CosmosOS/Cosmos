@@ -5,6 +5,7 @@ using System.Text;
 using EcmaCil;
 using System.Xml;
 using System.Diagnostics;
+using System.IO;
 
 namespace TestApp
 {
@@ -12,17 +13,23 @@ namespace TestApp
     {
         public static void Main(string[] args)
         {
-            try
+            using (var xReader = new ReflectionToEcmaCil.Reader())
             {
-                using (var xReader = new ReflectionToEcmaCil.Reader())
+                try
                 {
+                    xReader.EnableLogging(Path.ChangeExtension(typeof(SimpleMethodsTest.Program).Assembly.Location, "html"));
                     var xResult = xReader.Execute(typeof(SimpleMethodsTest.Program).Assembly.Location);
-                    //xReader.
+                    using (var xXmlOut = XmlWriter.Create(Path.ChangeExtension(typeof(SimpleMethodsTest.Program).Assembly.Location, "out")))
+                    {
+                        Dump.DumpTypes(xResult, xXmlOut);
+                        xXmlOut.Flush();
+                    }
                 }
-            }
-            catch (Exception E)
-            {
-                Console.WriteLine("Error: " + E.ToString());
+                catch (Exception E)
+                {
+                    Console.WriteLine("Error: " + E.ToString());
+                    xReader.WriteScanMap();
+                }
             }
             //using (var xReader = new MonoCecilToEcmaCil1.ReaderWithPlugSupport())
             //{

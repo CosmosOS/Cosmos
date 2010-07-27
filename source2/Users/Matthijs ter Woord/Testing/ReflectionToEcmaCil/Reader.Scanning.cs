@@ -231,5 +231,32 @@ namespace ReflectionToEcmaCil
                 //}
             }
         }
+
+        private void ScanArrayType(QueuedArrayType aArrayType, EcmaCil.ArrayTypeMeta aArrayMeta)
+        {
+            aArrayMeta.Dimensions = aArrayType.ArrayType.GetArrayRank();
+            // todo: fix?
+            //            foreach (ArrayDimension xDimension in aType.ArrayType.Dimensions)
+            //{
+            //    if (xDimension.LowerBound != 0 || xDimension.UpperBound != 0)
+            //    {
+            //        throw new Exception("Arrays with limited dimensions not supported");
+            //    }
+            //}
+            if (aArrayType.ArrayType.GetArrayRank() != 1)
+            {
+                throw new Exception("Multidimensional arrays not yet supported!");
+            }
+
+#if DEBUG
+            var xSB = new StringBuilder();
+            xSB.Append(aArrayMeta.ElementType.ToString());
+            xSB.Append("[");
+            xSB.Append(new String(',', aArrayMeta.Dimensions - 1));
+            xSB.Append("]");
+            aArrayMeta.Data[EcmaCil.DataIds.DebugMetaId] = xSB.ToString();
+#endif
+
+        }
     }
 }

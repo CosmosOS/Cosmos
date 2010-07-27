@@ -78,16 +78,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CecilExtensions.cs" />
+    <None Include="CecilExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reader.cs" />
-    <Compile Include="Reader.MonoHelpers.cs" />
-    <Compile Include="Reader.ScanLog.cs" />
-    <Compile Include="ReaderWithPlugSupport.cs" />
-    <Compile Include="_QueueItems\QueuedPointerType.cs" />
-    <Compile Include="_QueueItems\QueuedArrayType.cs" />
-    <Compile Include="_QueueItems\QueuedType.cs" />
-    <Compile Include="_QueueItems\QueuedMethod.cs" />
+    <None Include="Reader.cs" />
+    <None Include="Reader.MonoHelpers.cs" />
+    <None Include="Reader.ScanLog.cs" />
+    <None Include="ReaderWithPlugSupport.cs" />
+    <None Include="_QueueItems\QueuedPointerType.cs" />
+    <None Include="_QueueItems\QueuedArrayType.cs" />
+    <None Include="_QueueItems\QueuedType.cs" />
+    <None Include="_QueueItems\QueuedMethod.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">

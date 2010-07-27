@@ -61,12 +61,12 @@ namespace ReflectionToEcmaCil
                     ScanMethod(xMethod, mMethods[xMethod]);
                     continue;
                 }
-                //if (xItem is QueuedArrayType)
-                //{
-                //    var xType = (QueuedArrayType)xItem;
-                //    ScanArrayType(xType, mArrayTypes[xType]);
-                //    continue;
-                //}
+                if (xItem is QueuedArrayType)
+                {
+                    var xType = (QueuedArrayType)xItem;
+                    ScanArrayType(xType, mArrayTypes[xType]);
+                    continue;
+                }
                 //if (xItem is QueuedPointerType)
                 //{
                 //    var xType = (QueuedPointerType)xItem;
