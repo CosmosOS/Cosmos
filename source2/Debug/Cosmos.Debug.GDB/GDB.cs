@@ -83,7 +83,7 @@ namespace Cosmos.Debug.GDB {
         //TODO: Make path dynamic
         static protected string mCosmosPath = @"m:\source\Cosmos\";
 
-        static public void Connect(bool aRetry) {
+        static public void Connect(int aRetry) {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
             xStartInfo.Arguments = @"--interpreter=mi2";
@@ -100,14 +100,24 @@ namespace Cosmos.Debug.GDB {
             GetResponse();
             SendCmd("symbol-file CosmosKernel.obj");
 
-            SendCmd("target remote :8832");
+            bool xConnected = false;
+            while (aRetry > 0) {
+                var x = SendCmd("target remote :8832");
+                xConnected = !x.Error;
+                if (xConnected) {
+                    break;
+                }
+                aRetry--;
+            }
 
-            SendCmd("set architecture i386");
-            SendCmd("set language asm");
-            SendCmd("set disassembly-flavor intel");
-            SendCmd("break Kernel_Start");
-            SendCmd("continue");
-            SendCmd("delete 1");
+            if (xConnected) {
+                SendCmd("set architecture i386");
+                SendCmd("set language asm");
+                SendCmd("set disassembly-flavor intel");
+                SendCmd("break Kernel_Start");
+                SendCmd("continue");
+                SendCmd("delete 1");
+            }
         }
 
     }

@@ -33,7 +33,7 @@ namespace Cosmos.Debug.GDB {
             Update();
         }
 
-        protected void Connect(bool aRetry) {
+        protected void Connect(int aRetry) {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
@@ -44,7 +44,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmConnect_Click(object sender, EventArgs e) {
-            Connect(false);
+            Connect(1);
         }
 
         private void mitmRefresh_Click(object sender, EventArgs e) {
@@ -90,7 +90,7 @@ namespace Cosmos.Debug.GDB {
                 Settings.Load();
             }
             if (Settings.AutoConnect) {
-                Connect(true);
+                Connect(30);
             }
         }
 
