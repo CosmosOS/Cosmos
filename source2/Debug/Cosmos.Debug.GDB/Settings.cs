@@ -30,6 +30,7 @@ namespace Cosmos.Debug.GDB {
             if (File.Exists(Filename)) {
                 DS.ReadXml(Filename, System.Data.XmlReadMode.IgnoreSchema);
 
+                Windows.RestorePositions();
                 Windows.mBreakpointsForm.LoadSession();
             }
         }

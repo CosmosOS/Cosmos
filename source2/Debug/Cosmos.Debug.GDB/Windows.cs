@@ -58,6 +58,10 @@ namespace Cosmos.Debug.GDB {
                 }
                 // On load the often end up behind other apps, so we do this to force them up on first show
                 if (!x.IsVisibleNull()) {
+                    // Technically we should do this if any size exists, generally
+                    // they should be all present or all missing. so we just use
+                    // this one attribute for now.
+                    aForm.StartPosition = FormStartPosition.Manual;
                     xShowForm = x.Visible;
                 }
             }

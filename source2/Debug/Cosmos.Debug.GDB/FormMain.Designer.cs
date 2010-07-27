@@ -36,9 +36,12 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.continueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmViewBreakpoints = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmViewLog = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmViewDisassembly = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmRegisters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -47,7 +50,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(160, 30);
+            this.panel1.Size = new System.Drawing.Size(273, 30);
             this.panel1.TabIndex = 3;
             // 
             // menuStrip1
@@ -58,7 +61,7 @@
             this.viewToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(160, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(273, 24);
             this.menuStrip1.TabIndex = 5;
             this.menuStrip1.Text = "E&xecute";
             // 
@@ -144,43 +147,68 @@
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mitmViewBreakpoints,
             this.mitmMainViewCallStack,
-            this.mitmMainViewWatches,
-            this.mitmViewLog});
+            this.mitmViewDisassembly,
+            this.mitmViewLog,
+            this.mitmRegisters,
+            this.mitmMainViewWatches});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "&View";
             // 
+            // mitmViewBreakpoints
+            // 
+            this.mitmViewBreakpoints.Name = "mitmViewBreakpoints";
+            this.mitmViewBreakpoints.Size = new System.Drawing.Size(152, 22);
+            this.mitmViewBreakpoints.Text = "&Breakpoints";
+            this.mitmViewBreakpoints.Click += new System.EventHandler(this.mitmViewBreakpoints_Click);
+            // 
             // mitmMainViewCallStack
             // 
             this.mitmMainViewCallStack.Name = "mitmMainViewCallStack";
-            this.mitmMainViewCallStack.Size = new System.Drawing.Size(122, 22);
+            this.mitmMainViewCallStack.Size = new System.Drawing.Size(152, 22);
             this.mitmMainViewCallStack.Text = "&CallStack";
             this.mitmMainViewCallStack.Click += new System.EventHandler(this.mitmMainViewCallStack_Click);
-            // 
-            // mitmMainViewWatches
-            // 
-            this.mitmMainViewWatches.Name = "mitmMainViewWatches";
-            this.mitmMainViewWatches.Size = new System.Drawing.Size(122, 22);
-            this.mitmMainViewWatches.Text = "&Watches";
-            this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
             // 
             // mitmViewLog
             // 
             this.mitmViewLog.Name = "mitmViewLog";
-            this.mitmViewLog.Size = new System.Drawing.Size(122, 22);
+            this.mitmViewLog.Size = new System.Drawing.Size(152, 22);
             this.mitmViewLog.Text = "&Log";
             this.mitmViewLog.Click += new System.EventHandler(this.mitmViewLog_Click);
+            // 
+            // mitmMainViewWatches
+            // 
+            this.mitmMainViewWatches.Name = "mitmMainViewWatches";
+            this.mitmMainViewWatches.Size = new System.Drawing.Size(152, 22);
+            this.mitmMainViewWatches.Text = "&Watches";
+            this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
+            // 
+            // mitmViewDisassembly
+            // 
+            this.mitmViewDisassembly.Name = "mitmViewDisassembly";
+            this.mitmViewDisassembly.Size = new System.Drawing.Size(152, 22);
+            this.mitmViewDisassembly.Text = "&Disassembly";
+            this.mitmViewDisassembly.Click += new System.EventHandler(this.mitmViewDisassembly_Click);
+            // 
+            // mitmRegisters
+            // 
+            this.mitmRegisters.Name = "mitmRegisters";
+            this.mitmRegisters.Size = new System.Drawing.Size(152, 22);
+            this.mitmRegisters.Text = "&Registers";
+            this.mitmRegisters.Click += new System.EventHandler(this.mitmRegisters_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(160, 54);
+            this.ClientSize = new System.Drawing.Size(273, 54);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "FormMain";
             this.Text = "Cosmos GDB Debugger";
             this.TopMost = true;
@@ -212,6 +240,9 @@
         private System.Windows.Forms.ToolStripMenuItem mitmMainViewCallStack;
         private System.Windows.Forms.ToolStripMenuItem mitmMainViewWatches;
         private System.Windows.Forms.ToolStripMenuItem mitmViewLog;
+        private System.Windows.Forms.ToolStripMenuItem mitmViewBreakpoints;
+        private System.Windows.Forms.ToolStripMenuItem mitmViewDisassembly;
+        private System.Windows.Forms.ToolStripMenuItem mitmRegisters;
     }
 }
 

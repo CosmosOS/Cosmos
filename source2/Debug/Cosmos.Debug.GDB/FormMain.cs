@@ -37,7 +37,10 @@ namespace Cosmos.Debug.GDB {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
-            Windows.RestorePositions();
+            // Must be after Connect for now as it depends on Widnows being created
+            if (Settings.Filename != "") {
+                Settings.Load();
+            }
             GDB.Connect(aRetry);
 
             Windows.UpdateAllWindows();
@@ -71,7 +74,7 @@ namespace Cosmos.Debug.GDB {
         protected FormWindowState mLastWindowState = FormWindowState.Normal;
         private void FormMain_Resize(object sender, EventArgs e) {
             if (WindowState == FormWindowState.Minimized) {
-                // Window is begin minimized
+                // Window is being minimized
                 Windows.Hide();
             } else if ((mLastWindowState == FormWindowState.Minimized) && (WindowState != FormWindowState.Minimized)) {
                 // Window is being restored
@@ -86,12 +89,21 @@ namespace Cosmos.Debug.GDB {
 
         private void FormMain_Load(object sender, EventArgs e) {
             Windows.mMainForm = this;
-            if (Settings.Filename != "") {
-                Settings.Load();
-            }
             if (Settings.AutoConnect) {
                 Connect(30);
             }
+        }
+
+        private void mitmViewBreakpoints_Click(object sender, EventArgs e) {
+            Windows.Show(Windows.mBreakpointsForm);
+        }
+
+        private void mitmViewDisassembly_Click(object sender, EventArgs e) {
+            Windows.Show(Windows.mDisassemblyForm);
+        }
+
+        private void mitmRegisters_Click(object sender, EventArgs e) {
+            Windows.Show(Windows.mRegistersForm);
         }
 
     }
