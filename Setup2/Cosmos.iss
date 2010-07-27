@@ -110,6 +110,7 @@ Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion un
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\Qemu\*; DestDir: {app}\Build\Tools\Qemu; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
 Source: .\Build\Tools\Cygwin\*; DestDir: {app}\Build\Tools\cygwin; Flags: ignoreversion uninsremovereadonly overwritereadonly
+Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ;Source: .\Build\Tools\Cosmos.Hardware\*; DestDir: {app}\Build\Tools\Cosmsos.Hardware; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
 ;Source: .\Build\Tools\Cosmos.Hardware.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.Hardware.Plugs; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
 ;Source: .\Build\Tools\Cosmos.Kernel.Plugs\*; DestDir: {app}\Build\Tools\Cosmsos.Kernel.Plugs; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly

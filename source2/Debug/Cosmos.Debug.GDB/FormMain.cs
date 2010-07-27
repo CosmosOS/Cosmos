@@ -26,11 +26,13 @@ namespace Cosmos.Debug.GDB {
         private void mitmStepInto_Click(object sender, EventArgs e) {
             GDB.SendCmd("stepi");
             Update();
+            Windows.UpdateAllWindows();
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
             GDB.SendCmd("nexti");
             Update();
+            Windows.UpdateAllWindows();
         }
 
         protected void Connect(int aRetry) {
@@ -69,6 +71,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
+            Windows.SavePositions();
             Settings.Save();
         }
 
@@ -115,6 +118,22 @@ namespace Cosmos.Debug.GDB {
                 }
             }
 
+        }
+
+        private void mitmWindowsToForeground_Click(object sender, EventArgs e)
+        {
+            foreach (var xWindow in Windows.mForms)
+            {
+                if (xWindow == this)
+                {
+                    continue;
+                }
+                if (xWindow.Visible)
+                {
+                    xWindow.Activate();
+                }
+            }
+            this.Activate();
         }
 
     }

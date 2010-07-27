@@ -42,6 +42,8 @@
             this.mitmViewLog = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmRegisters = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+            this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -152,7 +154,9 @@
             this.mitmViewDisassembly,
             this.mitmViewLog,
             this.mitmRegisters,
-            this.mitmMainViewWatches});
+            this.mitmMainViewWatches,
+            this.toolStripMenuItem3,
+            this.mitmWindowsToForeground});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "&View";
@@ -160,44 +164,56 @@
             // mitmViewBreakpoints
             // 
             this.mitmViewBreakpoints.Name = "mitmViewBreakpoints";
-            this.mitmViewBreakpoints.Size = new System.Drawing.Size(139, 22);
+            this.mitmViewBreakpoints.Size = new System.Drawing.Size(215, 22);
             this.mitmViewBreakpoints.Text = "&Breakpoints";
             this.mitmViewBreakpoints.Click += new System.EventHandler(this.mitmViewBreakpoints_Click);
             // 
             // mitmMainViewCallStack
             // 
             this.mitmMainViewCallStack.Name = "mitmMainViewCallStack";
-            this.mitmMainViewCallStack.Size = new System.Drawing.Size(139, 22);
+            this.mitmMainViewCallStack.Size = new System.Drawing.Size(215, 22);
             this.mitmMainViewCallStack.Text = "&CallStack";
             this.mitmMainViewCallStack.Click += new System.EventHandler(this.mitmMainViewCallStack_Click);
             // 
             // mitmViewDisassembly
             // 
             this.mitmViewDisassembly.Name = "mitmViewDisassembly";
-            this.mitmViewDisassembly.Size = new System.Drawing.Size(139, 22);
+            this.mitmViewDisassembly.Size = new System.Drawing.Size(215, 22);
             this.mitmViewDisassembly.Text = "&Disassembly";
             this.mitmViewDisassembly.Click += new System.EventHandler(this.mitmViewDisassembly_Click);
             // 
             // mitmViewLog
             // 
             this.mitmViewLog.Name = "mitmViewLog";
-            this.mitmViewLog.Size = new System.Drawing.Size(139, 22);
+            this.mitmViewLog.Size = new System.Drawing.Size(215, 22);
             this.mitmViewLog.Text = "&Log";
             this.mitmViewLog.Click += new System.EventHandler(this.mitmViewLog_Click);
             // 
             // mitmRegisters
             // 
             this.mitmRegisters.Name = "mitmRegisters";
-            this.mitmRegisters.Size = new System.Drawing.Size(139, 22);
+            this.mitmRegisters.Size = new System.Drawing.Size(215, 22);
             this.mitmRegisters.Text = "&Registers";
             this.mitmRegisters.Click += new System.EventHandler(this.mitmRegisters_Click);
             // 
             // mitmMainViewWatches
             // 
             this.mitmMainViewWatches.Name = "mitmMainViewWatches";
-            this.mitmMainViewWatches.Size = new System.Drawing.Size(139, 22);
+            this.mitmMainViewWatches.Size = new System.Drawing.Size(215, 22);
             this.mitmMainViewWatches.Text = "&Watches";
             this.mitmMainViewWatches.Click += new System.EventHandler(this.mitmMainViewWatches_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(212, 6);
+            // 
+            // mitmWindowsToForeground
+            // 
+            this.mitmWindowsToForeground.Name = "mitmWindowsToForeground";
+            this.mitmWindowsToForeground.Size = new System.Drawing.Size(215, 22);
+            this.mitmWindowsToForeground.Text = "All windows to foreground";
+            this.mitmWindowsToForeground.Click += new System.EventHandler(this.mitmWindowsToForeground_Click);
             // 
             // FormMain
             // 
@@ -244,6 +260,8 @@
         private System.Windows.Forms.ToolStripMenuItem mitmViewBreakpoints;
         private System.Windows.Forms.ToolStripMenuItem mitmViewDisassembly;
         private System.Windows.Forms.ToolStripMenuItem mitmRegisters;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem mitmWindowsToForeground;
     }
 }
 

@@ -58,24 +58,32 @@ namespace Cosmos.Debug.Common.CDebugger {
         }
         
         protected void DoRead(IAsyncResult aResult) {
-            try {
+            try
+            {
                 Console.WriteLine("DoRead");
                 var xIncoming = (Incoming)aResult.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(aResult);
                 xIncoming.CurrentPos += xCount;
                 // If 0, end of stream then just exit without calling BeginRead again
-                if (xCount == 0) {
+                if (xCount == 0)
+                {
                     return;
-                // Packet is not full yet, read more data
-                } else if (xIncoming.CurrentPos < xIncoming.Packet.Length) {
+                    // Packet is not full yet, read more data
+                }
+                else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
+                {
                     xIncoming.Stream.BeginRead(xIncoming.Packet, xIncoming.CurrentPos
                         , xIncoming.Packet.Length - xIncoming.CurrentPos
                         , new AsyncCallback(DoRead), xIncoming);
-                // Full packet received, process it
-                } else {
+                    // Full packet received, process it
+                }
+                else
+                {
                     xIncoming.Completed(xIncoming.Packet);
                 }
-            } catch (System.IO.IOException ex) {
+            }
+            catch (System.IO.IOException ex)
+            {
                 ConnectionLost(ex);
             }
         }

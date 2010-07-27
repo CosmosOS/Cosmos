@@ -65,8 +65,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         protected void LaunchVMWareWorkstation(bool aGDB) {
             //TODO: Change to use Cosmos path
             //TODO: App Roaming doesnt have the vmx.. need to update the insaller
-            //string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
-            string xPath = @"M:\source\Cosmos\Build\VMWare\Workstation\";
+            string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
+            //string xPath = @"M:\source\Cosmos\Build\VMWare\Workstation\";
 
             using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
                 // This copy process also leaves the VMX writeable. VMWare doesnt like them read only.
@@ -82,8 +82,6 @@ namespace Cosmos.Debug.VSDebugEngine {
                            if ((xName == "uuid.location") || (xName == "uuid.bios")) {
                                xValue = null;
                            } else if (xName == "ide1:0.fileName") {
-                               //TODO: Update ISO to selected project
-                               //xValue = @"m:\source\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\CosmosKernel.iso";
                                xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
                            }
 

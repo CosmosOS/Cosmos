@@ -333,7 +333,7 @@ namespace Cosmos.IL2CPU.X86 {
             JumpIf(Flags.Equal, "DebugStub_Executing_AfterBreakOnAddress");
 
             // BP is active
-            EAX = Memory["DebugEIP"];
+            EAX = Memory["DebugEIP", 32];
             new Compare {
                 DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect = true,
                 SourceReg = Registers.EAX

@@ -81,7 +81,8 @@ namespace Cosmos.Debug.GDB {
         }
 
         //TODO: Make path dynamic
-        static protected string mCosmosPath = @"m:\source\Cosmos\";
+        //static protected string mCosmosPath = @"m:\source\Cosmos\";
+        static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
 
         static public void Connect(int aRetry) {
             var xStartInfo = new ProcessStartInfo();

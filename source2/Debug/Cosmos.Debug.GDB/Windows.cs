@@ -15,7 +15,7 @@ namespace Cosmos.Debug.GDB {
         static public FormRegisters mRegistersForm;
         static public FormDisassembly mDisassemblyForm;
 
-        static protected List<Form> mForms = new List<Form>();
+        static public List<Form> mForms = new List<Form>();
 
         static public void CreateForms() {
             mForms.Add(mCallStackForm = new FormCallStack());
@@ -63,6 +63,11 @@ namespace Cosmos.Debug.GDB {
                     // this one attribute for now.
                     aForm.StartPosition = FormStartPosition.Manual;
                     xShowForm = x.Visible;
+                }
+                var xBreakpoints = aForm as FormBreakpoints;
+                if (xBreakpoints != null)
+                {
+                    xBreakpoints.LoadSession();
                 }
             }
             if (xShowForm) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
+using System.IO;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
@@ -24,7 +25,6 @@ namespace Cosmos.Debug.Common.CDebugger
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
         protected abstract void PacketTracePoint(byte[] aPacket);
         protected abstract void PacketText(byte[] aPacket);
-    
         public void SendCommand(byte aCmd) {
             var xData = new byte[1];
             xData[0] = aCmd;
@@ -60,6 +60,7 @@ namespace Cosmos.Debug.Common.CDebugger
                     break;
                 case MsgType.Ready:
                     CmdReady();
+                    Next(1, PacketCommand);
                     break;
                 case MsgType.Noop:
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
