@@ -797,7 +797,12 @@ namespace ReflectionToEcmaCil
             xSB.Append("]");
             aArrayMeta.Data[EcmaCil.DataIds.DebugMetaId] = xSB.ToString();
 #endif
+        }
 
+
+        private void ScanVMT()
+        {
+            
         }
     }
 }

@@ -205,7 +205,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.Plugs %28New Sort %28source2%29\IL2CPU\Cosmos.IL2CPU.Plugs%29</Name>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
