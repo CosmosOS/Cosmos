@@ -61,6 +61,7 @@
     <Compile Include="BaseMeta.cs" />
     <Compile Include="BaseMetaComparer.cs" />
     <Compile Include="DataIds.cs" />
+    <Compile Include="MetaSorter.cs" />
     <Compile Include="PointerTypeMeta.cs" />
     <Compile Include="TypeMeta.cs" />
     <Compile Include="Dump.cs" />

@@ -8,6 +8,8 @@ namespace EcmaCil
 {
     public class TypeMeta: BaseMeta
     {
+        private static readonly FieldMeta[] EmptyFields = new FieldMeta[0];
+        private static readonly MethodMeta[] EmptyMethods = new MethodMeta[0];
         public TypeMeta()
             : base()
         {
