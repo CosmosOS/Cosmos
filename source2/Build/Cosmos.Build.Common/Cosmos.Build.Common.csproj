@@ -14,7 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <SccProjectName>%24/IL2CPU/source2/Build/Cosmos.Build.Common</SccProjectName>
     <SccLocalPath>.</SccLocalPath>
-    <SccAuxPath>https://tfs04.codeplex.com</SccAuxPath>
+    <SccAuxPath>https://tfs.codeplex.com/tfs/TFS04</SccAuxPath>
     <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>

@@ -17,16 +17,18 @@ namespace TestApp
             {
                 try
                 {
-                    xReader.EnableLogging(Path.ChangeExtension(typeof(SimpleMethodsTest.Program).Assembly.Location, "html"));
-                    var xResult = xReader.Execute(typeof(SimpleMethodsTest.Program).Assembly.Location);
-                    using (var xXmlOut = XmlWriter.Create(Path.ChangeExtension(typeof(SimpleMethodsTest.Program).Assembly.Location, "out")))
+                    var xTestClass= typeof(SimpleClassTest.Program);
+                    xReader.EnableLogging(Path.ChangeExtension(xTestClass.Assembly.Location, "html"));
+                    var xResult = xReader.Execute(xTestClass.Assembly.Location);
+                    using (var xXmlOut = XmlWriter.Create(Path.ChangeExtension(xTestClass.Assembly.Location, "out.xml")))
                     {
                         Dump.DumpTypes(xResult, xXmlOut);
                         xXmlOut.Flush();
-                    }
+                    }                                
                 }
                 catch (Exception E)
                 {
+                    
                     Console.WriteLine("Error: " + E.ToString());
                     xReader.WriteScanMap();
                 }
