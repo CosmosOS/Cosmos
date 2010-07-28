@@ -28,7 +28,6 @@ namespace TestApp
                 }
                 catch (Exception E)
                 {
-                    
                     Console.WriteLine("Error: " + E.ToString());
                     xReader.WriteScanMap();
                 }

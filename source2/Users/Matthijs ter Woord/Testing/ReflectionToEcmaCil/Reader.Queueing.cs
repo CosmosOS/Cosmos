@@ -19,11 +19,16 @@ namespace ReflectionToEcmaCil
             if (aMethod.IsGenericMethodDefinition)
             {
                 throw new Exception("Cannot queue generic method definitions");
-            }            
+            }
             Type xReturnType = null;
             var xMethodInfo = aMethod as MethodInfo;
-            if(xMethodInfo!=null){
-                xReturnType=xMethodInfo.ReturnType;
+            if (xMethodInfo != null)
+            {
+                xReturnType = xMethodInfo.ReturnType;
+            }
+            else
+            {
+                xReturnType = typeof(void);
             }
             var xQueuedMethod = new QueuedMethod(aMethod.DeclaringType, aMethod, (from item in aMethod.GetParameters()
                                                                                   select item.ParameterType).ToArray(), xReturnType);

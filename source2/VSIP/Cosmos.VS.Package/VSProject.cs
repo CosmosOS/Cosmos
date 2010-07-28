@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package {
     /// <summary>
@@ -31,7 +32,7 @@ namespace Cosmos.VS.Package {
     [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\9.0")]
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration(false, "Cosmos Visual Studio Integration Package", "www.gocosmos.org", "1.0", IconResourceID = 400, 
+    [InstalledProductRegistration(true, "Cosmos Visual Studio Integration Package", "www.gocosmos.org", "1.0", IconResourceID = 400, 
                 LanguageIndependentName = "Cosmos Visual Studio Integration Package")]
     // In order be loaded inside Visual Studio in a machine that has not the VS SDK installed, 
     // package needs to have a valid load key (it can be requested at 
@@ -53,7 +54,7 @@ namespace Cosmos.VS.Package {
 	[ProvideObject(typeof(DebugPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[ProvideObject(typeof(VMPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[Guid(Guids.guidProjectPkgString)]
-  public sealed class VSProject : ProjectPackage {
+  public sealed class VSProject : ProjectPackage, IVsInstalledProduct {
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -120,5 +121,40 @@ namespace Cosmos.VS.Package {
             }
         }
 
-    }
+
+        #region IVsInstalledProduct Members
+        //[InstalledProductRegistration(false, "Cosmos Visual Studio Integration Package", "www.gocosmos.org", "1.0", IconResourceID = 400,
+        //               LanguageIndependentName = "Cosmos Visual Studio Integration Package")]
+        int IVsInstalledProduct.IdBmpSplash(out uint pIdBmp)
+        {
+            pIdBmp = 400;
+            return VSConstants.S_OK;
+        }
+
+        int IVsInstalledProduct.IdIcoLogoForAboutbox(out uint pIdIco)
+        {
+            pIdIco = 400;
+            return VSConstants.S_OK;
+        }
+
+        int IVsInstalledProduct.OfficialName(out string pbstrName)
+        {
+            pbstrName = "Cosmos";
+            return VSConstants.S_OK;
+        }
+
+        int IVsInstalledProduct.ProductDetails(out string pbstrProductDetails)
+        {
+            pbstrProductDetails = "www.goCosmos.org";
+            return VSConstants.S_OK;
+        }
+
+        int IVsInstalledProduct.ProductID(out string pbstrPID)
+        {
+            pbstrPID = "Milestone 5";
+            return VSConstants.S_OK;
+        }
+
+        #endregion
+  }
 }

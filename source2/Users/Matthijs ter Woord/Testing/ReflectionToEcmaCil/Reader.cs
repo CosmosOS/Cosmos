@@ -45,46 +45,46 @@ namespace ReflectionToEcmaCil
             {
                 throw new ArgumentException("Main assembly should have entry point!");
             }
-            //if (xAssemblyDef.EntryPoint.GenericParameters.Count > 0 || xAssemblyDef.EntryPoint.DeclaringType.GenericParameters.Count > 0)
-            //{
-            //    throw new ArgumentException("Main assembly's entry point has generic parameters. This is not supported!");
-            //}
             EnqueueMethod(xAssemblyDef.EntryPoint, null, "entry point");
 
             // handle queue
-            while (mQueue.Count > 0)
+            do
             {
-                var xItem = mQueue.Dequeue();
-                if (xItem is QueuedMethod)
+                while (mQueue.Count > 0)
                 {
-                    var xMethod = (QueuedMethod)xItem;
-                    ScanMethod(xMethod, mMethods[xMethod]);
-                    continue;
+                    var xItem = mQueue.Dequeue();
+                    if (xItem is QueuedMethod)
+                    {
+                        var xMethod = (QueuedMethod)xItem;
+                        ScanMethod(xMethod, mMethods[xMethod]);
+                        continue;
+                    }
+                    if (xItem is QueuedArrayType)
+                    {
+                        var xType = (QueuedArrayType)xItem;
+                        ScanArrayType(xType, mArrayTypes[xType]);
+                        continue;
+                    }
+                    //if (xItem is QueuedPointerType)
+                    //{
+                    //    var xType = (QueuedPointerType)xItem;
+                    //    ScanPointerType(xType, mPointerTypes[xType]);
+                    //    continue;
+                    //}
+                    if (xItem is QueuedType)
+                    {
+                        var xType = (QueuedType)xItem;
+                        ScanType(xType, mTypes[xType]);
+                        continue;
+                    }
+                    throw new Exception("Queue item not supported: '" + xItem.GetType().FullName + "'!");
                 }
-                if (xItem is QueuedArrayType)
-                {
-                    var xType = (QueuedArrayType)xItem;
-                    ScanArrayType(xType, mArrayTypes[xType]);
-                    continue;
-                }
-                //if (xItem is QueuedPointerType)
-                //{
-                //    var xType = (QueuedPointerType)xItem;
-                //    ScanPointerType(xType, mPointerTypes[xType]);
-                //    continue;
-                //}
-                if (xItem is QueuedType)
-                {
-                    var xType = (QueuedType)xItem;
-                    ScanType(xType, mTypes[xType]);
-                    continue;
-                }
-                throw new Exception("Queue item not supported: '" + xItem.GetType().FullName + "'!");
-            }
+
+            } while (mQueue.Count > 0);
 
             return mTypes.Values.Cast<EcmaCil.TypeMeta>()
                 .Union(mArrayTypes.Values.Cast<EcmaCil.TypeMeta>())
-                .Union(mPointerTypes.Values.Cast<EcmaCil.TypeMeta>());
+                .Union(mPointerTypes.Values.Cast<EcmaCil.TypeMeta>()).ToArray();
         }
     }
 }

@@ -19,11 +19,39 @@ namespace EcmaCil
             Fields = new List<FieldMeta>();
         }
 
+        private TypeMeta mBaseType;
         public TypeMeta BaseType
         {
-            get;
-            set;
+            get
+            {
+                return mBaseType;
+            }
+            set
+            {
+                if (value != mBaseType)
+                {
+                    if (mBaseType != null)
+                    {
+                        mBaseType.mDescendants.Remove(this);
+                    }
+                    mBaseType = value;
+                    if (mBaseType != null)
+                    {
+                        mBaseType.mDescendants.Add(this);
+                    }
+                }
+            }
         }
+
+        private List<TypeMeta> mDescendants = new List<TypeMeta>();
+        public IEnumerable<TypeMeta> Descendants
+        {
+            get
+            {
+                return mDescendants;
+            }
+        }
+
 
         public List<MethodMeta> Methods
         {

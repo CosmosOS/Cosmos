@@ -147,10 +147,13 @@ Root: HKLM64; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey; C
 Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: uninsdeletevalue; Check: IsWin64
 
 ; VSIP package
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ; ValueData: Cosmos Visual Studio Integration Package
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: dword; ValueName: UseRegNameAsSplashName; ValueData: $00000001
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ProductDetails; ValueData: www.gocosmos.org
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: PID; ValueData: 1.0
+;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ; ValueData: Cosmos Visual Studio Integration Package
+;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: dword; ValueName: UseRegNameAsSplashName; ValueData: $00000001
+;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: ProductDetails; ValueData: www.gocosmos.org
+;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: PID; ValueData: 1.0
+;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: LogoID; ValueData: #400
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: Package; ValueData: {{4cae44ed-88b9-4b7c-822b-b040f18fcee3}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: dword; ValueName: UseInterface; ValueData: 1
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.VSProject, Cosmos.VS.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.VSProject

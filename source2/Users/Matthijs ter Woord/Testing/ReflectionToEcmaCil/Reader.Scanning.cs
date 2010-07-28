@@ -666,10 +666,9 @@ namespace ReflectionToEcmaCil
                         throw new NotImplementedException();
 
                     case OperandType.InlineString:
-                        throw new NotImplementedException();
-                    //xILOpCode = new ILOpCodes.OpString(xOpCodeVal, xOpPos, xPos + 4, aMethod.Module.ResolveString((int)ReadInt32(xIL, xPos)), xCurrentHandler);
-                    //xPos = xPos + 4;
-                    //break;
+                        xILOpCode = new Cil.InstructionString(Cil.InstructionKindEnum.Ldstr, xInstructionIndex, aMethod.Module.ResolveString(ReadInt32(xIL, xPos)));
+                        xPos = xPos + 4;
+                        break;
 
                     case OperandType.InlineSwitch:
                         throw new NotImplementedException();
