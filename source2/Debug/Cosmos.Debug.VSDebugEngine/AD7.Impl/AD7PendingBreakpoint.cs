@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine
 {

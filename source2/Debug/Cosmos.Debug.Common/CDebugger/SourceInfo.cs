@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Reflection;
@@ -54,7 +55,7 @@ namespace Cosmos.Debug.Common.CDebugger
             {
                 foreach (var xItem in aMap)
                 {
-                    xOut.WriteLine("{0}\t{1}", xItem.Key, xItem.Value);
+                    xOut.WriteLine("{0}\t{1}", xItem.Key.ToString("X8"), xItem.Value);
                 }
             }
         }
@@ -71,7 +72,7 @@ namespace Cosmos.Debug.Common.CDebugger
                 }
                 var xPart1 = xLine.Substring(0, xLine.IndexOf('\t'));
                 var xPart2 = xLine.Substring(xLine.IndexOf('\t') + 1);
-                var xAddr = UInt32.Parse(xPart1);
+                var xAddr = UInt32.Parse(xPart1, NumberStyles.HexNumber);
                 oAddressLabelMappings.Add(xAddr, xPart2);
                 oLabelAddressMappings.Add(xPart2, xAddr);
             }
