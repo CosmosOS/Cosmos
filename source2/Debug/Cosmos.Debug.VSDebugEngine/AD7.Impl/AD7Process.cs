@@ -207,7 +207,12 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         protected void DbgCmdReady() {
             DebugMsg("RmtDbg: Ready");
+            
+            // Guests never get the first byte sent. So we send a noop.
+            // This dummy byte seems to clear out the serial channel.
+            // Its never received, but if it ever is, its a noop anyways.
             mDbgConnector.SendCommand((byte)Command.Noop);
+
             // OK, now debugger is ready. Send it a list of breakpoints that were set before
             // program run.
             foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
@@ -233,6 +238,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         void DbgCmdTrace(Cosmos.Compiler.Debug.MsgType arg1, uint arg2) {
+            DebugMsg("DbgCmdTrace");
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
                     var xActualAddress = arg2 - 5; // - 5 to correct the addres:
