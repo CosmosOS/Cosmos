@@ -3,7 +3,10 @@
   <Breakpoint>
     <Label>DebugStub_SendTrace</Label>
   </Breakpoint>
-  <Window>
+  <Breakpoint>
+    <Label>DebugStub_BreakOnAddress</Label>
+  </Breakpoint>
+ <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
     <Top>0</Top>
