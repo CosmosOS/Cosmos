@@ -23,7 +23,10 @@ namespace Cosmos.Debug.GDB {
 
         static public void Save() {
             Windows.SavePositions();
-            DS.WriteXml(Filename, System.Data.XmlWriteMode.IgnoreSchema);
+            // Its often checked into TFS, so if its ro, just dont save it.
+            if ((File.GetAttributes(Filename) & FileAttributes.ReadOnly) != FileAttributes.ReadOnly) {
+                DS.WriteXml(Filename, System.Data.XmlWriteMode.IgnoreSchema);
+            }
         }
 
         static public void Load() {

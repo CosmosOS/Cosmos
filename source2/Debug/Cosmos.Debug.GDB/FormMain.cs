@@ -17,6 +17,10 @@ namespace Cosmos.Debug.GDB {
         // TODO
         // watches
         // View stack
+        // If close without connect, it wipes out the settings file
+
+        protected void SetUI() {
+        }
 
         private void mitmExit_Click(object sender, EventArgs e) {
             Close();
@@ -24,13 +28,11 @@ namespace Cosmos.Debug.GDB {
 
         private void mitmStepInto_Click(object sender, EventArgs e) {
             GDB.SendCmd("stepi");
-            Update();
             Windows.UpdateAllWindows();
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
             GDB.SendCmd("nexti");
-            Update();
             Windows.UpdateAllWindows();
         }
 
@@ -54,16 +56,16 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmConnect_Click(object sender, EventArgs e) {
-            Connect(1);
+            Connect(30);
         }
 
         private void mitmRefresh_Click(object sender, EventArgs e) {
-            Update();
+            Windows.UpdateAllWindows();
         }
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
             GDB.SendCmd("continue");
-            Update();
+            Windows.UpdateAllWindows();
         }
 
         private void mitmMainViewCallStack_Click(object sender, EventArgs e) {
@@ -121,7 +123,6 @@ namespace Cosmos.Debug.GDB {
                     Connect(30);
                 }
             }
-
         }
 
         private void mitmWindowsToForeground_Click(object sender, EventArgs e)

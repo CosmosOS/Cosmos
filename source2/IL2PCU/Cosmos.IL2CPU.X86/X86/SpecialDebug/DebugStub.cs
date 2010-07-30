@@ -128,7 +128,7 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
-        // Modifies: EAX
+        // Modifies: EAX, ESI
         protected void SendTrace() {
             Label = "DebugStub_SendTrace";
 
@@ -263,7 +263,7 @@ namespace Cosmos.IL2CPU.X86 {
         // Reads a byte into [EDI] and does EDI + 1
         // http://wiki.osdev.org/Serial_ports
         // We dont worry about byte over writing because:
-        //  -The UART will handle flow control for us
+        //  -The UART will handle flow control for us - except its not turned on right now.... :)
         //  -All modern UARTs have at least a 16 byte buffer.
         protected void ReadByteFromComPort() {
             Label = "ReadByteFromComPort";
@@ -436,10 +436,10 @@ namespace Cosmos.IL2CPU.X86 {
                 EAX = Memory[EBP];
                 // EIP is pointer to op after our call. We subtract 5 (the size of our call + address)
                 // so we get the EIP as IL2CPU records it. Its also useful for when we will
-                // be changing ops that call the stub.
+                // be changing ops that call this stub.
                 EAX.Sub(5);
                 // Store it for later use.
-                Memory["DebugEIP"] = EAX;
+                Memory["DebugEIP", 32] = EAX;
                 // Call secondary stub
                 Call("DebugStub_Executing");
             PopAll32();

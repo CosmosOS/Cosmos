@@ -87,28 +87,42 @@ namespace Cosmos.IL2CPU.X86
             if (mComNumber > 0)
             {
                 UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
-                // 9600 baud, 8 databits, no parity, 1 stopbit
+                // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
+                //
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0 };
                 new Out { DestinationReg = Registers.AL }; // disable interrupts for serial stuff
+                //
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x80 };
                 new Out { DestinationReg = Registers.AL }; // Enable DLAB (set baud rate divisor)
+                //
+                // 0x01 - 0x00 - 115200
+                // 0x02 - 0x00 - 57600
+                // 0x03 - 0x00 - 38400
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x1 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x01 };
                 new Out { DestinationReg = Registers.AL }; // Set divisor (lo byte)
+                //
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x0 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x00 };
                 new Out { DestinationReg = Registers.AL }; //			  (hi byte)
+                //
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
                 new Out { DestinationReg = Registers.AL }; // 8 bits, no parity, one stop bit
+                //
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 2 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0xC7 };
                 new Out { DestinationReg = Registers.AL }; // Enable FIFO, clear them, with 14-byte threshold
+                //
+                // 0x20 AFE Automatic Flow control Enable - May not be on all.. not sure for modern ones?
+                // 0x02 RTS
+                // 0x01 DTR
+                // Send 0x03 if no AFE
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 4 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
-                new Out { DestinationReg = Registers.AL }; // IRQ-s enabled, RTS/DSR set
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x03 };
+                new Out { DestinationReg = Registers.AL }; 
             }
 
             // SSE init

@@ -41,6 +41,7 @@ namespace Cosmos.Debug.GDB {
                 if (xSplit[0] == "Breakpoint") {
                     lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(s, int.Parse(xSplit[1])));
 
+                    // http://stackoverflow.com/questions/27674/dynamic-top-down-list-of-controls-in-windowsforms-and-c
                     var xUC = new BreakpointUC();
                     xUC.Dock = DockStyle.Top;
                     xUC.cboxEnabled.Checked = true;
