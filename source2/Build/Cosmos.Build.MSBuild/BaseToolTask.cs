@@ -21,7 +21,8 @@ namespace Cosmos.Build.MSBuild
             xProcessStartInfo.CreateNoWindow = true;
             using (var xProcess = Process.Start(xProcessStartInfo))
             {
-                if (!xProcess.WaitForExit(30 * 1000) || xProcess.ExitCode != 0)
+                xProcess.WaitForExit();
+                if (xProcess.ExitCode != 0)
                 {
                     if (!xProcess.HasExited)
                     {
