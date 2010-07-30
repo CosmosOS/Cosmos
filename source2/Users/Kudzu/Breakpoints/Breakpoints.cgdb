@@ -4,7 +4,7 @@
     <Label>DebugStub_SendTrace</Label>
   </Breakpoint>
   <Breakpoint>
-    <Label>DebugStub_BreakOnAddress</Label>
+    <Label>DebugStub_Executing_CommandComingIn</Label>
   </Breakpoint>
  <Window>
     <Name>FormCallStack</Name>
