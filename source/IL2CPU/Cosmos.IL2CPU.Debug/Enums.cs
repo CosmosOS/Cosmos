@@ -19,7 +19,8 @@ namespace Cosmos.Compiler.Debug {
     
     // Messages from Host to Guest
     public enum Command : byte {
-        TraceOff = 1, TraceOn = 2
+        Noop = 0
+        , TraceOff = 1, TraceOn = 2
         // Break command is also for continuing from breakstate.
         , Break = 3
         , Step = 4

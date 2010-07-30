@@ -92,8 +92,6 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        #region IDebugPendingBreakpoint2 Members
-
         // Binds this pending breakpoint to one or more code locations.
         int IDebugPendingBreakpoint2.Bind() {
             try {
@@ -274,6 +272,5 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        #endregion
     }
 }

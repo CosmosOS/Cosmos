@@ -19,9 +19,17 @@ namespace Cosmos.Debug.Common.CDebugger {
         }
 
         protected override void SendData(byte[] aBytes) {
+            //var xSB = new StringBuilder();
+            //xSB.AppendLine("Pending: " + mStream == null ? "true" : "false");
+            //foreach(byte x in aBytes) {
+            //    xSB.AppendLine(x.ToString("X2"));
+            //}
+            //System.Windows.Forms.MessageBox.Show(xSB.ToString());
+
             if (mStream != null) {
                 mStream.Write(aBytes, 0, aBytes.Length);
             } else {
+                //TODO: Is this actually used? And if so, doesnt it lose data if its called more than once?
                 mPendingSend = (byte[])aBytes.Clone();
             }
         }

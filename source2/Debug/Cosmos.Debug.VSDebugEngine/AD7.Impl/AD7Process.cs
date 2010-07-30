@@ -207,6 +207,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         protected void DbgCmdReady() {
             DebugMsg("RmtDbg: Ready");
+            mDbgConnector.SendCommand((byte)Command.Noop);
             // OK, now debugger is ready. Send it a list of breakpoints that were set before
             // program run.
             foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
@@ -215,7 +216,6 @@ namespace Cosmos.Debug.VSDebugEngine {
                     SetBreakpointAddress(xBBP.m_address);
                 }
             }
-            mDbgConnector.SendCommand((byte)Command.Break);
         }
 
         public void SetBreakpointAddress(uint aAddress) {

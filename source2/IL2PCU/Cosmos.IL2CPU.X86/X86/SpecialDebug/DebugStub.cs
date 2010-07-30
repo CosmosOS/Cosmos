@@ -143,13 +143,17 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_SendTraceType";
             Call("WriteALToComPort");
                         
-            // Send EIP. EBP points to location with EIP
-            ESI = Memory["DebugEIP", 32];
+            // Send Calling EIP.
+            //TODO: Simply point ESI at DebugEIP, but I dont know how 
+            // with our assembler
+            EAX = Memory["DebugEIP", 32];
+            EAX.Push();
+            ESI = ESP;
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
-
+            EAX.Pop();
             Return();
         }
 
@@ -362,6 +366,8 @@ namespace Cosmos.IL2CPU.X86 {
             // Process command
             DX = mComAddr;
             AL = Port[DX];
+            AL.Compare((byte)Command.Noop);
+                JumpIf(Flags.Equal, "DebugStub_Executing_Exit");
             AL.Compare((byte)Command.TraceOff);
                 JumpIf(Flags.Equal, "DebugStub_TraceOff");
             AL.Compare((byte)Command.TraceOn);
