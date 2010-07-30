@@ -30,6 +30,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         EngineCallback m_engineCallback;
         internal AD7Process mProcess;
+        internal IDebugProgram2 mProgram;
 
         // The sample debug engine is split into two parts: a managed front-end and a mixed-mode back end. DebuggedProcess is the primary
         // object in the back-end. AD7Engine holds a reference to it.
@@ -128,7 +129,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
                     //m_pollThread.SetDebugProcess(m_debuggedProcess);
                 }
-
+                mProgram = rgpPrograms[0];
                 AD7EngineCreateEvent.Send(this);
                 AD7ProgramCreateEvent.Send(this);
                 mProcess.ResumeFromLaunch();
@@ -496,6 +497,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 //                m_debuggedProcess.Terminate();
                 mProcess.Terminate();
                 m_engineCallback.OnProcessExit(0);
+                mProgram = null;
 
                 return VSConstants.S_OK;
             }
@@ -560,6 +562,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         public bool AfterBreak = false;
+        public IList<IDebugBoundBreakpoint2> Breakpoints = null;
 
         // Detach is called when debugging is stopped and the process was attached to (as opposed to launched)
         // or when one of the Detach commands are executed in the UI.
@@ -700,7 +703,7 @@ namespace Cosmos.Debug.VSDebugEngine
         public int Step(IDebugThread2 pThread, uint sk, uint Step)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-            mProcess.Step();
+            mProcess.Step(sk);
 
             return VSConstants.S_OK;
         }
@@ -709,6 +712,7 @@ namespace Cosmos.Debug.VSDebugEngine
         public int Terminate()
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+            mProgram = null;
 
             // Because the sample engine is a native debugger, it implements IDebugEngineLaunch2, and will terminate
             // the process in IDebugEngineLaunch2.TerminateProcess

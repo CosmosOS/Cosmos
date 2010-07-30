@@ -41,8 +41,12 @@ namespace Cosmos.Debug.VSDebugEngine
                 m_documentName = xSourceMapping.SourceFile;
                 m_functionName = xSourceMapping.MethodName;
                 m_lineNum = (uint)xSourceMapping.Line;
-            m_numLocals = 0;
+                m_numLocals = 0;
                 m_numParameters = 0;
+            }
+            else
+            {
+                ;
             }
 
             // If source information is available, create the collections of locals and parameters and populate them with

@@ -118,7 +118,7 @@ namespace Cosmos.Debug.VSDebugEngine
             Send(mBreak, AD7BreakEvent.IID, aThread);
         }
 
-        public void OnBreakpoint(AD7Thread thread, ReadOnlyCollection<IDebugBoundBreakpoint2> clients, uint address)
+        public void OnBreakpoint(AD7Thread thread, IList<IDebugBoundBreakpoint2> clients, uint address)
         {
             //AD7brea
             IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
@@ -151,8 +151,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public void OnStepComplete()//DebuggedThread thread)
         {
-            // Step complete is sent when a step has finished. The sample engine does not support stepping.
-            throw new Exception("The method or operation is not implemented.");
+            AD7StepCompletedEvent.Send(m_engine);
         }
 
         public void OnAsyncBreakComplete(AD7Thread aThread)

@@ -12,6 +12,7 @@ using Cosmos.Debug.Common.CDebugger;
 using Cosmos.Compiler.Debug;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine {
     public class AD7Process : IDebugProcess2 {
@@ -19,7 +20,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         private Process mProcess;
         private ProcessStartInfo mProcessStartInfo;
         private EngineCallback mCallback;
-        private AD7Thread mThread;
+        internal AD7Thread mThread;
         private AD7Engine mEngine;
         private DebugConnector mDbgConnector;
         internal ReverseSourceInfos mReverseSourceMappings;
@@ -241,7 +242,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             DebugMsg("DbgCmdTrace");
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
-                    var xActualAddress = arg2 - 5; // - 5 to correct the addres:
+
+                    var xActualAddress = arg2; // no need to correct the address, as the debugstub does thiis now.
                     DebugMsg("BP hit @ " + xActualAddress.ToString("X8").ToUpper());
 
                     // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
@@ -259,10 +261,25 @@ namespace Cosmos.Debug.VSDebugEngine {
 
                     mCurrentAddress = xActualAddress;
                     //mCallback.onb
-                    mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), xActualAddress);
-                    //mEngine.Callback.OnBreakComplete(mThread, );
-                    mEngine.AfterBreak = true;
-                    //mEngine.Callback.OnBreak(mThread);
+                    if (xBoundBreakpoints.Count == 0)
+                    {
+                        if (mEngine.AfterBreak)
+                        {
+                            mCallback.OnStepComplete();
+                            //mCallback.OnBreakpoint(mThread, mEngine.Breakpoints, xActualAddress);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Breakpoint was hit, but not found in the sources. Most likely a but in the debug stub");
+                        }
+                    }
+                    else
+                    {
+                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), xActualAddress);
+                        //mEngine.Callback.OnBreakComplete(mThread, );
+                        mEngine.AfterBreak = true;
+                        //mEngine.Callback.OnBreak(mThread);
+                    }
                     break;
                 }
 
@@ -388,7 +405,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             mDbgConnector.SendCommand((byte)Command.Break);
         }
 
-        internal void Step() {
+        internal void Step(uint stepKind) {
+            DebugMsg("StepKind: " + stepKind);
             mDbgConnector.SendCommand((byte)Command.Step);
         }
     }

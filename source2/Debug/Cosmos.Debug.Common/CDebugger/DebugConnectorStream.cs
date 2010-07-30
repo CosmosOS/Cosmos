@@ -54,7 +54,7 @@ namespace Cosmos.Debug.Common.CDebugger {
                 System.Windows.Forms.MessageBox.Show("Calling Next");
                 Next(1, PacketCommand);
             } catch (Exception e) {
-                System.Windows.Forms.MessageBox.Show(e.Message);
+                System.Windows.Forms.MessageBox.Show(e.ToString());
             }
         }
         

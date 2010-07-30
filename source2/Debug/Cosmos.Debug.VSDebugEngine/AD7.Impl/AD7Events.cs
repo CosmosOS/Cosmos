@@ -58,8 +58,28 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
     }
-    
+
     #endregion
+
+    sealed class AD7StepCompletedEvent : IDebugEvent2, IDebugStepCompleteEvent2
+    {
+        public const string IID = "0F7F24C1-74D9-4EA6-A3EA-7EDB2D81441D";
+        public static void Send(AD7Engine engine)
+        {
+            var xEvent = new AD7StepCompletedEvent();
+            engine.Callback.Send(xEvent, IID, engine.mProcess.Thread);
+        }
+
+        #region IDebugEvent2 Members
+
+        public int GetAttributes(out uint pdwAttrib)
+        {
+            pdwAttrib = (uint)(enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP);
+            return VSConstants.S_OK;
+        }
+
+        #endregion
+    }
 
     // The debug engine (DE) sends this interface to the session debug manager (SDM) when an instance of the DE is created.
     sealed class AD7EngineCreateEvent : AD7AsynchronousEvent, IDebugEngineCreateEvent2
@@ -77,11 +97,11 @@ namespace Cosmos.Debug.VSDebugEngine
             AD7EngineCreateEvent eventObject = new AD7EngineCreateEvent(engine);
             engine.Callback.Send(eventObject, IID, null, null);
         }
-        
+
         int IDebugEngineCreateEvent2.GetEngine(out IDebugEngine2 engine)
         {
             engine = m_engine;
-            
+
             return VSConstants.S_OK;
         }
     }
@@ -90,7 +110,9 @@ namespace Cosmos.Debug.VSDebugEngine
     sealed class AD7ProgramCreateEvent : AD7AsynchronousEvent, IDebugProgramCreateEvent2
     {
         public const string IID = "96CD11EE-ECD4-4E89-957E-B5D496FC4139";
-        
+
+
+
         internal static void Send(AD7Engine engine)
         {
             AD7ProgramCreateEvent eventObject = new AD7ProgramCreateEvent();
@@ -103,7 +125,7 @@ namespace Cosmos.Debug.VSDebugEngine
     sealed class AD7ModuleLoadEvent : AD7AsynchronousEvent, IDebugModuleLoadEvent2
     {
         public const string IID = "989DB083-0D7C-40D1-A9D9-921BF611A4B2";
-        
+
         readonly AD7Module m_module;
         readonly bool m_fLoad;
 
@@ -155,7 +177,7 @@ namespace Cosmos.Debug.VSDebugEngine
         int IDebugProgramDestroyEvent2.GetExitCode(out uint exitCode)
         {
             exitCode = m_exitCode;
-            
+
             return VSConstants.S_OK;
         }
 
@@ -189,10 +211,11 @@ namespace Cosmos.Debug.VSDebugEngine
         int IDebugThreadDestroyEvent2.GetExitCode(out uint exitCode)
         {
             exitCode = m_exitCode;
-            
+
             return VSConstants.S_OK;
         }
-        internal static void Send(AD7Engine aEngine, IDebugThread2 aThread, uint aExitCode){
+        internal static void Send(AD7Engine aEngine, IDebugThread2 aThread, uint aExitCode)
+        {
             var xObj = new AD7ThreadDestroyEvent(aExitCode);
             aEngine.Callback.Send(xObj, IID, aThread);
         }
@@ -223,7 +246,7 @@ namespace Cosmos.Debug.VSDebugEngine
     }
 
     // This interface is sent by the debug engine (DE) to the session debug manager (SDM) to output a string for debug tracing.
-    sealed class AD7OutputDebugStringEvent : AD7AsynchronousEvent, IDebugOutputStringEvent2  
+    sealed class AD7OutputDebugStringEvent : AD7AsynchronousEvent, IDebugOutputStringEvent2
     {
         public const string IID = "569c4bb1-7b82-46fc-ae28-4536ddad753e";
 
@@ -273,7 +296,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         #endregion
     }
-    
+
     // This interface is sent when a pending breakpoint has been bound in the debuggee.
     sealed class AD7BreakpointBoundEvent : AD7AsynchronousEvent, IDebugBreakpointBoundEvent2
     {
