@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
@@ -69,7 +70,9 @@ namespace Cosmos.Debug.Common.CDebugger
                     Next(1, PacketCommand);
                     break;
                 default:
-                    throw new Exception("Unknown debug command");
+                    // Exceptions crash VS.
+                    MessageBox.Show("Unknown debug command");
+                    break;
             }
         }
 
