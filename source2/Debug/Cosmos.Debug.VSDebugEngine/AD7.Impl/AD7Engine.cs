@@ -703,7 +703,7 @@ namespace Cosmos.Debug.VSDebugEngine
         public int Step(IDebugThread2 pThread, uint sk, uint Step)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-            mProcess.Step(sk);
+            mProcess.Step((enum_STEPKIND)sk);
 
             return VSConstants.S_OK;
         }

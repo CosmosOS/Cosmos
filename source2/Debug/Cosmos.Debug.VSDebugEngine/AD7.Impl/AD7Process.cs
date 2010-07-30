@@ -405,7 +405,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             mDbgConnector.SendCommand((byte)Command.Break);
         }
 
-        internal void Step(uint stepKind) {
+        internal void Step(enum_STEPKIND stepKind)
+        {
             DebugMsg("StepKind: " + stepKind);
             mDbgConnector.SendCommand((byte)Command.Step);
         }
