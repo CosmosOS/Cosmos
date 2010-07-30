@@ -1,5 +1,8 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
+  <Breakpoint>
+    <Label>DebugStub_SendTrace</Label>
+  </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
@@ -26,11 +29,11 @@
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>805</Left>
+    <Top>93</Top>
     <Width>300</Width>
     <Height>296</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormRegisters</Name>
