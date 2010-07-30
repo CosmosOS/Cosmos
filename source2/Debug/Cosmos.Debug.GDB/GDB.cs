@@ -80,9 +80,14 @@ namespace Cosmos.Debug.GDB {
             return xResult;
         }
 
+        static protected bool mConnected = false;
+        static public bool Connected {
+            get { return mConnected; }
+        }
+
         //TODO: Make path dynamic
-        //static protected string mCosmosPath = @"m:\source\Cosmos\";
-        static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
+        static protected string mCosmosPath = @"m:\source\Cosmos\";
+        //static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
 
         static public void Connect(int aRetry) {
             var xStartInfo = new ProcessStartInfo();
@@ -101,24 +106,24 @@ namespace Cosmos.Debug.GDB {
             GetResponse();
             SendCmd("symbol-file CosmosKernel.obj");
 
-            bool xConnected = false;
-            while (aRetry > 0) {
+            while (!mConnected) {
                 var x = SendCmd("target remote :8832");
-                xConnected = !x.Error;
-                if (xConnected) {
-                    break;
-                }
+                mConnected = !x.Error;
                 aRetry--;
+                if (aRetry == 0) {
+                    return;
+                }
+
+                System.Threading.Thread.Sleep(1000);
+                System.Windows.Forms.Application.DoEvents();
             }
 
-            if (xConnected) {
-                SendCmd("set architecture i386");
-                SendCmd("set language asm");
-                SendCmd("set disassembly-flavor intel");
-                SendCmd("break Kernel_Start");
-                SendCmd("continue");
-                SendCmd("delete 1");
-            }
+            SendCmd("set architecture i386");
+            SendCmd("set language asm");
+            SendCmd("set disassembly-flavor intel");
+            //SendCmd("break Kernel_Start");
+            SendCmd("continue");
+            //SendCmd("delete 1");
         }
 
     }

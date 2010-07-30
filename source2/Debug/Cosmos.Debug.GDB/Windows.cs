@@ -64,11 +64,6 @@ namespace Cosmos.Debug.GDB {
                     aForm.StartPosition = FormStartPosition.Manual;
                     xShowForm = x.Visible;
                 }
-                var xBreakpoints = aForm as FormBreakpoints;
-                if (xBreakpoints != null)
-                {
-                    xBreakpoints.LoadSession();
-                }
             }
             if (xShowForm) {
                 Show(aForm);

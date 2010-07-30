@@ -34,7 +34,7 @@
             this.mitmStepInto = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmStepOver = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.continueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmContinue = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmViewBreakpoints = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,11 +44,18 @@
             this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
+            this.butnConnect = new System.Windows.Forms.Button();
+            this.butnContinue = new System.Windows.Forms.Button();
+            this.lablConnected = new System.Windows.Forms.Label();
+            this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lablConnected);
+            this.panel1.Controls.Add(this.butnContinue);
+            this.panel1.Controls.Add(this.butnConnect);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
@@ -112,7 +119,7 @@
             this.mitmStepInto,
             this.mitmStepOver,
             this.toolStripMenuItem1,
-            this.continueToolStripMenuItem});
+            this.mitmContinue});
             this.executeToolStripMenuItem.Name = "executeToolStripMenuItem";
             this.executeToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
             this.executeToolStripMenuItem.Text = "&Run";
@@ -121,7 +128,7 @@
             // 
             this.mitmStepInto.Name = "mitmStepInto";
             this.mitmStepInto.ShortcutKeys = System.Windows.Forms.Keys.F11;
-            this.mitmStepInto.Size = new System.Drawing.Size(150, 22);
+            this.mitmStepInto.Size = new System.Drawing.Size(152, 22);
             this.mitmStepInto.Text = "Step &Into";
             this.mitmStepInto.Click += new System.EventHandler(this.mitmStepInto_Click);
             // 
@@ -129,22 +136,22 @@
             // 
             this.mitmStepOver.Name = "mitmStepOver";
             this.mitmStepOver.ShortcutKeys = System.Windows.Forms.Keys.F10;
-            this.mitmStepOver.Size = new System.Drawing.Size(150, 22);
+            this.mitmStepOver.Size = new System.Drawing.Size(152, 22);
             this.mitmStepOver.Text = "Step &Over";
             this.mitmStepOver.Click += new System.EventHandler(this.mitmStepOver_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
             // 
-            // continueToolStripMenuItem
+            // mitmContinue
             // 
-            this.continueToolStripMenuItem.Name = "continueToolStripMenuItem";
-            this.continueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.continueToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
-            this.continueToolStripMenuItem.Text = "&Continue";
-            this.continueToolStripMenuItem.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
+            this.mitmContinue.Name = "mitmContinue";
+            this.mitmContinue.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.mitmContinue.Size = new System.Drawing.Size(152, 22);
+            this.mitmContinue.Text = "&Continue";
+            this.mitmContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
             // 
             // viewToolStripMenuItem
             // 
@@ -215,6 +222,37 @@
             this.mitmWindowsToForeground.Text = "All windows to foreground";
             this.mitmWindowsToForeground.Click += new System.EventHandler(this.mitmWindowsToForeground_Click);
             // 
+            // butnConnect
+            // 
+            this.butnConnect.Location = new System.Drawing.Point(3, 3);
+            this.butnConnect.Name = "butnConnect";
+            this.butnConnect.Size = new System.Drawing.Size(56, 23);
+            this.butnConnect.TabIndex = 0;
+            this.butnConnect.Text = "Connect";
+            this.butnConnect.UseVisualStyleBackColor = true;
+            this.butnConnect.Click += new System.EventHandler(this.mitmConnect_Click);
+            // 
+            // butnContinue
+            // 
+            this.butnContinue.Location = new System.Drawing.Point(65, 3);
+            this.butnContinue.Name = "butnContinue";
+            this.butnContinue.Size = new System.Drawing.Size(26, 23);
+            this.butnContinue.TabIndex = 1;
+            this.butnContinue.Text = ">";
+            this.butnContinue.UseVisualStyleBackColor = true;
+            this.butnContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
+            // 
+            // lablConnected
+            // 
+            this.lablConnected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lablConnected.AutoSize = true;
+            this.lablConnected.Location = new System.Drawing.Point(211, 8);
+            this.lablConnected.Name = "lablConnected";
+            this.lablConnected.Size = new System.Drawing.Size(59, 13);
+            this.lablConnected.TabIndex = 2;
+            this.lablConnected.Text = "Connected";
+            this.lablConnected.Visible = false;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -232,6 +270,8 @@
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Resize += new System.EventHandler(this.FormMain_Resize);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -249,7 +289,7 @@
         private System.Windows.Forms.ToolStripMenuItem mitmStepInto;
         private System.Windows.Forms.ToolStripMenuItem mitmStepOver;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem continueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mitmContinue;
         private System.Windows.Forms.ToolStripMenuItem mitmConnect;
         private System.Windows.Forms.ToolStripMenuItem mitmRefresh;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
@@ -262,6 +302,9 @@
         private System.Windows.Forms.ToolStripMenuItem mitmRegisters;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem mitmWindowsToForeground;
+        private System.Windows.Forms.Button butnConnect;
+        private System.Windows.Forms.Button butnContinue;
+        private System.Windows.Forms.Label lablConnected;
     }
 }
 

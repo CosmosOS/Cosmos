@@ -15,7 +15,6 @@ namespace Cosmos.Debug.GDB {
         }
 
         // TODO
-        // Set breakpoints
         // watches
         // View stack
 
@@ -36,17 +35,22 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected void Connect(int aRetry) {
+            if (!mitmConnect.Enabled) {
+                return;
+            }
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
             GDB.Connect(aRetry);
-            // Must be after Connect for now as it depends on Widnows being created
-            // Also sets saved breakpoints, so GDB needs to be connected
-            if (Settings.Filename != "") {
-                Settings.Load();
+            if (GDB.Connected) {
+                lablConnected.Visible = true;
+                // Must be after Connect for now as it depends on Widnows being created
+                // Also sets saved breakpoints, so GDB needs to be connected
+                if (Settings.Filename != "") {
+                    Settings.Load();
+                }
+                Windows.UpdateAllWindows();
             }
-
-            Windows.UpdateAllWindows();
         }
 
         private void mitmConnect_Click(object sender, EventArgs e) {
