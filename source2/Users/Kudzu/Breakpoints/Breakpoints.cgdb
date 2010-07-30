@@ -6,7 +6,7 @@
   <Breakpoint>
     <Label>DebugStub_Executing_CommandComingIn</Label>
   </Breakpoint>
- <Window>
+  <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
     <Top>0</Top>
