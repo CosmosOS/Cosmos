@@ -65,12 +65,6 @@ namespace ReflectionToEcmaCil
                         ScanArrayType(xType, mArrayTypes[xType]);
                         continue;
                     }
-                    //if (xItem is QueuedPointerType)
-                    //{
-                    //    var xType = (QueuedPointerType)xItem;
-                    //    ScanPointerType(xType, mPointerTypes[xType]);
-                    //    continue;
-                    //}
                     if (xItem is QueuedType)
                     {
                         var xType = (QueuedType)xItem;
