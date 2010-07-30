@@ -6,6 +6,9 @@
   <Breakpoint>
     <Label>DebugStub_Executing_CommandComingIn</Label>
   </Breakpoint>
+  <Breakpoint>
+    <Label>DebugStub_AfterReady</Label>
+  </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
@@ -40,18 +43,18 @@
   </Window>
   <Window>
     <Name>FormRegisters</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>1248</Left>
+    <Top>13</Top>
     <Width>281</Width>
     <Height>287</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormDisassembly</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>1539</Left>
+    <Top>13</Top>
     <Width>500</Width>
     <Height>511</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
 </SettingsDS>
