@@ -121,9 +121,9 @@ namespace Cosmos.Debug.GDB {
             SendCmd("set architecture i386");
             SendCmd("set language asm");
             SendCmd("set disassembly-flavor intel");
-            //SendCmd("break Kernel_Start");
+            SendCmd("break Kernel_Start");
             SendCmd("continue");
-            //SendCmd("delete 1");
+            SendCmd("delete 1");
         }
 
     }
