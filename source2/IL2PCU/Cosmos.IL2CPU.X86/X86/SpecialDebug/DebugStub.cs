@@ -144,7 +144,7 @@ namespace Cosmos.IL2CPU.X86 {
             Call("WriteALToComPort");
                         
             // Send EIP. EBP points to location with EIP
-            ESI = EBP;
+            ESI = Memory["DebugEIP", 32];
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
@@ -320,7 +320,7 @@ namespace Cosmos.IL2CPU.X86 {
         protected void Executing() {
             Label = "DebugStub_Executing";
 
-            // The very first time, we want to send a one time Ready signal back to the host
+            // The very first time, we send a one time Ready signal back to the host
             Memory["DebugReadySent", 32].Compare(1);
             JumpIf(Flags.Equal, "DebugStub_AfterReady");
             Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again

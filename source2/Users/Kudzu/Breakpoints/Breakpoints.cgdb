@@ -1,54 +1,51 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
-  <Breakpoint>
-    <Label>DebugStub_TracerEntry</Label>
-  </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
-    <Left>50</Left>
-    <Top>50</Top>
+    <Left>0</Left>
+    <Top>0</Top>
     <Width>300</Width>
     <Height>296</Height>
     <Visible>false</Visible>
   </Window>
   <Window>
     <Name>FormWatches</Name>
-    <Left>150</Left>
-    <Top>113</Top>
-    <Width>337</Width>
-    <Height>318</Height>
-    <Visible>true</Visible>
+    <Left>0</Left>
+    <Top>0</Top>
+    <Width>300</Width>
+    <Height>296</Height>
+    <Visible>false</Visible>
   </Window>
   <Window>
     <Name>FormLog</Name>
-    <Left>100</Left>
-    <Top>100</Top>
+    <Left>0</Left>
+    <Top>0</Top>
     <Width>505</Width>
     <Height>408</Height>
     <Visible>false</Visible>
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>635</Left>
-    <Top>313</Top>
+    <Left>0</Left>
+    <Top>0</Top>
     <Width>300</Width>
     <Height>296</Height>
-    <Visible>true</Visible>
+    <Visible>false</Visible>
   </Window>
   <Window>
     <Name>FormRegisters</Name>
-    <Left>1493</Left>
-    <Top>567</Top>
+    <Left>0</Left>
+    <Top>0</Top>
     <Width>281</Width>
     <Height>287</Height>
-    <Visible>true</Visible>
+    <Visible>false</Visible>
   </Window>
   <Window>
     <Name>FormDisassembly</Name>
-    <Left>1488</Left>
-    <Top>51</Top>
+    <Left>0</Left>
+    <Top>0</Top>
     <Width>500</Width>
     <Height>511</Height>
-    <Visible>true</Visible>
+    <Visible>false</Visible>
   </Window>
 </SettingsDS>
