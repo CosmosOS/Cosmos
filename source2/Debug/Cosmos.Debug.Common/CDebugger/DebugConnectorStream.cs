@@ -48,12 +48,9 @@ namespace Cosmos.Debug.Common.CDebugger {
         
         protected override void PacketTracePoint(byte[] aPacket) {
             System.Windows.Forms.MessageBox.Show("Tracepoint: " + GetUInt32(aPacket, 0).ToString("X8"));
-            if (CmdTrace == null) {
-                System.Windows.Forms.MessageBox.Show("Null");
-            }
             System.Windows.Forms.MessageBox.Show(mCurrentMsgType.ToString());
             try {
-                    CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
+                CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
                 System.Windows.Forms.MessageBox.Show("Calling Next");
                 Next(1, PacketCommand);
             } catch (Exception e) {
