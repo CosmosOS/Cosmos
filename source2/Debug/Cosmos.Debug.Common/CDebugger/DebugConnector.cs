@@ -33,9 +33,10 @@ namespace Cosmos.Debug.Common.CDebugger
         }
 
         public void SetBreakpointAddress(int aID, uint aAddress) {
-            var xData = new byte[5];
+            var xData = new byte[6];
             xData[0] = (byte)Command.BreakOnAddress;
-            Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 1, 4);
+            xData[1] = (byte)aID;
+            Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 2, 4);
             SendData(xData);
         }
 

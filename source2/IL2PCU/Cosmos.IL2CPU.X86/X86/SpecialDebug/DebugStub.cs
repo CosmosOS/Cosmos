@@ -60,6 +60,11 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
+        // INLINE
+        // TODO: Modify X# to allow inlining better by using dynamic labels otherwise
+        // repeated use of an inline will fail with conflicting labels.
+        // TODO: Allow methods to emit a start label and return automatically
+        // and mark inlines so this does not happen.
         protected void ReadComPortX32toEAX() {
             // Make room on the stack for the address
             new Push { DestinationValue = 0 };
@@ -83,6 +88,9 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_BreakOnAddress";
             PushAll32();
 
+            // Read BP ID Number - Ignored currently.
+            Call("ReadALFromComPort");
+
             ReadComPortX32toEAX();
             // Set it to our breakpoint address
             Memory["DebugBreakpointAddress", 32] = EAX;
@@ -102,15 +110,7 @@ namespace Cosmos.IL2CPU.X86 {
             Call("DebugStub_SendTrace");
 
             // Wait for a command
-            Label = "DebugStub_WaitCmd";
-            DX = mComStatusAddr;
-            AL = Port[DX];
-            AL.Test(0x01);
-            JumpIf(Flags.Zero, "DebugStub_WaitCmd");
-
-            // Read command from port
-            DX = mComAddr;
-            AL = Port[DX];
+            Call("ReadALFromComPort");
 
             AL.Compare((byte)Command.TraceOff);
                 CallIf(Flags.Equal, "DebugStub_TraceOff", "DebugStub_WaitCmd");
@@ -260,6 +260,24 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
+        //Modifies: AL, DX
+        protected void ReadALFromComPort() {
+            Label = "ReadALFromComPort";
+            DX = mComStatusAddr;
+
+            // Wait for port to be ready
+            Label = "ReadALFromComPort_Wait";
+            AL = Port[DX];
+            AL.Test(1);
+            JumpIf(Flags.Zero, "ReadALFromComPort_Wait");
+
+            // Set address of port
+            DX = mComAddr;
+            // Read byte
+            AL = Port[DX];
+            Return();
+        }
+
         // Input: EDI
         // Output: [EDI]
         // Modified: AL, DX, EDI (+1)
@@ -271,18 +289,7 @@ namespace Cosmos.IL2CPU.X86 {
         //  -All modern UARTs have at least a 16 byte buffer.
         protected void ReadByteFromComPort() {
             Label = "ReadByteFromComPort";
-            DX = mComStatusAddr;
-            
-            // Wait for port to be ready
-            Label = "ReadByteFromComPort_Wait";
-            AL = Port[DX];
-            AL.Test(1);
-                JumpIf(Flags.Zero, "ReadByteFromComPort_Wait");
-
-            // Set address of port
-            DX = mComAddr;
-            // Read byte
-            AL = Port[DX];
+            Call("ReadALFromComPort");
             Memory[EDI, 8] = AL;
             new Inc { DestinationReg = Registers.EDI };
             Return();
