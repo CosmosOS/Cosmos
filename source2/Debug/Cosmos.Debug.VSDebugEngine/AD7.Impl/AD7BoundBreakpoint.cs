@@ -10,40 +10,38 @@ namespace Cosmos.Debug.VSDebugEngine {
     // that creates it. Unless the pending breakpoint only has one bound breakpoint, each bound breakpoint is displayed as a child of the
     // pending breakpoint in the breakpoints window. Otherwise, only one is displayed.
     class AD7BoundBreakpoint : IDebugBoundBreakpoint2 {
-        private AD7PendingBreakpoint m_pendingBreakpoint;
-        private AD7BreakpointResolution m_breakpointResolution;
-        private AD7Engine m_engine;
-        internal uint m_address;                                                                                               
-        private bool m_enabled;
-        private bool m_deleted;
+        protected AD7PendingBreakpoint m_pendingBreakpoint;
+        protected AD7BreakpointResolution m_breakpointResolution;
+        protected AD7Engine mEngine;
+        protected bool mEnabled = true;
+        protected bool mDeleted = false;
+        public uint mAddress;
 
-        public AD7BoundBreakpoint(AD7Engine engine, uint address, AD7PendingBreakpoint pendingBreakpoint, AD7BreakpointResolution breakpointResolution) {
-            m_engine = engine;
-            m_address = address;
+        public AD7BoundBreakpoint(AD7Engine aEngine, uint aAddress, AD7PendingBreakpoint pendingBreakpoint, AD7BreakpointResolution breakpointResolution) {
+            mEngine = aEngine;
+            mAddress = aAddress;
             m_pendingBreakpoint = pendingBreakpoint;
             m_breakpointResolution = breakpointResolution;
-            m_enabled = true;
-            m_deleted = false;
-            m_engine.mProcess.SetBreakpointAddress(address);
+            mEngine.mProcess.SetBreakpointAddress(aAddress);
         }
 
         // Called when the breakpoint is being deleted by the user.
         int IDebugBoundBreakpoint2.Delete() {
-            if (!m_deleted) {
-                m_deleted = true;
+            if (!mDeleted) {
+                mDeleted = true;
                 m_pendingBreakpoint.OnBoundBreakpointDeleted(this);
             }
             return VSConstants.S_OK;
         }
 
         // Called by the debugger UI when the user is enabling or disabling a breakpoint.
-        int IDebugBoundBreakpoint2.Enable(int fEnable) {
-            bool enabled = fEnable == 0 ? false : true;
-            if (m_enabled != enabled) {
+        int IDebugBoundBreakpoint2.Enable(int aEnable) {
+            bool xEnabled = aEnable != 0;
+            if (mEnabled != xEnabled) {
                 // A production debug engine would remove or add the underlying int3 here. The sample engine does not support true disabling
                 // of breakpionts.
             }
-            m_enabled = fEnable != 0;
+            mEnabled = aEnable != 0;
             return VSConstants.S_OK;
         }
 
@@ -62,9 +60,9 @@ namespace Cosmos.Debug.VSDebugEngine {
         int IDebugBoundBreakpoint2.GetState(out uint pState) {
             pState = 0;
 
-            if (m_deleted) {
+            if (mDeleted) {
                 pState = (uint)enum_BP_STATE.BPS_DELETED;
-            } else if (m_enabled) {
+            } else if (mEnabled) {
                 pState = (uint)enum_BP_STATE.BPS_ENABLED;
             } else {
                 pState = (uint)enum_BP_STATE.BPS_DISABLED;

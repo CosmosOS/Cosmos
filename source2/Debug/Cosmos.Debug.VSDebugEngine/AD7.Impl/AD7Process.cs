@@ -16,18 +16,18 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine {
     public class AD7Process : IDebugProcess2 {
-        internal Guid mID = Guid.NewGuid();
-        private Process mProcess;
-        private ProcessStartInfo mProcessStartInfo;
-        private EngineCallback mCallback;
-        internal AD7Thread mThread;
-        private AD7Engine mEngine;
-        private DebugConnector mDbgConnector;
-        internal ReverseSourceInfos mReverseSourceMappings;
-        internal SourceInfos mSourceMappings;
-        internal uint? mCurrentAddress = null;
-        internal string mISO;
-        private readonly NameValueCollection mDebugInfo;
+        public Guid mID = Guid.NewGuid();
+        protected Process mProcess;
+        protected ProcessStartInfo mProcessStartInfo;
+        protected EngineCallback mCallback;
+        public AD7Thread mThread;
+        protected AD7Engine mEngine;
+        protected DebugConnector mDbgConnector;
+        public ReverseSourceInfos mReverseSourceMappings;
+        public SourceInfos mSourceMappings;
+        public uint? mCurrentAddress = null;
+        public string mISO;
+        protected readonly NameValueCollection mDebugInfo;
         protected TargetHost mTargetHost;
 
         protected void LaunchQEMU(bool aGDB) {
@@ -218,8 +218,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             // program run.
             foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
                 foreach (var xBBP in xBP.mBoundBPs) {
-                    DebugMsg("Setting BP @ " + xBBP.m_address.ToString("X8").ToUpper());
-                    SetBreakpointAddress(xBBP.m_address);
+                    DebugMsg("Setting BP @ " + xBBP.mAddress.ToString("X8").ToUpper());
+                    SetBreakpointAddress(xBBP.mAddress);
                 }
             }
         }
@@ -253,7 +253,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                     // Search the BPs and find the ones that match our address
                     foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
                         foreach (var xBBP in xBP.mBoundBPs) { 
-                            if (xBBP.m_address == xActualAddress) {
+                            if (xBBP.mAddress == xActualAddress) {
                                 xBoundBreakpoints.Add(xBBP);
                             }
                         }

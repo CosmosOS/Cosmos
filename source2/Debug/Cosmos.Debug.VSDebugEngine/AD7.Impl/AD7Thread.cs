@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Cosmos.Debug.VSDebugEngine
 {
     // This class implements IDebugThread2 which represents a thread running in a program.
-    class AD7Thread : IDebugThread2
+    public class AD7Thread : IDebugThread2
     {
         readonly AD7Engine m_engine;
         //readonly DebuggedThread m_debuggedThread;

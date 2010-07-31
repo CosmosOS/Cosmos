@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    class EngineCallback //: ISampleEngineCallback
+    public class EngineCallback //: ISampleEngineCallback
     {
         readonly IDebugEventCallback2 m_ad7Callback;
         readonly AD7Engine m_engine;

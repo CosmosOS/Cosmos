@@ -10,7 +10,7 @@ using System.Threading;
 namespace Cosmos.Debug.VSDebugEngine
 {
     // this class represents a module loaded in the debuggee process to the debugger. 
-    class AD7Module : IDebugModule2, IDebugModule3
+    public class AD7Module : IDebugModule2, IDebugModule3
     {
         //public readonly DebuggedModule DebuggedModule;
 

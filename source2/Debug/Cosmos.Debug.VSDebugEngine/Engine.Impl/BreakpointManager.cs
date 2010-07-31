@@ -1,16 +1,17 @@
 ﻿using System;
-using Microsoft.VisualStudio.Debugger.Interop;
+using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Cosmos.Debug.VSDebugEngine {
     // This class manages breakpoints for the engine. 
     class BreakpointManager {
-        private AD7Engine mEngine;
-        internal System.Collections.Generic.List<AD7PendingBreakpoint> mPendingBPs;
+        protected AD7Engine mEngine;
+        public List<AD7PendingBreakpoint> mPendingBPs = new List<AD7PendingBreakpoint>();
+        public AD7BoundBreakpoint[] mActiveBPs = new AD7BoundBreakpoint[256];
 
         public BreakpointManager(AD7Engine aEngine) {
             mEngine = aEngine;
-            mPendingBPs = new System.Collections.Generic.List<AD7PendingBreakpoint>();
         }
       
         // A helper method used to construct a new pending breakpoint.
