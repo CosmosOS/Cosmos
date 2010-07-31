@@ -216,7 +216,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             // OK, now debugger is ready. Send it a list of breakpoints that were set before
             // program run.
-            foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
+            foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
                 foreach (var xBBP in xBP.mBoundBPs) {
                     DebugMsg("Setting BP @ " + xBBP.mAddress.ToString("X8").ToUpper());
                     SetBreakpointAddress(xBBP.mAddress);
@@ -251,7 +251,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                     var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
                     
                     // Search the BPs and find the ones that match our address
-                    foreach (var xBP in mEngine.m_breakpointManager.mPendingBPs) {
+                    foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
                         foreach (var xBBP in xBP.mBoundBPs) { 
                             if (xBBP.mAddress == xActualAddress) {
                                 xBoundBreakpoints.Add(xBBP);

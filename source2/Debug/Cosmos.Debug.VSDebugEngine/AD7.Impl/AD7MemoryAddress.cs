@@ -10,7 +10,7 @@ namespace Cosmos.Debug.VSDebugEngine
     // IDebugMemoryContext2 represents a position in the address space of the machine running the program being debugged.
     // IDebugCodeContext2 represents the starting position of a code instruction. 
     // For most run-time architectures today, a code context can be thought of as an address in a program's execution stream.
-    class AD7MemoryAddress : IDebugCodeContext2
+    public class AD7MemoryAddress : IDebugCodeContext2
     {
         readonly AD7Engine m_engine;
         readonly uint m_address;

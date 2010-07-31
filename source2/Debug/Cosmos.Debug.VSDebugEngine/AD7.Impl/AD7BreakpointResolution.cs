@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.VSDebugEngine {
     // This class represents the information that describes a bound breakpoint.
-    class AD7BreakpointResolution : IDebugBreakpointResolution2 {
+    public class AD7BreakpointResolution : IDebugBreakpointResolution2 {
         private AD7Engine m_engine;
         private uint m_address;
         private AD7DocumentContext m_documentContext;

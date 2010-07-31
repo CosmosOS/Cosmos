@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Cosmos.Debug.VSDebugEngine
 {
     // This class represents a document context to the debugger. A document context represents a location within a source file. 
-    class AD7DocumentContext : IDebugDocumentContext2
+    public class AD7DocumentContext : IDebugDocumentContext2
     {
         string m_fileName;
         TEXT_POSITION m_begPos;

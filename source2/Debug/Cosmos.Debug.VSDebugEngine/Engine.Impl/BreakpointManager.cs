@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Cosmos.Debug.VSDebugEngine {
     // This class manages breakpoints for the engine. 
-    class BreakpointManager {
+    public class BreakpointManager {
         protected AD7Engine mEngine;
         public List<AD7PendingBreakpoint> mPendingBPs = new List<AD7PendingBreakpoint>();
         public AD7BoundBreakpoint[] mActiveBPs = new AD7BoundBreakpoint[256];

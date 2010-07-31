@@ -9,7 +9,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // This class represents a breakpoint that has been bound to a location in the debuggee. It is a child of the pending breakpoint
     // that creates it. Unless the pending breakpoint only has one bound breakpoint, each bound breakpoint is displayed as a child of the
     // pending breakpoint in the breakpoints window. Otherwise, only one is displayed.
-    class AD7BoundBreakpoint : IDebugBoundBreakpoint2 {
+    public class AD7BoundBreakpoint : IDebugBoundBreakpoint2 {
         protected AD7PendingBreakpoint m_pendingBreakpoint;
         protected AD7BreakpointResolution m_breakpointResolution;
         protected AD7Engine mEngine;
@@ -17,11 +17,17 @@ namespace Cosmos.Debug.VSDebugEngine {
         protected bool mDeleted = false;
         public uint mAddress;
 
-        public AD7BoundBreakpoint(AD7Engine aEngine, uint aAddress, AD7PendingBreakpoint pendingBreakpoint, AD7BreakpointResolution breakpointResolution) {
+        public int mRemoteID = -1;
+        public int RemoteID {
+            get { return mRemoteID; }
+        }
+
+        public AD7BoundBreakpoint(AD7Engine aEngine, uint aAddress, AD7PendingBreakpoint aPendingBP, AD7BreakpointResolution breakpointResolution) {
             mEngine = aEngine;
             mAddress = aAddress;
-            m_pendingBreakpoint = pendingBreakpoint;
+            m_pendingBreakpoint = aPendingBP;
             m_breakpointResolution = breakpointResolution;
+            //mRemoteID = 
             mEngine.mProcess.SetBreakpointAddress(aAddress);
         }
 

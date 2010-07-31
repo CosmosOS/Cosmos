@@ -14,22 +14,12 @@ namespace Cosmos.Debug.VSDebugEngine
         //readonly DebuggedThread m_debuggedThread;
         //TODO: Can we safely change this?
         const string ThreadNameString = "Sample Engine Thread";
-        private AD7Process mProcess;
 
         public AD7Thread(AD7Engine engine, AD7Process aProcess)//, DebuggedThread debuggedThread)
         {
             m_engine = engine;
-            aProcess = mProcess;
-            //m_debuggedThread = debuggedThread;
         }      
         
-        //X86ThreadContext GetThreadContext()
-        //{
-        //    X86ThreadContext threadContext = m_engine.DebuggedProcess.GetThreadContext(m_debuggedThread.Handle);
-        //
-        //    return threadContext;
-        //}
-
         string GetCurrentLocation(bool fIncludeModuleName)
         {
             uint ip = 0;// GetThreadContext().eip;
@@ -37,11 +27,6 @@ namespace Cosmos.Debug.VSDebugEngine
 
             return location;
         }
-
-        //internal DebuggedThread GetDebuggedThread()
-        //{
-        //    return m_debuggedThread;
-        //}
 
         #region IDebugThread2 Members
 

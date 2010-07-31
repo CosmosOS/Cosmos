@@ -25,8 +25,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
     [ComVisible(true)]
     [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
-    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2
-    {
+    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         EngineCallback m_engineCallback;
         internal AD7Process mProcess;
@@ -39,7 +38,10 @@ namespace Cosmos.Debug.VSDebugEngine
         // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
         // api requires thread affinity to several operations.
         // This object manages breakpoints in the sample engine.
-        internal BreakpointManager m_breakpointManager;
+        protected BreakpointManager mBPMgr;
+        public BreakpointManager BPMgr {
+            get { return mBPMgr; }
+        }
 
         // A unique identifier for the program being debugged.
         Guid m_ad7ProgramId;
@@ -52,12 +54,11 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public AD7Engine() {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-            m_breakpointManager = new BreakpointManager(this);
+            mBPMgr = new BreakpointManager(this);
             //Worker.Initialize();
         }
 
-        ~AD7Engine()
-        {
+        ~AD7Engine() {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
         }
 
@@ -209,12 +210,12 @@ namespace Cosmos.Debug.VSDebugEngine
         int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-            System.Diagnostics.Debug.Assert(m_breakpointManager != null);
+            System.Diagnostics.Debug.Assert(BPMgr != null);
             ppPendingBP = null;
 
             try
             {
-                m_breakpointManager.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
+                BPMgr.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
             }
             catch (Exception e)
             {
@@ -571,7 +572,7 @@ namespace Cosmos.Debug.VSDebugEngine
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
 
-            m_breakpointManager.ClearBoundBreakpoints();
+            BPMgr.ClearBoundBreakpoints();
 
             //m_pollThread.RunOperation(new Operation(delegate
             //{

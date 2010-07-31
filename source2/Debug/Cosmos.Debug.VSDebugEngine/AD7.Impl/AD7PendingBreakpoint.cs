@@ -6,12 +6,11 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Windows.Forms;
 
-namespace Cosmos.Debug.VSDebugEngine
-{
+namespace Cosmos.Debug.VSDebugEngine {
     // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
     // When a user creates a new breakpoint, the pending breakpoint is created and is later bound. The bound breakpoints
     // become children of the pending breakpoint.
-    class AD7PendingBreakpoint : IDebugPendingBreakpoint2 {       
+    public class AD7PendingBreakpoint : IDebugPendingBreakpoint2 {       
         // The breakpoint request that resulted in this pending breakpoint being created.
         private IDebugBreakpointRequest2 m_pBPRequest;
         private BP_REQUEST_INFO m_bpRequestInfo; 
