@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var Y = new Y86();
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment( Assembler, "String Value: " + xOpString.Value.Replace( "\r", "\\r" ).Replace( "\n", "\\n" ) );
-      Y.EAX = Y.Reference(xDataName);
+      Y.EAX = Y.AddressOf(xDataName);
       Y.EAX.Push();
       Assembler.Stack.Push(4, typeof(string));
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!

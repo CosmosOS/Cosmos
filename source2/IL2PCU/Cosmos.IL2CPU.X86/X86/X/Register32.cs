@@ -6,14 +6,14 @@ using System.Text;
 namespace Cosmos.IL2CPU.X86.X {
     public class Register32 : Register {
 
+        // Not all overloads can go here.
+        // 1- C# overloads specifically by exact class and does not inherit in many cases
+        // 2- x86 does not support all operations on all registers
+
         public static AddressIndirect operator +(Register32 aBaseRegister, Int32 aDisplacement) {
             return new AddressIndirect(aBaseRegister, aDisplacement);
         }
 
-        // This syntax would be nice:
-        // EBP = EBP + 32
-        // But it would conflict with C#'s resolution of [EBP + 4] becuase
-        // C# on operator overloads does not look at return type, only argument types
         public void Add(UInt32 aValue) {
             new Add { DestinationReg = GetId(), SourceValue = aValue };
         }

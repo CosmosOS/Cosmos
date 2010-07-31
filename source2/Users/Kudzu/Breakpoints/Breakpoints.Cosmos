@@ -62,6 +62,11 @@
       <SubType>Content</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Compile last with NASM.bat">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
   </Target>

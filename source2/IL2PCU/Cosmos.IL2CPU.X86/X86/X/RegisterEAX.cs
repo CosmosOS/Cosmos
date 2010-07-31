@@ -32,8 +32,7 @@ namespace Cosmos.IL2CPU.X86.X {
             return Instance;
         }
 
-        public static implicit operator PortNumber(RegisterEAX aEAX)
-        {
+        public static implicit operator PortNumber(RegisterEAX aEAX) {
             return new PortNumber(aEAX.GetId());
         }
     }

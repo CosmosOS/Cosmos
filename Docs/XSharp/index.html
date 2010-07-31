@@ -6,5 +6,71 @@
     <title></title>
 </head>
 <body>
+    <h3>
+        binX#</h3>
+    <p>
+        X# is a combination of a high level machine language, and assembler.</p>
+    <h3>
+        C# versus External</h3>
+    <p>
+        At some point X# may be externalized and receive its own seperate compiler / 
+        assembler.</p>
+    <ul>
+        <li>This requires an addtional parser.</li>
+        <li>Input from C# values during comilation would need to be implemented.</li>
+        <li>One of the goals of Cosmos is the need to write very little assembly, so only 
+            debug stub, compiler users, etc need assembly. Too much work on X# may not be 
+            worth the resources required.</li>
+    </ul>
+    <h3>
+        Usage</h3>
+    <h3>
+        Register Arithmetic</h3>
+    <p>
+&nbsp;EBP = EBP + 32;<br />
+        This is not possible because C# operator overloading does not look at return 
+        type but only the operand types. That is C# sees Register + int. If we supported 
+        the previous example, then X# could not support:<br />
+        EAX = Memory[EBP + 4];<br />
+        In short, C# sees these two as the same and so X# can only support one. Because 
+        the memory addressing is used more frequently than adding a constant to a 
+        register, X# supports it.<br />
+        To add a constant to a register use:<br />
+        EBP.Add(32);</p>
+    <h3>
+        Register Methods</h3>
+    <ul>
+        <li>Add</li>
+        <li>Sub</li>
+        <li>Compare</li>
+        <li>Test</li>
+    </ul>
+    <h3>
+        Register = int</h3>
+    <p>
+        Example:<br />
+        EAX = 0x40;</p>
+    <h3>
+        Register = Register</h3>
+    <p>
+        Example:<br />
+        EAX = EBP;</p>
+    <h3>
+        Register = Memory[Address];<br />
+        Register = Memory[Address + int];</h3>
+    <p>
+        Address can be a string label. i.e. EAX = Memory[&quot;Data1&quot;]</p>
+    <h3>
+        Register = Port[x]<br />
+        Register = Port[EAX]</h3>
+    <p>
+        public static implicit operator RegisterEAX(ElementReference aReference) { 
+        Instance.Move(aReference); return Instance; }
+    </p>
+    <h3>
+        Register = Label</h3>
+    <p>
+        Example:<br />
+        EAX = AddressOf(&quot;Labelname&quot;);</p>
 </body>
 </html>

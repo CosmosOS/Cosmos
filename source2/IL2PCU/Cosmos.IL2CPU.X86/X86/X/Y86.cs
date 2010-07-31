@@ -45,7 +45,6 @@ namespace Cosmos.IL2CPU.X86.X {
             new Call { DestinationLabel = aLabel };
         }
 
-
         public void Define(string aSymbol) {
             new Define( aSymbol );
         }
@@ -121,7 +120,7 @@ namespace Cosmos.IL2CPU.X86.X {
             new ClrInterruptFlag();
         }
 
-        public ElementReference Reference(string aDataName) {
+        public ElementReference AddressOf(string aDataName) {
             return ElementReference.New(aDataName);
         }
     }

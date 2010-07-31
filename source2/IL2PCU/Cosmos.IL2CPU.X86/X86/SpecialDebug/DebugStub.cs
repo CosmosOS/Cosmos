@@ -110,6 +110,7 @@ namespace Cosmos.IL2CPU.X86 {
             Call("DebugStub_SendTrace");
 
             // Wait for a command
+            Label = "DebugStub_WaitCmd";
             Call("ReadALFromComPort");
 
             AL.Compare((byte)Command.TraceOff);
@@ -319,6 +320,7 @@ namespace Cosmos.IL2CPU.X86 {
             WriteALToComPort();
             WriteByteToComPort();
             ReadByteFromComPort();
+            ReadALFromComPort();
 
             DebugSuspend();
             DebugResume();
@@ -454,7 +456,8 @@ namespace Cosmos.IL2CPU.X86 {
                 // Store it for later use.
                 Memory["DebugEIP", 32] = EAX;
 
-                EAX = "DebugEIP";
+                Label = "DebugStub_Test";
+                EAX = AddressOf("DebugEIP");
 
 
                 // Call secondary stub
