@@ -453,6 +453,10 @@ namespace Cosmos.IL2CPU.X86 {
                 EAX.Sub(5);
                 // Store it for later use.
                 Memory["DebugEIP", 32] = EAX;
+
+                EAX = "DebugEIP";
+
+
                 // Call secondary stub
                 Call("DebugStub_Executing");
             PopAll32();
