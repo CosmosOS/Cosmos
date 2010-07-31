@@ -27,8 +27,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             mAddress = aAddress;
             m_pendingBreakpoint = aPendingBP;
             m_breakpointResolution = breakpointResolution;
-            //mRemoteID = 
-            mEngine.mProcess.SetBreakpointAddress(aAddress);
+            mRemoteID = mEngine.BPMgr.RemoteEnable(this);
         }
 
         // Called when the breakpoint is being deleted by the user.

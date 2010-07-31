@@ -22,7 +22,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         protected EngineCallback mCallback;
         public AD7Thread mThread;
         protected AD7Engine mEngine;
-        protected DebugConnector mDbgConnector;
+        public DebugConnector mDbgConnector;
         public ReverseSourceInfos mReverseSourceMappings;
         public SourceInfos mSourceMappings;
         public uint? mCurrentAddress = null;
@@ -219,13 +219,9 @@ namespace Cosmos.Debug.VSDebugEngine {
             foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
                 foreach (var xBBP in xBP.mBoundBPs) {
                     DebugMsg("Setting BP @ " + xBBP.mAddress.ToString("X8").ToUpper());
-                    SetBreakpointAddress(xBBP.mAddress);
+                    mDbgConnector.SetBreakpointAddress(xBBP.RemoteID, xBBP.mAddress);
                 }
             }
-        }
-
-        public void SetBreakpointAddress(uint aAddress) {
-            mDbgConnector.SetBreakpointAddress(aAddress);
         }
 
         void DbgCmdText(string obj) {

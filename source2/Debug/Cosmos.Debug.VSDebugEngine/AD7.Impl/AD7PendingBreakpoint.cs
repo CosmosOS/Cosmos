@@ -113,7 +113,6 @@ namespace Cosmos.Debug.VSDebugEngine {
                         var xBPR = new AD7BreakpointResolution(m_engine, xAddress, GetDocumentContext(xAddress));
                         var xBBP = new AD7BoundBreakpoint(m_engine, xAddress, this, xBPR);
                         mBoundBPs.Add(xBBP);
-                        m_engine.mProcess.SetBreakpointAddress(xAddress);
                     }
 
                     // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.

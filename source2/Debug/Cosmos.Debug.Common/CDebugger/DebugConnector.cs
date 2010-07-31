@@ -32,7 +32,7 @@ namespace Cosmos.Debug.Common.CDebugger
             SendData(xData);
         }
 
-        public void SetBreakpointAddress(uint aAddress) {
+        public void SetBreakpointAddress(int aID, uint aAddress) {
             var xData = new byte[5];
             xData[0] = (byte)Command.BreakOnAddress;
             Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 1, 4);
