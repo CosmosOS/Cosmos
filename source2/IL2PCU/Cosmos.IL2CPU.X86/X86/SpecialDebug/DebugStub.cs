@@ -145,16 +145,11 @@ namespace Cosmos.IL2CPU.X86 {
             Call("WriteALToComPort");
                         
             // Send Calling EIP.
-            //TODO: Simply point ESI at DebugEIP, but I dont know how 
-            // with our assembler
-            EAX = Memory["DebugEIP", 32];
-            EAX.Push();
-            ESI = ESP;
+            ESI = AddressOf("DebugEIP");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
-            EAX.Pop();
             Return();
         }
 

@@ -12,6 +12,11 @@ namespace Cosmos.IL2CPU.X86.X {
             return Name;
         }
 
+        public static implicit operator RegisterESI(ElementReference aReference) {
+            Instance.Move(aReference);
+            return Instance;
+        }
+
         public static implicit operator RegisterESI(MemoryAction aAction) {
             Instance.Move(aAction);
             return Instance;
