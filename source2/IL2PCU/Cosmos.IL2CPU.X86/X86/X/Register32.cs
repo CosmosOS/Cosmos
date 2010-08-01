@@ -17,13 +17,40 @@ namespace Cosmos.IL2CPU.X86.X {
         public void Add(UInt32 aValue) {
             new Add { DestinationReg = GetId(), SourceValue = aValue };
         }
+        public void Add(Register32 aReg) {
+            new Add { DestinationReg = GetId(), SourceReg = aReg.GetId() };
+        }
 
         public void Sub(UInt32 aValue) {
             new Sub { DestinationReg = GetId(), SourceValue = aValue };
         }
+        public void Sub(Register32 aReg) {
+            new Sub { DestinationReg = GetId(), SourceReg = aReg.GetId() };
+        }
 
         public void Compare(UInt32 aValue) {
             new Compare { DestinationReg = GetId(), SourceValue = aValue };
+        }
+        public void Compare(MemoryAction aAction) {
+            new Compare {
+                DestinationRef = aAction.Reference,
+                DestinationIsIndirect = true,
+                SourceReg = GetId()
+            };
+        }
+
+        public void ShiftLeft() {
+            ShiftLeft(1);
+        }
+        public void ShiftLeft(byte aSize) {
+            new ShiftLeft { DestinationReg = Registers.ECX, SourceValue = aSize };
+        }
+
+        public void ShiftRight() {
+            ShiftRight(1);
+        }
+        public void ShiftRight(byte aSize) {
+            new ShiftRight { DestinationReg = Registers.ECX, SourceValue = aSize };
         }
 
         public void Test(UInt32 aValue) {

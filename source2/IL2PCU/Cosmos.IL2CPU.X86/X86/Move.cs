@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
     [OpCode("mov")]
-	public class Move: InstructionWithDestinationAndSourceAndSize {
+	public class Move : InstructionWithDestinationAndSourceAndSize {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xC0 },
@@ -138,14 +138,12 @@ namespace Cosmos.IL2CPU.X86 {
             }); // memory to register (eax)
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x8A },
-                OperandSizeByte=0,
+                OperandSizeByte = 0,
                 NeedsModRMByte = true,
-                SourceMemory=true,
-                DestinationRegAny=true
+                SourceMemory = true,
+                DestinationRegAny = true
             }); // memory to register
         }
-
-
 
 	}
 }

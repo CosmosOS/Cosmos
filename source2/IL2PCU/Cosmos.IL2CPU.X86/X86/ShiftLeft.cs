@@ -34,15 +34,15 @@ namespace Cosmos.IL2CPU.X86 {
                 OperandSizeByte = 0,
                 DestinationRegAny = true,
                 ReverseRegisters = true,
-                SourceImmediate=true,
-                SourceImmediateSize=InstructionSize.Byte
+                SourceImmediate = true,
+                SourceImmediateSize = InstructionSize.Byte
             }); // register by immediate
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xC0 },
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 0x20,
                 OperandSizeByte = 0,
-                ReverseRegisters=true,
+                ReverseRegisters = true,
                 DestinationMemory = true,
                 SourceImmediate = true,
                 SourceImmediateSize = InstructionSize.Byte

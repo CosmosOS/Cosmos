@@ -38,7 +38,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     public override void AssembleNew(object aAssembler, object aMethodInfo) {
       #region generate IDT table
 
-      string xFieldData = "";
       string xFieldName = "_NATIVE_IDT_Contents";
       var xAssembler = (Assembler)aAssembler;
       xAssembler.DataMembers.Add(new CPUAll.DataMember(xFieldName,

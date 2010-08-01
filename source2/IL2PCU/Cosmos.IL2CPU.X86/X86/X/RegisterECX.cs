@@ -12,6 +12,11 @@ namespace Cosmos.IL2CPU.X86.X {
             return Name;
         }
 
+        public static implicit operator RegisterECX(ElementReference aReference) {
+            Instance.Move(aReference);
+            return Instance;
+        }
+
         public static implicit operator RegisterECX(MemoryAction aAction) {
             Instance.Move(aAction);
             return Instance;
@@ -23,6 +28,16 @@ namespace Cosmos.IL2CPU.X86.X {
         }
 
         public static implicit operator RegisterECX(RegisterEAX aValue) {
+            Instance.Move(aValue.GetId());
+            return Instance;
+        }
+
+        public static implicit operator RegisterECX(RegisterEBX aValue) {
+            Instance.Move(aValue.GetId());
+            return Instance;
+        }
+
+        public static implicit operator RegisterECX(RegisterEDX aValue) {
             Instance.Move(aValue.GetId());
             return Instance;
         }

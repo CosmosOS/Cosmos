@@ -12,13 +12,14 @@ namespace Cosmos.IL2CPU.X86.X {
 
         //TODO: Add registers as needed, not all are here yet
         public RegisterEAX EAX = RegisterEAX.Instance;
+        public RegisterAX AX = RegisterAX.Instance;
         public RegisterAL AL = RegisterAL.Instance;
         
         public RegisterEBX EBX = RegisterEBX.Instance;
+
         public RegisterECX ECX = RegisterECX.Instance;
 
         public RegisterEDX EDX = RegisterEDX.Instance;
-        public RegisterAX AX = RegisterAX.Instance;
         public RegisterDX DX = RegisterDX.Instance;
 
         public RegisterEBP EBP = RegisterEBP.Instance;

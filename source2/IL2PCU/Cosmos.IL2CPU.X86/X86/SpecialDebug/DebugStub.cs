@@ -40,8 +40,7 @@ namespace Cosmos.IL2CPU.X86 {
                 // If set to 1, on next trace a break will occur
                 new DataMember("DebugBreakOnNextTrace", 0)
 
-                // Breakpoint address
-                , new DataMember("DebugBreakpointAddress", 0)
+                // Breakpoint addresses
                 , new DataMember("DebugBPs", new int[256])
              });
         }
@@ -89,11 +88,21 @@ namespace Cosmos.IL2CPU.X86 {
             PushAll32();
 
             // Read BP ID Number - Ignored currently.
+            EAX = 0;
             Call("ReadALFromComPort");
+            ECX = EAX;
 
+            // BP Address
             ReadComPortX32toEAX();
-            // Set it to our breakpoint address
-            Memory["DebugBreakpointAddress", 32] = EAX;
+            
+            // Calculate location in table
+            // Mov [EBX + ECX * 4], EAX would be better, but our asm doesn't handle this yet
+            EBX = AddressOf("DebugBPs");
+            ECX.ShiftLeft(2);
+            EBX.Add(ECX);
+
+            //TODO: Make it so X# doesnt require the 32 and that it checks register size
+            Memory[EBX, 32] = EAX;
 
             PopAll32();
             Return();
@@ -338,15 +347,12 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_AfterReady";
             
             // If BP is disabled (0), skip BP checking code.
-            Memory["DebugBreakpointAddress", 32].Compare(0);
+            Memory["DebugBPs", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_Executing_AfterBreakOnAddress");
 
             // BP is active
             EAX = Memory["DebugEIP", 32];
-            new Compare {
-                DestinationRef = ElementReference.New("DebugBreakpointAddress"), DestinationIsIndirect = true,
-                SourceReg = Registers.EAX
-            };
+            EAX.Compare(Memory["DebugBPs", 32]);
             JumpIf(Flags.Equal, "DebugStub_Break");
 
             Label = "DebugStub_Executing_AfterBreakOnAddress";
@@ -450,10 +456,6 @@ namespace Cosmos.IL2CPU.X86 {
                 EAX.Sub(5);
                 // Store it for later use.
                 Memory["DebugEIP", 32] = EAX;
-
-                Label = "DebugStub_Test";
-                EAX = AddressOf("DebugEIP");
-
 
                 // Call secondary stub
                 Call("DebugStub_Executing");

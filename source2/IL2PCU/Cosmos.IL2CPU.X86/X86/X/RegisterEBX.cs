@@ -27,7 +27,17 @@ namespace Cosmos.IL2CPU.X86.X {
             return Instance;
         }
 
+        public static implicit operator RegisterEBX(RegisterEAX aValue) {
+            Instance.Move(aValue.GetId());
+            return Instance;
+        }
+
         public static implicit operator RegisterEBX(RegisterECX aValue) {
+            Instance.Move(aValue.GetId());
+            return Instance;
+        }
+
+        public static implicit operator RegisterEBX(RegisterEDX aValue) {
             Instance.Move(aValue.GetId());
             return Instance;
         }

@@ -18,8 +18,8 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
     {
         public static string GetNumberString(double aValue)
         {
-            const string xDigits = "0123456789";
-            const char divisor = '.';
+            //const string xDigits = "0123456789";
+            //const char divisor = '.';
             char[] xResultChars= new char[70];
             //BitConverter.(aValue,0);
             return null;
