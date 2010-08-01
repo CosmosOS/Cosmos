@@ -168,7 +168,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
-            mDbgConnector.CmdReady += new Action(DbgCmdReady);
+            mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
             mDbgConnector.ConnectionLost = new Action<Exception>(
                 delegate { 
                     mEngine.Callback.OnProcessExit(0);
@@ -207,8 +207,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             mCallback.OnOutputString(aMsg + "\n");
         }
 
-        protected void DbgCmdReady() {
-            DebugMsg("RmtDbg: Ready");
+        protected void DbgCmdStarted() {
+            DebugMsg("RmtDbg: Started");
             
             // Guests never get the first byte sent. So we send a noop.
             // This dummy byte seems to clear out the serial channel.

@@ -340,7 +340,7 @@ namespace Cosmos.IL2CPU.X86 {
             Memory["DebugReadySent", 32].Compare(1);
             JumpIf(Flags.Equal, "DebugStub_AfterReady");
             Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again
-            AL = (int)MsgType.Ready; // Send the actual Ready signal
+            AL = (int)MsgType.Started; // Send the actual Ready signal
             Call("WriteALToComPort");
             Jump("DebugStub_WaitCmd");
             Label = "DebugStub_AfterReady";

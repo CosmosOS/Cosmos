@@ -14,7 +14,8 @@ namespace Cosmos.Compiler.Debug {
         , Pointer = 5
         // This is sent once on start up. The first call to debug stub sends this. 
         // Host can then respond with a series of set breakpoints etc, ie ones that were set before running.
-        , Ready = 6
+        , Started = 6
+        
     }
     
     // Messages from Host to Guest

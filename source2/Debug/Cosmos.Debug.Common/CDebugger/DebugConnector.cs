@@ -16,7 +16,7 @@ namespace Cosmos.Debug.Common.CDebugger
         public Action<Exception> ConnectionLost;
         public Action<MsgType, UInt32> CmdTrace;
         public Action<string> CmdText;
-        public Action CmdReady;
+        public Action CmdStarted;
         
         protected MsgType mCurrentMsgType;
 
@@ -60,8 +60,8 @@ namespace Cosmos.Debug.Common.CDebugger
                 case MsgType.Message:
                     Next(2, PacketTextSize);
                     break;
-                case MsgType.Ready:
-                    CmdReady();
+                case MsgType.Started:
+                    CmdStarted();
                     Next(1, PacketCommand);
                     break;
                 case MsgType.Noop:
