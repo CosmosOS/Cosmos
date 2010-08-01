@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.X86
 
         public override void WriteText(Cosmos.IL2CPU.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
-            if ((Prefixes & InstructionPrefixes.RepeatNotEqual) != 0)
+            if ((Prefixes & InstructionPrefixes.RepeatTillEqual) != 0)
             {
                 aOutput.Write("repne ");
             }
