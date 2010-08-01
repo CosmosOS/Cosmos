@@ -139,7 +139,6 @@
     <Compile Include="Assembler\IEndIfDefined.cs" />
     <Compile Include="Assembler\IIfDefined.cs" />
     <Compile Include="Assembler\IIfNotDefined.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GCImplementation.cs" />
