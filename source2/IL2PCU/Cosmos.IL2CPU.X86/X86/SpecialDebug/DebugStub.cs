@@ -59,7 +59,7 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         // INLINE
-        // Modifies: Stack, EDI
+        // Modifies: Stack, EDI, AL
         // TODO: Modify X# to allow inlining better by using dynamic labels otherwise
         // repeated use of an inline will fail with conflicting labels.
         // TODO: Allow methods to emit a start label and return automatically
@@ -84,14 +84,16 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_BreakOnAddress";
             PushAll32();
 
-            // BP ID Number
-            EAX = 0;
-            Call("ReadALFromComPort");
-
             // BP Address
             ReadComPortX32toStack();
             ECX.Pop();
-            
+
+            // BP ID Number
+            // BP ID Number is sent after BP Address, becuase
+            // reading BP address uses AL (EAX).
+            EAX = 0;
+            Call("ReadALFromComPort");
+
             // Calculate location in table
             // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
             EBX = AddressOf("DebugBPs");
