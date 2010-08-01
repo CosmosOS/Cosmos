@@ -347,6 +347,7 @@
     <Compile Include="X86\Registers.cs" />
     <Compile Include="X86\Return.cs" />
     <Compile Include="X86\RotateThroughCarryRight.cs" />
+    <Compile Include="X86\Scas.cs" />
     <Compile Include="X86\SetInterruptFlag.cs" />
     <Compile Include="X86\ShiftLeft.cs" />
     <Compile Include="X86\ShiftRight.cs" />

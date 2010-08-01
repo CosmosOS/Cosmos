@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.X86 {
         None,
         Lock,
         Repeat,
-        RepeatNotEqual
+        RepeatTillNotEqual
     }
 
     public interface IInstructionWithPrefix {
