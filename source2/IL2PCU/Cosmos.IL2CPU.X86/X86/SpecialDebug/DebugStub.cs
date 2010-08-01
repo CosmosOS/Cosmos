@@ -20,8 +20,8 @@ namespace Cosmos.IL2CPU.X86 {
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
             Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
-                // 0 on start, set to 1 after Ready signal is sent.
-                new DataMember("DebugReadySent", 0),
+                // 0 on start, set to 1 after Started signal is sent.
+                new DataMember("DebugStartedSent", 0),
 
                 // Tracing: 0=Off, 1=On
                 new DataMember("DebugTraceMode", 0),
@@ -42,20 +42,6 @@ namespace Cosmos.IL2CPU.X86 {
                 // Breakpoint addresses
                 , new DataMember("DebugBPs", new int[256])
              });
-        }
-
-        protected void Commands() {
-            Label = "DebugStub_TraceOff";
-            Memory["DebugTraceMode", 32] = (int)Tracing.Off;
-            Return();
-
-            Label = "DebugStub_TraceOn";
-            Memory["DebugTraceMode", 32] = (int)Tracing.On;
-            Return();
-
-            Label = "DebugStub_Step";
-            Memory["DebugBreakOnNextTrace", 32] = 1;
-            Return();
         }
 
         // INLINE
@@ -134,6 +120,20 @@ namespace Cosmos.IL2CPU.X86 {
 
             Label = "DebugStub_Break_Exit";
             Memory["DebugStatus", 32] = (int)Status.Run;
+            Return();
+
+            /////////////////////
+            
+            Label = "DebugStub_TraceOff";
+            Memory["DebugTraceMode", 32] = (int)Tracing.Off;
+            Return();
+
+            Label = "DebugStub_TraceOn";
+            Memory["DebugTraceMode", 32] = (int)Tracing.On;
+            Return();
+
+            Label = "DebugStub_Step";
+            Memory["DebugBreakOnNextTrace", 32] = 1;
             Return();
         }
 
@@ -315,7 +315,6 @@ namespace Cosmos.IL2CPU.X86 {
         // This is only used by the compiler to force emission of each of our routines.
         // Each routine must be listed here, else it wont be emitted.
         protected void Emit() {
-            Commands();
             Executing();
             SendTrace();
             SendText();
@@ -329,6 +328,7 @@ namespace Cosmos.IL2CPU.X86 {
             DebugResume();
             Break();
             BreakOnAddress();
+            ProcessCommand();
         }
 
         // This is the secondary stub routine. After the primary (main) has decided we should do some debug
@@ -336,14 +336,14 @@ namespace Cosmos.IL2CPU.X86 {
         protected void Executing() {
             Label = "DebugStub_Executing";
 
-            // The very first time, we send a one time Ready signal back to the host
-            Memory["DebugReadySent", 32].Compare(1);
-            JumpIf(Flags.Equal, "DebugStub_AfterReady");
-            Memory["DebugReadySent", 32] = 1; // Set flag so we don't send Ready again
-            AL = (int)MsgType.Started; // Send the actual Ready signal
-            Call("WriteALToComPort");
-            Jump("DebugStub_WaitCmd");
-            Label = "DebugStub_AfterReady";
+            // The very first time, we send a one time Started signal back to the host
+            Memory["DebugStartedSent", 32].Compare(1);
+            JumpIf(Flags.Equal, "DebugStub_AfterStarted");
+                Memory["DebugStartedSent", 32] = 1; // Set flag so we don't send Ready again
+                AL = (int)MsgType.Started; // Send the actual started signal
+                Call("WriteALToComPort");
+                Jump("DebugStub_WaitCmd");
+            Label = "DebugStub_AfterStarted";
             
             // Look for a possible matching BP
             EAX = Memory["DebugEIP", 32];
@@ -354,7 +354,6 @@ namespace Cosmos.IL2CPU.X86 {
 
             Label = "DebugStub_Executing_AfterBreakOnAddress";
             // See if there is a requested break
-            //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
             Memory["DebugBreakOnNextTrace", 32].Compare(1);
                 CallIf(Flags.Equal, "DebugStub_Break");
             
@@ -362,29 +361,53 @@ namespace Cosmos.IL2CPU.X86 {
             Memory["DebugTraceMode", 32].Compare((int)Tracing.On);
                 CallIf(Flags.Equal, "DebugStub_SendTrace");
 
-            // Is there a new incoming command?
+            // Is there a new incoming command? We dont want to wait for one
+            // if there isn't one already here. This is a passing check.
             Label = "DebugStub_Executing_Normal";
             DX = mComStatusAddr;
             AL = Port[DX];
             AL.Test(0x01);
-            JumpIf(Flags.Zero, "DebugStub_Executing_Exit");
+            JumpIf(Flags.Zero, "DebugStub_Executing_NoCmd");
+                Call("DebugStub_ProcessCommand");
+            Label = "DebugStub_Executing_NoCmd";
 
-            Label = "DebugStub_Executing_CommandComingIn";
-            // Process command
-            DX = mComAddr;
-            AL = Port[DX];
+            Return();
+        }
+
+        // Modifies: AL, DX (ReadALFromComPort)
+        // Returns: AL
+        public void ProcessCommand() {
+            Label = "DebugStub_ProcessCommand";
+            Call("ReadALFromComPort");
+
             AL.Compare((byte)Command.Noop);
-                JumpIf(Flags.Equal, "DebugStub_Executing_Exit");
-            AL.Compare((byte)Command.TraceOff);
-                JumpIf(Flags.Equal, "DebugStub_TraceOff");
-            AL.Compare((byte)Command.TraceOn);
-                JumpIf(Flags.Equal, "DebugStub_TraceOn");
-            AL.Compare((byte)Command.Break);
-                JumpIf(Flags.Equal, "DebugStub_Break");
-            AL.Compare((byte)Command.BreakOnAddress);
-                JumpIf(Flags.Equal, "DebugStub_BreakOnAddress");
+            JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
 
-            Label = "DebugStub_Executing_Exit";
+            AL.Compare((byte)Command.TraceOff);
+            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
+                Memory["DebugTraceMode", 32] = (int)Tracing.Off;
+                Jump("DebugStub_ProcessCmd_Exit");
+            Label = "DebugStub_ProcessCmd_TraceOff_After";
+
+            AL.Compare((byte)Command.TraceOn);
+            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
+                Memory["DebugTraceMode", 32] = (int)Tracing.On;
+                Jump("DebugStub_ProcessCmd_Exit");
+            Label = "DebugStub_ProcessCmd_TraceOn_After";
+
+            AL.Compare((byte)Command.Break);
+            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
+                Call("DebugStub_Break");
+                Jump("DebugStub_ProcessCmd_Exit");
+            Label = "DebugStub_ProcessCmd_Break_After";
+
+            AL.Compare((byte)Command.BreakOnAddress);
+            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
+                Call("DebugStub_BreakOnAddress");
+                Jump("DebugStub_ProcessCmd_Exit");
+            Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
+
+            Label = "DebugStub_ProcessCmd_Exit";
             Return();
         }
 

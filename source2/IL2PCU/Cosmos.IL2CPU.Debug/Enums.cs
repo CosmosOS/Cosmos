@@ -15,7 +15,8 @@ namespace Cosmos.Compiler.Debug {
         // This is sent once on start up. The first call to debug stub sends this. 
         // Host can then respond with a series of set breakpoints etc, ie ones that were set before running.
         , Started = 6
-        
+        // Sent after commands to acknowledge receipt during batch mode
+        , CmdComplete = 7 
     }
     
     // Messages from Host to Guest
@@ -26,5 +27,7 @@ namespace Cosmos.Compiler.Debug {
         , Break = 3
         , Step = 4
         , BreakOnAddress = 5
+        , BatchBegin = 6
+        , BatchEnd = 7
     }
 }
