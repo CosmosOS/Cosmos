@@ -399,13 +399,13 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         internal void Continue() {
             mCurrentAddress = null;
-            mDbgConnector.SendCommand((byte)Command.Break);
+            mDbgConnector.SendCommand(Command.Continue);
         }
 
         internal void Step(enum_STEPKIND stepKind)
         {
             DebugMsg("StepKind: " + stepKind);
-            mDbgConnector.SendCommand((byte)Command.Step);
+            mDbgConnector.SendCommand(Command.Step);
         }
     }
 }

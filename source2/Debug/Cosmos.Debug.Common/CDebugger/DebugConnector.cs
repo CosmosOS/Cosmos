@@ -26,9 +26,10 @@ namespace Cosmos.Debug.Common.CDebugger
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
         protected abstract void PacketTracePoint(byte[] aPacket);
         protected abstract void PacketText(byte[] aPacket);
-        public void SendCommand(byte aCmd) {
+
+        public void SendCommand(Command aCmd) {
             var xData = new byte[1];
-            xData[0] = aCmd;
+            xData[0] = (byte)aCmd;
             SendData(xData);
         }
 
