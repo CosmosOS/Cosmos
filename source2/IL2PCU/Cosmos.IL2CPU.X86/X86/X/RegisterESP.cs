@@ -5,12 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.X {
     public class RegisterESP : Register32 {
-        public const string Name = "ESP";
         public static readonly RegisterESP Instance = new RegisterESP();
-
-        public override string ToString() {
-            return Name;
-        }
 
         public static implicit operator RegisterESP(UInt32 aValue) {
             Instance.Move(aValue);

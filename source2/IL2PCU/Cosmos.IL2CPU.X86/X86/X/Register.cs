@@ -6,11 +6,27 @@ using X86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.IL2CPU.X86.X {
     public abstract class Register {
+        protected byte mBitSize;
+        public byte BitSize {
+            get { return mBitSize; }
+        }
+
+        public readonly string Name;
+
+        public Register() {
+            Name = GetType().Name.Substring(typeof(Register).Name.Length);
+        }
+
+        public override string ToString() {
+            return Name;
+        }
+
         public RegistersEnum GetId() {
-            return Registers.GetRegister(GetName()).Value;
+            return Registers.GetRegister(Name).Value;
         }
 
         public void Push() {
+            // TODO: This emits Push dword which generates warnings about dword being ignored
             new Push { DestinationReg = GetId() };
         }
 
@@ -35,12 +51,10 @@ namespace Cosmos.IL2CPU.X86.X {
             new Move { DestinationReg = GetId(), SourceRef = aReference, Size = Registers.GetSize(GetId())};
         }
 
-        public string GetName() {
-            return GetType().Name.Substring("Register".Length);
-        }
         public bool isPort(){
-            if (GetId().Equals(Registers.AX) || GetId().Equals(Registers.AL) || GetId().Equals(Registers.EAX))
+            if (GetId().Equals(Registers.AX) || GetId().Equals(Registers.AL) || GetId().Equals(Registers.EAX)) {
                 return true;
+            }
             return false;
         }
     }

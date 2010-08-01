@@ -5,12 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.X {
     public class RegisterEBX : Register32 {
-        public const string Name = "EBX";
         public static readonly RegisterEBX Instance = new RegisterEBX();
-
-        public override string ToString() {
-            return Name;
-        }
 
         public static implicit operator RegisterEBX(ElementReference aReference) {
             Instance.Move(aReference);

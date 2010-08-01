@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.X {
         public readonly int Displacement;
 
         public AddressIndirect(Register32 aBaseRegister, Int32 aDisplacement) {
-            Register = Registers.GetRegister(aBaseRegister.GetName());
+            Register = Registers.GetRegister(aBaseRegister.Name);
             Displacement = aDisplacement;
         }
         public AddressIndirect(uint aBaseAddress, int aDisplacement) {

@@ -23,11 +23,11 @@ namespace Cosmos.Compiler.Debug {
     public enum Command : byte {
         Noop = 0
         , TraceOff = 1, TraceOn = 2
-        // Break command is also for continuing from breakstate.
         , Break = 3
-        , Step = 4
-        , BreakOnAddress = 5
-        , BatchBegin = 6
-        , BatchEnd = 7
+        , Continue = 4 // After a Break
+        , Step = 5
+        , BreakOnAddress = 6
+        , BatchBegin = 7
+        , BatchEnd = 8
     }
 }

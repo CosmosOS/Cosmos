@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.X {
     public class Register32 : Register {
+        public Register32() {
+            mBitSize = 32;
+        }
 
         // Not all overloads can go here.
         // 1- C# overloads specifically by exact class and does not inherit in many cases

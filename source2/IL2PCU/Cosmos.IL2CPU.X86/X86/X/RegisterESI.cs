@@ -5,12 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.X {
     public class RegisterESI : Register32 {
-        public const string Name = "ESI";
         public static readonly RegisterESI Instance = new RegisterESI();
-
-        public override string ToString() {
-            return Name;
-        }
 
         public static implicit operator RegisterESI(ElementReference aReference) {
             Instance.Move(aReference);

@@ -6,12 +6,7 @@ using X86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.IL2CPU.X86.X {
     public class RegisterAL : Register08 {
-        public const string Name = "AL";
         public static readonly RegisterAL Instance = new RegisterAL();
-
-        public override string ToString() {
-            return Name;
-        }
 
         // TODO: Use an attribute to find the register name
         // Also useful for Memory conversion - Can find attribute

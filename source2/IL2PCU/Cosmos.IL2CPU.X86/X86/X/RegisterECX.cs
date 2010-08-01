@@ -5,12 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.X86.X {
     public class RegisterECX : Register32 {
-        public const string Name = "ECX";
         public static readonly RegisterECX Instance = new RegisterECX();
-
-        public override string ToString() {
-            return Name;
-        }
 
         public static implicit operator RegisterECX(ElementReference aReference) {
             Instance.Move(aReference);

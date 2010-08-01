@@ -86,7 +86,6 @@ namespace Cosmos.IL2CPU.X86 {
             EAX = EAX << 2;
             EBX.Add(EAX);
 
-            //TODO: Make it so X# doesnt require the 32 and that it checks register size
             Memory[EBX, 32] = ECX;
 
             PopAll32();
@@ -105,35 +104,26 @@ namespace Cosmos.IL2CPU.X86 {
 
             // Wait for a command
             Label = "DebugStub_WaitCmd";
-            Call("ReadALFromComPort");
+                // Check for common commands
+                Call("DebugStub_ProcessCommand");
 
-            AL.Compare((byte)Command.TraceOff);
-                CallIf(Flags.Equal, "DebugStub_TraceOff", "DebugStub_WaitCmd");
-            AL.Compare((byte)Command.TraceOn);
-                CallIf(Flags.Equal, "DebugStub_TraceOn", "DebugStub_WaitCmd");
-            AL.Compare((byte)Command.Break);
-                // Break command is also the continue command
-                // If received while in break, then it continues
-                JumpIf(Flags.Equal, "DebugStub_Break_Exit");
-            AL.Compare((byte)Command.Step);
-                CallIf(Flags.Equal, "DebugStub_Step", "DebugStub_Break_Exit");
+                // Now check for commands that are only valid in break state
+                // or commands that require additional handling while in break
+                // state.
+
+                AL.Compare((byte)Command.Continue);
+                    JumpIf(Flags.Equal, "DebugStub_Break_Exit");
+
+                AL.Compare((byte)Command.Step);
+                JumpIf(Flags.NotEqual, "DebugStub_Break_Step_After");
+                    Memory["DebugBreakOnNextTrace", 32] = 1;
+                    Jump("DebugStub_ProcessCmd_Exit");
+                Label = "DebugStub_Break_Step_After";
+            // Loop around and wait for another command
+            Jump("DebugStub_WaitCmd");
 
             Label = "DebugStub_Break_Exit";
             Memory["DebugStatus", 32] = (int)Status.Run;
-            Return();
-
-            /////////////////////
-            
-            Label = "DebugStub_TraceOff";
-            Memory["DebugTraceMode", 32] = (int)Tracing.Off;
-            Return();
-
-            Label = "DebugStub_TraceOn";
-            Memory["DebugTraceMode", 32] = (int)Tracing.On;
-            Return();
-
-            Label = "DebugStub_Step";
-            Memory["DebugBreakOnNextTrace", 32] = 1;
             Return();
         }
 
@@ -379,6 +369,10 @@ namespace Cosmos.IL2CPU.X86 {
         public void ProcessCommand() {
             Label = "DebugStub_ProcessCommand";
             Call("ReadALFromComPort");
+            // Some callers expect AL to be returned, so we preserve it
+            // in case any commands modify AL.
+            //TODO: But in ASM wont let us push AL, so we push EAX for now
+            EAX.Push();
 
             AL.Compare((byte)Command.Noop);
             JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
@@ -408,6 +402,7 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
             Label = "DebugStub_ProcessCmd_Exit";
+            EAX.Pop();
             Return();
         }
 
