@@ -299,6 +299,7 @@
     <Compile Include="X86\ClrCarryFlag.cs" />
     <Compile Include="X86\ClrDirFlag.cs" />
     <Compile Include="X86\ClrInterruptFlag.cs" />
+    <Compile Include="X86\Cmps.cs" />
     <Compile Include="X86\Compare.cs" />
     <Compile Include="X86\ConditionalJump.cs" />
     <Compile Include="X86\ConditionalMove.cs" />

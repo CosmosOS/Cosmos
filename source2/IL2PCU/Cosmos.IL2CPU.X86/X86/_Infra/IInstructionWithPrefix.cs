@@ -8,7 +8,8 @@ namespace Cosmos.IL2CPU.X86 {
     public enum InstructionPrefixes {
         None,
         Lock,
-        Repeat
+        Repeat,
+        RepeatNotEqual
     }
 
     public interface IInstructionWithPrefix {
