@@ -31,6 +31,9 @@ WizardSmallImageFile=.\setup\images\cosmos_small.bmp
 InternalCompressLevel=none
 UninstallLogMode=overwrite
 
+; we're changing file associations, so:
+ChangesAssociations=yes
+
 #include "Code.inc"
 
 [LangOptions]
@@ -122,6 +125,7 @@ Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware.*; DestDir: {app
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\CosmosProject.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly
+Source: .\source\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
 
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
 Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
@@ -237,6 +241,14 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{B4DE9307-C062-45
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets
 Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets
+
+; add the .cosmos file association:
+Root: HKCR; SubKey: ".Cosmos"; ValueType: string; ValueName: ""; ValueData: "Cosmos.ProjectFile"; Flags: uninsdeletevalue
+Root: HKCR; SubKey: "Cosmos.ProjectFile"; ValueType: string; ValueName: ""; ValueData: "Cosmos Project File"; Flags: uninsdeletekey
+Root: HKCR; SubKey: "Cosmos.ProjectFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Cosmos.ico";
+Root: HKCR; SubKey: "Cosmos.ProjectFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{pf32}\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe"" ""%1""";
+
+
 [Run]
 Filename: {code:VSNET2008_PATH|}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 
