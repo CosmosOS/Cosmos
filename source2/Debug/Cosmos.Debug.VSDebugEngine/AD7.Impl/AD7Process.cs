@@ -164,6 +164,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             } else {
                 throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
             }
+            aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
             mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);

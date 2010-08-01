@@ -15,7 +15,11 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         public BreakpointManager(AD7Engine aEngine) {
             mEngine = aEngine;
-            mDbgConnector = aEngine.mProcess.mDbgConnector;
+        }
+
+        public void SetDebugConnector(DebugConnector aConnector)
+        {
+            mDbgConnector = aConnector;
         }
       
         // A helper method used to construct a new pending breakpoint.
