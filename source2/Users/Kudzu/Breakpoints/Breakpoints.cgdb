@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label>DebugStub_Break_Exit</Label>
+    <Label>DebugStub_WaitCmd</Label>
   </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
