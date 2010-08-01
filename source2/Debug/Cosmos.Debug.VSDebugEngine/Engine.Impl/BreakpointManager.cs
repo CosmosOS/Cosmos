@@ -41,6 +41,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             for (int xID = 0; xID < MaxBP; xID++) {
                 if (mActiveBPs[xID] == null) {
                     mActiveBPs[xID] = aBBP;
+                    mEngine.mProcess.DebugMsg("Set Remote BP #" + xID + " @ " + aBBP.mAddress.ToString("X8").ToUpper());
                     mDbgConnector.SetBreakpointAddress(xID, aBBP.mAddress);
                     return xID;
                 }

@@ -39,7 +39,6 @@ namespace Cosmos.IL2CPU.X86 {
                 new DataMember("InterruptsEnabledFlag", 0),
                 // If set to 1, on next trace a break will occur
                 new DataMember("DebugBreakOnNextTrace", 0)
-
                 // Breakpoint addresses
                 , new DataMember("DebugBPs", new int[256])
              });
@@ -344,9 +343,11 @@ namespace Cosmos.IL2CPU.X86 {
             Jump("DebugStub_WaitCmd");
             Label = "DebugStub_AfterReady";
             
-            // BP is active
+            // Look for a possible matching BP
             EAX = Memory["DebugEIP", 32];
-            EAX.Compare(Memory["DebugBPs", 32]);
+            EDI = AddressOf("DebugBPs");
+            ECX = 256;
+            new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
             JumpIf(Flags.Equal, "DebugStub_Break");
 
             Label = "DebugStub_Executing_AfterBreakOnAddress";
