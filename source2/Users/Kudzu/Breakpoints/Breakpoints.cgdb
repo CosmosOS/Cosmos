@@ -3,6 +3,9 @@
   <Breakpoint>
     <Label>DebugStub_WaitCmd</Label>
   </Breakpoint>
+  <Breakpoint>
+    <Label>DebugStub_ProcessCommand</Label>
+  </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
