@@ -27,12 +27,18 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmStepInto_Click(object sender, EventArgs e) {
+            lablRunning.Text = "Running";
+            Application.DoEvents();
             GDB.SendCmd("stepi");
+            lablRunning.Text = "Stopped";
             Windows.UpdateAllWindows();
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
+            lablRunning.Text = "Running";
+            Application.DoEvents();
             GDB.SendCmd("nexti");
+            lablRunning.Text = "Stopped";
             Windows.UpdateAllWindows();
         }
 
@@ -46,6 +52,8 @@ namespace Cosmos.Debug.GDB {
             GDB.Connect(aRetry);
             if (GDB.Connected) {
                 lablConnected.Visible = true;
+                lablRunning.Visible = true;
+                lablRunning.Text = "Stopped";
                 // Must be after Connect for now as it depends on Widnows being created
                 // Also sets saved breakpoints, so GDB needs to be connected
                 if (Settings.Filename != "") {
@@ -64,7 +72,10 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
+            lablRunning.Text = "Running";
+            Application.DoEvents();
             GDB.SendCmd("continue");
+            lablRunning.Text = "Stopped";
             Windows.UpdateAllWindows();
         }
 

@@ -24,6 +24,9 @@
         /// </summary>
         private void InitializeComponent() {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lablConnected = new System.Windows.Forms.Label();
+            this.butnContinue = new System.Windows.Forms.Button();
+            this.butnConnect = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmConnect = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,15 +47,14 @@
             this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
-            this.butnConnect = new System.Windows.Forms.Button();
-            this.butnContinue = new System.Windows.Forms.Button();
-            this.lablConnected = new System.Windows.Forms.Label();
+            this.lablRunning = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lablRunning);
             this.panel1.Controls.Add(this.lablConnected);
             this.panel1.Controls.Add(this.butnContinue);
             this.panel1.Controls.Add(this.butnConnect);
@@ -61,6 +63,37 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(273, 30);
             this.panel1.TabIndex = 3;
+            // 
+            // lablConnected
+            // 
+            this.lablConnected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lablConnected.AutoSize = true;
+            this.lablConnected.Location = new System.Drawing.Point(211, 8);
+            this.lablConnected.Name = "lablConnected";
+            this.lablConnected.Size = new System.Drawing.Size(59, 13);
+            this.lablConnected.TabIndex = 2;
+            this.lablConnected.Text = "Connected";
+            this.lablConnected.Visible = false;
+            // 
+            // butnContinue
+            // 
+            this.butnContinue.Location = new System.Drawing.Point(65, 3);
+            this.butnContinue.Name = "butnContinue";
+            this.butnContinue.Size = new System.Drawing.Size(26, 23);
+            this.butnContinue.TabIndex = 1;
+            this.butnContinue.Text = ">";
+            this.butnContinue.UseVisualStyleBackColor = true;
+            this.butnContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
+            // 
+            // butnConnect
+            // 
+            this.butnConnect.Location = new System.Drawing.Point(3, 3);
+            this.butnConnect.Name = "butnConnect";
+            this.butnConnect.Size = new System.Drawing.Size(56, 23);
+            this.butnConnect.TabIndex = 0;
+            this.butnConnect.Text = "Connect";
+            this.butnConnect.UseVisualStyleBackColor = true;
+            this.butnConnect.Click += new System.EventHandler(this.mitmConnect_Click);
             // 
             // menuStrip1
             // 
@@ -128,7 +161,7 @@
             // 
             this.mitmStepInto.Name = "mitmStepInto";
             this.mitmStepInto.ShortcutKeys = System.Windows.Forms.Keys.F11;
-            this.mitmStepInto.Size = new System.Drawing.Size(152, 22);
+            this.mitmStepInto.Size = new System.Drawing.Size(150, 22);
             this.mitmStepInto.Text = "Step &Into";
             this.mitmStepInto.Click += new System.EventHandler(this.mitmStepInto_Click);
             // 
@@ -136,20 +169,20 @@
             // 
             this.mitmStepOver.Name = "mitmStepOver";
             this.mitmStepOver.ShortcutKeys = System.Windows.Forms.Keys.F10;
-            this.mitmStepOver.Size = new System.Drawing.Size(152, 22);
+            this.mitmStepOver.Size = new System.Drawing.Size(150, 22);
             this.mitmStepOver.Text = "Step &Over";
             this.mitmStepOver.Click += new System.EventHandler(this.mitmStepOver_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 6);
             // 
             // mitmContinue
             // 
             this.mitmContinue.Name = "mitmContinue";
             this.mitmContinue.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.mitmContinue.Size = new System.Drawing.Size(152, 22);
+            this.mitmContinue.Size = new System.Drawing.Size(150, 22);
             this.mitmContinue.Text = "&Continue";
             this.mitmContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
             // 
@@ -222,36 +255,16 @@
             this.mitmWindowsToForeground.Text = "All windows to foreground";
             this.mitmWindowsToForeground.Click += new System.EventHandler(this.mitmWindowsToForeground_Click);
             // 
-            // butnConnect
+            // lablRunning
             // 
-            this.butnConnect.Location = new System.Drawing.Point(3, 3);
-            this.butnConnect.Name = "butnConnect";
-            this.butnConnect.Size = new System.Drawing.Size(56, 23);
-            this.butnConnect.TabIndex = 0;
-            this.butnConnect.Text = "Connect";
-            this.butnConnect.UseVisualStyleBackColor = true;
-            this.butnConnect.Click += new System.EventHandler(this.mitmConnect_Click);
-            // 
-            // butnContinue
-            // 
-            this.butnContinue.Location = new System.Drawing.Point(65, 3);
-            this.butnContinue.Name = "butnContinue";
-            this.butnContinue.Size = new System.Drawing.Size(26, 23);
-            this.butnContinue.TabIndex = 1;
-            this.butnContinue.Text = ">";
-            this.butnContinue.UseVisualStyleBackColor = true;
-            this.butnContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
-            // 
-            // lablConnected
-            // 
-            this.lablConnected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lablConnected.AutoSize = true;
-            this.lablConnected.Location = new System.Drawing.Point(211, 8);
-            this.lablConnected.Name = "lablConnected";
-            this.lablConnected.Size = new System.Drawing.Size(59, 13);
-            this.lablConnected.TabIndex = 2;
-            this.lablConnected.Text = "Connected";
-            this.lablConnected.Visible = false;
+            this.lablRunning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lablRunning.AutoSize = true;
+            this.lablRunning.Location = new System.Drawing.Point(146, 8);
+            this.lablRunning.Name = "lablRunning";
+            this.lablRunning.Size = new System.Drawing.Size(47, 13);
+            this.lablRunning.TabIndex = 3;
+            this.lablRunning.Text = "Running";
+            this.lablRunning.Visible = false;
             // 
             // FormMain
             // 
@@ -305,6 +318,7 @@
         private System.Windows.Forms.Button butnConnect;
         private System.Windows.Forms.Button butnContinue;
         private System.Windows.Forms.Label lablConnected;
+        private System.Windows.Forms.Label lablRunning;
     }
 }
 
