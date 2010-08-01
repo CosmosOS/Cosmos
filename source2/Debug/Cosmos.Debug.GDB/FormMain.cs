@@ -137,6 +137,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void BringWindowsToTop() {
+            mIgnoreNextActivate = true;
             foreach (var xWindow in Windows.mForms) {
                 if (xWindow == this) {
                     continue;
@@ -153,8 +154,14 @@ namespace Cosmos.Debug.GDB {
             BringWindowsToTop();
         }
 
+        private bool mIgnoreNextActivate = false;
         private void FormMain_Activated(object sender, EventArgs e) {
-            BringWindowsToTop();
+            // Necessary else we get looping becuase BringWindowsToTop reactivates this.
+            if (mIgnoreNextActivate) {
+                mIgnoreNextActivate = false;
+            } else {
+                BringWindowsToTop();
+            }
         }
 
     }
