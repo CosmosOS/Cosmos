@@ -12,6 +12,23 @@ namespace Cosmos.IL2CPU.X86.X {
             return Name;
         }
 
+        public static RegisterEAX operator++ (RegisterEAX aRegister) {
+            new Inc { DestinationReg = aRegister.GetId() };
+            return aRegister;
+        }
+        public static RegisterEAX operator-- (RegisterEAX aRegister) {
+            new Dec { DestinationReg = aRegister.GetId() };
+            return aRegister;
+        }
+        public static RegisterEAX operator<< (RegisterEAX aRegister, int aCount) {
+            new ShiftLeft { DestinationReg = aRegister.GetId(), SourceValue = (uint)aCount };
+            return aRegister;
+        }
+        public static RegisterEAX operator>> (RegisterEAX aRegister, int aCount) {
+            new ShiftRight { DestinationReg = aRegister.GetId(), SourceValue = (uint)aCount };
+            return aRegister;
+        }
+
         public static implicit operator RegisterEAX(ElementReference aReference) {
             Instance.Move(aReference);
             return Instance;

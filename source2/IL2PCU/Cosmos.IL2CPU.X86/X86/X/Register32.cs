@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.X {
         // 1- C# overloads specifically by exact class and does not inherit in many cases
         // 2- x86 does not support all operations on all registers
 
-        public static AddressIndirect operator +(Register32 aBaseRegister, Int32 aDisplacement) {
+        public static AddressIndirect operator+ (Register32 aBaseRegister, Int32 aDisplacement) {
             return new AddressIndirect(aBaseRegister, aDisplacement);
         }
 
@@ -37,20 +37,6 @@ namespace Cosmos.IL2CPU.X86.X {
                 DestinationIsIndirect = true,
                 SourceReg = GetId()
             };
-        }
-
-        public void ShiftLeft() {
-            ShiftLeft(1);
-        }
-        public void ShiftLeft(byte aSize) {
-            new ShiftLeft { DestinationReg = GetId(), SourceValue = aSize };
-        }
-
-        public void ShiftRight() {
-            ShiftRight(1);
-        }
-        public void ShiftRight(byte aSize) {
-            new ShiftRight { DestinationReg = GetId(), SourceValue = aSize };
         }
 
         public void Test(UInt32 aValue) {

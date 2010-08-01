@@ -95,7 +95,7 @@ namespace Cosmos.IL2CPU.X86 {
             // Calculate location in table
             // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
             EBX = AddressOf("DebugBPs");
-            EAX.ShiftLeft(2);
+            EAX = EAX << 2;
             EBX.Add(EAX);
 
             //TODO: Make it so X# doesnt require the 32 and that it checks register size
@@ -293,6 +293,7 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "ReadByteFromComPort";
             Call("ReadALFromComPort");
             Memory[EDI, 8] = AL;
+            EDI++;
             new Inc { DestinationReg = Registers.EDI };
             Return();
         }

@@ -7,17 +7,14 @@
 </head>
 <body>
     <h3>
-        binX#</h3>
+        To Do</h3>
     <p>
-        X# is a combination of a high level machine language, and assembler.</p>
+        JumpIf(EAX == 0x04, ....)</p>
+    <p>
+        Can do reg = reg + 4 - define the + overload as a type that can then be 
+        reimplicitly converted to a register, or whatever type goes inside Memory[x]</p>
     <h3>
-        C# versus External</h3>
-    <p>
-        At some point X# may be externalized and receive its own seperate compiler / 
-        assembler.</p>
-    <ul>
-        <li>This requires an addtional parser.</li>
-        <li>Input from C# values during comilation would need to be implemented.</li>
+        X#milation would need to be implemented.</li>
         <li>One of the goals of Cosmos is the need to write very little assembly, so only 
             debug stub, compiler users, etc need assembly. Too much work on X# may not be 
             worth the resources required.</li>
@@ -37,6 +34,17 @@
         register, X# supports it.<br />
         To add a constant to a register use:<br />
         EBP.Add(32);</p>
+    <h3>
+        Register-- / Register++</h3>
+    <p>
+        Valid and usable. Correspond to Inc and Dec.</p>
+    <h3>
+        Register Shifting</h3>
+    <p>
+        Example:<br />
+        EAX = EAX &lt;&lt; 2;</p>
+    <p>
+        Source and destination register must be the same.</p>
     <h3>
         Register Methods</h3>
     <ul>
