@@ -24,6 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lablRunning = new System.Windows.Forms.Label();
             this.lablConnected = new System.Windows.Forms.Label();
             this.butnContinue = new System.Windows.Forms.Button();
             this.butnConnect = new System.Windows.Forms.Button();
@@ -47,7 +48,6 @@
             this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
-            this.lablRunning = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -63,6 +63,17 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(273, 30);
             this.panel1.TabIndex = 3;
+            // 
+            // lablRunning
+            // 
+            this.lablRunning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lablRunning.AutoSize = true;
+            this.lablRunning.Location = new System.Drawing.Point(146, 8);
+            this.lablRunning.Name = "lablRunning";
+            this.lablRunning.Size = new System.Drawing.Size(47, 13);
+            this.lablRunning.TabIndex = 3;
+            this.lablRunning.Text = "Running";
+            this.lablRunning.Visible = false;
             // 
             // lablConnected
             // 
@@ -255,17 +266,6 @@
             this.mitmWindowsToForeground.Text = "All windows to foreground";
             this.mitmWindowsToForeground.Click += new System.EventHandler(this.mitmWindowsToForeground_Click);
             // 
-            // lablRunning
-            // 
-            this.lablRunning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lablRunning.AutoSize = true;
-            this.lablRunning.Location = new System.Drawing.Point(146, 8);
-            this.lablRunning.Name = "lablRunning";
-            this.lablRunning.Size = new System.Drawing.Size(47, 13);
-            this.lablRunning.TabIndex = 3;
-            this.lablRunning.Text = "Running";
-            this.lablRunning.Visible = false;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -281,6 +281,7 @@
             this.TopMost = true;
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
+            this.Activated += new System.EventHandler(this.FormMain_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Resize += new System.EventHandler(this.FormMain_Resize);
             this.panel1.ResumeLayout(false);

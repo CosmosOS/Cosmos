@@ -96,7 +96,7 @@ namespace Cosmos.IL2CPU.X86 {
             // Should only be called internally by DebugStub. Has a lot of preconditions
             // Externals should use BreakOnNextTrace instead
             Label = "DebugStub_Break";
-            // Reset request in case there was one
+            // Reset request in case we are currently responding to one
             Memory["DebugBreakOnNextTrace", 32] = 0;
             // Set break status
             Memory["DebugStatus", 32] = (int)Status.Break;
@@ -133,11 +133,11 @@ namespace Cosmos.IL2CPU.X86 {
 
             Memory["DebugStatus", 32].Compare((int)Status.Run);
             JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
-            AL = (int)MsgType.BreakPoint;
-            Jump("DebugStub_SendTraceType");
+                AL = (int)MsgType.BreakPoint;
+                Jump("DebugStub_SendTraceType");
             
             Label = "DebugStub_SendTrace_Normal";
-            AL = (int)MsgType.TracePoint;
+                AL = (int)MsgType.TracePoint;
 
             Label = "DebugStub_SendTraceType";
             Call("WriteALToComPort");

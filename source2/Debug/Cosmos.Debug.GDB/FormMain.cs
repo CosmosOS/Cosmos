@@ -136,20 +136,25 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        private void mitmWindowsToForeground_Click(object sender, EventArgs e)
-        {
-            foreach (var xWindow in Windows.mForms)
-            {
-                if (xWindow == this)
-                {
+        private void BringWindowsToTop() {
+            foreach (var xWindow in Windows.mForms) {
+                if (xWindow == this) {
                     continue;
                 }
-                if (xWindow.Visible)
-                {
+                if (xWindow.Visible) {
                     xWindow.Activate();
                 }
             }
             this.Activate();
+        }
+
+        private void mitmWindowsToForeground_Click(object sender, EventArgs e)
+        {
+            BringWindowsToTop();
+        }
+
+        private void FormMain_Activated(object sender, EventArgs e) {
+            BringWindowsToTop();
         }
 
     }
