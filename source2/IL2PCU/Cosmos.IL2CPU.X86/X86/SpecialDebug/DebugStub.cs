@@ -294,7 +294,6 @@ namespace Cosmos.IL2CPU.X86 {
             Call("ReadALFromComPort");
             Memory[EDI, 8] = AL;
             EDI++;
-            new Inc { DestinationReg = Registers.EDI };
             Return();
         }
 

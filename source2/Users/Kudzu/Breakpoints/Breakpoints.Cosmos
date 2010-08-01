@@ -27,7 +27,7 @@
     </QemuAudioCard>
     <QemuNetworkTAP>True</QemuNetworkTAP>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <TraceMode>
     </TraceMode>
   </PropertyGroup>
