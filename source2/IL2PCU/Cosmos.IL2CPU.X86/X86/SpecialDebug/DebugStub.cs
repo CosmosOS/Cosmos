@@ -332,7 +332,6 @@ namespace Cosmos.IL2CPU.X86 {
                 Memory["DebugStartedSent", 32] = 1; // Set flag so we don't send Ready again
                 AL = (int)MsgType.Started; // Send the actual started signal
                 Call("WriteALToComPort");
-                Jump("DebugStub_WaitCmd");
             Label = "DebugStub_AfterStarted";
             
             // Look for a possible matching BP
