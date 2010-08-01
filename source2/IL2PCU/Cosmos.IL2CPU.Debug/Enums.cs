@@ -16,7 +16,7 @@ namespace Cosmos.Compiler.Debug {
         // Host can then respond with a series of set breakpoints etc, ie ones that were set before running.
         , Started = 6
         // Sent after commands to acknowledge receipt during batch mode
-        , CmdComplete = 7 
+        , CmdComplete = 7 // Not used yet
     }
     
     // Messages from Host to Guest
@@ -27,7 +27,7 @@ namespace Cosmos.Compiler.Debug {
         , Continue = 4 // After a Break
         , Step = 5
         , BreakOnAddress = 6
-        , BatchBegin = 7
-        , BatchEnd = 8
+        , BatchBegin = 7 // Not used yet
+        , BatchEnd = 8 // Not used yet
     }
 }
