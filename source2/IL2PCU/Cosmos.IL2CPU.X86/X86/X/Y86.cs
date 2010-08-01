@@ -97,6 +97,13 @@ namespace Cosmos.IL2CPU.X86.X {
             }
         }
 
+        public void Push(UInt32 aValue) {
+            Push(aValue, 32);
+        }
+        public void Push(UInt32 aValue, byte aSize) {
+            new Push { DestinationValue = aValue, Size = aSize };
+        }
+
         public void PopAll32() {
             new Popad();
         }

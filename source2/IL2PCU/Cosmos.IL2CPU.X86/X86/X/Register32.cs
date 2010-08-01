@@ -43,14 +43,14 @@ namespace Cosmos.IL2CPU.X86.X {
             ShiftLeft(1);
         }
         public void ShiftLeft(byte aSize) {
-            new ShiftLeft { DestinationReg = Registers.ECX, SourceValue = aSize };
+            new ShiftLeft { DestinationReg = GetId(), SourceValue = aSize };
         }
 
         public void ShiftRight() {
             ShiftRight(1);
         }
         public void ShiftRight(byte aSize) {
-            new ShiftRight { DestinationReg = Registers.ECX, SourceValue = aSize };
+            new ShiftRight { DestinationReg = GetId(), SourceValue = aSize };
         }
 
         public void Test(UInt32 aValue) {

@@ -60,13 +60,14 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         // INLINE
+        // Modifies: Stack, EDI
         // TODO: Modify X# to allow inlining better by using dynamic labels otherwise
         // repeated use of an inline will fail with conflicting labels.
         // TODO: Allow methods to emit a start label and return automatically
         // and mark inlines so this does not happen.
-        protected void ReadComPortX32toEAX() {
+        protected void ReadComPortX32toStack() {
             // Make room on the stack for the address
-            new Push { DestinationValue = 0 };
+            Push(0);
             // ReadByteFromComPort writes to EDI, then increments
             EDI = ESP;
 
@@ -75,9 +76,6 @@ namespace Cosmos.IL2CPU.X86 {
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
             Call("ReadByteFromComPort");
-
-            // Pop of 4 bytes read from port to stack as EAX
-            new Pop { DestinationReg = RegistersEnum.EAX };
         }
 
         // Sets a breakpoint
@@ -87,22 +85,22 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_BreakOnAddress";
             PushAll32();
 
-            // Read BP ID Number - Ignored currently.
+            // BP ID Number
             EAX = 0;
             Call("ReadALFromComPort");
-            ECX = EAX;
 
             // BP Address
-            ReadComPortX32toEAX();
+            ReadComPortX32toStack();
+            ECX.Pop();
             
             // Calculate location in table
-            // Mov [EBX + ECX * 4], EAX would be better, but our asm doesn't handle this yet
+            // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
             EBX = AddressOf("DebugBPs");
-            ECX.ShiftLeft(2);
-            EBX.Add(ECX);
+            EAX.ShiftLeft(2);
+            EBX.Add(EAX);
 
             //TODO: Make it so X# doesnt require the 32 and that it checks register size
-            Memory[EBX, 32] = EAX;
+            Memory[EBX, 32] = ECX;
 
             PopAll32();
             Return();
@@ -346,10 +344,6 @@ namespace Cosmos.IL2CPU.X86 {
             Jump("DebugStub_WaitCmd");
             Label = "DebugStub_AfterReady";
             
-            // If BP is disabled (0), skip BP checking code.
-            Memory["DebugBPs", 32].Compare(0);
-            JumpIf(Flags.Equal, "DebugStub_Executing_AfterBreakOnAddress");
-
             // BP is active
             EAX = Memory["DebugEIP", 32];
             EAX.Compare(Memory["DebugBPs", 32]);
