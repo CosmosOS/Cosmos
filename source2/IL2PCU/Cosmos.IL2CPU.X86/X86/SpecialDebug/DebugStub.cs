@@ -261,8 +261,8 @@ namespace Cosmos.IL2CPU.X86 {
 
             // Wait for port to be ready
             Label = "ReadALFromComPort_Wait";
-            AL = Port[DX];
-            AL.Test(1);
+                AL = Port[DX];
+                AL.Test(0x01);
             JumpIf(Flags.Zero, "ReadALFromComPort_Wait");
 
             // Set address of port
@@ -350,15 +350,19 @@ namespace Cosmos.IL2CPU.X86 {
             Memory["DebugTraceMode", 32].Compare((int)Tracing.On);
                 CallIf(Flags.Equal, "DebugStub_SendTrace");
 
+            Label = "DebugStub_Executing_Normal";
             // Is there a new incoming command? We dont want to wait for one
             // if there isn't one already here. This is a passing check.
-            Label = "DebugStub_Executing_Normal";
-            DX = mComStatusAddr;
-            AL = Port[DX];
-            AL.Test(0x01);
-            JumpIf(Flags.Zero, "DebugStub_Executing_NoCmd");
+            Label = "DebugStub_CheckForCmd";
+                DX = mComStatusAddr;
+                AL = Port[DX];
+                AL.Test(0x01);
+                // If no command waiting, break from loop
+                JumpIf(Flags.Zero, "DebugStub_CheckForCmd_Break");
                 Call("DebugStub_ProcessCommand");
-            Label = "DebugStub_Executing_NoCmd";
+                // See if there are more commands waiting
+                Jump("DebugStub_CheckForCmd");
+            Label = "DebugStub_CheckForCmd_Break";
 
             Return();
         }
