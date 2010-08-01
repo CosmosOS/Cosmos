@@ -14,13 +14,13 @@ namespace Cosmos.Debug.VSDebugEngine {
         // The breakpoint request that resulted in this pending breakpoint being created.
         private IDebugBreakpointRequest2 m_pBPRequest;
         private BP_REQUEST_INFO m_bpRequestInfo; 
-        private AD7Engine m_engine;
-        private BreakpointManager m_bpManager;
+        private AD7Engine mEngine;
+        private BreakpointManager mBPMgr;
 
         internal List<AD7BoundBreakpoint> mBoundBPs = new List<AD7BoundBreakpoint>();
 
-        private bool m_enabled;
-        private bool m_deleted;       
+        private bool mEnabled = true;
+        private bool mDeleted = false;       
 
         public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, AD7Engine engine, BreakpointManager bpManager) {
             m_pBPRequest = pBPRequest;
@@ -29,23 +29,17 @@ namespace Cosmos.Debug.VSDebugEngine {
             m_bpRequestInfo = requestInfo[0];
             EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo((uint)enum_BPREQI_FIELDS.BPREQI_THREAD, requestInfo));
 
-            m_engine = engine;
-            m_bpManager = bpManager;
-            
-            m_enabled = true;
-            m_deleted = false;
+            mEngine = engine;
+            mBPMgr = bpManager;
         }
 
         private bool CanBind()
         {
             // The sample engine only supports breakpoints on a file and line number. No other types of breakpoints are supported.
-            if (this.m_deleted || m_bpRequestInfo.bpLocation.bpLocationType != (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
+            if (mDeleted || m_bpRequestInfo.bpLocation.bpLocationType != (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
                 return false;
-            }
-
-            if (m_engine.mProcess == null)
-            {
+            } else if (mEngine.mProcess == null) {
                 return false;
             }
 
@@ -65,13 +59,13 @@ namespace Cosmos.Debug.VSDebugEngine {
             TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
             EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));           
 
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, address);
+            AD7MemoryAddress codeContext = new AD7MemoryAddress(mEngine, address);
             
             return new AD7DocumentContext(documentName, startPosition[0], startPosition[0], codeContext);
         }
 
         // Remove all of the bound breakpoints for this pending breakpoint
-        public void ClearBoundBreakpoints()
+        public void ClearBoundBreakpoints() 
         {
             lock (mBoundBPs)
             {
@@ -83,10 +77,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         // Called by bound breakpoints when they are being deleted.
-        public void OnBoundBreakpointDeleted(AD7BoundBreakpoint boundBreakpoint)
-        {
-            lock (mBoundBPs)
-            {
+        public void OnBoundBreakpointDeleted(AD7BoundBreakpoint boundBreakpoint) {
+            lock (mBoundBPs) {
                 mBoundBPs.Remove(boundBreakpoint);
             }
         }
@@ -109,14 +101,14 @@ namespace Cosmos.Debug.VSDebugEngine {
                     EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
 
                     uint xAddress = 0;
-                    if( m_engine.mProcess.mReverseSourceMappings.FindAddressForSourceLocation(documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn, out xAddress)){
-                        var xBPR = new AD7BreakpointResolution(m_engine, xAddress, GetDocumentContext(xAddress));
-                        var xBBP = new AD7BoundBreakpoint(m_engine, xAddress, this, xBPR);
+                    if( mEngine.mProcess.mReverseSourceMappings.FindAddressForSourceLocation(documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn, out xAddress)){
+                        var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
+                        var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
                         mBoundBPs.Add(xBBP);
                     }
 
                     // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
-                    //uint[] addresses = m_engine.DebuggedProcess.GetAddressesForSourceLocation(null, 
+                    //uint[] addresses = mEngine.DebuggedProcess.GetAddressesForSourceLocation(null, 
                     //                                                                           documentName, 
                     //                                                                           startPosition[0].dwLine + 1, 
                     //                                                                           startPosition[0].dwColumn);
@@ -124,10 +116,10 @@ namespace Cosmos.Debug.VSDebugEngine {
                     {
                         //foreach (uint addr in addresses)
                         //{
-                        //    AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(m_engine, addr, GetDocumentContext(addr));
-                        //    AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(m_engine, addr, this, breakpointResolution);
+                        //    AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(mEngine, addr, GetDocumentContext(addr));
+                        //    AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(mEngine, addr, this, breakpointResolution);
                         //    m_boundBreakpoints.Add(boundBreakpoint);
-                        //    m_engine.DebuggedProcess.SetBreakpoint(addr, boundBreakpoint);
+                        //    mEngine.DebuggedProcess.SetBreakpoint(addr, boundBreakpoint);
                         //}
                     }
                     
@@ -172,12 +164,9 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         // Deletes this pending breakpoint and all breakpoints bound from it.
-        int IDebugPendingBreakpoint2.Delete()
-        {
-            lock (mBoundBPs)
-            {
-                for (int i = mBoundBPs.Count - 1; i >= 0; i--)
-                {
+        int IDebugPendingBreakpoint2.Delete() {
+            lock (mBoundBPs) {
+                for (int i = mBoundBPs.Count - 1; i >= 0; i--) {
                     ((IDebugBoundBreakpoint2)mBoundBPs[i]).Delete();
                 }
             }
@@ -188,12 +177,10 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Toggles the enabled state of this pending breakpoint.
         int IDebugPendingBreakpoint2.Enable(int fEnable)
         {
-            lock (mBoundBPs)
-            {
-                m_enabled = fEnable == 0 ? false : true;
+            lock (mBoundBPs) {
+                mEnabled = fEnable != 0;
 
-                foreach (AD7BoundBreakpoint bp in mBoundBPs)
-                {
+                foreach (AD7BoundBreakpoint bp in mBoundBPs) {
                     ((IDebugBoundBreakpoint2)mBoundBPs).Enable(fEnable);
                 }
             }
@@ -234,15 +221,15 @@ namespace Cosmos.Debug.VSDebugEngine {
         int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState)
         {
             pState[0].state = (uint)enum_BP_STATE.BPS_DISABLED;
-            if (m_deleted)
+            if (mDeleted)
             {
                 pState[0].state = (uint)enum_BP_STATE.BPS_DELETED;
             }
-            else if (m_enabled)
+            else if (mEnabled)
             {
                 pState[0].state = (uint)enum_BP_STATE.BPS_ENABLED;
             }
-            else if (!m_enabled)
+            else 
             {
                 pState[0].state = (uint)enum_BP_STATE.BPS_DISABLED;
             }

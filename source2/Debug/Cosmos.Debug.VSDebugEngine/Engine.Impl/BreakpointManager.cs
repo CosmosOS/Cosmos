@@ -41,12 +41,19 @@ namespace Cosmos.Debug.VSDebugEngine {
             for (int xID = 0; xID < MaxBP; xID++) {
                 if (mActiveBPs[xID] == null) {
                     mActiveBPs[xID] = aBBP;
-                    mEngine.mProcess.DebugMsg("Set Remote BP #" + xID + " @ " + aBBP.mAddress.ToString("X8").ToUpper());
-                    mDbgConnector.SetBreakpointAddress(xID, aBBP.mAddress);
+                    mEngine.mProcess.DebugMsg("Remote BP #" + xID + " @ " + aBBP.mAddress.ToString("X8").ToUpper());
+                    mDbgConnector.SetBreakpoint(xID, aBBP.mAddress);
                     return xID;
                 }
             }
             throw new Exception("Maximum number of active breakpoints exceeded (" + MaxBP + ").");
         }
+
+        public void RemoteDisable(AD7BoundBreakpoint aBBP) {
+            mEngine.mProcess.DebugMsg("Remote BP #" + aBBP.RemoteID + " deleted.");
+            mActiveBPs[aBBP.RemoteID] = null;
+            mDbgConnector.DeleteBreakpoint(aBBP.RemoteID);
+        }
+
     }
 }

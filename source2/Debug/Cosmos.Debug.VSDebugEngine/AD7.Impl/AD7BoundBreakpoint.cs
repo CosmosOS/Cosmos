@@ -17,7 +17,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         protected bool mDeleted = false;
         public uint mAddress;
 
-        public int mRemoteID = -1;
+        protected int mRemoteID = -1;
         public int RemoteID {
             get { return mRemoteID; }
         }
@@ -35,6 +35,9 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (!mDeleted) {
                 mDeleted = true;
                 m_pendingBreakpoint.OnBoundBreakpointDeleted(this);
+                // Remove from DebugStub
+                mEngine.BPMgr.RemoteDisable(this);
+                mRemoteID = -1;
             }
             return VSConstants.S_OK;
         }
@@ -45,8 +48,14 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (mEnabled != xEnabled) {
                 // A production debug engine would remove or add the underlying int3 here. The sample engine does not support true disabling
                 // of breakpionts.
+                // Remove from DebugStub
+                if (xEnabled) {
+                    mRemoteID = mEngine.BPMgr.RemoteEnable(this);
+                } else {
+                    mEngine.BPMgr.RemoteDisable(this);
+                }
+                mEnabled = xEnabled;
             }
-            mEnabled = aEnable != 0;
             return VSConstants.S_OK;
         }
 
@@ -64,7 +73,6 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         int IDebugBoundBreakpoint2.GetState(out uint pState) {
             pState = 0;
-
             if (mDeleted) {
                 pState = (uint)enum_BP_STATE.BPS_DELETED;
             } else if (mEnabled) {

@@ -1,10 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label>DebugStub_Break</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>DebugStub_ProcessCommand</Label>
+    <Label>DebugStub_Executing</Label>
   </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>

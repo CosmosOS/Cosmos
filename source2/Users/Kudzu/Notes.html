@@ -3,28 +3,21 @@
 <h3>
     To Do</h3>
 <ul>
-    <li>Set and remove breakpoints while running</li>
-    <li>Ready command - wait for all init, then send a final before going. ack/nack each 
-        so we dont overflow</li>
-    <li>Find out why its sending the bp 3 x... 2x before vmware even starts</li>
-    <li>We&#39;re getting closer. I synced up and set a breakpoint on line 30. Then I ran. 
-        It actually broke on line 32. It actually was 32, not just in the IDE but based 
-        on looking at the output in VMWare. Then I press F10 and it goes to line 54 (end 
-        of source + 1). Then 33. Then 54. Then 34. Then 54.......</li>
-    <li>Multiple breakpoints</li>
-    <li>Launch GDB client</li>
-    <li>stepping</li>
+    <li>BPs often dont get set in time before they get hit. Need to implement batching @ 
+        Start msg</li>
+    <li>F11 Stepping for MS5?</li>
 </ul>
 <h3>
     Matthijs</h3>
 <ul>
     <li>Ask on forums: How to debug the vsdebug pkg?</li>
-    <li>Icon for .cosmos, and associate with Visual Studio</li>
-    <li>step basics</li>
+    <li>From debug pkg - how to get the current .cosmos project being debugged?</li>
+    <li>Pipe reuse wo restarting vs</li>
 </ul>
 <p>
     Post MS5</p>
 <ul>
+    <li>Launch GDB client</li>
     <li>Build: ISOs etc get rebuilt even when Im running a non Cosmos project (such as 
         GDB)</li>
     <li>express</li>
@@ -32,6 +25,10 @@
     <li>TCP</li>
     <li>Filesystem</li>
     <li>Text console upgrades</li>
+    <li>Ready command - wait for all init, then send a final before going. ack/nack each 
+        so we dont overflow</li>
+    <li>stepping</li>
+    <li>Find out why its sending the bp 3 x... 2x before vmware even starts</li>
 </ul>
 <h3>
     Notes</h3>
