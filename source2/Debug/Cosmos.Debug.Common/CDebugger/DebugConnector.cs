@@ -48,8 +48,6 @@ namespace Cosmos.Debug.Common.CDebugger
 
         protected abstract void SendRawData(byte[] aBytes);
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
-        protected abstract void PacketTracePoint(byte[] aPacket);
-        protected abstract void PacketText(byte[] aPacket);
 
         protected const int CmdSize = 2;
         protected byte mCommandID = 0;
@@ -66,16 +64,22 @@ namespace Cosmos.Debug.Common.CDebugger
             return xResult;
         }
 
+        // Prevent more than one command from happening at once.
+        // The debugger is user driven so should not happen, but maybe could
+        // happen while a previous command is waiting on a reply msg.
+        protected object mSendCmdLock = new object();
         public void SendCommand(Command aCmd) {
-            if (aCmd == Command.Noop) {
-                // Noops dont have any data.
-                // This is becuase Noops are used to clear out the 
-                // channel and are often not received. Sending noop + data
-                // usually causes the data to be interpreted as a command
-                // as its often the first byte received.
-                SendCommandData(new byte[1] { (byte)Command.Noop });
-            } else {
-                SendCommandData(CreateCommand(aCmd, 0));
+            lock (mSendCmdLock) {
+                if (aCmd == Command.Noop) {
+                    // Noops dont have any data.
+                    // This is becuase Noops are used to clear out the 
+                    // channel and are often not received. Sending noop + data
+                    // usually causes the data to be interpreted as a command
+                    // as its often the first byte received.
+                    SendCommandData(new byte[1] { (byte)Command.Noop });
+                } else {
+                    SendCommandData(CreateCommand(aCmd, 0));
+                }
             }
         }
 
@@ -99,7 +103,7 @@ namespace Cosmos.Debug.Common.CDebugger
            return (UInt16)((aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);
         }
         
-        protected void PacketCommand(byte[] aPacket) {
+        protected void PacketMsg(byte[] aPacket) {
             mCurrentMsgType = (MsgType)aPacket[0];
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType) {
@@ -112,13 +116,16 @@ namespace Cosmos.Debug.Common.CDebugger
                     break;
                 case MsgType.Started:
                     CmdStarted();
-                    Next(1, PacketCommand);
+                    WaitForMessage();
                     break;
                 case MsgType.Noop:
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
                     // Kudzu: Made a Noop command to handle this
-                    Next(1, PacketCommand);
+                    WaitForMessage();
+                    break;
+                case MsgType.CmdCompleted:
+                    Next(1, PacketCmdCompleted);
                     break;
                 default:
                     // Exceptions crash VS.
@@ -127,14 +134,32 @@ namespace Cosmos.Debug.Common.CDebugger
             }
         }
 
-        public virtual void Dispose()
-        {
+        public virtual void Dispose() {
             GC.SuppressFinalize(this);
+        }
+
+        protected void WaitForMessage() {
+            Next(1, PacketMsg);
         }
 
         protected void PacketTextSize(byte[] aPacket) {
             Next(GetUInt16(aPacket, 0), PacketText);
         }
-        
+
+        protected void PacketCmdCompleted(byte[] aPacket) {
+            byte xCmdID = aPacket[0];
+            WaitForMessage();
+        }
+
+        protected void PacketTracePoint(byte[] aPacket) {
+            CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
+            WaitForMessage();
+        }
+
+        protected void PacketText(byte[] aPacket) {
+            CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
+            WaitForMessage();
+        }
+
     }
 }

@@ -30,8 +30,8 @@ namespace Cosmos.Debug.Common.CDebugger {
         // for the callback.
         protected void Start(Stream aStream) {
             mStream = aStream;
-            // Request first command
-            Next(1, PacketCommand);
+            // Wait for first message
+            WaitForMessage();
         }
 
         public override void Dispose()
@@ -42,16 +42,6 @@ namespace Cosmos.Debug.Common.CDebugger {
                 mStream = null;
             }
             base.Dispose();
-        }
-        
-        protected override void PacketTracePoint(byte[] aPacket) {
-            CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
-            Next(1, PacketCommand);
-        }
-        
-        protected override void PacketText(byte[] aPacket) {
-            CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
-            Next(1, PacketCommand);
         }
         
         protected override void Next(int aPacketSize, Action<byte[]> aCompleted) {
