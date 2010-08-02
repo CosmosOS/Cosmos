@@ -27,17 +27,38 @@ namespace Cosmos.Debug.Common.CDebugger
         protected abstract void PacketTracePoint(byte[] aPacket);
         protected abstract void PacketText(byte[] aPacket);
 
+        protected const int CmdSize = 2;
+        protected byte mCommandID = 0;
+
+        protected byte[] CreateCommand(Command aCmd, int aDataSize) {
+            var xResult = new byte[2 + aDataSize];
+            xResult[0] = (byte)aCmd;
+            if (mCommandID == 255) {
+                mCommandID = 0;
+            } else {
+                mCommandID++;
+            }
+            xResult[1] = mCommandID;
+            return xResult;
+        }
+
         public void SendCommand(Command aCmd) {
-            var xData = new byte[1];
-            xData[0] = (byte)aCmd;
-            SendData(xData);
+            if (aCmd == Command.Noop) {
+                // Noops dont have any data.
+                // This is becuase Noops are used to clear out the 
+                // channel and are often not received. Sending noop + data
+                // usually causes the data to be interpreted as a command
+                // as its often the first byte received.
+                SendData(new byte[1] { (byte)Command.Noop });
+            } else {
+                SendData(CreateCommand(aCmd, 0));
+            }
         }
 
         public void SetBreakpoint(int aID, uint aAddress) {
-            var xData = new byte[6];
-            xData[0] = (byte)Command.BreakOnAddress;
-            Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 1, 4);
-            xData[5] = (byte)aID;
+            var xData = CreateCommand(Command.BreakOnAddress, 5);
+            Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, CmdSize, 4);
+            xData[CmdSize + 4] = (byte)aID;
             SendData(xData);
         }
 

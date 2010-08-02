@@ -39,6 +39,8 @@ namespace Cosmos.IL2CPU.X86 {
                 new DataMember("InterruptsEnabledFlag", 0),
                 // If set to 1, on next trace a break will occur
                 new DataMember("DebugBreakOnNextTrace", 0)
+                // Command ID of last command received
+                , new DataMember("DebugStub_CommandID", 0)
                 // Breakpoint addresses
                 , new DataMember("DebugBPs", new int[256])
              });
@@ -377,8 +379,17 @@ namespace Cosmos.IL2CPU.X86 {
             //TODO: But in ASM wont let us push AL, so we push EAX for now
             EAX.Push();
 
+            // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
             AL.Compare((byte)Command.Noop);
             JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
+
+            // Read Command ID
+            Call("ReadALFromComPort");
+            Memory["DebugStub_CommandID"] = AL;
+            
+            // Get AL back so we can compare it, but also put it back for later
+            EAX.Pop();
+            EAX.Push();
 
             AL.Compare((byte)Command.TraceOff);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
