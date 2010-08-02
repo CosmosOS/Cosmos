@@ -41,7 +41,6 @@ namespace Cosmos.Debug.VSDebugEngine {
             for (int xID = 0; xID < MaxBP; xID++) {
                 if (mActiveBPs[xID] == null) {
                     mActiveBPs[xID] = aBBP;
-                    mEngine.mProcess.DebugMsg("Remote BP #" + xID + " @ " + aBBP.mAddress.ToString("X8").ToUpper());
                     mDbgConnector.SetBreakpoint(xID, aBBP.mAddress);
                     return xID;
                 }
@@ -50,7 +49,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         public void RemoteDisable(AD7BoundBreakpoint aBBP) {
-            mEngine.mProcess.DebugMsg("Remote BP #" + aBBP.RemoteID + " deleted.");
             mActiveBPs[aBBP.RemoteID] = null;
             mDbgConnector.DeleteBreakpoint(aBBP.RemoteID);
         }

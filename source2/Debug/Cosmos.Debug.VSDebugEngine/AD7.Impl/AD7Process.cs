@@ -169,11 +169,12 @@ namespace Cosmos.Debug.VSDebugEngine {
             mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
             mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
-            mDbgConnector.ConnectionLost = new Action<Exception>(
-                delegate { 
-                    mEngine.Callback.OnProcessExit(0);
-                }
-            );
+            mDbgConnector.OnDebugMsg += new Action<string>(delegate(string aMsg) {
+                DebugMsg(aMsg);
+            });
+            mDbgConnector.ConnectionLost = new Action<Exception>( delegate { 
+                mEngine.Callback.OnProcessExit(0);
+            } );
 
             System.Threading.Thread.Sleep(250);
             System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());

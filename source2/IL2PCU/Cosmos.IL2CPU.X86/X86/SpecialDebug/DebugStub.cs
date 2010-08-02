@@ -385,8 +385,8 @@ namespace Cosmos.IL2CPU.X86 {
 
             // Read Command ID
             Call("ReadALFromComPort");
-            Memory["DebugStub_CommandID"] = AL;
-            
+            Memory["DebugStub_CommandID", 32] = EAX;
+
             // Get AL back so we can compare it, but also put it back for later
             EAX.Pop();
             EAX.Push();
@@ -394,28 +394,44 @@ namespace Cosmos.IL2CPU.X86 {
             AL.Compare((byte)Command.TraceOff);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
                 Memory["DebugTraceMode", 32] = (int)Tracing.Off;
-                Jump("DebugStub_ProcessCmd_Exit");
+                Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_TraceOff_After";
 
             AL.Compare((byte)Command.TraceOn);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
                 Memory["DebugTraceMode", 32] = (int)Tracing.On;
-                Jump("DebugStub_ProcessCmd_Exit");
+                Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_TraceOn_After";
 
             AL.Compare((byte)Command.Break);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
                 Call("DebugStub_Break");
-                Jump("DebugStub_ProcessCmd_Exit");
+                Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_Break_After";
 
             AL.Compare((byte)Command.BreakOnAddress);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
                 Call("DebugStub_BreakOnAddress");
-                Jump("DebugStub_ProcessCmd_Exit");
+                Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
+            Label = "DebugStub_ProcessCmd_ACK";
+            // We acknowledge receipt of the command, not processing of it.
+            // We have to do this because sometimes callers do more processing
+            // We ACK even ones we dont process here, but do not ACK Noop.
+            // The buffers should be ok becuase more wont be sent till after our NACK
+            // is received.
+            // Right now our max cmd size is 2 + 5 = 7. UART buffer is 16.
+            // We may need to revisit this in the future to ack not commands, but data chunks
+            // and move them to a buffer.
+            AL = (int)MsgType.CmdCompleted;
+            Call("WriteALToComPort");
+            EAX = Memory["DebugStub_CommandID", 32];
+            Call("WriteALToComPort");
+
             Label = "DebugStub_ProcessCmd_Exit";
+            // Restore AL for callers who check the command and do
+            // further processing, or for commands not handled by this routine.
             EAX.Pop();
             Return();
         }

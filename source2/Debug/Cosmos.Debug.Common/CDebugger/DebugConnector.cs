@@ -9,18 +9,21 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.Common.CDebugger
 {
     public abstract class DebugConnector: IDisposable {
-        //TODO: These should not be this way and should in fact
-        // be checked or better yet done by constructor arguments
-        // but that puts a restriction on where the sub classes
-        // are created.
         public Action<Exception> ConnectionLost;
         public Action<MsgType, UInt32> CmdTrace;
         public Action<string> CmdText;
         public Action CmdStarted;
+        public Action<string> OnDebugMsg;
         
         protected MsgType mCurrentMsgType;
 
         public abstract void WaitConnect();
+
+        protected void DoDebugMsg(string aMsg) {
+            if (OnDebugMsg != null) {
+                OnDebugMsg(aMsg);
+            }
+        }
 
         public abstract bool Connected {
             get;
@@ -84,6 +87,20 @@ namespace Cosmos.Debug.Common.CDebugger
         }
 
         public void SetBreakpoint(int aID, uint aAddress) {
+            // Not needed as SendCommand will do it, but it saves
+            // some execution, but more importantly stops it from 
+            // logging messages to debug output for events that
+            // dont happen.
+            if (!Connected) {
+                return;
+            }
+
+            if (aAddress == 0) {
+                DoDebugMsg("DS Cmd: BP " + aID + " deleted");
+            } else {
+                DoDebugMsg("DS Cmd: BP " + aID + " @ " + aAddress.ToString("X8").ToUpper());
+            }
+
             var xData = CreateCommand(Command.BreakOnAddress, 5);
             Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, CmdSize, 4);
             xData[CmdSize + 4] = (byte)aID;
@@ -148,6 +165,7 @@ namespace Cosmos.Debug.Common.CDebugger
 
         protected void PacketCmdCompleted(byte[] aPacket) {
             byte xCmdID = aPacket[0];
+            DoDebugMsg("DS Msg: Cmd " + xCmdID + " Complete"); 
             WaitForMessage();
         }
 
