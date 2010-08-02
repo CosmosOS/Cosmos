@@ -94,9 +94,6 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ReadMe.html" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>
