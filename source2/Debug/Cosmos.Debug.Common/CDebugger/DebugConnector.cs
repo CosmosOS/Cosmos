@@ -27,11 +27,6 @@ namespace Cosmos.Debug.Common.CDebugger
         }
 
         protected void SendCommandData(byte[] aBytes) {
-            //var xSB = new StringBuilder();
-            //foreach(byte x in aBytes) {
-            //    xSB.AppendLine(x.ToString("X2"));
-            //}
-            //
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
             // If not connected, we dont send anything. Things like BPs etc can be set before connected.
             // The debugger must resend these after the start command hits.
@@ -41,6 +36,12 @@ namespace Cosmos.Debug.Common.CDebugger
             // that the caller (Debugger) knows when the Start msg is received that it must
             // send over initializing information such as breakpoints.
             if (Connected) {
+                //var xSB = new StringBuilder();
+                //foreach(byte x in aBytes) {
+                //    xSB.AppendLine(x.ToString("X2"));
+                //}
+                //System.Windows.Forms.MessageBox.Show(xSB.ToString());
+
                 SendRawData(aBytes);
             }
         }
