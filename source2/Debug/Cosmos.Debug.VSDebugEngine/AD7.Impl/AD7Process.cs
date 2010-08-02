@@ -220,7 +220,6 @@ namespace Cosmos.Debug.VSDebugEngine {
             // program run.
             foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
                 foreach (var xBBP in xBP.mBoundBPs) {
-                    DebugMsg("Setting BP# " + xBBP.RemoteID + " @ " + xBBP.mAddress.ToString("X8").ToUpper());
                     mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
                 }
             }

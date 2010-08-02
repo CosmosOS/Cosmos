@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Cosmos.Debug.Common.CDebugger
@@ -14,10 +15,10 @@ namespace Cosmos.Debug.Common.CDebugger
         public Action<string> CmdText;
         public Action CmdStarted;
         public Action<string> OnDebugMsg;
-        
-        protected MsgType mCurrentMsgType;
 
+        protected MsgType mCurrentMsgType;
         public abstract void WaitConnect();
+        protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
         protected void DoDebugMsg(string aMsg) {
             if (OnDebugMsg != null) {
@@ -29,7 +30,7 @@ namespace Cosmos.Debug.Common.CDebugger
             get;
         }
 
-        protected void SendCommandData(byte[] aBytes) {
+        protected void SendCommandData(byte[] aBytes, bool aWait) {
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
             // If not connected, we dont send anything. Things like BPs etc can be set before connected.
             // The debugger must resend these after the start command hits.
@@ -46,6 +47,9 @@ namespace Cosmos.Debug.Common.CDebugger
                 //System.Windows.Forms.MessageBox.Show(xSB.ToString());
 
                 SendRawData(aBytes);
+                if (aWait) {
+                    //mCmdWait.WaitOne();
+                }
             }
         }
 
@@ -54,7 +58,7 @@ namespace Cosmos.Debug.Common.CDebugger
 
         protected const int CmdSize = 2;
         protected byte mCommandID = 0;
-
+        protected byte mCurrCmdID;
         protected byte[] CreateCommand(Command aCmd, int aDataSize) {
             var xResult = new byte[2 + aDataSize];
             xResult[0] = (byte)aCmd;
@@ -64,6 +68,7 @@ namespace Cosmos.Debug.Common.CDebugger
                 mCommandID++;
             }
             xResult[1] = mCommandID;
+            mCurrCmdID = mCommandID;
             return xResult;
         }
 
@@ -79,9 +84,9 @@ namespace Cosmos.Debug.Common.CDebugger
                     // channel and are often not received. Sending noop + data
                     // usually causes the data to be interpreted as a command
                     // as its often the first byte received.
-                    SendCommandData(new byte[1] { (byte)Command.Noop });
+                    SendCommandData(new byte[1] { (byte)Command.Noop }, false);
                 } else {
-                    SendCommandData(CreateCommand(aCmd, 0));
+                    SendCommandData(CreateCommand(aCmd, 0), true);
                 }
             }
         }
@@ -104,7 +109,7 @@ namespace Cosmos.Debug.Common.CDebugger
             var xData = CreateCommand(Command.BreakOnAddress, 5);
             Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, CmdSize, 4);
             xData[CmdSize + 4] = (byte)aID;
-            SendCommandData(xData);
+            SendCommandData(xData, true);
         }
 
         public void DeleteBreakpoint(int aID) {
@@ -165,7 +170,12 @@ namespace Cosmos.Debug.Common.CDebugger
 
         protected void PacketCmdCompleted(byte[] aPacket) {
             byte xCmdID = aPacket[0];
-            DoDebugMsg("DS Msg: Cmd " + xCmdID + " Complete"); 
+            DoDebugMsg("DS Msg: Cmd " + xCmdID + " Complete");
+            if (mCurrCmdID != xCmdID) {
+                System.Windows.Forms.MessageBox.Show("DS Cmd Completed Mismatch. Expected " + mCurrCmdID + ", received " + xCmdID + ".");
+            }
+            // Release command
+            mCmdWait.Set();
             WaitForMessage();
         }
 
