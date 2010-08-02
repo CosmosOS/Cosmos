@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.Common.CDebugger
 {
-    public abstract class DebugConnector {
+    public abstract class DebugConnector: IDisposable {
         //TODO: These should not be this way and should in fact
         // be checked or better yet done by constructor arguments
         // but that puts a restriction on where the sub classes
@@ -101,6 +101,11 @@ namespace Cosmos.Debug.Common.CDebugger
                     MessageBox.Show("Unknown debug command");
                     break;
             }
+        }
+
+        public virtual void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
 
         protected void PacketTextSize(byte[] aPacket) {

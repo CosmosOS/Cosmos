@@ -369,6 +369,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         {
             mProcess.Kill();
             mProcess.Exited -= mProcess_Exited;
+            mDbgConnector.Dispose();
+            mDbgConnector = null;
             return VSConstants.S_OK;
         }
 
@@ -394,6 +396,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             Trace.WriteLine(String.Format("Process Exit Code: {0}", mProcess.ExitCode));
             //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
+            mDbgConnector.Dispose();
+            mDbgConnector = null;
             mCallback.OnProcessExit((uint)mProcess.ExitCode);
         }
 

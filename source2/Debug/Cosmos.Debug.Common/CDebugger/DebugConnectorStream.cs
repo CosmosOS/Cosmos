@@ -45,6 +45,16 @@ namespace Cosmos.Debug.Common.CDebugger {
             // Request first command
             Next(1, PacketCommand);
         }
+
+        public override void Dispose()
+        {
+            if (mStream != null)
+            {
+                mStream.Close();
+                mStream = null;
+            }
+            base.Dispose();
+        }
         
         protected override void PacketTracePoint(byte[] aPacket) {
             CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));

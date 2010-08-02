@@ -53,6 +53,7 @@ namespace Cosmos.VS.Package
                 xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", true));
                 xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", true));
                 xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", true));
+                xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
 
                 xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
