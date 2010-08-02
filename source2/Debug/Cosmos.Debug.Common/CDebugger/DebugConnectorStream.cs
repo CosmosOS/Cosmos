@@ -18,30 +18,18 @@ namespace Cosmos.Debug.Common.CDebugger {
             public Action<byte[]> Completed;
         }
 
-        protected override void SendData(byte[] aBytes) {
-            //var xSB = new StringBuilder();
-            //xSB.AppendLine("Pending: " + mStream == null ? "true" : "false");
-            //foreach(byte x in aBytes) {
-            //    xSB.AppendLine(x.ToString("X2"));
-            //}
-            //System.Windows.Forms.MessageBox.Show(xSB.ToString());
-
-            if (mStream != null) {
-                mStream.Write(aBytes, 0, aBytes.Length);
-            } else {
-                //TODO: Is this actually used? And if so, doesnt it lose data if its called more than once?
-                mPendingSend = (byte[])aBytes.Clone();
-            }
+        protected override void SendRawData(byte[] aBytes) {
+            mStream.Write(aBytes, 0, aBytes.Length);
         }
 
-        private byte[] mPendingSend = null;
+        public override bool Connected {
+            get { return mStream != null; }
+        }
 
+        // Start is not in ctor, because for servers we have to wait
+        // for the callback.
         protected void Start(Stream aStream) {
             mStream = aStream;
-            if (mPendingSend != null) {
-                SendData(mPendingSend);
-                mPendingSend = null;
-            }
             // Request first command
             Next(1, PacketCommand);
         }

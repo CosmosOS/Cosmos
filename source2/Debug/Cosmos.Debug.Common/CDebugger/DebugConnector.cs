@@ -21,8 +21,31 @@ namespace Cosmos.Debug.Common.CDebugger
         protected MsgType mCurrentMsgType;
 
         public abstract void WaitConnect();
-        
-        protected abstract void SendData(byte[] aBytes);
+
+        public abstract bool Connected {
+            get;
+        }
+
+        protected void SendCommandData(byte[] aBytes) {
+            //var xSB = new StringBuilder();
+            //foreach(byte x in aBytes) {
+            //    xSB.AppendLine(x.ToString("X2"));
+            //}
+            //
+            //System.Windows.Forms.MessageBox.Show(xSB.ToString());
+            // If not connected, we dont send anything. Things like BPs etc can be set before connected.
+            // The debugger must resend these after the start command hits.
+            // We dont queue them, as it would end up with a lot of overlapping ops, ie set and then remove.
+            // We also dont check connected at caller, becuase its a lot of extra code.
+            // So we just ignore any commands sent before ready, and its part of the contract
+            // that the caller (Debugger) knows when the Start msg is received that it must
+            // send over initializing information such as breakpoints.
+            if (Connected) {
+                SendRawData(aBytes);
+            }
+        }
+
+        protected abstract void SendRawData(byte[] aBytes);
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
         protected abstract void PacketTracePoint(byte[] aPacket);
         protected abstract void PacketText(byte[] aPacket);
@@ -49,9 +72,9 @@ namespace Cosmos.Debug.Common.CDebugger
                 // channel and are often not received. Sending noop + data
                 // usually causes the data to be interpreted as a command
                 // as its often the first byte received.
-                SendData(new byte[1] { (byte)Command.Noop });
+                SendCommandData(new byte[1] { (byte)Command.Noop });
             } else {
-                SendData(CreateCommand(aCmd, 0));
+                SendCommandData(CreateCommand(aCmd, 0));
             }
         }
 
@@ -59,7 +82,7 @@ namespace Cosmos.Debug.Common.CDebugger
             var xData = CreateCommand(Command.BreakOnAddress, 5);
             Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, CmdSize, 4);
             xData[CmdSize + 4] = (byte)aID;
-            SendData(xData);
+            SendCommandData(xData);
         }
 
         public void DeleteBreakpoint(int aID) {
