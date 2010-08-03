@@ -29,13 +29,16 @@
     <VMWareFlavor>Workstation</VMWareFlavor>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugSymbols>false</DebugSymbols>
-    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
     <BuildTarget>VMWare</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <TraceAssemblies>All</TraceAssemblies>
-    <DebugMode>None</DebugMode>
+    <DebugMode>Source</DebugMode>
+    <EnableGDB>False</EnableGDB>
+    <TraceMode>
+    </TraceMode>
+    <VMWareFlavor>Workstation</VMWareFlavor>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
