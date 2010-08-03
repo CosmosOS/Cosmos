@@ -139,8 +139,10 @@ namespace Cosmos.Debug.Common.CDebugger
                     Next(2, PacketTextSize);
                     break;
                 case MsgType.Started:
-                    CmdStarted();
+                    // Call WaitForMessage first, else it blocks becuase started triggers
+                    // other commands which need responses.
                     WaitForMessage();
+                    CmdStarted();
                     break;
                 case MsgType.Noop:
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
@@ -182,13 +184,13 @@ namespace Cosmos.Debug.Common.CDebugger
         }
 
         protected void PacketTracePoint(byte[] aPacket) {
-            CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
             WaitForMessage();
+            CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
         }
 
         protected void PacketText(byte[] aPacket) {
-            CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
             WaitForMessage();
+            CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
         }
 
     }
