@@ -332,10 +332,25 @@ namespace Cosmos.IL2CPU.X86 {
             // The very first time, we send a one time Started signal back to the host
             Memory["DebugStartedSent", 32].Compare(1);
             JumpIf(Flags.Equal, "DebugStub_AfterStarted");
-            Memory["DebugStartedSent", 32] = 1; // Set flag so we don't send Ready again
-            AL = (int)MsgType.Started; // Send the actual started signal
-            Call("WriteALToComPort");
-            Call("DebugStub_ProcessCommandBatch");
+                Memory["DebugStartedSent", 32] = 1; // Set flag so we don't send Ready again
+
+                // QEMU (and possibly others) send some garbage across the serial line first.
+                // To work around this we send a signature. DC then discards everything before the signature.
+                Push(Consts.SerialSignature);
+                ESI = AddressOf("DebugEIP");
+                Call("WriteByteToComPort");
+                Call("WriteByteToComPort");
+                Call("WriteByteToComPort");
+                Call("WriteByteToComPort");
+                // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
+                EAX.Pop();
+
+                // We could use the signature as the start signal, but I prefer
+                // to keep the logic separate, especially in DC.
+                AL = (int)MsgType.Started; // Send the actual started signal
+                Call("WriteALToComPort");
+
+                Call("DebugStub_ProcessCommandBatch");
             Label = "DebugStub_AfterStarted";
 
             // Look for a possible matching BP

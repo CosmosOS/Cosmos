@@ -30,8 +30,7 @@ namespace Cosmos.Debug.Common.CDebugger {
         // for the callback.
         protected void Start(Stream aStream) {
             mStream = aStream;
-            // Wait for first message
-            WaitForMessage();
+            Next(1, WaitForSignature);
         }
 
         public override void Dispose()
