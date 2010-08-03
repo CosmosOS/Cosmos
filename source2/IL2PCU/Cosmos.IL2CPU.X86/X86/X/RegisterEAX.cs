@@ -44,13 +44,28 @@ namespace Cosmos.IL2CPU.X86.X {
             return Instance;
         }
 
-        public static implicit operator RegisterEAX(RegisterECX aValue) {
-            Instance.Move(aValue.GetId());
+        public static implicit operator RegisterEAX(RegisterEBX aReg) {
+            Instance.Move(aReg.GetId());
+            return Instance;
+        }
+
+        public static implicit operator RegisterEAX(RegisterECX aReg) {
+            Instance.Move(aReg.GetId());
+            return Instance;
+        }
+
+        public static implicit operator RegisterEAX(RegisterEDX aReg) {
+            Instance.Move(aReg.GetId());
             return Instance;
         }
 
         public static implicit operator PortNumber(RegisterEAX aEAX) {
             return new PortNumber(aEAX.GetId());
         }
+
+        public void RotateRight(int aCount) {
+            new RotateRight { DestinationReg = Registers.EBX, SourceValue = (uint)aCount };
+        }
+
     }
 }

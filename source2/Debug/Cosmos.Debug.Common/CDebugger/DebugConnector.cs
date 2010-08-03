@@ -131,28 +131,44 @@ namespace Cosmos.Debug.Common.CDebugger
             DoDebugMsg("DC Recv: " + Enum.GetName(typeof(MsgType), mCurrentMsgType));
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType) {
+
                 case MsgType.TracePoint:
                 case MsgType.BreakPoint:
                     Next(4, PacketTracePoint);            
                     break;
+
                 case MsgType.Message:
                     Next(2, PacketTextSize);
                     break;
+
                 case MsgType.Started:
                     // Call WaitForMessage first, else it blocks becuase started triggers
                     // other commands which need responses.
                     WaitForMessage();
+                    // Guests never get the first byte sent. So we send a noop.
+                    // This dummy byte seems to clear out the serial channel.
+                    // Its never received, but if it ever is, its a noop anyways.
+                    SendCommand(Command.Noop);
+
+                    // Send signature
+                    var xData = new byte[4];
+                    Array.Copy(BitConverter.GetBytes(Cosmos.Compiler.Debug.Consts.SerialSignature), 0, xData, 0, 4);
+                    SendRawData(xData);
+
                     CmdStarted();
                     break;
+
                 case MsgType.Noop:
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
                     // Kudzu: Made a Noop command to handle this
                     WaitForMessage();
                     break;
+
                 case MsgType.CmdCompleted:
                     Next(1, PacketCmdCompleted);
                     break;
+
                 default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");
@@ -173,8 +189,7 @@ namespace Cosmos.Debug.Common.CDebugger
             mSigCheck[2] = mSigCheck[3];
             mSigCheck[3] = aPacket[0];
             var xSig = GetUInt32(mSigCheck, 0);
-            //DoDebugMsg("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
-            System.Windows.Forms.MessageBox.Show("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
+            DoDebugMsg("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
             if (xSig == Cosmos.Compiler.Debug.Consts.SerialSignature) {
                 // Sig found, wait for messages
                 WaitForMessage();

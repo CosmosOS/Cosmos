@@ -19,6 +19,7 @@ namespace Cosmos.IL2CPU.X86.X {
         public RegisterAL AL = RegisterAL.Instance;
         
         public RegisterEBX EBX = RegisterEBX.Instance;
+        public RegisterBL BL = RegisterBL.Instance;
 
         public RegisterECX ECX = RegisterECX.Instance;
 

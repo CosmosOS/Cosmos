@@ -8,9 +8,6 @@ namespace Cosmos.IL2CPU.X86.X {
     public class RegisterAL : Register08 {
         public static readonly RegisterAL Instance = new RegisterAL();
 
-        // TODO: Use an attribute to find the register name
-        // Also useful for Memory conversion - Can find attribute
-        // of descendant? or no?
         public static implicit operator RegisterAL(byte aValue) {
             Instance.Move(aValue);
             return Instance;

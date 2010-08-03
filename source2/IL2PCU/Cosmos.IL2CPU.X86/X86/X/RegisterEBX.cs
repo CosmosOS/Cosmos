@@ -7,6 +7,23 @@ namespace Cosmos.IL2CPU.X86.X {
     public class RegisterEBX : Register32 {
         public static readonly RegisterEBX Instance = new RegisterEBX();
 
+        public static RegisterEBX operator ++(RegisterEBX aRegister) {
+            new Inc { DestinationReg = aRegister.GetId() };
+            return aRegister;
+        }
+        public static RegisterEBX operator --(RegisterEBX aRegister) {
+            new Dec { DestinationReg = aRegister.GetId() };
+            return aRegister;
+        }
+        public static RegisterEBX operator <<(RegisterEBX aRegister, int aCount) {
+            new ShiftLeft { DestinationReg = aRegister.GetId(), SourceValue = (uint)aCount };
+            return aRegister;
+        }
+        public static RegisterEBX operator >>(RegisterEBX aRegister, int aCount) {
+            new ShiftRight { DestinationReg = aRegister.GetId(), SourceValue = (uint)aCount };
+            return aRegister;
+        }
+
         public static implicit operator RegisterEBX(ElementReference aReference) {
             Instance.Move(aReference);
             return Instance;
@@ -36,5 +53,10 @@ namespace Cosmos.IL2CPU.X86.X {
             Instance.Move(aValue.GetId());
             return Instance;
         }
+
+        public void RotateRight(int aCount) {
+            new RotateRight { DestinationReg = Registers.EBX, SourceValue = (uint)aCount };
+        }
+
     }
 }

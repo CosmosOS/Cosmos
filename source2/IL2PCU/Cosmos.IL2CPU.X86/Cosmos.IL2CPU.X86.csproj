@@ -281,6 +281,7 @@
     <Compile Include="Plugs\System\ObjectImplRefs.cs" />
     <Compile Include="Plugs\System\OutOfMemoryExceptionImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RotateRight.cs" />
     <Compile Include="X86\286AndUp\Lgdt.cs" />
     <Compile Include="X86\286AndUp\Lidt.cs" />
     <Compile Include="X86\386AndUp\Popad.cs" />
@@ -346,6 +347,7 @@
     <Compile Include="X86\Push.cs" />
     <Compile Include="X86\Registers.cs" />
     <Compile Include="X86\Return.cs" />
+    <Compile Include="X86\RotateLeft.cs" />
     <Compile Include="X86\RotateThroughCarryRight.cs" />
     <Compile Include="X86\Scas.cs" />
     <Compile Include="X86\SetInterruptFlag.cs" />
@@ -443,6 +445,7 @@
     <Compile Include="X86\X\Address.cs" />
     <Compile Include="X86\X\AddressDirect.cs" />
     <Compile Include="X86\X\AddressIndirect.cs" />
+    <Compile Include="X86\X\RegisterBL.cs" />
     <Compile Include="X86\X\RegisterEDI.cs" />
     <Compile Include="X86\X\Memory.cs" />
     <Compile Include="X86\X\MemoryAction.cs" />

@@ -322,6 +322,7 @@ namespace Cosmos.IL2CPU.X86 {
             BreakOnAddress();
             ProcessCommand();
             ProcessCommandBatch();
+            WaitForSignature();
         }
 
         // This is the secondary stub routine. After the primary (main) has decided we should do some debug
@@ -356,6 +357,7 @@ namespace Cosmos.IL2CPU.X86 {
                 AL = (int)MsgType.Started; // Send the actual started signal
                 Call("WriteALToComPort");
 
+                Call("DebugStub_WaitForSignature");
                 Call("DebugStub_ProcessCommandBatch");
             Label = "DebugStub_AfterStarted";
 
@@ -392,8 +394,21 @@ namespace Cosmos.IL2CPU.X86 {
             Return();
         }
 
-        // Currently only called from .Start
-        // Does not handle commands that are valid only during break.
+        public void WaitForSignature() {
+            Label = "DebugStub_WaitForSignature";
+            EBX = 0;
+
+            Label = "DebugStub_WaitForSignature_Read";
+            Call("ReadALFromComPort");
+            BL = AL;
+            EBX.RotateRight(8);
+            EBX.Compare(Consts.SerialSignature);
+            JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read");
+
+            Label = "DebugStub_WaitForSignature_Exit";
+            Return();
+        }
+
         public void ProcessCommandBatch() {
             Label = "DebugStub_ProcessCommandBatch";
             Call("DebugStub_ProcessCommand");
@@ -456,14 +471,6 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
             Label = "DebugStub_ProcessCmd_ACK";
-                // QEMU seems to get garbage in, and we echo it back out as ACKs
-                // We need to implement a signature receive, but until then we 
-                // filter out commands that appear invalid.
-                EAX.Pop();
-                EAX.Push();
-                EAX.Compare((byte)Command.Max);
-                JumpIf(Flags.GreaterThanOrEqualTo, "DebugStub_ProcessCmd_After");
-
                 // We acknowledge receipt of the command, not processing of it.
                 // We have to do this because sometimes callers do more processing
                 // We ACK even ones we dont process here, but do not ACK Noop.
