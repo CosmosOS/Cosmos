@@ -29,5 +29,7 @@ namespace Cosmos.Compiler.Debug {
         , BreakOnAddress = 6
         , BatchBegin = 7 // Not used yet
         , BatchEnd = 8 // Not used yet
+        // Make sure this is always the last entry. Used by DebugStub to verify commands
+        , Max = 9 
     }
 }

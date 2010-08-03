@@ -7,7 +7,10 @@ using X86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.X {
     public class Y86 {
         public enum Flags { 
-            Zero, NotZero, Equal, NotEqual // Zero is synonym for Equal
+            Zero, Equal // Zero is synonym for Equal
+            , NotZero, NotEqual
+            , GreaterThanOrEqualTo
+            , LessThan
         };
 
         //TODO: Add registers as needed, not all are here yet
@@ -93,6 +96,12 @@ namespace Cosmos.IL2CPU.X86.X {
                 case Flags.NotZero:
                 case Flags.NotEqual:
                     new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = aLabel };
+                    break;
+                case Flags.LessThan:
+                    new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = aLabel };
+                    break;
+                case Flags.GreaterThanOrEqualTo:
+                    new ConditionalJump { Condition = ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = aLabel };
                     break;
             }
         }

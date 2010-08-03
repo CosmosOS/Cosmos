@@ -337,10 +337,10 @@ namespace Cosmos.IL2CPU.X86 {
                 // "Clear" the UART out
                 AL = 0;
                 Call("WriteALToComPort");
-                AL = 0;
-                Call("WriteALToComPort");
 
                 // QEMU (and possibly others) send some garbage across the serial line first.
+                // Actually they send the garbage in bound, but garbage could be inbound as well so we 
+                // keep this.
                 // To work around this we send a signature. DC then discards everything before the signature.
                 Push(Consts.SerialSignature);
                 ESI = ESP;
@@ -456,18 +456,27 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
             Label = "DebugStub_ProcessCmd_ACK";
-            // We acknowledge receipt of the command, not processing of it.
-            // We have to do this because sometimes callers do more processing
-            // We ACK even ones we dont process here, but do not ACK Noop.
-            // The buffers should be ok becuase more wont be sent till after our NACK
-            // is received.
-            // Right now our max cmd size is 2 + 5 = 7. UART buffer is 16.
-            // We may need to revisit this in the future to ack not commands, but data chunks
-            // and move them to a buffer.
-            AL = (int)MsgType.CmdCompleted;
-            Call("WriteALToComPort");
-            EAX = Memory["DebugStub_CommandID", 32];
-            Call("WriteALToComPort");
+                // QEMU seems to get garbage in, and we echo it back out as ACKs
+                // We need to implement a signature receive, but until then we 
+                // filter out commands that appear invalid.
+                EAX.Pop();
+                EAX.Push();
+                EAX.Compare((byte)Command.Max);
+                JumpIf(Flags.GreaterThanOrEqualTo, "DebugStub_ProcessCmd_After");
+
+                // We acknowledge receipt of the command, not processing of it.
+                // We have to do this because sometimes callers do more processing
+                // We ACK even ones we dont process here, but do not ACK Noop.
+                // The buffers should be ok becuase more wont be sent till after our NACK
+                // is received.
+                // Right now our max cmd size is 2 + 5 = 7. UART buffer is 16.
+                // We may need to revisit this in the future to ack not commands, but data chunks
+                // and move them to a buffer.
+                AL = (int)MsgType.CmdCompleted;
+                Call("WriteALToComPort");
+                EAX = Memory["DebugStub_CommandID", 32];
+                Call("WriteALToComPort");
+            Label = "DebugStub_ProcessCmd_After";
 
             Label = "DebugStub_ProcessCmd_Exit";
             // Restore AL for callers who check the command and do
