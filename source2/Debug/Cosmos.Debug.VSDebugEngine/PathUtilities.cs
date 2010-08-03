@@ -31,11 +31,6 @@ namespace Cosmos.Debug.VSDebugEngine
             return Path.Combine(GetBuildDir(), "Tools");
         }
 
-        public static string GetQEmuDir()
-        {
-            return Path.Combine(GetToolsDir(), "qemu");
-        }
-
         public static string GetVSIPDir()
         {
             return Path.Combine(GetBuildDir(), "VSIP");

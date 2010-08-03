@@ -121,10 +121,6 @@
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Build\Cosmos.Build.Launch\Cosmos.Build.Launch.csproj">
-      <Project>{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}</Project>
-      <Name>Cosmos.Build.Launch</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>

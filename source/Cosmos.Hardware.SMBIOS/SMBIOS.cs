@@ -30,7 +30,6 @@ namespace Cosmos.Hardware.SMBIOS
             HasSMBIOS = false;
             //0x000F0000 Start
 
-            //0x???????? QEmu doesn't work with qemu :(
             //0x000F69E0 VMWare
             //0x000FFF30 VirtualBox
 

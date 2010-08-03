@@ -14,7 +14,7 @@ using Microsoft.VisualStudio;
 namespace Cosmos.VS.Package {
 	[Guid(Guids.BuildPage)]
 	public partial class BuildPage : ConfigurationBase {
-        public static TargetHost CurrentBuildTarget = TargetHost.QEMU;
+        public static TargetHost CurrentBuildTarget = TargetHost.VMWare;
 		public static event EventHandler BuildTargetChanged;
 
 		protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
@@ -131,7 +131,7 @@ namespace Cosmos.VS.Package {
         private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
             var xEnumValue = (EnumValue)comboTarget.SelectedItem;
             var xValue = (TargetHost)xEnumValue.Value;
-            if (!(xValue == TargetHost.VMWare || xValue == TargetHost.QEMU)) {
+            if (!(xValue == TargetHost.VMWare || xValue == TargetHost.VMWare)) {
                 MessageBox.Show("This type is temporarily unsupported.");
             }
         }

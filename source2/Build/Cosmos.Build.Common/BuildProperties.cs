@@ -15,7 +15,7 @@ namespace Cosmos.Build.Common
         }
         public TargetHost Target
         {
-            get { return this.GetProperty("BuildTarget", TargetHost.QEMU); }
+            get { return this.GetProperty("BuildTarget", TargetHost.VMWare); }
             set { this.SetProperty("BuildTarget", value); }
         }
         public Framework Framework

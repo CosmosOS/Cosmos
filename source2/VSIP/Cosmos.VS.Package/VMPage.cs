@@ -47,12 +47,6 @@ namespace Cosmos.VS.Package {
 			bool subpageChanged = false;
 
 			switch (target) {
-				case TargetHost.QEMU:
-					if (!(pageSubPage is VMPageQemu)) {
-						subpageChanged = true;
-						pageSubPage = new VMPageQemu();
-					}
-					break;
 				default:
 					subpageChanged = true;
 					pageSubPage = null;

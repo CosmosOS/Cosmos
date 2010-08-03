@@ -45,11 +45,7 @@ namespace Cosmos.VS.Package
                 var xValues = new NameValueCollection();
                 xValues.Add("ISOFile", Path.Combine(Path.GetDirectoryName(ProjectMgr.GetOutputAssembly(this.ConfigName)), Path.GetFileNameWithoutExtension(ProjectMgr.GetOutputAssembly(this.ConfigName)) + ".iso"));
                 xValues.Add("BinFormat", this.GetConfigurationProperty("BinFormat", true));
-                xValues.Add("QemuNetworkCard", this.GetConfigurationProperty("QemuNetworkCard", true));
-                xValues.Add("QemuAudioCard", this.GetConfigurationProperty("QemuAudioCard", true));
-                xValues.Add("QemuNetworkTAP", this.GetConfigurationProperty("QemuNetworkTAP", true));
                 xValues.Add("EnableGDB", this.GetConfigurationProperty("EnableGDB", true));
-                xValues.Add("QemuCommunication", this.GetConfigurationProperty("QemuCommunication", true));
                 xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", true));
                 xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", true));
                 xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", true));

@@ -365,8 +365,6 @@ namespace Cosmos.Debug.VSDebugEngine
                 //   var  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
                 //}));
 
-                //var xTarget = new Cosmos.Build.Launch.Target.QEMU();
-
 
                 AD7EngineCreateEvent.Send(this);
                 var xProcess = new AD7Process(aDebugInfo, m_engineCallback, this, aPort);

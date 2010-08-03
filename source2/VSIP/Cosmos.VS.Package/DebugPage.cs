@@ -53,12 +53,6 @@ namespace Cosmos.VS.Package {
                         xPageChange = true;
                     }
                     break;
-				case TargetHost.QEMU:
-					if (!(pageSubPage is DebugPageSub)) {
-						pageSubPage = new DebugPageSub();
-                        xPageChange = true;
-					}
-					break;
 				default:
                     xPageChange = true;
                     pageSubPage = null;

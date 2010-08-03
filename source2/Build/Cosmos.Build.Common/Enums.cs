@@ -9,11 +9,14 @@ namespace Cosmos.Build.Common {
 	public enum TargetHost {
 	  [Description("VMWare")]
 	  VMWare,
-	  QEMU,
 	  [Description("Virtual PC")]
 	  VPC,
-	  PXE,
-	  ISO
+      [Description("PXE Network Boot")]
+      PXE,
+      [Description("ISO Image")]
+      ISO,
+      [Description("USB Bootable Device")]
+      USB
 	}
 
     public enum VMwareFlavor
@@ -30,30 +33,6 @@ namespace Cosmos.Build.Common {
 		[Description("Microsoft .NET")]
 		MicrosoftNET,
 		Mono
-	}
-
-	public enum VMQemuNetworkCard {
-		None,
-		[Description("Realtek RTL8139")]
-		RealtekRTL8139,
-	}
-
-	public enum VMQemuAudioCard {
-		None,
-		[Description("PC Speaker")]
-		PCSpeaker
-	}
-
-	public enum DebugQemuCommunication {
-		None,
-		[Description("TCP: Cosmos client, QEMU server")] 
-		TCPListener,
-		[Description("TCP: QEMU client, Cosmos server")] 
-		TCPClient,
-        [Description("Pipe: Cosmos client, QEMU server")]
-		NamedPipeListener,
-		[Description("Pipe: QEMU client, Cosmos server")]
-		NamedPipeClient
 	}
 
     public enum LogSeverityEnum : byte {

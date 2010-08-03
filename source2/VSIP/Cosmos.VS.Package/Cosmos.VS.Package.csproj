@@ -130,12 +130,6 @@
     <Compile Include="VMPage.Designer.cs">
       <DependentUpon>VMPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="VMPageQemu.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="VMPageQemu.Designer.cs">
-      <DependentUpon>VMPageQemu.cs</DependentUpon>
-    </Compile>
     <Compile Include="VsConfigProvider.cs" />
     <Compile Include="VsProjectConfig.cs" />
     <Compile Include="VSProjectFactory.cs" />
@@ -184,9 +178,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VMPage.resx">
       <DependentUpon>VMPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VMPageQemu.resx">
-      <DependentUpon>VMPageQemu.cs</DependentUpon>
     </EmbeddedResource>
     <ZipProject Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
     <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos" />
