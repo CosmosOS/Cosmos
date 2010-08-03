@@ -33,19 +33,6 @@ namespace Cosmos.VS.Package {
 					IsDirty = true;
 				}
 			};
-
-            comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost), true));
-            comboTarget.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-				var value = (TargetHost)((EnumValue)comboTarget.SelectedItem).Value;
-                if (value != mProps.Target) {
-                    mProps.Target = value;
-					IsDirty = true;
-
-					CurrentBuildTarget = value;
-					OnBuildTargetChanged(this, EventArgs.Empty);
-				}
-			};
-
             comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
             comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
 				var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
@@ -62,7 +49,29 @@ namespace Cosmos.VS.Package {
 					IsDirty = true;
 				}
 			};
-		}
+
+
+            comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost), true));
+            comboTarget.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+                var value = (TargetHost)((EnumValue)comboTarget.SelectedItem).Value;
+                if (value != mProps.Target) {
+                    mProps.Target = value;
+                    IsDirty = true;
+
+                    CurrentBuildTarget = value;
+                    OnBuildTargetChanged(this, EventArgs.Empty);
+                }
+            };
+
+            comboFlavor.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareFlavor), true));
+            comboFlavor.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+                var x = (VMwareFlavor)((EnumValue)comboFlavor.SelectedItem).Value;
+                if (x != mProps.VMWareFlavor) {
+                    mProps.VMWareFlavor = x;
+                    IsDirty = true;
+                }
+            };
+        }
 
 		protected BuildProperties mProps = new BuildProperties();
 		public override PropertiesBase Properties { 
@@ -90,7 +99,10 @@ namespace Cosmos.VS.Package {
 
             mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
             checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
-		}
+            
+            mProps.SetProperty("VMWareFlavor", GetConfigProperty("VMWareFlavor"));
+            comboFlavor.SelectedItem = EnumValue.Find(comboFlavor.Items, mProps.VMWareFlavor);
+        }
 
 		private void OutputBrowse_Click(object sender, EventArgs e) {
 			string folderPath = String.Empty;
@@ -131,9 +143,13 @@ namespace Cosmos.VS.Package {
         private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
             var xEnumValue = (EnumValue)comboTarget.SelectedItem;
             var xValue = (TargetHost)xEnumValue.Value;
-            if (!(xValue == TargetHost.VMWare || xValue == TargetHost.VMWare)) {
+            if (xValue != TargetHost.VMWare) {
                 MessageBox.Show("This type is temporarily unsupported.");
             }
+        }
+
+        private void tableBuildOptions_Paint(object sender, PaintEventArgs e) {
+
         }
 
 	}

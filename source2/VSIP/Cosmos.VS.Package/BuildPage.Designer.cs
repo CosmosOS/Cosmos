@@ -41,6 +41,7 @@
             this.comboTarget = new System.Windows.Forms.ComboBox();
             this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
             this.labelInternalAssembler = new System.Windows.Forms.Label();
+            this.comboFlavor = new System.Windows.Forms.ComboBox();
             this.tableBuildOptions.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -53,20 +54,22 @@
             this.tableBuildOptions.ColumnCount = 2;
             this.tableBuildOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
             this.tableBuildOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
-            this.tableBuildOptions.Controls.Add(this.titleCompiler, 0, 3);
+            this.tableBuildOptions.Controls.Add(this.titleCompiler, 0, 4);
             this.tableBuildOptions.Controls.Add(this.titleOutput, 0, 0);
             this.tableBuildOptions.Controls.Add(this.label2, 0, 1);
             this.tableBuildOptions.Controls.Add(this.panel1, 1, 1);
-            this.tableBuildOptions.Controls.Add(this.labelFramework, 0, 4);
-            this.tableBuildOptions.Controls.Add(this.comboFramework, 1, 4);
+            this.tableBuildOptions.Controls.Add(this.labelFramework, 0, 5);
+            this.tableBuildOptions.Controls.Add(this.comboFramework, 1, 5);
             this.tableBuildOptions.Controls.Add(this.labelTarget, 0, 2);
             this.tableBuildOptions.Controls.Add(this.comboTarget, 1, 2);
-            this.tableBuildOptions.Controls.Add(this.checkUseInternalAssembler, 0, 5);
-            this.tableBuildOptions.Controls.Add(this.labelInternalAssembler, 0, 6);
+            this.tableBuildOptions.Controls.Add(this.checkUseInternalAssembler, 0, 6);
+            this.tableBuildOptions.Controls.Add(this.labelInternalAssembler, 0, 7);
+            this.tableBuildOptions.Controls.Add(this.comboFlavor, 1, 3);
             this.tableBuildOptions.Location = new System.Drawing.Point(0, 41);
             this.tableBuildOptions.Margin = new System.Windows.Forms.Padding(0);
             this.tableBuildOptions.Name = "tableBuildOptions";
-            this.tableBuildOptions.RowCount = 8;
+            this.tableBuildOptions.RowCount = 9;
+            this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -77,6 +80,7 @@
             this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableBuildOptions.Size = new System.Drawing.Size(492, 247);
             this.tableBuildOptions.TabIndex = 1;
+            this.tableBuildOptions.Paint += new System.Windows.Forms.PaintEventHandler(this.tableBuildOptions_Paint);
             // 
             // titleCompiler
             // 
@@ -86,7 +90,7 @@
             this.titleCompiler.Enabled = false;
             this.titleCompiler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.titleCompiler.LineColor = System.Drawing.SystemColors.ControlDark;
-            this.titleCompiler.Location = new System.Drawing.Point(3, 99);
+            this.titleCompiler.Location = new System.Drawing.Point(3, 126);
             this.titleCompiler.Margin = new System.Windows.Forms.Padding(3, 12, 3, 12);
             this.titleCompiler.Name = "titleCompiler";
             this.titleCompiler.Size = new System.Drawing.Size(486, 15);
@@ -159,7 +163,7 @@
             this.labelFramework.AutoSize = true;
             this.labelFramework.Enabled = false;
             this.labelFramework.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFramework.Location = new System.Drawing.Point(22, 129);
+            this.labelFramework.Location = new System.Drawing.Point(22, 156);
             this.labelFramework.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
             this.labelFramework.Name = "labelFramework";
             this.labelFramework.Size = new System.Drawing.Size(69, 21);
@@ -172,7 +176,7 @@
             this.comboFramework.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboFramework.Enabled = false;
             this.comboFramework.FormattingEnabled = true;
-            this.comboFramework.Location = new System.Drawing.Point(150, 129);
+            this.comboFramework.Location = new System.Drawing.Point(150, 156);
             this.comboFramework.Name = "comboFramework";
             this.comboFramework.Size = new System.Drawing.Size(143, 21);
             this.comboFramework.TabIndex = 8;
@@ -209,7 +213,7 @@
             this.tableBuildOptions.SetColumnSpan(this.checkUseInternalAssembler, 2);
             this.checkUseInternalAssembler.Enabled = false;
             this.checkUseInternalAssembler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkUseInternalAssembler.Location = new System.Drawing.Point(22, 165);
+            this.checkUseInternalAssembler.Location = new System.Drawing.Point(22, 192);
             this.checkUseInternalAssembler.Margin = new System.Windows.Forms.Padding(22, 12, 3, 3);
             this.checkUseInternalAssembler.Name = "checkUseInternalAssembler";
             this.checkUseInternalAssembler.Size = new System.Drawing.Size(146, 19);
@@ -221,13 +225,23 @@
             // 
             this.tableBuildOptions.SetColumnSpan(this.labelInternalAssembler, 2);
             this.labelInternalAssembler.Enabled = false;
-            this.labelInternalAssembler.Location = new System.Drawing.Point(44, 187);
+            this.labelInternalAssembler.Location = new System.Drawing.Point(44, 214);
             this.labelInternalAssembler.Margin = new System.Windows.Forms.Padding(44, 0, 3, 0);
             this.labelInternalAssembler.Name = "labelInternalAssembler";
-            this.labelInternalAssembler.Size = new System.Drawing.Size(401, 43);
+            this.labelInternalAssembler.Size = new System.Drawing.Size(401, 27);
             this.labelInternalAssembler.TabIndex = 6;
             this.labelInternalAssembler.Text = "Experimental. Leave unchecked unless you like debugging deep level assembly code." +
                 "";
+            // 
+            // comboFlavor
+            // 
+            this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboFlavor.FormattingEnabled = true;
+            this.comboFlavor.Location = new System.Drawing.Point(150, 90);
+            this.comboFlavor.Name = "comboFlavor";
+            this.comboFlavor.Size = new System.Drawing.Size(143, 21);
+            this.comboFlavor.Sorted = true;
+            this.comboFlavor.TabIndex = 13;
             // 
             // BuildPage
             // 
@@ -260,6 +274,7 @@
 		private System.Windows.Forms.CheckBox checkUseInternalAssembler;
 		private System.Windows.Forms.Label labelTarget;
 		private System.Windows.Forms.ComboBox comboTarget;
+        private System.Windows.Forms.ComboBox comboFlavor;
 
 
 	}

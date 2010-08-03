@@ -28,5 +28,9 @@ namespace Cosmos.Build.Common
             get { return this.GetProperty("UseInternalAssembler", false); }
             set { this.SetProperty("UseInternalAssembler", value); }
         }
+        public VMwareFlavor VMWareFlavor {
+            get { return GetProperty("VMWareFlavor", VMwareFlavor.Player); }
+            set { SetProperty("VMWareFlavor", value); }
+        }
     }
 }

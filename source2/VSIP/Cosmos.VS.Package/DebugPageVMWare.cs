@@ -38,17 +38,6 @@ namespace Cosmos.VS.Package
                 }
             };
 
-            comboFlavor.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareFlavor), true));
-            comboFlavor.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-            {
-                var x = (VMwareFlavor)((EnumValue)comboFlavor.SelectedItem).Value;
-                if (x != mProps.VMWareFlavor)
-                {
-                    mProps.VMWareFlavor = x;
-                    IsDirty = true;
-                }
-            };
-
             checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e)
             {
                 bool x = checkEnableGDB.Checked;
@@ -79,9 +68,6 @@ namespace Cosmos.VS.Package
 
             mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
             comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
-
-            mProps.SetProperty("VMWareFlavor", GetConfigProperty("VMWareFlavor"));
-            comboFlavor.SelectedItem = EnumValue.Find(comboFlavor.Items, mProps.VMWareFlavor);
         }
     }
 }

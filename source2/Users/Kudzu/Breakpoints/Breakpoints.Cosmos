@@ -19,13 +19,9 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
-    <BuildTarget>QEMU</BuildTarget>
+    <BuildTarget>VMWare</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <QemuNetworkCard>RealtekRTL8139</QemuNetworkCard>
-    <QemuAudioCard>
-    </QemuAudioCard>
-    <QemuNetworkTAP>True</QemuNetworkTAP>
     <DebugMode>Source</DebugMode>
     <EnableGDB>False</EnableGDB>
     <TraceMode>
@@ -35,11 +31,9 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>false</DebugSymbols>
     <OutputPath>bin\Release\</OutputPath>
-    <BuildTarget>QEMU</BuildTarget>
+    <BuildTarget>VMWare</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <QemuCommunication>
-    </QemuCommunication>
     <TraceAssemblies>All</TraceAssemblies>
     <DebugMode>None</DebugMode>
   </PropertyGroup>

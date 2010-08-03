@@ -32,7 +32,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.comboDebugMode = new System.Windows.Forms.ComboBox();
             this.table = new System.Windows.Forms.TableLayoutPanel();
-            this.titleTargetHost = new Cosmos.VS.Package.TitleDivision();
             this.label2 = new System.Windows.Forms.Label();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
             this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
@@ -81,7 +80,6 @@
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 39F));
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.66887F));
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.33113F));
-            this.table.Controls.Add(this.titleTargetHost, 0, 6);
             this.table.Controls.Add(this.label2, 1, 3);
             this.table.Controls.Add(this.titleGeneral, 0, 0);
             this.table.Controls.Add(this.label1, 1, 1);
@@ -108,20 +106,6 @@
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.table.Size = new System.Drawing.Size(492, 288);
             this.table.TabIndex = 1;
-            // 
-            // titleTargetHost
-            // 
-            this.titleTargetHost.BackColor = System.Drawing.Color.Transparent;
-            this.table.SetColumnSpan(this.titleTargetHost, 2);
-            this.titleTargetHost.Dock = System.Windows.Forms.DockStyle.Top;
-            this.titleTargetHost.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.titleTargetHost.LineColor = System.Drawing.SystemColors.ControlDark;
-            this.titleTargetHost.Location = new System.Drawing.Point(3, 140);
-            this.titleTargetHost.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
-            this.titleTargetHost.Name = "titleTargetHost";
-            this.titleTargetHost.Size = new System.Drawing.Size(257, 15);
-            this.titleTargetHost.TabIndex = 21;
-            this.titleTargetHost.Title = "Target Host";
             // 
             // label2
             // 
@@ -186,7 +170,6 @@
 
         private TitleDivision titleGeneral;
         private System.Windows.Forms.TableLayoutPanel table;
-        private TitleDivision titleTargetHost;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboDebugMode;

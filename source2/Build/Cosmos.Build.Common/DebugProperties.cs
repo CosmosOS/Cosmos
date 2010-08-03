@@ -20,11 +20,5 @@ namespace Cosmos.Build.Common {
             set { SetProperty("EnableGDB", value); }
         }
 
-        public VMwareFlavor VMWareFlavor
-        {
-            get { return GetProperty("VMWareFlavor", VMwareFlavor.Player); }
-            set { SetProperty("VMWareFlavor", value); }
-        }
-
     }
 }
