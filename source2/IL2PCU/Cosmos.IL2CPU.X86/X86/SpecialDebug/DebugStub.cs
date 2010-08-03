@@ -343,7 +343,7 @@ namespace Cosmos.IL2CPU.X86 {
                 // QEMU (and possibly others) send some garbage across the serial line first.
                 // To work around this we send a signature. DC then discards everything before the signature.
                 Push(Consts.SerialSignature);
-                ESI = AddressOf("DebugEIP");
+                ESI = ESP;
                 Call("WriteByteToComPort");
                 Call("WriteByteToComPort");
                 Call("WriteByteToComPort");

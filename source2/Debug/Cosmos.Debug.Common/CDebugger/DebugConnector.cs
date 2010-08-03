@@ -168,11 +168,13 @@ namespace Cosmos.Debug.Common.CDebugger
         // For more info see note in DebugStub where signature is transmitted.
         protected byte[] mSigCheck = new byte[4] { 0, 0, 0, 0} ;
         protected void WaitForSignature(byte[] aPacket) {
-            mSigCheck[3] = mSigCheck[2];
-            mSigCheck[2] = mSigCheck[1];
-            mSigCheck[1] = mSigCheck[0];
-            mSigCheck[0] = aPacket[0];
-            if (GetUInt32(mSigCheck, 0) == Cosmos.Compiler.Debug.Consts.SerialSignature) {
+            mSigCheck[0] = mSigCheck[1];
+            mSigCheck[1] = mSigCheck[2];
+            mSigCheck[2] = mSigCheck[3];
+            mSigCheck[3] = aPacket[0];
+            var xSig = GetUInt32(mSigCheck, 0);
+            DoDebugMsg("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
+            if (xSig == Cosmos.Compiler.Debug.Consts.SerialSignature) {
                 // Sig found, wait for messages
                 WaitForMessage();
             } else {
