@@ -7,29 +7,12 @@
 </head>
 <body>
     <h3>
-        To Do</h3>
-    <p>
-        Call/JumpIf(EAX == 0x04, ....)</p>
-    <p>
-        Can do reg = reg + 4 - define the + overload as a type that can then be 
-        reimplicitly converted to a register, or whatever type goes inside Memory[x]</p>
-    <p>
-        Make it so X# doesnt require the 32 and that it checks register size Memory[EBX, 
-        32] = ECX; </p>
-    <p>
-        Register.cs - public void Push() { // TODO: This emits Push dword which 
-        generates warnings about dword being ignored new Push { DestinationReg = GetId() 
-        }; } |<br />
-        AL.Push does not work at all.</p>
-    <p>
-        EAX = Memory[&quot;lable&quot;] does same as addressof.. you have to specify size... size 
-        should be infreered and never use teh value o lable</p>
-    <h3>
-        X#milation would need to be implemented.</li>
+        X#<p>
+        X# compiles C# code into assembly, but does it as it runs. This allows the use 
+        of intellisense, and modification of the output using C#.</p>
         <li>One of the goals of Cosmos is the need to write very little assembly, so only 
             debug stub, compiler users, etc need assembly. Too much work on X# may not be 
             worth the resources required.</li>
-    </ul>
     <h3>
         Usage</h3>
     <h3>

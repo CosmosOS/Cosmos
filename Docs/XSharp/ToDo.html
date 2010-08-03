@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <p>
+        Call/JumpIf(EAX == 0x04, ....)</p>
+    <p>
+        Can do reg = reg + 4 - define the + overload as a type that can then be 
+        reimplicitly converted to a register, or whatever type goes inside Memory[x]</p>
+    <p>
+        Make it so X# doesnt require the 32 and that it checks register size Memory[EBX, 
+        32] = ECX; </p>
+    <p>
+        Register.cs - public void Push() { // TODO: This emits Push dword which 
+        generates warnings about dword being ignored new Push { DestinationReg = GetId() 
+        }; } |<br />
+        AL.Push does not work at all.</p>
+    <p>
+        EAX = Memory[&quot;lable&quot;] does same as addressof.. you have to specify size... size 
+        should be infreered and never use teh value o lable</p>
+    
+</body>
+</html>
