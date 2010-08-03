@@ -13,6 +13,7 @@ using Cosmos.Compiler.Debug;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Cosmos.Debug.VSDebugEngine {
     public class AD7Process : IDebugProcess2 {
@@ -29,6 +30,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         public string mISO;
         protected readonly NameValueCollection mDebugInfo;
         protected TargetHost mTargetHost;
+
+        private int mProcessExitEventSent = 0;
 
         protected void LaunchQEMU(bool aGDB) {
             var xDebugConnectorStr = "-serial tcp:127.0.0.1:4444";
@@ -172,9 +175,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             mDbgConnector.OnDebugMsg += new Action<string>(delegate(string aMsg) {
                 DebugMsg(aMsg);
             });
-            mDbgConnector.ConnectionLost = new Action<Exception>( delegate { 
-                mEngine.Callback.OnProcessExit(0);
-            } );
+            mDbgConnector.ConnectionLost = new Action<Exception>(DbgConnector_ConnectionLost    );
 
             System.Threading.Thread.Sleep(250);
             System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
@@ -201,6 +202,17 @@ namespace Cosmos.Debug.VSDebugEngine {
             mPort = aPort;
         }
 
+        private void DbgConnector_ConnectionLost(Exception e)
+        {
+            if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 1)
+            {
+                return;
+            }
+            if (mDbgConnector != null)
+            {
+                mEngine.Callback.OnProcessExit(0);
+            }
+        }
         // Shows a message in the output window of VS. Needs special treatment, 
         // because normally VS only shows msgs from debugged process, not internal
         // stuff like us.
@@ -368,10 +380,16 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         public int Terminate()
         {
-            mProcess.Kill();
-            mProcess.Exited -= mProcess_Exited;
-            mDbgConnector.Dispose();
-            mDbgConnector = null;
+            if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0)
+            {
+                mProcess.Kill();
+                mProcess.Exited -= mProcess_Exited;
+                if (mDbgConnector != null)
+                {
+                    mDbgConnector.Dispose();
+                    mDbgConnector = null;
+                }
+            }
             return VSConstants.S_OK;
         }
 
@@ -399,7 +417,10 @@ namespace Cosmos.Debug.VSDebugEngine {
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
             mDbgConnector.Dispose();
             mDbgConnector = null;
-            mCallback.OnProcessExit((uint)mProcess.ExitCode);
+            if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0)
+            {
+                mCallback.OnProcessExit((uint)mProcess.ExitCode);
+            }
         }
 
         internal void Continue() {
