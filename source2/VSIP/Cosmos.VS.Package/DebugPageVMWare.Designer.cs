@@ -35,8 +35,6 @@
             this.titleTargetHost = new Cosmos.VS.Package.TitleDivision();
             this.label2 = new System.Windows.Forms.Label();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.comboFlavor = new System.Windows.Forms.ComboBox();
             this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.checkEnableGDB = new System.Windows.Forms.CheckBox();
             this.table.SuspendLayout();
@@ -89,8 +87,6 @@
             this.table.Controls.Add(this.label1, 1, 1);
             this.table.Controls.Add(this.comboDebugMode, 2, 1);
             this.table.Controls.Add(this.comboTraceMode, 2, 3);
-            this.table.Controls.Add(this.label3, 1, 7);
-            this.table.Controls.Add(this.comboFlavor, 2, 7);
             this.table.Controls.Add(this.titleDivision1, 2, 3);
             this.table.Controls.Add(this.checkEnableGDB, 1, 5);
             this.table.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -149,26 +145,6 @@
             this.comboTraceMode.Size = new System.Drawing.Size(223, 21);
             this.comboTraceMode.TabIndex = 15;
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Location = new System.Drawing.Point(42, 167);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(218, 27);
-            this.label3.TabIndex = 22;
-            this.label3.Text = "VMWare Flavor:";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // comboFlavor
-            // 
-            this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboFlavor.FormattingEnabled = true;
-            this.comboFlavor.Location = new System.Drawing.Point(266, 170);
-            this.comboFlavor.Name = "comboFlavor";
-            this.comboFlavor.Size = new System.Drawing.Size(223, 21);
-            this.comboFlavor.TabIndex = 23;
-            // 
             // titleDivision1
             // 
             this.titleDivision1.BackColor = System.Drawing.Color.Transparent;
@@ -215,8 +191,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboDebugMode;
         private System.Windows.Forms.ComboBox comboTraceMode;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ComboBox comboFlavor;
         private TitleDivision titleDivision1;
         private System.Windows.Forms.CheckBox checkEnableGDB;
 
