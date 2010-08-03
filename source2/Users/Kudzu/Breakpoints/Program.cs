@@ -20,7 +20,7 @@ namespace Cosmos.User.Kernel {
                 string xResult = Console.ReadLine();
                 Console.Write("Text typed: ");
                 Console.WriteLine(xResult);
-                Cosmos.Debug.Debugger.Send(xResult);
+                //Cosmos.Debug.Debugger.Send(xResult);
             }
         }
 

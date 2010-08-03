@@ -10,7 +10,7 @@ rem rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\Projec
 rem del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
-cd "..\..\source"
+cd "..\source"
 %windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86
 rem /t:Rebuild
 cd ..\Build\VSIP\
@@ -37,18 +37,13 @@ xcopy /Y ..\..\source\Cosmos.Kernel.FileSystems\bin\debug\Cosmos.Sys.FileSystem.
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\Debug\Cosmos.VS.Package.* .
 xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject.zip .
 
-echo .
+echo . 
 echo .
 echo .
 echo Creating setup.exe
 REM Try one, then if not there the other for x64
 IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
-	"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
+	"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Userkit
 ) ELSE (
-	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
+	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Userkit
 )
-
-..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
-
-rem Relaunch VS
-..\..\source\Cosmos.sln
