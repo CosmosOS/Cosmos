@@ -128,7 +128,7 @@ namespace Cosmos.Debug.Common.CDebugger
         
         protected void PacketMsg(byte[] aPacket) {
             mCurrentMsgType = (MsgType)aPacket[0];
-            DoDebugMsg("DC Recv: " + mCurrentMsgType.ToString());
+            DoDebugMsg("DC Recv: " + Enum.GetName(typeof(MsgType), mCurrentMsgType));
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType) {
                 case MsgType.TracePoint:

@@ -14,7 +14,6 @@ namespace Cosmos.Debug.Common.CDebugger
             mPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
              , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             mPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), mPipe);
-
         }
 
         private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
