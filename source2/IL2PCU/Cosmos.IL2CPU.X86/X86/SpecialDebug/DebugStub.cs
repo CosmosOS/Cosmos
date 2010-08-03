@@ -267,6 +267,7 @@ namespace Cosmos.IL2CPU.X86 {
             AL.Test(0x01);
             JumpIf(Flags.Zero, "ReadALFromComPort_Wait");
 
+            Label = "ReadALFromComPortNoCheck";
             // Set address of port
             DX = mComAddr;
             // Read byte
@@ -338,6 +339,15 @@ namespace Cosmos.IL2CPU.X86 {
                 // "Clear" the UART out
                 AL = 0;
                 Call("WriteALToComPort");
+
+                // QEMU has junk in the buffer when it first
+                // boots. VMWare doesn't...
+                // So we use this to "clear" it by doing 16
+                // reads. UART buffers are 16 bytes and 
+                // usually there are only a few junk bytes.
+                //for (int i = 1; i <= 16; i++) {
+                //    Call("ReadALFromComPortNoCheck");
+                //}
 
                 // QEMU (and possibly others) send some garbage across the serial line first.
                 // Actually they send the garbage in bound, but garbage could be inbound as well so we 

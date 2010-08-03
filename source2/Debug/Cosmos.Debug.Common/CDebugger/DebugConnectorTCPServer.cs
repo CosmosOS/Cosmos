@@ -22,8 +22,8 @@ namespace Cosmos.Debug.Common.CDebugger
         public void DoAcceptTcpClientCallback(IAsyncResult aResult) {
             var xListener = (TcpListener) aResult.AsyncState;
             var xClient = xListener.EndAcceptTcpClient(aResult);
-            Start(xClient.GetStream());
             mWaitConnectEvent.Set();
+            Start(xClient.GetStream());
         }
 
         public override void WaitConnect() {
