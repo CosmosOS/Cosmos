@@ -53,7 +53,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             if (aGDB) {
                 mProcessStartInfo.Arguments
-                    += " --gdb tcp::8832" // We now use 8832 to be same as VMWare
+                    += " --gdb tcp::8832,ipv4" // We now use 8832 to be same as VMWare
                     + " -S"; // Pause on startup, wait for GDB to connect and control
             }
             //#if VM_QEMU

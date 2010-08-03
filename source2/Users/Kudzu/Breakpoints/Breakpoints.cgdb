@@ -1,5 +1,8 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
+  <Breakpoint>
+    <Label>DebugStub_WaitForSignature</Label>
+  </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
@@ -26,26 +29,26 @@
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>805</Left>
+    <Top>93</Top>
     <Width>300</Width>
     <Height>296</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormRegisters</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>1248</Left>
+    <Top>13</Top>
     <Width>281</Width>
     <Height>287</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormDisassembly</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>1539</Left>
+    <Top>13</Top>
     <Width>500</Width>
     <Height>511</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
 </SettingsDS>
