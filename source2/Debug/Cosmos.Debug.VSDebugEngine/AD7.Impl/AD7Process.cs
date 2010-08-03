@@ -14,6 +14,7 @@ using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 using System.Windows.Forms;
 using System.Threading;
+using Microsoft.Win32;
 
 namespace Cosmos.Debug.VSDebugEngine {
     public class AD7Process : IDebugProcess2 {
@@ -67,11 +68,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         protected void LaunchVMWareWorkstation(bool aGDB) {
-            //TODO: Change to use Cosmos path
-            //TODO: App Roaming doesnt have the vmx.. need to update the insaller
             string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
-            //string xPath = @"M:\source\Cosmos\Build\VMWare\Workstation\";
-
+            
             using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
                 // This copy process also leaves the VMX writeable. VMWare doesnt like them read only.
                 using (var xDest = new StreamWriter(xPath + "Debug.vmx")) {
@@ -105,12 +103,37 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
 
             //TODO: Find this in code. This is hardcoded to default location right now.
-            string xVmwPath = @"C:\Program Files (x86)\VMware\VMware Workstation\";
+            //string xVmwPath = @"C:\Program Files (x86)\VMware\VMware Workstation\";
+            string xVmwPath = GetVMWareWorkstationPath();
             //mProcessStartInfo.Arguments = "true \"" + xPath + "Debug.vmx\" -x -q";
             // -x: Auto power on VM. Must be small x, big X means something else.
             // -q: Close VMWare when VM is powered off.
             // Options must come beore the vmx, and cannot use shellexecute
             mProcessStartInfo.Arguments = "false \"" + xVmwPath + "vmware.exe" + "\" -x -q \"" + xPath + "Debug.vmx\"";
+        }
+
+        private static string GetVMWareWorkstationPath()
+        {
+            using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VMware, Inc.\VMware Workstation", false))
+            {
+                if (xRegKey == null)
+                {
+                    return String.Empty;
+                }
+                return xRegKey.GetValue("InstallPath") as string;
+            }
+        }
+
+        private static string GetVMWarePlayerPath()
+        {
+            using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\VMware Player", false))
+            {
+                if (xRegKey == null)
+                {
+                    return String.Empty;
+                }
+                return xRegKey.GetValue(null) as string;
+            }
         }
 
         internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
