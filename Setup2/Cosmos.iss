@@ -13,8 +13,8 @@
 #else
 # error Unsupported configuration
 #endif
-	
-	
+
+
 ; Cosmos Registry key
 ; Install assemblies
 ; Delete old user kit installer and task asm
@@ -133,7 +133,6 @@ Name: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstal
 [Files]
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\Tools\Qemu\*; DestDir: {app}\Build\Tools\Qemu; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
 Source: .\Build\Tools\Cygwin\*; DestDir: {app}\Build\Tools\cygwin; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
@@ -221,10 +220,10 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\MSBuild\SafeImports; Val
 Root: HKCU; SubKey: Software\Microsoft\VisualStudio\9.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets
 
 ; add the .cosmos file association:
-Root: HKCR; SubKey: ".Cosmos"; ValueType: string; ValueName: ""; ValueData: "Cosmos.ProjectFile"; Flags: uninsdeletevalue
-Root: HKCR; SubKey: "Cosmos.ProjectFile"; ValueType: string; ValueName: ""; ValueData: "Cosmos Project File"; Flags: uninsdeletekey
-Root: HKCR; SubKey: "Cosmos.ProjectFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Cosmos.ico";
-Root: HKCR; SubKey: "Cosmos.ProjectFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{pf32}\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe"" ""%1""";
+Root: HKCR; SubKey: .Cosmos; ValueType: string; ValueName: ; ValueData: Cosmos.ProjectFile; Flags: uninsdeletevalue
+Root: HKCR; SubKey: Cosmos.ProjectFile; ValueType: string; ValueName: ; ValueData: Cosmos Project File; Flags: uninsdeletekey
+Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Cosmos.ico
+Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe"" ""%1"""
 
 
 [Run]
