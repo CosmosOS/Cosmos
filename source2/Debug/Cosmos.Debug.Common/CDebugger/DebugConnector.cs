@@ -19,14 +19,6 @@ namespace Cosmos.Debug.Common.CDebugger
         protected MsgType mCurrentMsgType;
         public abstract void WaitConnect();
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
-        protected const int CmdSize = 2;
-        protected byte mCommandID = 0;
-        protected byte mCurrCmdID;
-
-        // Prevent more than one command from happening at once.
-        // The debugger is user driven so should not happen, but maybe could
-        // happen while a previous command is waiting on a reply msg.
-        protected object mSendCmdLock = new object();
 
         protected void DoDebugMsg(string aMsg) {
             if (OnDebugMsg != null) {
@@ -49,6 +41,13 @@ namespace Cosmos.Debug.Common.CDebugger
             // send over initializing information such as breakpoints.
             if (Connected) {
                 lock (mSendCmdLock) {
+                    //var xSB = new StringBuilder();
+                    //foreach(byte x in aBytes) {
+                    //    xSB.AppendLine(x.ToString("X2"));
+                    //}
+                    //System.Windows.Forms.MessageBox.Show(xSB.ToString());
+                    DoDebugMsg("DC Send: " + aCmd.ToString());
+
                     if (aCmd == Command.Noop) {
                         // Noops dont have any data.
                         // This is becuase Noops are used to clear out the 
@@ -57,46 +56,40 @@ namespace Cosmos.Debug.Common.CDebugger
                         // as its often the first byte received.
                         SendRawData(new byte[1] { (byte)Command.Noop });
                     } else {
-                        //var xSB = new StringBuilder();
-                        //foreach(byte x in aBytes) {
-                        //    xSB.AppendLine(x.ToString("X2"));
-                        //}
-                        //System.Windows.Forms.MessageBox.Show(xSB.ToString());
-
-                        byte[] xBytes;
-                        if (aData == null) {
-                            xBytes = new byte[2];
-                        } else {
-                            xBytes = new byte[aData.Length + 2];
-                        }
-                        xBytes[0] = (byte)aCmd;
+                        var xData = new byte[aData.Length + 2];
+                        xData[0] = (byte)aCmd;
+                        aData.CopyTo(xData, 2);
 
                         if (mCommandID == 255) {
                             mCommandID = 0;
                         } else {
                             mCommandID++;
                         }
-                        xBytes[1] = mCommandID;
+                        xData[1] = mCommandID;
                         mCurrCmdID = mCommandID;
 
-                        if (aData != null) {
-                            aData.CopyTo(xBytes, 2);
-                        }
-
-                        SendRawData(xBytes);
+                        SendRawData(xData);
                         if (aWait) {
-                            //mCmdWait.WaitOne();
+                            mCmdWait.WaitOne();
                         }
                     }
                 }
+
             }
         }
 
         protected abstract void SendRawData(byte[] aBytes);
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
 
+        protected byte mCommandID = 0;
+        protected byte mCurrCmdID;
+
+        // Prevent more than one command from happening at once.
+        // The debugger is user driven so should not happen, but maybe could
+        // happen while a previous command is waiting on a reply msg.
+        protected object mSendCmdLock = new object();
         public void SendCommand(Command aCmd) {
-            SendCommandData(aCmd, null, true);
+          SendCommandData(aCmd, new byte[0], true);
         }
 
         public void SetBreakpoint(int aID, uint aAddress) {
@@ -135,6 +128,7 @@ namespace Cosmos.Debug.Common.CDebugger
         
         protected void PacketMsg(byte[] aPacket) {
             mCurrentMsgType = (MsgType)aPacket[0];
+            DoDebugMsg("DC Recv: " + mCurrentMsgType.ToString());
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType) {
                 case MsgType.TracePoint:
