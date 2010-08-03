@@ -71,7 +71,6 @@
   <ItemGroup>
     <Compile Include="Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Target\QEMU.cs" />
     <Compile Include="Target\Target.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
