@@ -131,7 +131,7 @@ namespace Cosmos.VS.Package {
         private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
             var xEnumValue = (EnumValue)comboTarget.SelectedItem;
             var xValue = (TargetHost)xEnumValue.Value;
-            if (!(xValue == TargetHost.VMWareWorkstation || xValue == TargetHost.QEMU)) {
+            if (!(xValue == TargetHost.VMWare || xValue == TargetHost.QEMU)) {
                 MessageBox.Show("This type is temporarily unsupported.");
             }
         }

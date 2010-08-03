@@ -31,6 +31,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         public string mISO;
         protected readonly NameValueCollection mDebugInfo;
         protected TargetHost mTargetHost;
+        protected VMwareFlavor mVMWareFlavor=VMwareFlavor.Player;
 
         private int mProcessExitEventSent = 0;
 
@@ -67,7 +68,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             //    #endif
         }
 
-        protected void LaunchVMWareWorkstation(bool aGDB) {
+        protected void LaunchVMWare(bool aGDB) {
             string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
             
             using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
@@ -104,12 +105,25 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             //TODO: Find this in code. This is hardcoded to default location right now.
             //string xVmwPath = @"C:\Program Files (x86)\VMware\VMware Workstation\";
-            string xVmwPath = GetVMWareWorkstationPath();
+            string xVmwPath;
+            switch (mVMWareFlavor)
+            {
+                case VMwareFlavor.Workstation:
+                    xVmwPath = GetVMWareWorkstationPath();
+                    mProcessStartInfo.Arguments = "false \"" + xVmwPath + "\" -x -q \"" + xPath + "Debug.vmx\"";
+                    break;
+                case VMwareFlavor.Player:
+                    xVmwPath = GetVMWarePlayerPath();
+                    mProcessStartInfo.Arguments = "false \"" + xVmwPath + "\" \"" + xPath + "Debug.vmx\"";
+                    break;
+                default:
+                    throw new NotImplementedException("VMWare flavor '" + mVMWareFlavor.ToString() + "' not implemented!");
+            }
             //mProcessStartInfo.Arguments = "true \"" + xPath + "Debug.vmx\" -x -q";
             // -x: Auto power on VM. Must be small x, big X means something else.
             // -q: Close VMWare when VM is powered off.
             // Options must come beore the vmx, and cannot use shellexecute
-            mProcessStartInfo.Arguments = "false \"" + xVmwPath + "vmware.exe" + "\" -x -q \"" + xPath + "Debug.vmx\"";
+            
         }
 
         private static string GetVMWareWorkstationPath()
@@ -120,7 +134,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 {
                     return String.Empty;
                 }
-                return xRegKey.GetValue("InstallPath") as string;
+                return Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmware.exe");
             }
         }
 
@@ -132,7 +146,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 {
                     return String.Empty;
                 }
-                return xRegKey.GetValue(null) as string;
+                return Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmplayer.exe");
             }
         }
 
@@ -150,9 +164,21 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu")) {
                 mTargetHost = TargetHost.QEMU;
                 LaunchQEMU(xGDBDebugStub);
-            } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWareWorkstation")) {
-                mTargetHost = TargetHost.VMWareWorkstation;
-                LaunchVMWareWorkstation(xGDBDebugStub);
+            } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWare")) {
+                mTargetHost = TargetHost.VMWare;
+                if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Player"))
+                {
+                    mVMWareFlavor = VMwareFlavor.Player;
+                }
+                else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Workstation"))
+                {
+                    mVMWareFlavor = VMwareFlavor.Workstation;
+                }
+                else
+                {
+                    throw new Exception("VMWare Flavor '" + mDebugInfo["VMWareFlavor"] + "' not implemented!");
+                }
+                LaunchVMWare(xGDBDebugStub);
             } else {
                 throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
             }
@@ -185,7 +211,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "qemu")) {
                 mDbgConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorTCPServer();
-            } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmwareworkstation")) {
+            } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
                 mDbgConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
             } else {
                 throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");

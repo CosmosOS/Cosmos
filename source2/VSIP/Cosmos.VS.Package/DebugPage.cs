@@ -46,7 +46,13 @@ namespace Cosmos.VS.Package {
 		private void SetSubPropertyPage(TargetHost target) {
             bool xPageChange = false;
 			switch (target) {
-                case TargetHost.VMWareWorkstation:
+                case TargetHost.VMWare:
+                    if (!(pageSubPage is DebugPageVMWare))
+                    {
+                        pageSubPage = new DebugPageVMWare();
+                        xPageChange = true;
+                    }
+                    break;
 				case TargetHost.QEMU:
 					if (!(pageSubPage is DebugPageSub)) {
 						pageSubPage = new DebugPageSub();

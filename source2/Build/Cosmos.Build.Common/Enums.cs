@@ -7,16 +7,20 @@ using System.Reflection;
 namespace Cosmos.Build.Common {
 
 	public enum TargetHost {
-	  [Description("VMWare Workstation")]
-	  VMWareWorkstation,
-	  [Description("VMWare Server")]
-	  VMWareServer,
+	  [Description("VMWare")]
+	  VMWare,
 	  QEMU,
 	  [Description("Virtual PC")]
 	  VPC,
 	  PXE,
 	  ISO
 	}
+
+    public enum VMwareFlavor
+    {
+        Workstation,
+        Player
+    }
 
 	public enum Architecture { 
         x86 //, x64 
