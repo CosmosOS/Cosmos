@@ -21,7 +21,7 @@ xcopy /Y ..\..\Source\libraries\MDbg\corapi.* .
 xcopy /Y ..\..\source2\Build\Cosmos.Build.MSBuild\Cosmos.targets .
 xcopy /Y ..\..\source2\Build\Cosmos.Build.Common\bin\Debug\Cosmos.Build.Common.* .
 xcopy /Y ..\..\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.* .
-xcopy /Y ..\..\source\IL2CPU\Cosmos.IL2CPU.Debug\bin\Debug\Cosmos.Compiler.Debug.* .
+xcopy /Y ..\..\source2\IL2PCU\Cosmos.IL2CPU.Debug\bin\Debug\Cosmos.Compiler.Debug.* .
 xcopy /Y ..\..\source2\debug\Cosmos.Debug.Common\bin\debug\Cosmos.Debug.Common.* .
 xcopy /Y ..\..\source2\debug\Cosmos.Debug.HostProcess\bin\debug\Cosmos.Debug.HostProcess.* .
 xcopy /Y ..\..\source2\debug\Cosmos.Debug.VSDebugEngine\bin\debug\Cosmos.Debug.VSDebugEngine.* .
