@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Debug; 
+using Cosmos.Compiler.Debug;
 using Cosmos.IL2CPU;
 
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86 {
         protected enum Tracing { Off = 0, On = 1 };
         // Current status of OS Debug Stub
         public enum Status { Run = 0, Break = 1 }
-        
+
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
             Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
@@ -106,21 +106,21 @@ namespace Cosmos.IL2CPU.X86 {
 
             // Wait for a command
             Label = "DebugStub_WaitCmd";
-                // Check for common commands
-                Call("DebugStub_ProcessCommand");
+            // Check for common commands
+            Call("DebugStub_ProcessCommand");
 
-                // Now check for commands that are only valid in break state
-                // or commands that require additional handling while in break
-                // state.
+            // Now check for commands that are only valid in break state
+            // or commands that require additional handling while in break
+            // state.
 
-                AL.Compare((byte)Command.Continue);
-                    JumpIf(Flags.Equal, "DebugStub_Break_Exit");
+            AL.Compare((byte)Command.Continue);
+            JumpIf(Flags.Equal, "DebugStub_Break_Exit");
 
-                AL.Compare((byte)Command.Step);
-                JumpIf(Flags.NotEqual, "DebugStub_Break_Step_After");
-                    Memory["DebugBreakOnNextTrace", 32] = 1;
-                    Jump("DebugStub_ProcessCmd_Exit");
-                Label = "DebugStub_Break_Step_After";
+            AL.Compare((byte)Command.Step);
+            JumpIf(Flags.NotEqual, "DebugStub_Break_Step_After");
+            Memory["DebugBreakOnNextTrace", 32] = 1;
+            Jump("DebugStub_ProcessCmd_Exit");
+            Label = "DebugStub_Break_Step_After";
             // Loop around and wait for another command
             Jump("DebugStub_WaitCmd");
 
@@ -135,15 +135,15 @@ namespace Cosmos.IL2CPU.X86 {
 
             Memory["DebugStatus", 32].Compare((int)Status.Run);
             JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
-                AL = (int)MsgType.BreakPoint;
-                Jump("DebugStub_SendTraceType");
-            
+            AL = (int)MsgType.BreakPoint;
+            Jump("DebugStub_SendTraceType");
+
             Label = "DebugStub_SendTrace_Normal";
-                AL = (int)MsgType.TracePoint;
+            AL = (int)MsgType.TracePoint;
 
             Label = "DebugStub_SendTraceType";
             Call("WriteALToComPort");
-                        
+
             // Send Calling EIP.
             ESI = AddressOf("DebugEIP");
             Call("WriteByteToComPort");
@@ -162,26 +162,26 @@ namespace Cosmos.IL2CPU.X86 {
             // Write the type
             AL = (int)MsgType.Message;
             Call("WriteALToComPort");
-            
+
             // Write Length
             ESI = EBP;
             new Add { DestinationReg = Registers.ESI, SourceValue = 12 };
             ECX = Memory[ESI];
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
-        
+
             // Address of string
             ESI = Memory[EBP + 8];
             Label = "DebugStub_SendTextWriteChar";
             ECX.Compare(0);
-                JumpIf(Flags.Equal, "DebugStub_SendTextExit");
+            JumpIf(Flags.Equal, "DebugStub_SendTextExit");
             Call("WriteByteToComPort");
             new Dec { DestinationReg = Registers.ECX };
             // We are storing as 16 bits, but for now I will transmit 8 bits
             // So we inc again to skip the 0
             new Inc { DestinationReg = Registers.ESI };
             Jump("DebugStub_SendTextWriteChar");
-   
+
             Label = "DebugStub_SendTextExit";
             Return();
         }
@@ -203,7 +203,7 @@ namespace Cosmos.IL2CPU.X86 {
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
-            
+
             Return();
         }
 
@@ -219,7 +219,7 @@ namespace Cosmos.IL2CPU.X86 {
             EAX.Pop(); // Is a local, cant use Return(4)
             Return();
         }
-        
+
         // Input: ESI
         // Output: None
         // Modifies: EAX, EDX
@@ -238,13 +238,13 @@ namespace Cosmos.IL2CPU.X86 {
             // Sucks again to use DX just for this, but x86 only supports
             // 8 bit address for literals on ports
             DX = mComStatusAddr;
-            
+
             // Wait for serial port to be ready
             Label = "WriteByteToComPort_Wait";
             AL = Port[DX];
             AL.Test(0x20);
-                JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
-            
+            JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
+
             // Set address of port
             DX = mComAddr;
             // Get byte to send
@@ -263,8 +263,8 @@ namespace Cosmos.IL2CPU.X86 {
 
             // Wait for port to be ready
             Label = "ReadALFromComPort_Wait";
-                AL = Port[DX];
-                AL.Test(0x01);
+            AL = Port[DX];
+            AL.Test(0x01);
             JumpIf(Flags.Zero, "ReadALFromComPort_Wait");
 
             // Set address of port
@@ -321,6 +321,7 @@ namespace Cosmos.IL2CPU.X86 {
             Break();
             BreakOnAddress();
             ProcessCommand();
+            ProcessCommandBatch();
         }
 
         // This is the secondary stub routine. After the primary (main) has decided we should do some debug
@@ -331,11 +332,12 @@ namespace Cosmos.IL2CPU.X86 {
             // The very first time, we send a one time Started signal back to the host
             Memory["DebugStartedSent", 32].Compare(1);
             JumpIf(Flags.Equal, "DebugStub_AfterStarted");
-                Memory["DebugStartedSent", 32] = 1; // Set flag so we don't send Ready again
-                AL = (int)MsgType.Started; // Send the actual started signal
-                Call("WriteALToComPort");
+            Memory["DebugStartedSent", 32] = 1; // Set flag so we don't send Ready again
+            AL = (int)MsgType.Started; // Send the actual started signal
+            Call("WriteALToComPort");
+            Call("DebugStub_ProcessCommandBatch");
             Label = "DebugStub_AfterStarted";
-            
+
             // Look for a possible matching BP
             EAX = Memory["DebugEIP", 32];
             EDI = AddressOf("DebugBPs");
@@ -346,26 +348,43 @@ namespace Cosmos.IL2CPU.X86 {
             Label = "DebugStub_Executing_AfterBreakOnAddress";
             // See if there is a requested break
             Memory["DebugBreakOnNextTrace", 32].Compare(1);
-                CallIf(Flags.Equal, "DebugStub_Break");
-            
+            CallIf(Flags.Equal, "DebugStub_Break");
+
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
             Memory["DebugTraceMode", 32].Compare((int)Tracing.On);
-                CallIf(Flags.Equal, "DebugStub_SendTrace");
+            CallIf(Flags.Equal, "DebugStub_SendTrace");
 
             Label = "DebugStub_Executing_Normal";
             // Is there a new incoming command? We dont want to wait for one
             // if there isn't one already here. This is a passing check.
             Label = "DebugStub_CheckForCmd";
-                DX = mComStatusAddr;
-                AL = Port[DX];
-                AL.Test(0x01);
-                // If no command waiting, break from loop
-                JumpIf(Flags.Zero, "DebugStub_CheckForCmd_Break");
-                Call("DebugStub_ProcessCommand");
-                // See if there are more commands waiting
-                Jump("DebugStub_CheckForCmd");
+            DX = mComStatusAddr;
+            AL = Port[DX];
+            AL.Test(0x01);
+            // If no command waiting, break from loop
+            JumpIf(Flags.Zero, "DebugStub_CheckForCmd_Break");
+            Call("DebugStub_ProcessCommand");
+            // See if there are more commands waiting
+            Jump("DebugStub_CheckForCmd");
             Label = "DebugStub_CheckForCmd_Break";
 
+            Return();
+        }
+
+        // Currently only called from .Start
+        // Does not handle commands that are valid only during break.
+        public void ProcessCommandBatch() {
+            Label = "DebugStub_ProcessCommandBatch";
+            Call("DebugStub_ProcessCommand");
+
+            // See if batch is complete
+            AL.Compare((byte)Command.BatchEnd);
+            JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
+
+            // Loop and wait
+            Jump("DebugStub_ProcessCommandBatch");
+
+            Label = "DebugStub_ProcessCommandBatch_Exit";
             Return();
         }
 
@@ -393,26 +412,26 @@ namespace Cosmos.IL2CPU.X86 {
 
             AL.Compare((byte)Command.TraceOff);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
-                Memory["DebugTraceMode", 32] = (int)Tracing.Off;
-                Jump("DebugStub_ProcessCmd_ACK");
+            Memory["DebugTraceMode", 32] = (int)Tracing.Off;
+            Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_TraceOff_After";
 
             AL.Compare((byte)Command.TraceOn);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
-                Memory["DebugTraceMode", 32] = (int)Tracing.On;
-                Jump("DebugStub_ProcessCmd_ACK");
+            Memory["DebugTraceMode", 32] = (int)Tracing.On;
+            Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_TraceOn_After";
 
             AL.Compare((byte)Command.Break);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
-                Call("DebugStub_Break");
-                Jump("DebugStub_ProcessCmd_ACK");
+            Call("DebugStub_Break");
+            Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_Break_After";
 
             AL.Compare((byte)Command.BreakOnAddress);
             JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
-                Call("DebugStub_BreakOnAddress");
-                Jump("DebugStub_ProcessCmd_ACK");
+            Call("DebugStub_BreakOnAddress");
+            Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
             Label = "DebugStub_ProcessCmd_ACK";
@@ -454,56 +473,56 @@ namespace Cosmos.IL2CPU.X86 {
             // We arent multi threaded yet, so this works fine.
             // IRQ's are disabled between Compare and JumpIf so an IRQ cant
             // happen in between them which could then cause double entry again
-            DisableInterrupts();           
-                Memory["DebugSuspendLevel", 32].Compare(0);
-                JumpIf(Flags.Equal, "DebugStub_Running");
-                    // DebugStub is already running, so exit.
-                    // But we need to see if IRQs are diabled.
-                    // If IRQ disabled, we dont reenable them after our disable
-                    // in this routine.
-                    Memory["InterruptsEnabledFlag", 32].Compare(0);
-                    JumpIf(Flags.Equal, "DebugStub_Return");
-                    EnableInterrupts();
-                    Jump("DebugStub_Return");
-                
-                Label = "DebugStub_Running";
-                Memory["DebugRunning", 32].Compare(0);
-                JumpIf(Flags.Equal, "DebugStub_Start");
-                    // DebugStub is already running, so exit.
-                    // But we need to see if IRQs are diabled.
-                    // If IRQ disabled, we dont reenable them after our disable
-                    // in this routine.
-                    Memory["InterruptsEnabledFlag", 32].Compare(0);
-                    JumpIf(Flags.Equal, "DebugStub_Return");
-                    EnableInterrupts();
-                    Jump("DebugStub_Return");
+            DisableInterrupts();
+            Memory["DebugSuspendLevel", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Running");
+            // DebugStub is already running, so exit.
+            // But we need to see if IRQs are diabled.
+            // If IRQ disabled, we dont reenable them after our disable
+            // in this routine.
+            Memory["InterruptsEnabledFlag", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Return");
+            EnableInterrupts();
+            Jump("DebugStub_Return");
 
-                // All clear, mark that we are entering the debug stub
-                Label = "DebugStub_Start";
-                Memory["DebugRunning", 32] = 1;
-                Memory["InterruptsEnabledFlag", 32].Compare(0);
-                JumpIf(Flags.Equal, "DebugStub_NoSTI");
+            Label = "DebugStub_Running";
+            Memory["DebugRunning", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Start");
+            // DebugStub is already running, so exit.
+            // But we need to see if IRQs are diabled.
+            // If IRQ disabled, we dont reenable them after our disable
+            // in this routine.
+            Memory["InterruptsEnabledFlag", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Return");
+            EnableInterrupts();
+            Jump("DebugStub_Return");
+
+            // All clear, mark that we are entering the debug stub
+            Label = "DebugStub_Start";
+            Memory["DebugRunning", 32] = 1;
+            Memory["InterruptsEnabledFlag", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_NoSTI");
             EnableInterrupts();
 
             // IRQ reenabled, call secondary debug stub
             Label = "DebugStub_NoSTI";
             PushAll32();
-                // We just pushed all registers to the stack so we can use them
-                // So we get the stack pointer and add 32. This skips over the
-                // registers we just pushed.
-                EBP = ESP;
-                EBP.Add(32);
-                // Get actual EIP of caller.
-                EAX = Memory[EBP];
-                // EIP is pointer to op after our call. We subtract 5 (the size of our call + address)
-                // so we get the EIP as IL2CPU records it. Its also useful for when we will
-                // be changing ops that call this stub.
-                EAX.Sub(5);
-                // Store it for later use.
-                Memory["DebugEIP", 32] = EAX;
+            // We just pushed all registers to the stack so we can use them
+            // So we get the stack pointer and add 32. This skips over the
+            // registers we just pushed.
+            EBP = ESP;
+            EBP.Add(32);
+            // Get actual EIP of caller.
+            EAX = Memory[EBP];
+            // EIP is pointer to op after our call. We subtract 5 (the size of our call + address)
+            // so we get the EIP as IL2CPU records it. Its also useful for when we will
+            // be changing ops that call this stub.
+            EAX.Sub(5);
+            // Store it for later use.
+            Memory["DebugEIP", 32] = EAX;
 
-                // Call secondary stub
-                Call("DebugStub_Executing");
+            // Call secondary stub
+            Call("DebugStub_Executing");
             PopAll32();
             // Complete, mark that DebugStub is complete
             Memory["DebugRunning", 32] = 0;

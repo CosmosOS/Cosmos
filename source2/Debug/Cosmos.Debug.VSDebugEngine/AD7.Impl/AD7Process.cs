@@ -214,7 +214,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             // Guests never get the first byte sent. So we send a noop.
             // This dummy byte seems to clear out the serial channel.
             // Its never received, but if it ever is, its a noop anyways.
-            mDbgConnector.SendCommand((byte)Command.Noop);
+            mDbgConnector.SendCommand(Command.Noop);
 
             // OK, now debugger is ready. Send it a list of breakpoints that were set before
             // program run.
@@ -223,6 +223,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                     mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
                 }
             }
+            mDbgConnector.SendCommand(Command.BatchEnd);
         }
 
         void DbgCmdText(string obj) {
