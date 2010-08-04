@@ -6,10 +6,11 @@ namespace $nameSpace$
 {
     public class $className$
     {
-	public static void Init()
-	{
-		Main();
-	}
+	    public static void Init()
+	    {
+    		Main();
+    	}
+
         static void Main()
         {
             // Boot the Cosmos kernel:

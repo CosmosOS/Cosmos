@@ -11,7 +11,7 @@ rem del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
 cd "..\source"
-%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86
+%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /t:Rebuild
 rem /t:Rebuild
 cd ..\Build\VSIP\
 
