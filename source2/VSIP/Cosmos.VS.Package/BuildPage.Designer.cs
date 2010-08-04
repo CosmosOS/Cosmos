@@ -228,10 +228,9 @@
             this.labelInternalAssembler.Location = new System.Drawing.Point(44, 214);
             this.labelInternalAssembler.Margin = new System.Windows.Forms.Padding(44, 0, 3, 0);
             this.labelInternalAssembler.Name = "labelInternalAssembler";
-            this.labelInternalAssembler.Size = new System.Drawing.Size(401, 27);
+            this.labelInternalAssembler.Size = new System.Drawing.Size(401, 15);
             this.labelInternalAssembler.TabIndex = 6;
-            this.labelInternalAssembler.Text = "Experimental. Leave unchecked unless you like debugging deep level assembly code." +
-                "";
+            this.labelInternalAssembler.Text = "Experimental. Check if you like to crash!";
             // 
             // comboFlavor
             // 
