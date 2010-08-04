@@ -58,7 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VSIP", "VSIP", "{CD3F5E45-8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{35CABD9D-5C85-419A-B6C9-561EAD97A553}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{35CABD9D-5C85-419A-B6C9-561EAD97A553}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
@@ -132,9 +132,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Breakpoints.Cosmos", "{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp", "..\source2\Compiler\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp.csproj", "{453F2952-FD48-477F-889B-B3C6963C9850}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 33
+		SccNumberOfProjects = 34
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS04
 		SccLocalPath0 = .
@@ -258,15 +260,19 @@ Global
 		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
 		SccProjectName30 = ../source2/IL2PCU/Cosmos.IL2CPU.Debug
 		SccLocalPath30 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Debug
-		SccWebProject31 = true
-		SccProjectUniqueName31 = ..\\Docs
-		SccProjectName31 = ../Docs
-		SccLocalPath31 = ..\\Docs
-		SccProjectEnlistmentChoice31 = 2
-		SccProjectUniqueName32 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Breakpoints.Cosmos
-		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
-		SccProjectName32 = ../source2/Users/Kudzu/Breakpoints
-		SccLocalPath32 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName31 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Breakpoints.Cosmos
+		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
+		SccProjectName31 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath31 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccWebProject32 = true
+		SccProjectUniqueName32 = ..\\Docs
+		SccProjectName32 = ../Docs
+		SccLocalPath32 = ..\\Docs
+		SccProjectEnlistmentChoice32 = 2
+		SccProjectUniqueName33 = ..\\source2\\Compiler\\Cosmos.Compiler.XSharp\\Cosmos.Compiler.XSharp.csproj
+		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
+		SccProjectName33 = ../source2/Compiler/Cosmos.Compiler.XSharp
+		SccLocalPath33 = ..\\source2\\Compiler\\Cosmos.Compiler.XSharp
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -627,6 +633,15 @@ Global
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}.Release|x86.ActiveCfg = Release|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{453F2952-FD48-477F-889B-B3C6963C9850}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -668,6 +683,7 @@ Global
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
+		{453F2952-FD48-477F-889B-B3C6963C9850} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{3C6DFC2F-DE70-4B1C-A938-A9D3FE890520} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{8D72B98D-8FB3-4731-A5EC-194D141AA431} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
