@@ -1,16 +1,16 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Collections.Generic;
 using System.Reflection;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
 	public class Stloc : ILOp
 	{
-		public Stloc(Cosmos.IL2CPU.Assembler aAsmblr)
+		public Stloc(Cosmos.Compiler.Assembler.Assembler aAsmblr)
 			: base(aAsmblr)
 		{
 		}

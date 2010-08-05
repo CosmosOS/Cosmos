@@ -8,6 +8,7 @@ using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.IL2CPU {
   // This is necessary because HashSet and Dictionary
@@ -28,7 +29,7 @@ namespace Cosmos.IL2CPU {
 
   public class ILScanner : IDisposable {
     protected ILReader mReader;
-    protected Assembler mAsmblr;
+    protected AppAssembler mAsmblr;
 
     // Contains known types and methods, both scanned and unscanned
     // We need both a HashSet and a List. HashSet for speed of checking
@@ -92,7 +93,7 @@ namespace Cosmos.IL2CPU {
     // how it works.
     //  private Type mThrowHelper;
 
-    public ILScanner(Assembler aAsmblr) {
+    public ILScanner(AppAssembler aAsmblr) {
       mAsmblr = aAsmblr;
       mReader = new ILReader();
       //mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");

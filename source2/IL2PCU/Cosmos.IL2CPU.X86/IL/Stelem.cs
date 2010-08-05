@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -7,7 +7,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem )]
     public class Stelem : ILOp
     {
-        public Stelem( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Stelem( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

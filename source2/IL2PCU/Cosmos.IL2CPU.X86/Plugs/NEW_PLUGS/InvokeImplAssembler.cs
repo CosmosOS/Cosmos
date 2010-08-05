@@ -5,11 +5,11 @@ using System.Reflection;
 using System.Text;
 using Cosmos.IL2CPU.IL;
 using Cosmos.IL2CPU.Plugs;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.X86.IL;
-using CPU = Cosmos.IL2CPU;
+using CPU = Cosmos.Compiler.Assembler;
 using MethodBase = System.Reflection.MethodBase;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using CosmosAssembler = Cosmos.IL2CPU.X86.CosmosAssembler;
 
 namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {

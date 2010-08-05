@@ -1,10 +1,10 @@
 using System;
 // using System.Collections.Generic;
 // using System.Linq;
-using CPU = Cosmos.IL2CPU.X86;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using System.Reflection;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Callvirt )]
     public class Callvirt : ILOp
     {
-        public Callvirt( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Callvirt( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

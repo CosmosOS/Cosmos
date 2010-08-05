@@ -1,12 +1,12 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_I8 )]
     public class Conv_I8 : ILOp
     {
-        public Conv_I8( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Conv_I8( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // 
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {

@@ -1,11 +1,12 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldsflda )]
     public class Ldsflda : ILOp
     {
-        public Ldsflda( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldsflda( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -23,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.Collections.Generic;
         // using Cosmos.IL2CPU.Compiler;
-        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
         // 

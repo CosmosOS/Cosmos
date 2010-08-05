@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.X86.IL;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
-using NewAssembler = Cosmos.IL2CPU.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
+using NewAssembler = Cosmos.Compiler.Assembler.Assembler;
 
 namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
   public class CtorImplAssembler: AssemblerMethod {

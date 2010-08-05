@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.IL2CPU.X86.X {
+namespace Cosmos.Compiler.Assembler.X86.X {
     public class Memory {
         public MemoryAction this[Address aAddress] {
             get {

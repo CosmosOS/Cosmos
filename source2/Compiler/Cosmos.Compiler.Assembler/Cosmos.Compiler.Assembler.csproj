@@ -16,6 +16,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,7 +51,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assembler.cs" />
+    <Compile Include="BaseAssemblerElement.cs" />
+    <Compile Include="Comment.cs" />
+    <Compile Include="DataEndIfDefined.cs" />
+    <Compile Include="DataIfDefined.cs" />
+    <Compile Include="DataIfNotDefined.cs" />
+    <Compile Include="DataMember.cs" />
+    <Compile Include="Define.cs" />
+    <Compile Include="ElementReference.cs" />
+    <Compile Include="EndIfDefined.cs" />
+    <Compile Include="IDefine.cs" />
+    <Compile Include="IEndIfDefined.cs" />
+    <Compile Include="IfDefined.cs" />
+    <Compile Include="IfNotDefined.cs" />
+    <Compile Include="IIfDefined.cs" />
+    <Compile Include="IIfNotDefined.cs" />
+    <Compile Include="InfraExtensions.cs" />
+    <Compile Include="Instruction.cs" />
+    <Compile Include="Label.cs" />
+    <Compile Include="MethodAndTypeLabelsHolder.cs" />
+    <Compile Include="MethodInfoLabelGenerator.cs" />
+    <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StackContents.cs" />
+    <Compile Include="TypeComparer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cosmos.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

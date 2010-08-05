@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cosmos.IL2CPU.Plugs;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.Kernel.Plugs.Assemblers
 {

@@ -5,12 +5,13 @@ using Cosmos.IL2CPU.ILOpCodes;
 // using System.Linq;
 // 
 // using IL2CPU=Cosmos.IL2CPU;
-using CPU=Cosmos.IL2CPU.X86;
-using CPUx86=Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.X86;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using Cosmos.Compiler.Assembler;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
 // using Cosmos.IL2CPU.Compiler;
@@ -29,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     //         private uint mCurrentILOffset;
     //         private MethodBase mMethod;
 
-    public Call(Cosmos.IL2CPU.Assembler aAsmblr)
+    public Call(Cosmos.Compiler.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPUAll = Cosmos.IL2CPU;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUAll = Cosmos.Compiler.Assembler;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class ClearInterruptsTable: AssemblerMethod {

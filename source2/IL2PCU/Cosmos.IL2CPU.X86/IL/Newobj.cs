@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Cosmos.IL2CPU;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using Cosmos.Compiler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 namespace Cosmos.IL2CPU.X86.IL
@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newobj )]
     public class Newobj : ILOp
     {
-        public Newobj( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Newobj( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

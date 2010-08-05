@@ -4,18 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CPU = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86
 {
     // TODO: I think we need to later elminate this class
     // Much of it is left over from the old build stuff, and info 
     // here actually belongs else where, not in the assembler
-    public abstract class CosmosAssembler : Cosmos.IL2CPU.Assembler
+    public class CosmosAssembler : Cosmos.Compiler.Assembler.Assembler
     {
         //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
         protected byte mComNumber = 0;
@@ -241,156 +242,6 @@ namespace Cosmos.IL2CPU.X86
         public override void FlushText(TextWriter aOutput)
         {
             base.FlushText(aOutput);
-        }
-
-        protected override void Move(string aDestLabelName, int aValue)
-        {
-            new Move
-            {
-                DestinationRef = ElementReference.New(aDestLabelName),
-                DestinationIsIndirect = true,
-                SourceValue = (uint)aValue
-            };
-        }
-
-        protected override void Push(uint aValue)
-        {
-            new Push
-            {
-                DestinationValue = aValue
-            };
-        }
-
-        protected override void Pop()
-        {
-            new Add { DestinationReg = Registers.ESP, SourceValue = (uint)Stack.Pop().Size };
-        }
-
-        protected override void Push(string aLabelName)
-        {
-            new Push
-            {
-                DestinationRef = ElementReference.New(aLabelName)
-            };
-        }
-
-        protected override void Call(MethodBase aMethod)
-        {
-            new IL2CPU.X86.Call
-            {
-                DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod)
-            };
-        }
-
-        protected override void Jump(string aLabelName)
-        {
-            new IL2CPU.X86.Jump
-            {
-                DestinationLabel = aLabelName
-            };
-        }
-
-        protected override int GetVTableEntrySize()
-        {
-            return 16; // todo: retrieve from actual type info
-        }
-
-        private const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
-
-
-        public override void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods)
-        {
-            #region Literal strings fixup code
-            // at the time the datamembers for literal strings are created, the type id for string is not yet determined. 
-            // for now, we fix this at runtime.
-            new Label(InitStringIDsLabel);
-            new Push { DestinationReg = Registers.EBP };
-            new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-            new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
-            foreach (var xDataMember in DataMembers)
-            {
-                if (!xDataMember.Name.StartsWith("StringLiteral"))
-                {
-                    continue;
-                }
-                if (xDataMember.Name.EndsWith("__Contents"))
-                {
-                    continue;
-                }
-                new Move { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            }
-            new Pop { DestinationReg = Registers.EBP };
-            new Return();
-            #endregion
-            new Label(EntryPointName);
-            new Push { DestinationReg = Registers.EBP };
-            new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-            new Call { DestinationLabel = InitVMTCodeLabel };
-            new Call { DestinationLabel = InitStringIDsLabel };
-
-            foreach (var xCctor in aMethods)
-            {
-                if (xCctor.Name == ".cctor"
-                  && xCctor.IsStatic
-                  && xCctor is ConstructorInfo)
-                {
-                    Call(xCctor);
-                }
-            }
-            Call(aEntrypoint);
-            new Pop { DestinationReg = Registers.EBP };
-            new Return();
-        }
-
-        protected override void Ldarg(MethodInfo aMethod, int aIndex)
-        {
-            IL.Ldarg.DoExecute(this, aMethod, (ushort)aIndex);
-        }
-
-        protected override void Call(MethodInfo aMethod, MethodInfo aTargetMethod)
-        {
-            var xSize = IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
-            if (xSize > 0)
-            {
-                new CPU.Sub { DestinationReg = Registers.ESP, SourceValue = xSize };
-            }
-            new CPU.Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
-        }
-
-        protected override void Ldflda(MethodInfo aMethod, string aFieldId)
-        {
-            IL.Ldflda.DoExecute(this, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
-        }
-
-        //// todo: remove when everything goes fine
-        //protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
-        //  base.AfterOp(aMethod, aOpCode);
-        //  new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP };
-        //  var xTotalTransitionalStackSize = (from item in Stack
-        //                                     select (int)ILOp.Align((uint)item.Size, 4)).Sum();
-        //  // include locals too
-        //  if (aMethod.MethodBase.DeclaringType.Name == "GCImplementationImpl"
-        //    && aMethod.MethodBase.Name == "AllocNewObject") {
-        //    Console.Write("");
-        //  }
-        //  var xLocalsValue = (from item in aMethod.MethodBase.GetMethodBody().LocalVariables
-        //                      select (int)ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
-        //  var xExtraSize = xLocalsValue + xTotalTransitionalStackSize;
-
-        //  new Sub { DestinationReg = Registers.EAX, SourceValue = (uint)xExtraSize };
-        //  new Compare { DestinationReg = Registers.EAX, SourceReg = Registers.ESP };
-        //  var xLabel = ILOp.GetLabel(aMethod, aOpCode) + "___TEMP__STACK_CHECK";
-        //  new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel };
-        //  new Xchg { DestinationReg = Registers.BX, SourceReg = Registers.BX, Size = 16 };
-        //  new Halt();
-
-        //  new Label(xLabel);
-
-        //}
-
-        public override uint GetSizeOfType(Type aType)
-        {
-            return ILOp.SizeOfType(aType);
         }
     }
 }

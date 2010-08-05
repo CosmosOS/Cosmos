@@ -1,11 +1,12 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
+
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
   public class Stelem_Ref: ILOp {
-    public Stelem_Ref(Cosmos.IL2CPU.Assembler aAsmblr)
+    public Stelem_Ref(Cosmos.Compiler.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
     public static void Assemble(Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
@@ -80,8 +81,8 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     // using System;
     // using System.IO;
-    // using CPU = Cosmos.IL2CPU.X86;
-    // using CPUx86 = Cosmos.IL2CPU.X86;
+    // using CPU = Cosmos.Compiler.Assembler.X86;
+    // using CPUx86 = Cosmos.Compiler.Assembler.X86;
     // using Cosmos.IL2CPU.X86;
     // 
     // namespace Cosmos.IL2CPU.IL.X86 {

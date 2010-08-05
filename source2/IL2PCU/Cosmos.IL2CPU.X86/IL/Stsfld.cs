@@ -1,12 +1,12 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stsfld )]
     public class Stsfld : ILOp
     {
-        public Stsfld( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Stsfld( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -84,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
     // using Cosmos.IL2CPU.X86;
     // 
     // 
-    // using CPUx86 = Cosmos.IL2CPU.X86;
+    // using CPUx86 = Cosmos.Compiler.Assembler.X86;
     // using System.Reflection;
     // using Cosmos.IL2CPU.Compiler;
     // 

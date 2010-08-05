@@ -1,13 +1,15 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldftn )]
     public class Ldftn : ILOp
     {
-        public Ldftn( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldftn( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -24,8 +26,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Linq;
         // 
         // 
-        // using CPU = Cosmos.IL2CPU.X86;
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
         // 

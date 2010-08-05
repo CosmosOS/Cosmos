@@ -1,12 +1,12 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Switch )]
     public class Switch : ILOp
     {
-        public Switch( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Switch( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( uint )i };
                 //string DestLabel = AssemblerNasm.TmpBranchLabel( aMethod, new ILOpCodes.OpBranch( ILOpCode.Code.Jmp, aOpCode.Position, OpSw.BranchLocations[ i ] ) );
-                string xDestLabel = AssemblerNasm.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
+                string xDestLabel = AppAssemblerNasm.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal
                   , DestinationLabel = xDestLabel
                 };
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // 
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Switch)]

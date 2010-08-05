@@ -1,12 +1,12 @@
 using System;
-using CPU = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Volatile)]
 	public class Volatile: ILOp
 	{
-		public Volatile(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
+		public Volatile(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

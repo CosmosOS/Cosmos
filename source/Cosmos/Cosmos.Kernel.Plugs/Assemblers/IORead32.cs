@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.IL2CPU.Assembler;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public sealed class IORead32: AssemblerMethod {

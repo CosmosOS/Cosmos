@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {

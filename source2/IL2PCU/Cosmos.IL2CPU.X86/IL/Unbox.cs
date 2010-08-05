@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CPU = Cosmos.IL2CPU.X86;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Unbox )]
     public class Unbox : ILOp
     {
-        public Unbox( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Unbox( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

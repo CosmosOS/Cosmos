@@ -1,12 +1,12 @@
 ﻿using System;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.IL2CPU.Assembler;
-using CPUAll = Cosmos.IL2CPU;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using CPUAll = Cosmos.Compiler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
-using CosAssembler = Cosmos.IL2CPU.Assembler;
-using CosCPUAll = Cosmos.IL2CPU;
-using CosCPUx86 = Cosmos.IL2CPU.X86;
+using CosAssembler = Cosmos.Compiler.Assembler.Assembler;
+using CosCPUAll = Cosmos.Compiler.Assembler;
+using CosCPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class ZeroFill: AssemblerMethod {

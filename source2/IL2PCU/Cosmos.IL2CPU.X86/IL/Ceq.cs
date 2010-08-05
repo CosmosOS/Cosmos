@@ -1,12 +1,14 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ceq )]
     public class Ceq : ILOp
     {
-        public Ceq( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ceq( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -97,8 +99,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.Linq;
         // 
-        // using CPU = Cosmos.IL2CPU.X86;
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {

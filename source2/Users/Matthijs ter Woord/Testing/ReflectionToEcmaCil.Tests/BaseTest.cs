@@ -27,7 +27,7 @@ namespace ReflectionToEcmaCil.Tests
                 }
             }
 
-            var xExpectedOutput = ReadAllTextFromStream(typeof(BaseTest).Assembly.GetManifestResourceStream(typeof(BaseTest).Namespace + "." + refName + ".xml"));
+            var xExpectedOutput = ReadAllTextFromStream(baseType.Assembly.GetManifestResourceStream(baseType.Namespace + "." + refName + ".xml"));
             Assert.AreEqual(xExpectedOutput, xActualOutput);
         }
 

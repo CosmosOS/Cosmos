@@ -63,14 +63,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assemblers\GetVbeModeAssembler.cs" />
@@ -90,6 +82,14 @@
     <Compile Include="VFS\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
+      <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
+      <Name>Cosmos.Compiler.Assembler.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler.csproj">
+      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
+      <Name>Cosmos.Compiler.Assembler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\source2\IL2PCU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>

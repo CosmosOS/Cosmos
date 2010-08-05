@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelem)]
   public class Ldelem: ILOp {
-    public Ldelem(Cosmos.IL2CPU.Assembler aAsmblr)
+    public Ldelem(Cosmos.Compiler.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using X86 = Cosmos.IL2CPU.X86;
+using X86 = Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.IL2CPU.X86.X {
+namespace Cosmos.Compiler.Assembler.X86.X {
     public class Y86 {
         public enum Flags { 
             Zero, Equal // Zero is synonym for Equal
@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.X {
 
         public string Label {
             set { 
-                new Cosmos.IL2CPU.Label(value); 
+                new Cosmos.Compiler.Assembler.Label(value); 
             }
         }
 

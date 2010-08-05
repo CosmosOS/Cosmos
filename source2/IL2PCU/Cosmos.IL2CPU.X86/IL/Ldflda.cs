@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldflda )]
     public class Ldflda : ILOp
     {
-        public Ldflda( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldflda( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -57,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPUx86 = Cosmos.IL2CPU.X86;	    
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;	    
         // using System.Reflection;
         // using Cosmos.IL2CPU.Compiler;
         // 

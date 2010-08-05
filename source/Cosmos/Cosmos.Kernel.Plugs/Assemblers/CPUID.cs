@@ -1,8 +1,8 @@
 ﻿using System;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.IL2CPU.Assembler;
-using CPUAll = Cosmos.IL2CPU;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using CPUAll = Cosmos.Compiler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class CPUIDSupport: AssemblerMethod {

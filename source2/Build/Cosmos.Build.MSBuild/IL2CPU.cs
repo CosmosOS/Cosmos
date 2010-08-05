@@ -5,11 +5,13 @@ using System.Text;
 using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 using System.Reflection;
-using Cosmos.IL2CPU;
-using Cosmos.IL2CPU.X86;
+using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 using System.IO;
 using Cosmos.Build.Common;
 using Microsoft.Win32;
+using Cosmos.IL2CPU.X86;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -198,13 +200,15 @@ namespace Cosmos.Build.MSBuild
                 LogTime("Engine execute started");
                 var xEntryAsm = Assembly.LoadFrom(InputAssembly);
                 var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                var xAsm = new AssemblerNasm(DebugCom);
+                var xAsm = new AppAssemblerNasm(DebugCom);
                 xAsm.DebugMode = mDebugMode;
                 xAsm.TraceAssemblies = mTraceAssemblies;
 #if OUTPUT_ELF
                 xAsm.EmitELF = true;
 #endif
-                xAsm.Initialize();
+
+                var xNasmAsm = (AssemblerNasm)xAsm.Assembler;
+                xAsm.Assembler.Initialize();
                 using (var xScanner = new ILScanner(xAsm))
                 {
                     xScanner.TempDebug += x => Log.LogMessage(x);
@@ -218,11 +222,12 @@ namespace Cosmos.Build.MSBuild
                     {
                         if (!String.IsNullOrEmpty(DebugSymbolsFile))
                         {
-                            xAsm.FlushText(xOut, DebugSymbolsFile);
+                            xNasmAsm.FlushText(xOut);
+                            xAsm.WriteDebugSymbols(DebugSymbolsFile);
                         }
                         else
                         {
-                            xAsm.FlushText(xOut);
+                            xAsm.Assembler.FlushText(xOut);
                         }
                     }
                 }

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using Asm = Cosmos.IL2CPU;
-using X86 = Cosmos.IL2CPU.X86;
+using Asm = Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86.X;
+
 
 namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Cosmos.Debug.Debugger))]
@@ -24,7 +25,7 @@ namespace Cosmos.Kernel.Plugs {
         public static void TraceOn() { }
     }
 
-    public class DebuggerAsm : X86.X.Y86 {
+    public class DebuggerAsm : Y86 {
         public void Break() {
             IfDefined("DEBUGSTUB");
             Memory["DebugBreakOnNextTrace", 32] = 1;

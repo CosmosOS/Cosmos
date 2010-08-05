@@ -1,6 +1,7 @@
 using System;
 using Cosmos.IL2CPU.X86;
-using CPU = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Beq)]
@@ -17,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
   public class Branch: ILOp {
 
-    public Branch(Cosmos.IL2CPU.Assembler aAsmblr)
+    public Branch(Cosmos.Compiler.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 
@@ -91,16 +92,16 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPU.Pop { DestinationReg = CPU.Registers.EAX };
           new CPU.Pop { DestinationReg = CPU.Registers.EBX };
           new CPU.Compare { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EAX };
-          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
         } else {
           new CPU.Pop { DestinationReg = CPU.Registers.EAX };
           new CPU.Pop { DestinationReg = CPU.Registers.EBX };
           new CPU.Pop { DestinationReg = CPU.Registers.ECX };
           new CPU.Pop { DestinationReg = CPU.Registers.EDX };
           new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
-          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
           new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
-          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
         }
       } else {
         // todo: improve code clarity
@@ -110,10 +111,10 @@ namespace Cosmos.IL2CPU.X86.IL {
         new CPU.Pop { DestinationReg = CPU.Registers.EAX };
         if (xTestOp == ConditionalTestEnum.Zero) {
           new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-          new CPU.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+          new CPU.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
         } else if (xTestOp == ConditionalTestEnum.NotZero) {
           new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-          new CPU.ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+          new CPU.ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
         } else {
           throw new NotSupportedException("Situation not supported yet!");
         }

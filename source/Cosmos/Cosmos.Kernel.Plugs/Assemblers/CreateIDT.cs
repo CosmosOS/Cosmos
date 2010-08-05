@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.IL2CPU.Assembler;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPUAll = Cosmos.IL2CPU;
+using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUAll = Cosmos.Compiler.Assembler;
 using HW = Cosmos.Hardware;
 using System.Collections.Generic;
 

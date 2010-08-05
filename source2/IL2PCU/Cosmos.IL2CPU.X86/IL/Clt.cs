@@ -1,8 +1,9 @@
 using System;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -12,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Clt )]
     public class Clt : ILOp
     {
-        public Clt( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Clt( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -98,8 +99,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPUx86 = Cosmos.IL2CPU.X86;
-        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 

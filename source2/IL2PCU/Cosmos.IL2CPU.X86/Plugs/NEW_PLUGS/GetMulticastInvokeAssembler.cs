@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.X86.IL;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using System.Reflection;
 using MethodInfo = Cosmos.IL2CPU.MethodInfo;
 
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.IL2CPU;
 
 namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS
 {

@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -8,7 +8,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Rem_Un )]
     public class Rem_Un : ILOp
     {
-        public Rem_Un( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Rem_Un( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -71,7 +71,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Rem_Un)]

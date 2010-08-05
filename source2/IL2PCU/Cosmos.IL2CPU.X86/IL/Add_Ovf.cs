@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Add_Ovf )]
     public class Add_Ovf : ILOp
     {
-        public Add_Ovf( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Add_Ovf( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

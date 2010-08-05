@@ -1,12 +1,14 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Cgt_Un )]
     public class Cgt_Un : ILOp
     {
-        public Cgt_Un( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Cgt_Un( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -93,8 +95,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // 
-        // using CPUx86 = Cosmos.IL2CPU.X86;
-        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 

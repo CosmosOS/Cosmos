@@ -2,31 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CPU = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.IL2CPU.IL;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.IL2CPU.X86 {
   public abstract class ILOp: Cosmos.IL2CPU.ILOp {
     protected new readonly Assembler Assembler;
 
-    protected ILOp(Cosmos.IL2CPU.Assembler aAsmblr)
+    protected ILOp(Cosmos.Compiler.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
       Assembler = (Assembler)aAsmblr;
     }
 
     protected static void Jump_Exception(MethodInfo aMethod) {
       // todo: port to numeric labels
-      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AssemblerNasm.EndOfMethodLabelNameException };
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException };
     }
 
     protected static void Jump_End(MethodInfo aMethod) {
-      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AssemblerNasm.EndOfMethodLabelNameNormal };
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
     }
 
     protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField) {

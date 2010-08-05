@@ -1,11 +1,11 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldind_I2 )]
     public class Ldind_I2 : ILOp
     {
-        public Ldind_I2( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldind_I2( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.Sys.Plugs.Assemblers
 {

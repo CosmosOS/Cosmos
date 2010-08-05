@@ -1,8 +1,8 @@
 ﻿using System;
 
 using Cosmos.IL2CPU.Plugs;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using Assembler = Cosmos.IL2CPU.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Assembler = Cosmos.Compiler.Assembler.Assembler;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class ASMSetPageDirectory: AssemblerMethod {

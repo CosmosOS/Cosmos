@@ -1,7 +1,7 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
-using CPU = Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 using System.Reflection;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 namespace Cosmos.IL2CPU.X86.IL
@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newarr )]
     public class Newarr : ILOp
     {
-        public Newarr( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Newarr( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -66,8 +66,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.Collections.Generic;
-        // using CPU = Cosmos.IL2CPU.X86;
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;

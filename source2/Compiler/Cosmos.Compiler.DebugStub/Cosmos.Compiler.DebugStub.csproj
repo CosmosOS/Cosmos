@@ -16,6 +16,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,14 +41,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugStub.cs" />
@@ -56,10 +50,25 @@
     <Content Include="ReadMe.html" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+      <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
+      <Name>Cosmos.Compiler.Debug</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
+      <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
+      <Name>Cosmos.Compiler.Assembler.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler.csproj">
+      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
+      <Name>Cosmos.Compiler.Assembler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp.csproj">
       <Project>{453F2952-FD48-477F-889B-B3C6963C9850}</Project>
       <Name>Cosmos.Compiler.XSharp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cosmos.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

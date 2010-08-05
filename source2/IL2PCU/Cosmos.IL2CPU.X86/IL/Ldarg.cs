@@ -1,13 +1,15 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.X86;
+using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarg )]
     public class Ldarg : ILOp
     {
-        public Ldarg( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldarg( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -107,7 +109,7 @@ namespace Cosmos.IL2CPU.X86.IL
       // using System.Collections.Generic;
       // using System.IO;
       // 
-      // using CPU = Cosmos.IL2CPU.X86;
+      // using CPU = Cosmos.Compiler.Assembler.X86;
       // 
       // namespace Cosmos.IL2CPU.IL.X86 {
       // 	[OpCode(OpCodeEnum.Ldarg)]

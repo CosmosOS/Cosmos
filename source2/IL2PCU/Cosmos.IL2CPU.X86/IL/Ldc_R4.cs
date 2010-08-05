@@ -1,12 +1,13 @@
 using System;
-using CPU = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
+using Cosmos.Compiler.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldc_R4 )]
     public class Ldc_R4 : ILOp
     {
-        public Ldc_R4( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldc_R4( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -22,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.Linq;
         // 
-        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {

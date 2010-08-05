@@ -1,12 +1,12 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Readonly)]
 	public class Readonly: ILOp
 	{
-		public Readonly(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
+		public Readonly(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

@@ -1,16 +1,17 @@
 using System;
-using CPU = Cosmos.IL2CPU;
+using CPU = Cosmos.Compiler.Assembler;
 using System.Text;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
 	public class LdStr: ILOp
 	{
-		public LdStr(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
+		public LdStr(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -83,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Text;
 		// using Cosmos.IL2CPU.X86;
 		// using Cosmos.IL2CPU.X86.X;
-		// using CPUx86 = Cosmos.IL2CPU.X86;
+		// using CPUx86 = Cosmos.Compiler.Assembler.X86;
 		// using Asm = Assembler;
 		// using System.Collections.Generic;
 		// 

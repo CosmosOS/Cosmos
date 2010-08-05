@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.Plugs;
-using CPU = Cosmos.IL2CPU;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public class Interrupt30 : AssemblerMethod {

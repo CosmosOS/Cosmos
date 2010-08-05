@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
 // Later we can optimize it.
-namespace Cosmos.IL2CPU.X86 {
+namespace Cosmos.Compiler.Assembler.X86 {
     public class DebugStub : X.Y86 {
         //TODO: We never init the com port. Whats its default speed? 9600 N81 ?
         // We should init it and set the speed

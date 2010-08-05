@@ -1,12 +1,13 @@
 using System;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
+using Cosmos.Compiler.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldobj )]
     public class Ldobj : ILOp
     {
-        public Ldobj( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Ldobj( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -52,7 +53,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using Cosmos.IL2CPU.X86;
-        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
         // 

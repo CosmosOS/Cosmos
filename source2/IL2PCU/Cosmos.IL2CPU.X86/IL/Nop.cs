@@ -1,12 +1,12 @@
 using System;
-using CPU = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Nop )]
     public class Nop : ILOp
     {
-        public Nop( Cosmos.IL2CPU.Assembler aAsmblr )
+        public Nop( Cosmos.Compiler.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

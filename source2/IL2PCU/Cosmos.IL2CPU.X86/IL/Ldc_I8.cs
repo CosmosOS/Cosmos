@@ -1,7 +1,7 @@
 using System;
-using Cosmos.IL2CPU;
+using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Collections.Generic;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldc_I8 )]
     public class Ldc_I8 : ILOp
     {
-        public Ldc_I8( Cosmos.IL2CPU.Assembler aAsmblr ) : base( aAsmblr ) { }
+        public Ldc_I8( Cosmos.Compiler.Assembler.Assembler aAsmblr ) : base( aAsmblr ) { }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
           //TODO: Fix for 64 bit
@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
     
 		// using System;
 		// using System.IO;
-		// using CPU = Cosmos.IL2CPU.X86;
+		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// using Cosmos.IL2CPU.X86;
 		// using System.Diagnostics;
 		// 

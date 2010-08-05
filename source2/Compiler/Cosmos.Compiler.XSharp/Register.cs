@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using X86 = Cosmos.IL2CPU.X86;
+using X86 = Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.IL2CPU.X86.X {
+namespace Cosmos.Compiler.Assembler.X86.X {
     public abstract class Register {
         protected byte mBitSize;
         public byte BitSize {
