@@ -6,24 +6,6 @@ using System.Text;
 namespace Cosmos.Compiler.Assembler.X86 {
     [OpCode("cdq")]
     public class SignExtendAX : InstructionWithSize {
-        public static void InitializeEncodingData(Instruction.InstructionData aData) {
-            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x98 },
-                AllowedSizes = InstructionSizes.Word,
-                DefaultSize = InstructionSize.Word
-            });
-            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x66, 0x98 },
-                AllowedSizes = InstructionSizes.Byte,
-                DefaultSize = InstructionSize.Byte
-            });
-            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x99 },
-                AllowedSizes = InstructionSizes.DWord,
-                DefaultSize = InstructionSize.DWord
-            });
-        }
-
         public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             switch (Size) {

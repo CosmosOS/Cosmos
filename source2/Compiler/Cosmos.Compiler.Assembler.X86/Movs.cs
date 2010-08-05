@@ -6,13 +6,6 @@ using System.Text;
 namespace Cosmos.Compiler.Assembler.X86 {
     [OpCode("movs")]
     public class Movs : InstructionWithSize, IInstructionWithPrefix {
-        public static void InitializeEncodingData(Instruction.InstructionData aData) {
-            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0xA4 },
-                OperandSizeByte = 0,                
-                DefaultSize = InstructionSize.Byte
-            });
-        }
         public InstructionPrefixes Prefixes {
             get;
             set;

@@ -8,10 +8,6 @@ namespace Cosmos.Compiler.Assembler.X86
     [OpCode("scas")]
     public class Scas: InstructionWithSize, IInstructionWithPrefix
     {
-        public static void InitializeEncodingData(Instruction.InstructionData aData)
-        {
-        }
-
         public InstructionPrefixes Prefixes
         {
             get;

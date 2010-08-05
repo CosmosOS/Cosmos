@@ -8,12 +8,5 @@ namespace Cosmos.Compiler.Assembler.X86.x87
     [OpCode("ftst")]
     public class FloatTest : Instruction
     {
-        public static void InitializeEncodingData(Instruction.InstructionData aData)
-        {
-            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
-            {
-                OpCode = new byte[] { 0xD9, 0xE4}
-            });
-        }
     }
 }

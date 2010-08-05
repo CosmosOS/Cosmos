@@ -7,8 +7,6 @@ namespace Cosmos.Compiler.Assembler.X86.X86
 {
     [OpCode("cmps")]
     public class Cmps: InstructionWithSize, IInstructionWithPrefix {
-        public static void InitializeEncodingData(Instruction.InstructionData aData) {
-        }
 
         public InstructionPrefixes Prefixes {
             get;
