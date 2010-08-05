@@ -147,6 +147,7 @@ Source: .\source\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremoverea
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
 Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
 
+
 [Registry]
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletekey

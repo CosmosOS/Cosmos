@@ -26,6 +26,12 @@ namespace Cosmos.Compiler.Assembler
         public Instruction( Assembler aAssembler )
         {
             aAssembler.Add( this );
+            var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
+            if (xAttribs != null && xAttribs.Length > 0)
+            {
+                var xAttrib = (OpCodeAttribute)xAttribs[0];
+                mMnemonic = xAttrib.Mnemonic;
+            }
         }
 
         public Instruction( bool aAddToAssembler )
@@ -33,6 +39,12 @@ namespace Cosmos.Compiler.Assembler
             if( aAddToAssembler )
             {
                 Assembler.CurrentInstance.Add( this );
+            }
+            var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
+            if (xAttribs != null && xAttribs.Length > 0)
+            {
+                var xAttrib = (OpCodeAttribute)xAttribs[0];
+                mMnemonic = xAttrib.Mnemonic;
             }
         }
 

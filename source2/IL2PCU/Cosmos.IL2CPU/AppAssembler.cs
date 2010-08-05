@@ -203,7 +203,7 @@ namespace Cosmos.IL2CPU
                     {
                         var xOpCode = (ushort)xAttrib.OpCode;
                         var xCtor = xType.GetConstructor(new Type[] { typeof(Assembler) });
-                        var xILOp = (ILOp)xCtor.Invoke(new Object[] { this });
+                        var xILOp = (ILOp)xCtor.Invoke(new Object[] { Assembler });
                         if (xOpCode <= 0xFF)
                         {
                             mILOpsLo[xOpCode] = xILOp;
