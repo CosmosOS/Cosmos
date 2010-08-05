@@ -51,6 +51,7 @@ namespace Cosmos.VS.Package
                 xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", true));
                 xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
                 xValues.Add("VMWareFlavor", this.GetConfigurationProperty("VMWareFlavor", true));
+                xValues.Add("StartCosmosGDB", this.GetConfigurationProperty("StartCosmosGDB", true));
 
                 xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 

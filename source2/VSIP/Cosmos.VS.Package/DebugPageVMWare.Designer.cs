@@ -36,6 +36,7 @@
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
             this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.checkEnableGDB = new System.Windows.Forms.CheckBox();
+            this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
             this.table.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,6 +81,7 @@
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 39F));
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.66887F));
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.33113F));
+            this.table.Controls.Add(this.checkStartCosmosGDB, 1, 7);
             this.table.Controls.Add(this.label2, 1, 3);
             this.table.Controls.Add(this.titleGeneral, 0, 0);
             this.table.Controls.Add(this.label1, 1, 1);
@@ -153,6 +155,17 @@
             this.checkEnableGDB.Text = "Enable GDB Debugger";
             this.checkEnableGDB.UseVisualStyleBackColor = true;
             // 
+            // checkStartCosmosGDB
+            // 
+            this.checkStartCosmosGDB.AutoSize = true;
+            this.checkStartCosmosGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 140);
+            this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
+            this.checkStartCosmosGDB.Size = new System.Drawing.Size(199, 19);
+            this.checkStartCosmosGDB.TabIndex = 27;
+            this.checkStartCosmosGDB.Text = "AutoStart Cosmos GDB Frontend";
+            this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
+            // 
             // DebugPageVMWare
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -176,6 +189,7 @@
         private System.Windows.Forms.ComboBox comboTraceMode;
         private TitleDivision titleDivision1;
         private System.Windows.Forms.CheckBox checkEnableGDB;
+        private System.Windows.Forms.CheckBox checkStartCosmosGDB;
 
     }
 }

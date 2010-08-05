@@ -36,6 +36,7 @@
             this.comboDebugMode = new System.Windows.Forms.ComboBox();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
             this.checkEnableGDB = new System.Windows.Forms.CheckBox();
+            this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
             this.table.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,20 +46,23 @@
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 39F));
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.66887F));
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.33113F));
-            this.table.Controls.Add(this.titleDivision1, 0, 8);
+            this.table.Controls.Add(this.titleDivision1, 0, 4);
             this.table.Controls.Add(this.label2, 1, 3);
             this.table.Controls.Add(this.titleGeneral, 0, 0);
             this.table.Controls.Add(this.label1, 1, 1);
             this.table.Controls.Add(this.comboDebugMode, 2, 1);
             this.table.Controls.Add(this.comboTraceMode, 2, 3);
-            this.table.Controls.Add(this.checkEnableGDB, 1, 9);
+            this.table.Controls.Add(this.checkEnableGDB, 1, 5);
+            this.table.Controls.Add(this.checkStartCosmosGDB, 1, 6);
             this.table.Dock = System.Windows.Forms.DockStyle.Fill;
             this.table.Location = new System.Drawing.Point(0, 0);
             this.table.Margin = new System.Windows.Forms.Padding(0);
             this.table.Name = "table";
-            this.table.RowCount = 11;
+            this.table.RowCount = 13;
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -145,12 +149,22 @@
             // checkEnableGDB
             // 
             this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkEnableGDB.Location = new System.Drawing.Point(42, 122);
+            this.checkEnableGDB.Location = new System.Drawing.Point(42, 117);
             this.checkEnableGDB.Name = "checkEnableGDB";
             this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
             this.checkEnableGDB.TabIndex = 20;
             this.checkEnableGDB.Text = "Enable GDB Debugger";
             this.checkEnableGDB.UseVisualStyleBackColor = true;
+            // 
+            // checkStartCosmosGDB
+            // 
+            this.checkStartCosmosGDB.AutoSize = true;
+            this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 143);
+            this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
+            this.checkStartCosmosGDB.Size = new System.Drawing.Size(195, 17);
+            this.checkStartCosmosGDB.TabIndex = 22;
+            this.checkStartCosmosGDB.Text = "AutoStart Cosmos GDB Frontend";
+            this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
             // 
             // DebugPageSub
             // 
@@ -176,5 +190,6 @@
         private System.Windows.Forms.Label label1;
         private TitleDivision titleDivision1;
         private System.Windows.Forms.CheckBox checkEnableGDB;
+        private System.Windows.Forms.CheckBox checkStartCosmosGDB;
 	}
 }

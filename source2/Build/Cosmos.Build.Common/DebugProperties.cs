@@ -20,5 +20,11 @@ namespace Cosmos.Build.Common {
             set { SetProperty("EnableGDB", value); }
         }
 
+        public bool StartCosmosGDB
+        {
+            get { return GetProperty("StartCosmosGDB", false); }
+            set { SetProperty("StartCosmosGDB", value); }
+        }
+
     }
 }
