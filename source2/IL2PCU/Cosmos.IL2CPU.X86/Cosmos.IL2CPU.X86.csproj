@@ -353,7 +353,6 @@
     <Compile Include="X86\SetInterruptFlag.cs" />
     <Compile Include="X86\ShiftLeft.cs" />
     <Compile Include="X86\ShiftRight.cs" />
-    <Compile Include="X86\SpecialDebug\DebugStub.cs" />
     <Compile Include="X86\SSEAndMMX2\AddPS.cs" />
     <Compile Include="X86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="X86\SSEAndMMX2\AndPS.cs" />
@@ -442,30 +441,6 @@
     <Compile Include="X86\x87\IntStoreWithTrunc.cs" />
     <Compile Include="X86\Xchg.cs" />
     <Compile Include="X86\Xor.cs" />
-    <Compile Include="X86\X\Address.cs" />
-    <Compile Include="X86\X\AddressDirect.cs" />
-    <Compile Include="X86\X\AddressIndirect.cs" />
-    <Compile Include="X86\X\RegisterBL.cs" />
-    <Compile Include="X86\X\RegisterEDI.cs" />
-    <Compile Include="X86\X\Memory.cs" />
-    <Compile Include="X86\X\MemoryAction.cs" />
-    <Compile Include="X86\X\PortNumber.cs" />
-    <Compile Include="X86\X\Ports.cs" />
-    <Compile Include="X86\X\Register.cs" />
-    <Compile Include="X86\X\Register08.cs" />
-    <Compile Include="X86\X\Register16.cs" />
-    <Compile Include="X86\X\Register32.cs" />
-    <Compile Include="X86\X\RegisterAL.cs" />
-    <Compile Include="X86\X\RegisterAX.cs" />
-    <Compile Include="X86\X\RegisterDX.cs" />
-    <Compile Include="X86\X\RegisterEAX.cs" />
-    <Compile Include="X86\X\RegisterEBP.cs" />
-    <Compile Include="X86\X\RegisterEBX.cs" />
-    <Compile Include="X86\X\RegisterECX.cs" />
-    <Compile Include="X86\X\RegisterEDX.cs" />
-    <Compile Include="X86\X\RegisterESI.cs" />
-    <Compile Include="X86\X\RegisterESP.cs" />
-    <Compile Include="X86\X\Y86.cs" />
     <Compile Include="X86\_Infra\Extensions.cs" />
     <Compile Include="X86\_Infra\IInstructionWithCondition.cs" />
     <Compile Include="X86\_Infra\IInstructionWithDestination.cs" />
@@ -527,6 +502,7 @@
     <Folder Include="X86\SSSE3\" />
     <Folder Include="X86\VTAndUp\" />
     <Folder Include="X86\x87\_Infra\" />
+    <Folder Include="X86\X\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

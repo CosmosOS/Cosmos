@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{453F2952-FD48-477F-889B-B3C6963C9850}</ProjectGuid>
+    <ProjectGuid>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Compiler.XSharp</RootNamespace>
-    <AssemblyName>Cosmos.Compiler.XSharp</AssemblyName>
+    <RootNamespace>Cosmos.Compiler.DebugStub</RootNamespace>
+    <AssemblyName>Cosmos.Compiler.DebugStub</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -49,36 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Address.cs" />
-    <Compile Include="AddressDirect.cs" />
-    <Compile Include="AddressIndirect.cs" />
-    <Compile Include="Memory.cs" />
-    <Compile Include="MemoryAction.cs" />
-    <Compile Include="PortNumber.cs" />
-    <Compile Include="Ports.cs" />
+    <Compile Include="DebugStub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Register.cs" />
-    <Compile Include="Register08.cs" />
-    <Compile Include="Register16.cs" />
-    <Compile Include="Register32.cs" />
-    <Compile Include="RegisterAL.cs" />
-    <Compile Include="RegisterAX.cs" />
-    <Compile Include="RegisterBL.cs" />
-    <Compile Include="RegisterDX.cs" />
-    <Compile Include="RegisterEAX.cs" />
-    <Compile Include="RegisterEBP.cs" />
-    <Compile Include="RegisterEBX.cs" />
-    <Compile Include="RegisterECX.cs" />
-    <Compile Include="RegisterEDI.cs" />
-    <Compile Include="RegisterEDX.cs" />
-    <Compile Include="RegisterESI.cs" />
-    <Compile Include="RegisterESP.cs" />
-    <Compile Include="Y86.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
-      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
-      <Name>Cosmos.IL2CPU.X86</Name>
+    <Content Include="ReadMe.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp.csproj">
+      <Project>{453F2952-FD48-477F-889B-B3C6963C9850}</Project>
+      <Name>Cosmos.Compiler.XSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
