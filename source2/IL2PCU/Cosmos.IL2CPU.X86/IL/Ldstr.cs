@@ -2,7 +2,6 @@ using System;
 using CPU = Cosmos.IL2CPU;
 using System.Text;
 using Cosmos.IL2CPU;
-using Cosmos.IL2CPU.X86.X;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
