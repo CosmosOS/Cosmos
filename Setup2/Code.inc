@@ -213,8 +213,8 @@ end;
 
 function InitializeSetup: Boolean;
 begin
-  if not csharp2008_Installed then begin
-    MsgBox(ExpandConstant('Visual studio 2008 not installed!'), MbError, MB_OK);
+  if not VSNET2008 then begin
+    MsgBox(ExpandConstant('Visual Studio 2008 not installed!'), MbError, MB_OK);
     result := false;
     exit;
    end;
