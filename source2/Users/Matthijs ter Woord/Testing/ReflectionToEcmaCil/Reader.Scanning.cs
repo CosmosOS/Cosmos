@@ -39,7 +39,10 @@ namespace ReflectionToEcmaCil
             aMethodMeta.Data[EcmaCil.DataIds.DebugMetaId] = aMethod.Method.GetFullName();
 #endif
             aMethodMeta.IsVirtual = aMethod.Method.IsVirtual;
+            aMethodMeta.IsPublic = aMethod.Method.IsPublic;
+            var xMethod = aMethod.Method;
             aMethodMeta.StartsNewVirtualTree = aMethodMeta.IsVirtual && ((aMethod.Method.Attributes & MethodAttributes.NewSlot) == MethodAttributes.NewSlot);
+            
             var xParamOffset = 0;
             if (!aMethod.Method.IsStatic)
             {
@@ -78,6 +81,36 @@ namespace ReflectionToEcmaCil
 #endif
                 xParamMeta.PropertyType = xType;
             }
+
+            if (aMethodMeta.IsVirtual && ((aMethod.Method.Attributes & MethodAttributes.NewSlot) != MethodAttributes.NewSlot))
+            {
+                // method is override
+                // now need to find parent method, just one level up, because when the parent method is scanned, its parent method will be found..
+                var xBaseType = aMethod.Method.DeclaringType;
+#if DEBUG
+                if (xBaseType == null)
+                {
+                    throw new Exception("New virtual method found, but declaring type has no base type");
+                }
+#endif
+                var xBindFlags = BindingFlags.Instance;
+                if (xMethod.IsPublic)
+                {
+                    xBindFlags |= BindingFlags.Public;
+                }
+                else
+                {
+                    xBindFlags |= BindingFlags.NonPublic;
+                }
+                var xFoundMethod = xBaseType.GetMethod(aMethod.Method.Name,
+                        xBindFlags, null, (from item in xMethodParameters
+                                           select item.ParameterType).ToArray(), null);
+                if (xFoundMethod != null)
+                {
+                    EnqueueMethod(xFoundMethod, aMethod, "Overridden method");
+                }
+            }
+
             var xMethodInfo = aMethod.Method as MethodInfo;
             var xReturnType = typeof(void);
             if (xMethodInfo != null)

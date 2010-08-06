@@ -36,6 +36,12 @@ namespace EcmaCil
             set;
         }
 
+        public bool IsPublic
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Specifies whether the method is a base method. in c# it's defined by: "virtual void", or "new virtual void.."
         /// </summary>

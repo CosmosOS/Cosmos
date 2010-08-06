@@ -50,6 +50,22 @@ namespace EcmaCil
                 {
                     output.WriteAttributeString("BaseType", (string)item.BaseType.Data[EcmaCil.DataIds.DebugMetaId]);
                 }
+                if (item.Descendants.Count > 0)
+                {
+                    output.WriteStartElement("Descendants");
+                    {
+                        foreach (var xDescendant in item.Descendants)
+                        {
+                            output.WriteStartElement("Descendant");
+                            {
+                                output.WriteAttributeString("Type", (string)xDescendant.Data[EcmaCil.DataIds.DebugMetaId]); 
+                            }
+                            output.WriteEndElement(); // Descendant
+                        }
+                    }
+                    output.WriteEndElement(); // descendants
+                }
+
 #else
                 if (item.BaseType != null)
                 {

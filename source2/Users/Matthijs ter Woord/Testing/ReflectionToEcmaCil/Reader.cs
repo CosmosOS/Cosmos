@@ -14,6 +14,9 @@ namespace ReflectionToEcmaCil
         private Dictionary<QueuedPointerType, EcmaCil.PointerTypeMeta> mPointerTypes = new Dictionary<QueuedPointerType, EcmaCil.PointerTypeMeta>();
         private Dictionary<QueuedMethod, EcmaCil.MethodMeta> mVirtuals = new Dictionary<QueuedMethod, EcmaCil.MethodMeta>();
 
+        private Dictionary<EcmaCil.TypeMeta, Type> mTypeMetaToType = new Dictionary<EcmaCil.TypeMeta, Type>();
+        private Dictionary<EcmaCil.MethodMeta, MethodBase> mMethodMetaToMethod = new Dictionary<EcmaCil.MethodMeta, MethodBase>();
+
 
         public void Dispose()
         {
@@ -73,12 +76,75 @@ namespace ReflectionToEcmaCil
                     }
                     throw new Exception("Queue item not supported: '" + xItem.GetType().FullName + "'!");
                 }
-
+                DoVMTScan();
             } while (mQueue.Count > 0);
 
             return mTypes.Values.Cast<EcmaCil.TypeMeta>()
                 .Union(mArrayTypes.Values.Cast<EcmaCil.TypeMeta>())
                 .Union(mPointerTypes.Values.Cast<EcmaCil.TypeMeta>()).ToArray();
+        }
+
+        private void DoVMTScan()
+        {
+            var xAllTypes = mTypes.ToArray();
+            foreach(var xTypePair in xAllTypes){
+                var xQueuedType = xTypePair.Key;
+                var xTypeMeta = xTypePair.Value;
+
+                foreach (var xMethod in xTypeMeta.Methods)
+                {
+                    if (!xMethod.IsVirtual)
+                    {
+                        continue;
+                    }
+
+                    MethodBase xBaseMethod;
+                    if (!mMethodMetaToMethod.TryGetValue(xMethod, out xBaseMethod))
+                    {
+                        throw new Exception("Couldn't find method!");
+                    }
+
+                    foreach (var xSubTypeMeta in xTypeMeta.Descendants)
+                    {
+                        if((from method in xSubTypeMeta.Methods
+                            where method.Overrides == xMethod
+                            select method).Any()){
+                            continue;
+                        }
+
+                        Type xSubType;
+                        if (!mTypeMetaToType.TryGetValue(xSubTypeMeta, out xSubType))
+                        {
+                            throw new Exception("Couldn't find type!");
+                        }
+                        var xBindFlags = BindingFlags.Instance;
+                        if (xMethod.IsPublic)
+                        {
+                            xBindFlags |= BindingFlags.Public;
+                        }
+                        else
+                        {
+                            xBindFlags |= BindingFlags.NonPublic;
+                        }
+                        
+                        var xFoundMethod = xSubType.GetMethod(xBaseMethod.Name,
+                                xBindFlags, null, (from item in xBaseMethod.GetParameters()
+                                                   select item.ParameterType).ToArray(), null);
+                        if (xFoundMethod != null)
+                        {
+                            EnqueueMethod(xFoundMethod, xMethod, "Overridden method");
+                        }
+                        else
+                        {
+                            // apparantly, this type doesn't override the method. to speed up scanning,
+                            // we add a dummy method, just calling base
+
+                        }
+                        
+                    }
+                }
+
+            }
         }
     }
 }

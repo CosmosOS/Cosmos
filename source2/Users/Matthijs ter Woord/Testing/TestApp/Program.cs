@@ -20,7 +20,7 @@ namespace TestApp
                     var xTestClass= typeof(SimpleClassTest.Program);
                     xReader.EnableLogging(Path.ChangeExtension(xTestClass.Assembly.Location, "html"));
                     var xResult = xReader.Execute(xTestClass.Assembly.Location);
-                    using (var xXmlOut = XmlWriter.Create(Path.ChangeExtension(xTestClass.Assembly.Location, "out.xml")))
+                    using (var xXmlOut = XmlWriter.Create(Path.ChangeExtension(xTestClass.Assembly.Location, "out.xml"), new XmlWriterSettings { Indent = true, IndentChars="  " }))
                     {
                         Dump.DumpTypes(xResult, xXmlOut);
                         xXmlOut.Flush();

@@ -38,6 +38,7 @@ namespace ReflectionToEcmaCil
             }
             var xDeclaringType = EnqueueType(aMethod.DeclaringType, aMethod, "Declaring type");
             xMethodMeta = new EcmaCil.MethodMeta();
+            mMethodMetaToMethod.Add(xMethodMeta, aMethod);
             xMethodMeta.DeclaringType = xDeclaringType;
             xDeclaringType.Methods.Add(xMethodMeta);
             mMethods.Add(xQueuedMethod, xMethodMeta);
@@ -91,6 +92,7 @@ namespace ReflectionToEcmaCil
                 return xTypeMeta;
             }
             xTypeMeta = new EcmaCil.TypeMeta();
+            mTypeMetaToType.Add(xTypeMeta, aTypeRef);
             if (aTypeRef.BaseType != null)
             {
                 xTypeMeta.BaseType = EnqueueType(aTypeRef.BaseType, aTypeRef, "Base type");

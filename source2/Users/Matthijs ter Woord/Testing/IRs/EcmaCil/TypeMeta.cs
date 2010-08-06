@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UtilityClasses;
+using System.Diagnostics;
 
 namespace EcmaCil
 {
+#if DEBUG
+    [DebuggerDisplay("Type({Data[1]})")]
+#endif
     public class TypeMeta: BaseMeta
     {
         private static readonly FieldMeta[] EmptyFields = new FieldMeta[0];
@@ -44,7 +48,7 @@ namespace EcmaCil
         }
 
         private List<TypeMeta> mDescendants = new List<TypeMeta>();
-        public IEnumerable<TypeMeta> Descendants
+        public IList<TypeMeta> Descendants
         {
             get
             {
