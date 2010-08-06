@@ -30,8 +30,14 @@ namespace EcmaCil
             set;
         }
 
+        public bool IsVirtual
+        {
+            get;
+            set;
+        }
+
         /// <summary>
-        /// Specifies whether the method is a base method. in c# it's defined by: "public virtual void", or "public new virtual void.."
+        /// Specifies whether the method is a base method. in c# it's defined by: "virtual void", or "new virtual void.."
         /// </summary>
         public bool StartsNewVirtualTree
         {

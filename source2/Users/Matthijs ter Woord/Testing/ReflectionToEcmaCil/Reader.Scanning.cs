@@ -38,6 +38,8 @@ namespace ReflectionToEcmaCil
 #if DEBUG
             aMethodMeta.Data[EcmaCil.DataIds.DebugMetaId] = aMethod.Method.GetFullName();
 #endif
+            aMethodMeta.IsVirtual = aMethod.Method.IsVirtual;
+            aMethodMeta.StartsNewVirtualTree = aMethodMeta.IsVirtual && ((aMethod.Method.Attributes & MethodAttributes.NewSlot) == MethodAttributes.NewSlot);
             var xParamOffset = 0;
             if (!aMethod.Method.IsStatic)
             {
@@ -89,94 +91,6 @@ namespace ReflectionToEcmaCil
             }
             aMethodMeta.IsStatic = aMethod.Method.IsStatic;
             ScanMethodBody(aMethod, aMethodMeta);
-            #region temporary disabled
-
-            //#region Virtuals scan
-            //if (aMethod.Method.IsVirtual)
-            //{
-            //    // For virtuals we need to climb up the type tree
-            //    // and find the top base method. We then add that top
-            //    // node to the mVirtuals list. We don't need to add the 
-            //    // types becuase adding DeclaringType will already cause
-            //    // all ancestor types to be added.
-
-            //    var xVirtMethod = aMethod.Method;
-            //    TypeReference xVirtType = aMethod.Method.DeclaringType;
-
-            //    xVirtMethod = xVirtMethod.GetOriginalBaseMethod();
-            //    #region old code
-            //    //                MethodReference xNewVirtMethod = null;
-            //    //                while (true)
-            //    //                {
-            //    //                    var xNewVirtType = xVirtType.Resolve();
-            //    //                    if (xNewVirtType.HasGenericParameters)
-            //    //                    {
-            //    //                        throw new Exception("Generics not fully supported yet!");
-            //    //                    }
-            //    //                    if (xNewVirtType == null)
-            //    //                    {
-            //    //                        xVirtType = null;
-            //    //                    }
-            //    //                    else
-            //    //                    {
-            //    //#warning // todo: verify if next code works ok with generics
-            //    //                        var xTempNewVirtMethod = xNewVirtType.  .m.Methods..GetMethod(aMethod.Method.Name, aMethod.Method.Parameters);
-            //    //                        if (xTempNewVirtMethod !=null)
-            //    //                        {
-            //    //                            if (xTempNewVirtMethod.IsVirtual)
-            //    //                            {
-            //    //                                xNewVirtMethod = xTempNewVirtMethod;
-            //    //                            }
-            //    //                        }
-            //    //                        else
-            //    //                        {
-            //    //                            xNewVirtMethod = null;
-            //    //                        }
-            //    //                    }
-            //    //                    if (xNewVirtMethod == null)
-            //    //                    {
-            //    //                        if (mVirtuals.ContainsKey(aMethod))
-            //    //                        {
-            //    //                            xVirtMethod = null;
-            //    //                        }
-            //    //                        break;
-            //    //                    }
-            //    //                    xVirtMethod = xNewVirtMethod.Resolve();
-            //    //                    xVirtType = xNewVirtType.BaseType;
-            //    //                    if (xVirtType == null)
-            //    //                    {
-            //    //                        break;
-            //    //                    }
-            //    //                }
-            //    #endregion old code
-            //    if (xVirtMethod != null)
-            //    {
-            //        EnqueueMethod(xVirtMethod, aMethod, "Virtual Base");
-
-            //        foreach (var xType in mTypes)
-            //        {
-            //            if (xType.Key.Type.IsSubclassOf(xVirtMethod.DeclaringType))
-            //            {
-            //                //xType.Key.Type.res
-            //                //var xNewMethod = xType.Key.Type.Methods.GetMethod(aMethod.Method.Name, aMethod.Method.Parameters);
-            //                //if (xNewMethod != null)
-            //                //{
-            //                //                        // We need to check IsVirtual, a non virtual could
-            //                //                        // "replace" a virtual above it?
-            //                //    // MtW: correct
-            //                //    if (xNewMethod.IsVirtual)
-            //                //    {
-            //                //        EnqueueMethod(xNewMethod, aMethod, "Virtual Downscan");
-            //                //    }
-            //                //}
-            //                throw new NotImplementedException();
-            //            }
-            //        }
-            //    }
-
-            //}
-            //#endregion
-            #endregion
         }
 
         protected virtual void ScanMethodBody(QueuedMethod aMethod, EcmaCil.MethodMeta aMethodMeta)

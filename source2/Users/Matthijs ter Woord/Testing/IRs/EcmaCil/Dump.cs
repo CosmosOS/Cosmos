@@ -89,7 +89,13 @@ namespace EcmaCil
 #endif
                 //output.WriteAttributeString("FullName", method.Name);
                 output.WriteAttributeString("IsStatic", method.IsStatic.ToString());
+                output.WriteAttributeString("IsVirtual", method.IsVirtual.ToString());
+                output.WriteAttributeString("StartsNewVirtualTree", method.StartsNewVirtualTree.ToString());
 #if DEBUG
+                if (method.Overrides!=null)
+                {
+                    output.WriteAttributeString("Overrides", (string)method.Overrides.Data[DataIds.DebugMetaId]);
+                }
                 if (method.ReturnType != null)
                 {
                     output.WriteAttributeString("ReturnType",  (string)method.ReturnType.Data[DataIds.DebugMetaId]);
