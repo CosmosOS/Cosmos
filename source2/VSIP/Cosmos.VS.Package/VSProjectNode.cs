@@ -4,94 +4,130 @@ using Microsoft.VisualStudio.Project;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Cosmos.VS.Package {
-  public class VSProjectNode : ProjectNode {
-    internal static int imageIndex;
-    public override int ImageIndex {
-      get { return imageIndex; }
-    }
-
-    private VSProject package;
-
-    public VSProjectNode(VSProject package) {
-        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject");
-        try
+namespace Cosmos.VS.Package
+{
+    public class VSProjectNode : ProjectNode
+    {
+        internal static int imageIndex;
+        public override int ImageIndex
         {
-            this.package = package;
+            get { return imageIndex; }
+        }
 
-            imageIndex = this.ImageHandler.ImageList.Images.Count;
+        private VSProject package;
 
-            foreach (Image img in imageList.Images)
+        public VSProjectNode(VSProject package)
+        {
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject");
+            try
             {
-                this.ImageHandler.AddImage(img);
+                this.package = package;
+
+                imageIndex = this.ImageHandler.ImageList.Images.Count;
+
+                foreach (Image img in imageList.Images)
+                {
+                    this.ImageHandler.AddImage(img);
+                }
+            }
+            catch (Exception E)
+            {
+                LogUtility.LogException(E);
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
             }
         }
-        catch (Exception E)
-        {
-            LogUtility.LogException(E);
-        }
-        finally
-        {
-            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
-        }
-    }
 
-    private static ImageList imageList;
-
-    protected override ConfigProvider CreateConfigProvider() {
-        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
-        try
+        protected override MSBuildResult InvokeMsBuild(string target)
         {
-            return new VsConfigProvider(this);
+            var xSolutionBuildManager = (IVsSolutionBuildManager)this.GetService(typeof(IVsSolutionBuildManager));
+            var xSolution = (IVsSolution)this.GetService(typeof(IVsSolution));
+            if (xSolutionBuildManager != null && xSolution != null)
+            {
+                IVsHierarchy xStartupProj;
+                xSolutionBuildManager.get_StartupProject(out xStartupProj);
+                if (xStartupProj != null)
+                {
+                    var xProj = xStartupProj as IVsProject3;
+                    Guid xGuid;
+                    xSolution.GetGuidOfProject(xStartupProj, out xGuid);
+                    if (xGuid != Guid.Empty)
+                    {
+                        if (xGuid != this.ProjectIDGuid)
+                        {
+                            return MSBuildResult.Successful;
+                        }
+                    }
+                }
+            }
+            return base.InvokeMsBuild(target);
         }
-        finally
-        {
-            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
-        }
-    }
 
-    protected override Guid[] GetConfigurationIndependentPropertyPages() {
-      // Default C# property pages
-      // Unfortunately just adding them to the list does not work.
-      // It causes AV's, but its specific to each page
-      // loading and getting confused under a different project type
-      //5E9A8AC2-4F34-4521-858F-4C248BA31532 - Application
-      //43E38D2E-43B8-4204-8225-9357316137A4 - Services
-      //031911C8-6148-4E25-B1B1-44BCA9A0C45C - Reference Paths
-      //F8D6553F-F752-4DBF-ACB6-F291B744A792 - Signing
-      //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
-        LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
-        try
+        private static ImageList imageList;
+
+        protected override ConfigProvider CreateConfigProvider()
         {
-            return new Guid[] {
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
+            try
+            {
+                return new VsConfigProvider(this);
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
+            }
+        }
+
+        protected override Guid[] GetConfigurationIndependentPropertyPages()
+        {
+            // Default C# property pages
+            // Unfortunately just adding them to the list does not work.
+            // It causes AV's, but its specific to each page
+            // loading and getting confused under a different project type
+            //5E9A8AC2-4F34-4521-858F-4C248BA31532 - Application
+            //43E38D2E-43B8-4204-8225-9357316137A4 - Services
+            //031911C8-6148-4E25-B1B1-44BCA9A0C45C - Reference Paths
+            //F8D6553F-F752-4DBF-ACB6-F291B744A792 - Signing
+            //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
+            try
+            {
+                return new Guid[] {
          // typeof(PropPageEnvironment).GUID,
           //typeof(PropPageTest).GUID,
 		  typeof(BuildPage).GUID,
 		  typeof(DebugPage).GUID,
 		  typeof(VMPage).GUID,
       };
+            }
+            finally
+            {
+                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
+            }
         }
-        finally
+
+        static VSProjectNode()
         {
-            LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
+            imageList = Utilities.GetImageList(typeof(VSProjectNode).Assembly.GetManifestResourceStream("Cosmos.VS.Package.Resources.CosmosProjectNode.bmp"));
         }
-    }
 
-    static VSProjectNode() {
-      imageList = Utilities.GetImageList(typeof(VSProjectNode).Assembly.GetManifestResourceStream("Cosmos.VS.Package.Resources.CosmosProjectNode.bmp"));
-    }
+        public override Guid ProjectGuid
+        {
+            get { return Guids.guidProjectFactory; }
+        }
 
-    public override Guid ProjectGuid {
-      get { return Guids.guidProjectFactory; }
-    }
-    
-    public override string ProjectType {
-      get { return "CosmosProjectType"; }
-    }
+        public override string ProjectType
+        {
+            get { return "CosmosProjectType"; }
+        }
 
-    public override void AddFileFromTemplate(
-        string source, string target) {
+        public override void AddFileFromTemplate(
+            string source, string target)
+        {
             LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.AddFileFromTemplate('{0}', '{1}')", source, target);
             try
             {
@@ -113,6 +149,6 @@ namespace Cosmos.VS.Package {
             {
                 LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.AddFileFromTemplate");
             }
-    } 
-  }
+        }
+    }
 }
