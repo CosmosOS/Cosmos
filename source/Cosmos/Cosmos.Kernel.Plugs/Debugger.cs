@@ -24,7 +24,7 @@ namespace Cosmos.Kernel.Plugs {
         public static void TraceOn() { }
     }
 
-    public class DebuggerAsm : Y86 {
+    public class DebuggerAsm : CodeBlock {
         public void Break() {
             IfDefined("DEBUGSTUB");
             Memory["DebugBreakOnNextTrace", 32] = 1;

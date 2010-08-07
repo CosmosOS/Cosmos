@@ -9,7 +9,7 @@ using Cosmos.Compiler.Assembler.X86;
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
 // Later we can optimize it.
 namespace Cosmos.Compiler.XSharp {
-    public class DebugStub : Y86 {
+    public class DebugStub : CodeBlock {
         //TODO: Move com port init to debugstub asm
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;

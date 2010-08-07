@@ -67,7 +67,7 @@
     <Compile Include="RegisterEDX.cs" />
     <Compile Include="RegisterESI.cs" />
     <Compile Include="RegisterESP.cs" />
-    <Compile Include="Y86.cs" />
+    <Compile Include="CodeBlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">

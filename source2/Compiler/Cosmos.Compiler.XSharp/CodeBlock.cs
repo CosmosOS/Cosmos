@@ -6,10 +6,10 @@ using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Compiler.XSharp {
-    public class Y86 {
+    public class CodeBlock {
         public enum Flags { 
             Zero, Equal // Zero is synonym for Equal
-            , NotZero, NotEqual
+            , NotZero, NotEqual // Synonyms
             , GreaterThanOrEqualTo
             , LessThan
         };
