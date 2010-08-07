@@ -61,15 +61,38 @@
         was not content enough to simply conquer building and deployment, we want to 
         make developing operating system as easy as developing Windows applications. 
         Debugging a Cosmos based operating system should feel very familiar to you. Lets 
-        set a breakpoint.</p>
+        modify our project a little bit to show the effect, and set a breakpoint.</p>
     <p>
-        &nbsp;</p>
+        <img src="SNAG-0005.png" style="width: 870px; height: 493px" /></p>
     <p>
-        &nbsp;</p>
+        Now run the project again.</p>
     <p>
-        &nbsp;</p>
+        <img src="SNAG-0007.png" style="width: 1177px; height: 513px" /></p>
     <p>
-        ----------------------</p>
+        Note that the execution stopped at &quot;One&quot;? Thats becuase in Visual Studio our 
+        project has stopped on a breakpoint. Simply press F5 to continue just as you 
+        would in a normal application!</p>
+    <p>
+        Milestone 5 only supports breakpoints. In the coming weeks we will release 
+        updates for stepping and watches. They are relatively easy now that we&#39;ve done 
+        all the hard work of building the Visual Studio integration and communication 
+        with the running operating system. To debug on real hardware, you must use a 
+        serial cable. We are working on debugging over ethernet as well.</p>
+    <h3>
+        What&#39;s the catch?</h3>
+    <p>
+        There really is no catch. Everything I&#39;ve shown here is functioning, there are 
+        no mockups. However we still have a lot of work to go. Items of interest that 
+        are on our current task list include interfaces (necessary for foreach), file 
+        systems (partial support exists), threads, networking, and graphics. We have 
+        prototypes and experimentation for each, but none have been rolled into the 
+        mainline Cosmos development as of yet.</p>
+    <h3>
+        What was that Syslinux thing I saw on boot?</h3>
+    <p>
+        Cosmos does not run on Linux. A boot loader called Syslinux is used to boot 
+        Cosmos. After booting, Syslinux is not used. Syslinux is a bootloader and is not 
+        a Linux distro.</p>
     <h3>
         Obtaining Cosmos</h3>
     <ul>
@@ -77,100 +100,6 @@
         <li>Source Code - Both dev kit and user kit - <a href="http://Cosmos.CodePlex.com">
             http://Cosmos.CodePlex.com</a></li>
     </ul>
-    <h3>
-        ----------------</h3>
-    <p>
-        &nbsp;TThis is the demo, booted directly to hardware. There is no need for Windows, 
-        Linux or any other operating system to run this code. During the boot process 
-        you may notice SysLinux. SysLinux however is not a Linux distribution, but 
-        instead just a boot loader used to read files from the disk. We use SysLinux 
-        instead of Grub because it has support for PXE and other options. SysLinux is 
-        only used for initial loading of the Cosmos binaries and as soon as Cosmos is 
-        loaded SysLinux is unloaded is not used to run Cosmos code.</p>
-    <h3>
-        Graphics, Network, File Systems/h3>
-    <p>
-        Ease of use, or what I like to call &quot;Nail the basics&quot; is a priority for us. 
-        However graphics and other things will follow in the future. Currently we are 
-        working on a wide range of file systems including FAT and ext2. We are also 
-        working on Ethernet support and can already send basic UDP packets, and are 
-        working on TCP support as well.</p>
-    <h3>
-        DDebugging</h3>
-    <p>
-        Debugging operating systems is typically inconvenient and hinders progress. 
-        Because of this, just as we did with making the build and boot process, we 
-        strived to make the debugging process easy. The debugger is still a work in 
-        progress, but is already quite advanced for an operating system debugger.</p>
-    <p>
-        <img src="SNAG-0018.jpg" style="width: 268px; height: 85px" /></p>
-    <p>
-        Adding the Cosmos.Debug namespace gives the code access to communicate directly 
-        with the debugger.</p>
-    <p>
-        <img src="SNAG-0022.jpg" style="width: 294px; height: 161px" /></p>
-    <p>
-        In the Guess demo I am adding a Debugger.Send, which will write a debug string 
-        to the debugger. These can be used to track code execution, but can also be used 
-        for watching variables. In this case I will use it to write out the magic 
-        number.</p>
-    <p>
-        <img src="SNAG-0023.jpg" style="width: 347px; height: 125px" /></p>
-    <p>
-        Notice I have also added a Debugger.Break. This will force the program to 
-        execute a breakpoint at that location.</p>
-    <p>
-        Now let&#39;s run the Guess again. Which demo is booted is selected in Visual Studio 
-        simply by selecting it as the startup project for the solution.</p>
-    <p>
-        <img src="SNAG-0024.jpg" style="width: 253px; height: 100px" /></p>
-    <p>
-        This time in debugger options Source and User Only is selected. Source tells the 
-        debugger to debug C# code, rather than the lower level IL. And User Only tells 
-        the debugger not to trace into the Cosmos Kernel or the .NET libraries. This 
-        speeds up execution, but also lets me focus on tracing just the demo code.</p>
-    <p>
-        <img src="SNAG-0025.jpg" style="width: 743px; height: 551px" /></p>
-    <p>
-        Note that this time it did prompt us for the number yet? This is because it hit 
-        the breakpoint. Another window will appear as well, this is the Cosmos Debugger.</p>
-    <p>
-        <img src="SNAG-0026.jpg" style="width: 720px; height: 379px" /></p>
-    <p>
-        The message and breakpoint are displayed in the trace log, and the code is 
-        selected for the breakpoint. Breakpoints occur on the next statement after the 
-        requested break.</p>
-    <p>
-        Now we can use the Step button (F11, just like Visual Studio) to step through 
-        the code. Each step is recorded in the trace log and previous items can be 
-        selected to walk backwards through the code. The trace log functions similarly 
-        to the call stack window in Visual Studio.</p>
-    <p>
-        <img src="SNAG-0027.jpg" style="width: 683px; height: 460px" /></p>
-    <p>
-        Press continue (F5) and the code will run again until a breakpoint is 
-        encountered in code, or requested from the debugger. After continue, a new 
-        button will appear to that allows a forced instant break. After continue, the 
-        code will continue and we will be prompted for the number.</p>
-    <p>
-        <img src="SNAG-0028.jpg" style="width: 743px; height: 551px" /></p>
-    <p>
-        We can also turn tracing on and off for specific sections of code using the 
-        Cosmos.Debug namespace.</p>
-    <p>
-        <img src="SNAG-0029.jpg" style="width: 335px; height: 225px" /></p>
-    <p>
-        This will cause the trace log to be populated with all statement executions 
-        between the TraceOn and TraceOff without needing to step through each statement 
-        manually.</p>
-    <p>
-        <img src="SNAG-0030.jpg" style="width: 255px; height: 94px" /></p>
-    <p>
-        This time Cosmos &amp; User is selected to show more details in the trace log. 
-        Normally this option is only needed by developers working on Cosmos kernel 
-        source.</p>
-    <p>
-        <img src="SNAG-0031.jpg" style="width: 764px; height: 559px" /></p>
-    
+        
 </body>
 </html>
