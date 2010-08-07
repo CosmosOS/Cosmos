@@ -47,6 +47,7 @@ namespace Microsoft.VisualStudio.Project
 		#endregion
 
 		#region overridden properties
+
 		public override int SortPriority
 		{
 			get
@@ -315,11 +316,7 @@ namespace Microsoft.VisualStudio.Project
 		protected virtual ReferenceNode CreateReferenceNode(string referenceType, ProjectElement element)
 		{
 			ReferenceNode node = null;
-			if(referenceType == ProjectFileConstants.COMReference)
-			{
-				node = this.CreateComReferenceNode(element);
-			}
-			else if(referenceType == ProjectFileConstants.Reference)
+			if(referenceType == ProjectFileConstants.Reference)
 			{
 				node = this.CreateAssemblyReferenceNode(element);
 			}

@@ -101,7 +101,7 @@ namespace Cosmos.VS.Package {
 		public bool IgnoreDirty
 		{ get; set; }
 	 
-	        protected ProjectNode ProjectMgr 
+	        public ProjectNode ProjectMgr 
 	        { 
 	            get 
 	            { 
@@ -135,7 +135,7 @@ namespace Cosmos.VS.Package {
 				System.Diagnostics.Debug.Print(String.Format("{0}->FillConfigs", this.GetType().Name));
             }
 	 
-	        public void ApplyChanges() {
+	        public virtual void ApplyChanges() {
 				System.Diagnostics.Debug.Print(String.Format("{0}->ApplyChanges", this.GetType().Name));
 
 				if (this.Properties != null) {

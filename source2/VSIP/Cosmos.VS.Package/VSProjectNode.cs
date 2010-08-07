@@ -11,7 +11,7 @@ namespace Cosmos.VS.Package
     public class VSProjectNode : ProjectNode
     {
         internal static int imageIndex;
-        public override int ImageIndex
+        public override int ImageIndex  
         {
             get { return imageIndex; }
         }
@@ -41,6 +41,13 @@ namespace Cosmos.VS.Package
                 LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
             }
         }
+
+        public override MSBuildResult Build(uint vsopts, string config, IVsOutputWindowPane output, string target)
+        {
+            var xReferenceContainer = GetReferenceContainer();
+            
+            return base.Build(vsopts, config, output, target);
+        } 
 
         protected override MSBuildResult InvokeMsBuild(string target)
         {
@@ -99,6 +106,7 @@ namespace Cosmos.VS.Package
                 return new Guid[] {
          // typeof(PropPageEnvironment).GUID,
           //typeof(PropPageTest).GUID,
+          typeof(KernelPage).GUID,
 		  typeof(BuildPage).GUID,
 		  typeof(DebugPage).GUID,
 		  typeof(VMPage).GUID,

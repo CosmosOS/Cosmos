@@ -171,21 +171,31 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ProductVersion; ValueData: 1.0
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ProductName; ValueData: Cosmos Visual Studio Integration Package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: CompanyName; ValueData: Cosmos
+; BuildPage configuration page
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.BuildPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.BuildPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
+; DebugPage configuration page
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.DebugPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.DebugPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
+; VMPage configuration page
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.VMPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.VMPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
+; KernelPage configuration page
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.KernelPage
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.KernelPage
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
+
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: ; ValueData: VSProjectFactory
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: DisplayName; ValueData: Cosmos
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: DisplayProjectFileExtensions; ValueData: "Cosmos Project Files (*.Cosmos);*.Cosmos"

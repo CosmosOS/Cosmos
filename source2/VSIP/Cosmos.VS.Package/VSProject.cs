@@ -53,6 +53,7 @@ namespace Cosmos.VS.Package {
 	[ProvideObject(typeof(BuildPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[ProvideObject(typeof(DebugPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[ProvideObject(typeof(VMPage), RegisterUsing = RegistrationMethod.CodeBase)]
+    [ProvideObject(typeof(KernelPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[Guid(Guids.guidProjectPkgString)]
   public sealed class VSProject : ProjectPackage, IVsInstalledProduct {
         /// <summary>

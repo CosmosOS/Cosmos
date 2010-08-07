@@ -13,7 +13,7 @@ using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package {
 	[Guid(Guids.BuildPage)]
-	public partial class BuildPage : ConfigurationBase {
+	public partial class BuildPage : ConfigurationBase{
         public static TargetHost CurrentBuildTarget = TargetHost.VMWare;
 		public static event EventHandler BuildTargetChanged;
 

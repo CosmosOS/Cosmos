@@ -50,6 +50,11 @@ namespace Microsoft.VisualStudio.Project
 			}
 		}
 
+        public override string AssemblyFilename
+        {
+            get { throw new NotImplementedException(); }
+        }
+
 		/// <summary>
 		/// Returns the name of the assembly this reference refers to on this specific
 		/// machine. It can be different from the AssemblyName property because it can

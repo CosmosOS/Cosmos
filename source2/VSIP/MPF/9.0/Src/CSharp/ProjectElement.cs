@@ -59,6 +59,14 @@ namespace Microsoft.VisualStudio.Project
 			}
 		}
 
+        public ProjectNode ItemProject
+        {
+            get
+            {
+                return itemProject;
+            }
+        }
+
 		internal MSBuild.BuildItem Item
 		{
 			get

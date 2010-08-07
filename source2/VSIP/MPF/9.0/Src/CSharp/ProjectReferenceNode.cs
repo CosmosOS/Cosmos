@@ -3,11 +3,13 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -46,9 +48,23 @@ namespace Microsoft.VisualStudio.Project
 		/// </summary>
 		private bool isNodeValid;
 
+        private string mAssemblyFilename = null;
+
 		#endregion
 
 		#region properties
+
+        public override string AssemblyFilename
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(mAssemblyFilename))
+                {
+                    mAssemblyFilename = (string)ReferencedProjectObject.Properties.Item("OutputFilename").Value;
+                }
+                return mAssemblyFilename;
+            }
+        }
 
 		public override string Url
 		{
@@ -109,7 +125,142 @@ namespace Microsoft.VisualStudio.Project
 		{
 			get { return this.referencedProjectName; }
 		}
+        private static EnvDTE.Project FindProject(ProjectItems projectList, string referencedPathName)
+        {
+            foreach (ProjectItem xItem in projectList)
+            {
+                var xProj = xItem.SubProject;
+                if (xProj == null)
+                {
+                    continue;
+                }
 
+                // if this project is a solution folder, iterate it's child items
+                if (string.Compare(EnvDTE.Constants.vsProjectKindSolutionItems, xProj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    var xResult = FindProject(xProj.ProjectItems, referencedPathName);
+                    if (xResult != null)
+                    {
+                        return xResult;
+                    }
+                    continue;
+                }
+
+                //Skip this project if it is an umodeled project (unloaded)
+                if (string.Compare(EnvDTE.Constants.vsProjectKindUnmodeled, xProj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    continue;
+                }
+
+                // Get the full path of the current project.
+                EnvDTE.Property pathProperty = null;
+                try
+                {
+                    pathProperty = xProj.Properties.Item("FullPath");
+                    if (null == pathProperty)
+                    {
+                        // The full path should alway be availabe, but if this is not the
+                        // case then we have to skip it.
+                        continue;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                string prjPath = pathProperty.Value.ToString();
+                EnvDTE.Property fileNameProperty = null;
+                // Get the name of the project file.
+                try
+                {
+                    fileNameProperty = xProj.Properties.Item("FileName");
+                    if (null == fileNameProperty)
+                    {
+                        // Again, this should never be the case, but we handle it anyway.
+                        continue;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                prjPath = System.IO.Path.Combine(prjPath, fileNameProperty.Value.ToString());
+
+                // If the full path of this project is the same as the one of this
+                // reference, then we have found the right project.
+                if (NativeMethods.IsSamePath(prjPath, referencedPathName))
+                {
+                    return xProj;
+                }
+            }
+
+            return null;
+        }
+        private static EnvDTE.Project FindProject(Projects projectList, string referencedPathName)
+        {
+            foreach (EnvDTE.Project prj in projectList)
+            {
+                // if this project is a solution folder, iterate it's child items
+                if (string.Compare(EnvDTE.Constants.vsProjectKindSolutionItems, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    var xResult = FindProject(prj.ProjectItems, referencedPathName);
+                    if (xResult != null)
+                    {
+                        return xResult;
+                    }
+                    continue;
+                }
+
+                //Skip this project if it is an umodeled project (unloaded)
+                if (string.Compare(EnvDTE.Constants.vsProjectKindUnmodeled, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    continue;
+                }
+
+                // Get the full path of the current project.
+                EnvDTE.Property pathProperty = null;
+                try
+                {
+                    pathProperty = prj.Properties.Item("FullPath");
+                    if (null == pathProperty)
+                    {
+                        // The full path should alway be availabe, but if this is not the
+                        // case then we have to skip it.
+                        continue;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                string prjPath = pathProperty.Value.ToString();
+                EnvDTE.Property fileNameProperty = null;
+                // Get the name of the project file.
+                try
+                {
+                    fileNameProperty = prj.Properties.Item("FileName");
+                    if (null == fileNameProperty)
+                    {
+                        // Again, this should never be the case, but we handle it anyway.
+                        continue;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                prjPath = System.IO.Path.Combine(prjPath, fileNameProperty.Value.ToString());
+
+                // If the full path of this project is the same as the one of this
+                // reference, then we have found the right project.
+                if (NativeMethods.IsSamePath(prjPath, referencedPathName))
+                {
+                    return prj;
+                }
+            }
+            return null;
+        }
+        
 		/// <summary>
 		/// Gets the automation object for the referenced project.
 		/// </summary>
@@ -128,56 +279,8 @@ namespace Microsoft.VisualStudio.Project
 					{
 						return null;
 					}
-					foreach(EnvDTE.Project prj in dte.Solution.Projects)
-					{
-						//Skip this project if it is an umodeled project (unloaded)
-						if(string.Compare(EnvDTE.Constants.vsProjectKindUnmodeled, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
-						{
-							continue;
-						}
 
-						// Get the full path of the current project.
-						EnvDTE.Property pathProperty = null;
-						try
-						{
-							pathProperty = prj.Properties.Item("FullPath");
-							if(null == pathProperty)
-							{
-								// The full path should alway be availabe, but if this is not the
-								// case then we have to skip it.
-								continue;
-							}
-						}
-						catch(ArgumentException)
-						{
-							continue;
-						}
-						string prjPath = pathProperty.Value.ToString();
-						EnvDTE.Property fileNameProperty = null;
-						// Get the name of the project file.
-						try
-						{
-							fileNameProperty = prj.Properties.Item("FileName");
-							if(null == fileNameProperty)
-							{
-								// Again, this should never be the case, but we handle it anyway.
-								continue;
-							}
-						}
-						catch(ArgumentException)
-						{
-							continue;
-						}
-						prjPath = System.IO.Path.Combine(prjPath, fileNameProperty.Value.ToString());
-
-						// If the full path of this project is the same as the one of this
-						// reference, then we have found the right project.
-						if(NativeMethods.IsSamePath(prjPath, referencedProjectFullPath))
-						{
-							this.referencedProject = prj;
-							break;
-						}
-					}
+                    referencedProject = FindProject(dte.Solution.Projects, referencedProjectFullPath);
 				}
 
 				return this.referencedProject;
@@ -282,11 +385,13 @@ namespace Microsoft.VisualStudio.Project
 
 			string guidString = this.ItemNode.GetMetadata(ProjectFileConstants.Project);
 
+            base.ReferenceIdentifier = "project:" + guidString;
+            
 			// Continue even if project setttings cannot be read.
 			try
 			{
 				this.referencedProjectGuid = new Guid(guidString);
-
+                
 				this.buildDependency = new BuildDependency(this.ProjectMgr, this.referencedProjectGuid);
 				this.ProjectMgr.AddBuildDependency(this.buildDependency);
 			}
@@ -319,13 +424,15 @@ namespace Microsoft.VisualStudio.Project
 
 			int indexOfSeparator = projectReference.IndexOf('|');
 
-
+            ReferenceIdentifier = "ProjectReference:" + projectReference;
+                        
 			string fileName = String.Empty;
 
 			// Unfortunately we cannot use the path part of the projectReference string since it is not resolving correctly relative pathes.
 			if(indexOfSeparator != -1)
 			{
 				string projectGuid = projectReference.Substring(0, indexOfSeparator);
+                base.ReferenceIdentifier = "project:" + projectGuid;
 				this.referencedProjectGuid = new Guid(projectGuid);
 				if(indexOfSeparator + 1 < projectReference.Length)
 				{
@@ -358,7 +465,6 @@ namespace Microsoft.VisualStudio.Project
 			this.referencedProjectFullPath = Path.Combine(projectPath, justTheFileName);
 
 			this.buildDependency = new BuildDependency(this.ProjectMgr, this.referencedProjectGuid);
-
 		}
 		#endregion
 

@@ -10,7 +10,7 @@ using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package {
 	public partial class SubPropertyPageBase : UserControl {
-		private CustomPropertyPage subpageOwner;
+		protected CustomPropertyPage subpageOwner;
 
 		public SubPropertyPageBase() {
 			InitializeComponent();

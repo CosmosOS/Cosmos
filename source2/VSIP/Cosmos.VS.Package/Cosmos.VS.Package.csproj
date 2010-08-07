@@ -105,6 +105,12 @@
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="KernelPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="KernelPage.Designer.cs">
+      <DependentUpon>KernelPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="LogUtility.cs" />
     <Compile Include="SubPropertyPageBase.cs">
       <SubType>UserControl</SubType>
@@ -165,6 +171,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DebugPageVMWare.resx">
       <DependentUpon>DebugPageVMWare.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KernelPage.resx">
+      <DependentUpon>KernelPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="SubPropertyPageBase.resx">

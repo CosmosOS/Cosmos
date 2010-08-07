@@ -44,8 +44,8 @@
             // 
             this.table.ColumnCount = 3;
             this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 39F));
-            this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.66887F));
-            this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.33113F));
+            this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.table.Controls.Add(this.titleDivision1, 0, 4);
             this.table.Controls.Add(this.label2, 1, 3);
             this.table.Controls.Add(this.titleGeneral, 0, 0);
@@ -85,7 +85,7 @@
             this.titleDivision1.Location = new System.Drawing.Point(3, 87);
             this.titleDivision1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
             this.titleDivision1.Name = "titleDivision1";
-            this.titleDivision1.Size = new System.Drawing.Size(257, 15);
+            this.titleDivision1.Size = new System.Drawing.Size(259, 15);
             this.titleDivision1.TabIndex = 21;
             this.titleDivision1.Title = "Machine Level";
             // 
@@ -97,7 +97,7 @@
             this.label2.Location = new System.Drawing.Point(39, 60);
             this.label2.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(224, 21);
+            this.label2.Size = new System.Drawing.Size(226, 21);
             this.label2.TabIndex = 18;
             this.label2.Text = "Tracing:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -112,7 +112,7 @@
             this.titleGeneral.Location = new System.Drawing.Point(3, 3);
             this.titleGeneral.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
             this.titleGeneral.Name = "titleGeneral";
-            this.titleGeneral.Size = new System.Drawing.Size(257, 15);
+            this.titleGeneral.Size = new System.Drawing.Size(259, 15);
             this.titleGeneral.TabIndex = 0;
             this.titleGeneral.Title = "Visual Studio";
             // 
@@ -123,7 +123,7 @@
             this.label1.Location = new System.Drawing.Point(39, 33);
             this.label1.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(224, 21);
+            this.label1.Size = new System.Drawing.Size(226, 21);
             this.label1.TabIndex = 14;
             this.label1.Text = "Debug Level:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -132,18 +132,18 @@
             // 
             this.comboDebugMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboDebugMode.FormattingEnabled = true;
-            this.comboDebugMode.Location = new System.Drawing.Point(266, 33);
+            this.comboDebugMode.Location = new System.Drawing.Point(268, 33);
             this.comboDebugMode.Name = "comboDebugMode";
-            this.comboDebugMode.Size = new System.Drawing.Size(223, 21);
+            this.comboDebugMode.Size = new System.Drawing.Size(221, 21);
             this.comboDebugMode.TabIndex = 19;
             // 
             // comboTraceMode
             // 
             this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboTraceMode.FormattingEnabled = true;
-            this.comboTraceMode.Location = new System.Drawing.Point(266, 60);
+            this.comboTraceMode.Location = new System.Drawing.Point(268, 60);
             this.comboTraceMode.Name = "comboTraceMode";
-            this.comboTraceMode.Size = new System.Drawing.Size(223, 21);
+            this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
             this.comboTraceMode.TabIndex = 15;
             // 
             // checkEnableGDB

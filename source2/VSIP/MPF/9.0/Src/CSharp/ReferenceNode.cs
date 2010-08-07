@@ -60,6 +60,17 @@ namespace Microsoft.VisualStudio.Project
 			}
 		}
 
+        public string ReferenceIdentifier
+        {
+            get;
+            protected set;
+        }
+
+        public abstract string AssemblyFilename
+        {
+            get;
+        }
+
 		public override string Caption
 		{
 			get
