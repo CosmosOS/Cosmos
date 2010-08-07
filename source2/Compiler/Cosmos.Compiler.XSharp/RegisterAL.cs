@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using X86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.Compiler.Assembler.X86.X {
+namespace Cosmos.Compiler.XSharp {
     public class RegisterAL : Register08 {
         public static readonly RegisterAL Instance = new RegisterAL();
 

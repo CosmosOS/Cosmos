@@ -10,6 +10,7 @@ using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.IL2CPU.X86
 {

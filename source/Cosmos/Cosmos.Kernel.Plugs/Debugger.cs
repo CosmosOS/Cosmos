@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Asm = Cosmos.Compiler.Assembler;
-using Cosmos.Compiler.Assembler.X86.X;
-
+using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Cosmos.Debug.Debugger))]

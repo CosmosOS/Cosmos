@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
 // Later we can optimize it.
-namespace Cosmos.Compiler.Assembler.X86 {
-    public class DebugStub : X.Y86 {
-        //TODO: We never init the com port. Whats its default speed? 9600 N81 ?
-        // We should init it and set the speed
+namespace Cosmos.Compiler.XSharp {
+    public class DebugStub : Y86 {
+        //TODO: Move com port init to debugstub asm
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
         protected enum Tracing { Off = 0, On = 1 };
@@ -19,7 +19,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
 
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
-            Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
+            Assembler.Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
                 // 0 on start, set to 1 after Started signal is sent.
                 new DataMember("DebugStartedSent", 0),
 

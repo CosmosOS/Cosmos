@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler.X86.X {
+namespace Cosmos.Compiler.XSharp {
     public class Address {
 
         public static implicit operator Address(Register32 aRegister) {
