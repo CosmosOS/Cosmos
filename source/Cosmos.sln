@@ -140,7 +140,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler.X86", "..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj", "{94D079E4-3C66-486A-8407-EA6EC049FF53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakpointsKernel", "..\source2\Users\Kudzu\BreakpointsKernel\BreakpointsKernel.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakpointsKernel", "..\source2\Users\Kudzu\Breakpoints\BreakpointsKernel.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -293,10 +293,10 @@ Global
 		SccProjectTopLevelParentUniqueName36 = Cosmos.sln
 		SccProjectName36 = ../source2/Compiler/Cosmos.Compiler.Assembler.X86
 		SccLocalPath36 = ..\\source2\\Compiler\\Cosmos.Compiler.Assembler.X86
-		SccProjectUniqueName37 = ..\\source2\\Users\\Kudzu\\BreakpointsKernel\\BreakpointsKernel.csproj
+		SccProjectUniqueName37 = ..\\source2\\Users\\Kudzu\\Breakpoints\\BreakpointsKernel.csproj
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
-		SccProjectName37 = ../source2/Users/Kudzu/BreakpointsKernel
-		SccLocalPath37 = ..\\source2\\Users\\Kudzu\\BreakpointsKernel
+		SccProjectName37 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath37 = ..\\source2\\Users\\Kudzu\\Breakpoints
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -714,7 +714,6 @@ Global
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|x86.Build.0 = Debug|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|x86.ActiveCfg = Release|Any CPU
