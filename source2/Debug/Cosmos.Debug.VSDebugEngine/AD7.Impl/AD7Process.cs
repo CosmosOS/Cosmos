@@ -224,14 +224,16 @@ namespace Cosmos.Debug.VSDebugEngine {
                 // But allow overrides for dev kit, I dont want to have to run the install 
                 // for each change to gdb client.
                 string xGDBClientEXE = @"m:\source\Cosmos\source2\Debug\Cosmos.Debug.GDB\bin\Debug\Cosmos.Debug.GDB.exe";
-                var xPSInfo = new ProcessStartInfo(xGDBClientEXE);
-                xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
-                xPSInfo.UseShellExecute = false;
-                xPSInfo.RedirectStandardInput = false;
-                xPSInfo.RedirectStandardError = false;
-                xPSInfo.RedirectStandardOutput = false;
-                xPSInfo.CreateNoWindow = false;
-                Process.Start(xPSInfo);
+                if (File.Exists(xGDBClientEXE)) {
+                    var xPSInfo = new ProcessStartInfo(xGDBClientEXE);
+                    xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
+                    xPSInfo.UseShellExecute = false;
+                    xPSInfo.RedirectStandardInput = false;
+                    xPSInfo.RedirectStandardError = false;
+                    xPSInfo.RedirectStandardOutput = false;
+                    xPSInfo.CreateNoWindow = false;
+                    Process.Start(xPSInfo);
+                }
             }
         }
 
