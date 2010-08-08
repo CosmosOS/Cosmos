@@ -32,11 +32,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this.comboDebugMode = new System.Windows.Forms.ComboBox();
             this.table = new System.Windows.Forms.TableLayoutPanel();
+            this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
             this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.checkEnableGDB = new System.Windows.Forms.CheckBox();
-            this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
             this.table.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,7 +52,7 @@
             this.titleGeneral.Name = "titleGeneral";
             this.titleGeneral.Size = new System.Drawing.Size(257, 15);
             this.titleGeneral.TabIndex = 0;
-            this.titleGeneral.Title = "Visual Studio";
+            this.titleGeneral.Title = "Source";
             // 
             // label1
             // 
@@ -98,16 +98,27 @@
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.table.Size = new System.Drawing.Size(492, 288);
             this.table.TabIndex = 1;
+            // 
+            // checkStartCosmosGDB
+            // 
+            this.checkStartCosmosGDB.AutoSize = true;
+            this.checkStartCosmosGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 143);
+            this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
+            this.checkStartCosmosGDB.Size = new System.Drawing.Size(151, 18);
+            this.checkStartCosmosGDB.TabIndex = 27;
+            this.checkStartCosmosGDB.Text = "Use Cosmos GDB Client";
+            this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
@@ -141,30 +152,19 @@
             this.titleDivision1.Location = new System.Drawing.Point(3, 87);
             this.titleDivision1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
             this.titleDivision1.Name = "titleDivision1";
-            this.titleDivision1.Size = new System.Drawing.Size(257, 12);
+            this.titleDivision1.Size = new System.Drawing.Size(257, 15);
             this.titleDivision1.TabIndex = 25;
-            this.titleDivision1.Title = "Machine Level";
+            this.titleDivision1.Title = "Assembly Language";
             // 
             // checkEnableGDB
             // 
             this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkEnableGDB.Location = new System.Drawing.Point(42, 114);
+            this.checkEnableGDB.Location = new System.Drawing.Point(42, 117);
             this.checkEnableGDB.Name = "checkEnableGDB";
             this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
             this.checkEnableGDB.TabIndex = 24;
             this.checkEnableGDB.Text = "Enable GDB Debugger";
             this.checkEnableGDB.UseVisualStyleBackColor = true;
-            // 
-            // checkStartCosmosGDB
-            // 
-            this.checkStartCosmosGDB.AutoSize = true;
-            this.checkStartCosmosGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 140);
-            this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
-            this.checkStartCosmosGDB.Size = new System.Drawing.Size(199, 19);
-            this.checkStartCosmosGDB.TabIndex = 27;
-            this.checkStartCosmosGDB.Text = "AutoStart Cosmos GDB Frontend";
-            this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
             // 
             // DebugPageVMWare
             // 

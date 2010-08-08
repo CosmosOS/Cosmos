@@ -16,7 +16,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <Language>CSharp</Language>
     <KernelAssemblyReference>BreakpointsKernel.dll</KernelAssemblyReference>
-    <KernelAssemblyReferenceId>project:{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}</KernelAssemblyReferenceId>
+    <KernelAssemblyReferenceId>project:{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</KernelAssemblyReferenceId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,10 +25,11 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
+    <StartCosmosGDB>True</StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>

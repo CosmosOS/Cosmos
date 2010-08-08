@@ -47,6 +47,11 @@ namespace Cosmos.VS.Package
                     IsDirty = true;
                 }
                 checkStartCosmosGDB.Enabled = x;
+
+                // Only change it if its in response to user click, not loading
+                if (mPropsFilled) {
+                    checkStartCosmosGDB.Checked = checkEnableGDB.Checked;
+                }
             };
 
             checkStartCosmosGDB.CheckedChanged += delegate(Object sender, EventArgs e)
@@ -66,6 +71,7 @@ namespace Cosmos.VS.Package
             get { return mProps; }
         }
 
+        protected bool mPropsFilled = false;
         public override void FillProperties()
         {
             base.FillProperties();
@@ -82,6 +88,9 @@ namespace Cosmos.VS.Package
 
             mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
             comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
+
+            mPropsFilled = true;
         }
+
     }
 }
