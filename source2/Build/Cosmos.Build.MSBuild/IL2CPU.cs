@@ -71,6 +71,11 @@ namespace Cosmos.Build.MSBuild
                 {
                     return Assembly.LoadFrom(xPath);
                 }
+                xPath = Path.Combine(xDir, xShortName + ".exe");
+                if (File.Exists(xPath))
+                {
+                    return Assembly.LoadFrom(xPath);
+                }
             }
             if (mStaticLog != null)
             {
@@ -143,13 +148,36 @@ namespace Cosmos.Build.MSBuild
             set;
         }
 
+        public ITaskItem[] References
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         private bool Initialize()
         {
             CheckFirstTime();            
             DoInitTypes();
-
+            // load searchpaths:
+            Log.LogMessage("SearchPath: '{0}'", References);
+            if (References!=null)
+            {
+                var xSearchPaths = new List<string>(mSearchDirs);
+                foreach (var xRef in References)
+                {
+                    if (xRef.MetadataNames.OfType<string>().Contains("FullPath"))
+                    {
+                        var xDir = Path.GetDirectoryName(xRef.GetMetadata("FullPath"));
+                        if (!xSearchPaths.Contains(xDir))
+                        {
+                            xSearchPaths.Add(xDir);
+                        }
+                    }
+                }
+                mSearchDirs = xSearchPaths.ToArray();
+            }
             if (String.IsNullOrEmpty(DebugMode))
             {
                 mDebugMode = Cosmos.Build.Common.DebugMode.None;
@@ -198,7 +226,15 @@ namespace Cosmos.Build.MSBuild
                 }
 
                 LogTime("Engine execute started");
-                var xEntryAsm = Assembly.LoadFrom(InputAssembly);
+                Assembly xEntryAsm;
+                if (Path.IsPathRooted(InputAssembly))
+                {
+                    xEntryAsm = Assembly.LoadFrom(InputAssembly);
+                }
+                else
+                {
+                    xEntryAsm = Assembly.Load(Path.GetFileNameWithoutExtension(InputAssembly));
+                }
                 var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                 var xAsm = new AppAssemblerNasm(DebugCom);
                 xAsm.DebugMode = mDebugMode;
