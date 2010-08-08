@@ -28,7 +28,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         public ReverseSourceInfos mReverseSourceMappings;
         public SourceInfos mSourceMappings;
         public uint? mCurrentAddress = null;
-        public string mISO;
         protected readonly NameValueCollection mDebugInfo;
         protected TargetHost mTargetHost;
         protected VMwareFlavor mVMWareFlavor=VMwareFlavor.Player;
@@ -117,15 +116,23 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
         }
 
+        public string mISO;
+        public string mProjectFile;
         internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
             mCallback = aCallback; 
+
+            // Load passed in values
             mDebugInfo = new NameValueCollection();
             NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
-
+            //
             mISO = mDebugInfo["ISOFile"];
-
+            mProjectFile = mDebugInfo["ProjectFile"];
+            //
             var xGDBDebugStub = false;
             Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
+            //
+            var xGDBClient = false;
+            Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
 
             mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWare")) {
@@ -206,11 +213,26 @@ namespace Cosmos.Debug.VSDebugEngine {
                 throw new Exception("Error while starting application");
             }
 
-            
             mEngine = aEngine;
             mThread = new AD7Thread(aEngine, this);
             mCallback.OnThreadStart(mThread);
             mPort = aPort;
+
+            // Launch GDB Client
+            if (xGDBDebugStub && xGDBClient) {
+                // TODO: Need to integrate the GDB client to the build
+                // But allow overrides for dev kit, I dont want to have to run the install 
+                // for each change to gdb client.
+                string xGDBClientEXE = @"m:\source\Cosmos\source2\Debug\Cosmos.Debug.GDB\bin\Debug\Cosmos.Debug.GDB.exe";
+                var xPSInfo = new ProcessStartInfo(xGDBClientEXE);
+                xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
+                xPSInfo.UseShellExecute = false;
+                xPSInfo.RedirectStandardInput = false;
+                xPSInfo.RedirectStandardError = false;
+                xPSInfo.RedirectStandardOutput = false;
+                xPSInfo.CreateNoWindow = false;
+                Process.Start(xPSInfo);
+            }
         }
 
         private void DbgConnector_ConnectionLost(Exception e)
