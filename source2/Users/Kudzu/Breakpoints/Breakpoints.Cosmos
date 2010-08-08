@@ -15,8 +15,8 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <Language>CSharp</Language>
-    <KernelAssemblyReference>BreakpointsKernel.exe</KernelAssemblyReference>
-    <KernelAssemblyReferenceId>file:..\BreakpointsKernel\bin\Debug\BreakpointsKernel.exe</KernelAssemblyReferenceId>
+    <KernelAssemblyReference>BreakpointsKernel.dll</KernelAssemblyReference>
+    <KernelAssemblyReferenceId>project:{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}</KernelAssemblyReferenceId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,12 +61,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="BreakpointsKernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <ProjectReference Include="..\BreakpointsKernel\BreakpointsKernel.csproj">
       <Name>BreakpointsKernel</Name>
-      <AssemblyName>BreakpointsKernel.exe</AssemblyName>
-      <HintPath>..\BreakpointsKernel\bin\Debug\BreakpointsKernel.exe</HintPath>
+      <Project>{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</Project>
       <Private>True</Private>
-    </Reference>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">

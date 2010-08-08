@@ -235,7 +235,31 @@ namespace Cosmos.Build.MSBuild
                 {
                     xEntryAsm = Assembly.Load(Path.GetFileNameWithoutExtension(InputAssembly));
                 }
-                var xInitMethod = xEntryAsm.EntryPoint.DeclaringType.GetMethod("Init", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                // find the kernel's entry point now. we are looking for a public class Kernel, with public static void Boot()
+                MethodBase xInitMethod=null;
+                foreach (var xType in xEntryAsm.GetExportedTypes())
+                {
+                    if (xType.Name == "Kernel")
+                    {
+                        var xMethod = xType.GetMethod("Boot");
+                        if (!xMethod.IsStatic)
+                        {
+                            continue;
+                        }
+                        if (xInitMethod != null)
+                        {
+                            // already found an init method. log error.
+                            Log.LogError("Assembly has multiple Kernel.Boot methods!");
+                            return false;
+                        }
+                        xInitMethod = xMethod;
+                    }
+                }
+                if (xInitMethod == null)
+                {
+                    Log.LogError("No Kernel.Boot method found!");
+                    return false;
+                }
                 var xAsm = new AppAssemblerNasm(DebugCom);
                 xAsm.DebugMode = mDebugMode;
                 xAsm.TraceAssemblies = mTraceAssemblies;

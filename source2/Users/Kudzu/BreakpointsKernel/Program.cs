@@ -4,14 +4,9 @@ using System.Text;
 
 namespace BreakpointsKernel
 {
-    class Program
+    public class Kernel
     {
-        public static void Init()
-        {
-            Main();
-        }
-
-        static void Main()
+        public static void Boot()
         {
             Cosmos.Sys.Boot xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
