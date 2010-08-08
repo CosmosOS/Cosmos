@@ -1616,7 +1616,7 @@ namespace Microsoft.VisualStudio.Project
 					this.ShowProjectInSolutionPage = false;
 
 					// call the container to open the add reference dialog.
-					string browseFilters = "Component files (*.dll)" + "\0*.dll\0";
+					string browseFilters = "Component files (*.dll)" + "\0*.dll;*.exe\0";
 					ErrorHandler.ThrowOnFailure(componentDialog.ComponentSelectorDlg(
 						(System.UInt32)(__VSCOMPSELFLAGS.VSCOMSEL_MultiSelectMode | __VSCOMPSELFLAGS.VSCOMSEL_IgnoreMachineName),
 						(IVsComponentUser)this,
