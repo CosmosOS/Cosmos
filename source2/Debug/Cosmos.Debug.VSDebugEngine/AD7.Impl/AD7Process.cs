@@ -310,7 +310,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                         }
                         else
                         {
-                            MessageBox.Show("Breakpoint was hit, but not found in the sources. Most likely a but in the debug stub");
+                            MessageBox.Show("Breakpoint was hit, but not found in the sources. Most likely a bug in the debug stub (or Matthijs' VSIP code. :) )");
                         }
                     }
                     else
@@ -431,7 +431,6 @@ namespace Cosmos.Debug.VSDebugEngine {
             // We do this because VS requires a start, and then a resume after. So we have debughost which is a stub
             // that allows VS to "see" that. Here we resume it.
             mProcess.StandardInput.WriteLine();
-
         }
 
         void mProcess_Exited(object sender, EventArgs e) {
@@ -449,14 +448,23 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         internal void Continue() {
+            // F5
             mCurrentAddress = null;
             mDbgConnector.SendCommand(Command.Continue);
         }
 
-        internal void Step(enum_STEPKIND stepKind)
-        {
-            DebugMsg("StepKind: " + stepKind);
-            mDbgConnector.SendCommand(Command.Step);
+        internal void Step(enum_STEPKIND aKind) {
+            // F11: STEP_INTO
+            // F10: STEP_OVER
+            // Shift-F11: STEP_OUT - Doesnt appear in the menus?
+            // STEP_BACKWARDS - Supported at all by VS?
+            if (aKind == enum_STEPKIND.STEP_INTO) {
+                mDbgConnector.SendCommand(Command.Step);
+            } else {
+                MessageBox.Show("Currently only Trace Into (F11) is supported.");
+                // Have to call this otherwise VS is "stuck"
+                mCallback.OnStepComplete();
+            }
         }
     }
 }
