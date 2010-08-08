@@ -43,14 +43,6 @@
     <VMWareFlavor>Workstation</VMWareFlavor>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </None>
-    <None Include="Program.cs">
-      <SubType>Code</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Breakpoints.cgdb">
       <SubType>Content</SubType>
     </None>
