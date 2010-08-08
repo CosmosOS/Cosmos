@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label>DebugStub_WaitForSignature</Label>
+    <Label>StopHere</Label>
   </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
