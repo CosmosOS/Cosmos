@@ -116,10 +116,12 @@ namespace Cosmos.Compiler.XSharp {
             AL.Compare((byte)Command.Continue);
             JumpIf(Flags.Equal, "DebugStub_Break_Exit");
 
+      Label = "StopHere";
             AL.Compare((byte)Command.Step);
             JumpIf(Flags.NotEqual, "DebugStub_Break_Step_After");
             Memory["DebugBreakOnNextTrace", 32] = 1;
-            Jump("DebugStub_ProcessCmd_Exit");
+            Jump("DebugStub_Break_Exit");
+
             Label = "DebugStub_Break_Step_After";
             // Loop around and wait for another command
             Jump("DebugStub_WaitCmd");
