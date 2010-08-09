@@ -1,0 +1,24 @@
+<VSTemplate Version="2.0.0" Type="ProjectGroup" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Cosmos Project</Name>
+    <Description>A project for creating a Cosmos Kernel</Description>
+    <Icon>Kernel.ico</Icon>
+    <ProjectType>Cosmos</ProjectType>
+    <SortOrder>50</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+      <ProjectCollection>
+          <ProjectTemplateLink ProjectName="$safeprojectname$">
+              Proj\CosmosProj.vstemplate
+          </ProjectTemplateLink>
+          <ProjectTemplateLink ProjectName="$safeprojectname$Kernel">
+              ProjKernel\CSharpProj.vstemplate
+          </ProjectTemplateLink>
+      </ProjectCollection>
+      <CustomParameters>
+          <CustomParameter Name="guid1" Value="$guid1$"/>
+          <CustomParameter Name="guid2" Value="$guid2$"/>
+          <CustomParameter Name="kernelname" Value="$safeprojectname$"/>
+      </CustomParameters>
+  </TemplateContent>
+</VSTemplate>

@@ -2,16 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace $nameSpace$
+namespace $safeprojectname$
 {
-    public class $className$
+    public class Kernel
     {
-	    public static void Init()
-	    {
-    		Main();
-    	}
-
-        static void Main()
+	    public static void Boot()
         {
             // Boot the Cosmos kernel:
             Cosmos.Sys.Boot xBoot = new Cosmos.Sys.Boot();

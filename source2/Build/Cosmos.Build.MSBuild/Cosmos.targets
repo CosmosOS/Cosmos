@@ -36,7 +36,7 @@
                  References="@(ReferencePath)"
                  OutputDir="$(TargetDir)"
                  EnableLogging="true"
-                 EmitDebugSymbols="true">
+                 EmitDebugSymbols="$(DebugSymbols)">
             <Output TaskParameter="OutputFilename" PropertyName="KernelName"/>
         </IL2CPU>
         <Warning Text="$(TargetDir)$(KernelName).asm"/>

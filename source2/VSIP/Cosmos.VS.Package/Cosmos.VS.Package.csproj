@@ -35,6 +35,26 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
@@ -148,6 +168,36 @@
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CosmosProject.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\ProjKernel\CSharpProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\ProjKernel\CSharpProject.csproj">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\ProjKernel\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\ProjKernel\AssemblyInfo.cs">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProject.Cosmos">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\ProjKernel\Kernel.cs">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Proj\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
     <EmbeddedResource Include="BuildPage.resx">
       <DependentUpon>BuildPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -179,12 +229,6 @@
     <EmbeddedResource Include="VMPage.resx">
       <DependentUpon>VMPage.cs</DependentUpon>
     </EmbeddedResource>
-    <ZipProject Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
-    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos" />
-    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.ico" />
-    <ZipProject Include="Templates\Projects\CosmosProject\CosmosProject.vstemplate" />
-    <ZipProject Include="Templates\Projects\CosmosProject\Kernel.ico" />
-    <ZipProject Include="Templates\Projects\CosmosProject\Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
@@ -249,26 +293,6 @@
     <RegisterOutputPackage>true</RegisterOutputPackage>
     <RegisterWithCodebase>true</RegisterWithCodebase>
     <ProjectBasePath>..\MPF\9.0\Src\CSharp</ProjectBasePath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v9.0\VSSDK\Microsoft.VsSDK.targets" />

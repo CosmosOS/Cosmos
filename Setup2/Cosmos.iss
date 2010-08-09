@@ -141,7 +141,7 @@ Source: .\source\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.*; DestDir: {app}\
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\CosmosProject.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
 
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
