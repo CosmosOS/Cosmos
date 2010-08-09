@@ -189,13 +189,8 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.VMPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
-; KernelPage configuration page
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.KernelPage
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.KernelPage
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\CLSID\{{10FF43F2-A169-11DF-847B-150FDFD72085}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 
+; project type factory
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: ; ValueData: VSProjectFactory
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: DisplayName; ValueData: Cosmos
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\9.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: DisplayProjectFileExtensions; ValueData: "Cosmos Project Files (*.Cosmos);*.Cosmos"

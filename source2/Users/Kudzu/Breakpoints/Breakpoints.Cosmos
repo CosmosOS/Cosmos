@@ -4,19 +4,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3eee2aba-87b3-4dd7-b6c5-bef23d411136}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Cosmos.User.Kernel</RootNamespace>
-    <AssemblyName>CosmosKernel</AssemblyName>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Name>Project2</Name>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
-    <Language>CSharp</Language>
-    <KernelAssemblyReference>BreakpointsKernel.dll</KernelAssemblyReference>
-    <KernelAssemblyReferenceId>project:{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</KernelAssemblyReferenceId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,7 +47,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Breakpoints\BreakpointsKernel.csproj">
+    <ProjectReference Include="..\BreakpointsKernel\BreakpointsKernel.csproj">
       <Name>BreakpointsKernel</Name>
       <Project>{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</Project>
       <Private>True</Private>

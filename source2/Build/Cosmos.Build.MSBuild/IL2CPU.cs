@@ -98,13 +98,6 @@ namespace Cosmos.Build.MSBuild
 
         #region properties
         [Required]
-        public string InputAssembly
-        {
-            get;
-            set;
-        }
-
-        [Required]
         public string DebugMode{
             get;
             set;
@@ -129,26 +122,34 @@ namespace Cosmos.Build.MSBuild
             set;
         }
 
-        public string DebugSymbolsFile
+        [Required]
+        public ITaskItem[] References
         {
             get;
             set;
         }
 
-        public string LogFile
+        [Output]
+        public string OutputFilename
+        {
+            get;
+            set;
+        }
+
+        public bool EnableLogging
         {
             get;
             set;
         }
 
         [Required]
-        public string OutputFile
+        public string OutputDir
         {
             get;
             set;
         }
 
-        public ITaskItem[] References
+        public bool EmitDebugSymbols
         {
             get;
             set;
@@ -204,7 +205,6 @@ namespace Cosmos.Build.MSBuild
                 }
                 mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
-            AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(InputAssembly));
             return true;
         }
 
@@ -226,40 +226,45 @@ namespace Cosmos.Build.MSBuild
                 }
 
                 LogTime("Engine execute started");
-                Assembly xEntryAsm;
-                if (Path.IsPathRooted(InputAssembly))
-                {
-                    xEntryAsm = Assembly.LoadFrom(InputAssembly);
-                }
-                else
-                {
-                    xEntryAsm = Assembly.Load(Path.GetFileNameWithoutExtension(InputAssembly));
-                }
                 // find the kernel's entry point now. we are looking for a public class Kernel, with public static void Boot()
                 MethodBase xInitMethod=null;
-                foreach (var xType in xEntryAsm.GetExportedTypes())
+                #region detect entry point method
+                foreach (var xRef in References)
                 {
-                    if (xType.Name == "Kernel")
+                    if (xRef.MetadataNames.OfType<string>().Contains("FullPath"))
                     {
-                        var xMethod = xType.GetMethod("Boot");
-                        if (!xMethod.IsStatic)
+                        var xFile = xRef.GetMetadata("FullPath");
+                        if (File.Exists(xFile))
                         {
-                            continue;
+                            var xAssembly = Assembly.LoadFile(xFile);
+                            foreach (var xType in xAssembly.GetExportedTypes())
+                            {
+                                if (xType.Name == "Kernel")
+                                {
+                                    var xMethod = xType.GetMethod("Boot");
+                                    if (!xMethod.IsStatic)
+                                    {
+                                        continue;
+                                    }
+                                    if (xInitMethod != null)
+                                    {
+                                        // already found an init method. log error.
+                                        Log.LogError("Project has multiple Kernel.Boot methods!");
+                                        return false;
+                                    }
+                                    xInitMethod = xMethod;
+                                }
+                            }
                         }
-                        if (xInitMethod != null)
-                        {
-                            // already found an init method. log error.
-                            Log.LogError("Assembly has multiple Kernel.Boot methods!");
-                            return false;
-                        }
-                        xInitMethod = xMethod;
                     }
                 }
+                #endregion detect entry point method
                 if (xInitMethod == null)
                 {
                     Log.LogError("No Kernel.Boot method found!");
                     return false;
                 }
+                OutputFilename = xInitMethod.DeclaringType.Assembly.GetName().Name;
                 var xAsm = new AppAssemblerNasm(DebugCom);
                 xAsm.DebugMode = mDebugMode;
                 xAsm.TraceAssemblies = mTraceAssemblies;
@@ -272,18 +277,18 @@ namespace Cosmos.Build.MSBuild
                 using (var xScanner = new ILScanner(xAsm))
                 {
                     xScanner.TempDebug += x => Log.LogMessage(x);
-                    if (!String.IsNullOrEmpty(LogFile))
+                    if(EnableLogging)
                     {
-                        xScanner.EnableLogging(LogFile);
+                        xScanner.EnableLogging(Path.Combine(OutputDir, OutputFilename + ".log.html"));
                     }
                     xScanner.Execute(xInitMethod);
 
-                    using (var xOut = new StreamWriter(OutputFile, false))
+                    using (var xOut = new StreamWriter(Path.Combine(OutputDir, OutputFilename + ".asm"), false))
                     {
-                        if (!String.IsNullOrEmpty(DebugSymbolsFile))
+                        if(EmitDebugSymbols)
                         {
                             xNasmAsm.FlushText(xOut);
-                            xAsm.WriteDebugSymbols(DebugSymbolsFile);
+                            xAsm.WriteDebugSymbols(Path.Combine(OutputDir, OutputFilename + ".cxdb"));
                         }
                         else
                         {

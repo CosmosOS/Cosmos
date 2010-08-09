@@ -89,6 +89,11 @@ namespace Cosmos.Debug.VSDebugEngine {
             // -x: Auto power on VM. Must be small x, big X means something else.
             // -q: Close VMWare when VM is powered off.
             // Options must come beore the vmx, and cannot use shellexecute
+
+            if (String.IsNullOrEmpty(xVmwPath) || !File.Exists(xVmwPath))
+            {
+                MessageBox.Show("VWMare not installed, probably going to crash now!", "Cosmos DebugEngine", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             
         }
 
