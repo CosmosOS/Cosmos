@@ -153,7 +153,7 @@ namespace Cosmos.IL2CPU.X86
             new Jump { DestinationLabel = ".loop" };
             if (mComNumber > 0)
             {
-                var xStub = new DebugStub();
+                var xStub = new DebugStubOld();
                 xStub.Main(mComPortAddresses[mComNumber - 1]);
             }
             else
@@ -228,7 +228,7 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("Kernel_Stack",
                            new byte[0]));
             DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
-            DebugStub.EmitDataSection();
+            DebugStubOld.EmitDataSection();
         }
 
         protected override void OnBeforeFlush()
