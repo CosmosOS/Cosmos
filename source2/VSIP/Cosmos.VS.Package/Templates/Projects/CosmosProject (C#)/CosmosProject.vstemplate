@@ -8,17 +8,12 @@
   </TemplateData>
   <TemplateContent>
       <ProjectCollection>
-          <ProjectTemplateLink ProjectName="$safeprojectname$">
-              Proj\CosmosProj.vstemplate
-          </ProjectTemplateLink>
           <ProjectTemplateLink ProjectName="$safeprojectname$Kernel">
               ProjKernel\CSharpProj.vstemplate
           </ProjectTemplateLink>
+          <ProjectTemplateLink ProjectName="$safeprojectname$">
+              Proj\CosmosProj.vstemplate
+          </ProjectTemplateLink>
       </ProjectCollection>
-      <CustomParameters>
-          <CustomParameter Name="guid1" Value="$guid1$"/>
-          <CustomParameter Name="guid2" Value="$guid2$"/>
-          <CustomParameter Name="kernelname" Value="$safeprojectname$"/>
-      </CustomParameters>
   </TemplateContent>
 </VSTemplate>

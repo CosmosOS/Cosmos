@@ -74,6 +74,10 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
+    <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.TemplateWizardInterface.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.9.0" />
     <Reference Include="System" />
@@ -132,6 +136,8 @@
     <Compile Include="SubPropertyPageBase.Designer.cs">
       <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
     </Compile>
+    <Compile Include="Templates\GenerateGuidsWizard.cs" />
+    <Compile Include="Templates\UseGuidsWizard.cs" />
     <Compile Include="TitleDivision.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -168,6 +174,7 @@
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
+    <Content Include="Templates\Projects\CosmosProject %28C#%29\Readme.txt" />
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CosmosProject.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>

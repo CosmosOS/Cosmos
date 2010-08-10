@@ -14,4 +14,8 @@
     <TemplateContent>
         <Project File="CosmosProject.Cosmos" ReplaceParameters="true"/>
     </TemplateContent>
+    <WizardExtension>
+        <Assembly>Cosmos.VS.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3</Assembly>
+        <FullClassName>Cosmos.VS.Package.Templates.Wizards.UseGuidsWizard</FullClassName>
+    </WizardExtension>
 </VSTemplate>

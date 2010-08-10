@@ -528,14 +528,14 @@ namespace Microsoft.VisualStudio.Project
 				return false;
 			}
 
-			IVsHierarchy hierarchy = null;
+			//IVsHierarchy hierarchy = null;
 
-			hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, this.referencedProjectGuid);
-
-			if(hierarchy == null)
-			{
-				return false;
-			}
+            // MtW: this code has been disabled, fixes dependency and reference resolving issues.
+            //hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, this.referencedProjectGuid);
+            //if(hierarchy == null)
+            //{
+            //    return false;
+            //}
 
 			//If the Project is unloaded return false
 			if(this.ReferencedProjectObject == null)

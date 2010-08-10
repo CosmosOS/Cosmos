@@ -5,6 +5,8 @@ using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using IServiceProvider = System.IServiceProvider;
+using Cosmos.VS.Package;
+using Microsoft.VisualStudio.Project.Automation;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -12,6 +14,51 @@ namespace Microsoft.VisualStudio.Project
 	[CLSCompliant(false)]
 	public class SolutionListenerForProjectOpen : SolutionListener
 	{
+        public static string GetDisplayNameForHierarch(IVsHierarchy hierarchy)
+        {
+            if (hierarchy == null)
+            {
+                return "Hierarchy == null";
+            }
+            object xValue;
+            hierarchy.GetProperty(0xfffffffe, (int)__VSHPROPID.VSHPROPID_EditLabel, out xValue);
+            return (string)xValue;
+        }
+
+        internal static EnvDTE.Project GetProject(IVsHierarchy hierarchy)
+        {
+            object project;
+
+            ErrorHandler.ThrowOnFailure(
+                hierarchy.GetProperty(
+                    VSConstants.VSITEMID_ROOT,
+                    (int)__VSHPROPID.VSHPROPID_ExtObject,
+                    out project
+                )
+            );
+
+            return (project as EnvDTE.Project);
+        }
+
+        public static VSProjectNode GetCommonProject(EnvDTE.Project project)
+        {
+            OAProject oaProj = project as OAProject;
+            if (oaProj != null)
+            {
+                var common = oaProj.Project as VSProjectNode;
+                if (common != null)
+                {
+                    return common;
+                }
+            }
+            return null;
+        }
+
+        internal static VSProjectNode GetVSProject(EnvDTE.Project project)
+        {
+            return GetCommonProject(project) as VSProjectNode;
+        }
+
 		public SolutionListenerForProjectOpen(IServiceProvider serviceProvider)
 			: base(serviceProvider)
 		{
@@ -19,6 +66,8 @@ namespace Microsoft.VisualStudio.Project
 
 		public override int OnAfterOpenProject(IVsHierarchy hierarchy, int added)
 		{
+
+
 			// If this is a new project and our project. We use here that it is only our project that will implemnet the "internal"  IBuildDependencyOnProjectContainer.
 			if(added != 0 && hierarchy is IBuildDependencyUpdate)
 			{
