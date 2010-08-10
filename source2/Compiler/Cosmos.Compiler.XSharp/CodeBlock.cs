@@ -6,13 +6,15 @@ using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Compiler.XSharp {
-    public class CodeBlock {
+    public abstract class CodeBlock {
         public enum Flags { 
             Zero, Equal // Zero is synonym for Equal
             , NotZero, NotEqual // Synonyms
             , GreaterThanOrEqualTo
             , LessThan
         };
+
+        public abstract void Assemble();
 
         //TODO: Add registers as needed, not all are here yet
         public RegisterEAX EAX = RegisterEAX.Instance;

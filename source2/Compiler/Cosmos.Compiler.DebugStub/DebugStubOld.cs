@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Debug;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Debug;
+using Cosmos.Compiler.XSharp;
 
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
 // Later we can optimize it.
-namespace Cosmos.Compiler.XSharp {
+namespace Cosmos.Compiler.DebugStub {
     public class DebugStubOld : CodeBlock {
+        public override void Assemble() {
+        }
+
         //TODO: Move com port init to debugstub asm
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;

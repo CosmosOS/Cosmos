@@ -25,6 +25,9 @@ namespace Cosmos.Kernel.Plugs {
     }
 
     public class DebuggerAsm : CodeBlock {
+        public override void Assemble() {
+        }
+
         public void Break() {
             IfDefined("DEBUGSTUB");
             Memory["DebugBreakOnNextTrace", 32] = 1;

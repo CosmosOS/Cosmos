@@ -41,11 +41,14 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="AddressDirect.cs" />
     <Compile Include="AddressIndirect.cs" />
+    <Compile Include="CodeGroup.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="MemoryAction.cs" />
     <Compile Include="PortNumber.cs" />
