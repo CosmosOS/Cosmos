@@ -2,9 +2,9 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>$GeneratedGuid1$</ProjectGuid>
+        <ProjectGuid>$CosmosProjGuid$</ProjectGuid>
         <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-        <Name>$safeprojectname$</Name>
+        <Name>$CosmosProjectName$</Name>
         <BinFormat>elf</BinFormat>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -32,12 +32,11 @@
         <StartCosmosGDB>false</StartCosmosGDB>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\$safeprojectname$Kernel\$safeprojectname$Kernel.csproj">
-            <Name>$safeprojectname$Kernel</Name>
-            <Project>$GeneratedGuid2$</Project>
+        <ProjectReference Include=".\$KernelName$.csproj">
+            <Name>$KernelName$</Name>
+            <Project>$KernelGuid$</Project>
         </ProjectReference>
     </ItemGroup>
 
     <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
-
 </Project>

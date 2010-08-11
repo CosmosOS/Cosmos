@@ -1,14 +1,14 @@
 <VSTemplate Version="2.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
     <TemplateData>
-        <Name>ProjKernel</Name>
+        <Name>CSharp Kernel</Name>
         <Description>A project for creating a Cosmos Kernel</Description>
         <Icon>Kernel.ico</Icon>
-        <ProjectType>CSharp</ProjectType>
+        <ProjectType>Cosmos</ProjectType>
         <!--<SortOrder>50</SortOrder>
-    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>-->
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>CosmosProjectKernel</DefaultName>
-    <ProvideDefaultName>true</ProvideDefaultName>-->
+    <ProvideDefaultName>true</ProvideDefaultName>
     </TemplateData>
     <TemplateContent>
         <Project File="CSharpProject.csproj" ReplaceParameters="true">
@@ -18,6 +18,6 @@
     </TemplateContent>
     <WizardExtension>
         <Assembly>Cosmos.VS.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3</Assembly>
-        <FullClassName>Cosmos.VS.Package.Templates.Wizards.GenerateGuidsWizard</FullClassName>
+        <FullClassName>Cosmos.VS.Package.Templates.GenerateCosmosProjectWizard</FullClassName>
     </WizardExtension>
 </VSTemplate>
