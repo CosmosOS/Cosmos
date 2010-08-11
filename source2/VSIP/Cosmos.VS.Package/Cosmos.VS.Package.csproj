@@ -190,7 +190,17 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\AssemblyInfo.cs">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
-    <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
+      <ZipItem Include="Templates\Projects\CosmosExpress\CosmosProject.Cosmos">
+          <RootPath>Templates\Projects\CosmosExpress</RootPath>
+      </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosExpress\Kernel.ico">
+        <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    </ZipItem>
+      <ZipItem Include="Templates\Projects\CosmosExpress\CosmosExpress.vstemplate">
+          <RootPath>Templates\Projects\CosmosExpress</RootPath>
+      </ZipItem>
+      
+      <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </None>
     <EmbeddedResource Include="Templates\CosmosProject.Cosmos">
