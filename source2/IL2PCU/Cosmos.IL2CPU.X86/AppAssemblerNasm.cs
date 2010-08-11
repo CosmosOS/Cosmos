@@ -73,12 +73,12 @@ namespace Cosmos.IL2CPU.X86
               {
                   xCodeOffsets = new int[xSmbMethod.SequencePointCount];
                   var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                  var xCodeLines = new int[xSmbMethod.SequencePointCount];
+                  xCodeLineNumbers = new int[xSmbMethod.SequencePointCount];
                   var xCodeColumns = new int[xSmbMethod.SequencePointCount];
                   var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
                   var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
                   xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
-                   , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+                   , xCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
               }
           }
       }
@@ -346,7 +346,13 @@ namespace Cosmos.IL2CPU.X86
             // If the current position equals one of the offsets, then we have
             // reached a new atomic C# statement
             if (aCodeOffsets != null) {
-                if (aCodeOffsets.Contains(aOp.Position) == false) {
+                var xIndex = Array.IndexOf(aCodeOffsets, aOp.Position);
+                if (xIndex == -1) {
+                    return;
+                }
+                // 0xFEEFEE means hiddenline -> we dont want to stop there
+                if (xCodeLineNumbers[xIndex] == 0xFEEFEE)
+                {
                     return;
                 }
             }
@@ -396,6 +402,7 @@ namespace Cosmos.IL2CPU.X86
     }
 
     private int[] xCodeOffsets;
+    private int[] xCodeLineNumbers;
     protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
       base.AfterOp(aMethod, aOpCode);
       var xContents = "";
