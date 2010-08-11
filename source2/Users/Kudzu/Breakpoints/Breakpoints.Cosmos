@@ -14,7 +14,7 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
-    <BuildTarget>ISO</BuildTarget>
+    <BuildTarget>VMWare</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>

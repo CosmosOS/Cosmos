@@ -129,7 +129,7 @@ namespace Cosmos.Build.MSBuild
             set;
         }
 
-        [Output]
+        [Required]
         public string OutputFilename
         {
             get;
@@ -137,13 +137,6 @@ namespace Cosmos.Build.MSBuild
         }
 
         public bool EnableLogging
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public string OutputDir
         {
             get;
             set;
@@ -264,7 +257,7 @@ namespace Cosmos.Build.MSBuild
                     Log.LogError("No Kernel.Boot method found!");
                     return false;
                 }
-                OutputFilename = xInitMethod.DeclaringType.Assembly.GetName().Name;
+                var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
                 var xAsm = new AppAssemblerNasm(DebugCom);
                 xAsm.DebugMode = mDebugMode;
                 xAsm.TraceAssemblies = mTraceAssemblies;
@@ -279,16 +272,16 @@ namespace Cosmos.Build.MSBuild
                     xScanner.TempDebug += x => Log.LogMessage(x);
                     if(EnableLogging)
                     {
-                        xScanner.EnableLogging(Path.Combine(OutputDir, OutputFilename + ".log.html"));
+                        xScanner.EnableLogging(xOutputFilename + ".log.html");
                     }
                     xScanner.Execute(xInitMethod);
 
-                    using (var xOut = new StreamWriter(Path.Combine(OutputDir, OutputFilename + ".asm"), false))
+                    using (var xOut = new StreamWriter(OutputFilename, false))
                     {
                         if(EmitDebugSymbols)
                         {
                             xNasmAsm.FlushText(xOut);
-                            xAsm.WriteDebugSymbols(Path.Combine(OutputDir, OutputFilename + ".cxdb"));
+                            xAsm.WriteDebugSymbols(xOutputFilename + ".cxdb");
                         }
                         else
                         {

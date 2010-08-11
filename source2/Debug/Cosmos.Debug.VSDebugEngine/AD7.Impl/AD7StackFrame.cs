@@ -43,10 +43,11 @@ namespace Cosmos.Debug.VSDebugEngine
                 m_lineNum = (uint)xSourceMapping.Line;
                 m_numLocals = 0;
                 m_numParameters = 0;
+                xProcess.DebugMsg(String.Format("StackFrame: Returning: {0}#{1}[{2}]", m_documentName, m_functionName, m_lineNum));
             }
             else
             {
-                ;
+                xProcess.DebugMsg("StackFrame: No Source available");
             }
 
             // If source information is available, create the collections of locals and parameters and populate them with

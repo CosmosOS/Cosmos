@@ -62,11 +62,16 @@ namespace Cosmos.Build.MSBuild
             {
                 xFormat = "elf";
             }
-            return ExecuteTool(
+            var xResult = ExecuteTool(
                 Path.GetDirectoryName(OutputFile),
                 ExePath,
                 String.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile), xFormat.ToUpper()),
                 "NAsm");
+            if (xResult)
+            {
+                Log.LogMessage("{0} -> {1}", InputFile, OutputFile);
+            }
+            return xResult;
         }
 
 

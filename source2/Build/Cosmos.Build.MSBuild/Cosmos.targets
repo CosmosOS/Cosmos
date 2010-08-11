@@ -34,51 +34,52 @@
                  DebugCom="1"
                  UseNAsm="true"
                  References="@(ReferencePath)"
-                 OutputDir="$(TargetDir)"
+                 OutputFilename="$(TargetDir)$(MSBuildProjectName).asm"
                  EnableLogging="true"
-                 EmitDebugSymbols="$(DebugSymbols)">
-            <Output TaskParameter="OutputFilename" PropertyName="KernelName"/>
-        </IL2CPU>
-        <Warning Text="$(TargetDir)$(KernelName).asm"/>
-        <NAsm    InputFile="$(TargetDir)$(KernelName).asm"
-                 OutputFile="$(TargetDir)$(KernelName).obj"
+                 EmitDebugSymbols="$(DebugSymbols)"/>
+
+        <Warning Text="TargetDir = '$(TargetDir)'"/>
+        <Warning Text="MSBuildProjectName = '$(MSBuildProjectName)'"/>
+        
+        <NAsm    InputFile="$(TargetDir)$(MSBuildProjectName).asm"
+                 OutputFile="$(TargetDir)$(MSBuildProjectName).obj"
                  IsELF="$(IsELF)"
                  ExePath="$(NasmFile)" />
 
           <!--ELF only--> 
         <Ld      CosmosBuildDir="$(CosmosDir)\Build"
                  WorkingDir="$(TargetDir)"
-                 Arguments="-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o '$(TargetDir)$(KernelName).bin' '$(TargetDir)$(KernelName).obj'"
+                 Arguments="-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o '$(TargetDir)$(MSBuildProjectName).bin' '$(TargetDir)$(MSBuildProjectName).obj'"
                  Condition="$(IsELF) == 'true'"/>
-        <Delete Files="$(TargetDir)$(KernelName).obj" Condition="$(IsELF) == 'true'"/>
-        <ExtractMapFromElfFile  InputFile="$(TargetDir)$(KernelName).bin"
-                                OutputFile="$(TargetDir)$(KernelName).cmap"
+        <Delete Files="$(TargetDir)$(MSBuildProjectName).obj" Condition="$(IsELF) == 'true'"/>
+        <ExtractMapFromElfFile  InputFile="$(TargetDir)$(MSBuildProjectName).bin"
+                                OutputFile="$(TargetDir)$(MSBuildProjectName).cmap"
                                 WorkingDir="$(TargetDir)"
                                 CosmosBuildDir="$(CosmosDir)\Build"
                                 Condition="$(IsELF) == 'true'"/>
 
-        <CreateItem Include="$(TargetDir)$(KernelName).bin" Condition="$(IsELF) == 'true'">
+        <CreateItem Include="$(TargetDir)$(MSBuildProjectName).bin" Condition="$(IsELF) == 'true'">
             <Output TaskParameter="Include"
                     ItemName="TempFilesToCopy"/>
         </CreateItem>
         <Copy SourceFiles="@(TempFilesToCopy)"
               DestinationFiles="@(TempFilesToCopy->'$(TargetDir)\%(Filename).obj')"
               Condition="$(IsELF) == 'true'"/>
-        <Delete Files="$(TargetDir)$(KernelName).bin" Condition="$(IsELF) == 'true'"/>
+        <Delete Files="$(TargetDir)$(MSBuildProjectName).bin" Condition="$(IsELF) == 'true'"/>
 
 
          <!--End of ELF only-->
 
          <!--binary only--> 
         <ReadNAsmMapToCosmosMap InputBaseDir="$(TargetDir)"
-                                OutputFile="$(TargetDir)$(KernelName).cmap"
+                                OutputFile="$(TargetDir)$(MSBuildProjectName).cmap"
                                 Condition="$(IsELF) == 'false'"/>
          <!--end of binary only-->
 
 
          <!--todo: update cxdb to cxdbg--> 
-        <MakeISO InputFile="$(TargetDir)$(KernelName).obj"
-                 OutputFile="$(TargetDir)$(KernelName).iso"
+        <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).obj"
+                 OutputFile="$(TargetDir)$(MSBuildProjectName).iso"
                  CosmosBuildDir="$(CosmosDir)\Build" />
     </Target>
 
