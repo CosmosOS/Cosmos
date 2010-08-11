@@ -12,7 +12,7 @@ namespace Cosmos.Compiler.XSharp {
         public void Assemble() {
             var xThisType = this.GetType();
             foreach (var xType in xThisType.GetNestedTypes()) {
-                if (xType is CodeBlock) {
+                if (xType.IsSubclassOf(typeof(CodeBlock))) {
                     var xCtor = xType.GetConstructor(new Type[0]);
                     var xBlock = (CodeBlock)(xCtor.Invoke(new Object[0]));
 

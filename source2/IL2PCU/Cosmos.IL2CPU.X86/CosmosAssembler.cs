@@ -148,22 +148,21 @@ namespace Cosmos.IL2CPU.X86
 
             new Call { DestinationLabel = EntryPointName };
             new Label(".loop");
-            new ClrInterruptFlag();
-            new Halt();
+                new ClrInterruptFlag();
+                new Halt();
             new Jump { DestinationLabel = ".loop" };
+
             var xStub = new Cosmos.Compiler.DebugStub.DebugStub();
-            if (mComNumber > 0)
-            {
+            if (mComNumber > 0) {
                 xStub.Assemble();
 
                 var xStubOld = new Cosmos.Compiler.DebugStub.DebugStubOld();
                 xStubOld.Main(mComPortAddresses[mComNumber - 1]);
-            }
-            else
-            {
+            } else {
                 new Label("DebugStub_Step");
                 new Return();
             }
+
 #if !LFB_1024_8
             DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
             uint xFlags = 0x10003;
@@ -233,7 +232,7 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
 
             xStub.AssembleDataSection();
-            Cosmos.Compiler.DebugStub.DebugStubOld.EmitDataSection();
+            //Cosmos.Compiler.DebugStub.DebugStubOld.EmitDataSection();
         }
 
         protected override void OnBeforeFlush()

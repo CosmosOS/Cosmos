@@ -23,18 +23,21 @@ namespace Cosmos.Compiler.DebugStub {
             }
         }
 
-        public class Cls: CodeBlock {
+        public class Cls : CodeBlock {
             public override void Assemble() {
-                uint xBase = 0xB800;
+                uint xBase = 0xB8000;
                 
                 ESI = xBase;
                 // TODO: X# upgrade this
                 Label = "DebugStub_Cls_More";
-                Memory[ESI, 32] = 0x0A; // Colour
-                ESI++;
-                Memory[ESI, 32] = 0x00; // Text
-                ESI++;
-                ESI.Compare(xBase + 25 * 80 * 2);
+                    //TODO: Fix to direct memory write after
+                    AL = 0x0A;
+                    Memory[ESI, 8] = AL; // Colour
+                    ESI++;
+                    AL = 0x00;
+                    Memory[ESI, 8] = AL; // Text
+                    ESI++;
+                    ESI.Compare(xBase + 25 * 80 * 2);
                 JumpIf(Flags.LessThan, "DebugStub_Cls_More");
             }
         }
