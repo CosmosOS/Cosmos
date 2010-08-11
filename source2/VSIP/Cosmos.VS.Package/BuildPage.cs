@@ -143,7 +143,7 @@ namespace Cosmos.VS.Package {
         private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
             var xEnumValue = (EnumValue)comboTarget.SelectedItem;
             var xValue = (TargetHost)xEnumValue.Value;
-            if (xValue != TargetHost.VMWare) {
+            if (xValue != TargetHost.VMWare && xValue != TargetHost.ISO) {
                 MessageBox.Show("This type is temporarily unsupported.");
             }
         }

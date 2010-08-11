@@ -123,12 +123,13 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         public string mISO;
         public string mProjectFile;
-        internal AD7Process(string aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
+        internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
+        {
             mCallback = aCallback; 
 
             // Load passed in values
-            mDebugInfo = new NameValueCollection();
-            NameValueCollectionHelper.LoadFromString(mDebugInfo, aDebugInfo);
+            mDebugInfo = aDebugInfo;
+            
             //
             mISO = mDebugInfo["ISOFile"];
             mProjectFile = mDebugInfo["ProjectFile"];

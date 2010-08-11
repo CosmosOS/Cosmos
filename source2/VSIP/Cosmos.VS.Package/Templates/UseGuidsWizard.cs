@@ -18,6 +18,7 @@ namespace Cosmos.VS.Package.Templates.Wizards
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
         {
+
         }
 
         public void RunFinished()

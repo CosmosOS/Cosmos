@@ -6,6 +6,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
+using System.Collections.Specialized;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -355,6 +357,9 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 m_engineCallback = new EngineCallback(this, aAD7Callback);
 
+                var xDebugInfo = new NameValueCollection();
+                NameValueCollectionHelper.LoadFromString(xDebugInfo, aDebugInfo);
+
                 //string commandLine = EngineUtils.BuildCommandLine(exe, args);
                 //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
                 // We are being asked to debug a process when we currently aren't debugging anything
@@ -365,53 +370,52 @@ namespace Cosmos.Debug.VSDebugEngine
                 //   var  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
                 //}));
 
+                    AD7EngineCreateEvent.Send(this);
+                    var xProcess = new AD7Process(xDebugInfo, m_engineCallback, this, aPort);
+                    aProcess = xProcess;
+                    mProcess = xProcess;
+                    m_ad7ProgramId = xProcess.mID;
+                    //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
+                    mModule = new AD7Module();
+                    mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
 
-                AD7EngineCreateEvent.Send(this);
-                var xProcess = new AD7Process(aDebugInfo, m_engineCallback, this, aPort);
-                aProcess = xProcess;
-                mProcess = xProcess;
-                m_ad7ProgramId = xProcess.mID;
-                //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
-                mModule = new AD7Module();
-                mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
 
+                    //           DebuggedModule^ module = m_moduleList->First->Value;		
 
-                //           DebuggedModule^ module = m_moduleList->First->Value;		
+                    //CComBSTR bstrModuleName;
+                    //CComBSTR bstrSymbolPath;
+                    //bstrModuleName.Attach((BSTR)(System::Runtime::InteropServices::Marshal::StringToBSTR(module->Name).ToInt32()));
 
-                //CComBSTR bstrModuleName;
-                //CComBSTR bstrSymbolPath;
-                //bstrModuleName.Attach((BSTR)(System::Runtime::InteropServices::Marshal::StringToBSTR(module->Name).ToInt32()));
+                    //// Load symbols for the application's exe. This is the only symbol file the sample engine will load.
+                    //if (m_pSymbolEngine->LoadSymbolsForModule(bstrModuleName, &bstrSymbolPath))
+                    //{
+                    //    module->SymbolsLoaded = true;
+                    //    module->SymbolPath = gcnew String(bstrSymbolPath);
+                    //}	
 
-                //// Load symbols for the application's exe. This is the only symbol file the sample engine will load.
-                //if (m_pSymbolEngine->LoadSymbolsForModule(bstrModuleName, &bstrSymbolPath))
-                //{
-                //    module->SymbolsLoaded = true;
-                //    module->SymbolPath = gcnew String(bstrSymbolPath);
-                //}	
+                    //m_entrypointModule = module;
+                    //DebuggedThread^ thread = CreateThread(m_lastDebugEvent.dwThreadId, m_lastDebugEvent.u.CreateProcessInfo.hThread, (DWORD_PTR)m_lastDebugEvent.u.CreateProcessInfo.lpStartAddress);
 
-                //m_entrypointModule = module;
-                //DebuggedThread^ thread = CreateThread(m_lastDebugEvent.dwThreadId, m_lastDebugEvent.u.CreateProcessInfo.hThread, (DWORD_PTR)m_lastDebugEvent.u.CreateProcessInfo.lpStartAddress);
+                    //if (m_debugMethod == Launch)
+                    //{
+                    //    // Because of Com-re-entrancy, the engine must wait to send the fake mod-load and thread create events until after the
+                    //    // launch is complete. Save these references so the call to ResumeFromLaunch can send the events.
+                    //    m_entrypointModule = module;
+                    //    m_entrypointThread = thread;
 
-                //if (m_debugMethod == Launch)
-                //{
-                //    // Because of Com-re-entrancy, the engine must wait to send the fake mod-load and thread create events until after the
-                //    // launch is complete. Save these references so the call to ResumeFromLaunch can send the events.
-                //    m_entrypointModule = module;
-                //    m_entrypointThread = thread;
+                    //    // Do not continue the create process event until after the call to ResumeFromLaunch.
+                    //    fContinue = false;
+                    //}
+                    //else
+                    //{
+                    //    // This is an attach.
+                    //    // Fake up a thread create event for the entrypoint module and the first thread in the process for attach
+                    //m_callback->OnModuleLoad(module);
 
-                //    // Do not continue the create process event until after the call to ResumeFromLaunch.
-                //    fContinue = false;
-                //}
-                //else
-                //{
-                //    // This is an attach.
-                //    // Fake up a thread create event for the entrypoint module and the first thread in the process for attach
-                //m_callback->OnModuleLoad(module);
-
-                //m_callback->OnSymbolSearch(module, module->SymbolPath, module->SymbolsLoaded);
-                //    m_callback->OnThreadStart(thread);
-                //}
-                return VSConstants.S_OK;
+                    //m_callback->OnSymbolSearch(module, module->SymbolPath, module->SymbolsLoaded);
+                    //    m_callback->OnThreadStart(thread);
+                    //}
+                    return VSConstants.S_OK;
             }
             catch (Exception e)
             {
