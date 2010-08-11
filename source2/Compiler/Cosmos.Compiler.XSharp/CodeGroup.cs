@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
     public class CodeGroup {
+
+        public void AssembleDataSection() {
+        }
+
         public void Assemble() {
             var xThisType = this.GetType();
             foreach (var xType in xThisType.GetNestedTypes()) {
@@ -21,5 +25,6 @@ namespace Cosmos.Compiler.XSharp {
                 }
             }
         }
+
     }
 }

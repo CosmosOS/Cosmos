@@ -151,10 +151,13 @@ namespace Cosmos.IL2CPU.X86
             new ClrInterruptFlag();
             new Halt();
             new Jump { DestinationLabel = ".loop" };
+            var xStub = new Cosmos.Compiler.DebugStub.DebugStub();
             if (mComNumber > 0)
             {
-                var xStub = new Cosmos.Compiler.DebugStub.DebugStubOld();
-                xStub.Main(mComPortAddresses[mComNumber - 1]);
+                xStub.Assemble();
+
+                var xStubOld = new Cosmos.Compiler.DebugStub.DebugStubOld();
+                xStubOld.Main(mComPortAddresses[mComNumber - 1]);
             }
             else
             {
@@ -228,6 +231,8 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("Kernel_Stack",
                            new byte[0]));
             DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
+
+            xStub.AssembleDataSection();
             Cosmos.Compiler.DebugStub.DebugStubOld.EmitDataSection();
         }
 
