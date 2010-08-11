@@ -17,6 +17,18 @@ namespace Cosmos.Debug {
             }
         }
 
+        // TODO: Kudzu repacement methods for Cosmos.Hardware.DebugUtil
+        public static unsafe void SendMessage(string aModule, string aData) {
+            string xSingleString = "Message Module: " + aModule + " Data: " + aData;
+            Send(xSingleString);
+        }
+
+        public static unsafe void SendError(string aModule, string aData)
+        {
+            string xSingleString = "Error Module: " + aModule + " Data: " + aData;
+            Send(xSingleString);
+        }
+
         public unsafe static void ViewMemory()
         {
             ViewMemory(0);
