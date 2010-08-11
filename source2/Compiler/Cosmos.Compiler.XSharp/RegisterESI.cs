@@ -3,10 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Compiler.XSharp {
     public class RegisterESI : Register32 {
         public static readonly RegisterESI Instance = new RegisterESI();
+
+        public static RegisterESI operator ++(RegisterESI aRegister) {
+            new Inc { DestinationReg = aRegister.GetId() };
+            return aRegister;
+        }
+        public static RegisterESI operator --(RegisterESI aRegister) {
+            new Dec { DestinationReg = aRegister.GetId() };
+            return aRegister;
+        }
 
         public static implicit operator RegisterESI(ElementReference aReference) {
             Instance.Move(aReference);
