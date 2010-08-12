@@ -55,7 +55,7 @@ namespace Cosmos.Compiler.XSharp {
             return GetType().Name + mLabelCounter.ToString("X8").ToUpper();
         }
 
-        public void Call<T>() {
+        static public void Call<T>() {
             new Call { DestinationLabel = MakeLabel(typeof(T)) };
         }
         public void Call(string aLabel) {

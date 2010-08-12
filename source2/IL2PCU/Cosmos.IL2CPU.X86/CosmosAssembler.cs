@@ -10,6 +10,7 @@ using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.DebugStub;
 using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.IL2CPU.X86
@@ -143,20 +144,26 @@ namespace Cosmos.IL2CPU.X86
 
             new And { DestinationReg = Registers.EAX, SourceValue = 1 };
             new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-
             // END SSE INIT
 
+            if (mComNumber > 0) {
+                CodeBlock.Call<DebugStub.Init>();
+            }
+
+            // Jump to Kernel entry point
             new Call { DestinationLabel = EntryPointName };
+
+            // After Kernel is done, sit here and halt till next IRQ.
             new Label(".loop");
                 new ClrInterruptFlag();
                 new Halt();
             new Jump { DestinationLabel = ".loop" };
 
-            var xStub = new Cosmos.Compiler.DebugStub.DebugStub();
             if (mComNumber > 0) {
+                var xStub = new DebugStub();
                 xStub.Assemble();
 
-                var xStubOld = new Cosmos.Compiler.DebugStub.DebugStubOld();
+                var xStubOld = new DebugStubOld();
                 xStubOld.Main(mComPortAddresses[mComNumber - 1]);
             } else {
                 new Label("DebugStub_Step");
