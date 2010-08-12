@@ -14,7 +14,6 @@ namespace Cosmos.Compiler.DebugStub {
         public override void Assemble() {
         }
 
-        //TODO: Move com port init to debugstub asm
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
         protected enum Tracing { Off = 0, On = 1 };

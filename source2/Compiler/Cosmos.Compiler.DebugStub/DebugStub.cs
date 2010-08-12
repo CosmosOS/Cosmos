@@ -2,16 +2,78 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.Compiler.DebugStub {
     public class DebugStub : CodeGroup {
         protected const uint VidBase = 0xB8000;
+        static protected int mComNo = 0;
+
+        public DebugStub(int aComNo) {
+            mComNo = aComNo;
+        }
 
         // Called before Kernel runs. Inits debug stub, etc
         public class Init : CodeBlock {
             public override void Assemble() {
                 Call<Cls>();
+                Call<DisplayWaitMsg>();
+                Call<InitSerial>();
+            }
+        }
+
+        public class InitSerial : CodeBlock {
+            public override void Assemble() {
+                UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
+                UInt16 xComAddr = xComPortAddresses[mComNo - 1];
+                // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
+
+                // disable interrupts for serial stuff
+                DX = (UInt16)(xComAddr + 1);
+                AL = 0;
+                Port[DX] = AL;
+
+                // Enable DLAB (set baud rate divisor)
+                DX = (UInt16)(xComAddr + 3);
+                AL = 0x80;
+                Port[DX] = AL;
+
+                // 0x01 - 0x00 - 115200
+                // 0x02 - 0x00 - 57600
+                // 0x03 - 0x00 - 38400
+                //
+                // Set divisor (lo byte)
+                DX = xComAddr;
+                AL = 0x01;
+                Port[DX] = AL;
+                // hi byte
+                DX = (UInt16)(xComAddr + 1);
+                AL = 0x00;
+                Port[DX] = AL;
+                
+                // 8N1
+                DX = (UInt16)(xComAddr + 3);
+                AL = 0x03;
+                Port[DX] = AL;
+
+                // Enable FIFO, clear them, with 14-byte threshold
+                DX = (UInt16)(xComAddr + 2);
+                AL = 0xC7;
+                Port[DX] = AL;
+                
+                // 0x20 AFE Automatic Flow control Enable - May not be on all.. not sure for modern ones?
+                // 0x02 RTS
+                // 0x01 DTR
+                // Send 0x03 if no AFE
+                DX = (UInt16)(xComAddr + 4);
+                AL = 0x03;
+                Port[DX] = AL;
+            }
+        }
+
+        public class DisplayWaitMsg : CodeBlock {
+            public override void Assemble() {
                 ESI = AddressOf("DebugWaitMsg");
                 // 10 lines down, 20 cols in
                 EDI = DebugStub.VidBase + (10 * 80 + 20) * 2;

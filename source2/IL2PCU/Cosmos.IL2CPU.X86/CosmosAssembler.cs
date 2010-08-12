@@ -22,12 +22,9 @@ namespace Cosmos.IL2CPU.X86
     {
         //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
         protected byte mComNumber = 0;
-        protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
 
-        public CosmosAssembler(byte aComNumber)
-        {
+        public CosmosAssembler(byte aComNumber) {
             mComNumber = aComNumber;
-
         }
 
         private static string GetValidGroupName(string aGroup)
@@ -87,46 +84,6 @@ namespace Cosmos.IL2CPU.X86
 #endif
             new Comment(this, "some more startups todo");
             new ClrInterruptFlag();
-            if (mComNumber > 0)
-            {
-                UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
-                // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
-                //
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0 };
-                new Out { DestinationReg = Registers.AL }; // disable interrupts for serial stuff
-                //
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x80 };
-                new Out { DestinationReg = Registers.AL }; // Enable DLAB (set baud rate divisor)
-                //
-                // 0x01 - 0x00 - 115200
-                // 0x02 - 0x00 - 57600
-                // 0x03 - 0x00 - 38400
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x01 };
-                new Out { DestinationReg = Registers.AL }; // Set divisor (lo byte)
-                //
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x00 };
-                new Out { DestinationReg = Registers.AL }; //			  (hi byte)
-                //
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
-                new Out { DestinationReg = Registers.AL }; // 8 bits, no parity, one stop bit
-                //
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 2 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0xC7 };
-                new Out { DestinationReg = Registers.AL }; // Enable FIFO, clear them, with 14-byte threshold
-                //
-                // 0x20 AFE Automatic Flow control Enable - May not be on all.. not sure for modern ones?
-                // 0x02 RTS
-                // 0x01 DTR
-                // Send 0x03 if no AFE
-                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 4 };
-                new Move { DestinationReg = Registers.AL, SourceValue = 0x03 };
-                new Out { DestinationReg = Registers.AL }; 
-            }
 
             // SSE init
             // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
@@ -160,11 +117,12 @@ namespace Cosmos.IL2CPU.X86
             new Jump { DestinationLabel = ".loop" };
 
             if (mComNumber > 0) {
-                var xStub = new DebugStub();
+                var xStub = new DebugStub(mComNumber);
                 xStub.Assemble();
 
+                UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
                 var xStubOld = new DebugStubOld();
-                xStubOld.Main(mComPortAddresses[mComNumber - 1]);
+                xStubOld.Main(xComPortAddresses[mComNumber - 1]);
             } else {
                 new Label("DebugStub_Step");
                 new Return();
