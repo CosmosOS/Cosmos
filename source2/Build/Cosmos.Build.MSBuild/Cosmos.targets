@@ -38,9 +38,6 @@
                  EnableLogging="true"
                  EmitDebugSymbols="$(DebugSymbols)"/>
 
-        <Warning Text="TargetDir = '$(TargetDir)'"/>
-        <Warning Text="MSBuildProjectName = '$(MSBuildProjectName)'"/>
-        
         <NAsm    InputFile="$(TargetDir)$(MSBuildProjectName).asm"
                  OutputFile="$(TargetDir)$(MSBuildProjectName).obj"
                  IsELF="$(IsELF)"

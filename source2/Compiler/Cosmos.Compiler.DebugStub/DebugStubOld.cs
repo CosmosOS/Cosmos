@@ -500,6 +500,7 @@ namespace Cosmos.Compiler.DebugStub {
         public void Main(UInt16 aComAddr) {
             mComAddr = aComAddr;
             mComStatusAddr = (UInt16)(aComAddr + 5);
+            EmitDataSection();
             Emit();
 
             // Main entry point that IL2CPU generated code calls
