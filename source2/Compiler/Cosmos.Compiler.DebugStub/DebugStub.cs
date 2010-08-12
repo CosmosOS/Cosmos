@@ -18,9 +18,6 @@ namespace Cosmos.Compiler.DebugStub {
                 EAX.Pop(); // Is a local, cant use Return(4)
             }
 
-            static public void Call() {
-                CodeBlock.Call(typeof(WriteALToComPort));
-            }
         }
 
         public class Cls : CodeBlock {
