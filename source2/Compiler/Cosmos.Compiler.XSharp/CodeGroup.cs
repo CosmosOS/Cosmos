@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +17,7 @@ namespace Cosmos.Compiler.XSharp {
                     var xBlock = (CodeBlock)(xCtor.Invoke(new Object[0]));
 
                     // Issue label for the routine
-                    xBlock.Label = xThisType.Name + "_" + xType.Name;
+                    xBlock.Label = CodeBlock.MakeLabel(xThisType);
                     // Assemble the routine itself
                     xBlock.Assemble();
                     // Issue the return for the routine

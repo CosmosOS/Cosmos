@@ -14,8 +14,6 @@ namespace Cosmos.Compiler.XSharp {
             , LessThan
         };
 
-        public abstract void Assemble();
-
         //TODO: Add registers as needed, not all are here yet
         public RegisterEAX EAX = RegisterEAX.Instance;
         public RegisterAX AX = RegisterAX.Instance;
@@ -37,6 +35,14 @@ namespace Cosmos.Compiler.XSharp {
         public readonly Ports Port = new Ports();
         public readonly Memory Memory = new Memory();
 
+        public abstract void Assemble();
+
+        static public string MakeLabel(Type aType) {
+            var xParts = aType.FullName.Split('.');
+            string xLabel = xParts[xParts.Length - 1];
+            return xLabel.Replace('+', '_');
+        }
+
         public string Label {
             set { 
                 new Cosmos.Compiler.Assembler.Label(value); 
@@ -49,6 +55,9 @@ namespace Cosmos.Compiler.XSharp {
             return GetType().Name + mLabelCounter.ToString("X8").ToUpper();
         }
 
+        public void Call(Type aType) {
+            new Call { DestinationLabel = MakeLabel(aType) };
+        }
         public void Call(string aLabel) {
             new Call { DestinationLabel = aLabel };
         }

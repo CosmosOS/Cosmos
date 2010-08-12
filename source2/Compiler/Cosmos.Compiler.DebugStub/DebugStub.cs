@@ -11,9 +11,6 @@ namespace Cosmos.Compiler.DebugStub {
             // Input AL
             // Output: None
             // Modifies: EAX, EDX, ESI
-
-            // inherited .Call()
-
             public override void Assemble() {
                 //TODO: Make a data point to put this in instead of using stack
                 EAX.Push();
