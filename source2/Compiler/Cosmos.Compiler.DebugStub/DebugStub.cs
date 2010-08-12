@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Debug;
 using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.Compiler.DebugStub {
@@ -20,6 +21,45 @@ namespace Cosmos.Compiler.DebugStub {
                 Call<Cls>();
                 Call<DisplayWaitMsg>();
                 Call<InitSerial>();
+                Call<WaitForDbgHandshake>();
+            }
+        }
+
+        public class WaitForDbgHandshake : CodeBlock {
+            public override void Assemble() {
+                // "Clear" the UART out
+                AL = 0;
+                Call<DebugStub.WriteALToComPort>();
+
+                // QEMU has junk in the buffer when it first
+                // boots. VMWare doesn't...
+                // So we use this to "clear" it by doing 16
+                // reads. UART buffers are 16 bytes and 
+                // usually there are only a few junk bytes.
+                //for (int i = 1; i <= 16; i++) {
+                //    Call("ReadALFromComPortNoCheck");
+                //}
+
+                // QEMU (and possibly others) send some garbage across the serial line first.
+                // Actually they send the garbage in bound, but garbage could be inbound as well so we 
+                // keep this.
+                // To work around this we send a signature. DC then discards everything before the signature.
+                Push(Consts.SerialSignature);
+                ESI = ESP;
+                Call("WriteByteToComPort");
+                Call("WriteByteToComPort");
+                Call("WriteByteToComPort");
+                Call("WriteByteToComPort");
+                // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
+                EAX.Pop();
+
+                // We could use the signature as the start signal, but I prefer
+                // to keep the logic separate, especially in DC.
+                AL = (int)MsgType.Started; // Send the actual started signal
+                Call<DebugStub.WriteALToComPort>();
+
+                Call("DebugStub_WaitForSignature");
+                Call("DebugStub_ProcessCommandBatch");
             }
         }
 
@@ -73,6 +113,9 @@ namespace Cosmos.Compiler.DebugStub {
         }
 
         public class DisplayWaitMsg : CodeBlock {
+            // http://wiki.osdev.org/Text_UI
+            // Later can cycle for x changes of second register:
+            // http://wiki.osdev.org/Time_And_Date
             public override void Assemble() {
                 ESI = AddressOf("DebugWaitMsg");
                 // 10 lines down, 20 cols in
