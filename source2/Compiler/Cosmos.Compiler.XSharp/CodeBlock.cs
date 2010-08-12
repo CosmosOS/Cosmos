@@ -21,12 +21,19 @@ namespace Cosmos.Compiler.XSharp {
         public RegisterAL AL = RegisterAL.Instance;
         
         public RegisterEBX EBX = RegisterEBX.Instance;
+        //BX
+        //BH
         public RegisterBL BL = RegisterBL.Instance;
 
         public RegisterECX ECX = RegisterECX.Instance;
+        //CX
+        //CH
+        //CL
 
         public RegisterEDX EDX = RegisterEDX.Instance;
         public RegisterDX DX = RegisterDX.Instance;
+        //DH
+        //DL
 
         public RegisterEBP EBP = RegisterEBP.Instance;
         public RegisterESP ESP = RegisterESP.Instance;

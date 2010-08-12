@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using Cosmos.Kernel;
 
 namespace Cosmos.Debug {
