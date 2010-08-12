@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BinFormat>elf</BinFormat>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3eee2aba-87b3-4dd7-b6c5-bef23d411136}</ProjectGuid>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>Project2</Name>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildTarget>VMWare</BuildTarget>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+    <DebugMode>Source</DebugMode>
+    <EnableGDB>False</EnableGDB>
+    <TraceMode>
+    </TraceMode>
+    <VMWareFlavor>Player</VMWareFlavor>
+    <StartCosmosGDB>False</StartCosmosGDB>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildTarget>VMWare</BuildTarget>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+    <DebugMode>Source</DebugMode>
+    <EnableGDB>False</EnableGDB>
+    <TraceMode>
+    </TraceMode>
+    <VMWareFlavor>Workstation</VMWareFlavor>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Breakpoints.cgdb">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Compile last with NASM.bat">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Breakpoints\BreakpointsKernel2010.csproj">
+      <Name>BreakpointsKernel</Name>
+      <Project>{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+  <Target Name="BeforeBuild">
+  </Target>
+</Project>

@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cosmos.VS.Package</RootNamespace>
+    <AssemblyName>Cosmos.VS.Package</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectGuid>{61535AF6-4A1E-4691-B2BC-039851EF4850}</ProjectGuid>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\PublicAssemblies\EnvDTE.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build.Utilities.v3.5">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Debugger.Interop, Version=8.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.Designer.Interfaces, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\Microsoft Visual Studio 2008 SDK\VisualStudioIntegration\Common\Assemblies\Microsoft.VisualStudio.Designer.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0" />
+    <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.TemplateWizardInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
+    <Reference Include="Microsoft.VisualStudio.Shell.10.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BuildPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BuildPage.Designer.cs">
+      <DependentUpon>BuildPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigurationBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ConfigurationBase.Designer.cs">
+      <DependentUpon>ConfigurationBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomPropertyPage.Designer.cs">
+      <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugPage.Designer.cs">
+      <DependentUpon>DebugPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugPageSub.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugPageSub.Designer.cs">
+      <DependentUpon>DebugPageSub.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugPageVMWare.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugPageVMWare.Designer.cs">
+      <DependentUpon>DebugPageVMWare.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guids.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="LogUtility.cs" />
+    <Compile Include="SubPropertyPageBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SubPropertyPageBase.Designer.cs">
+      <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\GenerateCosmosProjectWizard.cs" />
+    <Compile Include="Templates\GenerateGuidsWizard.cs" />
+    <Compile Include="Templates\UseGuidsWizard.cs" />
+    <Compile Include="TitleDivision.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TitleDivision.Designer.cs">
+      <DependentUpon>TitleDivision.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UnsavedConfigChangesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UnsavedConfigChangesDialog.Designer.cs">
+      <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VMPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VMPage.Designer.cs">
+      <DependentUpon>VMPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VsConfigProvider.cs" />
+    <Compile Include="VsProjectConfig.cs" />
+    <Compile Include="VSProjectFactory.cs" />
+    <Compile Include="VSProjectNode.cs" />
+    <Compile Include="VSProject.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Images\alert.png" />
+    <None Include="bin\Images\alert1.png" />
+    <None Include="Key.snk" />
+    <Content Include="PLKResponse.html" />
+    <Content Include="Resources\Cosmos.ico" />
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Readme.txt">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProject.csproj">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\AssemblyInfo.cs">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosExpress\CosmosProject.Cosmos">
+      <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosExpress\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosExpress\CosmosExpress.vstemplate">
+      <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    </ZipItem>
+    <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </None>
+    <EmbeddedResource Include="Templates\CosmosProject.Cosmos">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </EmbeddedResource>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </None>
+    <EmbeddedResource Include="BuildPage.resx">
+      <DependentUpon>BuildPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigurationBase.resx">
+      <DependentUpon>ConfigurationBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomPropertyPage.resx">
+      <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugPage.resx">
+      <DependentUpon>DebugPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugPageSub.resx">
+      <DependentUpon>DebugPageSub.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugPageVMWare.resx">
+      <DependentUpon>DebugPageVMWare.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
+    <EmbeddedResource Include="SubPropertyPageBase.resx">
+      <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TitleDivision.resx">
+      <DependentUpon>TitleDivision.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UnsavedConfigChangesDialog.resx">
+      <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VMPage.resx">
+      <DependentUpon>VMPage.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
+      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
+      <Name>Cosmos.Hardware.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
+      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
+      <Name>Cosmos.Sys.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
+      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
+      <Name>Cosmos.Kernel.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
+      <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
+      <Name>Cosmos.Sys.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
+      <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
+      <Name>Cosmos.Sys</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
+      <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
+      <Name>Cosmos.Build.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
+      <Project>{BC6AE974-1F18-4A19-A956-5062E4D3FD53}</Project>
+      <Name>Cosmos.Build.MSBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj">
+      <Project>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</Project>
+      <Name>Cosmos.Debug.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj">
+      <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>
+      <Name>Cosmos.Debug.VSDebugEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
+      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
+      <Name>Cosmos.IL2CPU.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <PropertyGroup>
+    <!--
+    To specify a different registry root to register your package, uncomment the TargetRegistryRoot
+    tag and specify a registry root in it.
+    <TargetRegistryRoot></TargetRegistryRoot>
+    -->
+    <RegisterOutputPackage>true</RegisterOutputPackage>
+    <RegisterWithCodebase>true</RegisterWithCodebase>
+    <ProjectBasePath>..\MPF\9.0\Src\CSharp</ProjectBasePath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\VSSDK\Microsoft.VsSDK.targets" />
+  <Import Project="$(ProjectBasePath)\ProjectBase.Files" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
