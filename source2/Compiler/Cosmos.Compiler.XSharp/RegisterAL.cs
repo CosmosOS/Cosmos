@@ -14,6 +14,11 @@ namespace Cosmos.Compiler.XSharp {
             return Instance;
         }
 
+        public static implicit operator RegisterAL(char aValue) {
+            Instance.Move((byte)aValue);
+            return Instance;
+        }
+
         public static implicit operator RegisterAL(MemoryAction aAction) {
             Instance.Move(aAction);
             return Instance;

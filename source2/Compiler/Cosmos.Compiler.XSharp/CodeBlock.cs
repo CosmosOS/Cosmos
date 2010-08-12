@@ -17,6 +17,7 @@ namespace Cosmos.Compiler.XSharp {
         //TODO: Add registers as needed, not all are here yet
         public RegisterEAX EAX = RegisterEAX.Instance;
         public RegisterAX AX = RegisterAX.Instance;
+        //public RegisterAH AH = RegisterAH.Instance;
         public RegisterAL AL = RegisterAL.Instance;
         
         public RegisterEBX EBX = RegisterEBX.Instance;

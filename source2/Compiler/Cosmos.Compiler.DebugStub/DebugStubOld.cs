@@ -47,6 +47,8 @@ namespace Cosmos.Compiler.DebugStub {
                 , new DataMember("DebugStub_CommandID", 0)
                 // Breakpoint addresses
                 , new DataMember("DebugBPs", new int[256])
+                //TODO: Move to DebugStub (new)
+                , new DataMember("DebugWaitMsg", "Waiting for debugger connection...")
              });
         }
 

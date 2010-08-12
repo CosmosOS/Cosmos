@@ -12,37 +12,22 @@ namespace Cosmos.Compiler.DebugStub {
         public class Init : CodeBlock {
             public override void Assemble() {
                 Call<Cls>();
+                ESI = AddressOf("DebugWaitMsg");
                 // 10 lines down, 20 cols in
-                ESI = DebugStub.VidBase + (10 * 80 + 20) * 2;
+                EDI = DebugStub.VidBase + (10 * 80 + 20) * 2;
 
-                //TODO: X# upgrade this to accept char
-                AL = (byte)'H';
-                Memory[ESI, 8] = AL;
+                // Read and copy string till 0 terminator
+                Label = "DebugStub_Init_ReadChar";
+                AL = Memory[ESI, 8];
+                AL.Compare(0);
+                JumpIf(Flags.Equal, "DebugStub_Init_AfterMsg");
                 ESI++;
-                ESI++;
-
-                AL = (byte)'e';
-                Memory[ESI, 8] = AL; 
-                ESI++;
-                ESI++;
-
-                AL = (byte)'l';
-                Memory[ESI, 8] = AL;
-                ESI++;
-                ESI++;
-
-                AL = (byte)'l';
-                Memory[ESI, 8] = AL; 
-                ESI++;
-                ESI++;
-
-                AL = (byte)'o';
-                Memory[ESI, 8] = AL; 
-                ESI++;
-                ESI++;
-
-                Label = "temp2";
-                //Jump("temp2");
+                Memory[EDI, 8] = AL;
+                EDI++;
+                EDI++;
+                Jump("DebugStub_Init_ReadChar");
+                //TODO: Local labels in X#
+                Label = "DebugStub_Init_AfterMsg";
             }
         }
 

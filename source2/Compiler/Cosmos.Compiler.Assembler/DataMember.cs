@@ -52,13 +52,21 @@ namespace Cosmos.Compiler.Assembler
 
         private object[] UntypedDefaultValue;
 
-        public DataMember( string aName, params object[] aDefaultValue )
-        {
+        public DataMember(string aName, params object[] aDefaultValue) {
             Name = aName;
             UntypedDefaultValue = aDefaultValue;
         }
 
-        public DataMember( string aName, byte[] aDefaultValue )
+        public DataMember(string aName, string aValue) {
+            Name = aName;
+            var xBytes = ASCIIEncoding.ASCII.GetBytes(aValue);
+            var xBytes2 = new byte[xBytes.Length + 1];
+            xBytes.CopyTo(xBytes2, 0);
+            xBytes2[xBytes2.Length - 1] = 0;
+            RawDefaultValue = xBytes2;
+        }
+
+        public DataMember(string aName, byte[] aDefaultValue)
         {
             Name = aName;
             RawDefaultValue = aDefaultValue;
