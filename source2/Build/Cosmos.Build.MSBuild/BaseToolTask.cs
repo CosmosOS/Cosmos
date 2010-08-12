@@ -19,9 +19,23 @@ namespace Cosmos.Build.MSBuild
             xProcessStartInfo.RedirectStandardOutput = true;
             xProcessStartInfo.RedirectStandardError = true;
             xProcessStartInfo.CreateNoWindow = true;
-            using (var xProcess = Process.Start(xProcessStartInfo))
+            using (var xProcess = new Process())
             {
-                xProcess.WaitForExit();
+                xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    mErrors.Add(e.Data);
+                };
+                xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    mOutput.Add(e.Data);
+                };
+                xProcess.StartInfo = xProcessStartInfo;
+                mErrors = new List<string>();
+                mOutput = new List<string>();
+                xProcess.Start();
+                xProcess.BeginErrorReadLine();
+                xProcess.BeginOutputReadLine();
+                xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
                 if (xProcess.ExitCode != 0)
                 {
                     if (!xProcess.HasExited)
@@ -33,18 +47,17 @@ namespace Cosmos.Build.MSBuild
                     {
                         Log.LogError("Error occurred while invoking {0}", name);
                     }
-                    while (!xProcess.StandardOutput.EndOfStream)
+                    foreach (var xError in mErrors)
                     {
-                        Log.LogMessage("{0} output: {1}", name, xProcess.StandardOutput.ReadLine());
-                    }
-                    while (!xProcess.StandardError.EndOfStream)
-                    {
-                        Log.LogMessage("{0} error: {1}", name, xProcess.StandardError.ReadLine());
+                        Log.LogError(xError);
                     }
                     return false;
                 }
             }
             return true;
         }
+
+        private List<string> mErrors;
+        private List<string> mOutput;
     }
 }
