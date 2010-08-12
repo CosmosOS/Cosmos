@@ -8,11 +8,10 @@ namespace Cosmos.Compiler.DebugStub {
     public class DebugStub : CodeGroup {
 
         public class WriteALToComPort : CodeBlock {
-            // Input AL
+            // Input: AL
             // Output: None
             // Modifies: EAX, EDX, ESI
             public override void Assemble() {
-                //TODO: Make a data point to put this in instead of using stack
                 EAX.Push();
                 ESI = ESP;
                 Call("WriteByteToComPort");
@@ -27,7 +26,7 @@ namespace Cosmos.Compiler.DebugStub {
                 ESI = xBase;
                 // TODO: X# upgrade this
                 Label = "DebugStub_Cls_More";
-                    //TODO: Fix to direct memory write after
+                    //TODO: Fix to direct memory write after we fix the X# bug with Memory[ESI, 8] = 0x0A;
                     AL = 0x0A;
                     Memory[ESI, 8] = AL; // Colour
                     ESI++;
