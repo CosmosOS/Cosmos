@@ -147,7 +147,7 @@ namespace Cosmos.Compiler.DebugStub {
             AL = (int)MsgType.TracePoint;
 
             Label = "DebugStub_SendTraceType";
-            Call("WriteALToComPort");
+            Call(typeof(DebugStub.WriteALToComPort));
 
             // Send Calling EIP.
             ESI = AddressOf("DebugEIP");
@@ -166,7 +166,7 @@ namespace Cosmos.Compiler.DebugStub {
 
             // Write the type
             AL = (int)MsgType.Message;
-            Call("WriteALToComPort");
+            Call(typeof(DebugStub.WriteALToComPort));
 
             // Write Length
             ESI = EBP;
@@ -199,7 +199,7 @@ namespace Cosmos.Compiler.DebugStub {
 
             // Write the type
             AL = (int)MsgType.Pointer;
-            Call("WriteALToComPort");
+            Call(typeof(DebugStub.WriteALToComPort));
 
             // pointer value
             ESI = Memory[EBP + 8];
@@ -209,19 +209,6 @@ namespace Cosmos.Compiler.DebugStub {
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
 
-            Return();
-        }
-
-        // Input AL
-        // Output: None
-        // Modifies: EAX, EDX, ESI
-        protected void WriteALToComPort() {
-            Label = "WriteALToComPort";
-            //TODO: Make a data point to put this in instead of using stack
-            EAX.Push();
-            ESI = ESP;
-            Call("WriteByteToComPort");
-            EAX.Pop(); // Is a local, cant use Return(4)
             Return();
         }
 
@@ -317,7 +304,6 @@ namespace Cosmos.Compiler.DebugStub {
             SendTrace();
             SendText();
             SendPtr();
-            WriteALToComPort();
             WriteByteToComPort();
             ReadByteFromComPort();
             ReadALFromComPort();
@@ -343,7 +329,7 @@ namespace Cosmos.Compiler.DebugStub {
 
                 // "Clear" the UART out
                 AL = 0;
-                Call("WriteALToComPort");
+                Call(typeof(DebugStub.WriteALToComPort));
 
                 // QEMU has junk in the buffer when it first
                 // boots. VMWare doesn't...
@@ -370,7 +356,7 @@ namespace Cosmos.Compiler.DebugStub {
                 // We could use the signature as the start signal, but I prefer
                 // to keep the logic separate, especially in DC.
                 AL = (int)MsgType.Started; // Send the actual started signal
-                Call("WriteALToComPort");
+                Call(typeof(DebugStub.WriteALToComPort));
 
                 Call("DebugStub_WaitForSignature");
                 Call("DebugStub_ProcessCommandBatch");
@@ -495,9 +481,9 @@ namespace Cosmos.Compiler.DebugStub {
                 // We may need to revisit this in the future to ack not commands, but data chunks
                 // and move them to a buffer.
                 AL = (int)MsgType.CmdCompleted;
-                Call("WriteALToComPort");
+                Call(typeof(DebugStub.WriteALToComPort));
                 EAX = Memory["DebugStub_CommandID", 32];
-                Call("WriteALToComPort");
+                Call(typeof(DebugStub.WriteALToComPort));
             Label = "DebugStub_ProcessCmd_After";
 
             Label = "DebugStub_ProcessCmd_Exit";
