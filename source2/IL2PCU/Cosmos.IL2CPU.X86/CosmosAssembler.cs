@@ -230,9 +230,6 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataMember("Kernel_Stack",
                            new byte[0]));
             DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
-
-            xStub.AssembleDataSection();
-            //Cosmos.Compiler.DebugStub.DebugStubOld.EmitDataSection();
         }
 
         protected override void OnBeforeFlush()

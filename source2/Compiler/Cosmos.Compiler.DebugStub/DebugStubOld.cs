@@ -147,7 +147,7 @@ namespace Cosmos.Compiler.DebugStub {
             AL = (int)MsgType.TracePoint;
 
             Label = "DebugStub_SendTraceType";
-            Call(typeof(DebugStub.WriteALToComPort));
+            DebugStub.WriteALToComPort.Call();
 
             // Send Calling EIP.
             ESI = AddressOf("DebugEIP");
@@ -166,7 +166,7 @@ namespace Cosmos.Compiler.DebugStub {
 
             // Write the type
             AL = (int)MsgType.Message;
-            Call(typeof(DebugStub.WriteALToComPort));
+            DebugStub.WriteALToComPort.Call();
 
             // Write Length
             ESI = EBP;
@@ -199,7 +199,7 @@ namespace Cosmos.Compiler.DebugStub {
 
             // Write the type
             AL = (int)MsgType.Pointer;
-            Call(typeof(DebugStub.WriteALToComPort));
+            DebugStub.WriteALToComPort.Call();
 
             // pointer value
             ESI = Memory[EBP + 8];
@@ -329,7 +329,7 @@ namespace Cosmos.Compiler.DebugStub {
 
                 // "Clear" the UART out
                 AL = 0;
-                Call(typeof(DebugStub.WriteALToComPort));
+                DebugStub.WriteALToComPort.Call();
 
                 // QEMU has junk in the buffer when it first
                 // boots. VMWare doesn't...
@@ -356,7 +356,7 @@ namespace Cosmos.Compiler.DebugStub {
                 // We could use the signature as the start signal, but I prefer
                 // to keep the logic separate, especially in DC.
                 AL = (int)MsgType.Started; // Send the actual started signal
-                Call(typeof(DebugStub.WriteALToComPort));
+                DebugStub.WriteALToComPort.Call();
 
                 Call("DebugStub_WaitForSignature");
                 Call("DebugStub_ProcessCommandBatch");
@@ -481,9 +481,9 @@ namespace Cosmos.Compiler.DebugStub {
                 // We may need to revisit this in the future to ack not commands, but data chunks
                 // and move them to a buffer.
                 AL = (int)MsgType.CmdCompleted;
-                Call(typeof(DebugStub.WriteALToComPort));
+                DebugStub.WriteALToComPort.Call();
                 EAX = Memory["DebugStub_CommandID", 32];
-                Call(typeof(DebugStub.WriteALToComPort));
+                DebugStub.WriteALToComPort.Call();
             Label = "DebugStub_ProcessCmd_After";
 
             Label = "DebugStub_ProcessCmd_Exit";
