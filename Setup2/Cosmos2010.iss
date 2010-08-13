@@ -55,7 +55,7 @@ UninstallLogMode=overwrite
 ; we're changing file associations, so:
 ChangesAssociations=yes
 
-#include "Code.inc"
+#include "Code2010.inc"
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; InfoBeforeFile: .\setup2\Readme.txt
