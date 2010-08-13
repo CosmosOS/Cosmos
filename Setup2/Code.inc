@@ -18,7 +18,8 @@ var
   __VSNET2008_PATH,
   __VSNET2010_PATH,
   __VSNET2008_BASE_PATH,
-  __VSNET2010_BASE_PATH: string;
+  __VSNET2010_BASE_PATH,
+	__CSharpExpress2008ProjectTemplatePath: string;
   
 procedure InitializePaths;
 begin
@@ -59,6 +60,10 @@ __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETF
   __VSNET2008_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2008_PATH)+'..\..');
   if __VSNET2010 then
   __VSNET2010_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2010_PATH)+'..\..');
+  
+  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\9.0', 'UserProjectTemplatesLocation', __CSharpExpress2008ProjectTemplatePath);
+  
+  StringChangeEx(__CSharpExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
 
 end;
 
@@ -120,12 +125,20 @@ end;
 
 function Vb2010_Installed: Boolean;
 begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
+	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
-function csharp2008_Installed: Boolean;
+function booltostr(value: Boolean) : string;
 begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
+	if value then
+		Result := 'true'
+	else
+		Result := 'false';
+end;
+
+function csharp2008_Installed(test: string): Boolean;
+begin
+	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
 end;
 
 function csharp2010_Installed: Boolean;
@@ -210,6 +223,20 @@ begin
   Result := __NET_FRAMEWORK4_INSTALLED;
 end;
 
+function IsCSharpExpress2008Installed(dummy: string): boolean;
+begin
+	if (Length(Trim(__CSharpExpress2008ProjectTemplatePath)) > 0) then
+		Result := True
+	else
+		Result := False;
+end;
+
+function GetCSharpExpress2008ProjectTemplatePath(dummy: string) : string;
+begin
+	InitializePaths;
+	Result := __CSharpExpress2008ProjectTemplatePath;
+	SaveStringToFile('c:\setup.log', Format('C# Express TemplatePath: "%s"'#13#10, [Result]), true);
+end;
 
 function InitializeSetup: Boolean;
 begin

@@ -235,17 +235,20 @@ namespace Cosmos.Build.MSBuild
                                 if (xType.Name == "Kernel")
                                 {
                                     var xMethod = xType.GetMethod("Boot");
-                                    if (!xMethod.IsStatic)
+                                    if (xMethod != null)
                                     {
-                                        continue;
+                                        if (!xMethod.IsStatic)
+                                        {
+                                            continue;
+                                        }
+                                        if (xInitMethod != null)
+                                        {
+                                            // already found an init method. log error.
+                                            Log.LogError("Project has multiple Kernel.Boot methods!");
+                                            return false;
+                                        }
+                                        xInitMethod = xMethod;
                                     }
-                                    if (xInitMethod != null)
-                                    {
-                                        // already found an init method. log error.
-                                        Log.LogError("Project has multiple Kernel.Boot methods!");
-                                        return false;
-                                    }
-                                    xInitMethod = xMethod;
                                 }
                             }
                         }
