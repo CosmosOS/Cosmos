@@ -69,12 +69,20 @@ namespace Cosmos.Debug.VSDebugEngine
             //Send(eventObject, AD7ModuleLoadEvent.IID, null);
         }
 
-        public void OnOutputString(string outputString)
-        {
+        // Call this one for internal Cosmos dev.
+        // Can be turned off and should be turned off by default. Use an IFDEF or something.
+        public void OnOutputString(string outputString) {
+            if (false) {
+                //System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
+                var eventObject = new AD7OutputDebugStringEvent(outputString);
+                Send(eventObject, AD7OutputDebugStringEvent.IID, null);
+            }
+        }
+
+        // This is the user version, messages directly from Cosmos user code
+        public void OnOutputStringUser(string outputString) {
             //System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
-
-            AD7OutputDebugStringEvent eventObject = new AD7OutputDebugStringEvent(outputString);
-
+            var eventObject = new AD7OutputDebugStringEvent(outputString);
             Send(eventObject, AD7OutputDebugStringEvent.IID, null);
         }
 

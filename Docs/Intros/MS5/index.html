@@ -100,17 +100,37 @@
         debugger and use additional functionality. It is accessed using the Debugger 
         class in the Cosmos.Debug namespace in the Cosmos.Kernel assembly. This assembly 
         is used by all Cosmos projects.</p>
+    <h3>
+        Code Based Breakpoints</h3>
     <pre>Debugger.Break();</pre>
     <p>
         Break can be used to issue a code based break. Visual Studio will break on the 
-        line after this statement. Since Cosmos does not support conditional breaks in 
-        the IDE yet, code base breaks are very useful for implementing such. For 
-        example:</p>
+        line after this statement.     </p>
+    <p>
+        <img src="CosmosMS5/SNAG-0006.png" style="width: 509px; height: 174px" /></p>
+    <p>
+        Since Cosmos does not support conditional breakpoints in the IDE yet, code base 
+        breaks are very useful for implementing such. For example:</p>
     <pre>if (x == 5) {
     Debugger.Break();
 }</pre>
     <p>
-        &nbsp;</p>
+        Alternatively you can call the .NET class libary break:</p>
+    <pre>System.Diagnostics.Debugger.Break();</pre>
+    <p>
+        Both functions will produce the same result.</p>
+    <h3>
+        Debug Output</h3>
+    <p>
+        Debug strings can be output to the debug window of the host. Because Cosmos does 
+        not support watches yet, this functionality can be very useful for watching 
+        variable values and for performing tracing without breakpoints.</p>
+    <pre>Debugger.Send(&quot;Hello from Cosmos!&quot;);</pre>
+    <p>
+        When this line is executed, it will send a message over the debugging channel 
+        and it will appear in the Visual Studio output window.</p>
+    <p>
+        <img alt="" src="CosmosMS5/SNAG-0008.png" style="width: 454px; height: 118px" /></p>
     <h3>
         What&#39;s the catch?</h3>
     <p>

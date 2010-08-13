@@ -17,11 +17,11 @@ namespace Cosmos.Kernel.Plugs {
         [PlugMethod(Assembler = typeof(DebugSendPtr))]
         public static unsafe void SendPtr(object aPtr) { }
 
-		[PlugMethod(Assembler = typeof(DebugTraceOff))]
-        public static void TraceOff() { }
+		//[PlugMethod(Assembler = typeof(DebugTraceOff))]
+        //public static void TraceOff() { }
 
-		[PlugMethod(Assembler = typeof(DebugTraceOn))]
-        public static void TraceOn() { }
+		//[PlugMethod(Assembler = typeof(DebugTraceOn))]
+        //public static void TraceOn() { }
     }
 
     public class DebuggerAsm : CodeBlock {

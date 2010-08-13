@@ -273,7 +273,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         void DbgCmdText(string obj) {
-            mCallback.OnOutputString(obj + "\r\n");
+            mCallback.OnOutputStringUser(obj + "\r\n");
         }
 
         internal AD7Thread Thread {
