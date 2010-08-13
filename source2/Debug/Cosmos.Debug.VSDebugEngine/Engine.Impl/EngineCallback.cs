@@ -118,14 +118,10 @@ namespace Cosmos.Debug.VSDebugEngine
             Send(mBreak, AD7BreakEvent.IID, aThread);
         }
 
-        public void OnBreakpoint(AD7Thread thread, IList<IDebugBoundBreakpoint2> clients, uint address)
-        {
-            //AD7brea
-            IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
-
+        public void OnBreakpoint(AD7Thread thread, IList<IDebugBoundBreakpoint2> clients) {
+            var boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
             int i = 0;
-            foreach (var objCurrentBreakpoint in clients)
-            {
+            foreach (var objCurrentBreakpoint in clients) {
                 boundBreakpoints[i] = objCurrentBreakpoint;
                 i++;
             }
@@ -133,12 +129,9 @@ namespace Cosmos.Debug.VSDebugEngine
             // An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
             // should notify each bound breakpoint that it has been hit and evaluate conditions here.
             // The sample engine does not support these features.
-
-            AD7BoundBreakpointsEnum boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
-            
-            AD7BreakpointEvent eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
-
-            AD7Thread ad7Thread = (AD7Thread)thread;
+            var boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
+            var eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
+            var ad7Thread = (AD7Thread)thread;
             Send(eventObject, AD7BreakpointEvent.IID, ad7Thread);
         }
 

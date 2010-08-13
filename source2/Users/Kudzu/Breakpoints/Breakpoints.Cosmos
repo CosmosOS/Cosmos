@@ -21,7 +21,7 @@
     <EnableGDB>False</EnableGDB>
     <TraceMode>
     </TraceMode>
-    <VMWareFlavor>Player</VMWareFlavor>
+    <VMWareFlavor>Workstation</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

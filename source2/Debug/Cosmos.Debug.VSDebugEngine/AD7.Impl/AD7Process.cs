@@ -196,10 +196,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
             mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
-            mDbgConnector.OnDebugMsg += new Action<string>(delegate(string aMsg) {
-                DebugMsg(aMsg);
-            });
-            mDbgConnector.ConnectionLost = new Action<Exception>(DbgConnector_ConnectionLost    );
+            mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
+            mDbgConnector.ConnectionLost = new Action<Exception>(DbgConnector_ConnectionLost);
 
             System.Threading.Thread.Sleep(250);
             System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
@@ -288,11 +286,11 @@ namespace Cosmos.Debug.VSDebugEngine {
             DebugMsg("DbgCmdTrace");
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
-
-                    var xActualAddress = arg2; // no need to correct the address, as the debugstub does thiis now.
+                    // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
+                    // Dont need to correct the address, becuase DebugStub does it for us.
+                    var xActualAddress = arg2; 
                     DebugMsg("BP hit @ " + xActualAddress.ToString("X8").ToUpper());
 
-                    // when doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
                     var xActionPoints = new List<object>();
                     var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
                     
@@ -306,25 +304,19 @@ namespace Cosmos.Debug.VSDebugEngine {
                     }
 
                     mCurrentAddress = xActualAddress;
-                    //mCallback.onb
-                    if (xBoundBreakpoints.Count == 0)
-                    {
-                        if (mEngine.AfterBreak)
-                        {
+                    // if no matching breakpoint, its either a stepping operation, or a code based break
+                    if (xBoundBreakpoints.Count == 0) {
+                        // Is it a result of stepping operation?
+                        if (mEngine.AfterBreak) {
                             mCallback.OnStepComplete();
-                            //mCallback.OnBreakpoint(mThread, mEngine.Breakpoints, xActualAddress);
+                        } else {
+                            // Code based break. Tell VS to break.
+                            mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
                         }
-                        else
-                        {
-                            MessageBox.Show("Breakpoint was hit, but not found in the sources. Most likely a bug in the debug stub (or Matthijs' VSIP code. :) )");
-                        }
-                    }
-                    else
-                    {
-                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints), xActualAddress);
-                        //mEngine.Callback.OnBreakComplete(mThread, );
+                    } else {
+                        // Found a bound breakpoint
+                        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
                         mEngine.AfterBreak = true;
-                        //mEngine.Callback.OnBreak(mThread);
                     }
                     break;
                 }
@@ -335,7 +327,6 @@ namespace Cosmos.Debug.VSDebugEngine {
                 }
             }
         }
-
 
         #region IDebugProcess2 Members
 
@@ -468,7 +459,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 mDbgConnector.SendCommand(Command.Step);
             } else {
                 MessageBox.Show("Currently only Trace Into (F11) is supported.");
-                // Have to call this otherwise VS is "stuck"
+                // Have to call this otherwise VS gets "stuck"
                 mCallback.OnStepComplete();
             }
         }

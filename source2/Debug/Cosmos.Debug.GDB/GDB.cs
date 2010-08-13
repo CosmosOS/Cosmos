@@ -104,7 +104,7 @@ namespace Cosmos.Debug.GDB {
             mGDBProcess.StandardInput.AutoFlush = true;
 
             GetResponse();
-            SendCmd("symbol-file CosmosKernel.obj");
+            SendCmd("symbol-file Breakpoints.obj");
 
             while (!mConnected) {
                 var x = SendCmd("target remote :8832");

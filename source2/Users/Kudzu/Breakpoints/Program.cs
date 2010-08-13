@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Debug;
 
 namespace BreakpointsKernel
 {
@@ -13,6 +14,7 @@ namespace BreakpointsKernel
 
             Console.WriteLine("Test");
             Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back.");
+            Debugger.Break();
             Console.WriteLine("Test");
             while (true)
             {

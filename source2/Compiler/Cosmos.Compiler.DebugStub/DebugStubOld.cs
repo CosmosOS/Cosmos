@@ -326,9 +326,9 @@ namespace Cosmos.Compiler.DebugStub {
             ECX = 256;
             new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
             JumpIf(Flags.Equal, "DebugStub_Break");
-
             Label = "DebugStub_Executing_AfterBreakOnAddress";
-            // See if there is a requested break
+
+            // See if there is a break request
             Memory["DebugBreakOnNextTrace", 32].Compare(1);
             CallIf(Flags.Equal, "DebugStub_Break");
 
