@@ -16,7 +16,9 @@ namespace BreakpointsKernel
             Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back.");
             Debugger.Break();
             Console.WriteLine("Test");
-            while (true) {
+
+            while (true)
+            {
                 Console.Write("Input: ");
                 string xResult = Console.ReadLine();
                 Console.Write("Text typed: ");
