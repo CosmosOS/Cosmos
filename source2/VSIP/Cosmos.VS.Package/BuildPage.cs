@@ -58,6 +58,8 @@ namespace Cosmos.VS.Package {
                     mProps.Target = value;
                     IsDirty = true;
 
+                    comboFlavor.Visible = value == TargetHost.VMWare;
+
                     CurrentBuildTarget = value;
                     OnBuildTargetChanged(this, EventArgs.Empty);
                 }
@@ -147,10 +149,5 @@ namespace Cosmos.VS.Package {
                 MessageBox.Show("This type is temporarily unsupported.");
             }
         }
-
-        private void tableBuildOptions_Paint(object sender, PaintEventArgs e) {
-
-        }
-
 	}
 }

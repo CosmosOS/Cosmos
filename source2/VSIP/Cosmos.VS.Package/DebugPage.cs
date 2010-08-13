@@ -47,9 +47,9 @@ namespace Cosmos.VS.Package {
             bool xPageChange = false;
 			switch (target) {
                 case TargetHost.VMWare:
-                    if (!(pageSubPage is DebugPageVMWare))
+                    if (!(pageSubPage is DebugPageSub))
                     {
-                        pageSubPage = new DebugPageVMWare();
+                        pageSubPage = new DebugPageSub();
                         xPageChange = true;
                     }
                     break;

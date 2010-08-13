@@ -121,12 +121,6 @@
     <Compile Include="DebugPageSub.Designer.cs">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
     </Compile>
-    <Compile Include="DebugPageVMWare.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DebugPageVMWare.Designer.cs">
-      <DependentUpon>DebugPageVMWare.cs</DependentUpon>
-    </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogUtility.cs" />
@@ -244,9 +238,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DebugPageSub.resx">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DebugPageVMWare.resx">
-      <DependentUpon>DebugPageVMWare.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="SubPropertyPageBase.resx">

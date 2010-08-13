@@ -80,7 +80,6 @@
             this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableBuildOptions.Size = new System.Drawing.Size(492, 247);
             this.tableBuildOptions.TabIndex = 1;
-            this.tableBuildOptions.Paint += new System.Windows.Forms.PaintEventHandler(this.tableBuildOptions_Paint);
             // 
             // titleCompiler
             // 

@@ -159,6 +159,7 @@
             // checkStartCosmosGDB
             // 
             this.checkStartCosmosGDB.AutoSize = true;
+            this.checkStartCosmosGDB.Enabled = false;
             this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 143);
             this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
             this.checkStartCosmosGDB.Size = new System.Drawing.Size(195, 17);
