@@ -48,7 +48,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{A4478219
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}"
 	ProjectSection(SolutionItems) = preProject
-		..\source2\Users\Kudzu\Notes.html = ..\source2\Users\Kudzu\Notes.html
 		..\source2\Users\Kudzu\Old-IDANotes.html = ..\source2\Users\Kudzu\Old-IDANotes.html
 	EndProjectSection
 EndProject
@@ -306,7 +305,6 @@ Global
 		SccProjectName38 = ../source2/Users/Kudzu/VBProj
 		SccLocalPath38 = ..\\source2\\Users\\Kudzu\\VBProj
 		SccProjectUniqueName39 = ..\\source2\\Users\\Kudzu\\VBProj\\VBProjKernel.vbproj
-		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
 		SccProjectName39 = ../source2/Users/Kudzu/VBProj
 		SccLocalPath39 = ..\\source2\\Users\\Kudzu\\VBProj
 	EndGlobalSection
@@ -783,7 +781,6 @@ Global
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
-		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}

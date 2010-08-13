@@ -151,11 +151,9 @@ Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
 ; Templates
 ; ; Install files into VS Integrated Shell (which includes full Visual Studio)
 Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2008_Installed('dummy');
-Source: ".\Build\VSIP\Cosmos.zip";      DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly;
-Source: ".\Build\VSIP\CosmosKernel (C#).zip";  DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2008_Installed('dummy');
 ; ; Install templates into C# Express
-Source: ".\Build\VSIP\CosmosKernel (C#).zip";  DestDir: {code:GetCSharpExpress2008ProjectTemplatePath|}; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy');
-Source: ".\Build\VSIP\Cosmos.zip";               DestDir: c:\; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.zip";      DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'));
+Source: ".\Build\VSIP\CosmosKernel (C#).zip";  DestDir: {code:GetCSharpExpress2008ProjectTemplatePath|}; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'));
 
 
 [Registry]
