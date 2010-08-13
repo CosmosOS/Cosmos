@@ -142,9 +142,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler.X
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakpointsKernel", "..\source2\Users\Kudzu\Breakpoints\BreakpointsKernel.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
 EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "VBProj", "..\source2\Users\Kudzu\VBProj\VBProj.Cosmos", "{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBProjKernel", "..\source2\Users\Kudzu\VBProj\VBProjKernel.vbproj", "{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 38
+		SccNumberOfProjects = 40
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS04
 		SccLocalPath0 = .
@@ -297,6 +301,14 @@ Global
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
 		SccProjectName37 = ../source2/Users/Kudzu/Breakpoints
 		SccLocalPath37 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName38 = ..\\source2\\Users\\Kudzu\\VBProj\\VBProj.Cosmos
+		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
+		SccProjectName38 = ../source2/Users/Kudzu/VBProj
+		SccLocalPath38 = ..\\source2\\Users\\Kudzu\\VBProj
+		SccProjectUniqueName39 = ..\\source2\\Users\\Kudzu\\VBProj\\VBProjKernel.vbproj
+		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
+		SccProjectName39 = ../source2/Users/Kudzu/VBProj
+		SccLocalPath39 = ..\\source2\\Users\\Kudzu\\VBProj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -717,6 +729,24 @@ Global
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B}.Release|x86.ActiveCfg = Release|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -752,6 +782,8 @@ Global
 		{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
+		{59A881BF-EBE0-4A36-9C4A-4A17B8D9DC7B} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
+		{AE5E856F-C3B2-45E0-972B-802CB2F2C61E} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}

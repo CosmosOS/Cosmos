@@ -7,9 +7,8 @@ namespace BreakpointsKernel
 {
     public class Kernel
     {
-        public static void Boot()
-        {
-            Cosmos.Sys.Boot xBoot = new Cosmos.Sys.Boot();
+        public static void Boot() {
+            var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
             Console.WriteLine("Test");
@@ -17,8 +16,7 @@ namespace BreakpointsKernel
             Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back.");
             Debugger.Break();
             Console.WriteLine("Test");
-            while (true)
-            {
+            while (true) {
                 Console.Write("Input: ");
                 string xResult = Console.ReadLine();
                 Console.Write("Text typed: ");
