@@ -10,7 +10,7 @@ Public Class Kernel
         Debugger.Send("Hello from Cosmos!")
         Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back.")
         Console.WriteLine("Test")
-        while 
+        While True
             Console.Write("Input: ")
             Dim xResult = Console.ReadLine()
             Console.Write("Text typed: ")
