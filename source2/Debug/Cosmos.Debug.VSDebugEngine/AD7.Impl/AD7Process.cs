@@ -92,7 +92,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             if (String.IsNullOrEmpty(xVmwPath) || !File.Exists(xVmwPath))
             {
-                MessageBox.Show("VWMare not installed, probably going to crash now!", "Cosmos DebugEngine", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("VWMare is not installed, probably going to crash now!", "Cosmos DebugEngine", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             
         }

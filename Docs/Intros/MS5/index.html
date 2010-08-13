@@ -100,6 +100,17 @@
         debugger and use additional functionality. It is accessed using the Debugger 
         class in the Cosmos.Debug namespace in the Cosmos.Kernel assembly. This assembly 
         is used by all Cosmos projects.</p>
+    <pre>Debugger.Break();</pre>
+    <p>
+        Break can be used to issue a code based break. Visual Studio will break on the 
+        line after this statement. Since Cosmos does not support conditional breaks in 
+        the IDE yet, code base breaks are very useful for implementing such. For 
+        example:</p>
+    <pre>if (x == 5) {
+    Debugger.Break();
+}</pre>
+    <p>
+        &nbsp;</p>
     <h3>
         What&#39;s the catch?</h3>
     <p>
