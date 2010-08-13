@@ -45,7 +45,7 @@ namespace Cosmos.Sys {
                 Console.WriteLine("Detection went ok");
             }
             Console.WriteLine("Checked all devices");
-            Hardware.DebugUtil.SendNumber("VFS","Registered Filesystems",(uint)mFilesystems.Count,32);
+            Cosmos.Debug.Debugger.SendNumber("VFS","Registered Filesystems",(uint)mFilesystems.Count,32);
             Console.WriteLine("End check");
             if (mFilesystems.Count == 0)
             {
@@ -368,11 +368,11 @@ namespace Cosmos.Sys {
 
         public static string ReadFileAsString(string aFile)
         {
-            Hardware.DebugUtil.SendMessage("ReadFile", "Start reading file now");
+            Cosmos.Debug.Debugger.SendMessage("ReadFile", "Start reading file now");
             var xFile = GetFileEntry(aFile);
-            Hardware.DebugUtil.SendMessage("ReadFile", "Found file " + xFile.Id.ToString());
+            Cosmos.Debug.Debugger.SendMessage("ReadFile", "Found file " + xFile.Id.ToString());
             var xFS = xFile.Filesystem;//GetFileSystemFromPath(aFile, 1);
-            //Hardware.DebugUtil.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
+            //Cosmos.Debug.Debugger.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
 
             byte[] xSingleBlockBuffer = new byte[xFS.BlockSize];
             byte[] xAllBlocksBuffer = new byte[xFile.Size];
@@ -380,16 +380,16 @@ namespace Cosmos.Sys {
             if ((xAllBlocksBuffer.Length % xSingleBlockBuffer.Length) > 0) {
                 xBlockCount++;
             }
-            Hardware.DebugUtil.SendNumber("ReadFile", "xBlockCount", (uint)xBlockCount, 32);
+            Cosmos.Debug.Debugger.SendNumber("ReadFile", "xBlockCount", (uint)xBlockCount, 32);
             for (uint i = 0; i < xBlockCount; i++)
             {
-                Hardware.DebugUtil.SendMessage("ReadFile", "Reading block " + i.ToString());
+                Cosmos.Debug.Debugger.SendMessage("ReadFile", "Reading block " + i.ToString());
                 //Read the block
                 if (!xFS.ReadBlock(xFile.Id, i, xSingleBlockBuffer))
                 {
                     return "";
                 }
-                Hardware.DebugUtil.SendMessage("ReadFile", "After ReadBlock");
+                Cosmos.Debug.Debugger.SendMessage("ReadFile", "After ReadBlock");
                 //int xCurLength = xAllBlocksBuffer.Length % xSingleBlockBuffer.Length;
                 int xCurLength = (int)xFS.BlockSize;
                 if(i == (xBlockCount-1)) {
@@ -398,7 +398,7 @@ namespace Cosmos.Sys {
                         xCurLength = (int)(xFile.Size % xFS.BlockSize);
                     }
                 }
-                Hardware.DebugUtil.SendNumber("ReadFile", "xCurLength", (uint)xCurLength, 32);
+                Cosmos.Debug.Debugger.SendNumber("ReadFile", "xCurLength", (uint)xCurLength, 32);
                 //if (xCurLength == 0)
                 //{
                 //    xCurLength = xSingleBlockBuffer.Length;
@@ -514,33 +514,33 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         public static FilesystemEntry GetFileEntry(String aFile)
         {
-            Hardware.DebugUtil.SendMessage("GetFileEntry", "Searching for file " + aFile);
+            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Searching for file " + aFile);
             string xFileName = Path.GetFileName(aFile);
-            Hardware.DebugUtil.SendMessage("GetFileEntry", "Filename is " + xFileName);
+            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Filename is " + xFileName);
 
             //Find the directory first.
             var xDirectory = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aFile) + Path.DirectorySeparatorChar); 
-            Hardware.DebugUtil.SendMessage("GetFileEntry", "Directory is " + xDirectory.Name);
+            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Directory is " + xDirectory.Name);
 
             //Then find file in that directory
             //var xFS = GetFileSystemFromPath(aFile, 1);
-            //Hardware.DebugUtil.SendMessage("GetFileEntry", "Got filesystem");
+            //Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Got filesystem");
 
             //FilesystemEntry[] xEntries = xFS.GetDirectoryListing(xDirectory.Id);
-            //Hardware.DebugUtil.SendMessage("GetFileEntry", "Got Directory Listing");
+            //Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Got Directory Listing");
 
             FilesystemEntry[] xEntries = VFSManager.GetDirectoryListing(xDirectory);
             Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Found " + xEntries.Length + " entries");
 
             foreach (FilesystemEntry xEntry in xEntries)
             {
-                Hardware.DebugUtil.SendMessage("GetFileEntry", "Matching " + xEntry.Name + " with " + xFileName);
+                Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Matching " + xEntry.Name + " with " + xFileName);
                 if (xEntry.Name.Equals(xFileName))
                     return xEntry;
             }
 
             //throw new FileNotFoundException();
-            Hardware.DebugUtil.SendMessage("GetFileEntry", "File not found: " + aFile);
+            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "File not found: " + aFile);
             return null;
         }
 

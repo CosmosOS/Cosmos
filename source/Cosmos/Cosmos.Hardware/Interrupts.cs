@@ -225,7 +225,7 @@ namespace Cosmos.Hardware {
         {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
-            //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
+            //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //Console.WriteLine("IRQ 11 raised!");
 
             IRQ(10,ref aContext);
@@ -239,7 +239,7 @@ namespace Cosmos.Hardware {
         public static void HandleInterrupt_2B(ref InterruptContext aContext) {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
-            //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
+            //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //Console.WriteLine("IRQ 11 raised!");
 
             IRQ(11,ref aContext);
@@ -251,7 +251,7 @@ namespace Cosmos.Hardware {
         {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
-            //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
+            //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //A> Vermeulen
             //Commented out below
             //Console.WriteLine("IRQ 12 raised!");
@@ -263,7 +263,7 @@ namespace Cosmos.Hardware {
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static void HandleInterrupt_2E(ref InterruptContext aContext) {
-            Cosmos.Hardware.DebugUtil.SendMessage("IRQ",
+            Cosmos.Debug.Debugger.SendMessage("IRQ",
                                                   "Primary IDE");
             //Storage.ATAOld.HandleInterruptPrimary();
             Storage.ATA.ATA.HandleInterruptPrimary();
@@ -283,7 +283,7 @@ namespace Cosmos.Hardware {
         }
 
         public static void HandleInterrupt_35(ref InterruptContext aContext) {
-            Cosmos.Hardware.DebugUtil.SendMessage("Interrupts",
+            Cosmos.Debug.Debugger.SendMessage("Interrupts",
                                                   "Interrupt 35 handler");
             DebugUtil.LogInterruptOccurred(ref aContext);
             Console.WriteLine("Interrupt 0x35 occurred");
@@ -296,7 +296,7 @@ namespace Cosmos.Hardware {
         //IRQ 15 - Secondary IDE
         public static void HandleInterrupt_2F(ref InterruptContext aContext) {
             Storage.ATA.ATA.HandleInterruptSecondary();
-            Cosmos.Hardware.DebugUtil.SendMessage("IRQ",
+            Cosmos.Debug.Debugger.SendMessage("IRQ",
                                                   "Secondary IDE");
             PIC.SignalSecondary();
         }
@@ -467,7 +467,7 @@ namespace Cosmos.Hardware {
 //            Console.WriteLine("Register States:");
             // TODO: Register states
 
-            Cosmos.Hardware.DebugUtil.SendMessage("Exceptions",
+            Cosmos.Debug.Debugger.SendMessage("Exceptions",
                                                   aName);
             Console.WriteLine();
             while (true) {
