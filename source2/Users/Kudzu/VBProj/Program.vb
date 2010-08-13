@@ -7,8 +7,8 @@ Public Class Kernel
         xBoot.Execute()
 
         Console.WriteLine("Test")
-        Debugger.Send("Hello from Cosmos!")
-        Console.WriteLine("3 Cosmos booted successfully. Type a line of text to get it echoed back.")
+        Debugger.Send("Hello from Cosmos (VB)!")
+        Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.")
         Console.WriteLine("Test")
         While True
             Console.Write("Input: ")
