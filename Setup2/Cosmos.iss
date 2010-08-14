@@ -43,9 +43,9 @@ InternalCompressLevel=none
 SolidCompression=true
 SourceDir=..
 ;Left Image should be 164x314
-WizardImageFile=.\setup\images\cosmos.bmp
+WizardImageFile=.\setup2\images\cosmos.bmp
 ;Small Image should be 55x55
-WizardSmallImageFile=.\setup\images\cosmos_small.bmp
+WizardSmallImageFile=.\setup2\images\cosmos_small.bmp
 
 ; If you want all languages to be listed in the "Select Setup Language"
 ; dialog, even those that can't be displayed in the active code page,
@@ -61,36 +61,36 @@ ChangesAssociations=yes
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; InfoBeforeFile: .\setup2\Readme.txt
 #ifdef IncludeUILanguages
-Name: eu; MessagesFile: .\setup\Languages\Basque-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ca; MessagesFile: .\setup\Languages\Catalan-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: cs; MessagesFile: .\setup\Languages\Czech-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: da; MessagesFile: .\setup\Languages\Danish-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: nl; MessagesFile: .\setup\Languages\Dutch-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: fi; MessagesFile: .\setup\Languages\Finnish-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: fr; MessagesFile: .\setup\Languages\French-15-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: de; MessagesFile: .\setup\Languages\German-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: hu; MessagesFile: .\setup\Languages\Hungarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: it; MessagesFile: .\setup\Languages\Italian-14-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: no; MessagesFile: .\setup\Languages\Norwegian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: pl; MessagesFile: .\setup\Languages\Polish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: pt; MessagesFile: .\setup\Languages\PortugueseStd-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ru; MessagesFile: .\setup\Languages\Russian-19-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: sk; MessagesFile: .\setup\Languages\Slovak-6-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: sl; MessagesFile: .\setup\Languages\Slovenian-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: eu; MessagesFile: .\setup2\Languages\Basque-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ca; MessagesFile: .\setup2\Languages\Catalan-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: cs; MessagesFile: .\setup2\Languages\Czech-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: da; MessagesFile: .\setup2\Languages\Danish-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: nl; MessagesFile: .\setup2\Languages\Dutch-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: fi; MessagesFile: .\setup2\Languages\Finnish-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: fr; MessagesFile: .\setup2\Languages\French-15-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: de; MessagesFile: .\setup2\Languages\German-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: hu; MessagesFile: .\setup2\Languages\Hungarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: it; MessagesFile: .\setup2\Languages\Italian-14-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: no; MessagesFile: .\setup2\Languages\Norwegian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: pl; MessagesFile: .\setup2\Languages\Polish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: pt; MessagesFile: .\setup2\Languages\PortugueseStd-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ru; MessagesFile: .\setup2\Languages\Russian-19-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: sk; MessagesFile: .\setup2\Languages\Slovak-6-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: sl; MessagesFile: .\setup2\Languages\Slovenian-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 ;InOffical:
-Name: bg; MessagesFile: .\setup\Languages\InOfficial\Bulgarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: el; MessagesFile: .\setup\Languages\InOfficial\Greek-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: is; MessagesFile: .\setup\Languages\InOfficial\Icelandic-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: id; MessagesFile: .\setup\Languages\InOfficial\Indonesian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ja; MessagesFile: .\setup\Languages\InOfficial\Japanese-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ko; MessagesFile: .\setup\Languages\InOfficial\Korean-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ms; MessagesFile: .\setup\Languages\InOfficial\Malaysian-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: es; MessagesFile: .\setup\Languages\InOfficial\SpanishStd-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: sv; MessagesFile: .\setup\Languages\InOfficial\Swedish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: tr; MessagesFile: .\setup\Languages\InOfficial\Turkish-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: uk; MessagesFile: .\setup\Languages\InOfficial\Ukrainian-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: cn; MessagesFile: .\setup\Languages\InOfficial\ChineseSimp-11-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: tw; MessagesFile: .\setup\Languages\InOfficial\ChineseTrad-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: bg; MessagesFile: .\setup2\Languages\InOfficial\Bulgarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: el; MessagesFile: .\setup2\Languages\InOfficial\Greek-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: is; MessagesFile: .\setup2\Languages\InOfficial\Icelandic-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: id; MessagesFile: .\setup2\Languages\InOfficial\Indonesian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ja; MessagesFile: .\setup2\Languages\InOfficial\Japanese-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ko; MessagesFile: .\setup2\Languages\InOfficial\Korean-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ms; MessagesFile: .\setup2\Languages\InOfficial\Malaysian-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: es; MessagesFile: .\setup2\Languages\InOfficial\SpanishStd-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: sv; MessagesFile: .\setup2\Languages\InOfficial\Swedish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: tr; MessagesFile: .\setup2\Languages\InOfficial\Turkish-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: uk; MessagesFile: .\setup2\Languages\InOfficial\Ukrainian-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: cn; MessagesFile: .\setup2\Languages\InOfficial\ChineseSimp-11-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: tw; MessagesFile: .\setup2\Languages\InOfficial\ChineseTrad-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 #endif
 
 [Messages]
