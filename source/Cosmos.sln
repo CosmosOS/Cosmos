@@ -143,15 +143,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hardware", "Hardware", "{67
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System", "System", "{693C6704-6934-410F-97E0-4B6900730E63}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rings", "Rings", "{426E77A5-80AA-48DC-97F9-037071345778}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{426E77A5-80AA-48DC-97F9-037071345778}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{C4941654-3D7A-484B-9F5C-3D331AB8F585}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "..\source2\Rings\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "..\source2\Rings\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj", "{6A991D03-1435-4005-9809-B8BACDF3B021}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "..\source2\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj", "{6A991D03-1435-4005-9809-B8BACDF3B021}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "..\source2\Rings\System\Cosmos.System\Cosmos.System.csproj", "{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "..\source2\Kernel\System\Cosmos.System\Cosmos.System.csproj", "{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -308,18 +308,18 @@ Global
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
 		SccProjectName37 = Cosmos/Cosmos.Hardware
 		SccLocalPath37 = Cosmos\\Cosmos.Hardware
-		SccProjectUniqueName38 = ..\\source2\\Rings\\System\\Hardware\\Core\\Cosmos.Core\\Cosmos.Core.csproj
+		SccProjectUniqueName38 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core\\Cosmos.Core.csproj
 		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
-		SccProjectName38 = ../source2/Rings/System/Hardware/Core/Cosmos.Core
-		SccLocalPath38 = ..\\source2\\Rings\\System\\Hardware\\Core\\Cosmos.Core
-		SccProjectUniqueName39 = ..\\source2\\Rings\\System\\Hardware\\Cosmos.Hardware\\Cosmos.Hardware.csproj
+		SccProjectName38 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core
+		SccLocalPath38 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core
+		SccProjectUniqueName39 = ..\\source2\\Kernel\\System\\Hardware\\Cosmos.Hardware\\Cosmos.Hardware.csproj
 		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
-		SccProjectName39 = ../source2/Rings/System/Hardware/Cosmos.Hardware
-		SccLocalPath39 = ..\\source2\\Rings\\System\\Hardware\\Cosmos.Hardware
-		SccProjectUniqueName40 = ..\\source2\\Rings\\System\\Cosmos.System\\Cosmos.System.csproj
+		SccProjectName39 = ../source2/Kernel/System/Hardware/Cosmos.Hardware
+		SccLocalPath39 = ..\\source2\\Kernel\\System\\Hardware\\Cosmos.Hardware
+		SccProjectUniqueName40 = ..\\source2\\Kernel\\System\\Cosmos.System\\Cosmos.System.csproj
 		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
-		SccProjectName40 = ../source2/Rings/System/Cosmos.System
-		SccLocalPath40 = ..\\source2\\Rings\\System\\Cosmos.System
+		SccProjectName40 = ../source2/Kernel/System/Cosmos.System
+		SccLocalPath40 = ..\\source2\\Kernel\\System\\Cosmos.System
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
