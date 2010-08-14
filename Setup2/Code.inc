@@ -19,7 +19,8 @@ var
   __VSNET2010_PATH,
   __VSNET2008_BASE_PATH,
   __VSNET2010_BASE_PATH,
-	__CSharpExpress2008ProjectTemplatePath: string;
+	__CSharpExpress2008ProjectTemplatePath,
+	__VBExpress2008ProjectTemplatePath: string;
   
 procedure InitializePaths;
 begin
@@ -62,8 +63,10 @@ __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETF
   __VSNET2010_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2010_PATH)+'..\..');
   
   RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\9.0', 'UserProjectTemplatesLocation', __CSharpExpress2008ProjectTemplatePath);
-  
   StringChangeEx(__CSharpExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+
+  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VBExpress\9.0', 'UserProjectTemplatesLocation', __VBExpress2008ProjectTemplatePath);
+  StringChangeEx(__VBExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
 
 end;
 
@@ -118,7 +121,7 @@ begin
   result := __FRAMEWORK64_INSTALL_ROOT;
 end;
 
-function Vb2008_Installed: Boolean;
+function Vb2008_Installed(dummy: string): Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
@@ -225,6 +228,7 @@ end;
 
 function IsCSharpExpress2008Installed(dummy: string): boolean;
 begin
+	InitializePaths;
 	if (Length(Trim(__CSharpExpress2008ProjectTemplatePath)) > 0) then
 		Result := True
 	else
@@ -235,7 +239,21 @@ function GetCSharpExpress2008ProjectTemplatePath(dummy: string) : string;
 begin
 	InitializePaths;
 	Result := __CSharpExpress2008ProjectTemplatePath;
-	SaveStringToFile('c:\setup.log', Format('C# Express TemplatePath: "%s"'#13#10, [Result]), true);
+end;
+
+function IsVBExpress2008Installed(dummy: string) : boolean;
+begin
+InitializePaths;
+	if (Length(Trim(__VBExpress2008ProjectTemplatePath))  > 0) then
+		Result := True
+	else
+		Result := False;
+end;
+
+function GetVBExpress2008ProjectTemplatePath(dummy: string): string;
+begin
+	InitializePaths;
+	Result := __VBExpress2008ProjectTEmplatePath;
 end;
 
 function InitializeSetup: Boolean;
