@@ -39,12 +39,20 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Global.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Kernel.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

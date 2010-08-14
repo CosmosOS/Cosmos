@@ -41,7 +41,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Global.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
