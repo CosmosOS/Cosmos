@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <p>
+        Surely our security model will evolve as Cosmos evolves. However we need 
+        something simple, efficient, and with minimal impact to the users. I feel this 
+        is something most operating systems today fail greatly at.</p>
+    <p>
+        Cosmos will be divided into rings. In some senses they are similar to 
+        traditional operating system rings however they are not enforced by hardware and 
+        thus do not have the runtime overhead. Instead they are enforced by the compiler 
+        and later by the installation system which will verify assemblies are part of 
+        installation.</p>
+    <p>
+        A new assembly level attribute will be created for processing by IL2CPU. If the 
+        attribute is not present User Ring is the default.</p>
+    <p>
+        From lowest to highest:</p>
+    <ul>
+        <li>Kernel<ul>
+            <li>Hardware<ul>
+                <li>System<ul>
+                    <li>User</li>
+                    </ul>
+                </li>
+                </ul>
+            </li>
+            </ul>
+        </li>
+    </ul>
+    <h3>
+        Access</h3>
+    <p>
+        Rings can only access assemblies in the same ring, or the next lower ring.</p>
+    <p style="margin-left: 40px">
+        Kernel &lt;-- Hardware &lt;-- System &lt;-- User</p>
+    <p>
+        For example, System can consume classes in Hardware but not Kernel.</p>
+    <p>
+        &nbsp;</p>
+    <h1>
+        Old Docs Below - For review and import</h1>
+    <h3>
+        Kernel Ring<br />
+    </h3>
+    <p>
+        In the Kernel Ring, all things are permitted including unsafe code. Assemblies 
+        that can be marked as Kernel Ring are restricted. A protected list of assemblies 
+        is maintained and enforced my IL2CPU and the installation system.</p>
+    <p>
+        Kernel Ring includes memory management, process and thread control, etc.</p>
+    <p>
+        Permitted</p>
+    <ul>
+        <li>Anything</li>
+    </ul>
+    <p>
+        Not Permitted</p>
+    <ul>
+        <li>Nothing</li>
+    </ul>
+    <p>
+        Restrictions</p>
+    <ul>
+        <li>Assembly must be approved by policy to be part of Kernel.<br />
+        </li>
+    </ul>
+    <h3>
+        Hardware Ring<br />
+    </h3>
+    <p>
+        Hardware Ring contains drivers for hardware. Hardware Ring cannot contain unsafe 
+        code but can access the managed memory object (see separate annotation) to 
+        ensure proper alignment of structures etc. Kernel Ring can assign specific PCI, 
+        USB and other devices to drivers and communicate with such devices through the 
+        Kernel Ring and managed memory objects, but cannot access pointers directly.<br />
+    </p>
+    <h3>
+        System Ring<br />
+    </h3>
+    <p>
+        The System Ring includes file systems, network stacks, etc. Unsafe code is not 
+        permitted.<br />
+    </p>
+    <h3>
+        User Ring<br />
+    </h3>
+    <p>
+        User Ring includes applications and services.<br />
+    </p>
+
+</body>
+</html>
