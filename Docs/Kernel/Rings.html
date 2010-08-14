@@ -20,12 +20,12 @@
         A new assembly level attribute will be created for processing by IL2CPU. If the 
         attribute is not present User Ring is the default.</p>
     <p>
-        From lowest to highest:</p>
+        Rings from highest to lowest:</p>
     <ul>
-        <li>Kernel<ul>
-            <li>Hardware<ul>
-                <li>System<ul>
-                    <li>User</li>
+        <li>User<ul>
+            <li>System<ul>
+                <li>Hardware<ul>
+                    <li>Core</li>
                     </ul>
                 </li>
                 </ul>
@@ -38,55 +38,67 @@
     <p>
         Rings can only access assemblies in the same ring, or the next lower ring.</p>
     <p style="margin-left: 40px">
-        Kernel &lt;-- Hardware &lt;-- System &lt;-- User</p>
+        Core &lt;-- Hardware &lt;-- System &lt;-- User</p>
     <p>
         For example, System can consume classes in Hardware but not Kernel.</p>
     <h3>
-        Kernel Ring</h3>
+        Core Ring</h3>
     <p>
-        &nbsp;</p>
+        In the core ring, &quot;anything goes&quot;. This also means that code which does not 
+        require such privileges should not exist in the core ring. The core ring should 
+        be restricted to code which truly needs such unfettered access.
+    </p>
+    <p>
+        Priviliges that exist only in the core ring:</p>
+    <ul>
+        <li>Use of pointers and direct access to memory/li>
+        <li>Access to x86 IO ports.</li>
+        <li>Explicit assembly language code</li>
+        <li>Unsafe code</li>
+    </ul>
+    <p>
+        TThe core ring includes functionality such as:</p>
+    <ul>
+        <li>Threading/li>
+        <li>Memory management</li>
+    </ul>
+    <p>
+        AAssemblies which are part of the core are restricted.</p>
+    <p>
+        The core ring exposes objects which allow the hardware ring to access memory 
+        indirectly, and in a controlled restricted fashion. For example to allow a 
+        driver to acccess video RAM, a memory object can be created by the core ring 
+        which allows access to only the specific block of memory needed by the video 
+        driver.</p>
     <h3>
-        Hardware Ring</h3>
+        Hardware Ring/h3>
     <p>
-        &nbsp;</p>
+        The hardware ring contains drivers and code for accessing hardware via more 
+        generic objects exposed by the kernel ring.</p>
+    <p>
+        The hardware ring includes functionality such as:</p>
+    <ul>
+        <li>IDE</li>
+        <li>SATA</li>
+        <li>Ethernet</li>
+        <li>USB</li>
+    </ul>
     <h3>
         System Ring</h3>
     <p>
-        &nbsp;</p>
+        The system ring contains code which builds functionality on top of hardware or 
+        other system assemblies.</p>
+    <p>
+        The system ring includes functionality such as:</p>
+    <ul>
+        <li>File systems</li>
+        <li>TCP/IP</li>
+    </ul>
     <h3>
         User Ring</h3>
     <p>
         The user ring is compromised of all user code including applications and 
         services.</p>
-    <h1>
-        Old Docs Below - For review and import</h1>
-    <h3>
-        Kernel Ring</h3>
-    <p>
-        In the Kernel Ring, all things are permitted including unsafe code. Assemblies 
-        that can be marked as Kernel Ring are restricted. A protected list of assemblies 
-        is maintained and enforced my IL2CPU and the installation system.</p>
-    <p>
-        Kernel Ring includes memory management, process and thread control, etc. Things 
-        common to all PCs.</p>
-    <p>
-        Permitted: Anything</p>
-    <p>
-        Restrictions: Assembly must be approved by policy to be part of Kernel.</p>
-    <h3>
-        Hardware Ring</h3>
-    <p>
-        Hardware Ring contains drivers for hardware. Hardware Ring cannot contain unsafe 
-        code but can access the managed memory object (see separate annotation) to 
-        ensure proper alignment of structures etc. Kernel Ring can assign specific PCI, 
-        USB and other devices to drivers and communicate with such devices through the 
-        Kernel Ring and managed memory objects, but cannot access pointers directly.</p>
-    <h3>
-        System Ring</h3>
-    <p>
-        The System Ring includes file systems, network stacks, etc. Unsafe code is not 
-        permitted.<br />
-    </p>
 
 </body>
 </html>

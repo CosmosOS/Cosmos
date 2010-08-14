@@ -22,6 +22,7 @@ namespace Cosmos.Compiler.DebugStub {
                 Call<DisplayWaitMsg>();
                 Call<InitSerial>();
                 Call<WaitForDbgHandshake>();
+                Call<Cls>();
             }
         }
 
