@@ -34,64 +34,58 @@
         </li>
     </ul>
     <h3>
-        Access</h3>
+        Ring Control</h3>
     <p>
         Rings can only access assemblies in the same ring, or the next lower ring.</p>
     <p style="margin-left: 40px">
         Kernel &lt;-- Hardware &lt;-- System &lt;-- User</p>
     <p>
         For example, System can consume classes in Hardware but not Kernel.</p>
+    <h3>
+        Kernel Ring</h3>
     <p>
         &nbsp;</p>
+    <h3>
+        Hardware Ring</h3>
+    <p>
+        &nbsp;</p>
+    <h3>
+        System Ring</h3>
+    <p>
+        &nbsp;</p>
+    <h3>
+        User Ring</h3>
+    <p>
+        The user ring is compromised of all user code including applications and 
+        services.</p>
     <h1>
         Old Docs Below - For review and import</h1>
     <h3>
-        Kernel Ring<br />
-    </h3>
+        Kernel Ring</h3>
     <p>
         In the Kernel Ring, all things are permitted including unsafe code. Assemblies 
         that can be marked as Kernel Ring are restricted. A protected list of assemblies 
         is maintained and enforced my IL2CPU and the installation system.</p>
     <p>
-        Kernel Ring includes memory management, process and thread control, etc.</p>
+        Kernel Ring includes memory management, process and thread control, etc. Things 
+        common to all PCs.</p>
     <p>
-        Permitted</p>
-    <ul>
-        <li>Anything</li>
-    </ul>
+        Permitted: Anything</p>
     <p>
-        Not Permitted</p>
-    <ul>
-        <li>Nothing</li>
-    </ul>
-    <p>
-        Restrictions</p>
-    <ul>
-        <li>Assembly must be approved by policy to be part of Kernel.<br />
-        </li>
-    </ul>
+        Restrictions: Assembly must be approved by policy to be part of Kernel.</p>
     <h3>
-        Hardware Ring<br />
-    </h3>
+        Hardware Ring</h3>
     <p>
         Hardware Ring contains drivers for hardware. Hardware Ring cannot contain unsafe 
         code but can access the managed memory object (see separate annotation) to 
         ensure proper alignment of structures etc. Kernel Ring can assign specific PCI, 
         USB and other devices to drivers and communicate with such devices through the 
-        Kernel Ring and managed memory objects, but cannot access pointers directly.<br />
-    </p>
+        Kernel Ring and managed memory objects, but cannot access pointers directly.</p>
     <h3>
-        System Ring<br />
-    </h3>
+        System Ring</h3>
     <p>
         The System Ring includes file systems, network stacks, etc. Unsafe code is not 
         permitted.<br />
-    </p>
-    <h3>
-        User Ring<br />
-    </h3>
-    <p>
-        User Ring includes applications and services.<br />
     </p>
 
 </body>
