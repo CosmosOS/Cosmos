@@ -262,9 +262,9 @@
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
       <Name>Cosmos.Sys.FileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware</Name>
+      <Name>Cosmos.Hardware2</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
       <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>

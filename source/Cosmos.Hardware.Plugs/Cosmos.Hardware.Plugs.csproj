@@ -75,9 +75,9 @@
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware</Name>
+      <Name>Cosmos.Hardware2</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
