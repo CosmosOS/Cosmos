@@ -7,6 +7,9 @@ namespace Cosmos.Hardware {
     public class Global {
         static public void Init() {
             Cosmos.Core.Global.Init();
+            // Temp
+            Cosmos.Hardware.Global2.Init();
+            // End Temp
         }
     }
 }

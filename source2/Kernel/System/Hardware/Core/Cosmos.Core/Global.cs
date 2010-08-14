@@ -6,6 +6,9 @@ using System.Text;
 namespace Cosmos.Core {
     public class Global {
         static public void Init() {
+            // Temp
+            Kernel.Global.Init();
+            // End Temp
         }
     }
 }

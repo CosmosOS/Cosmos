@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
-    public class Global {
+    public class Global2 {
         public static void Init() {
             Console.WriteLine("    Init Global Descriptor Table");
             Kernel.CPU.CreateGDT();

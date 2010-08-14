@@ -24,7 +24,7 @@ namespace Cosmos.Sys {
             Console.Clear();
 
             Kernel.Global.Init();
-            Hardware.Global.Init();
+            Hardware.Global2.Init();
             Sys.Global.Init();
 
             // Clear again in case debug information has been written out

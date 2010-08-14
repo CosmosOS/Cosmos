@@ -37,12 +37,16 @@ namespace Cosmos.System {
                 Console.Clear();
             }
 
+            BeforeRun();
             while (!mStopped) {
                 Run();
             }
+            AfterRun();
         }
 
+        protected virtual void BeforeRun() { }
         protected abstract void Run();
+        protected virtual void AfterRun() { }
 
         protected void WriteLine(string aMsg) {
             if (!Silent) {
