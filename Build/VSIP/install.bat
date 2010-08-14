@@ -58,4 +58,8 @@ IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
 ..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
 rem Relaunch VS
-..\..\source\Cosmos.sln
+echo on
+rem calling .sln doesnt work. Might be related to having 2010 and 2008 both installed
+rem ..\..\source\Cosmos.sln
+"C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
+"C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln

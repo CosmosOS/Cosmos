@@ -38,6 +38,7 @@ namespace Cosmos.VS.Package {
                     IsDirty = true;
                 }
                 checkStartCosmosGDB.Enabled = x;
+                checkStartCosmosGDB.Checked = x;
             };
 
             checkStartCosmosGDB.CheckedChanged += delegate(Object sender, EventArgs e)
