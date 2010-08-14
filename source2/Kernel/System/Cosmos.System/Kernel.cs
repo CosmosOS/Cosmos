@@ -4,13 +4,23 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.System {
-    public class Kernel {
+    public abstract class Kernel {
         public bool ClearScreen = true;
         // Set to true to hide messages during boot.
         public bool Silent = false;
 
+        // Set after initial start. Can be started and stopped at same time
+        protected bool mStarted = false;
+        // Set to signal stopped
+        protected bool mStopped = false;
+
         // Start the system up using the properties for configuration.
         public void Start() {
+            if (mStarted) {
+                throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
+            }
+            mStarted = true;
+
             //TODO - Set and document the Console class (and its supporting classes) to default to 80x25
             //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
 
@@ -26,7 +36,13 @@ namespace Cosmos.System {
             if (ClearScreen) {
                 Console.Clear();
             }
+
+            while (!mStopped) {
+                Run();
+            }
         }
+
+        protected abstract void Run();
 
         protected void WriteLine(string aMsg) {
             if (!Silent) {
@@ -35,11 +51,12 @@ namespace Cosmos.System {
         }
 
         // Shut down the system and power off
-        static public void Stop() {
+        public void Stop() {
+            mStopped = true;
         }
 
         // Shutdown and restart
-        static public void Restart() {
+        public void Restart() {
         }
     }
 }
