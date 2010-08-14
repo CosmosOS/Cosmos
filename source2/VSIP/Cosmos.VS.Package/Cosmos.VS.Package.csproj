@@ -169,40 +169,37 @@
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
-      <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\AssemblyInfo.vb">
-          <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.ico">
-          <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.vb">
-          <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProj.vstemplate">
-          <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProjKernel.vbproj">
-          <RootPath>templates\Projects\CosmosKernel %28VB%29</RootPath>
-      </ZipItem>
-
-      <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\AssemblyInfo.vb">
-          <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.ico">
-          <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.vb">
-          <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProj.vstemplate">
-          <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-      </ZipItem>
-      <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProjKernel.vbproj">
-          <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-      </ZipItem>
-      
-
-      <ZipItem Include="Templates\Projects\Readme.txt" />
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\AssemblyInfo.vb">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.vb">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProjKernel.vbproj">
+      <RootPath>templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\AssemblyInfo.vb">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.vb">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProjKernel.vbproj">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\Readme.txt" />
     <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Readme.txt">
       <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
     </ZipItem>
@@ -245,12 +242,10 @@
     <ZipItem Include="Templates\Projects\Cosmos\Cosmos.vstemplate">
       <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
+    <EmbeddedResource Include="Templates\CosmosProject.Cosmos" />
     <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </None>
-    <EmbeddedResource Include="Templates\CosmosProject.Cosmos">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </EmbeddedResource>
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>

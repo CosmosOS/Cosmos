@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>$KernelGuid$</ProjectGuid>
+    <ProjectGuid>{$KernelGuid$}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>$safeprojectname$</RootNamespace>
     <AssemblyName>$safeprojectname$</AssemblyName>
@@ -65,5 +65,6 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>
+  $KernelGuid$
   -->
 </Project>
