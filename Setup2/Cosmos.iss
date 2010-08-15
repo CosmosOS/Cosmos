@@ -146,6 +146,9 @@ Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Ker
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
 
+; wizards
+Source: .\source2\VSIP\Cosmos.VS.Wizards\bin\Debug\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2008_PATH|}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
+
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
 Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
 

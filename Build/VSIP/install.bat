@@ -52,7 +52,7 @@ IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
 	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
 )
 
-..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
+..\..\Setup2\Output\CosmosUserKit.exe /SILENT
 
 rem Relaunch VS
 rem calling .sln doesnt work. Might be related to having 2010 and 2008 both installed
