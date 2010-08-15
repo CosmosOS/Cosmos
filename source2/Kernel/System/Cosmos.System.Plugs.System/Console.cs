@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Sys = Cosmos.System;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System;
 
@@ -43,32 +42,32 @@ namespace Cosmos.System.Plugs.System {
         }
 
         public static int get_CursorLeft() {
-            return Sys.Global.Console.X;
+            return Global.Console.X;
         }
 
         public static int get_CursorTop() {
-            return Sys.Global.Console.Y;
+            return Global.Console.Y;
         }
 
         public static void set_CursorLeft(int x) {
-            Sys.Global.Console.X = x;
+            Global.Console.X = x;
         }
 
         public static void set_CursorTop(int y) {
-            Sys.Global.Console.Y = y;
+            Global.Console.Y = y;
         }
 
         public static int get_WindowHeight() {
-            return Sys.Global.Console.Rows;
+            return Global.Console.Rows;
         }
 
         public static int get_WindowWidth() {
-            return Sys.Global.Console.Cols;
+            return Global.Console.Cols;
         }
 
         //TODO: Console uses TextWriter - intercept and plug it instead
         public static void Clear() {
-            Sys.Global.Console.Clear();
+            Global.Console.Clear();
         }
 
         #region Write
@@ -78,7 +77,7 @@ namespace Cosmos.System.Plugs.System {
         }
 
         public static void Write(char aChar) {
-            Sys.Global.Console.WriteChar(aChar);
+            Global.Console.WriteChar(aChar);
         }
 
         public static void Write(byte aByte) {
@@ -140,7 +139,7 @@ namespace Cosmos.System.Plugs.System {
         public static void Write(string aText) {
             for (int i = 0; i < aText.Length; i++) {
                 if (aText[i] == '\n') {
-                    Sys.Global.Console.NewLine();
+                    Global.Console.NewLine();
                     continue;
                 }
                 if (aText[i] == '\r') {
@@ -150,7 +149,7 @@ namespace Cosmos.System.Plugs.System {
                     Write("    ");
                     continue;
                 }
-                Sys.Global.Console.WriteChar(aText[i]);
+                Global.Console.WriteChar(aText[i]);
             }
         }
 
@@ -159,7 +158,7 @@ namespace Cosmos.System.Plugs.System {
         #region WriteLine
 
         public static void WriteLine() {
-            Sys.Global.Console.NewLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(object value) {
@@ -243,9 +242,9 @@ namespace Cosmos.System.Plugs.System {
                 if (current == '\u0968') // Backspace   
                 {
                     if (currentCount > 0) {
-                        int curCharTemp = Sys.Global.Console.X;
+                        int curCharTemp = Global.Console.X;
                         chars.RemoveAt(currentCount - 1);
-                        Sys.Global.Console.X = Sys.Global.Console.X - 1;
+                        Global.Console.X = Global.Console.X - 1;
 
                         //Move characters to the left
                         for (int x = currentCount - 1; x < chars.Count; x++) {
@@ -254,7 +253,7 @@ namespace Cosmos.System.Plugs.System {
 
                         Write(' ');
 
-                        Sys.Global.Console.X = curCharTemp - 1;
+                        Global.Console.X = curCharTemp - 1;
 
                         currentCount--;
                     }
@@ -262,14 +261,14 @@ namespace Cosmos.System.Plugs.System {
                 } else if (current == '\u2190') // Arrow Left
                 {
                     if (currentCount > 0) {
-                        Sys.Global.Console.X = Sys.Global.Console.X - 1;
+                        Global.Console.X = Global.Console.X - 1;
                         currentCount--;
                     }
                     continue;
                 } else if (current == '\u2192') // Arrow Right
                 {
                     if (currentCount < chars.Count) {
-                        Sys.Global.Console.X = Sys.Global.Console.X + 1;
+                        Global.Console.X = Global.Console.X + 1;
                         currentCount++;
                     }
                     continue;
@@ -301,7 +300,7 @@ namespace Cosmos.System.Plugs.System {
                         Write(chars[x]);
                     }
 
-                    Sys.Global.Console.X -= (chars.Count - currentCount) - 1;
+                    Global.Console.X -= (chars.Count - currentCount) - 1;
                     currentCount++;
                 }
             }
