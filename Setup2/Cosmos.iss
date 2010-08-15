@@ -140,8 +140,7 @@ Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion unin
 Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware2.dll; DestDir: {app}\Kernel; DestName: Cosmos.Hardware.dll; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware2.pdb; DestDir: {app}\Kernel; DestName: Cosmos.Hardware.pdb; Flags: ignoreversion uninsremovereadonly
+Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware2.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
