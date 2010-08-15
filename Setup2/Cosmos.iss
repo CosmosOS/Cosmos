@@ -130,7 +130,7 @@ tw.BeveledLabel=Chinese Traditional
 
 [Dirs]
 Name: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstall
-Name: {app}; Flags: uninsalwaysuninstall;
+Name: {app}; Flags: uninsalwaysuninstall
 
 [Files]
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
@@ -140,7 +140,7 @@ Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion unin
 Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware2.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\source\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
@@ -150,12 +150,12 @@ Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
 
 ; Templates
 ; ; Install files into VS Integrated Shell (which includes full Visual Studio)
-Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2008_Installed('dummy');
+Source: .\Build\VSIP\CosmosProject (C#).zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2008_Installed('dummy')
 ;Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Vb2008_Installed('dummy');
 ; ; Install templates into Shell
-Source: ".\Build\VSIP\Cosmos.zip";      DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') or IsVBExpress2008Installed('dummy');
+Source: .\Build\VSIP\Cosmos.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') or IsVBExpress2008Installed('dummy')
 ; ; Install templates into C# Express
-Source: ".\Build\VSIP\CosmosKernel (C#).zip";  DestDir: {code:GetCSharpExpress2008ProjectTemplatePath|}; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'));
+Source: .\Build\VSIP\CosmosKernel (C#).zip; DestDir: {code:GetCSharpExpress2008ProjectTemplatePath|}; DestName: CosmosKernel (C#).zip; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'))
 ; ; Install templates into VB Express
 ;Source: ".\Build\VSIP\CosmosKernel (VB).zip";  DestDir: {code:GetVBExpress2008ProjectTemplatePath|}; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2008Installed('dummy') and (not Vb2008_Installed('dummy'));
 
@@ -259,5 +259,4 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 
 [Run]
 Filename: {code:VSNET2008_PATH|}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
-
 

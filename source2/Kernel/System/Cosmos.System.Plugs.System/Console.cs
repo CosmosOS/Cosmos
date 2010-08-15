@@ -16,7 +16,7 @@ namespace Cosmos.System.Plugs.System {
 
         public static void set_ForegroundColor(ConsoleColor value) {
             _foreground = value;
-            TextScreen.SetColors(_foreground, _background);
+            Global.TextScreen.SetColors(_foreground, _background);
         }
 
         public static ConsoleColor get_BackgroundColor() {
@@ -25,7 +25,7 @@ namespace Cosmos.System.Plugs.System {
 
         public static void set_BackgroundColor(ConsoleColor value) {
             _background = value;
-            TextScreen.SetColors(_foreground, _background);
+            Global.TextScreen.SetColors(_foreground, _background);
         }
 
         public static void Beep(int aFrequency, int aDuration) {
@@ -42,32 +42,32 @@ namespace Cosmos.System.Plugs.System {
         }
 
         public static int get_CursorLeft() {
-            return TextScreen.CurrentChar;
+            return Global.TextScreen.CurrentX;
         }
 
         public static int get_CursorTop() {
-            return TextScreen.CurrentRow;
+            return Global.TextScreen.CurrentY;
         }
 
         public static void set_CursorLeft(int x) {
-            TextScreen.CurrentChar = x;
+            Global.TextScreen.CurrentX = x;
         }
 
         public static void set_CursorTop(int y) {
-            TextScreen.CurrentRow = y;
+            Global.TextScreen.CurrentY = y;
         }
 
         public static int get_WindowHeight() {
-            return TextScreen.Rows;
+            return Global.TextScreen.Rows;
         }
 
         public static int get_WindowWidth() {
-            return TextScreen.Columns;
+            return Global.TextScreen.Columns;
         }
 
         //TODO: Console uses TextWriter - intercept and plug it instead
         public static void Clear() {
-            TextScreen.Clear();
+            Global.TextScreen.Clear();
         }
 
         #region Write
@@ -77,7 +77,7 @@ namespace Cosmos.System.Plugs.System {
         }
 
         public static void Write(char aChar) {
-            TextScreen.WriteChar(aChar);
+            Global.TextScreen.WriteChar(aChar);
         }
 
         public static void Write(byte aByte) {
@@ -139,7 +139,7 @@ namespace Cosmos.System.Plugs.System {
         public static void Write(string aText) {
             for (int i = 0; i < aText.Length; i++) {
                 if (aText[i] == '\n') {
-                    TextScreen.NewLine();
+                    Global.TextScreen.NewLine();
                     continue;
                 }
                 if (aText[i] == '\r') {
@@ -149,8 +149,7 @@ namespace Cosmos.System.Plugs.System {
                     Write("    ");
                     continue;
                 }
-                TextScreen.WriteChar(aText[i]);
-                //                break;
+                Global.TextScreen.WriteChar(aText[i]);
             }
         }
 
@@ -159,7 +158,7 @@ namespace Cosmos.System.Plugs.System {
         #region WriteLine
 
         public static void WriteLine() {
-            TextScreen.NewLine();
+            Global.TextScreen.NewLine();
         }
 
         public static void WriteLine(object value) {
@@ -243,9 +242,9 @@ namespace Cosmos.System.Plugs.System {
                 if (current == '\u0968') // Backspace   
                 {
                     if (currentCount > 0) {
-                        int curCharTemp = TextScreen.CurrentChar;
+                        int curCharTemp = Global.TextScreen.CurrentX;
                         chars.RemoveAt(currentCount - 1);
-                        TextScreen.CurrentChar--;
+                        Global.TextScreen.CurrentX--;
 
                         //Move characters to the left
                         for (int x = currentCount - 1; x < chars.Count; x++) {
@@ -254,7 +253,7 @@ namespace Cosmos.System.Plugs.System {
 
                         Write(' ');
 
-                        TextScreen.CurrentChar = curCharTemp - 1;
+                        Global.TextScreen.CurrentX = curCharTemp - 1;
 
                         currentCount--;
                     }
@@ -262,14 +261,14 @@ namespace Cosmos.System.Plugs.System {
                 } else if (current == '\u2190') // Arrow Left
                 {
                     if (currentCount > 0) {
-                        TextScreen.CurrentChar--;
+                        Global.TextScreen.CurrentX--;
                         currentCount--;
                     }
                     continue;
                 } else if (current == '\u2192') // Arrow Right
                 {
                     if (currentCount < chars.Count) {
-                        TextScreen.CurrentChar++;
+                        Global.TextScreen.CurrentX++;
                         currentCount++;
                     }
                     continue;
@@ -301,7 +300,7 @@ namespace Cosmos.System.Plugs.System {
                         Write(chars[x]);
                     }
 
-                    TextScreen.CurrentChar -= (chars.Count - currentCount) - 1;
+                    Global.TextScreen.CurrentX -= (chars.Count - currentCount) - 1;
                     currentCount++;
                 }
             }

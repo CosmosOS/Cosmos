@@ -5,136 +5,124 @@ using System.Text;
 using Cosmos.Core;
 
 namespace Cosmos.Hardware {
-    //TODO: Move all writeline etc and tracking to system ring. This clas is hardware, should be just basic stuff
-    //TODO: Move raw writing to core ring
-    //TODO: Remove /unsafe option from this asm
+    // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
+    // by memory moves
     public class TextScreen {
         protected const byte DefaultColor = 15; // White
-        protected static bool mInitialized = false;
-        protected static byte Color;
+        protected bool mInitialized = false;
+        protected byte Color;
 
-        static protected Core.IOGroup.TextScreen IOGroup = Core.Global.BaseIOGroups.TextScreen;
-        static protected MemoryBlock08 mMemory08;
+        protected Core.IOGroup.TextScreen IOGroup = Core.Global.BaseIOGroups.TextScreen;
+        protected MemoryBlock08 mMemory08;
 
-        static TextScreen() {
+        public TextScreen() {
             mMemory08 = IOGroup.Memory.Bytes;
         }
 
-        protected static void CheckInit() {
+        protected void CheckInit() {
             if (!mInitialized) {
                 Color = DefaultColor;
                 mInitialized = true;
             }
         }
 
-        public static int Rows {
+        public int Rows {
             get { return 25; }
         }
 
-        public static int Columns {
+        public int Columns {
             get { return 80; }
         }
 
-        public static void NewLine() {
-            CurrentRow += 1;
-            CurrentChar = 0;
-            if (CurrentRow > Rows) {
+        public void NewLine() {
+            CurrentY += 1;
+            CurrentX = 0;
+            if (CurrentY > Rows) {
                 ScrollUp();
-                CurrentRow -= 1;
-                CurrentChar = 0;
+                CurrentY -= 1;
+                CurrentX = 0;
             }
 
             SetCursor();
         }
 
-        public static void Clear() {
+        public void Clear() {
             CheckInit();
             // Empty + White + Empty + White
             UInt32 xData = 0x000F000F;
             IOGroup.Memory.Fill(0, 80 * 25 * 2 / 4, xData);
 
-            CurrentChar = 0;
-            CurrentRow = 1;
+            CurrentX = 0;
+            CurrentY = 1;
 
             SetCursor();
         }
         
-        public static void WriteChar(char aChar) {
-            PutChar(CurrentRow, CurrentChar, aChar);
-            CurrentChar += 1;
-            if (CurrentChar == Columns) {
+        public void WriteChar(char aChar) {
+            this[CurrentX, CurrentY] = aChar;
+            CurrentX++;
+            if (CurrentX == Columns) {
                 NewLine();
             }
-
             SetCursor();
         }
 
-        protected static void ScrollUp() {
+        protected void ScrollUp() {
             CheckInit();
             IOGroup.Memory.MoveDown(0, 80, 80 * 24 * 2 / 4);
             SetCursor();
         }
 
-        //TODO: Change to indexer
-        public static void PutChar(int aLine, int aRow, char aChar) {
-            CheckInit();
-            UInt32 xScreenOffset = (UInt32)((aRow + aLine * Columns) * 2);
-            mMemory08[xScreenOffset] = (byte)aChar;
-            mMemory08[xScreenOffset + 1] = Color;
-            SetCursor();
-        }
-
-        public static void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
-            CheckInit();
-            Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
-        }
-
-        //TODO: Change to use Port class
-        private static void SetCursor() {
-            CheckInit();
-
-            // TODO:
-            // Set AH = 0x02
-            // Set BH = 0
-            // Set DH = CurrentRow
-            // Set DL = CurrentChar 
-            // Call interrupt 0x10
-
-            //Store a backup of the color so that we can make sure the cursor is white
-            byte tempColor = Color;
-
-            Color = DefaultColor;
-
-            char position = (char)((CurrentRow * 80) + CurrentChar);
-
-            // cursor low byte to VGA index register
-            Cosmos.Kernel.CPUBus.Write8(0x03D4, 0x0F);
-            Cosmos.Kernel.CPUBus.Write8(0x03D5, (byte)(position & 0xFF));
-            // cursor high byte to vga index register
-            Cosmos.Kernel.CPUBus.Write8(0x03D4, 0x0E);
-            Cosmos.Kernel.CPUBus.Write8(0x03D5, (byte)((position >> 8) & 0xFF));
-
-            Color = tempColor;
-        }
-
-        private static int mCurrentRow = 1;
-        public static int CurrentRow {
-            get {
-                return mCurrentRow;
+        public char this[int aX, int aY] {
+            get { 
+                CheckInit();
+                UInt32 xScreenOffset = (UInt32)((aX + aY * Columns) * 2);
+                return (char)mMemory08[xScreenOffset];
             }
             set {
-                mCurrentRow = value;
+                CheckInit();
+                var xScreenOffset = (UInt32)((aX + aY * Columns) * 2);
+                mMemory08[xScreenOffset] = (byte)value;
+                mMemory08[xScreenOffset + 1] = Color;
                 SetCursor();
             }
         }
 
-        private static int mCurrentChar = 0;
-        public static int CurrentChar {
+        public void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
+            CheckInit();
+            Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
+        }
+
+        private void SetCursor() {
+            CheckInit();
+
+            char xPos = (char)((CurrentY * 80) + CurrentX);
+            // cursor low byte to VGA index register
+            IOGroup.Idx3.Byte = 0x0F;
+            IOGroup.Data3.Byte = (byte)(xPos & 0xFF);
+            // cursor high byte to vga index register
+            IOGroup.Idx3.Byte = 0x0E;
+            IOGroup.Data3.Byte = (byte)(xPos >> 8);
+        }
+
+        private int mCurrentY = 1;
+        public int CurrentY {
             get {
-                return mCurrentChar;
+                return mCurrentY;
             }
             set {
-                mCurrentChar = value;
+                mCurrentY = value;
+                SetCursor();
+            }
+        }
+
+        private int mCurrentX = 0;
+        public int CurrentX {
+            get {
+                return mCurrentX;
+            }
+            set {
+                mCurrentX = value;
                 SetCursor();
             }
         }

@@ -11,24 +11,19 @@ namespace Cosmos.Core {
             Port = aPort;
         }
 
-        public void Write8(byte aData) {
-            CPUBus.Write8(Port, aData);
-        }
-        public void Write16(UInt16 aData) {
-            CPUBus.Write16(Port, aData);
-        }
-        public void Write32(UInt32 aData) {
-            CPUBus.Write32(Port, aData);
+        public byte Byte {
+            get { return CPUBus.Read8(Port); }
+            set { CPUBus.Write8(Port, value); }
         }
 
-        public byte Read8() {
-            return CPUBus.Read8(Port); 
+        public UInt16 Word {
+            get { return CPUBus.Read16(Port); }
+            set { CPUBus.Write16(Port, value); }
         }
-        public UInt16 Read16() {
-            return CPUBus.Read16(Port);
-        }
-        public UInt32 Read32() {
-            return CPUBus.Read32(Port);
+
+        public UInt32 DWord {
+            get { return CPUBus.Read32(Port); }
+            set { CPUBus.Write32(Port, value); }
         }
 
     }
