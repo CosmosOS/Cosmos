@@ -81,8 +81,13 @@
         <li>IDE</li>
         <li>SATA</li>
         <li>Ethernet</li>
-        <li>USB</li>
+        <li>USB Controller</li>
     </ul>
+    <p>
+        The hardware ring may be further split into two levels at a later date. For 
+        example, a driver may exist for the USB Controller and it would require access 
+        to the core ring. But drivers implementing USB devices do not need to talk to 
+        hardware directly, but instead talk to the USB Controller driver.</p>
     <h3>
         System Ring</h3>
     <p>

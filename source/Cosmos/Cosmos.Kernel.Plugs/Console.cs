@@ -7,8 +7,7 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.Kernel.Plugs
 {
     [Plug(Target = typeof(System.Console))]
-    class Console
-    {
+    class Console {
         private static ConsoleColor _background = ConsoleColor.Black;
         private static ConsoleColor _foreground = ConsoleColor.White;
 
