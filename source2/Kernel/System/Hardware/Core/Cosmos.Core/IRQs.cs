@@ -64,13 +64,9 @@ namespace Cosmos.Core {
             public ushort IOPBOffset;
         }
 
-        private static InterruptDelegate[] mIRQ_Handlers;
+        private static InterruptDelegate[] mIRQ_Handlers = new InterruptDelegate[256];
 
         public static void AddIRQHandler(byte IRQ, InterruptDelegate handler) {
-            if (mIRQ_Handlers == null) {
-                mIRQ_Handlers = new InterruptDelegate[256];
-            }
-
             mIRQ_Handlers[IRQ] = handler;
         }
 
