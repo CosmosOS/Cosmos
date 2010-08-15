@@ -134,20 +134,7 @@ namespace Cosmos.System.Plugs.System {
         }
 
         public static void Write(string aText) {
-            for (int i = 0; i < aText.Length; i++) {
-                if (aText[i] == '\n') {
-                    Global.Console.NewLine();
-                    continue;
-                }
-                if (aText[i] == '\r') {
-                    continue;
-                }
-                if (aText[i] == '\t') {
-                    Write("    ");
-                    continue;
-                }
-                Global.Console.WriteChar(aText[i]);
-            }
+            Global.Console.Write(aText);
         }
 
         #endregion
@@ -160,67 +147,67 @@ namespace Cosmos.System.Plugs.System {
 
         public static void WriteLine(object value) {
             Write(value);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(char[] buffer) {
             Write(buffer);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(bool aBool) {
             Write(aBool);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(char aChar) {
             Write(aChar);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(byte aByte) {
             Write(aByte);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(string aLine) {
             Write(aLine);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(UInt16 aValue) {
             Write(aValue);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(Int16 aValue) {
             Write(aValue);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(UInt32 aValue) {
             Write(aValue);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(Int32 aValue) {
             Write(aValue);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(UInt64 aValue) {
             Write(aValue);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(Int64 aValue) {
             Write(aValue);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         public static void WriteLine(char[] aBuffer, int aIndex, int aCount) {
             Write(aBuffer, aIndex, aCount);
-            WriteLine();
+            Global.Console.NewLine();
         }
 
         #endregion
@@ -303,11 +290,9 @@ namespace Cosmos.System.Plugs.System {
                     currentCount++;
                 }
             }
-
             WriteLine();
 
             char[] final = chars.ToArray();
-
             return new string(final);
         }
     }

@@ -40,6 +40,7 @@ namespace Cosmos.System {
             UpdateCursor();
         }
 
+        //TODO: This is slow, batch it and only do it at end of updates
         protected void UpdateCursor() {
             mText.SetCursorPos(mX, mY);
         }
@@ -64,10 +65,23 @@ namespace Cosmos.System {
             UpdateCursor();
         }
 
-        public void WriteLine(string aText) {           
+        public void WriteLine(string aText) {
+            Write(aText);
+            NewLine();
         }
 
+        //TODO: Optimize this
         public void Write(string aText) {
+            for (int i = 0; i < aText.Length; i++) {
+                if (aText[i] == '\n') {
+                    NewLine();
+                } else if (aText[i] == '\r') {
+                } else if (aText[i] == '\t') {
+                    Write("    ");
+                } else {
+                    WriteChar(aText[i]);
+                }
+            }
         }
 
     }

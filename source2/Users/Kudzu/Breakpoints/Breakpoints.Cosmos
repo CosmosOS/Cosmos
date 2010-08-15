@@ -35,6 +35,9 @@
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
+    <StartCosmosGDB>
+    </StartCosmosGDB>
+    <TraceAssemblies>Cosmos</TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Breakpoints.cgdb">

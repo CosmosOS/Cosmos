@@ -15,8 +15,16 @@ namespace Cosmos.Hardware {
             mHandleKeyboardKey = aHandleKeyboardKeyDelegate;
         }
 
-        public void Initialize() {
-            CheckInit();
+        public Keyboard() {
+            mBuffer = new Queue<uint>(BufferSize);
+
+            Initialize(HandleScancode);
+            Core.IRQs.SetHandler(1, HandleIRQ);
+            // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
+
+            if (mKeys == null) {
+                CreateDefaultKeymap();
+            }
         }
 
         public void HandleIRQ(ref HW2.IRQContext aContext) {
@@ -107,21 +115,6 @@ namespace Cosmos.Hardware {
                 aValue = (byte)(aValue ^ 0x80);
             }
             mHandleKeyboardKey(aValue, xReleased);
-        }
-
-        private void CheckInit() {
-            if (mBuffer == null) {
-                mBuffer = new Queue<uint>(BufferSize);
-
-                Initialize(HandleScancode);
-                //Interrupts.IRQ01 += HandleKeyboardInterrupt;
-                Core.IRQs.AddIRQHandler(1, HandleIRQ);
-                // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
-
-                if (mKeys == null) {
-                    CreateDefaultKeymap();
-                }
-            }
         }
 
         private void CreateDefaultKeymap() {
@@ -354,7 +347,6 @@ namespace Cosmos.Hardware {
         }
 
         public char ReadChar() {
-            CheckInit();
             char xResult = '\0';
             while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
@@ -364,7 +356,6 @@ namespace Cosmos.Hardware {
         }
 
         public bool GetChar(out char c) {
-            CheckInit();
             c = '\0';
 
             if (mBuffer.Count > 0) {
@@ -376,7 +367,6 @@ namespace Cosmos.Hardware {
         }
 
         public ConsoleKey ReadKey() {
-            CheckInit();
             ConsoleKey xResult = ConsoleKey.NoName;
             while (mBuffer.Count == 0 || !GetKeyValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
@@ -385,7 +375,6 @@ namespace Cosmos.Hardware {
             return xResult;
         }
         public bool GetKey(out ConsoleKey c) {
-            CheckInit();
             c = ConsoleKey.NoName;
 
             if (mBuffer.Count > 0) {
@@ -397,7 +386,6 @@ namespace Cosmos.Hardware {
         }
 
         public KeyMapping ReadMapping() {
-            CheckInit();
             KeyMapping xResult = null;
             while (mBuffer.Count == 0 || !GetKeyMapping(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
@@ -406,7 +394,6 @@ namespace Cosmos.Hardware {
             return xResult;
         }
         public bool GetMapping(out KeyMapping c) {
-            CheckInit();
             c = null;
 
             if (mBuffer.Count > 0) {
@@ -418,8 +405,6 @@ namespace Cosmos.Hardware {
         }
 
         public uint ReadScancode() {
-            CheckInit();
-
             while (mBuffer.Count == 0) {
                 K2.CPU.Halt();
             }
@@ -427,8 +412,6 @@ namespace Cosmos.Hardware {
             return mBuffer.Dequeue();
         }
         public bool GetScancode(out uint c) {
-            CheckInit();
-
             if (mBuffer.Count > 0) {
                 c = mBuffer.Dequeue();
                 return true;

@@ -8,6 +8,8 @@ using Cosmos.Hardware2;
 
 namespace Cosmos.Core {
     public class IRQs {
+        // TODO: Protect IRQs like memory and ports are
+
         [StructLayout(LayoutKind.Explicit, Size = 0x68)]
         public struct TSS {
             [FieldOffset(0)]
@@ -66,8 +68,12 @@ namespace Cosmos.Core {
 
         private static InterruptDelegate[] mIRQ_Handlers = new InterruptDelegate[256];
 
-        public static void AddIRQHandler(byte IRQ, InterruptDelegate handler) {
-            mIRQ_Handlers[IRQ] = handler;
+        // We used to use:
+        //Interrupts.IRQ01 += HandleKeyboardInterrupt;
+        // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
+        // [1:48:37 PM] Matthijs ter Woord: the issues were: "they didn't work, would crash kernel". not sure if we still have them..
+        public static void SetHandler(byte aIrqNo, InterruptDelegate aHandler) {
+            mIRQ_Handlers[aIrqNo] = aHandler;
         }
 
         private static void IRQ(uint irq, ref IRQContext aContext) {
