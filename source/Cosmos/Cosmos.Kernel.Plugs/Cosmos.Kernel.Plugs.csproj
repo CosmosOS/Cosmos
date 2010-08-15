@@ -90,7 +90,6 @@
     <Compile Include="Assemblers\IORead32.cs" />
     <Compile Include="Assemblers\IOWrite16.cs" />
     <Compile Include="Assemblers\CreateGDT.cs" />
-    <Compile Include="Assemblers\CreateIDT.cs" />
     <Compile Include="Assemblers\IORead8.cs" />
     <Compile Include="Assemblers\IOWrite32.cs" />
     <Compile Include="Assemblers\IOWrite8.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="Interlocked.cs" />
     <Compile Include="PagingUtilityImpl.cs" />
     <Compile Include="String.cs" />
-    <Compile Include="CPU.cs" />
     <Compile Include="Hardware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThreadImpl.cs" />
