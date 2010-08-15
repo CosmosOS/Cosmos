@@ -24,10 +24,6 @@ namespace Cosmos.Hardware2 {
             Console.WriteLine("    Init PCIBus");
             PCIBus.Init();
 
-            // Old
-            Console.WriteLine("    Init Keyboard");
-            Keyboard.Initialize();
-
             Console.WriteLine("    Init Mouse");
             Mouse.Initialize();
             // New

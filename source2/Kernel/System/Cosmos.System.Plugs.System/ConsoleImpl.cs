@@ -227,7 +227,8 @@ namespace Cosmos.System.Plugs.System {
 
         public static int Read() {
             //TODO - after this and kb, remove asm ref to Hardware2
-            return Cosmos.Hardware2.Keyboard.ReadChar();
+            //return Cosmos.Hardware2.Keyboard.ReadChar();
+            return 0;
         }
 
         public static string ReadLine() {
@@ -235,7 +236,7 @@ namespace Cosmos.System.Plugs.System {
             char current;
             int currentCount = 0;
 
-            while ((current = Cosmos.Hardware2.Keyboard.ReadChar()) != '\n') {
+            while ((current = Hardware.Global.Keyboard.ReadChar()) != '\n') {
                 //Check for "special" keys
                 if (current == '\u0968') // Backspace   
                 {

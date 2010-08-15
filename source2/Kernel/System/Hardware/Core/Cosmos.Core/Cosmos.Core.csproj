@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="IOGroup\Keyboard.cs" />
     <Compile Include="IRQs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />
     <Compile Include="IOGroup\PIT.cs" />

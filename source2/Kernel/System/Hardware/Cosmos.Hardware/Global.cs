@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Cosmos.Hardware {
     static public class Global {
-        static public TextScreen TextScreen = new TextScreen();
+        static public Keyboard Keyboard = new Keyboard();
         static public PIT PIT = new PIT();
+        static public TextScreen TextScreen = new TextScreen();
 
         static public void Init() {
             Cosmos.Core.Global.Init();

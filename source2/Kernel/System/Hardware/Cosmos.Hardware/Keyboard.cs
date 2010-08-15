@@ -1,132 +1,94 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using Cosmos.Kernel;
+using HW2 = Cosmos.Hardware2;
+using K2 = Cosmos.Kernel;
 
-namespace Cosmos.Hardware2
-{
-    //public class Keyboard : Cosmos.Hardware2.SerialDevice {
-    //    public Keyboard() {
-    //        mType = DeviceType.Keyboard;
-    //    }
-
-    //    public void InterruptReceived() {
-    //        byte xByte = Kernel.CPUBus.Read8(0x60);
-    //        ByteReceived(xByte);
-    //    }
-    //    public override string Name {
-    //        get {
-    //            return "Keyboard";
-    //        }
-    //    }
-    //}
-
+namespace Cosmos.Hardware {
     public delegate void HandleKeyboardDelegate(byte aScanCode, bool aReleased);
-    public class Keyboard : Hardware
-    {
-        private static HandleKeyboardDelegate mHandleKeyboardKey;
-        public static void Initialize(HandleKeyboardDelegate aHandleKeyboardKeyDelegate)
-        {
+    public class Keyboard : Device {
+        protected Core.IOGroup.Keyboard IO = Core.Global.BaseIOGroups.Keyboard;
+
+        private HandleKeyboardDelegate mHandleKeyboardKey;
+        public void Initialize(HandleKeyboardDelegate aHandleKeyboardKeyDelegate) {
             mHandleKeyboardKey = aHandleKeyboardKeyDelegate;
         }
 
-        public static void Initialize()
-        {
+        public void Initialize() {
             CheckInit();
         }
 
-        public static void HandleKeyboardInterrupt(ref IRQContext aContext)
-        {
-        //  Console.WriteLine("Handling KeyboardInterrupt");
-          if (mHandleKeyboardKey != null) {
-            byte xScanCode = IOReadByte(0x60);
-            bool xReleased = (xScanCode & 0x80) == 0x80;
-            if (xReleased) {
-              xScanCode = (byte)(xScanCode ^ 0x80);
+        public void HandleKeyboardInterrupt(ref HW2.IRQContext aContext) {
+            //  Console.WriteLine("Handling KeyboardInterrupt");
+            if (mHandleKeyboardKey != null) {
+                byte xScanCode = IO.Port60.Byte;
+                bool xReleased = (xScanCode & 0x80) == 0x80;
+                if (xReleased) {
+                    xScanCode = (byte)(xScanCode ^ 0x80);
+                }
+                mHandleKeyboardKey(xScanCode, xReleased);
             }
-            mHandleKeyboardKey(xScanCode, xReleased);
-          }
         }
 
-        private static Queue<uint> mBuffer;
+        private Queue<uint> mBuffer;
         private const int BufferSize = 64;
-        private static bool mEscaped;
-        private static List<KeyMapping> mKeys;
-        private static bool mShiftState;
-        private static bool mCtrlState;
-        private static bool mAltState;
+        private bool mEscaped;
+        private List<KeyMapping> mKeys;
+        private bool mShiftState;
+        private bool mCtrlState;
+        private bool mAltState;
 
-        public static bool ShiftPressed
-        {
-            get
-            {
+        public bool ShiftPressed {
+            get {
                 return mShiftState;
             }
         }
-        public static bool CtrlPressed
-        {
-            get
-            {
+        public bool CtrlPressed {
+            get {
                 return mCtrlState;
             }
         }
-        public static bool AltPressed
-        {
-            get
-            {
+        public bool AltPressed {
+            get {
                 return mAltState;
             }
         }
 
-        protected static void HandleScancode(byte aScancode, bool aReleased)
-        {
+        protected void HandleScancode(byte aScancode, bool aReleased) {
             uint xTheScancode = aScancode;
-            if (mEscaped)
-            {
+            if (mEscaped) {
                 xTheScancode = (ushort)(xTheScancode << 8);
                 mEscaped = false;
             }
-            switch (xTheScancode)
-            {
+            switch (xTheScancode) {
                 case 0x36:
-                case 0x2A:
-                    {
+                case 0x2A: {
                         mShiftState = !aReleased;
                         break;
                     }
-                case 0x1D:
-                    {
+                case 0x1D: {
                         mCtrlState = !aReleased;
                         break;
                     }
-                case 0x38:
-                    {
+                case 0x38: {
                         mAltState = !aReleased;
                         break;
                     }
-                default:
-                    {
-                        if ((mCtrlState) && (mAltState) && (xTheScancode == 0x53))
-                        {
+                default: {
+                        if ((mCtrlState) && (mAltState) && (xTheScancode == 0x53)) {
                             Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
                             Cosmos.Kernel.CPU.Reboot();
                         }
-                        if (mShiftState)
-                        {
+                        if (mShiftState) {
                             xTheScancode = xTheScancode << 16;
                         }
-                        if (mBuffer.Count < BufferSize)
-                        {
-                            if (!aReleased)
-                            {
+                        if (mBuffer.Count < BufferSize) {
+                            if (!aReleased) {
                                 char xTheChar;
-                                if (!GetCharValue(xTheScancode, out xTheChar))
-                                {
+                                if (!GetCharValue(xTheScancode, out xTheChar)) {
                                     //DebugUtil.SendError("Keyboard", "error while getting scancode character!");
-                                }
-                                else
-                                {
+                                } else {
                                     //DebugUtil.SendDoubleNumber("Keyboard", "Scancode and Char", xTheScancode, 32, xTheChar, 16);
                                 }
                                 mBuffer.Enqueue(xTheScancode);
@@ -140,24 +102,21 @@ namespace Cosmos.Hardware2
 
         // Can merge HandleScancode after we remove old code
         // Remove the static.. Make it a real class
-        protected static void ByteReceived(byte aValue)
-        {
+        protected void ByteReceived(byte aValue) {
             bool xReleased = (aValue & 0x80) == 0x80;
-            if (xReleased)
-            {
+            if (xReleased) {
                 aValue = (byte)(aValue ^ 0x80);
             }
             mHandleKeyboardKey(aValue, xReleased);
         }
 
-        private static unsafe void CheckInit()
-        {
-            if (mBuffer == null)
-            {
+        private void CheckInit() {
+            if (mBuffer == null) {
                 mBuffer = new Queue<uint>(BufferSize);
 
                 // Old
-                Keyboard.Initialize(HandleScancode);
+                //TODO New Kernel
+                //Keyboard.Initialize(HandleScancode);
                 //Interrupts.IRQ01 += HandleKeyboardInterrupt;
                 //TODO New Kernel
                 //IRQs.AddIRQHandler(1, HandleKeyboardInterrupt);
@@ -167,15 +126,13 @@ namespace Cosmos.Hardware2
                 //xKeyboard.ByteReceived += new HW.SerialDevice.ByteReceivedDelegate(ByteReceived);
                 // End
 
-                if (mKeys == null)
-                {
+                if (mKeys == null) {
                     CreateDefaultKeymap();
                 }
             }
         }
 
-        private static void CreateDefaultKeymap()
-        {
+        private void CreateDefaultKeymap() {
             mKeys = new List<KeyMapping>(164);
 
             //TODO: fn (for laptops)
@@ -341,54 +298,43 @@ namespace Cosmos.Hardware2
             #endregion
         }
 
-        private static uint KeyCount = 0;
+        private uint KeyCount = 0;
 
-        private static void AddKey(uint p, char p_2, ConsoleKey p_3)
-        {
+        private void AddKey(uint p, char p_2, ConsoleKey p_3) {
             mKeys.Add(new KeyMapping(p, p_2, p_3));
             KeyCount++;
         }
-        private static void AddKeyWithShift(uint p, char p_2, ConsoleKey p_3)
-        {
-          AddKey(p, p_2, p_3);
-          AddKey(p << 16, p_2, p_3);
+        private void AddKeyWithShift(uint p, char p_2, ConsoleKey p_3) {
+            AddKey(p, p_2, p_3);
+            AddKey(p << 16, p_2, p_3);
         }
-        private static void AddKey(uint p, ConsoleKey p_3)
-        {
-          AddKey(p, '\0', p_3);
+        private void AddKey(uint p, ConsoleKey p_3) {
+            AddKey(p, '\0', p_3);
         }
-        private static void AddKeyWithShift(uint p, ConsoleKey p_3)
-        {
-          AddKeyWithShift(p, '\0', p_3);
+        private void AddKeyWithShift(uint p, ConsoleKey p_3) {
+            AddKeyWithShift(p, '\0', p_3);
         }
 
-        public static void ChangeKeyMap(List<KeyMapping> aKeys)
-        {
+        public void ChangeKeyMap(List<KeyMapping> aKeys) {
             mKeys = aKeys;
         }
 
-        public static bool GetCharValue(uint aScanCode, out char aValue)
-        {
-          //Console.Write("Key count: ");
-          //Interrupts.WriteNumber((uint)mKeys.Count, 32);
-          //Console.WriteLine("");
+        public bool GetCharValue(uint aScanCode, out char aValue) {
+            //Console.Write("Key count: ");
+            //Interrupts.WriteNumber((uint)mKeys.Count, 32);
+            //Console.WriteLine("");
 
-            for (int i = 0; i < mKeys.Count; i++)
-            {
-              //if (i == 0) {
-              //  Console.Write("ScanCode in KeyMapping: ");
-              //  Interrupts.WriteNumber(mKeys[i].Scancode, 32);
-              //  Console.WriteLine("");
-              //}
-                if (mKeys[i].Scancode == aScanCode)
-                {
-                    if (mKeys[i].Value != '\0')
-                    {
+            for (int i = 0; i < mKeys.Count; i++) {
+                //if (i == 0) {
+                //  Console.Write("ScanCode in KeyMapping: ");
+                //  Interrupts.WriteNumber(mKeys[i].Scancode, 32);
+                //  Console.WriteLine("");
+                //}
+                if (mKeys[i].Scancode == aScanCode) {
+                    if (mKeys[i].Value != '\0') {
                         aValue = mKeys[i].Value;
                         return true;
-                    }
-                    else
-                    {
+                    } else {
                         //DebugUtil.SendError("Keyboard", "Char not mapped for scancode '" + aScanCode.ToHex() + "' with key '" + mKeys[i].Key.ToString() + "'!");
 
                         goto Failure;
@@ -402,12 +348,9 @@ namespace Cosmos.Hardware2
             aValue = '\0';
             return false;
         }
-        public static bool GetKeyValue(uint aScanCode, out ConsoleKey aValue)
-        {
-            for (int i = 0;i < mKeys.Count;i++)
-            {
-                if (mKeys[i].Scancode == aScanCode)
-                {
+        public bool GetKeyValue(uint aScanCode, out ConsoleKey aValue) {
+            for (int i = 0; i < mKeys.Count; i++) {
+                if (mKeys[i].Scancode == aScanCode) {
                     aValue = mKeys[i].Key;
                     return true;
                 }
@@ -416,13 +359,10 @@ namespace Cosmos.Hardware2
             aValue = ConsoleKey.NoName;
             return false;
         }
-        public static bool GetKeyMapping(uint aScanCode, out KeyMapping aValue)
-        {
-            for (int i = 0;i < mKeys.Count;i++)
-            {
+        public bool GetKeyMapping(uint aScanCode, out KeyMapping aValue) {
+            for (int i = 0; i < mKeys.Count; i++) {
 
-                if (mKeys[i].Scancode == aScanCode)
-                {
+                if (mKeys[i].Scancode == aScanCode) {
                     aValue = mKeys[i];
                     return true;
                 }
@@ -432,116 +372,92 @@ namespace Cosmos.Hardware2
             return false;
         }
 
-        public static char ReadChar()
-        {
+        public char ReadChar() {
             CheckInit();
             char xResult = '\0';
-            while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult))
-            {
+            while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
-                CPU.Halt();
+                K2.CPU.Halt();
             }
             return xResult;
         }
-        public static bool GetChar(out char c)
-        {
+        public bool GetChar(out char c) {
             CheckInit();
 
             c = '\0';
 
-            if (mBuffer.Count > 0)
-            {
+            if (mBuffer.Count > 0) {
                 GetCharValue(mBuffer.Dequeue(), out c);
 
                 return true;
-            }
-            else
-            { 
+            } else {
                 return false;
             }
         }
 
-        public static ConsoleKey ReadKey()
-        {
+        public ConsoleKey ReadKey() {
             CheckInit();
             ConsoleKey xResult = ConsoleKey.NoName;
-            while (mBuffer.Count == 0 || !GetKeyValue(mBuffer.Dequeue(), out xResult))
-            {
+            while (mBuffer.Count == 0 || !GetKeyValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
-                CPU.Halt();
+                K2.CPU.Halt();
             }
             return xResult;
         }
-        public static bool GetKey(out ConsoleKey c)
-        {
+        public bool GetKey(out ConsoleKey c) {
             CheckInit();
 
             c = ConsoleKey.NoName;
 
-            if (mBuffer.Count > 0)
-            {
+            if (mBuffer.Count > 0) {
                 GetKeyValue(mBuffer.Dequeue(), out c);
 
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
 
-        public static KeyMapping ReadMapping()
-        {
+        public KeyMapping ReadMapping() {
             CheckInit();
             KeyMapping xResult = null;
-            while (mBuffer.Count == 0 || !GetKeyMapping(mBuffer.Dequeue(), out xResult))
-            {
+            while (mBuffer.Count == 0 || !GetKeyMapping(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
-                CPU.Halt();
+                K2.CPU.Halt();
             }
             return xResult;
         }
-        public static bool GetMapping(out KeyMapping c)
-        {
+        public bool GetMapping(out KeyMapping c) {
             CheckInit();
 
             c = null;
 
-            if (mBuffer.Count > 0)
-            {
+            if (mBuffer.Count > 0) {
                 GetKeyMapping(mBuffer.Dequeue(), out c);
 
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
 
-        public static uint ReadScancode()
-        {
+        public uint ReadScancode() {
             CheckInit();
 
-            while (mBuffer.Count == 0)
-            {
-                CPU.Halt();
+            while (mBuffer.Count == 0) {
+                K2.CPU.Halt();
             }
 
             return mBuffer.Dequeue();
         }
-        public static bool GetScancode(out uint c)
-        {
+        public bool GetScancode(out uint c) {
             CheckInit();
 
-            if (mBuffer.Count > 0)
-            {
+            if (mBuffer.Count > 0) {
                 c = mBuffer.Dequeue();
 
                 return true;
-            }
-            else
-            {
+            } else {
                 c = 0;
 
                 return false;
@@ -551,20 +467,17 @@ namespace Cosmos.Hardware2
         /// <summary>
         /// Represents the current KeyMap
         /// </summary>
-        public class KeyMapping
-        {
+        public class KeyMapping {
             public uint Scancode;
             public char Value;
             public ConsoleKey Key;
 
-            public KeyMapping(uint aScanCode, char aValue, ConsoleKey aKey)
-            {
+            public KeyMapping(uint aScanCode, char aValue, ConsoleKey aKey) {
                 Scancode = aScanCode;
                 Value = aValue;
                 Key = aKey;
             }
-            public KeyMapping(uint aScanCode, ConsoleKey aKey)
-            {
+            public KeyMapping(uint aScanCode, ConsoleKey aKey) {
                 Scancode = aScanCode;
                 Value = '\0';
                 Key = aKey;
