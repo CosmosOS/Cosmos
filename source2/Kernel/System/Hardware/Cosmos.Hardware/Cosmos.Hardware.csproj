@@ -72,6 +72,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Keyboard.html" />
     <Content Include="TextScreen.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

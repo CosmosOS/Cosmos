@@ -19,7 +19,7 @@ namespace Cosmos.Hardware {
             CheckInit();
         }
 
-        public void HandleKeyboardInterrupt(ref HW2.IRQContext aContext) {
+        public void HandleIRQ(ref HW2.IRQContext aContext) {
             if (mHandleKeyboardKey != null) {
                 byte xScanCode = IO.Port60.Byte;
                 bool xReleased = (xScanCode & 0x80) == 0x80;
@@ -113,17 +113,10 @@ namespace Cosmos.Hardware {
             if (mBuffer == null) {
                 mBuffer = new Queue<uint>(BufferSize);
 
-                // Old
-                //TODO New Kernel
-                //Keyboard.Initialize(HandleScancode);
+                Initialize(HandleScancode);
                 //Interrupts.IRQ01 += HandleKeyboardInterrupt;
-                //TODO New Kernel
-                //IRQs.AddIRQHandler(1, HandleKeyboardInterrupt);
-                // New
+                Core.IRQs.AddIRQHandler(1, HandleIRQ);
                 // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
-                //var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);
-                //xKeyboard.ByteReceived += new HW.SerialDevice.ByteReceivedDelegate(ByteReceived);
-                // End
 
                 if (mKeys == null) {
                     CreateDefaultKeymap();
@@ -136,7 +129,6 @@ namespace Cosmos.Hardware {
 
             //TODO: fn (for laptops)
 
-            //reference: http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html#ss1.1
             #region Letters
             AddKey(0x10, 'q', ConsoleKey.Q);
             AddKey(0x100000, 'Q', ConsoleKey.Q);
@@ -319,10 +311,6 @@ namespace Cosmos.Hardware {
         }
 
         public bool GetCharValue(uint aScanCode, out char aValue) {
-            //Console.Write("Key count: ");
-            //Interrupts.WriteNumber((uint)mKeys.Count, 32);
-            //Console.WriteLine("");
-
             for (int i = 0; i < mKeys.Count; i++) {
                 //if (i == 0) {
                 //  Console.Write("ScanCode in KeyMapping: ");
@@ -333,17 +321,11 @@ namespace Cosmos.Hardware {
                     if (mKeys[i].Value != '\0') {
                         aValue = mKeys[i].Value;
                         return true;
-                    } else {
-                        //DebugUtil.SendError("Keyboard", "Char not mapped for scancode '" + aScanCode.ToHex() + "' with key '" + mKeys[i].Key.ToString() + "'!");
-
-                        goto Failure;
                     }
+                    break;
                 }
             }
 
-            //DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
-
-        Failure:
             aValue = '\0';
             return false;
         }
@@ -380,14 +362,13 @@ namespace Cosmos.Hardware {
             }
             return xResult;
         }
+
         public bool GetChar(out char c) {
             CheckInit();
-
             c = '\0';
 
             if (mBuffer.Count > 0) {
                 GetCharValue(mBuffer.Dequeue(), out c);
-
                 return true;
             } else {
                 return false;
@@ -405,12 +386,10 @@ namespace Cosmos.Hardware {
         }
         public bool GetKey(out ConsoleKey c) {
             CheckInit();
-
             c = ConsoleKey.NoName;
 
             if (mBuffer.Count > 0) {
                 GetKeyValue(mBuffer.Dequeue(), out c);
-
                 return true;
             } else {
                 return false;
@@ -428,12 +407,10 @@ namespace Cosmos.Hardware {
         }
         public bool GetMapping(out KeyMapping c) {
             CheckInit();
-
             c = null;
 
             if (mBuffer.Count > 0) {
                 GetKeyMapping(mBuffer.Dequeue(), out c);
-
                 return true;
             } else {
                 return false;
@@ -454,18 +431,13 @@ namespace Cosmos.Hardware {
 
             if (mBuffer.Count > 0) {
                 c = mBuffer.Dequeue();
-
                 return true;
             } else {
                 c = 0;
-
                 return false;
             }
         }
 
-        /// <summary>
-        /// Represents the current KeyMap
-        /// </summary>
         public class KeyMapping {
             public uint Scancode;
             public char Value;
