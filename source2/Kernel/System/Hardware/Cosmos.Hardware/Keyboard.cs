@@ -20,7 +20,6 @@ namespace Cosmos.Hardware {
         }
 
         public void HandleKeyboardInterrupt(ref HW2.IRQContext aContext) {
-            //  Console.WriteLine("Handling KeyboardInterrupt");
             if (mHandleKeyboardKey != null) {
                 byte xScanCode = IO.Port60.Byte;
                 bool xReleased = (xScanCode & 0x80) == 0x80;
