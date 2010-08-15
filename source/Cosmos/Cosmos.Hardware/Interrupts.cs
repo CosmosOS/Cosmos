@@ -115,10 +115,6 @@ namespace Cosmos.Hardware2 {
 
             [FieldOffset(56)]
             public uint UserESP;
-
-            
-
-
         }
 
         private static InterruptDelegate[] mIRQ_Handlers;

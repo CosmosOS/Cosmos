@@ -8,7 +8,7 @@ using HW = Cosmos.Hardware2;
 using System.Collections.Generic;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
-  public class CreateIDT: AssemblerMethod {
+  public class CreateIDT : AssemblerMethod {
     private static MethodBase GetMethodDef(Assembly aAssembly,
                                            string aType,
                                            string aMethodName,

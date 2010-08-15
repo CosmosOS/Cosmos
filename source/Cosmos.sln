@@ -114,7 +114,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "57549"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -151,9 +150,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs.System"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "..\source2\VSIP\Cosmos.VS.Wizards\Cosmos.VS.Wizards.csproj", "{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 41
+		SccNumberOfProjects = 42
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS04
 		SccLocalPath0 = .
@@ -318,6 +319,10 @@ Global
 		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
 		SccProjectName40 = ../source2/VSIP/Cosmos.VS.Wizards
 		SccLocalPath40 = ..\\source2\\VSIP\\Cosmos.VS.Wizards
+		SccProjectUniqueName41 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
+		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
+		SccProjectName41 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core.Plugs
+		SccLocalPath41 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -766,6 +771,15 @@ Global
 		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|x86.ActiveCfg = Release|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -830,5 +844,6 @@ Global
 		{ADDA07A5-ADA8-4D71-831B-0A421F04A546} = {677B6C6A-14DC-4C0B-ACDB-C04696DF77A8}
 		{6A991D03-1435-4005-9809-B8BACDF3B021} = {677B6C6A-14DC-4C0B-ACDB-C04696DF77A8}
 		{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
 	EndGlobalSection
 EndGlobal
