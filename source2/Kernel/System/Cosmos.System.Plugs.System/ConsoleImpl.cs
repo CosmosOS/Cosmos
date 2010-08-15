@@ -5,11 +5,8 @@ using Cosmos.IL2CPU.Plugs;
 using Cosmos.System;
 
 namespace Cosmos.System.Plugs.System {
-    [Plug(Target = typeof(System.Console))]
-    public class Console {
-        //public static ConsoleColor get_ForegroundColor() {
-        //    return _foreground;
-        //}
+    [Plug(Target = typeof(Console))]
+    public class ConsoleImpl {
 
         //public static void set_ForegroundColor(ConsoleColor value) {
         //    _foreground = value;
