@@ -13,12 +13,11 @@ namespace Cosmos.Hardware {
         protected static bool mInitialized = false;
         protected static byte Color;
 
-        static protected MemoryBlock mMemory;
+        static protected Core.IOGroup.TextScreen IOGroup = Core.Global.BaseIOGroups.TextScreen;
         static protected MemoryBlock08 mMemory08;
 
         static TextScreen() {
-            mMemory = Core.Global.TextScreenMemory;
-            mMemory08 = mMemory.Bytes;
+            mMemory08 = IOGroup.Memory.Bytes;
         }
 
         protected static void CheckInit() {
@@ -52,7 +51,7 @@ namespace Cosmos.Hardware {
             CheckInit();
             // Empty + White + Empty + White
             UInt32 xData = 0x000F000F;
-            mMemory.Fill(0, 80 * 25 * 2 / 4, xData);
+            IOGroup.Memory.Fill(0, 80 * 25 * 2 / 4, xData);
 
             CurrentChar = 0;
             CurrentRow = 1;
@@ -72,7 +71,7 @@ namespace Cosmos.Hardware {
 
         protected static void ScrollUp() {
             CheckInit();
-            mMemory.MoveDown(0, 80, 80 * 24 * 2 / 4);
+            IOGroup.Memory.MoveDown(0, 80, 80 * 24 * 2 / 4);
             SetCursor();
         }
 
@@ -109,11 +108,11 @@ namespace Cosmos.Hardware {
             char position = (char)((CurrentRow * 80) + CurrentChar);
 
             // cursor low byte to VGA index register
-            Cosmos.Kernel.CPUBus.Write8(0x3D4, 0x0F);
-            Cosmos.Kernel.CPUBus.Write8(0x3D5, (byte)(position & 0xFF));
+            Cosmos.Kernel.CPUBus.Write8(0x03D4, 0x0F);
+            Cosmos.Kernel.CPUBus.Write8(0x03D5, (byte)(position & 0xFF));
             // cursor high byte to vga index register
-            Cosmos.Kernel.CPUBus.Write8(0x3D4, 0x0E);
-            Cosmos.Kernel.CPUBus.Write8(0x3D5, (byte)((position >> 8) & 0xFF));
+            Cosmos.Kernel.CPUBus.Write8(0x03D4, 0x0E);
+            Cosmos.Kernel.CPUBus.Write8(0x03D5, (byte)((position >> 8) & 0xFF));
 
             Color = tempColor;
         }

@@ -47,7 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="IOGroup\IOGroup.cs" />
+    <Compile Include="IOGroup\TextScreen.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
