@@ -34,7 +34,7 @@
 		<Reference Include="System.Data"/>
 		<Reference Include="System.Xml"/>
 
-        <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
+        <Reference Include="Cosmos.Hardware2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
         <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
         <Reference Include="Cosmos.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     </ItemGroup>
