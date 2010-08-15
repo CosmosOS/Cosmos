@@ -78,10 +78,6 @@
     <Compile Include="TestClass.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
-      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
-      <Name>Cosmos.Hardware.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
       <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
       <Name>Cosmos.Kernel.Plugs</Name>
@@ -117,6 +113,10 @@
     <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
+      <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
+      <Name>Cosmos.System.Plugs.System</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>

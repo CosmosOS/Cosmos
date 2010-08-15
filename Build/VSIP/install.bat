@@ -3,12 +3,6 @@
 REM Necessary to set dir when running as admin
 cd %~dp0
 
-rem Prob not needed at all anymore, can delete
-rem echo Killing old stuff - Need to modify not to be user specific
-rem del /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies\*.*"
-rem rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\ProjectAssemblies"
-rem del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
-
 echo Compiling cosmos
 cd "..\..\source"
 %windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86
@@ -61,8 +55,7 @@ IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
 ..\..\Setup2\Output\CosmosUserKit5.exe /SILENT
 
 rem Relaunch VS
-echo on
 rem calling .sln doesnt work. Might be related to having 2010 and 2008 both installed
 rem ..\..\source\Cosmos.sln
-"C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
+"C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln

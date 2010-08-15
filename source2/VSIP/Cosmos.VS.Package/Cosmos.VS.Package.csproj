@@ -282,10 +282,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
-      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
-      <Name>Cosmos.Hardware.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
       <Name>Cosmos.Sys.FileSystem</Name>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Globalization = System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Framework;
@@ -73,7 +74,7 @@ namespace Cosmos.Build.MSBuild
                 uint xAddress;
                 try
                 {
-                    xAddress = UInt32.Parse(xLine.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
+                    xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
                 }
                 catch (Exception)
                 {

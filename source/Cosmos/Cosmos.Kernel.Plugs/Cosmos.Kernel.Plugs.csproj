@@ -103,7 +103,6 @@
     <Compile Include="Interlocked.cs" />
     <Compile Include="PagingUtilityImpl.cs" />
     <Compile Include="String.cs" />
-    <Compile Include="Console.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="Hardware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

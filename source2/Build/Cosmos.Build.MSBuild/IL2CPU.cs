@@ -88,12 +88,12 @@ namespace Cosmos.Build.MSBuild
 
         private void DoInitTypes()
         {
-            var xType = typeof(Cosmos.Hardware.Plugs.FCL.System.Console);
-            Log.LogMessage("Console plug loaded: {0}", xType.FullName);
+            Type xType;
             xType = typeof(Cosmos.Sys.Plugs.Deboot);
             Log.LogMessage("Deboot plug loaded: {0}", xType.FullName);
             xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
             Log.LogMessage("ArrayList plug loaded: {0}", xType.FullName);
+            xType = typeof(Cosmos.System.Plugs.System.Console);
         }
 
         #region properties
