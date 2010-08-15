@@ -47,7 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Device.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextScreen.cs" />
   </ItemGroup>

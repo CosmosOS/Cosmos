@@ -126,7 +126,6 @@
     <Compile Include="Global.cs" />
     <Compile Include="DebugUtil.cs" />
     <Compile Include="Hardware.cs" />
-    <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RTC.cs" />
     <Compile Include="Serial.cs" />

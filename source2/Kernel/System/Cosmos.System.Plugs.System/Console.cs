@@ -33,12 +33,12 @@ namespace Cosmos.System.Plugs.System {
             if (aDuration <= 0) {
                 throw new ArgumentOutOfRangeException("Duration must be more than 0");
             }
-            
-            //TODO - after this and kb, remove asm ref to Hardware2
-            Hardware2.PIT.EnableSound();
-            Hardware2.PIT.T2Frequency = (uint)aFrequency;
-            Hardware2.PIT.Wait((uint)aDuration);
-            Hardware2.PIT.DisableSound();
+
+            var xPIT = Hardware.Global.PIT;
+            xPIT.EnableSound();
+            xPIT.T2Frequency = (uint)aFrequency;
+            xPIT.Wait((uint)aDuration);
+            xPIT.DisableSound();
         }
 
         public static int get_CursorLeft() {
@@ -229,6 +229,7 @@ namespace Cosmos.System.Plugs.System {
         #endregion
 
         public static int Read() {
+            //TODO - after this and kb, remove asm ref to Hardware2
             return Cosmos.Hardware2.Keyboard.ReadChar();
         }
 

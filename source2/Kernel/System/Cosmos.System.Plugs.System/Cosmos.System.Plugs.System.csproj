@@ -57,6 +57,10 @@
       <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
