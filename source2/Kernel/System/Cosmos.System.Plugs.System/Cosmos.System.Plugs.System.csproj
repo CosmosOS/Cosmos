@@ -53,9 +53,9 @@
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.Hardware</Name>
+    <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj">
+      <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
+      <Name>Cosmos.System</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
