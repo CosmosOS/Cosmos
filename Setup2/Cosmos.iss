@@ -46,6 +46,7 @@ SourceDir=..
 WizardImageFile=.\setup2\images\cosmos.bmp
 ;Small Image should be 55x55
 WizardSmallImageFile=.\setup2\images\cosmos_small.bmp
+AllowCancelDuringInstall=false
 
 ; If you want all languages to be listed in the "Select Setup Language"
 ; dialog, even those that can't be displayed in the active code page,
