@@ -88,9 +88,7 @@ namespace Cosmos.Core {
         }
 
         public delegate void InterruptDelegate(ref IRQContext aContext);
-
-        public delegate void ExceptionInterruptDelegate(ref IRQContext aContext,
-                                                        ref bool aHandled);
+        public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
 
         //IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
         //IRQ 3 - COM2 (Default) and COM4 (User) serial ports
@@ -381,8 +379,9 @@ namespace Cosmos.Core {
 
         // This is to trick IL2CPU to compile it in
         //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
-        public static void Init() {
-            #region Compiler magic
+        // We dont actually need to cal this method
+        public static void Dummy() {
+            // Compiler magic
             bool xTest = false;
             if (xTest) {
                 unsafe {
@@ -420,7 +419,6 @@ namespace Cosmos.Core {
                     HandleInterrupt_35(ref xCtx);
                 }
             }
-            #endregion
         }
 
     }

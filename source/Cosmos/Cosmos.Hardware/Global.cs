@@ -13,7 +13,7 @@ namespace Cosmos.Hardware2 {
             Console.WriteLine("    Init PIC");
             PIC.Init();
 
-            Console.WriteLine("    Init Serial");
+            //Console.WriteLine("    Init Serial");
             //Serial.InitSerial(0); // MtW: disabled, screws up debugging
             //PIT.Initialize(Tick);
 
@@ -24,19 +24,19 @@ namespace Cosmos.Hardware2 {
             Console.WriteLine("    Init PCIBus");
             PCIBus.Init();
 
-            Console.WriteLine("    Init Mouse");
-            Mouse.Initialize();
+            //Console.WriteLine("    Init Mouse");
+            //Mouse.Initialize();
             // New
-            Console.WriteLine("    Init ATA");
-            Storage.ATA.ATA.Initialize();
+            //Console.WriteLine("    Init ATA");
+            //Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
 
-            Network.Devices.RTL8139.RTL8139.InitDriver();
-            Network.Devices.AMDPCNetII.AMDPCNet.InitDriver();
+            //Network.Devices.RTL8139.RTL8139.InitDriver();
+            //Network.Devices.AMDPCNetII.AMDPCNet.InitDriver();
             //Network.Devices.ViaRhine.VT6102.InitDriver();
 
-            Console.WriteLine("    Init Device Drivers");
-            Device.DriversInit();
+            //Console.WriteLine("    Init Device Drivers");
+            //Device.DriversInit();
         }
 
         public static uint TickCount {
