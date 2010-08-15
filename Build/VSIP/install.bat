@@ -4,8 +4,9 @@ REM Necessary to set dir when running as admin
 cd %~dp0
 
 echo Compiling cosmos
+set "THE_OUTPUT_PATH=%CD%"
 cd "..\..\source"
-%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86
+%windir%\Microsoft.NET\Framework\V3.5\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%"
 rem /t:Rebuild
 cd ..\Build\VSIP\
 
