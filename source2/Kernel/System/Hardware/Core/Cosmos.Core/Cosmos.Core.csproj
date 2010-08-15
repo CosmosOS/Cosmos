@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="IOPort.html" />
+    <Content Include="IRQs.html" />
     <Content Include="MemoryBlock.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

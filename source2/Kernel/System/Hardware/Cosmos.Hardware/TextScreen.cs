@@ -11,7 +11,7 @@ namespace Cosmos.Hardware {
         protected byte Color = 0x0F; // White
 
         protected Core.IOGroup.TextScreen IO = Core.Global.BaseIOGroups.TextScreen;
-        protected MemoryBlock08 mMemory08;
+        protected readonly MemoryBlock08 mMemory08;
 
         public TextScreen() {
             mMemory08 = IO.Memory.Bytes;
