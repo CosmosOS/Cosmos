@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Compiler.Assembler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using CPUAll = Cosmos.Compiler.Assembler;
-using HW = Cosmos.Hardware;
+using HW = Cosmos.Hardware2;
 using System.Collections.Generic;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
@@ -28,8 +28,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     }
 
     private static MethodBase GetInterruptHandler(byte aInterrupt) {
-      return GetMethodDef(typeof(Cosmos.Hardware.Interrupts).Assembly,
-                          typeof(Cosmos.Hardware.Interrupts).FullName,
+      return GetMethodDef(typeof(Cosmos.Hardware2.Interrupts).Assembly,
+                          typeof(Cosmos.Hardware2.Interrupts).FullName,
                           "HandleInterrupt_" + aInterrupt.ToString("X2"),
                           false);
     }
@@ -136,8 +136,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
         MethodBase xHandler = GetInterruptHandler((byte)j);
         if (xHandler == null) {
-          xHandler = GetMethodDef(typeof(Cosmos.Hardware.Interrupts).Assembly,
-                                  typeof(Cosmos.Hardware.Interrupts).FullName,
+          xHandler = GetMethodDef(typeof(Cosmos.Hardware2.Interrupts).Assembly,
+                                  typeof(Cosmos.Hardware2.Interrupts).FullName,
                                   "HandleInterrupt_Default",
                                   true);
         }

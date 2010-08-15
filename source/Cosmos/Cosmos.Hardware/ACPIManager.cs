@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Hardware
+namespace Cosmos.Hardware2
 {
     public static class ACPIManager
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware;
+using Cosmos.Hardware2;
 
 namespace Cosmos.Sys {
 
@@ -24,7 +24,7 @@ namespace Cosmos.Sys {
             Console.Clear();
 
             Kernel.Global.Init();
-            Hardware.Global2.Init();
+            Hardware2.Global2.Init();
             Sys.Global.Init();
 
             // Clear again in case debug information has been written out

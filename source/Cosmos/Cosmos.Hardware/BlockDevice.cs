@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
     public abstract class BlockDevice : Device {
         protected BlockDevice() {
             mType = DeviceType.Storage;

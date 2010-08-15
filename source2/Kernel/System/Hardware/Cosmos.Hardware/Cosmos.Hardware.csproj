@@ -16,6 +16,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,26 +36,37 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware2</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cosmos.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

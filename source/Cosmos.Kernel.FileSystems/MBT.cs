@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cosmos.Hardware;
+using Cosmos.Hardware2;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Sys.FileSystem {

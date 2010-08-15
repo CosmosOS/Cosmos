@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware;
-using Cosmos.Hardware.Audio.Devices.ES1370.Registers;
-using Cosmos.Hardware.Audio.Devices.ES1370.Components;
-using Cosmos.Hardware.Audio.Devices.ES1370.Managers;
-namespace Cosmos.Hardware.Audio.Devices.ES1370
+using Cosmos.Hardware2;
+using Cosmos.Hardware2.Audio.Devices.ES1370.Registers;
+using Cosmos.Hardware2.Audio.Devices.ES1370.Components;
+using Cosmos.Hardware2.Audio.Devices.ES1370.Managers;
+namespace Cosmos.Hardware2.Audio.Devices.ES1370
 {
     /// <summary>
     /// Driver for the soundcard Ensoniq 1370 AudioPCI (testing for QEMU audio emulation)
@@ -52,7 +52,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         {
             List<ES1370> found = new List<ES1370>();
 
-            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
+            foreach (PCIDevice device in Cosmos.Hardware2.PCIBus.Devices)
             {
                 Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
@@ -77,8 +77,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
 
         public void InitializeDriver()
         {
-            //Cosmos.Hardware.Interrupts.IRQ05 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleAudioInterrupt);
-            Cosmos.Hardware.Interrupts.AddIRQHandler(5, this.HandleAudioInterrupt);
+            //Cosmos.Hardware2.Interrupts.IRQ05 = new Cosmos.Hardware2.Interrupts.InterruptDelegate(this.HandleAudioInterrupt);
+            Cosmos.Hardware2.Interrupts.AddIRQHandler(5, this.HandleAudioInterrupt);
         }
 
         #endregion

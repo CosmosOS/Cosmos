@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
 	public class Serial: Hardware {
 		private const ushort COM1 = 0x3F8;
         private const ushort COM2 = 0x2F8;

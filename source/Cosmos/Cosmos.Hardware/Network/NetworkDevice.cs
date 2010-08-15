@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware.Network
+namespace Cosmos.Hardware2.Network
 {    
     public delegate void DataReceivedHandler(byte[] packetData);
 

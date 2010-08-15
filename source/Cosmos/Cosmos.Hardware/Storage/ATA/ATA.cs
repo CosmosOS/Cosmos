@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Storage.ATA
+namespace Cosmos.Hardware2.Storage.ATA
 {
     public class ATA : BlockDevice
     {

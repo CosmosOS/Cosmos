@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware
+namespace Cosmos.Hardware2
 {
-    //public class Keyboard : Cosmos.Hardware.SerialDevice {
+    //public class Keyboard : Cosmos.Hardware2.SerialDevice {
     //    public Keyboard() {
     //        mType = DeviceType.Keyboard;
     //    }

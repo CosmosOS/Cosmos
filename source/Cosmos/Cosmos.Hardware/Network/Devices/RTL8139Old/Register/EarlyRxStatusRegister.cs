@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
+namespace Cosmos.Hardware2.Network.Devices.RTL8139.Register
 {
     /// <summary>
     /// The Early Receive Status Register (ERSR) is used as an indicator when incoming data is received.

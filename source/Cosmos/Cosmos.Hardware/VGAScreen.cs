@@ -12,7 +12,7 @@ Sets VGA-compatible video modes without using the BIOS
  * by Stephen Remde 
 //*/
 
-namespace Cosmos.Hardware
+namespace Cosmos.Hardware2
 {
     public class VGAScreen : Hardware
     {

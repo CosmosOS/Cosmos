@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware.Network;
-using Cosmos.Hardware.Network.Devices.RTL8139.Register;
-using Cosmos.Hardware.PC.Bus;
-using Cosmos.Hardware;
+using Cosmos.Hardware2.Network;
+using Cosmos.Hardware2.Network.Devices.RTL8139.Register;
+using Cosmos.Hardware2.PC.Bus;
+using Cosmos.Hardware2;
 using Cosmos.Kernel;
-using Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2;
+using Cosmos.Hardware2.Network.TCPIPModel.PhysicalLayer.Ethernet2;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139
+namespace Cosmos.Hardware2.Network.Devices.RTL8139
 {
     /// <summary>
     /// Driver for networkcards using the RTL8139 chip.
@@ -64,7 +64,7 @@ DebugUtil.SendMessage("RTL8139", aText);
         public static List<RTL8139_Old> FindAll()
         {
             List<RTL8139_Old> found = new List<RTL8139_Old>();
-            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices) {
+            foreach (PCIDevice device in Cosmos.Hardware2.PCIBus.Devices) {
                 //DebugWriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
                     found.Add(new RTL8139_Old(device));
@@ -98,7 +98,7 @@ DebugUtil.SendMessage("RTL8139", aText);
             rcr.PromiscuousMode = true;
             
             //Enable IRQ Interrupt
-            //Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
+            //Cosmos.Hardware2.Interrupts.IRQ11 += HandleNetworkInterrupt;
             Interrupts.AddIRQHandler(pciCard.InterruptLine, HandleNetworkInterrupt);
 
             InitIRQMaskRegister();

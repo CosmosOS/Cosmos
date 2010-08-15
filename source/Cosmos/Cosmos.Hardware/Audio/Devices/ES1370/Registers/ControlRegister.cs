@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cosmos.Hardware;
-using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware2;
+using Cosmos.Hardware2.PC.Bus;
 using Cosmos.Kernel;
-namespace Cosmos.Hardware.Audio.Devices.ES1370.Registers
+namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
 {
     class ControlRegister
     {

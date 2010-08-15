@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware;
-using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware2;
+using Cosmos.Hardware2.PC.Bus;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
+namespace Cosmos.Hardware2.Network.Devices.RTL8139.Register
 {
     /// <summary>
     /// The TransmitConfigurationRegister (TCR) defines transmit configuration. It controls functions as

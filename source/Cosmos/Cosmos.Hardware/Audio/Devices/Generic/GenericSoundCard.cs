@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware.Audio.Devices.Generic.Managers;
-namespace Cosmos.Hardware.Audio.Devices
+using Cosmos.Hardware2.Audio.Devices.Generic.Managers;
+namespace Cosmos.Hardware2.Audio.Devices
 {
     public abstract class GenericSoundCard
     {

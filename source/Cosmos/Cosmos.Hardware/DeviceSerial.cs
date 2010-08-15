@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
     // This class is currently intended for 'slow' serial devices
     // like the keyboard, mouse etc.
     // May need to change or add another class in the future

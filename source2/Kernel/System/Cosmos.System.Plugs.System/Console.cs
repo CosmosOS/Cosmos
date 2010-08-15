@@ -34,11 +34,11 @@ namespace Cosmos.System.Plugs.System {
 
             if (aDuration <= 0)
                 throw new ArgumentOutOfRangeException("Duration must be more than 0");
-
-            PIT.EnableSound();
-            PIT.T2Frequency = (uint)aFrequency;
-            PIT.Wait((uint)aDuration);
-            PIT.DisableSound();
+            
+            Cosmos.Hardware2.PIT.EnableSound();
+            Cosmos.Hardware2.PIT.T2Frequency = (uint)aFrequency;
+            Cosmos.Hardware2.PIT.Wait((uint)aDuration);
+            Cosmos.Hardware2.PIT.DisableSound();
         }
 
         public static int get_CursorLeft() {
@@ -230,7 +230,7 @@ namespace Cosmos.System.Plugs.System {
         #endregion
 
         public static int Read() {
-            return Keyboard.ReadChar();
+            return Cosmos.Hardware2.Keyboard.ReadChar();
         }
 
         public static string ReadLine() {
@@ -238,7 +238,7 @@ namespace Cosmos.System.Plugs.System {
             char current;
             int currentCount = 0;
 
-            while ((current = Keyboard.ReadChar()) != '\n') {
+            while ((current = Cosmos.Hardware2.Keyboard.ReadChar()) != '\n') {
                 //Check for "special" keys
                 if (current == '\u0968') // Backspace   
                 {

@@ -4,8 +4,8 @@ using System.IO;
 //using System.Linq;
 using Cosmos.Sys.FileSystem;
 using Cosmos.Sys.FileSystem.Ext2;
-using Cosmos.Hardware;
-using Cosmos.Hardware.Storage;
+using Cosmos.Hardware2;
+using Cosmos.Hardware2.Storage;
 //using DebugUtil=Cosmos.FileSystem.DebugUtil;
 
 namespace Cosmos.Sys {

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
-using Cosmos.Hardware.PC.Bus;
-using Cosmos.Hardware.Network.Devices.RTL8139.Register;
+using Cosmos.Hardware2.PC.Bus;
+using Cosmos.Hardware2.Network.Devices.RTL8139.Register;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
+namespace Cosmos.Hardware2.Network.Devices.RTL8139.Register
 {
 
     /// <summary>

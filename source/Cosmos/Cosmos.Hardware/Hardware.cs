@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
     public class Hardware {
         //Dont want non hardware members to be able to call this - but need to expose it for future hardware..... 
         //TODO: Remove these when all old hardware is ported

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware;
-using Cosmos.Hardware.Network;
+using Cosmos.Hardware2;
+using Cosmos.Hardware2.Network;
 using Cosmos.Kernel;
 using Cosmos.Kernel.ManagedMemory;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139
+namespace Cosmos.Hardware2.Network.Devices.RTL8139
 {
     public class RTL8139 : NetworkDevice
     {

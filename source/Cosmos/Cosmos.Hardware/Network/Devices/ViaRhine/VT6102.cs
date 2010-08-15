@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Network.Devices.ViaRhine
+namespace Cosmos.Hardware2.Network.Devices.ViaRhine
 {
     public class VT6102 : NetworkDevice
     {
@@ -128,7 +128,7 @@ namespace Cosmos.Hardware.Network.Devices.ViaRhine
         public static void FindAll()
         {
             Console.WriteLine("Scanning for VIA Rhine-II cards...");
-            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
+            foreach (PCIDevice device in Cosmos.Hardware2.PCIBus.Devices)
             {
                 if ((device.VendorID == 0x1106) && (device.DeviceID == 0x3065) && (device.Claimed == false))
                 {

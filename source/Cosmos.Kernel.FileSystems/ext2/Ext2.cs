@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware;
-using HW=Cosmos.Hardware;
+using Cosmos.Hardware2;
+using HW=Cosmos.Hardware2;
 using Cosmos.Sys.FileSystem;
 
 namespace Cosmos.Sys.FileSystem.Ext2 {
@@ -373,7 +373,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 // todo: implement better detection
                 aDevice.ReadBlock(2,
                                   xBuffer);
-                Hardware.DebugUtil.WriteBinary("Ext2",
+                Hardware2.DebugUtil.WriteBinary("Ext2",
                                                "Detecting Ext2 (1)",
                                                xBuffer,
                                                55,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
 
     public class PCIBus {
         //TODO: Change to Dictionary<UInt32, string> when the IL2CPU bug is fixed

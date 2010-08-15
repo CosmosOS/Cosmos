@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
+namespace Cosmos.Hardware2.Network.TCPIPModel.NetworkLayer.IPv4
 {
     //See http://en.wikipedia.org/wiki/IPv4#Header
     [Obsolete("Use Cosmos.Sys.IP4Packet instead")]

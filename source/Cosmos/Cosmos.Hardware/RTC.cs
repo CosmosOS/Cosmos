@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
 	public class RTC: Hardware {
 		private const ushort AddressPort = 0x70;
 		private const ushort DataPort = 0x71;

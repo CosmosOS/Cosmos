@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware
+namespace Cosmos.Hardware2
 {
     public static class Mouse
     {

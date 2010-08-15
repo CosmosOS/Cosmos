@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
     public class Interrupts {
         [StructLayout(LayoutKind.Explicit, Size = 0x68)]
         public struct TSS
@@ -191,10 +191,10 @@ namespace Cosmos.Hardware {
             ////mIRQ_Handlers[1](ref aContext);
             ////
             //// Old keyboard
-            ////Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt();
+            ////Cosmos.Hardware2.Keyboard.HandleKeyboardInterrupt();
             ////
             //// New Keyboard
-            ////Cosmos.Hardware.PC
+            ////Cosmos.Hardware2.PC
             ////
             //// - End change area
             //Console.WriteLine("Signal PIC primary");

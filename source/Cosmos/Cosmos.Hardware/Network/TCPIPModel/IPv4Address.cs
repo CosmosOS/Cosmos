@@ -3,7 +3,7 @@ using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
 
-namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
+namespace Cosmos.Hardware2.Network.TCPIPModel.NetworkLayer.IPv4
 {
     //Kudzu - Frode I planned to use the existing stuff in System.Net for parsing URLS, but 
     // the problem is it crashes right now.

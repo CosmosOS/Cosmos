@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2
+namespace Cosmos.Hardware2.Network.TCPIPModel.PhysicalLayer.Ethernet2
 {
     public class Ethernet2Frame
     {

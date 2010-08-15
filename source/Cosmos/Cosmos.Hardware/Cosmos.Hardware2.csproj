@@ -8,8 +8,8 @@
     <ProjectGuid>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Hardware</RootNamespace>
-    <AssemblyName>Cosmos.Hardware</AssemblyName>
+    <RootNamespace>Cosmos.Hardware2</RootNamespace>
+    <AssemblyName>Cosmos.Hardware2</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -131,7 +131,6 @@
     <Compile Include="RTC.cs" />
     <Compile Include="Serial.cs" />
     <Compile Include="DeviceSerial.cs" />
-    <Compile Include="TextScreen.cs" />
     <Compile Include="VGAScreen.cs" />
   </ItemGroup>
   <ItemGroup>

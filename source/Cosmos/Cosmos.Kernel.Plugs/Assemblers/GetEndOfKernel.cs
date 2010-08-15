@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Compiler.Assembler.Assembler;
 using CPUAll = Cosmos.Compiler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using HW = Cosmos.Hardware;
+using HW = Cosmos.Hardware2;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class GetEndOfKernel: AssemblerMethod {

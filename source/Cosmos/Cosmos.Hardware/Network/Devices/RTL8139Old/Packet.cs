@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139
+namespace Cosmos.Hardware2.Network.Devices.RTL8139
 {
     /// <summary>
     /// A network Packet used when transferring data over a network. 

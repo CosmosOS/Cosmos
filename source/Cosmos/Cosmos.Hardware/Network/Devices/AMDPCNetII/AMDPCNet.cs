@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cosmos.Kernel;
 using Cosmos.Kernel.ManagedMemory;
 
-namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
+namespace Cosmos.Hardware2.Network.Devices.AMDPCNetII
 {
     public class AMDPCNet : NetworkDevice
     {
@@ -132,7 +132,7 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
         public static void FindAll()
         {
             Console.WriteLine("Scanning for AMD PCNet cards...");
-            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
+            foreach (PCIDevice device in Cosmos.Hardware2.PCIBus.Devices)
             {
                 if ((device.VendorID == 0x1022) && (device.DeviceID == 0x2000) && (device.Claimed == false))
                 {

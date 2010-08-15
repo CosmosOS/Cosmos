@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using HW = Cosmos.Hardware;
+using HW = Cosmos.Hardware2;
 using ARP = Cosmos.Sys.Network.TCPIP.ARP;
 using ICMP = Cosmos.Sys.Network.TCPIP.ICMP;
 using UDP = Cosmos.Sys.Network.TCPIP.UDP;

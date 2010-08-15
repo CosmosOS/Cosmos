@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using HW = Cosmos.Hardware;
+using HW = Cosmos.Hardware2;
 
 namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Kernel.CPU))]

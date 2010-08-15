@@ -1,4 +1,4 @@
-﻿using HW = Cosmos.Hardware;
+﻿using HW = Cosmos.Hardware2;
 
 namespace Cosmos.Sys.Network.TCPIP.ARP
 {

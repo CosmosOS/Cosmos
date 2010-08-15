@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware.Network.Devices.RTL8139
+namespace Cosmos.Hardware2.Network.Devices.RTL8139
 {
     /// <summary>
     /// The packethead consists of two bytes (i.e. 16 bits).

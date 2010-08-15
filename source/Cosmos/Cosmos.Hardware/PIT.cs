@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware
+namespace Cosmos.Hardware2
 {
     /*
 	public class PIT: Hardware

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware2.PC.Bus;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.PC.Bus.USB
+namespace Cosmos.Hardware2.PC.Bus.USB
 {
     public class USBHostOHCIRegisters
     {

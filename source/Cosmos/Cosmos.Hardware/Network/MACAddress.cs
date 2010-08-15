@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Network
+namespace Cosmos.Hardware2.Network
 {
     public class MACAddress : IComparable
     {

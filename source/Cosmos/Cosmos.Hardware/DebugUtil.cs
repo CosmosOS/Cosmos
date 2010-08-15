@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
 	public static class DebugUtil {
         public static void LogInterruptOccurred(ref Interrupts.InterruptContext aContext) {
             //StartLogging();

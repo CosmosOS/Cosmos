@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Hardware {
+namespace Cosmos.Hardware2 {
     public class Global2 {
         public static void Init() {
             Console.WriteLine("    Init Global Descriptor Table");
@@ -17,7 +17,7 @@ namespace Cosmos.Hardware {
             //Serial.InitSerial(0); // MtW: disabled, screws up debugging
             //PIT.Initialize(Tick);
 
-            //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
+            //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware2.Keyboard.HandleKeyboardInterrupt);
             Console.WriteLine("    Init IRQ");
             Interrupts.Init();
             Kernel.CPU.CreateIDT(false);

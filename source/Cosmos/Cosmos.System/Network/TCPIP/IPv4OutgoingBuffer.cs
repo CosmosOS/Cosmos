@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using HW = Cosmos.Hardware;
+using HW = Cosmos.Hardware2;
 using System;
 
 namespace Cosmos.Sys.Network.TCPIP

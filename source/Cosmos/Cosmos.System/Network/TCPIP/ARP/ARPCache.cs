@@ -1,5 +1,5 @@
 ﻿using System;
-using HW = Cosmos.Hardware;
+using HW = Cosmos.Hardware2;
 
 namespace Cosmos.Sys.Network.TCPIP.ARP
 {
@@ -11,7 +11,7 @@ namespace Cosmos.Sys.Network.TCPIP.ARP
         {
             if (cache == null)
             {
-                cache = new HW.TempDictionary<Cosmos.Hardware.Network.MACAddress>();
+                cache = new HW.TempDictionary<Cosmos.Hardware2.Network.MACAddress>();
             }
         }
 

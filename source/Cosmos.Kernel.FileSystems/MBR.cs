@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware;
+using Cosmos.Hardware2;
 
 namespace Cosmos.Sys.FileSystem
 {
@@ -12,14 +12,14 @@ namespace Cosmos.Sys.FileSystem
 
         public static void Initialise()
         {
-            for (int i = 0; i < Cosmos.Hardware.Device.Devices.Count; i++)
+            for (int i = 0; i < Cosmos.Hardware2.Device.Devices.Count; i++)
             {
-                Device d = Cosmos.Hardware.Device.Devices[i];
+                Device d = Cosmos.Hardware2.Device.Devices[i];
                 if (d is Disk)
                 {
                     MBR mbr = new MBR(d as Disk);
                     if (mbr.IsValid())
-                        Cosmos.Hardware.Device.Devices.Add(mbr);
+                        Cosmos.Hardware2.Device.Devices.Add(mbr);
                 }
             }
         }
