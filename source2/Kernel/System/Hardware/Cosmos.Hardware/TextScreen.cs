@@ -20,8 +20,7 @@ namespace Cosmos.Hardware {
         }
 
         public static int Rows {
-            // for now 24 lines, as it's one line for the Heap Debug Display
-            get { return 24; }
+            get { return 25; }
         }
 
         public static int Columns {
@@ -58,6 +57,7 @@ namespace Cosmos.Hardware {
 
             SetCursor();
         }
+        
         public static unsafe void ReallyClearScreen() {
             CheckInit();
 
@@ -74,6 +74,7 @@ namespace Cosmos.Hardware {
 
             SetCursor();
         }
+
         public static void WriteChar(char aChar) {
             PutChar(CurrentRow, CurrentChar, aChar);
             CurrentChar += 1;
