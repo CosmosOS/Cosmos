@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Debug;
-using Cosmos.System;
+using Sys = Cosmos.System;
 
 namespace BreakpointsKernel {
-    public class BreakpointsOS : Cosmos.System.Kernel {
+    public class BreakpointsOS : Sys.Kernel {
         protected override void BeforeRun() {
             Console.WriteLine("Test");
             Debugger.Send("Hello from Cosmos!");

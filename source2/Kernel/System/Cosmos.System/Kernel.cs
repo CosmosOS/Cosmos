@@ -25,7 +25,7 @@ namespace Cosmos.System {
             //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
 
             // Clear before booting
-            Console.Clear();
+            Global.Console.Clear();
             WriteLine("Cosmos kernel boot initiated.");
 
             //TODO: System inits hardware, and hardware inits core
@@ -34,7 +34,7 @@ namespace Cosmos.System {
             WriteLine("Cosmos kernel boot completed.");
             // Provide the user with a clear scree if they requested it
             if (ClearScreen) {
-                Console.Clear();
+                Global.Console.Clear();
             }
 
             BeforeRun();
@@ -50,7 +50,7 @@ namespace Cosmos.System {
 
         protected void WriteLine(string aMsg) {
             if (!Silent) {
-                Console.WriteLine(aMsg);
+                Global.Console.WriteLine(aMsg);
             }
         }
 

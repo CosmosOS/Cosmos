@@ -29,16 +29,18 @@ namespace Cosmos.System.Plugs.System {
         }
 
         public static void Beep(int aFrequency, int aDuration) {
-            if (aFrequency < 37 || aFrequency > 32767)
+            if (aFrequency < 37 || aFrequency > 32767) {
                 throw new ArgumentOutOfRangeException("Frequency must be between 37 and 32767Hz");
+            }
 
-            if (aDuration <= 0)
+            if (aDuration <= 0) {
                 throw new ArgumentOutOfRangeException("Duration must be more than 0");
+            }
             
-            Cosmos.Hardware2.PIT.EnableSound();
-            Cosmos.Hardware2.PIT.T2Frequency = (uint)aFrequency;
-            Cosmos.Hardware2.PIT.Wait((uint)aDuration);
-            Cosmos.Hardware2.PIT.DisableSound();
+            Hardware2.PIT.EnableSound();
+            Hardware2.PIT.T2Frequency = (uint)aFrequency;
+            Hardware2.PIT.Wait((uint)aDuration);
+            Hardware2.PIT.DisableSound();
         }
 
         public static int get_CursorLeft() {

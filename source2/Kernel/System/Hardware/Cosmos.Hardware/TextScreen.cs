@@ -8,7 +8,7 @@ namespace Cosmos.Hardware {
     // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
     // by memory moves
     public class TextScreen {
-        protected const byte DefaultColor = 15; // White
+        protected const byte DefaultColor = 0x0F; // White
         protected bool mInitialized = false;
         protected byte Color;
 
@@ -43,7 +43,7 @@ namespace Cosmos.Hardware {
                 CurrentX = 0;
             }
 
-            SetCursor();
+            SetCursor(CurrentX, CurrentY);
         }
 
         public void Clear() {
@@ -55,7 +55,7 @@ namespace Cosmos.Hardware {
             CurrentX = 0;
             CurrentY = 1;
 
-            SetCursor();
+            SetCursor(CurrentX, CurrentY);
         }
         
         public void WriteChar(char aChar) {
@@ -64,13 +64,13 @@ namespace Cosmos.Hardware {
             if (CurrentX == Columns) {
                 NewLine();
             }
-            SetCursor();
+            SetCursor(CurrentX, CurrentY);
         }
 
         protected void ScrollUp() {
             CheckInit();
             IOGroup.Memory.MoveDown(0, 80, 80 * 24 * 2 / 4);
-            SetCursor();
+            SetCursor(CurrentX, CurrentY);
         }
 
         public char this[int aX, int aY] {
@@ -84,7 +84,7 @@ namespace Cosmos.Hardware {
                 var xScreenOffset = (UInt32)((aX + aY * Columns) * 2);
                 mMemory08[xScreenOffset] = (byte)value;
                 mMemory08[xScreenOffset + 1] = Color;
-                SetCursor();
+                SetCursor(CurrentX, CurrentY);
             }
         }
 
@@ -93,10 +93,10 @@ namespace Cosmos.Hardware {
             Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
         }
 
-        private void SetCursor() {
+        private void SetCursor(int aX, int aY) {
             CheckInit();
 
-            char xPos = (char)((CurrentY * 80) + CurrentX);
+            char xPos = (char)((aY * 80) + aX);
             // cursor low byte to VGA index register
             IOGroup.Idx3.Byte = 0x0F;
             IOGroup.Data3.Byte = (byte)(xPos & 0xFF);
@@ -112,7 +112,7 @@ namespace Cosmos.Hardware {
             }
             set {
                 mCurrentY = value;
-                SetCursor();
+                SetCursor(CurrentX, CurrentY);
             }
         }
 
@@ -123,7 +123,7 @@ namespace Cosmos.Hardware {
             }
             set {
                 mCurrentX = value;
-                SetCursor();
+                SetCursor(CurrentX, CurrentY);
             }
         }
     }
