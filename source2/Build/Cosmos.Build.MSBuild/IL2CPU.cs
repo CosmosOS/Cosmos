@@ -91,10 +91,14 @@ namespace Cosmos.Build.MSBuild
             Type xType;
             // Old
             xType = typeof(Cosmos.Sys.Plugs.Deboot);
+            var xName = xType.FullName;
             xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
+            xName = xType.FullName;
             // New
             xType = typeof(Cosmos.Core.Plugs.CPU);
+            xName = xType.FullName;
             xType = typeof(Cosmos.System.Plugs.System.ConsoleImpl);
+            xName = xType.FullName;
         }
 
         #region properties
