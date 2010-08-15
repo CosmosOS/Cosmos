@@ -43,7 +43,7 @@ namespace Cosmos.Hardware {
                 CurrentX = 0;
             }
 
-            SetCursor(CurrentX, CurrentY);
+            SetCursorPos(CurrentX, CurrentY);
         }
 
         public void Clear() {
@@ -55,7 +55,7 @@ namespace Cosmos.Hardware {
             CurrentX = 0;
             CurrentY = 1;
 
-            SetCursor(CurrentX, CurrentY);
+            SetCursorPos(CurrentX, CurrentY);
         }
         
         public void WriteChar(char aChar) {
@@ -64,13 +64,13 @@ namespace Cosmos.Hardware {
             if (CurrentX == Columns) {
                 NewLine();
             }
-            SetCursor(CurrentX, CurrentY);
+            SetCursorPos(CurrentX, CurrentY);
         }
 
         protected void ScrollUp() {
             CheckInit();
             IOGroup.Memory.MoveDown(0, 80, 80 * 24 * 2 / 4);
-            SetCursor(CurrentX, CurrentY);
+            SetCursorPos(CurrentX, CurrentY);
         }
 
         public char this[int aX, int aY] {
@@ -84,7 +84,7 @@ namespace Cosmos.Hardware {
                 var xScreenOffset = (UInt32)((aX + aY * Columns) * 2);
                 mMemory08[xScreenOffset] = (byte)value;
                 mMemory08[xScreenOffset + 1] = Color;
-                SetCursor(CurrentX, CurrentY);
+                SetCursorPos(CurrentX, CurrentY);
             }
         }
 
@@ -93,7 +93,7 @@ namespace Cosmos.Hardware {
             Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
         }
 
-        private void SetCursor(int aX, int aY) {
+        public void SetCursorPos(int aX, int aY) {
             CheckInit();
 
             char xPos = (char)((aY * 80) + aX);
@@ -112,7 +112,7 @@ namespace Cosmos.Hardware {
             }
             set {
                 mCurrentY = value;
-                SetCursor(CurrentX, CurrentY);
+                SetCursorPos(CurrentX, CurrentY);
             }
         }
 
@@ -123,7 +123,7 @@ namespace Cosmos.Hardware {
             }
             set {
                 mCurrentX = value;
-                SetCursor(CurrentX, CurrentY);
+                SetCursorPos(CurrentX, CurrentY);
             }
         }
     }

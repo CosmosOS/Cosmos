@@ -13,6 +13,9 @@ namespace Cosmos.System {
 
         public void Clear() {
             mText.Clear();
+            mX = 0;
+            mY = 0;
+            mText.SetCursorPos(mX, mY);
         }
 
         public void WriteLine(string aText) {
