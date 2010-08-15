@@ -3,10 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware2", "Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{0D558E33-78B0-47DB-B5EF-B7C2F3114D75}"
-	ProjectSection(SolutionItems) = preProject
-		ReadMe.html = ReadMe.html
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old Sort", "Old Sort", "{0D558E33-78B0-47DB-B5EF-B7C2F3114D75}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs", "Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj", "{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}"
 EndProject
@@ -22,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hardware", "Hardware", "{F1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sys", "Sys", "{0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "New Sort (source2)", "New Sort (source2)", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source2", "source2", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
