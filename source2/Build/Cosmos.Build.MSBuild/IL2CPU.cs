@@ -93,7 +93,7 @@ namespace Cosmos.Build.MSBuild
             Log.LogMessage("Deboot plug loaded: {0}", xType.FullName);
             xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
             Log.LogMessage("ArrayList plug loaded: {0}", xType.FullName);
-            //xType = typeof(Cosmos.System.Plugs.System.Console);
+            xType = typeof(Cosmos.System.Plugs.System.Console);
         }
 
         #region properties
