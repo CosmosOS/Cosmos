@@ -36,7 +36,7 @@ namespace Cosmos.Hardware2
             CheckInit();
         }
 
-        public static void HandleKeyboardInterrupt(ref Interrupts.InterruptContext aContext)
+        public static void HandleKeyboardInterrupt(ref IRQContext aContext)
         {
         //  Console.WriteLine("Handling KeyboardInterrupt");
           if (mHandleKeyboardKey != null) {
@@ -46,8 +46,6 @@ namespace Cosmos.Hardware2
               xScanCode = (byte)(xScanCode ^ 0x80);
             }
             mHandleKeyboardKey(xScanCode, xReleased);
-          } else {
-            DebugUtil.SendError("Keyboard", "No Keyboard Handler found!");
           }
         }
 
@@ -125,9 +123,6 @@ namespace Cosmos.Hardware2
                                 char xTheChar;
                                 if (!GetCharValue(xTheScancode, out xTheChar))
                                 {
-                                  Console.Write("Error getting scancode character: ");
-                                  Interrupts.WriteNumber(xTheScancode, 32);
-                                  Console.WriteLine("");
                                     //DebugUtil.SendError("Keyboard", "error while getting scancode character!");
                                 }
                                 else
@@ -164,7 +159,8 @@ namespace Cosmos.Hardware2
                 // Old
                 Keyboard.Initialize(HandleScancode);
                 //Interrupts.IRQ01 += HandleKeyboardInterrupt;
-                Interrupts.AddIRQHandler(1, HandleKeyboardInterrupt);
+                //TODO New Kernel
+                //IRQs.AddIRQHandler(1, HandleKeyboardInterrupt);
                 // New
                 // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
                 //var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);
@@ -343,9 +339,6 @@ namespace Cosmos.Hardware2
 
             AddKeyWithShift(0x37, '*', ConsoleKey.Multiply);
             #endregion
-            Console.Write("KeyCount: ");
-            Interrupts.WriteNumber(KeyCount, 32);
-            Console.WriteLine("");
         }
 
         private static uint KeyCount = 0;
@@ -397,21 +390,12 @@ namespace Cosmos.Hardware2
                     else
                     {
                         //DebugUtil.SendError("Keyboard", "Char not mapped for scancode '" + aScanCode.ToHex() + "' with key '" + mKeys[i].Key.ToString() + "'!");
-                      Console.Write("ScanCode not mapped to char: ");
-                      Interrupts.WriteNumber(aScanCode, 32);
-                      Console.WriteLine("");
-                      Console.Write("  Value was '");
-                      Interrupts.WriteNumber((ushort) mKeys[i].Value, 16);
-                      Console.WriteLine("");
 
                         goto Failure;
                     }
                 }
             }
 
-            Console.Write("ScanCode not found: ");
-            Interrupts.WriteNumber(aScanCode, 32);
-            Console.WriteLine("");
             //DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
 
         Failure:
@@ -429,12 +413,6 @@ namespace Cosmos.Hardware2
                 }
             }
 
-            //DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
-            Console.WriteLine("ScanCode Not Mapped!");
-            Console.Write("  ScanCode: ");
-            Interrupts.WriteNumber(aScanCode, 32);
-            Console.WriteLine("");
-
             aValue = ConsoleKey.NoName;
             return false;
         }
@@ -449,8 +427,6 @@ namespace Cosmos.Hardware2
                     return true;
                 }
             }
-
-            DebugUtil.SendError("Keyboard", "Scancode '" + aScanCode.ToHex() + "' not mapped!");
 
             aValue = null;
             return false;

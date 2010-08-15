@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="IRQs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />
     <Compile Include="IOGroup\PIT.cs" />
     <Compile Include="IOGroup\TextScreen.cs" />
@@ -57,6 +58,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
+      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
+      <Name>Cosmos.Hardware2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>

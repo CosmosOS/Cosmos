@@ -35,7 +35,6 @@ namespace Cosmos.Hardware2.Network.Devices.RTL8139
         // before its done. So this allows us to turn it on and off
         protected static void DebugWriteLine(string aText) {
             //if (DebugOutput) {
-DebugUtil.SendMessage("RTL8139", aText);
 //                Console.WriteLine(aText);
             //}
         }
@@ -99,7 +98,7 @@ DebugUtil.SendMessage("RTL8139", aText);
             
             //Enable IRQ Interrupt
             //Cosmos.Hardware2.Interrupts.IRQ11 += HandleNetworkInterrupt;
-            Interrupts.AddIRQHandler(pciCard.InterruptLine, HandleNetworkInterrupt);
+            //Interrupts.AddIRQHandler(pciCard.InterruptLine, HandleNetworkInterrupt);
 
             InitIRQMaskRegister();
             mInstance = this;
@@ -121,7 +120,6 @@ DebugUtil.SendMessage("RTL8139", aText);
 
             //Write the address of the buffer area to the RBSTART 
             valueReg.RBSTART = GetMemoryAddress(ref RxBuffer);
-            DebugUtil.SendNumber("RTL8139", "DataBuffer address", GetMemoryAddress(ref RxBuffer), 32);
         }
 
         private void InitTransmitBuffer()
@@ -304,8 +302,6 @@ DebugUtil.SendMessage("RTL8139", aText);
             UInt16 readPointer = valueReg.CurrentAddressOfPacketRead;
             UInt16 writtenPointer = valueReg.CurrentBufferAddress;
             readPointer += 20;
-            DebugUtil.SendNumber("RTL8139", "ReadPointer", readPointer, 16);
-            DebugUtil.SendNumber("RTL8139", "WrittenPointer", writtenPointer, 16);
             for (int i = 0; i < writtenPointer; i++) {
                 //while (readPointer != writtenPointer)
                 //{
@@ -317,7 +313,6 @@ DebugUtil.SendMessage("RTL8139", aText);
                 readPointer++;
             }
             var xResult = receivedBytes.ToArray();
-            DebugUtil.WriteBinary("Test", "Received Data", xResult);
             if (DataReceived != null)
             {
                 DataReceived(xResult);
@@ -424,24 +419,15 @@ DebugUtil.SendMessage("RTL8139", aText);
             //var xStatus = isr.ISR;
             mem.Write32((uint)MainRegister.Bit.Cfg9346,
                         0xc0);
-            DebugUtil.SendMessage("RTL8139", "HandleReceiveInterrupt");
             Console.WriteLine("RTL8139 Interrupt Recvd");
             while ((mem.Read8((uint)MainRegister.Bit.ChipCmd) & 0x01) == 0) {
                 //DebugUtil.WriteBinary("RTL8139",
                 //                      "Full RxBuffer",
                 //                      RxBuffer);
-                DebugUtil.SendNumber("RTL8139",
-                                     "RxBufferIdx",
-                                     (uint)RxBufferIdx,
-                                     32);
                 // iterate while buffer is not empty
                 uint xStatus = BitConverter.ToUInt32(RxBuffer,
                                                      RxBufferIdx);
                 uint xLen = xStatus >> 16;
-                DebugUtil.SendNumber("RTL8139",
-                                     "Packet length",
-                                     xLen,
-                                     16);
                 if (xLen == 0xFFF0) {
                     break;
                 }
@@ -457,9 +443,6 @@ DebugUtil.SendMessage("RTL8139", aText);
                  */
                 if ((xStatus & 0x3E) != 0) {
                     // handle error    
-                    DebugUtil.SendMessage("RTL8139",
-                                          "Error in ReceiveInterrupt");
-                    DebugUtil.SendNumber("RTL8139", "Error in interrupt", xStatus & 0x3E, 8);
                     mem.Write8((uint)MainRegister.Bit.ChipCmd, 0x4); // only TX enabled
                     // set up rx mode/configuration
                     RCR.RCR = (UInt32)(ReceiveConfigurationRegister.BitValue.RBLEN0 | ReceiveConfigurationRegister.BitValue.MXDMA0 | ReceiveConfigurationRegister.BitValue.MXDMA1 | ReceiveConfigurationRegister.BitValue.AB | ReceiveConfigurationRegister.BitValue.AM | ReceiveConfigurationRegister.BitValue.APM);
@@ -481,36 +464,16 @@ DebugUtil.SendMessage("RTL8139", aText);
                     for (uint i = 0; i < xLen; i++) {
                         xBuff[i] = RxBuffer[i + RxBufferIdx];
                     }
-                    DebugUtil.WriteBinary("RTL8139",
-                                          "Package received",
-                                          xBuff);
                     mBuffer.Enqueue(xBuff);
                     if (DataReceived != null)
                     {
                         DataReceived(xBuff);
                     }
 
-                    DebugUtil.SendNumber("RTL8139", "xLen", xLen, 32);
-                    DebugUtil.SendNumber("RTL8139",
-                                         "RxBufferIdx",
-                                         (uint)RxBufferIdx,
-                                         32);
-                    DebugUtil.SendNumber("RTL8139",
-                                         "RxBuffer.Length",
-                                         (uint)RxBuffer.Length,
-                                         32);
                     RxBufferIdx += (ushort)((xLen + 4 + 3) & 0xFFFFFFFC);
-                    DebugUtil.SendNumber("RTL8139",
-                                         "RxBufferIdx1",
-                                         (uint)RxBufferIdx,
-                                         32);
                     if (RxBufferIdx > RxBufferSize) {
                         RxBufferIdx -= RxBufferSize;
                     }
-                    DebugUtil.SendNumber("RTL8139",
-                                         "RxBufferIdx2",
-                                         (uint)RxBufferIdx,
-                                         32);
                 }
                 valueReg.CurrentAddressOfPacketRead = (ushort)(RxBufferIdx - 16);
 //                break;
@@ -522,7 +485,7 @@ DebugUtil.SendMessage("RTL8139", aText);
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
-        public static void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
+        public static void HandleNetworkInterrupt(ref IRQContext aContext)
         {
             if (mInstance.isr.ReceiveOK)
             {

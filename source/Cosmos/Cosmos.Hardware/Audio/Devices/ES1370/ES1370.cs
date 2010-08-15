@@ -78,7 +78,7 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370
         public void InitializeDriver()
         {
             //Cosmos.Hardware2.Interrupts.IRQ05 = new Cosmos.Hardware2.Interrupts.InterruptDelegate(this.HandleAudioInterrupt);
-            Cosmos.Hardware2.Interrupts.AddIRQHandler(5, this.HandleAudioInterrupt);
+            //Cosmos.Hardware2.Interrupts.AddIRQHandler(5, this.HandleAudioInterrupt);
         }
 
         #endregion
@@ -94,7 +94,7 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370
         /// <summary>
         /// (Should be) Called when the PCI audio card raises an Interrupt.
         /// </summary>
-        public void HandleAudioInterrupt(ref Interrupts.InterruptContext aContext)
+        public void HandleAudioInterrupt(ref IRQContext aContext)
         {
             Console.Write("IRQ detected: ");
             if (isr.IsCodecBusyIntEnabled)

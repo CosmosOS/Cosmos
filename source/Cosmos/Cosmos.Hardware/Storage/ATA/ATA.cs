@@ -178,7 +178,6 @@ namespace Cosmos.Hardware2.Storage.ATA
         private readonly byte mDrive;
         private ATA(string aName, byte aController, byte aDrive)
         {
-            DebugUtil.SendMessage("ATA", aName);
             mName = aName;
             mControllerIndex = aController;
             mController = GetControllerAddress1(aController);
@@ -253,8 +252,6 @@ namespace Cosmos.Hardware2.Storage.ATA
 
         public static void Initialize()
         {
-            DebugUtil.SendMessage("ATA", "Start Device Detection");
-            DebugUtil.SendNumber("ATA", "Controllers", (uint)GetControllerAddressCount(), 32);
             for (byte xControllerBaseAIdx = 0; xControllerBaseAIdx < GetControllerAddressCount(); xControllerBaseAIdx++)
             {
                 var xOldValue = IOReadByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_STATUS));
@@ -276,11 +273,7 @@ namespace Cosmos.Hardware2.Storage.ATA
                     {
                         ATA xATA = xATA = new ATA(String.Concat(mControllerNumbers[xControllerBaseAIdx], " ", mDriveNames[xDrive]), xControllerBaseAIdx, xDrive);
                         Device.Add(xATA);
-
-                        DebugUtil.SendNumber("ATA", "Device Size", (uint)xATA.BlockCount, 32);
-                        Console.WriteLine(" Found");
                     }
-                    Console.WriteLine("");
                 }
             }
         }
@@ -320,7 +313,6 @@ namespace Cosmos.Hardware2.Storage.ATA
         {
             // 1) Read the status register of the primary or the secondary IDE controller. 
             // 2) The BSY and DRQ bits must be zero if the controller is ready. 
-            DebugUtil.SendNumber("ATA", "ReadBlock", (ushort)aBlock, 32);
             uint xSleepCount = Timeout;
             while (((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0)
             {
@@ -400,7 +392,6 @@ namespace Cosmos.Hardware2.Storage.ATA
             //    the INTRQ and you will not have pending IRQs waiting to be detected. This is a MUST to read 
             //    the status register when you are done reading from IDE ports. 
             IOReadByte(mController_Command);
-            DebugUtil.SendATA_BlockReceived(mControllerIndex, mDrive, (uint)aBlock, aBuffer);
         }
 
         public override void WriteBlock(ulong aBlock, byte[] aContents)

@@ -6459,18 +6459,6 @@ namespace Cosmos.Hardware2 {
             get { return mDevices; }
         }
 
-        public static void DoTest()
-        {
-            Console.WriteLine("------------------------");
-            Console.Write("Via mDevices: ");
-            Interrupts.WriteNumber((uint)mDevices.Length, 32);
-            Console.WriteLine("");
-            Console.Write("Via Devices: ");
-            Interrupts.WriteNumber((uint)Devices.Length, 32);
-            Console.WriteLine("");
-
-        }
-
         protected static bool mEnumerationCompleted = false;
 
         public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function) {
@@ -6493,11 +6481,8 @@ namespace Cosmos.Hardware2 {
             EnumerateBus(0, ref xDevices);
             Console.WriteLine("Converting devices list to array.");
             Console.Write("Count: ");
-            Interrupts.WriteNumber((uint)xDevices.Count, 32);
             Console.WriteLine("");
             mDevices = xDevices.ToArray();
-            Console.Write("Length: ");
-            Interrupts.WriteNumber((uint)mDevices.Length, 32);
             Console.WriteLine("");
             mEnumerationCompleted = true;
         }
@@ -6779,13 +6764,6 @@ namespace Cosmos.Hardware2 {
                 {
                     UInt32 size = (~(PCI_BASE_ADDRESS_IO_MASK & flags)) & 0xFF;
                     IOMaps[i] = new Kernel.IOAddressSpace(address-1, ((uint)size));
-                    Console.Write("IOSpace IO. Size = ");
-                    Interrupts.WriteNumber(size, 32);
-                    Console.Write(", Address = ");
-                    Interrupts.WriteNumber(address - 1, 32);
-                    Console.Write(", flags = ");
-                    Interrupts.WriteNumber(flags, 32);
-                    Console.WriteLine("");
                     NeedsIO = true;
                 }
             }

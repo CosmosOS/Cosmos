@@ -31,7 +31,7 @@ namespace Cosmos.Hardware2.Network.Devices.ViaRhine
 
             // Setup interrupt handling
             //Interrupts.IRQ10 += HandleNetworkInterrupt;
-            Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
+            //Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
             io = pciCard.GetAddressSpace(0) as Kernel.IOAddressSpace;
@@ -143,7 +143,7 @@ namespace Cosmos.Hardware2.Network.Devices.ViaRhine
             }
         }
 
-        protected void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
+        protected void HandleNetworkInterrupt(ref IRQContext aContext)
         {
             UInt16 cur_status = IntStatusRegister;
 

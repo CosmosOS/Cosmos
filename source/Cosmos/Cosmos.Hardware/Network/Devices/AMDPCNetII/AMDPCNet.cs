@@ -35,7 +35,7 @@ namespace Cosmos.Hardware2.Network.Devices.AMDPCNetII
 
             // Setup interrupt handling
             //Interrupts.IRQ09 += HandleNetworkInterrupt;
-            Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
+            //Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
             io = (Kernel.IOAddressSpace)pciCard.GetAddressSpace(0);
@@ -147,7 +147,7 @@ namespace Cosmos.Hardware2.Network.Devices.AMDPCNetII
             }
         }
 
-        protected void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
+        protected void HandleNetworkInterrupt(ref IRQContext aContext)
         {
             UInt32 cur_status = StatusRegister;
 

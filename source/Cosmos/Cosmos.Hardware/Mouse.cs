@@ -81,7 +81,7 @@ namespace Cosmos.Hardware2
         private static byte mouse_cycle =0;
         private static int[] mouse_byte = new int[4];
 
-        public static void HandleMouse(ref Interrupts.InterruptContext context)
+        public static void HandleMouse(ref IRQContext context)
         {
             switch (mouse_cycle)
             {

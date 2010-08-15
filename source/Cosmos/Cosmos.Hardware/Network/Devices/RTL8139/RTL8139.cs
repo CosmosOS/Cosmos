@@ -37,16 +37,13 @@ namespace Cosmos.Hardware2.Network.Devices.RTL8139
 
             // Setup interrupt handling
             //Interrupts.IRQ11 += HandleNetworkInterrupt;
-            Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
+            //Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
             io = pciCard.GetAddressSpace(0);
 
             // Enable the card
             pciCard.EnableDevice();
-
-            Console.Write("AddressSpace size = ");
-            Interrupts.WriteNumber(io.Size, 32);
 
             // Turn on the card
             io.Write8(0x52, 0x01);
@@ -102,7 +99,7 @@ namespace Cosmos.Hardware2.Network.Devices.RTL8139
             }
         }
 
-        protected void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
+        protected void HandleNetworkInterrupt(ref IRQContext aContext)
         {
             UInt16 cur_status = IntStatusRegister;
 

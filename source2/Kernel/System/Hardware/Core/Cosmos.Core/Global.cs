@@ -11,6 +11,8 @@ namespace Cosmos.Core {
             // Temp
             Kernel.Global.Init();
             // End Temp
+            IRQs.Init();
+            Kernel.CPU.CreateIDT(false);
         }
     }
 }

@@ -117,10 +117,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
 
         public override FilesystemEntry[] GetDirectoryListing(ulong aId) {
             var xBaseINodeNumber = (uint)aId;
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "Getting DirectoryListing of INode",
-                                    xBaseINodeNumber,
-                                    32);
             INode xINode;
             GetINode(xBaseINodeNumber,
                      out xINode);
@@ -128,7 +124,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             var xResult = new List<FilesystemEntry>(10);
             var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
             uint xBlockId = 0;
-            HW.DebugUtil.SendMessage("Ext2", "Start reading entries:");
             while (ReadINodeBlock(ref xINode,
                                   xBlockId,
                                   xFSBuffer)) {
@@ -142,7 +137,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 //                        xFSBuffer[0],
                 //                        8);
                 int xIndex = 0;
-                HW.DebugUtil.SendMessage("Ext2", "INode block read");
                 var xIteration = 0;
                 while (xIndex < BlockSize) {
                     var xINodeNumber = ToUInt32(xFSBuffer, xIndex);
@@ -184,7 +178,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                     }
                     //break;
                 }
-                HW.DebugUtil.SendNumber("Ext2", "DataBlockIndex", xBlockId, 32);
                 xBlockId++;
             }
             for (int i = 0; i < xResult.Count; i++) {
@@ -201,54 +194,33 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             var xId = aINodeNumber - 1;
             var xGroup = (uint)(xId / mSuperblock.INodesPerGroup);
             var xGroupIndex = (uint)(xId % mSuperblock.INodesPerGroup);
-            HW.DebugUtil.SendMessage("Ext2",
-                                     "Reading INode");
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "INode Id",
-                                    (uint)xId,
-                                    32);
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "Group",
-                                    xGroup,
-                                    32);
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "GroupIndex",
-                                    xGroupIndex,
-                                    32);
+            //HW.DebugUtil.SendMessage("Ext2",
+            //                         "Reading INode");
+            //HW.DebugUtil.SendNumber("Ext2",
+            //                        "INode Id",
+            //                        (uint)xId,
+            //                        32);
+            //HW.DebugUtil.SendNumber("Ext2",
+            //                        "Group",
+            //                        xGroup,
+            //                        32);
+            //HW.DebugUtil.SendNumber("Ext2",
+            //                        "GroupIndex",
+            //                        xGroupIndex,
+            //                        32);
             // read the inode:
             var xTableBlockOffset = (uint)(xGroupIndex % (ulong)(BlockSize / sizeof(INode)));
             var xTableBlock = mGroupDescriptors[xGroup].INodeTable;
             xTableBlock += xGroupIndex / (uint)(BlockSize / sizeof(INode));
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "TableBlockOffset(1)",
-                                    xTableBlockOffset,
-                                    32);
             xTableBlock *= (BlockSize / mBackend.BlockSize);
             xTableBlock += xTableBlockOffset / (uint)(mBackend.BlockSize / sizeof(INode));
             xTableBlockOffset = xTableBlockOffset % (uint)(mBackend.BlockSize / sizeof(INode));
-            // below these two lines, the blocks are physical blocks!
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "Physical TableBlock",
-                                    xTableBlock,
-                                    32);
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "TableBlockOffset(Final)",
-                                    xTableBlockOffset,
-                                    32);
             mBackend.ReadBlock(xTableBlock,
                                mBuffer);
             INode xINode=new INode();
             fixed (byte* xTempAddress = &mBuffer[0]) {
                 var xINodeAddress = (INode*)xTempAddress;
                 xINode = xINodeAddress[(int)xTableBlockOffset];
-                HW.DebugUtil.SendNumber("Ext2",
-                                        "INode mode first byte",
-                                        mBufferAddress[sizeof(INode)],
-                                        32);
-                HW.DebugUtil.SendNumber("Ext2",
-                                        "INode mode",
-                                        (ushort)xINode.Mode,
-                                        32);
             }
             oINode = xINode;
         }
@@ -270,11 +242,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             {
                 return false;
             }
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "BlockId",
-                                    aBlockId,
-                                    32);
-            HW.DebugUtil.SendNumber("Ext2", "Block[0]", aINode.Block, 32);
             fixed (INode* xINodePtr = &aINode)
             {
                 uint xINodeAddr = (uint)xINodePtr;
@@ -282,23 +249,17 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 if (aBlockId >= 0 && aBlockId <= 11)
                 {
                     var xBlockId = xBlocks[aBlockId];
-                    HW.DebugUtil.SendNumber("Ext2", "Blocknr on disk", xBlockId, 32);
                     if (xBlockId == 0)
                     {
                         return false;
                     }
                     ReadDataBlock(xBlockId,
                                   aBuffer);
-                    HW.DebugUtil.SendNumber("Ext2", "In ReadINodeBlock, first block byte", aBuffer[0], 8);
                     return true;
                 }
                 else
                 {
                     uint xIndirectBlockRefsPerDataBlock = BlockSize / 4;
-                    HW.DebugUtil.SendNumber("Ext2",
-                                            "Indirect block reference count per data block",
-                                            xIndirectBlockRefsPerDataBlock,
-                                            32);
                     if ((aBlockId - 12) < xIndirectBlockRefsPerDataBlock)
                     {
                         var xBlockId = xBlocks[12];
@@ -322,17 +283,11 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
         private void ReadDataBlock(uint aBlockId,
                                    byte[] aBuffer) {
             var xPhyBlocksPerFSBlock = (BlockSize / mBackend.BlockSize);
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "PhyBlocksPerFSBlock",
-                                    xPhyBlocksPerFSBlock,
-                                    32);
             //aBlockId *= xPhyBlocksPerFSBlock;
             int xBlock = (int)(aBlockId * xPhyBlocksPerFSBlock);
             for (var i = 0; i < xPhyBlocksPerFSBlock; i++) {
                 mBackend.ReadBlock((uint)(xBlock + i),
                                    mBuffer);
-                HW.DebugUtil.SendNumber("Ext2", "PhyBlock", (uint)(xBlock + i), 32);
-                HW.DebugUtil.SendNumber("Ext2", "First byte", mBuffer[0], 8);
                 for (int j = 0; j < (int)mBackend.BlockSize; j++)
                 {
                     aBuffer[(int)((i * ((int)mBackend.BlockSize)) + j)] = mBuffer[j];
@@ -343,7 +298,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 //           (mBackend.BlockSize * i),
                 //           mBackend.BlockSize);
             }
-            HW.DebugUtil.SendNumber("Ext2", "First byte of block", aBuffer[0], 8);
         }
 
         public override bool ReadBlock(ulong aId,
@@ -351,14 +305,6 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                                        byte[] aBuffer) {
             INode xTheINode;
             uint xId = (uint)aId;
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "ReadingBlock of INode",
-                                    xId,
-                                    32);
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "Reading Blocknr",
-                                    (uint)aBlock,
-                                    32);
             GetINode(xId,
                      out xTheINode);
             return ReadINodeBlock(ref xTheINode,
@@ -373,20 +319,7 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                 // todo: implement better detection
                 aDevice.ReadBlock(2,
                                   xBuffer);
-                Hardware2.DebugUtil.WriteBinary("Ext2",
-                                               "Detecting Ext2 (1)",
-                                               xBuffer,
-                                               55,
-                                               4);
                 bool xResult = (xBuffer[56] == 0x53 && xBuffer[57] == 0xEF);
-                if (xResult)
-                {
-                    Console.WriteLine("Ext2 valid!");
-                }
-                else
-                {
-                    Console.WriteLine("Ext2 not valid!");
-                }
                 return xResult;
             }
             return false;

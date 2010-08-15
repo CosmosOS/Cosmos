@@ -17,11 +17,6 @@ namespace Cosmos.Hardware2 {
             //Serial.InitSerial(0); // MtW: disabled, screws up debugging
             //PIT.Initialize(Tick);
 
-            //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware2.Keyboard.HandleKeyboardInterrupt);
-            Console.WriteLine("    Init IRQ");
-            Interrupts.Init();
-            Kernel.CPU.CreateIDT(false);
-
             //Doku: See ACPIManager class
             //Console.WriteLine("    Init ACPI");
             //ACPIManager.Init();

@@ -77,12 +77,8 @@ namespace Cosmos.Hardware2 {
         }
 
 	    public static Device FindFirst(DeviceType aType) {
-            DebugUtil.SendNumber("Hardware", "DeviceCount in FindFirst", (uint)mDevices.Count, 32);
-            DebugUtil.SendMessage("Hardware|Looking for device", DeviceTypeToString(aType));
 			for (int i = 0; i < mDevices.Count; i++) {
-                DebugUtil.SendNumber("Hardware", "DeviceId", (uint)i, 32);
 				var xDevice = mDevices[i];
-                DebugUtil.SendMessage("Hardware|DeviceType", DeviceTypeToString(xDevice.Type));
 				if (xDevice.Type == aType) {
 					return xDevice;
 				}
