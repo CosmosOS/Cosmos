@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Global.cs" />
     <Compile Include="IOPort.cs" />
+    <Compile Include="MemoryBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="IOPort.html" />
+    <Content Include="MemoryBlock.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,16 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
 
 namespace Cosmos.Hardware {
     //TODO: Move all writeline etc and tracking to system ring. This clas is hardware, should be just basic stuff
     //TODO: Move raw writing to core ring
     //TODO: Remove /unsafe option from this asm
     public class TextScreen {
-        protected const int VideoAddr = 0xB8000;
-        protected const byte DefaultColor = 15; //White
+        protected const byte DefaultColor = 15; // White
         protected static bool mInitialized = false;
         protected static byte Color;
+
+        static protected MemoryBlock mMemory;
+        static protected MemoryBlock08 mMemory08;
+
+        static TextScreen() {
+            mMemory = Core.Global.TextScreenMemory;
+            mMemory08 = mMemory.Bytes;
+        }
+
         protected static void CheckInit() {
             if (!mInitialized) {
                 Color = DefaultColor;
@@ -39,18 +48,11 @@ namespace Cosmos.Hardware {
             SetCursor();
         }
 
-        public static unsafe void Clear() {
+        public static void Clear() {
             CheckInit();
-
-            byte* xScreenPtr = (byte*)(VideoAddr + (2 * Columns));
-            for (int i = 0; i < Columns * (Rows); i++) {
-                *xScreenPtr = 0;
-                xScreenPtr++;
-                //TODO: This and prob bg color too are a bug. We cant put straight in
-                // because it causes blink etc. We need to translate/reduce the color.
-                *xScreenPtr = Color;
-                xScreenPtr++;
-            }
+            // Empty + White + Empty + White
+            UInt32 xData = 0x000F000F;
+            mMemory.Fill(0, 80 * 25 * 2 / 4, xData);
 
             CurrentChar = 0;
             CurrentRow = 1;
@@ -58,23 +60,6 @@ namespace Cosmos.Hardware {
             SetCursor();
         }
         
-        public static unsafe void ReallyClearScreen() {
-            CheckInit();
-
-            byte* xScreenPtr = (byte*)(VideoAddr);
-            for (int i = 0; i < Columns * Rows; i++) {
-                *xScreenPtr = 0;
-                xScreenPtr++;
-                *xScreenPtr = Color;
-                xScreenPtr++;
-            }
-
-            CurrentChar = 0;
-            CurrentRow = 1;
-
-            SetCursor();
-        }
-
         public static void WriteChar(char aChar) {
             PutChar(CurrentRow, CurrentChar, aChar);
             CurrentChar += 1;
@@ -85,47 +70,18 @@ namespace Cosmos.Hardware {
             SetCursor();
         }
 
-        protected static unsafe void ScrollUp() {
+        protected static void ScrollUp() {
             CheckInit();
-            int Columns2 = Columns * 2;
-            byte* xScreenPtr = (byte*)(VideoAddr + Columns2);
-            for (int i = 0; i < Columns * Rows; i++) {
-                *xScreenPtr = *(xScreenPtr + Columns2);
-                xScreenPtr++;
-                *xScreenPtr = *(xScreenPtr + Columns2);
-                xScreenPtr++;
-            }
-
-            xScreenPtr = (byte*)(VideoAddr + Rows * Columns * 2);
-            for (int i = 0; i < Columns; i++) {
-                *xScreenPtr = 0;
-                xScreenPtr++;
-                *xScreenPtr = Color;
-                xScreenPtr++;
-            }
-
+            mMemory.MoveDown(0, 80, 80 * 24 * 2 / 4);
             SetCursor();
         }
 
-        public unsafe static void RemoveChar(int aLine, int aRow) {
+        //TODO: Change to indexer
+        public static void PutChar(int aLine, int aRow, char aChar) {
             CheckInit();
-            int xScreenOffset = ((aRow + (aLine * Columns)) * 2);
-            byte* xScreenPtr = (byte*)(VideoAddr + xScreenOffset);
-            *xScreenPtr = 0;
-            xScreenPtr++;
-            *xScreenPtr = 0;
-
-            SetCursor();
-        }
-
-        public unsafe static void PutChar(int aLine, int aRow, char aChar) {
-            CheckInit();
-            int xScreenOffset = ((aRow + (aLine * Columns)) * 2);
-            byte* xScreenPtr = (byte*)(VideoAddr + xScreenOffset);
-            byte xVal = (byte)aChar;
-            *xScreenPtr = xVal;
-            xScreenPtr++;
-            *xScreenPtr = Color;
+            UInt32 xScreenOffset = (UInt32)((aRow + aLine * Columns) * 2);
+            mMemory08[xScreenOffset] = (byte)aChar;
+            mMemory08[xScreenOffset + 1] = Color;
             SetCursor();
         }
 
@@ -134,6 +90,7 @@ namespace Cosmos.Hardware {
             Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
         }
 
+        //TODO: Change to use Port class
         private static void SetCursor() {
             CheckInit();
 
