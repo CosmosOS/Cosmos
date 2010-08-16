@@ -14,7 +14,12 @@ namespace Cosmos.Hardware {
         protected readonly MemoryBlock08 mMemory08;
 
         public TextScreen() {
+            //Use Changeset 64921
+            //This gets called before at least one of the initializers.
+            //1) This is a bug.
+            //2) This should throw a null ref, which it does not currently
             mMemory08 = IO.Memory.Bytes;
+
             Cosmos.Debug.Debugger.Send("TextScreen()");
             Cosmos.Debug.Debugger.Send("Bytes Base, Size: " + IO.Memory.Bytes.Base.ToString() + ", " + IO.Memory.Bytes.Size.ToString());
             Cosmos.Debug.Debugger.Send("mMemory08 Base, Size: " + mMemory08.Base.ToString() + ", " + mMemory08.Size.ToString());
