@@ -8,7 +8,7 @@
             </ul>
         </li>
         <li>Guess Demo</li>
-        <li>use INT3 for BP?</li>
+        <li>use INT3 for BP? Will save 3 bytes per call.. which is a lot...</li>
         <li>Plugs<ul>
             <li>To add a plug<ul>
                 <li>Cosmos.Build.MSBuild add ref to the plug asm</li>
@@ -19,38 +19,54 @@
         </li>
 </ul>
 <h3>
-    Matthijs</h3>
+    Matthijs - Next Release</h3>
 <ul>
-    <li>Next Release<ul>
-        <li>Write a manual cleanup utility that runs as part of our install first</li>
-        <li>New projects should be: C# Operating System, VB.NET Operating System, C# 
+    <li>Write a manual cleanup utility that runs as part of our install first</li>
+    <li>New projects should be: C# Operating System, VB.NET Operating System, C# 
         Library, VB.NET Library, Cosmos Project (Empty)</li>
-        <li>Express</li>
-        <li>Change to new kernel lib format</li>
-        </ul>
-    </li>
-    <li style="font-weight: 700">Post Release:</li>
+    <li>Express</li>
+    <li>Change to new kernel lib format</li>
+</ul>
+    <h3>
+        Matthijs - Next Release + 1</h3>
+    <ul>
     <li>IL2CPU.AlwaysCompile attribute and get rid of IDT.Dummy</li>
-    <li>Change plugs to be included by assembly reference<ul>
-        <li>Many kernel functions (TextScreen is linked to by console plug) requires 
-            rebuilding of bat each time? And thus wont trace either? We need to dynamically 
-            load the plugs etc so we can just rebuild and run and even trace them</li>
+        <li>Change plugs to be included by assembly reference - but plugs will ref others, 
+            can go two ways will have circular ref. ie Cosmos.System.Plugs.System will 
+            already need to ref&nbsp; Cosmos.System. So how to drag in the plugs asm 
+            automatically? Just add them to the project default refs? Yes.. do that... <ul>
+        <li>Non Source Plugs - Leave as they are</li>
+                <li>Source Plugs - Change to have attribute on the TARGET instead of the 
+                    implementation and only allow assembly.. this cuts out the &quot;proxy&quot; class and 
+                    makes it easier to find plug impls. See Rings.html for more info. The assembly 
+                    level plugs can even go in the same assembly, source file and if we can the same 
+                    class? That is currently these assembly plugs require 3 classes to implement. 
+                    its ugly and messy... we can get it down to 2 - 1 + assembly (X# only!). Current 
+                    way is such a mess we even comment them as plugged, but then have to go guessing 
+                    where the impl is... See example down below....</li>
+                <li>Convert all source plugs and disable old attributes...so for new ones use new 
+                    names</li>
         </ul>
     </li>
-    <li>2010 support<ul>
-        <li>http://blogs.msdn.com/b/jacdavis/archive/2010/04/05/vs-2010-version-of-debugenginesample-is-now-available.aspx</li>
-        <li>Trivalik worked on some already</li>
+        <ul>
+            <li>We need to dynamically 
+            load the plugs etc so we can just rebuild and run and even trace them wihout 
+                rerunnig the bat for each change</li>
         </ul>
-    </li>
-    <li>Ring attributes and enforcement<ul>
-        <li>Also allow restriction of assembly references</li>
-        <li>Only allow core to be /unsafe, no others</li>
-        </ul>
-    </li>
-    <li>Ask on forums: How to debug the vsdebug pkg?<ul>
-        <li>http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/6a9a307a-19fa-4c06-8728-303c1f4dd0bc/</li>
-        </ul>
-    </li>
+        <li>2010 support<ul>
+            <li>http://blogs.msdn.com/b/jacdavis/archive/2010/04/05/vs-2010-version-of-debugenginesample-is-now-available.aspx</li>
+            <li>Trivalik worked on some already</li>
+            </ul>
+        </li>
+        <li>Ring attributes and enforcement<ul>
+            <li>Also allow restriction of assembly references</li>
+            <li>Only allow core to be /unsafe, no others</li>
+            </ul>
+        </li>
+        <li>Ask on forums: How to debug the vsdebug pkg?<ul>
+            <li>http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/6a9a307a-19fa-4c06-8728-303c1f4dd0bc/</li>
+            </ul>
+        </li>
 </ul>
 <h3>
     Post MS5</h3>
@@ -80,6 +96,54 @@
     Notes</h3>
 <p>
     &nbsp;
+
+    <h3>
+        Assembly Plug Example</h3>
+    <h4>
+        Old way</h4>
+    <p>
+        (3 classes, often 3 source files as well)</p>
+    <pre>public class CPUBus {
+	// Plugged
+	public static void Write8(UInt16 aPort, byte aData) { }
+...
+
+[Plug(Target = typeof(Cosmos.Kernel.CPUBus))]
+class CPUBus { 
+	[PlugMethod(Assembler = typeof(Assemblers.IOWrite8))]
+	public static void Write8(UInt16 aPort, byte aData) { }
+...
+
+public sealed class IOWrite8: AssemblerMethod { 
+	public override void AssembleNew(object aAssembler, object aMethodInfo) { 
+		//TODO: This is a lot of work to write to a single port. We need to have some kind of inline ASM option that can emit a single out instruction 
+		new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = 0xC, SourceIsIndirect = true };
+		new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = 0x8, SourceIsIndirect = true };
+		new CPUx86.Out { DestinationReg = CPUx86.Registers.AL }; 
+	}
+} </pre>
+    <h4>
+        New way</h4>
+    <p>
+        See how much neater and self contained this is? :)</p>
+    <p>
+        public class CPUBus {<br />
+&nbsp;&nbsp;&nbsp;
+        <br />
+&nbsp;&nbsp;&nbsp; [AsmBody(Assembler = typeof(IOWrite8))]<br />
+&nbsp;&nbsp;&nbsp; public static void Write8(UInt16 aPort, byte aData) { }<br />
+&nbsp;&nbsp;&nbsp; // Nested class even... :) Keeps it all in one unit!<br />
+&nbsp;&nbsp;&nbsp; public class IOWrite8 : CodeBlock {
+        <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public override void Assemble() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EDX = EBP + 0x0C;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EAX = EBP + 0x08;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Port[DX] = AL;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br />
+&nbsp;&nbsp;&nbsp; }
+        <br />
+        <br />
+        }     </p>
 
 </body>
 </html>

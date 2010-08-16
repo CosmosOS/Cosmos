@@ -29,9 +29,32 @@
         contained in the existing implementation, it substitutes the plug version 
         instead.</p>
     <h3>
+        Plug Targets</h3>
+    <p>
+        Plugs can be applied to:</p>
+    <ul>
+        <li>Non Source Targets (A class library without modifiable or available source) - 
+            For example the Console class in the .NET Framework. The Console class uses the 
+            Windows API, so plugs can be used to redefine the methods in the Console class 
+            to use code which interacts with Cosmos instead. For these types of plug 
+            targets, the attributes are specified on the plug implemenation since the source 
+            cannot be modified of the target. If we coud modify the source, we wouldn&#39;t need 
+            plugs. :)</li>
+        <li>Source Targets - Empty methods which create a sort of &quot;abstract&quot; class are used 
+            to define an interface to an assembly language plug. This type of plug is rare 
+            and only for the core ring. For these types of plugs, the attributes are 
+            specified on the target, rather than the implementation.</li>
+    </ul>
+    <p>
+        Non source targets should never need to use assembly language, but if they do 
+        the plugs must be cascaded since assembly language plugs can only be applied to 
+        classes with modifiable source.</p>
+    <h3>
         Implementing a Plug</h3>
     <p>
-        Plugs can be applied at the class, or to an individual method or property.</p>
+        Plugs can be applied at the class, or to an individual method or property. Plug 
+        implementations are defined by applying attributes to the class which provides 
+        the plug implementation.</p>
     <h3>
         Plug Assembly Naming in Cosmos</h3>
     <p>
@@ -61,8 +84,6 @@
         needed by the compiler, off hand I cannot think of any that should be 
         implemented in any ring lower than the system ring.</p>
 
-    <p>
-        &nbsp;</p>
     <p>
         <b>Plug Target</b></p>
     <p>
