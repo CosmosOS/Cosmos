@@ -68,7 +68,6 @@ namespace Cosmos.Core {
         internal MemoryBlock08(UInt32 aBase, UInt32 aSize) {
             Base = aBase;
             Size = aSize;
-            Cosmos.Debug.Debugger.Send("08 Base, Size: " + Base.ToString() + ", " + Size.ToString());
         }
 
         public unsafe byte this[UInt32 aOffset] {
@@ -79,13 +78,11 @@ namespace Cosmos.Core {
                 return *(byte*)(Base + aOffset);
             }
             set {
-                Cosmos.Debug.Debugger.Send("Base, Offset, Size: " + Base.ToString() + ", " + aOffset.ToString() + ", " + Size.ToString());
                 //Offset, Size: 0, 4294967295
                 if (aOffset >= Size) {
                     // Also this exception gets eaten?
                     throw new Exception("Memory access violation");
                 }
-                Cosmos.Debug.Debugger.Send("Address: " + (Base + aOffset).ToString() + " = " + value.ToString());
                 (*(byte*)(Base + aOffset)) = value;
             }
         }
