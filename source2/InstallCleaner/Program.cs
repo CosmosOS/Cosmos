@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Win32;
+using System.IO;
 
 namespace InstallCleaner
 {
@@ -20,7 +22,22 @@ namespace InstallCleaner
         /// </summary>
         private static void CleanupOldTemplates_Shell()
         {
-            throw new NotImplementedException();
+            using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false))
+            {
+                if (xReg == null)
+                {
+                    // shouldn't even happen, but better safe than sorry:
+                    return;
+                }
+                var xInstallDir = xReg.GetValue("InstallDir") as string;
+                if (xInstallDir == null)
+                {
+                    return;
+                }
+                var xCosmosDir = Path.Combine(xInstallDir, @"ProjectTemplates\Cosmos");
+
+                throw new NotImplementedException();
+            }
         }
 
         /// <summary>
