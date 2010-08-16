@@ -16,6 +16,7 @@ namespace Cosmos.Core {
             Size = aSize;
             Cosmos.Debug.Debugger.Send("32 Base, Size: " + Base.ToString() + ", " + Size.ToString());
             Bytes = new MemoryBlock08(aBase, aSize * 4);
+            Cosmos.Debug.Debugger.Send("08 After Base, Size: " + Bytes.Base.ToString() + ", " + Bytes.Size.ToString());
             Words = new MemoryBlock16(aBase, aSize * 2);
         }
 

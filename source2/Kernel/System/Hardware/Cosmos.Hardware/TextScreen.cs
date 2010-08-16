@@ -15,6 +15,9 @@ namespace Cosmos.Hardware {
 
         public TextScreen() {
             mMemory08 = IO.Memory.Bytes;
+            Cosmos.Debug.Debugger.Send("TextScreen()");
+            Cosmos.Debug.Debugger.Send("Bytes Base, Size: " + IO.Memory.Bytes.Base.ToString() + ", " + IO.Memory.Bytes.Size.ToString());
+            Cosmos.Debug.Debugger.Send("mMemory08 Base, Size: " + mMemory08.Base.ToString() + ", " + mMemory08.Size.ToString());
         }
 
         public int Rows { get { return 25; } }
