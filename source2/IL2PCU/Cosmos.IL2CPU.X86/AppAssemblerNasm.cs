@@ -26,12 +26,28 @@ namespace Cosmos.IL2CPU.X86
 
 
             protected override void MethodBegin(MethodInfo aMethod) {
-      base.MethodBegin(aMethod);
-      if (aMethod.PluggedMethod != null) {
-        new Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
-      } else {
-        new Label(aMethod.MethodBase);
-      }
+                base.MethodBegin(aMethod);
+                if (aMethod.PluggedMethod != null)
+                {
+                    new Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
+                }
+                else
+                {
+                    new Label(aMethod.MethodBase);
+                }
+                if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo)
+                {
+                    new Comment("This is a static constructor. see if it has been called already, and if so, return.");
+                    var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
+                    var xAsmMember = new DataMember(xName, (byte)0);
+                    Assembler.DataMembers.Add(xAsmMember);
+                    new Compare { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 0 };
+                    new ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
+                    new Move { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+                    new Return { };
+                    new Label(".AfterCCTorAlreadyCalledCheck");
+                }
+
       new Push { DestinationReg = Registers.EBP };
       new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       //new CPUx86.Push("0");

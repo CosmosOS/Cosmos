@@ -15,7 +15,6 @@ namespace Cosmos.IL2CPU.X86
     {
       public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
       public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
-      public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
 
 
         public AppAssembler(byte comportNumber)
@@ -102,21 +101,22 @@ namespace Cosmos.IL2CPU.X86
             new Pop { DestinationReg = Registers.EBP };
             new Return();
             #endregion
-            new Label(EntryPointName);
+            new Label(CosmosAssembler.EntryPointName);
             new Push { DestinationReg = Registers.EBP };
             new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
             new Call { DestinationLabel = InitVMTCodeLabel };
             new Call { DestinationLabel = InitStringIDsLabel };
 
-            foreach (var xCctor in aMethods)
-            {
-                if (xCctor.Name == ".cctor"
-                  && xCctor.IsStatic
-                  && xCctor is ConstructorInfo)
-                {
-                    Call(xCctor);
-                }
-            }
+            // old code:
+            //foreach (var xCctor in aMethods)
+            //{
+            //    if (xCctor.Name == ".cctor"
+            //      && xCctor.IsStatic
+            //      && xCctor is ConstructorInfo)
+            //    {
+            //        Call(xCctor);
+            //    }
+            //}
             Call(aEntrypoint);
             new Pop { DestinationReg = Registers.EBP };
             new Return();

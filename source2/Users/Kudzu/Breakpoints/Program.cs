@@ -9,6 +9,7 @@ namespace BreakpointsKernel
         // This is a temp wrapper to bridge from existing project format 
         // to the new coming project format.
         public static void Boot() {
+            Cosmos.Debug.Debugger.Send("Starting kernel boot now");
             var xKernel = new BreakpointsOS();
             xKernel.Start();
         }

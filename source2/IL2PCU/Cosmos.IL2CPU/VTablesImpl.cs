@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.IL2CPU {
+    // todo: optimize this, probably using assembler
 	public static class VTablesImpl {
 		// this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
 		public static VTable[] mTypes;
@@ -145,5 +146,7 @@ namespace Cosmos.IL2CPU {
 		public int[] MethodIndexes;
 		[FieldOffset(12)]
 		public int[] MethodAddresses;
+        [FieldOffset(16)]
+        public uint TypeInitialized;
 	}
 }

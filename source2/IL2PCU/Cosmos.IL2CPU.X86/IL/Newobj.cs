@@ -4,6 +4,7 @@ using Cosmos.Compiler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
+using System.Reflection;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newobj )]
@@ -64,6 +65,14 @@ namespace Cosmos.IL2CPU.X86.IL
             //             }
             #endregion
             var xType = xMethod.Value.DeclaringType;
+
+            // call cctor:
+            var xCctor = (xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
+            if (xCctor != null)
+            {
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
+                // todo: add exception support
+            }
 
             // If not ValueType, then we need gc
             if( !xType.IsValueType )

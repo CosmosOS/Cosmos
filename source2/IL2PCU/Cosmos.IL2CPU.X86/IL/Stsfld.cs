@@ -1,6 +1,9 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.Assembler;
+using System.Reflection;
+using System.Linq;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stsfld )]
@@ -17,6 +20,13 @@ namespace Cosmos.IL2CPU.X86.IL
             var xType = aMethod.MethodBase.DeclaringType;
             var xOpCode = ( ILOpCodes.OpField )aOpCode;
             System.Reflection.FieldInfo xField = xOpCode.Value;
+            // call cctor:
+            var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
+            if (xCctor != null)
+            {
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
+                // todo: add exception support
+            }
 
 
             int aExtraOffset = 0;
