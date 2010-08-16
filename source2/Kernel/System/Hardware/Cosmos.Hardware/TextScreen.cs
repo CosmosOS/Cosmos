@@ -17,8 +17,11 @@ namespace Cosmos.Hardware {
             //Use Changeset 64921
             //This gets called before at least one of the initializers.
             //1) This is a bug.
-            //2) This should throw a null ref, which it does not currently
+            //2) This should throw a null ref, which it does not currently. Although its not null.. so maybe thats the issue.
             mMemory08 = IO.Memory.Bytes;
+            if (mMemory08 == null) {
+                Cosmos.Debug.Debugger.Send("mMemory08 is null");
+            }
             Cosmos.Debug.Debugger.Send("TextScreen() Bytes Base, Size: " + IO.Memory.Bytes.Base.ToString() + ", " + IO.Memory.Bytes.Size.ToString());
         }
 

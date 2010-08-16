@@ -7,6 +7,10 @@ namespace Cosmos.Core {
     static public class Global {
         static public BaseIOGroups BaseIOGroups = new BaseIOGroups();
 
+        static Global() {
+            Cosmos.Debug.Debugger.Send("static Global()");
+        }
+
         static public void Init() {
             // Temp
             Kernel.Global.Init();

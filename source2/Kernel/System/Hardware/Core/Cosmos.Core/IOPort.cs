@@ -26,5 +26,15 @@ namespace Cosmos.Core {
             set { CPUBus.Write32(Port, value); }
         }
 
+        //[AsmBody(Assembler = typeof(IOWrite8))]
+        //public static void Write8(UInt16 aPort, byte aData) { }
+        //public class IOWrite8 : CodeBlock {
+        //    public override void Assemble() {
+        //        EDX = EBP + 0x0C;
+        //        EAX = EBP + 0x08;
+        //        Port[DX] = AL;
+        //    }
+        //} 
+
     }
 }

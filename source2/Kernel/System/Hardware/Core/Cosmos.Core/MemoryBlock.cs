@@ -12,11 +12,10 @@ namespace Cosmos.Core {
         public readonly MemoryBlock16 Words;
 
         internal MemoryBlock(UInt32 aBase, UInt32 aSize) {
+            Cosmos.Debug.Debugger.Send("MemoryBlock()");
             Base = aBase;
             Size = aSize;
-            Cosmos.Debug.Debugger.Send("32 Base, Size: " + Base.ToString() + ", " + Size.ToString());
             Bytes = new MemoryBlock08(aBase, aSize * 4);
-            Cosmos.Debug.Debugger.Send("08 After Base, Size: " + Bytes.Base.ToString() + ", " + Bytes.Size.ToString());
             Words = new MemoryBlock16(aBase, aSize * 2);
         }
 

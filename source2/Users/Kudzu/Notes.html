@@ -21,11 +21,11 @@
 <h3>
     Matthijs - Next Release</h3>
 <ul>
+    <li>Change to new kernel lib format</li>
     <li>Write a manual cleanup utility that runs as part of our install first</li>
     <li>New projects should be: C# Operating System, VB.NET Operating System, C# 
         Library, VB.NET Library, Cosmos Project (Empty)</li>
     <li>Express</li>
-    <li>Change to new kernel lib format</li>
 </ul>
     <h3>
         Matthijs - Next Release + 1</h3>
@@ -53,6 +53,7 @@
             load the plugs etc so we can just rebuild and run and even trace them wihout 
                 rerunnig the bat for each change</li>
         </ul>
+        <li>Someone disabled nullref checks on callvirt, and normal exception support...</li>
         <li>2010 support<ul>
             <li>http://blogs.msdn.com/b/jacdavis/archive/2010/04/05/vs-2010-version-of-debugenginesample-is-now-available.aspx</li>
             <li>Trivalik worked on some already</li>
@@ -125,7 +126,11 @@ public sealed class IOWrite8: AssemblerMethod {
     <h4>
         New way</h4>
     <p>
-        See how much neater and self contained this is? :)</p>
+        See how much neater and self contained this is? :) This can also exist on a 
+        method only, with no need for any attribute on the class, as it plugs the class 
+        directly.</p>
+    <p>
+        See Cosmos.Core.IOPort for example and test case.</p>
     <p>
         public class CPUBus {<br />
 &nbsp;&nbsp;&nbsp;
