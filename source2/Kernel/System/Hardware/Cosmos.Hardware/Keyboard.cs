@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using HW2 = Cosmos.Hardware2;
 using K2 = Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
@@ -27,7 +26,7 @@ namespace Cosmos.Hardware {
             }
         }
 
-        public void HandleIRQ(ref HW2.IRQContext aContext) {
+        public void HandleIRQ(ref Core.IRQs.IRQContext aContext) {
             if (mHandleKeyboardKey != null) {
                 byte xScanCode = IO.Port60.Byte;
                 bool xReleased = (xScanCode & 0x80) == 0x80;
@@ -104,7 +103,6 @@ namespace Cosmos.Hardware {
                         break;
                     }
             }
-            //DebugUtil.SendKeyboardEvent(xTheScancode, aReleased);
         }
 
         // Can merge HandleScancode after we remove old code

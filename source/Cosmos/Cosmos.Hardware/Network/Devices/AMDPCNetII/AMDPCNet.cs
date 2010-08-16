@@ -147,32 +147,32 @@ namespace Cosmos.Hardware2.Network.Devices.AMDPCNetII
             }
         }
 
-        protected void HandleNetworkInterrupt(ref IRQContext aContext)
-        {
-            UInt32 cur_status = StatusRegister;
+        //protected void HandleNetworkInterrupt(ref IRQContext aContext)
+        //{
+        //    UInt32 cur_status = StatusRegister;
 
-            if ((cur_status & 0x100) != 0)
-            {
-                mInitDone = true;
-            }
-            if ((cur_status & 0x200) != 0)
-            {
-                if (mTransmitBuffer.Count > 0)
-                {
-                    byte[] data = mTransmitBuffer.Peek();
-                    if (SendBytes(ref data) == true)
-                    {
-                        mTransmitBuffer.Dequeue();
-                    }
-                }
-            }
-            if ((cur_status & 0x400) != 0)
-            {
-                ReadRawData();
-            }
+        //    if ((cur_status & 0x100) != 0)
+        //    {
+        //        mInitDone = true;
+        //    }
+        //    if ((cur_status & 0x200) != 0)
+        //    {
+        //        if (mTransmitBuffer.Count > 0)
+        //        {
+        //            byte[] data = mTransmitBuffer.Peek();
+        //            if (SendBytes(ref data) == true)
+        //            {
+        //                mTransmitBuffer.Dequeue();
+        //            }
+        //        }
+        //    }
+        //    if ((cur_status & 0x400) != 0)
+        //    {
+        //        ReadRawData();
+        //    }
 
-            StatusRegister = cur_status;
-        }
+        //    StatusRegister = cur_status;
+        //}
 
         public bool InitDone
         {

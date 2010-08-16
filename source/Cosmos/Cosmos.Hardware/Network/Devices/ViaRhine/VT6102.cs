@@ -143,17 +143,17 @@ namespace Cosmos.Hardware2.Network.Devices.ViaRhine
             }
         }
 
-        protected void HandleNetworkInterrupt(ref IRQContext aContext)
-        {
-            UInt16 cur_status = IntStatusRegister;
+        //protected void HandleNetworkInterrupt(ref IRQContext aContext)
+        //{
+        //    UInt16 cur_status = IntStatusRegister;
 
-            if ((cur_status & 0x01) != 0)
-            {
-                ReadRawData();
-            }
+        //    if ((cur_status & 0x01) != 0)
+        //    {
+        //        ReadRawData();
+        //    }
 
-            IntStatusRegister = cur_status;
-        }
+        //    IntStatusRegister = cur_status;
+        //}
 
         #region Register Access
         protected UInt16 CommandRegister

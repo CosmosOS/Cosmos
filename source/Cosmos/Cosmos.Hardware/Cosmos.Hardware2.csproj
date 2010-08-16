@@ -91,7 +91,6 @@
     <Compile Include="Audio\PCMStream.cs" />
     <Compile Include="BlockDevice.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="IRQContext.cs" />
     <Compile Include="Mouse.cs" />
     <Compile Include="Network\Devices\AMDPCNetII\AMDPCNet.cs" />
     <Compile Include="Network\Devices\RTL8139\RTL8139.cs" />

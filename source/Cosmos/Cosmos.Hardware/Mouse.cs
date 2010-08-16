@@ -81,49 +81,49 @@ namespace Cosmos.Hardware2
         private static byte mouse_cycle =0;
         private static int[] mouse_byte = new int[4];
 
-        public static void HandleMouse(ref IRQContext context)
-        {
-            switch (mouse_cycle)
-            {
-                case 0:
-                    mouse_byte[0] = CPUBus.Read8(0x60);
+    //    public static void HandleMouse(ref IRQContext context)
+    //    {
+    //        switch (mouse_cycle)
+    //        {
+    //            case 0:
+    //                mouse_byte[0] = CPUBus.Read8(0x60);
 
-                    if ((mouse_byte[0] & 0x8) == 0x8)
-                        mouse_cycle++;
+    //                if ((mouse_byte[0] & 0x8) == 0x8)
+    //                    mouse_cycle++;
 
-                    break;
-                case 1:
-                    mouse_byte[1] = CPUBus.Read8(0x60);
-                    mouse_cycle++;
-                    break;
-                case 2:
-                    mouse_byte[2] = CPUBus.Read8(0x60);
-                    mouse_cycle = 0;
+    //                break;
+    //            case 1:
+    //                mouse_byte[1] = CPUBus.Read8(0x60);
+    //                mouse_cycle++;
+    //                break;
+    //            case 2:
+    //                mouse_byte[2] = CPUBus.Read8(0x60);
+    //                mouse_cycle = 0;
 
-                    if ((mouse_byte[0] & 0x10) == 0x10)
-                        X -= mouse_byte[1] ^ 0xff;
-                    else
-                        X += mouse_byte[1];
+    //                if ((mouse_byte[0] & 0x10) == 0x10)
+    //                    X -= mouse_byte[1] ^ 0xff;
+    //                else
+    //                    X += mouse_byte[1];
 
-                    if ((mouse_byte[0] & 0x20) == 0x20)
-                        Y += mouse_byte[2] ^ 0xff;
-                    else
-                        Y -= mouse_byte[2];
+    //                if ((mouse_byte[0] & 0x20) == 0x20)
+    //                    Y += mouse_byte[2] ^ 0xff;
+    //                else
+    //                    Y -= mouse_byte[2];
 
-                    if (X < 0)
-                        X = 0;
-                    else if (X > 319)
-                        X = 319;
+    //                if (X < 0)
+    //                    X = 0;
+    //                else if (X > 319)
+    //                    X = 319;
 
-                    if (Y < 0)
-                        Y = 0;
-                    else if (Y > 199)
-                        Y = 199;
+    //                if (Y < 0)
+    //                    Y = 0;
+    //                else if (Y > 199)
+    //                    Y = 199;
 
-                    Buttons = (MouseState)(mouse_byte[0] & 0x7);
+    //                Buttons = (MouseState)(mouse_byte[0] & 0x7);
 
-                    break;
-            }
-        }
+    //                break;
+    //        }
+    //    }
     }
 }

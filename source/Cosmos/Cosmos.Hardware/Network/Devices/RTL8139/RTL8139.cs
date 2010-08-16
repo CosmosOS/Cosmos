@@ -99,40 +99,40 @@ namespace Cosmos.Hardware2.Network.Devices.RTL8139
             }
         }
 
-        protected void HandleNetworkInterrupt(ref IRQContext aContext)
-        {
-            UInt16 cur_status = IntStatusRegister;
+        //protected void HandleNetworkInterrupt(ref IRQContext aContext)
+        //{
+        //    UInt16 cur_status = IntStatusRegister;
 
-            //Console.WriteLine("RTL8139 Interrupt: ISR=" + cur_status.ToString());
-            if ((cur_status & 0x01) != 0)
-            {
-                while ((CommandRegister & 0x01) == 0)
-                {
-                    //UInt32 packetHeader = BitConverter.ToUInt32(rxBuffer, rxBufferOffset + capr);
-                    UInt32 packetHeader = rxBuffer.Read32(capr);
-                    UInt16 packetLen = (UInt16)(packetHeader >> 16);
-                    if ((packetHeader & 0x3E) != 0x00)
-                    {
-                        CommandRegister = 0x04; // TX Only;
-                        capr = CurBufferAddressRegister;
-                        CommandRegister = 0x0C; // RX and TX Enabled
-                    }
-                    else if ((packetHeader & 0x01) == 0x01)
-                    {
-                        ReadRawData(packetLen);
-                    }
+        //    //Console.WriteLine("RTL8139 Interrupt: ISR=" + cur_status.ToString());
+        //    if ((cur_status & 0x01) != 0)
+        //    {
+        //        while ((CommandRegister & 0x01) == 0)
+        //        {
+        //            //UInt32 packetHeader = BitConverter.ToUInt32(rxBuffer, rxBufferOffset + capr);
+        //            UInt32 packetHeader = rxBuffer.Read32(capr);
+        //            UInt16 packetLen = (UInt16)(packetHeader >> 16);
+        //            if ((packetHeader & 0x3E) != 0x00)
+        //            {
+        //                CommandRegister = 0x04; // TX Only;
+        //                capr = CurBufferAddressRegister;
+        //                CommandRegister = 0x0C; // RX and TX Enabled
+        //            }
+        //            else if ((packetHeader & 0x01) == 0x01)
+        //            {
+        //                ReadRawData(packetLen);
+        //            }
 
-                    CurAddressPointerReadRegister = (UInt16)(capr - 0x10);
-                }
-            }
-            if ((cur_status & 0x10) != 0)
-            {
-                CurAddressPointerReadRegister = (UInt16)(CurBufferAddressRegister - 0x10);
-                cur_status = (UInt16)(cur_status | 0x01);
-            }
+        //            CurAddressPointerReadRegister = (UInt16)(capr - 0x10);
+        //        }
+        //    }
+        //    if ((cur_status & 0x10) != 0)
+        //    {
+        //        CurAddressPointerReadRegister = (UInt16)(CurBufferAddressRegister - 0x10);
+        //        cur_status = (UInt16)(cur_status | 0x01);
+        //    }
 
-            IntStatusRegister = cur_status;
-        }
+        //    IntStatusRegister = cur_status;
+        //}
 
         #region Register Access
         protected UInt32 RBStartRegister

@@ -9,6 +9,7 @@ using Cosmos.Hardware2;
 namespace Cosmos.Core {
     public class IRQs {
         // TODO: Protect IRQs like memory and ports are
+        // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
 
         [StructLayout(LayoutKind.Explicit, Size = 0x68)]
         public struct TSS {
@@ -66,6 +67,58 @@ namespace Cosmos.Core {
             public ushort IOPBOffset;
         }
 
+        [StructLayout(LayoutKind.Explicit, Size = 512)]
+        public struct MMXContext {
+        }
+
+        [StructLayout(LayoutKind.Explicit, Size = 80)]
+        public struct IRQContext {
+            [FieldOffset(0)]
+            public unsafe MMXContext* MMXContext;
+
+            [FieldOffset(4)]
+            public uint EDI;
+
+            [FieldOffset(8)]
+            public uint ESI;
+
+            [FieldOffset(12)]
+            public uint EBP;
+
+            [FieldOffset(16)]
+            public uint ESP;
+
+            [FieldOffset(20)]
+            public uint EBX;
+
+            [FieldOffset(24)]
+            public uint EDX;
+
+            [FieldOffset(28)]
+            public uint ECX;
+
+            [FieldOffset(32)]
+            public uint EAX;
+
+            [FieldOffset(36)]
+            public uint Interrupt;
+
+            [FieldOffset(40)]
+            public uint Param;
+
+            [FieldOffset(44)]
+            public uint EIP;
+
+            [FieldOffset(48)]
+            public uint CS;
+
+            [FieldOffset(52)]
+            public EFlagsEnum EFlags;
+
+            [FieldOffset(56)]
+            public uint UserESP;
+        }
+
         private static InterruptDelegate[] mIRQ_Handlers = new InterruptDelegate[256];
 
         // We used to use:
@@ -95,20 +148,6 @@ namespace Cosmos.Core {
 
         public delegate void InterruptDelegate(ref IRQContext aContext);
         public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
-
-        //IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
-        //IRQ 3 - COM2 (Default) and COM4 (User) serial ports
-        //IRQ 4 - COM1 (Default) and COM3 (User) serial ports
-        //IRQ 5 - LPT2 Parallel Port 2 or sound card
-        //IRQ 6 - Floppy disk controller
-        //IRQ 7 - LPT1 Parallel Port 1 or sound card (8-bit Sound Blaster and compatibles)
-
-        //IRQ 8 - Real time clock
-        //IRQ 9 - Free / Open interrupt / Available / SCSI. Any devices configured to use IRQ 2 will actually be using IRQ 9.
-        //IRQ 10 - Free / Open interrupt / Available / SCSI
-        //IRQ 11 - Free / Open interrupt / Available / SCSI
-        //IRQ 12 - PS/2 connector Mouse. If no PS/2 connector mouse is used, this can be used for other peripherals
-        //IRQ 13 - ISA / Math Co-Processor
 
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(ref IRQContext aContext) {

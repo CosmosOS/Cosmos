@@ -485,49 +485,49 @@ namespace Cosmos.Hardware2.Network.Devices.RTL8139
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
-        public static void HandleNetworkInterrupt(ref IRQContext aContext)
-        {
-            if (mInstance.isr.ReceiveOK)
-            {
-                DebugWriteLine("IRQ detected: Receive OK");
-                mInstance.HandleReceiveInterrupt();
-            }
+        //public static void HandleNetworkInterrupt(ref IRQContext aContext)
+        //{
+        //    if (mInstance.isr.ReceiveOK)
+        //    {
+        //        DebugWriteLine("IRQ detected: Receive OK");
+        //        mInstance.HandleReceiveInterrupt();
+        //    }
 
-            if (mInstance.isr.ReceiveError)
-                DebugWriteLine("IRQ detected: Receive ERROR");
+        //    if (mInstance.isr.ReceiveError)
+        //        DebugWriteLine("IRQ detected: Receive ERROR");
 
-            if (mInstance.isr.TransmitOK)
-                DebugWriteLine("IRQ detected: Transmit OK");
+        //    if (mInstance.isr.TransmitOK)
+        //        DebugWriteLine("IRQ detected: Transmit OK");
             
-            if (mInstance.imr.TransmitError & mInstance.isr.TransmitError)
-                DebugWriteLine("IRQ detected: Transmit Error");
+        //    if (mInstance.imr.TransmitError & mInstance.isr.TransmitError)
+        //        DebugWriteLine("IRQ detected: Transmit Error");
 
-            if (mInstance.imr.RxBufferOverflow & mInstance.isr.RxBufferOverflow)
-                DebugWriteLine("IRQ detected: RxBufferOverflow");
+        //    if (mInstance.imr.RxBufferOverflow & mInstance.isr.RxBufferOverflow)
+        //        DebugWriteLine("IRQ detected: RxBufferOverflow");
 
-            if (mInstance.imr.RxFifoOverflow & mInstance.isr.RxFifoOverflow)
-                DebugWriteLine("IRQ detected: RxFIFOOverflow");
+        //    if (mInstance.imr.RxFifoOverflow & mInstance.isr.RxFifoOverflow)
+        //        DebugWriteLine("IRQ detected: RxFIFOOverflow");
 
-            if (mInstance.imr.CableLengthChange & mInstance.isr.CableLengthChange)
-                DebugWriteLine("IRQ detected: Cable Length Change");
+        //    if (mInstance.imr.CableLengthChange & mInstance.isr.CableLengthChange)
+        //        DebugWriteLine("IRQ detected: Cable Length Change");
 
-            if (mInstance.imr.PacketUnderrun & mInstance.isr.PacketUnderrun)
-                DebugWriteLine("IRQ detected: Packet Underrun");
+        //    if (mInstance.imr.PacketUnderrun & mInstance.isr.PacketUnderrun)
+        //        DebugWriteLine("IRQ detected: Packet Underrun");
 
-            if (mInstance.imr.SoftwareInterrupt & mInstance.isr.SoftwareInterrupt)
-                DebugWriteLine("IRQ detected: Software Interrupt");
+        //    if (mInstance.imr.SoftwareInterrupt & mInstance.isr.SoftwareInterrupt)
+        //        DebugWriteLine("IRQ detected: Software Interrupt");
 
-            if (mInstance.imr.TxDescriptorUnavailable & mInstance.isr.TxDescriptorUnavailable)
-                DebugWriteLine("IRQ detected: TxDescriptorUnavailable");
+        //    if (mInstance.imr.TxDescriptorUnavailable & mInstance.isr.TxDescriptorUnavailable)
+        //        DebugWriteLine("IRQ detected: TxDescriptorUnavailable");
 
-            if (mInstance.imr.SystemError & mInstance.isr.SystemError)
-                DebugWriteLine("IRQ detected: System Error!");
+        //    if (mInstance.imr.SystemError & mInstance.isr.SystemError)
+        //        DebugWriteLine("IRQ detected: System Error!");
 
 
-            mInstance.ResetAllIRQ();
-            //Console.ReadLine();
+        //    mInstance.ResetAllIRQ();
+        //    //Console.ReadLine();
 
-        }
+        //}
 
         private void ResetAllIRQ()
         {

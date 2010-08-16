@@ -94,26 +94,26 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370
         /// <summary>
         /// (Should be) Called when the PCI audio card raises an Interrupt.
         /// </summary>
-        public void HandleAudioInterrupt(ref IRQContext aContext)
-        {
-            Console.Write("IRQ detected: ");
-            if (isr.IsCodecBusyIntEnabled)
-                Console.WriteLine("Codec busy Interrupt! ");
-            if(isr.IsCodecStatusIntEnabled)
-                Console.WriteLine("Codec Enabled Interrupt! ");
-            if (isr.IsCodecWriteInProgressEnabled)
-                Console.WriteLine("Codec WriteInProgress Interrupt!");
-            if (isr.IsDAC1InterruptEnabled)
-                Console.WriteLine("DAC1 Interrupt!");
-            if (isr.IsDAC2InterruptEnabled)
-                Console.WriteLine("DAC2 Interrupt!");
-            if (isr.IsUARTInterruptEnabled)
-                Console.WriteLine("UART Interrupt!");
-            if (isr.IsMCCBIntEnabled)
-                Console.WriteLine("MCCB Interrupt!");
-            this.ResetAllIRQ();
+        //public void HandleAudioInterrupt(ref IRQContext aContext)
+        //{
+        //    Console.Write("IRQ detected: ");
+        //    if (isr.IsCodecBusyIntEnabled)
+        //        Console.WriteLine("Codec busy Interrupt! ");
+        //    if(isr.IsCodecStatusIntEnabled)
+        //        Console.WriteLine("Codec Enabled Interrupt! ");
+        //    if (isr.IsCodecWriteInProgressEnabled)
+        //        Console.WriteLine("Codec WriteInProgress Interrupt!");
+        //    if (isr.IsDAC1InterruptEnabled)
+        //        Console.WriteLine("DAC1 Interrupt!");
+        //    if (isr.IsDAC2InterruptEnabled)
+        //        Console.WriteLine("DAC2 Interrupt!");
+        //    if (isr.IsUARTInterruptEnabled)
+        //        Console.WriteLine("UART Interrupt!");
+        //    if (isr.IsMCCBIntEnabled)
+        //        Console.WriteLine("MCCB Interrupt!");
+        //    this.ResetAllIRQ();
 
-        }
+        //}
 
         private void ResetAllIRQ()
         {
