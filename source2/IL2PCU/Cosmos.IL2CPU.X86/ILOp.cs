@@ -137,6 +137,10 @@ namespace Cosmos.IL2CPU.X86 {
 
     public static void EmitExceptionLogic(Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup)
     {
+        EmitExceptionLogic(aAssembler, aMethodInfo, aCurrentOpCode, aDoTest, aCleanup, ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition));
+    }
+    public static void EmitExceptionLogic(Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException)
+    {
         string xJumpTo = null;
         if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null)
         {
@@ -170,7 +174,7 @@ namespace Cosmos.IL2CPU.X86 {
             //new CPUx86.Call("_CODE_REQUESTED_BREAK_");
             if (xJumpTo == null)
             {
-                Jump_End(aMethodInfo);
+                Jump_Exception(aMethodInfo);
             }
             else
             {
@@ -184,23 +188,27 @@ namespace Cosmos.IL2CPU.X86 {
 
             if (aCleanup != null)
             {
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition) };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };
                 aCleanup();
                 if (xJumpTo == null)
                 {
-                    Jump_End(aMethodInfo);
+                    new CPU.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
                 }
                 else
-                { new CPUx86.Jump { DestinationLabel = xJumpTo }; }
+                {
+                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
+                }
             }
             else
             {
                 if (xJumpTo == null)
                 {
-                    Jump_End(aMethodInfo);
+                    new CPU.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
                 }
                 else
-                { new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo }; }
+                {
+                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
+                }
             }
         }
     }

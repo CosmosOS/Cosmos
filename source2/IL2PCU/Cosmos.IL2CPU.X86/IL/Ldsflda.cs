@@ -23,7 +23,8 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xCctor != null)
             {
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
-                ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null);
+                ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
+                new Label(".AfterCCTorExceptionCheck");
             }
             string xDataName =DataMember.GetStaticFieldName(xField);
             new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ) };

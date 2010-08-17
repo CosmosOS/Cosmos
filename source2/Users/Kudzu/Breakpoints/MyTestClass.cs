@@ -12,5 +12,10 @@ namespace BreakpointsKernel
         }
 
         public static int Value = 43;
+
+        public static void DoTest()
+        {
+            Cosmos.Debug.Debugger.Send("In MyTestClass.DoTest");
+        }
     }
 }
