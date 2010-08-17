@@ -48,6 +48,7 @@ xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\Cosmos.zip" .
 echo .
 echo .
 echo .
+del /F ..\..\Setup2\Output\CosmosUserKit.exe
 echo Creating setup.exe
 REM Try one, then if not there the other for x64
 IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
