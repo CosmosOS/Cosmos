@@ -30,6 +30,7 @@
             this.lboxDisassemble = new System.Windows.Forms.ListBox();
             this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.panel4.SuspendLayout();
             this.menuDisassembly.SuspendLayout();
             this.SuspendLayout();
@@ -65,6 +66,7 @@
             // 
             // lboxDisassemble
             // 
+            this.lboxDisassemble.ContextMenuStrip = this.menuDisassembly;
             this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lboxDisassemble.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lboxDisassemble.FormattingEnabled = true;
@@ -77,16 +79,24 @@
             // menuDisassembly
             // 
             this.menuDisassembly.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mitemDisassemblyAddBreakpoint});
+            this.mitemDisassemblyAddBreakpoint,
+            this.mitmCopyToClipboard});
             this.menuDisassembly.Name = "menuDisassembly";
-            this.menuDisassembly.Size = new System.Drawing.Size(157, 26);
+            this.menuDisassembly.Size = new System.Drawing.Size(172, 48);
             // 
             // mitemDisassemblyAddBreakpoint
             // 
             this.mitemDisassemblyAddBreakpoint.Name = "mitemDisassemblyAddBreakpoint";
-            this.mitemDisassemblyAddBreakpoint.Size = new System.Drawing.Size(156, 22);
+            this.mitemDisassemblyAddBreakpoint.Size = new System.Drawing.Size(171, 22);
             this.mitemDisassemblyAddBreakpoint.Text = "&Add Breakpoint";
             this.mitemDisassemblyAddBreakpoint.Click += new System.EventHandler(this.mitemDisassemblyAddBreakpoint_Click);
+            // 
+            // mitmCopyToClipboard
+            // 
+            this.mitmCopyToClipboard.Name = "mitmCopyToClipboard";
+            this.mitmCopyToClipboard.Size = new System.Drawing.Size(171, 22);
+            this.mitmCopyToClipboard.Text = "&Copy to Clipboard";
+            this.mitmCopyToClipboard.Click += new System.EventHandler(this.mitmCopyToClipboard_Click);
             // 
             // FormDisassembly
             // 
@@ -115,6 +125,7 @@
         private System.Windows.Forms.ListBox lboxDisassemble;
         private System.Windows.Forms.ContextMenuStrip menuDisassembly;
         private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
+        private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;
 
     }
 }

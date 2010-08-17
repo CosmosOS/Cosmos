@@ -1,15 +1,15 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label>StopHere</Label>
+    <Label>*0x005657DE</Label>
   </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
-    <Left>0</Left>
-    <Top>0</Top>
-    <Width>300</Width>
+    <Left>48</Left>
+    <Top>587</Top>
+    <Width>968</Width>
     <Height>296</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormWatches</Name>
@@ -29,25 +29,25 @@
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>805</Left>
-    <Top>93</Top>
+    <Left>34</Left>
+    <Top>125</Top>
     <Width>300</Width>
     <Height>296</Height>
     <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormRegisters</Name>
-    <Left>1248</Left>
-    <Top>13</Top>
+    <Left>354</Left>
+    <Top>109</Top>
     <Width>281</Width>
     <Height>287</Height>
     <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormDisassembly</Name>
-    <Left>1539</Left>
-    <Top>13</Top>
-    <Width>500</Width>
+    <Left>659</Left>
+    <Top>79</Top>
+    <Width>1370</Width>
     <Height>511</Height>
     <Visible>true</Visible>
   </Window>

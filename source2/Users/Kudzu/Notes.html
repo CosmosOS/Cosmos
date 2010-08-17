@@ -9,6 +9,15 @@
         </li>
         <li>Guess Demo</li>
         <li>use INT3 for BP? Will save 3 bytes per call.. which is a lot...</li>
+        <li>GDB<ul>
+            <li>tracing and logging</li>
+            <li>Run to and set bp from disassembly window</li>
+            <li>carry keys back to main window or common controller</li>
+            <li>Ctrl-c support</li>
+            </ul>
+        </li>
+        <li>but that bring sup a point.. Cosmos.debug will need to be in its own ASM or have 
+            downlinks when i import it. So all rings can reach it.</li>
         <li>Plugs<ul>
             <li>To add a plug<ul>
                 <li>Cosmos.Build.MSBuild add ref to the plug asm</li>
@@ -21,11 +30,11 @@
 <h3>
     Matthijs - Next Release</h3>
 <ul>
-    <li>Change to new kernel lib format</li>
     <li>Write a manual cleanup utility that runs as part of our install first</li>
     <li>New projects should be: C# Operating System, VB.NET Operating System, C# 
         Library, VB.NET Library, Cosmos Project (Empty)</li>
     <li>Express</li>
+    <li>Change to new kernel lib format</li>
 </ul>
     <h3>
         Matthijs - Next Release + 1</h3>
@@ -35,8 +44,8 @@
             can go two ways will have circular ref. ie Cosmos.System.Plugs.System will 
             already need to ref&nbsp; Cosmos.System. So how to drag in the plugs asm 
             automatically? Just add them to the project default refs? Yes.. do that... <ul>
-        <li>Non Source Plugs - Leave as they are</li>
-                <li>Source Plugs - Change to have attribute on the TARGET instead of the 
+        <li>Source Plugs - Leave as they are</li>
+                <li>Assembly Plugs - Change to have attribute on the TARGET instead of the 
                     implementation and only allow assembly.. this cuts out the &quot;proxy&quot; class and 
                     makes it easier to find plug impls. See Rings.html for more info. The assembly 
                     level plugs can even go in the same assembly, source file and if we can the same 
@@ -53,7 +62,6 @@
             load the plugs etc so we can just rebuild and run and even trace them wihout 
                 rerunnig the bat for each change</li>
         </ul>
-        <li>Someone disabled nullref checks on callvirt, and normal exception support...</li>
         <li>2010 support<ul>
             <li>http://blogs.msdn.com/b/jacdavis/archive/2010/04/05/vs-2010-version-of-debugenginesample-is-now-available.aspx</li>
             <li>Trivalik worked on some already</li>
@@ -126,11 +134,7 @@ public sealed class IOWrite8: AssemblerMethod {
     <h4>
         New way</h4>
     <p>
-        See how much neater and self contained this is? :) This can also exist on a 
-        method only, with no need for any attribute on the class, as it plugs the class 
-        directly.</p>
-    <p>
-        See Cosmos.Core.IOPort for example and test case.</p>
+        See how much neater and self contained this is? :)</p>
     <p>
         public class CPUBus {<br />
 &nbsp;&nbsp;&nbsp;

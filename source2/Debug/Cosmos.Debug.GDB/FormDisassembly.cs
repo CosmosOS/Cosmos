@@ -94,5 +94,10 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        private void mitmCopyToClipboard_Click(object sender, EventArgs e) {
+            var x = (AsmLine)lboxDisassemble.SelectedItem;
+            Clipboard.SetText(x.ToString());
+        }
+
     }
 }

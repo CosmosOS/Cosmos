@@ -87,11 +87,6 @@ namespace Cosmos.Debug.GDB {
             Windows.Show(Windows.mWatchesForm);
         }
 
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
-            Windows.SavePositions();
-            Settings.Save();
-        }
-
         protected FormWindowState mLastWindowState = FormWindowState.Normal;
         private void FormMain_Resize(object sender, EventArgs e) {
             if (WindowState == FormWindowState.Minimized) {
@@ -162,6 +157,11 @@ namespace Cosmos.Debug.GDB {
             } else {
                 BringWindowsToTop();
             }
+        }
+
+        private void mitmSave_Click(object sender, EventArgs e) {
+            Windows.SavePositions();
+            Settings.Save();
         }
 
     }

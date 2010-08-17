@@ -12,7 +12,6 @@ namespace Cosmos.Core {
         public readonly MemoryBlock16 Words;
 
         internal MemoryBlock(UInt32 aBase, UInt32 aSize) {
-            Cosmos.Debug.Debugger.Send("MemoryBlock()");
             Base = aBase;
             Size = aSize;
             Bytes = new MemoryBlock08(aBase, aSize * 4);
@@ -77,7 +76,6 @@ namespace Cosmos.Core {
                 return *(byte*)(Base + aOffset);
             }
             set {
-                //Offset, Size: 0, 4294967295
                 if (aOffset >= Size) {
                     // Also this exception gets eaten?
                     throw new Exception("Memory access violation");
