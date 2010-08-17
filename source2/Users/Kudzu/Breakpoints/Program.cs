@@ -10,8 +10,11 @@ namespace BreakpointsKernel
         // to the new coming project format.
         public static void Boot() {
             Cosmos.Debug.Debugger.Send("Starting kernel boot now");
-            var xKernel = new BreakpointsOS();
-            xKernel.Start();
+            Cosmos.Debug.Debugger.Send("Value 2"); 
+            Cosmos.Debug.Debugger.Send("Value: " + MyTestClass.Value.ToString());
+            Cosmos.Debug.Debugger.Send("Value 3");
+            //var xKernel = new BreakpointsOS();
+            //xKernel.Start();
         }
     }
 }

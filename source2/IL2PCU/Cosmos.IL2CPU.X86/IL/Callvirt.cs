@@ -24,12 +24,12 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           var xOpMethod = aOpCode as OpMethod;
           string xCurrentMethodLabel = GetLabel(aMethod, aOpCode.Position);
-          DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode.Position);
+          DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode);
         }
 
-        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, int aOpPosition) {
+        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp) {
                        
-          string xCurrentMethodLabel = GetLabel(aMethod, aOpPosition);
+          string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
           
           // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
           //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
@@ -206,24 +206,19 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
             new Label(xCurrentMethodLabel + "__AFTER_NOT_BOXED_THIS");
           }
-          //             Call.EmitExceptionLogic(Assembler,
-          //                                mCurrentILOffset,
-          //                                mCurrentMethodInfo,
-          //                                mLabelName + "__NO_EXCEPTION_AFTER_CALL",
-          //                                true,
-          //                                delegate()
-          //                                {
-          //                                    var xResultSize = mTargetMethodInfo.ReturnSize;
-          //                                    if (xResultSize % 4 != 0)
-          //                                    {
-          //                                        xResultSize += 4 - (xResultSize % 4);
-          //                                    }
-          //                                    for (int i = 0; i < xResultSize / 4; i++)
-          //                                    {
-          //                                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-          //                                    }
-          //                                });
-          // 
+          ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true, 
+                                  delegate()
+                                  {
+                                      var xResultSize = xReturnSize;
+                                      if (xResultSize % 4 != 0)
+                                      {
+                                          xResultSize += 4 - (xResultSize % 4);
+                                      }
+                                      for (int i = 0; i < xResultSize / 4; i++)
+                                      {
+                                          new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                                      }
+                                  });
           new Label(xCurrentMethodLabel + "__NO_EXCEPTION_AFTER_CALL");
           new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
           if (xReturnSize > 0) {

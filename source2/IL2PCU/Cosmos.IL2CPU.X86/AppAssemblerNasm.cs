@@ -41,9 +41,11 @@ namespace Cosmos.IL2CPU.X86
                     var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
                     var xAsmMember = new DataMember(xName, (byte)0);
                     Assembler.DataMembers.Add(xAsmMember);
-                    new Compare { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 0 };
-                    new ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
+                    new Compare { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+                    new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
                     new Move { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+                    new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck"};
+                    new Label(".BeforeQuickReturn");                    
                     new Return { };
                     new Label(".AfterCCTorAlreadyCalledCheck");
                 }

@@ -61,10 +61,10 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
-      DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode.Position);
+      DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode);
     }
 
-    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, uint aTargetMethodUID, int aCurrentPosition) {
+    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aCurrent) {
       //if (aTargetMethod.IsVirtual) {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
       //  return;
@@ -94,9 +94,36 @@ namespace Cosmos.IL2CPU.X86.IL {
       new CPUx86.Call {
         DestinationLabel = xNormalAddress
       };
-      ////if (mResultSize != 0) {
-      ////new CPUx86.Pop("eax");
-      ////}
+
+      uint xReturnSize=0;
+      if (xMethodInfo != null)
+      {
+          xReturnSize = SizeOfType(xMethodInfo.ReturnType);
+      }
+
+      EmitExceptionLogic(Assembler, aCurrentMethod, aCurrent, true, 
+                 delegate() {
+                     var xResultSize = xReturnSize;
+                     if (xResultSize % 4 != 0)
+                     {
+                         xResultSize += 4 - (xResultSize % 4);
+                     }
+                     for (int i = 0; i < xResultSize / 4; i++)
+                     {
+                         new CPUx86.Add
+                         {
+                             DestinationReg = CPUx86.Registers.ESP,
+                             SourceValue = 4
+                         };
+                     }
+                 });
+
+
+
+
+
+
+
       //EmitExceptionLogic(Assembler,
       //           mCurrentILOffset,
       //           mMethodInfo,

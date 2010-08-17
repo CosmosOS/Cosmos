@@ -164,6 +164,7 @@ namespace Cosmos.IL2CPU.X86 {
                 }
             }
         }
+        // if aDoTest is true, we check ECX for exception flags
         if (!aDoTest)
         {
             //new CPUx86.Call("_CODE_REQUESTED_BREAK_");
