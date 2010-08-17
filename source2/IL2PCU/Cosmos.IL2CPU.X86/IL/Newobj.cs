@@ -92,17 +92,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-
-                // We IncRef here twice because it's effectively pushed on the stack twice:
-                // * once for the .ctor parameter
-                // * once for the "returnvalue" of the newobj il op
-
-                // todo: probably we want to check for exceptions after calling IncRef
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
-
+                
                 uint xObjSize = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC

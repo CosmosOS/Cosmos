@@ -50,11 +50,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 xOffset += SizeOfType( xInfo.FieldType );
             }
             string xDataName = DataMember.GetStaticFieldName(xField);
-            if( xNeedsGC )
-            {
-                new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ), DestinationIsIndirect = true };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
-            }
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

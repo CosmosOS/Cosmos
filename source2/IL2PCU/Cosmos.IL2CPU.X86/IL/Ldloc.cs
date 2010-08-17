@@ -52,11 +52,6 @@ namespace Cosmos.IL2CPU.X86.IL
 						}
 				}
 				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-				if(!xVar.LocalType.IsValueType)
-				{
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Call { DestinationLabel =MethodAndTypeLabelsHolder.GC_IncRefLabel };
-				}
 			}
 			Assembler.Stack.Push((int)xSize, xVar.LocalType);
 		}

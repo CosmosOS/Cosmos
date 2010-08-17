@@ -16,7 +16,10 @@ namespace Cosmos.System {
 
         // Start the system up using the properties for configuration.
         public void Start() {
-            if (mStarted) {
+            Cosmos.Debug.Debugger.Send("Starting kernel");
+            if (mStarted)
+            {
+                Cosmos.Debug.Debugger.Send("ERROR: Kernel Already Started");
                 throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
             }
             mStarted = true;
@@ -25,6 +28,7 @@ namespace Cosmos.System {
             //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
 
             // Clear before booting
+            Cosmos.Debug.Debugger.Send("Clearing screen");
             Global.Console.Clear();
             WriteLine("Cosmos kernel boot initiated.");
 

@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Cosmos.System {
     public class Console {
+        public Console()
+        {
+            Cosmos.Debug.Debugger.Send("Cosmos.System..ctor()");
+        }
         protected int mX = 0;
         public int X {
             get { return mX; }

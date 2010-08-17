@@ -112,12 +112,6 @@ namespace Cosmos.IL2CPU.X86.IL
             default:
               throw new Exception("Remainder size " + xFieldInfo.FieldType.ToString() + (xSize) + " not supported!");
           }
-#if! SKIP_GC_CODE
-          if (xNeedsGC) {
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
-          }
-#endif
           Assembler.Stack.Push(new StackContents.Item((int)xSize, xFieldInfo.FieldType));
         }
 

@@ -20,13 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xField = aOpCode as ILOpCodes.OpVar;
 			var xFieldInfo = aMethod.MethodBase.GetMethodBody().LocalVariables[xField.Value];
 			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xField));
-#if !SKIP_GC_CODE
-			if (!xFieldInfo.LocalType.IsValueType)
-			{
-				new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int) 0 - xEBPOffset };
-				new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
-			}
-#endif
+
             new Comment("EBPOffset = " + xEBPOffset);
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{

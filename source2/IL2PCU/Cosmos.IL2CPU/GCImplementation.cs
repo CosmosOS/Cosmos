@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU {
 //			WriteNumber(xCount, false);
 //			Console.WriteLine();
 //#endif
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 
 		}
 
@@ -136,7 +136,7 @@ namespace Cosmos.IL2CPU {
 //#endif
 ////			}
 ///     
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
 #if GC_DEBUG

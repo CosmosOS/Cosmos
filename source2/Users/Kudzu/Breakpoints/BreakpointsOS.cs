@@ -6,6 +6,10 @@ using Sys = Cosmos.System;
 
 namespace BreakpointsKernel {
     public class BreakpointsOS : Sys.Kernel {
+        public BreakpointsOS()
+        {
+            Debugger.Send("BreakpointsKernel.BreakpointOS..ctor()");
+        }
         protected override void BeforeRun() {
             Console.WriteLine("Test");
             Debugger.Send("Hello from Cosmos!");

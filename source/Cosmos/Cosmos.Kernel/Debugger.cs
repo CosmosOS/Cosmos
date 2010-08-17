@@ -22,7 +22,7 @@ namespace Cosmos.Debug {
             //xSingleString = "Message Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
             //Send(xSingleString);
-        }
+        }                                          
 
         public static unsafe void SendError(string aModule, string aData)
         {

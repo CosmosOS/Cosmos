@@ -14,6 +14,7 @@ namespace Cosmos.Hardware {
         protected readonly MemoryBlock08 mMemory08;
 
         public TextScreen() {
+            Cosmos.Debug.Debugger.Send("Cosmos.Hardware.TextScreen");
             //Use Changeset 64921
             //This gets called before at least one of the initializers.
             //1) This is a bug.

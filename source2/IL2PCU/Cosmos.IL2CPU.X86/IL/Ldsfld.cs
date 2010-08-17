@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
             System.Reflection.FieldInfo xField = xOpCode.Value;
 
             // call cctor:
-                        var xCctor = (xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
+                        var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
             if (xCctor != null)
             {
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
@@ -107,14 +107,6 @@ namespace Cosmos.IL2CPU.X86.IL
             }
 
             Assembler.Stack.Push( new StackContents.Item( ( int )xSize, null ) );
-
-            if( xNeedsGC )
-            {
-                new Dup( Assembler ).Execute( aMethod, aOpCode );
-
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
-                Assembler.Stack.Pop();
-            }
         }
 
 
