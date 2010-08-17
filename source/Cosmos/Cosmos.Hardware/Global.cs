@@ -21,8 +21,8 @@ namespace Cosmos.Hardware2 {
             //Console.WriteLine("    Init ACPI");
             //ACPIManager.Init();
                                                                                 
-            Console.WriteLine("    Init PCIBus");
-            PCIBus.Init();
+            //Console.WriteLine("    Init PCIBus");
+            //PCIBus.Init();
 
             //Console.WriteLine("    Init Mouse");
             //Mouse.Initialize();
