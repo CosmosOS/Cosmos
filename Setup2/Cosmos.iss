@@ -134,6 +134,7 @@ Name: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstal
 Name: {app}; Flags: uninsalwaysuninstall
 
 [Files]
+Source: .\Build\VSIP\InstallCleaner.exe; DestDir: {app}; Flags: dontcopy
 ; Tools
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly

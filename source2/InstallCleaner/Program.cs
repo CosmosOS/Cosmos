@@ -7,13 +7,18 @@ using System.IO;
 
 namespace InstallCleaner
 {
-    class Program
+    partial class Program
     {
         static void Main(string[] args)
         {
+					try{
             CleanupUserKitInstallDir();
             CleanupOldTemplates_Shell();
             CleanupOldTemplates_Express();
+            } catch(Exception E){
+							Console.WriteLine(E.ToString());
+							Console.ReadLine();
+            }
         }
 
 
@@ -36,7 +41,10 @@ namespace InstallCleaner
                 }
                 var xCosmosDir = Path.Combine(xInstallDir, @"ProjectTemplates\Cosmos");
 
-                throw new NotImplementedException();
+                if (Directory.Exists(xCosmosDir))
+                {
+                    Directory.Delete(xCosmosDir, true);
+                }
             }
         }
 
@@ -45,7 +53,25 @@ namespace InstallCleaner
         /// </summary>
         private static void CleanupOldTemplates_Express()
         {
-            throw new NotImplementedException();
+            using (var xReg = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false))
+            {
+                if (xReg == null)
+                {
+                    return;
+                }
+                var xDir = xReg.GetValue("UserProjectTemplatesLocation") as string;
+                if (String.IsNullOrEmpty(xDir))
+                {
+                    return;
+                }
+                if (Directory.Exists(xDir))
+                {
+                    foreach (var xFile in Directory.GetFiles(xDir, "*Cosmos*.zip", SearchOption.AllDirectories))
+                    {
+                        File.Delete(xFile);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -53,7 +79,29 @@ namespace InstallCleaner
         /// </summary>
         private static void CleanupUserKitInstallDir()
         {
-            throw new NotImplementedException();
+            using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Cosmos", false))
+            {
+                if (xReg == null)
+                {
+                    return;
+                }
+                var xDir = xReg.GetValue(null) as string;
+                if (String.IsNullOrEmpty(xDir))
+                {
+                    return;
+                }
+                if (Directory.Exists(xDir))
+                {
+                    if (Directory.Exists(Path.Combine(xDir, "Build")))
+                    {
+                        Directory.Delete(Path.Combine(xDir, "Build"), true);
+                    }
+                    if (Directory.Exists(Path.Combine(xDir, "Kernel")))
+                    {
+                        Directory.Delete(Path.Combine(xDir, "Kernel"), true);
+                    }
+                }
+            }
         }
     }
 }

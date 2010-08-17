@@ -256,6 +256,24 @@ begin
 	Result := __VBExpress2008ProjectTEmplatePath;
 end;
 
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+	FullPath: string;
+	ReturnCode: Integer;
+begin
+	ExtractTemporaryFile('InstallCleaner.exe');
+	FullPath := ExpandConstant('{tmp}\InstallCleaner.exe');
+	if not Exec(FullPath, '', '', SW_SHOW, ewWaitUntilTerminated, ReturnCode) then
+		Result := Format('Error running cleanup utility (Exec returned false, ReturnCode contains %d)', [ReturnCode])
+	else 
+	begin
+		if ReturnCode <> 0 then
+			Result := Format('Error running cleanup utility (ReturnCode %d)', [ReturnCode])
+		else
+			Result := '';
+	end;
+end;
+
 function InitializeSetup: Boolean;
 begin
   if not VSNET2008 then begin
