@@ -1,6 +1,6 @@
 <VSTemplate Version="2.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
     <TemplateData>
-        <Name>Cosmos</Name>
+        <Name>Cosmos Project (Empty)</Name>
         <Description>A project for running your code as operating system. Does not include any language.</Description>
         <Icon>Kernel.ico</Icon>
         <ProjectType>Cosmos</ProjectType>
