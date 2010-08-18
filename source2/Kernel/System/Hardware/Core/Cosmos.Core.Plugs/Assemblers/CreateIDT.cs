@@ -37,6 +37,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
 
         // there's one argument. 
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
+
             #region generate IDT table
 
             string xFieldName = "_NATIVE_IDT_Contents";
@@ -44,30 +45,38 @@ namespace Cosmos.Core.Plugs.Assemblers {
             xAssembler.DataMembers.Add(new CPUAll.DataMember(xFieldName,
                                                       new byte[8 * 256]));
             for (int i = 0; i < 256; i++) {
-                new CPUx86.Move {
+                new CPUx86.Move
+                {
                     DestinationReg = CPUx86.Registers.EAX,
                     SourceRef = CPUAll.ElementReference.New("__ISR_Handler_" + i.ToString("X2"))
                 };
-                new CPUx86.Move {
+                new CPUx86.Move
+                {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 0),
                     SourceReg = CPUx86.Registers.AL
                 };
-                new CPUx86.Move {
+                new CPUx86.Move
+                {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 1),
                     SourceReg = CPUx86.Registers.AH
+
                 };
-                new CPUx86.Move {
+                new CPUx86.Move
+                {
+
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 2),
                     SourceValue = 0x8,
                     Size = 8
                 };
-                new CPUx86.Move {
+
+                new CPUx86.Move
+                {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 5),
@@ -75,13 +84,15 @@ namespace Cosmos.Core.Plugs.Assemblers {
                     Size = 8
                 };
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 16 };
-                new CPUx86.Move {
+                new CPUx86.Move
+                {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 6),
                     SourceReg = CPUx86.Registers.AL
                 };
-                new CPUx86.Move {
+                new CPUx86.Move
+                {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 7),
@@ -110,6 +121,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
             var xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
             for (int j = 0; j < 256; j++) {
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2"));
+                new CPUx86.Call { DestinationLabel = "__INTERRUPT_OCCURRED__" };
                 new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
                 if (Array.IndexOf(xInterruptsWithParam,
                                   j) ==
@@ -160,6 +172,8 @@ namespace Cosmos.Core.Plugs.Assemblers {
                 //} 
                 new CPUx86.InterruptReturn();
             }
+            new CPUAll.Label("__INTERRUPT_OCCURRED__");
+            new CPUx86.Return();
             new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             new CPUx86.Noop();
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
