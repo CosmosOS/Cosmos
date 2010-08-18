@@ -13,7 +13,8 @@ namespace InstallCleaner
         {
 					try{
             CleanupUserKitInstallDir();
-            CleanupOldTemplates_Shell();
+            CleanupOldTemplates_Shell_x86();
+            CleanupOldTemplates_Shell_x64();
             CleanupOldTemplates_Express();
             } catch(Exception E){
 							Console.WriteLine(E.ToString());
@@ -25,7 +26,7 @@ namespace InstallCleaner
         /// <summary>
         /// Removes any old cosmos templates in "Microsoft Visual Studio 9.0\Common7\IDE\ProjectTemplates"
         /// </summary>
-        private static void CleanupOldTemplates_Shell()
+        private static void CleanupOldTemplates_Shell_x86()
         {
             using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false))
             {
@@ -43,6 +44,29 @@ namespace InstallCleaner
 
                 if (Directory.Exists(xCosmosDir))
                 {
+                    Directory.Delete(xCosmosDir, true);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Removes any old cosmos templates in "Microsoft Visual Studio 9.0\Common7\IDE\ProjectTemplates"
+        /// </summary>
+        private static void CleanupOldTemplates_Shell_x64() {
+            //Registry.LocalMachine.
+            using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Wow6432\Microsoft\VisualStudio\9.0", false,)) {
+                if (xReg == null) {
+                    // shouldn't even happen, but better safe than sorry:
+                    return;
+                }
+                var xInstallDir = xReg.GetValue("InstallDir") as string;
+                if (xInstallDir == null) {
+                    return;
+                }
+                var xCosmosDir = Path.Combine(xInstallDir, @"ProjectTemplates\Cosmos");
+
+                if (Directory.Exists(xCosmosDir)) {
                     Directory.Delete(xCosmosDir, true);
                 }
             }
