@@ -55,21 +55,21 @@ namespace InstallCleaner
         /// </summary>
         private static void CleanupOldTemplates_Shell_x64() {
             //Registry.LocalMachine.
-            using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Wow6432\Microsoft\VisualStudio\9.0", false,)) {
-                if (xReg == null) {
-                    // shouldn't even happen, but better safe than sorry:
-                    return;
-                }
-                var xInstallDir = xReg.GetValue("InstallDir") as string;
-                if (xInstallDir == null) {
-                    return;
-                }
-                var xCosmosDir = Path.Combine(xInstallDir, @"ProjectTemplates\Cosmos");
+            //using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Wow6432\Microsoft\VisualStudio\9.0", false,)) {
+            //    if (xReg == null) {
+            //        // shouldn't even happen, but better safe than sorry:
+            //        return;
+            //    }
+            //    var xInstallDir = xReg.GetValue("InstallDir") as string;
+            //    if (xInstallDir == null) {
+            //        return;
+            //    }
+            //    var xCosmosDir = Path.Combine(xInstallDir, @"ProjectTemplates\Cosmos");
 
-                if (Directory.Exists(xCosmosDir)) {
-                    Directory.Delete(xCosmosDir, true);
-                }
-            }
+            //    if (Directory.Exists(xCosmosDir)) {
+            //        Directory.Delete(xCosmosDir, true);
+            //    }
+            //}
         }
 
         /// <summary>
