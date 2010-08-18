@@ -90,12 +90,6 @@
     <Compile Include="FormCallStack.Designer.cs">
       <DependentUpon>FormCallStack.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormDisassembly.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormDisassembly.Designer.cs">
-      <DependentUpon>FormDisassembly.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormLog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -145,9 +139,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCallStack.resx">
       <DependentUpon>FormCallStack.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormDisassembly.resx">
-      <DependentUpon>FormDisassembly.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormLog.resx">
       <DependentUpon>FormLog.cs</DependentUpon>

@@ -1,7 +1,10 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label>*0x005657DE</Label>
+    <Label>*0x00583BA1</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>__AFTER__ALL__ISR__HANDLER__STUBS__</Label>
   </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>

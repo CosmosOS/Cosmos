@@ -23,14 +23,16 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lablRunning = new System.Windows.Forms.Label();
             this.lablConnected = new System.Windows.Forms.Label();
             this.butnContinue = new System.Windows.Forms.Button();
             this.butnConnect = new System.Windows.Forms.Button();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.menuMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmConnect = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmSave = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmRefresh = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.mitmExit = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,15 +44,22 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmViewBreakpoints = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmViewDisassembly = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmViewLog = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmRegisters = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmMainViewWatches = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
-            this.mitmSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.lablCurrentFunction = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lboxDisassemble = new System.Windows.Forms.ListBox();
+            this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
+            this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
+            this.menuMain.SuspendLayout();
+            this.panel4.SuspendLayout();
+            this.menuDisassembly.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -59,17 +68,17 @@
             this.panel1.Controls.Add(this.lablConnected);
             this.panel1.Controls.Add(this.butnContinue);
             this.panel1.Controls.Add(this.butnConnect);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(273, 30);
+            this.panel1.Size = new System.Drawing.Size(589, 30);
             this.panel1.TabIndex = 3;
             // 
             // lablRunning
             // 
             this.lablRunning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lablRunning.AutoSize = true;
-            this.lablRunning.Location = new System.Drawing.Point(146, 8);
+            this.lablRunning.Location = new System.Drawing.Point(462, 8);
             this.lablRunning.Name = "lablRunning";
             this.lablRunning.Size = new System.Drawing.Size(47, 13);
             this.lablRunning.TabIndex = 3;
@@ -80,7 +89,7 @@
             // 
             this.lablConnected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lablConnected.AutoSize = true;
-            this.lablConnected.Location = new System.Drawing.Point(211, 8);
+            this.lablConnected.Location = new System.Drawing.Point(527, 8);
             this.lablConnected.Name = "lablConnected";
             this.lablConnected.Size = new System.Drawing.Size(59, 13);
             this.lablConnected.TabIndex = 2;
@@ -107,17 +116,17 @@
             this.butnConnect.UseVisualStyleBackColor = true;
             this.butnConnect.Click += new System.EventHandler(this.mitmConnect_Click);
             // 
-            // menuStrip1
+            // menuMain
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.executeToolStripMenuItem,
             this.viewToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(273, 24);
-            this.menuStrip1.TabIndex = 5;
-            this.menuStrip1.Text = "E&xecute";
+            this.menuMain.Location = new System.Drawing.Point(0, 0);
+            this.menuMain.Name = "menuMain";
+            this.menuMain.Size = new System.Drawing.Size(589, 24);
+            this.menuMain.TabIndex = 5;
+            this.menuMain.Text = "E&xecute";
             // 
             // fileToolStripMenuItem
             // 
@@ -138,6 +147,13 @@
             this.mitmConnect.Size = new System.Drawing.Size(162, 22);
             this.mitmConnect.Text = "&Connect";
             this.mitmConnect.Click += new System.EventHandler(this.mitmConnect_Click);
+            // 
+            // mitmSave
+            // 
+            this.mitmSave.Name = "mitmSave";
+            this.mitmSave.Size = new System.Drawing.Size(162, 22);
+            this.mitmSave.Text = "&Save";
+            this.mitmSave.Click += new System.EventHandler(this.mitmSave_Click);
             // 
             // mitmRefresh
             // 
@@ -204,7 +220,6 @@
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mitmViewBreakpoints,
             this.mitmMainViewCallStack,
-            this.mitmViewDisassembly,
             this.mitmViewLog,
             this.mitmRegisters,
             this.mitmMainViewWatches,
@@ -227,13 +242,6 @@
             this.mitmMainViewCallStack.Size = new System.Drawing.Size(215, 22);
             this.mitmMainViewCallStack.Text = "&CallStack";
             this.mitmMainViewCallStack.Click += new System.EventHandler(this.mitmMainViewCallStack_Click);
-            // 
-            // mitmViewDisassembly
-            // 
-            this.mitmViewDisassembly.Name = "mitmViewDisassembly";
-            this.mitmViewDisassembly.Size = new System.Drawing.Size(215, 22);
-            this.mitmViewDisassembly.Text = "&Disassembly";
-            this.mitmViewDisassembly.Click += new System.EventHandler(this.mitmViewDisassembly_Click);
             // 
             // mitmViewLog
             // 
@@ -268,22 +276,79 @@
             this.mitmWindowsToForeground.Text = "All windows to foreground";
             this.mitmWindowsToForeground.Click += new System.EventHandler(this.mitmWindowsToForeground_Click);
             // 
-            // mitmSave
+            // panel4
             // 
-            this.mitmSave.Name = "mitmSave";
-            this.mitmSave.Size = new System.Drawing.Size(162, 22);
-            this.mitmSave.Text = "&Save";
-            this.mitmSave.Click += new System.EventHandler(this.mitmSave_Click);
+            this.panel4.Controls.Add(this.lablCurrentFunction);
+            this.panel4.Controls.Add(this.label5);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel4.Location = new System.Drawing.Point(0, 54);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(589, 32);
+            this.panel4.TabIndex = 12;
+            // 
+            // lablCurrentFunction
+            // 
+            this.lablCurrentFunction.AutoSize = true;
+            this.lablCurrentFunction.Location = new System.Drawing.Point(102, 7);
+            this.lablCurrentFunction.Name = "lablCurrentFunction";
+            this.lablCurrentFunction.Size = new System.Drawing.Size(35, 13);
+            this.lablCurrentFunction.TabIndex = 1;
+            this.lablCurrentFunction.Text = "label9";
+            this.lablCurrentFunction.Visible = false;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 7);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Current Function:";
+            // 
+            // lboxDisassemble
+            // 
+            this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lboxDisassemble.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lboxDisassemble.FormattingEnabled = true;
+            this.lboxDisassemble.ItemHeight = 19;
+            this.lboxDisassemble.Location = new System.Drawing.Point(0, 86);
+            this.lboxDisassemble.Name = "lboxDisassemble";
+            this.lboxDisassemble.Size = new System.Drawing.Size(589, 308);
+            this.lboxDisassemble.TabIndex = 13;
+            // 
+            // menuDisassembly
+            // 
+            this.menuDisassembly.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mitemDisassemblyAddBreakpoint,
+            this.mitmCopyToClipboard});
+            this.menuDisassembly.Name = "menuDisassembly";
+            this.menuDisassembly.Size = new System.Drawing.Size(172, 48);
+            // 
+            // mitemDisassemblyAddBreakpoint
+            // 
+            this.mitemDisassemblyAddBreakpoint.Name = "mitemDisassemblyAddBreakpoint";
+            this.mitemDisassemblyAddBreakpoint.Size = new System.Drawing.Size(171, 22);
+            this.mitemDisassemblyAddBreakpoint.Text = "&Add Breakpoint";
+            this.mitemDisassemblyAddBreakpoint.Click += new System.EventHandler(this.mitemDisassemblyAddBreakpoint_Click);
+            // 
+            // mitmCopyToClipboard
+            // 
+            this.mitmCopyToClipboard.Name = "mitmCopyToClipboard";
+            this.mitmCopyToClipboard.Size = new System.Drawing.Size(171, 22);
+            this.mitmCopyToClipboard.Text = "&Copy to Clipboard";
+            this.mitmCopyToClipboard.Click += new System.EventHandler(this.mitmCopyToClipboard_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(273, 54);
+            this.ClientSize = new System.Drawing.Size(589, 396);
+            this.Controls.Add(this.lboxDisassemble);
+            this.Controls.Add(this.panel4);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.menuMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MainMenuStrip = this.menuStrip1;
+            this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
             this.Name = "FormMain";
             this.Text = "Cosmos GDB Debugger";
@@ -294,8 +359,11 @@
             this.Resize += new System.EventHandler(this.FormMain_Resize);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.menuMain.ResumeLayout(false);
+            this.menuMain.PerformLayout();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
+            this.menuDisassembly.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -304,7 +372,7 @@
         #endregion
 
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.MenuStrip menuMain;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mitmExit;
         private System.Windows.Forms.ToolStripMenuItem executeToolStripMenuItem;
@@ -320,7 +388,6 @@
         private System.Windows.Forms.ToolStripMenuItem mitmMainViewWatches;
         private System.Windows.Forms.ToolStripMenuItem mitmViewLog;
         private System.Windows.Forms.ToolStripMenuItem mitmViewBreakpoints;
-        private System.Windows.Forms.ToolStripMenuItem mitmViewDisassembly;
         private System.Windows.Forms.ToolStripMenuItem mitmRegisters;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem mitmWindowsToForeground;
@@ -329,6 +396,13 @@
         private System.Windows.Forms.Label lablConnected;
         private System.Windows.Forms.Label lablRunning;
         private System.Windows.Forms.ToolStripMenuItem mitmSave;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Label lablCurrentFunction;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ListBox lboxDisassemble;
+        private System.Windows.Forms.ContextMenuStrip menuDisassembly;
+        private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
+        private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;
     }
 }
 

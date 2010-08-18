@@ -7,16 +7,17 @@ namespace Cosmos.Core {
     static public class Global {
         static public BaseIOGroups BaseIOGroups = new BaseIOGroups();
 
-        static Global() {
-            Cosmos.Debug.Debugger.Send("static Global()");
-        }
-
         static public void Init() {
             // Temp
             Kernel.Global.Init();
+            Console.WriteLine("    Init Global Descriptor Table");
+            Kernel.CPU.CreateGDT();
+            Console.WriteLine("    Init IDT");
+            Kernel.CPU.CreateIDT(true);
+            Console.WriteLine("    Init Floating point unit");
+            Kernel.CPU.InitFloat();
             // End Temp
             IRQs.Dummy();
-            Kernel.CPU.CreateIDT(false);
         }
     }
 }

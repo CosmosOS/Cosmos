@@ -6,10 +6,6 @@ using Cosmos.Kernel;
 namespace Cosmos.Hardware2 {
     public class Global2 {
         public static void Init() {
-            Console.WriteLine("    Init Global Descriptor Table");
-            Kernel.CPU.CreateGDT();
-            Console.WriteLine("    Init Floating point unit");
-            Kernel.CPU.InitFloat();
             Console.WriteLine("    Init PIC");
             PIC.Init();
 
