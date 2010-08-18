@@ -103,8 +103,13 @@ namespace Cosmos.IL2CPU.X86
             new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
             // END SSE INIT
 
-            if (mComNumber > 0) {
+            if (mComNumber > 0)
+            {
                 CodeBlock.Call<DebugStub.Init>();
+            }
+            else
+            {
+                DataMembers.Add(new DataMember("InterruptsEnabledFlag", new int[] { 0 }));
             }
 
             // Jump to Kernel entry point

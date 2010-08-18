@@ -131,6 +131,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
                 new CPUx86.Push { DestinationValue = (uint)j };
                 new CPUx86.Pushad();
 
+                
                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP }; // preserve old stack address for passing to interrupt handler
 

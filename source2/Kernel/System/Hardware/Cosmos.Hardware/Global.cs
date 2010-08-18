@@ -10,10 +10,10 @@ namespace Cosmos.Hardware {
         static public TextScreen TextScreen = new TextScreen();
 
         static public void Init() {
-            Cosmos.Core.Global.Init();
             // Temp
             Cosmos.Hardware2.Global2.Init();
             // End Temp
+            Cosmos.Core.Global.Init();
         }
 
     }

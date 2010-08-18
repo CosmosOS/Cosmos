@@ -39,9 +39,9 @@ namespace Cosmos.Hardware2 {
             Kernel.CPUBus.Write8(DataPort2, 0x01);
             // Masks - 0 = receive all IRQ's
 			// MTW, to disable PIT, send 0x1 to DataPort1
-            Kernel.CPUBus.Write8(DataPort1, 0x00);
+            Kernel.CPUBus.Write8(DataPort1, 0x01);
             //Kernel.CPUBus.Write8(DataPort2, 0x00);
-            Kernel.CPUBus.Write8(DataPort2, 0x01);
+            Kernel.CPUBus.Write8(DataPort2, 0x00);
 		}
     }
 }

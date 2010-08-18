@@ -266,6 +266,10 @@ namespace Cosmos.Build.MSBuild
                     return false;
                 }
                 var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
+                if (mDebugMode == Common.DebugMode.None)
+                {
+                    DebugCom = 0;
+                }
                 var xAsm = new AppAssemblerNasm(DebugCom);
                 xAsm.DebugMode = mDebugMode;
                 xAsm.TraceAssemblies = mTraceAssemblies;

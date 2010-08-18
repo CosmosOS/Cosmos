@@ -6,9 +6,6 @@ using Cosmos.Kernel;
 namespace Cosmos.Hardware2 {
     public class Global2 {
         public static void Init() {
-            Console.WriteLine("    Init PIC");
-            PIC.Init();
-
             //Console.WriteLine("    Init Serial");
             //Serial.InitSerial(0); // MtW: disabled, screws up debugging
             //PIT.Initialize(Tick);
