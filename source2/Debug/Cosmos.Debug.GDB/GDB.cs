@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Threading;
 
 namespace Cosmos.Debug.GDB {
     public class GDB {
@@ -18,8 +19,35 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        static protected System.Diagnostics.Process mGDBProcess;
-        static protected System.IO.StreamReader mGDB;
+        protected System.Diagnostics.Process mGDBProcess;
+        protected System.IO.StreamReader mGDB;
+
+        protected class GDBThread {
+            protected Thread mThread;
+
+            // StreamReader as arg
+            public GDBThread() {
+                mThread = new Thread(Execute);
+                mThread.Start();
+            }
+
+            protected void Execute() {
+                while (true) {
+                    // ReadLine
+                    Thread.Sleep(1000);
+                    return;
+
+                    Action<Response> xMethod = OnResponse;
+                    var xResponse = new Response();
+                    // Need to chagne to dispatcher invoke
+                    var xAsync = xMethod.BeginInvoke(xResponse, null, null);
+                    xMethod.EndInvoke(xAsync);
+                }
+            }
+
+            protected void OnResponse(Response aResponse) {
+            }
+        }
 
         static public string Unescape(string aInput) {
             // Remove surrounding ", /n, then unescape and trim
@@ -32,7 +60,7 @@ namespace Cosmos.Debug.GDB {
             return xResult.Trim();
         }
 
-        static public Response GetResponse() {
+        protected Response GetResponse() {
             var xResult = new Response();
 
             //TODO: Cant find a better way than peek... 
@@ -72,7 +100,7 @@ namespace Cosmos.Debug.GDB {
             return xResult;
         }
 
-        static public Response SendCmd(string aCmd) {
+        public Response SendCmd(string aCmd) {
             mGDBProcess.StandardInput.WriteLine(aCmd);
             var xResult = GetResponse();
             xResult.Command = aCmd;
@@ -80,16 +108,17 @@ namespace Cosmos.Debug.GDB {
             return xResult;
         }
 
-        static protected bool mConnected = false;
-        static public bool Connected {
+        protected bool mConnected = false;
+        public bool Connected {
             get { return mConnected; }
         }
 
         //TODO: Make path dynamic
-        static protected string mCosmosPath = @"m:\source\Cosmos\";
+        protected string mCosmosPath = @"m:\source\Cosmos\";
         //static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
 
-        static public void Connect(int aRetry) {
+        protected GDBThread mThread;
+        public GDB(int aRetry) {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
             xStartInfo.Arguments = @"--interpreter=mi2";
@@ -102,6 +131,8 @@ namespace Cosmos.Debug.GDB {
             mGDBProcess = System.Diagnostics.Process.Start(xStartInfo);
             mGDB = mGDBProcess.StandardOutput;
             mGDBProcess.StandardInput.AutoFlush = true;
+
+            mThread = new GDBThread();
 
             GetResponse();
             SendCmd("symbol-file Breakpoints.obj");

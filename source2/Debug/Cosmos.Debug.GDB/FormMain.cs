@@ -50,7 +50,7 @@ namespace Cosmos.Debug.GDB {
             lablCurrentFunction.Text = "";
             lablCurrentFunction.Visible = true;
 
-            var xResult = GDB.SendCmd(("disassemble " + aLabel).Trim()).Text;
+            var xResult = Global.GDB.SendCmd(("disassemble " + aLabel).Trim()).Text;
             lboxDisassemble.BeginUpdate();
             try {
                 lboxDisassemble.Items.Clear();
@@ -95,7 +95,7 @@ namespace Cosmos.Debug.GDB {
         private void mitmStepInto_Click(object sender, EventArgs e) {
             lablRunning.Text = "Running";
             Application.DoEvents();
-            GDB.SendCmd("stepi");
+            Global.GDB.SendCmd("stepi");
             lablRunning.Text = "Stopped";
             Windows.UpdateAllWindows();
         }
@@ -103,7 +103,7 @@ namespace Cosmos.Debug.GDB {
         private void mitmStepOver_Click(object sender, EventArgs e) {
             lablRunning.Text = "Running";
             Application.DoEvents();
-            GDB.SendCmd("nexti");
+            Global.GDB.SendCmd("nexti");
             lablRunning.Text = "Stopped";
             Windows.UpdateAllWindows();
         }
@@ -115,8 +115,8 @@ namespace Cosmos.Debug.GDB {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
-            GDB.Connect(aRetry);
-            if (GDB.Connected) {
+            Global.GDB = new GDB(aRetry);
+            if (Global.GDB.Connected) {
                 lablConnected.Visible = true;
                 lablRunning.Visible = true;
                 lablRunning.Text = "Stopped";
@@ -140,7 +140,7 @@ namespace Cosmos.Debug.GDB {
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
             lablRunning.Text = "Running";
             Application.DoEvents();
-            GDB.SendCmd("continue");
+            Global.GDB.SendCmd("continue");
             lablRunning.Text = "Stopped";
             Windows.UpdateAllWindows();
         }

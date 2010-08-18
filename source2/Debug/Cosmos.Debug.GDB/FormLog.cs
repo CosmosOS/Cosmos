@@ -36,7 +36,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void butnSendCmd_Click(object sender, EventArgs e) {
-            GDB.SendCmd(textSendCmd.Text);
+            Global.GDB.SendCmd(textSendCmd.Text);
             textSendCmd.Clear();
         }
 

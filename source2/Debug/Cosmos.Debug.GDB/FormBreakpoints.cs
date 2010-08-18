@@ -36,7 +36,7 @@ namespace Cosmos.Debug.GDB {
         public bool AddBreakpoint(string aLabel) {
             string s = aLabel.Trim();
             if (s.Length > 0) {
-                var xResult = GDB.SendCmd("break " + s).Text;
+                var xResult = Global.GDB.SendCmd("break " + s).Text;
                 var xSplit = xResult[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 if (xSplit[0] == "Breakpoint") {
                     lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(s, int.Parse(xSplit[1])));
@@ -80,7 +80,7 @@ namespace Cosmos.Debug.GDB {
         private void mitmBreakpointDelete_Click(object sender, EventArgs e) {
             var x = (Breakpoint)lboxBreakpoints.SelectedItem;
             if (x != null) {
-                GDB.SendCmd("delete " + x.Index);
+                Global.GDB.SendCmd("delete " + x.Index);
                 lboxBreakpoints.Items.Remove(x);
             }
         }

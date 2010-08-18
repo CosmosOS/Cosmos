@@ -32,7 +32,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void Redo() {
-            var xResult = GDB.SendCmd("where");
+            var xResult = Global.GDB.SendCmd("where");
             lboxCallStack.BeginUpdate();
             try {
                 lboxCallStack.Items.Clear();
