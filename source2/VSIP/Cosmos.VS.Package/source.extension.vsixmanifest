@@ -6,7 +6,7 @@
 		<Version>1.0</Version>
 		<Description xml:space="preserve">Empty VSIX Project.</Description>
 		<Locale>1033</Locale>
-		<Icon>Cosmos.ico</Icon>
+		<Icon>..\..\Cosmos.ico</Icon>
 		<SupportedProducts>
 			<VisualStudio Version="10.0">
 				<Edition>Ultimate</Edition>
@@ -19,7 +19,7 @@
 		<SupportedFrameworkRuntimeEdition MinVersion="2.0" MaxVersion="4.0" />
 	</Identifier>
 	<References>
-		<Reference Id="Microsoft.VisualStudio.MPF" MinVersion="9.0">
+		<Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
 			<Name>Visual Studio MPF</Name>
 		</Reference>
 	</References>

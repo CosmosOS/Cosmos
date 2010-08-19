@@ -155,7 +155,7 @@
     <Compile Include="VsProjectConfig.cs" />
     <Compile Include="VSProjectFactory.cs" />
     <Compile Include="VSProjectNode.cs" />
-    <Compile Include="VSProject.cs" />
+    <Compile Include="VSProject2010.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -172,10 +172,6 @@
     <None Include="bin\Images\alert.png" />
     <None Include="bin\Images\alert1.png" />
     <None Include="Key.snk" />
-    <Content Include="Cosmos.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
     <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\AssemblyInfo.vb">

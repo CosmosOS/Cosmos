@@ -41,7 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{A4478219
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}"
 	ProjectSection(SolutionItems) = preProject
-		..\source2\Users\Kudzu\Notes.html = ..\source2\Users\Kudzu\Notes.html
 		..\source2\Users\Kudzu\Old-IDANotes.html = ..\source2\Users\Kudzu\Old-IDANotes.html
 	EndProjectSection
 EndProject
@@ -114,6 +113,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "24703"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug2010.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
