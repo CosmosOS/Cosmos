@@ -267,5 +267,11 @@ namespace Cosmos.Debug.GDB {
             Clipboard.SetText(x.ToString());
         }
 
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
+            if (Global.GDB != null) {
+                Global.GDB.Dispose();
+            }
+        }
+
     }
 }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 
 namespace Cosmos.Debug.GDB {
-    public class GDB {
+    public class GDB : IDisposable {
         public class Response {
             public string Command = "";
             public bool Error = false;
@@ -36,7 +36,7 @@ namespace Cosmos.Debug.GDB {
             }
 
             protected void Execute() {
-                while (!mGDB.EndOfStream) {
+                while (true) {
                     var xResponse = GetResponse();
                     Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
                 }
@@ -45,9 +45,7 @@ namespace Cosmos.Debug.GDB {
             protected Response GetResponse() {
                 var xResult = new Response();
 
-                //TODO: Cant find a better way than peek... 
-                //while (!mGDBProcess.HasExited) {
-                while (!mGDB.EndOfStream) {
+                while (true) {
                     var xLine = mGDB.ReadLine();
                     // Null occurs after quit
                     if (xLine == null) {
@@ -145,6 +143,10 @@ namespace Cosmos.Debug.GDB {
             SendCmd("break Kernel_Start");
             SendCmd("continue");
             SendCmd("delete 1");
+        }
+
+        public void Dispose() {
+            
         }
 
     }
