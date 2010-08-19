@@ -12,6 +12,13 @@
         <p>
             Can a signle IRQ happen while one is already in progress? ie Int 2 happen while 
             Int 2 is already in progress? If so does it call again, queue it? or lose it?</p>
+        <p>
+            MtW: This depends on us: we can do this, but can have issues with debugger etc. 
+            Right now, we dont allow it.</p>
+        <p>
+            &nbsp;</p>
+        <p>
+            One thing to keep in mind: the Hardware IRQ&#39;s are mapped to interrupts 0x20-0x2F</p>
         <h3>
             Links</h3>
         <p>

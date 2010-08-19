@@ -163,7 +163,7 @@ namespace Cosmos.Core {
             ////
             //// Triggers IL2CPU error
             //DebugUtil.LogInterruptOccurred(ref aContext);
-            IRQ(1, ref aContext);
+            IRQ(0x21, ref aContext);
             ////mIRQ_Handlers[1](ref aContext);
             ////
             //// Old keyboard
@@ -181,7 +181,7 @@ namespace Cosmos.Core {
         //public static InterruptDelegate IRQ05;
 
         public static void HandleInterrupt_25(ref IRQContext aContext) {
-            IRQ(5, ref aContext);
+            IRQ(0x25, ref aContext);
 
             PIC.SignalSecondary();
         }
@@ -190,7 +190,7 @@ namespace Cosmos.Core {
         //public static InterruptDelegate IRQ09;
 
         public static void HandleInterrupt_29(ref IRQContext aContext) {
-            IRQ(9, ref aContext);
+            IRQ(0x29, ref aContext);
             PIC.SignalSecondary();
         }
 
@@ -203,7 +203,7 @@ namespace Cosmos.Core {
             //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //Console.WriteLine("IRQ 11 raised!");
 
-            IRQ(10, ref aContext);
+            IRQ(0x2A, ref aContext);
 
             PIC.SignalSecondary();
         }
@@ -217,7 +217,7 @@ namespace Cosmos.Core {
             //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //Console.WriteLine("IRQ 11 raised!");
 
-            IRQ(11, ref aContext);
+            IRQ(0x2B, ref aContext);
 
             PIC.SignalSecondary();
         }
@@ -230,7 +230,7 @@ namespace Cosmos.Core {
             //Commented out below
             //Console.WriteLine("IRQ 12 raised!");
 
-            IRQ(12, ref aContext);
+            IRQ(0x2C, ref aContext);
 
             PIC.SignalSecondary();
         }

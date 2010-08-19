@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Hardware2;
 
 namespace Cosmos.Core {
     static public class Global {
@@ -10,11 +11,9 @@ namespace Cosmos.Core {
         static public void Init() {
             // Temp
             Kernel.Global.Init();
-            Console.WriteLine("    Init Global Descriptor Table");
             Kernel.CPU.CreateGDT();
-            Console.WriteLine("    Init IDT");
+            PIC.Init();
             Kernel.CPU.CreateIDT(true);
-            Console.WriteLine("    Init Floating point unit");
             Kernel.CPU.InitFloat();
             // End Temp
             IRQs.Dummy();
