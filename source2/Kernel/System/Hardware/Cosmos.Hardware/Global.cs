@@ -17,9 +17,6 @@ namespace Cosmos.Hardware {
             
             // End Temp
             Cosmos.Core.Global.Init();
-            Cosmos.Debug.Debugger.Send("Initializing keyboard");
-            // todo: ideally, Keyboard should be initialized inline, but this means it's done too early..
-            //Keyboard = new Keyboard();
         }
 
     }

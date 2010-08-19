@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 
 namespace Cosmos.Debug.GDB {
-    public class GDB : IDisposable {
+    public class GDB {
         public class Response {
             public string Command = "";
             public bool Error = false;
@@ -20,67 +20,54 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected System.Diagnostics.Process mGDBProcess;
-        protected GDBThread mThread;
+        protected Action<Response> mOnResponse;
+        protected List<string> mBuffer = new List<string>();
 
-        protected class GDBThread {
-            protected Thread mThread;
-            protected System.IO.StreamReader mGDB;
-            protected Action<Response> mOnResponse;
-
-            // StreamReader as arg
-            public GDBThread(System.IO.StreamReader aGDB, Action<Response> aOnResponse) {
-                mGDB = aGDB;
-                mOnResponse = aOnResponse;
-                mThread = new Thread(Execute);
-                mThread.Start();
+        // DO  NOT change to sync reads.. with process output there are SERIOUS bugs in the StreamReader..
+        // Unforunately the .NET implementation when no more data exists
+        // sticks forever and there seems to be no way to abort it including closing the stream.
+        // StreamReader in general has other issues on non seekable streams as well and accounts for why even our
+        // implementation looks poor in places.
+        void mGDBProcess_OutputDataReceived(object sender, DataReceivedEventArgs e) {
+            string xData = e.Data.Trim();
+            if (xData == "(gdb)") {
+                ProcessResponse();
+            } else {
+                mBuffer.Add(xData);
             }
+        }
 
-            protected void Execute() {
-                while (true) {
-                    var xResponse = GetResponse();
-                    Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
+        protected void ProcessResponse() {
+            var xResponse = new Response();
+            
+            foreach (string xLine in mBuffer) {
+                var xType = xLine[0];
+                // & echo of a command
+                // ~ text response
+                // ^ done
+
+                //&target remote :8832
+                //&:8832: No connection could be made because the target machine actively refused it.
+                //^error,msg=":8832: No connection could be made because the target machine actively refused it."
+
+                //&target remote :8832
+                //~Remote debugging using :8832
+                //~[New Thread 1]
+                //~0x000ffff0 in ?? ()
+                //^done
+
+                string sData = Unescape(xLine.Substring(1));
+                if (xType == '&') {
+                    xResponse.Command = sData;
+                } else if (xType == '^') {
+                    xResponse.Error = sData != "done";
+                } else if (xType == '~') {
+                    xResponse.Text.Add(Unescape(sData));
                 }
             }
 
-            protected Response GetResponse() {
-                var xResult = new Response();
-
-                while (true) {
-                    var xLine = mGDB.ReadLine();
-                    // Null occurs after quit
-                    if (xLine == null) {
-                        break;
-                    } else if (xLine.Trim() == "(gdb)") {
-                        break;
-                    } else {
-                        var xType = xLine[0];
-                        // & echo of a command
-                        // ~ text response
-                        // ^ done
-
-                        //&target remote :8832
-                        //&:8832: No connection could be made because the target machine actively refused it.
-                        //^error,msg=":8832: No connection could be made because the target machine actively refused it."
-
-                        //&target remote :8832
-                        //~Remote debugging using :8832
-                        //~[New Thread 1]
-                        //~0x000ffff0 in ?? ()
-                        //^done
-
-                        xLine = Unescape(xLine.Substring(1));
-                        if (xType == '&') {
-                            xResult.Command = xLine;
-                        } else if (xType == '^') {
-                            xResult.Error = xLine != "done";
-                        } else if (xType == '~') {
-                            xResult.Text.Add(Unescape(xLine));
-                        }
-                    }
-                }
-
-                return xResult;
-            }
+            mBuffer.Clear();
+            Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
         }
 
         static public string Unescape(string aInput) {
@@ -108,6 +95,8 @@ namespace Cosmos.Debug.GDB {
         //static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
 
         public GDB(int aRetry, Action<Response> aOnResponse) {
+            mOnResponse = aOnResponse;
+
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
             xStartInfo.Arguments = @"--interpreter=mi2";
@@ -115,12 +104,13 @@ namespace Cosmos.Debug.GDB {
             xStartInfo.CreateNoWindow = true;
             xStartInfo.UseShellExecute = false;
             xStartInfo.RedirectStandardError = true;
-            xStartInfo.RedirectStandardOutput = true;
             xStartInfo.RedirectStandardInput = true;
+            xStartInfo.RedirectStandardOutput = true;
             mGDBProcess = System.Diagnostics.Process.Start(xStartInfo);
             mGDBProcess.StandardInput.AutoFlush = true;
 
-            mThread = new GDBThread(mGDBProcess.StandardOutput, aOnResponse);
+            mGDBProcess.OutputDataReceived += new DataReceivedEventHandler(mGDBProcess_OutputDataReceived);
+            mGDBProcess.BeginOutputReadLine();
 
             SendCmd("symbol-file Breakpoints.obj");
             SendCmd("target remote :8832");
@@ -143,10 +133,6 @@ namespace Cosmos.Debug.GDB {
             SendCmd("break Kernel_Start");
             SendCmd("continue");
             SendCmd("delete 1");
-        }
-
-        public void Dispose() {
-            
         }
 
     }
