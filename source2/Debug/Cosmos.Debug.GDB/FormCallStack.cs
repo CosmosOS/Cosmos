@@ -32,11 +32,14 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void Redo() {
-            var xResult = Global.GDB.SendCmd("where");
+            Global.GDB.SendCmd("where");
+        }
+
+        public void OnWhere(GDB.Response aResponse) {
             lboxCallStack.BeginUpdate();
             try {
                 lboxCallStack.Items.Clear();
-                foreach (var x in xResult.Text) {
+                foreach (var x in aResponse.Text) {
                     //#0  0x0056d5df in DebugStub_Start ()
                     //#1  0x0057572b in System_Void__Cosmos_User_Kernel_Program_Init____DOT__00000001 ()
                     //#2  0x00550018 in Before_Kernel_Stack ()

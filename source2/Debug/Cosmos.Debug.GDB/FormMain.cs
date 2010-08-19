@@ -46,17 +46,55 @@ namespace Cosmos.Debug.GDB {
 
         protected string mFuncName;
 
+        protected void OnGDBResponse(GDB.Response aResponse) {
+            try {
+                Windows.mLogForm.Log(aResponse);
+                var xCmdLine = aResponse.Command.ToLower();
+                if (xCmdLine == "info registers") {
+                    Windows.mRegistersForm.UpdateRegisters(aResponse);
+                } else if (xCmdLine == "") {
+                    // This happens on initial connect
+                } else {
+                    var xCmdParts = aResponse.Command.Split(" ".ToCharArray());
+                    string xCmd = xCmdParts[0].ToLower();
+                    if (xCmd == "disassemble") {
+                        OnDisassemble(aResponse);
+                    } else if (xCmd == "symbol-file") { // nothing
+                    } else if (xCmd == "set") { // nothing
+                    } else if (xCmd == "target") { // nothing
+                    } else if (xCmd == "delete") {
+                    } else if ((xCmd == "stepi") || (xCmd == "nexti") || (xCmd == "continue")) {
+                        lablRunning.Text = "Stopped";
+                        Windows.UpdateAllWindows();
+                    } else if (xCmd == "where") {
+                        Windows.mCallStackForm.OnWhere(aResponse);
+                    } else if (xCmd == "break") {
+                        Windows.mBreakpointsForm.OnBreak(aResponse);
+                    } else {
+                        throw new Exception("Unrecognized command response: " + xCmd);
+                    }
+                }
+            } catch (Exception e) {
+                MessageBox.Show("Exception: " + e.Message);
+            }
+        }
+
         public void Disassemble(string aLabel) {
             lablCurrentFunction.Text = "";
             lablCurrentFunction.Visible = true;
+            Global.GDB.SendCmd(("disassemble " + aLabel).Trim());
+        }
 
-            var xResult = Global.GDB.SendCmd(("disassemble " + aLabel).Trim()).Text;
+        protected void OnDisassemble(GDB.Response xResponse) {
+            var xResult = xResponse.Text;
             lboxDisassemble.BeginUpdate();
             try {
                 lboxDisassemble.Items.Clear();
+
                 // In some cases GDB might return no results. This is common when no symbols are loaded.
                 if (xResult.Count > 0) {
-                    var xSplit = GDB.Unescape(xResult[1]).Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    // Get function name
+                    var xSplit = GDB.Unescape(xResult[0]).Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     mFuncName = xSplit[xSplit.Length - 1];
                     lablCurrentFunction.Text = mFuncName;
 
@@ -94,18 +132,12 @@ namespace Cosmos.Debug.GDB {
 
         private void mitmStepInto_Click(object sender, EventArgs e) {
             lablRunning.Text = "Running";
-            Application.DoEvents();
             Global.GDB.SendCmd("stepi");
-            lablRunning.Text = "Stopped";
-            Windows.UpdateAllWindows();
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
             lablRunning.Text = "Running";
-            Application.DoEvents();
             Global.GDB.SendCmd("nexti");
-            lablRunning.Text = "Stopped";
-            Windows.UpdateAllWindows();
         }
 
         protected void Connect(int aRetry) {
@@ -115,7 +147,7 @@ namespace Cosmos.Debug.GDB {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
-            Global.GDB = new GDB(aRetry);
+            Global.GDB = new GDB(aRetry, OnGDBResponse);
             if (Global.GDB.Connected) {
                 lablConnected.Visible = true;
                 lablRunning.Visible = true;
@@ -139,10 +171,7 @@ namespace Cosmos.Debug.GDB {
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
             lablRunning.Text = "Running";
-            Application.DoEvents();
             Global.GDB.SendCmd("continue");
-            lablRunning.Text = "Stopped";
-            Windows.UpdateAllWindows();
         }
 
         private void mitmMainViewCallStack_Click(object sender, EventArgs e) {

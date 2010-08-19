@@ -20,32 +20,68 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected System.Diagnostics.Process mGDBProcess;
-        protected System.IO.StreamReader mGDB;
+        protected GDBThread mThread;
 
         protected class GDBThread {
             protected Thread mThread;
+            protected System.IO.StreamReader mGDB;
+            protected Action<Response> mOnResponse;
 
             // StreamReader as arg
-            public GDBThread() {
+            public GDBThread(System.IO.StreamReader aGDB, Action<Response> aOnResponse) {
+                mGDB = aGDB;
+                mOnResponse = aOnResponse;
                 mThread = new Thread(Execute);
                 mThread.Start();
             }
 
             protected void Execute() {
-                while (true) {
-                    // ReadLine
-                    Thread.Sleep(1000);
-                    return;
-
-                    Action<Response> xMethod = OnResponse;
-                    var xResponse = new Response();
-                    // Need to chagne to dispatcher invoke
-                    var xAsync = xMethod.BeginInvoke(xResponse, null, null);
-                    xMethod.EndInvoke(xAsync);
+                while (!mGDB.EndOfStream) {
+                    var xResponse = GetResponse();
+                    Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
                 }
             }
 
-            protected void OnResponse(Response aResponse) {
+            protected Response GetResponse() {
+                var xResult = new Response();
+
+                //TODO: Cant find a better way than peek... 
+                //while (!mGDBProcess.HasExited) {
+                while (!mGDB.EndOfStream) {
+                    var xLine = mGDB.ReadLine();
+                    // Null occurs after quit
+                    if (xLine == null) {
+                        break;
+                    } else if (xLine.Trim() == "(gdb)") {
+                        break;
+                    } else {
+                        var xType = xLine[0];
+                        // & echo of a command
+                        // ~ text response
+                        // ^ done
+
+                        //&target remote :8832
+                        //&:8832: No connection could be made because the target machine actively refused it.
+                        //^error,msg=":8832: No connection could be made because the target machine actively refused it."
+
+                        //&target remote :8832
+                        //~Remote debugging using :8832
+                        //~[New Thread 1]
+                        //~0x000ffff0 in ?? ()
+                        //^done
+
+                        xLine = Unescape(xLine.Substring(1));
+                        if (xType == '&') {
+                            xResult.Command = xLine;
+                        } else if (xType == '^') {
+                            xResult.Error = xLine != "done";
+                        } else if (xType == '~') {
+                            xResult.Text.Add(Unescape(xLine));
+                        }
+                    }
+                }
+
+                return xResult;
             }
         }
 
@@ -60,52 +96,8 @@ namespace Cosmos.Debug.GDB {
             return xResult.Trim();
         }
 
-        protected Response GetResponse() {
-            var xResult = new Response();
-
-            //TODO: Cant find a better way than peek... 
-            while (!mGDBProcess.HasExited) {
-                var xLine = mGDB.ReadLine();
-                // Null occurs after quit
-                if (xLine == null) {
-                    break;
-                } else if (xLine.Trim() == "(gdb)") {
-                    break;
-                } else {
-                    var xType = xLine[0];
-                    // & echo of a command
-                    // ~ text response
-                    // ^ done
-
-                    //&target remote :8832
-                    //&:8832: No connection could be made because the target machine actively refused it.
-                    //^error,msg=":8832: No connection could be made because the target machine actively refused it."
-
-                    //&target remote :8832
-                    //~Remote debugging using :8832
-                    //~[New Thread 1]
-                    //~0x000ffff0 in ?? ()
-                    //^done
-
-                    xLine = Unescape(xLine.Substring(1));
-                    if (xType == '&') {
-                    } else if (xType == '^') {
-                        xResult.Error = xLine != "done";
-                    } else if (xType == '~') {
-                        xResult.Text.Add(Unescape(xLine));
-                    }
-                }
-            }
-
-            return xResult;
-        }
-
-        public Response SendCmd(string aCmd) {
+        public void SendCmd(string aCmd) {
             mGDBProcess.StandardInput.WriteLine(aCmd);
-            var xResult = GetResponse();
-            xResult.Command = aCmd;
-            Windows.mLogForm.Log(xResult);
-            return xResult;
         }
 
         protected bool mConnected = false;
@@ -117,8 +109,7 @@ namespace Cosmos.Debug.GDB {
         protected string mCosmosPath = @"m:\source\Cosmos\";
         //static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
 
-        protected GDBThread mThread;
-        public GDB(int aRetry) {
+        public GDB(int aRetry, Action<Response> aOnResponse) {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
             xStartInfo.Arguments = @"--interpreter=mi2";
@@ -129,25 +120,24 @@ namespace Cosmos.Debug.GDB {
             xStartInfo.RedirectStandardOutput = true;
             xStartInfo.RedirectStandardInput = true;
             mGDBProcess = System.Diagnostics.Process.Start(xStartInfo);
-            mGDB = mGDBProcess.StandardOutput;
             mGDBProcess.StandardInput.AutoFlush = true;
 
-            mThread = new GDBThread();
+            mThread = new GDBThread(mGDBProcess.StandardOutput, aOnResponse);
 
-            GetResponse();
             SendCmd("symbol-file Breakpoints.obj");
+            SendCmd("target remote :8832");
 
-            while (!mConnected) {
-                var x = SendCmd("target remote :8832");
-                mConnected = !x.Error;
-                aRetry--;
-                if (aRetry == 0) {
-                    return;
-                }
+            //while (!mConnected) {
+            //    var x = SendCmd("target remote :8832");
+            //    mConnected = !x.Error;
+            //    aRetry--;
+            //    if (aRetry == 0) {
+            //        return;
+            //    }
 
-                System.Threading.Thread.Sleep(1000);
-                System.Windows.Forms.Application.DoEvents();
-            }
+            //    System.Threading.Thread.Sleep(1000);
+            //    System.Windows.Forms.Application.DoEvents();
+            //}
 
             SendCmd("set architecture i386");
             SendCmd("set language asm");

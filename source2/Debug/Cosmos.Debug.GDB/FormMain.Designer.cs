@@ -347,12 +347,10 @@
             this.Controls.Add(this.panel4);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuMain);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
             this.Name = "FormMain";
             this.Text = "Cosmos GDB Debugger";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.Activated += new System.EventHandler(this.FormMain_Activated);

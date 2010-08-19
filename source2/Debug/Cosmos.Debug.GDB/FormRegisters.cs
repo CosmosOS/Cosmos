@@ -20,7 +20,11 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void Redo() {
-            var xResult = Global.GDB.SendCmd("info registers").Text;
+            Global.GDB.SendCmd("info registers");
+        }
+
+        public void UpdateRegisters(GDB.Response aResponse) {
+            var xResult = aResponse.Text;
 
             int i = 0;
             CPUReg xReg;
