@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Microsoft.VisualStudio.Project.ReferenceNode">
+    <Position X="0.75" Y="1.5" Width="2.25" />
+    <NestedTypes>
+      <Delegate Name="Microsoft.VisualStudio.Project.ReferenceNode.CannotAddReferenceErrorMessage" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ReferenceNode.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AIBAAGagAAFAAAAAgACiIAAAAAAQAAEAGAAQAABAAAA=</HashCode>
+      <FileName>ReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ProjectReferenceNode">
+    <Position X="5.75" Y="1.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="buildDependency" Type="Microsoft.VisualStudio.Project.BuildDependency" FixedFromPoint="true">
+      <Path>
+        <Point X="8.25" Y="1.845" />
+        <Point X="10" Y="1.845" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>CIACCFYCAgAAgAEgAIACBAQAAAAQABAACAAAAECACgA=</HashCode>
+      <FileName>ProjectReferenceNode.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="buildDependency" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.BuildDependency">
+    <Position X="10" Y="1.5" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAQAAYAAAQAgAAQAEAAAAAAAAAAAAAAEQAAAACAAAA=</HashCode>
+      <FileName>BuildDependency.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ComReferenceNode" Collapsed="true">
+    <Position X="3.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACACCIAAAIAACQgQAAEBAQAgACAAAABCAgQAQACIAA=</HashCode>
+      <FileName>ComReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.SolutionListenerForProjectReferenceUpdate">
+    <Position X="0.75" Y="6.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAIAAAAgAAAAAIAAAAgABAAAA=</HashCode>
+      <FileName>SolutionListenerForProjectReferenceUpdate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.SolutionListener" Collapsed="true">
+    <Position X="4.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIACRBQoCAQCCAAEAIAJAAACgQBAAAYAQAiiAIAAAA=</HashCode>
+      <FileName>SolutionListener.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.AssemblyReferenceNode" Collapsed="true">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACCCJAACAACAAgEAoAAAACBABACIAIGAAAEACAABw=</HashCode>
+      <FileName>AssemblyReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

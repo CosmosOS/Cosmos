@@ -17,21 +17,6 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +26,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,7 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,7 +45,6 @@
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -73,20 +55,17 @@
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\PublicAssemblies\EnvDTE.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies\EnvDTE.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Build.Utilities.v3.5">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop, Version=8.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Designer.Interfaces, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Microsoft Visual Studio 2008 SDK\VisualStudioIntegration\Common\Assemblies\Microsoft.VisualStudio.Designer.Interfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Microsoft Visual Studio 2010 SDK\VisualStudioIntegration\Common\Assemblies\Microsoft.VisualStudio.Designer.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
@@ -101,14 +80,15 @@
     <Reference Include="Microsoft.VisualStudio.Shell.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="System" />
-    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    <Reference Include="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildPage.cs">
@@ -140,12 +120,6 @@
     </Compile>
     <Compile Include="DebugPageSub.Designer.cs">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DebugPageVMWare.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DebugPageVMWare.Designer.cs">
-      <DependentUpon>DebugPageVMWare.cs</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -198,8 +172,61 @@
     <None Include="bin\Images\alert.png" />
     <None Include="bin\Images\alert1.png" />
     <None Include="Key.snk" />
+    <Content Include="Cosmos.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\AssemblyInfo.vb">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.vb">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProjKernel.vbproj">
+      <RootPath>templates\Projects\CosmosKernel %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\AssemblyInfo.vb">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.vb">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProjKernel.vbproj">
+      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\Readme.txt" />
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Readme.txt">
+      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\AssemblyInfo.cs">
+      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Kernel.cs">
+      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProject.csproj">
+      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.ico">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
@@ -215,21 +242,19 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\AssemblyInfo.cs">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosExpress\CosmosProject.Cosmos">
-      <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    <ZipItem Include="Templates\Projects\Cosmos\CosmosProject.Cosmos">
+      <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosExpress\Kernel.ico">
-      <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    <ZipItem Include="Templates\Projects\Cosmos\Kernel.ico">
+      <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosExpress\CosmosExpress.vstemplate">
-      <RootPath>Templates\Projects\CosmosExpress</RootPath>
+    <ZipItem Include="Templates\Projects\Cosmos\Cosmos.vstemplate">
+      <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
+    <EmbeddedResource Include="Templates\CosmosProject.Cosmos" />
     <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </None>
-    <EmbeddedResource Include="Templates\CosmosProject.Cosmos">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </EmbeddedResource>
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
@@ -251,9 +276,6 @@
     <EmbeddedResource Include="DebugPageSub.resx">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DebugPageVMWare.resx">
-      <DependentUpon>DebugPageVMWare.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="SubPropertyPageBase.resx">
       <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
@@ -269,17 +291,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
-      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
-      <Name>Cosmos.Hardware.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
       <Name>Cosmos.Sys.FileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware</Name>
+      <Name>Cosmos.Hardware2</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
       <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
@@ -322,28 +340,6 @@
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
@@ -352,7 +348,7 @@
     -->
     <RegisterOutputPackage>true</RegisterOutputPackage>
     <RegisterWithCodebase>true</RegisterWithCodebase>
-    <ProjectBasePath>..\MPF\9.0\Src\CSharp</ProjectBasePath>
+    <ProjectBasePath>..\MPF\10.0\Src\CSharp</ProjectBasePath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\VSSDK\Microsoft.VsSDK.targets" />

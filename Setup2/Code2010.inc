@@ -18,7 +18,11 @@ var
   __VSNET2008_PATH,
   __VSNET2010_PATH,
   __VSNET2008_BASE_PATH,
-  __VSNET2010_BASE_PATH: string;
+  __VSNET2010_BASE_PATH,
+	__CSharpExpress2008ProjectTemplatePath,
+	__VBExpress2008ProjectTemplatePath,
+	__CSharpExpress2010ProjectTemplatePath,
+	__VBExpress2010ProjectTemplatePath: string;
   
 procedure InitializePaths;
 begin
@@ -59,6 +63,18 @@ __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETF
   __VSNET2008_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2008_PATH)+'..\..');
   if __VSNET2010 then
   __VSNET2010_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2010_PATH)+'..\..');
+  
+  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\9.0', 'UserProjectTemplatesLocation', __CSharpExpress2008ProjectTemplatePath);
+  StringChangeEx(__CSharpExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+
+  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VBExpress\9.0', 'UserProjectTemplatesLocation', __VBExpress2008ProjectTemplatePath);
+  StringChangeEx(__VBExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+  
+  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\10.0', 'UserProjectTemplatesLocation', __CSharpExpress2010ProjectTemplatePath);
+  StringChangeEx(__CSharpExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+
+  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VBExpress\10.0', 'UserProjectTemplatesLocation', __VBExpress2010ProjectTemplatePath);
+  StringChangeEx(__VBExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
 
 end;
 
@@ -70,12 +86,14 @@ end;
 function VSNET2008: Boolean;
 begin
   InitializePaths;
+  MsgBox(ExpandConstant('call VSNET2008'), MbError, MB_OK);
   Result := __VSNET2008;
 end;
 
 function VSNET2010: Boolean;
 begin
   InitializePaths;
+    MsgBox(ExpandConstant('call VSNET2010'), MbError, MB_OK);
   Result := __VSNET2010;
 end;
 
@@ -113,22 +131,30 @@ begin
   result := __FRAMEWORK64_INSTALL_ROOT;
 end;
 
-function Vb2008_Installed: Boolean;
+function Vb2008_Installed(dummy: string): Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
-function Vb2010_Installed: Boolean;
+function Vb2010_Installed(dummy: string): Boolean;
 begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
+	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
-function csharp2008_Installed: Boolean;
+function booltostr(value: Boolean) : string;
 begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
+	if value then
+		Result := 'true'
+	else
+		Result := 'false';
 end;
 
-function csharp2010_Installed: Boolean;
+function csharp2008_Installed(test: string): Boolean;
+begin
+	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
+end;
+
+function csharp2010_Installed(dummy: string): Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
 end;
@@ -141,6 +167,22 @@ end;
 function VS2010_REGISTRY_HIVE(dummy: string): string;
 begin
   Result := '10.0';
+end;
+
+function VS2008UP_REGISTRY_HIVE(dummy: string): string;
+begin
+  if VSNET2008 then begin
+    Result := '9.0';
+  end
+  else begin
+    if VSNET2010 then begin
+	  Result := '10.0';
+	end
+	else begin
+	  MsgBox(ExpandConstant('Visual Studio 2008/2010 not installed!'), MbError, MB_OK);
+	end;
+  end;
+    
 end;
 
 function ORCAS_REGISTRY_HIVE(dummy: string): string;
@@ -210,11 +252,57 @@ begin
   Result := __NET_FRAMEWORK4_INSTALLED;
 end;
 
+function IsCSharpExpress2008Installed(dummy: string): boolean;
+begin
+	InitializePaths;
+	if (Length(Trim(__CSharpExpress2008ProjectTemplatePath)) > 0) then
+		Result := True
+	else
+		Result := False;
+end;
+
+function IsCSharpExpress2010Installed(dummy: string): boolean;
+begin
+	InitializePaths;
+	if (Length(Trim(__CSharpExpress2010ProjectTemplatePath)) > 0) then
+		Result := True
+	else
+		Result := False;
+end;
+
+function GetCSharpExpress2008ProjectTemplatePath(dummy: string) : string;
+begin
+	InitializePaths;
+	Result := __CSharpExpress2008ProjectTemplatePath;
+end;
+
+function GetCSharpExpress2010ProjectTemplatePath(dummy: string) : string;
+begin
+	InitializePaths;
+	Result := __CSharpExpress2010ProjectTemplatePath;
+end;
+
+function IsVBExpress2008Installed(dummy: string) : boolean;
+begin
+InitializePaths;
+	if (Length(Trim(__VBExpress2008ProjectTemplatePath))  > 0) then
+		Result := True
+	else
+		Result := False;
+end;
+
+function GetVBExpress2008ProjectTemplatePath(dummy: string): string;
+begin
+	InitializePaths;
+	Result := __VBExpress2008ProjectTEmplatePath;
+end;
+
+
 
 function InitializeSetup: Boolean;
 begin
-  if not VSNET2010 then begin
-    MsgBox(ExpandConstant('Visual Studio 2010 not installed!'), MbError, MB_OK);
+  if not VSNET2008 and not VSNET2010 then begin
+    MsgBox(ExpandConstant('Visual Studio 2008/2010 not installed!'), MbError, MB_OK);
     result := false;
     exit;
    end;

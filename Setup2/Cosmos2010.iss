@@ -22,7 +22,7 @@
 [Setup]
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
-AppVerName=Cosmos User Kit Milestone 5
+AppVerName=Cosmos User Kit
 AppCopyright=Copyright © 2007-2010 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
@@ -32,7 +32,7 @@ AppVersion=0.5
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
-OutputBaseFilename=CosmosUserKit5
+OutputBaseFilename=CosmosUserKit
 #ifdef Compress
 Compression=lzma2/ultra64
 InternalCompressLevel=ultra64
@@ -43,9 +43,10 @@ InternalCompressLevel=none
 SolidCompression=true
 SourceDir=..
 ;Left Image should be 164x314
-WizardImageFile=.\setup\images\cosmos.bmp
+WizardImageFile=.\setup2\images\cosmos.bmp
 ;Small Image should be 55x55
-WizardSmallImageFile=.\setup\images\cosmos_small.bmp
+WizardSmallImageFile=.\setup2\images\cosmos_small.bmp
+AllowCancelDuringInstall=false
 
 ; If you want all languages to be listed in the "Select Setup Language"
 ; dialog, even those that can't be displayed in the active code page,
@@ -56,40 +57,41 @@ UninstallLogMode=overwrite
 ChangesAssociations=yes
 
 #include "Code2010.inc"
+#include "Events2010.inc"
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; InfoBeforeFile: .\setup2\Readme.txt
 #ifdef IncludeUILanguages
-Name: eu; MessagesFile: .\setup\Languages\Basque-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ca; MessagesFile: .\setup\Languages\Catalan-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: cs; MessagesFile: .\setup\Languages\Czech-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: da; MessagesFile: .\setup\Languages\Danish-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: nl; MessagesFile: .\setup\Languages\Dutch-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: fi; MessagesFile: .\setup\Languages\Finnish-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: fr; MessagesFile: .\setup\Languages\French-15-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: de; MessagesFile: .\setup\Languages\German-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: hu; MessagesFile: .\setup\Languages\Hungarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: it; MessagesFile: .\setup\Languages\Italian-14-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: no; MessagesFile: .\setup\Languages\Norwegian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: pl; MessagesFile: .\setup\Languages\Polish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: pt; MessagesFile: .\setup\Languages\PortugueseStd-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ru; MessagesFile: .\setup\Languages\Russian-19-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: sk; MessagesFile: .\setup\Languages\Slovak-6-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: sl; MessagesFile: .\setup\Languages\Slovenian-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: eu; MessagesFile: .\setup2\Languages\Basque-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ca; MessagesFile: .\setup2\Languages\Catalan-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: cs; MessagesFile: .\setup2\Languages\Czech-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: da; MessagesFile: .\setup2\Languages\Danish-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: nl; MessagesFile: .\setup2\Languages\Dutch-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: fi; MessagesFile: .\setup2\Languages\Finnish-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: fr; MessagesFile: .\setup2\Languages\French-15-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: de; MessagesFile: .\setup2\Languages\German-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: hu; MessagesFile: .\setup2\Languages\Hungarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: it; MessagesFile: .\setup2\Languages\Italian-14-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: no; MessagesFile: .\setup2\Languages\Norwegian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: pl; MessagesFile: .\setup2\Languages\Polish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: pt; MessagesFile: .\setup2\Languages\PortugueseStd-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ru; MessagesFile: .\setup2\Languages\Russian-19-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: sk; MessagesFile: .\setup2\Languages\Slovak-6-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: sl; MessagesFile: .\setup2\Languages\Slovenian-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 ;InOffical:
-Name: bg; MessagesFile: .\setup\Languages\InOfficial\Bulgarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: el; MessagesFile: .\setup\Languages\InOfficial\Greek-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: is; MessagesFile: .\setup\Languages\InOfficial\Icelandic-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: id; MessagesFile: .\setup\Languages\InOfficial\Indonesian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ja; MessagesFile: .\setup\Languages\InOfficial\Japanese-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ko; MessagesFile: .\setup\Languages\InOfficial\Korean-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: ms; MessagesFile: .\setup\Languages\InOfficial\Malaysian-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: es; MessagesFile: .\setup\Languages\InOfficial\SpanishStd-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: sv; MessagesFile: .\setup\Languages\InOfficial\Swedish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: tr; MessagesFile: .\setup\Languages\InOfficial\Turkish-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: uk; MessagesFile: .\setup\Languages\InOfficial\Ukrainian-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: cn; MessagesFile: .\setup\Languages\InOfficial\ChineseSimp-11-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-Name: tw; MessagesFile: .\setup\Languages\InOfficial\ChineseTrad-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: bg; MessagesFile: .\setup2\Languages\InOfficial\Bulgarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: el; MessagesFile: .\setup2\Languages\InOfficial\Greek-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: is; MessagesFile: .\setup2\Languages\InOfficial\Icelandic-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: id; MessagesFile: .\setup2\Languages\InOfficial\Indonesian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ja; MessagesFile: .\setup2\Languages\InOfficial\Japanese-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ko; MessagesFile: .\setup2\Languages\InOfficial\Korean-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: ms; MessagesFile: .\setup2\Languages\InOfficial\Malaysian-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: es; MessagesFile: .\setup2\Languages\InOfficial\SpanishStd-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: sv; MessagesFile: .\setup2\Languages\InOfficial\Swedish-8-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: tr; MessagesFile: .\setup2\Languages\InOfficial\Turkish-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: uk; MessagesFile: .\setup2\Languages\InOfficial\Ukrainian-5-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: cn; MessagesFile: .\setup2\Languages\InOfficial\ChineseSimp-11-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
+Name: tw; MessagesFile: .\setup2\Languages\InOfficial\ChineseTrad-2-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 #endif
 
 [Messages]
@@ -129,28 +131,52 @@ tw.BeveledLabel=Chinese Traditional
 
 [Dirs]
 Name: {code:VSNET2010_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstall
+Name: {app}; Flags: uninsalwaysuninstall
 
 [Files]
+Source: .\Build\VSIP\InstallCleaner.exe; DestDir: {app}; Flags: dontcopy
+; Tools
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\Cygwin\*; DestDir: {app}\Build\Tools\cygwin; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
-Source: .\Build\VSIP\*; DestDir: {app}\Build\VSIP\; Flags: recursesubdirs createallsubdirs ignoreversion uninsremovereadonly
+; Kernel assemblies
+Source: .\Build\VSIP\Cosmos.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Hardware2.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.System.Plugs.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Core.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+; Icon
+Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
+; VSIP stuff
 Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos\Cosmos.System\bin\Debug\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\source\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.VS.Package.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Debug.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Build.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Compiler.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.IL2CPU.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\corapi.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+
+; wizards
+Source: .\source2\VSIP\Cosmos.VS.Wizards\bin\Debug\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2010_PATH|}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
 
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
 Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
 
 ; Templates
-Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: {code:VSNET2010_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2010_Installed;
-Source: ".\Build\VSIP\CosmosExpress.zip";      DestDir: {code:VSNET2010_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly;
-
-
+; ; Install files into VS Integrated Shell (which includes full Visual Studio)
+Source: .\Build\VSIP\CosmosProject (C#).zip; DestDir: {code:VSNET2010_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2010_Installed('dummy');
+;Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: {code:VSNET2010_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy');
+; ; Install templates into Shell
+Source: .\Build\VSIP\Cosmos.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') or IsVBExpress2008Installed('dummy')
+; ; Install templates into C# Express
+Source: .\Build\VSIP\CosmosKernel (C#).zip; DestDir: {code:GetCSharpExpress2010ProjectTemplatePath|}; DestName: CosmosKernel (C#).zip; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
+; ; Install templates into VB Express
+;Source: ".\Build\VSIP\CosmosKernel (VB).zip";  DestDir: {code:GetVBExpress2010ProjectTemplatePath|}; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2010Installed('dummy') and (not Vb2010_Installed('dummy'));
 
 
 [Registry]
@@ -253,5 +279,3 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 [Run]
 Filename: {code:VSNET2010_PATH|}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 
-[UninstallRun]
-Filename: {code:VSNET2010_PATH|}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
