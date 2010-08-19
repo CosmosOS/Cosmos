@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Hardware {
     static public class Global {
-        static public Keyboard Keyboard;
+        static public Keyboard Keyboard = new Keyboard();
         static public PIT PIT = new PIT();
         static public TextScreen TextScreen = new TextScreen();
 
@@ -19,7 +19,7 @@ namespace Cosmos.Hardware {
             Cosmos.Core.Global.Init();
             Cosmos.Debug.Debugger.Send("Initializing keyboard");
             // todo: ideally, Keyboard should be initialized inline, but this means it's done too early..
-            Keyboard = new Keyboard();
+            //Keyboard = new Keyboard();
         }
 
     }
