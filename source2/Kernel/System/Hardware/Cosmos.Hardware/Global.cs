@@ -12,13 +12,7 @@ namespace Cosmos.Hardware {
         static public TextScreen TextScreen = new TextScreen();
 
         static public void Init() {
-
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
-            // Temp
-            Cosmos.Hardware2.Global2.Init();
-            Global.Dbg.Send("Before Cosmos.Core.Global.Init");
-            
-            // End Temp
             Cosmos.Core.Global.Init();
         }
 
