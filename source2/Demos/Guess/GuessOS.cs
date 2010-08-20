@@ -13,3 +13,4 @@ namespace GuessKernel {
             string xResult = Console.ReadLine();
         }
     }
+}
