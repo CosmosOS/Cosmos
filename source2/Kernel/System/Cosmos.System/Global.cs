@@ -10,9 +10,6 @@ namespace Cosmos.System {
         
         static public void Init() {
             Cosmos.Hardware.Global.Init();
-            // Temp
-            Cosmos.Sys.Global.Init();
-            // End temp
         }
     }
 }

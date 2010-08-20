@@ -42,8 +42,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
@@ -59,10 +57,6 @@
     <ProjectReference Include="..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\source\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
-      <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
-      <Name>Cosmos.Sys</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
