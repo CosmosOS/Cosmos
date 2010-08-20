@@ -1,0 +1,42 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5b2c0369-7a84-4113-892c-f71b50e1da12}</ProjectGuid>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>Guess</Name>
+    <BinFormat>elf</BinFormat>
+    <RootNamespace>Guess</RootNamespace>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+    <EnableGDB>False</EnableGDB>
+    <DebugMode>Source</DebugMode>
+    <TraceMode>User</TraceMode>
+    <BuildTarget>VMWare</BuildTarget>
+    <VMWareFlavor>Player</VMWareFlavor>
+    <StartCosmosGDB>false</StartCosmosGDB>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+    <EnableGDB>False</EnableGDB>
+    <DebugMode>Source</DebugMode>
+    <TraceMode>User</TraceMode>
+    <BuildTarget>VMWare</BuildTarget>
+    <VMWareFlavor>Player</VMWareFlavor>
+    <StartCosmosGDB>false</StartCosmosGDB>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+</Project>
