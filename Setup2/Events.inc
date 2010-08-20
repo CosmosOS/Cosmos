@@ -15,3 +15,14 @@ begin
 		EnableFsRedirection(false);
 	end;
 end;
+
+//procedure CurStepChanged(CurStep: TSetupStep);
+//begin
+//  if (CurStep=ssInstall) then
+//  begin
+//    if (IsUpgrade()) then
+//    begin
+//      UnInstallOldVersion();
+//    end;
+//  end;
+//end;

@@ -57,6 +57,7 @@ UninstallLogMode=overwrite
 ChangesAssociations=yes
 
 #include "Code.inc"
+
 #include "Events.inc"
 
 [Languages]
@@ -132,6 +133,12 @@ tw.BeveledLabel=Chinese Traditional
 [Dirs]
 Name: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstall
 Name: {app}; Flags: uninsalwaysuninstall
+
+[InstallDelete]
+Type: filesandordirs; Name: "{code:VSNET2008_PATH|}\ProjectTemplates\Cosmos";
+Type: filesandordirs; Name: "{code:GetCSHarpExpress2008ProjectTemplatePath|}\*Cosmos*.*"; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'))
+
+
 
 [Files]
 Source: .\Build\VSIP\InstallCleaner.exe; DestDir: {app}; Flags: dontcopy
