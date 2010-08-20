@@ -40,6 +40,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -51,6 +52,7 @@
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="Heap.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
     <Compile Include="IOGroup\PIC.cs" />
     <Compile Include="IRQs.cs" />
@@ -63,10 +65,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
-      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
-      <Name>Cosmos.Kernel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>

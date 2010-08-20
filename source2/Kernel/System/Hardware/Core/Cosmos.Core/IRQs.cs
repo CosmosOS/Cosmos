@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel;
 
 namespace Cosmos.Core {
     public class IRQs {

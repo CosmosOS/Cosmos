@@ -8,12 +8,13 @@ namespace Cosmos.Core {
         static readonly public BaseIOGroups BaseIOGroups = new BaseIOGroups();
         static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Core", "");
         static public PIC PIC;
+        static public Heap Heap;
 
         static public void Init() {
             // Temp
             //Init Heap first - Hardware loads devices and they need heap
             Console.WriteLine("    Init Heap");
-            Kernel.Heap.Init();
+            Heap = new Heap(Kernel.CPU.EndOfKernel, (Kernel.CPU.AmountOfMemory * 1024 * 1024) - 1024);
 
             Kernel.CPU.CreateGDT();
             PIC = new PIC();
