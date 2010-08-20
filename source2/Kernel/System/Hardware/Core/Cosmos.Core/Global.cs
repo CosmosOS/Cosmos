@@ -11,7 +11,10 @@ namespace Cosmos.Core {
 
         static public void Init() {
             // Temp
-            Kernel.Global.Init();
+            //Init Heap first - Hardware loads devices and they need heap
+            Console.WriteLine("    Init Heap");
+            Kernel.Heap.Init();
+
             Kernel.CPU.CreateGDT();
             PIC.Init();
             Kernel.CPU.CreateIDT(true);

@@ -40,6 +40,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cosmos.Hardware2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -60,10 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
-      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware2</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
