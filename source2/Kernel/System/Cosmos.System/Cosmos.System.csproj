@@ -38,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -54,17 +55,9 @@
     <Content Include="Kernel.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
-      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
-      <Name>Cosmos.Kernel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.Hardware</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
