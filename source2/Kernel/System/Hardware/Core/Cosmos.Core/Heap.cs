@@ -25,7 +25,7 @@ namespace Cosmos.Core {
 
         private void ClearMemory(uint aStartAddress, uint aLength) {
             //TODO: Move to memory. Internal access only...
-            Kernel.CPU.ZeroFill(aStartAddress, aLength);
+            CPU.ZeroFill(aStartAddress, aLength);
         }
 
         private void WriteNumber(uint aNumber, byte aBits) {

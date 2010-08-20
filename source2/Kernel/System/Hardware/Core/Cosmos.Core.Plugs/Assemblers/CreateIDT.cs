@@ -4,7 +4,6 @@ using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Compiler.Assembler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using CPUAll = Cosmos.Compiler.Assembler;
-using HW = Cosmos.Hardware2;
 using System.Collections.Generic;
 
 namespace Cosmos.Core.Plugs.Assemblers {

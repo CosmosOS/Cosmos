@@ -11,16 +11,16 @@ namespace Cosmos.Core {
         static public Heap Heap;
 
         static public void Init() {
-            // Temp
             //Init Heap first - Hardware loads devices and they need heap
             Console.WriteLine("    Init Heap");
-            Heap = new Heap(Kernel.CPU.EndOfKernel, (Kernel.CPU.AmountOfMemory * 1024 * 1024) - 1024);
+            Heap = new Heap(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() * 1024 * 1024) - 1024);
 
             CPU.CreateGDT();
             PIC = new PIC();
             CPU.CreateIDT(true);
             CPU.InitFloat();
-            // End Temp
+
+            // Drag this stuff in to the compiler manually until we add the always include attrib
             IRQs.Dummy();
         }
     }

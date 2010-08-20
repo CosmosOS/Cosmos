@@ -50,13 +50,10 @@
     <Compile Include="Assemblers\CreateGDT.cs" />
     <Compile Include="Assemblers\CreateIDT.cs" />
     <Compile Include="CPUImpl.cs" />
+    <Compile Include="IOPortImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
-      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware2</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
       <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
       <Name>Cosmos.Kernel.Plugs</Name>

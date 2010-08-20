@@ -1,5 +1,4 @@
 ﻿using System;
-using Cosmos.Kernel;
 
 namespace Cosmos.Core {
     // Sealed so higher rings cannot inherit and muck about
@@ -12,29 +11,26 @@ namespace Cosmos.Core {
         }
 
         public byte Byte {
-            get { return CPUBus.Read8(Port); }
-            set { CPUBus.Write8(Port, value); }
+            get { return Read8(Port); }
+            set { Write8(Port, value); }
         }
 
         public UInt16 Word {
-            get { return CPUBus.Read16(Port); }
-            set { CPUBus.Write16(Port, value); }
+            get { return Read16(Port); }
+            set { Write16(Port, value); }
         }
 
         public UInt32 DWord {
-            get { return CPUBus.Read32(Port); }
-            set { CPUBus.Write32(Port, value); }
+            get { return Read32(Port); }
+            set { Write32(Port, value); }
         }
 
-        //[AsmBody(Assembler = typeof(IOWrite8))]
-        //public static void Write8(UInt16 aPort, byte aData) { }
-        //public class IOWrite8 : CodeBlock {
-        //    public override void Assemble() {
-        //        EDX = EBP + 0x0C;
-        //        EAX = EBP + 0x08;
-        //        Port[DX] = AL;
-        //    }
-        //} 
+        protected void Write8(UInt16 aPort, byte aData) { } // Plugged
+        protected void Write16(UInt16 aPort, UInt16 aData) { } // Plugged
+        protected void Write32(UInt16 aPort, UInt32 aData) { } // Plugged
 
+        protected byte Read8(UInt16 aPort) { return 0; } // Plugged
+        protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
+        protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
     }
 }
