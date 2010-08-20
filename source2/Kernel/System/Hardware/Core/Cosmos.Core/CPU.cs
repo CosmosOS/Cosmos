@@ -7,11 +7,30 @@ namespace Cosmos.Core {
     // Non hardware class, only used by core and hardware drivers for ports etc.
     public class CPU {
         // Amount of RAM in MB's.
-        public static uint GetAmountOfRAM() { return 0; } // Plugged
-        public static uint GetEndOfKernel() { return 0; } // Plugged
-        public static void CreateGDT() { } // Plugged
-        public static void CreateIDT(bool aEnableInterruptsImmediately) { } // Plugged
-        public static void InitFloat() { } // Plugged
-        public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
+        public uint GetAmountOfRAM() { return 0; } // Plugged
+        public uint GetEndOfKernel() { return 0; } // Plugged
+        public void CreateGDT() { } // Plugged
+        public void CreateIDT(bool aEnableInterruptsImmediately) { } // Plugged
+        public void InitFloat() { } // Plugged
+        public void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
+        public void Halt() { } // Plugged
+
+        public void Reboot() {
+            // Disable all interrupts
+            //DisableInterrupts();
+
+            //byte temp;
+
+            //// Clear all keyboard buffers
+            //do {
+            //    temp = CPUBus.Read8(0x64); // Empty user data
+            //    if ((temp & 0x01) != 0) {
+            //        CPUBus.Read8(0x60); // Empty keyboard data
+            //    }
+            //} while ((temp & 0x02) != 0);
+
+            //CPUBus.Write8(0x64, 0xFE); // Pulse CPU Reset line
+            Halt(); // If it didn't work, Halt the CPU
+        }
     }
 }

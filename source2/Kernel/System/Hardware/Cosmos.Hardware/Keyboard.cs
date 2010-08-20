@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using K2 = Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
     public delegate void HandleKeyboardDelegate(byte aScanCode, bool aReleased);
@@ -84,7 +83,7 @@ namespace Cosmos.Hardware {
                 default: {
                         if ((mCtrlState) && (mAltState) && (xTheScancode == 0x53)) {
                             Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                            Cosmos.Kernel.CPU.Reboot();
+                            Core.Global.CPU.Reboot();
                         }
                         if (mShiftState) {
                             xTheScancode = xTheScancode << 16;
@@ -348,7 +347,7 @@ namespace Cosmos.Hardware {
             char xResult = '\0';
             while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
-                K2.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
             return xResult;
         }
@@ -368,7 +367,7 @@ namespace Cosmos.Hardware {
             ConsoleKey xResult = ConsoleKey.NoName;
             while (mBuffer.Count == 0 || !GetKeyValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
-                K2.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
             return xResult;
         }
@@ -387,7 +386,7 @@ namespace Cosmos.Hardware {
             KeyMapping xResult = null;
             while (mBuffer.Count == 0 || !GetKeyMapping(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
-                K2.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
             return xResult;
         }
@@ -404,7 +403,7 @@ namespace Cosmos.Hardware {
 
         public uint ReadScancode() {
             while (mBuffer.Count == 0) {
-                K2.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
 
             return mBuffer.Dequeue();

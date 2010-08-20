@@ -66,6 +66,14 @@ namespace Cosmos.Core.Plugs {
         [PlugMethod(Assembler = typeof(InitFloatAsm))]
         public void InitFloat() { }
 
+        public class HaltAsm : AssemblerMethod {
+            public override void AssembleNew(object aAssembler, object aMethodInfo) {
+                new CPUx86.Halt();
+            }
+        }
+        [PlugMethod(Assembler = typeof(HaltAsm))]
+        public void Halt() { }
+
 
     //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetEndOfStack))]
     //    public static uint GetEndOfStack() {

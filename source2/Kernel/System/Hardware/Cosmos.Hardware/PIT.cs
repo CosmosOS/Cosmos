@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using K2 = Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
     public class PIT : Device {
@@ -150,7 +149,7 @@ namespace Cosmos.Hardware {
             RegisterTimer(new PITTimer(SignalWait, (int)(TimeoutMS * 1000000), false));
 
             while (!WaitSignaled) {
-                K2.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
         }
         public void WaitNS(int TimeoutNS) {
@@ -159,7 +158,7 @@ namespace Cosmos.Hardware {
             RegisterTimer(new PITTimer(SignalWait, TimeoutNS, false));
 
             while (!WaitSignaled) {
-                K2.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
         }
 

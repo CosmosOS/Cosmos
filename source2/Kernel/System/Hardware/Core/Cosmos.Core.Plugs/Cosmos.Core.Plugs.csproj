@@ -43,8 +43,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assemblers\CreateGDT.cs" />
@@ -54,14 +52,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
-      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
-      <Name>Cosmos.Kernel.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
-      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
-      <Name>Cosmos.Kernel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
       <Name>Cosmos.Compiler.Assembler.X86</Name>
