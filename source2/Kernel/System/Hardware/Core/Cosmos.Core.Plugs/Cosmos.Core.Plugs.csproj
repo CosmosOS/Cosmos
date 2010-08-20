@@ -47,8 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assemblers\CreateGDT.cs" />
     <Compile Include="Assemblers\CreateIDT.cs" />
-    <Compile Include="CPU.cs" />
+    <Compile Include="CPUImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

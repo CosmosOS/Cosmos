@@ -16,10 +16,10 @@ namespace Cosmos.Core {
             Console.WriteLine("    Init Heap");
             Heap = new Heap(Kernel.CPU.EndOfKernel, (Kernel.CPU.AmountOfMemory * 1024 * 1024) - 1024);
 
-            Kernel.CPU.CreateGDT();
+            CPU.CreateGDT();
             PIC = new PIC();
-            Kernel.CPU.CreateIDT(true);
-            Kernel.CPU.InitFloat();
+            CPU.CreateIDT(true);
+            CPU.InitFloat();
             // End Temp
             IRQs.Dummy();
         }

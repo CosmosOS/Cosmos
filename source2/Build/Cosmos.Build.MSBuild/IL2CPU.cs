@@ -95,7 +95,7 @@ namespace Cosmos.Build.MSBuild
             xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
             xName = xType.FullName;
             // New
-            xType = typeof(Cosmos.Core.Plugs.CPU);
+            xType = typeof(Cosmos.Core.Plugs.CPUImpl);
             xName = xType.FullName;
             xType = typeof(Cosmos.System.Plugs.System.ConsoleImpl);
             xName = xType.FullName;
