@@ -14,9 +14,5 @@ namespace Cosmos.Core.IOGroup {
         public readonly IOPort Data2 = new IOPort(0x03CF);
         public readonly IOPort Idx3 = new IOPort(0x03D4);
         public readonly IOPort Data3 = new IOPort(0x03D5);
-
-        public TextScreen() {
-            Cosmos.Debug.Debugger.Send("IOGroups.TextScreen()");
-        }
     }
 }

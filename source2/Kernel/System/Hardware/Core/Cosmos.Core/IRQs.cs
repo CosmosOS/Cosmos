@@ -237,8 +237,7 @@ namespace Cosmos.Core {
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static void HandleInterrupt_2E(ref IRQContext aContext) {
-            Cosmos.Debug.Debugger.SendMessage("IRQ",
-                                                  "Primary IDE");
+            Global.Dbg.SendMessage("IRQ", "Primary IDE");
             //Storage.ATAOld.HandleInterruptPrimary();
             //Storage.ATA.ATA.HandleInterruptPrimary();
             PIC.SignalSecondary();
@@ -253,7 +252,7 @@ namespace Cosmos.Core {
         }
 
         public static void HandleInterrupt_35(ref IRQContext aContext) {
-            Cosmos.Debug.Debugger.SendMessage("Interrupts",
+            Global.Dbg.SendMessage("Interrupts",
                                                   "Interrupt 35 handler");
             aContext.EAX *= 2;
             aContext.EBX *= 2;
@@ -264,8 +263,7 @@ namespace Cosmos.Core {
         //IRQ 15 - Secondary IDE
         public static void HandleInterrupt_2F(ref IRQContext aContext) {
             //Storage.ATA.ATA.HandleInterruptSecondary();
-            Cosmos.Debug.Debugger.SendMessage("IRQ",
-                                                  "Secondary IDE");
+            Global.Dbg.SendMessage("IRQ", "Secondary IDE");
             PIC.SignalSecondary();
         }
 

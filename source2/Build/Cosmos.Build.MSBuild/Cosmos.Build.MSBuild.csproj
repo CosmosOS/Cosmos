@@ -114,6 +114,10 @@
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
+      <Project>{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}</Project>
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
       <Name>Cosmos.System.Plugs.System</Name>

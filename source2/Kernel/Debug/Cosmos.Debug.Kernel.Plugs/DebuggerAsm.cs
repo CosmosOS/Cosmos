@@ -5,22 +5,22 @@ using Cosmos.IL2CPU.Plugs;
 using Asm = Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.XSharp;
 
-namespace Cosmos.Kernel.Plugs {
-    [Plug(Target = typeof(Cosmos.Debug.Debugger))]
+namespace Cosmos.Debug.Kernel.Plugs {
+    [Plug(Target = typeof(Cosmos.Debug.Kernel.Debugger))]
     public class Debugger {
-	    [PlugMethod(Assembler = typeof(DebugBreak))]
-        public static unsafe void Break() { }
+        [PlugMethod(Assembler = typeof(DebugBreak))]
+        public void Break() { }
 
-		[PlugMethod(Assembler = typeof(DebugSend))]
-        public static unsafe void Send(int aLength, char* aText) { }
+        [PlugMethod(Assembler = typeof(DebugSend))]
+        public unsafe void Send(int aLength, char* aText) { }
 
         [PlugMethod(Assembler = typeof(DebugSendPtr))]
-        public static unsafe void SendPtr(object aPtr) { }
+        public unsafe void SendPtr(object aPtr) { }
 
-		//[PlugMethod(Assembler = typeof(DebugTraceOff))]
+        //[PlugMethod(Assembler = typeof(DebugTraceOff))]
         //public static void TraceOff() { }
 
-		//[PlugMethod(Assembler = typeof(DebugTraceOn))]
+        //[PlugMethod(Assembler = typeof(DebugTraceOn))]
         //public static void TraceOn() { }
     }
 
@@ -42,8 +42,7 @@ namespace Cosmos.Kernel.Plugs {
             EndIfDefined(); // DEBUGSTUB
         }
 
-        public void SendPtr()
-        {
+        public void SendPtr() {
             IfDefined("DEBUGSTUB");
             PushAll32();
             Call("DebugStub_SendPtr");
@@ -96,10 +95,8 @@ namespace Cosmos.Kernel.Plugs {
         }
     }
 
-    public class DebugSendPtr : AssemblerMethod
-    {
-        public override void AssembleNew(object aAssembler, object aMethodInfo)
-        {
+    public class DebugSendPtr : AssemblerMethod {
+        public override void AssembleNew(object aAssembler, object aMethodInfo) {
             new DebuggerAsm().SendPtr();
         }
     }

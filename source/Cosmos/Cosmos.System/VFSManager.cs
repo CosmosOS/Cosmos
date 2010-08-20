@@ -45,7 +45,7 @@ namespace Cosmos.Sys {
                 Console.WriteLine("Detection went ok");
             }
             Console.WriteLine("Checked all devices");
-            Cosmos.Debug.Debugger.SendNumber("VFS","Registered Filesystems",(uint)mFilesystems.Count,32);
+            //// Cosmos.Debug.Debugger.SendNumber("VFS","Registered Filesystems",(uint)mFilesystems.Count,32);
             Console.WriteLine("End check");
             if (mFilesystems.Count == 0)
             {
@@ -122,7 +122,7 @@ namespace Cosmos.Sys {
 
             if (aPath.Length == 1)
             { //Uber-root (/)
-                Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "aPath is 1 long!");
+                //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "aPath is 1 long!");
                 return null;
             }
             else
@@ -130,16 +130,16 @@ namespace Cosmos.Sys {
                 string[] xPathParts = SplitPath(aPath);
             
                 // first get the correct FS
-                Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Searching for filesystem: " + xPathParts[0]);
+                //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Searching for filesystem: " + xPathParts[0]);
                 var xFS = GetFileSystemFromPath(ParseStringToInt(xPathParts[0]));
-                Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Found filesystem " + xFS.RootId.ToString());
+                //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Found filesystem " + xFS.RootId.ToString());
 
                 var xCurrentFSEntryId = xFS.RootId;
-                Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
+                //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
                 if (xPathParts.Length == 1)
                 {
-                    Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Returning root entry");
-                    Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "String parsed");
+                    //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Returning root entry");
+                    //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "String parsed");
                     return GetVolumeEntry(ParseStringToInt(xPathParts[0]));
                     //return null;
                 }
@@ -149,13 +149,13 @@ namespace Cosmos.Sys {
                     bool xFound = false;
                     for (int j = 0; j < xListing.Length; j++)
                     {
-                        Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Checking if " + xListing[j].Name + " equals " + xPathParts[i]);
+                        //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Checking if " + xListing[j].Name + " equals " + xPathParts[i]);
                         if (xListing[j].Name.Equals(xPathParts[i]))
                         {
                             xCurrentFSEntryId = xListing[j].Id;
                             if (i == (xPathParts.Length - 1))
                             {
-                                Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Found match! : " + xListing[j].Name);
+                                //// Cosmos.Debug.Debugger.SendMessage("GetDirectoryEntry", "Found match! : " + xListing[j].Name);
                                 return xListing[j];
                             }
                             xFound = true;
@@ -164,11 +164,11 @@ namespace Cosmos.Sys {
                     }
                     if (!xFound)
                     {
-                        Cosmos.Debug.Debugger.SendError("GetDirectoryEntry", "Path not found(1)");
+                        //// Cosmos.Debug.Debugger.SendError("GetDirectoryEntry", "Path not found(1)");
                         throw new Exception("Path not found: " + aPath);
                     }
                 }
-                Cosmos.Debug.Debugger.SendError("GetDirectoryEntry", "Path not found(2)");
+                //// Cosmos.Debug.Debugger.SendError("GetDirectoryEntry", "Path not found(2)");
                 throw new Exception("Path not found: " + aPath);
             }
         }
@@ -204,9 +204,9 @@ namespace Cosmos.Sys {
                 //string xParentPath = aPath;
                 //if (String.IsNullOrEmpty(xParentPath))
                 //{
-                //    Cosmos.Debug.Debugger.SendMessage("GetDirectoryListing", "Should never come here!");
+                //    // Cosmos.Debug.Debugger.SendMessage("GetDirectoryListing", "Should never come here!");
                 //    var xFS = GetFileSystemFromPath(aPath, 1);
-                //    Cosmos.Debug.Debugger.SendMessage("GetDirectoryListing", "1-RootId=" + xFS.RootId.ToString());
+                //    // Cosmos.Debug.Debugger.SendMessage("GetDirectoryListing", "1-RootId=" + xFS.RootId.ToString());
                 //    return xFS.GetDirectoryListing(xFS.RootId);
                 //}
 
@@ -265,7 +265,7 @@ namespace Cosmos.Sys {
                 throw new ArgumentException("Only Directories are allowed");
 
             var xFS = aDirectory.Filesystem;
-            //Cosmos.Debug.Debugger.SendMessage("GetDirectorylisting", "ID is " + aDirectory.Id);
+            //// Cosmos.Debug.Debugger.SendMessage("GetDirectorylisting", "ID is " + aDirectory.Id);
             //aDirectory.
             return xFS.GetDirectoryListing(aDirectory.Id);
         }
@@ -277,7 +277,7 @@ namespace Cosmos.Sys {
         /// <returns>A filesystem</returns>
         private static Filesystem GetFileSystemFromPath(int aPath)
         {
-            Cosmos.Debug.Debugger.SendMessage("GetFileSystemFromPath", aPath.ToString());
+            //// Cosmos.Debug.Debugger.SendMessage("GetFileSystemFromPath", aPath.ToString());
             if (mFilesystems.Count == 0)
                 throw new Exception("No filesystems found");
             else
@@ -343,17 +343,17 @@ namespace Cosmos.Sys {
 
                 //var xDirectory = GetDirectoryEntry(Path.GetDirectoryName(s));
 
-                //Cosmos.Debug.Debugger.SendMessage("FileExists", "1");
+                //// Cosmos.Debug.Debugger.SendMessage("FileExists", "1");
                 //var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
-                //Cosmos.Debug.Debugger.SendMessage("FileExists", "2");
+                //// Cosmos.Debug.Debugger.SendMessage("FileExists", "2");
                 //string xFileName = Path.GetFileName(s);
-                //Cosmos.Debug.Debugger.SendMessage("FileExists", "3");
+                //// Cosmos.Debug.Debugger.SendMessage("FileExists", "3");
                 //for (int i = 0; i < xEntries.Length; i++)
                 //{
-                //    Cosmos.Debug.Debugger.SendMessage("FileExists", "4");
+                //    // Cosmos.Debug.Debugger.SendMessage("FileExists", "4");
                 //    if (xEntries[i].Name.Equals(xFileName))
                 //    {
-                //        Cosmos.Debug.Debugger.SendMessage("FileExists", "5");
+                //        // Cosmos.Debug.Debugger.SendMessage("FileExists", "5");
                 //        return !xEntries[i].IsDirectory;
                 //    }
                 //}
@@ -361,18 +361,18 @@ namespace Cosmos.Sys {
             }
             catch (Exception e)
             {
-                Cosmos.Debug.Debugger.SendMessage("FileExists", "Error!: " + e.Message);
+                //// Cosmos.Debug.Debugger.SendMessage("FileExists", "Error!: " + e.Message);
                 return false;
             }
         }
 
         public static string ReadFileAsString(string aFile)
         {
-            Cosmos.Debug.Debugger.SendMessage("ReadFile", "Start reading file now");
+            //// Cosmos.Debug.Debugger.SendMessage("ReadFile", "Start reading file now");
             var xFile = GetFileEntry(aFile);
-            Cosmos.Debug.Debugger.SendMessage("ReadFile", "Found file " + xFile.Id.ToString());
+            //// Cosmos.Debug.Debugger.SendMessage("ReadFile", "Found file " + xFile.Id.ToString());
             var xFS = xFile.Filesystem;//GetFileSystemFromPath(aFile, 1);
-            //Cosmos.Debug.Debugger.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
+            //// Cosmos.Debug.Debugger.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
 
             byte[] xSingleBlockBuffer = new byte[xFS.BlockSize];
             byte[] xAllBlocksBuffer = new byte[xFile.Size];
@@ -380,16 +380,16 @@ namespace Cosmos.Sys {
             if ((xAllBlocksBuffer.Length % xSingleBlockBuffer.Length) > 0) {
                 xBlockCount++;
             }
-            Cosmos.Debug.Debugger.SendNumber("ReadFile", "xBlockCount", (uint)xBlockCount, 32);
+            // Cosmos.Debug.Debugger.SendNumber("ReadFile", "xBlockCount", (uint)xBlockCount, 32);
             for (uint i = 0; i < xBlockCount; i++)
             {
-                Cosmos.Debug.Debugger.SendMessage("ReadFile", "Reading block " + i.ToString());
+                // Cosmos.Debug.Debugger.SendMessage("ReadFile", "Reading block " + i.ToString());
                 //Read the block
                 if (!xFS.ReadBlock(xFile.Id, i, xSingleBlockBuffer))
                 {
                     return "";
                 }
-                Cosmos.Debug.Debugger.SendMessage("ReadFile", "After ReadBlock");
+                // Cosmos.Debug.Debugger.SendMessage("ReadFile", "After ReadBlock");
                 //int xCurLength = xAllBlocksBuffer.Length % xSingleBlockBuffer.Length;
                 int xCurLength = (int)xFS.BlockSize;
                 if(i == (xBlockCount-1)) {
@@ -398,7 +398,7 @@ namespace Cosmos.Sys {
                         xCurLength = (int)(xFile.Size % xFS.BlockSize);
                     }
                 }
-                Cosmos.Debug.Debugger.SendNumber("ReadFile", "xCurLength", (uint)xCurLength, 32);
+                // Cosmos.Debug.Debugger.SendNumber("ReadFile", "xCurLength", (uint)xCurLength, 32);
                 //if (xCurLength == 0)
                 //{
                 //    xCurLength = xSingleBlockBuffer.Length;
@@ -455,7 +455,7 @@ namespace Cosmos.Sys {
             }
             catch (Exception e)
             {
-                Cosmos.Debug.Debugger.SendError("VFSManager.cs", e.Message);
+                // Cosmos.Debug.Debugger.SendError("VFSManager.cs", e.Message);
                 return false;
             }
              
@@ -468,22 +468,22 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         //public static FilesystemEntry[] GetDirectories(string aDir)
         //{
-        //    Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Checking for nullreference");
+        //    // Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Checking for nullreference");
         //    if (aDir == null)
         //    {
         //        throw new ArgumentNullException("aDir is null");
         //    }
 
-        //    Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Checking if " + aDir + " exists");
+        //    // Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Checking if " + aDir + " exists");
         //    //if (!Directory.Exists(aDir))
         //    //{
         //    //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
         //    //}
 
-        //    Cosmos.Debug.Debugger.SendMessage("GetDirectories", "About to GetDirectoryListing");
+        //    // Cosmos.Debug.Debugger.SendMessage("GetDirectories", "About to GetDirectoryListing");
 
         //    var xDir = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aDir));
-        //    ///Cosmos.Debug.Debugger.SendMessage("GetDirectories", xDir.Name + " with ID " + xDir.Id.ToString());
+        //    ///// Cosmos.Debug.Debugger.SendMessage("GetDirectories", xDir.Name + " with ID " + xDir.Id.ToString());
         //    var xEntries = VFSManager.GetDirectoryListing(xDir);
         //    //var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
         //    //List<FilesystemEntry> xDirectories = new List<FilesystemEntry>();
@@ -501,7 +501,7 @@ namespace Cosmos.Sys {
 
 
         //    ////return (from xEntry in GetDirectoryListing(aDir) where xEntry.IsDirectory select xEntry).ToArray();
-        //    //Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Returning");
+        //    //// Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Returning");
         //    //return xDirectories.ToArray();
         //    return new FilesystemEntry[0];
         //}
@@ -514,33 +514,33 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         public static FilesystemEntry GetFileEntry(String aFile)
         {
-            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Searching for file " + aFile);
+            // Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Searching for file " + aFile);
             string xFileName = Path.GetFileName(aFile);
-            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Filename is " + xFileName);
+            // Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Filename is " + xFileName);
 
             //Find the directory first.
             var xDirectory = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aFile) + Path.DirectorySeparatorChar); 
-            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Directory is " + xDirectory.Name);
+            // Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Directory is " + xDirectory.Name);
 
             //Then find file in that directory
             //var xFS = GetFileSystemFromPath(aFile, 1);
-            //Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Got filesystem");
+            //// Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Got filesystem");
 
             //FilesystemEntry[] xEntries = xFS.GetDirectoryListing(xDirectory.Id);
-            //Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Got Directory Listing");
+            //// Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Got Directory Listing");
 
             FilesystemEntry[] xEntries = VFSManager.GetDirectoryListing(xDirectory);
-            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Found " + xEntries.Length + " entries");
+            // Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Found " + xEntries.Length + " entries");
 
             foreach (FilesystemEntry xEntry in xEntries)
             {
-                Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Matching " + xEntry.Name + " with " + xFileName);
+                // Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "Matching " + xEntry.Name + " with " + xFileName);
                 if (xEntry.Name.Equals(xFileName))
                     return xEntry;
             }
 
             //throw new FileNotFoundException();
-            Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "File not found: " + aFile);
+            // Cosmos.Debug.Debugger.SendMessage("GetFileEntry", "File not found: " + aFile);
             return null;
         }
 
@@ -555,22 +555,22 @@ namespace Cosmos.Sys {
                 throw new ArgumentNullException("aDir is null");
 
             //var xDirectory = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aDir));
-            //Cosmos.Debug.Debugger.SendMessage("GetFiles", "Directory found");
+            //// Cosmos.Debug.Debugger.SendMessage("GetFiles", "Directory found");
             ////var xFS = xDirectory.Filesystem;
             //var xFS = GetFileSystemFromPath(Path.GetDirectoryName(aDir), 1);
-            //Cosmos.Debug.Debugger.SendMessage("GetFiles", "Filesystem set");
+            //// Cosmos.Debug.Debugger.SendMessage("GetFiles", "Filesystem set");
             
             //List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
-            //Cosmos.Debug.Debugger.SendMessage("GetFiles", "Going to search directory with ID " + xDirectory.Id);
+            //// Cosmos.Debug.Debugger.SendMessage("GetFiles", "Going to search directory with ID " + xDirectory.Id);
             //var xEntries = xFS.GetDirectoryListing(xDirectory.Id);
             //foreach (FilesystemEntry xEntry in xEntries)
             //{
-            //    Cosmos.Debug.Debugger.SendMessage("GetFiles", "Foreach");
+            //    // Cosmos.Debug.Debugger.SendMessage("GetFiles", "Foreach");
             //    if (!xEntry.IsDirectory)
             //        xFiles.Add(xEntry);
             //}
 
-            //Cosmos.Debug.Debugger.SendMessage("GetFiles", "Converting to array");
+            //// Cosmos.Debug.Debugger.SendMessage("GetFiles", "Converting to array");
             //return xFiles.ToArray();
 
 
@@ -600,7 +600,7 @@ namespace Cosmos.Sys {
         /// <returns></returns>
         public static FilesystemEntry[] GetFiles(FilesystemEntry aDir)
         {
-            Cosmos.Debug.Debugger.SendMessage("GetFiles(FileystemEntry)", aDir.Name);
+            // Cosmos.Debug.Debugger.SendMessage("GetFiles(FileystemEntry)", aDir.Name);
 
             if (aDir == null)
                 throw new ArgumentNullException("aDir in GetFiles(FilesystemEntry)");
@@ -611,7 +611,7 @@ namespace Cosmos.Sys {
             List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
             foreach (FilesystemEntry xEntry in VFSManager.GetDirectoryListing(aDir))
             {
-                Cosmos.Debug.Debugger.SendMessage("GetFiles(FileystemEntry)", "Found " + xEntry.Name);
+                // Cosmos.Debug.Debugger.SendMessage("GetFiles(FileystemEntry)", "Found " + xEntry.Name);
                 if (!xEntry.IsDirectory)
                     xFiles.Add(xEntry);
             }

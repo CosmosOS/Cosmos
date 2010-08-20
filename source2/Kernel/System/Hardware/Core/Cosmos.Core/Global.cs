@@ -6,7 +6,8 @@ using Cosmos.Hardware2;
 
 namespace Cosmos.Core {
     static public class Global {
-        static public BaseIOGroups BaseIOGroups = new BaseIOGroups();
+        static readonly public BaseIOGroups BaseIOGroups = new BaseIOGroups();
+        static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Core", "");
 
         static public void Init() {
             // Temp

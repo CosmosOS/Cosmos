@@ -64,6 +64,10 @@
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
       <Name>Cosmos.Hardware</Name>

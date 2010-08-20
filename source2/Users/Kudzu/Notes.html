@@ -3,7 +3,6 @@
 <h3>
     To Do</h3>
     <ul>
-        <li>GDB auto connect and shut down thread</li>
         <li>debugger send - separate pkg, one for each ring so user can filter</li>
         <li>New clean kernel with no links to old one, just console..<ul>
             <li>keyboard PIC GDT CPU CPUBus and plug </li>
@@ -12,14 +11,13 @@
         <li>Guess Demo</li>
         <li>use INT3 for BP? Will save 3 bytes per call.. which is a lot...</li>
         <li>GDB<ul>
+            <li>Reenable auto connect</li>
             <li>warn on close</li>
             <li>tracing and logging</li>
             <li>Run to and set bp from disassembly window</li>
             <li>Ctrl-c support</li>
             </ul>
         </li>
-        <li>but that bring sup a point.. Cosmos.debug will need to be in its own ASM or have 
-            downlinks when i import it. So all rings can reach it.</li>
         <li>Plugs<ul>
             <li>To add a plug<ul>
                 <li>Cosmos.Build.MSBuild add ref to the plug asm</li>
@@ -32,12 +30,11 @@
 <h3>
     Matthijs - Next Release</h3>
 <ul>
-    <li>Write a manual cleanup utility that runs as part of our install first</li>
     <li>Move install cleaner to build or some place.. on disk and in sln... prob under 
         build</li>
+    <li>Change to new kernel lib format</li>
     <li>New projects should be: C# Operating System, VB.NET Operating System, C# 
         Library, VB.NET Library, Cosmos Project (Empty)</li>
-    <li>Change to new kernel lib format</li>
     <li>Express</li>
 </ul>
     <h3>

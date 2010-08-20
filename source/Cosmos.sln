@@ -157,9 +157,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallCleaner", "..\source
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 43
+		SccNumberOfProjects = 45
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS04
 		SccLocalPath0 = .
@@ -332,6 +338,14 @@ Global
 		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
 		SccProjectName42 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core.Plugs
 		SccLocalPath42 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
+		SccProjectUniqueName43 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel\\Cosmos.Debug.Kernel.csproj
+		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
+		SccProjectName43 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel
+		SccLocalPath43 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel
+		SccProjectUniqueName44 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
+		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
+		SccProjectName44 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel.Plugs
+		SccLocalPath44 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -808,6 +822,26 @@ Global
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Release|x86.ActiveCfg = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Bootstrap|x86.Build.0 = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61607F1E-58F9-41CF-972F-128384F3E115}.Release|x86.ActiveCfg = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Bootstrap|x86.Build.0 = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -867,6 +901,7 @@ Global
 		{7A24BC15-49A3-43AF-AF2B-3681D9A06C62} = {A9E19073-3AA0-487D-BBD2-D3E9132AF942}
 		{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D} = {A9E19073-3AA0-487D-BBD2-D3E9132AF942}
 		{693C6704-6934-410F-97E0-4B6900730E63} = {426E77A5-80AA-48DC-97F9-037071345778}
+		{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2} = {426E77A5-80AA-48DC-97F9-037071345778}
 		{677B6C6A-14DC-4C0B-ACDB-C04696DF77A8} = {693C6704-6934-410F-97E0-4B6900730E63}
 		{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5} = {693C6704-6934-410F-97E0-4B6900730E63}
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409} = {693C6704-6934-410F-97E0-4B6900730E63}
@@ -874,5 +909,7 @@ Global
 		{6A991D03-1435-4005-9809-B8BACDF3B021} = {677B6C6A-14DC-4C0B-ACDB-C04696DF77A8}
 		{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
+		{61607F1E-58F9-41CF-972F-128384F3E115} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 	EndGlobalSection
 EndGlobal

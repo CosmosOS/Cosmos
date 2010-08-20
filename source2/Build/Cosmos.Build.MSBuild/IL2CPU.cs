@@ -99,6 +99,8 @@ namespace Cosmos.Build.MSBuild
             xName = xType.FullName;
             xType = typeof(Cosmos.System.Plugs.System.ConsoleImpl);
             xName = xType.FullName;
+            xType = typeof(Cosmos.Debug.Kernel.Plugs.Debugger);
+            xName = xType.FullName;
         }
 
         #region properties

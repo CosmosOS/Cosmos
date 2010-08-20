@@ -44,7 +44,7 @@ namespace Cosmos.Hardware2 {
         // DO NOT USE, try to keep the kernel tickless
         // note: if you do use it, first enable PIT in code again..
         public static void Sleep_Old(uint aMSec) {
-            Cosmos.Debug.Debugger.SendNumber("PC", "Sleep", aMSec, 32);
+            //Cosmos.Debug.Debugger.SendNumber("PC", "Sleep", aMSec, 32);
             CPU.Halt();//At least one hlt even if aMSec is 0
             if (aMSec > 0)
             {
@@ -55,7 +55,7 @@ namespace Cosmos.Hardware2 {
                     CPU.Halt();
                 }
             }
-            Cosmos.Debug.Debugger.SendMessage("PC", "Sleeping done");
+            //Cosmos.Debug.Debugger.SendMessage("PC", "Sleeping done");
         }
     }
 }

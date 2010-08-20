@@ -12,9 +12,5 @@ namespace Cosmos.Core {
         public readonly IOGroup.Keyboard Keyboard = new IOGroup.Keyboard();
         public readonly IOGroup.PIT PIT = new IOGroup.PIT();
         public readonly IOGroup.TextScreen TextScreen = new IOGroup.TextScreen();
-
-        public BaseIOGroups() {
-            Cosmos.Debug.Debugger.Send("BaseIOGroups()");
-        }
     }
 }
