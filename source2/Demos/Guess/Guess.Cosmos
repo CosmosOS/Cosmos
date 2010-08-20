@@ -38,5 +38,12 @@
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Guess\GuessKernel.csproj">
+      <Name>GuessKernel</Name>
+      <Project>{73cf15c1-0ab6-4b3a-8142-d326ada72970}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 </Project>
