@@ -120,7 +120,6 @@
     <Compile Include="Network\TCPIPModel\IPv4Packet.cs" />
     <Compile Include="Network\TCPIPModel\Ethernet2Frame.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
-    <Compile Include="PIC.cs" />
     <Compile Include="PCIBus.cs" />
     <Compile Include="Old\TempDictionary.cs" />
     <Compile Include="Global.cs" />

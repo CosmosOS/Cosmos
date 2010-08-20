@@ -4,12 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel;
-using Cosmos.Hardware2;
 
 namespace Cosmos.Core {
     public class IRQs {
         // TODO: Protect IRQs like memory and ports are
         // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
+        public enum EFlagsEnum : uint {
+            Carry = 1,
+            Parity = 1 << 2,
+            AuxilliaryCarry = 1 << 4,
+            Zero = 1 << 6,
+            Sign = 1 << 7,
+            Trap = 1 << 8,
+            InterruptEnable = 1 << 9,
+            Direction = 1 << 10,
+            Overflow = 1 << 11,
+            NestedTag = 1 << 14,
+            Resume = 1 << 16,
+            Virtual8086Mode = 1 << 17,
+            AlignmentCheck = 1 << 18,
+            VirtualInterrupt = 1 << 19,
+            VirtualInterruptPending = 1 << 20,
+            ID = 1 << 21
+        }
 
         [StructLayout(LayoutKind.Explicit, Size = 0x68)]
         public struct TSS {
@@ -139,9 +156,9 @@ namespace Cosmos.Core {
         public static void HandleInterrupt_Default(ref IRQContext aContext) {
             if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F) {
                 if (aContext.Interrupt >= 0x28) {
-                    PIC.SignalSecondary();
+                    Global.PIC.SignalSecondary();
                 } else {
-                    PIC.SignalPrimary();
+                    Global.PIC.SignalPrimary();
                 }
             }
         }
@@ -153,7 +170,7 @@ namespace Cosmos.Core {
         public static void HandleInterrupt_20(ref IRQContext aContext) {
             //TODO New Kernel
             //PIT.HandleInterrupt();
-            PIC.SignalPrimary();
+            Global.PIC.SignalPrimary();
         }
 
         //public static InterruptDelegate IRQ01;
@@ -174,7 +191,7 @@ namespace Cosmos.Core {
             ////
             //// - End change area
             //Console.WriteLine("Signal PIC primary");
-            PIC.SignalPrimary();
+            Global.PIC.SignalPrimary();
         }
 
         //IRQ 5 - (Added for ES1370 AudioPCI)
@@ -183,7 +200,7 @@ namespace Cosmos.Core {
         public static void HandleInterrupt_25(ref IRQContext aContext) {
             IRQ(0x25, ref aContext);
 
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         //IRQ 09 - (Added for AMD PCNet network card)
@@ -191,7 +208,7 @@ namespace Cosmos.Core {
 
         public static void HandleInterrupt_29(ref IRQContext aContext) {
             IRQ(0x29, ref aContext);
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         //IRQ 10 - (Added for VIA Rhine network card)
@@ -205,7 +222,7 @@ namespace Cosmos.Core {
 
             IRQ(0x2A, ref aContext);
 
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         //IRQ 11 - (Added for RTL8139 network card)
@@ -219,7 +236,7 @@ namespace Cosmos.Core {
 
             IRQ(0x2B, ref aContext);
 
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         public static void HandleInterrupt_2C(ref IRQContext aContext) {
@@ -232,7 +249,7 @@ namespace Cosmos.Core {
 
             IRQ(0x2C, ref aContext);
 
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
@@ -240,7 +257,7 @@ namespace Cosmos.Core {
             Global.Dbg.SendMessage("IRQ", "Primary IDE");
             //Storage.ATAOld.HandleInterruptPrimary();
             //Storage.ATA.ATA.HandleInterruptPrimary();
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         public static event InterruptDelegate Interrupt30;
@@ -264,7 +281,7 @@ namespace Cosmos.Core {
         public static void HandleInterrupt_2F(ref IRQContext aContext) {
             //Storage.ATA.ATA.HandleInterruptSecondary();
             Global.Dbg.SendMessage("IRQ", "Secondary IDE");
-            PIC.SignalSecondary();
+            Global.PIC.SignalSecondary();
         }
 
         public static void HandleInterrupt_00(ref IRQContext aContext) {

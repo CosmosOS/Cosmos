@@ -40,7 +40,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Hardware2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -50,14 +49,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
+    <Compile Include="CPU.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
+    <Compile Include="IOGroup\PIC.cs" />
     <Compile Include="IRQs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />
     <Compile Include="IOGroup\PIT.cs" />
     <Compile Include="IOGroup\TextScreen.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
+    <Compile Include="PIC.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
