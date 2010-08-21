@@ -67,7 +67,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArrayListImpl.cs" />
     <Compile Include="Assemblers\ClearInterruptsTable.cs" />
     <Compile Include="Assemblers\CPUID.cs" />
     <Compile Include="Assemblers\DisableInterrupts.cs" />
@@ -96,7 +95,6 @@
     <Compile Include="Assemblers\SetPageDirectory.cs" />
     <Compile Include="Assemblers\ZeroFill.cs" />
     <Compile Include="GCImplementationImpl.cs" />
-    <Compile Include="Hardware\PC\Bus\CPUBus.cs" />
     <Compile Include="HeapImpl.cs" />
     <Compile Include="Interlocked.cs" />
     <Compile Include="PagingUtilityImpl.cs" />
