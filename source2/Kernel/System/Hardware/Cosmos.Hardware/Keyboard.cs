@@ -17,7 +17,7 @@ namespace Cosmos.Hardware {
             mBuffer = new Queue<uint>(BufferSize);
 
             Initialize(HandleScancode);
-            Core.IRQs.SetHandler(0x21, HandleIRQ);
+            Core.INTs.SetIrqHandler(0x01, HandleIRQ);
             // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
 
             if (mKeys == null) {
@@ -25,7 +25,7 @@ namespace Cosmos.Hardware {
             }
         }
 
-        public void HandleIRQ(ref Core.IRQs.IRQContext aContext) {
+        public void HandleIRQ(ref Core.INTs.IRQContext aContext) {
             if (mHandleKeyboardKey != null) {
                 byte xScanCode = IO.Port60.Byte;
                 bool xReleased = (xScanCode & 0x80) == 0x80;

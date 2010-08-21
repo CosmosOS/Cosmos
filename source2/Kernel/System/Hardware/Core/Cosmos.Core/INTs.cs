@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
 {
-    public class IRQs
+    public class INTs
     {
         // TODO: Protect IRQs like memory and ports are
         // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
@@ -147,9 +147,11 @@ namespace Cosmos.Core
         //Interrupts.IRQ01 += HandleKeyboardInterrupt;
         // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
         // [1:48:37 PM] Matthijs ter Woord: the issues were: "they didn't work, would crash kernel". not sure if we still have them..
-        public static void SetHandler(byte aIrqNo, InterruptDelegate aHandler)
-        {
-            mIRQ_Handlers[aIrqNo] = aHandler;
+        public static void SetIntHandler(byte aIntNo, InterruptDelegate aHandler) {
+            mIRQ_Handlers[aIntNo] = aHandler;
+        }
+        public static void SetIrqHandler(byte aIrqNo, InterruptDelegate aHandler) {
+            SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
         }
 
         private static void IRQ(uint irq, ref IRQContext aContext)

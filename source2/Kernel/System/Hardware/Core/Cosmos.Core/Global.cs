@@ -22,7 +22,7 @@ namespace Cosmos.Core {
             CPU.InitFloat();
 
             // Drag this stuff in to the compiler manually until we add the always include attrib
-            IRQs.Dummy();
+            INTs.Dummy();
             // drag in the heap:
             Heap.Initialize();
         }

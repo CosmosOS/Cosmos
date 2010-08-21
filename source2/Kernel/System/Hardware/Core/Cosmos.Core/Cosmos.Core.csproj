@@ -52,7 +52,7 @@
     <Compile Include="Heap.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
     <Compile Include="IOGroup\PIC.cs" />
-    <Compile Include="IRQs.cs" />
+    <Compile Include="INTs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />
     <Compile Include="IOGroup\PIT.cs" />
     <Compile Include="IOGroup\TextScreen.cs" />
@@ -72,7 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="IOPort.html" />
-    <Content Include="IRQs.html" />
+    <Content Include="INTs.html" />
     <Content Include="MemoryBlock.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
