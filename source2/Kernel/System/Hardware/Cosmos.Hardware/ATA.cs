@@ -4,6 +4,6 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Hardware {
-    class PATA {
+    public class ATA {
     }
 }
