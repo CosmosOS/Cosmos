@@ -19,7 +19,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(IOWrite8Asm))]
-        public void Write8(UInt16 aPort, byte aData) { }
+        public static void Write8(IOPort aThis, UInt16 aPort, byte aData) { }
 
         public sealed class IOWrite16Asm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -30,7 +30,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(IOWrite16Asm))]
-        public static void Write16(UInt16 aPort, UInt16 aData) { }
+        public static void Write16(IOPort aThis, UInt16 aPort, UInt16 aData) { }
 
         public sealed class IOWrite32Asm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -41,7 +41,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(IOWrite32Asm))]
-        public void Write32(UInt16 aPort, UInt32 aData) { }
+        public static void Write32(IOPort aThis, UInt16 aPort, UInt32 aData) { }
 
         public sealed class IORead8Asm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -56,7 +56,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(IORead8Asm))]
-        public byte Read8(UInt16 aPort) {
+        public static byte Read8(IOPort aThis, UInt16 aPort) {
             return 0;
         }
 
@@ -73,7 +73,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(IORead16Asm))]
-        public UInt16 Read16(UInt16 aPort) {
+        public static UInt16 Read16(IOPort aThis, UInt16 aPort) {
             return 0;
         }
 
@@ -87,7 +87,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(IORead32Asm))]
-        public UInt32 Read32(UInt16 aPort) {
+        public static UInt32 Read32(IOPort aThis, UInt16 aPort) {
             return 0;
         }
     }

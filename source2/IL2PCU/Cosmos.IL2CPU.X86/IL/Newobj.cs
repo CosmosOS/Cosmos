@@ -19,80 +19,43 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             OpMethod xMethod = ( OpMethod )aOpCode;
             string xCurrentLabel = GetLabel( aMethod, aOpCode );
-            #region Old code, todo..
-            // TODO: enable this again
-            // if (DynamicMethodEmit.GetHasDynamicMethod(CtorDef)) {
-            //   CtorDef = DynamicMethodEmit.GetDynamicMethod(CtorDef);
-            // }
-
-            //var xAllocInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef, false);
-
-            //             Assemble(
-            //                 Assembler,
-            //                 CtorDef,
-            //                 GetService<IMetaDataInfoService>().GetTypeIdLabel(CtorDef.DeclaringType),
-            //                 CurrentLabel,
-            //                 MethodInformation,
-            //                 (int)ILOffset,
-            //                 mNextLabel,
-            //                 GetService<IMetaDataInfoService>().GetTypeInfo(CtorDef.DeclaringType),
-            //                 GetService<IMetaDataInfoService>().GetMethodInfo(CtorDef, false),
-            //                 GetServiceProvider(),
-            //                 xAllocInfo.LabelName
-            //             );
-            // }
-            // 
-            //         public static void Assemble(
-            //             Assembler.Assembler aAssembler,
-            //             MethodBase aCtorDef,
-            //             string aTypeId,
-            //             string aCurrentLabel,
-            //             MethodInformation aCurrentMethodInformation,
-            //             int aCurrentILOffset,
-            //             string aNextLabel,
-            //             TypeInformation aCtorDeclTypeInfo,
-            //             MethodInformation aCtorMethodInfo,
-            //             IServiceProvider aServiceProvider,
-            //             string aAllocMemLabel
-            //         )
-
-            //TODO: What is this for?
-            //             if (aCtorDef != null) {
-            //                 //if (!aCtorDef.DeclaringType.FullName.StartsWith("Cosmos.IL2CPU.MultiArrayEmit.ContType"))
-            //                 //    Engine.QueueMethod(aCtorDef);
-            //             } else {
-            //                 throw new ArgumentNullException("aCtorDef");
-            //             }
-            #endregion
             var xType = xMethod.Value.DeclaringType;
 
+            Assemble(Assembler, aMethod, xMethod, xCurrentLabel, xType, xMethod.Value);
+        }
+
+        public static void Assemble(Assembler aAssembler, MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
+        {
             // call cctor:
-            var xCctor = (xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
-            if (xCctor != null)
+            if (aMethod != null)
             {
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
-                ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
-                new Label(".AfterCCTorExceptionCheck");
+                var xCctor = (objectType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
+                if (xCctor != null)
+                {
+                    new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
+                    ILOp.EmitExceptionLogic(aAssembler, aMethod, xMethod, true, null, ".AfterCCTorExceptionCheck");
+                    new Label(".AfterCCTorExceptionCheck");
+                }
             }
 
             // If not ValueType, then we need gc
-            if( !xType.IsValueType )
+            if (!objectType.IsValueType)
             {
-                var xParams = xMethod.Value.GetParameters();
-                for( int i = 0; i < xParams.Length; i++ )
+                var xParams = constructor.GetParameters();
+                for (int i = 0; i < xParams.Length; i++)
                 {
-                    Assembler.Stack.Pop();
+                    aAssembler.Stack.Pop();
                 }
 
-                uint xMemSize = GetStorageSize(xType);
+                uint xMemSize = GetStorageSize(objectType);
                 int xExtraSize = 20;
-                new CPUx86.Push { DestinationValue = ( uint )( xMemSize + xExtraSize ) };
+                new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
 
                 // todo: probably we want to check for exceptions after calling Alloc
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-                
+
                 uint xObjSize = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC
@@ -101,65 +64,67 @@ namespace Cosmos.IL2CPU.X86.IL
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC
                 //select item ).Count();
-                int xGCFieldCount = xType.GetFields().Count( x => x.FieldType.IsValueType );
+                int xGCFieldCount = objectType.GetFields().Count(x => x.FieldType.IsValueType);
 
-              // todo: use a cleaner approach here. this class shouldnt assemble the string          
-                string strTypeId = GetTypeIDLabel(xMethod.Value.DeclaringType);
+                // todo: use a cleaner approach here. this class shouldnt assemble the string          
+                string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New( strTypeId ), SourceIsIndirect = true };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( uint )InstanceTypeEnum.NormalObject, Size = 32 };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = ( uint )xGCFieldCount, Size = 32 };
-                uint xSize = ( uint )( ( ( from item in xParams
-                                           let xQSize = Align( SizeOfType( item.GetType() ), 4 )
-                                           select ( int )xQSize ).Take( xParams.Length).Sum() ) );
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
+                uint xSize = (uint)(((from item in xParams
+                                      let xQSize = Align(SizeOfType(item.GetType()), 4)
+                                      select (int)xQSize).Take(xParams.Length).Sum()));
 
-                foreach( var xParam in xParams )
+                foreach (var xParam in xParams)
                 {
-                    uint xParamSize = SizeOfType( xParams.GetType() );
-                    new Comment( Assembler, String.Format( "Arg {0}: {1}", xParam.Name, xParamSize ) );
-                    for( int i = 0; i < xParamSize; i += 4 )
+                    uint xParamSize = SizeOfType(xParams.GetType());
+                    new Comment(aAssembler, String.Format("Arg {0}: {1}", xParam.Name, xParamSize));
+                    for (int i = 0; i < xParamSize; i += 4)
                     {
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize + 4 ) };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
                     }
                 }
 
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( xMethod.Value ) };
-                new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
-                string xNoErrorLabel = xCurrentLabel + "_NO_ERROR_" + MethodInfoLabelGenerator.LabelCount.ToString();
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
-
-                //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
-                //{
-                //    new CPUx86.Add
-                //    {
-                //        DestinationReg = CPUx86.Registers.ESP,
-                //        SourceValue = ( aCtorMethodInfo.Arguments[ i ].Size % 4 == 0
-                //             ? aCtorMethodInfo.Arguments[ i ].Size
-                //             : ( ( aCtorMethodInfo.Arguments[ i ].Size / 4 ) * 4 ) + 1 )
-                //    };
-                //}
-                PushAlignedParameterSize( xMethod.Value );
-                // an exception occurred, we need to cleanup the stack, and jump to the exit
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                new Comment( Assembler, "[ Newobj.Execute cleanup start count = " + Assembler.Stack.Count.ToString() +  " ]" );
-                //foreach( var xStackInt in Assembler.Stack )
-                //{
-                //    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
-                //}
-
-                uint xESPOffset = 0;
-                foreach( var xParam in xParams )
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(constructor) };
+                if (aMethod != null)
                 {
-                    xESPOffset += SizeOfType( xParams.GetType() );
+                    new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
+                    string xNoErrorLabel = currentLabel + "_NO_ERROR_" + MethodInfoLabelGenerator.LabelCount.ToString();
+                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
+
+                    //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
+                    //{
+                    //    new CPUx86.Add
+                    //    {
+                    //        DestinationReg = CPUx86.Registers.ESP,
+                    //        SourceValue = ( aCtorMethodInfo.Arguments[ i ].Size % 4 == 0
+                    //             ? aCtorMethodInfo.Arguments[ i ].Size
+                    //             : ( ( aCtorMethodInfo.Arguments[ i ].Size / 4 ) * 4 ) + 1 )
+                    //    };
+                    //}
+                    PushAlignedParameterSize(constructor);
+                    // an exception occurred, we need to cleanup the stack, and jump to the exit
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    new Comment(aAssembler, "[ Newobj.Execute cleanup start count = " + aAssembler.Stack.Count.ToString() + " ]");
+                    //foreach( var xStackInt in Assembler.Stack )
+                    //{
+                    //    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
+                    //}
+
+                    uint xESPOffset = 0;
+                    foreach (var xParam in xParams)
+                    {
+                        xESPOffset += SizeOfType(xParams.GetType());
+                    }
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xESPOffset };
+
+                    new Comment(aAssembler, "[ Newobj.Execute cleanup end ]");
+                    Jump_Exception(aMethod);
+                    new Label(xNoErrorLabel);
                 }
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xESPOffset };
-
-                new Comment( Assembler, "[ Newobj.Execute cleanup end ]" );
-                Jump_Exception( aMethod );
-
-                new Label( xNoErrorLabel );
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
@@ -172,14 +137,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 //             : ( ( aCtorMethodInfo.Arguments[ i ].Size / 4 ) * 4 ) + 1 )
                 //    };
                 //}
-                PushAlignedParameterSize( xMethod.Value );
+                PushAlignedParameterSize(constructor);
 
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                Assembler.Stack.Push( 4, xMethod.Value.DeclaringType );
+                aAssembler.Stack.Push(4, constructor.DeclaringType);
             }
             else
             {
-              //throw new Exception("Not implemented yet: .ctor on value type");
+                //throw new Exception("Not implemented yet: .ctor on value type");
                 /*
                  * Current sitation on stack:
                  *   $ESP       Arg
@@ -195,13 +160,13 @@ namespace Cosmos.IL2CPU.X86.IL
                  *  + pointer should be set
                  *  + call .ctor
                  */
-                uint xStorageSize = Align(SizeOfType( xType ), 4);
+                uint xStorageSize = Align(SizeOfType(objectType), 4);
                 //var xStorageSize = aCtorDeclTypeInfo.StorageSize;
                 //uint xArgSize = 0;
-                var xParams = xMethod.Value.GetParameters();
-                uint xArgSize = ( uint )( ( ( from item in xParams.Skip( 1 ) 
-                                           let xQSize = Align( SizeOfType( item.GetType() ), 4 )
-                                           select ( int )xQSize ).Take( xParams.Length - 1 ).Sum() ) );
+                var xParams = constructor.GetParameters();
+                uint xArgSize = (uint)(((from item in xParams.Skip(1)
+                                         let xQSize = Align(SizeOfType(item.GetType()), 4)
+                                         select (int)xQSize).Take(xParams.Length - 1).Sum()));
 
                 //foreach( var xArg in aCtorMethodInfo.Arguments.Skip( 1 ) )
                 //{
@@ -209,24 +174,24 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                                            ? 0
                 //                                            : ( 4 - ( xArg.Size % 4 ) ) );
                 //}
-                int xExtraArgSize = ( int )( xStorageSize - xArgSize );
-                if( xExtraArgSize < 0 )
+                int xExtraArgSize = (int)(xStorageSize - xArgSize);
+                if (xExtraArgSize < 0)
                 {
                     xExtraArgSize = 0;
                 }
-                if( xExtraArgSize > 0 )
+                if (xExtraArgSize > 0)
                 {
-                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xExtraArgSize };
+                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
                 }
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
-                Assembler.Stack.Push( new StackContents.Item( 4 ) );
+                aAssembler.Stack.Push(new StackContents.Item(4));
                 //at this point, we need to move copy all arguments over. 
-                for( int i = 0; i < ( xArgSize / 4 ); i++ )
+                for (int i = 0; i < (xArgSize / 4); i++)
                 {
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xStorageSize + 4 ) }; // + 4 because the ptr is pushed too
-                    new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xStorageSize + 4 + 4 ), SourceValue = 0, Size = 32 };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4) }; // + 4 because the ptr is pushed too
+                    new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4 + 4), SourceValue = 0, Size = 32 };
                 }
-                new Call( Assembler ).Execute( aMethod, aOpCode );
+                new Call(aAssembler).Execute(aMethod, xMethod);
                 //var xCall = new Call( aCtorDef,
                 //                     ( uint )aCurrentILOffset,
                 //                     true,
@@ -234,22 +199,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 //xCall.SetServiceProvider( aServiceProvider );
                 //xCall.Assembler = aAssembler;
                 //xCall.Assemble();
-                Assembler.Stack.Push( new StackContents.Item( ( int )xStorageSize, xType ) );
+                aAssembler.Stack.Push(new StackContents.Item((int)xStorageSize, objectType));
             }
         }
 
-        private void PushAlignedParameterSize( System.Reflection.MethodBase aMethod )
+        private static void PushAlignedParameterSize( System.Reflection.MethodBase aMethod )
         {
             System.Reflection.ParameterInfo[] xParams = aMethod.GetParameters();
 
             uint xSize;
-            new Comment( Assembler, "[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]" );
+            new Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]" );
             for( int i = 0; i < xParams.Length; i++ )
             {
                 xSize = SizeOfType( xParams[ i ].GetType() );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align( xSize, 4 ) };
             }
-            new Comment( Assembler, "[ Newobj.PushAlignedParameterSize end ]" );
+            new Comment("[ Newobj.PushAlignedParameterSize end ]" );
         }
         // using System.Collections.Generic;
         // using System.Diagnostics;

@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using System.Reflection.Emit;
 
 
 namespace Cosmos.Compiler.Assembler
@@ -133,7 +134,14 @@ namespace Cosmos.Compiler.Assembler
                 }
             }
             xBuilder.Append( "  " );
-            xBuilder.Append( GetFullName( aMethod.DeclaringType ) );
+            if (aMethod.DeclaringType != null)
+            {
+                xBuilder.Append(GetFullName(aMethod.DeclaringType));
+            }
+            else
+            {
+                xBuilder.Append("dynamic_method");
+            }
             xBuilder.Append( "." );
             xBuilder.Append( aMethod.Name );
             if( aMethod.IsGenericMethod || aMethod.IsGenericMethodDefinition )

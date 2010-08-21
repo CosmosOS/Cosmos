@@ -107,17 +107,13 @@ namespace Cosmos.IL2CPU.X86
             new Call { DestinationLabel = InitVMTCodeLabel };
             new Call { DestinationLabel = InitStringIDsLabel };
 
-            // old code:
-            //foreach (var xCctor in aMethods)
-            //{
-            //    if (xCctor.Name == ".cctor"
-            //      && xCctor.IsStatic
-            //      && xCctor is ConstructorInfo)
-            //    {
-            //        Call(xCctor);
-            //    }
-            //}
-            Call(aEntrypoint);
+            // we now need to do "newobj" on the entry point, and after that, call .Start on it
+            var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
+            new Label(xCurLabel);
+            IL.Newobj.Assemble(Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+            xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
+            new Label(xCurLabel);
+            IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), 0, null, xCurLabel);
             new Pop { DestinationReg = Registers.EBP };
             new Return();
         }

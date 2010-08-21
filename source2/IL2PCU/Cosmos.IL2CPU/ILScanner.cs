@@ -9,6 +9,7 @@ using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
 using Cosmos.Compiler.Assembler;
+using System.Reflection.Emit;
 
 namespace Cosmos.IL2CPU {
   // This is necessary because HashSet and Dictionary
@@ -384,6 +385,11 @@ namespace Cosmos.IL2CPU {
       //                                       select Label.GetFullName(xMethod)).ToArray());
     }
 
+    public void QueueMethod(MethodBase method)
+    {
+        Queue(method, null, "Explicit entry via QueueMethod");
+    }
+
     /// <summary>
     /// This method changes the opcodes. Changes are:
     /// * inserting the ValueUID for method ops.
@@ -540,10 +546,15 @@ namespace Cosmos.IL2CPU {
         xParamTypes[i] = xParams[i].ParameterType;
         Queue(xParamTypes[i], aMethod, "Parameter");
       }
+      var xIsDynamicMethod = aMethod.DeclaringType == null;
       // Queue Types directly related to method
       if (!aIsPlug) {
         // Don't queue declaring types of plugs
-        Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+          if (!xIsDynamicMethod)
+          {
+              // dont queue declaring types of dynamic methods either, those dont have a declaring type
+              Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+          }
       }
       if (aMethod is System.Reflection.MethodInfo) {
         Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
@@ -551,7 +562,8 @@ namespace Cosmos.IL2CPU {
 
       // Scan virtuals
       #region Virtuals scan
-      if (aMethod.IsVirtual) {
+      if (!xIsDynamicMethod && aMethod.IsVirtual)
+      {
         // For virtuals we need to climb up the type tree
         // and find the top base method. We then add that top
         // node to the mVirtuals list. We don't need to add the 
@@ -622,12 +634,8 @@ namespace Cosmos.IL2CPU {
 
       MethodBase xPlug = null;
       // Plugs may use plugs, but plugs won't be plugged over themself
-      if (!aIsPlug) {
-          if (aMethod.Name == "GetMulticastInvoke"
-              && aMethod.DeclaringType.Name == "Delegate")
-          {
-              Console.Write("");
-          }
+      if (!aIsPlug && !xIsDynamicMethod)
+      {
         // Check to see if method is plugged, if it is we don't scan body
         xPlug = ResolvePlug(aMethod, xParamTypes);
       }

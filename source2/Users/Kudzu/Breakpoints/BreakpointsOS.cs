@@ -18,6 +18,8 @@ namespace BreakpointsKernel {
             string xResult = Console.ReadLine();
             Console.Write("Text typed: ");
             Console.WriteLine(xResult);
+            var xDivisor = 0;
+            var xTest = 5 / xDivisor;
             //Cosmos.Debug.Debugger.Send(xResult);
         }
     }

@@ -51,6 +51,10 @@ namespace Cosmos.Build.MSBuild
                     {
                         Log.LogError(xError);
                     }
+                    foreach (var xOutput in mOutput)
+                    {
+                        Log.LogError(xOutput);
+                    }
                     return false;
                 }
             }

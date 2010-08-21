@@ -12,6 +12,7 @@ using Cosmos.Build.Common;
 using Microsoft.Win32;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
+using System.Reflection.Emit;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -42,11 +43,6 @@ namespace Cosmos.Build.MSBuild
                 mSearchDirs = xSearchDirs.ToArray();
 
                 AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
-
-                Assembly.LoadWithPartialName("Cosmos.Sys");
-                Assembly.LoadWithPartialName("Cosmos.Hardware");
-                Assembly.LoadWithPartialName("Cosmos.Kernel");
-                Assembly.LoadWithPartialName("Cosmos.Sys.FileSystem");
             }
         }
 
@@ -90,17 +86,8 @@ namespace Cosmos.Build.MSBuild
         {
             Type xType;
             // Old
-            xType = typeof(Cosmos.Sys.Plugs.Deboot);
-            var xName = xType.FullName;
-            xType = typeof(Cosmos.Kernel.Plugs.ArrayListImpl);
-            xName = xType.FullName;
-            // New
-            xType = typeof(Cosmos.Core.Plugs.CPUImpl);
-            xName = xType.FullName;
-            xType = typeof(Cosmos.System.Plugs.System.ConsoleImpl);
-            xName = xType.FullName;
             xType = typeof(Cosmos.Debug.Kernel.Plugs.Debugger);
-            xName = xType.FullName;
+            var xName = xType.FullName;
         }
 
         #region properties
@@ -173,7 +160,12 @@ namespace Cosmos.Build.MSBuild
                         var xDir = Path.GetDirectoryName(xRef.GetMetadata("FullPath"));
                         if (!xSearchPaths.Contains(xDir))
                         {
-                            xSearchPaths.Add(xDir);
+                            xSearchPaths.Insert(0, xDir);
+                        }
+                        var xName = xRef.GetMetadata("FullPath");
+                        if (xName.Length > 0)
+                        {
+                            Assembly.LoadFile(xName);
                         }
                     }
                 }
@@ -227,44 +219,9 @@ namespace Cosmos.Build.MSBuild
 
                 LogTime("Engine execute started");
                 // find the kernel's entry point now. we are looking for a public class Kernel, with public static void Boot()
-                MethodBase xInitMethod=null;
-                #region detect entry point method
-                foreach (var xRef in References)
-                {
-                    if (xRef.MetadataNames.OfType<string>().Contains("FullPath"))
-                    {
-                        var xFile = xRef.GetMetadata("FullPath");
-                        if (File.Exists(xFile))
-                        {
-                            var xAssembly = Assembly.LoadFile(xFile);
-                            foreach (var xType in xAssembly.GetExportedTypes())
-                            {
-                                if (xType.Name == "Kernel")
-                                {
-                                    var xMethod = xType.GetMethod("Boot");
-                                    if (xMethod != null)
-                                    {
-                                        if (!xMethod.IsStatic)
-                                        {
-                                            continue;
-                                        }
-                                        if (xInitMethod != null)
-                                        {
-                                            // already found an init method. log error.
-                                            Log.LogError("Project has multiple Kernel.Boot methods!");
-                                            return false;
-                                        }
-                                        xInitMethod = xMethod;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                #endregion detect entry point method
+                var xInitMethod = RetrieveEntryPoint();
                 if (xInitMethod == null)
                 {
-                    Log.LogError("No Kernel.Boot method found!");
                     return false;
                 }
                 var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
@@ -288,6 +245,8 @@ namespace Cosmos.Build.MSBuild
                     {
                         xScanner.EnableLogging(xOutputFilename + ".log.html");
                     }
+                    // TODO: shouldn't be here?
+                    xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                     xScanner.Execute(xInitMethod);
 
                     using (var xOut = new StreamWriter(OutputFilename, false))
@@ -308,14 +267,74 @@ namespace Cosmos.Build.MSBuild
             }
             catch (Exception E)
             {
+                Log.LogErrorFromException(E, true);
                 Log.LogMessage("Loaded assemblies: ");
                 foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    Log.LogMessage(xAsm.Location);
+                    // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
+                    try
+                    {
+                        Log.LogMessage(xAsm.Location);
+                    }
+                    catch
+                    {
+                    }
                 }
-                Log.LogErrorFromException(E, true);
                 return false;
             }
+        }
+
+        private MethodBase RetrieveEntryPoint()
+        {
+            Type xFoundType = null;
+            #region detect entry point method
+            foreach (var xRef in References)
+            {
+                if (xRef.MetadataNames.OfType<string>().Contains("FullPath"))
+                {
+                    var xFile = xRef.GetMetadata("FullPath");
+                    if (File.Exists(xFile))
+                    {
+                        var xAssembly = Assembly.LoadFile(xFile);
+                        foreach (var xType in xAssembly.GetExportedTypes())
+                        {
+                            if (xType.IsGenericTypeDefinition)
+                            {
+                                continue;
+                            }
+                            if (xType.IsAbstract)
+                            {
+                                continue;
+                            }
+                            // FIX THIS: when the kernel class changes, fix the name below
+                            if (xType.BaseType.FullName == "Cosmos.System.Kernel")
+                            {
+                                // found kernel?
+                                if (xFoundType != null)
+                                {
+                                    // already a kernel found, which is not supported.
+                                    Log.LogError("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xFoundType.AssemblyQualifiedName);
+                                    return null;
+                                }
+                                xFoundType = xType;
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion detect entry point method
+            if (xFoundType == null)
+            {
+                Log.LogError("No Kernel found!");
+                return null;
+            }
+            var xCtor = xFoundType.GetConstructor(Type.EmptyTypes);
+            if (xCtor == null)
+            {
+                Log.LogError("Kernel has no public default constructor");
+                return null;
+            }
+            return xCtor;
         }
     }
 }

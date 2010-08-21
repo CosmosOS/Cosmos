@@ -148,14 +148,10 @@ Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignore
 Source: .\Build\Tools\Cygwin\*; DestDir: {app}\Build\Tools\cygwin; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; Kernel assemblies
-Source: .\Build\VSIP\Cosmos.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Hardware2.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.System.Plugs.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Debug.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.Core.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
 ; VSIP stuff

@@ -9,14 +9,12 @@ namespace Cosmos.Core {
         static readonly public BaseIOGroups BaseIOGroups = new BaseIOGroups();
         static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Core", "");
         static public PIC PIC;
-        static public Heap Heap;
 
         static public void Init() {
             CPU = new CPU();
 
             //Init Heap first - Hardware loads devices and they need heap
             Console.WriteLine("    Init Heap");
-            Heap = new Heap(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() * 1024 * 1024) - 1024);
 
             CPU.CreateGDT();
             PIC = new PIC();
@@ -25,6 +23,8 @@ namespace Cosmos.Core {
 
             // Drag this stuff in to the compiler manually until we add the always include attrib
             IRQs.Dummy();
+            // drag in the heap:
+            Heap.Initialize();
         }
     }
 }

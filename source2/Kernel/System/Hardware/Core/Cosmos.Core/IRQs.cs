@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Core {
-    public class IRQs {
+namespace Cosmos.Core
+{
+    public class IRQs
+    {
         // TODO: Protect IRQs like memory and ports are
         // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
-        public enum EFlagsEnum : uint {
+        public enum EFlagsEnum : uint
+        {
             Carry = 1,
             Parity = 1 << 2,
             AuxilliaryCarry = 1 << 4,
@@ -28,7 +31,8 @@ namespace Cosmos.Core {
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 0x68)]
-        public struct TSS {
+        public struct TSS
+        {
             [FieldOffset(0)]
             public ushort Link;
             [FieldOffset(4)]
@@ -84,11 +88,13 @@ namespace Cosmos.Core {
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 512)]
-        public struct MMXContext {
+        public struct MMXContext
+        {
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 80)]
-        public struct IRQContext {
+        public struct IRQContext
+        {
             [FieldOffset(0)]
             public unsafe MMXContext* MMXContext;
 
@@ -141,22 +147,30 @@ namespace Cosmos.Core {
         //Interrupts.IRQ01 += HandleKeyboardInterrupt;
         // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
         // [1:48:37 PM] Matthijs ter Woord: the issues were: "they didn't work, would crash kernel". not sure if we still have them..
-        public static void SetHandler(byte aIrqNo, InterruptDelegate aHandler) {
+        public static void SetHandler(byte aIrqNo, InterruptDelegate aHandler)
+        {
             mIRQ_Handlers[aIrqNo] = aHandler;
         }
 
-        private static void IRQ(uint irq, ref IRQContext aContext) {
+        private static void IRQ(uint irq, ref IRQContext aContext)
+        {
             var xCallback = mIRQ_Handlers[irq];
-            if (xCallback != null) {
+            if (xCallback != null)
+            {
                 xCallback(ref aContext);
             }
         }
 
-        public static void HandleInterrupt_Default(ref IRQContext aContext) {
-            if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F) {
-                if (aContext.Interrupt >= 0x28) {
+        public static void HandleInterrupt_Default(ref IRQContext aContext)
+        {
+            if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F)
+            {
+                if (aContext.Interrupt >= 0x28)
+                {
                     Global.PIC.SignalSecondary();
-                } else {
+                }
+                else
+                {
                     Global.PIC.SignalPrimary();
                 }
             }
@@ -166,7 +180,8 @@ namespace Cosmos.Core {
         public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
 
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
-        public static void HandleInterrupt_20(ref IRQContext aContext) {
+        public static void HandleInterrupt_20(ref IRQContext aContext)
+        {
             //TODO New Kernel
             //PIT.HandleInterrupt();
             Global.PIC.SignalPrimary();
@@ -174,7 +189,8 @@ namespace Cosmos.Core {
 
         //public static InterruptDelegate IRQ01;
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
-        public static void HandleInterrupt_21(ref IRQContext aContext) {
+        public static void HandleInterrupt_21(ref IRQContext aContext)
+        {
             ////Change area
             ////
             //// Triggers IL2CPU error
@@ -196,7 +212,8 @@ namespace Cosmos.Core {
         //IRQ 5 - (Added for ES1370 AudioPCI)
         //public static InterruptDelegate IRQ05;
 
-        public static void HandleInterrupt_25(ref IRQContext aContext) {
+        public static void HandleInterrupt_25(ref IRQContext aContext)
+        {
             IRQ(0x25, ref aContext);
 
             Global.PIC.SignalSecondary();
@@ -205,7 +222,8 @@ namespace Cosmos.Core {
         //IRQ 09 - (Added for AMD PCNet network card)
         //public static InterruptDelegate IRQ09;
 
-        public static void HandleInterrupt_29(ref IRQContext aContext) {
+        public static void HandleInterrupt_29(ref IRQContext aContext)
+        {
             IRQ(0x29, ref aContext);
             Global.PIC.SignalSecondary();
         }
@@ -213,7 +231,8 @@ namespace Cosmos.Core {
         //IRQ 10 - (Added for VIA Rhine network card)
         //public static InterruptDelegate IRQ10;
 
-        public static void HandleInterrupt_2A(ref IRQContext aContext) {
+        public static void HandleInterrupt_2A(ref IRQContext aContext)
+        {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
             //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
@@ -227,7 +246,8 @@ namespace Cosmos.Core {
         //IRQ 11 - (Added for RTL8139 network card)
         //public static InterruptDelegate IRQ11;
 
-        public static void HandleInterrupt_2B(ref IRQContext aContext) {
+        public static void HandleInterrupt_2B(ref IRQContext aContext)
+        {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
             //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
@@ -238,7 +258,8 @@ namespace Cosmos.Core {
             Global.PIC.SignalSecondary();
         }
 
-        public static void HandleInterrupt_2C(ref IRQContext aContext) {
+        public static void HandleInterrupt_2C(ref IRQContext aContext)
+        {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
             //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
@@ -252,7 +273,8 @@ namespace Cosmos.Core {
         }
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
-        public static void HandleInterrupt_2E(ref IRQContext aContext) {
+        public static void HandleInterrupt_2E(ref IRQContext aContext)
+        {
             Global.Dbg.SendMessage("IRQ", "Primary IDE");
             //Storage.ATAOld.HandleInterruptPrimary();
             //Storage.ATA.ATA.HandleInterruptPrimary();
@@ -261,13 +283,16 @@ namespace Cosmos.Core {
 
         public static event InterruptDelegate Interrupt30;
         // Interrupt 0x30, enter VMM
-        public static void HandleInterrupt_30(ref IRQContext aContext) {
-            if (Interrupt30 != null) {
+        public static void HandleInterrupt_30(ref IRQContext aContext)
+        {
+            if (Interrupt30 != null)
+            {
                 Interrupt30(ref aContext);
             }
         }
 
-        public static void HandleInterrupt_35(ref IRQContext aContext) {
+        public static void HandleInterrupt_35(ref IRQContext aContext)
+        {
             Global.Dbg.SendMessage("Interrupts",
                                                   "Interrupt 35 handler");
             aContext.EAX *= 2;
@@ -277,20 +302,23 @@ namespace Cosmos.Core {
         }
 
         //IRQ 15 - Secondary IDE
-        public static void HandleInterrupt_2F(ref IRQContext aContext) {
+        public static void HandleInterrupt_2F(ref IRQContext aContext)
+        {
             //Storage.ATA.ATA.HandleInterruptSecondary();
             Global.Dbg.SendMessage("IRQ", "Secondary IDE");
             Global.PIC.SignalSecondary();
         }
 
-        public static void HandleInterrupt_00(ref IRQContext aContext) {
+        public static void HandleInterrupt_00(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Divide by zero",
                             "EDivideByZero",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_06(ref IRQContext aContext) {
+        public static void HandleInterrupt_06(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Invalid Opcode",
                             "EInvalidOpcode",
@@ -299,13 +327,16 @@ namespace Cosmos.Core {
 
         public static event ExceptionInterruptDelegate GeneralProtectionFault;
 
-        public static void HandleInterrupt_0D(ref IRQContext aContext) {
+        public static void HandleInterrupt_0D(ref IRQContext aContext)
+        {
             bool xHandled = false;
-            if (GeneralProtectionFault != null) {
+            if (GeneralProtectionFault != null)
+            {
                 GeneralProtectionFault(ref aContext,
                                        ref xHandled);
             }
-            if (!xHandled) {
+            if (!xHandled)
+            {
                 HandleException(aContext.EIP,
                                 "General Protection Fault",
                                 "GPF",
@@ -313,112 +344,128 @@ namespace Cosmos.Core {
             }
         }
 
-        public static void HandleInterrupt_01(ref IRQContext aContext) {
+        public static void HandleInterrupt_01(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Debug Exception",
                             "Debug Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_02(ref IRQContext aContext) {
+        public static void HandleInterrupt_02(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Non Maskable Interrupt Exception",
                             "Non Maskable Interrupt Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_03(ref IRQContext aContext) {
+        public static void HandleInterrupt_03(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Breakpoint Exception",
                             "Breakpoint Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_04(ref IRQContext aContext) {
+        public static void HandleInterrupt_04(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Into Detected Overflow Exception",
                             "Into Detected Overflow Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_05(ref IRQContext aContext) {
+        public static void HandleInterrupt_05(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Out of Bounds Exception",
                             "Out of Bounds Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_07(ref IRQContext aContext) {
+        public static void HandleInterrupt_07(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "No Coprocessor Exception",
                             "No Coprocessor Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_08(ref IRQContext aContext) {
+        public static void HandleInterrupt_08(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Double Fault Exception",
                             "Double Fault Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_09(ref IRQContext aContext) {
+        public static void HandleInterrupt_09(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Coprocessor Segment Overrun Exception",
                             "Coprocessor Segment Overrun Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_0A(ref IRQContext aContext) {
+        public static void HandleInterrupt_0A(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Bad TSS Exception",
                             "Bad TSS Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_0B(ref IRQContext aContext) {
+        public static void HandleInterrupt_0B(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Segment Not Present",
                             "Segment Not Present",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_0C(ref IRQContext aContext) {
+        public static void HandleInterrupt_0C(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Stack Fault Exception",
                             "Stack Fault Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_0E(ref IRQContext aContext) {
+        public static void HandleInterrupt_0E(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Page Fault Exception",
                             "Page Fault Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_0F(ref IRQContext aContext) {
+        public static void HandleInterrupt_0F(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Unknown Interrupt Exception",
                             "Unknown Interrupt Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_10(ref IRQContext aContext) {
+        public static void HandleInterrupt_10(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Coprocessor Fault Exception",
                             "Coprocessor Fault Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_11(ref IRQContext aContext) {
+        public static void HandleInterrupt_11(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Alignment Exception",
                             "Alignment Exception",
                             ref aContext);
         }
 
-        public static void HandleInterrupt_12(ref IRQContext aContext) {
+        public static void HandleInterrupt_12(ref IRQContext aContext)
+        {
             HandleException(aContext.EIP,
                             "Machine Check Exception",
                             "Machine Check Exception",
@@ -428,10 +475,27 @@ namespace Cosmos.Core {
         private static void HandleException(uint aEIP,
                                             string aDescription,
                                             string aName,
-                                            ref IRQContext ctx) {
+                                            ref IRQContext ctx)
+        {
             const string SysFault = "*** System Fault ***  ";
+            const string xHex = "0123456789ABCDEF";
 
-            while (true) {
+            // we're printing exception info to the screen now:
+            // 0/0: X
+            // 1/0: exception number in hex
+            unsafe
+            {
+                byte* xAddress = (byte*)0xB8000;
+                xAddress[1] = 0x0C;
+                xAddress[0] = (byte)'X';
+                xAddress[3] = 0x0C;
+                xAddress[2] = (byte)xHex[(int)((ctx.Interrupt >> 4) & 0xF)];
+                xAddress[5] = 0x0C;
+                xAddress[4] = (byte)xHex[(int)(ctx.Interrupt & 0xF)];
+            }
+
+            while (true)
+            {
                 ;
             }
         }
@@ -439,11 +503,14 @@ namespace Cosmos.Core {
         // This is to trick IL2CPU to compile it in
         //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
         // We dont actually need to cal this method
-        public static void Dummy() {
+        public static void Dummy()
+        {
             // Compiler magic
             bool xTest = false;
-            if (xTest) {
-                unsafe {
+            if (xTest)
+            {
+                unsafe
+                {
                     var xCtx = new IRQContext();
                     HandleInterrupt_Default(ref xCtx);
                     HandleInterrupt_00(ref xCtx);

@@ -57,7 +57,6 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities" />
     <Reference Include="System" />
@@ -79,10 +78,6 @@
     <Compile Include="TestClass.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
-      <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
-      <Name>Cosmos.Sys.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
       <Name>Cosmos.Compiler.Assembler.X86</Name>
@@ -114,14 +109,6 @@
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
       <Project>{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}</Project>
       <Name>Cosmos.Debug.Kernel.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
-      <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
-      <Name>Cosmos.System.Plugs.System</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Project>{D9A87AAD-FCC9-4517-B31D-E904DAD00784}</Project>
-      <Name>Cosmos.Core.Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.System {
+    // MtW: if the fullname (namespace + name) of this class changes, please also change IL2CPU msbuild task
     public abstract class Kernel {
         public bool ClearScreen = true;
         // Set to true to hide messages during boot.
@@ -27,25 +28,29 @@ namespace Cosmos.System {
             //TODO - Set and document the Console class (and its supporting classes) to default to 80x25
             //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
 
+            //TODO: System inits hardware, and hardware inits core
+            Global.Init();
+
             // Clear before booting
             Global.Dbg.Send("Clearing screen");
             Global.Console.Clear();
             WriteLine("Cosmos kernel boot initiated.");
 
-            //TODO: System inits hardware, and hardware inits core
-            Global.Init();
-
             WriteLine("Cosmos kernel boot completed.");
             // Provide the user with a clear scree if they requested it
-            if (ClearScreen) {
+            if (ClearScreen)
+            {
                 Global.Console.Clear();
             }
 
             BeforeRun();
-            while (!mStopped) {
+            while (!mStopped)
+            {
                 Run();
             }
             AfterRun();
+            while (true)
+                ;
         }
 
         protected virtual void BeforeRun() { }
@@ -64,7 +69,8 @@ namespace Cosmos.System {
         }
 
         // Shutdown and restart
-        public void Restart() {
+        public void Restart()
+        {
         }
     }
 }

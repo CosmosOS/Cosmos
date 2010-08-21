@@ -8,7 +8,7 @@ namespace Cosmos.Compiler.Assembler
         public readonly string Text;
 
         public Comment( Assembler aAssembler, string aText )
-            : base( aAssembler ) //HACK
+            : base() //HACK
         {
           if (aText.StartsWith(";")) {
             aText = aText.TrimStart(';').TrimStart();

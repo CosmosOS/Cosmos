@@ -10,11 +10,11 @@ namespace Cosmos.Core.Plugs {
     [Plug(Target = typeof(Core.CPU))]
     public class CPUImpl {
         [PlugMethod(Assembler = typeof(Assemblers.CreateIDT))]
-        public void CreateIDT(bool aEnableInterruptsImmediately) {
+        public static void CreateIDT(CPU aThis, bool aEnableInterruptsImmediately) {
         }
 
         [PlugMethod(Assembler = typeof(Assemblers.CreateGDT))]
-        public void CreateGDT() { }
+        public static void CreateGDT(CPU aThis) { }
 
         public class GetAmountOfRAMAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -27,7 +27,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(GetAmountOfRAMAsm))]
-        public uint GetAmountOfRAM() { return 0; }
+        public static uint GetAmountOfRAM() { return 0; }
 
         public class GetEndOfKernelAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -35,7 +35,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(GetEndOfKernelAsm))]
-        public uint GetEndOfKernel() { return 0; }
+        public static uint GetEndOfKernel() { return 0; }
 
         public class ZeroFillAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -56,7 +56,7 @@ namespace Cosmos.Core.Plugs {
         }
         [PlugMethod(Assembler = typeof(ZeroFillAsm))]
         // TODO: implement this using REP STOSB and REPO STOSD
-        public void ZeroFill(uint aStartAddress, uint aLength) { }
+        public static void ZeroFill(CPU aThis, uint aStartAddress, uint aLength) { }
 
         public class InitFloatAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -64,7 +64,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(InitFloatAsm))]
-        public void InitFloat() { }
+        public static void InitFloat(CPU aThis) { }
 
         public class HaltAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -72,7 +72,7 @@ namespace Cosmos.Core.Plugs {
             }
         }
         [PlugMethod(Assembler = typeof(HaltAsm))]
-        public void Halt() { }
+        public static void Halt(CPU aThis) { }
 
 
     //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetEndOfStack))]
