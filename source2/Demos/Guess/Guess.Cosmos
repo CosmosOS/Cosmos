@@ -45,6 +45,26 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.Core.Plugs</Name>
+      <AssemblyName>Cosmos.Core.Plugs.dll</AssemblyName>
+      <HintPath>C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Core.Plugs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+      <AssemblyName>Cosmos.Debug.Kernel.Plugs.dll</AssemblyName>
+      <HintPath>C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Debug.Kernel.Plugs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.System.Plugs.System</Name>
+      <AssemblyName>Cosmos.System.Plugs.System.dll</AssemblyName>
+      <HintPath>C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.System.Plugs.System.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
   </Target>

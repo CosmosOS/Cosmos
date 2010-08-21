@@ -4,15 +4,19 @@
     To Do</h3>
     <ul>
         <li>Guess Demo</li>
-        <li>Move remainging plugs out of Cosmos.Sys, Kernel etc and then remove refs to them 
-            from MSBuild task.</li>
         <li>use INT3 for BP? Will save 3 bytes per call.. which is a lot...</li>
         <li>Watches - at least locals first</li>
 </ul>
 <h3>
     Matthijs - Next Release</h3>
 <ul>
-    <li>Fix plugs</li>
+    <li>Try to run Guess: (int.Parse causes this) error: symbol 
+        `System_UInt32__Cosmos_IL2CPU_RuntimeEngine_Heap_AllocNewObject_System_UInt32_&#39; 
+        undefined</li>
+    <li>Fix and move plugs<ul>
+        <li>Remove refs from MSBuild task to plugs</li>
+        </ul>
+    </li>
     <li>Change to new kernel lib format</li>
     <li>Express isnt showing any templates</li>
     <li>For VMWare Workstation, if not found, fall back automatically to Player without 
