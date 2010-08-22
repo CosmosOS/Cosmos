@@ -44,6 +44,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
@@ -51,6 +53,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Heap.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
+    <Compile Include="IOGroup\PciBus.cs" />
     <Compile Include="IOGroup\PIC.cs" />
     <Compile Include="INTs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />
@@ -58,6 +61,7 @@
     <Compile Include="IOGroup\TextScreen.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
+    <Compile Include="PciBus.cs" />
     <Compile Include="PIC.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -74,6 +78,7 @@
     <Content Include="IOPort.html" />
     <Content Include="INTs.html" />
     <Content Include="MemoryBlock.html" />
+    <Content Include="PciBus.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
