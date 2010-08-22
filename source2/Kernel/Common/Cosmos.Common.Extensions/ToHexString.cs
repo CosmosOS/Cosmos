@@ -3,59 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.System {
-    public static class HexExtension {
-        #region C# 3.0 Extension Methods
+namespace Cosmos.Common.Extensions {
+    public static class ToHexString {
 
         //TODO: Can add several more overloads for other numbertypes, with and withouth width argument.
 
         public static string ToHex(this byte n) {
-            return ConvertToHex((UInt32)n);
+            return ConvertToHex((UInt32)n, 2);
         }
-
-        /// <summary>
-        /// When width is supplied the hex value will be left padded with zeroes.
-        /// </summary>
-        public static string ToHex(this byte n, int width) {
-            return ConvertToHex((UInt32)n).PadLeft(width, '0');
+        public static string ToHex(this byte n, int aWidth) {
+            return ConvertToHex((UInt32)n, aWidth);
         }
 
         public static string ToHex(this int n) {
             return ConvertToHex((UInt32)n);
         }
-
-        public static string ToHex(this int n, int width) {
-            return ConvertToHex((UInt32)n).PadLeft(width, '0');
+        public static string ToHex(this int n, int aWidth) {
+            return ConvertToHex((UInt32)n, aWidth);
         }
 
         public static string ToHex(this UInt16 n) {
-            return ConvertToHex((UInt32)n);
+            return ConvertToHex((UInt32)n, 4);
         }
-
-        public static string ToHex(this UInt16 n, int width) {
-            return ConvertToHex((UInt32)n).PadLeft(width, '0');
+        public static string ToHex(this UInt16 n, int aWidth) {
+            return ConvertToHex((UInt32)n, aWidth);
         }
-
 
         public static string ToHex(this uint aValue) {
             return ConvertToHex(aValue);
         }
-
         public static string ToHex(this uint aValue, int aWidth) {
-            return ConvertToHex(aValue).PadLeft(aWidth, '0');
+            return ConvertToHex(aValue, aWidth);
         }
 
         public static string ToHex(this ulong aValue) {
             return ConvertToHex(aValue);
         }
-
         public static string ToHex(this ulong aValue, int aWidth) {
             return ConvertToHex(aValue).PadLeft(aWidth, '0');
         }
-
-        #endregion
-
-        #region Prefix/Suffix
 
         private static string GetPrefix() {
             return "0x";
@@ -64,10 +50,6 @@ namespace Cosmos.System {
         private static string GetSuffix() {
             return "h";
         }
-
-        #endregion
-
-        #region Converters
 
         private static string ConvertToHex(UInt32 num) {
             string xHex = string.Empty;
@@ -80,6 +62,11 @@ namespace Cosmos.System {
 
             return xHex;
         }
+
+        private static string ConvertToHex(UInt32 aValue, int aWidth) {
+            return ConvertToHex(aValue).PadLeft(aWidth, '0');
+        }
+
 
         private static string ConvertToHex(UInt64 num) {
             string xHex = string.Empty;
@@ -116,23 +103,21 @@ namespace Cosmos.System {
                 case 9:
                     return "9";
                 case 10:
-                    return "a";
+                    return "A";
                 case 11:
-                    return "b";
+                    return "B";
                 case 12:
-                    return "c";
+                    return "C";
                 case 13:
-                    return "d";
+                    return "D";
                 case 14:
-                    return "e";
+                    return "E";
                 case 15:
-                    return "f";
+                    return "F";
             }
             return " ";
 
         }
-
-        #endregion
 
     }
 }

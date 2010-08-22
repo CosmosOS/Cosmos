@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Common.Extensions;
 
 namespace Cosmos.Core {
     public class PciBus {
@@ -49,10 +50,11 @@ namespace Cosmos.Core {
                             UInt16 xVendorID = (UInt16)(x & 0xFFFF);
                             UInt16 xDeviceID = (UInt16)(x >> 16);
 
-                            Global.Dbg.Send("PCI Ven:" + xVendorID + " Dev:" + xDeviceID);
+                            Global.Dbg.Send("PCI Ven:" + xVendorID.ToHex() + " Dev:" + xDeviceID.ToHex());
                         }
 
-                    //    var xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
+   
+    //    var xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
                     //    if (xPCIDevice.DeviceExists) {
                     //        if (xPCIDevice.HeaderType == 2) { /* PCIHeaderType.Cardbus */
                     //            xPCIDevice = new PCIDeviceCardBus(aBus, xSlot, xFunction);
