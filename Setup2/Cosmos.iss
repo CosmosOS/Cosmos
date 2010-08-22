@@ -135,13 +135,13 @@ Name: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstal
 Name: {app}; Flags: uninsalwaysuninstall
 
 [InstallDelete]
+Type: files; Name: "{code:VSNET2008_PATH|}\PrivateAssemblies\Cosmos.*";
 Type: filesandordirs; Name: "{code:VSNET2008_PATH|}\ProjectTemplates\Cosmos";
 Type: filesandordirs; Name: "{code:GetCSHarpExpress2008ProjectTemplatePath|}\*Cosmos*.*"; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'))
 
 
 
 [Files]
-Source: .\Build\VSIP\InstallCleaner.exe; DestDir: {app}; Flags: dontcopy
 ; Tools
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
@@ -165,7 +165,7 @@ Source: .\Build\VSIP\corapi.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion 
 Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 
 ; wizards
-Source: .\source2\VSIP\Cosmos.VS.Wizards\bin\Debug\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2008_PATH|}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2008_PATH|}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
 
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
 Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO

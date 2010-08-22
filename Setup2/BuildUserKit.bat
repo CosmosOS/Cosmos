@@ -48,9 +48,15 @@ REM xcopy /Y ..\..\source2\Compiler\Cosmos.Compiler.DebugStub\bin\debug\Cosmos.C
 REM xcopy /Y ..\..\source2\Compiler\Cosmos.Compiler.XSharp\bin\debug\Cosmos.Compiler.XSharp.* .
 
 REM Copy templates
-xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" .
-xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosKernel (C#).zip" .
-xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\Cosmos.zip" .
+IF EXIST "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" (
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosKernel (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\Cosmos.zip" .
+) ELSE (
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosKernel (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\Cosmos.zip" .
+)
 
 echo . 
 echo .

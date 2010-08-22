@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-		<ProductVersion>8.0.30703</ProductVersion>
+		<ProductVersion>9.0.30729</ProductVersion>
 		<SchemaVersion>2.0</SchemaVersion>
 		<ProjectGuid>$KernelGuid$</ProjectGuid>
 		<OutputType>Library</OutputType>
@@ -34,9 +34,9 @@
 		<Reference Include="System.Data"/>
 		<Reference Include="System.Xml"/>
 
-        <Reference Include="Cosmos.Hardware2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
-        <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
-        <Reference Include="Cosmos.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
+        <Reference Include="Cosmos.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
+        <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
+        <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
     </ItemGroup>
 	<ItemGroup>
 		<Compile Include="Kernel.cs" />

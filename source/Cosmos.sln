@@ -114,6 +114,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "24703"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -366,37 +367,31 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Bootstrap|x86.Build.0 = Debug|x86
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|x86.ActiveCfg = Debug|x86
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|x86.Build.0 = Debug|x86
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Release|x86.ActiveCfg = Release|x86
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Release|x86.Build.0 = Release|x86
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}.Bootstrap|x86.Build.0 = Debug|x86
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}.Debug|x86.ActiveCfg = Debug|x86
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}.Debug|x86.Build.0 = Debug|x86
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}.Release|x86.ActiveCfg = Release|x86
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}.Release|x86.Build.0 = Release|x86
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{A1F83D9F-2D44-4264-A08B-416797123018}.Bootstrap|x86.Build.0 = Debug|x86
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Debug|x86.ActiveCfg = Debug|x86
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Debug|x86.Build.0 = Debug|x86
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|x86.ActiveCfg = Release|x86
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|x86.Build.0 = Release|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Bootstrap|x86.Build.0 = Debug|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|x86.ActiveCfg = Debug|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|x86.Build.0 = Debug|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|x86.ActiveCfg = Release|x86
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|x86.Build.0 = Release|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Bootstrap|x86.Build.0 = Debug|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Debug|x86.ActiveCfg = Debug|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Debug|x86.Build.0 = Debug|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|x86.ActiveCfg = Release|x86
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|x86.Build.0 = Release|x86
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Bootstrap|x86.Build.0 = Debug|x86
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Debug|x86.ActiveCfg = Debug|x86
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Debug|x86.Build.0 = Debug|x86
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Release|x86.ActiveCfg = Release|x86
@@ -444,7 +439,6 @@ Global
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|x86.ActiveCfg = Release|x86
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|x86.Build.0 = Release|x86
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Bootstrap|x86.ActiveCfg = Debug|x86
-		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Bootstrap|x86.Build.0 = Debug|x86
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|x86.ActiveCfg = Debug|x86
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|x86.Build.0 = Debug|x86
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|x86.ActiveCfg = Release|x86
