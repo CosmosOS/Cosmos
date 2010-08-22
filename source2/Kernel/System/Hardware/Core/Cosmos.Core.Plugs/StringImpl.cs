@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.Kernel.Plugs {
+namespace Cosmos.Core.Plugs {
     //TODO: Move this and other FCL plugs to Cosmos.Plugs assembly. some plugs like Console need hardware
     // but these generics ones should be moved, this does not depend on kernel
-    [Plug(Target = typeof(string))]
-    public class String {
+    public class StringImpl {
         /*public int IndexOf(char c)
 		{
 			// TODO: We can't get 'this'
@@ -92,8 +92,7 @@ namespace Cosmos.Kernel.Plugs {
             return new global::System.String(xChars);
         }
 
-        public static bool Contains(string aThis, string value)
-        {
+        public static bool Contains(string aThis, string value) {
             if (aThis.IndexOf(value) != -1)
                 return true;
             else
@@ -117,8 +116,7 @@ namespace Cosmos.Kernel.Plugs {
             return -1;
         }
 
-        public static bool EndsWith(string aThis, string aSubStr, bool aIgnoreCase, System.Globalization.CultureInfo aCulture)
-        {
+        public static bool EndsWith(string aThis, string aSubStr, bool aIgnoreCase, System.Globalization.CultureInfo aCulture) {
             return EndsWith(aThis, aSubStr, StringComparison.CurrentCulture);
         }
 
@@ -133,15 +131,15 @@ namespace Cosmos.Kernel.Plugs {
                 return true;
 
             int xLastIdx = aThis.Length - aSubStr.Length;
-            for(int i = 0; i < aSubStr.Length; i++) {
-                if(aThis[xLastIdx+i] != aSubStr[i]) {
+            for (int i = 0; i < aSubStr.Length; i++) {
+                if (aThis[xLastIdx + i] != aSubStr[i]) {
                     return false;
                 }
             }
             return true;
         }
 
-//        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
+        //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
 
         public static bool Equals(string aThis, string aThat, StringComparison aComparison) {
 #warning TODO: implement
@@ -165,8 +163,7 @@ namespace Cosmos.Kernel.Plugs {
         }
 
         public static int IndexOf(string aThis,
-                                  string aValue)
-        {
+                                  string aValue) {
             return aThis.IndexOf(aValue, 0, aThis.Length, StringComparison.CurrentCulture);
         }
 
@@ -190,7 +187,7 @@ namespace Cosmos.Kernel.Plugs {
             int xResult = -1;
             for (int i = 0; i < aSeparators.Length; i++) {
                 var xValue = aThis.IndexOf(aSeparators[i],
-                                           aStartIndex, 
+                                           aStartIndex,
                                            aLength);
                 if (xValue < xResult || xResult == -1) {
                     xResult = xValue;
@@ -199,14 +196,12 @@ namespace Cosmos.Kernel.Plugs {
             return xResult;
         }
 
-        public static string Insert(string aThis, int aStartPos, string aValue)
-        {
+        public static string Insert(string aThis, int aStartPos, string aValue) {
             return aThis.Substring(0, aStartPos) + aValue + aThis.Substring(aStartPos);
         }
 
-        public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount)
-        {
-            return LastIndexOfAny(aThis, new char[] {aChar}, aStartIndex, aCount);
+        public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount) {
+            return LastIndexOfAny(aThis, new char[] { aChar }, aStartIndex, aCount);
         }
 
         public static int LastIndexOfAny(string aThis,
@@ -222,8 +217,7 @@ namespace Cosmos.Kernel.Plugs {
             return -1;
         }
 
-        public static int nativeCompareOrdinalEx(string aStrA, int aIndexA, string aStrB, int aIndexB, int aCount)
-        {
+        public static int nativeCompareOrdinalEx(string aStrA, int aIndexA, string aStrB, int aIndexB, int aCount) {
             //Just a basic implementation
             if (aStrA == aStrB)
                 return 0;
@@ -231,13 +225,11 @@ namespace Cosmos.Kernel.Plugs {
                 return -1;
         }
 
-        public static string PadLeft(string aThis, int totalWidth)
-        {
+        public static string PadLeft(string aThis, int totalWidth) {
             return PadLeft(aThis, totalWidth, ' ');
         }
 
-        public static string PadLeft(string aThis, int totalWidth, char paddingChar)
-        {
+        public static string PadLeft(string aThis, int totalWidth, char paddingChar) {
             if (aThis.Length >= totalWidth)
                 return aThis;
 
@@ -247,13 +239,11 @@ namespace Cosmos.Kernel.Plugs {
             return aThis;
         }
 
-        public static string PadRight(string aThis, int totalWidth)
-        {
+        public static string PadRight(string aThis, int totalWidth) {
             return PadRight(aThis, totalWidth, ' ');
         }
 
-        public static string PadRight(string aThis, int totalWidth, char paddingChar)
-        {
+        public static string PadRight(string aThis, int totalWidth, char paddingChar) {
             if (aThis.Length >= totalWidth)
                 return aThis;
 
@@ -263,11 +253,9 @@ namespace Cosmos.Kernel.Plugs {
             return aThis;
         }
 
-        public static string Replace(string aThis, char oldChar, char newChar)
-        {
+        public static string Replace(string aThis, char oldChar, char newChar) {
             string nString = "";
-            for (int i = 0; i < aThis.Length; i++)
-            {
+            for (int i = 0; i < aThis.Length; i++) {
                 if (aThis[i] == oldChar)
                     nString += newChar.ToString();
                 else
@@ -277,15 +265,12 @@ namespace Cosmos.Kernel.Plugs {
             return nString;
         }
 
-        public static bool StartsWith(string aThis, string aSubStr, StringComparison aComparison)
-        {
+        public static bool StartsWith(string aThis, string aSubStr, StringComparison aComparison) {
             return StartsWith(aThis, aSubStr, true, null);
         }
 
-        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, System.Globalization.CultureInfo aCulture)
-        {
-            for (int i = 0; i < aSubStr.Length; i++)
-            {
+        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, System.Globalization.CultureInfo aCulture) {
+            for (int i = 0; i < aSubStr.Length; i++) {
                 if (aThis[i] != aSubStr[i])
                     return false;
             }
@@ -302,15 +287,12 @@ namespace Cosmos.Kernel.Plugs {
             return new string(xChars);
         }
 
-        public static string Remove(string aThis, int aStart, int aCount)
-        {
-            return aThis.Substring(0, aStart) + aThis.Substring(aStart+aCount, aThis.Length-(aStart+aCount));
+        public static string Remove(string aThis, int aStart, int aCount) {
+            return aThis.Substring(0, aStart) + aThis.Substring(aStart + aCount, aThis.Length - (aStart + aCount));
         }
 
-        public static string Replace(string aThis, string oldValue, string newValue)
-        {
-            while (aThis.IndexOf(oldValue) != -1)
-            {
+        public static string Replace(string aThis, string oldValue, string newValue) {
+            while (aThis.IndexOf(oldValue) != -1) {
                 int xIndex = aThis.IndexOf(oldValue);
                 aThis = aThis.Remove(xIndex, oldValue.Length);
                 aThis = aThis.Insert(xIndex, newValue);
@@ -318,25 +300,21 @@ namespace Cosmos.Kernel.Plugs {
             return aThis;
         }
 
-        public static string ToLower(string aThis, System.Globalization.CultureInfo aCulture)
-        {
+        public static string ToLower(string aThis, System.Globalization.CultureInfo aCulture) {
             return ChangeCasing(aThis, 65, 90, 32);
         }
 
-        public static string ToUpper(string aThis, System.Globalization.CultureInfo aCulture)
-        {
+        public static string ToUpper(string aThis, System.Globalization.CultureInfo aCulture) {
             return ChangeCasing(aThis, 97, 122, -32);
         }
 
-        private static string ChangeCasing(string aValue, int lowerAscii, int upperAscii, int offset)
-        {
+        private static string ChangeCasing(string aValue, int lowerAscii, int upperAscii, int offset) {
             char[] xChars = new char[aValue.Length];
 
-            for (int i = 0; i < aValue.Length; i++)
-            {
+            for (int i = 0; i < aValue.Length; i++) {
                 int xAsciiCode = (int)aValue[i];
                 if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii))
-                    xChars[i] = (char)(xAsciiCode+offset);
+                    xChars[i] = (char)(xAsciiCode + offset);
                 else
                     xChars[i] = aValue[i];
             }

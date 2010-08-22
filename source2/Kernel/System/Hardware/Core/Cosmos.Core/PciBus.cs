@@ -33,7 +33,9 @@ namespace Cosmos.Core {
 
         protected void EnumerateBusses() {
             // We have to scan all busses. Normally only 0 and 1 are used.
-            for (byte xBus = 0; xBus < 255; xBus++) {
+            // During dev, just scan first 4...takes too long to scan rest till our
+            // code becomes more optimized, and we can also manually find PCI bridges.
+            for (byte xBus = 0; xBus < 4; xBus++) {
                 // Devices are not always sequential, there could be gaps.
                 for (byte xSlot = 0; xSlot < 32; xSlot++) {
                     // Multi function devices can support up to 8 functions.
@@ -42,7 +44,12 @@ namespace Cosmos.Core {
                     for (byte xFunction = 0; xFunction < 8; xFunction++) {
                         UInt32 xAddr = GetAddressBase(xBus, xSlot, xFunction);
                         // 0xFFFFFFFF is returned when no device exists at this spot
-                        if (ReadRegister(xAddr, 0) != 0xFFFFFFFF) {
+                        UInt32 x = ReadRegister(xAddr, 0);
+                        if (x != 0xFFFFFFFF) {
+                            UInt16 xVendorID = (UInt16)(x & 0xFFFF);
+                            UInt16 xDeviceID = (UInt16)(x >> 16);
+
+                            Global.Dbg.Send("PCI Ven:" + xVendorID + " Dev:" + xDeviceID);
                         }
 
                     //    var xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);

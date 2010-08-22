@@ -6,6 +6,10 @@ using Cosmos.Debug.Kernel;
 
 namespace BreakpointsKernel {
     public class BreakpointsOS : Sys.Kernel {
+        public BreakpointsOS() {
+            ClearScreen = false;
+        }
+
         protected override void BeforeRun() {
             Console.WriteLine("Test");
             //Debugger.Send("Hello from Cosmos!");

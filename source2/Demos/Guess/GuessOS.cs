@@ -5,26 +5,33 @@ using Sys = Cosmos.System;
 
 namespace GuessKernel {
     public class GuessOS : Sys.Kernel {
-        protected override void BeforeRun() {
-            Console.WriteLine("Guess Demo");
+        protected int mCount = 0;
+        protected int mMagicNo = 22;
+
+        public GuessOS() {
+            // Didnt check if tickcount is working yet.. can change this later
+            //var xRandom = new Random(234243534);
+            //mMagicNo = xRandom.Next(1, 100);
         }
 
-        protected int xCount = 0;
-        protected int xMagicNo = 22;
+        protected override void BeforeRun() {
+            Console.WriteLine("Guess Demo");
+            Console.WriteLine("Please guess a number from 1 to 100.");
+        }
 
         protected override void Run() {
-            xCount++;
+            mCount++;
             Console.WriteLine();
-            Console.WriteLine("Guess #" + xCount);
+            Console.WriteLine("Guess #" + mCount);
             Console.Write("Please enter a guess: ");
             string xInputStr = Console.ReadLine();
             Console.Write("Input length: ");
             Console.WriteLine(xInputStr.Length.ToString());
             int xGuess = int.Parse(xInputStr);
             Console.WriteLine("Your guess was " + xGuess);
-            if (xGuess < xMagicNo) {
+            if (xGuess < mMagicNo) {
                 Console.WriteLine("Too low.");
-            } else if (xGuess > xMagicNo) {
+            } else if (xGuess > mMagicNo) {
                 Console.WriteLine("Too high.");
             } else {
                 Console.WriteLine("You guessed it!");

@@ -6,6 +6,8 @@ using System.Text;
 namespace Cosmos.System {
     // MtW: if the fullname (namespace + name) of this class changes, please also change IL2CPU msbuild task
     public abstract class Kernel {
+        public readonly Debug.Kernel.Debugger Dbg = new Debug.Kernel.Debugger("User", "");
+
         public bool ClearScreen = true;
         // Set to true to hide messages during boot.
         public bool Silent = false;

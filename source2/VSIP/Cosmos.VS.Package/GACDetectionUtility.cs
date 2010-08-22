@@ -18,6 +18,10 @@ namespace Cosmos.VS.Package
 
         public static bool IsAssemblyFileFromGAC(string filename)
         {
+            if (String.IsNullOrEmpty(filename)) {
+                // if filename is empty, assume gac as well
+                return true;
+            }
             if (mGACDirs == null)
             {
                 #region initialize

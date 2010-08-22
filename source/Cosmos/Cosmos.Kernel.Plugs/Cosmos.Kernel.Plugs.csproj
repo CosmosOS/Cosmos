@@ -86,7 +86,6 @@
     <Compile Include="HeapImpl.cs" />
     <Compile Include="Interlocked.cs" />
     <Compile Include="PagingUtilityImpl.cs" />
-    <Compile Include="String.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThreadImpl.cs" />
   </ItemGroup>

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="CPU.cs" />
+    <Compile Include="DeviceIDAttribute.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Heap.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
