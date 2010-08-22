@@ -177,9 +177,9 @@ Source: .\Build\VSIP\CosmosProject (C#).zip; DestDir: {code:VSNET2008_PATH|}\Pro
 ; ; Install templates into Shell
 Source: .\Build\VSIP\Cosmos.zip; DestDir: {code:VSNET2008_PATH|}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') or IsVBExpress2008Installed('dummy')
 ; ; Install templates into C# Express
-Source: .\Build\VSIP\CosmosKernel (C#).zip; DestDir: {code:GetCSharpExpress2008ProjectTemplatePath|}; DestName: CosmosKernel (C#).zip; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'))
+Source: .\Build\VSIP\CosmosKernel (C#).zip; DestDir: {code:GetCSharpExpress2008ProjectTemplatePath|}; DestName: CosmosKernel (C#).zip; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2008Installed('dummy')
 ; ; Install templates into VB Express
-;Source: ".\Build\VSIP\CosmosKernel (VB).zip";  DestDir: {code:GetVBExpress2008ProjectTemplatePath|}; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2008Installed('dummy') and (not Vb2008_Installed('dummy'));
+;Source: ".\Build\VSIP\CosmosKernel (VB).zip";  DestDir: {code:GetVBExpress2008ProjectTemplatePath|}; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2008Installed('dummy')
 
 
 [Registry]
