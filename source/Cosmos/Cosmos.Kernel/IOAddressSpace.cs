@@ -17,7 +17,7 @@ namespace Cosmos.Kernel
 
         public override string ToString()
         {
-            return String.Concat("IOAddressSpace, offset = ", Offset.ToHex(), ", size = ", Size.ToHex());
+            return ""; // String.Concat("IOAddressSpace, offset = ", Offset.ToHex(), ", size = ", Size.ToHex());
         }
 
         public override byte Read8( UInt32 offset )

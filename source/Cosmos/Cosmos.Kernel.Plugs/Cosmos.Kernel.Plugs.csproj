@@ -71,7 +71,6 @@
     <Compile Include="Assemblers\DisableInterrupts.cs" />
     <Compile Include="Assemblers\DisablePaging.cs" />
     <Compile Include="Assemblers\DisablePSE.cs" />
-    <Compile Include="Assemblers\DoTest.cs" />
     <Compile Include="Assemblers\EnableInterrupts.cs" />
     <Compile Include="Assemblers\EnablePaging.cs" />
     <Compile Include="Assemblers\EnablePSE.cs" />
@@ -79,8 +78,6 @@
     <Compile Include="Assemblers\GetCurrentESP.cs" />
     <Compile Include="Assemblers\GetMBIAddress.cs" />
     <Compile Include="Assemblers\InitFloat.cs" />
-    <Compile Include="Assemblers\Interrupt30.cs" />
-    <Compile Include="Assemblers\InvalidatePage.cs" />
     <Compile Include="Assemblers\SetPageDirectory.cs" />
     <Compile Include="GCImplementationImpl.cs" />
     <Compile Include="HeapImpl.cs" />

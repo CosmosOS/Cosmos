@@ -33,10 +33,5 @@ namespace Cosmos.Kernel.Plugs
         {
             //Assembler
         }
-        [PlugMethod(Assembler=typeof(Assemblers.ASMInvalidatePage))]
-        public static void InvalidatePage(uint Address)
-        {
-            //Assembler
-        }
     }
 }

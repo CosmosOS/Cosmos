@@ -109,7 +109,7 @@ namespace Cosmos.Hardware2.Network.TCPIPModel.PhysicalLayer.Ethernet2
             sb.Append(Environment.NewLine);
             sb.Append("Source: " + this.Source.ToString());
             sb.Append(Environment.NewLine);
-            sb.Append("Type: 0x" + this.EtherType[0].ToHex() + this.EtherType[1].ToHex());
+            //sb.Append("Type: 0x" + this.EtherType[0].ToHex() + this.EtherType[1].ToHex());
             sb.Append(Environment.NewLine);
             sb.Append("Payload size: " + this.Payload.Length);
             sb.Append(Environment.NewLine);

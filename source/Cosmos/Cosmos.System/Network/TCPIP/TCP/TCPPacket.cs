@@ -220,8 +220,8 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
 
         public override string ToString()
         {
-            return "TCP Packet Src=" + sourceIP + ":" + sourcePort + ", Dest=" + destIP + ":" + destPort +
-                ",Flags=" + tcpFlags.ToHex(2) + ",SeqNo=" + seqNum + ",AckNum=" + ackNum + ", DataLen=" + TCP_DataLength;
+            return ""; // "TCP Packet Src=" + sourceIP + ":" + sourcePort + ", Dest=" + destIP + ":" + destPort +
+                 //",Flags=" + tcpFlags.ToHex(2) + ",SeqNo=" + seqNum + ",AckNum=" + ackNum + ", DataLen=" + TCP_DataLength;
         }
 
         internal void AddMSSOption(int mss)

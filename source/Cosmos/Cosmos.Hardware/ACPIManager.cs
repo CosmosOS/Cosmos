@@ -47,7 +47,7 @@ namespace Cosmos.Hardware2
             {
                 get
                 {
-                    return Signature0.ToHex(8) + Signature1.ToHex(8);
+                    return ""; // Signature0.ToHex(8) + Signature1.ToHex(8);
                 }
             }
             public string OemID
@@ -199,7 +199,7 @@ namespace Cosmos.Hardware2
 
                 Found = true;
 
-                Console.WriteLine("Found Version "  + Rsd.Revision + " (" + Rsd.OemID + ") @ " + rsdp.ToHex(8));
+                //Console.WriteLine("Found Version "  + Rsd.Revision + " (" + Rsd.OemID + ") @ " + rsdp.ToHex(8));
 
                 acpi_table_header* Rsdt = (acpi_table_header*)Rsd.RsdtAddress;
                 uint i = Rsdt->length;
@@ -214,7 +214,6 @@ namespace Cosmos.Hardware2
                 {
                     ACPITable[j] = *(uint*)(rsdt + 36 +j*4);
                     acpi_table_header* header = (acpi_table_header*)ACPITable[j];
-                    Console.WriteLine(j.ToHex(2) + " @" + ACPITable[j].ToHex(8) + " " + header->Signature);
                     
                         
                 }

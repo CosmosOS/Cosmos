@@ -84,7 +84,7 @@ namespace Cosmos.Sys.Network.TCPIP
 
         public override string ToString()
         {
-            return "Ethernet Packet : Src=" + srcMAC + ", Dest=" + destMAC + ", Type=" + aEtherType.ToHex(4);
+            return ""; // "Ethernet Packet : Src=" + srcMAC + ", Dest=" + destMAC + ", Type=" + aEtherType.ToHex(4);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Cosmos.Hardware.SMBIOS
 
             for( uint i = 0; i < count; i++ )
             {
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( Memory.Read8Unchecked( from + i ), 2 ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( Memory.Read8Unchecked( from + i ), 2 ) );
                 Console.Write( " " );
                 j++;
                 if( j == column )
@@ -45,32 +45,32 @@ namespace Cosmos.Hardware.SMBIOS
                 a.GetSMBIOS_Data();
  
                 Console.Write( " SMBios found at: 0x" );
-                Console.Write(Cosmos.Kernel.HexExtension.ToHex(a.SMBBIOSAddress, 8));
+                //Console.Write(Cosmos.Kernel.HexExtension.ToHex(a.SMBBIOSAddress, 8));
                 Console.Write( " Version: " );
                 Console.Write(a.SMBIOS_Data.SMBIOSMajorVersion);
                 Console.Write( "." );
                 Console.WriteLine(a.SMBIOS_Data.SMBIOSMinorVersion);
 
                 Console.Write( " Signature: " );
-                Console.WriteLine( Cosmos.Kernel.HexExtension.ToHex( a.Signature ) );
+                //Console.WriteLine( Cosmos.Kernel.HexExtension.ToHex( a.Signature ) );
 
                 Console.WriteLine( " SMBIOS dump: " );
 
                 DumpBytes( a.SMBBIOSAddress, 32, 16 );
                 Console.WriteLine( "" );
 
-                Console.Write( " SMBIOS anchor:  " );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 0 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 1 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 2 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 3 ] ) );
+                //Console.Write( " SMBIOS anchor:  " );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 0 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 1 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 2 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.AnchorString[ 3 ] ) );
 
-                Console.Write( " DMI anchor: " );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 0 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 1 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 2 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 3 ] ) );
-                Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 4 ] ) );
+                //Console.Write( " DMI anchor: " );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 0 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 1 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 2 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 3 ] ) );
+                //Console.Write( Cosmos.Kernel.HexExtension.ToHex( a.SMBIOS_Data.IntermediateAnchorString[ 4 ] ) );
 
                 Console.Write( " Number of tables:" );
                 Console.Write( a.SMBIOS_Data.NumberOfSMBIOSStructures );
