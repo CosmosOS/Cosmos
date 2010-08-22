@@ -3,29 +3,24 @@
 <h3>
     To Do</h3>
     <ul>
+        <li>int.parse plug<ul>
+            <li>plug article</li>
+            </ul>
+        </li>
         <li>Guess Demo</li>
         <li>Watches - at least locals first</li>
 </ul>
 <h3>
     Matthijs - Next Release</h3>
 <ul>
-    <li>Try to run Guess: (int.Parse causes this) error: symbol 
-        `System_UInt32__Cosmos_IL2CPU_RuntimeEngine_Heap_AllocNewObject_System_UInt32_&#39; 
-        undefined</li>
     <li>
-        <pre wrap="">bug in vsip. when creating the project, the (fake-)gac references dont
-resolve, but when closing and opening the solution, it works. dammit.
-we had this for project references as well, but then somehow fixed it.
-may take some time..</pre>
-    </li>
-    <li>Fix and move plugs<ul>
-        <li>Remove refs from MSBuild task to plugs</li>
+                Fix and move plugs<ul>
+            <li>Remove refs from MSBuild task to plugs - Debugger one</li>
+            <li>add aThis to the debugger plugs</li>
         </ul>
     </li>
-    <li>Change to new kernel lib format</li>
+    <li>please remind me to update templates to include the debugger plugs</li>
     <li>Express isnt showing any templates</li>
-    <li>For VMWare Workstation, if not found, fall back automatically to Player without 
-        changing the option in the properties. Just fallback at runtime.</li>
 </ul>
     <h3>
         Matthijs - Next Release + 1</h3>
@@ -68,8 +63,9 @@ may take some time..</pre>
         </li>
 </ul>
 <h3>
-    Post MS5</h3>
+    Even later</h3>
 <ul>
+    <li>localloc - int.parse needs plug for now because of this.</li>
     <li>use INT3 for BP? Will save 3 bytes per call.. which is a lot...</li>
     <li>Gradual X# upgrades (Kudzu)</li>
     <li>Filesystem</li>
