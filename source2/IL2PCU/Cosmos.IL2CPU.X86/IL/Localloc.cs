@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xId = MethodInfoLabelGenerator.GenerateLabelName( RuntimeEngineRefs.Heap_AllocNewObjectRef );
+            var xId = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef);
             new CPUx86.Call { DestinationLabel = xId };
             new CPUx86.Move
             {
