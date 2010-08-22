@@ -18,6 +18,8 @@ namespace GuessKernel {
             Console.WriteLine("Guess #" + xCount);
             Console.Write("Please enter a guess: ");
             string xInputStr = Console.ReadLine();
+            Console.Write("Input length: ");
+            Console.WriteLine(xInputStr.Length.ToString());
             int xGuess = int.Parse(xInputStr);
             Console.WriteLine("Your guess was " + xGuess);
             if (xGuess < xMagicNo) {

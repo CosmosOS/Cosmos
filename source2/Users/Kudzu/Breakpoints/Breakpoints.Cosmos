@@ -65,6 +65,12 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+      <AssemblyName>Cosmos.Debug.Kernel.Plugs.dll</AssemblyName>
+    </Reference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
   </Target>
