@@ -55,6 +55,7 @@
     <Compile Include="Heap.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
     <Compile Include="IOGroup\PciBus.cs" />
+    <Compile Include="IOGroup\PciDevice.cs" />
     <Compile Include="IOGroup\PIC.cs" />
     <Compile Include="INTs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />

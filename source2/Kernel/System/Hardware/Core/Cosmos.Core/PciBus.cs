@@ -6,6 +6,17 @@ using Cosmos.Common.Extensions;
 
 namespace Cosmos.Core {
     public class PciBus {
+        public class PciInfo {
+            public readonly UInt16 VendorID;
+            public readonly UInt16 DeviceID;
+
+            public PciInfo(UInt16 aVendorID, UInt16 aDeviceID) {
+                VendorID = aVendorID;
+                DeviceID = aDeviceID;
+            }
+        }
+        static public Action<PciInfo, IOGroup.PciDevice> OnPCIDeviceFound;
+
         protected IOGroup.PciBus IO = new IOGroup.PciBus();
 
         public PciBus() {
@@ -50,7 +61,9 @@ namespace Cosmos.Core {
                             UInt16 xVendorID = (UInt16)(x & 0xFFFF);
                             UInt16 xDeviceID = (UInt16)(x >> 16);
 
-                            Global.Dbg.Send("PCI Ven:" + xVendorID.ToHex() + " Dev:" + xDeviceID.ToHex());
+                            var xInfo = new PciInfo(xVendorID, xDeviceID);
+                            var xIO = new IOGroup.PciDevice();
+                            OnPCIDeviceFound(xInfo, xIO);
                         }
 
    
