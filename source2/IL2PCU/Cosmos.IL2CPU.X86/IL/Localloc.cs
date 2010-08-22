@@ -21,16 +21,17 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xId = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef);
-            new CPUx86.Call { DestinationLabel = xId };
-            new CPUx86.Move
-            {
-                DestinationReg = CPUx86.Registers.EBP,
-                DestinationIsIndirect = true,
-                //DestinationDisplacement = mLocallocOffset,
-                SourceReg = CPUx86.Registers.ESP,
-                SourceIsIndirect = true
-            };
+            //var xId = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef);
+            //new CPUx86.Call { DestinationLabel = xId };
+            //new CPUx86.Move
+            //{
+            //    DestinationReg = CPUx86.Registers.EBP,
+            //    DestinationIsIndirect = true,
+            //    //DestinationDisplacement = mLocallocOffset,
+            //    SourceReg = CPUx86.Registers.ESP,
+            //    SourceIsIndirect = true
+            //};
+            throw new NotImplementedException("Localloc is not yet implemented!");
         }
 
 

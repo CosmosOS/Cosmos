@@ -467,20 +467,17 @@ namespace Microsoft.VisualStudio.Project
 		/// </summary>
 		private void SetReferenceProperties()
 		{
+            
 			// Set a default HintPath for msbuild to be able to resolve the reference.
 			this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
 
 			// Resolve assembly referernces. This is needed to make sure that properties like the full path
 			// to the assembly or the hint path are set.
-            //if(this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful)
-            //{
-            //    return;
-            //}
-            if (this.ProjectMgr.Build(MsBuildTarget.Build) != MSBuildResult.Successful)
+            if(this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful)
             {
                 return;
             }
-
+            
 			// Check if we have to resolve again the path to the assembly.
 			if(string.IsNullOrEmpty(this.assemblyPath))
 			{
@@ -503,15 +500,7 @@ namespace Microsoft.VisualStudio.Project
 			}
 
             MSBuild.BuildItemGroup group = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(ProjectFileConstants.ReferencePath);
-            if (group == null)
-            {
-                if (!this.ProjectMgr.BuildProject.Build("ResolveAssemblyReferences"))
-                {
-                    MessageBox.Show("Error when calling ResolveAssemblyReferences target");
-                }
-                group = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(ProjectFileConstants.ReferencePath);
-            }
-			if(group != null)
+            if(group != null)
 			{
 				IEnumerator enumerator = group.GetEnumerator();
 
