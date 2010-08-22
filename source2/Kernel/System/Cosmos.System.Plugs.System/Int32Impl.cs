@@ -6,7 +6,7 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.System.Plugs.System {
     [Plug(Target = typeof(Int32))]
     public class Int32Impl {
-        protected static readonly char[] Digits = "0123456789".ToCharArray();
+        protected static readonly string Digits = "0123456789";
 
         // error during compile about "Plug needed."
        //     Error	11	Plug needed. System.RuntimeTypeHandle  System.Type.get_TypeHandle()
@@ -20,7 +20,7 @@ namespace Cosmos.System.Plugs.System {
             int xResult = 0;
             for (int i = s.Length - 1; i >= 0; i--) {
                 xResult = xResult * 10;
-                int j = Array.IndexOf(Digits, s[i]);
+                int j = Digits.IndexOf(s[i]);
                 if (j == -1) {
                     throw new Exception("Non numeric digit found in int.parse");
                 }

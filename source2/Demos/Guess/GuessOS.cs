@@ -16,9 +16,10 @@ namespace GuessKernel {
             xCount++;
             Console.WriteLine();
             Console.WriteLine("Guess #" + xCount);
-            Console.WriteLine("Please enter a guess:");
+            Console.Write("Please enter a guess: ");
             string xInputStr = Console.ReadLine();
             int xGuess = int.Parse(xInputStr);
+            Console.WriteLine("Your guess was " + xGuess);
             if (xGuess < xMagicNo) {
                 Console.WriteLine("Too low.");
             } else if (xGuess > xMagicNo) {
