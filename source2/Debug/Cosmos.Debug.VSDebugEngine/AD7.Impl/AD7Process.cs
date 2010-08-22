@@ -76,6 +76,10 @@ namespace Cosmos.Debug.VSDebugEngine {
             {
                 case VMwareFlavor.Workstation:
                     xVmwPath = GetVMWareWorkstationPath();
+                    if (String.IsNullOrEmpty(xVmwPath))
+                    {
+                        goto case VMwareFlavor.Player;
+                    }
                     mProcessStartInfo.Arguments = "false \"" + xVmwPath + "\" -x -q \"" + xPath + "Debug.vmx\"";
                     break;
                 case VMwareFlavor.Player:
