@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using MSBuild = Microsoft.Build.BuildEngine;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Cosmos.VS.Package;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -122,7 +123,7 @@ namespace Microsoft.VisualStudio.Project
 		public AssemblyReferenceNode(ProjectNode root, ProjectElement element)
 			: base(root, element)
 		{
-			this.GetPathNameFromProjectFile();
+         	this.GetPathNameFromProjectFile();
 
 			this.InitializeFileChangeEvents();
 
@@ -417,59 +418,62 @@ namespace Microsoft.VisualStudio.Project
 			this.ResolveAssemblyReference();
 		}
 
-		private void SetHintPathAndPrivateValue()
-		{
+        private void SetHintPathAndPrivateValue()
+        {
+            // Private means local copy; we want to know if it is already set to not override the default
+            string privateValue = this.ItemNode.GetMetadata(ProjectFileConstants.Private);
 
-			// Private means local copy; we want to know if it is already set to not override the default
-			string privateValue = this.ItemNode.GetMetadata(ProjectFileConstants.Private);
+            // Get the list of items which require HintPath
+            Microsoft.Build.BuildEngine.BuildItemGroup references = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
 
-			// Get the list of items which require HintPath
-			Microsoft.Build.BuildEngine.BuildItemGroup references = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
+            // Remove the HintPath, we will re-add it below if it is needed
+            if (!String.IsNullOrEmpty(this.assemblyPath))
+            {
+                this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
+                if (GACDetectionUtility.IsAssemblyFileFromGAC(assemblyPath))
+                {
+                    return;
+                }
+            }
 
-			// Remove the HintPath, we will re-add it below if it is needed
-			if(!String.IsNullOrEmpty(this.assemblyPath))
-			{
-				this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
-			}
+            // Now loop through the generated References to find the corresponding one
+            foreach (Microsoft.Build.BuildEngine.BuildItem reference in references)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(reference.FinalItemSpec);
+                if (String.Compare(fileName, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    // We found it, now set some properties based on this.
 
-			// Now loop through the generated References to find the corresponding one
-			foreach(Microsoft.Build.BuildEngine.BuildItem reference in references)
-			{
-				string fileName = Path.GetFileNameWithoutExtension(reference.FinalItemSpec);
-				if(String.Compare(fileName, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase) == 0)
-				{
-					// We found it, now set some properties based on this.
+                    string hintPath = reference.GetMetadata(ProjectFileConstants.HintPath);
+                    if (!String.IsNullOrEmpty(hintPath))
+                    {
+                        if (Path.IsPathRooted(hintPath))
+                        {
+                            hintPath = PackageUtilities.GetPathDistance(this.ProjectMgr.BaseURI.Uri, new Uri(hintPath));
+                        }
 
-					string hintPath = reference.GetMetadata(ProjectFileConstants.HintPath);
-					if(!String.IsNullOrEmpty(hintPath))
-					{
-						if(Path.IsPathRooted(hintPath))
-						{
-							hintPath = PackageUtilities.GetPathDistance(this.ProjectMgr.BaseURI.Uri, new Uri(hintPath));
-						}
-
-						this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, hintPath);
-						// If this is not already set, we default to true
-						if(String.IsNullOrEmpty(privateValue))
-						{
-							this.ItemNode.SetMetadata(ProjectFileConstants.Private, true.ToString());
-						}
-					}
-					break;
-				}
-
-			}
-
-		}
+                        this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, hintPath);
+                        // If this is not already set, we default to true
+                        if (String.IsNullOrEmpty(privateValue))
+                        {
+                            this.ItemNode.SetMetadata(ProjectFileConstants.Private, true.ToString());
+                        }
+                    }
+                    break;
+                }
+            }
+        }
 
 		/// <summary>
 		/// This function ensures that some properies of the reference are set.
 		/// </summary>
 		private void SetReferenceProperties()
 		{
-            
-			// Set a default HintPath for msbuild to be able to resolve the reference.
-			this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
+            if (!GACDetectionUtility.IsAssemblyFileFromGAC(assemblyPath))
+            {
+                // Set a default HintPath for msbuild to be able to resolve the reference.
+                this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
+            }
 
 			// Resolve assembly referernces. This is needed to make sure that properties like the full path
 			// to the assembly or the hint path are set.

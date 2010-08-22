@@ -121,6 +121,7 @@
     <Compile Include="DebugPageSub.Designer.cs">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
     </Compile>
+    <Compile Include="GACDetectionUtility.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogUtility.cs" />
