@@ -82,14 +82,6 @@ namespace Cosmos.Build.MSBuild
 
         private static Action<string> mStaticLog = null;
 
-        private void DoInitTypes()
-        {
-            Type xType;
-            // Old
-            xType = typeof(Cosmos.Debug.Kernel.Plugs.Debugger);
-            var xName = xType.FullName;
-        }
-
         #region properties
         [Required]
         public string DebugMode{
@@ -147,7 +139,6 @@ namespace Cosmos.Build.MSBuild
         private bool Initialize()
         {
             CheckFirstTime();            
-            DoInitTypes();
             // load searchpaths:
             Log.LogMessage("SearchPath: '{0}'", References);
             if (References!=null)

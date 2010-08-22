@@ -7,15 +7,15 @@ using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.Debug.Kernel.Plugs {
     [Plug(Target = typeof(Cosmos.Debug.Kernel.Debugger))]
-    public class Debugger {
+    public static class Debugger {
         [PlugMethod(Assembler = typeof(DebugBreak))]
-        public void Break() { }
+        public static void Break(Kernel.Debugger aThis) { }
 
         [PlugMethod(Assembler = typeof(DebugSend))]
-        public unsafe void Send(int aLength, char* aText) { }
+        public static unsafe void Send(Kernel.Debugger aThis, int aLength, char* aText) { }
 
         [PlugMethod(Assembler = typeof(DebugSendPtr))]
-        public unsafe void SendPtr(object aPtr) { }
+        public static unsafe void SendPtr(Kernel.Debugger aThis, object aPtr) { }
 
         //[PlugMethod(Assembler = typeof(DebugTraceOff))]
         //public static void TraceOff() { }

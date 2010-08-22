@@ -17,7 +17,7 @@
     <BuildTarget>VMWare</BuildTarget>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <DebugMode>None</DebugMode>
+    <DebugMode>Source</DebugMode>
     <EnableGDB>False</EnableGDB>
     <TraceMode>
     </TraceMode>
