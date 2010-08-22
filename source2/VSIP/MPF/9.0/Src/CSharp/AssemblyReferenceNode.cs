@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using MSBuild = Microsoft.Build.BuildEngine;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -25,7 +26,21 @@ namespace Microsoft.VisualStudio.Project
 		private System.Reflection.AssemblyName assemblyName;
 		private AssemblyName resolvedAssemblyName;
 
-		private string assemblyPath = String.Empty;
+		private string m_assemblyPath = String.Empty;
+        private string assemblyPath
+        {
+            get
+            {
+                return m_assemblyPath;
+            }
+            set
+            {
+                if (value != m_assemblyPath)
+                {
+                    m_assemblyPath = value;
+                }
+            }
+        }
 
 		/// <summary>
 		/// Defines the listener that would listen on file changes on the nested project node.
@@ -114,6 +129,7 @@ namespace Microsoft.VisualStudio.Project
 			string include = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
 
 			this.CreateFromAssemblyName(new System.Reflection.AssemblyName(include));
+            BindReferenceData();
 		}
 
         private static string RelativePathTo(string fromDirectory, string toPath)
@@ -344,7 +360,10 @@ namespace Microsoft.VisualStudio.Project
 		{
 			if(String.IsNullOrEmpty(this.assemblyPath) || !File.Exists(this.assemblyPath) || !this.ProjectMgr.HasPassedSecurityChecks)
 			{
-				return false;
+                if (resolvedAssemblyName == null)
+                {
+                    return false;
+                }
 			}
 
 			return true;
@@ -453,10 +472,14 @@ namespace Microsoft.VisualStudio.Project
 
 			// Resolve assembly referernces. This is needed to make sure that properties like the full path
 			// to the assembly or the hint path are set.
-			if(this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful)
-			{
-				return;
-			}
+            //if(this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful)
+            //{
+            //    return;
+            //}
+            if (this.ProjectMgr.Build(MsBuildTarget.Build) != MSBuildResult.Successful)
+            {
+                return;
+            }
 
 			// Check if we have to resolve again the path to the assembly.
 			if(string.IsNullOrEmpty(this.assemblyPath))
@@ -479,7 +502,15 @@ namespace Microsoft.VisualStudio.Project
 				return;
 			}
 
-			MSBuild.BuildItemGroup group = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(ProjectFileConstants.ReferencePath);
+            MSBuild.BuildItemGroup group = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(ProjectFileConstants.ReferencePath);
+            if (group == null)
+            {
+                if (!this.ProjectMgr.BuildProject.Build("ResolveAssemblyReferences"))
+                {
+                    MessageBox.Show("Error when calling ResolveAssemblyReferences target");
+                }
+                group = this.ProjectMgr.BuildProject.GetEvaluatedItemsByName(ProjectFileConstants.ReferencePath);
+            }
 			if(group != null)
 			{
 				IEnumerator enumerator = group.GetEnumerator();
