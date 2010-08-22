@@ -11,9 +11,9 @@ namespace BreakpointsKernel {
         }
 
         protected override void BeforeRun() {
-            Console.WriteLine("Hello " + 5.ToString());
+            Console.WriteLine("Hello " + 6.ToString());
             //Debugger.Send("Hello from Cosmos!");
-            Console.WriteLine("4 Cosmos booted successfully. Type a line of text to get it echoed back.");
+            Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
             //Debugger.Break();
             Console.WriteLine("Test");
         }
