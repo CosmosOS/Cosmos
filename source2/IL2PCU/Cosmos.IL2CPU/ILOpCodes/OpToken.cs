@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpToken : ILOpCode {
-    public readonly UInt32 Value;
+      public readonly Int32 Value;
     public readonly FieldInfo ValueField;
     public readonly Type ValueType;
 
@@ -41,16 +41,16 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         }
     }
 
-    public OpToken(Code aOpCode, int aPos, int aNextPos, UInt32 aValue, Module aModule, Type[] aTypeGenericArgs, Type[] aMethodGenericArgs, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpToken(Code aOpCode, int aPos, int aNextPos, Int32 aValue, Module aModule, Type[] aTypeGenericArgs, Type[] aMethodGenericArgs, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
       if (ValueIsField)
       {
-          ValueField = aModule.ResolveField((int)Value, aTypeGenericArgs, aMethodGenericArgs);
+          ValueField = aModule.ResolveField(Value, aTypeGenericArgs, aMethodGenericArgs);
       }
       if (ValueIsType)
       {
-          ValueType = aModule.ResolveType((int)Value, aTypeGenericArgs, aMethodGenericArgs);
+          ValueType = aModule.ResolveType(Value, aTypeGenericArgs, aMethodGenericArgs);
       }
 
     }

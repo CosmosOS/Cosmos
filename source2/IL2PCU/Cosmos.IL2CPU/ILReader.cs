@@ -184,7 +184,7 @@ namespace Cosmos.IL2CPU {
                   xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 8, xCurrentHandler);
                   break;
                 case ILOpCode.Code.Ldc_I4_M1:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 0xFFFFFFFF, xCurrentHandler);
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, -1, xCurrentHandler);
                   break;
                 case ILOpCode.Code.Ldloc_0:
                   xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 0, xCurrentHandler);
@@ -279,7 +279,7 @@ namespace Cosmos.IL2CPU {
                     #endregion
                 }
           case OperandType.InlineBrTarget: {
-              int xTarget = xPos + 4 + (Int32)ReadUInt32(xIL, xPos);
+              int xTarget = xPos + 4 + (Int32)ReadInt32(xIL, xPos);
               CheckBranch(xTarget, xIL.Length);
               xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 4, xTarget, xCurrentHandler);
               xPos = xPos + 4;
@@ -289,24 +289,16 @@ namespace Cosmos.IL2CPU {
           case OperandType.ShortInlineI:
             switch (xOpCodeVal) {
               case ILOpCode.Code.Ldc_I4_S:
-                    // x = x & 0xFFFFFFFC;
-                    // The above code produces:
-                    // ldc.i4.s -4
-                    // But its getting loaded into a I4, so we have to "extend" it
-                    //
-                    // First we have to cast it to a signed byte, so .NET will extend it properly to a uint.
-                    sbyte xSVal = (sbyte)xIL[xPos];
-                    uint xVal = (uint)xSVal;
-                    xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos + 1, xVal, xCurrentHandler);
+                    xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos + 1, ((sbyte)xIL[xPos]), xCurrentHandler);
                 break;
               default:
-                xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 1, xIL[xPos], xCurrentHandler);
+                xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 1, ((sbyte)xIL[xPos]), xCurrentHandler);
                 break;
             }
             xPos = xPos + 1;
             break;
           case OperandType.InlineI:
-            xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 4, ReadUInt32(xIL, xPos), xCurrentHandler);
+            xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), xCurrentHandler);
             xPos = xPos + 4;
             break;
           case OperandType.InlineI8:
@@ -325,7 +317,7 @@ namespace Cosmos.IL2CPU {
 
           // The operand is a 32-bit metadata token.
           case OperandType.InlineField: {
-              var xValue = aMethod.Module.ResolveField((int)ReadUInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
+              var xValue = aMethod.Module.ResolveField((int)ReadInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
               xILOpCode = new ILOpCodes.OpField(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentHandler);
               xPos = xPos + 4;
               break;
@@ -333,7 +325,7 @@ namespace Cosmos.IL2CPU {
 
           // The operand is a 32-bit metadata token.
           case OperandType.InlineMethod: {
-              var xValue = aMethod.Module.ResolveMethod((int)ReadUInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
+              var xValue = aMethod.Module.ResolveMethod((int)ReadInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
               xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentHandler);
               xPos = xPos + 4;
               break;
@@ -342,22 +334,22 @@ namespace Cosmos.IL2CPU {
           // 32-bit metadata signature token.
           case OperandType.InlineSig:
             //TODO: What are these used for? A breakpoint causes no breaks with current tests...
-              xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, xOpPos, xPos + 4, ReadUInt32(xIL, xPos), xCurrentHandler);
+              xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), xCurrentHandler);
             xPos = xPos + 4;
             break;
 
           case OperandType.InlineString:
-            xILOpCode = new ILOpCodes.OpString(xOpCodeVal, xOpPos, xPos + 4, aMethod.Module.ResolveString((int)ReadUInt32(xIL, xPos)), xCurrentHandler);
+            xILOpCode = new ILOpCodes.OpString(xOpCodeVal, xOpPos, xPos + 4, aMethod.Module.ResolveString((int)ReadInt32(xIL, xPos)), xCurrentHandler);
             xPos = xPos + 4;
             break;
 
           case OperandType.InlineSwitch: {
-              int xCount = (int)ReadUInt32(xIL, xPos);
+              int xCount = (int)ReadInt32(xIL, xPos);
               xPos = xPos + 4;
               int xNextOpPos = xPos + xCount * 4;
               int[] xBranchLocations = new int[xCount];
               for (int i = 0; i < xCount; i++) {
-                xBranchLocations[i] = xNextOpPos + (int)ReadUInt32(xIL, xPos + i * 4);
+                xBranchLocations[i] = xNextOpPos + (int)ReadInt32(xIL, xPos + i * 4);
                 CheckBranch(xBranchLocations[i], xIL.Length);
               }
               xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal, xOpPos, xPos, xBranchLocations, xCurrentHandler);
@@ -367,13 +359,13 @@ namespace Cosmos.IL2CPU {
 
           // The operand is a FieldRef, MethodRef, or TypeRef token.
           case OperandType.InlineTok:
-              xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, xOpPos, xPos + 4, ReadUInt32(xIL, xPos), aMethod.Module, xTypeGenArgs, xMethodGenArgs, xCurrentHandler);
+              xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), aMethod.Module, xTypeGenArgs, xMethodGenArgs, xCurrentHandler);
             xPos = xPos + 4;
             break;
 
           // 32-bit metadata token.
           case OperandType.InlineType: {
-              var xValue = aMethod.Module.ResolveType((int)ReadUInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
+              var xValue = aMethod.Module.ResolveType((int)ReadInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
               xILOpCode = new ILOpCodes.OpType(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentHandler);
               xPos = xPos + 4;
               break;
@@ -424,8 +416,8 @@ namespace Cosmos.IL2CPU {
       return (UInt16)(aBytes[aPos + 1] << 8 | aBytes[aPos]);
     }
 
-    private UInt32 ReadUInt32(byte[] aBytes, int aPos) {
-      return (UInt32)(aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
+    private Int32 ReadInt32(byte[] aBytes, int aPos) {
+      return (Int32)(aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
     }
 
     private UInt64 ReadUInt64(byte[] aBytes, int aPos) {
