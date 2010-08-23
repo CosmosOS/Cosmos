@@ -289,7 +289,15 @@ namespace Cosmos.IL2CPU {
           case OperandType.ShortInlineI:
             switch (xOpCodeVal) {
               case ILOpCode.Code.Ldc_I4_S:
-                    xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos + 1, xIL[xPos], xCurrentHandler);
+                    // x = x & 0xFFFFFFFC;
+                    // The above code produces:
+                    // ldc.i4.s -4
+                    // But its getting loaded into a I4, so we have to "extend" it
+                    //
+                    // First we have to cast it to a signed byte, so .NET will extend it properly to a uint.
+                    sbyte xSVal = (sbyte)xIL[xPos];
+                    uint xVal = (uint)xSVal;
+                    xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos + 1, xVal, xCurrentHandler);
                 break;
               default:
                 xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 1, xIL[xPos], xCurrentHandler);
