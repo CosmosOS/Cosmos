@@ -30,14 +30,14 @@ namespace Cosmos.Common.Extensions {
         }
 
         public static string ToHex(this uint aValue) {
-            return ConvertToHex(aValue);
+            return ConvertToHex(aValue, 8);
         }
         public static string ToHex(this uint aValue, int aWidth) {
             return ConvertToHex(aValue, aWidth);
         }
 
         public static string ToHex(this ulong aValue) {
-            return ConvertToHex(aValue);
+            return ConvertToHex(aValue).PadLeft(16, '0');
         }
         public static string ToHex(this ulong aValue, int aWidth) {
             return ConvertToHex(aValue).PadLeft(aWidth, '0');
