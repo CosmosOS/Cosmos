@@ -61,6 +61,44 @@ namespace Cosmos.Core {
                             UInt16 xVendorID = (UInt16)(x & 0xFFFF);
                             UInt16 xDeviceID = (UInt16)(x >> 16);
 
+                            if ((xVendorID == 0x8086) && (xDeviceID == 0x7111)) {
+                                Global.Dbg.Send("--------------");
+                                Global.Dbg.Send("ATA Controller");
+
+                                x = ReadRegister(xAddr, 0x04);
+                                Global.Dbg.Send("Status: " + ((UInt16)(x >> 16)).ToHex());
+                                Global.Dbg.Send("Command: " + ((UInt16)(x & 0xFFFF)).ToHex());
+                                x = ReadRegister(xAddr, 0x08);
+                                Global.Dbg.Send("Class Code: " + ((byte)(x >> 24)).ToHex());
+                                Global.Dbg.Send("Subclass: " + ((byte)((x >> 16) & 0xFF)).ToHex());
+                                Global.Dbg.Send("Prog IF: " + ((byte)((x >> 8) & 0xFF)).ToHex());
+                                Global.Dbg.Send("Revision ID: " + ((byte)(x & 0xFF)).ToHex());
+                                x = ReadRegister(xAddr, 0x0C);
+                                Global.Dbg.Send("BIST: " + ((byte)(x >> 24)).ToHex());
+                                Global.Dbg.Send("Header Type: " + ((byte)((x >> 16) & 0xFF)).ToHex());
+                                Global.Dbg.Send("Latency Timer: " + ((byte)((x >> 8) & 0xFF)).ToHex());
+                                Global.Dbg.Send("Cache Line Size: " + ((byte)(x & 0xFF)).ToHex());
+                                x = ReadRegister(xAddr, 0x10);
+                                Global.Dbg.Send("BAR 0: " + x.ToHex());
+                                x = ReadRegister(xAddr, 0x14);
+                                Global.Dbg.Send("BAR 1: " + x.ToHex());
+                                x = ReadRegister(xAddr, 0x18);
+                                Global.Dbg.Send("BAR 2: " + x.ToHex());
+                                x = ReadRegister(xAddr, 0x1C);
+                                Global.Dbg.Send("BAR 3: " + x.ToHex());
+                                x = ReadRegister(xAddr, 0x20);
+                                Global.Dbg.Send("BAR 4: " + x.ToHex());
+                                x = ReadRegister(xAddr, 0x24);
+                                Global.Dbg.Send("BAR 5: " + x.ToHex());
+                                x = ReadRegister(xAddr, 0x3C);
+                                Global.Dbg.Send("Max Latency: " + ((byte)(x >> 24)).ToHex());
+                                Global.Dbg.Send("Min Grant: " + ((byte)((x >> 16) & 0xFF)).ToHex());
+                                Global.Dbg.Send("Interrupt PIN: " + ((byte)((x >> 8) & 0xFF)).ToHex());
+                                Global.Dbg.Send("Interrupt Line: " + ((byte)(x & 0xFF)).ToHex());
+
+                                Global.Dbg.Send("--------------");
+                            }
+    
                             var xInfo = new PciInfo(xVendorID, xDeviceID);
                             var xIO = new IOGroup.PciDevice();
                             OnPCIDeviceFound(xInfo, xIO);
