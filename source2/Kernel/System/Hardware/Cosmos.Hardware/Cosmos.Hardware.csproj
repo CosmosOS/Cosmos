@@ -74,6 +74,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ATA.html" />
     <Content Include="Drivers\ReadMe.html" />
     <Content Include="Keyboard.html" />
     <Content Include="TextScreen.html" />
