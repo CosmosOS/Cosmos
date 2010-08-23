@@ -13,5 +13,7 @@ namespace Cosmos.Core {
         public readonly IOGroup.PIC PIC = new IOGroup.PIC();
         public readonly IOGroup.PIT PIT = new IOGroup.PIT();
         public readonly IOGroup.TextScreen TextScreen = new IOGroup.TextScreen();
+        public readonly IOGroup.ATA ATA1 = new IOGroup.ATA(false);
+        public readonly IOGroup.ATA ATA2 = new IOGroup.ATA(true);
     }
 }

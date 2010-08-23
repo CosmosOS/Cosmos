@@ -10,7 +10,7 @@ namespace Cosmos.Hardware {
         static public Keyboard Keyboard = new Keyboard();
         static public PIT PIT = new PIT();
         static public TextScreen TextScreen = new TextScreen();
-        static public ATA ATA;
+        static public ATA ATA1;
 
         static public void Init() {
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
@@ -21,7 +21,7 @@ namespace Cosmos.Hardware {
         static void PCIDeviceFound(Core.PciBus.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {
             // Later we need to dynamically load these, but we need to finish the design first.
             if ((aInfo.VendorID == 0x8086) && (aInfo.DeviceID == 0x7111)) {
-                ATA = new ATA(aIO);
+                ATA1 = new ATA(Core.Global.BaseIOGroups.ATA1);
             }
         }
 
