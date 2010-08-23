@@ -46,8 +46,7 @@ namespace Cosmos.Core {
         protected void DebugSendBAR(UInt32 aAddr, byte aBar) {
             UInt32 x = ReadRegister(aAddr, (byte)(0x10 + aBar * 4));
             if ((x & 0x01) == 0x01) {
-                //TODO: Fix this 0 back to F when compmiler bug is fixed
-                x = x & 0x0FFFFFFC;
+                x = x & 0xFFFFFFFC;
                 Global.Dbg.Send("BAR (IO) " + aBar + ": " + x.ToHex());
             } else {
                 Global.Dbg.Send("BAR " + aBar + ": " + x.ToHex());

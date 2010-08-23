@@ -115,19 +115,7 @@ namespace Cosmos.Hardware {
             ATA_REG_ALTSTATUS = 0x0C,
             ATA_REG_DEVADDRESS = 0x0D
             // 13 regs
-            //*  Data Register: BAR0 + 0; // Read-Write
-            //* Error Register: BAR0 + 1; // Read Only
-            //* Features Register: BAR0 + 1; // Write Only
-            //* SECCOUNT0: BAR0 + 2; // Read-Write
-            //* LBA0: BAR0 + 3; // Read-Write
-            //* LBA1: BAR0 + 4; // Read-Write
-            //* LBA2: BAR0 + 5; // Read-Write
-            //* HDDEVSEL: BAR0 + 6; // Read-Write, used to select a drive in the channel.
-            //* Command Register: BAR0 + 7; // Write Only.
-            //* Status Register: BAR0 + 7; // Read Only.
-            //* Alternate Status Register: BAR1 + 2; // Read Only.
-            //* Control Register: BAR1 + 2; // Write Only.
-            //* DEVADDRESS: BAR1 + 2; // I don't know what is the benefit from this register. 
+
             //The map above is the same with the secondary channel, but it uses BAR2 and BAR3 instead of BAR0 and BAR1. 
         }
     }

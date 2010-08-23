@@ -12,10 +12,6 @@ namespace BreakpointsKernel {
         }
 
         protected override void BeforeRun() {
-            UInt32 x = 0x000010E1;
-            x = x & 0xFFFFFFFC;
-            Console.WriteLine(x.ToHex());
-
             Console.WriteLine("Hello " + 6.ToString());
             //Debugger.Send("Hello from Cosmos!");
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
@@ -28,9 +24,6 @@ namespace BreakpointsKernel {
             string xResult = Console.ReadLine();
             Console.Write("Text typed: ");
             Console.WriteLine(xResult);
-                                                  
-            var xTempDebugger = new Debugger("app", "test");
-            xTempDebugger.Send("Hello, World");
         }
     }
 }
