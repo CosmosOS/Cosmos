@@ -14,6 +14,7 @@ namespace Cosmos.Core {
             Port = (UInt16)(aBase + aOffset);
         }
 
+        //TODO: Reads and writes can use this to get port instead of argument
         protected void Write8(UInt16 aPort, byte aData) { } // Plugged
         protected void Write16(UInt16 aPort, UInt16 aData) { } // Plugged
         protected void Write32(UInt16 aPort, UInt32 aData) { } // Plugged
@@ -21,6 +22,12 @@ namespace Cosmos.Core {
         protected byte Read8(UInt16 aPort) { return 0; } // Plugged
         protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
         protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
+        //TODO: Plug this with asm to read directly to RAM
+        public void Read(uint[] aData) {
+            for (int i = 0; i < aData.Length; i++) {
+                aData[i] = Read32(Port);
+            }
+        }
     }
 
     public class IOPort : IOPortBase {
@@ -43,6 +50,9 @@ namespace Cosmos.Core {
         }
     }
 
+    // I split these instead of adding CanRead/CanWrite becuase this enforces
+    // at build time, and its also faster at runtime. Finally it allows future optimizations better
+    // than checking at runtime.
     public class IOPortRead : IOPortBase {
         internal IOPortRead(UInt16 aPort) : base(aPort) { }
         internal IOPortRead(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }

@@ -16,6 +16,7 @@ namespace Cosmos.Hardware {
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
             Core.PciBus.OnPCIDeviceFound = PCIDeviceFound;
             Cosmos.Core.Global.Init();
+            ATA1.Test();
         }
 
         static void PCIDeviceFound(Core.PciBus.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Cosmos.Hardware {
     public class ATA {
@@ -26,19 +27,20 @@ namespace Cosmos.Hardware {
             //   ide_write(channel, ATA_REG_CONTROL, channels[channel].nIEN);
         }
 
-        [FlagsAttribute]
+        [Flags]
         enum Status : byte {
-            ATA_SR_BSY = 0x80,
+            None = 0x00,
+            Busy = 0x80,
             ATA_SR_DRD = 0x40,
             ATA_SR_DF = 0x20,
             ATA_SR_DSC = 0x10,
-            ATA_SR_DRQ = 0x08,
+            DRQ = 0x08,
             ATA_SR_COR = 0x04,
             ATA_SR_IDX = 0x02,
-            ATA_SR_ERR = 0x01
+            Error = 0x01
         };
 
-        [FlagsAttribute]
+        [Flags]
         enum Error : byte {
             ATA_ER_BBK = 0x80,
             ATA_ER_UNC = 0x40,
@@ -50,22 +52,34 @@ namespace Cosmos.Hardware {
             ATA_ER_AMNF = 0x01
         };
 
+        [Flags]
+        enum DvcSelVal : byte {
+            // Bits 0-3: Head Number for CHS.
+            // Bit 4: Slave Bit. (0: Selecting Master Drive, 1: Selecting Slave Drive).
+            Slave = 0x10,
+            //* Bit 6: LBA (0: CHS, 1: LBA).
+            LBA = 0x40,
+            //* Bit 5: Obsolete and isn't used, but should be set.
+            //* Bit 7: Obsolete and isn't used, but should be set. 
+            Default = 0xA0
+        };
+
         enum Cmd : byte {
-            ATA_CMD_READ_PIO = 0x20,
-            ATA_CMD_READ_PIO_EXT = 0x24,
-            ATA_CMD_READ_DMA = 0xC8,
-            ATA_CMD_READ_DMA_EXT = 0x25,
-            ATA_CMD_WRITE_PIO = 0x30,
-            ATA_CMD_WRITE_PIO_EXT = 0x34,
-            ATA_CMD_WRITE_DMA = 0xCA,
-            ATA_CMD_WRITE_DMA_EXT = 0x35,
-            ATA_CMD_CACHE_FLUSH = 0xE7,
-            ATA_CMD_CACHE_FLUSH_EXT = 0xEA,
-            ATA_CMD_PACKET = 0xA0,
-            ATA_CMD_IDENTIFY_PACKET = 0xA1,
-            ATA_CMD_IDENTIFY = 0xEC,
-            ATAPI_CMD_READ = 0xA8,
-            ATAPI_CMD_EJECT = 0x1B
+            ReadPio = 0x20,
+            ReadPioExt = 0x24,
+            ReadDma = 0xC8,
+            ReadDmaExt = 0x25,
+            WritePio = 0x30,
+            WritePioExt = 0x34,
+            WriteDma = 0xCA,
+            WriteDmaExt = 0x35,
+            CacheFlush = 0xE7,
+            CacheFlushExt = 0xEA,
+            Packet = 0xA0,
+            IdentifyPacket = 0xA1,
+            Identify = 0xEC,
+            Read = 0xA8,
+            Eject = 0x1B
         }
 
         enum Ident : byte {
@@ -82,41 +96,103 @@ namespace Cosmos.Hardware {
             ATA_IDENT_MAX_LBA_EXT = 200
         }
 
-        //#define IDE_ATA        0x00
-        //#define IDE_ATAPI      0x01
+        public enum SpecLevel {
+            ATA = 0,
+            ATAPI = 1
+        }
 
         //#define ATA_MASTER     0x00
         //#define ATA_SLAVE      0x01
-
-        // Channels:
-        //#define      ATA_PRIMARY      0x00
-        //#define      ATA_SECONDARY    0x01
 
         // Directions:
         //#define      ATA_READ      0x00
         //#define      ATA_WRITE     0x01
 
-        enum Register : byte {
-            ATA_REG_DATA = 0x00,
-            ATA_REG_ERROR = 0x01,
-            ATA_REG_FEATURES = 0x01,
-            ATA_REG_SECCOUNT0 = 0x02,
-            ATA_REG_LBA0 = 0x03,
-            ATA_REG_LBA1 = 0x04,
-            ATA_REG_LBA2 = 0x05,
-            ATA_REG_HDDEVSEL = 0x06,
-            ATA_REG_COMMAND = 0x07,
-            ATA_REG_STATUS = 0x07,
-            ATA_REG_SECCOUNT1 = 0x08,
-            ATA_REG_LBA3 = 0x09,
-            ATA_REG_LBA4 = 0x0A,
-            ATA_REG_LBA5 = 0x0B,
-            ATA_REG_CONTROL = 0x0C,
-            ATA_REG_ALTSTATUS = 0x0C,
-            ATA_REG_DEVADDRESS = 0x0D
-            // 13 regs
+        public void Test() {
+            // Disable IRQs:
+            IO.Control.DWord = 0x02;
 
-            //The map above is the same with the secondary channel, but it uses BAR2 and BAR3 instead of BAR0 and BAR1. 
-        }
+            int xCount = 0;
+            for (int xDrive = 0; xDrive <= 1; xDrive++) {
+                byte xErr = 0;
+                
+                //      ide_devices[count].Reserved = 0; // Assuming that no drive here.
+
+                // Select Drive
+                IO.DeviceSelect.Byte = (byte)(DvcSelVal.Default | DvcSelVal.LBA | (xDrive == 1 ? DvcSelVal.Slave : 0));
+                // Wait 1ms for drive select to work.
+                //Thread.Sleep(1);
+
+                // Send ATA Identify Command
+                IO.Command.Byte = (byte)Cmd.Identify;
+                //Thread.Sleep(1);
+
+                // Polling
+                // No drive found
+                if (IO.Status.Byte == 0) {
+                    continue;
+                }
+                while(true) {
+                    Status xStatus;
+                    xStatus = (Status)IO.Status.Byte;
+                    if ((xStatus & Status.Error) == Status.None) {
+                        // Device is not ATA
+                        xErr = 1;
+                        break;
+                    } else if ((xStatus & Status.Busy) == Status.None && (xStatus & Status.DRQ) != Status.None) {
+                        // Found drive and its ok
+                        break;
+                    }
+                }
+
+                // Look for ATAPI devices
+                var xType = SpecLevel.ATA;
+                if (xErr == 0) {
+                    byte xCL = IO.LBA1.Byte;
+                    byte xCH = IO.LBA2.Byte;
+                    if (xCL == 0x14 && xCH == 0xEB) {
+                        xType = SpecLevel.ATAPI;
+                    } else if (xCL == 0x69 && xCH == 0x96) {
+                        xType = SpecLevel.ATAPI;
+                    } else {
+                        // Unknown type. Might not be a device.
+                        continue;
+                    }
+                    IO.Command.Byte = (byte)Cmd.IdentifyPacket;
+                    //Thread.Sleep(1);
+                }
+
+                // Read Identification Space of the Device
+                var xBuff = new uint[128];
+                IO.Data.Read(xBuff);
+
+                // Read Device Parameters:
+                Global.Dbg.Send("--------------------------");
+                Global.Dbg.Send("Drive Found");
+                Global.Dbg.Send("Type: " + xType);
+                Global.Dbg.Send("Drive #: " + xDrive);
+                //      ide_devices[count].Signature    = ((unsigned short *)(ide_buf + ATA_IDENT_DEVICETYPE));
+                //      ide_devices[count].Capabilities = ((unsigned short *)(ide_buf + ATA_IDENT_CAPABILITIES));
+                //      ide_devices[count].CommandSets  = ((unsigned int *)(ide_buf + ATA_IDENT_COMMANDSETS));
+
+                //      // (VII) Get Size:
+                //      if (ide_devices[count].CommandSets & (1 << 26))
+                //         // Device uses 48-Bit Addressing:
+                //         ide_devices[count].Size   = ((unsigned int *)(ide_buf + ATA_IDENT_MAX_LBA_EXT));
+                //      else
+                //         // Device uses CHS or 28-bit Addressing:
+                //         ide_devices[count].Size   = ((unsigned int *)(ide_buf + ATA_IDENT_MAX_LBA));
+
+                //      // (VIII) String indicates model of device (like Western Digital HDD and SONY DVD-RW...):
+                //      for(k = 0; k < 40; k += 2) {
+                //         ide_devices[count].Model[k] = ide_buf[ATA_IDENT_MODEL + k + 1];
+                //         ide_devices[count].Model[k + 1] = ide_buf[ATA_IDENT_MODEL + k];}
+                //      ide_devices[count].Model[40] = 0; // Terminate String.
+                Global.Dbg.Send("--------------------------");
+
+                xCount++;
+            }
+       }
+        
     }
 }
