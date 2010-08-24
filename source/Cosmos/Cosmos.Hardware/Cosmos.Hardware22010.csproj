@@ -134,7 +134,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
+    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel2010.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
     </ProjectReference>

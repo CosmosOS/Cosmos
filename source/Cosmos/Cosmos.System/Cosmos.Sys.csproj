@@ -101,15 +101,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
+    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem2010.csproj">
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
       <Name>Cosmos.Sys.FileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Hardware\Cosmos.Hardware2.csproj">
+    <ProjectReference Include="..\Cosmos.Hardware\Cosmos.Hardware22010.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
+    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel2010.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
     </ProjectReference>

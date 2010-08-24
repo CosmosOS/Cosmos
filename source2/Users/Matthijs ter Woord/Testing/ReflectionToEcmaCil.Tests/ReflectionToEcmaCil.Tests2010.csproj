@@ -65,19 +65,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest.csproj">
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest2010.csproj">
       <Project>{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}</Project>
       <Name>SimpleClassTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest.csproj">
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest2010.csproj">
       <Project>{B47ED632-1ACE-4516-9576-81E38BA092F1}</Project>
       <Name>SimpleMethodsTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
+    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil2010.csproj">
       <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>
       <Name>EcmaCil</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ReflectionToEcmaCil\ReflectionToEcmaCil.csproj">
+    <ProjectReference Include="..\ReflectionToEcmaCil\ReflectionToEcmaCil2010.csproj">
       <Project>{FD4B2006-B518-4884-B196-C2EF2B83FD6F}</Project>
       <Name>ReflectionToEcmaCil</Name>
     </ProjectReference>

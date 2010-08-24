@@ -86,14 +86,12 @@ end;
 function VSNET2008: Boolean;
 begin
   InitializePaths;
-  MsgBox(ExpandConstant('call VSNET2008'), MbError, MB_OK);
   Result := __VSNET2008;
 end;
 
 function VSNET2010: Boolean;
 begin
   InitializePaths;
-    MsgBox(ExpandConstant('call VSNET2010'), MbError, MB_OK);
   Result := __VSNET2010;
 end;
 

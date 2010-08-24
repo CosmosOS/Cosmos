@@ -91,7 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\UtilityClasses\UtilityClasses.csproj">
+    <ProjectReference Include="..\..\UtilityClasses\UtilityClasses2010.csproj">
       <Project>{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}</Project>
       <Name>UtilityClasses</Name>
     </ProjectReference>

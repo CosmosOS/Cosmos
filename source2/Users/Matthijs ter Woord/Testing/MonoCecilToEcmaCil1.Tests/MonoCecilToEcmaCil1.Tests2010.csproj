@@ -65,19 +65,19 @@
     <Compile Include="SimpleMethodsTestsTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest.csproj">
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest2010.csproj">
       <Project>{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}</Project>
       <Name>SimpleClassTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest.csproj">
+    <ProjectReference Include="..\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest2010.csproj">
       <Project>{B47ED632-1ACE-4516-9576-81E38BA092F1}</Project>
       <Name>SimpleMethodsTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
+    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil2010.csproj">
       <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>
       <Name>EcmaCil</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MonoCecilToEcmaCil1\MonoCecilToEcmaCil1.csproj">
+    <ProjectReference Include="..\MonoCecilToEcmaCil1\MonoCecilToEcmaCil12010.csproj">
       <Project>{719B5067-62CD-43A9-924D-BAD46C4AD192}</Project>
       <Name>MonoCecilToEcmaCil1</Name>
     </ProjectReference>

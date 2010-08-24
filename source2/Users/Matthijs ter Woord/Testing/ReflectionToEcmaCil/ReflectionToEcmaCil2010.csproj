@@ -80,7 +80,7 @@
     <Compile Include="_QueueItems\QueuedType.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil.csproj">
+    <ProjectReference Include="..\IRs\EcmaCil\EcmaCil2010.csproj">
       <Project>{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}</Project>
       <Name>EcmaCil</Name>
     </ProjectReference>

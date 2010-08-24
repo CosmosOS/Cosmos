@@ -133,22 +133,24 @@ tw.BeveledLabel=Chinese Traditional
 Name: {code:VSNET2010_PATH|}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstall
 Name: {app}; Flags: uninsalwaysuninstall
 
+[InstallDelete]
+Type: files; Name: "{code:VSNET2010_PATH|}\PrivateAssemblies\Cosmos.*";
+Type: filesandordirs; Name: "{code:VSNET2010_PATH|}\ProjectTemplates\Cosmos";
+Type: filesandordirs; Name: "{code:GetCSHarpExpress2010ProjectTemplatePath|}\*Cosmos*.*"; Check: IsCSharpExpress2008Installed('dummy') and (not csharp2008_Installed('dummy'))
+
+
+
 [Files]
-Source: .\Build\VSIP\InstallCleaner.exe; DestDir: {app}; Flags: dontcopy
 ; Tools
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\Cygwin\*; DestDir: {app}\Build\Tools\cygwin; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; Kernel assemblies
-Source: .\Build\VSIP\Cosmos.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Hardware2.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Sys.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.System.Plugs.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Sys.FileSystem.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Debug.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.Core.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
 ; VSIP stuff
@@ -162,7 +164,7 @@ Source: .\Build\VSIP\corapi.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion 
 Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 
 ; wizards
-Source: .\source2\VSIP\Cosmos.VS.Wizards\bin\Debug\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2010_PATH|}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2008_PATH|}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
 
 Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
 Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
