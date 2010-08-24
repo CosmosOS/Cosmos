@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</ProjectGuid>
+    <ProjectGuid>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Core</RootNamespace>
-    <AssemblyName>Cosmos.Core</AssemblyName>
+    <RootNamespace>Cosmos.System</RootNamespace>
+    <AssemblyName>Cosmos.System</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -28,7 +28,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,9 +36,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -48,44 +47,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseIOGroups.cs" />
-    <Compile Include="CPU.cs" />
-    <Compile Include="DeviceIDAttribute.cs" />
+    <Compile Include="Console.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Heap.cs" />
-    <Compile Include="IOGroup\ATA.cs" />
-    <Compile Include="IOGroup\Keyboard.cs" />
-    <Compile Include="IOGroup\PciBus.cs" />
-    <Compile Include="IOGroup\PciDevice.cs" />
-    <Compile Include="IOGroup\PIC.cs" />
-    <Compile Include="INTs.cs" />
-    <Compile Include="IOGroup\IOGroup.cs" />
-    <Compile Include="IOGroup\PIT.cs" />
-    <Compile Include="IOGroup\TextScreen.cs" />
-    <Compile Include="IOPort.cs" />
-    <Compile Include="MemoryBlock.cs" />
-    <Compile Include="PciBus.cs" />
-    <Compile Include="PIC.cs" />
+    <Compile Include="Kernel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions2010.csproj">
+    <Content Include="Console.html" />
+    <Content Include="Kernel.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions2010.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel2010.csproj">
+    <ProjectReference Include="..\..\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel2010.csproj">
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="IOPort.html" />
-    <Content Include="INTs.html" />
-    <Content Include="MemoryBlock.html" />
-    <Content Include="PciBus.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

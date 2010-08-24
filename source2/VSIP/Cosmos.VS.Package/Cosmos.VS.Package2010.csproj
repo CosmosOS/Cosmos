@@ -121,6 +121,7 @@
     <Compile Include="DebugPageSub.Designer.cs">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
     </Compile>
+    <Compile Include="GACDetectionUtility.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogUtility.cs" />
@@ -130,9 +131,6 @@
     <Compile Include="SubPropertyPageBase.Designer.cs">
       <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
     </Compile>
-    <Compile Include="Templates\GenerateCosmosProjectWizard.cs" />
-    <Compile Include="Templates\GenerateGuidsWizard.cs" />
-    <Compile Include="Templates\UseGuidsWizard.cs" />
     <Compile Include="TitleDivision.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -247,7 +245,6 @@
     <ZipItem Include="Templates\Projects\Cosmos\Cosmos.vstemplate">
       <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
-    <EmbeddedResource Include="Templates\CosmosProject.Cosmos" />
     <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </None>
@@ -287,30 +284,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
-      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
-      <Name>Cosmos.Sys.FileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
-      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
-      <Name>Cosmos.Hardware2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
-      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
-      <Name>Cosmos.Kernel.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
-      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
-      <Name>Cosmos.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
-      <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
-      <Name>Cosmos.Sys.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
-      <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
-      <Name>Cosmos.Sys</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
@@ -326,14 +299,6 @@
     <ProjectReference Include="..\..\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj">
       <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>
       <Name>Cosmos.Debug.VSDebugEngine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
-      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
-      <Name>Cosmos.IL2CPU.X86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
-      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
-      <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
