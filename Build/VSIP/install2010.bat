@@ -2,9 +2,11 @@
 
 REM Necessary to set dir when running as admin
 cd /D %~dp0
-set "THE_OUTPUT_PATH=%CD%"
 
-echo Compiling cosmos to %THE_OUTPUT_PATH%
+echo Compiling cosmos
+set "THE_OUTPUT_PATH=%CD%"
+set "ProgFiles=%ProgramFiles%
+if not "[%ProgramFiles(x86)%]"=="[]" set "ProgFiles=%ProgramFiles(x86)%
 
 cd "..\..\source"
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos2010.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%"
@@ -42,29 +44,36 @@ REM xcopy /Y ..\..\source2\Compiler\Cosmos.Compiler.DebugStub\bin\debug\Cosmos.C
 REM xcopy /Y ..\..\source2\Compiler\Cosmos.Compiler.XSharp\bin\debug\Cosmos.Compiler.XSharp.* .
 
 REM Copy templates
-xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" .
-xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosKernel (C#).zip" .
-xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\Cosmos.zip" .
+IF EXIST "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" (
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosKernel (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\Cosmos.zip" .
+) ELSE (
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosKernel (C#).zip" .
+	xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\Cosmos.zip" .
+)
 
-REM delete Cosmos.VS.Package.vsix
-del Cosmos.VS.Package.vsix
+
 
 echo .
 echo .
 echo .
 del /F ..\..\Setup2\Output\CosmosUserKit.exe
-echo Creating setup.exe
-REM Try one, then if not there the other for x64
-IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
-	"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos2010.iss /dBuildConfiguration=Devkit
-) ELSE (
-	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos2010.iss /dBuildConfiguration=Devkit
+
+IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
+	echo Creating setup.exe
+	"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
 )
 
 ..\..\Setup2\Output\CosmosUserKit.exe /SILENT
 
 rem Relaunch VS
-rem calling .sln doesnt work. Might be related to having 2010 and 2008 both installed
-rem ..\..\source\Cosmos2010.sln
-"C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos2010.sln
-rem "C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos2010.sln
+rem calling .sln doesnt work. Is related to having 2010 and 2008 both installed.
+IF EXIST "%ProgFiles%\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" (
+	 "%ProgFiles%\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
+) ELSE (
+	IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
+		 "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos2010.sln
+	)
+)
