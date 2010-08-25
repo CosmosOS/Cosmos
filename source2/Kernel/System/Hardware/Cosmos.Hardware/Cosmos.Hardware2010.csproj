@@ -54,6 +54,7 @@
     <Compile Include="PciDevice.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RTC.cs" />
     <Compile Include="TextScreen.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +78,8 @@
     <Content Include="ATA.html" />
     <Content Include="Drivers\ReadMe.html" />
     <Content Include="Keyboard.html" />
+    <Content Include="PIT.html" />
+    <Content Include="RTC.html" />
     <Content Include="TextScreen.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

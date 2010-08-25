@@ -134,7 +134,7 @@ begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
-function Vb2010_Installed(dummy: string): Boolean;
+function Vb2010_Installed: Boolean;
 begin
 	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
@@ -152,7 +152,7 @@ begin
 	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\9.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
 end;
 
-function csharp2010_Installed(dummy: string): Boolean;
+function csharp2010_Installed(test: string): Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
 end;
@@ -167,7 +167,7 @@ begin
   Result := '10.0';
 end;
 
-function VS2008UP_REGISTRY_HIVE(dummy: string): string;
+function VS2008UP_REGISTRY_HIVE: string;
 begin
   if VSNET2008 then begin
     Result := '9.0';
@@ -250,7 +250,7 @@ begin
   Result := __NET_FRAMEWORK4_INSTALLED;
 end;
 
-function IsCSharpExpress2008Installed(dummy: string): boolean;
+function IsCSharpExpress2008Installed(dummy: string): Boolean;
 begin
 	InitializePaths;
 	if (Length(Trim(__CSharpExpress2008ProjectTemplatePath)) > 0) then
@@ -259,7 +259,7 @@ begin
 		Result := False;
 end;
 
-function IsCSharpExpress2010Installed(dummy: string): boolean;
+function IsCSharpExpress2010Installed(dummy: string): Boolean;
 begin
 	InitializePaths;
 	if (Length(Trim(__CSharpExpress2010ProjectTemplatePath)) > 0) then
@@ -274,13 +274,13 @@ begin
 	Result := __CSharpExpress2008ProjectTemplatePath;
 end;
 
-function GetCSharpExpress2010ProjectTemplatePath(dummy: string) : string;
+function GetCSharpExpress2010ProjectTemplatePath(dummy: string): string;
 begin
 	InitializePaths;
 	Result := __CSharpExpress2010ProjectTemplatePath;
 end;
 
-function IsVBExpress2008Installed(dummy: string) : boolean;
+function IsVBExpress2008Installed(dummy: string) : Boolean;
 begin
 InitializePaths;
 	if (Length(Trim(__VBExpress2008ProjectTemplatePath))  > 0) then
@@ -295,7 +295,20 @@ begin
 	Result := __VBExpress2008ProjectTEmplatePath;
 end;
 
+function IsVBExpress2010Installed(dummy: string) : Boolean;
+begin
+InitializePaths;
+	if (Length(Trim(__VBExpress2010ProjectTemplatePath))  > 0) then
+		Result := True
+	else
+		Result := False;
+end;
 
+function GetVBExpress2010ProjectTemplatePath(dummy: string) : string;
+begin
+	InitializePaths;
+	Result := __VBExpress2010ProjectTEmplatePath;
+end;
 
 function InitializeSetup: Boolean;
 begin
