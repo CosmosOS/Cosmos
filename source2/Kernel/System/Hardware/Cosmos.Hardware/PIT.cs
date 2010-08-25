@@ -59,9 +59,9 @@ namespace Cosmos.Hardware {
             set {
                 _T0Countdown = value;
 
-                IO.Port43.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
-                IO.Port40.Byte = (byte)(value & 0xFF);
-                IO.Port40.Byte = (byte)(value >> 8);
+                IO.Command.Byte = (byte)(T0RateGen ? 0x34 : 0x30);
+                IO.Data0.Byte = (byte)(value & 0xFF);
+                IO.Data0.Byte = (byte)(value >> 8);
             }
         }
         public uint T0Frequency {
@@ -95,9 +95,9 @@ namespace Cosmos.Hardware {
             set {
                 _T2Countdown = value;
 
-                IO.Port43.Byte = 0xB6;
-                IO.Port40.Byte = (byte)(value & 0xFF);
-                IO.Port40.Byte = (byte)(value >> 8);
+                IO.Command.Byte = 0xB6;
+                IO.Data0.Byte = (byte)(value & 0xFF);
+                IO.Data0.Byte = (byte)(value >> 8);
             }
         }
         public uint T2Frequency {
@@ -126,10 +126,10 @@ namespace Cosmos.Hardware {
 
         //TODO: Why is sound in PIT? Is it a function of the PIT?
         public void EnableSound() {
-            IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
+            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0x03);
         }
         public void DisableSound() {
-            IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
+            //IO.Port61.Byte = (byte)(IO.Port61.Byte | 0xFC);
         }
         public void PlaySound(int aFreq) {
             EnableSound();

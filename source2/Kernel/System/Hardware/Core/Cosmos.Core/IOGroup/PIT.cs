@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Cosmos.Core.IOGroup {
     public class PIT : IOGroup {
-        public readonly IOPort Port40 = new IOPort(0x40);
-        public readonly IOPort Port43 = new IOPort(0x43);
-        public readonly IOPort Port61 = new IOPort(0x61);
+        public readonly IOPort Data0 = new IOPort(0x40);
+        public readonly IOPort Data1 = new IOPort(0x41);
+        public readonly IOPort Data2 = new IOPort(0x42);
+        public readonly IOPortWrite Command = new IOPortWrite(0x43);
     }
 }

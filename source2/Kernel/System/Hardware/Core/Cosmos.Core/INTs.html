@@ -5,6 +5,14 @@
 	</head>
 	<body>
 	
+	    <ul>
+            <li>IRQs can interrupt each other. But of same level?</li>
+            <li>IRQs can stack up - if same IRQ they can get &quot;lost&quot; (<a 
+                    href="http://www.gossamer-threads.com/lists/linux/kernel/494604">Link</a>). 
+                If of different level, will queue up.. lower priority queues up, higher 
+                intterupts unless masked.</li>
+        </ul>
+	
 	    IRQs are handled by priority and are queued.<h3>
             Questions</h3>
         <p>
@@ -28,7 +36,10 @@
             http://en.wikipedia.org/wiki/Interrupt_request</a><br />
             <a href="http://en.wikipedia.org/wiki/IF_(x86_flag)/">
             http://en.wikipedia.org/wiki/IF_%28x86_flag%29\</a><br />
-            <a href="http://wiki.osdev.org/IRQ">http://wiki.osdev.org/IRQ</a></p>
+            <a href="http://wiki.osdev.org/IRQ">http://wiki.osdev.org/IRQ</a><br />
+            <a href="http://www.xml.com/ldd/chapter/book/ch09.html">
+            http://www.xml.com/ldd/chapter/book/ch09.html</a><br />
+        </p>
         <p>
             Interrupt Descriptor Table -
             <a href="http://en.wikipedia.org/wiki/Interrupt_descriptor_table">
