@@ -16,13 +16,13 @@ namespace Cosmos.Hardware {
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
             Core.PciBus.OnPCIDeviceFound = PCIDeviceFound;
             Cosmos.Core.Global.Init();
-            ATA1.Test();
+            //ATA1.Test();
         }
 
         static void PCIDeviceFound(Core.PciBus.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {
             // Later we need to dynamically load these, but we need to finish the design first.
             if ((aInfo.VendorID == 0x8086) && (aInfo.DeviceID == 0x7111)) {
-                ATA1 = new ATA(Core.Global.BaseIOGroups.ATA1);
+                //ATA1 = new ATA(Core.Global.BaseIOGroups.ATA1);
             }
         }
 
