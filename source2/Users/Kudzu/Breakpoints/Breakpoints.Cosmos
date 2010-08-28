@@ -18,11 +18,11 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
-    <StartCosmosGDB>False</StartCosmosGDB>
+    <StartCosmosGDB>True</StartCosmosGDB>
     <TraceAssemblies>Cosmos</TraceAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

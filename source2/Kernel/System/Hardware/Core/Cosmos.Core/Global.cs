@@ -12,15 +12,15 @@ namespace Cosmos.Core {
         static internal PciBus PciBus;
 
         static public void Init() {
+            // Drag this stuff in to the compiler manually until we add the always include attrib
+            INTs.Dummy();
+
             CPU = new CPU();
 
             CPU.CreateGDT();
             PIC = new PIC();
             CPU.CreateIDT(true);
             CPU.InitFloat();
-
-            // Drag this stuff in to the compiler manually until we add the always include attrib
-            INTs.Dummy();
 
             //Init Heap first - Hardware loads devices and they need heap
             // drag in the heap:
