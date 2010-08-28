@@ -10,6 +10,7 @@ namespace Cosmos.Debug.GDB {
     public class GDB {
         public class Response {
             public string Command = "";
+            public string Reply = "";
             public bool Error = false;
             public string ErrorMsg = "";
             public List<string> Text = new List<string>();
@@ -19,6 +20,7 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        protected Queue<string> mLastCmd = new Queue<string>();
         protected System.Diagnostics.Process mGDBProcess;
         protected Action<Response> mOnResponse;
         protected List<string> mBuffer = new List<string>();
@@ -39,10 +41,13 @@ namespace Cosmos.Debug.GDB {
 
         protected void ProcessResponse() {
             var xResponse = new Response();
+            lock (mLastCmd) {
+                xResponse.Command = mLastCmd.Dequeue();
+            }
             
             foreach (string xLine in mBuffer) {
                 var xType = xLine[0];
-                // & echo of a command
+                // & echo of a command or reply
                 // ~ text response
                 // ^ done
 
@@ -58,7 +63,7 @@ namespace Cosmos.Debug.GDB {
 
                 string sData = Unescape(xLine.Substring(1));
                 if (xType == '&') {
-                    xResponse.Command = sData;
+                    xResponse.Reply = sData;
                 } else if (xType == '^') {
                     xResponse.Error = sData != "done";
                 } else if (xType == '~') {
@@ -82,6 +87,9 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void SendCmd(string aCmd) {
+            lock (mLastCmd) {
+                mLastCmd.Enqueue(aCmd);
+            }
             mGDBProcess.StandardInput.WriteLine(aCmd);
         }
 
@@ -96,6 +104,8 @@ namespace Cosmos.Debug.GDB {
 
         public GDB(int aRetry, Action<Response> aOnResponse) {
             mOnResponse = aOnResponse;
+            // To handle greeting from GDB since its not associated with any command
+            mLastCmd.Enqueue("");
 
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
@@ -111,6 +121,8 @@ namespace Cosmos.Debug.GDB {
 
             mGDBProcess.OutputDataReceived += new DataReceivedEventHandler(mGDBProcess_OutputDataReceived);
             mGDBProcess.BeginOutputReadLine();
+
+            mConnected = true;
 
             SendCmd("symbol-file " + Settings.ObjFile);
             SendCmd("target remote :8832");

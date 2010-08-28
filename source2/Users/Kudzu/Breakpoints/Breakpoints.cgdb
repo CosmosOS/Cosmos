@@ -3,13 +3,16 @@
   <Breakpoint>
     <Label>__ISR_HANDLER_21</Label>
   </Breakpoint>
+  <Breakpoint>
+    <Label>System_Void__Cosmos_Core_PIC__ctor__</Label>
+  </Breakpoint>
   <Window>
     <Name>FormCallStack</Name>
-    <Left>48</Left>
-    <Top>587</Top>
-    <Width>968</Width>
+    <Left>0</Left>
+    <Top>0</Top>
+    <Width>300</Width>
     <Height>296</Height>
-    <Visible>true</Visible>
+    <Visible>false</Visible>
   </Window>
   <Window>
     <Name>FormWatches</Name>
@@ -29,26 +32,18 @@
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>34</Left>
-    <Top>125</Top>
+    <Left>25</Left>
+    <Top>25</Top>
     <Width>300</Width>
     <Height>296</Height>
     <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormRegisters</Name>
-    <Left>354</Left>
-    <Top>109</Top>
+    <Left>0</Left>
+    <Top>0</Top>
     <Width>281</Width>
     <Height>287</Height>
-    <Visible>true</Visible>
-  </Window>
-  <Window>
-    <Name>FormDisassembly</Name>
-    <Left>659</Left>
-    <Top>79</Top>
-    <Width>1370</Width>
-    <Height>511</Height>
-    <Visible>true</Visible>
+    <Visible>false</Visible>
   </Window>
 </SettingsDS>

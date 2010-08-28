@@ -72,7 +72,7 @@ namespace Cosmos.Debug.GDB {
                     } else if (xCmd == "break") {
                         Windows.mBreakpointsForm.OnBreak(aResponse);
                     } else {
-                        throw new Exception("Unrecognized command response: " + xCmd);
+                        throw new Exception("Unrecognized command response: " + aResponse.Command);
                     }
                 }
             } catch (Exception e) {
@@ -266,6 +266,10 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
+        }
+
+        private void butnBreakpoints_Click(object sender, EventArgs e) {
+            mitmViewBreakpoints.PerformClick();
         }
 
     }

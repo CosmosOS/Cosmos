@@ -45,6 +45,10 @@
       </xs:choice>
     </xs:complexType>
     <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Breakpoint" />
+      <xs:field xpath="mstns:Label" />
+    </xs:unique>
+    <xs:unique name="Window_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
       <xs:selector xpath=".//mstns:Window" />
       <xs:field xpath="mstns:Name" />
     </xs:unique>

@@ -36,8 +36,12 @@ namespace Cosmos.Debug.GDB {
         public bool AddBreakpoint(string aLabel) {
             string s = aLabel.Trim();
             if (s.Length > 0) {
+                Global.GDB.SendCmd("break " + s);
             }
             return false;
+        }
+
+        public void OnDelete(GDB.Response aResponse) {
         }
 
         public void OnBreak(GDB.Response aResponse) {
@@ -45,7 +49,7 @@ namespace Cosmos.Debug.GDB {
             string xLabel = xCmdParts[1];
 
             var xSplit = aResponse.Text[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            if (xSplit[0] == "Breakpoint") {
+            if (xSplit[0].ToLower() == "breakpoint") {
                 lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(xLabel, int.Parse(xSplit[1])));
 
                 // http://stackoverflow.com/questions/27674/dynamic-top-down-list-of-controls-in-windowsforms-and-c
@@ -58,16 +62,18 @@ namespace Cosmos.Debug.GDB {
 
                 // We dont add address types, as most of them change between compiles.
                 if (!xLabel.StartsWith("*")) {
-                    // Add here and not in AddBreakpoint, because during load we call AddBreakpoint
-                    var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
-                    xBP.Label = xLabel;
-                    Settings.DS.Breakpoint.AddBreakpointRow(xBP);
+                    if (Settings.DS.Breakpoint.Rows.Find(xLabel) == null) {
+                        var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
+                        xBP.Label = xLabel;
+                        Settings.DS.Breakpoint.AddBreakpointRow(xBP);
+                    }
                 }
             }
         }
 
         private void butnBreakpointAdd_Click(object sender, EventArgs e) {
             string xLabel = textBreakpoint.Text.Trim();
+            AddBreakpoint(xLabel);
             textBreakpoint.Clear();
         }
 

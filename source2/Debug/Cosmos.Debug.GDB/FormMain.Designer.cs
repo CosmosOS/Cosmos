@@ -56,6 +56,7 @@
             this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.butnBreakpoints = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.menuMain.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -64,6 +65,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.butnBreakpoints);
             this.panel1.Controls.Add(this.lablRunning);
             this.panel1.Controls.Add(this.lablConnected);
             this.panel1.Controls.Add(this.butnContinue);
@@ -98,7 +100,7 @@
             // 
             // butnContinue
             // 
-            this.butnContinue.Location = new System.Drawing.Point(65, 3);
+            this.butnContinue.Location = new System.Drawing.Point(70, 4);
             this.butnContinue.Name = "butnContinue";
             this.butnContinue.Size = new System.Drawing.Size(26, 23);
             this.butnContinue.TabIndex = 1;
@@ -151,6 +153,7 @@
             // mitmSave
             // 
             this.mitmSave.Name = "mitmSave";
+            this.mitmSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.mitmSave.Size = new System.Drawing.Size(162, 22);
             this.mitmSave.Text = "&Save";
             this.mitmSave.Click += new System.EventHandler(this.mitmSave_Click);
@@ -338,6 +341,16 @@
             this.mitmCopyToClipboard.Text = "&Copy to Clipboard";
             this.mitmCopyToClipboard.Click += new System.EventHandler(this.mitmCopyToClipboard_Click);
             // 
+            // butnBreakpoints
+            // 
+            this.butnBreakpoints.Location = new System.Drawing.Point(118, 3);
+            this.butnBreakpoints.Name = "butnBreakpoints";
+            this.butnBreakpoints.Size = new System.Drawing.Size(75, 23);
+            this.butnBreakpoints.TabIndex = 2;
+            this.butnBreakpoints.Text = "Breakpoints";
+            this.butnBreakpoints.UseVisualStyleBackColor = true;
+            this.butnBreakpoints.Click += new System.EventHandler(this.butnBreakpoints_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -402,6 +415,7 @@
         private System.Windows.Forms.ContextMenuStrip menuDisassembly;
         private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
         private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;
+        private System.Windows.Forms.Button butnBreakpoints;
     }
 }
 

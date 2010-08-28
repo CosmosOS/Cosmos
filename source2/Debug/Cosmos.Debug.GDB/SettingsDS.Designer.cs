@@ -436,6 +436,12 @@ namespace Cosmos.Debug.GDB {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public BreakpointRow FindByLabel(string Label) {
+                return ((BreakpointRow)(this.Rows.Find(new object[] {
+                            Label})));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public override global::System.Data.DataTable Clone() {
                 BreakpointDataTable cln = ((BreakpointDataTable)(base.Clone()));
                 cln.InitVars();
@@ -456,7 +462,10 @@ namespace Cosmos.Debug.GDB {
             private void InitClass() {
                 this.columnLabel = new global::System.Data.DataColumn("Label", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLabel);
+                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
+                                this.columnLabel}, true));
                 this.columnLabel.AllowDBNull = false;
+                this.columnLabel.Unique = true;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
