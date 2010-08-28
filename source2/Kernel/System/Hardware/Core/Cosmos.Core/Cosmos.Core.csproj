@@ -87,6 +87,7 @@
     <Content Include="INTs.html" />
     <Content Include="MemoryBlock.html" />
     <Content Include="PciBus.html" />
+    <Content Include="PIC.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -15,13 +15,14 @@ namespace Cosmos.Core {
         }
 
         //TODO: Reads and writes can use this to get port instead of argument
-        protected void Write8(UInt16 aPort, byte aData) { } // Plugged
-        protected void Write16(UInt16 aPort, UInt16 aData) { } // Plugged
-        protected void Write32(UInt16 aPort, UInt32 aData) { } // Plugged
+        static protected void Write8(UInt16 aPort, byte aData) { } // Plugged
+        static protected void Write16(UInt16 aPort, UInt16 aData) { } // Plugged
+        static protected void Write32(UInt16 aPort, UInt32 aData) { } // Plugged
 
-        protected byte Read8(UInt16 aPort) { return 0; } // Plugged
-        protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
-        protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
+        static protected byte Read8(UInt16 aPort) { return 0; } // Plugged
+        static protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
+        static protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
+
         //TODO: Plug this with asm to read directly to RAM
         public void Read(uint[] aData) {
             for (int i = 0; i < aData.Length; i++) {
@@ -34,19 +35,29 @@ namespace Cosmos.Core {
         internal IOPort(UInt16 aPort) : base(aPort) { }
         internal IOPort(UInt16 aBase, UInt16 aOffset) : base(aBase, aBase) { }
 
+        static public void Wait() {
+            // Write to an unused port. This assures whatever we were waiting on for a previous
+            // IO read/write has completed.
+            // Port 0x80 is unused after BIOS POST.
+            // 0x22 is just a random byte.
+            // Since IO is slow - its just a dummy sleep to wait long enough for the previous operation
+            // to have effect on the target.
+            IOPortBase.Write8(0x80, 0x22);
+        }
+
         public byte Byte {
-            get { return Read8(Port); }
-            set { Write8(Port, value); }
+            get { return IOPortBase.Read8(Port); }
+            set { IOPortBase.Write8(Port, value); }
         }
 
         public UInt16 Word {
-            get { return Read16(Port); }
-            set { Write16(Port, value); }
+            get { return IOPortBase.Read16(Port); }
+            set { IOPortBase.Write16(Port, value); }
         }
 
         public UInt32 DWord {
-            get { return Read32(Port); }
-            set { Write32(Port, value); }
+            get { return IOPortBase.Read32(Port); }
+            set { IOPortBase.Write32(Port, value); }
         }
     }
 
@@ -58,15 +69,15 @@ namespace Cosmos.Core {
         internal IOPortRead(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
 
         public byte Byte {
-            get { return Read8(Port); }
+            get { return IOPortBase.Read8(Port); }
         }
 
         public UInt16 Word {
-            get { return Read16(Port); }
+            get { return IOPortBase.Read16(Port); }
         }
 
         public UInt32 DWord {
-            get { return Read32(Port); }
+            get { return IOPortBase.Read32(Port); }
         }
     }
 
@@ -75,15 +86,15 @@ namespace Cosmos.Core {
         internal IOPortWrite(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
 
         public byte Byte {
-            set { Write8(Port, value); }
+            set { IOPortBase.Write8(Port, value); }
         }
 
         public UInt16 Word {
-            set { Write16(Port, value); }
+            set { IOPortBase.Write16(Port, value); }
         }
 
         public UInt32 DWord {
-            set { Write32(Port, value); }
+            set { IOPortBase.Write32(Port, value); }
         }
     }
 

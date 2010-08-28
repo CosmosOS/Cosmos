@@ -5,9 +5,13 @@ using System.Text;
 
 namespace Cosmos.Core.IOGroup {
     public class PIC : IOGroup {
-        public readonly IOPort PortCmd1 = new IOPort(0x20);
-        public readonly IOPort PortData1 = new IOPort(0x21);
-        public readonly IOPort PortCmd2 = new IOPort(0xA0);
-        public readonly IOPort PortData2 = new IOPort(0xA1);
+        public readonly IOPort Cmd = new IOPort(0x20);
+        public readonly IOPort Data = new IOPort(0x21);
+
+        internal PIC(bool aSlave) {
+            byte aBase = (byte)(aSlave ? 0xA0 : 0x20);
+            Cmd = new IOPort(aBase);
+            Data = new IOPort((byte)(aBase + 1));
+        }
     }
 }

@@ -169,11 +169,11 @@ namespace Cosmos.Core
             {
                 if (aContext.Interrupt >= 0x28)
                 {
-                    Global.PIC.SignalSecondary();
+                    Global.PIC.EoiSlave();
                 }
                 else
                 {
-                    Global.PIC.SignalPrimary();
+                    Global.PIC.EoiMaster();
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace Cosmos.Core
         {
             //TODO New Kernel
             //PIT.HandleInterrupt();
-            Global.PIC.SignalPrimary();
+            Global.PIC.EoiMaster();
         }
 
         //public static InterruptDelegate IRQ01;
@@ -208,7 +208,7 @@ namespace Cosmos.Core
             ////
             //// - End change area
             //Console.WriteLine("Signal PIC primary");
-            Global.PIC.SignalPrimary();
+            Global.PIC.EoiMaster();
         }
 
         //IRQ 5 - (Added for ES1370 AudioPCI)
@@ -218,7 +218,7 @@ namespace Cosmos.Core
         {
             IRQ(0x25, ref aContext);
 
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         //IRQ 09 - (Added for AMD PCNet network card)
@@ -227,7 +227,7 @@ namespace Cosmos.Core
         public static void HandleInterrupt_29(ref IRQContext aContext)
         {
             IRQ(0x29, ref aContext);
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         //IRQ 10 - (Added for VIA Rhine network card)
@@ -242,7 +242,7 @@ namespace Cosmos.Core
 
             IRQ(0x2A, ref aContext);
 
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         //IRQ 11 - (Added for RTL8139 network card)
@@ -257,7 +257,7 @@ namespace Cosmos.Core
 
             IRQ(0x2B, ref aContext);
 
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         public static void HandleInterrupt_2C(ref IRQContext aContext)
@@ -271,7 +271,7 @@ namespace Cosmos.Core
 
             IRQ(0x2C, ref aContext);
 
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
@@ -280,7 +280,7 @@ namespace Cosmos.Core
             Global.Dbg.SendMessage("IRQ", "Primary IDE");
             //Storage.ATAOld.HandleInterruptPrimary();
             //Storage.ATA.ATA.HandleInterruptPrimary();
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         public static event InterruptDelegate Interrupt30;
@@ -308,7 +308,7 @@ namespace Cosmos.Core
         {
             //Storage.ATA.ATA.HandleInterruptSecondary();
             Global.Dbg.SendMessage("IRQ", "Secondary IDE");
-            Global.PIC.SignalSecondary();
+            Global.PIC.EoiSlave();
         }
 
         public static void HandleInterrupt_00(ref IRQContext aContext)
