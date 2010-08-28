@@ -7,15 +7,22 @@ namespace Cosmos.Hardware {
     static public class Global {
         static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Hardware", "");
 
-        static public Keyboard Keyboard = new Keyboard();
-        static public PIT PIT = new PIT();
-        static public TextScreen TextScreen = new TextScreen();
+        static public Keyboard Keyboard;
+        //static public PIT PIT = new PIT();
+        static public TextScreen TextScreen;
         static public ATA ATA1;
 
         static public void Init() {
+            // DANGER! This is before heap? Yet somehow its working currently...
+            // Leaving it for now because Core.Init outputs to Console, but we need
+            // to change this...
+            TextScreen = new TextScreen();
+            
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
             Core.PciBus.OnPCIDeviceFound = PCIDeviceFound;
             Cosmos.Core.Global.Init();
+
+            Keyboard = new Keyboard();
             //ATA1.Test();
         }
 

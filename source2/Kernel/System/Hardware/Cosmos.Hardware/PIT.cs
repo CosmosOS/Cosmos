@@ -37,8 +37,9 @@ namespace Cosmos.Hardware {
             }
 
             public void Dispose() {
-                if (ID != -1)
-                    Global.PIT.UnregisterTimer(ID);
+                if (ID != -1) {
+                    //Global.PIT.UnregisterTimer(ID);
+                }
             }
         }
 

@@ -33,7 +33,7 @@ namespace Cosmos.Core {
             IO.PortData1.Byte = 0x01;
             IO.PortData2.Byte = 0x01;
             // Masks - 0 = receive all IRQ's
-			// MTW, to disable PIT, send 0x1 to DataPort1
+			// MTW: to disable PIT, send 0x01 to DataPort1
             IO.PortData1.Byte = 0x01;
             IO.PortData2.Byte = 0x00;
 		}

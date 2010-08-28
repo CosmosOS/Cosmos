@@ -6,7 +6,7 @@ using System.Text;
 namespace Cosmos.Core {
     static public class Global {
         static public CPU CPU;
-        static readonly public BaseIOGroups BaseIOGroups = new BaseIOGroups();
+        static public BaseIOGroups BaseIOGroups;
         static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Core", "");
         static public PIC PIC;
         static internal PciBus PciBus;
@@ -27,8 +27,11 @@ namespace Cosmos.Core {
             Heap.Initialize();
             Console.WriteLine("    Heap OK");
 
+            // After heap init etc
+            BaseIOGroups = new BaseIOGroups();
+
             Console.WriteLine("    Finding PCI Devices");
-            // Enumerate PCI Buss
+            // Enumerate PCI Bus
             PciBus = new PciBus();
         }
     }
