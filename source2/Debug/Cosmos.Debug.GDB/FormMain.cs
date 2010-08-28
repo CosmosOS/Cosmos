@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -147,16 +148,13 @@ namespace Cosmos.Debug.GDB {
             mitmConnect.Enabled = false;
 
             Windows.CreateForms();
+            Global.AsmSource = new AsmFile(Path.Combine(Settings.OutputPath, Settings.AsmFile));
             Global.GDB = new GDB(aRetry, OnGDBResponse);
             if (Global.GDB.Connected) {
                 lablConnected.Visible = true;
                 lablRunning.Visible = true;
                 lablRunning.Text = "Stopped";
-                // Must be after Connect for now as it depends on Widnows being created
-                // Also sets saved breakpoints, so GDB needs to be connected
-                if (Settings.Filename != "") {
-                    Settings.Load();
-                }
+                Settings.InitWindows();
                 Windows.UpdateAllWindows();
             }
         }

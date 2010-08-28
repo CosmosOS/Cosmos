@@ -53,7 +53,9 @@ System_Void__BreakpointsKernel_BreakpointsOS_BeforeRun____DOT__00000008:
             <li>When Digits is a char array, we get a plug needed error.</li>
             </ul>
         </li>
-        <li>Plugs <ul>
+        <li>cxdb contains full asm path and filenames over and over... cant we write them 
+            out once and use a byte/word index to identify them? This will make it smaller 
+            and make reading faster.<li>Plugs <ul>
         <li>Source Plugs - Leave as they are</li>
                 <li>Assembly Plugs - Change to have attribute on the TARGET instead of the 
                     implementation and only allow assembly.. this cuts out the &quot;proxy&quot; class and 

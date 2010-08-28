@@ -10,13 +10,27 @@ namespace Cosmos.Debug.GDB {
         static protected string mFilename = "";
         static public string Filename {
             get { return mFilename; }
-            set { mFilename = value; }
         }
 
         static protected bool mAutoConnect = false;
         static public bool AutoConnect {
             get { return mAutoConnect; }
             set { mAutoConnect = value; }
+        }
+
+        static protected string mOutputPath;
+        static public string OutputPath {
+            get { return mOutputPath; }
+        }
+
+        static protected string mObjFile;
+        static public string ObjFile {
+            get { return mObjFile; }
+        }
+
+        static protected string mAsmFile;
+        static public string AsmFile {
+            get { return mAsmFile; }
         }
 
         static public SettingsDS DS = new SettingsDS();
@@ -31,13 +45,21 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        static public void Load() {
+        static public void Load(string aFilename) {
+            mFilename = aFilename;
             if (File.Exists(Filename)) {
+                //TODO: Change this and other general settings to read from the General datatable
+                mOutputPath = Path.Combine(Path.GetDirectoryName(Filename), @"bin\debug\");
+                mObjFile = Path.GetFileNameWithoutExtension(Filename) + ".obj";
+                mAsmFile = Path.GetFileNameWithoutExtension(Filename) + ".asm";
+                
                 DS.ReadXml(Filename, System.Data.XmlReadMode.IgnoreSchema);
-
-                Windows.RestorePositions();
-                Windows.mBreakpointsForm.LoadSession();
             }
+        }
+
+        static public void InitWindows() {
+            Windows.RestorePositions();
+            Windows.mBreakpointsForm.LoadSession();
         }
     }
 

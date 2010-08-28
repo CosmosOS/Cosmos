@@ -100,7 +100,7 @@ namespace Cosmos.Debug.GDB {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
             xStartInfo.Arguments = @"--interpreter=mi2";
-            xStartInfo.WorkingDirectory = mCosmosPath + @"source2\Users\Kudzu\Breakpoints\bin\debug";
+            xStartInfo.WorkingDirectory = Settings.OutputPath;
             xStartInfo.CreateNoWindow = true;
             xStartInfo.UseShellExecute = false;
             xStartInfo.RedirectStandardError = true;
@@ -112,7 +112,7 @@ namespace Cosmos.Debug.GDB {
             mGDBProcess.OutputDataReceived += new DataReceivedEventHandler(mGDBProcess_OutputDataReceived);
             mGDBProcess.BeginOutputReadLine();
 
-            SendCmd("symbol-file Breakpoints.obj");
+            SendCmd("symbol-file " + Settings.ObjFile);
             SendCmd("target remote :8832");
 
             //while (!mConnected) {
