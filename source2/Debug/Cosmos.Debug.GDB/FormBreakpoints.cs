@@ -9,20 +9,6 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
     public partial class FormBreakpoints : Form {
-        protected class Breakpoint {
-            public readonly string Label;
-            public readonly int Index;
-
-            public Breakpoint(string aLabel, int aIndex) {
-                Label = aLabel;
-                Index = aIndex;
-            }
-
-            public override string ToString() {
-                return Index.ToString("00") + " " + Label;
-            }
-        }
-
         protected Dictionary<int, BreakpointUC> mBreakpoints = new Dictionary<int, BreakpointUC>();
 
         public FormBreakpoints() {
@@ -44,16 +30,25 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void OnDelete(GDB.Response aResponse) {
-            var xSplit = aResponse.Text[0].Split(' ');
+            var xSplit = aResponse.Reply.Split(' ');
             int xID = int.Parse(xSplit[1]);
             var xUC = mBreakpoints[xID];
 
             // Delete UC
-
-            // change settings to use a save method
+            Controls.Remove(xUC);
+            xUC.Dispose();
         }
 
         public void SaveSettings() {
+            foreach (var xUC in mBreakpoints.Values) {
+                string xLabel = xUC.lablName.Text;
+                // We dont add address types, as most of them change between compiles.
+                if (!xLabel.StartsWith("*")) {
+                    var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
+                    xBP.Label = xLabel;
+                    Settings.DS.Breakpoint.AddBreakpointRow(xBP);
+                }
+            }
         }
 
         public void OnBreak(GDB.Response aResponse) {
@@ -62,8 +57,6 @@ namespace Cosmos.Debug.GDB {
 
             var xSplit = aResponse.Text[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             if (xSplit[0].ToLower() == "breakpoint") {
-                lboxBreakpoints.SelectedIndex = lboxBreakpoints.Items.Add(new Breakpoint(xLabel, int.Parse(xSplit[1])));
-
                 // http://stackoverflow.com/questions/27674/dynamic-top-down-list-of-controls-in-windowsforms-and-c
                 var xUC = new BreakpointUC();
                 mBreakpoints.Add(int.Parse(xSplit[1]), xUC);
@@ -72,17 +65,13 @@ namespace Cosmos.Debug.GDB {
                 xUC.cboxEnabled.Checked = true;
                 xUC.lablNum.Text = xSplit[1];
                 xUC.lablName.Text = xLabel;
+                xUC.Delete += new Action<int>(xUC_Delete);
                 panl.Controls.Add(xUC);
-
-                // We dont add address types, as most of them change between compiles.
-                if (!xLabel.StartsWith("*")) {
-                    if (Settings.DS.Breakpoint.Rows.Find(xLabel) == null) {
-                        var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
-                        xBP.Label = xLabel;
-                        Settings.DS.Breakpoint.AddBreakpointRow(xBP);
-                    }
-                }
             }
+        }
+
+        void xUC_Delete(int aID) {
+            Global.GDB.SendCmd("delete " + aID);
         }
 
         private void butnBreakpointAdd_Click(object sender, EventArgs e) {
@@ -94,14 +83,6 @@ namespace Cosmos.Debug.GDB {
         private void textBreakpoint_KeyPress(object sender, KeyPressEventArgs e) {
             if (e.KeyChar == '\r') {
                 butnBreakpointAdd.PerformClick();
-            }
-        }
-
-        private void mitmBreakpointDelete_Click(object sender, EventArgs e) {
-            var x = (Breakpoint)lboxBreakpoints.SelectedItem;
-            if (x != null) {
-                Global.GDB.SendCmd("delete " + x.Index);
-                lboxBreakpoints.Items.Remove(x);
             }
         }
 

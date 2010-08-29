@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.butnBreakpoints = new System.Windows.Forms.Button();
             this.lablRunning = new System.Windows.Forms.Label();
             this.lablConnected = new System.Windows.Forms.Label();
             this.butnContinue = new System.Windows.Forms.Button();
@@ -56,7 +57,6 @@
             this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
             this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.butnBreakpoints = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.menuMain.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -75,6 +75,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(589, 30);
             this.panel1.TabIndex = 3;
+            // 
+            // butnBreakpoints
+            // 
+            this.butnBreakpoints.Location = new System.Drawing.Point(118, 3);
+            this.butnBreakpoints.Name = "butnBreakpoints";
+            this.butnBreakpoints.Size = new System.Drawing.Size(75, 23);
+            this.butnBreakpoints.TabIndex = 2;
+            this.butnBreakpoints.Text = "Breakpoints";
+            this.butnBreakpoints.UseVisualStyleBackColor = true;
+            this.butnBreakpoints.Click += new System.EventHandler(this.butnBreakpoints_Click);
             // 
             // lablRunning
             // 
@@ -340,16 +350,6 @@
             this.mitmCopyToClipboard.Size = new System.Drawing.Size(171, 22);
             this.mitmCopyToClipboard.Text = "&Copy to Clipboard";
             this.mitmCopyToClipboard.Click += new System.EventHandler(this.mitmCopyToClipboard_Click);
-            // 
-            // butnBreakpoints
-            // 
-            this.butnBreakpoints.Location = new System.Drawing.Point(118, 3);
-            this.butnBreakpoints.Name = "butnBreakpoints";
-            this.butnBreakpoints.Size = new System.Drawing.Size(75, 23);
-            this.butnBreakpoints.TabIndex = 2;
-            this.butnBreakpoints.Text = "Breakpoints";
-            this.butnBreakpoints.UseVisualStyleBackColor = true;
-            this.butnBreakpoints.Click += new System.EventHandler(this.butnBreakpoints_Click);
             // 
             // FormMain
             // 

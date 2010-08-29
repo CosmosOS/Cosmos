@@ -37,7 +37,8 @@ namespace Cosmos.Debug.GDB {
 
         static public void Save() {
             Windows.SavePositions();
-            // Its often checked into TFS, so if its ro, just dont save it.
+            Windows.mBreakpointsForm.SaveSettings();
+            // Its often checked into TFS, so if its readonly, dont save it.
             if ((File.GetAttributes(Filename) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
                 MessageBox.Show("File is read only. Cannot save.");
             } else {

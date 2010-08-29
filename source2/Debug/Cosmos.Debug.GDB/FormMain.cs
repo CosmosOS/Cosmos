@@ -64,6 +64,7 @@ namespace Cosmos.Debug.GDB {
                     } else if (xCmd == "set") { // nothing
                     } else if (xCmd == "target") { // nothing
                     } else if (xCmd == "delete") {
+                        Windows.mBreakpointsForm.OnDelete(aResponse);
                     } else if ((xCmd == "stepi") || (xCmd == "nexti") || (xCmd == "continue")) {
                         lablRunning.Text = "Stopped";
                         Windows.UpdateAllWindows();
