@@ -23,6 +23,8 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+        protected Dictionary<int, BreakpointUC> mBreakpoints = new Dictionary<int, BreakpointUC>();
+
         public FormBreakpoints() {
             InitializeComponent();
         }
@@ -42,6 +44,16 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void OnDelete(GDB.Response aResponse) {
+            var xSplit = aResponse.Text[0].Split(' ');
+            int xID = int.Parse(xSplit[1]);
+            var xUC = mBreakpoints[xID];
+
+            // Delete UC
+
+            // change settings to use a save method
+        }
+
+        public void SaveSettings() {
         }
 
         public void OnBreak(GDB.Response aResponse) {
@@ -54,6 +66,8 @@ namespace Cosmos.Debug.GDB {
 
                 // http://stackoverflow.com/questions/27674/dynamic-top-down-list-of-controls-in-windowsforms-and-c
                 var xUC = new BreakpointUC();
+                mBreakpoints.Add(int.Parse(xSplit[1]), xUC);
+
                 xUC.Dock = DockStyle.Top;
                 xUC.cboxEnabled.Checked = true;
                 xUC.lablNum.Text = xSplit[1];
