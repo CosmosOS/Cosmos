@@ -12,7 +12,7 @@ namespace Cosmos.Debug.GDB {
                 Settings.Load(xArgs[1]);
             }
             if (xArgs.Length > 2) {
-                Settings.AutoConnect = string.Compare(xArgs[2], "/Connect", true) == 0;
+                //Settings.AutoConnect = string.Compare(xArgs[2], "/Connect", true) == 0;
             }
 
             Application.EnableVisualStyles();

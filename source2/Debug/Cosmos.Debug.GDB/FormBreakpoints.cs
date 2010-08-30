@@ -40,6 +40,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void SaveSettings() {
+            Settings.DS.Breakpoint.Clear();
             foreach (var xUC in mBreakpoints.Values) {
                 string xLabel = xUC.lablName.Text;
                 // We dont add address types, as most of them change between compiles.

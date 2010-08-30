@@ -483,13 +483,13 @@ namespace Cosmos.Core
             const string xHex = "0123456789ABCDEF";
 
             // we're printing exception info to the screen now:
-            // 0/0: X
+            // 0/0: x
             // 1/0: exception number in hex
             unsafe
             {
                 byte* xAddress = (byte*)0xB8000;
                 xAddress[1] = 0x0C;
-                xAddress[0] = (byte)'X';
+                xAddress[0] = (byte)'x';
                 xAddress[3] = 0x0C;
                 xAddress[2] = (byte)xHex[(int)((ctx.Interrupt >> 4) & 0xF)];
                 xAddress[5] = 0x0C;

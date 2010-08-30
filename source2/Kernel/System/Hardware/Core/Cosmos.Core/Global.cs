@@ -16,7 +16,6 @@ namespace Cosmos.Core {
             INTs.Dummy();
 
             CPU = new CPU();
-
             CPU.CreateGDT();
             PIC = new PIC();
             CPU.CreateIDT(true);

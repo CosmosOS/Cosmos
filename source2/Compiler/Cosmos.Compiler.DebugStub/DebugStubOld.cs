@@ -496,6 +496,7 @@ namespace Cosmos.Compiler.DebugStub {
             // All clear, mark that we are entering the debug stub
             Label = "DebugStub_Start";
             Memory["DebugRunning", 32] = 1;
+            // Enable interrupts only if the kernel is ready to handle them
             Memory["InterruptsEnabledFlag", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_NoSTI");
             EnableInterrupts();

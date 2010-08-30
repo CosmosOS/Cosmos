@@ -36,6 +36,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         static public void RestorePositions() {
+            RestoreWindow(Windows.mMainForm);
             foreach (var x in mForms) {
                 RestoreWindow(x);
             }
@@ -86,6 +87,7 @@ namespace Cosmos.Debug.GDB {
 
         static public void SavePositions() {
             Settings.DS.Window.Clear();
+            SaveWindow(Windows.mMainForm);
             foreach (var x in mForms) {
                 SaveWindow(x);
             }

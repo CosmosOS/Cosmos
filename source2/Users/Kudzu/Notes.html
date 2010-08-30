@@ -15,25 +15,7 @@
 <h3>
     Matthijs - Next Release</h3>
 <ul>
-    <li>Literal bug<ul>
-        <li>
-            <pre>UInt32 x = 0x000010E1;
-x = x &amp; 0xFFFFFFFC;
-Console.WriteLine(x.ToHex());
-
-This produces 000000E1
-If you change it to
-x = x &amp; 0x0FFFFFFC;
-
-it works. It seems our compiler is outputting wrong when the high bit is set. The outputted ASM when the high bit is set is wrong:
-
-System_Void__BreakpointsKernel_BreakpointsOS_BeforeRun____DOT__00000008:
-  ; [Cosmos.IL2CPU.X86.IL.Ldc_I4]
-  push dword 0xFC
-  ; Stack contains 2 items: (4, 4) </pre>
-        </li>
-        </ul>
-    </li>
+    <li>0x08 crash</li>
     <li>Express isnt showing any templates</li>
 </ul>
     <h3>
