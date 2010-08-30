@@ -1,6 +1,5 @@
-###############################################################
-# bochsrc.txt file for DLX Linux disk image.
-###############################################################
+
+#gdbstub: enabled=1, port=1234
 
 # how much memory the emulated machine will have
 megs: 32
