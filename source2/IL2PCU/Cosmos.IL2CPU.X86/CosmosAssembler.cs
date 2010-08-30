@@ -40,6 +40,10 @@ namespace Cosmos.IL2CPU.X86
                 new Define("DEBUGSTUB");
             }
             new Label("Kernel_Start") { IsGlobal = true };
+            
+            // CLI ASAP
+            new ClrInterruptFlag();
+
             new Comment(this, "MultiBoot-compliant loader (e.g. GRUB or X.exe) provides info in registers: ");
             new Comment(this, "EBX=multiboot_info ");
             new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
@@ -83,7 +87,6 @@ namespace Cosmos.IL2CPU.X86
             new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
             new Comment(this, "some more startups todo");
-            new ClrInterruptFlag();
 
             // SSE init
             // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1

@@ -24,6 +24,15 @@
   <Breakpoint>
     <Label>System_Byte__Cosmos_Core_IOPortBase_Read8_System_UInt16_</Label>
   </Breakpoint>
+  <Breakpoint>
+    <Label>System_UInt32__Cosmos_Core_IOPortBase_Read32_System_UInt16_</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>System_Void__Cosmos_Core_Global_Init__</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>System_Void__Cosmos_Core_CPU_CreateGDT____DOT__END__OF__METHOD_EXCEPTION__2</Label>
+  </Breakpoint>
   <Window>
     <Name>FormMain</Name>
     <Left>410</Left>
@@ -61,7 +70,7 @@
     <Left>3</Left>
     <Top>4</Top>
     <Width>407</Width>
-    <Height>296</Height>
+    <Height>486</Height>
     <Visible>true</Visible>
   </Window>
   <Window>
