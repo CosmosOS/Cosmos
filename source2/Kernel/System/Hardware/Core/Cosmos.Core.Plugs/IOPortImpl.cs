@@ -7,7 +7,7 @@ using Assembler = Cosmos.Compiler.Assembler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Core.Plugs {
-    [Plug(Target = typeof(Cosmos.Core.IOPort))]
+    [Plug(Target = typeof(Cosmos.Core.IOPortBase))]
     public class IOPortImpl {
 
         public sealed class IOWrite8Asm : AssemblerMethod {

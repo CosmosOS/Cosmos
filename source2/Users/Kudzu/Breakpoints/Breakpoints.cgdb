@@ -12,12 +12,24 @@
   <Breakpoint>
     <Label>__AFTER__ALL__ISR__HANDLER__STUBS__</Label>
   </Breakpoint>
+  <Breakpoint>
+    <Label>Kernel_Start</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>System_Void__Cosmos_Core_Plugs_IOPortImpl_Write8_System_UInt16__System_Byte_</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>System_Void__Cosmos_Core_IOPortBase_Write32_System_UInt16__System_UInt32_</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>System_Byte__Cosmos_Core_IOPortBase_Read8_System_UInt16_</Label>
+  </Breakpoint>
   <Window>
     <Name>FormMain</Name>
-    <Left>345</Left>
-    <Top>41</Top>
-    <Width>1016</Width>
-    <Height>650</Height>
+    <Left>410</Left>
+    <Top>6</Top>
+    <Width>955</Width>
+    <Height>820</Height>
     <Visible>true</Visible>
   </Window>
   <Window>
@@ -46,9 +58,9 @@
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>44</Left>
-    <Top>41</Top>
-    <Width>300</Width>
+    <Left>3</Left>
+    <Top>4</Top>
+    <Width>407</Width>
     <Height>296</Height>
     <Visible>true</Visible>
   </Window>

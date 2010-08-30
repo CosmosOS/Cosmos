@@ -22,7 +22,7 @@
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
     <TraceAssemblies>Cosmos</TraceAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
