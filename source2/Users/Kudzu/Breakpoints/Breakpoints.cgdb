@@ -1,11 +1,25 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label>__ISR_HANDLER_21</Label>
+    <Label />
   </Breakpoint>
   <Breakpoint>
     <Label>System_Void__Cosmos_Core_PIC__ctor__</Label>
   </Breakpoint>
+  <Breakpoint>
+    <Label>System_Void__Cosmos_Core_CPU_CreateIDT_System_Boolean_</Label>
+  </Breakpoint>
+  <Breakpoint>
+    <Label>__AFTER__ALL__ISR__HANDLER__STUBS__</Label>
+  </Breakpoint>
+  <Window>
+    <Name>FormMain</Name>
+    <Left>345</Left>
+    <Top>41</Top>
+    <Width>1016</Width>
+    <Height>650</Height>
+    <Visible>true</Visible>
+  </Window>
   <Window>
     <Name>FormCallStack</Name>
     <Left>0</Left>
@@ -32,18 +46,18 @@
   </Window>
   <Window>
     <Name>FormBreakpoints</Name>
-    <Left>25</Left>
-    <Top>25</Top>
+    <Left>44</Left>
+    <Top>41</Top>
     <Width>300</Width>
     <Height>296</Height>
     <Visible>true</Visible>
   </Window>
   <Window>
     <Name>FormRegisters</Name>
-    <Left>0</Left>
-    <Top>0</Top>
+    <Left>1366</Left>
+    <Top>48</Top>
     <Width>281</Width>
     <Height>287</Height>
-    <Visible>false</Visible>
+    <Visible>true</Visible>
   </Window>
 </SettingsDS>
