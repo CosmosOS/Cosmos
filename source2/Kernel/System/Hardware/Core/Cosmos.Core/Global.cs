@@ -24,6 +24,9 @@ namespace Cosmos.Core {
             //Init Heap first - Hardware loads devices and they need heap
             // drag in the heap:
             Heap.Initialize();
+            //TODO: Since this is FCL, its "common". Otherwise it should be
+            // system level and not accessible from Core. Need to think about this
+            // for the future.
             Console.WriteLine("    Heap OK");
 
             // After heap init etc

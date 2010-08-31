@@ -11,14 +11,17 @@ namespace Cosmos.Hardware {
         protected byte Color = 0x0F; // White
 
         protected Core.IOGroup.TextScreen IO = Core.Global.BaseIOGroups.TextScreen;
-        protected readonly MemoryBlock08 mMemory08;
+        protected readonly MemoryBlock08 mRAM;
 
         public TextScreen() {
             //Use Changeset 64921
             //This gets called before at least one of the initializers.
             //1) This is a bug.
             //2) This should throw a null ref, which it does not currently. Although its not null.. so maybe thats the issue.
-            mMemory08 = IO.Memory.Bytes;
+            mRAM = IO.Memory.Bytes;
+
+            //TODO - Set and document the Console class (and its supporting classes) to default to 80x25
+            //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
         }
 
         public int Rows { get { return 25; } }
@@ -26,7 +29,9 @@ namespace Cosmos.Hardware {
 
         public void Clear() {
             // Empty + White + Empty + White
-            UInt32 xData = 0x000F000F;
+            //UInt32 xData = 0x000F000F;
+            // This is just for testing...revert back to the one above...
+            UInt32 xData = 0x430F430F;
             IO.Memory.Fill(0, (uint)(Cols * Rows * 2 / 4), xData);
         }
 
@@ -36,13 +41,13 @@ namespace Cosmos.Hardware {
 
         public char this[int aX, int aY] {
             get {
-                UInt32 xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
-                return (char)mMemory08[xScreenOffset];
+                var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
+                return (char)mRAM[xScreenOffset];
             }
             set {
                 var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
-                mMemory08[xScreenOffset] = (byte)value;
-                mMemory08[xScreenOffset + 1] = Color;
+                mRAM[xScreenOffset] = (byte)value;
+                mRAM[xScreenOffset + 1] = Color;
             }
         }
 

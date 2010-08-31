@@ -16,7 +16,9 @@ namespace Cosmos.Hardware {
             // DANGER! This is before heap? Yet somehow its working currently...
             // Leaving it for now because Core.Init outputs to Console, but we need
             // to change this...
+            // Heap seems to self init on demand? But even before IDT/GDT etc?
             TextScreen = new TextScreen();
+            TextScreen.Clear();
             
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
             Core.PciBus.OnPCIDeviceFound = PCIDeviceFound;
