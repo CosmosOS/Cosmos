@@ -1,37 +1,10 @@
 <?xml version="1.0" standalone="yes"?>
 <SettingsDS xmlns="http://tempuri.org/SettingsDS.xsd">
   <Breakpoint>
-    <Label />
-  </Breakpoint>
-  <Breakpoint>
     <Label>System_Void__Cosmos_Core_PIC__ctor__</Label>
   </Breakpoint>
   <Breakpoint>
     <Label>System_Void__Cosmos_Core_CPU_CreateIDT_System_Boolean_</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>__AFTER__ALL__ISR__HANDLER__STUBS__</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>Kernel_Start</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>System_Void__Cosmos_Core_Plugs_IOPortImpl_Write8_System_UInt16__System_Byte_</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>System_Void__Cosmos_Core_IOPortBase_Write32_System_UInt16__System_UInt32_</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>System_Byte__Cosmos_Core_IOPortBase_Read8_System_UInt16_</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>System_UInt32__Cosmos_Core_IOPortBase_Read32_System_UInt16_</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>System_Void__Cosmos_Core_Global_Init__</Label>
-  </Breakpoint>
-  <Breakpoint>
-    <Label>System_Void__Cosmos_Core_CPU_CreateGDT____DOT__END__OF__METHOD_EXCEPTION__2</Label>
   </Breakpoint>
   <Window>
     <Name>FormMain</Name>
