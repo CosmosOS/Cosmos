@@ -29,9 +29,7 @@ namespace Cosmos.Hardware {
 
         public void Clear() {
             // Empty + White + Empty + White
-            //UInt32 xData = 0x000F000F;
-            // This is just for testing...revert back to the one above...
-            UInt32 xData = 0x430F430F;
+            UInt32 xData = 0x000F000F;
             IO.Memory.Fill(0, (uint)(Cols * Rows * 2 / 4), xData);
         }
 

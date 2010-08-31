@@ -38,6 +38,8 @@ namespace Cosmos.Core {
         }
 
         public void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData) {
+            //TODO: before next step can at least check bounds here and do the addition just once to 
+            //start the loop.
             //TODO - When asm can check count against size just one time and use a native fill asm op
             for (UInt32 i = aStart; i < aStart + aCount; i++) {
                 this[i] = aData;
