@@ -14,14 +14,7 @@ namespace Cosmos.Hardware {
         protected readonly MemoryBlock08 mRAM;
 
         public TextScreen() {
-            //Use Changeset 64921
-            //This gets called before at least one of the initializers.
-            //1) This is a bug.
-            //2) This should throw a null ref, which it does not currently. Although its not null.. so maybe thats the issue.
             mRAM = IO.Memory.Bytes;
-
-            //TODO - Set and document the Console class (and its supporting classes) to default to 80x25
-            //Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
         }
 
         public int Rows { get { return 25; } }

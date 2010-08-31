@@ -9,7 +9,8 @@ namespace Cosmos.Hardware {
 
         static public Keyboard Keyboard;
         //static public PIT PIT = new PIT();
-        static public TextScreen TextScreen;
+        // Must be static init, other static inits rely on it not being null
+        static public TextScreen TextScreen = new TextScreen();
         static public ATA ATA1;
 
         static public void Init() {
@@ -17,7 +18,7 @@ namespace Cosmos.Hardware {
             // Leaving it for now because Core.Init outputs to Console, but we need
             // to change this...
             // Heap seems to self init on demand? But even before IDT/GDT etc?
-            TextScreen = new TextScreen();
+            //TextScreen = new TextScreen();
             TextScreen.Clear();
             
             Global.Dbg.Send("Cosmos.Hardware.Global.Init");
