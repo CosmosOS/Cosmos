@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsmFile.cs" />
     <Compile Include="BreakpointUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
