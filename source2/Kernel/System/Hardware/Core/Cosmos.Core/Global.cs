@@ -5,33 +5,26 @@ using System.Text;
 
 namespace Cosmos.Core {
     static public class Global {
-        static public CPU CPU;
         static public BaseIOGroups BaseIOGroups = new BaseIOGroups();
         static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Core", "");
-        static public PIC PIC;
         static internal PciBus PciBus;
 
+        // These are used by Bootstrap.. but also called to signal end of interrupt etc...
+        // Need to chagne this.. I dont like how this is.. maybe isolate or split into to classes... one for boostrap one for 
+        // later user
+        static public PIC PIC;
+        static public CPU CPU;
+
         static public void Init() {
-            //TODO: Move this stuff to a pre init so its guaranteed to be first, even before static inits and other calls
-            // Drag this stuff in to the compiler manually until we add the always include attrib
-            INTs.Dummy();
+            // See note in Bootstrap about these
+            CPU = Bootstrap.CPU;
+            PIC = Bootstrap.PIC;
 
-            CPU = new CPU();
-            CPU.CreateGDT();
-            PIC = new PIC();
-            CPU.CreateIDT(true);
-            CPU.InitFloat();
-            /////////////////////////////////
-
-            //Init Heap first - Hardware loads devices and they need heap
-            // drag in the heap:
-            Heap.Initialize();
             //TODO: Since this is FCL, its "common". Otherwise it should be
             // system level and not accessible from Core. Need to think about this
             // for the future.
-            Console.WriteLine("    Heap OK");
-
             Console.WriteLine("    Finding PCI Devices");
+
             // Enumerate PCI Bus
             PciBus = new PciBus();
         }

@@ -9,7 +9,8 @@ namespace Cosmos.System {
         static public Console Console;
         
         static public void Init() {
-            // Danger: See note in Hardware.Global.Init about TextScreen.
+            // We must init Console before calling Inits. This is part of the 
+            // "minimal" boot to allow output
             Console = new Console(); 
             
             Cosmos.Hardware.Global.Init();

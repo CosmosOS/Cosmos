@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Hardware;
 
 namespace Cosmos.System {
     // MtW: if the fullname (namespace + name) of this class changes, please also change IL2CPU msbuild task
@@ -24,7 +25,7 @@ namespace Cosmos.System {
             }
             mStarted = true;
 
-            //TODO: System inits hardware, and hardware inits core
+            Hardware.Bootstrap.Init();
             Global.Init();
 
             // Provide the user with a clear screen if they requested it
