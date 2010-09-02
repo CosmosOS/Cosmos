@@ -95,7 +95,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		SccAuxPath = "SAK"
 		SccLocalPath = "SAK"
 		SccProvider = "SAK"
-		TargetFramework = "3.5"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv3.5"
 		Debug.AspNetCompiler.VirtualPath = "/Docs"
 		Debug.AspNetCompiler.PhysicalPath = "..\Docs\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Docs\"
@@ -169,6 +169,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CDF131
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "..\source2\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions2010.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.IL2CPUTask", "..\source2\Build\Cosmos.Build.Task.IL2CPU\Cosmos.Build.IL2CPUTask2010.csproj", "{D47F264B-F102-4783-A629-00A4FC571915}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
