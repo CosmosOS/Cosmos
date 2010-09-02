@@ -32,38 +32,36 @@ namespace Cosmos.Debug.Common.CDebugger
 
 	public class MLDebugSymbol {
 		public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile) {
-            using (var xWriter = new BinaryWriter(new FileStream(aFile, FileMode.Create), Encoding.ASCII))
-            {
-                foreach(var xItem in aSymbols){
-                    xWriter.Write(xItem.LabelName);
-                    xWriter.Write(xItem.Address);
-                    xWriter.Write(xItem.StackDifference);
-                    xWriter.Write(xItem.AssemblyFile);
-                    xWriter.Write(xItem.TypeToken);
-                    xWriter.Write(xItem.MethodToken);
-                    xWriter.Write(xItem.ILOffset);
-                    xWriter.Write(xItem.MethodName);
-                }
+            var xDS = new SymbolsDS();
+            foreach(var xItem in aSymbols){
+                var x = xDS.Entry.NewEntryRow();
+                x.LabelName = xItem.LabelName;
+                x.Address = xItem.Address;
+                x.StackDiff = xItem.StackDifference;
+                x.ILAsmFile = xItem.AssemblyFile;
+                x.TypeToken = xItem.TypeToken;
+                x.MethodToken = xItem.MethodToken;
+                x.ILOffset = xItem.ILOffset;
+                x.MethodName = xItem.MethodName;
+                xDS.Entry.AddEntryRow(x);
             }
+            xDS.WriteXml(aFile);
 		}
 
 		public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile) {
-            using (var xReader = new BinaryReader(new FileStream(aFile, FileMode.Open), Encoding.ASCII))
-            {
-                while (xReader.BaseStream.Position < xReader.BaseStream.Length)
-                {
-                    aSymbols.Add(new MLDebugSymbol
-                    {
-                        LabelName = xReader.ReadString(),
-                        Address = xReader.ReadUInt32(),
-                        StackDifference=xReader.ReadInt32(),
-                        AssemblyFile = xReader.ReadString(),
-                        TypeToken = xReader.ReadInt32(),
-                        MethodToken = xReader.ReadInt32(),
-                        ILOffset = xReader.ReadInt32(),
-                        MethodName = xReader.ReadString()
-                    });
-                }
+            var xDS = new SymbolsDS();
+            xDS.ReadXml(aFile);
+            foreach (SymbolsDS.EntryRow x in xDS.Entry.Rows) {
+                aSymbols.Add(new MLDebugSymbol {
+                    LabelName = x.LabelName,
+                    Address = x.Address,
+                    StackDifference = x.StackDiff,
+                    AssemblyFile = x.ILAsmFile,
+                    TypeToken = x.TypeToken,
+                    MethodToken = x.MethodToken,
+                    ILOffset = x.ILOffset,
+                    MethodName = x.MethodName
+                });
             }
 		}
 
