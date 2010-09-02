@@ -28,7 +28,6 @@ namespace Cosmos.Debug.VSDebugEngine
         // An array of this frame's locals
         //private VariableInformation[] m_locals;     
 
-
         public AD7StackFrame(AD7Engine engine, AD7Thread thread)//, X86ThreadContext threadContext)
         {
             m_engine = engine;
@@ -471,6 +470,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                                 out string pbstrError,
                                                 out uint pichError)
         {
+            //System.Windows.Forms.MessageBox.Show("pszCode: " + pszCode);
             pbstrError = "";
             pichError = 0;
             ppExpr = null;
