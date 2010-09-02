@@ -59,7 +59,7 @@ IF EXIST "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).
 echo .
 echo .
 echo .
-del /F ..\..\Setup2\Output\CosmosUserKit.exe
+IF EXIST ..\..\Setup2\Output\CosmosUserKit.exe del /F ..\..\Setup2\Output\CosmosUserKit.exe
 
 IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Creating setup.exe
