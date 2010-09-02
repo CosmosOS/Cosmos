@@ -872,11 +872,16 @@ Global
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Release|x86.ActiveCfg = Release|Any CPU
 		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|Any CPU.ActiveCfg = Release|x86
-		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|x86.ActiveCfg = Release|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|x86.ActiveCfg = Debug|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|x86.Build.0 = Debug|x86
 		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|x86.ActiveCfg = Debug|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|x86.Build.0 = Debug|x86
 		{D47F264B-F102-4783-A629-00A4FC571915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D47F264B-F102-4783-A629-00A4FC571915}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D47F264B-F102-4783-A629-00A4FC571915}.Release|x86.ActiveCfg = Release|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

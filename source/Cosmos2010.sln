@@ -1,33 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware2", "Cosmos\Cosmos.Hardware\Cosmos.Hardware22010.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware22010", "Cosmos\Cosmos.Hardware\Cosmos.Hardware22010.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old Sort", "Old Sort", "{0D558E33-78B0-47DB-B5EF-B7C2F3114D75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs", "Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs2010.csproj", "{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs2010", "Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs2010.csproj", "{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel2010.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel2010", "Cosmos\Cosmos.Kernel\Cosmos.Kernel2010.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem2010.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.FileSystem2010", "Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem2010.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys", "Cosmos\Cosmos.System\Cosmos.Sys2010.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys2010", "Cosmos\Cosmos.System\Cosmos.Sys2010.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.Plugs", "Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs2010.csproj", "{6110AD07-EB07-4A99-BB73-7A69AF5732F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.Plugs2010", "Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs2010.csproj", "{6110AD07-EB07-4A99-BB73-7A69AF5732F1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source2", "source2", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common", "..\source2\Build\Cosmos.Build.Common\Cosmos.Build.Common2010.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common2010", "..\source2\Build\Cosmos.Build.Common\Cosmos.Build.Common2010.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild2010.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild2010", "..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild2010.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{FF5BAFDE-AE9D-438D-935A-86B33EE0A758}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Common", "..\source2\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common2010.csproj", "{AB24E403-54F3-4F67-B5E0-119A7227AAC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Common2010", "..\source2\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common2010.csproj", "{AB24E403-54F3-4F67-B5E0-119A7227AAC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.VSDebugEngine", "..\source2\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine2010.csproj", "{6D2688FE-6FD8-44A8-B96A-6037457F72A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.VSDebugEngine2010", "..\source2\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine2010.csproj", "{6D2688FE-6FD8-44A8-B96A-6037457F72A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{1698DD83-72A3-44CD-B088-4320A4014A95}"
 EndProject
@@ -43,51 +43,51 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VSIP", "VSIP", "{CD3F5E45-8B24-424F-ADF1-0211712F4CB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package2010.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package2010", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package2010.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{35CABD9D-5C85-419A-B6C9-561EAD97A553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU2010.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU2010", "..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU2010.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86", "..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X862010.csproj", "{63F7BFB9-419E-4965-B580-304B9C9FA7D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X862010", "..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X862010.csproj", "{63F7BFB9-419E-4965-B580-304B9C9FA7D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS", "Cosmos.Hardware.SMBIOS\Cosmos.Hardware.SMBIOS2010.csproj", "{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS2010", "Cosmos.Hardware.SMBIOS\Cosmos.Hardware.SMBIOS2010.csproj", "{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landmann", "{2DF5F17F-4890-4856-ADFD-4DE23282C3B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero2010.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero2010", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero2010.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.HostProcess", "..\source2\Debug\Cosmos.Debug.HostProcess\Cosmos.Debug.HostProcess2010.csproj", "{4266FA56-F6FE-4E9B-BAE3-B6910183884C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.HostProcess2010", "..\source2\Debug\Cosmos.Debug.HostProcess\Cosmos.Debug.HostProcess2010.csproj", "{4266FA56-F6FE-4E9B-BAE3-B6910183884C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests", "..\source2\IL2PCU\Cosmos.IL2CPU.X86.Tests\Cosmos.IL2CPU.X86.Tests2010.csproj", "{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests2010", "..\source2\IL2PCU\Cosmos.IL2CPU.X86.Tests\Cosmos.IL2CPU.X86.Tests2010.csproj", "{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source2\IL2PCU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs2010.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs2010", "..\source2\IL2PCU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs2010.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.GDB", "..\source2\Debug\Cosmos.Debug.GDB\Cosmos.Debug.GDB2010.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.GDB2010", "..\source2\Debug\Cosmos.Debug.GDB\Cosmos.Debug.GDB2010.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcmaCil", "..\source2\Users\Matthijs ter Woord\Testing\IRs\EcmaCil\EcmaCil2010.csproj", "{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcmaCil2010", "..\source2\Users\Matthijs ter Woord\Testing\IRs\EcmaCil\EcmaCil2010.csproj", "{AE684C98-F100-47AE-9C8C-E71BF8C9F8AA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IRs", "IRs", "{8D72B98D-8FB3-4731-A5EC-194D141AA431}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityClasses", "..\source2\Users\Matthijs ter Woord\Testing\UtilityClasses\UtilityClasses2010.csproj", "{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityClasses2010", "..\source2\Users\Matthijs ter Woord\Testing\UtilityClasses\UtilityClasses2010.csproj", "{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionToEcmaCil", "..\source2\Users\Matthijs ter Woord\Testing\ReflectionToEcmaCil\ReflectionToEcmaCil2010.csproj", "{FD4B2006-B518-4884-B196-C2EF2B83FD6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionToEcmaCil2010", "..\source2\Users\Matthijs ter Woord\Testing\ReflectionToEcmaCil\ReflectionToEcmaCil2010.csproj", "{FD4B2006-B518-4884-B196-C2EF2B83FD6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionToEcmaCil.Tests", "..\source2\Users\Matthijs ter Woord\Testing\ReflectionToEcmaCil.Tests\ReflectionToEcmaCil.Tests2010.csproj", "{0D162A82-CBC1-4A39-916D-E1079B212DDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionToEcmaCil.Tests2010", "..\source2\Users\Matthijs ter Woord\Testing\ReflectionToEcmaCil.Tests\ReflectionToEcmaCil.Tests2010.csproj", "{0D162A82-CBC1-4A39-916D-E1079B212DDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "..\source2\Users\Matthijs ter Woord\Testing\TestApp\TestApp2010.csproj", "{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp2010", "..\source2\Users\Matthijs ter Woord\Testing\TestApp\TestApp2010.csproj", "{47B9E5D3-A800-4402-AD6A-315FAF4E82F4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileToEcmaCilTests", "FileToEcmaCilTests", "{A9E19073-3AA0-487D-BBD2-D3E9132AF942}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMethodsTest", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest2010.csproj", "{B47ED632-1ACE-4516-9576-81E38BA092F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMethodsTest2010", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleMethodsTest\SimpleMethodsTest2010.csproj", "{B47ED632-1ACE-4516-9576-81E38BA092F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClassTest", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest2010.csproj", "{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClassTest2010", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleClassTest\SimpleClassTest2010.csproj", "{7A24BC15-49A3-43AF-AF2B-3681D9A06C62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClass2Test", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleClass2Test\SimpleClass2Test2010.csproj", "{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClass2Test2010", "..\source2\Users\Matthijs ter Woord\Testing\FileToEcmaCilTests\SimpleClass2Test\SimpleClass2Test2010.csproj", "{8612AC0F-6C80-4F14-AFFA-7A96AFF18A6D}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF0-1CEE-4ED6-A22D-97E5EA61157A}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -110,24 +110,25 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "24703"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug2010.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug2010", "..\source2\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug2010.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Breakpoints.Cosmos", "{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3370FC04-B669-46A4-A4AA-A89540318F8D} = {3370FC04-B669-46A4-A4AA-A89540318F8D}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp", "..\source2\Compiler\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp2010.csproj", "{453F2952-FD48-477F-889B-B3C6963C9850}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp2010", "..\source2\Compiler\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp2010.csproj", "{453F2952-FD48-477F-889B-B3C6963C9850}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.DebugStub", "..\source2\Compiler\Cosmos.Compiler.DebugStub\Cosmos.Compiler.DebugStub2010.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.DebugStub2010", "..\source2\Compiler\Cosmos.Compiler.DebugStub\Cosmos.Compiler.DebugStub2010.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler", "..\source2\Compiler\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler2010.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler2010", "..\source2\Compiler\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler2010.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler.X86", "..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X862010.csproj", "{94D079E4-3C66-486A-8407-EA6EC049FF53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler.X862010", "..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X862010.csproj", "{94D079E4-3C66-486A-8407-EA6EC049FF53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakpointsKernel", "..\source2\Users\Kudzu\Breakpoints\BreakpointsKernel2010.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakpointsKernel2010", "..\source2\Users\Kudzu\Breakpoints\BreakpointsKernel2010.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{ADDA07A5-ADA8-4D71-831B-0A421F04A546}"
 EndProject
@@ -139,38 +140,38 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{426E77
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{C4941654-3D7A-484B-9F5C-3D331AB8F585}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core2010.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core2010", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core2010.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "..\source2\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware2010.csproj", "{6A991D03-1435-4005-9809-B8BACDF3B021}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware2010", "..\source2\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware2010.csproj", "{6A991D03-1435-4005-9809-B8BACDF3B021}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "..\source2\Kernel\System\Cosmos.System\Cosmos.System2010.csproj", "{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System2010", "..\source2\Kernel\System\Cosmos.System\Cosmos.System2010.csproj", "{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs.System", "..\source2\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System2010.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs.System2010", "..\source2\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System2010.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "..\source2\VSIP\Cosmos.VS.Wizards\Cosmos.VS.Wizards2010.csproj", "{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards2010", "..\source2\VSIP\Cosmos.VS.Wizards\Cosmos.VS.Wizards2010.csproj", "{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs2010.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs2010", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs2010.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel2010.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel2010", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel2010.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs2010.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs2010", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs2010.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessKernel", "..\source2\Demos\Guess\GuessKernel2010.csproj", "{73CF15C1-0AB6-4B3A-8142-D326ADA72970}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Guess", "..\source2\Demos\Guess\Guess.Cosmos", "{5B2C0369-7A84-4113-892C-F71B50E1DA12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallCleaner", "..\source2\Build\InstallCleaner\InstallCleaner2010.csproj", "{505074BE-32BE-4871-A0A6-99238B14BF18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallCleaner2010", "..\source2\Build\InstallCleaner\InstallCleaner2010.csproj", "{505074BE-32BE-4871-A0A6-99238B14BF18}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CDF13174-7897-4334-9AE4-B1DCC013F6BD}"
 	ProjectSection(SolutionItems) = preProject
 		..\source2\Kernel\Common\ReadMe.html = ..\source2\Kernel\Common\ReadMe.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "..\source2\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions2010.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions2010", "..\source2\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions2010.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.IL2CPUTask", "..\source2\Build\Cosmos.Build.Task.IL2CPU\Cosmos.Build.IL2CPUTask2010.csproj", "{D47F264B-F102-4783-A629-00A4FC571915}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.IL2CPUTask2010", "..\source2\Build\Cosmos.Build.Task.IL2CPU\Cosmos.Build.IL2CPUTask2010.csproj", "{D47F264B-F102-4783-A629-00A4FC571915}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -872,11 +873,16 @@ Global
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Release|x86.ActiveCfg = Release|Any CPU
 		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|Any CPU.ActiveCfg = Release|x86
-		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|x86.ActiveCfg = Release|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|x86.ActiveCfg = Debug|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Bootstrap|x86.Build.0 = Debug|x86
 		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|x86.ActiveCfg = Debug|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Debug|x86.Build.0 = Debug|x86
 		{D47F264B-F102-4783-A629-00A4FC571915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D47F264B-F102-4783-A629-00A4FC571915}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D47F264B-F102-4783-A629-00A4FC571915}.Release|x86.ActiveCfg = Release|x86
+		{D47F264B-F102-4783-A629-00A4FC571915}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

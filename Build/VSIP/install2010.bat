@@ -71,9 +71,9 @@ IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 rem Relaunch VS
 rem calling .sln doesnt work. Is related to having 2010 and 2008 both installed.
 IF EXIST "%ProgFiles%\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" (
-	 "%ProgFiles%\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
+	start "%ProgFiles%\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
 ) ELSE (
 	IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
-		 "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos2010.sln
+		start "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos2010.sln
 	)
 )
