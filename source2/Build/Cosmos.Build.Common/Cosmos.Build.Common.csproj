@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildProperties.cs" />
+    <Compile Include="CosmosPaths.cs" />
     <Compile Include="DebugProperties.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EnumValue.cs" />
