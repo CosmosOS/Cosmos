@@ -221,6 +221,7 @@ namespace Cosmos.Debug.Common.CDebugger
 				}
 			}
             xSW.Stop();
+            // Next line should read CXDB and not PDB?
             System.Diagnostics.Trace.WriteLine("Loading PDB info took: " + xSW.Elapsed);
 			return xResult;
 		}
