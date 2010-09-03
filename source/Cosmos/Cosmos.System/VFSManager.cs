@@ -461,11 +461,7 @@ namespace Cosmos.Sys {
              
         }
 
-        /// <summary>
         /// Retrieve multiple directories from the given directory.
-        /// </summary>
-        /// <param name="aDir"></param>
-        /// <returns></returns>
         //public static FilesystemEntry[] GetDirectories(string aDir)
         //{
         //    // Cosmos.Debug.Debugger.SendMessage("GetDirectories", "Checking for nullreference");
