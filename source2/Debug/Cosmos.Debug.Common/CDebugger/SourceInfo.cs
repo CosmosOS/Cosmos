@@ -127,13 +127,7 @@ namespace Cosmos.Debug.Common.CDebugger
 
 		public static SourceInfos GetSourceInfo(IDictionary<uint, string> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, string aDebugFile) {
 			var xSymbolsList = new List<MLDebugSymbol>();
-            var xSW = new Stopwatch();
-            xSW.Start();
 			MLDebugSymbol.ReadSymbolsListFromFile(xSymbolsList, aDebugFile);
-            xSW.Stop();
-            System.Diagnostics.Trace.WriteLine("Loading SymbolsList took: " + xSW.Elapsed);
-            xSW.Reset();
-            xSW.Start();
             #region sort
             xSymbolsList.Sort(delegate(MLDebugSymbol a, MLDebugSymbol b) {
 				if (a == null) {
@@ -156,11 +150,7 @@ namespace Cosmos.Debug.Common.CDebugger
 				return xCompareResult;
 			});
             #endregion
-            xSW.Stop();
-            System.Diagnostics.Trace.WriteLine("Sorting SymbolsList took: " + xSW.Elapsed);
-            //MLDebugSymbol.WriteSymbolsListToFile(xSymbolsList, aDebugFile + ".sorted");
-            xSW.Reset();
-            xSW.Start();
+
             var xResult = new SourceInfos();
 			string xOldAssembly = null;
 			ISymbolReader xSymbolReader = null;
@@ -220,9 +210,6 @@ namespace Cosmos.Debug.Common.CDebugger
 					}
 				}
 			}
-            xSW.Stop();
-            // Next line should read CXDB and not PDB?
-            System.Diagnostics.Trace.WriteLine("Loading PDB info took: " + xSW.Elapsed);
 			return xResult;
 		}
 	}

@@ -178,13 +178,8 @@ namespace Cosmos.Debug.VSDebugEngine {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
             }
             
-            //TODO: This next line takes a long time. See if we can speed it up.
-            var xSW = new Stopwatch();
-            xSW.Start();
             mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(mISO, ".cxdb"));
-            xSW.Stop();
 
-            Trace.WriteLine("GetSourceInfo took: " + xSW.Elapsed);
             if (mSourceMappings.Count == 0) {
                 throw new Exception("Debug data not found: SourceMappings");
             }

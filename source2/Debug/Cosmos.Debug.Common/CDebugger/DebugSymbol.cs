@@ -33,6 +33,9 @@ namespace Cosmos.Debug.Common.CDebugger
 	public class MLDebugSymbol {
 		public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile) {
             var xDS = new SymbolsDS();
+            // This is a dataset and XML currently.
+            // Later change it to a real DB as we don't need it in RAM all at once but we need it to be fast.
+            // Probably embedded Firebird
             foreach(var xItem in aSymbols){
                 var x = xDS.Entry.NewEntryRow();
                 x.LabelName = xItem.LabelName;
