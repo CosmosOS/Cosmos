@@ -64,23 +64,6 @@ namespace Cosmos.VS.Package {
         /// </summary>
         public VSProject() {
             LogUtility.LogString("Entering Cosmos.VS.Package.VSProject.ctor()");
-            try
-            {
-                // fake compiler?
-                var xType = typeof(Cosmos.Debug.VSDebugEngine.AD7Engine);
-                if (xType.FullName.Length == 0)
-                {
-                    throw new Exception("No fullname!");
-                }
-            }
-            catch (Exception E)
-            {
-                LogUtility.LogException(E);
-            }
-            finally
-            {
-                LogUtility.LogString("Exiting Cosmos.VS.Package.VSProject.ctor()");
-            }
         }
 
         // This is used in the MSBuild files to locate Cosmos tasks

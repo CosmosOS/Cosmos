@@ -9,7 +9,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Cosmos.Debug.VSDebugEngine;
 using System.Collections.Specialized;
 using Cosmos.Debug.Common;
 
@@ -64,13 +63,8 @@ namespace Cosmos.VS.Package
                     LogUtility.LogString("Parameters = '{0}'", xInfo.bstrExe);
 
                     // Select the debugger
-                    // Managed debugger
-                    //xInfo.clsidCustom = VSConstants.CLSID_ComPlusOnlyDebugEngine;
-                    // Our debugger - a work in progress
-                    xInfo.clsidCustom = new Guid(AD7Engine.ID);
+                    xInfo.clsidCustom = new Guid("{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}");
                     xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
-                    // Sample Debug Engine
-                    //xInfo.clsidCustom = new Guid("{D951924A-4999-42a0-9217-1EB5233D1D5A}"); 
 
                     VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
                     LogUtility.LogString("Returning VSConstants.S_OK");

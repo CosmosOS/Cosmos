@@ -162,9 +162,9 @@
             this.checkStartCosmosGDB.Enabled = false;
             this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 143);
             this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
-            this.checkStartCosmosGDB.Size = new System.Drawing.Size(195, 17);
+            this.checkStartCosmosGDB.Size = new System.Drawing.Size(147, 17);
             this.checkStartCosmosGDB.TabIndex = 22;
-            this.checkStartCosmosGDB.Text = "AutoStart Cosmos GDB Frontend";
+            this.checkStartCosmosGDB.Text = "Use Cosmos GDB Client";
             this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
             // 
             // DebugPageSub
