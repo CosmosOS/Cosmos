@@ -30,7 +30,14 @@ namespace Cosmos.Core {
 
         public PIC() {
             // MTW: to disable PIT, send 0x01 to Master mask
-            Init(Master, 0x20, 4, 0xFF);
+            // Right now we mask all IRQs. We enable them as we add
+            // support for them. The 0x08 on master MUST remain. IRQ7
+            // has a problem of "spurious requests" and is therefore unreliable.
+            // It used for LPT2 (and sometimes old 8 bit sound blasters). We likely 
+            // won't need either of those for a very long time, so we just mask it
+            // completely. For more info:
+            // http://en.wikipedia.org/wiki/Intel_8259#Spurious_Interrupts
+            Init(Master, 0x20, 4, 0xFF | 0x08);
             Init(Slave, 0x28, 2, 0xFF);
         }
 
