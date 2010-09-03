@@ -92,6 +92,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+    <None Include="SymbolsDS.xsc">
+      <DependentUpon>SymbolsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SymbolsDS.xsd" />
+    <None Include="SymbolsDS.xss">
+      <DependentUpon>SymbolsDS.xsd</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IL2PCU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug2010.csproj">
