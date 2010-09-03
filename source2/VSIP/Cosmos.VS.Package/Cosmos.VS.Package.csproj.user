@@ -12,4 +12,9 @@
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe</StartProgram>
+    <StartArguments>/ranu /rootsuffix Exp</StartArguments>
+  </PropertyGroup>
 </Project>
