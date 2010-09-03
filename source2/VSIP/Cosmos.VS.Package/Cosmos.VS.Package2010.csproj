@@ -167,8 +167,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Images\alert.png" />
-    <None Include="bin\Images\alert1.png" />
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />

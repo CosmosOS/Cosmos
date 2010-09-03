@@ -1,13 +1,13 @@
+using Cosmos.Debug.Common;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Specialized;
-using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
