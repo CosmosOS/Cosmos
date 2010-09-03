@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
           if (xNeedsGC) {
             xExtraOffset = 12;
           }
-          uint xOffset = 0;
+          uint xOffset;// = 0;
 
           var xActualOffset = xFieldInfo.Offset + xExtraOffset;
           var xSize = xFieldInfo.Size;

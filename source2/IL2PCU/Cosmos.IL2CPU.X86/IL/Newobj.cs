@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
-                uint xObjSize = 0;
+                uint xObjSize;// = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC
                 //select item ).Count();

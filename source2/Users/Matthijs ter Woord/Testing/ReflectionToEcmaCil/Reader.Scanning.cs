@@ -152,7 +152,7 @@ namespace ReflectionToEcmaCil
                 }
                 #endregion
 
-                List<EcmaCil.IL.BaseInstruction> xInstructions;
+                //List<EcmaCil.IL.BaseInstruction> xInstructions;
                 var xILOffsetToInstructionOffset = new Dictionary<int, int>();
                 var xInstructionOffsetToILOffset = new Dictionary<int, int>();
                 var xSecondStageInits = new List<Action<EcmaCil.MethodMeta>>();

@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Label(".AfterCCTorExceptionCheck");
             }
 
-            int aExtraOffset = 0;
+            int aExtraOffset;// = 0;
             bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
             uint xSize = SizeOfType( xField.FieldType );
             if( xNeedsGC )

@@ -62,9 +62,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     throw new Exception("TODO");
                     //new CPUx86.SSE.CompareSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0, pseudoOpcode = (byte)CPUx86.SSE.ComparePseudoOpcodes.NotAboveOrEqual / Carry / Below };
-                    new CPUx86.MoveD { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.XMM1 };
-                    new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
-                    new CPUx86.Move { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                    //new CPUx86.MoveD { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.XMM1 };
+                    //new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
+                    //new CPUx86.Move { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 }
                 else
                 {

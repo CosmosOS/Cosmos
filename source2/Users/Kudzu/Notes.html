@@ -9,6 +9,7 @@
                 db</li>
             </ul>
         </li>
+        <li>Output Window - VMWare has its own. Can we get our own?</li>
         <li>ring restrictions on console etc.. by class, or explict inclusion</li>
         <li>PIT/RTC<ul>
             <li>And sleep, needed for ATA</li>
@@ -35,6 +36,20 @@
     <li>Express isnt showing any templates</li>
 </ul>
     <h3>
+        Trivalik - Next Release</h3>
+    <ul>
+        <li>Remove 2008<ul>
+            <li>And 2010 suffixes</li>
+            </ul>
+        </li>
+        <li>Warning 1 Could not read state file 
+            &quot;obj\Release\ResolveAssemblyReference.cache&quot;. Unable to cast object of type 
+            &#39;Microsoft.Build.Tasks.SystemState&#39; to type 
+            &#39;Microsoft.Build.Tasks.StateFileBase&#39;. 
+            C:\Windows\Microsoft.NET\Framework\v2.0.50727\Microsoft.Common.targets 0 1 Guess 
+            (source2\Demos\Guess\Guess) </li>
+    </ul>
+    <h3>
         &nbsp;Next Release + 1</h3>
     <ul>
     <li>Throw exception on null ref...</li>
@@ -56,7 +71,7 @@
         </li>
         <li>cxdb contains full asm path and filenames over and over... cant we write them 
             out once and use a byte/word index to identify them? This will make it smaller 
-            and make reading faster.<li>Plugs <ul>
+            and make reading faster.</li><li>Plugs <ul>
         <li>Source Plugs - Leave as they are</li>
                 <li>Assembly Plugs - Change to have attribute on the TARGET instead of the 
                     implementation and only allow assembly.. this cuts out the &quot;proxy&quot; class and 
@@ -115,9 +130,6 @@
     </ul>
 <h3>
     Notes</h3>
-<p>
-    &nbsp;
-
     <h3>
         Assembly Plug Example</h3>
     <h4>

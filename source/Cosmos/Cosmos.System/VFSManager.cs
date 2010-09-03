@@ -359,7 +359,7 @@ namespace Cosmos.Sys {
                 //}
                 //return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //// Cosmos.Debug.Debugger.SendMessage("FileExists", "Error!: " + e.Message);
                 return false;
@@ -453,7 +453,7 @@ namespace Cosmos.Sys {
                 //}
                 //return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // Cosmos.Debug.Debugger.SendError("VFSManager.cs", e.Message);
                 return false;
