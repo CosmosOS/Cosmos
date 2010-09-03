@@ -89,11 +89,6 @@
     <Compile Include="Consts.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SymbolsDS.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SymbolsDS.xsd</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
@@ -103,7 +98,6 @@
     <None Include="SymbolsDS.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>SymbolsDS.Designer.cs</LastGenOutput>
     </None>
     <None Include="SymbolsDS.xss">
       <DependentUpon>SymbolsDS.xsd</DependentUpon>
