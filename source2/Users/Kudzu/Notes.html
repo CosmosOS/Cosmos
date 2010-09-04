@@ -9,14 +9,6 @@
                 db</li>
             </ul>
         </li>
-        <li>Output Window<ul>
-            <li><a href="http://msdn.microsoft.com/en-us/library/bb166236.aspx">
-                http://msdn.microsoft.com/en-us/library/bb166236.aspx</a></li>
-            <li>var xDTE = (DTE2)Shell.Package.GetGlobalService(typeof(EnvDTE.DTE));<br />
-                var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;<br />
-                xPane.Add(&quot;Cosmos&quot;); </li>
-            </ul>
-        </li>
         <li>ring restrictions on console etc.. by class, or explict inclusion</li>
         <li>PIT/RTC<ul>
             <li>And sleep, needed for ATA</li>
@@ -49,17 +41,25 @@
             <li>And 2010 suffixes</li>
             </ul>
         </li>
-        <li>Warning 1 Could not read state file 
+    </ul>
+    <h3>
+        &nbsp;Next Release + 1</h3>
+    <ul>
+    <li>Warning 1 Could not read state file 
             &quot;obj\Release\ResolveAssemblyReference.cache&quot;. Unable to cast object of type 
             &#39;Microsoft.Build.Tasks.SystemState&#39; to type 
             &#39;Microsoft.Build.Tasks.StateFileBase&#39;. 
             C:\Windows\Microsoft.NET\Framework\v2.0.50727\Microsoft.Common.targets 0 1 Guess 
             (source2\Demos\Guess\Guess) </li>
-    </ul>
-    <h3>
-        &nbsp;Next Release + 1</h3>
-    <ul>
-    <li>Merge VSIP and Debugger projects into VSIP project</li>
+        <li>Merge VSIP and Debugger projects into VSIP project</li>
+        <li>Output Window<ul>
+            <li><a href="http://msdn.microsoft.com/en-us/library/bb166236.aspx">
+                http://msdn.microsoft.com/en-us/library/bb166236.aspx</a></li>
+            <li>var xDTE = (DTE2)Shell.Package.GetGlobalService(typeof(EnvDTE.DTE));<br />
+                var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;<br />
+                xPane.Add(&quot;Cosmos&quot;); </li>
+            </ul>
+        </li>
         <li>Throw exception on null ref...</li>
         <li>Plugs - warn if plugging something that doesnt exists... caused the x08 bug?</li>
         <li>Write out .asm line number to the cxdb file so I can use it in cgdb</li>

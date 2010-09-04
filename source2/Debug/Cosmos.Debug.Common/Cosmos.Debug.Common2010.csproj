@@ -61,6 +61,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\source\libraries\MDbg\corapi.dll</HintPath>
     </Reference>
+    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=2.5.2.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\FirebirdSql.Data.FirebirdClient.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -94,6 +99,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SymbolsDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
@@ -113,6 +119,20 @@
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fbclient.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="icudt30.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="icuin30.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="icuuc30.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
