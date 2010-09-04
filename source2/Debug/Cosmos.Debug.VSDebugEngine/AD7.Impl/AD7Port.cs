@@ -8,8 +8,6 @@ namespace Cosmos.Debug.VSDebugEngine
 {
     public class AD7Port: IDebugPort2
     {
-        #region IDebugPort2 Members
-
         int IDebugPort2.EnumProcesses(out IEnumDebugProcesses2 ppEnum)
         {
             throw new NotImplementedException();
@@ -40,6 +38,5 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new NotImplementedException();
         }
 
-        #endregion
     }
 }
