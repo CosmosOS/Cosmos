@@ -61,7 +61,7 @@ IF EXIST ..\..\Setup2\Output\CosmosUserKit.exe del /F ..\..\Setup2\Output\Cosmos
 
 IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Creating setup.exe
-	"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos2010.iss /dBuildConfiguration=Devkit
+	"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
 )
 
 ..\..\Setup2\Output\CosmosUserKit.exe /SILENT
