@@ -134,9 +134,9 @@ Name: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstall
 Name: {app}; Flags: uninsalwaysuninstall
 
 [InstallDelete]
-Type: files; Name: "{code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*";
-Type: filesandordirs; Name: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos";
-Type: filesandordirs; Name: "{code:GetCSharpExpress2010ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
+Type: files; Name: {code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*
+Type: filesandordirs; Name: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos
+Type: filesandordirs; Name: {code:GetCSharpExpress2010ProjectTemplatePath}\*Cosmos*.*; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
 
 
 
@@ -163,6 +163,8 @@ Source: .\Build\VSIP\Cosmos.Compiler.*; DestDir: {app}\Build\VSIP\; Flags: ignor
 Source: .\Build\VSIP\Cosmos.IL2CPU.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\corapi.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\fbembed.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\icu*.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 
 ; wizards
 Source: .\Build\VSIP\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2010_PATH}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly

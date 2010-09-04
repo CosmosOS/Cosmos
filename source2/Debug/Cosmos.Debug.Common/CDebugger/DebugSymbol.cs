@@ -35,9 +35,11 @@ namespace Cosmos.Debug.Common.CDebugger
 	public class MLDebugSymbol {
 
         protected static void CreateCPDB(string aPathname) {
+            File.Delete(aPathname);
+
             var xCSB = new FbConnectionStringBuilder();
             xCSB.ServerType = FbServerType.Embedded;
-            xCSB.Database = @"m:\temp\Cosmos.cpdb";
+            xCSB.Database = aPathname;
 
             FbConnection.CreateDatabase(xCSB.ToString());
 
