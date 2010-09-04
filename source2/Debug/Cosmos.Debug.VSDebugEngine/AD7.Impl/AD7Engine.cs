@@ -1,4 +1,5 @@
 using Cosmos.Debug.Common;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Shell = Microsoft.VisualStudio.Shell;
@@ -58,8 +59,6 @@ namespace Cosmos.Debug.VSDebugEngine
         public AD7Engine() {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             mBPMgr = new BreakpointManager(this);
-
-            Shell.Package.GetGlobalService(typeof(EnvDTE.DTE));
         }
 
         ~AD7Engine() {

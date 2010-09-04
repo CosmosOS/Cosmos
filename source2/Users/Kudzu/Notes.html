@@ -12,6 +12,9 @@
         <li>Output Window<ul>
             <li><a href="http://msdn.microsoft.com/en-us/library/bb166236.aspx">
                 http://msdn.microsoft.com/en-us/library/bb166236.aspx</a></li>
+            <li>var xDTE = (DTE2)Shell.Package.GetGlobalService(typeof(EnvDTE.DTE));<br />
+                var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;<br />
+                xPane.Add(&quot;Cosmos&quot;); </li>
             </ul>
         </li>
         <li>ring restrictions on console etc.. by class, or explict inclusion</li>
