@@ -109,7 +109,7 @@ namespace Cosmos.Debug.Common.CDebugger
 		}
 
 		public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile) {
-            OpenCPDB(Path.ChangeExtension(aFile, ".cpdb"), false);
+            //OpenCPDB(Path.ChangeExtension(aFile, ".cpdb"), false);
             var xDS = new SymbolsDS();
             xDS.ReadXml(aFile);
             foreach (SymbolsDS.EntryRow x in xDS.Entry.Rows) {
