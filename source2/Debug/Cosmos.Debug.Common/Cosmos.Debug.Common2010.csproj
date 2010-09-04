@@ -121,7 +121,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fbclient.dll">
+    <None Include="fbembed.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="icudt30.dll">

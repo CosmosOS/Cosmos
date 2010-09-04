@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Isql;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +33,26 @@ namespace Cosmos.Debug.Common.CDebugger
 	}
 
 	public class MLDebugSymbol {
+
+        protected static void CreateCPDB(string aPathname) {
+            var xCSB = new FbConnectionStringBuilder();
+            xCSB.ServerType = FbServerType.Embedded;
+            xCSB.Database = @"m:\temp\Cosmos.cpdb";
+
+            FbConnection.CreateDatabase(xCSB.ToString());
+
+            using (var xConn = new FbConnection(xCSB.ToString())) {
+                var xExec = new FbBatchExecution(xConn);
+                //foreach (string cmd in script.Results) {
+                //    xExec.SqlStatements.Add(cmd);
+                //}
+                //fbe.Execute();
+            }
+        }
+
 		public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile) {
+            CreateCPDB(Path.ChangeExtension(aFile, ".cpdb"));
+
             var xDS = new SymbolsDS();
             // This is a dataset and XML currently.
             // Later change it to a real DB as we don't need it in RAM all at once but we need it to be fast.
