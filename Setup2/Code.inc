@@ -97,11 +97,6 @@ begin
   result := __FRAMEWORK64_INSTALL_ROOT;
 end;
 
-function Vb2010_Installed: Boolean;
-begin
-	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
-end;
-
 function booltostr(value: Boolean) : string;
 begin
 	if value then
@@ -110,9 +105,14 @@ begin
 		Result := 'false';
 end;
 
-function csharp2010_Installed(test: string): Boolean;
+function Csharp2010_Installed(dummy: string): Boolean;
 begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
+end;
+
+function Vb2010_Installed(dummy: string): Boolean;
+begin
+	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
 function VS2010_REGISTRY_HIVE(dummy: string): string;
@@ -197,7 +197,7 @@ end;
 
 function InitializeSetup: Boolean;
 begin
-  if VSNET2010 then begin
+  if not VSNET2010 then begin
     MsgBox(ExpandConstant('Visual Studio 2010 not installed!'), MbError, MB_OK);
     result := false;
     exit;

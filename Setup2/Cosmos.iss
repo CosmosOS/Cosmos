@@ -174,7 +174,7 @@ Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
 
 ; Templates
 ; ; Install files into VS Integrated Shell (which includes full Visual Studio)
-Source: .\Build\VSIP\CosmosProject (C#).zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: csharp2010_Installed('dummy')
+Source: .\Build\VSIP\CosmosProject (C#).zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
 ;Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy')
 ; ; Install templates into Shell
 Source: .\Build\VSIP\Cosmos.zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy') or IsVBExpress2010Installed('dummy')
