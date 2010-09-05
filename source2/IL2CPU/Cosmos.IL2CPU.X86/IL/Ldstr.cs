@@ -37,10 +37,6 @@ namespace Cosmos.IL2CPU.X86.IL
         || xFields[2].Offset != 8) {
         throw new Exception("Fields changed!");
       }
-      if (xFields[3].Id != "System.Int32 System.String.m_arrayLength"
-        || xFields[3].Offset != 12) {
-        throw new Exception("Fields changed!");
-        }
       #endregion
     }
 

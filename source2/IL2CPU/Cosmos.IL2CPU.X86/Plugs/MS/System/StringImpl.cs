@@ -10,13 +10,11 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 		//[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char____System_Int32__System_Int32_")]
 		public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 			[FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-			[FieldAccess(Name = "System.Int32 System.String.m_arrayLength")] ref int aArrayLength,
 			[FieldAccess(Name = "System.Char System.String.m_firstChar")] ref char* aFirstChar) {
 			Char[] newChars = new Char[aLength];
 			Array.Copy(aChars, aStartIndex, newChars, 0, aLength);
 			aStorage = newChars;
 			aStringLength = newChars.Length;
-			aArrayLength = newChars.Length;
 			fixed (char* xFirstChar = &aStorage[0]) {
 				aFirstChar = xFirstChar;
 			}
@@ -25,11 +23,9 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 		//[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char___")]
 		public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")] ref Char[] aStorage, Char[] aChars,
 			[FieldAccess(Name = "System.Int32 System.String.m_stringLength")]ref int aStringLength,
-			[FieldAccess(Name = "System.Int32 System.String.m_arrayLength")] ref int aArrayLength,
 			[FieldAccess(Name = "System.Char System.String.m_firstChar")] ref char* aFirstChar) {
 			aStorage = aChars;
 			aStringLength = aChars.Length;
-			aArrayLength = aChars.Length;
 			fixed(char* xFirstChar = &aStorage[0]){
 				aFirstChar = xFirstChar;
 			}
