@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4">
 
     <PropertyGroup>
         <CosmosDir Condition="$(CosmosDir) == ''">$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
