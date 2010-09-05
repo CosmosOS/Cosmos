@@ -223,11 +223,11 @@ Global
 		SccLocalPath10 = ..\\source2\\VSIP\\Cosmos.VS.Package
 		SccProjectUniqueName11 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
 		SccProjectTopLevelParentUniqueName11 = Cosmos.sln
-		SccProjectName11 = ../source2/IL2PCU/Cosmos.IL2CPU
+		SccProjectName11 = ../source2/IL2CPU/Cosmos.IL2CPU
 		SccLocalPath11 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU
 		SccProjectUniqueName12 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.X86\\Cosmos.IL2CPU.X86.csproj
 		SccProjectTopLevelParentUniqueName12 = Cosmos.sln
-		SccProjectName12 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
+		SccProjectName12 = ../source2/IL2CPU/Cosmos.IL2CPU.X86
 		SccLocalPath12 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.X86
 		SccProjectUniqueName13 = Cosmos.Hardware.SMBIOS\\Cosmos.Hardware.SMBIOS.csproj
 		SccProjectTopLevelParentUniqueName13 = Cosmos.sln
@@ -243,11 +243,11 @@ Global
 		SccLocalPath15 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
 		SccProjectUniqueName16 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.X86.Tests\\Cosmos.IL2CPU.X86.Tests.csproj
 		SccProjectTopLevelParentUniqueName16 = Cosmos.sln
-		SccProjectName16 = ../source2/IL2PCU/Cosmos.IL2CPU.X86.Tests
+		SccProjectName16 = ../source2/IL2CPU/Cosmos.IL2CPU.X86.Tests
 		SccLocalPath16 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.X86.Tests
 		SccProjectUniqueName17 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Plugs\\Cosmos.IL2CPU.Plugs.csproj
 		SccProjectTopLevelParentUniqueName17 = Cosmos.sln
-		SccProjectName17 = ../source2/IL2PCU/Cosmos.IL2CPU.Plugs
+		SccProjectName17 = ../source2/IL2CPU/Cosmos.IL2CPU.Plugs
 		SccLocalPath17 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Plugs
 		SccProjectUniqueName18 = ..\\source2\\Debug\\Cosmos.Debug.GDB\\Cosmos.Debug.GDB.csproj
 		SccProjectTopLevelParentUniqueName18 = Cosmos.sln
@@ -287,7 +287,7 @@ Global
 		SccLocalPath26 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\Testing\\FileToEcmaCilTests\\SimpleClass2Test
 		SccProjectUniqueName27 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.Compiler.Debug.csproj
 		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
-		SccProjectName27 = ../source2/IL2PCU/Cosmos.IL2CPU.Debug
+		SccProjectName27 = ../source2/IL2CPU/Cosmos.IL2CPU.Debug
 		SccLocalPath27 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Debug
 		SccProjectUniqueName28 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Breakpoints.Cosmos
 		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
