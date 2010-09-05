@@ -152,6 +152,7 @@ Source: .\Build\VSIP\Cosmos.Core.*; DestDir: {app}\Kernel; Flags: ignoreversion 
 Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.Common.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\FirebirdSql.Data.FirebirdClient.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
 ; VSIP stuff
