@@ -23,14 +23,14 @@ REM xcopy /Y ..\..\Source\libraries\MDbg\corapi.* .
 REM xcopy /Y ..\..\source2\Build\Cosmos.Build.MSBuild\Cosmos.targets .
 REM xcopy /Y ..\..\source2\Build\Cosmos.Build.Common\bin\Debug\Cosmos.Build.Common.* .
 REM xcopy /Y ..\..\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.* .
-REM xcopy /Y ..\..\source2\IL2PCU\Cosmos.IL2CPU.Debug\bin\Debug\Cosmos.Compiler.Debug.* .
+REM xcopy /Y ..\..\source2\IL2CPU\Cosmos.IL2CPU.Debug\bin\Debug\Cosmos.Compiler.Debug.* .
 REM xcopy /Y ..\..\source2\debug\Cosmos.Debug.Common\bin\debug\Cosmos.Debug.Common.* .
 REM xcopy /Y ..\..\source2\debug\Cosmos.Debug.HostProcess\bin\debug\Cosmos.Debug.HostProcess.* .
 REM xcopy /Y ..\..\source2\debug\Cosmos.Debug.VSDebugEngine\bin\debug\Cosmos.Debug.VSDebugEngine.* .
 REM xcopy /Y ..\..\source\Cosmos\Cosmos.Hardware\bin\debug\Cosmos.Hardware2.* .
 REM xcopy /Y ..\..\source\Cosmos.Hardware.Plugs\bin\Debug\Cosmos.Hardware.Plugs.* .
-REM xcopy /Y ..\..\source2\IL2PCU\Cosmos.IL2CPU\bin\debug\Cosmos.IL2CPU.* .
-REM xcopy /Y ..\..\source2\IL2PCU\Cosmos.IL2CPU.x86\bin\debug\Cosmos.IL2CPU.X86.* .
+REM xcopy /Y ..\..\source2\IL2CPU\Cosmos.IL2CPU\bin\debug\Cosmos.IL2CPU.* .
+REM xcopy /Y ..\..\source2\IL2CPU\Cosmos.IL2CPU.x86\bin\debug\Cosmos.IL2CPU.X86.* .
 REM xcopy /Y ..\..\source\Cosmos\Cosmos.Kernel\bin\debug\Cosmos.Kernel.* .
 REM xcopy /Y ..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.* .
 REM xcopy /Y ..\..\source\Cosmos\Cosmos.System\bin\debug\Cosmos.Sys.* .
