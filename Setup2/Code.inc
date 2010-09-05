@@ -6,7 +6,6 @@ var
   __NET_FRAMEWORK4_INSTALLED,
   __NET_FRAMEWORK_SDK_INSTALLED,
   __NET_FRAMEWORK_64BIT_INSTALLED,
-  __VSNET2008,
   __VSNET2010,
   __PathsInitialized: Boolean;
   __FRAMEWORK_INSTALL_ROOT,
@@ -15,12 +14,8 @@ var
   __SDK2_INSTALL_ROOT,
   __REGASM,
   __REGASM64,
-  __VSNET2008_PATH,
   __VSNET2010_PATH,
-  __VSNET2008_BASE_PATH,
   __VSNET2010_BASE_PATH,
-	__CSharpExpress2008ProjectTemplatePath,
-	__VBExpress2008ProjectTemplatePath,
 	__CSharpExpress2010ProjectTemplatePath,
 	__VBExpress2010ProjectTemplatePath: string;
   
@@ -55,20 +50,10 @@ __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETF
   __NET_FRAMEWORK_64BIT_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework,Enable64Bit|0}') = '1';
   __NET_FRAMEWORK_64BIT_INSTALLED := __NET_FRAMEWORK_64BIT_INSTALLED or ((__RegAsm64<> '') and FileExists(__RegAsm64));
 
-  __VSNET2008_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\9.0,InstallDir|}');
   __VSNET2010_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\10.0,InstallDir|}');
-  __VSNET2008 := __VSNET2008_PATH <> '';
   __VSNET2010 := __VSNET2010_PATH <> '';
-  if __VSNET2008 then
-  __VSNET2008_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2008_PATH)+'..\..');
   if __VSNET2010 then
   __VSNET2010_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2010_PATH)+'..\..');
-  
-  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\9.0', 'UserProjectTemplatesLocation', __CSharpExpress2008ProjectTemplatePath);
-  StringChangeEx(__CSharpExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
-
-  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VBExpress\9.0', 'UserProjectTemplatesLocation', __VBExpress2008ProjectTemplatePath);
-  StringChangeEx(__VBExpress2008ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
   
   RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\10.0', 'UserProjectTemplatesLocation', __CSharpExpress2010ProjectTemplatePath);
   StringChangeEx(__CSharpExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
@@ -83,21 +68,10 @@ begin
   __PathsInitialized := False;
 end;
 
-function VSNET2008: Boolean;
-begin
-  InitializePaths;
-  Result := __VSNET2008;
-end;
-
 function VSNET2010: Boolean;
 begin
   InitializePaths;
   Result := __VSNET2010;
-end;
-
-function VSNET2008UP: Boolean;
-begin
-  Result := VSNET2008 or VSNET2010;
 end;
 
 function VSNET2010UP: Boolean;
