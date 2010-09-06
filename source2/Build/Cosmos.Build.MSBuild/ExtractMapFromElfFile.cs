@@ -7,7 +7,7 @@ using Microsoft.Build.Framework;
 using System.IO;
 using Microsoft.Build.Utilities;
 using System.Diagnostics;
-using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
-using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild
 {

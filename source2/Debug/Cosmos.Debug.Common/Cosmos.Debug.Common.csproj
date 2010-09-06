@@ -81,19 +81,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CDebugger\ReverseSourceInfo.cs" />
-    <Compile Include="CDebugger\DebugConnector.cs" />
-    <Compile Include="CDebugger\DebugConnectorPipeServer.cs" />
-    <Compile Include="CDebugger\DebugConnectorSerial.cs" />
-    <Compile Include="CDebugger\DebugConnectorStream.cs" />
-    <Compile Include="CDebugger\DebugConnectorTCPServer.cs" />
-    <Compile Include="CDebugger\DebugSymbol.cs" />
-    <Compile Include="CDebugger\KeyState.cs" />
-    <Compile Include="CDebugger\ObjDump.cs" />
-    <Compile Include="CDebugger\SourceInfo.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="DebugConnector.cs" />
+    <Compile Include="DebugConnectorPipeServer.cs" />
+    <Compile Include="DebugConnectorSerial.cs" />
+    <Compile Include="DebugConnectorStream.cs" />
+    <Compile Include="DebugConnectorTCPServer.cs" />
+    <Compile Include="DebugSymbol.cs" />
+    <Compile Include="KeyState.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />
+    <Compile Include="ObjDump.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReverseSourceInfo.cs" />
+    <Compile Include="SourceInfo.cs" />
     <Compile Include="SymbolsDS.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
