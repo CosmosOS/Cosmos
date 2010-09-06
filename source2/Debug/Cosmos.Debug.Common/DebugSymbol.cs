@@ -9,7 +9,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
 	public class DebugSymbol {
 		public string AssemblyFileName {

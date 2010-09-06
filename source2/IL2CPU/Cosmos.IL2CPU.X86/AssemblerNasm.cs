@@ -8,7 +8,7 @@ using System.IO;
 using Cosmos.Compiler.Assembler;
 using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
-using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 
 namespace Cosmos.IL2CPU.X86 {

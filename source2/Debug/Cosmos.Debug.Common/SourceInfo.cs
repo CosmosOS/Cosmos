@@ -9,7 +9,7 @@ using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Diagnostics;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
 	public class SourceInfos: SortedList<uint, SourceInfo> {
 		public SourceInfo GetMapping(uint aValue) {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 
-namespace Cosmos.Debug.Common.CDebugger {
+namespace Cosmos.Debug.Common {
     [Obsolete("We're not using ELF Format anymore")]
 	public class ObjDump {
 		public static SortedList<uint, string> GetLabelByAddressMapping(string aKernel, string aObjDumpExe) {

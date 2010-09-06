@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
 
     public class KeyState {

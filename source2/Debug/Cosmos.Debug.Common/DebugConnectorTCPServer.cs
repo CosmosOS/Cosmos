@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
     public class DebugConnectorTCPServer : DebugConnectorStream {
 

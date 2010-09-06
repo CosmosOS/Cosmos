@@ -7,7 +7,7 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
 	public class ReverseSourceInfos {
         private readonly SourceInfos mSourceInfos;

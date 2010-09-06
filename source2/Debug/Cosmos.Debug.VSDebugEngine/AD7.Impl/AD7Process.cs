@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Collections.Specialized;
-using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Debug.Common;
 using Cosmos.Compiler.Debug;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
@@ -172,13 +172,13 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             IDictionary<uint, string> xAddressLabelMappings;
             IDictionary<string, uint> xLabelAddressMappings;
-            Cosmos.Debug.Common.CDebugger.SourceInfo.ReadFromFile(Path.ChangeExtension(mISO, "cmap"), out xAddressLabelMappings, out xLabelAddressMappings);
+            Cosmos.Debug.Common.SourceInfo.ReadFromFile(Path.ChangeExtension(mISO, "cmap"), out xAddressLabelMappings, out xLabelAddressMappings);
             if (xAddressLabelMappings.Count == 0)
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
             }
             
-            mSourceMappings = Cosmos.Debug.Common.CDebugger.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(mISO, ".cxdb"));
+            mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(mISO, ".cxdb"));
 
             if (mSourceMappings.Count == 0) {
                 throw new Exception("Debug data not found: SourceMappings");
@@ -186,7 +186,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
-                mDbgConnector = new Cosmos.Debug.Common.CDebugger.DebugConnectorPipeServer();
+                mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
             } else {
                 throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
             }

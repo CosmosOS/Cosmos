@@ -7,7 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
     public abstract class DebugConnector: IDisposable {
         public Action<Exception> ConnectionLost;

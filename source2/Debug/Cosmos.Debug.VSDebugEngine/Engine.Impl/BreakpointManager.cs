@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Cosmos.Debug.Common.CDebugger;
+using Cosmos.Debug.Common;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Cosmos.Debug.VSDebugEngine {

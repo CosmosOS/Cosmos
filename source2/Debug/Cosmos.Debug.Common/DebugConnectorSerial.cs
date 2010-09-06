@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO.Ports;
 
-namespace Cosmos.Debug.Common.CDebugger
+namespace Cosmos.Debug.Common
 {
     //public class DebugConnectorSerial : DebugConnectorStream {
     //    private SerialPort mPort;

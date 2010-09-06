@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 
-namespace Cosmos.Debug.Common.CDebugger {
+namespace Cosmos.Debug.Common {
     public abstract class DebugConnectorStream : DebugConnector {
         private Stream mStream;
         
