@@ -183,7 +183,7 @@ namespace Cosmos.IL2CPU {
             throw new ArgumentNullException("aStartMethod");
         }
         // TODO: Investigate using MS CCI
-      // Need to check license, as well as in profiler
+        // Need to check license, as well as in profiler
         // http://cciast.codeplex.com/
 
         #region Description

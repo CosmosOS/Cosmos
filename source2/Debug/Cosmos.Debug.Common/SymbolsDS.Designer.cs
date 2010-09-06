@@ -277,7 +277,7 @@ namespace Cosmos.Debug.Common {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class EntryDataTable : global::System.Data.TypedTableBase<EntryRow> {
+        public partial class EntryDataTable : global::System.Data.DataTable, global::System.Collections.IEnumerable {
             
             private global::System.Data.DataColumn columnLabelName;
             
@@ -443,6 +443,12 @@ namespace Cosmos.Debug.Common {
                 rowEntryRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowEntryRow);
                 return rowEntryRow;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public virtual global::System.Collections.IEnumerator GetEnumerator() {
+                return this.Rows.GetEnumerator();
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
