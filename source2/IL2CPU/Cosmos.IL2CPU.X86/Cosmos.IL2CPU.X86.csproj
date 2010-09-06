@@ -321,7 +321,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Plugs\Generic\" />
-    <Folder Include="Plugs\Mono\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
