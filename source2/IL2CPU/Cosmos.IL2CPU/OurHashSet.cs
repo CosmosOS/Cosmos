@@ -5,9 +5,20 @@ using System.Text;
 using System.Collections;
 
 namespace Cosmos.IL2CPU {
-  public class OurHashSet<T>: IEnumerable<T> {
-    private Dictionary<int, T> mItems = new Dictionary<int, T>();
+    // Contains known types and methods, both scanned and unscanned
+    // We need both a HashSet and a List. HashSet for speed of checking
+    // to see if we already have it. And mItems contains an indexed list
+    // so we can scan it as it changes. Foreach can work on HashSet,
+    // but if foreach is used while its changed, a collection changed
+    // exception will occur and copy on demand for each loop has too
+    // much overhead.
+    // we use a custom comparer, because the default one does some intelligent magic, which breaks lookups. is probably related
+    // to comparing different types
+    // Its possible .NET 4.0 may have a better replacement, but be careful about the object compare issue (see note about custom
+    // comparer in ILScanner)
 
+    public class OurHashSet<T> : IEnumerable<T> {
+    private Dictionary<int, T> mItems = new Dictionary<int, T>();
 
     public bool Contains(T aItem) {
       if(aItem==null){

@@ -13,42 +13,31 @@ using System.Reflection.Emit;
 
 namespace Cosmos.IL2CPU {
   // This is necessary because HashSet and Dictionary
-  // have troubles when differnet types of objects are stored
+  // have troubles when different types of objects are stored
   // in them. I dont remember the exact problem, but something
-  // how it compares objects.
-  public class HashcodeComparer<T>: IEqualityComparer<T> {
+  // with how it compares objects. ie when HashSet<object> is used, this is necessary.
+    public class HashcodeComparer<T> : IEqualityComparer<T> {
+        public bool Equals(T x, T y) {
+            return x.GetHashCode() == y.GetHashCode();
+        }
 
-    public bool Equals(T x, T y) {
-      return x.GetHashCode() == y.GetHashCode();
+        public int GetHashCode(T obj) {
+            return obj.GetHashCode();
+        }
     }
 
-    public int GetHashCode(T obj) {
-      return obj.GetHashCode();
-    }
-
-  }
-
-  public class ILScanner : IDisposable {
+    public class ILScanner : IDisposable {
     protected ILReader mReader;
     protected AppAssembler mAsmblr;
 
-    // Contains known types and methods, both scanned and unscanned
-    // We need both a HashSet and a List. HashSet for speed of checking
-    // to see if we already have it. And mItems contains an indexed list
-    // so we can scan it as it changes. Foreach can work on HashSet,
-    // but if foreach is used while its changed, a collection changed
-    // exception will occur and copy on demand for each loop has too
-    // much overhead.
-    // we use a custom comparer, because the default one does some intelligent magic, which breaks lookups. is probably related
-    // to comparing different types
-    protected OurHashSet<object> mItems = new OurHashSet<object>();//(new HashcodeComparer<object>());
+    protected OurHashSet<object> mItems = new OurHashSet<object>();
     protected List<object> mItemsList = new List<object>();
     // Contains items to be scanned, both types and methods
     protected Queue<object> mQueue = new Queue<object>();
     // Virtual methods are nasty and constantly need to be rescanned for
     // overriding methods in new types, so we keep track of them separately. 
     // They are also in the main mItems and mQueue.
-    protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>(new HashcodeComparer<MethodBase>());
+    protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>();
 
     protected IDictionary<MethodBase, uint> mMethodUIDs = new Dictionary<MethodBase, uint>();
     protected IDictionary<Type, uint> mTypeUIDs = new Dictionary<Type, uint>();
@@ -108,7 +97,7 @@ namespace Cosmos.IL2CPU {
 
     protected void Queue(object aItem, object aSrc, string aSrcType) {
       var xMemInfo = aItem as MemberInfo;
-        // todo: fix this, as each label/symbol should also contain an assembly specifier.
+      //TODO: fix this, as each label/symbol should also contain an assembly specifier.
       if (xMemInfo != null
         && xMemInfo.DeclaringType != null
         && xMemInfo.DeclaringType.FullName == "System.ThrowHelper"
@@ -139,7 +128,7 @@ namespace Cosmos.IL2CPU {
               ScanMethod(xMethod, true);
             } else {
               if (xAttrib.IsWildcard && xAttrib.Assembler == null) {
-                throw new Exception("Wildcard PlugMethods need to use an assembler for now");
+                throw new Exception("Wildcard PlugMethods need to use an assembler for now.");
               }
               if (xAttrib.Enabled && !xAttrib.IsMonoOnly) {
                 ScanMethod(xMethod, true);
