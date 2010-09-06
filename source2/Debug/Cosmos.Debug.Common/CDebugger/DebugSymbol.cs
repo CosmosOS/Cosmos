@@ -1,5 +1,6 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,18 @@ namespace Cosmos.Debug.Common.CDebugger
             xCSB.Password = "masterkey";
             xCSB.Pooling = false;
 
+            // Ugh - The curr dir is the actual .cosmos dir. But we dont want to
+            // copy the FB Embedded DLLs everywhere, and we don't want them in system
+            // or path as they might conflict with other apps.
+            // However the FB .NET provider doesnt let us set the path, so we hack it
+            // by changing the current dir right before the first load (create or open).
+            // We set it back after.
+            string xCurrDir = Directory.GetCurrentDirectory();
+            using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Cosmos", false)) {
+                string xCosmosDir = (string)xKey.GetValue("");
+                Directory.SetCurrentDirectory(Path.Combine(xCosmosDir, @"Build\VSIP"));
+            }
+
             if (aCreate) {
                 File.Delete(aPathname);
                 FbConnection.CreateDatabase(xCSB.ToString());
@@ -51,6 +64,9 @@ namespace Cosmos.Debug.Common.CDebugger
 
             DBConn = new FbConnection(xCSB.ToString());
             DBConn.Open();
+
+            // Set the current directory back to the original
+            Directory.SetCurrentDirectory(xCurrDir);
         }
 
         protected static void CreateCPDB(string aPathname) {
