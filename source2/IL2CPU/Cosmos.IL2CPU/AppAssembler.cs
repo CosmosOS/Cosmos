@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU
         protected virtual void MethodBegin(MethodInfo aMethod)
         {
             new Comment("---------------------------------------------------------");
-            new Comment("Assembly: " + aMethod.MethodBase.DeclaringType.AssemblyQualifiedName);
+            new Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
             new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
             new Comment("Name: " + aMethod.MethodBase.Name);
             new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
