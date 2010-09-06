@@ -99,7 +99,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SymbolsDS.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
