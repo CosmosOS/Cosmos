@@ -16,15 +16,31 @@ namespace Cosmos.IL2CPU {
   // have troubles when different types of objects are stored
   // in them. I dont remember the exact problem, but something
   // with how it compares objects. ie when HashSet<object> is used, this is necessary.
-    public class HashcodeComparer<T> : IEqualityComparer<T> {
+    /*public class HashcodeComparer<T> : IEqualityComparer<T> {
         public bool Equals(T x, T y) {
-            return x.GetHashCode() == y.GetHashCode();
+			return internalEqualsSinceNET40(x, y);// x.GetHashCode() == y.GetHashCode();
         }
+
+		public bool internalEqualsSinceNET40(T left, T right)
+		{
+			var methodDeclaringType = left.GetType().GetMethod("get_DeclaringType");
+			var leftDeclaringType = methodDeclaringType.Invoke(left, null);
+
+			var method = right.GetType().GetMethod("get_DeclaringType");
+			var rightDeclaringType = method.Invoke(right, null);
+
+			if (left.ToString() == right.ToString()
+				&& leftDeclaringType == rightDeclaringType)
+			{
+				return true;
+			}
+			return false;
+		}
 
         public int GetHashCode(T obj) {
             return obj.GetHashCode();
         }
-    }
+    }*/
 
     public class ILScanner : IDisposable {
     protected ILReader mReader;
