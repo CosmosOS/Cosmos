@@ -28,27 +28,6 @@ namespace Cosmos.IL2CPU
 			if (aItem == null)
 				throw new ArgumentNullException("aItem");
 			return mItems.ContainsKey(GetHash(aItem));
-
-			var methodDeclaringType = aItem.GetType().GetMethod("get_DeclaringType");
-			var aItemDeclaringType = methodDeclaringType.Invoke(aItem, null);
-
-			bool ret2 = false;
-			foreach (var item in mItems)
-			{
-				var method = item.Value.GetType().GetMethod("get_DeclaringType");
-				var itemDeclaringType = method.Invoke(item.Value, null);
-
-				if (item.Value.ToString() == aItem.ToString()
-					&& itemDeclaringType == aItemDeclaringType)
-				{
-					if (ret2)
-						throw new Exception(" item mulitply in list!");
-					ret2 = true;
-				}
-
-			}
-
-			return ret2;
 		}
 
 		public void Add(T aItem)
@@ -91,13 +70,13 @@ namespace Cosmos.IL2CPU
 		public static string GetDeclareTypeString(T item)
 		{
 			var xName = GetDeclareType(item);
-			return xName == null ? "null" : xName.ToString();
+			return xName == null ? string.Empty : xName.ToString();
 		}
 
 		public static int GetHash(T item)
 		{
-			//return item.GetHashCode();
 			return (item.ToString() + GetDeclareTypeString(item)).GetHashCode();
 		}
 	}
+
 }
