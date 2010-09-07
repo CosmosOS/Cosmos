@@ -71,7 +71,6 @@
     <Compile Include="BaseToolTask.cs" />
     <Compile Include="ExtractMapFromElfFile.cs" />
     <Compile Include="IL2CPU.cs" />
-    <Compile Include="IL2CPU_Old.cs" />
     <Compile Include="Ld.cs" />
     <Compile Include="MakeISO.cs" />
     <Compile Include="NAsm.cs" />
