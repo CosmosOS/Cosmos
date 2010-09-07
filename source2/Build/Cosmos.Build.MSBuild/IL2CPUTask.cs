@@ -17,10 +17,10 @@ using System.Reflection.Emit;
 namespace Cosmos.Build.MSBuild {
     // Class is separated from MSBuild task so we can call it from debugging and standalone applications.
     public class IL2CPUTask {
-        public Action<string> OnLog(string aMsg); 
+        //public Action<string> OnLog(string aMsg); 
 
         protected void Log(string aMsg) {
-            OnLog(aMsg);
+            //OnLog(aMsg);
         }
 
         protected static void CheckFirstTime()
@@ -192,7 +192,7 @@ namespace Cosmos.Build.MSBuild {
         {
             //
         }
-        public override bool Execute()
+        public bool Execute()
         {
             try
             {
@@ -225,7 +225,7 @@ namespace Cosmos.Build.MSBuild {
                 xAsm.Assembler.Initialize();
                 using (var xScanner = new ILScanner(xAsm))
                 {
-                    xScanner.TempDebug += x => Log.LogMessage(x);
+                    //xScanner.TempDebug += x => Log.LogMessage(x);
                     if (EnableLogging)
                     {
                         xScanner.EnableLogging(xOutputFilename + ".log.html");
@@ -259,7 +259,7 @@ namespace Cosmos.Build.MSBuild {
                     // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
                     try
                     {
-                        Log.LogMessage(xAsm.Location);
+                        //Log.LogMessage(xAsm.Location);
                     }
                     catch
                     {
@@ -298,7 +298,7 @@ namespace Cosmos.Build.MSBuild {
                                 if (xFoundType != null)
                                 {
                                     // already a kernel found, which is not supported.
-                                    Log.LogError("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xFoundType.AssemblyQualifiedName);
+                                    //Log.LogError("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xFoundType.AssemblyQualifiedName);
                                     return null;
                                 }
                                 xFoundType = xType;
