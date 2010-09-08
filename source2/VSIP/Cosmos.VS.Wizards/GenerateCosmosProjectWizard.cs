@@ -72,6 +72,14 @@ namespace Cosmos.VS.Package.Templates
 			// Make .Cosmos project dependent on library project.
 			EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
 			bd.AddProject(project.UniqueName);
+
+			// found this with macro functionality in VS2010
+			dynamic d2 = project.DTE.ActiveWindow.Object;
+			d2.GetItem(project.Name + "\\" + project.Name + "Boot").Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
+			project.DTE.ExecuteCommand("Project.SetasStartUpProject");
+			// because
+			// project.DTE.Solution.SolutionBuild.StartupProjects = new object[] { project.Name + "Boot.Cosmos"}; 
+			// didnt work correct
         }
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
