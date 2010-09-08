@@ -144,14 +144,16 @@ namespace Cosmos.Build.MSBuild {
                 {
                     if (xRef.MetadataNames.OfType<string>().Contains("FullPath"))
                     {
-                        var xDir = Path.GetDirectoryName(xRef.GetMetadata("FullPath"));
+						var xName = xRef.GetMetadata("FullPath");
+                        var xDir = Path.GetDirectoryName(xName);
                         if (!xSearchPaths.Contains(xDir))
                         {
                             xSearchPaths.Insert(0, xDir);
                         }
-                        var xName = xRef.GetMetadata("FullPath");
                         if (xName.Length > 0)
                         {
+							if (!File.Exists(xName))
+								LogError("File " + xName + " does not exist!");
                             Assembly.LoadFile(xName);
                         }
                     }
