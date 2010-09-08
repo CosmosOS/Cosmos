@@ -49,6 +49,10 @@ namespace Cosmos.VS.Package.Templates
             xFilename += ".Cosmos";
             File.WriteAllText(xFilename, xInputString);
             project.DTE.Solution.AddFromFile(xFilename, false);
+
+			// Make .Cosmos project dependent on library project.
+			EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
+			bd.AddProject(project.UniqueName);
         }
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
