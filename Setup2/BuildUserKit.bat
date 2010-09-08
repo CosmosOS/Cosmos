@@ -53,6 +53,8 @@ del Cosmos.VS.Package.vsix
 REM Copy templates
 xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).zip" .
 xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosKernel (C#).zip" .
+xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (VB).zip" .
+xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosKernel (VB).zip" .
 xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\Cosmos.zip" .
 
 echo .
@@ -61,8 +63,8 @@ echo .
 echo Creating setup.exe
 REM Try one, then if not there the other for x64
 IF EXIST "C:\Program Files\Inno Setup 5\ISCC.exe" (
-	"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos2010.iss /dBuildConfiguration=Userkit
+	"C:\Program Files\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Userkit
 ) ELSE (
-	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos2010.iss /dBuildConfiguration=Userkit
+	"C:\Program Files (x86)\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Userkit
 )
 cd ..\..\Setup2

@@ -1,21 +1,22 @@
-﻿Imports Cosmos.Debug
+﻿Imports System
+Imports System.Collections.Generic
+Imports System.Text
 
-Public Class Kernel
+Namespace $safeprojectname$
 
-    Public Shared Sub Boot()
-        Dim xBoot = New Cosmos.Sys.Boot()
-        xBoot.Execute()
+	Public Class Kernel
+		Inherits Cosmos.System.Kernel
 
-        Console.WriteLine("Test")
-        Debugger.Send("Hello from Cosmos (VB)!")
-        Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.")
-        Console.WriteLine("Test")
-        While True
-            Console.Write("Input: ")
-            Dim xResult = Console.ReadLine()
-            Console.Write("Text typed: ")
-            Console.WriteLine(xResult)
-        End While
-    End Sub
+		Protected Overrides Sub BeforeRun()
+			Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.")
+		End Sub
 
-End Class
+		Protected Overrides Sub Run()
+			Console.Write("Input: ")
+			Console.ReadLine()
+			Console.Write("Text typed: ")
+		End Sub
+
+	End Class
+
+End Namespace

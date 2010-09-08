@@ -32,7 +32,7 @@
         <StartCosmosGDB>false</StartCosmosGDB>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include=".\$KernelName$.csproj">
+        <ProjectReference Include=".\$KernelName$.$ProjectTypeExtension$">
             <Name>$KernelName$</Name>
             <Project>$KernelGuid$</Project>
         </ProjectReference>
