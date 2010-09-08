@@ -33,7 +33,7 @@ namespace Cosmos.VS.Package.Templates
 
         public void ProjectFinishedGenerating(EnvDTE.Project project)
         {
-            //project.DTE.Solution
+			// read embedded template file
             var xInputString = GetTemplateString();
             if (xInputString == null)
             {
@@ -41,20 +41,21 @@ namespace Cosmos.VS.Package.Templates
             }
 
 			// set project extension for reference
-
 			string extension = null;
 			switch (project.Kind)
 			{
 				// VB.NET
 				case "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}":
-					extension = "vb";
+					extension = "vbproj";
 					break;
 				// C#
 				case "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}":
-					extension = "cs";
+					extension = "csproj";
 					break;
 				default:
-					throw new Exception("Unknown project type!");
+					// unknown project type
+					extension = project.UniqueName.Split('.')[1];
+					break;
 			}
 
             xInputString = xInputString.Replace("$KernelGuid$", mGuidKernel.ToString("b"));
@@ -67,8 +68,6 @@ namespace Cosmos.VS.Package.Templates
             xFilename += ".Cosmos";
             File.WriteAllText(xFilename, xInputString);
             project.DTE.Solution.AddFromFile(xFilename, false);
-
-			
 
 			// Make .Cosmos project dependent on library project.
 			EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
