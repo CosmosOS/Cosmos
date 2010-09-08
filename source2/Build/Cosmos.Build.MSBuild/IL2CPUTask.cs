@@ -23,13 +23,11 @@ namespace Cosmos.Build.MSBuild {
             //OnLog(aMsg);
         }
 
-        protected static void CheckFirstTime()
-        {
+        protected static void CheckFirstTime() {
             var xSearchDirs = new List<string>();
             xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
 
-            using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false))
-            {
+            using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false)) {
                 var xPath = (string)xReg.GetValue(null);
                 xSearchDirs.Add(xPath);
                 xSearchDirs.Add(Path.Combine(xPath, "Kernel"));
@@ -41,15 +39,12 @@ namespace Cosmos.Build.MSBuild {
 
         protected static string[] mSearchDirs = new string[0];
 
-        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
+        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
             var xShortName = args.Name;
-            if (xShortName.Contains(','))
-            {
+            if (xShortName.Contains(',')) {
                 xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
                 // TODO: remove following statement if it proves unnecessary
-                if (xShortName.Contains(','))
-                {
+                if (xShortName.Contains(',')) {
                     throw new Exception("Algo error");
                 }
             }
@@ -265,7 +260,6 @@ namespace Cosmos.Build.MSBuild {
         protected MethodBase RetrieveEntryPoint()
         {
             Type xFoundType = null;
-            #region detect entry point method
             foreach (var xRef in References)
             {
                 if (xRef.MetadataNames.OfType<string>().Contains("FullPath"))
@@ -300,7 +294,6 @@ namespace Cosmos.Build.MSBuild {
                     }
                 }
             }
-            #endregion detect entry point method
             if (xFoundType == null)
             {
                 //Log.LogError("No Kernel found!");
