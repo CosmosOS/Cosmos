@@ -75,8 +75,6 @@ namespace Cosmos.Build.MSBuild {
 
         protected static Action<string> mStaticLog = null;
 
-        #region properties
-        [Required]
         public string DebugMode
         {
             get;
@@ -95,21 +93,18 @@ namespace Cosmos.Build.MSBuild {
             set;
         }
 
-        [Required]
         public bool UseNAsm
         {
             get;
             set;
         }
 
-        [Required]
         public ITaskItem[] References
         {
             get;
             set;
         }
 
-        [Required]
         public string OutputFilename
         {
             get;
@@ -127,8 +122,6 @@ namespace Cosmos.Build.MSBuild {
             get;
             set;
         }
-
-        #endregion
 
         protected bool Initialize()
         {
