@@ -20,10 +20,6 @@ namespace Cosmos.Build.MSBuild
     {
         protected IL2CPUTask mTask = new IL2CPUTask();
 
-        private static string[] mSearchDirs = new string[0];
-
-        private static Action<string> mStaticLog = null;
-
         [Required]
         public string DebugMode
         {
