@@ -1,26 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
-using Microsoft.Build.Framework;
-using System.Reflection;
+﻿using Cosmos.Build.Common;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
-using System.IO;
-using Cosmos.Build.Common;
-using Microsoft.Win32;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
+using Microsoft.Win32;
+using Microsoft.Build.Utilities;
+using Microsoft.Build.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace Cosmos.Build.MSBuild {
     // Class is separated from MSBuild task so we can call it from debugging and standalone applications.
     public class IL2CPUTask {
-        //public Action<string> OnLog(string aMsg); 
+        public Action<string> OnLogMessage;
+        public Action<string> OnLogError;
+        public Action<Exception> OnLogException;
 
-        protected void Log(string aMsg) {
-            //OnLog(aMsg);
+        protected void LogMessage(string aMsg) {
+            if (OnLogMessage != null) {
+                OnLogMessage(aMsg);
+            }
+        }
+
+        protected void LogError(string aMsg) {
+            if (OnLogError != null) {
+                OnLogError(aMsg);
+            }
+        }
+
+        protected void LogException(Exception e) {
+            if (OnLogException != null) {
+                OnLogException(e);
+            }
         }
 
         protected static void CheckFirstTime() {
@@ -121,8 +137,6 @@ namespace Cosmos.Build.MSBuild {
         protected bool Initialize()
         {
             CheckFirstTime();
-            // load searchpaths:
-            //Log.LogMessage("SearchPath: '{0}'", References);
             if (References != null)
             {
                 var xSearchPaths = new List<string>(mSearchDirs);
@@ -152,7 +166,7 @@ namespace Cosmos.Build.MSBuild {
             {
                 if (!Enum.GetNames(typeof(DebugMode)).Contains(DebugMode, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    //Log.LogError("Invalid DebugMode specified");
+                    LogError("Invalid DebugMode specified");
                     return false;
                 }
                 mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
@@ -165,7 +179,7 @@ namespace Cosmos.Build.MSBuild {
             {
                 if (!Enum.GetNames(typeof(TraceAssemblies)).Contains(TraceAssemblies, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    //Log.LogError("Invalid TraceAssemblies specified");
+                    LogError("Invalid TraceAssemblies specified");
                     return false;
                 }
                 mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
@@ -184,7 +198,7 @@ namespace Cosmos.Build.MSBuild {
         {
             try
             {
-                //Log.LogMessage("Executing IL2CPU on assembly");
+                LogMessage("Executing IL2CPU on assembly");
                 if (!Initialize())
                 {
                     return false;
@@ -213,7 +227,7 @@ namespace Cosmos.Build.MSBuild {
                 xAsm.Assembler.Initialize();
                 using (var xScanner = new ILScanner(xAsm))
                 {
-                    //xScanner.TempDebug += x => Log.LogMessage(x);
+                    xScanner.TempDebug += x => LogMessage(x);
                     if (EnableLogging)
                     {
                         xScanner.EnableLogging(xOutputFilename + ".log.html");
@@ -238,16 +252,16 @@ namespace Cosmos.Build.MSBuild {
                 LogTime("Engine execute finished");
                 return true;
             }
-            catch (Exception E)
+            catch (Exception e)
             {
-                //Log.LogErrorFromException(E, true);
-                //Log.LogMessage("Loaded assemblies: ");
+                LogException(e);
+                LogMessage("Loaded assemblies: ");
                 foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
                     try
                     {
-                        //Log.LogMessage(xAsm.Location);
+                        LogMessage(xAsm.Location);
                     }
                     catch
                     {
@@ -285,7 +299,7 @@ namespace Cosmos.Build.MSBuild {
                                 if (xFoundType != null)
                                 {
                                     // already a kernel found, which is not supported.
-                                    //Log.LogError("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xFoundType.AssemblyQualifiedName);
+                                    LogError(string.Format("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xFoundType.AssemblyQualifiedName));
                                     return null;
                                 }
                                 xFoundType = xType;
@@ -296,13 +310,13 @@ namespace Cosmos.Build.MSBuild {
             }
             if (xFoundType == null)
             {
-                //Log.LogError("No Kernel found!");
+                LogError("No Kernel found!");
                 return null;
             }
             var xCtor = xFoundType.GetConstructor(Type.EmptyTypes);
             if (xCtor == null)
             {
-                //Log.LogError("Kernel has no public default constructor");
+                LogError("Kernel has no public default constructor");
                 return null;
             }
             return xCtor;

@@ -76,7 +76,23 @@ namespace Cosmos.Build.MSBuild
             set;
         }
 
+        protected void LogMessage(string aMsg) {
+            Log.LogMessage(aMsg);
+        }
+
+        protected void LogError(string aMsg) {
+            Log.LogMessage(aMsg);
+        }
+
+        protected void LogException(Exception e) {
+            Log.LogErrorFromException(e, true);
+        }
+
         public override bool Execute() {
+            mTask.OnLogMessage = LogMessage;
+            mTask.OnLogError = LogError;
+            mTask.OnLogException = LogException;
+
             mTask.DebugMode = DebugMode;
             mTask.TraceAssemblies = TraceAssemblies;
             mTask.DebugCom = DebugCom;
