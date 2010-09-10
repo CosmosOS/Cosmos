@@ -8,9 +8,9 @@
 
     For creating your own Cosmos in Express 2010 you need the following:
 	<ul>
-     <li>Microsoft Visual Studio Express 2010</li>
-	 <li>installed Cosmos (Userkit or compiled from checkout (Devkit))</li>
-	 <li>Microsoft Visual Studio 2010 Shell (Isolated Shell)</li>
+     <li>Visual Studio Express 2010 for C# or VB.NET</li>
+	 <li>installed Cosmos Kit(User Kit or compiled from checkout (Dev Kit))</li>
+	 <li>Visual Studio 2010 Shell (Isolated Shell)</li>
 	</ul>
 
 	<p>In Visual Studio Express 2010 you create a library project, that contain your OS code, and
@@ -22,7 +22,7 @@
 	<li>(UNTESTED) Start your Microsoft Visual Studio 2010 Shell and create a Project "Cosmos Project (Empty)".
 	   It contains a custom Project that use MSBuild with many tasks to create your OS. Save the project.</li>
 	<li>Copy now the created library with name of your project in the folder of the build project under bin/Debug/
-	   Thats need else would the added reference not found.</li>
+	   Thats needed else would the added reference in next step not found.</li>
 	<li>Add now the reference to the build project and try to build. When you get a warning that the added assembly
 	   is not found, you get "No Kernel Found!".</li>
 	</ol>

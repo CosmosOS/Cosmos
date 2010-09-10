@@ -17,33 +17,27 @@
         <h3>
             Prerequisites</h3>
         <ul>
-            <li>All User Kit prerequisites - See web site</li>
-            <li>(Optional) Team Foundation Client<ul>
-                <li>This can be found on your Visual Studio 2008 installation media under TFCClient 
-                    folder. It is best to install this before installing Visual Studio 2008 SP1. If 
-                    you do not wish to use the integrated source control, you can use the SVN bridge 
-                    instead.<ul>
-                        <li>(Free) If you are using the integrated TFS client you will also need the
-                            <a href="http://www.microsoft.com/downloads/details.aspx?familyid=CF13EA45-D17B-4EDC-8E6C-6C5B208EC54D&amp;displaylang=en">
-                            Visual Studio Team System 2008 Service Pack 1 Forward Compatibility Update for 
-                            Team Foundation Server 2010</a></li>
-                    </ul>
-                </li>
-                <li>If using Express, you can use the
-                    <a href="http://cosmos.codeplex.com/SourceControl/list/changesets">SVN bridge</a>, 
-                    or one of the many TFS standalone clients available at CodePlex.</li>
-                </ul>
+            <li>(Free) source code of Devkit from <a href="http://cosmos.codeplex.com/SourceControl/list/changesets">Cosmos on CodePlex</a>
+			  <ul>
+			   <li>(Optional) <a href="http://www.microsoft.com/downloads/en/details.aspx?FamilyID=fe4f9904-0480-4c9d-a264-02fedd78ab38">
+				  Visual Studio Team Explorer 2010</a><br />
+			      If you do not wish to use the integrated source control, you can use the SVN bridge instead.</li>
+               <li>If using Visual Studio 2010 Express, you can use the
+                   <a href="http://cosmos.codeplex.com/SourceControl/list/changesets">SVN bridge</a> i.e. direct download current changeset in a zip file, 
+                   or one of the many TFS standalone clients available at CodePlex.</li>
+              </ul>
             </li>
-            <li>(Free) <a href="http://www.jrsoftware.org/isdl.php#qsp">InnoSetup QuickStart Kit</a><ul>
-                <li>This is required to build the setup kit which is used to build and instal the 
-                    Visual Studio integration libaries for Cosmos</li>
-                <li>During install it will ask you about optional components to install. Leave them 
-                    all checked.</li>
-                </ul>
+            <li>(Free) <a href="http://www.jrsoftware.org/isdl.php#qsp">InnoSetup QuickStart Kit</a>
+			  <ul>
+                <li>This is required to build the setup kit which is used to build and install the 
+                    Visual Studio integration libaries for Cosmos.</li>
+                <li>During install it will ask you about optional components to install. Be sure you
+				    check "Install Inno Setup Preprocessor".</li>
+              </ul>
             </li>
             <li>(Free)
-                <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=59ec6ec3-4273-48a3-ba25-dc925a45584d&amp;displaylang=en">
-                Visual Studio 2008 SDK version 1.1</a></li>
+                <a href="http://www.microsoft.com/downloads/en/details.aspx?FamilyID=47305cf4-2bea-43c0-91cd-1b853602dcc5">
+                Visual Studio 2010 SDK</a></li>
         </ul>
     
     </div>
@@ -51,11 +45,8 @@
     <h3>
         Installation</h3>
     <ul>
-        <li>Get source from <a href="http://Cosmos.Codeplex.com">CodePlex</a>.</li>
-        <li>Run /build/VSIP/install.bat with admin privileges</li>
-        <li>Run /build/VSIP/install.bat AGAIN with admin privileges</li>
+        <li>Look in the downloaded sources and <b>run /build/VSIP/install.bat</b> with admin privileges (Windows XP and lower version, Vista and upper will ask you for it), needed for install in system directories</li>
+        <li>On end it will start retail versions of Visual Studio and you can begin with OS development.</li>
     </ul>
-    <p>
-        &nbsp;</p>
 </body>
 </html>
