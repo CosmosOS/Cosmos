@@ -1,14 +1,22 @@
 @echo off
 
+rem click on install.bat and run as admin the path in %CD% is c:\windows\system32
+if "%CD%" == "%SystemRoot%\system32" goto adminClick
+goto adminCalledFromACmdShellOrUnprivileged
+
+:adminClick
 REM Necessary to set dir when running as admin
 cd /D %~dp0
 
-echo Compiling cosmos
-set "THE_OUTPUT_PATH=%CD%"
-set "ProgFiles=%ProgramFiles%
-if not "[%ProgramFiles(x86)%]"=="[]" set "ProgFiles=%ProgramFiles(x86)%
+:adminCalledFromACmdShellOrUnprivileged
 
-cd "..\..\source"
+echo Compiling cosmos
+set THE_OUTPUT_PATH=%CD%
+set ProgFiles=%ProgramFiles%
+if not "%ProgramFiles(x86)%"=="" set "ProgFiles=%ProgramFiles(x86)%
+
+cd /D %~dp0
+cd ..\..\source
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%"
 rem /t:Rebuild
 cd ..\Build\VSIP\

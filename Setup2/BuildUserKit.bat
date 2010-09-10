@@ -1,7 +1,14 @@
 @echo off
 
+rem click on install.bat and run as admin the path in %CD% is c:\windows\system32
+if "%CD%" == "%SystemRoot%\system32" goto adminClick
+goto adminCalledFromACmdShellOrUnprivileged
+
+:adminClick
 REM Necessary to set dir when running as admin
 cd /D %~dp0
+
+:adminCalledFromACmdShellOrUnprivileged
 
 rem Prob not needed at all anymore, can delete
 rem echo Killing old stuff - Need to modify not to be user specific
@@ -10,10 +17,11 @@ rem rmdir /S /Q "C:\Users\Atmoic\AppData\Local\Microsoft\VisualStudio\9.0\Projec
 rem del /S /Q "C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\VSIP\*.*"
 
 echo Compiling cosmos
-cd ..\Build\VSIP
 set "THE_OUTPUT_PATH=%CD%"
-cd "..\..\source"
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos2010.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /t:Rebuild "/p:OutputPath=%THE_OUTPUT_PATH%"
+
+cd /D %~dp0
+cd ..\source
+%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%"
 rem /t:Rebuild
 cd ..\Build\VSIP\
 
