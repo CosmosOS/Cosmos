@@ -44,14 +44,16 @@ namespace Cosmos.VS.Package
 
         public override MSBuildResult Build(uint vsopts, string config, IVsOutputWindowPane output, string target)
         {
-            var xReferenceContainer = GetReferenceContainer();
+			// remove it, no really function in it Trivalik
+            //var xReferenceContainer = GetReferenceContainer();
             
             return base.Build(vsopts, config, output, target);
         } 
 
         protected override MSBuildResult InvokeMsBuild(string target)
         {
-            var xSolutionBuildManager = (IVsSolutionBuildManager)this.GetService(typeof(IVsSolutionBuildManager));
+			// remove it, no really function in it Trivalik
+            /*var xSolutionBuildManager = (IVsSolutionBuildManager)this.GetService(typeof(IVsSolutionBuildManager));
             var xSolution = (IVsSolution)this.GetService(typeof(IVsSolution));
             if (xSolutionBuildManager != null && xSolution != null)
             {
@@ -70,7 +72,7 @@ namespace Cosmos.VS.Package
                         }
                     }
                 }
-            }
+            }*/
             return base.InvokeMsBuild(target);
         }
 
