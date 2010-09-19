@@ -8,7 +8,7 @@ using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild
 {
-    public class ReadNAsmMapToCosmosMap : Task
+    public class ReadNAsmMapToCosmosMap : AppDomainIsolatedTask
     {
         [Required]
         public string InputBaseDir

@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild
 {
-	public abstract class BaseToolTask : Task
+	public abstract class BaseToolTask : AppDomainIsolatedTask
 	{
 		protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
 		{
