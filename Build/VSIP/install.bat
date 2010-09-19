@@ -75,7 +75,7 @@ IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Creating setup.exe
 	"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
 )
-pause
+rem pause
 ..\..\Setup2\Output\CosmosUserKit.exe /SILENT
 
 rem Relaunch VS
