@@ -70,8 +70,17 @@ namespace Cosmos.VS.Package.Templates
             project.DTE.Solution.AddFromFile(xFilename, false);
 
 			// Make .Cosmos project dependent on library project.
-			EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
-			bd.AddProject(project.UniqueName);
+			// not working for all people EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
+            var xEnu = project.DTE.Solution.SolutionBuild.BuildDependencies.GetEnumerator();
+            while (xEnu.MoveNext())
+            {
+                EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency) xEnu.Current;
+                if (bd.Project.Name == project.Name + "Boot")
+                {
+                    bd.AddProject(project.UniqueName);
+                    break;
+                }
+            }
 
 			// found this with macro functionality in VS2010
 			dynamic d2 = project.DTE.ActiveWindow.Object;
