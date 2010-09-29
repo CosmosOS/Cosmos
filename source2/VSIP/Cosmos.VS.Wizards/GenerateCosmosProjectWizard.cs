@@ -83,12 +83,25 @@ namespace Cosmos.VS.Package.Templates
             }
 
 			// found this with macro functionality in VS2010
-			dynamic d2 = project.DTE.ActiveWindow.Object;
-			d2.GetItem(project.Name + "\\" + project.Name + "Boot").Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
+			project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();
+			EnvDTE.UIHierarchy hierarchy = project.DTE.ActiveWindow.Object as EnvDTE.UIHierarchy;
+			hierarchy.GetItem(project.Name + "\\" + project.Name + "Boot").Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
 			project.DTE.ExecuteCommand("Project.SetasStartUpProject");
 			// because
 			// project.DTE.Solution.SolutionBuild.StartupProjects = new object[] { project.Name + "Boot.Cosmos"}; 
 			// didnt work correct
+
+			// set building Cosmos project
+			var enu = project.DTE.Solution.SolutionBuild.SolutionConfigurations.GetEnumerator();
+			while (enu.MoveNext())
+			{
+				var eno = (enu.Current as EnvDTE.SolutionConfiguration).SolutionContexts.GetEnumerator();
+				while (eno.MoveNext())
+				{
+					EnvDTE.SolutionContext context = eno.Current as EnvDTE.SolutionContext;
+					context.ShouldBuild = true;
+				}
+			}
         }
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
