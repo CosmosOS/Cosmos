@@ -172,7 +172,12 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             IDictionary<uint, string> xAddressLabelMappings;
             IDictionary<string, uint> xLabelAddressMappings;
-            Cosmos.Debug.Common.SourceInfo.ReadFromFile(Path.ChangeExtension(mISO, "cmap"), out xAddressLabelMappings, out xLabelAddressMappings);
+			string xCmapPath = Path.ChangeExtension(mISO, "cmap");
+			if (!File.Exists(xCmapPath))
+			{
+				throw new Exception("Debug data file " + xCmapPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
+			}
+            Cosmos.Debug.Common.SourceInfo.ReadFromFile(xCmapPath, out xAddressLabelMappings, out xLabelAddressMappings);
             if (xAddressLabelMappings.Count == 0)
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
