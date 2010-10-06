@@ -36,55 +36,72 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         protected void LaunchVMWare(bool aGDB) {
             string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
+			string xDebugVmx = "Debug.vmx";
             
-            using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
-                // This copy process also leaves the VMX writeable. VMWare doesnt like them read only.
-                using (var xDest = new StreamWriter(xPath + "Debug.vmx")) {
-                   string xLine;
-                   while ((xLine = xSrc.ReadLine()) != null) {
-                       var xParts = xLine.Split('=');
-                       if (xParts.Length == 2) {
-                           string xName = xParts[0].Trim();
-                           string xValue = xParts[1].Trim();
+            using (var xSrc = new StreamReader(xPath + "Cosmos.vmx"))
+			{
+				try
+				{
+					// This copy process also leaves the VMX writeable. VMWare doesnt like them read only.
+					using (var xDest = new StreamWriter(xPath + xDebugVmx))
+					{
+						string xLine;
+						while ((xLine = xSrc.ReadLine()) != null)
+						{
+							var xParts = xLine.Split('=');
+							if (xParts.Length == 2)
+							{
+								string xName = xParts[0].Trim();
+								string xValue = xParts[1].Trim();
 
-                           // We delete uuid entries so VMWare doenst ask the user "Did you move or copy" the file
-                           if ((xName == "uuid.location") || (xName == "uuid.bios")) {
-                               xValue = null;
-                           } else if (xName == "ide1:0.fileName") {
-                               xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
-                           }
+								// We delete uuid entries so VMWare doenst ask the user "Did you move or copy" the file
+								if ((xName == "uuid.location") || (xName == "uuid.bios"))
+								{
+									xValue = null;
+								}
+								else if (xName == "ide1:0.fileName")
+								{
+									xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
+								}
 
-                           if (xValue != null) {
-                               xDest.WriteLine(xName + " = " + xValue);
-                           }
-                       }
-                   }
-                   if (aGDB) {
-                       xDest.WriteLine();
-                       xDest.WriteLine("debugStub.listen.guest32 = \"TRUE\"");
-                       xDest.WriteLine("debugStub.hideBreakpoints = \"TRUE\"");
-                       xDest.WriteLine("monitor.debugOnStartGuest32 = \"TRUE\"");
-                       xDest.WriteLine("debugStub.listen.guest32.remote = \"TRUE\"");
-                   }
-                }
+								if (xValue != null)
+								{
+									xDest.WriteLine(xName + " = " + xValue);
+								}
+							}
+						}
+						if (aGDB)
+						{
+							xDest.WriteLine();
+							xDest.WriteLine("debugStub.listen.guest32 = \"TRUE\"");
+							xDest.WriteLine("debugStub.hideBreakpoints = \"TRUE\"");
+							xDest.WriteLine("monitor.debugOnStartGuest32 = \"TRUE\"");
+							xDest.WriteLine("debugStub.listen.guest32.remote = \"TRUE\"");
+						}
+					}
+				}
+				catch (IOException e)
+				{
+					if (e.Message.Contains(xDebugVmx))
+						throw new Exception("The Vmware image " + xDebugVmx + " is still in use! Please exit current Vmware session with Cosmos and try again!", e);
+					throw e;
+				}
             }
 
-            //TODO: Find this in code. This is hardcoded to default location right now.
-            //string xVmwPath = @"C:\Program Files (x86)\VMware\VMware Workstation\";
-            string xVmwPath;
+            string xVmwarePath;
             switch (mVMWareFlavor)
             {
                 case VMwareFlavor.Workstation:
-                    xVmwPath = GetVMWareWorkstationPath();
-                    if (String.IsNullOrEmpty(xVmwPath))
+                    xVmwarePath = GetVMWareWorkstationPath();
+                    if (String.IsNullOrEmpty(xVmwarePath))
                     {
                         goto case VMwareFlavor.Player;
                     }
-                    mProcessStartInfo.Arguments = "false \"" + xVmwPath + "\" -x -q \"" + xPath + "Debug.vmx\"";
+                    mProcessStartInfo.Arguments = "false \"" + xVmwarePath + "\" -x -q \"" + xPath + "Debug.vmx\"";
                     break;
                 case VMwareFlavor.Player:
-                    xVmwPath = GetVMWarePlayerPath();
-                    mProcessStartInfo.Arguments = "false \"" + xVmwPath + "\" \"" + xPath + "Debug.vmx\"";
+                    xVmwarePath = GetVMWarePlayerPath();
+                    mProcessStartInfo.Arguments = "false \"" + xVmwarePath + "\" \"" + xPath + "Debug.vmx\"";
                     break;
                 default:
                     throw new NotImplementedException("VMWare flavor '" + mVMWareFlavor.ToString() + "' not implemented!");
@@ -94,7 +111,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             // -q: Close VMWare when VM is powered off.
             // Options must come beore the vmx, and cannot use shellexecute
 
-            if (String.IsNullOrEmpty(xVmwPath) || !File.Exists(xVmwPath))
+            if (String.IsNullOrEmpty(xVmwarePath) || !File.Exists(xVmwarePath))
             {
                 MessageBox.Show("VWMare is not installed, probably going to crash now!", "Cosmos DebugEngine", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
