@@ -11,33 +11,39 @@ using System.IO;
 
 namespace Cosmos.Debug.Common
 {
-	public class DebugSymbol {
-		public string AssemblyFileName {
-			get;
-			set;
-		}
+    public delegate void LogTimeDelegate(string message);
 
-		public int MethodMetaDataToken {
-			get;
-			set;
-		}
+    public class DebugSymbol
+    {
+        public string AssemblyFileName
+        {
+            get;
+            set;
+        }
 
-		public int InstructionOffset {
-			get;
-			set;
-		}
+        public int MethodMetaDataToken
+        {
+            get;
+            set;
+        }
 
-		public string LabelName {
-			get;
-			set;
-		}
-	}
+        public int InstructionOffset
+        {
+            get;
+            set;
+        }
 
-	public class MLDebugSymbol {
+        public string LabelName
+        {
+            get;
+            set;
+        }
+    }
 
-        static protected FbConnection DBConn;
-
-        protected static void OpenCPDB(string aPathname, bool aCreate) {
+    public class MLDebugSymbol
+    {
+        private static FbConnection OpenCPDB(string aPathname, bool aCreate)
+        {
             var xCSB = new FbConnectionStringBuilder();
             xCSB.ServerType = FbServerType.Embedded;
             xCSB.Database = aPathname;
@@ -52,25 +58,30 @@ namespace Cosmos.Debug.Common
             // by changing the current dir right before the first load (create or open).
             // We set it back after.
             string xCurrDir = Directory.GetCurrentDirectory();
-            using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Cosmos", false)) {
+            using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Cosmos", false))
+            {
                 string xCosmosDir = (string)xKey.GetValue("");
                 Directory.SetCurrentDirectory(Path.Combine(xCosmosDir, @"Build\VSIP"));
             }
 
-            if (aCreate) {
+            if (aCreate)
+            {
                 File.Delete(aPathname);
                 FbConnection.CreateDatabase(xCSB.ToString());
             }
 
-            DBConn = new FbConnection(xCSB.ToString());
+            FbConnection DBConn = new FbConnection(xCSB.ToString());
             DBConn.Open();
 
             // Set the current directory back to the original
             Directory.SetCurrentDirectory(xCurrDir);
+
+            return DBConn;
         }
 
-        protected static void CreateCPDB(string aPathname) {
-            OpenCPDB(aPathname, true);
+        private static FbConnection CreateCPDB(string aPathname)
+        {
+            FbConnection DBConn = OpenCPDB(aPathname, true);
             var xExec = new FbBatchExecution(DBConn);
 
             xExec.SqlStatements.Add(
@@ -89,47 +100,73 @@ namespace Cosmos.Debug.Common
             xExec.Execute();
             // Batch execution closes the connection, so we have to reopen it
             DBConn.Open();
+
+            return DBConn;
         }
 
-		public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile) {
-            CreateCPDB(Path.ChangeExtension(aFile, ".cpdb"));
+        public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile)
+        {
+            // Use a temporary file for the database and then move the newly created database to the wanted location afterwards.
+            // We do this so the user can gain compilation speed when using a faster disk for instance a mem-disk for the temporary files.
+            string tmpdbname = Path.GetTempFileName();
+            string dbname = Path.ChangeExtension(aFile, ".cpdb");
 
-            var xDS = new SymbolsDS();
-            // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-            foreach(var xItem in aSymbols){
-                var x = xDS.Entry.NewEntryRow();
-                x.LabelName = xItem.LabelName;
-                x.Address = xItem.Address;
-                x.StackDiff = xItem.StackDifference;
-                x.ILAsmFile = xItem.AssemblyFile;
-                x.TypeToken = xItem.TypeToken;
-                x.MethodToken = xItem.MethodToken;
-                x.ILOffset = xItem.ILOffset;
-                x.MethodName = xItem.MethodName;
-                xDS.Entry.AddEntryRow(x);
+            using (FbConnection DBConn = CreateCPDB(tmpdbname))
+            {
+                var xDS = new SymbolsDS();
 
-                var xCmd = new FbCommand("INSERT INTO SYMBOL (LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)"
-                    + " VALUES (@LABELNAME, @ADDRESS, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)"
-                    , DBConn);
-                xCmd.Parameters.Add("@LABELNAME", xItem.LabelName);
-                xCmd.Parameters.Add("@ADDRESS", xItem.Address);
-                xCmd.Parameters.Add("@STACKDIFF", xItem.StackDifference);
-                xCmd.Parameters.Add("@ILASMFILE", xItem.AssemblyFile);
-                xCmd.Parameters.Add("@TYPETOKEN", xItem.TypeToken);
-                xCmd.Parameters.Add("@METHODTOKEN", xItem.MethodToken);
-                xCmd.Parameters.Add("@ILOFFSET", xItem.ILOffset);
-                xCmd.Parameters.Add("@METHODNAME", xItem.MethodName);
-                xCmd.ExecuteNonQuery();
+                using (FbTransaction transaction = DBConn.BeginTransaction())
+                {
+                    string sqlstmt = "INSERT INTO SYMBOL (LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                                     " VALUES (@LABELNAME, @ADDRESS, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
+
+                    // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
+                    foreach (var xItem in aSymbols)
+                    {
+                        var x = xDS.Entry.NewEntryRow();
+                        x.LabelName = xItem.LabelName;
+                        x.Address = xItem.Address;
+                        x.StackDiff = xItem.StackDifference;
+                        x.ILAsmFile = xItem.AssemblyFile;
+                        x.TypeToken = xItem.TypeToken;
+                        x.MethodToken = xItem.MethodToken;
+                        x.ILOffset = xItem.ILOffset;
+                        x.MethodName = xItem.MethodName;
+                        xDS.Entry.AddEntryRow(x);
+
+                        var xCmd = new FbCommand(sqlstmt, DBConn, transaction);
+                        xCmd.Parameters.Add("@LABELNAME", xItem.LabelName);
+                        xCmd.Parameters.Add("@ADDRESS", xItem.Address);
+                        xCmd.Parameters.Add("@STACKDIFF", xItem.StackDifference);
+                        xCmd.Parameters.Add("@ILASMFILE", xItem.AssemblyFile);
+                        xCmd.Parameters.Add("@TYPETOKEN", xItem.TypeToken);
+                        xCmd.Parameters.Add("@METHODTOKEN", xItem.MethodToken);
+                        xCmd.Parameters.Add("@ILOFFSET", xItem.ILOffset);
+                        xCmd.Parameters.Add("@METHODNAME", xItem.MethodName);
+                        xCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+
+                xDS.WriteXml(aFile);
             }
-            xDS.WriteXml(aFile);
-		}
 
-		public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile) {
+            if (File.Exists(dbname))
+                File.Delete(dbname);
+
+            File.Move(tmpdbname, dbname);
+        }
+
+        public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile)
+        {
             //OpenCPDB(Path.ChangeExtension(aFile, ".cpdb"), false);
             var xDS = new SymbolsDS();
             xDS.ReadXml(aFile);
-            foreach (SymbolsDS.EntryRow x in xDS.Entry.Rows) {
-                aSymbols.Add(new MLDebugSymbol {
+            foreach (SymbolsDS.EntryRow x in xDS.Entry.Rows)
+            {
+                aSymbols.Add(new MLDebugSymbol
+                {
                     LabelName = x.LabelName,
                     Address = x.Address,
                     StackDifference = x.StackDiff,
@@ -140,44 +177,51 @@ namespace Cosmos.Debug.Common
                     MethodName = x.MethodName
                 });
             }
-		}
+        }
 
-		public string LabelName {
-			get;
-			set;
-		}
+        public string LabelName
+        {
+            get;
+            set;
+        }
 
-		public uint Address {
-			get;
-			set;
-		}
+        public uint Address
+        {
+            get;
+            set;
+        }
 
-		public int StackDifference {
-			get;
-			set;
-		}
+        public int StackDifference
+        {
+            get;
+            set;
+        }
 
-		public string AssemblyFile {
-			get;
-			set;
-		}
-		public int TypeToken {
-			get;
-			set;
-		}
-		public int MethodToken {
-			get;
-			set;
-		}
-		public int ILOffset {
-			get;
-			set;
-		}
+        public string AssemblyFile
+        {
+            get;
+            set;
+        }
+        public int TypeToken
+        {
+            get;
+            set;
+        }
+        public int MethodToken
+        {
+            get;
+            set;
+        }
+        public int ILOffset
+        {
+            get;
+            set;
+        }
 
         public string MethodName
         {
             get;
             set;
         }
-	}
+    }
 }
