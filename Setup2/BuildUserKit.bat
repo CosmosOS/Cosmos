@@ -21,8 +21,7 @@ set "THE_OUTPUT_PATH=%CD%"
 
 cd /D %~dp0
 cd ..\source
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%"
-rem /t:Rebuild
+%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%" /t:Rebuild
 cd ..\Build\VSIP\
 
 echo Copying files
