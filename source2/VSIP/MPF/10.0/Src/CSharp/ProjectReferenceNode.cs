@@ -442,14 +442,15 @@ namespace Microsoft.VisualStudio.Project
 				return false;
 			}
 
-			IVsHierarchy hierarchy = null;
+            // MtW: disabling this code makes dependency resolution work
+            //IVsHierarchy hierarchy = null;
 
-			hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, this.referencedProjectGuid);
+            //hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, this.referencedProjectGuid);
 
-			if(hierarchy == null)
-			{
-				return false;
-			}
+            //if (hierarchy == null)
+            //{
+            //    return false;
+            //}
 
 			//If the Project is unloaded return false
 			if(this.ReferencedProjectObject == null)
