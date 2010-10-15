@@ -67,7 +67,7 @@ namespace Cosmos.Debug.Common
             if (aCreate)
             {
                 File.Delete(aPathname);
-                FbConnection.CreateDatabase(xCSB.ToString());
+                FbConnection.CreateDatabase(xCSB.ToString(), 16384, false, true); // Specifying false to forcedwrites will improve database speed.
             }
 
             FbConnection DBConn = new FbConnection(xCSB.ToString());
