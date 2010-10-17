@@ -336,5 +336,11 @@ namespace Microsoft.VisualStudio.Project
 		protected abstract void BindReferenceData();
 
 		#endregion
+
+        public abstract string AssemblyFilename
+        {
+            get;
+        }
+
 	}
 }

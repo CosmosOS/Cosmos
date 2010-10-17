@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudio.Project
 
 			this.InitializeFileChangeEvents();
 
-            ReferenceIdentifier = "file:" + RelativePathTo(root.ProjectFolder, assemblyPath);
+//            ReferenceIdentifier = "file:" + RelativePathTo(root.ProjectFolder, assemblyPath);
             mAssemblyFilename = Path.GetFileName(assemblyPath);
 
 			// The assemblyPath variable can be an actual path on disk or a generic assembly name.

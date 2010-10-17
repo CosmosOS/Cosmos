@@ -59,6 +59,20 @@ namespace Microsoft.VisualStudio.Project
 
 		#region properties
 
+        private string mAssemblyFilename;
+        public override string AssemblyFilename
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(mAssemblyFilename))
+                {
+                    mAssemblyFilename = (string)ReferencedProjectObject.Properties.Item("OutputFilename").Value;
+                }
+                return mAssemblyFilename;
+            }
+        }
+
+
 		public override string Url
 		{
 			get
