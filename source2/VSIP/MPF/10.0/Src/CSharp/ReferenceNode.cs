@@ -337,6 +337,12 @@ namespace Microsoft.VisualStudio.Project
 
 		#endregion
 
+        public string ReferenceIdentifier
+        {
+            get;
+            protected set;
+        }
+
         public abstract string AssemblyFilename
         {
             get;

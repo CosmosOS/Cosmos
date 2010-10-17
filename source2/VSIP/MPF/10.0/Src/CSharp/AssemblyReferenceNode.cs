@@ -217,8 +217,9 @@ namespace Microsoft.VisualStudio.Project
 
 			this.InitializeFileChangeEvents();
 
-//            ReferenceIdentifier = "file:" + RelativePathTo(root.ProjectFolder, assemblyPath);
+            //           ReferenceIdentifier = "file:" + RelativePathTo(root.ProjectFolder, assemblyPath);
             mAssemblyFilename = Path.GetFileName(assemblyPath);
+
 
 			// The assemblyPath variable can be an actual path on disk or a generic assembly name.
 			if(File.Exists(assemblyPath))
@@ -398,6 +399,7 @@ namespace Microsoft.VisualStudio.Project
 			else
 			{
 				this.assemblyPath = this.GetFullPathFromPath(result);
+                mAssemblyFilename = Path.GetFileName(result);
 			}
 		}
 
@@ -438,6 +440,10 @@ namespace Microsoft.VisualStudio.Project
 			if(!String.IsNullOrEmpty(this.assemblyPath))
 			{
 				this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
+                if (GACDetectionUtility.IsAssemblyFileFromGAC(assemblyPath))
+                {
+                    return;
+                }
 			}
 
 			// Now loop through the generated References to find the corresponding one
