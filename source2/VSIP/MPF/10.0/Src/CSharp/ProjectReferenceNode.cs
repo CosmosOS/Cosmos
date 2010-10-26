@@ -59,20 +59,6 @@ namespace Microsoft.VisualStudio.Project
 
 		#region properties
 
-        private string mAssemblyFilename;
-        public override string AssemblyFilename
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(mAssemblyFilename))
-                {
-                    mAssemblyFilename = (string)ReferencedProjectObject.Properties.Item("OutputFilename").Value;
-                }
-                return mAssemblyFilename;
-            }
-        }
-
-
 		public override string Url
 		{
 			get
@@ -456,15 +442,14 @@ namespace Microsoft.VisualStudio.Project
 				return false;
 			}
 
-            // MtW: disabling this code makes dependency resolution work
-            //IVsHierarchy hierarchy = null;
+			IVsHierarchy hierarchy = null;
 
-            //hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, this.referencedProjectGuid);
+			hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, this.referencedProjectGuid);
 
-            //if (hierarchy == null)
-            //{
-            //    return false;
-            //}
+			if(hierarchy == null)
+			{
+				return false;
+			}
 
 			//If the Project is unloaded return false
 			if(this.ReferencedProjectObject == null)

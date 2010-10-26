@@ -356,11 +356,5 @@ namespace Microsoft.VisualStudio.Project
         }
 
         #endregion
-
-        public override string AssemblyFilename
-        {
-            get { throw new NotImplementedException(); }
-        }
-
     }
 }

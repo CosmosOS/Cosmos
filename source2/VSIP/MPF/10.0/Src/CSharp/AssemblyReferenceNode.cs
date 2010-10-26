@@ -23,13 +23,10 @@ using MSBuild = Microsoft.Build.Evaluation;
 using MSBuildExecution = Microsoft.Build.Execution;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
-using Cosmos.VS.Package;
+using Microsoft.Build.Execution;
 
 namespace Microsoft.VisualStudio.Project
 {
-    /// <summary>
-    /// This class is used to handle file references to assemblies
-    /// </summary>
 	[CLSCompliant(false)]
 	[ComVisible(true)]
 	public class AssemblyReferenceNode : ReferenceNode
@@ -105,15 +102,6 @@ namespace Microsoft.VisualStudio.Project
 				return assemblyRef;
 			}
 		}
-
-        private string mAssemblyFilename;
-        public override string AssemblyFilename
-        {
-            get
-            {
-                return mAssemblyFilename;
-            }
-        }
 		#endregion
 
 		#region ctors
@@ -130,74 +118,7 @@ namespace Microsoft.VisualStudio.Project
 			string include = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
 
 			this.CreateFromAssemblyName(new System.Reflection.AssemblyName(include));
-            BindReferenceData();
 		}
-
-        private static string RelativePathTo(string fromDirectory, string toPath)
-        {
-            if (fromDirectory == null)
-            {
-                throw new ArgumentNullException("fromDirectory");
-            }
-            if (toPath == null)
-            {
-                throw new ArgumentNullException("toPath");
-            }
-            var isRooted = Path.IsPathRooted(fromDirectory)
-                && Path.IsPathRooted(toPath);
-
-            if (isRooted)
-            {
-                bool isDifferentRoot = string.Compare(Path.GetPathRoot(fromDirectory), Path.GetPathRoot(toPath), true) != 0;
-                if (isDifferentRoot)
-                {
-                    return toPath;
-                }
-            }
-            var relativePath = new List<string>();
-            var fromDirectories = fromDirectory.Split(Path.DirectorySeparatorChar);
-            var toDirectories = toPath.Split(Path.DirectorySeparatorChar);
-
-            var length = Math.Min(fromDirectories.Length, toDirectories.Length);
-
-            int lastCommonRoot = -1;
-            // find common root
-            for (int x = 0; x < length; x++)
-            {
-                if (string.Compare(fromDirectories[x], toDirectories[x], true) != 0)
-                {
-                    break;
-                }
-
-                lastCommonRoot = x;
-            }
-
-            if (lastCommonRoot == -1)
-            {
-                return toPath;
-            }
-
-
-            // add relative folders in from path
-            for (int x = lastCommonRoot + 1; x < fromDirectories.Length; x++)
-            {
-                if (fromDirectories[x].Length > 0)
-                {
-                    relativePath.Add("..");
-                }
-            }
-
-            // add to folders to path
-            for (int x = lastCommonRoot + 1; x < toDirectories.Length; x++)
-            {
-                relativePath.Add(toDirectories[x]);
-            }
-
-            // create relative path
-            var relativeParts = new string[relativePath.Count];
-            relativePath.CopyTo(relativeParts, 0);
-            return String.Join(Path.DirectorySeparatorChar.ToString(), relativeParts);
-        }
 
 		/// <summary>
 		/// Constructor for the AssemblyReferenceNode
@@ -216,10 +137,6 @@ namespace Microsoft.VisualStudio.Project
 			}
 
 			this.InitializeFileChangeEvents();
-
-            //           ReferenceIdentifier = "file:" + RelativePathTo(root.ProjectFolder, assemblyPath);
-            mAssemblyFilename = Path.GetFileName(assemblyPath);
-
 
 			// The assemblyPath variable can be an actual path on disk or a generic assembly name.
 			if(File.Exists(assemblyPath))
@@ -371,10 +288,7 @@ namespace Microsoft.VisualStudio.Project
 		{
 			if(String.IsNullOrEmpty(this.assemblyPath) || !File.Exists(this.assemblyPath))
 			{
-                if (resolvedAssemblyName == null)
-                {
-                    return false;
-                }
+				return false;
 			}
 
 			return true;
@@ -399,7 +313,6 @@ namespace Microsoft.VisualStudio.Project
 			else
 			{
 				this.assemblyPath = this.GetFullPathFromPath(result);
-                mAssemblyFilename = Path.GetFileName(result);
 			}
 		}
 
@@ -434,20 +347,16 @@ namespace Microsoft.VisualStudio.Project
 			string privateValue = this.ItemNode.GetMetadata(ProjectFileConstants.Private);
 
 			// Get the list of items which require HintPath
-            IEnumerable<MSBuild.ProjectItem> references = this.ProjectMgr.BuildProject.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
+            ICollection<ProjectItemInstance> references = this.ProjectMgr.CurrentConfig.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
 
 			// Remove the HintPath, we will re-add it below if it is needed
 			if(!String.IsNullOrEmpty(this.assemblyPath))
 			{
 				this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
-                if (GACDetectionUtility.IsAssemblyFileFromGAC(assemblyPath))
-                {
-                    return;
-                }
 			}
 
 			// Now loop through the generated References to find the corresponding one
-            foreach (MSBuild.ProjectItem reference in references)
+            foreach (ProjectItemInstance reference in references)
 			{
 				string fileName = Path.GetFileNameWithoutExtension(reference.EvaluatedInclude);
 				if(String.Compare(fileName, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase) == 0)
@@ -482,11 +391,7 @@ namespace Microsoft.VisualStudio.Project
 		private void SetReferenceProperties()
 		{
 			// Set a default HintPath for msbuild to be able to resolve the reference.
-            if (!GACDetectionUtility.IsAssemblyFileFromGAC(assemblyPath))
-            {
-                // Set a default HintPath for msbuild to be able to resolve the reference.
-                this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
-            }
+			this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
 
 			// Resolve assembly referernces. This is needed to make sure that properties like the full path
 			// to the assembly or the hint path are set.
