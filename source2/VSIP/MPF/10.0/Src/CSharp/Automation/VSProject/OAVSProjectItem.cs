@@ -12,8 +12,8 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using VSLangProj;
 using EnvDTE;
+using VSLangProj;
 
 namespace Microsoft.VisualStudio.Project.Automation
 {

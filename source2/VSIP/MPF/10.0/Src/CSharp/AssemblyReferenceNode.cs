@@ -348,7 +348,7 @@ namespace Microsoft.VisualStudio.Project
 
 			// Get the list of items which require HintPath
             ICollection<ProjectItemInstance> references = this.ProjectMgr.CurrentConfig.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
-
+                                                                               
 			// Remove the HintPath, we will re-add it below if it is needed
 			if(!String.IsNullOrEmpty(this.assemblyPath))
 			{
@@ -401,13 +401,11 @@ namespace Microsoft.VisualStudio.Project
 			}
 
 			// Check if we have to resolve again the path to the assembly.
-			if(string.IsNullOrEmpty(this.assemblyPath))
-			{
-				ResolveReference();
-			}
-
-			// Make sure that the hint path if set (if needed).
-			SetHintPathAndPrivateValue();
+            if (string.IsNullOrEmpty(this.assemblyPath))
+            {
+                ResolveReference();
+                SetHintPathAndPrivateValue();
+            }
 		}
 
 		/// <summary>
