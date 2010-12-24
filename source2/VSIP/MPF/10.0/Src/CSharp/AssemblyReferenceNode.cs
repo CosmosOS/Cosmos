@@ -401,7 +401,7 @@ namespace Microsoft.VisualStudio.Project
 			}
 
 			// Check if we have to resolve again the path to the assembly.
-            if (string.IsNullOrEmpty(this.assemblyPath))
+            if (!string.IsNullOrEmpty(this.assemblyPath))
             {
                 ResolveReference();
                 SetHintPathAndPrivateValue();
