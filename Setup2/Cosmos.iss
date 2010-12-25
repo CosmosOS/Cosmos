@@ -1,3 +1,5 @@
+#define ChangeSetVersion "71246"
+
 #ifndef BuildConfiguration
 	#error "No Build configuration defined!"
 #endif
@@ -22,13 +24,13 @@
 [Setup]
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
-AppVerName=Cosmos User Kit
+AppVerName=Cosmos User Kit v{#ChangeSetVersion}
 AppCopyright=Copyright © 2007-2010 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
 AppUpdatesURL=http://www.goCosmos.org/
-AppVersion=0.5
+AppVersion={#ChangeSetVersion}
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
