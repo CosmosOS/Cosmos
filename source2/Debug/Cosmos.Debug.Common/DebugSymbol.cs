@@ -134,16 +134,18 @@ namespace Cosmos.Debug.Common
                         x.MethodName = xItem.MethodName;
                         xDS.Entry.AddEntryRow(x);
 
-                        var xCmd = new FbCommand(sqlstmt, DBConn, transaction);
-                        xCmd.Parameters.Add("@LABELNAME", xItem.LabelName);
-                        xCmd.Parameters.Add("@ADDRESS", xItem.Address);
-                        xCmd.Parameters.Add("@STACKDIFF", xItem.StackDifference);
-                        xCmd.Parameters.Add("@ILASMFILE", xItem.AssemblyFile);
-                        xCmd.Parameters.Add("@TYPETOKEN", xItem.TypeToken);
-                        xCmd.Parameters.Add("@METHODTOKEN", xItem.MethodToken);
-                        xCmd.Parameters.Add("@ILOFFSET", xItem.ILOffset);
-                        xCmd.Parameters.Add("@METHODNAME", xItem.MethodName);
-                        xCmd.ExecuteNonQuery();
+                        using (var xCmd = new FbCommand(sqlstmt, DBConn, transaction))
+                        {
+                            xCmd.Parameters.Add("@LABELNAME", xItem.LabelName);
+                            xCmd.Parameters.Add("@ADDRESS", xItem.Address);
+                            xCmd.Parameters.Add("@STACKDIFF", xItem.StackDifference);
+                            xCmd.Parameters.Add("@ILASMFILE", xItem.AssemblyFile);
+                            xCmd.Parameters.Add("@TYPETOKEN", xItem.TypeToken);
+                            xCmd.Parameters.Add("@METHODTOKEN", xItem.MethodToken);
+                            xCmd.Parameters.Add("@ILOFFSET", xItem.ILOffset);
+                            xCmd.Parameters.Add("@METHODNAME", xItem.MethodName);
+                            xCmd.ExecuteNonQuery();
+                        }
                     }
 
                     transaction.Commit();
