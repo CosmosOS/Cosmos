@@ -110,6 +110,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "34581"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -172,9 +173,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.StandAlone", "..\source2\Build\Cosmos.Build.StandAlone\Cosmos.Build.StandAlone.csproj", "{C5519AC3-218A-4211-9D40-B23AA80FB35E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatthijsPlayground", "..\source2\Users\Matthijs ter Woord\MatthijsPlayground\MatthijsPlayground.csproj", "{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "MatthijsPlaygroundBoot", "..\source2\Users\Matthijs ter Woord\MatthijsPlayground\MatthijsPlaygroundBoot.Cosmos", "{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC} = {6882C74B-3ED2-4D76-9E7B-67B6A28808BC}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 49
+		SccNumberOfProjects = 51
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -351,27 +359,35 @@ Global
 		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
 		SccProjectName43 = ../source2/Demos/Guess
 		SccLocalPath43 = ..\\source2\\Demos\\Guess
-		SccWebProject44 = true
-		SccProjectUniqueName44 = ..\\Docs
-		SccProjectName44 = ../Docs
-		SccLocalPath44 = ..\\Docs
-		SccProjectEnlistmentChoice44 = 2
-		SccProjectUniqueName45 = ..\\source2\\Build\\InstallCleaner\\InstallCleaner.csproj
+		SccProjectUniqueName44 = ..\\source2\\Build\\InstallCleaner\\InstallCleaner.csproj
+		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
+		SccProjectName44 = ../source2/Build/InstallCleaner
+		SccLocalPath44 = ..\\source2\\Build\\InstallCleaner
+		SccProjectUniqueName45 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
 		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = ../source2/Build/InstallCleaner
-		SccLocalPath45 = ..\\source2\\Build\\InstallCleaner
-		SccProjectUniqueName46 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
+		SccProjectName45 = ../source2/Kernel/Common/Cosmos.Common.Extensions
+		SccLocalPath45 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions
+		SccProjectUniqueName46 = ..\\source2\\Demos\\Guess\\GuessKernel.csproj
 		SccProjectTopLevelParentUniqueName46 = Cosmos.sln
-		SccProjectName46 = ../source2/Kernel/Common/Cosmos.Common.Extensions
-		SccLocalPath46 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions
-		SccProjectUniqueName47 = ..\\source2\\Demos\\Guess\\GuessKernel.csproj
+		SccProjectName46 = ../source2/Demos/Guess
+		SccLocalPath46 = ..\\source2\\Demos\\Guess
+		SccProjectUniqueName47 = ..\\source2\\Build\\Cosmos.Build.StandAlone\\Cosmos.Build.StandAlone.csproj
 		SccProjectTopLevelParentUniqueName47 = Cosmos.sln
-		SccProjectName47 = ../source2/Demos/Guess
-		SccLocalPath47 = ..\\source2\\Demos\\Guess
-		SccProjectUniqueName48 = ..\\source2\\Build\\Cosmos.Build.StandAlone\\Cosmos.Build.StandAlone.csproj
-		SccProjectTopLevelParentUniqueName48 = Cosmos.sln
-		SccProjectName48 = ../source2/Build/Cosmos.Build.StandAlone
-		SccLocalPath48 = ..\\source2\\Build\\Cosmos.Build.StandAlone
+		SccProjectName47 = ../source2/Build/Cosmos.Build.StandAlone
+		SccLocalPath47 = ..\\source2\\Build\\Cosmos.Build.StandAlone
+		SccWebProject48 = true
+		SccProjectUniqueName48 = ..\\Docs
+		SccProjectName48 = ../Docs
+		SccLocalPath48 = ..\\Docs
+		SccProjectEnlistmentChoice48 = 2
+		SccProjectUniqueName49 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\MatthijsPlayground\\MatthijsPlayground.csproj
+		SccProjectTopLevelParentUniqueName49 = Cosmos.sln
+		SccProjectName49 = ../source2/Users/Matthijs\u0020ter\u0020Woord/MatthijsPlayground
+		SccLocalPath49 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\MatthijsPlayground
+		SccProjectUniqueName50 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\MatthijsPlayground\\MatthijsPlaygroundBoot.Cosmos
+		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
+		SccProjectName50 = ../source2/Users/Matthijs\u0020ter\u0020Woord/MatthijsPlayground
+		SccLocalPath50 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\MatthijsPlayground
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -1142,6 +1158,36 @@ Global
 		{C5519AC3-218A-4211-9D40-B23AA80FB35E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{C5519AC3-218A-4211-9D40-B23AA80FB35E}.Release|x86.ActiveCfg = Release|x86
 		{C5519AC3-218A-4211-9D40-B23AA80FB35E}.Release|x86.Build.0 = Release|x86
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Bootstrap|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Bootstrap|Mixed Platforms.Build.0 = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}.Release|x86.ActiveCfg = Release|Any CPU
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|Any CPU.ActiveCfg = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|x86.ActiveCfg = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|x86.Build.0 = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|x86.ActiveCfg = Debug|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|x86.Build.0 = Debug|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|Any CPU.ActiveCfg = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|Mixed Platforms.Build.0 = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|x86.ActiveCfg = Release|x86
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1189,6 +1235,8 @@ Global
 		{94D079E4-3C66-486A-8407-EA6EC049FF53} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{3C6DFC2F-DE70-4B1C-A938-A9D3FE890520} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
+		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
+		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{8D72B98D-8FB3-4731-A5EC-194D141AA431} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{FD4B2006-B518-4884-B196-C2EF2B83FD6F} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}

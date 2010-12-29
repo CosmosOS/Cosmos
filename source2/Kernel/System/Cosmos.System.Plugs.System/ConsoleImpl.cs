@@ -3,24 +3,33 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System;
+using Cosmos.Hardware;
 
 namespace Cosmos.System.Plugs.System {
     [Plug(Target = typeof(global::System.Console))]
-    public class ConsoleImpl {
+    public static class ConsoleImpl {
 
-        //public static void set_ForegroundColor(ConsoleColor value) {
-        //    _foreground = value;
-        //    HW.Global.TextScreen.SetColors(_foreground, _background);
-        //}
+        private static ConsoleColor mForeground = ConsoleColor.White;
+        private static ConsoleColor mBackground = ConsoleColor.Black;
 
-        //public static ConsoleColor get_BackgroundColor() {
-        //    return _background;
-        //}
+        public static ConsoleColor get_ForegroundColor()
+        {
+            return mForeground;
+        }
 
-        //public static void set_BackgroundColor(ConsoleColor value) {
-        //    _background = value;
-        //    HW.Global.TextScreen.SetColors(_foreground, _background);
-        //}
+        public static void set_ForegroundColor(ConsoleColor value) {
+            mForeground = value;
+            Cosmos.Hardware.Global.TextScreen.SetColors(mForeground, mBackground);
+        }
+
+        public static ConsoleColor get_BackgroundColor() {
+            return mBackground;
+        }
+
+        public static void set_BackgroundColor(ConsoleColor value) {
+            mBackground = value;
+            Cosmos.Hardware.Global.TextScreen.SetColors(mForeground, mBackground);
+        }
 
         public static void Beep(int aFrequency, int aDuration) {
             //if (aFrequency < 37 || aFrequency > 32767) {
