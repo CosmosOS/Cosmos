@@ -243,7 +243,8 @@ namespace Cosmos.Build.MSBuild {
                         if (EmitDebugSymbols)
                         {
                             xNasmAsm.FlushText(xOut);
-                            xAsm.WriteDebugSymbols(xOutputFilename + ".cxdb");
+                            File.Delete(xOutputFilename + ".cpdb");
+                            xAsm.WriteDebugSymbols(xOutputFilename + ".cpdb");
                         }
                         else
                         {

@@ -189,18 +189,18 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             IDictionary<uint, string> xAddressLabelMappings;
             IDictionary<string, uint> xLabelAddressMappings;
-			string xCmapPath = Path.ChangeExtension(mISO, "cmap");
-			if (!File.Exists(xCmapPath))
+			string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
+			if (!File.Exists(xCpdbPath))
 			{
-				throw new Exception("Debug data file " + xCmapPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
+				throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
 			}
-            Cosmos.Debug.Common.SourceInfo.ReadFromFile(xCmapPath, out xAddressLabelMappings, out xLabelAddressMappings);
+            Cosmos.Debug.Common.SourceInfo.ReadFromFile(xCpdbPath, out xAddressLabelMappings, out xLabelAddressMappings);
             if (xAddressLabelMappings.Count == 0)
             {
                 throw new Exception("Debug data not found: LabelByAddressMapping");
             }
-            
-            mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, Path.ChangeExtension(mISO, ".cxdb"));
+
+            mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, xCpdbPath);
 
             if (mSourceMappings.Count == 0) {
                 throw new Exception("Debug data not found: SourceMappings");

@@ -8,6 +8,7 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Diagnostics;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace Cosmos.Debug.Common
 {
@@ -51,11 +52,24 @@ namespace Cosmos.Debug.Common
 
         public static void WriteToFile(SortedList<uint, String> aMap, string outFile)
         {
-            using (var xOut = new StreamWriter(outFile, false))
+            using (var xConn = MLDebugSymbol.OpenOrCreateCPDB(outFile))
             {
-                foreach (var xItem in aMap)
+                using (var xTrans = xConn.BeginTransaction())
                 {
-                    xOut.WriteLine("{0}\t{1}", xItem.Key.ToString("X8"), xItem.Value);
+                    using (var xCmd = xConn.CreateCommand())
+                    {
+                        xCmd.Transaction = xTrans;
+                        xCmd.CommandText = "insert into ADDRESSLABELMAPPING (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
+                        xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
+                        xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
+                        xCmd.Prepare();
+                        foreach(var xItem in aMap){
+                            xCmd.Parameters[0].Value = xItem.Value;
+                            xCmd.Parameters[1].Value = xItem.Key;
+                            xCmd.ExecuteNonQuery();
+                        }
+                        xTrans.Commit();
+                    }
                 }
             }
         }
@@ -64,17 +78,20 @@ namespace Cosmos.Debug.Common
         {
             oAddressLabelMappings = new Dictionary<uint, string>();
             oLabelAddressMappings = new Dictionary<string, uint>();
-            foreach (var xLine in File.ReadAllLines(aFile))
+            using (var xConn = MLDebugSymbol.OpenOrCreateCPDB(aFile))
             {
-                if (!xLine.Contains('\t'))
+                using (var xCmd = xConn.CreateCommand())
                 {
-                    continue;
+                    xCmd.CommandText = "select LABELNAME, ADDRESS from ADDRESSLABELMAPPING";
+                    using (var xReader = xCmd.ExecuteReader())
+                    {
+                        while (xReader.Read())
+                        {
+                            oAddressLabelMappings.Add((uint)xReader.GetInt64(1), xReader.GetString(0));
+                            oLabelAddressMappings.Add(xReader.GetString(0), (uint)xReader.GetInt64(1));
+                        }
+                    }
                 }
-                var xPart1 = xLine.Substring(0, xLine.IndexOf('\t'));
-                var xPart2 = xLine.Substring(xLine.IndexOf('\t') + 1);
-                var xAddr = UInt32.Parse(xPart1, NumberStyles.HexNumber);
-                oAddressLabelMappings.Add(xAddr, xPart2);
-                oLabelAddressMappings.Add(xPart2, xAddr);
             }
         }
 

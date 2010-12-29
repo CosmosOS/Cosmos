@@ -42,6 +42,18 @@ namespace Cosmos.Debug.Common
 
     public class MLDebugSymbol
     {
+        public static FbConnection OpenOrCreateCPDB(string aPathName)
+        {
+            if (File.Exists(aPathName))
+            {
+                return OpenCPDB(aPathName, false);
+            }
+            else
+            {
+                return CreateCPDB(aPathName);
+            }
+        }
+
         private static FbConnection OpenCPDB(string aPathname, bool aCreate)
         {
             var xCSB = new FbConnectionStringBuilder();
@@ -85,7 +97,7 @@ namespace Cosmos.Debug.Common
             var xExec = new FbBatchExecution(DBConn);
 
             xExec.SqlStatements.Add(
-                "CREATE TABLE SYMBOL ("
+                "CREATE TABLE MLSYMBOL ("
                 + "   LABELNAME   VARCHAR(255)  NOT NULL"
                 + " , ADDRESS     BIGINT        NOT NULL"
                 + " , STACKDIFF   INT           NOT NULL"
@@ -96,6 +108,11 @@ namespace Cosmos.Debug.Common
                 + " , METHODNAME  VARCHAR(255)  NOT NULL"
                 + ");"
             );
+            xExec.SqlStatements.Add(
+                "CREATE TABLE ADDRESSLABELMAPPING ("
+                + "  LABELNAME VARCHAR(255) NOT NULL"
+                + ", ADDRESS   BIGINT NOT NULL"
+                + ");");
 
             xExec.Execute();
             // Batch execution closes the connection, so we have to reopen it
@@ -106,78 +123,71 @@ namespace Cosmos.Debug.Common
 
         public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile)
         {
-            // Use a temporary file for the database and then move the newly created database to the wanted location afterwards.
-            // We do this so the user can gain compilation speed when using a faster disk for instance a mem-disk for the temporary files.
-            string tmpdbname = Path.GetTempFileName();
-            string dbname = Path.ChangeExtension(aFile, ".cpdb");
-
-            using (FbConnection DBConn = CreateCPDB(tmpdbname))
+            using (FbConnection DBConn = OpenOrCreateCPDB(aFile))
             {
-                var xDS = new SymbolsDS();
-
                 using (FbTransaction transaction = DBConn.BeginTransaction())
                 {
-                    string sqlstmt = "INSERT INTO SYMBOL (LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                    using (var xCmd = DBConn.CreateCommand())
+                    {
+                        xCmd.Transaction = transaction;
+                        xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
                                      " VALUES (@LABELNAME, @ADDRESS, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
 
-                    // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-                    foreach (var xItem in aSymbols)
-                    {
-                        var x = xDS.Entry.NewEntryRow();
-                        x.LabelName = xItem.LabelName;
-                        x.Address = xItem.Address;
-                        x.StackDiff = xItem.StackDifference;
-                        x.ILAsmFile = xItem.AssemblyFile;
-                        x.TypeToken = xItem.TypeToken;
-                        x.MethodToken = xItem.MethodToken;
-                        x.ILOffset = xItem.ILOffset;
-                        x.MethodName = xItem.MethodName;
-                        xDS.Entry.AddEntryRow(x);
+                        xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
+                        xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
+                        xCmd.Parameters.Add("@STACKDIFF", FbDbType.Integer);
+                        xCmd.Parameters.Add("@ILASMFILE", FbDbType.VarChar);
+                        xCmd.Parameters.Add("@TYPETOKEN", FbDbType.Integer);
+                        xCmd.Parameters.Add("@METHODTOKEN", FbDbType.Integer);
+                        xCmd.Parameters.Add("@ILOFFSET", FbDbType.Integer);
+                        xCmd.Parameters.Add("@METHODNAME", FbDbType.VarChar);
+                        xCmd.Prepare();
 
-                        using (var xCmd = new FbCommand(sqlstmt, DBConn, transaction))
+                        // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
+                        foreach (var xItem in aSymbols)
                         {
-                            xCmd.Parameters.Add("@LABELNAME", xItem.LabelName);
-                            xCmd.Parameters.Add("@ADDRESS", xItem.Address);
-                            xCmd.Parameters.Add("@STACKDIFF", xItem.StackDifference);
-                            xCmd.Parameters.Add("@ILASMFILE", xItem.AssemblyFile);
-                            xCmd.Parameters.Add("@TYPETOKEN", xItem.TypeToken);
-                            xCmd.Parameters.Add("@METHODTOKEN", xItem.MethodToken);
-                            xCmd.Parameters.Add("@ILOFFSET", xItem.ILOffset);
-                            xCmd.Parameters.Add("@METHODNAME", xItem.MethodName);
+                            xCmd.Parameters[0].Value = xItem.LabelName;
+                            xCmd.Parameters[1].Value = xItem.Address;
+                            xCmd.Parameters[2].Value = xItem.StackDifference;
+                            xCmd.Parameters[3].Value = xItem.AssemblyFile;
+                            xCmd.Parameters[4].Value = xItem.TypeToken;
+                            xCmd.Parameters[5].Value = xItem.MethodToken;
+                            xCmd.Parameters[6].Value = xItem.ILOffset;
+                            xCmd.Parameters[7].Value = xItem.MethodName;
                             xCmd.ExecuteNonQuery();
                         }
                     }
 
                     transaction.Commit();
                 }
-
-                xDS.WriteXml(aFile);
             }
-
-            if (File.Exists(dbname))
-                File.Delete(dbname);
-
-            File.Move(tmpdbname, dbname);
         }
 
         public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile)
         {
-            //OpenCPDB(Path.ChangeExtension(aFile, ".cpdb"), false);
-            var xDS = new SymbolsDS();
-            xDS.ReadXml(aFile);
-            foreach (SymbolsDS.EntryRow x in xDS.Entry.Rows)
+            using (var xConn = OpenCPDB(aFile, false))
             {
-                aSymbols.Add(new MLDebugSymbol
+                using (var xCmd = xConn.CreateCommand())
                 {
-                    LabelName = x.LabelName,
-                    Address = x.Address,
-                    StackDifference = x.StackDiff,
-                    AssemblyFile = x.ILAsmFile,
-                    TypeToken = x.TypeToken,
-                    MethodToken = x.MethodToken,
-                    ILOffset = x.ILOffset,
-                    MethodName = x.MethodName
-                });
+                    xCmd.CommandText = "select LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL";
+                    using (var xReader = xCmd.ExecuteReader())
+                    {
+                        while (xReader.Read())
+                        {
+                            aSymbols.Add(new MLDebugSymbol
+                            {
+                                LabelName=xReader.GetString(0),
+                                Address = (uint)xReader.GetInt64(1),
+                                StackDifference = xReader.GetInt32(2),
+                                AssemblyFile = xReader.GetString(3),
+                                TypeToken = xReader.GetInt32(4),
+                                MethodToken = xReader.GetInt32(5),
+                                ILOffset = xReader.GetInt32(6),
+                                MethodName = xReader.GetString(7)
+                            });
+                        }
+                    }
+                }
             }
         }
 
