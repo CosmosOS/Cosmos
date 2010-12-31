@@ -180,9 +180,11 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "MatthijsPlaygroundBoot", ".
 		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC} = {6882C74B-3ED2-4D76-9E7B-67B6A28808BC}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "..\source2\Users\Matthijs ter Woord\TestConsoleApp\TestConsoleApp.csproj", "{3296FE8A-A2BA-4291-8FA0-184CA14E1271}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 51
+		SccNumberOfProjects = 52
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -388,6 +390,10 @@ Global
 		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
 		SccProjectName50 = ../source2/Users/Matthijs\u0020ter\u0020Woord/MatthijsPlayground
 		SccLocalPath50 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\MatthijsPlayground
+		SccProjectUniqueName51 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\TestConsoleApp\\TestConsoleApp.csproj
+		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
+		SccProjectName51 = ../source2/Users/Matthijs\u0020ter\u0020Woord/TestConsoleApp
+		SccLocalPath51 = ..\\source2\\Users\\Matthijs\u0020ter\u0020Woord\\TestConsoleApp
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -1188,6 +1194,21 @@ Global
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|Mixed Platforms.Build.0 = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|x86.ActiveCfg = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|x86.Build.0 = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Bootstrap|Any CPU.ActiveCfg = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Bootstrap|x86.ActiveCfg = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Bootstrap|x86.Build.0 = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Debug|x86.ActiveCfg = Debug|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Debug|x86.Build.0 = Debug|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Release|Any CPU.ActiveCfg = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Release|x86.ActiveCfg = Release|x86
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1237,6 +1258,7 @@ Global
 		{3C6DFC2F-DE70-4B1C-A938-A9D3FE890520} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
+		{3296FE8A-A2BA-4291-8FA0-184CA14E1271} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{8D72B98D-8FB3-4731-A5EC-194D141AA431} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{54795C40-B3E8-4DBB-A3DE-FACBADD20ADB} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}
 		{FD4B2006-B518-4884-B196-C2EF2B83FD6F} = {3C6DFC2F-DE70-4B1C-A938-A9D3FE890520}

@@ -108,6 +108,7 @@ namespace Cosmos.Debug.Common
                 + " , METHODNAME  VARCHAR(255)  NOT NULL"
                 + ");"
             );
+            
             xExec.SqlStatements.Add(
                 "CREATE TABLE ADDRESSLABELMAPPING ("
                 + "  LABELNAME VARCHAR(255) NOT NULL"
