@@ -59,7 +59,7 @@ namespace Cosmos.Hardware
             for (i = 0; i < NumGCRegs; i++)
             {
                 mIO.GraphicsController_Index.Byte=i;
-                mIO.GraphicsController_Data.Byte=registers[i];
+                mIO.GraphicsController_Data.Byte = registers[xIdx];
                 xIdx++;
             }
             /* write ATTRIBUTE CONTROLLER regs */
@@ -173,13 +173,22 @@ namespace Cosmos.Hardware
         }
 
         public SetPixelDelegate SetPixel;
+        public GetPixelDelegate GetPixel;
 
         public VGAScreen()
         {
             SetPixel = new SetPixelDelegate(SetPixelNoMode);
+            GetPixel = new GetPixelDelegate(GetPixelNoMode);
         }
 
         public delegate void SetPixelDelegate(uint x, uint y, uint c);
+        public delegate uint GetPixelDelegate(uint x, uint y);
+
+        public uint this[uint x, uint y]
+        {
+            get { return GetPixel(x, y); }
+            set { SetPixel(x, y, value); }
+        }
 
         public enum TextSize { Size40x25, Size40x50, Size80x25, Size80x50, Size90x30, Size90x60 };
 
@@ -215,7 +224,7 @@ namespace Cosmos.Hardware
                     throw new Exception("Invalid text size.");
             }
         }
-
+        /*
         //TODO: Change this to be like SetTextmode, but take two enums. One for size, one for bit depth
         public void SetMode640x480x2()
         {
@@ -229,6 +238,7 @@ namespace Cosmos.Hardware
         {
             WriteVGARegisters(g_720x480x16);
         }
+        */
         public void SetMode320x200x8()
         {
             WriteVGARegisters(g_320x200x256);
@@ -237,7 +247,9 @@ namespace Cosmos.Hardware
             PixelHeight = 200;
             Colors = 256;
             SetPixel = new SetPixelDelegate(SetPixel320x200x8);
+            GetPixel = new GetPixelDelegate(GetPixel320x200x8);
         }
+        /*
         public void SetMode640x480x4()
         {
             WriteVGARegisters(g_640x480x16);
@@ -248,10 +260,7 @@ namespace Cosmos.Hardware
             SetPixel = new SetPixelDelegate(SetPixel640x480x4);
         }
 
-        private void SetPixelNoMode(uint x, uint y, uint c)
-        {
-            throw new Exception("No video mode set!");
-        }
+        
 
         public void SetPixel640x480x4(uint x, uint y, uint c)
         {
@@ -269,24 +278,25 @@ namespace Cosmos.Hardware
                 xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf0) | c);
             }
         }
-        
+        */
+
+        private void SetPixelNoMode(uint x, uint y, uint c)
+        {
+            throw new Exception("No video mode set!");
+        }
+        private uint GetPixelNoMode(uint x, uint y)
+        {
+            throw new Exception("No video mode set!");
+        }
+
         public void SetPixel320x200x8(uint x, uint y, uint c)
         {
-            //var xSegment = GetFramebufferSegment();
-            //if (xSegment.Base != 0xA000)
-            //{
-            //    Global.Dbg.Send("VGA: Segment is wrong, should be 0xA0000, but was " + xSegment.Base.ToString());
-            //}
-
-            // todo: use getframebuffersegmetn
-            var xSegment = mIO.VGAMemoryBlock;
-            xSegment[(y * 320) + x] = (byte)(c & 0xFF);
+            mIO.VGAMemoryBlock[(y * 320) + x] = (byte)(c & 0xFF);
         }
 
         public uint GetPixel320x200x8(uint x, uint y)
-        {
-            var xSegment = GetFramebufferSegment();
-            return xSegment[(y * 320) + x];
+        {            
+            return mIO.VGAMemoryBlock[(y * 320) + x];
         }
 
         public int PixelWidth
@@ -306,56 +316,31 @@ namespace Cosmos.Hardware
             get;
         }
 
-        public void Test()
+        public void TestMode320x200x8()
         {
             SetMode320x200x8();
 
-            if (Colors == 256)
+            for (byte i = 0; i < 64; i++)
             {
-                for (byte i = 0; i < 64; i++)
-                {
-                    SetPaletteEntry(i, i, 0, 0);
-                    SetPaletteEntry(i + 64, 63, i, 0);
-                    SetPaletteEntry(i + 128, 63, 63, i);
-                    SetPaletteEntry(i + 192, (byte)(63 - i), (byte)(63 - i), (byte)(63 - i));
-
-                }
-            }
-            else
-            {
-                for (byte i = 0; i < Colors; i++)
-                {
-                    byte ii = (byte)((int)i * 64 / Colors);
-                    SetPaletteEntry(i, ii, ii, ii);
-                }
+                SetPaletteEntry(i, i, 0, 0);
+                SetPaletteEntry(i + 64, 63, i, 0);
+                SetPaletteEntry(i + 128, 63, 63, i);
+                SetPaletteEntry(i + 192, (byte)(63 - i), (byte)(63 - i), (byte)(63 - i));
             }
 
-            int[] xs = { 0 };
-            int[] ys = { 0 };
             var xSegment = GetFramebufferSegment();
 
             for (uint y = 0; y < PixelHeight; y++)
-            {
                 for (uint x = 0; x < PixelWidth; x++)
-                {
-                    byte m = (byte)(x + y);
-
-                    //SetPixel(x, y, m);
-                    xSegment[(y * 320) + x] = m;
-                }
-            }
+                    xSegment[(y * 320) + x] = (byte)(x + y);
         }
 
         public void Clear(int color)
         {
             var xSegment = GetFramebufferSegment();
-            for (uint y = 0; y < PixelHeight; y++)
-            {
-                for (uint x = 0; x < PixelWidth; x++)
-                {
-                    xSegment[(y * 320) + x] = (byte)(color & 0xFF);
-                }
-            }
+
+            for (uint i = 0; i < PixelHeight * PixelWidth; i++)            
+                xSegment[i] = (byte)(color & 0xFF);            
         }
 
         private Color[] _Palette = new Color[256];
@@ -365,25 +350,22 @@ namespace Cosmos.Hardware
         }
         public void SetPaletteEntry(int index, Color color)
         {
-            //_Palette[index] = color;
             SetPaletteEntry(index, color.R, color.G, color.B);
         }
 
         public void SetPalette(int index, byte[] pallete)
         {
             mIO.DACIndex_Write.Byte=(byte)index;
-            for (int i = 0; i < pallete.Length; i++)
-            {
-                mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
-            }
+            for (int i = 0; i < pallete.Length; i++)            
+                mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);            
         }
 
         public void SetPaletteEntry(int index, byte r, byte g, byte b)
         {
             mIO.DACIndex_Write.Byte = (byte)index;
-            mIO.DAC_Data.Byte = r;
-            mIO.DAC_Data.Byte = g;
-            mIO.DAC_Data.Byte = b;
+            mIO.DAC_Data.Byte = (byte)(r >> 2);
+            mIO.DAC_Data.Byte = (byte)(g >> 2);
+            mIO.DAC_Data.Byte = (byte)(b >> 2);
         }
 
 
