@@ -65,11 +65,13 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="Drivers\VGAScreen.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="ATA.cs" />

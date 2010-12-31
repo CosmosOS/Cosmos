@@ -87,6 +87,7 @@
     <Compile Include="IOGroup\PIT.cs" />
     <Compile Include="IOGroup\RTC.cs" />
     <Compile Include="IOGroup\TextScreen.cs" />
+    <Compile Include="IOGroup\VGA.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
     <Compile Include="PciBus.cs" />
