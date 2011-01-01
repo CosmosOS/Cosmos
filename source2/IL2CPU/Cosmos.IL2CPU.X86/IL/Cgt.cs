@@ -36,6 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP , DestinationIsIndirect=true};
                     new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
                     new CPUx86.x87.FloatDecTopPointer();
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
                 }
                 else
                 {
@@ -49,17 +50,17 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     //value1: ECX:EBX
-					new CPUx86.Sub { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
+					new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelFalse };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationLabel = LabelTrue };
-					new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelFalse };
                 }
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
+				new Label( LabelFalse );
                 new CPUx86.Push { DestinationValue = 0 };
                 new CPUx86.Jump { DestinationLabel = xNextLabel };
                 new Label( LabelTrue );
                 new CPUx86.Push { DestinationValue = 1 };
-
             }
             else
             {
