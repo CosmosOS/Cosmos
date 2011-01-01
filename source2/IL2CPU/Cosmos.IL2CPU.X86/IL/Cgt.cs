@@ -49,8 +49,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     //value1: ECX:EBX
-                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
-                    new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.Sub { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationLabel = LabelTrue };
+					new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
                 }
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
                 new CPUx86.Push { DestinationValue = 0 };

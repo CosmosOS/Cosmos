@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Hardware {
+	/// <summary>
+	/// Programmable Interval Timer
+	/// with 1,193181818... MHz
+	/// </summary>
     public class PIT : Device {
         public class PITTimer : IDisposable {
             internal int NSRemaining;
@@ -185,7 +189,7 @@ namespace Cosmos.Hardware {
 
         public int RegisterTimer(PITTimer timer) {
             if (timer.ID != -1)
-                throw new InvalidOperationException("Timer has allready been registered!");
+                throw new InvalidOperationException("Timer has already been registered!");
 
             timer.ID = (TimerCounter++);
             ActiveHandlers.Add(timer);

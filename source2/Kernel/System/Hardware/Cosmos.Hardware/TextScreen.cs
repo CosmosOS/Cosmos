@@ -27,7 +27,7 @@ namespace Cosmos.Hardware {
         }
 
         public void ScrollUp() {
-            IO.Memory.MoveDown(0, (uint)Cols, (uint)(Cols * (Rows - 1) * 2 / 4));
+			IO.Memory.MoveDown(0, (uint)(Cols * 2 / 4), (uint)(Cols * (Rows - 1) * 2 / 4));
         }
 
         public char this[int aX, int aY] {
