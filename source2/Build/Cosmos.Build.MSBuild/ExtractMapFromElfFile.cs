@@ -21,7 +21,7 @@ namespace Cosmos.Build.MSBuild
         }
 
         [Required]
-        public string OutputFile
+        public string DebugInfoFile
         {
             get;
             set;
@@ -98,7 +98,10 @@ namespace Cosmos.Build.MSBuild
                 xResult.Add(xAddress, xLabel);
             }
             #endregion
-            SourceInfo.WriteToFile(xResult, Path.Combine(WorkingDir, OutputFile));
+            using (var xDebugInfo = new DebugInfo(DebugInfoFile))
+            {
+                xDebugInfo.WriteAddressLabelMappings(xResult);
+            }
             return true;
         }
 

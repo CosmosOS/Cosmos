@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild {
     // Class is separated from MSBuild task so we can call it from debugging and standalone applications.
@@ -219,36 +220,40 @@ namespace Cosmos.Build.MSBuild {
                     DebugCom = 0;
                 }
                 var xAsm = new AppAssemblerNasm(DebugCom);
-                xAsm.DebugMode = mDebugMode;
-                xAsm.TraceAssemblies = mTraceAssemblies;
+                File.Delete(xOutputFilename + ".cpdb");
+                using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cpdb"))
+                {
+                    xAsm.DebugInfo = xDebugInfo;
+                    xAsm.DebugMode = mDebugMode;
+                    xAsm.TraceAssemblies = mTraceAssemblies;
 #if OUTPUT_ELF
                 xAsm.EmitELF = true;
 #endif
 
-                var xNasmAsm = (AssemblerNasm)xAsm.Assembler;
-                xAsm.Assembler.Initialize();
-                using (var xScanner = new ILScanner(xAsm))
-                {
-                    xScanner.TempDebug += x => LogMessage(x);
-                    if (EnableLogging)
+                    var xNasmAsm = (AssemblerNasm)xAsm.Assembler;
+                    xAsm.Assembler.Initialize();
+                    using (var xScanner = new ILScanner(xAsm))
                     {
-                        xScanner.EnableLogging(xOutputFilename + ".log.html");
-                    }
-                    // TODO: shouldn't be here?
-                    xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
-                    xScanner.Execute(xInitMethod);
-
-                    using (var xOut = new StreamWriter(OutputFilename, false))
-                    {
-                        if (EmitDebugSymbols)
+                        xScanner.TempDebug += x => LogMessage(x);
+                        if (EnableLogging)
                         {
-                            xNasmAsm.FlushText(xOut);
-                            File.Delete(xOutputFilename + ".cpdb");
-                            xAsm.WriteDebugSymbols(xOutputFilename + ".cpdb");
+                            xScanner.EnableLogging(xOutputFilename + ".log.html");
                         }
-                        else
+                        // TODO: shouldn't be here?
+                        xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
+                        xScanner.Execute(xInitMethod);
+
+                        using (var xOut = new StreamWriter(OutputFilename, false))
                         {
-                            xAsm.Assembler.FlushText(xOut);
+                            if (EmitDebugSymbols)
+                            {
+                                xNasmAsm.FlushText(xOut);
+                                xAsm.FinalizeDebugInfo();
+                            }
+                            else
+                            {
+                                xAsm.Assembler.FlushText(xOut);
+                            }
                         }
                     }
                 }

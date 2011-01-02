@@ -88,6 +88,7 @@
     <Compile Include="DebugConnectorSerial.cs" />
     <Compile Include="DebugConnectorStream.cs" />
     <Compile Include="DebugConnectorTCPServer.cs" />
+    <Compile Include="DebugInfo.cs" />
     <Compile Include="DebugSymbol.cs" />
     <Compile Include="KeyState.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />

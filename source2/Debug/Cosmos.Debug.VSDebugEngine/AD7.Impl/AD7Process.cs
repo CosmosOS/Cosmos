@@ -189,24 +189,29 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             IDictionary<uint, string> xAddressLabelMappings;
             IDictionary<string, uint> xLabelAddressMappings;
-			string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
+            
+            string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
 			if (!File.Exists(xCpdbPath))
 			{
 				throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
 			}
-            Cosmos.Debug.Common.SourceInfo.ReadFromFile(xCpdbPath, out xAddressLabelMappings, out xLabelAddressMappings);
-            if (xAddressLabelMappings.Count == 0)
+
+            using (var xDebugInfo = new DebugInfo(xCpdbPath))
             {
-                throw new Exception("Debug data not found: LabelByAddressMapping");
-            }
+                xDebugInfo.ReadAddressLabelMappings(out xAddressLabelMappings, out xLabelAddressMappings);
+                if (xAddressLabelMappings.Count == 0)
+                {
+                    throw new Exception("Debug data not found: LabelByAddressMapping");
+                }
 
-            mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, xCpdbPath);
+                mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, xDebugInfo);
 
-            if (mSourceMappings.Count == 0) {
-                throw new Exception("Debug data not found: SourceMappings");
+                if (mSourceMappings.Count == 0)
+                {
+                    throw new Exception("Debug data not found: SourceMappings");
+                }
+                mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
             }
-            mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
-            
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
                 mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
             } else {

@@ -50,7 +50,7 @@
                  Condition="$(IsELF) == 'true'"/>
         <Delete Files="$(TargetDir)$(MSBuildProjectName).obj" Condition="$(IsELF) == 'true'"/>
         <ExtractMapFromElfFile  InputFile="$(TargetDir)$(MSBuildProjectName).bin"
-                                OutputFile="$(TargetDir)$(MSBuildProjectName).cpdb"
+                                DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cpdb"
                                 WorkingDir="$(TargetDir)"
                                 CosmosBuildDir="$(CosmosDir)\Build"
                                 Condition="$(IsELF) == 'true'"/>
@@ -69,7 +69,7 @@
 
          <!--binary only--> 
         <ReadNAsmMapToCosmosMap InputBaseDir="$(TargetDir)"
-                                OutputFile="$(TargetDir)$(MSBuildProjectName).cpdb"
+                                DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cpdb"
                                 Condition="$(IsELF) == 'false'"/>
          <!--end of binary only-->
 

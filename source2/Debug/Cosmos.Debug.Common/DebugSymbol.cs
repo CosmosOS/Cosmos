@@ -40,7 +40,7 @@ namespace Cosmos.Debug.Common
         }
     }
 
-    public class MLDebugSymbol
+    public class MLDebugSymbol_Old
     {
         public static FbConnection OpenOrCreateCPDB(string aPathName)
         {
@@ -120,76 +120,6 @@ namespace Cosmos.Debug.Common
             DBConn.Open();
 
             return DBConn;
-        }
-
-        public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile)
-        {
-            using (FbConnection DBConn = OpenOrCreateCPDB(aFile))
-            {
-                using (FbTransaction transaction = DBConn.BeginTransaction())
-                {
-                    using (var xCmd = DBConn.CreateCommand())
-                    {
-                        xCmd.Transaction = transaction;
-                        xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                                     " VALUES (@LABELNAME, @ADDRESS, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
-
-                        xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
-                        xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
-                        xCmd.Parameters.Add("@STACKDIFF", FbDbType.Integer);
-                        xCmd.Parameters.Add("@ILASMFILE", FbDbType.VarChar);
-                        xCmd.Parameters.Add("@TYPETOKEN", FbDbType.Integer);
-                        xCmd.Parameters.Add("@METHODTOKEN", FbDbType.Integer);
-                        xCmd.Parameters.Add("@ILOFFSET", FbDbType.Integer);
-                        xCmd.Parameters.Add("@METHODNAME", FbDbType.VarChar);
-                        xCmd.Prepare();
-
-                        // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-                        foreach (var xItem in aSymbols)
-                        {
-                            xCmd.Parameters[0].Value = xItem.LabelName;
-                            xCmd.Parameters[1].Value = xItem.Address;
-                            xCmd.Parameters[2].Value = xItem.StackDifference;
-                            xCmd.Parameters[3].Value = xItem.AssemblyFile;
-                            xCmd.Parameters[4].Value = xItem.TypeToken;
-                            xCmd.Parameters[5].Value = xItem.MethodToken;
-                            xCmd.Parameters[6].Value = xItem.ILOffset;
-                            xCmd.Parameters[7].Value = xItem.MethodName;
-                            xCmd.ExecuteNonQuery();
-                        }
-                    }
-
-                    transaction.Commit();
-                }
-            }
-        }
-
-        public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile)
-        {
-            using (var xConn = OpenCPDB(aFile, false))
-            {
-                using (var xCmd = xConn.CreateCommand())
-                {
-                    xCmd.CommandText = "select LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL";
-                    using (var xReader = xCmd.ExecuteReader())
-                    {
-                        while (xReader.Read())
-                        {
-                            aSymbols.Add(new MLDebugSymbol
-                            {
-                                LabelName=xReader.GetString(0),
-                                Address = (uint)xReader.GetInt64(1),
-                                StackDifference = xReader.GetInt32(2),
-                                AssemblyFile = xReader.GetString(3),
-                                TypeToken = xReader.GetInt32(4),
-                                MethodToken = xReader.GetInt32(5),
-                                ILOffset = xReader.GetInt32(6),
-                                MethodName = xReader.GetString(7)
-                            });
-                        }
-                    }
-                }
-            }
         }
 
         public string LabelName

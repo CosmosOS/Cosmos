@@ -50,51 +50,6 @@ namespace Cosmos.Debug.Common
 			set;
 		}
 
-        public static void WriteToFile(SortedList<uint, String> aMap, string outFile)
-        {
-            using (var xConn = MLDebugSymbol.OpenOrCreateCPDB(outFile))
-            {
-                using (var xTrans = xConn.BeginTransaction())
-                {
-                    using (var xCmd = xConn.CreateCommand())
-                    {
-                        xCmd.Transaction = xTrans;
-                        xCmd.CommandText = "insert into ADDRESSLABELMAPPING (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
-                        xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
-                        xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
-                        xCmd.Prepare();
-                        foreach(var xItem in aMap){
-                            xCmd.Parameters[0].Value = xItem.Value;
-                            xCmd.Parameters[1].Value = xItem.Key;
-                            xCmd.ExecuteNonQuery();
-                        }
-                        xTrans.Commit();
-                    }
-                }
-            }
-        }
-
-        public static void ReadFromFile(string aFile, out IDictionary<uint, string> oAddressLabelMappings, out IDictionary<string, uint> oLabelAddressMappings)
-        {
-            oAddressLabelMappings = new Dictionary<uint, string>();
-            oLabelAddressMappings = new Dictionary<string, uint>();
-            using (var xConn = MLDebugSymbol.OpenOrCreateCPDB(aFile))
-            {
-                using (var xCmd = xConn.CreateCommand())
-                {
-                    xCmd.CommandText = "select LABELNAME, ADDRESS from ADDRESSLABELMAPPING";
-                    using (var xReader = xCmd.ExecuteReader())
-                    {
-                        while (xReader.Read())
-                        {
-                            oAddressLabelMappings.Add((uint)xReader.GetInt64(1), xReader.GetString(0));
-                            oLabelAddressMappings.Add(xReader.GetString(0), (uint)xReader.GetInt64(1));
-                        }
-                    }
-                }
-            }
-        }
-
         public static SortedList<uint,String> ParseMapFile(String buildPath)
         {
             var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
@@ -142,11 +97,12 @@ namespace Cosmos.Debug.Common
 			return xIdx;
 		}
 
-		public static SourceInfos GetSourceInfo(IDictionary<uint, string> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, string aDebugFile) {
-			var xSymbolsList = new List<MLDebugSymbol>();
-			MLDebugSymbol.ReadSymbolsListFromFile(xSymbolsList, aDebugFile);
+		public static SourceInfos GetSourceInfo(IDictionary<uint, string> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, DebugInfo debugInfo) {
+            var xSymbolsList = new List<DebugInfo.MLDebugSymbol>();
+            debugInfo.ReadSymbolsList(xSymbolsList);			
             #region sort
-            xSymbolsList.Sort(delegate(MLDebugSymbol a, MLDebugSymbol b) {
+            xSymbolsList.Sort(delegate(DebugInfo.MLDebugSymbol a, DebugInfo.MLDebugSymbol b)
+            {
 				if (a == null) {
 					throw new ArgumentNullException("a");
 				}

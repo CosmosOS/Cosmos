@@ -8,7 +8,7 @@ using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild
 {
-    public class ReadNAsmMapToCosmosMap : AppDomainIsolatedTask
+    public class ReadNAsmMapToDebugInfo : AppDomainIsolatedTask
     {
         [Required]
         public string InputBaseDir
@@ -18,7 +18,7 @@ namespace Cosmos.Build.MSBuild
         }
 
         [Required]
-        public string OutputFile
+        public string DebugInfoFile
         {
             get;
             set;
@@ -32,7 +32,10 @@ namespace Cosmos.Build.MSBuild
                 Log.LogError("No SourceInfos found!");
                 return false;
             }
-            SourceInfo.WriteToFile(xSourceInfos, OutputFile);
+            using (var xDebugInfo = new DebugInfo(DebugInfoFile))
+            {
+                xDebugInfo.WriteAddressLabelMappings(xSourceInfos);
+            }
             
             return true;
         }
