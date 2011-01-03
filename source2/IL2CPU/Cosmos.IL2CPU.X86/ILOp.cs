@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86 {
       new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
     }
 
-    protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField) {
+    public static uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField) {
       var xSize = SizeOfType(aField.LocalType);
       var xResult = xSize / 4;
       if (xSize % 4 != 0) {
@@ -39,11 +39,11 @@ namespace Cosmos.IL2CPU.X86 {
       return xResult;
     }
 
-    protected uint GetEBPOffsetForLocal(MethodInfo aMethod, OpVar aOp) {
+    public static uint GetEBPOffsetForLocal(MethodInfo aMethod, int localIndex) {
       var xBody = aMethod.MethodBase.GetMethodBody();
       uint xOffset = 4;
       for (int i = 0; i < xBody.LocalVariables.Count; i++) {
-          if (i == aOp.Value)
+          if (i == localIndex)
           {
               break;
           }

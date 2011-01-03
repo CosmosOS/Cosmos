@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpVar = (OpVar)aOpCode;
-      var xAddress = GetEBPOffsetForLocal(aMethod, xOpVar);
+      var xAddress = GetEBPOffsetForLocal(aMethod, xOpVar.Value);
       if (aMethod.MethodBase.Name == "Init" && aMethod.MethodBase.DeclaringType.Name == "Program")
       {
           Console.Write("");

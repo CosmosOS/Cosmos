@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 			var xField = aOpCode as ILOpCodes.OpVar;
 			var xFieldInfo = aMethod.MethodBase.GetMethodBody().LocalVariables[xField.Value];
-			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xField));
+			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xField.Value));
 
             new Comment("EBPOffset = " + xEBPOffset);
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)

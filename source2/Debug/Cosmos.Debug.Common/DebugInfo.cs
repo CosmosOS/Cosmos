@@ -57,6 +57,27 @@ namespace Cosmos.Debug.Common
                 set;
             }
         }
+        public class Local_Argument_Info{
+            public bool IsArgument{
+                get;
+                set;
+            }
+
+            public string MethodLabelName{
+                get;
+                set;
+            }
+
+            public int Index{
+                get;
+                set;
+            }
+
+            public int Offset{
+                get;
+                set;
+            }
+        }
         private FbConnection mConnection;
 
         public DebugInfo(string file)
@@ -133,6 +154,15 @@ namespace Cosmos.Debug.Common
                 + ", ADDRESS   BIGINT NOT NULL"
                 + ");");
 
+            xExec.SqlStatements.Add(
+                "CREATE TABLE LOCAL_ARGUMENT_INFO ("
+                + "  METHODLABELNAME VARCHAR(255) NOT NULL"
+                + ", ISARGUMENT      SMALLINT          NOT NULL"
+                + ", INDEXINMETHOD   INT          NOT NULL"
+                + ", OFFSET          INT          NOT NULL"
+                + ");"
+                );
+
             xExec.Execute();
             // Batch execution closes the connection, so we have to reopen it
             DBConn.Open();
@@ -201,6 +231,60 @@ namespace Cosmos.Debug.Common
                             MethodName = xReader.GetString(7)
                         });
                     }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Param/Local locations
+
+        // tuple format: MethodLabel, IsArgument, Index, Offset
+        public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos)
+        {
+            using (var xTrans = mConnection.BeginTransaction())
+            {
+                using (var xCmd = mConnection.CreateCommand())
+                {
+                    xCmd.Transaction = xTrans;
+                    xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET)";
+                    xCmd.Parameters.Add("@METHODLABELNAME", FbDbType.VarChar);
+                    xCmd.Parameters.Add("@ISARGUMENT", FbDbType.SmallInt);
+                    xCmd.Parameters.Add("@INDEXINMETHOD", FbDbType.Integer);
+                    xCmd.Parameters.Add("@OFFSET", FbDbType.Integer);
+                    xCmd.Prepare();
+                    foreach (var xInfo in infos)
+                    {
+                        xCmd.Parameters[0].Value = xInfo.MethodLabelName;
+                        xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
+                        xCmd.Parameters[2].Value = xInfo.Index;
+                        xCmd.Parameters[3].Value = xInfo.Offset;
+                        xCmd.ExecuteNonQuery();
+                    }
+                    xTrans.Commit();
+                }
+            }
+        }
+
+        public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfos()
+        {
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET from LOCAL_ARGUMENT_INFO";
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
+                    while (xReader.Read())
+                    {
+                        xResult.Add(new Local_Argument_Info
+                        {
+                            MethodLabelName = xReader.GetString(0),
+                            IsArgument = xReader.GetInt16(1) == 1,
+                            Index = xReader.GetInt32(2),
+                            Offset = xReader.GetInt32(3)
+                        });
+                    }
+                    return xResult;
                 }
             }
         }

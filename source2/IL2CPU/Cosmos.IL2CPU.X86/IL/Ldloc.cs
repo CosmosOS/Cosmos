@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xOpVar = (OpVar)aOpCode;
 			var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
 			var xStackCount = GetStackCountForLocal(aMethod, xVar);
-			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xOpVar));
+			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xOpVar.Value));
 			var xSize = SizeOfType(xVar.LocalType);
             new Comment("EBPOffset = " + xEBPOffset); if (xStackCount > 1)
 			{

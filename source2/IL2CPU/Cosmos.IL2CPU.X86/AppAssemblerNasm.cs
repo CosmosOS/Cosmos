@@ -24,6 +24,7 @@ namespace Cosmos.IL2CPU.X86
             InitILOps(typeof(ILOp));
         }
 
+        private IList<DebugInfo.Local_Argument_Info> mLocals_Arguments_Infos = new List<DebugInfo.Local_Argument_Info>();
 
         protected override void MethodBegin(MethodInfo aMethod)
         {
@@ -36,6 +37,7 @@ namespace Cosmos.IL2CPU.X86
             {
                 new Label(aMethod.MethodBase);
             }
+            var xMethodLabel = Label.LastFullLabel;
             if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo)
             {
                 new Comment("This is a static constructor. see if it has been called already, and if so, return.");
@@ -63,16 +65,49 @@ namespace Cosmos.IL2CPU.X86
             //}
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null)
             {
+                // the body of aMethod is getting emitted
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 if (xBody != null)
                 {
                     foreach (var xLocal in xBody.LocalVariables)
                     {
+                        mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
+                        {
+                            MethodLabelName = xMethodLabel,
+                            IsArgument = false,
+                            Index = xLocal.LocalIndex,
+                            Offset = (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex)
+                        });
                         new Comment("Local " + xLocal.LocalIndex);
                         new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
                     }
                 }
+
+                // debug info:
+                var xIdxOffset = 0u;
+                if(!aMethod.MethodBase.IsStatic){
+                    mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info{
+                        MethodLabelName=xMethodLabel,
+                        IsArgument=true,
+                        Index=0,
+                        Offset=IL.Ldarg.GetArgumentDisplacement(aMethod, 0)
+                    });
+                    xIdxOffset++;
+                }
+
+                var xParamCount = (ushort)aMethod.MethodBase.GetParameters().Length;
+                for (ushort i = 0; i < xParamCount; i++)
+                {
+                    mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
+                    {
+                        MethodLabelName = xMethodLabel,
+                        IsArgument = true,
+                        Index = (int)(i + xIdxOffset),
+                        Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset))
+                    });
+                }
             }
+
             //foreach (var xLocal in aLocals) {
             //  aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
             //  for (int i = 0; i < (xLocal.Size / 4); i++) {
@@ -475,6 +510,7 @@ namespace Cosmos.IL2CPU.X86
         public void FinalizeDebugInfo()
         {
             this.DebugInfo.WriteSymbolsListToFile(mSymbols);
+            this.DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
         }
     }
 }
