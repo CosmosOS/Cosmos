@@ -48,12 +48,11 @@ namespace Cosmos.VS.Package
             //var xReferenceContainer = GetReferenceContainer();
             
             return base.Build(vsopts, config, output, target);
-        } 
+        }
 
-        protected override MSBuildResult InvokeMsBuild(string target)
+        internal override void BuildAsync(uint vsopts, string config, IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback)
         {
-			// remove it, no really function in it Trivalik
-            /*var xSolutionBuildManager = (IVsSolutionBuildManager)this.GetService(typeof(IVsSolutionBuildManager));
+            var xSolutionBuildManager = (IVsSolutionBuildManager)this.GetService(typeof(IVsSolutionBuildManager));
             var xSolution = (IVsSolution)this.GetService(typeof(IVsSolution));
             if (xSolutionBuildManager != null && xSolution != null)
             {
@@ -68,11 +67,20 @@ namespace Cosmos.VS.Package
                     {
                         if (xGuid != this.ProjectIDGuid)
                         {
-                            return MSBuildResult.Successful;
+                            uiThreadCallback(MSBuildResult.Successful, "Skipped");
+                            output.OutputStringThreadSafe("Project skipped, as it's not necessary for running");
+                            return;
                         }
                     }
                 }
-            }*/
+            } 
+            base.BuildAsync(vsopts, config, output, target, uiThreadCallback);
+        }
+
+        protected override MSBuildResult InvokeMsBuild(string target)
+        {
+			// if the project is not set as startup project, don't build the iso
+            
             return base.InvokeMsBuild(target);
         }
 
