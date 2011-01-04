@@ -95,6 +95,50 @@ namespace Cosmos.Compiler.DebugStub {
             Return();
         }
 
+        // sends a stack value
+        // Serial Params:
+        //  1: x32 - offset relative to EBP
+        //  2: x32 - size of data to send
+        protected void SendMethodContext()
+        {
+            Label = "DebugStub_SendMethodContext";
+            PushAll32();
+
+            ReadComPortX32toStack();
+            EAX.Pop();
+            ESI = EBP;
+            ESI.Add(EAX);
+            // todo: adjust ESI to the actual offset
+
+            AL = (int)MsgType.MethodContext;
+            Call<DebugStub.WriteALToComPort>();
+            
+            // now send size
+            EAX = ESI;
+            Call<DebugStub.WriteALToComPort>();
+            EAX = EAX >> 8;
+            Call<DebugStub.WriteALToComPort>();
+            EAX = EAX >> 8;
+            Call<DebugStub.WriteALToComPort>();
+            EAX = EAX >> 8;
+            Call<DebugStub.WriteALToComPort>();
+
+            ReadComPortX32toStack();
+            ECX.Pop();
+
+            Label = "DebugStub_SendMethodContext_SendByte";
+            new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
+            JumpIf(Flags.Equal, "DebugStub_SendMethodContext_After_SendByte");
+            Call("WriteByteToComPort");
+            new Dec { DestinationReg = Registers.ECX };
+            Jump("DebugStub_SendMethodContext_SendByte");
+
+            Label = "DebugStub_SendMethodContext_After_SendByte";        
+
+            PopAll32();
+            Return();
+        }
+
         protected void Break() {
             // Should only be called internally by DebugStub. Has a lot of preconditions
             // Externals should use BreakOnNextTrace instead
@@ -304,6 +348,7 @@ namespace Cosmos.Compiler.DebugStub {
             WriteByteToComPort();
             ReadByteFromComPort();
             ReadALFromComPort();
+            SendMethodContext();
 
             DebugSuspend();
             DebugResume();
@@ -428,6 +473,13 @@ namespace Cosmos.Compiler.DebugStub {
             Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
+            AL.Compare((byte)Command.SendMethodContext);
+            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMethodContext_After");
+            Call("DebugStub_SendMethodContext");
+            Jump("DebugStub_ProcessCmd_ACK");
+            Label = "DebugStub_ProcessCmd_SendMethodContext_After";
+
+            
             Label = "DebugStub_ProcessCmd_ACK";
                 // We acknowledge receipt of the command, not processing of it.
                 // We have to do this because sometimes callers do more processing
@@ -473,7 +525,7 @@ namespace Cosmos.Compiler.DebugStub {
             Memory["DebugSuspendLevel", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_Running");
             // DebugStub is already running, so exit.
-            // But we need to see if IRQs are diabled.
+            // But we need to see if IRQs are disabled.
             // If IRQ disabled, we dont reenable them after our disable
             // in this routine.
             Memory["InterruptsEnabledFlag", 32].Compare(0);
@@ -485,7 +537,7 @@ namespace Cosmos.Compiler.DebugStub {
             Memory["DebugRunning", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_Start");
             // DebugStub is already running, so exit.
-            // But we need to see if IRQs are diabled.
+            // But we need to see if IRQs are disabled.
             // If IRQ disabled, we dont reenable them after our disable
             // in this routine.
             Memory["InterruptsEnabledFlag", 32].Compare(0);

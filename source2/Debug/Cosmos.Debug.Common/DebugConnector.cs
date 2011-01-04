@@ -12,6 +12,7 @@ namespace Cosmos.Debug.Common
     public abstract class DebugConnector: IDisposable {
         public Action<Exception> ConnectionLost;
         public Action<MsgType, UInt32> CmdTrace;
+        public Action<byte[]> CmdMethodContext;
         public Action<string> CmdText;
         public Action CmdStarted;
         public Action<string> OnDebugMsg;
@@ -169,6 +170,10 @@ namespace Cosmos.Debug.Common
                     Next(1, PacketCmdCompleted);
                     break;
 
+                case MsgType.MethodContext:
+                    Next(4, PacketMethodContextSize);
+                    break;
+
                 default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");
@@ -207,6 +212,19 @@ namespace Cosmos.Debug.Common
             Next(GetUInt16(aPacket, 0), PacketText);
         }
 
+        protected void PacketMethodContextSize(byte[] aPacket)
+        {
+            var xSize = GetUInt32(aPacket, 0);
+            DoDebugMsg("MethodContext coming in. Size = " + xSize);
+            Next((int)xSize, PacketMethodContext);
+        }
+
+        protected void PacketMethodContext(byte[] aPacket)
+        {
+            WaitForMessage();
+            CmdMethodContext(aPacket);
+        }
+
         protected void PacketCmdCompleted(byte[] aPacket) {
             byte xCmdID = aPacket[0];
             DoDebugMsg("DS Msg: Cmd " + xCmdID + " Complete");
@@ -227,6 +245,5 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
             CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
         }
-
     }
 }

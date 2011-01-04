@@ -56,6 +56,12 @@ namespace Cosmos.Compiler.XSharp {
             return Instance;
         }
 
+        public static implicit operator RegisterEAX(RegisterESI aReg)
+        {
+            Instance.Move(aReg.GetId());
+            return Instance;
+        }
+
         public static implicit operator RegisterEAX(RegisterEDX aReg) {
             Instance.Move(aReg.GetId());
             return Instance;

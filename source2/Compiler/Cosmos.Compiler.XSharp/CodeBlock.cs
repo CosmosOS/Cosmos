@@ -12,6 +12,7 @@ namespace Cosmos.Compiler.XSharp {
             , NotZero, NotEqual // Synonyms
             , GreaterThanOrEqualTo
             , LessThan
+            , Below
         };
 
         //TODO: Add registers as needed, not all are here yet
@@ -124,6 +125,11 @@ namespace Cosmos.Compiler.XSharp {
                 case Flags.GreaterThanOrEqualTo:
                     new ConditionalJump { Condition = ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = aLabel };
                     break;
+                case Flags.Below:
+                    new ConditionalJump { Condition = ConditionalTestEnum.Below, DestinationLabel = aLabel };
+                    break;
+                default:
+                    throw new NotImplementedException("Flag '" + aFlags.ToString() + "' not implemented yet!");
             }
         }
 

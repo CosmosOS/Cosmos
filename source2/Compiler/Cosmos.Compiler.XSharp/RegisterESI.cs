@@ -42,5 +42,11 @@ namespace Cosmos.Compiler.XSharp {
             Instance.Move(aValue);
             return Instance;
         }
+
+        public static implicit operator RegisterESI(RegisterEAX aValue)
+        {
+            Instance.Move(aValue);
+            return Instance;
+        }
     }
 }
