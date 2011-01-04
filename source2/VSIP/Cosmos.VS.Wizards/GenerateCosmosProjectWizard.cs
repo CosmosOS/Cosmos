@@ -33,48 +33,48 @@ namespace Cosmos.VS.Package.Templates
 
         public void ProjectFinishedGenerating(EnvDTE.Project project)
         {
-			// read embedded template file
+            // read embedded template file
             var xInputString = GetTemplateString();
             if (xInputString == null)
             {
                 return;
             }
 
-			// set project extension for reference
-			string extension = null;
-			switch (project.Kind)
-			{
-				// VB.NET
-				case "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}":
-					extension = "vbproj";
-					break;
-				// C#
-				case "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}":
-					extension = "csproj";
-					break;
-				default:
-					// unknown project type
-					extension = project.UniqueName.Split('.')[1];
-					break;
-			}
+            // set project extension for reference
+            string extension = null;
+            switch (project.Kind)
+            {
+                // VB.NET
+                case "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}":
+                    extension = "vbproj";
+                    break;
+                // C#
+                case "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}":
+                    extension = "csproj";
+                    break;
+                default:
+                    // unknown project type
+                    extension = project.UniqueName.Split('.')[1];
+                    break;
+            }
 
             xInputString = xInputString.Replace("$KernelGuid$", mGuidKernel.ToString("b"));
             xInputString = xInputString.Replace("$CosmosProjGuid$", mGuidCosmosProj.ToString("b"));
             xInputString = xInputString.Replace("$KernelName$", project.Name);
             xInputString = xInputString.Replace("$CosmosProjectName$", project.Name + "Boot");
-			xInputString = xInputString.Replace("$ProjectTypeExtension$", extension);
+            xInputString = xInputString.Replace("$ProjectTypeExtension$", extension);
             var xFilename = Path.GetDirectoryName(project.FullName);
             xFilename = Path.Combine(xFilename, project.Name + "Boot");
             xFilename += ".Cosmos";
             File.WriteAllText(xFilename, xInputString);
-            project.DTE.Solution.AddFromFile(xFilename, false);
+            var xCosmosProject = project.DTE.Solution.AddFromFile(xFilename, false);
 
-			// Make .Cosmos project dependent on library project.
-			// not working for all people EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
+            // Make .Cosmos project dependent on library project.
+            // not working for all people EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
             var xEnu = project.DTE.Solution.SolutionBuild.BuildDependencies.GetEnumerator();
             while (xEnu.MoveNext())
             {
-                EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency) xEnu.Current;
+                EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency)xEnu.Current;
                 if (bd.Project.Name == project.Name + "Boot")
                 {
                     bd.AddProject(project.UniqueName);
@@ -82,26 +82,56 @@ namespace Cosmos.VS.Package.Templates
                 }
             }
 
-			// found this with macro functionality in VS2010
-			project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();
-			EnvDTE.UIHierarchy hierarchy = project.DTE.ActiveWindow.Object as EnvDTE.UIHierarchy;
-			hierarchy.GetItem(project.Name + "\\" + project.Name + "Boot").Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
-			project.DTE.ExecuteCommand("Project.SetasStartUpProject");
-			// because
-			// project.DTE.Solution.SolutionBuild.StartupProjects = new object[] { project.Name + "Boot.Cosmos"}; 
-			// didnt work correct
+            //// found this with macro functionality in VS2010
+            // but crashes
+            //project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();
+            //EnvDTE.UIHierarchy hierarchy = project.DTE.ActiveWindow.Object as EnvDTE.UIHierarchy;
+            //hierarchy.GetItem(GetNames(xCosmosProject)).Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
+            //project.DTE.ExecuteCommand("Project.SetasStartUpProject");
+            // because
+            // project.DTE.Solution.SolutionBuild.StartupProjects = new object[] { project.Name + "Boot.Cosmos"}; 
+            // didnt work correct
 
-			// set building Cosmos project
-			var enu = project.DTE.Solution.SolutionBuild.SolutionConfigurations.GetEnumerator();
-			while (enu.MoveNext())
-			{
-				var eno = (enu.Current as EnvDTE.SolutionConfiguration).SolutionContexts.GetEnumerator();
-				while (eno.MoveNext())
-				{
-					EnvDTE.SolutionContext context = eno.Current as EnvDTE.SolutionContext;
-					context.ShouldBuild = true;
-				}
-			}
+            // set building Cosmos project
+            var xCurrent = project.DTE.Solution.SolutionBuild.ActiveConfiguration;
+            if (xCurrent != null)
+            {
+                var eno = xCurrent.SolutionContexts.GetEnumerator();
+                while (eno.MoveNext())
+                {
+                    EnvDTE.SolutionContext context = eno.Current as EnvDTE.SolutionContext;
+                    if (context.ProjectName == xCosmosProject.UniqueName || context.ProjectName == project.UniqueName)
+                    {
+                        context.ShouldBuild = true;
+                    }
+                }
+            }
+        }
+
+        private static string GetNames(EnvDTE.Project project)
+        {
+            var xCurProjectItem = project.ParentProjectItem;
+            var xResult = String.Empty;
+            do
+            {
+                if (String.IsNullOrEmpty(xResult))
+                {
+                    xResult = xCurProjectItem.Name;
+                }
+                else
+                {
+                    xResult = xCurProjectItem.Name + "\\" + xResult;
+                }
+                if (xCurProjectItem.ContainingProject != null)
+                {
+                    xCurProjectItem = xCurProjectItem.ContainingProject.ParentProjectItem;
+                }
+                else
+                {
+                    xCurProjectItem = null;
+                }
+            } while (xCurProjectItem != null);
+            return xResult;
         }
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
