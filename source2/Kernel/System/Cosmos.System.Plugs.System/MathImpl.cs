@@ -14,16 +14,11 @@ namespace Cosmos.System.Plugs.System
 
         public static double Abs(double value)
         {
-            double xResult;
-            if (value < 0)
-            {
-                xResult = value - (2 * value);
-            }
-            else
-            {
-                xResult = value;
-            }
-            return xResult;
+            if (value < 0)            
+                return -value;
+            
+            else            
+                return value;
         }
         
         //public static float Abs(float value)
@@ -56,37 +51,34 @@ namespace Cosmos.System.Plugs.System
 
         public static int Abs(int value)
         {
-            int xResult;
             if (value < 0)
-            {
-                xResult = value - (2 * value);
-            }
+                return -value;
+
             else
-            {
-                xResult = value;
-            }
-            return xResult;
+                return value;
         }
 
         public static double Pow(double x, double y)
-        {
-            double xResult = x;
+        {            
             if (y == 0)
             {
-                xResult = 1;
+                return 1;
             }
             else if (y == 1)
             {
-                xResult = x;
+                return x;
             }
             else
             {
+                double xResult = x;
+
                 for (int i = 2; i <= y; i++)
                 {
                     xResult = xResult * x;
                 }
-            }
-            return xResult;
+
+                return xResult;
+            }                        
         }
     }
 }

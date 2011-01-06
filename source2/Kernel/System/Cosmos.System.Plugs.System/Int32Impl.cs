@@ -16,12 +16,15 @@ namespace Cosmos.System.Plugs.System {
        //at Cosmos.Build.MSBuild.IL2CPU.Execute() in M:\source\Cosmos\source2\Build\Cosmos.Build.MSBuild\IL2CPU.cs:line 250	C:\Program Files (x86)\MSBuild\Cosmos\Cosmos.targets	32	10	Guess (source2\Demos\Guess\Guess)
 
         // for instance ones still declare as static but add a aThis argument first of same type as target
-        public static int Parse(string s) {
+        public static int Parse(string s)
+        {
             int xResult = 0;
-            for (int i = s.Length - 1; i >= 0; i--) {
+            for (int i = s.Length - 1; i >= 0; i--)
+            {
                 xResult = xResult * 10;
-                int j = Digits.IndexOf(s[i]);
-                if (j == -1) {
+                int j = s[i] - '0';
+                if (j < 0 || j > 9)
+                {
                     throw new Exception("Non numeric digit found in int.parse");
                 }
                 xResult = xResult + j;
