@@ -15,10 +15,8 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           // todo: implement exception support.
           if (Assembler.Stack.Count > 0) {
-            new CPUx86.Pop {
-              DestinationReg = CPUx86.Registers.EAX
-            };
-            Assembler.Stack.Pop();
+			  var xItem = Assembler.Stack.Pop();
+			  new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xItem.Size };
           }
         }
 
