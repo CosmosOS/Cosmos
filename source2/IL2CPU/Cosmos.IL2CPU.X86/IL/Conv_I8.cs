@@ -14,27 +14,32 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSource = Assembler.Stack.Peek();
-            if (xSource.IsFloat)
-            {
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-            }
             Assembler.Stack.Pop();
             switch( xSource.Size )
             {
                 case 1:
                 case 2:
                 case 4:
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.SignExtendAX { Size = 32 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					if (xSource.IsFloat)
+					{
+						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32 };
+						new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+					}
+					else
+					{
+						new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+						new CPUx86.SignExtendAX { Size = 32 };
+						new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+						new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					}
                     break;
                 case 8:
+					if (xSource.IsFloat)
+					{
+						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+					}
                     break;
                 default:
                     //EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
