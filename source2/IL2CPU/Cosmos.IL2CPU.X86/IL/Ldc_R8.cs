@@ -17,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
             OpDouble xOp = ( OpDouble )aOpCode;
 
             byte[] xBytes = BitConverter.GetBytes( xOp.Value );
+			new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 4) };
             new CPU.Push { DestinationValue = BitConverter.ToUInt32( xBytes, 0 ) };
-            new CPU.Push { DestinationValue = BitConverter.ToUInt32( xBytes, 4 ) };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( Double ) ) );
         }
 
