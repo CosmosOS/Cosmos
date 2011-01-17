@@ -18,8 +18,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
             byte[] xBytes = BitConverter.GetBytes( xOp.Value );
 			new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 4) };
-            new CPU.Push { DestinationValue = BitConverter.ToUInt32( xBytes, 0 ) };
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( Double ) ) );
+            new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 0) };
+            Assembler.Stack.Push( new StackContents.Item( 8, typeof( Double ) ) );
         }
 
 
