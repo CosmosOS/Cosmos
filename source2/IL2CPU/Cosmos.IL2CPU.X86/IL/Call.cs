@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       int xExtraStackSize = (int)Align(xReturnSize, 4);
       var xParameters = aMethod.GetParameters();
       foreach (var xItem in xParameters) {
-        xExtraStackSize -= (int)Align(SizeOfType(xItem.GetType()), 4);
+        xExtraStackSize -= (int)Align(SizeOfType(xItem.ParameterType), 4);
       }
       if (!xMethodInfo.IsStatic) {
         xExtraStackSize -= (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
