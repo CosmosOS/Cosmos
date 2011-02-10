@@ -75,10 +75,6 @@
       <Project>{D9A87AAD-FCC9-4517-B31D-E904DAD00784}</Project>
       <Name>Cosmos.Core.Plugs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MatthijsPlayground\MatthijsPlayground.csproj">
-      <Project>{6882C74B-3ED2-4D76-9E7B-67B6A28808BC}</Project>
-      <Name>MatthijsPlayground</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

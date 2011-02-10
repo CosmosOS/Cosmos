@@ -63,6 +63,31 @@ namespace Cosmos.IL2CPU.X86
             //    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
             //    Engine.QueueMethod(xTempMethod);
             //}
+            #region Load CodeOffset
+            ISymbolMethod xMethodSymbols;
+            if (DebugMode == DebugMode.Source)
+            {
+                var xSymbolReader = GetSymbolReaderForAssembly(aMethod.MethodBase.DeclaringType.Assembly);
+                if (xSymbolReader != null)
+                {
+                    xMethodSymbols = xSymbolReader.GetMethod(new SymbolToken(aMethod.MethodBase.MetadataToken));
+                    // This gets the Sequence Points.
+                    // Sequence Points are spots that identify what the compiler/debugger says is a spot
+                    // that a breakpoint can occur one. Essentially, an atomic source line in C#
+                    if (xMethodSymbols != null)
+                    {
+                        xCodeOffsets = new int[xMethodSymbols.SequencePointCount];
+                        var xCodeDocuments = new ISymbolDocument[xMethodSymbols.SequencePointCount];
+                        xCodeLineNumbers = new int[xMethodSymbols.SequencePointCount];
+                        var xCodeColumns = new int[xMethodSymbols.SequencePointCount];
+                        var xCodeEndLines = new int[xMethodSymbols.SequencePointCount];
+                        var xCodeEndColumns = new int[xMethodSymbols.SequencePointCount];
+                        xMethodSymbols.GetSequencePoints(xCodeOffsets, xCodeDocuments
+                         , xCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+                    }
+                }
+            }
+            #endregion
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null)
             {
                 // the body of aMethod is getting emitted
@@ -71,13 +96,16 @@ namespace Cosmos.IL2CPU.X86
                 {
                     foreach (var xLocal in xBody.LocalVariables)
                     {
-                        mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
+                        var xInfo=new DebugInfo.Local_Argument_Info
                         {
                             MethodLabelName = xMethodLabel,
                             IsArgument = false,
                             Index = xLocal.LocalIndex,
+                            Name="Local" + xLocal.LocalIndex,
                             Offset = (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex)
-                        });
+                        };
+                        mLocals_Arguments_Infos.Add(xInfo);
+
                         new Comment("Local " + xLocal.LocalIndex);
                         new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
                     }
@@ -89,13 +117,15 @@ namespace Cosmos.IL2CPU.X86
                     mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info{
                         MethodLabelName=xMethodLabel,
                         IsArgument=true,
+                        Name="this",
                         Index=0,
                         Offset=IL.Ldarg.GetArgumentDisplacement(aMethod, 0)
                     });
                     xIdxOffset++;
                 }
 
-                var xParamCount = (ushort)aMethod.MethodBase.GetParameters().Length;
+                var xParams = aMethod.MethodBase.GetParameters();
+                var xParamCount = (ushort)xParams.Length;
                 for (ushort i = 0; i < xParamCount; i++)
                 {
                     mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
@@ -103,6 +133,7 @@ namespace Cosmos.IL2CPU.X86
                         MethodLabelName = xMethodLabel,
                         IsArgument = true,
                         Index = (int)(i + xIdxOffset),
+                        Name=xParams[i].Name,
                         Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset))
                     });
                 }
@@ -117,30 +148,6 @@ namespace Cosmos.IL2CPU.X86
             //if (aDebugMode && aIsNonDebuggable) {
             //  new CPUx86.Call { DestinationLabel = "DebugPoint_DebugSuspend" };
             //}
-            #region Load CodeOffset
-            if (DebugMode == DebugMode.Source)
-            {
-                var xSymbolReader = GetSymbolReaderForAssembly(aMethod.MethodBase.DeclaringType.Assembly);
-                if (xSymbolReader != null)
-                {
-                    var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(aMethod.MethodBase.MetadataToken));
-                    // This gets the Sequence Points.
-                    // Sequence Points are spots that identify what the compiler/debugger says is a spot
-                    // that a breakpoint can occur one. Essentially, an atomic source line in C#
-                    if (xSmbMethod != null)
-                    {
-                        xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                        var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                        xCodeLineNumbers = new int[xSmbMethod.SequencePointCount];
-                        var xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                        var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                        var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
-                        xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
-                         , xCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-                    }
-                }
-            }
-            #endregion
         }
 
         protected override void MethodEnd(MethodInfo aMethod)

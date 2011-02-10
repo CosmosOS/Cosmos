@@ -20,11 +20,11 @@ namespace Cosmos.Debug.VSDebugEngine {
         #region IDebugProgramProvider2 Members
 
         // Obtains information about programs running, filtered in a variety of ways.
-        int IDebugProgramProvider2.GetProviderProcessData(uint Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray)
+        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray)
         {
             processArray[0] = new PROVIDER_PROCESS_DATA();
            
-            if (EngineUtils.IsFlagSet(Flags, (int)enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES))
+            if (Flags.HasFlag(enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES))
             {
                 // The debugger is asking the engine to return the program nodes it can debug. The 
                 // sample engine claims that it can debug all processes, and returns exsactly one
@@ -38,7 +38,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 IntPtr destinationArray = Marshal.AllocCoTaskMem(IntPtr.Size * programNodes.Length);                
                 Marshal.Copy(programNodes, 0, destinationArray, programNodes.Length);
 
-                processArray[0].Fields = (uint)enum_PROVIDER_FIELDS.PFIELD_PROGRAM_NODES;
+                processArray[0].Fields = enum_PROVIDER_FIELDS.PFIELD_PROGRAM_NODES;
                 processArray[0].ProgramNodes.Members = destinationArray;
                 processArray[0].ProgramNodes.dwCount = (uint)programNodes.Length;
 
@@ -49,7 +49,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         // Gets a program node, given a specific process ID.
-        int IDebugProgramProvider2.GetProviderProgramNode(uint Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, ref Guid guidEngine, ulong programId, out IDebugProgramNode2 programNode)
+        int IDebugProgramProvider2.GetProviderProgramNode(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, ref Guid guidEngine, ulong programId, out IDebugProgramNode2 programNode)
         {
             // This method is used for Just-In-Time debugging support, which this program provider does not support
             programNode = null;
@@ -63,7 +63,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         // Establishes a callback to watch for provider events associated with specific kinds of processes
-        int IDebugProgramProvider2.WatchForProviderEvents(uint Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, ref Guid guidLaunchingEngine, IDebugPortNotify2 ad7EventCallback)
+        int IDebugProgramProvider2.WatchForProviderEvents(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, ref Guid guidLaunchingEngine, IDebugPortNotify2 ad7EventCallback)
         {
             // The sample debug engine is a native debugger, and can therefore always provide a program node
             // in GetProviderProcessData. Non-native debuggers may wish to implement this method as a way

@@ -185,9 +185,9 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Engines notify the debugger about the results of a symbol serach by sending an instance
         // of IDebugSymbolSearchEvent2
-        public void OnSymbolSearch(AD7Module module, string status, uint dwStatusFlags)
+        public void OnSymbolSearch(AD7Module module, string status, enum_MODULE_INFO_FLAGS dwStatusFlags)
         {
-            string statusString = (dwStatusFlags == 1 ? "Symbols Loaded - " : "No symbols loaded") + status;
+            string statusString = (dwStatusFlags == enum_MODULE_INFO_FLAGS.MIF_SYMBOLS_LOADED ? "Symbols Loaded - " : "No symbols loaded") + status;
 
             AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(module, statusString, dwStatusFlags);
             Send(eventObject, AD7SymbolSearchEvent.IID, null);

@@ -17,12 +17,12 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
     <VMWareFlavor>Workstation</VMWareFlavor>
-    <StartCosmosGDB>false</StartCosmosGDB>
+    <StartCosmosGDB>True</StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>

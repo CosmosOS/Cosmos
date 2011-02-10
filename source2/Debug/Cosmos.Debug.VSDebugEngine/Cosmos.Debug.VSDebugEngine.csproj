@@ -78,9 +78,9 @@
     <Reference Include="envdte90a, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Debugger.Interop, Version=8.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Microsoft.VisualStudio.Debugger.Interop.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 2010 SDK\VisualStudioIntegration\Common\Assemblies\v2.0\Microsoft.VisualStudio.Debugger.InteropA.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Shell, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -118,6 +118,7 @@
     <Compile Include="AD7.Impl\AD7Thread.cs" />
     <Compile Include="AD7.Definitions\AD7Hresult.cs" />
     <Compile Include="AD7.Impl\AD7PendingBreakpoint.cs" />
+    <Compile Include="AD7.Impl\DebugLocalInfo.cs" />
     <Compile Include="Engine.Impl\BreakpointManager.cs" />
     <Compile Include="Engine.Impl\OperationThread.cs" />
     <Compile Include="AD7.Impl\AD7Engine.cs" />

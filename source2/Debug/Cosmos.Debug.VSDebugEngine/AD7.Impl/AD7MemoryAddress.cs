@@ -38,7 +38,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Compares the memory context to each context in the given array in the manner indicated by compare flags, 
         // returning an index of the first context that matches.
-        public int Compare(uint uContextCompare, IDebugMemoryContext2[] compareToItems, uint compareToLength, out uint foundIndex)
+        public int Compare(enum_CONTEXT_COMPARE uContextCompare, IDebugMemoryContext2[] compareToItems, uint compareToLength, out uint foundIndex)
         {
             foundIndex = uint.MaxValue;
 
@@ -132,24 +132,24 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Gets information that describes this context.
-        public int GetInfo(uint dwFields, CONTEXT_INFO[] pinfo)
+        public int GetInfo(enum_CONTEXT_INFO_FIELDS dwFields, CONTEXT_INFO[] pinfo)
         {           
             try
             {
                 pinfo[0].dwFields = 0;
 
-                if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS) != 0)
+                if (dwFields.HasFlag(enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS))
                 {
                     pinfo[0].bstrAddress = m_address.ToString();
-                    pinfo[0].dwFields |= (uint)enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS;
+                    pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS;
                 }
 
                 // Fields not supported by the sample
-                if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSOFFSET) != 0){}
-                if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSABSOLUTE) != 0){}
-                if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_MODULEURL) != 0){}
-                if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION) != 0) {}
-                if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_FUNCTIONOFFSET) != 0) {}
+                //if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSOFFSET) != 0){}
+                //if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSABSOLUTE) != 0){}
+                //if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_MODULEURL) != 0){}
+                //if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION) != 0) {}
+                //if ((dwFields & (uint)enum_CONTEXT_INFO_FIELDS.CIF_FUNCTIONOFFSET) != 0) {}
 
                 return VSConstants.S_OK;
             }

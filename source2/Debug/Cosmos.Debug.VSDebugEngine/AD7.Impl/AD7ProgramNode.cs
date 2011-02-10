@@ -41,7 +41,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Gets the name of the process hosting a program.
-        int IDebugProgramNode2.GetHostName(uint dwHostNameType, out string processName)
+        int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
         {
             // Since we are using default transport and don't want to customize the process name, this method doesn't need
             // to be implemented.

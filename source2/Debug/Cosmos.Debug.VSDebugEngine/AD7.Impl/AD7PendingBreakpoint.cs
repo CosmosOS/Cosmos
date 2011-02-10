@@ -25,9 +25,9 @@ namespace Cosmos.Debug.VSDebugEngine {
         public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, AD7Engine engine, BreakpointManager bpManager) {
             m_pBPRequest = pBPRequest;
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
-            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo((uint)enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
+            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
             m_bpRequestInfo = requestInfo[0];
-            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo((uint)enum_BPREQI_FIELDS.BPREQI_THREAD, requestInfo));
+            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_THREAD, requestInfo));
 
             mEngine = engine;
             mBPMgr = bpManager;
@@ -200,7 +200,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         // Enumerates all error breakpoints that resulted from this pending breakpoint.
-        int IDebugPendingBreakpoint2.EnumErrorBreakpoints(uint bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum)
+        int IDebugPendingBreakpoint2.EnumErrorBreakpoints(enum_BP_ERROR_TYPE bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum)
         {
             // Called when a pending breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
             // The sample engine does not support this, but a real world engine will want to send an instance of IDebugBreakpointErrorEvent2 to the
@@ -220,18 +220,18 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Gets the state of this pending breakpoint.
         int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState)
         {
-            pState[0].state = (uint)enum_BP_STATE.BPS_DISABLED;
+            pState[0].state = enum_PENDING_BP_STATE.PBPS_DISABLED;
             if (mDeleted)
             {
-                pState[0].state = (uint)enum_BP_STATE.BPS_DELETED;
+                pState[0].state = enum_PENDING_BP_STATE.PBPS_DELETED;
             }
             else if (mEnabled)
             {
-                pState[0].state = (uint)enum_BP_STATE.BPS_ENABLED;
+                pState[0].state = enum_PENDING_BP_STATE.PBPS_ENABLED;
             }
             else 
             {
-                pState[0].state = (uint)enum_BP_STATE.BPS_DISABLED;
+                pState[0].state = enum_PENDING_BP_STATE.PBPS_DISABLED;
             }
 
             return VSConstants.S_OK;

@@ -105,26 +105,27 @@ namespace Cosmos.Compiler.DebugStub {
             PushAll32();
 
             ReadComPortX32toStack();
-            EAX.Pop();
-            ESI = EBP;
-            ESI.Add(EAX);
+            //EAX.Pop();
+            //ESI = EBP;
+            //ESI.Add(EAX);
+            //ESI.Push();
             // todo: adjust ESI to the actual offset
 
             AL = (int)MsgType.MethodContext;
             Call<DebugStub.WriteALToComPort>();
-            
-            // now send size
-            EAX = ESI;
-            Call<DebugStub.WriteALToComPort>();
-            EAX = EAX >> 8;
-            Call<DebugStub.WriteALToComPort>();
-            EAX = EAX >> 8;
-            Call<DebugStub.WriteALToComPort>();
-            EAX = EAX >> 8;
-            Call<DebugStub.WriteALToComPort>();
 
+            //EAX.Pop();
+            //EAX.Push();
+            
             ReadComPortX32toStack();
             ECX.Pop();
+            EAX.Pop();
+
+            // now ECX contains size of data (count)
+            // EAX contains relative to EBP
+
+            ESI = EBP;
+            ESI.Add(EAX);
 
             Label = "DebugStub_SendMethodContext_SendByte";
             new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };

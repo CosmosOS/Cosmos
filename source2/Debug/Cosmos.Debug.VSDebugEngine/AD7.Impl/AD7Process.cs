@@ -31,7 +31,10 @@ namespace Cosmos.Debug.VSDebugEngine {
         protected readonly NameValueCollection mDebugInfo;
         protected TargetHost mTargetHost;
         protected VMwareFlavor mVMWareFlavor=VMwareFlavor.Player;
-
+        internal DebugInfo mDebugInfoDb;
+        internal IDictionary<uint, string> mAddressLabelMappings;
+        internal IDictionary<string, uint> mLabelAddressMappings;
+        
         private int mProcessExitEventSent = 0;
 
         protected void LaunchVMWare(bool aGDB) {
@@ -146,6 +149,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         public string mProjectFile;
         internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
+            System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
             mCallback = aCallback; 
 
             // Load passed in values
@@ -187,31 +191,26 @@ namespace Cosmos.Debug.VSDebugEngine {
             mProcessStartInfo.RedirectStandardOutput = true;
             mProcessStartInfo.CreateNoWindow = true;
 
-            IDictionary<uint, string> xAddressLabelMappings;
-            IDictionary<string, uint> xLabelAddressMappings;
-            
             string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
 			if (!File.Exists(xCpdbPath))
 			{
 				throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
 			}
 
-            using (var xDebugInfo = new DebugInfo(xCpdbPath))
-            {
-                xDebugInfo.ReadAddressLabelMappings(out xAddressLabelMappings, out xLabelAddressMappings);
-                if (xAddressLabelMappings.Count == 0)
+            mDebugInfoDb = new DebugInfo(xCpdbPath);
+            mDebugInfoDb.ReadAddressLabelMappings(out mAddressLabelMappings, out mLabelAddressMappings);
+                if (mAddressLabelMappings.Count == 0)
                 {
                     throw new Exception("Debug data not found: LabelByAddressMapping");
                 }
 
-                mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(xAddressLabelMappings, xLabelAddressMappings, xDebugInfo);
+                mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(mAddressLabelMappings, mLabelAddressMappings, mDebugInfoDb);
 
                 if (mSourceMappings.Count == 0)
                 {
                     throw new Exception("Debug data not found: SourceMappings");
                 }
                 mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
-            }
             if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
                 mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
             } else {
@@ -254,6 +253,11 @@ namespace Cosmos.Debug.VSDebugEngine {
                 // But allow overrides for dev kit, I dont want to have to run the install 
                 // for each change to gdb client.
                 string xGDBClientEXE = @"m:\source\Cosmos\source2\Debug\Cosmos.Debug.GDB\bin\Debug\Cosmos.Debug.GDB.exe";
+                if (Environment.MachineName.Equals("MATTHIJS-VAST1", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    // for now, the paths are hardcoded
+                    xGDBClientEXE = @"c:\Data\Sources\Cosmos\source2\Debug\Cosmos.Debug.GDB\bin\Debug\Cosmos.Debug.GDB.exe";
+                }
                 if (File.Exists(xGDBClientEXE)) {
                     var xPSInfo = new ProcessStartInfo(xGDBClientEXE);
                     xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
@@ -390,11 +394,12 @@ namespace Cosmos.Debug.VSDebugEngine {
             throw new NotImplementedException();
         }
 
-        public int GetInfo(uint Fields, PROCESS_INFO[] pProcessInfo)
-        {                  throw new NotImplementedException();
+        public int GetInfo(enum_PROCESS_INFO_FIELDS Fields, PROCESS_INFO[] pProcessInfo)
+        {
+            throw new NotImplementedException();
         }
 
-        public int GetName(uint gnType, out string pbstrName)
+        public int GetName(enum_GETNAME_TYPE gnType, out string pbstrName)
         {
             throw new NotImplementedException();
         }
@@ -442,6 +447,11 @@ namespace Cosmos.Debug.VSDebugEngine {
                     mDbgConnector.Dispose();
                     mDbgConnector = null;
                 }
+                if (mDebugInfoDb != null)
+                {
+                    mDebugInfoDb.Dispose();
+                    mDebugInfoDb = null;
+                }
             }
             return VSConstants.S_OK;
         }
@@ -464,6 +474,11 @@ namespace Cosmos.Debug.VSDebugEngine {
             //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
             mDbgConnector.Dispose();
             mDbgConnector = null;
+            if (mDebugInfoDb != null)
+            {
+                mDebugInfoDb.Dispose();
+                mDebugInfoDb = null;
+            }
             if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0)
             {
                 mCallback.OnProcessExit((uint)mProcess.ExitCode);

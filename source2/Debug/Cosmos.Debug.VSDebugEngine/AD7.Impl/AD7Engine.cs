@@ -86,7 +86,7 @@ namespace Cosmos.Debug.VSDebugEngine
         #region IDebugEngine2 Members
 
         // Attach the debug engine to a program. 
-        int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, uint dwReason)
+        int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
@@ -344,7 +344,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
         // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
-        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess)
+        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo, string aArgs, string aDir, string aEnv, string aOptions, enum_LAUNCH_FLAGS aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
@@ -648,7 +648,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // The debugger calls this when it needs to obtain the IDebugDisassemblyStream2 for a particular code-context.
         // The sample engine does not support dissassembly so it returns E_NOTIMPL
-        public int GetDisassemblyStream(uint dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
+        public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             disassemblyStream = null;
@@ -704,7 +704,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // This method is deprecated. Use the IDebugProcess3::Step method instead.
-        public int Step(IDebugThread2 pThread, uint sk, uint Step)
+        public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             mProcess.Step((enum_STEPKIND)sk);
@@ -724,7 +724,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Writes a dump to a file.
-        public int WriteDump(uint DUMPTYPE, string pszDumpUrl)
+        public int WriteDump(enum_DUMPTYPE DUMPTYPE, string pszDumpUrl)
         {
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             // The sample debugger does not support creating or reading mini-dumps.

@@ -274,9 +274,9 @@ namespace Cosmos.Debug.VSDebugEngine
 
         private AD7Module m_module;
         private string m_searchInfo;
-        private uint m_symbolFlags;
+        private enum_MODULE_INFO_FLAGS m_symbolFlags;
 
-        public AD7SymbolSearchEvent(AD7Module module, string searchInfo, uint symbolFlags)
+        public AD7SymbolSearchEvent(AD7Module module, string searchInfo, enum_MODULE_INFO_FLAGS symbolFlags)
         {
             m_module = module;
             m_searchInfo = searchInfo;
@@ -285,11 +285,11 @@ namespace Cosmos.Debug.VSDebugEngine
 
         #region IDebugSymbolSearchEvent2 Members
 
-        int IDebugSymbolSearchEvent2.GetSymbolSearchInfo(out IDebugModule3 pModule, ref string pbstrDebugMessage, out uint pdwModuleInfoFlags)
+        int IDebugSymbolSearchEvent2.GetSymbolSearchInfo(out IDebugModule3 pModule, ref string pbstrDebugMessage, enum_MODULE_INFO_FLAGS[] pdwModuleInfoFlags)
         {
             pModule = m_module;
             pbstrDebugMessage = m_searchInfo;
-            pdwModuleInfoFlags = m_symbolFlags;
+            pdwModuleInfoFlags[0] = m_symbolFlags;
 
             return VSConstants.S_OK;
         }

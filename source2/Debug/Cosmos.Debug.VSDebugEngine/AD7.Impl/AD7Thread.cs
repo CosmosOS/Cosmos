@@ -14,10 +14,12 @@ namespace Cosmos.Debug.VSDebugEngine
         //readonly DebuggedThread m_debuggedThread;
         //TODO: Can we safely change this?
         const string ThreadNameString = "Sample Engine Thread";
+        private AD7Process mProcess;
 
         public AD7Thread(AD7Engine engine, AD7Process aProcess)//, DebuggedThread debuggedThread)
         {
             m_engine = engine;
+            mProcess = aProcess;
         }      
         
         string GetCurrentLocation(bool fIncludeModuleName)
@@ -42,8 +44,11 @@ namespace Cosmos.Debug.VSDebugEngine
         // and coverting that to an implementation of IEnumDebugFrameInfo2. 
         // Real engines will most likely want to cache this information to avoid recomputing it each time it is asked for,
         // and or construct it on demand instead of walking the entire stack.
-        int IDebugThread2.EnumFrameInfo(uint dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 enumObject)
+        int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 enumObject)
         {
+            System.Diagnostics.Debug.WriteLine("AD7Thread.EnumFrameInfo");
+            System.Diagnostics.Debug.WriteLine("\tdwFieldSpec = 0x" + dwFieldSpec.ToString("X"));
+            System.Diagnostics.Debug.WriteLine("\tnRadix = 0x" + nRadix.ToString("X"));
             // Ask the lower-level to perform a stack walk on this thread
             //m_engine.DebuggedProcess.DoStackWalk(this.m_debuggedThread);
             enumObject = null;
@@ -58,7 +63,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 {
                     // failed to walk any frames. Only return the top frame.
                     frameInfoArray = new FRAMEINFO[1];
-                    AD7StackFrame frame = new AD7StackFrame(m_engine, this);
+                    AD7StackFrame frame = new AD7StackFrame(m_engine, this, mProcess);
                     frame.SetFrameInfo((enum_FRAMEINFO_FLAGS)dwFieldSpec, out frameInfoArray[0]);
                 }
                 //else
@@ -107,41 +112,41 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Gets properties that describe a thread.
-        int IDebugThread2.GetThreadProperties(uint dwFields, THREADPROPERTIES[] propertiesArray)
+        int IDebugThread2.GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] propertiesArray)
         {
             try
             {
                 THREADPROPERTIES props = new THREADPROPERTIES();
 
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS.TPF_ID) != 0)
+                if (dwFields.HasFlag(enum_THREADPROPERTY_FIELDS.TPF_ID))
                 {
                     //props.dwThreadId = (uint)m_debuggedThread.Id;
-                    props.dwFields |= (uint)enum_THREADPROPERTY_FIELDS.TPF_ID;
+                    props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_ID;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT) != 0) 
+                if (dwFields.HasFlag(enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT)) 
                 {
                     // sample debug engine doesn't support suspending threads
-                    props.dwFields |= (uint)enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT;
+                    props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS.TPF_STATE) != 0) 
+                if (dwFields.HasFlag(enum_THREADPROPERTY_FIELDS.TPF_STATE)) 
                 {
                     props.dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
-                    props.dwFields |= (uint)enum_THREADPROPERTY_FIELDS.TPF_STATE;
+                    props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_STATE;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS.TPF_PRIORITY) != 0) 
+                if (dwFields.HasFlag(enum_THREADPROPERTY_FIELDS.TPF_PRIORITY)) 
                 {
                     props.bstrPriority = "Normal";
-                    props.dwFields |= (uint)enum_THREADPROPERTY_FIELDS.TPF_PRIORITY;
+                    props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_PRIORITY;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS.TPF_NAME) != 0)
+                if (dwFields.HasFlag(enum_THREADPROPERTY_FIELDS.TPF_NAME))
                 {
                     props.bstrName = ThreadNameString;
-                    props.dwFields |= (uint)enum_THREADPROPERTY_FIELDS.TPF_NAME;
+                    props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_NAME;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS.TPF_LOCATION) != 0)
+                if (dwFields.HasFlag(enum_THREADPROPERTY_FIELDS.TPF_LOCATION))
                 {
                     props.bstrLocation = GetCurrentLocation(true);
-                    props.dwFields |= (uint)enum_THREADPROPERTY_FIELDS.TPF_LOCATION;
+                    props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_LOCATION;
                 }
 
                 return VSConstants.S_OK;

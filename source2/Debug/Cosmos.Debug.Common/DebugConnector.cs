@@ -21,7 +21,10 @@ namespace Cosmos.Debug.Common
         public abstract void WaitConnect();
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
+        private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
+
         protected void DoDebugMsg(string aMsg) {
+            mDebugWriter.WriteLine(aMsg);
             if (OnDebugMsg != null) {
                 OnDebugMsg(aMsg);
             }
@@ -114,6 +117,30 @@ namespace Cosmos.Debug.Common
             SendCommandData(Command.BreakOnAddress, xData, true);
         }
 
+        public byte[] GetStackData(int offsetToEBP, uint size)
+        {
+            // from debugstub:
+            //// sends a stack value
+            //// Serial Params:
+            ////  1: x32 - offset relative to EBP
+            ////  2: x32 - size of data to send
+
+            if (!Connected)
+            {
+                return null;
+            }
+            var xData = new byte[8];
+            mStackDataSize = (int)size;
+            Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
+            Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
+            SendCommandData(Command.SendMethodContext, xData, true);
+            var xResult = mStackData;
+            mStackData = null;
+            return xResult;
+        }
+        private int mStackDataSize;
+        private byte[] mStackData;
+
         public void DeleteBreakpoint(int aID) {
             SetBreakpoint(aID, 0);
         }
@@ -171,7 +198,7 @@ namespace Cosmos.Debug.Common
                     break;
 
                 case MsgType.MethodContext:
-                    Next(4, PacketMethodContextSize);
+                    Next(mStackDataSize, PacketMethodContext);
                     break;
 
                 default:
@@ -182,7 +209,12 @@ namespace Cosmos.Debug.Common
         }
 
         public virtual void Dispose() {
-            GC.SuppressFinalize(this);
+            if (mDebugWriter != null)
+            {
+                mDebugWriter.Dispose();
+                mDebugWriter = null;
+                GC.SuppressFinalize(this);
+            }
         }
 
         // Signature is sent after garbage emitted during init of serial port.
@@ -212,17 +244,12 @@ namespace Cosmos.Debug.Common
             Next(GetUInt16(aPacket, 0), PacketText);
         }
 
-        protected void PacketMethodContextSize(byte[] aPacket)
-        {
-            var xSize = GetUInt32(aPacket, 0);
-            DoDebugMsg("MethodContext coming in. Size = " + xSize);
-            Next((int)xSize, PacketMethodContext);
-        }
-
         protected void PacketMethodContext(byte[] aPacket)
         {
+            mStackData = aPacket;
+             // not really nice to use this one?
+            mCmdWait.Set();
             WaitForMessage();
-            CmdMethodContext(aPacket);
         }
 
         protected void PacketCmdCompleted(byte[] aPacket) {

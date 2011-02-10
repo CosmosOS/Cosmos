@@ -18,7 +18,19 @@ namespace Cosmos.Debug.Common {
             public Action<byte[]> Completed;
         }
 
+        private static string BytesToString(byte[] bytes, int index, int count)
+        {
+            var xSB = new StringBuilder(2 + (bytes.Length * 2));
+            xSB.Append("0x");
+            for (int i = index; i < index+count; i++)
+            {
+                xSB.Append(bytes[i].ToString("X2").ToString());
+            }
+            return xSB.ToString();
+        }
+
         protected override void SendRawData(byte[] aBytes) {
+            System.Diagnostics.Debug.WriteLine(String.Format("DC - sending: {0}", BytesToString(aBytes, 0, aBytes.Length)));
             mStream.Write(aBytes, 0, aBytes.Length);
         }
 
@@ -58,6 +70,7 @@ namespace Cosmos.Debug.Common {
                 Console.WriteLine("DoRead");
                 var xIncoming = (Incoming)aResult.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(aResult);
+                System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
                 xIncoming.CurrentPos += xCount;
                 // If 0, end of stream then just exit without calling BeginRead again
                 if (xCount == 0)

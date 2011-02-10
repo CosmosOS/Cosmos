@@ -33,13 +33,13 @@ namespace Cosmos.Debug.VSDebugEngine
         // must be sent to the IDebugEventCallback2 event callback
         //
         // This is primarily used for the immediate window which this engine does not currently support.
-        int IDebugExpression2.EvaluateAsync(uint dwFlags, IDebugEventCallback2 pExprCallback)
+        int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback)
         {
             throw new NotImplementedException();
         }
 
         // This method evaluates the expression synchronously.
-        int IDebugExpression2.EvaluateSync(uint dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
+        int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
             ppResult = null;// new AD7Property(m_var);
             return VSConstants.S_OK;

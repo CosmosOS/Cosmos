@@ -27,7 +27,7 @@ namespace Cosmos.Debug.VSDebugEngine
         #region IDebugDocumentContext2 Members
 
         // Compares this document context to a given array of document contexts.
-        int IDebugDocumentContext2.Compare(uint Compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext)
+        int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE Compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext)
         {
             dwDocContextSetLen = 0;
             pdwDocContext = 0;
@@ -77,7 +77,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Gets the displayable name of the document that contains this document context.
-        int IDebugDocumentContext2.GetName(uint gnType, out string pbstrFileName)
+        int IDebugDocumentContext2.GetName(enum_GETNAME_TYPE gnType, out string pbstrFileName)
         {
             pbstrFileName = m_fileName;
             return VSConstants.S_OK;

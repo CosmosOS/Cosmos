@@ -14,54 +14,80 @@ namespace Cosmos.Debug.VSDebugEngine
     class AD7Property : IDebugProperty2
     {
         
-        //private VariableInformation m_variableInformation;
+        private DebugLocalInfo m_variableInformation;
+        private AD7Process mProcess;
+        private AD7StackFrame mStackFrame;
 
-        public AD7Property()//VariableInformation vi)
+        public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
         {
-            //m_variableInformation = vi;
+            m_variableInformation = localInfo;
+            mProcess = process;
+            mStackFrame = stackFrame;
         }
 
         // Construct a DEBUG_PROPERTY_INFO representing this local or parameter.
-        public DEBUG_PROPERTY_INFO ConstructDebugPropertyInfo(uint dwFields)
+        public DEBUG_PROPERTY_INFO ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields)
         {
             DEBUG_PROPERTY_INFO propertyInfo = new DEBUG_PROPERTY_INFO();
 
-            if ((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME) != 0)
+            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME))
             {
-                StringBuilder sb = new StringBuilder("");//m_variableInformation.m_name);
-                propertyInfo.bstrFullName = sb.ToString();
-                propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME);
+                propertyInfo.bstrFullName = m_variableInformation.Name;
+                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME;
             }
 
-            if ((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME) != 0)
+            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME))
             {
-                StringBuilder sb = new StringBuilder();//m_variableInformation.m_name);
-                propertyInfo.bstrName = sb.ToString();
-                propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME);
+                propertyInfo.bstrName = m_variableInformation.Name;
+                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME;
             }
 
-            if ((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE) != 0)
+            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE))
             {
-                StringBuilder sb = new StringBuilder();//m_variableInformation.m_typeName);
-                propertyInfo.bstrType = sb.ToString();
-                propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE);
+                // todo: add support for types of properties
+                propertyInfo.bstrType = "System.Byte[]";
+                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
             }
 
-            if ((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE) != 0)
+            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
                 StringBuilder sb = new StringBuilder();//m_variableInformation.m_value);
+                // retrieve property value:
+                // todo: corect size of data, datatypes, refactor to move to some dedicated class etc
+                byte[] xData;
+                if (m_variableInformation.IsLocal)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mLocalInfos[m_variableInformation.Index].Offset, 4);
+                }
+                else
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mArgumentInfos[m_variableInformation.Index].Offset, 4);
+                }
+                // for now, dump as hex
+                sb.Append("0x");
+                if (xData == null)
+                {
+                    sb.Append("(xData == null)");
+                }
+                else
+                {
+                    for (int i = 0; i < xData.Length; i++)
+                    {
+                        sb.Append(xData[i].ToString("X2").ToUpper());
+                    }
+                }
                 propertyInfo.bstrValue = sb.ToString();
-                propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE);
+                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 
-            if ((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB) != 0)
+            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB))
             {
                 // The sample does not support writing of values displayed in the debugger, so mark them all as read-only.
-                propertyInfo.dwAttrib = DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
+                propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
 
                 //if (this.m_variableInformation.child != null)
                 {
-                    propertyInfo.dwAttrib |= DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
+                    //propertyInfo.dwAttrib |= DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
                 }
             }
 
@@ -70,8 +96,8 @@ namespace Cosmos.Debug.VSDebugEngine
             //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
                 //|| (this.m_variableInformation.child != null))
             {
-                propertyInfo.pProperty = (IDebugProperty2)this;
-                propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
+                //propertyInfo.pProperty = (IDebugProperty2)this;
+                //propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
             }
 
             return propertyInfo;
@@ -81,7 +107,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Enumerates the children of a property. This provides support for dereferencing pointers, displaying members of an array, or fields of a class or struct.
         // The sample debugger only supports pointer dereferencing as children. This means there is only ever one child.
-        public int EnumChildren(uint dwFields, uint dwRadix, ref System.Guid guidFilter, ulong dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum)
+        public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref System.Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum)
         {
             ppEnum = null;
 
@@ -132,7 +158,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Fills in a DEBUG_PROPERTY_INFO structure that describes a property.
-        public int GetPropertyInfo(uint dwFields, uint dwRadix, uint dwTimeout, IDebugReference2[] rgpArgs, uint dwArgCount, DEBUG_PROPERTY_INFO[] pPropertyInfo)
+        public int GetPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, uint dwTimeout, IDebugReference2[] rgpArgs, uint dwArgCount, DEBUG_PROPERTY_INFO[] pPropertyInfo)
         {
             pPropertyInfo[0] = new DEBUG_PROPERTY_INFO();
             rgpArgs = null;

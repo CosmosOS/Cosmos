@@ -71,14 +71,19 @@ namespace Cosmos.Debug.VSDebugEngine {
             return VSConstants.S_OK;
         }
 
-        int IDebugBoundBreakpoint2.GetState(out uint pState) {
-            pState = 0;
-            if (mDeleted) {
-                pState = (uint)enum_BP_STATE.BPS_DELETED;
-            } else if (mEnabled) {
-                pState = (uint)enum_BP_STATE.BPS_ENABLED;
-            } else {
-                pState = (uint)enum_BP_STATE.BPS_DISABLED;
+        int IDebugBoundBreakpoint2.GetState(enum_BP_STATE[] state)
+        {
+            if (mDeleted)
+            {
+                state[0] = enum_BP_STATE.BPS_DELETED;
+            }
+            else if (mEnabled)
+            {
+                state[0] = enum_BP_STATE.BPS_ENABLED;
+            }
+            else
+            {
+                state[0] = enum_BP_STATE.BPS_DISABLED;
             }
 
             return VSConstants.S_OK;

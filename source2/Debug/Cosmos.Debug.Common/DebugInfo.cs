@@ -77,6 +77,12 @@ namespace Cosmos.Debug.Common
                 get;
                 set;
             }
+
+            public string Name
+            {
+                get;
+                set;
+            }
         }
         private FbConnection mConnection;
 
@@ -160,6 +166,7 @@ namespace Cosmos.Debug.Common
                 + ", ISARGUMENT      SMALLINT          NOT NULL"
                 + ", INDEXINMETHOD   INT          NOT NULL"
                 + ", OFFSET          INT          NOT NULL"
+                + ", NAME            VARCHAR(255) NOT NULL"
                 + ");"
                 );
 
@@ -235,6 +242,37 @@ namespace Cosmos.Debug.Common
             }
         }
 
+        public MLDebugSymbol ReadSymbolByLabelName(string labelName)
+        {
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL "
+                    + "WHERE LABELNAME = @LABELNAME";
+                xCmd.Parameters.Add("@LABELNAME", labelName);
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    if (xReader.Read())
+                    {
+                        return new MLDebugSymbol
+                        {
+                            LabelName = xReader.GetString(0),
+                            Address = (uint)xReader.GetInt64(1),
+                            StackDifference = xReader.GetInt32(2),
+                            AssemblyFile = xReader.GetString(3),
+                            TypeToken = xReader.GetInt32(4),
+                            MethodToken = xReader.GetInt32(5),
+                            ILOffset = xReader.GetInt32(6),
+                            MethodName = xReader.GetString(7)
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Param/Local locations
@@ -247,11 +285,12 @@ namespace Cosmos.Debug.Common
                 using (var xCmd = mConnection.CreateCommand())
                 {
                     xCmd.Transaction = xTrans;
-                    xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET)";
+                    xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME)";
                     xCmd.Parameters.Add("@METHODLABELNAME", FbDbType.VarChar);
                     xCmd.Parameters.Add("@ISARGUMENT", FbDbType.SmallInt);
                     xCmd.Parameters.Add("@INDEXINMETHOD", FbDbType.Integer);
                     xCmd.Parameters.Add("@OFFSET", FbDbType.Integer);
+                    xCmd.Parameters.Add("@NAME", FbDbType.VarChar);
                     xCmd.Prepare();
                     foreach (var xInfo in infos)
                     {
@@ -259,6 +298,7 @@ namespace Cosmos.Debug.Common
                         xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
                         xCmd.Parameters[2].Value = xInfo.Index;
                         xCmd.Parameters[3].Value = xInfo.Offset;
+                        xCmd.Parameters[4].Value = xInfo.Name;
                         xCmd.ExecuteNonQuery();
                     }
                     xTrans.Commit();
@@ -270,7 +310,7 @@ namespace Cosmos.Debug.Common
         {
             using (var xCmd = mConnection.CreateCommand())
             {
-                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET from LOCAL_ARGUMENT_INFO";
+                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME from LOCAL_ARGUMENT_INFO";
                 using (var xReader = xCmd.ExecuteReader())
                 {
                     var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
@@ -281,7 +321,34 @@ namespace Cosmos.Debug.Common
                             MethodLabelName = xReader.GetString(0),
                             IsArgument = xReader.GetInt16(1) == 1,
                             Index = xReader.GetInt32(2),
-                            Offset = xReader.GetInt32(3)
+                            Offset = xReader.GetInt32(3),
+                            Name=xReader.GetString(4)
+                        });
+                    }
+                    return xResult;
+                }
+            }
+        }
+
+        public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfosByMethodLabelName(string methodLabelName)
+        {
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME from LOCAL_ARGUMENT_INFO" 
+                    + " WHERE METHODLABELNAME = @METHODLABELNAME";
+                xCmd.Parameters.Add("@METHODLABELNAME", methodLabelName);
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
+                    while (xReader.Read())
+                    {
+                        xResult.Add(new Local_Argument_Info
+                        {
+                            MethodLabelName = xReader.GetString(0),
+                            IsArgument = xReader.GetInt16(1) == 1,
+                            Index = xReader.GetInt32(2),
+                            Offset = xReader.GetInt32(3),
+                            Name = xReader.GetString(4)
                         });
                     }
                     return xResult;
@@ -330,7 +397,7 @@ namespace Cosmos.Debug.Common
                     xTrans.Commit();
                 }
             }
-        }
+        } 
         #endregion
 
         public void Dispose()

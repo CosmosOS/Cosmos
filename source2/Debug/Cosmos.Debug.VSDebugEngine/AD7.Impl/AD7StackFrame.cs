@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
+using Cosmos.Debug.Common;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -19,19 +22,25 @@ namespace Cosmos.Debug.VSDebugEngine
         private string m_functionName;
         private uint m_lineNum;
         private bool m_hasSource;
-        private uint m_numParameters;
-        private uint m_numLocals;
+        private int m_numParameters;
+        private int m_numLocals;
+
+        internal DebugInfo.Local_Argument_Info[] mLocalInfos;
+        internal DebugInfo.Local_Argument_Info[] mArgumentInfos;
 
         // An array of this frame's parameters
-        //private VariableInformation[] m_parameters;
+        private DebugLocalInfo[] m_parameters;
 
         // An array of this frame's locals
-        //private VariableInformation[] m_locals;     
+        private DebugLocalInfo[] m_locals;
+        private AD7Process mProcess;
 
-        public AD7StackFrame(AD7Engine engine, AD7Thread thread)//, X86ThreadContext threadContext)
+        public AD7StackFrame(AD7Engine engine, AD7Thread thread, AD7Process process)//, X86ThreadContext threadContext)
         {
+            System.Diagnostics.Debug.WriteLine("In AD7StackFrame..ctor");
             m_engine = engine;
             m_thread = thread;
+            mProcess = process;
             var xProcess = m_engine.mProcess;
             m_hasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceMappings.ContainsKey(xProcess.mCurrentAddress.Value);
             if (m_hasSource)
@@ -42,6 +51,56 @@ namespace Cosmos.Debug.VSDebugEngine
                 m_lineNum = (uint)xSourceMapping.Line;
                 m_numLocals = 0;
                 m_numParameters = 0;
+                string xCurrentInstructionLabelName = String.Empty;
+                if (xProcess.mAddressLabelMappings.TryGetValue(xProcess.mCurrentAddress.Value, out xCurrentInstructionLabelName))
+                {
+                    var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xCurrentInstructionLabelName);
+                    if (xSymbolInfo != null)
+                    {
+                        var xAllInfos = xProcess.mDebugInfoDb.ReadAllLocalsArgumentsInfosByMethodLabelName(xSymbolInfo.MethodName);
+                        mLocalInfos = (from item in xAllInfos
+                                       where !item.IsArgument
+                                       select item).ToArray();
+                        mArgumentInfos = (from item in xAllInfos
+                                          where item.IsArgument
+                                          select item).ToArray();
+                        m_numLocals = mLocalInfos.Length;
+                        m_numParameters = mArgumentInfos.Length;
+                        if (m_numParameters > 0)
+                        {
+                            m_parameters = new DebugLocalInfo[m_numParameters];
+                            for (int i = 0; i < m_numParameters; i++)
+                            {
+                                m_parameters[i] = new DebugLocalInfo
+                                {
+                                    Name = mArgumentInfos[i].Name,
+                                    Index = i,
+                                    IsLocal=false
+                                };
+                            }
+                        }
+
+                        if (m_numLocals > 0)
+                        {
+                            m_locals = new DebugLocalInfo[m_numLocals];
+                            for (int i = 0; i < m_numLocals; i++)
+                            {
+                                m_locals[i] = new DebugLocalInfo
+                                {
+                                    Name = mLocalInfos[i].Name,
+                                    Index = i,
+                                    IsLocal = true
+                                };
+                            }
+                            //m_locals = new VariableInformation[m_numLocals];
+                            //m_engine.DebuggedProcess.GetFunctionLocalsByIP(m_threadContext.eip, m_threadContext.ebp, m_locals);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No Symbol found for address 0x" + xProcess.mCurrentAddress.Value.ToString("X8").ToUpper());
+                }
                 xProcess.DebugMsg(String.Format("StackFrame: Returning: {0}#{1}[{2}]", m_documentName, m_functionName, m_lineNum));
             }
             else
@@ -65,6 +124,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     //m_engine.DebuggedProcess.GetFunctionLocalsByIP(m_threadContext.eip, m_threadContext.ebp, m_locals);
                 }
             }
+            System.Diagnostics.Debug.WriteLine("\tHasSource = " + m_hasSource);
+            System.Diagnostics.Debug.WriteLine("\tm_numParameters = " + m_numParameters);
+            System.Diagnostics.Debug.WriteLine("\tm_numLocals = " + m_numLocals);
         }
 
         #region Non-interface methods
@@ -72,6 +134,8 @@ namespace Cosmos.Debug.VSDebugEngine
         // Construct a FRAMEINFO for this stack frame with the requested information.
         public void SetFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, out FRAMEINFO frameInfo)
         {
+            System.Diagnostics.Debug.WriteLine("In AD7StackFrame.SetFrameInfo");
+            System.Diagnostics.Debug.WriteLine("\tdwFieldSpec = " + dwFieldSpec.ToString());
             frameInfo = new FRAMEINFO();
 
             //uint ip = m_threadContext.eip;
@@ -99,28 +163,29 @@ namespace Cosmos.Debug.VSDebugEngine
                     if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS) && m_numParameters > 0)
                     {
                         frameInfo.m_bstrFuncName += "(";
-                        //for (int i = 0; i < m_parameters.Length; i++)
-                        //{
-                        //    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_TYPES) != 0)
-                        //    {
-                        //        frameInfo.m_bstrFuncName += m_parameters[i].m_typeName + " ";
-                        //    }
+                        for (int i = 0; i < m_parameters.Length; i++)
+                        {
+                            if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_TYPES) != 0)
+                            {
+                                //frameInfo.m_bstrFuncName += m_parameters[i]. + " ";
+                                frameInfo.m_bstrFuncName += "ParamType ";
+                            }
 
-                        //    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_NAMES) != 0)
-                        //    {
-                        //        frameInfo.m_bstrFuncName += m_parameters[i].m_name;
-                        //    }
+                            if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_NAMES) != 0)
+                            {
+                                frameInfo.m_bstrFuncName += m_parameters[i].Name;
+                            }
 
                         //    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_VALUES) != 0)
                         //    {
                         //        frameInfo.m_bstrFuncName += "=" + m_parameters[i].m_value;
                         //    }
 
-                        //    if (i < m_parameters.Length - 1)
-                        //    {
-                        //        frameInfo.m_bstrFuncName += ", ";
-                        //    }
-                        //}
+                            if (i < m_parameters.Length - 1)
+                            {
+                                frameInfo.m_bstrFuncName += ", ";
+                            }
+                        }
                         frameInfo.m_bstrFuncName += ")";
                     }
 
@@ -141,14 +206,14 @@ namespace Cosmos.Debug.VSDebugEngine
                         //frameInfo.m_bstrFuncName = EngineUtils.GetAddressDescription(null, ip);
                     }
                 }
-                frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
+                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             }
 
             // The debugger is requesting the name of the module for this stack frame.
             if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_MODULE))
             {
                 frameInfo.m_bstrModule = "module";
-                frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_MODULE;
+                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_MODULE;
             }
 
             // The debugger is requesting the range of memory addresses for this frame.
@@ -157,28 +222,28 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 //frameInfo.m_addrMin = m_threadContext.ebp;
                 //frameInfo.m_addrMax = m_threadContext.ebp;
-                frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_STACKRANGE;
+                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_STACKRANGE;
             }
 
             // The debugger is requesting the IDebugStackFrame2 value for this frame info.
             if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FRAME))
             {
                 frameInfo.m_pFrame = this;
-                frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_FRAME;
+                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FRAME;
             }
 
             // Does this stack frame of symbols loaded?
             if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO))
             {
                 frameInfo.m_fHasDebugInfo = m_hasSource ? 1 : 0;
-                frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO;
+                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO;
             }
 
             // Is this frame stale?
             if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_STALECODE))
             {
                 frameInfo.m_fStaleCode = 0;
-                frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_STALECODE;
+                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_STALECODE;
             }
 
             // The debugger would like a pointer to the IDebugModule2 that contains this stack frame.
@@ -187,7 +252,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 if (m_engine.mModule != null)
                 {
                     frameInfo.m_pModule = m_engine.mModule;
-                    frameInfo.m_dwValidFields |= (uint)enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
+                    frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
                 }
             }
         }
@@ -197,37 +262,37 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             elementsReturned = 0;
 
-            //int localsLength = 0;
+            int localsLength = 0;
 
-            //if (m_locals != null)
-            //{
-            //    localsLength = m_locals.Length;
-            //    elementsReturned += (uint)localsLength;
-            //}
+            if (m_locals != null)
+            {
+                localsLength = m_locals.Length;
+                elementsReturned += (uint)localsLength;
+            }
 
-            //if (m_parameters != null)
-            //{
-            //    elementsReturned += (uint)m_parameters.Length;
-            //}
+            if (m_parameters != null)
+            {
+                elementsReturned += (uint)m_parameters.Length;
+            }
             DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[elementsReturned];
 
-            //if (m_locals != null)
-            //{
-            //    for (int i = 0; i < m_locals.Length; i++)
-            //    {
-            //        AD7Property property = new AD7Property(m_locals[i]);
-            //        propInfo[i] = property.ConstructDebugPropertyInfo((uint)DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
-            //    }
-            //}
+            if (m_locals != null)
+            {
+                for (int i = 0; i < m_locals.Length; i++)
+                {
+                    AD7Property property = new AD7Property(m_locals[i], this.mProcess, this);
+                    propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+                }
+            }
 
-            //if (m_parameters != null)
-            //{
-            //    for (int i = 0; i < m_parameters.Length; i++)
-            //    {                   
-            //        AD7Property property = new AD7Property(m_parameters[i]);
-            //        propInfo[localsLength + i] = property.ConstructDebugPropertyInfo((uint)DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD); 
-            //    }
-            //}
+            if (m_parameters != null)
+            {
+                for (int i = 0; i < m_parameters.Length; i++)
+                {
+                    AD7Property property = new AD7Property(m_parameters[i], this.mProcess, this);
+                    propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+                }
+            }
 
             enumObject = new AD7PropertyInfoEnum(propInfo);
         }
@@ -235,31 +300,31 @@ namespace Cosmos.Debug.VSDebugEngine
         // Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
         private void CreateLocalProperties(out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
-            elementsReturned = 0;// (uint)m_locals.Length;
-            //DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[m_locals.Length];
+            elementsReturned = (uint)m_locals.Length;
+            DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[m_locals.Length];
 
-            //for (int i = 0; i < propInfo.Length; i++)
-            //{
-            //    AD7Property property = new AD7Property(m_locals[i]);
-            //    propInfo[i] = property.ConstructDebugPropertyInfo((uint)DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
-            //}
+            for (int i = 0; i < propInfo.Length; i++)
+            {
+                AD7Property property = new AD7Property(m_locals[i], mProcess, this);
+                propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+            }
 
-            enumObject = null;// new AD7PropertyInfoEnum(propInfo);
+            enumObject = new AD7PropertyInfoEnum(propInfo);
         }
 
         // Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
         private void CreateParameterProperties(out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
-            elementsReturned = 0;// (uint)m_parameters.Length;
-            //DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[m_parameters.Length];
+            elementsReturned = (uint)m_parameters.Length;
+            DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[m_parameters.Length];
 
-            //for (int i = 0; i < propInfo.Length; i++)
-            //{
-            //    AD7Property property = new AD7Property(m_parameters[i]);
-            //    propInfo[i] = property.ConstructDebugPropertyInfo((uint)DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
-            //}
+            for (int i = 0; i < propInfo.Length; i++)
+            {
+                AD7Property property = new AD7Property(m_parameters[i], mProcess, this);
+                propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+            }
 
-            enumObject = null;// new AD7PropertyInfoEnum(propInfo);
+            enumObject = new AD7PropertyInfoEnum(propInfo);
         }
 
         #endregion
@@ -269,7 +334,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // Creates an enumerator for properties associated with the stack frame, such as local variables.
         // The sample engine only supports returning locals and parameters. Other possible values include
         // class fields (this pointer), registers, exceptions...
-        int IDebugStackFrame2.EnumProperties(uint dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
+        int IDebugStackFrame2.EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             int hr;
 
@@ -384,7 +449,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Gets a description of the stack frame.
-        int IDebugStackFrame2.GetInfo(uint dwFieldSpec, uint nRadix, FRAMEINFO[] pFrameInfo)
+        int IDebugStackFrame2.GetInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, FRAMEINFO[] pFrameInfo)
         {
             try
             {
@@ -464,7 +529,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // Parses a text-based expression for evaluation.
         // The engine sample only supports locals and parameters so the only task here is to check the names in those collections.
         int IDebugExpressionContext2.ParseText(string pszCode,
-                                                uint dwFlags,
+                                                enum_PARSEFLAGS dwFlags,
                                                 uint nRadix,
                                                 out IDebugExpression2 ppExpr,
                                                 out string pbstrError,
