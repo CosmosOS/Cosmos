@@ -20,7 +20,7 @@ namespace Cosmos.VS.Package
 
         public VSProjectNode(VSProject package)
         {
-            LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject");
+            LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
             try
             {
                 this.package = package;

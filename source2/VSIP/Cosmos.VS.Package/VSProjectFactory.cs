@@ -26,7 +26,7 @@ namespace Cosmos.VS.Package {
             VSProjectNode project = new VSProjectNode(this.package);
 
             project.SetSite((IOleServiceProvider)((IServiceProvider)this.package).GetService(typeof(IOleServiceProvider)));
-            LogUtility.LogString("(Result == null) == {0}", project == null);
+            LogUtility.LogString("(Result == null) = {0}", project == null);
             return project;
         }
         catch (Exception E)
