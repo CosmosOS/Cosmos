@@ -71,7 +71,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else
                 {
-                    for (int i = 0; i < xData.Length; i++)
+                    for (int i = xData.Length - 1; i >= 0; i--)
                     {
                         sb.Append(xData[i].ToString("X2").ToUpper());
                     }
