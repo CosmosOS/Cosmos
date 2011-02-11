@@ -17,12 +17,12 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
     <VMWareFlavor>Workstation</VMWareFlavor>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,9 +52,10 @@
       <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include=".\MatthijsPlayground.csproj">
+    <ProjectReference Include="..\MatthijsPlayground\MatthijsPlayground.csproj">
       <Name>MatthijsPlayground</Name>
-      <Project>{72b4a664-3bc2-49ec-b2d9-d878ea87d124}</Project>
+      <Project>{6882c74b-3ed2-4d76-9e7b-67b6a28808bc}</Project>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />

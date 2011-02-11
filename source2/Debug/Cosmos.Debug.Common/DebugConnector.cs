@@ -21,10 +21,10 @@ namespace Cosmos.Debug.Common
         public abstract void WaitConnect();
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
-        private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
+//        private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
 
         protected void DoDebugMsg(string aMsg) {
-            mDebugWriter.WriteLine(aMsg);
+//            mDebugWriter.WriteLine(aMsg);
             if (OnDebugMsg != null) {
                 OnDebugMsg(aMsg);
             }
@@ -209,12 +209,13 @@ namespace Cosmos.Debug.Common
         }
 
         public virtual void Dispose() {
-            if (mDebugWriter != null)
-            {
-                mDebugWriter.Dispose();
-                mDebugWriter = null;
-                GC.SuppressFinalize(this);
-            }
+            //if (mDebugWriter != null)
+            //{
+            //    mDebugWriter.Dispose();
+            //    mDebugWriter = null;
+            //    
+            //}
+            GC.SuppressFinalize(this);
         }
 
         // Signature is sent after garbage emitted during init of serial port.
@@ -246,10 +247,11 @@ namespace Cosmos.Debug.Common
 
         protected void PacketMethodContext(byte[] aPacket)
         {
+            WaitForMessage(); 
             mStackData = aPacket;
              // not really nice to use this one?
-            mCmdWait.Set();
-            WaitForMessage();
+            //mCmdWait.Set();
+            //WaitForMessage();
         }
 
         protected void PacketCmdCompleted(byte[] aPacket) {
