@@ -135,6 +135,7 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCommandData(Command.SendMethodContext, xData, true);
             var xResult = mStackData;
+            xResult = xResult.Reverse().ToArray();
             mStackData = null;
             return xResult;
         }

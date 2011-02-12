@@ -88,7 +88,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                 m_locals[i] = new DebugLocalInfo
                                 {
                                     Name = mLocalInfos[i].Name,
-                                    Index = i,
+                                    Index = m_numLocals - i - 1,
                                     IsLocal = true
                                 };
                             }
