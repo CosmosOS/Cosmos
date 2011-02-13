@@ -996,7 +996,6 @@ Global
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|x86.ActiveCfg = Release|x86
-		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Bootstrap|x86.Build.0 = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Debug|Mixed Platforms.Build.0 = Debug|x86
