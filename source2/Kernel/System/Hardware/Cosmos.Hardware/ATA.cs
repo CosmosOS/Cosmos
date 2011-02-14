@@ -110,8 +110,7 @@ namespace Cosmos.Hardware {
 
     public void Test() {
       // Disable IRQs:
-      Global.Dbg.Send(IO.Control.Port.ToString());
-      IO.Control.DWord = 0x02;
+      IO.Control.Byte = 0x02;
 
       int xCount = 0;
       for (int xDrive = 0; xDrive <= 1; xDrive++) {
@@ -171,6 +170,11 @@ namespace Cosmos.Hardware {
         Global.Dbg.Send("--------------------------");
         Global.Dbg.Send("Drive Found");
         Global.Dbg.Send("Type: " + xType);
+        if (xType == SpecLevel.ATA) {
+          Global.Dbg.Send("Type: ATA");
+        } else {
+          Global.Dbg.Send("Type: ATAPI");
+        }
         Global.Dbg.Send("Drive #: " + xDrive);
         //      ide_devices[count].Signature    = ((unsigned short *)(ide_buf + ATA_IDENT_DEVICETYPE));
         //      ide_devices[count].Capabilities = ((unsigned short *)(ide_buf + ATA_IDENT_CAPABILITIES));
