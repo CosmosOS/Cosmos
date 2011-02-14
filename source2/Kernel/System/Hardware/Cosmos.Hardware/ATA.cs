@@ -110,7 +110,8 @@ namespace Cosmos.Hardware {
 
         public void Test() {
             // Disable IRQs:
-            IO.Control.DWord = 0x02;
+          Global.Dbg.Send(IO.Control.Port.ToString());
+          IO.Control.DWord = 0x02;
 
             int xCount = 0;
             for (int xDrive = 0; xDrive <= 1; xDrive++) {
