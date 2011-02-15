@@ -484,6 +484,7 @@ namespace Cosmos.Core
           // report a crash dump.
             const string SysFault = "*** System Fault ***  ";
             const string xHex = "0123456789ABCDEF";
+            uint xPtr = ctx.EIP;
 
             // we're printing exception info to the screen now:
             // 0/0: x
