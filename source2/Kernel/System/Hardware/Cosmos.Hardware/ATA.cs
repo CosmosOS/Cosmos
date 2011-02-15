@@ -116,26 +116,31 @@ namespace Cosmos.Hardware {
         string xFirmwareRev = GetString(xBuff, 23, 8);
         string xModelNo = GetString(xBuff, 27, 40);
 
-        //// (VII) Get Size:
-        //if (ide_devices[count].CommandSets & (1 << 26))
-        //   // Device uses 48-Bit Addressing:
-        //   ide_devices[count].Size   = ((unsigned int *)(ide_buf + ATA_IDENT_MAX_LBA_EXT));
-        //else
-        //   // Device uses CHS or 28-bit Addressing:
-        //   ide_devices[count].Size   = ((unsigned int *)(ide_buf + ATA_IDENT_MAX_LBA));
- 
-        //// (VIII) String indicates model of device (like Western Digital HDD and SONY DVD-RW...):
-        //for(k = 0; k < 40; k += 2) {
-        //   ide_devices[count].Model[k] = ide_buf[ATA_IDENT_MODEL + k + 1];
-        //   ide_devices[count].Model[k + 1] = ide_buf[ATA_IDENT_MODEL + k];}
-        //ide_devices[count].Model[40] = 0; // Terminate String.
+        //Words (61:60) shall contain the value one greater than the total number of user-addressable
+        //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
+        //be greater than or equal to one and less than or equal to 268,435,455.
+        // Sectors are 512 bytes
+        UInt32 xSectors28 = (UInt32)(xBuff[61] << 16 | xBuff[60]);
 
-        // Read Device Parameters:
+        //Words (103:100) shall contain the value one greater than the total number of user-addressable
+        //sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
+        //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
+        //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
+        UInt32 xSectors48 = 0;
+        bool xLba48Capable = (xBuff[83] & 0x400) != 0;
+        if (xLba48Capable) {
+          xSectors48 = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
+        }
+
         Global.Dbg.Send("--------------------------");
         Global.Dbg.Send("Drive #: " + xDrive + ", " + (xType == SpecLevel.ATA ? "ATA" : "ATAPI"));
         Global.Dbg.Send("Serial No: " + xSerialNo);
         Global.Dbg.Send("Firmware Rev: " + xFirmwareRev);
         Global.Dbg.Send("Model No: " + xModelNo);
+        Global.Dbg.Send("Disk Size 28 (MB): " + xSectors28 * 512 / 1024 / 1024);
+        if (xLba48Capable) {
+          Global.Dbg.Send("Disk Size 48 (MB): " + xSectors48 * 512 / 1024 / 1024);
+        }
 
         xCount++;
       }
