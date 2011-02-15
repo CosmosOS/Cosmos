@@ -64,12 +64,20 @@ namespace Cosmos.Hardware {
     }
 
     public Status SendCmd(Cmd aCmd) {
+      return SendCmd(aCmd, true);
+    }
+    public Status SendCmd(Cmd aCmd, bool aThrowOnError) {
       IO.Command.Byte = (byte)aCmd;
       Status xStatus;
       do {
         Wait();
         xStatus = (Status)IO.Status.Byte;
       } while ((xStatus & Status.Busy) != 0);
+      // Error occurred
+      if ((xStatus & Status.Error) != 0) {
+        // TODO: Read error port
+        throw new Exception("ATA Error");
+      }
       return xStatus;
     }
 
@@ -150,7 +158,6 @@ namespace Cosmos.Hardware {
 
     public void ReadSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
       SelectSector(aSlave, aSectorNo, 1);
-      //TODO: Update SendCmd to look for error bit
       SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
@@ -172,7 +179,7 @@ namespace Cosmos.Hardware {
 
     public SpecLevel DiscoverDrive(bool aSlave) {
       SelectDrive(aSlave);
-      var xIdentifyStatus = SendCmd(Cmd.Identify);
+      var xIdentifyStatus = SendCmd(Cmd.Identify, false);
       // No drive found, go to next
       if (xIdentifyStatus == Status.None) {
         return SpecLevel.Null;
