@@ -49,55 +49,48 @@ namespace Cosmos.Hardware {
       Wait();
     }
 
-    public void SendCmd(Cmd aCmd) {
+    public Status SendCmd(Cmd aCmd) {
       IO.Command.Byte = (byte)aCmd;
-      Wait();
-    }
-
-    public Status GetStatus() {
-      return (Status)IO.Status.Byte;
+      Status xStatus;
+      do {
+        Wait();
+        xStatus = (Status)IO.Status.Byte;
+      } while ((xStatus & Status.Busy) != 0);
+      return xStatus;
     }
 
     public void Test() {
+      var xType = SpecLevel.ATA;
+
       // Disable IRQs:
       IO.Control.Byte = 0x02;
 
       int xCount = 0;
       for (int xDrive = 0; xDrive <= 1; xDrive++) {
-        bool xError = false;
-
         SelectDrive((DriveSelect)xDrive);
-        SendCmd(Cmd.Identify);
-
-        // Polling
-        // No drive found
-        if (GetStatus() == Status.None) {
+        var xIdentifyStatus = SendCmd(Cmd.Identify);
+        // No drive found, go to next
+        if (xIdentifyStatus == Status.None) {
           continue;
-        }
-        while (true) {
-          var xStatus = GetStatus();
-          if ((xStatus & Status.Error) == Status.None) {
-            // Device is not ATA
-            xError = true;
-            break;
-          } else if ((xStatus & Status.Busy) == Status.None && (xStatus & Status.DRQ) != Status.None) {
-            // Found drive and its ok
-            break;
-          }
-        }
+        } else if ((xIdentifyStatus & Status.Error) != 0) {
+          // Can look in Error port for more info
+          // Device is not ATA
+          // This is also triggered by ATAPI devices
 
-        var xType = SpecLevel.ATA;
-        if (!xError) {
           int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
           if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
             xType = SpecLevel.ATAPI;
+            // Send a new command which will create a new buffer read
+            SendCmd(Cmd.IdentifyPacket);
           } else {
             // Unknown type. Might not be a device.
             continue;
           }
+        } else if ((xIdentifyStatus & Status.DRQ) == 0) {
+          // Error
+          continue;
         }
 
-        SendCmd(Cmd.IdentifyPacket);
         // Read Identification Space of the Device
         var xBuff = new uint[128];
         IO.Data.Read(xBuff);
@@ -122,7 +115,6 @@ namespace Cosmos.Hardware {
         //         ide_devices[count].Model[k] = ide_buf[ATA_IDENT_MODEL + k + 1];
         //         ide_devices[count].Model[k + 1] = ide_buf[ATA_IDENT_MODEL + k];}
         //      ide_devices[count].Model[40] = 0; // Terminate String.
-        Global.Dbg.Send("--------------------------");
 
         xCount++;
       }
