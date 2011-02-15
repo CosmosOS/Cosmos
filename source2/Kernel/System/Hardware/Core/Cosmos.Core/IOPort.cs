@@ -23,15 +23,22 @@ namespace Cosmos.Core {
         static protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
         static protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
 
-        //TODO: Plug this with asm to read directly to RAM
+        //TODO: Plug these Reads with asm to read directly to RAM
         // REP INSW
-        public void Read(UInt16[] aData) {
+        public void Read16(byte[] aData) {
+          UInt16 xValue;
+          for (int i = 0; i < aData.Length / 2; i++) {
+            xValue = Read16(Port);
+            aData[i * 2] = (byte)xValue;
+            aData[i * 2 + 1] = (byte)(xValue >> 8);
+          }
+        }
+        public void Read16(UInt16[] aData) {
           for (int i = 0; i < aData.Length; i++) {
             aData[i] = Read16(Port);
           }
         }
-        //TODO: Plug this with asm to read directly to RAM
-        public void Read(uint[] aData) {
+        public void Read32(UInt32[] aData) {
           for (int i = 0; i < aData.Length; i++) {
             aData[i] = Read32(Port);
           }

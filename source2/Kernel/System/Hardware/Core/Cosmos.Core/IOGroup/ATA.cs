@@ -8,7 +8,7 @@ namespace Cosmos.Core.IOGroup {
         public readonly IOPort Data;
         //* Error Register: BAR0 + 1; // Read Only
         //* Features Register: BAR0 + 1; // Write Only
-        //* SECCOUNT0: BAR0 + 2; // Read-Write
+        public readonly IOPortWrite SectorCount;
         // ATA_REG_SECCOUNT1  0x08 - HOB
         public readonly IOPort LBA0;
         public readonly IOPort LBA1;
@@ -27,6 +27,7 @@ namespace Cosmos.Core.IOGroup {
             UInt16 xBAR0 = (UInt16)(aSecondary ? 0x0170 : 0x01F0);
             UInt16 xBAR1 = (UInt16)(aSecondary ? 0x0374 : 0x03F4);
             Data = new IOPort(xBAR0);
+            SectorCount = new IOPortWrite(xBAR0, 2);
             LBA0 = new IOPort(xBAR0, 3);
             LBA1 = new IOPort(xBAR0, 4);
             LBA2 = new IOPort(xBAR0, 5);

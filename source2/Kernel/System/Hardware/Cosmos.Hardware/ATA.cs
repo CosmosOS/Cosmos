@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Cosmos.Common.Extensions;
 
 namespace Cosmos.Hardware {
   public class ATA {
@@ -54,7 +55,10 @@ namespace Cosmos.Hardware {
     }
 
     public void SelectDrive(bool aSlave) {
-      IO.DeviceSelect.Byte = (byte)(DvcSelVal.Default | DvcSelVal.LBA | (aSlave ? DvcSelVal.Slave : 0));
+      SelectDrive(aSlave, 0);
+    }
+    public void SelectDrive(bool aSlave, byte aLbaHigh4) {
+      IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (aSlave ? DvcSelVal.Slave : 0)) | aLbaHigh4);
       Wait();
     }
 
@@ -95,7 +99,7 @@ namespace Cosmos.Hardware {
 
       // Read Identification Space of the Device
       var xBuff = new UInt16[256];
-      IO.Data.Read(xBuff);
+      IO.Data.Read16(xBuff);
       string xSerialNo = GetString(xBuff, 10, 20);
       string xFirmwareRev = GetString(xBuff, 23, 8);
       string xModelNo = GetString(xBuff, 27, 40);
@@ -111,20 +115,33 @@ namespace Cosmos.Hardware {
       //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
       //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
       UInt32 xSectors48 = 0;
-      bool xLba48Capable = (xBuff[83] & 0x800) != 0;
+      bool xLba48Capable = (xBuff[83] & 0x400) != 0;
       if (xLba48Capable) {
         xSectors48 = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
       }
 
       Global.Dbg.Send("--------------------------");
-      Global.Dbg.Send("Drive: " + (aType == SpecLevel.ATA ? "ATA" : "ATAPI"));
+      Global.Dbg.Send("Type: " + (aType == SpecLevel.ATA ? "ATA" : "ATAPI"));
       Global.Dbg.Send("Serial No: " + xSerialNo);
       Global.Dbg.Send("Firmware Rev: " + xFirmwareRev);
       Global.Dbg.Send("Model No: " + xModelNo);
       Global.Dbg.Send("Disk Size 28 (MB): " + xSectors28 * 512 / 1024 / 1024);
       if (xLba48Capable) {
+        Global.Dbg.Send("48 bit LBA): yes");
         Global.Dbg.Send("Disk Size 48 (MB): " + xSectors48 * 512 / 1024 / 1024);
       }
+    }
+
+    public void ReadSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
+      SelectDrive(aSlave, (byte)(aSectorNo >> 24));
+      // Number of sectors to read
+      IO.SectorCount.Byte = 1;
+      IO.LBA0.Byte = (byte)(aSectorNo & 0xFF);
+      IO.LBA1.Byte = (byte)((aSectorNo & 0xFF00) >> 8);
+      IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
+      SendCmd(Cmd.ReadPio);
+      //TODO: Update SendCmd to look for error bit
+      IO.Data.Read16(aData);
     }
 
     public void Test() {
@@ -154,7 +171,13 @@ namespace Cosmos.Hardware {
         }
 
         InitDrive(xType);
-
+        var xData = new byte[512];
+        ReadSector(xDrive == 1, 0, xData);
+        var xSB = new StringBuilder();
+        for (int i = 0; i < 256; i++) {
+          xSB.Append(xData[i].ToHex());
+         }
+        Console.WriteLine(xSB.ToString());
         xCount++;
       }
     }

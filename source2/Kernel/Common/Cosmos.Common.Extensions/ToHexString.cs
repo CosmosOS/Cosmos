@@ -6,7 +6,7 @@ using System.Text;
 namespace Cosmos.Common.Extensions {
     public static class ToHexString {
 
-        //TODO: Can add several more overloads for other numbertypes, with and withouth width argument.
+        //TODO: Can add several more overloads for other numbertypes, with and without width argument.
 
         public static string ToHex(this byte n) {
             return ConvertToHex((UInt32)n, 2);
