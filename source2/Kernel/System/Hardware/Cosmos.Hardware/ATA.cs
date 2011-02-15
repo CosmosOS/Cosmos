@@ -12,7 +12,7 @@ namespace Cosmos.Hardware {
       IO = aIO;
     }
 
-    [Flags] enum Status : byte {None = 0x00, Busy = 0x80, ATA_SR_DRD = 0x40, ATA_SR_DF = 0x20, ATA_SR_DSC = 0x10, DRQ = 0x08, ATA_SR_COR = 0x04, ATA_SR_IDX = 0x02, Error = 0x01 };
+    [Flags] public enum Status : byte {None = 0x00, Busy = 0x80, ATA_SR_DRD = 0x40, ATA_SR_DF = 0x20, ATA_SR_DSC = 0x10, DRQ = 0x08, ATA_SR_COR = 0x04, ATA_SR_IDX = 0x02, Error = 0x01 };
     [Flags] enum Error : byte { ATA_ER_BBK = 0x80, ATA_ER_UNC = 0x40, ATA_ER_MC = 0x20, ATA_ER_IDNF = 0x10, ATA_ER_MCR = 0x08, ATA_ER_ABRT = 0x04, ATA_ER_TK0NF = 0x02, ATA_ER_AMNF = 0x01 };
     [Flags]
     enum DvcSelVal : byte {
@@ -54,28 +54,31 @@ namespace Cosmos.Hardware {
       Wait();
     }
 
+    public Status GetStatus() {
+      return (Status)IO.Status.Byte;
+    }
+
     public void Test() {
       // Disable IRQs:
       IO.Control.Byte = 0x02;
 
       int xCount = 0;
       for (int xDrive = 0; xDrive <= 1; xDrive++) {
-        byte xErr = 0;
+        bool xError = false;
 
         SelectDrive((DriveSelect)xDrive);
         SendCmd(Cmd.Identify);
 
         // Polling
         // No drive found
-        if (IO.Status.Byte == 0) {
+        if (GetStatus() == Status.None) {
           continue;
         }
         while (true) {
-          Status xStatus;
-          xStatus = (Status)IO.Status.Byte;
+          var xStatus = GetStatus();
           if ((xStatus & Status.Error) == Status.None) {
             // Device is not ATA
-            xErr = 1;
+            xError = true;
             break;
           } else if ((xStatus & Status.Busy) == Status.None && (xStatus & Status.DRQ) != Status.None) {
             // Found drive and its ok
@@ -83,16 +86,15 @@ namespace Cosmos.Hardware {
           }
         }
 
-        // Look for ATAPI devices
         var xType = SpecLevel.ATA;
-        if (xErr == 0) {
+        if (!xError) {
           int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
           if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
+            xType = SpecLevel.ATAPI;
           } else {
             // Unknown type. Might not be a device.
             continue;
           }
-          xType = SpecLevel.ATAPI;
         }
 
         SendCmd(Cmd.IdentifyPacket);
