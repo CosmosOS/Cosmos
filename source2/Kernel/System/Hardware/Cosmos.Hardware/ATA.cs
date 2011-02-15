@@ -33,7 +33,8 @@ namespace Cosmos.Hardware {
     public enum Cmd : byte { ReadPio = 0x20, ReadPioExt = 0x24, ReadDma = 0xC8, ReadDmaExt = 0x25, WritePio = 0x30, WritePioExt = 0x34, WriteDma = 0xCA, WriteDmaExt = 0x35, CacheFlush = 0xE7,
       CacheFlushExt = 0xEA, Packet = 0xA0, IdentifyPacket = 0xA1, Identify = 0xEC, Read = 0xA8, Eject = 0x1B }
     public enum Ident : byte { DEVICETYPE = 0, CYLINDERS = 2, HEADS = 6, SECTORS = 12, SERIAL = 20, MODEL = 54, CAPABILITIES = 98, FIELDVALID = 106, MAX_LBA = 120, COMMANDSETS = 164, MAX_LBA_EXT = 200 }
-    public enum SpecLevel { ATA = 0, ATAPI = 1 }
+    // TODO: Null is used for unknown, none, etc. Nullable type would be better, but we dont have support for them yet
+    public enum SpecLevel { Null, ATA, ATAPI }
 
     // Directions:
     //#define      ATA_READ      0x00
@@ -94,8 +95,14 @@ namespace Cosmos.Hardware {
       //IDENTIFY command
       // Not sure if all this is needed, its different than documented elsewhere but might not be bad
       // to add code to do all listed here:
-      //To use the IDENTIFY command, select a target drive by sending 0xA0 for the master drive, or 0xB0 for the slave, to the "drive select" IO port. On the Primary bus, this would be port 0x1F6. Then set the Sectorcount, LBAlo, LBAmid, and LBAhi IO ports to 0 (port 0x1F2 to 0x1F5). Then send the IDENTIFY command (0xEC) to the Command IO port (0x1F7). Then read the Status port (0x1F7) again. If the value read is 0, the drive does not exist. For any other value: poll the Status port (0x1F7) until bit 7 (BSY, value = 0x80) clears. Because of some ATAPI drives that do not follow spec, at this point you need to check the LBAmid and LBAhi ports (0x1F4 and 0x1F5) to see if they are non-zero. If so, the drive is not ATA, and you should stop polling. Otherwise, continue polling one of the Status ports until bit 3 (DRQ, value = 8) sets, or until bit 0 (ERR, value = 1) sets.
-      //At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them. 
+      //
+      //To use the IDENTIFY command, select a target drive by sending 0xA0 for the master drive, or 0xB0 for the slave, to the "drive select" IO port. On the Primary bus, this would be port 0x1F6. 
+      // Then set the Sectorcount, LBAlo, LBAmid, and LBAhi IO ports to 0 (port 0x1F2 to 0x1F5). 
+      // Then send the IDENTIFY command (0xEC) to the Command IO port (0x1F7). 
+      // Then read the Status port (0x1F7) again. If the value read is 0, the drive does not exist. For any other value: poll the Status port (0x1F7) until bit 7 (BSY, value = 0x80) clears. 
+      // Because of some ATAPI drives that do not follow spec, at this point you need to check the LBAmid and LBAhi ports (0x1F4 and 0x1F5) to see if they are non-zero. 
+      // If so, the drive is not ATA, and you should stop polling. Otherwise, continue polling one of the Status ports until bit 3 (DRQ, value = 8) sets, or until bit 0 (ERR, value = 1) sets.
+      // At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them. 
 
       // Read Identification Space of the Device
       var xBuff = new UInt16[256];
@@ -143,8 +150,8 @@ namespace Cosmos.Hardware {
 
     public void ReadSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
       SelectSector(aSlave, aSectorNo, 1);
-      SendCmd(Cmd.ReadPio);
       //TODO: Update SendCmd to look for error bit
+      SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
 
@@ -163,29 +170,35 @@ namespace Cosmos.Hardware {
       SendCmd(Cmd.CacheFlush);
     }
 
-    public void Test() {
-      var xType = SpecLevel.ATA;
+    public SpecLevel DiscoverDrive(bool aSlave) {
+      SelectDrive(aSlave);
+      var xIdentifyStatus = SendCmd(Cmd.Identify);
+      // No drive found, go to next
+      if (xIdentifyStatus == Status.None) {
+        return SpecLevel.Null;
+      } else if ((xIdentifyStatus & Status.Error) != 0) {
+        // Can look in Error port for more info
+        // Device is not ATA
+        // This is also triggered by ATAPI devices
+        int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
+        if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
+          return SpecLevel.ATAPI;
+        } else {
+          // Unknown type. Might not be a device.
+          return SpecLevel.Null;
+        }
+      } else if ((xIdentifyStatus & Status.DRQ) == 0) {
+        // Error
+        return SpecLevel.Null;
+      }
+      return SpecLevel.ATA;
+    }
 
+    public void Test() {
       int xCount = 0;
       for (int xDrive = 0; xDrive <= 1; xDrive++) {
-        SelectDrive(xDrive == 1);
-        var xIdentifyStatus = SendCmd(Cmd.Identify);
-        // No drive found, go to next
-        if (xIdentifyStatus == Status.None) {
-          continue;
-        } else if ((xIdentifyStatus & Status.Error) != 0) {
-          // Can look in Error port for more info
-          // Device is not ATA
-          // This is also triggered by ATAPI devices
-          int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
-          if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
-            xType = SpecLevel.ATAPI;
-          } else {
-            // Unknown type. Might not be a device.
-            continue;
-          }
-        } else if ((xIdentifyStatus & Status.DRQ) == 0) {
-          // Error
+        var xType = DiscoverDrive(xDrive == 1);
+        if (xType == SpecLevel.Null) {
           continue;
         }
 
