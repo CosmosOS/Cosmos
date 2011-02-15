@@ -12,6 +12,8 @@ namespace Cosmos.Hardware {
 
     public ATA(Core.IOGroup.ATA aIO) {
       IO = aIO;
+      // Disable IRQs, we use polling currently
+      IO.Control.Byte = 0x02;
     }
 
     [Flags] public enum Status : byte {None = 0x00, Busy = 0x80, ATA_SR_DRD = 0x40, ATA_SR_DF = 0x20, ATA_SR_DSC = 0x10, DRQ = 0x08, ATA_SR_COR = 0x04, ATA_SR_IDX = 0x02, Error = 0x01 };
@@ -79,11 +81,54 @@ namespace Cosmos.Hardware {
       return new string(xChars);
     }
 
+    protected void InitDrive(SpecLevel aType) {
+      if (aType == SpecLevel.ATA) {
+        SendCmd(Cmd.Identify);
+      } else {
+        SendCmd(Cmd.IdentifyPacket);
+      }
+      //IDENTIFY command
+      // Not sure if all this is needed, its different than documented elsewhere but might not be bad
+      // to add code to do all listed here:
+      //To use the IDENTIFY command, select a target drive by sending 0xA0 for the master drive, or 0xB0 for the slave, to the "drive select" IO port. On the Primary bus, this would be port 0x1F6. Then set the Sectorcount, LBAlo, LBAmid, and LBAhi IO ports to 0 (port 0x1F2 to 0x1F5). Then send the IDENTIFY command (0xEC) to the Command IO port (0x1F7). Then read the Status port (0x1F7) again. If the value read is 0, the drive does not exist. For any other value: poll the Status port (0x1F7) until bit 7 (BSY, value = 0x80) clears. Because of some ATAPI drives that do not follow spec, at this point you need to check the LBAmid and LBAhi ports (0x1F4 and 0x1F5) to see if they are non-zero. If so, the drive is not ATA, and you should stop polling. Otherwise, continue polling one of the Status ports until bit 3 (DRQ, value = 8) sets, or until bit 0 (ERR, value = 1) sets.
+      //At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them. 
+
+      // Read Identification Space of the Device
+      var xBuff = new UInt16[256];
+      IO.Data.Read(xBuff);
+      string xSerialNo = GetString(xBuff, 10, 20);
+      string xFirmwareRev = GetString(xBuff, 23, 8);
+      string xModelNo = GetString(xBuff, 27, 40);
+
+      //Words (61:60) shall contain the value one greater than the total number of user-addressable
+      //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
+      //be greater than or equal to one and less than or equal to 268,435,455.
+      // Sectors are 512 bytes
+      UInt32 xSectors28 = (UInt32)(xBuff[61] << 16 | xBuff[60]);
+
+      //Words (103:100) shall contain the value one greater than the total number of user-addressable
+      //sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
+      //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
+      //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
+      UInt32 xSectors48 = 0;
+      bool xLba48Capable = (xBuff[83] & 0x800) != 0;
+      if (xLba48Capable) {
+        xSectors48 = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
+      }
+
+      Global.Dbg.Send("--------------------------");
+      Global.Dbg.Send("Drive: " + (aType == SpecLevel.ATA ? "ATA" : "ATAPI"));
+      Global.Dbg.Send("Serial No: " + xSerialNo);
+      Global.Dbg.Send("Firmware Rev: " + xFirmwareRev);
+      Global.Dbg.Send("Model No: " + xModelNo);
+      Global.Dbg.Send("Disk Size 28 (MB): " + xSectors28 * 512 / 1024 / 1024);
+      if (xLba48Capable) {
+        Global.Dbg.Send("Disk Size 48 (MB): " + xSectors48 * 512 / 1024 / 1024);
+      }
+    }
+
     public void Test() {
       var xType = SpecLevel.ATA;
-
-      // Disable IRQs:
-      IO.Control.Byte = 0x02;
 
       int xCount = 0;
       for (int xDrive = 0; xDrive <= 1; xDrive++) {
@@ -96,12 +141,9 @@ namespace Cosmos.Hardware {
           // Can look in Error port for more info
           // Device is not ATA
           // This is also triggered by ATAPI devices
-
           int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
           if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
             xType = SpecLevel.ATAPI;
-            // Send a new command which will create a new buffer read
-            SendCmd(Cmd.IdentifyPacket);
           } else {
             // Unknown type. Might not be a device.
             continue;
@@ -111,44 +153,7 @@ namespace Cosmos.Hardware {
           continue;
         }
 
-        //IDENTIFY command
-        // Not sure if all this is needed, its different than documented elsewhere but might not be bad
-        // to add code to do all listed here:
-        //To use the IDENTIFY command, select a target drive by sending 0xA0 for the master drive, or 0xB0 for the slave, to the "drive select" IO port. On the Primary bus, this would be port 0x1F6. Then set the Sectorcount, LBAlo, LBAmid, and LBAhi IO ports to 0 (port 0x1F2 to 0x1F5). Then send the IDENTIFY command (0xEC) to the Command IO port (0x1F7). Then read the Status port (0x1F7) again. If the value read is 0, the drive does not exist. For any other value: poll the Status port (0x1F7) until bit 7 (BSY, value = 0x80) clears. Because of some ATAPI drives that do not follow spec, at this point you need to check the LBAmid and LBAhi ports (0x1F4 and 0x1F5) to see if they are non-zero. If so, the drive is not ATA, and you should stop polling. Otherwise, continue polling one of the Status ports until bit 3 (DRQ, value = 8) sets, or until bit 0 (ERR, value = 1) sets.
-        //At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them. 
-
-        // Read Identification Space of the Device
-        var xBuff = new UInt16[256];
-        IO.Data.Read(xBuff);
-        string xSerialNo = GetString(xBuff, 10, 20);
-        string xFirmwareRev = GetString(xBuff, 23, 8);
-        string xModelNo = GetString(xBuff, 27, 40);
-
-        //Words (61:60) shall contain the value one greater than the total number of user-addressable
-        //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
-        //be greater than or equal to one and less than or equal to 268,435,455.
-        // Sectors are 512 bytes
-        UInt32 xSectors28 = (UInt32)(xBuff[61] << 16 | xBuff[60]);
-
-        //Words (103:100) shall contain the value one greater than the total number of user-addressable
-        //sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
-        //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
-        //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
-        UInt32 xSectors48 = 0;
-        bool xLba48Capable = (xBuff[83] & 0x800) != 0;
-        if (xLba48Capable) {
-          xSectors48 = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
-        }
-
-        Global.Dbg.Send("--------------------------");
-        Global.Dbg.Send("Drive #: " + xDrive + ", " + (xType == SpecLevel.ATA ? "ATA" : "ATAPI"));
-        Global.Dbg.Send("Serial No: " + xSerialNo);
-        Global.Dbg.Send("Firmware Rev: " + xFirmwareRev);
-        Global.Dbg.Send("Model No: " + xModelNo);
-        Global.Dbg.Send("Disk Size 28 (MB): " + xSectors28 * 512 / 1024 / 1024);
-        if (xLba48Capable) {
-          Global.Dbg.Send("Disk Size 48 (MB): " + xSectors48 * 512 / 1024 / 1024);
-        }
+        InitDrive(xType);
 
         xCount++;
       }
