@@ -132,16 +132,35 @@ namespace Cosmos.Hardware {
       }
     }
 
-    public void ReadSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
+    protected void SelectSector(bool aSlave, UInt64 aSectorNo, int aSectorCount) {
       SelectDrive(aSlave, (byte)(aSectorNo >> 24));
       // Number of sectors to read
       IO.SectorCount.Byte = 1;
       IO.LBA0.Byte = (byte)(aSectorNo & 0xFF);
       IO.LBA1.Byte = (byte)((aSectorNo & 0xFF00) >> 8);
       IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
+    }
+
+    public void ReadSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
+      SelectSector(aSlave, aSectorNo, 1);
       SendCmd(Cmd.ReadPio);
       //TODO: Update SendCmd to look for error bit
       IO.Data.Read16(aData);
+    }
+
+    public void WriteSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
+      SelectSector(aSlave, aSectorNo, 1);
+      SendCmd(Cmd.WritePio);
+
+      UInt16 xValue;
+      for (int i = 0; i < aData.Length / 2; i++) {
+        xValue = (UInt16)((aData[i * 2 + 1] << 8) | aData[i * 2]);
+        IO.Data.Word = xValue;
+        // There must be a tiny delay between each OUTSW output word. A jmp $+2 size of delay.
+        // But that delay is cpu specific? so how long of a delay?
+      }
+
+      SendCmd(Cmd.CacheFlush);
     }
 
     public void Test() {
@@ -171,13 +190,21 @@ namespace Cosmos.Hardware {
         }
 
         InitDrive(xType);
-        //var xData = new byte[512];
-        //ReadSector(xDrive == 1, 0, xData);
-        //var xSB = new StringBuilder();
-        //for (int i = 0; i < 256; i++) {
-        //  xSB.Append(xData[i].ToHex());
-        // }
-        //Console.WriteLine(xSB.ToString());
+
+        var xWrite = new byte[512];
+        for (int i = 0; i < 512; i++) {
+          xWrite[i] = (byte)i;
+        }
+        WriteSector(xDrive == 1, 0, xWrite);
+
+        var xRead = new byte[512];
+        ReadSector(xDrive == 1, 0, xRead);
+        string xDisplay = "";
+        for (int i = 0; i < 512; i++) {
+          xDisplay = xDisplay + xRead[i].ToHex();
+        }
+        Console.WriteLine(xDisplay);
+
         xCount++;
       }
     }

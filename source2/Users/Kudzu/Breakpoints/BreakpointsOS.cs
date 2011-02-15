@@ -15,6 +15,15 @@ namespace BreakpointsKernel {
       Console.WriteLine("Cosmos boot complete.");
     }
 
+    protected void TestSB() {
+      var xSB = new StringBuilder();
+      xSB.Append("Hello");
+      xSB.Append("Hello");
+      var xDisplay = xSB.ToString();
+      Console.WriteLine(xDisplay.Length);
+      Console.WriteLine(xDisplay);
+    }
+
     protected override void Run() {
       var xATA = new Cosmos.Hardware.ATA(Cosmos.Core.Global.BaseIOGroups.ATA1);
       xATA.Test();
