@@ -87,7 +87,7 @@ namespace Cosmos.Hardware {
 
     protected void InitDrive(SpecLevel aType) {
       if (aType == SpecLevel.ATA) {
-        //SendCmd(Cmd.Identify);
+        SendCmd(Cmd.Identify);
       } else {
         SendCmd(Cmd.IdentifyPacket);
       }

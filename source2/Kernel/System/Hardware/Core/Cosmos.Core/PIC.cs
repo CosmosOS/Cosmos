@@ -40,7 +40,9 @@ namespace Cosmos.Core {
             
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
+          //for now enable only keyboard
             Remap(0x20, 0xFD | 0x08, 0x28, 0xFF);
+          
         }
 
         private void Remap(byte masterStart, byte masterMask, byte slaveStart, byte slaveMask)
@@ -87,8 +89,8 @@ namespace Cosmos.Core {
             // set masks:
             Master.Data.Byte = masterMask;
             IOPort.Wait();
-            Slave.Data.Byte = slaveMask;
-            IOPort.Wait();
+            //Slave.Data.Byte = slaveMask;
+            //IOPort.Wait();
         }
 
         protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask){
