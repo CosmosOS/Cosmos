@@ -479,6 +479,9 @@ namespace Cosmos.Core
                                             string aName,
                                             ref IRQContext ctx)
         {
+          // At this point we are in a very unstable state.
+          // Try not to use any Cosmos routines, just
+          // report a crash dump.
             const string SysFault = "*** System Fault ***  ";
             const string xHex = "0123456789ABCDEF";
 
@@ -496,9 +499,9 @@ namespace Cosmos.Core
                 xAddress[4] = (byte)xHex[(int)(ctx.Interrupt & 0xF)];
             }
 
+          // lock up
             while (true)
             {
-                ;
             }
         }
 
