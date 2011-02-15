@@ -16,7 +16,7 @@ namespace Cosmos.Core.IOGroup {
         // ATA_REG_LBA3       0x09 - HOB
         // ATA_REG_LBA4       0x0A - HOB
         // ATA_REG_LBA5       0x0B - HOB
-        public readonly IOPort DeviceSelect;
+        public readonly IOPortWrite DeviceSelect;
         public readonly IOPortWrite Command;
         public readonly IOPortRead Status;
         //* Alternate Status Register: BAR1 + 2; // Read Only.
@@ -32,7 +32,7 @@ namespace Cosmos.Core.IOGroup {
             LBA2 = new IOPort(xBAR0, 5);
             Command = new IOPortWrite(xBAR0, 7);
             Status = new IOPortRead(xBAR0, 7);
-            DeviceSelect = new IOPort(xBAR0, 6);
+            DeviceSelect = new IOPortWrite(xBAR0, 6);
             Control = new IOPortWrite(xBAR1, 2);
         }
     }

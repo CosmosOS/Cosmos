@@ -6,6 +6,8 @@ using System.Threading;
 
 namespace Cosmos.Hardware {
   public class ATA {
+    // Rename this class to AtaPio later - we need this class as a fallback for debugging/boot/debugstub in the future even when
+    // we create DMA and other method support
     protected Core.IOGroup.ATA IO;
 
     public ATA(Core.IOGroup.ATA aIO) {
@@ -29,22 +31,28 @@ namespace Cosmos.Hardware {
       CacheFlushExt = 0xEA, Packet = 0xA0, IdentifyPacket = 0xA1, Identify = 0xEC, Read = 0xA8, Eject = 0x1B }
     public enum Ident : byte { DEVICETYPE = 0, CYLINDERS = 2, HEADS = 6, SECTORS = 12, SERIAL = 20, MODEL = 54, CAPABILITIES = 98, FIELDVALID = 106, MAX_LBA = 120, COMMANDSETS = 164, MAX_LBA_EXT = 200 }
     public enum SpecLevel { ATA = 0, ATAPI = 1 }
-    public enum DriveSelect { Master = 0x00, Slave = 0x01 }
 
     // Directions:
     //#define      ATA_READ      0x00
     //#define      ATA_WRITE     0x01
 
-    // ATA often requires a wait of 400 nanoseconds.
-    // We cant wait right now, but our code is slow enough that we probably wait that
-    // long anyways. But we have this call as a placeholder for when we can
-    // actually wait.
+    // ATA requires a wait of 400 nanoseconds.
+    // Read the Status register FIVE TIMES, and only pay attention to the value 
+    // returned by the last one -- after selecting a new master or slave device. The point being that 
+    // you can assume an IO port read takes approximately 100ns, so doing the first four creates a 400ns 
+    // delay -- which allows the drive time to push the correct voltages onto the bus. 
+    // Since we read status again later, we wait by reading it 4 times.
     protected void Wait() {
       // Wait 400 ns
+      byte xVoid;
+      xVoid = IO.Status.Byte;
+      xVoid = IO.Status.Byte;
+      xVoid = IO.Status.Byte;
+      xVoid = IO.Status.Byte;
     }
 
-    public void SelectDrive(DriveSelect aDrive) {
-      IO.DeviceSelect.Byte = (byte)(DvcSelVal.Default | DvcSelVal.LBA | (aDrive == DriveSelect.Slave ? DvcSelVal.Slave : 0));
+    public void SelectDrive(bool aSlave) {
+      IO.DeviceSelect.Byte = (byte)(DvcSelVal.Default | DvcSelVal.LBA | (aSlave ? DvcSelVal.Slave : 0));
       Wait();
     }
 
@@ -79,7 +87,7 @@ namespace Cosmos.Hardware {
 
       int xCount = 0;
       for (int xDrive = 0; xDrive <= 1; xDrive++) {
-        SelectDrive((DriveSelect)xDrive);
+        SelectDrive(xDrive == 1);
         var xIdentifyStatus = SendCmd(Cmd.Identify);
         // No drive found, go to next
         if (xIdentifyStatus == Status.None) {
@@ -127,7 +135,7 @@ namespace Cosmos.Hardware {
         //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
         //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
         UInt32 xSectors48 = 0;
-        bool xLba48Capable = (xBuff[83] & 0x400) != 0;
+        bool xLba48Capable = (xBuff[83] & 0x800) != 0;
         if (xLba48Capable) {
           xSectors48 = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
         }

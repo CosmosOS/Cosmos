@@ -24,6 +24,7 @@ namespace Cosmos.Core {
         static protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
 
         //TODO: Plug this with asm to read directly to RAM
+        // REP INSW
         public void Read(UInt16[] aData) {
           for (int i = 0; i < aData.Length; i++) {
             aData[i] = Read16(Port);
@@ -39,7 +40,7 @@ namespace Cosmos.Core {
 
     public class IOPort : IOPortBase {
         internal IOPort(UInt16 aPort) : base(aPort) { }
-        internal IOPort(UInt16 aBase, UInt16 aOffset) : base(aBase, aBase) { }
+        internal IOPort(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
 
         static public void Wait() {
             // Write to an unused port. This assures whatever we were waiting on for a previous
