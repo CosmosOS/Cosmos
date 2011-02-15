@@ -87,7 +87,7 @@ namespace Cosmos.Hardware {
 
     protected void InitDrive(SpecLevel aType) {
       if (aType == SpecLevel.ATA) {
-        SendCmd(Cmd.Identify);
+        //SendCmd(Cmd.Identify);
       } else {
         SendCmd(Cmd.IdentifyPacket);
       }
@@ -171,13 +171,13 @@ namespace Cosmos.Hardware {
         }
 
         InitDrive(xType);
-        var xData = new byte[512];
-        ReadSector(xDrive == 1, 0, xData);
-        var xSB = new StringBuilder();
-        for (int i = 0; i < 256; i++) {
-          xSB.Append(xData[i].ToHex());
-         }
-        Console.WriteLine(xSB.ToString());
+        //var xData = new byte[512];
+        //ReadSector(xDrive == 1, 0, xData);
+        //var xSB = new StringBuilder();
+        //for (int i = 0; i < 256; i++) {
+        //  xSB.Append(xData[i].ToHex());
+        // }
+        //Console.WriteLine(xSB.ToString());
         xCount++;
       }
     }
