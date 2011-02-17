@@ -73,7 +73,7 @@ namespace Cosmos.Debug.VSDebugEngine
                             {
                                 m_parameters[i] = new DebugLocalInfo
                                 {
-                                    Name = mArgumentInfos[i].Name,
+                                    Name = mArgumentInfos[i].Name + ":" + mArgumentInfos[i].Offset,
                                     Index = i,
                                     IsLocal=false
                                 };
@@ -87,7 +87,7 @@ namespace Cosmos.Debug.VSDebugEngine
                             {
                                 m_locals[i] = new DebugLocalInfo
                                 {
-                                    Name = mLocalInfos[i].Name,
+                                    Name = mLocalInfos[i].Name + ":" + mLocalInfos[i].Offset,
                                     Index = m_numLocals - i - 1,
                                     IsLocal = true
                                 };

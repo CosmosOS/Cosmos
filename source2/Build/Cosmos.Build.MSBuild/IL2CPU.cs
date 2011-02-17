@@ -13,6 +13,7 @@ using Microsoft.Win32;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
 using System.Reflection.Emit;
+using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -85,19 +86,28 @@ namespace Cosmos.Build.MSBuild
         }
 
         public override bool Execute() {
-            mTask.OnLogMessage = LogMessage;
-            mTask.OnLogError = LogError;
-            mTask.OnLogException = LogException;
+            var xSW = Stopwatch.StartNew();
+            try
+            {
+                mTask.OnLogMessage = LogMessage;
+                mTask.OnLogError = LogError;
+                mTask.OnLogException = LogException;
 
-            mTask.DebugMode = DebugMode;
-            mTask.TraceAssemblies = TraceAssemblies;
-            mTask.DebugCom = DebugCom;
-            mTask.UseNAsm = UseNAsm;
-            mTask.References = References;
-            mTask.OutputFilename = OutputFilename;
-            mTask.EnableLogging = EnableLogging;
-            mTask.EmitDebugSymbols = EmitDebugSymbols;
-            return mTask.Execute();
+                mTask.DebugMode = DebugMode;
+                mTask.TraceAssemblies = TraceAssemblies;
+                mTask.DebugCom = DebugCom;
+                mTask.UseNAsm = UseNAsm;
+                mTask.References = References;
+                mTask.OutputFilename = OutputFilename;
+                mTask.EnableLogging = EnableLogging;
+                mTask.EmitDebugSymbols = EmitDebugSymbols;
+                return mTask.Execute();
+            }
+            finally
+            {
+                xSW.Stop();
+                Log.LogWarning("IL2CPU task took {0}", xSW.Elapsed);
+            }
         }
 
     }

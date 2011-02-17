@@ -10,6 +10,8 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Mono.Cecil;
+using System.IO;
 
 namespace Cosmos.IL2CPU.X86
 {
@@ -94,6 +96,7 @@ namespace Cosmos.IL2CPU.X86
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 if (xBody != null)
                 {
+                    var xLocalsOffset = mLocals_Arguments_Infos.Count;
                     foreach (var xLocal in xBody.LocalVariables)
                     {
                         var xInfo=new DebugInfo.Local_Argument_Info
@@ -102,12 +105,29 @@ namespace Cosmos.IL2CPU.X86
                             IsArgument = false,
                             Index = xLocal.LocalIndex,
                             Name="Local" + xLocal.LocalIndex,
-                            Offset = (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex)
+                            Offset = 0 - (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex)
                         };
                         mLocals_Arguments_Infos.Add(xInfo);
 
                         new Comment("Local " + xLocal.LocalIndex);
                         new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+                    }
+                    var xCecilMethod = GetCecilMethodDefinitionForSymbolReading(aMethod.MethodBase);
+                    if (xCecilMethod != null && xCecilMethod.Body != null)
+                    {
+                        // mLocals_Arguments_Infos is one huge list, so ourlatest additions are at the end
+                        for (int i = 0; i < xCecilMethod.Body.Variables.Count; i++)
+                        {
+                            mLocals_Arguments_Infos[xLocalsOffset + i].Name = xCecilMethod.Body.Variables[i].Name;
+                            mLocals_Arguments_Infos[xLocalsOffset + i].Name += ":" + mLocals_Arguments_Infos[xLocalsOffset+i].Offset;
+                        }
+                        for (int i = xLocalsOffset + xCecilMethod.Body.Variables.Count - 1; i >= xLocalsOffset; i--)
+                        {
+                            if (mLocals_Arguments_Infos[i].Name.Contains('$'))
+                            {
+                                mLocals_Arguments_Infos.RemoveAt(i);
+                            }
+                        }
                     }
                 }
 
@@ -117,10 +137,11 @@ namespace Cosmos.IL2CPU.X86
                     mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info{
                         MethodLabelName=xMethodLabel,
                         IsArgument=true,
-                        Name="this",
+                        Name="this:" + IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
                         Index=0,
                         Offset=IL.Ldarg.GetArgumentDisplacement(aMethod, 0)
                     });
+
                     xIdxOffset++;
                 }
 
@@ -133,21 +154,60 @@ namespace Cosmos.IL2CPU.X86
                         MethodLabelName = xMethodLabel,
                         IsArgument = true,
                         Index = (int)(i + xIdxOffset),
-                        Name=xParams[i].Name,
+                        Name = xParams[i].Name + ":" + IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset)),
                         Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset))
                     });
                 }
             }
+        }
 
-            //foreach (var xLocal in aLocals) {
-            //  aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
-            //  for (int i = 0; i < (xLocal.Size / 4); i++) {
-            //    new CPUx86.Push { DestinationValue = 0 };
-            //  }
-            //}
-            //if (aDebugMode && aIsNonDebuggable) {
-            //  new CPUx86.Call { DestinationLabel = "DebugPoint_DebugSuspend" };
-            //}
+        private Dictionary<string, ModuleDefinition> mLoadedModules = new Dictionary<string, ModuleDefinition>();
+        //private Dictionary<Tuple<string, int>, MethodDefinition> mMethods = new 
+
+        private MethodDefinition GetCecilMethodDefinitionForSymbolReading(MethodBase methodBase)
+        {
+            var xMethodBase = methodBase;
+            if (xMethodBase.IsGenericMethod)
+            {
+                var xMethodInfo = (System.Reflection.MethodInfo)xMethodBase;
+                xMethodBase = xMethodInfo.GetGenericMethodDefinition();
+                if (xMethodBase.IsGenericMethod)
+                {
+                    // apparently, a generic method can be derived from a generic method..
+                    throw new Exception("Make recursive");
+                }
+            }
+            var xLocation = xMethodBase.DeclaringType.Assembly.Location;
+            ModuleDefinition xModule = null;
+            if (!mLoadedModules.TryGetValue(xLocation, out xModule))
+            {
+                // if not in cache, try loading.
+                if (xMethodBase.DeclaringType.Assembly.GlobalAssemblyCache || !File.Exists(xLocation))
+                {
+                    // file doesn't exist, so assume no symbols
+                    mLoadedModules.Add(xLocation, null);
+                    return null;
+                }
+                else
+                {
+                    xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider =new Mono.Cecil.Pdb.PdbReaderProvider() });
+                    if (xModule.HasSymbols)
+                    {
+                        mLoadedModules.Add(xLocation, xModule);
+                    }
+                    else
+                    {
+                        mLoadedModules.Add(xLocation, null);
+                        return null;
+                    }
+                }
+            }
+            if (xModule == null)
+            {
+                return null;
+            }
+            // todo: cache MethodDefinition ?
+            return xModule.LookupToken(xMethodBase.MetadataToken) as MethodDefinition;
         }
 
         protected override void MethodEnd(MethodInfo aMethod)

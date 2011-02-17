@@ -38,7 +38,8 @@ namespace Cosmos.System {
                 Run();
             }
             AfterRun();
-            while (true) {
+            bool xTest = 1 != 3;
+            while (xTest) {
             }
         }
 
