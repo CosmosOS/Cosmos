@@ -88,7 +88,12 @@ namespace Cosmos.Compiler.Assembler {
       return null;
     }
 
+	public void Add(Instruction aReader){
+		mInstructions.Add(aReader);
+	}
+
     public void Add(params Instruction[] aReaders) {
+	  mInstructions.Capacity += aReaders.Length;
       foreach (Instruction xInstruction in aReaders) {
         mInstructions.Add(xInstruction);
       }
