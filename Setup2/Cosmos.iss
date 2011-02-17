@@ -143,6 +143,11 @@ Type: filesandordirs; Name: {code:GetCSharpExpress2010ProjectTemplatePath}\*Cosm
 
 
 [Files]
+; Cecil dll, pdb
+Source: .\Resources\Dependencies\cecil\Mono.Cecil.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Resources\Dependencies\cecil\Mono.Cecil.pdb; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Resources\Dependencies\cecil\Mono.Cecil.Pdb.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Resources\Dependencies\cecil\Mono.Cecil.Pdb.pdb; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 ; Tools
 Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
