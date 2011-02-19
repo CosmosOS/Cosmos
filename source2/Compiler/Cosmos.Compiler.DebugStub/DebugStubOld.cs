@@ -246,7 +246,6 @@ namespace Cosmos.Compiler.DebugStub {
 
             // pointer value
             ESI = Memory[EBP + 8];
-
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
@@ -275,9 +274,10 @@ namespace Cosmos.Compiler.DebugStub {
             DX = mComStatusAddr;
 
             // Wait for serial port to be ready
+            // Bit 5 (0x20) test for Transmit Holding Register to be empty.
             Label = "WriteByteToComPort_Wait";
-            AL = Port[DX];
-            AL.Test(0x20);
+              AL = Port[DX];
+              AL.Test(0x20);
             JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
 
             // Set address of port
@@ -316,9 +316,6 @@ namespace Cosmos.Compiler.DebugStub {
         //
         // Reads a byte into [EDI] and does EDI + 1
         // http://wiki.osdev.org/Serial_ports
-        // We dont worry about byte over writing because:
-        //  -The UART will handle flow control for us - except its not turned on right now.... :)
-        //  -All modern UARTs have at least a 16 byte buffer.
         protected void ReadByteFromComPort() {
             Label = "ReadByteFromComPort";
             Call("ReadALFromComPort");
@@ -488,7 +485,8 @@ namespace Cosmos.Compiler.DebugStub {
                 // We ACK even ones we dont process here, but do not ACK Noop.
                 // The buffers should be ok becuase more wont be sent till after our NACK
                 // is received.
-                // Right now our max cmd size is 2 + 5 = 7. UART buffer is 16.
+                // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
+                // UART buffer is 16.
                 // We may need to revisit this in the future to ack not commands, but data chunks
                 // and move them to a buffer.
                 AL = (int)MsgType.CmdCompleted;

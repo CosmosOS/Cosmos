@@ -61,7 +61,13 @@ namespace Cosmos.Debug.Common
                         SendRawData(new byte[1] { (byte)Command.Noop });
                     } else {
                         var xData = new byte[aData.Length + 2];
-                        xData[0] = (byte)aCmd;
+                        // See comments about flow control in the DebugStub class
+                        // to see why we limit to 16.
+                        if (aData.Length > 16) {
+                          throw new Exception("Command is too large. 16 bytes max.");
+                        }
+
+                      xData[0] = (byte)aCmd;
                         aData.CopyTo(xData, 2);
 
                         if (mCommandID == 255) {
