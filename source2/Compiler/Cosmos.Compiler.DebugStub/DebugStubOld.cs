@@ -126,6 +126,7 @@ namespace Cosmos.Compiler.DebugStub {
 
             ESI = EBP;
             ESI.Add(EAX);
+            ESI.Add(16);
 
             Label = "DebugStub_SendMethodContext_SendByte";
             new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };

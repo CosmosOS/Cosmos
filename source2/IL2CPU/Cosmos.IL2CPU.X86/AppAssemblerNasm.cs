@@ -119,7 +119,6 @@ namespace Cosmos.IL2CPU.X86
                         for (int i = 0; i < xCecilMethod.Body.Variables.Count; i++)
                         {
                             mLocals_Arguments_Infos[xLocalsOffset + i].Name = xCecilMethod.Body.Variables[i].Name;
-                            mLocals_Arguments_Infos[xLocalsOffset + i].Name += ":" + mLocals_Arguments_Infos[xLocalsOffset+i].Offset;
                         }
                         for (int i = xLocalsOffset + xCecilMethod.Body.Variables.Count - 1; i >= xLocalsOffset; i--)
                         {
@@ -154,7 +153,7 @@ namespace Cosmos.IL2CPU.X86
                         MethodLabelName = xMethodLabel,
                         IsArgument = true,
                         Index = (int)(i + xIdxOffset),
-                        Name = xParams[i].Name + ":" + IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset)),
+                        Name = xParams[i].Name,
                         Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset))
                     });
                 }

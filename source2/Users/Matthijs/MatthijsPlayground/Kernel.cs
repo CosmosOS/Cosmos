@@ -25,10 +25,10 @@ namespace MatthijsPlayground
             //Console.Write("Text typed: ");
             //Console.WriteLine(input);
             //Console.ForegroundColor = xOldColor;
-            TestFooBarMethod();
+            TestFooBarMethod(0xd, 0xe, 0xf);
         }
 
-        public static void TestFooBarMethod()
+        public static void TestFooBarMethod(int d, int e, int f)
         {
             uint xA = 0xAAAAAAAA;
             uint xB = 0xBBBBBBBB;

@@ -88,7 +88,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "5002"
+		VWDPort = "27136"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -318,19 +318,19 @@ Global
 		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
 		SccProjectName39 = ../source2/Build/Cosmos.Build.StandAlone
 		SccLocalPath39 = ..\\source2\\Build\\Cosmos.Build.StandAlone
-		SccWebProject40 = true
-		SccProjectUniqueName40 = ..\\Docs
-		SccProjectName40 = ../Docs
-		SccLocalPath40 = ..\\Docs
-		SccProjectEnlistmentChoice40 = 2
-		SccProjectUniqueName41 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground\\MatthijsPlayground.csproj
+		SccProjectUniqueName40 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground\\MatthijsPlayground.csproj
+		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
+		SccProjectName40 = ../source2/Users/Matthijs/MatthijsPlayground
+		SccLocalPath40 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground
+		SccProjectUniqueName41 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground\\MatthijsPlaygroundBoot.Cosmos
 		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
 		SccProjectName41 = ../source2/Users/Matthijs/MatthijsPlayground
 		SccLocalPath41 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground
-		SccProjectUniqueName42 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground\\MatthijsPlaygroundBoot.Cosmos
-		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
-		SccProjectName42 = ../source2/Users/Matthijs/MatthijsPlayground
-		SccLocalPath42 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground
+		SccWebProject42 = true
+		SccProjectUniqueName42 = ..\\Docs
+		SccProjectName42 = ../Docs
+		SccLocalPath42 = ..\\Docs
+		SccProjectEnlistmentChoice42 = 2
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
