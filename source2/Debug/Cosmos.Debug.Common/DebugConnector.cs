@@ -248,8 +248,8 @@ namespace Cosmos.Debug.Common
 
         protected void PacketMethodContext(byte[] aPacket)
         {
-            WaitForMessage(); 
-            mStackData = aPacket;
+            WaitForMessage();
+            mStackData = aPacket.Reverse().ToArray();
              // not really nice to use this one?
             //mCmdWait.Set();
             //WaitForMessage();

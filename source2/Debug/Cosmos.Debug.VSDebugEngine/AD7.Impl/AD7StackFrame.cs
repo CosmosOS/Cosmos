@@ -344,8 +344,7 @@ namespace Cosmos.Debug.VSDebugEngine
             try
             {
                 if (guidFilter == AD7Guids.guidFilterLocalsPlusArgs ||
-                        guidFilter == AD7Guids.guidFilterAllLocalsPlusArgs ||
-                        guidFilter == AD7Guids.guidFilterAllLocals)
+                        guidFilter == AD7Guids.guidFilterAllLocalsPlusArgs)
                 {
                     CreateLocalsPlusArgsProperties(out elementsReturned, out enumObject);
                     hr = VSConstants.S_OK;
