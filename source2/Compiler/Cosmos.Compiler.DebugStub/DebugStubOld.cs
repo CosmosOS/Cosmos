@@ -266,7 +266,7 @@ namespace Cosmos.Compiler.DebugStub {
             // The overhead is a lot, but compared to the speed of the serial and the fact
             // that we wait on the serial port anyways, its a wash.
             //
-            // This could be changed to use interrupts, but that then copmlicates
+            // This could be changed to use interrupts, but that then complicates
             // the code and causes interaction with other code. DebugStub should be
             // as isolated as possible from any other code.
             Label = "WriteByteToComPort";

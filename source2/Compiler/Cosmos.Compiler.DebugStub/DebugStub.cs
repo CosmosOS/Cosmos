@@ -32,19 +32,12 @@ namespace Cosmos.Compiler.DebugStub {
                 AL = 0;
                 Call<DebugStub.WriteALToComPort>();
 
-                // QEMU has junk in the buffer when it first
-                // boots. VMWare doesn't...
-                // So we use this to "clear" it by doing 16
-                // reads. UART buffers are 16 bytes and 
-                // usually there are only a few junk bytes.
-                //for (int i = 1; i <= 16; i++) {
-                //    Call("ReadALFromComPortNoCheck");
-                //}
-
                 // QEMU (and possibly others) send some garbage across the serial line first.
-                // Actually they send the garbage in bound, but garbage could be inbound as well so we 
+                // Actually they send the garbage inbound, but garbage could be inbound as well so we 
                 // keep this.
                 // To work around this we send a signature. DC then discards everything before the signature.
+                // QEMU has other serial issues too, and we dont support it anymore, but this signature is a good
+                // feature so we kept it.
                 Push(Consts.SerialSignature);
                 ESI = ESP;
                 Call("WriteByteToComPort");
@@ -103,7 +96,7 @@ namespace Cosmos.Compiler.DebugStub {
                 AL = 0xC7;
                 Port[DX] = AL;
                 
-                // 0x20 AFE Automatic Flow control Enable - May not be on all.. not sure for modern ones?
+                // 0x20 AFE Automatic Flow control Enable - 16550 (VMWare uses 16550A) is most common and does not support it
                 // 0x02 RTS
                 // 0x01 DTR
                 // Send 0x03 if no AFE
