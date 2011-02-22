@@ -26,7 +26,7 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.BusPositionEnum.Master);
+      var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
       
       var xWrite = new byte[512];
       for (int i = 0; i < 512; i++) {

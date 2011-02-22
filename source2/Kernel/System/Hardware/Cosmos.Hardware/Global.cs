@@ -12,6 +12,14 @@ namespace Cosmos.Hardware {
     // Must be static init, other static inits rely on it not being null
     static public TextScreen TextScreen = new TextScreen();
 
+    static void InitAta(BlockDevice.Ata.ControllerIdEnum aControllerID, BlockDevice.Ata.BusPositionEnum aBusPosition) {
+      var xIO = aControllerID == BlockDevice.Ata.ControllerIdEnum.Primary ? Cosmos.Core.Global.BaseIOGroups.ATA1 : Cosmos.Core.Global.BaseIOGroups.ATA2;
+      var xATA = new BlockDevice.AtaPio(xIO, aControllerID, aBusPosition);
+      if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
+        BlockDevice.BlockDevice.Devices.Add(xATA);
+      }
+    }
+
     // Init devices that are "static"/mostly static. These are devices
     // that all PCs are expected to have. Keyboards, screens, ATA hard drives etc.
     // Despite them being static, some discovery is required. For example, to see if
@@ -22,7 +30,11 @@ namespace Cosmos.Hardware {
 
       Keyboard = new Keyboard();
 
-
+      // Find hardcoded ATA controllers
+      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
+      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
+      InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
+      InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
     }
 
     static internal void InitPciDevices() {

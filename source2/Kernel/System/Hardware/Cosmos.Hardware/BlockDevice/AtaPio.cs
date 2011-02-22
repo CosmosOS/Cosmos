@@ -22,8 +22,9 @@ namespace Cosmos.Hardware.BlockDevice {
       get { return mDriveType; }
     }
 
-    public AtaPio(Core.IOGroup.ATA aIO, Ata.BusPositionEnum aBusPosition) {
+    public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition) {
       IO = aIO;
+      mControllerID = aControllerId;
       mBusPosition = aBusPosition;
       // Disable IRQs, we use polling currently
       IO.Control.Byte = 0x02;
