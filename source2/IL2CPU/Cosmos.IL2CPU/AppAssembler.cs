@@ -89,7 +89,7 @@ namespace Cosmos.IL2CPU
             {
                 foreach (var xOpCode in aOpCodes)
                 {
-                    uint xOpCodeVal = (uint)xOpCode.OpCode;
+                    ushort xOpCodeVal = (ushort)xOpCode.OpCode;
                     ILOp xILOp;
                     if (xOpCodeVal <= 0xFF)
                     {
@@ -557,7 +557,7 @@ namespace Cosmos.IL2CPU
                         {
                             try
                             {
-                                xData = new byte[xTheSize];
+								xData = new byte[xTheSize];
                                 if (xValue.GetType().IsValueType)
                                 {
                                     for (int x = 0; x < xTheSize; x++)

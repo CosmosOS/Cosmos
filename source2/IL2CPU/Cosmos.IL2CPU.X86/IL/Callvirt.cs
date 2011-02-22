@@ -222,69 +222,9 @@ namespace Cosmos.IL2CPU.X86.IL
           new Label(xCurrentMethodLabel + "__NO_EXCEPTION_AFTER_CALL");
           new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
           if (xReturnSize > 0) {
-            Assembler.Stack.Push(new StackContents.Item((int)xReturnSize));
+            Assembler.Stack.Push(new StackContents.Item(xReturnSize, typeof(Int32)));
           }
           //throw new NotImplementedException();
         }
-
-
-        //     public class Callvirt : Op {
-        //         private string mMethodIdentifier;
-        //         private string mNormalAddress;
-        //         private string mMethodDescription;
-        //         private int mThisOffset;
-        //         private uint mArgumentCount;
-        //         private uint mReturnSize;
-        //         private string mLabelName;
-        //         private MethodInformation mCurrentMethodInfo;
-        //         private MethodInformation mTargetMethodInfo;
-        //         private uint mCurrentILOffset;
-        //         private int mExtraStackSpace;
-        //         private MethodBase mMethod;
-        // 
-        //         public static void ScanOp(ILReader aReader,
-        //                                   MethodInformation aMethodInfo,
-        //                                   SortedList<string, object> aMethodData,
-        //             IServiceProvider aServiceProvider)
-        //         {
-        //             MethodBase xMethod = aReader.OperandValueMethod;
-        //             if (xMethod == null)
-        //             {
-        //                 throw new Exception("Unable to determine Method!");
-        //             }
-        //             MethodBase xMethodDef = xMethod;
-        //             var xTargetMethodInfo = aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(xMethodDef,
-        //                                                                                                       false);
-        //             foreach (var xParam in xMethodDef.GetParameters())
-        //             {
-        //                 aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xParam.ParameterType);
-        //             }
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xTargetMethodInfo.ReturnType);
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(xMethodDef, false);
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(VTablesImplRefs.GetMethodAddressForTypeRef, false);
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(typeof(NullReferenceException).GetConstructor(new Type[0]), false);
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
-        //                 CPU.Assembler.CurrentExceptionOccurredRef, false);
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(typeof (NullReferenceException));
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetStaticFieldLabel(CPU.Assembler.CurrentExceptionRef);
-        //             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
-        //                     CPU.Assembler.CurrentExceptionOccurredRef, false);
-        //         }
-        // 
-        //         public Callvirt(ILReader aReader,
-        //                         MethodInformation aMethodInfo)
-        //             : base(aReader,
-        //                    aMethodInfo) {
-        //             mLabelName = GetInstructionLabel(aReader);
-        //             mCurrentMethodInfo = aMethodInfo;
-        //             mMethod = aReader.OperandValueMethod;
-        //             if (mMethod == null) {
-        //                 throw new Exception("Unable to determine Method!");
-        //             }
-        //             mCurrentILOffset = aReader.Position;
-        //         }
-        //     }
-        // }
-
     }
 }

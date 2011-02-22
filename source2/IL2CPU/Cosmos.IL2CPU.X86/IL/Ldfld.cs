@@ -8,6 +8,7 @@ using System.Linq;
 using Cosmos.Compiler.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -62,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
-          Assembler.Stack.Pop();
+          var xStackValue = Assembler.Stack.Pop();
           var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
           var xFields = GetFieldsInfo(aDeclaringType);
           var xFieldInfo = (from item in xFields
@@ -71,7 +72,12 @@ namespace Cosmos.IL2CPU.X86.IL
           
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
-          var xSize = xFieldInfo.Size;
+#if DOTNETCOMPATIBLE
+			// pushed size is always 4 or 8
+			var xSize = ILOp.Align(xFieldInfo.Size, 4);
+#else
+			var xSize = xFieldInfo.Size;
+#endif
 
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset) };
 
@@ -110,26 +116,9 @@ namespace Cosmos.IL2CPU.X86.IL
                       break;
                     }
             default:
-              throw new Exception("Remainder size " + xFieldInfo.FieldType.ToString() + (xSize) + " not supported!");
+              throw new Exception(string.Format("Remainder size {0:D} {1:D} not supported!", xFieldInfo.FieldType.ToString(), xSize));
           }
-          Assembler.Stack.Push(new StackContents.Item((int)xSize, xFieldInfo.FieldType));
+          Assembler.Stack.Push(new StackContents.Item(xSize, xFieldInfo.FieldType));
         }
-
-        // 	public class Ldfld: Op {
-        //         private Type mDeclaringType;
-        // 		private TypeInformation.Field mFieldInfo;
-        // 		private readonly TypeInformation mTypeInfo;
-        //         private string mFieldId;
-        // 
-        // 		public Ldfld(ILReader aReader, MethodInformation aMethodInfo)
-        // 			: base(aReader, aMethodInfo) {
-        // 			FieldInfo xField = aReader.OperandValueField;
-        // 			if (xField == null) {
-        // 					throw new Exception("Field not found!");
-        // 			}
-        // 			mFieldId = xField.GetFullName();
-        //             mDeclaringType = xField.DeclaringType;
-        // 		}
-
     }
 }

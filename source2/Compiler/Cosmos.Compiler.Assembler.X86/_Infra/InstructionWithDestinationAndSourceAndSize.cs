@@ -20,7 +20,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             set 
             {
                 if (value == 0 || value % 8 != 0)
-                    throw new ArgumentException("Size must be greater than 0 and bits in byte sizes");  
+                    throw new ArgumentException(string.Format("Size must be greater than 0 and bits in byte sizes. Your Value: {0:D}", value)); 
 
               mSize = value;
 

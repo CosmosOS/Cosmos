@@ -73,13 +73,13 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
-          uint xArgSize = 0;
+          uint xArgSize = 0u;
           var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
           Type xArgType;
           if (aMethod.MethodBase.IsStatic) {
             xArgType = aMethod.MethodBase.GetParameters()[aParam].ParameterType;
           } else {
-            if (aParam == 0) {
+            if (aParam == 0u) {
               xArgType = aMethod.MethodBase.DeclaringType;
               if (xArgType.IsValueType)
               {
@@ -101,47 +101,7 @@ namespace Cosmos.IL2CPU.X86.IL
               DestinationDisplacement = (int)(xDisplacement - ((i) * 4))
             };
           }
-          Assembler.Stack.Push((int)xArgSize, xArgType);
+          Assembler.Stack.Push(xArgSize, xArgType);
         }
-
-
-      // using System;
-      // using System.Collections.Generic;
-      // using System.IO;
-      // 
-      // using CPU = Cosmos.Compiler.Assembler.X86;
-      // 
-      // namespace Cosmos.IL2CPU.IL.X86 {
-      // 	[OpCode(OpCodeEnum.Ldarg)]
-      // 	public class Ldarg: Op {
-      // 		private MethodInformation.Argument mArgument;
-      // 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
-      // 			mArgument = aMethodInfo.Arguments[aIndex];
-      // 		}
-      // 
-      // 		public Ldarg(MethodInformation aMethodInfo, int aIndex)
-      // 			: base(null, aMethodInfo) {
-      // 			SetArgIndex(aIndex, aMethodInfo);
-      // 		}
-      // 
-      // 		public Ldarg(ILReader aReader, MethodInformation aMethodInfo)
-      // 			: base(aReader, aMethodInfo) {
-      // 			int xArgIndex;
-      // 			if (aReader != null) {
-      // 				xArgIndex = aReader.OperandValueInt32;
-      // 				SetArgIndex(xArgIndex, aMethodInfo);
-      // 				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
-      // 				//if (xParam != null) {
-      // 				//    SetArgIndex(xParam.Sequence - 1, aMethodInfo);
-      // 				//}
-      // 			}
-      // 		}
-      // 
-      // 		public override void DoAssemble() {
-      // 			Ldarg(Assembler, mArgument);
-      // 		}
-      // 	}
-      // }
-
     }
 }

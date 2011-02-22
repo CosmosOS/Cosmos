@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-            Assembler.Stack.Push(4, true, false, false);
+			Assembler.Stack.Push(4, typeof(uint));
         }
 
 

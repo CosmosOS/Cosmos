@@ -14,13 +14,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            int xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
+            var xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
             new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-            Assembler.Stack.Push(xSize);
+            Assembler.Stack.Push(xSize, typeof(Int32));
         }
-
     }
 }

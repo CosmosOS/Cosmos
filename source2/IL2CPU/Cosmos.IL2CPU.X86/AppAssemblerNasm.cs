@@ -436,22 +436,23 @@ namespace Cosmos.IL2CPU.X86
                 var xMLSymbol = new DebugInfo.MLDebugSymbol();
                 xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
                 xMLSymbol.MethodName = aMethod.MethodBase.GetFullName();
-                int xStackSize = (from item in mAssembler.Stack
-                                  let xSize = (item.Size % 4 == 0)
-                                                  ? item.Size
-                                                  : (item.Size + (4 - (item.Size % 4)))
-                                  select xSize).Sum();
-                xMLSymbol.StackDifference = -1;
-                if (aMethod.MethodBase != null)
-                {
-                    var xBody = aMethod.MethodBase.GetMethodBody();
-                    if (xBody != null)
-                    {
-                        var xLocalsSize = (from item in xBody.LocalVariables
-                                           select (int)ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
-                        xMLSymbol.StackDifference = xLocalsSize + xStackSize;
-                    }
-                }
+
+				var xStackSize = (from item in mAssembler.Stack
+								  let xSize = (item.Size % 4u == 0u)
+												  ? item.Size
+												  : (item.Size + (4u - (item.Size % 4u)))
+								  select xSize).Sum();
+				xMLSymbol.StackDifference = -1;
+				if (aMethod.MethodBase != null)
+				{
+					var xBody = aMethod.MethodBase.GetMethodBody();
+					if (xBody != null)
+					{
+						var xLocalsSize = (from item in xBody.LocalVariables
+										   select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
+						xMLSymbol.StackDifference = checked((int) (xLocalsSize + xStackSize));
+					}
+				}
                 try
                 {
                     xMLSymbol.AssemblyFile = aMethod.MethodBase.DeclaringType.Assembly.Location;

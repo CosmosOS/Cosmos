@@ -47,11 +47,11 @@ namespace Cosmos.Build.MSBuild
 					}
 					else
 					{
-						Log.LogError("Error occurred while invoking {0}", name);
+						Log.LogError("Error occurred while invoking {0}.", name);
 					}
 					foreach (var xError in mErrors)
 					{
-						Log.LogError(xError);
+						Log.LogError(ExtendLineError(xError));
 					}
 					foreach (var xOutput in mOutput)
 					{
@@ -72,5 +72,10 @@ namespace Cosmos.Build.MSBuild
 
 		private List<string> mErrors;
 		private List<string> mOutput;
+
+		public virtual string ExtendLineError(string errorMessage)
+		{
+			return errorMessage;
+		}
 	}
 }

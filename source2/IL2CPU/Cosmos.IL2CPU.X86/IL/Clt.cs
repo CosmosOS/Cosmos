@@ -28,7 +28,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 throw new NotImplementedException();
                 //return;
             }
-            Assembler.Stack.Push( new StackContents.Item( 1, typeof( bool ) ) );
+#if DOTNETCOMPATIBLE
+            Assembler.Stack.Push( new StackContents.Item( ILOp.Align(1, 4), typeof( bool ) ) );
+#else
+			Assembler.Stack.Push( new StackContents.Item( 1, typeof( bool ) ) );
+#endif
             string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";

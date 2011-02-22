@@ -70,6 +70,7 @@
     <Compile Include="386AndUp\Popfd.cs" />
     <Compile Include="386AndUp\Pushad.cs" />
     <Compile Include="386AndUp\Pushfd.cs" />
+    <Compile Include="386AndUp\Shld.cs" />
     <Compile Include="386AndUp\SignExtendAX.cs" />
     <Compile Include="486AndUp\CmpXchg.cs" />
     <Compile Include="486AndUp\CpuId.cs" />
@@ -211,6 +212,8 @@
     <Compile Include="x87\IntSubReverse.cs" />
     <Compile Include="Xchg.cs" />
     <Compile Include="Xor.cs" />
+    <Compile Include="_Infra\IInstructionWithArgument.cs" />
+    <Compile Include="_Infra\InstructionWithDestinationAndSourceAndArgument.cs" />
     <Compile Include="_Infra\Extensions.cs" />
     <Compile Include="_Infra\IInstructionWithCondition.cs" />
     <Compile Include="_Infra\IInstructionWithDestination.cs" />

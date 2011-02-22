@@ -67,6 +67,7 @@ namespace Cosmos.Build.MSBuild
                 ExePath,
                 String.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile), xFormat.ToUpper()),
                 "NAsm");
+
             if (xResult)
             {
                 Log.LogMessage("{0} -> {1}", InputFile, OutputFile);
@@ -74,24 +75,31 @@ namespace Cosmos.Build.MSBuild
             return xResult;
         }
 
+		public override string ExtendLineError(string errorMessage)
+		{
+			try
+			{
+				if (errorMessage.StartsWith(InputFile))
+				{
+					string[] split = errorMessage.Substring(InputFile.Length).Split(':');
+					uint lineNumber = uint.Parse(split[1]);
+					return errorMessage + " Code: " + GetLine(InputFile, lineNumber);
+				}
+			}
+			catch (Exception)
+			{
+			}
+			return base.ExtendLineError(errorMessage);			
+		}
 
-        //public void Execute()
-        //{
-        //    Init();
-
-        //    buildFileUtils.RemoveFile(BuildPath + "output.obj");
-        //    var xFormat = "bin";
-        //    if (IsELF)
-        //    {
-        //        xFormat = "elf";
-        //    }
-        //    Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f {0} -o \"{1}\" \"{2}\"", xFormat, BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
-
-        //    Finish();
-        //}
-
-
-
-
+		private static string GetLine(string fileName, uint line)
+		{
+			using (var sr = new StreamReader(fileName))
+			{
+				for (uint i = 1; i < line; i++)
+					sr.ReadLine();
+				return sr.ReadLine();
+			}
+		}
     }
 }

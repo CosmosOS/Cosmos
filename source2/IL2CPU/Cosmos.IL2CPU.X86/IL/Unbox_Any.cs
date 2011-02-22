@@ -57,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( ( i * 4 ) + ObjectImpl.FieldDataOffset ) };
             }
-            Assembler.Stack.Push( new StackContents.Item( ( int )xTypeSize, xType.Value ) );
+            Assembler.Stack.Push( new StackContents.Item(xTypeSize, xType.Value ) );
             //new CPUx86.Jump { DestinationLabel = mNextOpLabel };
             new Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
             new Label( mReturnNullLabel );
@@ -65,6 +65,5 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationValue = 0 };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
         }
-
     }
 }

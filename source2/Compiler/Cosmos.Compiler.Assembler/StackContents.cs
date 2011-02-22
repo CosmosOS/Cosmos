@@ -2,46 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using System.Diagnostics.Contracts;
 
 namespace Cosmos.Compiler.Assembler {
 
   public class StackContents: IEnumerable<StackContents.Item> {
     #region class Item
-    public sealed class Item {
-      public Item(int aSize) {
-        Size = aSize;
-      }
+	public sealed class Item {
+		private Item(uint aSize)
+		{
+#if DOTNETCOMPATIBLE
+			Contract.Requires(
+				aSize == 4 || aSize == 8,
+				"The size could not exist, because always is pushed Int32 or Int64!");
+#endif
+			Size = aSize;
+		}
 
-      public Item(int aSize, Type aType)
-        : this(aSize) {
-        IsNumber = (aType == typeof(byte)
-            || aType == typeof(sbyte)
-            || aType == typeof(Boolean)
-            || aType == typeof(short)
-            || aType == typeof(ushort)
-            || aType == typeof(int)
-            || aType == typeof(uint)
-            || aType == typeof(long)
-            || aType == typeof(ulong)
-            || aType == typeof(Single)
-            || aType == typeof(Double));
-        IsFloat = (aType == typeof(Single) || aType == typeof(Double));
-        IsSigned = (aType == typeof(sbyte)
-            || aType == typeof(short)
-            || aType == typeof(int)
-            || aType == typeof(long)
-            || aType == typeof(Single)
-            || aType == typeof(Double));
-        ContentType = aType;
-      }
+		/// <summary>
+		/// A Item for the Stack.
+		/// </summary>
+		/// <param name="aSize">The Size 4 or 8 to be pushed.</param>
+		/// <param name="aType">The real type behind the Int32 or Int64.</param>
+		public Item(uint aSize, Type aType)
+			: this(aSize) {
+			IsNumber = (aType == typeof(byte)
+				|| aType == typeof(sbyte)
+				|| aType == typeof(Boolean)
+				|| aType == typeof(short)
+				|| aType == typeof(ushort)
+				|| aType == typeof(int)
+				|| aType == typeof(uint)
+				|| aType == typeof(long)
+				|| aType == typeof(ulong)
+				|| aType == typeof(Single)
+				|| aType == typeof(Double));
+			IsFloat = (aType == typeof(Single) || aType == typeof(Double));
+			IsSigned = (aType == typeof(sbyte)
+				|| aType == typeof(short)
+				|| aType == typeof(int)
+				|| aType == typeof(long)
+				|| aType == typeof(Single)
+				|| aType == typeof(Double));
+			ContentType = aType;
+		}
 
-      public Item(int aSize, bool aIsNumber, bool aIsFloat, bool aIsSigned)
-        : this(aSize) {
-        IsNumber = aIsNumber;
-        IsFloat = aIsFloat;
-        IsSigned = aIsSigned;
-      }
-      public readonly int Size;
+      public readonly uint Size;
       public readonly bool IsNumber = false;
       public readonly bool IsFloat = false;
       public readonly bool IsSigned = false;
@@ -72,16 +78,8 @@ namespace Cosmos.Compiler.Assembler {
       mStack.Push(aItem);
     }
 
-    public void Push(int aSize) {
-      mStack.Push(new Item(aSize));
-    }
-
-    public void Push(int aSize, Type aType) {
+    public void Push(uint aSize, Type aType) {
       mStack.Push(new Item(aSize, aType));
-    }
-
-    public void Push(int aSize, bool aIsNumber, bool aIsFloat, bool aIsSigned) {
-      mStack.Push(new Item(aSize, aIsNumber, aIsFloat, aIsSigned));
     }
 
     public IEnumerator<Item> GetEnumerator() {

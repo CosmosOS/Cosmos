@@ -16,8 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xStackContent = Assembler.Stack.Peek();
 
-            
-            int xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
+            var xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
             if( xSize > 8 )
                 throw new NotImplementedException( "StackSize>8 not supported" );
             
@@ -37,10 +36,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPU.Pop { DestinationReg = CPU.Registers.EAX };
                 new CPU.Pop { DestinationReg = CPU.Registers.EDX };
                 new CPU.And { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EDX };
-                new CPU.Push { DestinationReg = CPU.Registers.EAX };
+				new CPU.Push { DestinationReg = CPU.Registers.EAX };
             }
             Assembler.Stack.Push( xStackContent );
         }
-
     }
 }

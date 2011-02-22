@@ -1,5 +1,6 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -16,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xStackItem = Assembler.Stack.Pop();
-            int xSize = Math.Max(xStackItem.Size, Assembler.Stack.Pop().Size);
+            var xSize = Math.Max(xStackItem.Size, Assembler.Stack.Pop().Size);
             if (xSize > 4)
             {
                 if (xStackItem.IsFloat)
@@ -65,22 +66,5 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             Assembler.Stack.Push(xStackItem);
         }
-
-
-        // using System;
-        // using System.IO;
-        // 
-        // 
-        // using CPU = Cosmos.Compiler.Assembler.X86;
-        // 
-        // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Rem_Un)]
-        // 	public class Rem_Un: Rem {
-        // 		public Rem_Un(ILReader aReader, MethodInformation aMethodInfo)
-        // 			: base(aReader, aMethodInfo) {
-        // 		}
-        // 	}
-        // }
-
     }
 }

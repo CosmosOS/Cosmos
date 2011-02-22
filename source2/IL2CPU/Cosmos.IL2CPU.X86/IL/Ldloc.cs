@@ -53,44 +53,11 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			}
-			Assembler.Stack.Push((int)xSize, xVar.LocalType);
+#if DOTNETCOMPATIBLE
+			Assembler.Stack.Push(ILOp.Align(xSize, 4), xVar.LocalType);
+#else
+			Assembler.Stack.Push(xSize, xVar.LocalType);
+#endif
 		}
-
-
-		// using System;
-		// using System.IO;
-		// using Cosmos.IL2CPU.X86;
-		// 
-		// 
-		// using CPU = Cosmos.Compiler.Assembler.X86;
-		// using Cosmos.IL2CPU.Compiler;
-		// 
-		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Ldloc)]
-		// 	public class Ldloc: Op {
-		// 		private MethodInformation.Variable mLocal;
-		// 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-		// 			mLocal = aMethodInfo.Locals[aIndex];
-		// 		}
-		// 		public Ldloc(MethodInformation aMethodInfo, int aIndex)
-		// 			: base(null, aMethodInfo) {
-		// 			SetLocalIndex(aIndex, aMethodInfo);
-		// 		}
-		// 
-		// 		public Ldloc(ILReader aReader, MethodInformation aMethodInfo)
-		// 			: base(aReader, aMethodInfo) {
-		// 			SetLocalIndex(aReader.OperandValueInt32, aMethodInfo);
-		// 			//VariableDefinition xVarDef = aReader.Operand as VariableDefinition;
-		// 			//if (xVarDef != null) {
-		// 			//    SetLocalIndex(xVarDef.Index, aMethodInfo);
-		// 			//}
-		// 		}
-		// 
-		// 		public sealed override void DoAssemble() {
-		// 			Ldloc(Assembler, mLocal, GetService<IMetaDataInfoService>().SizeOfType(mLocal.VariableType));
-		// 		}
-		// 	}
-		// }
-
 	}
 }

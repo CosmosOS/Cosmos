@@ -1,5 +1,6 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldind_U2 )]
@@ -17,26 +18,11 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.DX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-            Assembler.Stack.Push( 2, typeof( ushort ) );
+#if DOTNETCOMPATIBLE
+            Assembler.Stack.Push(ILOp.Align(2, 4), typeof( ushort ) );
+#else
+			Assembler.Stack.Push( 2, typeof( ushort ) );
+#endif
         }
-
-
-        // using System;
-        // 
-        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
-        // using Cosmos.IL2CPU.X86;
-        // 
-        // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldind_U2)]
-        // 	public class Ldind_U2: Op {
-        // 		public Ldind_U2(ILReader aReader, MethodInformation aMethodInfo)
-        // 			: base(aReader, aMethodInfo) {
-        // 		}
-        // 		public override void DoAssemble() {
-
-        // 		}
-        // 	}
-        // }
-
     }
 }

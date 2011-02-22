@@ -5,6 +5,7 @@ using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using System.Reflection;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newobj )]
@@ -56,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
-                uint xObjSize;// = 0;
+                //??? uint xObjSize;// = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC
                 //select item ).Count();
@@ -160,7 +161,7 @@ namespace Cosmos.IL2CPU.X86.IL
                  *  + pointer should be set
                  *  + call .ctor
                  */
-                uint xStorageSize = Align(SizeOfType(objectType), 4);
+                var xStorageSize = Align(SizeOfType(objectType), 4);
                 //var xStorageSize = aCtorDeclTypeInfo.StorageSize;
                 //uint xArgSize = 0;
                 var xParams = constructor.GetParameters();
@@ -184,7 +185,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
                 }
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
-                aAssembler.Stack.Push(new StackContents.Item(4));
+                aAssembler.Stack.Push(new StackContents.Item(4, null));
                 //at this point, we need to move copy all arguments over. 
                 for (int i = 0; i < (xArgSize / 4); i++)
                 {
@@ -199,7 +200,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //xCall.SetServiceProvider( aServiceProvider );
                 //xCall.Assembler = aAssembler;
                 //xCall.Assemble();
-                aAssembler.Stack.Push(new StackContents.Item((int)xStorageSize, objectType));
+                aAssembler.Stack.Push(new StackContents.Item(xStorageSize, objectType));
             }
         }
 
@@ -216,55 +217,5 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             new Comment("[ Newobj.PushAlignedParameterSize end ]" );
         }
-        // using System.Collections.Generic;
-        // using System.Diagnostics;
-        // using System.Linq;
-        // using System.Reflection;
-        // using Cosmos.IL2CPU.X86;
-        // using Cosmos.IL2CPU.X86;
-        // using CPU=Cosmos.IL2CPU.X86;
-        // using CPUx86=Cosmos.IL2CPU.X86;
-        // using Asm=Cosmos.IL2CPU.X86;
-        // using Assembler=Assembler;
-        // using Cosmos.IL2CPU.Compiler;
-        // 
-        // namespace Cosmos.IL2CPU.IL.X86
-        // {
-        //     [OpCode(OpCodeEnum.Newobj)]
-        //     public class Newobj : Op
-        //     {
-        //         public MethodBase CtorDef;
-        //         public string CurrentLabel;
-        //         public uint ILOffset;
-        //         public MethodInformation MethodInformation;
-        // 
-        //         public static void ScanOp(MethodBase aCtor, IServiceProvider aProvider)
-        //         {
-        //             Call.ScanOp(aCtor, aProvider);
-        //             Call.ScanOp(GCImplementationRefs.AllocNewObjectRef, aProvider);
-        //             Call.ScanOp(CPU.Assembler.CurrentExceptionOccurredRef, aProvider);
-        //             Call.ScanOp(GCImplementationRefs.IncRefCountRef, aProvider);
-        //         }
-        // 
-        //         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aProvider)
-        //         {
-        //             var xCtorDef = aReader.OperandValueMethod;
-        //             ScanOp(xCtorDef, aProvider);
-        //         }
-        // 
-        //         public Newobj(ILReader aReader,
-        //                       MethodInformation aMethodInfo)
-        //             : base(aReader,
-        //                    aMethodInfo)
-        //         {
-        //             CtorDef = aReader.OperandValueMethod;
-        //             CurrentLabel = GetInstructionLabel(aReader);
-        //             MethodInformation = aMethodInfo;
-        //             ILOffset = aReader.Position;
-        //             mNextLabel = GetInstructionLabel(aReader.NextPosition);
-        //         }
-        // 
-        //         private string mNextLabel;
-        // }
     }
 }
