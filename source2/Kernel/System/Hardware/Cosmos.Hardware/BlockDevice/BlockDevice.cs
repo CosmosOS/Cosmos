@@ -4,15 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Hardware.BlockDevice {
-  public class BlockDevice : Device {
+  // This class should not support selecting a device or sub device. 
+  // Each instance must control exactly one device. For example with ATA
+  // master/slave, each one needs its own device instance. For ATA
+  // this complicates things a bit because they share IO ports, but this 
+  // is an intentional decision.
+  public abstract class BlockDevice : Device {
     // TODO: Need to protect this from changes except by Hardware ring 
-    //
-    // This class should not support selecting a device or sub device. 
-    // Each instance must control exactly one device. For example with ATA
-    // master/slave, each one needs its own device instance. For ATA
-    // this complicates things a bit because they share IO ports, but this 
-    // is an intentional decision.
-
     static public List<BlockDevice> Devices = new List<BlockDevice>();
 
     protected UInt64 mBlockCount = 0;
@@ -24,5 +22,9 @@ namespace Cosmos.Hardware.BlockDevice {
     public UInt64 BlockSize {
       get { return mBlockSize; }
     }
+
+    public abstract void ReadSector(UInt64 aSectorNo, byte[] aData);
+    public abstract void WriteSector(UInt64 aSectorNo, byte[] aData);
+
   }
 }

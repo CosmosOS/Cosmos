@@ -21,6 +21,8 @@ namespace Cosmos.Hardware {
       TextScreen.Clear();
 
       Keyboard = new Keyboard();
+
+
     }
 
     static internal void InitPciDevices() {

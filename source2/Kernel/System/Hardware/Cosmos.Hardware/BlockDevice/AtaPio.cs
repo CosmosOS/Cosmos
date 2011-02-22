@@ -6,22 +6,32 @@ using System.Threading;
 using Cosmos.Common.Extensions;
 
 namespace Cosmos.Hardware.BlockDevice {
-  public class AtaPio : BlockDevice {
-    // We need this class as a fallback for debugging/boot/debugstub in the future even when
-    // we create DMA and other method support
-    //
-    // AtaPio is also used as the detection class to detect drives. If another ATA mode is used,
-    // the instnace of AtaPio should be discarded in favour of another ATA class. AtaPio is used
-    // to do this as capabilities can also be detected, but all ATA devices must support PIO
-    // and thus it can also be used to read the partition table and perform other tasks before
-    // initializing another ATA class in favour of AtaPio
-    //
+  // We need this class as a fallback for debugging/boot/debugstub in the future even when
+  // we create DMA and other method support
+  //
+  // AtaPio is also used as the detection class to detect drives. If another ATA mode is used,
+  // the instnace of AtaPio should be discarded in favour of another ATA class. AtaPio is used
+  // to do this as capabilities can also be detected, but all ATA devices must support PIO
+  // and thus it can also be used to read the partition table and perform other tasks before
+  // initializing another ATA class in favour of AtaPio
+  public class AtaPio : Ata {
     protected Core.IOGroup.ATA IO;
 
-    public AtaPio(Core.IOGroup.ATA aIO) {
+    protected SpecLevel mDriveType = SpecLevel.Null;
+    public SpecLevel DriveType {
+      get { return mDriveType; }
+    }
+
+    public AtaPio(Core.IOGroup.ATA aIO, Ata.BusPositionEnum aBusPosition) {
       IO = aIO;
+      mBusPosition = aBusPosition;
       // Disable IRQs, we use polling currently
       IO.Control.Byte = 0x02;
+
+      mDriveType = DiscoverDrive();
+      if (mDriveType != SpecLevel.Null) {
+        InitDrive();
+      }
     }
 
     [Flags] public enum Status : byte {None = 0x00, Busy = 0x80, ATA_SR_DRD = 0x40, ATA_SR_DF = 0x20, ATA_SR_DSC = 0x10, DRQ = 0x08, ATA_SR_COR = 0x04, ATA_SR_IDX = 0x02, Error = 0x01 };
@@ -47,6 +57,30 @@ namespace Cosmos.Hardware.BlockDevice {
     //#define      ATA_READ      0x00
     //#define      ATA_WRITE     0x01
 
+    public SpecLevel DiscoverDrive() {
+      SelectDrive(0);
+      var xIdentifyStatus = SendCmd(Cmd.Identify, false);
+      // No drive found, go to next
+      if (xIdentifyStatus == Status.None) {
+        return SpecLevel.Null;
+      } else if ((xIdentifyStatus & Status.Error) != 0) {
+        // Can look in Error port for more info
+        // Device is not ATA
+        // This is also triggered by ATAPI devices
+        int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
+        if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
+          return SpecLevel.ATAPI;
+        } else {
+          // Unknown type. Might not be a device.
+          return SpecLevel.Null;
+        }
+      } else if ((xIdentifyStatus & Status.DRQ) == 0) {
+        // Error
+        return SpecLevel.Null;
+      }
+      return SpecLevel.ATA;
+    }
+
     // ATA requires a wait of 400 nanoseconds.
     // Read the Status register FIVE TIMES, and only pay attention to the value 
     // returned by the last one -- after selecting a new master or slave device. The point being that 
@@ -62,11 +96,8 @@ namespace Cosmos.Hardware.BlockDevice {
       xVoid = IO.Status.Byte;
     }
 
-    public void SelectDrive(bool aSlave) {
-      SelectDrive(aSlave, 0);
-    }
-    public void SelectDrive(bool aSlave, byte aLbaHigh4) {
-      IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (aSlave ? DvcSelVal.Slave : 0)) | aLbaHigh4);
+    public void SelectDrive(byte aLbaHigh4) {
+      IO.DeviceSelect.Byte = (byte)((byte)(DvcSelVal.Default | DvcSelVal.LBA | (mBusPosition == BusPositionEnum.Slave ? DvcSelVal.Slave : 0)) | aLbaHigh4);
       Wait();
     }
 
@@ -101,8 +132,8 @@ namespace Cosmos.Hardware.BlockDevice {
       return new string(xChars);
     }
 
-    protected void InitDrive(SpecLevel aType) {
-      if (aType == SpecLevel.ATA) {
+    protected void InitDrive() {
+      if (mDriveType == SpecLevel.ATA) {
         SendCmd(Cmd.Identify);
       } else {
         SendCmd(Cmd.IdentifyPacket);
@@ -143,7 +174,7 @@ namespace Cosmos.Hardware.BlockDevice {
       }
 
       Global.Dbg.Send("--------------------------");
-      Global.Dbg.Send("Type: " + (aType == SpecLevel.ATA ? "ATA" : "ATAPI"));
+      Global.Dbg.Send("Type: " + (mDriveType == SpecLevel.ATA ? "ATA" : "ATAPI"));
       Global.Dbg.Send("Serial No: " + xSerialNo);
       Global.Dbg.Send("Firmware Rev: " + xFirmwareRev);
       Global.Dbg.Send("Model No: " + xModelNo);
@@ -154,8 +185,8 @@ namespace Cosmos.Hardware.BlockDevice {
       }
     }
 
-    protected void SelectSector(bool aSlave, UInt64 aSectorNo, int aSectorCount) {
-      SelectDrive(aSlave, (byte)(aSectorNo >> 24));
+    protected void SelectSector(UInt64 aSectorNo, int aSectorCount) {
+      SelectDrive((byte)(aSectorNo >> 24));
       // Number of sectors to read
       IO.SectorCount.Byte = 1;
       IO.LBA0.Byte = (byte)(aSectorNo & 0xFF);
@@ -163,14 +194,14 @@ namespace Cosmos.Hardware.BlockDevice {
       IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
     }
 
-    public void ReadSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
-      SelectSector(aSlave, aSectorNo, 1);
+    public override void ReadSector(UInt64 aSectorNo, byte[] aData) {
+      SelectSector(aSectorNo, 1);
       SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
 
-    public void WriteSector(bool aSlave, UInt64 aSectorNo, byte[] aData) {
-      SelectSector(aSlave, aSectorNo, 1);
+    public override void WriteSector(UInt64 aSectorNo, byte[] aData) {
+      SelectSector(aSectorNo, 1);
       SendCmd(Cmd.WritePio);
 
       UInt16 xValue;
@@ -184,56 +215,8 @@ namespace Cosmos.Hardware.BlockDevice {
       SendCmd(Cmd.CacheFlush);
     }
 
-    public SpecLevel DiscoverDrive(bool aSlave) {
-      SelectDrive(aSlave);
-      var xIdentifyStatus = SendCmd(Cmd.Identify, false);
-      // No drive found, go to next
-      if (xIdentifyStatus == Status.None) {
-        return SpecLevel.Null;
-      } else if ((xIdentifyStatus & Status.Error) != 0) {
-        // Can look in Error port for more info
-        // Device is not ATA
-        // This is also triggered by ATAPI devices
-        int xTypeId = IO.LBA2.Byte << 8 | IO.LBA1.Byte;
-        if (xTypeId == 0xEB14 || xTypeId == 0x9669) {
-          return SpecLevel.ATAPI;
-        } else {
-          // Unknown type. Might not be a device.
-          return SpecLevel.Null;
-        }
-      } else if ((xIdentifyStatus & Status.DRQ) == 0) {
-        // Error
-        return SpecLevel.Null;
-      }
-      return SpecLevel.ATA;
-    }
-
     public void Test() {
-      int xCount = 0;
-      for (int xDrive = 0; xDrive <= 1; xDrive++) {
-        var xType = DiscoverDrive(xDrive == 1);
-        if (xType == SpecLevel.Null) {
-          continue;
-        }
 
-        InitDrive(xType);
-
-        var xWrite = new byte[512];
-        for (int i = 0; i < 512; i++) {
-          xWrite[i] = (byte)i;
-        }
-        WriteSector(xDrive == 1, 0, xWrite);
-
-        var xRead = new byte[512];
-        ReadSector(xDrive == 1, 0, xRead);
-        string xDisplay = "";
-        for (int i = 0; i < 512; i++) {
-          xDisplay = xDisplay + xRead[i].ToHex();
-        }
-        Console.WriteLine(xDisplay);
-
-        xCount++;
-      }
     }
 
   }
