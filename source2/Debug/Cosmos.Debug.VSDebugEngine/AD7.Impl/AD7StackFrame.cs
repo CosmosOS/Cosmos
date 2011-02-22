@@ -79,7 +79,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                 };
                             }
                         }
-
+ 
                         if (m_numLocals > 0)
                         {
                             m_locals = new DebugLocalInfo[m_numLocals];
@@ -88,7 +88,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                 m_locals[i] = new DebugLocalInfo
                                 {
                                     Name = mLocalInfos[i].Name,
-                                    Index = m_numLocals - i - 1,
+                                    Index = i,
                                     IsLocal = true
                                 };
                             }

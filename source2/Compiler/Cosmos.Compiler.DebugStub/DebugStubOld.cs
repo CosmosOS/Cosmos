@@ -35,6 +35,8 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugResumeLevel", 0),
                 // Last EIP value
                 new DataMember("DebugEIP", 0),
+                // the calling code's ebp value
+                new DataMember("DebugOriginalEBP", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
                 // If set to 1, on next trace a break will occur
                 new DataMember("DebugBreakOnNextTrace", 0)
@@ -105,29 +107,20 @@ namespace Cosmos.Compiler.DebugStub {
             PushAll32();
 
             ReadComPortX32toStack();
-            //EAX.Pop();
-            //ESI = EBP;
-            //ESI.Add(EAX);
-            //ESI.Push();
-            // todo: adjust ESI to the actual offset
-
+            
             AL = (int)MsgType.MethodContext;
             Call<DebugStub.WriteALToComPort>();
 
-            //EAX.Pop();
-            //EAX.Push();
-            
             ReadComPortX32toStack();
             ECX.Pop();
             EAX.Pop();
 
             // now ECX contains size of data (count)
             // EAX contains relative to EBP
-
-            ESI = EBP;
+            Label = "DebugStub_SendMethodContext2";
+            ESI = Memory["DebugOriginalEBP", 32];
             ESI.Add(EAX);
-            ESI.Add(16);
-
+            
             Label = "DebugStub_SendMethodContext_SendByte";
             new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
             JumpIf(Flags.Equal, "DebugStub_SendMethodContext_After_SendByte");
@@ -136,6 +129,50 @@ namespace Cosmos.Compiler.DebugStub {
             Jump("DebugStub_SendMethodContext_SendByte");
 
             Label = "DebugStub_SendMethodContext_After_SendByte";        
+
+            PopAll32();
+            Return();
+        }
+
+        // sends a stack value
+        // Serial Params:
+        //  1: x32 - offset relative to EBP
+        //  2: x32 - size of data to send
+        protected void SendMemory()
+        {
+            Label = "DebugStub_SendMemory";
+            PushAll32();
+
+            ReadComPortX32toStack();
+            //EAX.Pop();
+            //ESI = EBP;
+            //ESI.Add(EAX);
+            //ESI.Push();
+            // todo: adjust ESI to the actual offset
+            Label = "DebugStub_SendMemory_1";
+            AL = (int)MsgType.MemoryData;
+            Call<DebugStub.WriteALToComPort>();
+
+            //EAX.Pop();
+            //EAX.Push();
+
+            ReadComPortX32toStack();
+            Label = "DebugStub_SendMemory_2";
+            ECX.Pop();
+            ESI.Pop();
+            
+            // now ECX contains size of data (count)
+            // ESI contains address
+
+            Label = "DebugStub_SendMemory_3";
+            Label = "DebugStub_SendMemory_SendByte";
+            new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
+            JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte");
+            Call("WriteByteToComPort");
+            new Dec { DestinationReg = Registers.ECX };
+            Jump("DebugStub_SendMemory_SendByte");
+
+            Label = "DebugStub_SendMemory_After_SendByte";
 
             PopAll32();
             Return();
@@ -347,7 +384,9 @@ namespace Cosmos.Compiler.DebugStub {
             WriteByteToComPort();
             ReadByteFromComPort();
             ReadALFromComPort();
+
             SendMethodContext();
+            SendMemory();
 
             DebugSuspend();
             DebugResume();
@@ -478,6 +517,12 @@ namespace Cosmos.Compiler.DebugStub {
             Jump("DebugStub_ProcessCmd_ACK");
             Label = "DebugStub_ProcessCmd_SendMethodContext_After";
 
+            AL.Compare((byte)Command.SendMemory);
+            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMemory_After");
+            Call("DebugStub_SendMemory");
+            Jump("DebugStub_ProcessCmd_ACK");
+            Label = "DebugStub_ProcessCmd_SendMemory_After";
+
             
             Label = "DebugStub_ProcessCmd_ACK";
                 // We acknowledge receipt of the command, not processing of it.
@@ -515,6 +560,8 @@ namespace Cosmos.Compiler.DebugStub {
             // Main entry point that IL2CPU generated code calls
             Label = "DebugStub_TracerEntry";
 
+            Memory["DebugOriginalEBP", 32] = EBP;
+
             // If debug stub is in break, and then an IRQ happens, the IRQ
             // can call debug stub again. This causes two debug stubs to 
             // run which causes havoc. So we only allow one to run.
@@ -551,7 +598,7 @@ namespace Cosmos.Compiler.DebugStub {
             // Enable interrupts only if the kernel is ready to handle them
             Memory["InterruptsEnabledFlag", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_NoSTI");
-            EnableInterrupts();
+            //EnableInterrupts();
 
             // IRQ reenabled, call secondary debug stub
             Label = "DebugStub_NoSTI";
@@ -575,6 +622,10 @@ namespace Cosmos.Compiler.DebugStub {
             PopAll32();
             // Complete, mark that DebugStub is complete
             Memory["DebugRunning", 32] = 0;
+
+            Memory["InterruptsEnabledFlag", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Return");
+            EnableInterrupts();
 
             Label = "DebugStub_Return";
             Return();

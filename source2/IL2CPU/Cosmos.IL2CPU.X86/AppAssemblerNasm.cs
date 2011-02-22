@@ -105,7 +105,8 @@ namespace Cosmos.IL2CPU.X86
                             IsArgument = false,
                             Index = xLocal.LocalIndex,
                             Name="Local" + xLocal.LocalIndex,
-                            Offset = 0 - (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex)
+                            Offset = 0 - (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex),
+                            Type=xLocal.LocalType.AssemblyQualifiedName
                         };
                         mLocals_Arguments_Infos.Add(xInfo);
 
@@ -138,7 +139,8 @@ namespace Cosmos.IL2CPU.X86
                         IsArgument=true,
                         Name="this:" + IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
                         Index=0,
-                        Offset=IL.Ldarg.GetArgumentDisplacement(aMethod, 0)
+                        Offset=IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
+                        Type = aMethod.MethodBase.DeclaringType.AssemblyQualifiedName
                     });
 
                     xIdxOffset++;
@@ -154,7 +156,8 @@ namespace Cosmos.IL2CPU.X86
                         IsArgument = true,
                         Index = (int)(i + xIdxOffset),
                         Name = xParams[i].Name,
-                        Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset))
+                        Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset)),
+                        Type=xParams[i].ParameterType.AssemblyQualifiedName
                     });
                 }
             }

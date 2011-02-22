@@ -123,6 +123,69 @@ namespace Cosmos.Debug.Common
             SendCommandData(Command.BreakOnAddress, xData, true);
         }
 
+        public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1)
+        {
+            // from debugstub:
+            //// sends a stack value
+            //// Serial Params:
+            ////  1: x32 - offset relative to EBP
+            ////  2: x32 - size of data to send
+
+            if (!Connected)
+            {
+                return null;
+            }
+            var xData = new byte[8];
+            mDataSize = (int)size;
+            Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
+            Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
+            SendCommandData(Command.SendMemory, xData, true);
+            var xResult = mData.Reverse().ToArray();
+            if (xResult.Length != size)
+            {
+                throw new Exception("Retrieved a different size than requested!");
+            }
+            // somehow it sends the dwords in reverse order?
+            if (dataElementSize != 1)
+            {
+                if (size % dataElementSize == 0)
+                {
+                    byte[] xRealResult;
+                    int xNumElements;
+                    switch (dataElementSize)
+                    {
+                        case 4:
+                            xRealResult = new byte[xResult.Length];
+                            xNumElements = xResult.Length / 4;
+                            for (var i = xNumElements - 1; i >= 0; i--)
+                            {
+                                var xRealIdx = (xNumElements - i - 1) * 4;
+                                xRealResult[xRealIdx + 0] = xResult[(i * 4) + 3];
+                                xRealResult[xRealIdx + 1] = xResult[(i * 4) + 2];
+                                xRealResult[xRealIdx + 2] = xResult[(i * 4) + 1];
+                                xRealResult[xRealIdx + 3] = xResult[(i * 4) + 0];
+                            }
+                            xResult = xRealResult;
+                            break;
+                        case 2:
+                            xRealResult = new byte[xResult.Length];
+                            xNumElements = xResult.Length / 2;
+                            for (var i = xNumElements - 1; i >= 0; i--)
+                            {
+                                var xRealIdx = (xNumElements - i - 1) * 2;
+                                xRealResult[xRealIdx + 0] = xResult[(i * 2) + 1];
+                                xRealResult[xRealIdx + 1] = xResult[(i * 2) + 0];
+                            }
+                            xResult = xRealResult;
+                            break;
+                        default:
+                            throw new Exception("DataElement size not supported: " + dataElementSize);
+                    }
+                }
+            }
+            return xResult;
+        }
+
         public byte[] GetStackData(int offsetToEBP, uint size)
         {
             // from debugstub:
@@ -136,17 +199,17 @@ namespace Cosmos.Debug.Common
                 return null;
             }
             var xData = new byte[8];
-            mStackDataSize = (int)size;
+            mDataSize = (int)size;
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCommandData(Command.SendMethodContext, xData, true);
-            var xResult = mStackData;
-            xResult = xResult.Reverse().ToArray();
-            mStackData = null;
+            var xResult = mData;
+            mData = null;
             return xResult;
         }
-        private int mStackDataSize;
-        private byte[] mStackData;
+
+        private int mDataSize;
+        private byte[] mData;
 
         public void DeleteBreakpoint(int aID) {
             SetBreakpoint(aID, 0);
@@ -205,9 +268,12 @@ namespace Cosmos.Debug.Common
                     break;
 
                 case MsgType.MethodContext:
-                    Next(mStackDataSize, PacketMethodContext);
+                    Next(mDataSize, PacketMethodContext);
                     break;
 
+                case MsgType.MemoryData:
+                    Next(mDataSize, PacketMemoryData);
+                    break; 
                 default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");
@@ -254,11 +320,14 @@ namespace Cosmos.Debug.Common
 
         protected void PacketMethodContext(byte[] aPacket)
         {
+            mData = aPacket.ToArray();
             WaitForMessage();
-            mStackData = aPacket.Reverse().ToArray();
-             // not really nice to use this one?
-            //mCmdWait.Set();
-            //WaitForMessage();
+        }
+
+        protected void PacketMemoryData(byte[] aPacket)
+        {
+            mData = aPacket.ToArray();
+            WaitForMessage();
         }
 
         protected void PacketCmdCompleted(byte[] aPacket) {

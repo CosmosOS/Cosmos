@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -17,12 +19,22 @@ namespace Cosmos.Debug.VSDebugEngine
         private DebugLocalInfo m_variableInformation;
         private AD7Process mProcess;
         private AD7StackFrame mStackFrame;
+        private DebugInfo.Local_Argument_Info mDebugInfo;
+        
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
         {
             m_variableInformation = localInfo;
             mProcess = process;
             mStackFrame = stackFrame;
+            if (localInfo.IsLocal)
+            {
+                mDebugInfo = mStackFrame.mLocalInfos[m_variableInformation.Index];
+            }
+            else
+            {
+                mDebugInfo = mStackFrame.mArgumentInfos[m_variableInformation.Index];
+            }
         }
 
         // Construct a DEBUG_PROPERTY_INFO representing this local or parameter.
@@ -44,39 +56,65 @@ namespace Cosmos.Debug.VSDebugEngine
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE))
             {
-                // todo: add support for types of properties
-                propertyInfo.bstrType = "System.Byte[]";
+                propertyInfo.bstrType = mDebugInfo.Type;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
-                StringBuilder sb = new StringBuilder();//m_variableInformation.m_value);
-                // retrieve property value:
-                // todo: corect size of data, datatypes, refactor to move to some dedicated class etc
                 byte[] xData;
-                if (m_variableInformation.IsLocal)
+                if (mDebugInfo.Type == typeof(string).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mLocalInfos[m_variableInformation.Index].Offset, 4);
-                }
-                else
-                {
-                    xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mArgumentInfos[m_variableInformation.Index].Offset, 4);
-                }
-                // for now, dump as hex
-                sb.Append("0x");
-                if (xData == null)
-                {
-                    sb.Append("(xData == null)");
-                }
-                else
-                {
-                    for (int i = xData.Length - 1; i >= 0; i--)
+                    const uint xStringLengthOffset = 16;
+                    const uint xStringFirstCharPtrOffset = 20;
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    uint xStrPointer = BitConverter.ToUInt32(xData, 0);
+                    if (xStrPointer == 0)
                     {
-                        sb.Append(xData[i].ToString("X2").ToUpper());
+                        propertyInfo.bstrValue = "(null)";
+                    }
+                    else
+                    {
+                        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
+                        uint xStringLength = BitConverter.ToUInt32(xData, 0);
+                        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
+                        uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
+                        xData = mProcess.mDbgConnector.GetMemoryData(xFirstCharPtr, xStringLength * 2, 2);
+                        propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
+                        //propertyInfo.bstrValue = Encoding.Unicode.GetString(xData);
+                        
+                        //propertyInfo.bstrValue = String.Format("String at 0x{0}, Length at 0x{1}, Length Value = {2}", xLocation, (xStrPointer + xStringLengthOffset).ToString("X8").ToUpper(), xStringLength);
+                        //propertyInfo.bstrValue = "String of length: " + xStringLength;
                     }
                 }
-                propertyInfo.bstrValue = sb.ToString();
+                else
+                {
+                        StringBuilder sb = new StringBuilder();//m_variableInformation.m_value);
+                        // retrieve property value:
+                        // todo: corect size of data, datatypes, refactor to move to some dedicated class etc
+                        if (m_variableInformation.IsLocal)
+                        {
+                            xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mLocalInfos[m_variableInformation.Index].Offset, 4);
+                        }
+                        else
+                        {
+                            xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mArgumentInfos[m_variableInformation.Index].Offset, 4);
+                        }
+                        // for now, dump as hex
+                        sb.Append("0x");
+                        if (xData == null)
+                        {
+                            sb.Append("(xData == null)");
+                        }
+                        else
+                        {
+                            for (int i = xData.Length - 1; i >= 0; i--)
+                            {
+                                sb.Append(xData[i].ToString("X2").ToUpper());
+                            }
+                        }
+                        propertyInfo.bstrValue = sb.ToString();
+                }
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 

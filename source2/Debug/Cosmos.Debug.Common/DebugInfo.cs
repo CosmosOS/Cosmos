@@ -83,6 +83,12 @@ namespace Cosmos.Debug.Common
                 get;
                 set;
             }
+
+            public string Type
+            {
+                get;
+                set;
+            }
         }
         private FbConnection mConnection;
 
@@ -167,6 +173,7 @@ namespace Cosmos.Debug.Common
                 + ", INDEXINMETHOD   INT          NOT NULL"
                 + ", OFFSET          INT          NOT NULL"
                 + ", NAME            VARCHAR(255) NOT NULL"
+                + ", TYPENAME        VARCHAR(255) NOT NULL"
                 + ");"
                 );
 
@@ -285,12 +292,13 @@ namespace Cosmos.Debug.Common
                 using (var xCmd = mConnection.CreateCommand())
                 {
                     xCmd.Transaction = xTrans;
-                    xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME)";
+                    xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
                     xCmd.Parameters.Add("@METHODLABELNAME", FbDbType.VarChar);
                     xCmd.Parameters.Add("@ISARGUMENT", FbDbType.SmallInt);
                     xCmd.Parameters.Add("@INDEXINMETHOD", FbDbType.Integer);
                     xCmd.Parameters.Add("@OFFSET", FbDbType.Integer);
                     xCmd.Parameters.Add("@NAME", FbDbType.VarChar);
+                    xCmd.Parameters.Add("@TYPENAME", FbDbType.VarChar);
                     xCmd.Prepare();
                     foreach (var xInfo in infos)
                     {
@@ -299,6 +307,7 @@ namespace Cosmos.Debug.Common
                         xCmd.Parameters[2].Value = xInfo.Index;
                         xCmd.Parameters[3].Value = xInfo.Offset;
                         xCmd.Parameters[4].Value = xInfo.Name;
+                        xCmd.Parameters[5].Value = xInfo.Type;
                         xCmd.ExecuteNonQuery();
                     }
                     xTrans.Commit();
@@ -310,7 +319,7 @@ namespace Cosmos.Debug.Common
         {
             using (var xCmd = mConnection.CreateCommand())
             {
-                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME from LOCAL_ARGUMENT_INFO";
+                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO";
                 using (var xReader = xCmd.ExecuteReader())
                 {
                     var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
@@ -322,7 +331,8 @@ namespace Cosmos.Debug.Common
                             IsArgument = xReader.GetInt16(1) == 1,
                             Index = xReader.GetInt32(2),
                             Offset = xReader.GetInt32(3),
-                            Name=xReader.GetString(4)
+                            Name=xReader.GetString(4),
+                            Type = xReader.GetString(5)
                         });
                     }
                     return xResult;
@@ -334,7 +344,7 @@ namespace Cosmos.Debug.Common
         {
             using (var xCmd = mConnection.CreateCommand())
             {
-                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME from LOCAL_ARGUMENT_INFO" 
+                xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO" 
                     + " WHERE METHODLABELNAME = @METHODLABELNAME";
                 xCmd.Parameters.Add("@METHODLABELNAME", methodLabelName);
                 using (var xReader = xCmd.ExecuteReader())
@@ -348,7 +358,8 @@ namespace Cosmos.Debug.Common
                             IsArgument = xReader.GetInt16(1) == 1,
                             Index = xReader.GetInt32(2),
                             Offset = xReader.GetInt32(3),
-                            Name = xReader.GetString(4)
+                            Name = xReader.GetString(4),
+                            Type=xReader.GetString(5)
                         });
                     }
                     return xResult;
