@@ -25,7 +25,7 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      var xATA = new Cosmos.Hardware.ATA(Cosmos.Core.Global.BaseIOGroups.ATA1);
+      var xATA = new Cosmos.Hardware.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1);
       xATA.Test();
 
       Stop();

@@ -69,12 +69,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockDevice\BlockDevice.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Drivers\VGAScreen.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Keyboard.cs" />
-    <Compile Include="ATA.cs" />
+    <Compile Include="BlockDevice\AtaPio.cs" />
     <Compile Include="PciDevice.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -99,7 +100,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ATA.html" />
+    <Content Include="BlockDevice\ATA.html" />
     <Content Include="Drivers\ReadMe.html" />
     <Content Include="Keyboard.html" />
     <Content Include="PIT.html" />

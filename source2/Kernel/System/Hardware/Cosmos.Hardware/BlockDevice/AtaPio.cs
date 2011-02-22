@@ -5,13 +5,20 @@ using System.Text;
 using System.Threading;
 using Cosmos.Common.Extensions;
 
-namespace Cosmos.Hardware {
-  public class ATA {
-    // Rename this class to AtaPio later - we need this class as a fallback for debugging/boot/debugstub in the future even when
+namespace Cosmos.Hardware.BlockDevice {
+  public class AtaPio : BlockDevice {
+    // We need this class as a fallback for debugging/boot/debugstub in the future even when
     // we create DMA and other method support
+    //
+    // AtaPio is also used as the detection class to detect drives. If another ATA mode is used,
+    // the instnace of AtaPio should be discarded in favour of another ATA class. AtaPio is used
+    // to do this as capabilities can also be detected, but all ATA devices must support PIO
+    // and thus it can also be used to read the partition table and perform other tasks before
+    // initializing another ATA class in favour of AtaPio
+    //
     protected Core.IOGroup.ATA IO;
 
-    public ATA(Core.IOGroup.ATA aIO) {
+    public AtaPio(Core.IOGroup.ATA aIO) {
       IO = aIO;
       // Disable IRQs, we use polling currently
       IO.Control.Byte = 0x02;

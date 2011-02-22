@@ -2,7 +2,17 @@
 
 namespace Cosmos.Core {
     public abstract class IOPortBase {
-        public readonly UInt16 Port;
+      //TODO Make it that IO port classe are exclusive to each port. For example
+      // only one IOPort class can be created per port number. This will prevent
+      // two instances of an IOPort from using the same port.
+      // A locking mechanism is not necessary as the creator can control access
+      // to the instance.
+      // We are not threaded yet anyways, but when we are will assume the caller
+      // or owner handles any concurrency issues so as to minimize overhead in this
+      // class. Or maybe some base support can be added to this class, but its functionality
+      // is optinoal and only used by classes that need concurrency control like ATA.
+      
+      public readonly UInt16 Port;
 
         // all ctors are internal - Only Core ring can create it.. but hardware ring can use it.
         internal IOPortBase(UInt16 aPort) {
