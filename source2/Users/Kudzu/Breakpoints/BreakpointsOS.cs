@@ -27,7 +27,8 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      var xATA = (AtaPio)BlockDevice.Devices[0];
+      //var xATA = (AtaPio)BlockDevice.Devices[0];
+      var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
       Console.WriteLine("--------------------------");
       Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
       Console.WriteLine("Serial No: " + xATA.SerialNo);

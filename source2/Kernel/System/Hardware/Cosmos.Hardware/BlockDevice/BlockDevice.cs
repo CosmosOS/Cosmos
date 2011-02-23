@@ -13,18 +13,22 @@ namespace Cosmos.Hardware.BlockDevice {
     // TODO: Need to protect this from changes except by Hardware ring 
     static public List<BlockDevice> Devices = new List<BlockDevice>();
 
-    protected UInt64 mBlockCount = 0;
-    public UInt64 BlockCount {
+    //TODO:UInt64
+    protected UInt32 mBlockCount = 0;
+    public UInt32 BlockCount {
       get { return mBlockCount; }
     }
 
-    protected UInt64 mBlockSize = 0;
-    public UInt64 BlockSize {
+    //TODO:UInt64
+    protected UInt32 mBlockSize = 0;
+    public UInt32 BlockSize {
       get { return mBlockSize; }
     }
 
-    public virtual void ReadBlock(UInt64 aSectorNo, byte[] aData) {}
-    public virtual void WriteBlock(UInt64 aSectorNo, byte[] aData) {}
+    //TODO:UInt64
+    public virtual void ReadBlock(UInt32 aSectorNo, byte[] aData) { }
+    //TODO:UInt64
+    public virtual void WriteBlock(UInt32 aSectorNo, byte[] aData) { }
 
   }
 }
