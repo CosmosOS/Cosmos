@@ -33,10 +33,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                     else
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-                        new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true,  DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EAX };
+                        new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
                     }
                 }
                 else

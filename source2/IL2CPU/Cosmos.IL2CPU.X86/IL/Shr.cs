@@ -15,38 +15,75 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            string xLabelName = AppAssemblerNasm.TmpPosLabel(aMethod, aOpCode);
+			new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
+			var xStackItem_ShiftAmount = Assembler.Stack.Pop();
+			var xStackItem_Value = Assembler.Stack.Peek();
+#if DOTNETCOMPATIBLE
+			if (xStackItem_Value.Size == 4)
+#else
+			if (xStackItem_Value.Size <= 4)
+#endif
+			{
+				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.CL };
+			}
+#if DOTNETCOMPATIBLE
+			else if (xStackItem_Value.Size == 8)
+#else
+			else if (xStackItem_Value.Size <= 8)
+#endif
+			{
+				string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
+				string HighPartIsZero = BaseLabel + "HighPartIsZero";
+				string End_Shr = BaseLabel + "End_Shr";
+
+				// [ESP] is high part
+				// [ESP + 4] is low part
+
+				new CPUx86.Compare { DestinationReg = CPUx86.Registers.CL, SourceValue = 32, Size = 16 };
+				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = HighPartIsZero };
+
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true};
+				// shift lower part
+				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
+				// shift higher part
+				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.Registers.CL };
+				new CPUx86.Jump { DestinationLabel = End_Shr };
+
+				new Label(HighPartIsZero);
+				// remove bits >= 32, so that CL max value could be only 31
+				new CPUx86.And { DestinationReg = CPUx86.Registers.CL, SourceValue = 0x1f, Size = 16 };
+
+				// move high part in EAX
+				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+				// shift high part and move it in low part
+				new CPUx86.ShiftRight{ DestinationReg = CPUx86.Registers.EAX, Size = 32, SourceReg = CPUx86.Registers.CL };
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+				// replace unknown high part with a zero, if <= 32
+				new CPUx86.Push { DestinationValue = 0, Size = 32 };
+
+				new Label(End_Shr);
+			}
+			else
+				throw new NotSupportedException("A size bigger 8 not supported at Shr!");
+            /*string xLabelName = AppAssemblerNasm.TmpPosLabel(aMethod, aOpCode);
             var xStackItem_ShiftAmount = Assembler.Stack.Pop();
-            var xStackItem_Value = Assembler.Stack.Pop();
+            var xStackItem_Value = Assembler.Stack.Peek();
             if( xStackItem_Value.Size <= 4 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // value
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
-                Assembler.Stack.Push( xStackItem_Value );
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
+                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.CL };
             }
             else if( xStackItem_Value.Size <= 8 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new Label( xLabelName + "__StartLoop" );
-                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xLabelName + "__EndLoop" };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
-                new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
-                new CPUx86.Jump { DestinationLabel = xLabelName + "__StartLoop" };
-
-                new Label( xLabelName + "__EndLoop" );
-                Assembler.Stack.Push( xStackItem_Value );
-            }
+				new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
+				// [ESP] is high part
+				// [ESP + 4] is low part
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+				// shift low part
+				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
+				// shift high part
+				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.Registers.CL };
+            }*/
         }
-
     }
 }

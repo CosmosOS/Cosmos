@@ -14,10 +14,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
-			string ResultIsZero = BaseLabel + "ResultIsZero";
-			string End_Shl = BaseLabel + "End_Shl";
-
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
             var xStackItem_ShiftAmount = Assembler.Stack.Pop();
 			var xStackItem_Value = Assembler.Stack.Peek();
@@ -26,40 +22,47 @@ namespace Cosmos.IL2CPU.X86.IL
 #else
 			if (xStackItem_Value.Size <= 4)
 #endif
-				new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceValue = 32 };
-			else if (xStackItem_Value.Size == 8)
-				new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceValue = 64 };
-			else
-				throw new NotSupportedException(string.Format("A value of size {0:D} is not useable, yet!", xStackItem_Value.Size));
-			new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = ResultIsZero };
-
-			if (xStackItem_Value.Size == 4)
 			{
 				new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.CL };
-				new CPUx86.Jump { DestinationLabel = End_Shl };
 			}
+#if DOTNETCOMPATIBLE
 			else if (xStackItem_Value.Size == 8)
+#else
+			else if (xStackItem_Value.Size <= 8)
+#endif
 			{
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // value low part
+				string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
+				string LowPartIsZero = BaseLabel + "LowPartIsZero";
+				string End_Shl = BaseLabel + "End_Shl";
+
+				// [ESP] is high part
+				// [ESP + 4] is low part
+
+				new CPUx86.Compare { DestinationReg = CPUx86.Registers.CL, SourceValue = 32, Size = 16 };
+				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = LowPartIsZero };
+
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 				// shift higher part
 				new CPUx86.ShiftLeftDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
 				// shift lower part
-				new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EAX, Size = 32, SourceReg = CPUx86.Registers.CL };
-				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+				new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.Registers.CL };
 				new CPUx86.Jump { DestinationLabel = End_Shl };
-			}
-            
-			new Label(ResultIsZero);
-			//replace unknown number with a zero, if more or equal 32(64 to shift
-			if (xStackItem_ShiftAmount.Size == 8)
-			{
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64, SourceValue = 0 };
+
+				new Label(LowPartIsZero);
+				// remove bits >= 32, so that CL max value could be only 31
+				new CPUx86.And { DestinationReg = CPUx86.Registers.CL, SourceValue = 0x1f, Size = 16 };
+				// move low part to EAX
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+				// shift low part in EAX and move it in high part
+				new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.CL, Size = 32};
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+				// replace unknown low part with a zero, if <= 32
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0 };
+
+				new Label(End_Shl);
 			}
 			else
-			{
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32, SourceValue = 0 };
-			}
-			new Label(End_Shl);
+				throw new NotSupportedException("A size bigger 8 not supported at Shl!");
         }
     }
 }

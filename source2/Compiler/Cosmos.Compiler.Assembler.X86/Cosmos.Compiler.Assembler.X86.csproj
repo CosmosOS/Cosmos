@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="286AndUp\Lgdt.cs" />
     <Compile Include="286AndUp\Lidt.cs" />
+    <Compile Include="386AndUp\Shrd.cs" />
     <Compile Include="386AndUp\Popad.cs" />
     <Compile Include="386AndUp\Popfd.cs" />
     <Compile Include="386AndUp\Pushad.cs" />
