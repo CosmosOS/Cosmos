@@ -113,7 +113,7 @@ namespace Cosmos.Hardware.BlockDevice {
         xStatus = (Status)IO.Status.Byte;
       } while ((xStatus & Status.Busy) != 0);
       // Error occurred
-      if ((xStatus & Status.Error) != 0) {
+      if (aThrowOnError && (xStatus & Status.Error) != 0) {
         // TODO: Read error port
         throw new Exception("ATA Error");
       }
