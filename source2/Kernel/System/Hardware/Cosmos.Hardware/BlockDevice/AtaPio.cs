@@ -175,12 +175,6 @@ namespace Cosmos.Hardware.BlockDevice {
       //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
       //be greater than or equal to one and less than or equal to 268,435,455.
       // We need 28 bit addressing - small drives on VMWare and possibly other cases are 28 bit
-      var x = xBuff[60];
-      var y = xBuff[61];
-      UInt32 y1 = (UInt32)(y << 16);
-      UInt32 z1 = (UInt32)(y << 16 | x);
-      UInt32 z2 = (UInt32)(y << 16 | x) - 1;
-      UInt32 z3 = z1 - 1;
       mBlockCount = (UInt32)(xBuff[61] << 16 | xBuff[60]) - 1;
 
       //Words (103:100) shall contain the value one greater than the total number of user-addressable

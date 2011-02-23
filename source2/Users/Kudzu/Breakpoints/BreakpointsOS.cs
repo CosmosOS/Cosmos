@@ -27,15 +27,21 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      //var xATA = (AtaPio)BlockDevice.Devices[0];
-      var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+      // This first line causes both Cosmos and VS to lock up
+      var x = BlockDevice.Devices[0];
+      var v = BlockDevice.Devices.Count;
+      // Next line barfs. No reflection?
+      string y = x.GetType().ToString();
+      // Next line cause Run to restart? Inteferes with loop?
+      var z = (AtaPio)x;
+      var xATA = (AtaPio)BlockDevice.Devices[0];
+
+      //var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
       Console.WriteLine("--------------------------");
       Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
       Console.WriteLine("Serial No: " + xATA.SerialNo);
       Console.WriteLine("Firmware Rev: " + xATA.FirmwareRev);
       Console.WriteLine("Model No: " + xATA.ModelNo);
-      var x = xATA.BlockCount;
-      var y = xATA.BlockSize;
       Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
 
       //var xWrite = new byte[512];
