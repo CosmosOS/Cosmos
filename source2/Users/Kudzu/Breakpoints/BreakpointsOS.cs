@@ -33,11 +33,7 @@ namespace BreakpointsKernel {
       Console.WriteLine("Serial No: " + xATA.SerialNo);
       Console.WriteLine("Firmware Rev: " + xATA.FirmwareRev);
       Console.WriteLine("Model No: " + xATA.ModelNo);
-      //Console.WriteLine("Disk Size 28 (MB): " + xSectors28 * 512 / 1024 / 1024);
-      //if (xLba48Capable) {
-      //  Console.WriteLine("48 bit LBA): yes");
-      //  Console.WriteLine("Disk Size 48 (MB): " + xSectors48 * 512 / 1024 / 1024);
-      //}
+      Console.WriteLine("Disk Size 28 (MB): " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024);
 
       var xWrite = new byte[512];
       for (int i = 0; i < 512; i++) {

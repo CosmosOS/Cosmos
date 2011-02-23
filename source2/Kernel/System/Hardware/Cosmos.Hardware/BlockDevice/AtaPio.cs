@@ -174,22 +174,21 @@ namespace Cosmos.Hardware.BlockDevice {
       //Words (61:60) shall contain the value one greater than the total number of user-addressable
       //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
       //be greater than or equal to one and less than or equal to 268,435,455.
-      // Sectors are 512 bytes
-      // Commented out as we only support 48 bit addressing. Do we need 28 bit addressing?
-      //UInt32 xSectors28 = (UInt32)(xBuff[61] << 16 | xBuff[60]);
+      // We need 28 bit addressing - small drives on VMWare and possibly other cases are 28 bit
+      mBlockCount = (UInt32)(xBuff[61] << 16 | xBuff[60] - 1);
 
       //Words (103:100) shall contain the value one greater than the total number of user-addressable
       //sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
       //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
       //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
       bool xLba48Capable = (xBuff[83] & 0x400) != 0;
-      if (!xLba48Capable) {
-        throw new Exception("48 bit LBA incapable.");
+      if (xLba48Capable) {
+        mBlockCount = ((UInt64)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100])) - 1;
       }
-      mBlockCount = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
     }
 
     protected void SelectSector(UInt64 aSectorNo, int aSectorCount) {
+      //TODO: Check for 48 bit sectorno mode and select 48 bits
       SelectDrive((byte)(aSectorNo >> 24));
       // Number of sectors to read
       IO.SectorCount.Byte = 1;
