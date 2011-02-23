@@ -23,8 +23,8 @@ namespace Cosmos.Hardware.BlockDevice {
       get { return mBlockSize; }
     }
 
-    public abstract void ReadSector(UInt64 aSectorNo, byte[] aData);
-    public abstract void WriteSector(UInt64 aSectorNo, byte[] aData);
+    public abstract void ReadBlock(UInt64 aSectorNo, byte[] aData);
+    public abstract void WriteBlock(UInt64 aSectorNo, byte[] aData);
 
   }
 }

@@ -39,10 +39,10 @@ namespace BreakpointsKernel {
       for (int i = 0; i < 512; i++) {
         xWrite[i] = (byte)i;
       }
-      xATA.WriteSector(0, xWrite);
+      xATA.WriteBlock(0, xWrite);
 
       var xRead = new byte[512];
-      xATA.ReadSector(0, xRead);
+      xATA.ReadBlock(0, xRead);
       string xDisplay = "";
       for (int i = 0; i < 512; i++) {
         xDisplay = xDisplay + xRead[i].ToHex();

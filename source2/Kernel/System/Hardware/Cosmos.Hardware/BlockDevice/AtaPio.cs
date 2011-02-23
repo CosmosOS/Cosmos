@@ -197,13 +197,13 @@ namespace Cosmos.Hardware.BlockDevice {
       IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
     }
 
-    public override void ReadSector(UInt64 aSectorNo, byte[] aData) {
+    public override void ReadBlock(UInt64 aSectorNo, byte[] aData) {
       SelectSector(aSectorNo, 1);
       SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
 
-    public override void WriteSector(UInt64 aSectorNo, byte[] aData) {
+    public override void WriteBlock(UInt64 aSectorNo, byte[] aData) {
       SelectSector(aSectorNo, 1);
       SendCmd(Cmd.WritePio);
 
