@@ -133,6 +133,19 @@ namespace Cosmos.Hardware.BlockDevice {
       return new string(xChars);
     }
 
+    protected string mSerialNo;
+    public string SerialNo {
+      get { return mSerialNo; }
+    }
+    protected string mFirmwareRev;
+    public string FirmwareRev {
+      get { return mFirmwareRev; }
+    }
+    protected string mModelNo;
+    public string ModelNo {
+      get { return mModelNo; }
+    }
+
     protected void InitDrive() {
       if (mDriveType == SpecLevel.ATA) {
         SendCmd(Cmd.Identify);
@@ -154,36 +167,26 @@ namespace Cosmos.Hardware.BlockDevice {
       // Read Identification Space of the Device
       var xBuff = new UInt16[256];
       IO.Data.Read16(xBuff);
-      string xSerialNo = GetString(xBuff, 10, 20);
-      string xFirmwareRev = GetString(xBuff, 23, 8);
-      string xModelNo = GetString(xBuff, 27, 40);
+      mSerialNo = GetString(xBuff, 10, 20);
+      mFirmwareRev = GetString(xBuff, 23, 8);
+      mModelNo = GetString(xBuff, 27, 40);
 
       //Words (61:60) shall contain the value one greater than the total number of user-addressable
       //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
       //be greater than or equal to one and less than or equal to 268,435,455.
       // Sectors are 512 bytes
-      UInt32 xSectors28 = (UInt32)(xBuff[61] << 16 | xBuff[60]);
+      // Commented out as we only support 48 bit addressing. Do we need 28 bit addressing?
+      //UInt32 xSectors28 = (UInt32)(xBuff[61] << 16 | xBuff[60]);
 
       //Words (103:100) shall contain the value one greater than the total number of user-addressable
       //sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
       //The contents of words (61:60) and (103:100) shall not be used to determine if 48-bit addressing is
       //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
-      UInt32 xSectors48 = 0;
       bool xLba48Capable = (xBuff[83] & 0x400) != 0;
-      if (xLba48Capable) {
-        xSectors48 = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
+      if (!xLba48Capable) {
+        throw new Exception("48 bit LBA incapable.");
       }
-
-      Global.Dbg.Send("--------------------------");
-      Global.Dbg.Send("Type: " + (mDriveType == SpecLevel.ATA ? "ATA" : "ATAPI"));
-      Global.Dbg.Send("Serial No: " + xSerialNo);
-      Global.Dbg.Send("Firmware Rev: " + xFirmwareRev);
-      Global.Dbg.Send("Model No: " + xModelNo);
-      Global.Dbg.Send("Disk Size 28 (MB): " + xSectors28 * 512 / 1024 / 1024);
-      if (xLba48Capable) {
-        Global.Dbg.Send("48 bit LBA): yes");
-        Global.Dbg.Send("Disk Size 48 (MB): " + xSectors48 * 512 / 1024 / 1024);
-      }
+      mBlockCount = (UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100]);
     }
 
     protected void SelectSector(UInt64 aSectorNo, int aSectorCount) {
