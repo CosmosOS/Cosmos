@@ -9,10 +9,11 @@ namespace Cosmos.Hardware.BlockDevice {
   // master/slave, each one needs its own device instance. For ATA
   // this complicates things a bit because they share IO ports, but this 
   // is an intentional decision.
-  public class BlockDevice : Device {
+
+  public abstract class BlockDevice : Device {
     // TODO: Need to protect this from changes except by Hardware ring 
     static public List<BlockDevice> Devices = new List<BlockDevice>();
-
+    
     //TODO:UInt64
     protected UInt32 mBlockCount = 0;
     public UInt32 BlockCount {
@@ -26,9 +27,16 @@ namespace Cosmos.Hardware.BlockDevice {
     }
 
     //TODO:UInt64
-    public virtual void ReadBlock(UInt32 aSectorNo, byte[] aData) { }
+    public abstract void ReadBlock(UInt32 aBlockNo, byte[] aData);
     //TODO:UInt64
-    public virtual void WriteBlock(UInt32 aSectorNo, byte[] aData) { }
+    public abstract void WriteBlock(UInt32 aBlockNo, byte[] aData);
+
+    //TODO:UInt64
+    protected void CheckBlockNo(UInt32 aBlockNo) {
+      if (aBlockNo >= mBlockCount) {
+        throw new Exception("Invalid block number.");
+      }
+    }
 
   }
 }

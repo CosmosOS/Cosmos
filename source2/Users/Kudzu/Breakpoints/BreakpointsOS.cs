@@ -37,6 +37,8 @@ namespace BreakpointsKernel {
       // Next line barfs too
       //var xATA = (AtaPio)BlockDevice.Devices[0];
 
+      Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
+
       var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
       Console.WriteLine("--------------------------");
       Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));

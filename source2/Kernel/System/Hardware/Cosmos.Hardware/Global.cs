@@ -21,6 +21,11 @@ namespace Cosmos.Hardware {
         xATA.ReadBlock(0, xMbrData);
         var xMBR = new BlockDevice.MBR(xMbrData);
         // TODO Change this to foreach when foreach is supported
+        for (int i = 0; i < xMBR.Partitions.Count; i++) {
+          var xPart = xMBR.Partitions[i];
+          var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+          BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+        }
       }
     }
 
