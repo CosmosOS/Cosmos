@@ -78,7 +78,6 @@
     <Compile Include="Add.cs" />
     <Compile Include="AddWithCarry.cs" />
     <Compile Include="And.cs" />
-    <Compile Include="Assembler.cs" />
     <Compile Include="Call.cs" />
     <Compile Include="ClrCarryFlag.cs" />
     <Compile Include="ClrDirFlag.cs" />
