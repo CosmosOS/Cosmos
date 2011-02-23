@@ -27,13 +27,15 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
+      var xATA = (AtaPio)BlockDevice.Devices[0];
       Console.WriteLine("--------------------------");
       Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
       Console.WriteLine("Serial No: " + xATA.SerialNo);
       Console.WriteLine("Firmware Rev: " + xATA.FirmwareRev);
       Console.WriteLine("Model No: " + xATA.ModelNo);
-      Console.WriteLine("Disk Size 28 (MB): " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024);
+      var x = xATA.BlockCount;
+      var y = xATA.BlockSize;
+      Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
 
       //var xWrite = new byte[512];
       //for (int i = 0; i < 512; i++) {
