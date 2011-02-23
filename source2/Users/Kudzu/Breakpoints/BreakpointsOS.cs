@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Sys = Cosmos.System;
 using Cosmos.Debug.Kernel;
@@ -27,7 +28,6 @@ namespace BreakpointsKernel {
 
     protected override void Run() {
       var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
-
       Console.WriteLine("--------------------------");
       Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
       Console.WriteLine("Serial No: " + xATA.SerialNo);
@@ -35,19 +35,19 @@ namespace BreakpointsKernel {
       Console.WriteLine("Model No: " + xATA.ModelNo);
       Console.WriteLine("Disk Size 28 (MB): " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024);
 
-      var xWrite = new byte[512];
-      for (int i = 0; i < 512; i++) {
-        xWrite[i] = (byte)i;
-      }
-      xATA.WriteBlock(0, xWrite);
+      //var xWrite = new byte[512];
+      //for (int i = 0; i < 512; i++) {
+      //  xWrite[i] = (byte)i;
+      //}
+      //xATA.WriteBlock(0, xWrite);
 
-      var xRead = new byte[512];
-      xATA.ReadBlock(0, xRead);
-      string xDisplay = "";
-      for (int i = 0; i < 512; i++) {
-        xDisplay = xDisplay + xRead[i].ToHex();
-      }
-      Console.WriteLine(xDisplay);
+      //var xRead = new byte[512];
+      //xATA.ReadBlock(0, xRead);
+      //string xDisplay = "";
+      //for (int i = 0; i < 512; i++) {
+      //  xDisplay = xDisplay + xRead[i].ToHex();
+      //}
+      //Console.WriteLine(xDisplay);
       Stop();
     }
 

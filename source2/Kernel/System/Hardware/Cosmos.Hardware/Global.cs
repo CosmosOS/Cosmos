@@ -17,6 +17,10 @@ namespace Cosmos.Hardware {
       var xATA = new BlockDevice.AtaPio(xIO, aControllerID, aBusPosition);
       if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
         BlockDevice.BlockDevice.Devices.Add(xATA);
+        var xMbrData = new byte[512];
+        xATA.ReadBlock(0, xMbrData);
+        var xMBR = new BlockDevice.MBR(xMbrData);
+        // TODO Change this to foreach when foreach is supported
       }
     }
 
@@ -35,6 +39,7 @@ namespace Cosmos.Hardware {
       InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
       //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum? 
       // They do show up in PCI space as well as the fixed space. 
+      // Or is it always here, and was our compiler stack corruption issue?
       //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
       //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
     }
