@@ -68,6 +68,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="Filesystem\FAT.cs" />
+    <Compile Include="Filesystem\Filesystem.cs" />
+    <Compile Include="Filesystem\MBR.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
