@@ -88,7 +88,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "13702"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -155,9 +154,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatthijsPlayground", "..\so
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "MatthijsPlaygroundBoot", "..\source2\Users\Matthijs\MatthijsPlayground\MatthijsPlaygroundBoot.Cosmos", "{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common", "..\source2\Kernel\Common\Cosmos.Common\Cosmos.Common.csproj", "{04602B68-B877-4CA0-B17B-09C309732943}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 43
+		SccNumberOfProjects = 44
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -331,6 +332,10 @@ Global
 		SccProjectName42 = ../Docs
 		SccLocalPath42 = ..\\Docs
 		SccProjectEnlistmentChoice42 = 2
+		SccProjectUniqueName43 = ..\\source2\\Kernel\\Common\\Cosmos.Common\\Cosmos.Common.csproj
+		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
+		SccProjectName43 = ../source2/Kernel/Common/Cosmos.Common
+		SccLocalPath43 = ..\\source2\\Kernel\\Common\\Cosmos.Common
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -1006,6 +1011,21 @@ Global
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|Mixed Platforms.Build.0 = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|x86.ActiveCfg = Release|x86
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953}.Release|x86.Build.0 = Release|x86
+		{04602B68-B877-4CA0-B17B-09C309732943}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Bootstrap|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Bootstrap|Mixed Platforms.Build.0 = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{04602B68-B877-4CA0-B17B-09C309732943}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1069,5 +1089,6 @@ Global
 		{61607F1E-58F9-41CF-972F-128384F3E115} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
+		{04602B68-B877-4CA0-B17B-09C309732943} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
 	EndGlobalSection
 EndGlobal
