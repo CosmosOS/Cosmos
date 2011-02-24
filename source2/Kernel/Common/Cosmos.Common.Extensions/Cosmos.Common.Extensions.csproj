@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteConvertor.cs" />
     <Compile Include="ToHexString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

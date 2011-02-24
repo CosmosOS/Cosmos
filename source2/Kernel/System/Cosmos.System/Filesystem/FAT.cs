@@ -2,20 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Common.Extensions;
 
 namespace Cosmos.System.Filesystem {
   public class FAT : Filesystem {
-    readonly public int BytesPerSector;
-    readonly public int SectorsPerCluster;
-    readonly public int ReservedSectorCount;
-    readonly public int NumberOfFATs;
-    readonly public int FatSectorCount;
-    readonly public int TotalSectorCount;
-    readonly public int DataSectorCount;
-    readonly public int ClusterCount;
-    readonly public int RootSector; // FAT12/16
-    readonly public int RootCluster; // FAT32
-    readonly public int RootEntryCount;
+    readonly public UInt32 BytesPerSector;
+    readonly public UInt32 SectorsPerCluster;
+    
+    readonly public UInt32 ReservedSectorCount;
+    readonly public UInt32 TotalSectorCount;
+    readonly public UInt32 ClusterCount;
+    
+    readonly public UInt32 NumberOfFATs;
+    readonly public UInt32 FatSectorCount;
+
+    readonly public UInt32 RootSector = 0; // FAT12/16
+    readonly public UInt32 RootSectorCount = 0; // FAT12/16, FAT32 remains 0
+    readonly public UInt32 RootCluster; // FAT32
+    readonly public UInt32 RootEntryCount;
+
+    readonly public UInt32 DataSector; // First Data Sector
+    readonly public UInt32 DataSectorCount;
 
     public enum FatTypeEnum {Unknown, Fat12, Fat16, Fat32}
     readonly public FatTypeEnum FatType = FatTypeEnum.Unknown;
@@ -25,27 +32,30 @@ namespace Cosmos.System.Filesystem {
     public FAT(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
       mDevice = aDevice;
 
-      // 0xAA55
-      // [510] == 0x55
-      // [511] == 0xAA
-      // This is the FAT signature. We need to check it in the future.
-
-      var xBPB = aDevice.GetDataArray(1);
+      var xBPB = aDevice.NewBlockArray(1);
       mDevice.ReadBlock(0, 1, xBPB);
-      BytesPerSector = xBPB[12] << 8 | xBPB[11];
-      SectorsPerCluster = xBPB[13];
-      ReservedSectorCount = xBPB[15] << 8 | xBPB[14];
-      NumberOfFATs = xBPB[16];
-      RootEntryCount = xBPB[18] << 8 | xBPB[17];
 
-      TotalSectorCount = xBPB[20] << 8 | xBPB[19];
-      if (TotalSectorCount == 0) {
-        TotalSectorCount = xBPB[35] << 24 | xBPB[34] << 16 | xBPB[33] << 8 | xBPB[32];
+      UInt16 xSig = xBPB.ToUInt16(510);
+      if (xSig != 0xAA55) {
+        throw new Exception("FAT signature not found.");
       }
 
-      FatSectorCount = xBPB[23] << 8 | xBPB[22];
+      BytesPerSector = xBPB.ToUInt16(11);
+      SectorsPerCluster = xBPB[13];
+      ReservedSectorCount = xBPB.ToUInt16(14);
+      NumberOfFATs = xBPB[16];
+      RootEntryCount = xBPB.ToUInt16(17);
+
+      TotalSectorCount = xBPB.ToUInt16(19);
+      var i = TotalSectorCount;
+      if (TotalSectorCount == 0) {
+        TotalSectorCount = xBPB.ToUInt32(32);
+      }
+
+      // FATSz
+      FatSectorCount = xBPB.ToUInt16(22);
       if (FatSectorCount == 0) {
-        FatSectorCount = xBPB[39] << 24 | xBPB[38] << 16 | xBPB[37] << 8 | xBPB[36];
+        FatSectorCount = xBPB.ToUInt32(36);
       }
 
       DataSectorCount = TotalSectorCount - (ReservedSectorCount + (NumberOfFATs * FatSectorCount) + ReservedSectorCount);
@@ -65,10 +75,30 @@ namespace Cosmos.System.Filesystem {
       }
 
       if (FatType == FatTypeEnum.Fat32) {
-        RootCluster = xBPB[47] << 24 | xBPB[46] << 16 | xBPB[45] << 8 | xBPB[44];
+        RootCluster = xBPB.ToUInt32(44);
       } else {
         RootSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount);
+        RootSectorCount = (RootEntryCount * 32 + (BytesPerSector - 1)) / BytesPerSector;
       }
+      DataSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount) + RootSectorCount;
+    }
+
+    protected byte[] NewClusterArray() {
+      return new byte[SectorsPerCluster * BytesPerSector];
+    }
+
+    protected void ReadCluster(UInt32 aCluster, byte[] aData) {
+      //TODO:UInt64
+      UInt32 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
+      mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
+    }
+
+    public List<string> GetDir() {
+      var xResult = new List<string>();
+
+      var xData = NewClusterArray();
+
+      return xResult;
     }
 
   }

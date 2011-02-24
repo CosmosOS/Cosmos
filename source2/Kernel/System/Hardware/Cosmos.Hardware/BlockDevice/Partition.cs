@@ -16,14 +16,14 @@ namespace Cosmos.Hardware.BlockDevice {
       mBlockCount = aSectorCount;
     }
 
-    public override void ReadBlock(UInt32 aBlockNo, int aBlockCount, byte[] aData) {
+    public override void ReadBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData) {
       // TODO:UInt64
       UInt32 xHostBlockNo = mStartingSector + aBlockNo;
       CheckBlockNo(xHostBlockNo, aBlockCount);
       mHost.ReadBlock(xHostBlockNo, aBlockCount, aData);
     }
 
-    public override void WriteBlock(UInt32 aBlockNo, int aBlockCount, byte[] aData) {
+    public override void WriteBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData) {
       // TODO:UInt64
       UInt32 xHostBlockNo = mStartingSector + aBlockNo;
       CheckBlockNo(xHostBlockNo, aBlockCount);
