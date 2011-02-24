@@ -47,6 +47,8 @@ namespace BreakpointsKernel {
       Console.WriteLine("Model No: " + xATA.ModelNo);
       Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
 
+      var xFS = new Cosmos.System.Filesystem.FAT(BlockDevice.Devices[1]);
+
       //var xWrite = new byte[512];
       //for (int i = 0; i < 512; i++) {
       //  xWrite[i] = (byte)i;
