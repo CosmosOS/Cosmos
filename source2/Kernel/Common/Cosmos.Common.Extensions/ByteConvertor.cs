@@ -24,5 +24,14 @@ namespace Cosmos.Common.Extensions {
       return (UInt32)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
     }
 
+    static public string GetAsciiString(this byte[] n, int aStart, int aSize) {
+      var xChars = new char[aSize];
+      for (int i = aStart; i < aStart + aSize; i++) {
+        xChars[i] = (char)n[i];
+      }
+      return new string(xChars);
+    }
+
+
   }
 }

@@ -202,8 +202,8 @@ namespace Cosmos.Hardware.BlockDevice {
     }
 
     public override void ReadBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData) {
-      CheckDataSize(aData, 1);
-      SelectSector(aBlockNo, 1);
+      CheckDataSize(aData, aBlockCount);
+      SelectSector(aBlockNo, aBlockCount);
       SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
@@ -222,10 +222,6 @@ namespace Cosmos.Hardware.BlockDevice {
       }
 
       SendCmd(Cmd.CacheFlush);
-    }
-
-    public void Test() {
-
     }
 
   }

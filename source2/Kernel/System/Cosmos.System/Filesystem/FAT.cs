@@ -47,7 +47,6 @@ namespace Cosmos.System.Filesystem {
       RootEntryCount = xBPB.ToUInt16(17);
 
       TotalSectorCount = xBPB.ToUInt16(19);
-      var i = TotalSectorCount;
       if (TotalSectorCount == 0) {
         TotalSectorCount = xBPB.ToUInt32(32);
       }
@@ -96,7 +95,29 @@ namespace Cosmos.System.Filesystem {
     public List<string> GetDir() {
       var xResult = new List<string>();
 
-      var xData = NewClusterArray();
+      byte[] xData;
+      if (FatType == FatTypeEnum.Fat32) {
+        xData = NewClusterArray();
+        ReadCluster(RootCluster, xData);
+      } else {
+        xData = mDevice.NewBlockArray(RootSectorCount);
+        mDevice.ReadBlock(RootSector, RootSectorCount, xData);
+      }
+
+      for (int i = 0; i < xData.Length; i = i + 32) {
+        byte xStatus = xData[i];
+        if (xStatus == 0xE5) {
+          // 0xE5 = Empty slot
+        } else if (xStatus == 0x00) {
+          // Empty slot, and no more entries after this
+          break;
+        } else if (xStatus == 0x05) {
+          // Japanese characters - We dont handle this
+        } else {
+          string xName = xData.GetAsciiString(i, 11);
+          int x = 4;
+        }
+      }
 
       return xResult;
     }

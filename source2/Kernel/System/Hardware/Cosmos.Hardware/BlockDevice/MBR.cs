@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Common.Extensions;
 
 namespace Cosmos.Hardware.BlockDevice {
   // Its not a BlockDevice, but its related to "fixed" devices
@@ -36,10 +37,8 @@ namespace Cosmos.Hardware.BlockDevice {
       byte xSystemID = aMBR[aLoc + 4];
       // SystemID = 0 means no partition
       if (xSystemID != 0) {
-        // TODO - Make Bitconvertor work and change all these
-        // TODO - Make a note about BitConvertor - change to high speed ASM plugs / cosmos calls
-        UInt32 xStartSector = (UInt32)(aMBR[aLoc + 11] << 24 | aMBR[aLoc + 10] << 16 | aMBR[aLoc + 9] << 8 | aMBR[aLoc + 8]);
-        UInt32 xSectorCount = (UInt32)(aMBR[aLoc + 15] << 24 | aMBR[aLoc + 14] << 16 | aMBR[aLoc + 13] << 8 | aMBR[aLoc + 12]);
+        UInt32 xStartSector = aMBR.ToUInt32(aLoc + 8);
+        UInt32 xSectorCount = aMBR.ToUInt32(aLoc + 12);
 
         var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
         Partitions.Add(xPartInfo);

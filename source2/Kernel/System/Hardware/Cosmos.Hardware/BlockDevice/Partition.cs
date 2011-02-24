@@ -14,6 +14,8 @@ namespace Cosmos.Hardware.BlockDevice {
       mHost = aHost;
       mStartingSector = aStartingSector;
       mBlockCount = aSectorCount;
+
+      mBlockSize = mHost.BlockSize;
     }
 
     public override void ReadBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData) {
