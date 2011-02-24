@@ -106,6 +106,8 @@ namespace Cosmos.System.Filesystem {
 
       for (int i = 0; i < xData.Length; i = i + 32) {
         byte xStatus = xData[i];
+        byte xAttrib = xData[i + 11];
+        byte xType = xData[i + 12];
         if (xStatus == 0xE5) {
           // 0xE5 = Empty slot
         } else if (xStatus == 0x00) {

@@ -26,8 +26,8 @@ namespace Cosmos.Common.Extensions {
 
     static public string GetAsciiString(this byte[] n, int aStart, int aSize) {
       var xChars = new char[aSize];
-      for (int i = aStart; i < aStart + aSize; i++) {
-        xChars[i] = (char)n[i];
+      for (int i = 0; i < aSize; i++) {
+        xChars[i] = (char)n[aStart + i];
       }
       return new string(xChars);
     }
