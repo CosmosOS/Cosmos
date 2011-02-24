@@ -15,12 +15,12 @@ namespace Cosmos.Debug.VSDebugEngine
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
     class AD7Property : IDebugProperty2
     {
-        
+
         private DebugLocalInfo m_variableInformation;
         private AD7Process mProcess;
         private AD7StackFrame mStackFrame;
         private DebugInfo.Local_Argument_Info mDebugInfo;
-        
+
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
         {
@@ -77,43 +77,61 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
                         uint xStringLength = BitConverter.ToUInt32(xData, 0);
-                        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
-                        uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
-                        xData = mProcess.mDbgConnector.GetMemoryData(xFirstCharPtr, xStringLength * 2, 2);
-                        propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
+                        if (xStringLength > 100)
+                        {
+                            propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
+                        }
+                        else
+                        {
+                            xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
+                            uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
+                            xData = mProcess.mDbgConnector.GetMemoryData(xFirstCharPtr, xStringLength * 2, 2);
+                            propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
+                        }
                         //propertyInfo.bstrValue = Encoding.Unicode.GetString(xData);
-                        
+
                         //propertyInfo.bstrValue = String.Format("String at 0x{0}, Length at 0x{1}, Length Value = {2}", xLocation, (xStrPointer + xStringLengthOffset).ToString("X8").ToUpper(), xStringLength);
                         //propertyInfo.bstrValue = "String of length: " + xStringLength;
                     }
                 }
+                else if (mDebugInfo.Type == typeof(char).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 2);
+                    var xTypedCharValue = BitConverter.ToChar(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
+                }
+                else if (mDebugInfo.Type == typeof(int).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    var xTypedIntValue = BitConverter.ToInt32(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
+                }
+                else if (mDebugInfo.Type == typeof(long).AssemblyQualifiedName)
+                {
+                    // for now, hack long/ulong support: stack values are stored in reverse order (dword-wise)
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset - 4, 8);
+                    if (xData.Length != 8)
+                    {
+                        throw new Exception("Length should have been 8, but is " + xData.Length);
+                    }
+                    var xTypedLongValue = BitConverter.ToInt64(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedLongValue, xTypedLongValue.ToString("X").ToUpper());
+                }
+                else if (mDebugInfo.Type == typeof(ulong).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset - 4, 8);
+                    if (xData.Length != 8)
+                    {
+                        throw new Exception("Length should have been 8, but is " + xData.Length);
+                    }
+                    var xTypedULongValue = BitConverter.ToUInt64(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedULongValue, xTypedULongValue.ToString("X").ToUpper());
+                }
                 else
                 {
-                        StringBuilder sb = new StringBuilder();//m_variableInformation.m_value);
-                        // retrieve property value:
-                        // todo: corect size of data, datatypes, refactor to move to some dedicated class etc
-                        if (m_variableInformation.IsLocal)
-                        {
-                            xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mLocalInfos[m_variableInformation.Index].Offset, 4);
-                        }
-                        else
-                        {
-                            xData = mProcess.mDbgConnector.GetStackData(mStackFrame.mArgumentInfos[m_variableInformation.Index].Offset, 4);
-                        }
-                        // for now, dump as hex
-                        sb.Append("0x");
-                        if (xData == null)
-                        {
-                            sb.Append("(xData == null)");
-                        }
-                        else
-                        {
-                            for (int i = xData.Length - 1; i >= 0; i--)
-                            {
-                                sb.Append(xData[i].ToString("X2").ToUpper());
-                            }
-                        }
-                        propertyInfo.bstrValue = sb.ToString();
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
                 }
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
@@ -132,7 +150,7 @@ namespace Cosmos.Debug.VSDebugEngine
             // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
             // then set the pProperty field so the debugger can call back when the chilren are enumerated.
             //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
-                //|| (this.m_variableInformation.child != null))
+            //|| (this.m_variableInformation.child != null))
             {
                 //propertyInfo.pProperty = (IDebugProperty2)this;
                 //propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);

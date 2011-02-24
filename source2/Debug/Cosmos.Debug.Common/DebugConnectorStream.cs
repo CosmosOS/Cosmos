@@ -70,7 +70,7 @@ namespace Cosmos.Debug.Common {
                 Console.WriteLine("DoRead");
                 var xIncoming = (Incoming)aResult.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(aResult);
-                System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
+                //System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
                 xIncoming.CurrentPos += xCount;
                 // If 0, end of stream then just exit without calling BeginRead again
                 if (xCount == 0)

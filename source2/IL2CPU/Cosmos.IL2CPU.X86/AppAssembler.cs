@@ -45,11 +45,12 @@ namespace Cosmos.IL2CPU.X86
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mAssembler.Stack.Pop().Size };
         }
 
-        protected override void Push(string aLabelName)
+        protected override void Push(string aLabelName, bool isIndirect = false)
         {
             new CPUx86.Push
             {
-                DestinationRef = CPU.ElementReference.New(aLabelName)
+                DestinationRef = CPU.ElementReference.New(aLabelName),
+                DestinationIsIndirect = isIndirect                
             };
         }
 

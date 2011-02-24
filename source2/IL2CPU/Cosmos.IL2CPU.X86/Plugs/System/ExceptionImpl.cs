@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
     }
 
     public static string ToString(Exception aThis) {
-      return aThis.Message;
+      return "Exception: " + aThis.Message;
     }
   }
 }

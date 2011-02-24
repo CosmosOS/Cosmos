@@ -122,6 +122,7 @@
     <Compile Include="CustomImplementation\System\SRImpl.cs" />
     <Compile Include="CustomImplementation\System\StringImpl.cs" />
     <Compile Include="CustomImplementation\System\StringImplRefs.cs" />
+    <Compile Include="CustomImplementation\System\Text\StringBuilderImpl.cs" />
     <Compile Include="CustomImplementation\System\Threading\Interlocked.cs" />
     <Compile Include="CustomImplementation\System\UInt16Impl.cs" />
     <Compile Include="CustomImplementation\System\UInt32Impl.cs" />

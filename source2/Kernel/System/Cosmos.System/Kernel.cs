@@ -18,28 +18,41 @@ namespace Cosmos.System {
 
         // Start the system up using the properties for configuration.
         public void Start() {
-            Global.Dbg.Send("Starting kernel");
-            if (mStarted) {
-                Global.Dbg.Send("ERROR: Kernel Already Started");
-                throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
-            }
-            mStarted = true;
+            try
+            {
+                Global.Dbg.Send("Starting kernel");
+                if (mStarted)
+                {
+                    Global.Dbg.Send("ERROR: Kernel Already Started");
+                    throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
+                }
+                mStarted = true;
 
-            Hardware.Bootstrap.Init();
-            Global.Init();
+                Hardware.Bootstrap.Init();
+                Global.Init();
 
-            // Provide the user with a clear screen if they requested it
-            if (ClearScreen) {
-                Global.Console.Clear();
-            }
+                // Provide the user with a clear screen if they requested it
+                if (ClearScreen)
+                {
+                    Global.Console.Clear();
+                }
 
-            BeforeRun();
-            while (!mStopped) {
-                Run();
+                BeforeRun();
+                while (!mStopped)
+                {
+                    Run();
+                }
+                AfterRun();
+                bool xTest = 1 != 3;
+                while (xTest)
+                {
+                }
             }
-            AfterRun();
-            bool xTest = 1 != 3;
-            while (xTest) {
+            catch (Exception E)
+            {
+                // todo: better ways to handle?
+                global::System.Console.WriteLine("Exception occurred while running kernel:");
+                global::System.Console.WriteLine(E.ToString());
             }
         }
 

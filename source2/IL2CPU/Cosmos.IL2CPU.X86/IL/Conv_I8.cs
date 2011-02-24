@@ -32,8 +32,8 @@ namespace Cosmos.IL2CPU.X86.IL
 					{
 						new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 						new CPUx86.SignExtendAX { Size = 32 };
-						new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 						new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 					}
                     break;
                 case 8:

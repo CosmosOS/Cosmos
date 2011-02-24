@@ -170,7 +170,7 @@ namespace Cosmos.IL2CPU
                     var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
                     if (xNeedsExceptionPush)
                     {
-                        Push(0);
+                        Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
                         mAssembler.Stack.Push(4, typeof(Exception));
                     }
                     xILOp.Execute(aMethod, xOpCode);
@@ -219,7 +219,7 @@ namespace Cosmos.IL2CPU
         }
 
         protected abstract void Push(uint aValue);
-        protected abstract void Push(string aLabelName);
+        protected abstract void Push(string aLabelName, bool isIndirect = false);
         protected abstract void Call(MethodBase aMethod);
         protected abstract void Move(string aDestLabelName, int aValue);
         protected abstract void Jump(string aLabelName);

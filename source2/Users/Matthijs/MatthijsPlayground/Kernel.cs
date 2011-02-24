@@ -14,12 +14,23 @@ namespace MatthijsPlayground
 
         protected override void Run()
         {
-            Console.Write("Input: ");
-            var input = Console.ReadLine();
-            int xA = 0;
-            int xB = 13;
-            Console.WriteLine("Test");
-            Console.WriteLine((xA + xB).ToString());
+            var xSB = new StringBuilder("AAAA");
+            
+            if (xSB[0] == 'A')
+            {
+                Console.WriteLine("1");
+            }
+            else
+            {
+                Console.WriteLine("2");
+            }
+            while (true)
+                ;
+        }
+
+        private static void DoSomething()
+        {
+            throw new Exception("Hello, World!");
         }
     }
 }

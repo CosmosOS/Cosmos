@@ -20,7 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xStackCount = GetStackCountForLocal(aMethod, xVar);
 			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xOpVar.Value));
 			var xSize = SizeOfType(xVar.LocalType);
-            new Comment("EBPOffset = " + xEBPOffset); if (xStackCount > 1)
+            new Comment("EBPOffset = " + xEBPOffset); 
+            if (xStackCount > 1)
 			{
 				for (int i = 0; i < xStackCount; i++)
 				{
@@ -30,8 +31,6 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
 			else
 			{
-				
-
 				switch (xSize)
 				{
 					case 1:

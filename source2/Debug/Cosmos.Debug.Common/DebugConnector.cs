@@ -203,8 +203,26 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCommandData(Command.SendMethodContext, xData, true);
-            var xResult = mData;
-            mData = null;
+            // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
+            byte[] xResult;
+            if ((size % 4 == 0)
+                && size > 4)
+            {
+                // values are reversed on the stack..
+                xResult = new byte[size];
+                for (int i = 0; i < (size / 4); i++)
+                {
+                    xResult[(i * 4) + 0] = xData[size - (i * 4) - 4 + 0];
+                    xResult[(i * 4) + 1] = xData[size - (i * 4) - 4 + 1];
+                    xResult[(i * 4) + 2] = xData[size - (i * 4) - 4 + 2];
+                    xResult[(i * 4) + 3] = xData[size - (i * 4) - 4 + 3];
+                }
+            }
+            else
+            {
+                xResult = mData;
+                mData = null;
+            }
             return xResult;
         }
 
