@@ -41,7 +41,7 @@ namespace Cosmos.Hardware.BlockDevice {
       var xDataSize = aBlockCount * mBlockSize;
       if (aData.Length != aBlockCount * mBlockSize) {
         //TODO: uint comparison to int is broken - so we comment this out for now
-        //throw new Exception("Invalid data size.");
+        throw new Exception("Invalid data size.");
       }
     }
 
