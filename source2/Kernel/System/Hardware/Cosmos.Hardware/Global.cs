@@ -18,7 +18,7 @@ namespace Cosmos.Hardware {
       if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
         BlockDevice.BlockDevice.Devices.Add(xATA);
         var xMbrData = new byte[512];
-        xATA.ReadBlock(0, xMbrData);
+        xATA.ReadBlock(0, 1, xMbrData);
         var xMBR = new BlockDevice.MBR(xMbrData);
         // TODO Change this to foreach when foreach is supported
         for (int i = 0; i < xMBR.Partitions.Count; i++) {

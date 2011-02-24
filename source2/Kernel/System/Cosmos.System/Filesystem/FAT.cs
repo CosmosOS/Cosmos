@@ -30,8 +30,8 @@ namespace Cosmos.System.Filesystem {
       // [511] == 0xAA
       // This is the FAT signature. We need to check it in the future.
 
-      var xBPB = new byte[512];
-      mDevice.ReadBlock(0, xBPB);
+      var xBPB = aDevice.GetDataArray(1);
+      mDevice.ReadBlock(0, 1, xBPB);
       BytesPerSector = xBPB[12] << 8 | xBPB[11];
       SectorsPerCluster = xBPB[13];
       ReservedSectorCount = xBPB[15] << 8 | xBPB[14];
@@ -55,8 +55,7 @@ namespace Cosmos.System.Filesystem {
       // Determine the FAT type. Do not use another method - this IS the official and
       // proper way to determine FAT type.
       // Comparisons are purposefully < and not <=
-      // FAT16 starts at 4085
-      // FAT32 starts at 65525 
+      // FAT16 starts at 4085, FAT32 starts at 65525 
       if (ClusterCount < 4085) {
         FatType = FatTypeEnum.Fat12;
       } else if(ClusterCount < 65525) {

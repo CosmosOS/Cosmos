@@ -190,7 +190,7 @@ namespace Cosmos.Hardware.BlockDevice {
 
     //TODO:UInt64
     protected void SelectSector(UInt32 aSectorNo, int aSectorCount) {
-      CheckBlockNo(aSectorNo);
+      CheckBlockNo(aSectorNo, aSectorCount);
       //TODO: Check for 48 bit sectorno mode and select 48 bits
       SelectDrive((byte)(aSectorNo >> 24));
       // Number of sectors to read
@@ -200,13 +200,15 @@ namespace Cosmos.Hardware.BlockDevice {
       IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
     }
 
-    public override void ReadBlock(UInt32 aBlockNo, byte[] aData) {
+    public override void ReadBlock(UInt32 aBlockNo, int aBlockCount, byte[] aData) {
+      CheckDataSize(aData, 1);
       SelectSector(aBlockNo, 1);
       SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
 
-    public override void WriteBlock(UInt32 aBlockNo, byte[] aData) {
+    public override void WriteBlock(UInt32 aBlockNo, int aBlockCount, byte[] aData) {
+      CheckDataSize(aData, 1);
       SelectSector(aBlockNo, 1);
       SendCmd(Cmd.WritePio);
 
