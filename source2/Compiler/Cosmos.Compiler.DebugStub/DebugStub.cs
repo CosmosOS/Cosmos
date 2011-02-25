@@ -63,8 +63,8 @@ namespace Cosmos.Compiler.DebugStub {
         AL = (int)MsgType.Started; // Send the actual started signal
         Call<DebugStub.WriteALToComPort>();
 
-        Call("DebugStub_WaitForSignature");
-        Call("DebugStub_ProcessCommandBatch");
+        Call<WaitForSignature>();
+        Call<ProcessCommandBatch>();
       }
     }
 
@@ -192,7 +192,7 @@ namespace Cosmos.Compiler.DebugStub {
 
     public class ProcessCommandBatch : CodeBlock {
       public override void Assemble() {
-        Call("DebugStub_ProcessCommand");
+        Call<ProcessCommand>();
 
         // See if batch is complete
         AL.Compare(Command.BatchEnd);
@@ -389,7 +389,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Wait for a command
         Label = "DebugStub_WaitCmd";
         // Check for common commands
-        Call("DebugStub_ProcessCommand");
+        Call<ProcessCommand>();
 
         // Now check for commands that are only valid in break state
         // or commands that require additional handling while in break
