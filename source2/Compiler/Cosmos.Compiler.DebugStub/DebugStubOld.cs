@@ -199,12 +199,12 @@ namespace Cosmos.Compiler.DebugStub {
             AL.Compare(Command.Continue);
             JumpIf(Flags.Equal, "DebugStub_Break_Exit");
 
-            AL.Compare(Command.Step);
-            JumpIf(Flags.NotEqual, "DebugStub_Break_Step_After");
+            AL.Compare(Command.StepInto);
+            JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
             Memory["DebugBreakOnNextTrace", 32] = 1;
             Jump("DebugStub_Break_Exit");
+            Label = "DebugStub_Break_StepInto_After";
 
-            Label = "DebugStub_Break_Step_After";
             // Loop around and wait for another command
             Jump("DebugStub_WaitCmd");
 

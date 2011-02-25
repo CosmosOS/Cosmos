@@ -304,7 +304,7 @@ namespace Cosmos.Compiler.DebugStub {
         // UART buffer is 16.
         // We may need to revisit this in the future to ack not commands, but data chunks
         // and move them to a buffer.
-        AL = (int)MsgType.CmdCompleted;
+        AL = MsgType.CmdCompleted;
         Call<DebugStub.WriteALToComPort>();
         EAX = Memory["DebugStub_CommandID", 32];
         Call<DebugStub.WriteALToComPort>();

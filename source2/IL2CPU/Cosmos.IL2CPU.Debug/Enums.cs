@@ -28,13 +28,15 @@ namespace Cosmos.Compiler.Debug {
     public const byte TraceOn = 2;
     public const byte Break = 3;
     public const byte Continue = 4; // After a Break
-    public const byte Step = 5;
+    public const byte StepInto = 5;
     public const byte BreakOnAddress = 6;
     public const byte BatchBegin = 7; // Not used yet
     public const byte BatchEnd = 8; // Not used yet
     public const byte SendMethodContext = 9; // sends data from stack, relative to EBP (in x86)
     public const byte SendMemory = 10;
+    public const byte StepOver = 11;
+    public const byte StepOut = 12;
     // Make sure this is always the last entry. Used by DebugStub to verify commands
-    public const byte Max = 11;
+    public const byte Max = 13;
   }
 }
