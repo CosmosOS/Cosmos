@@ -376,7 +376,6 @@ namespace Cosmos.Compiler.DebugStub {
         // This is only used by the compiler to force emission of each of our routines.
         // Each routine must be listed here, else it wont be emitted.
         protected void Emit() {
-            Executing();
             SendTrace();
             SendText();
             SendPtr();
@@ -392,44 +391,6 @@ namespace Cosmos.Compiler.DebugStub {
             Break();
             BreakOnAddress();
             ProcessCommandBatch();
-        }
-
-        // This is the secondary stub routine. After the primary (main) has decided we should do some debug
-        // activities, this one is called.
-        protected void Executing() {
-            Label = "DebugStub_Executing";
-
-            // Look for a possible matching BP
-            EAX = Memory["DebugEIP", 32];
-            EDI = AddressOf("DebugBPs");
-            ECX = 256;
-            new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
-            JumpIf(Flags.Equal, "DebugStub_Break");
-            Label = "DebugStub_Executing_AfterBreakOnAddress";
-
-            // See if there is a break request
-            Memory["DebugBreakOnNextTrace", 32].Compare(1);
-            CallIf(Flags.Equal, "DebugStub_Break");
-
-            //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
-            Memory["DebugTraceMode", 32].Compare((int)DebugStub.Tracing.On);
-            CallIf(Flags.Equal, "DebugStub_SendTrace");
-
-            Label = "DebugStub_Executing_Normal";
-            // Is there a new incoming command? We dont want to wait for one
-            // if there isn't one already here. This is a passing check.
-            Label = "DebugStub_CheckForCmd";
-            DX = mComStatusAddr;
-            AL = Port[DX];
-            AL.Test(0x01);
-            // If no command waiting, break from loop
-            JumpIf(Flags.Zero, "DebugStub_CheckForCmd_Break");
-            Call("DebugStub_ProcessCommand");
-            // See if there are more commands waiting
-            Jump("DebugStub_CheckForCmd");
-            Label = "DebugStub_CheckForCmd_Break";
-
-            Return();
         }
 
         public void ProcessCommandBatch() {

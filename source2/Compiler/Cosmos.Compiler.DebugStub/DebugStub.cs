@@ -9,11 +9,15 @@ using Cosmos.Compiler.XSharp;
 namespace Cosmos.Compiler.DebugStub {
   public class DebugStub : CodeGroup {
     protected const uint VidBase = 0xB8000;
-    static protected int mComNo = 0;
     public enum Tracing { Off = 0, On = 1 };
+
+    static public int mComNo = 0;
+    protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
+    static public UInt16 mComAddr;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
+      mComAddr = mComPortAddresses[mComNo - 1];
     }
 
     // Called before Kernel runs. Inits debug stub, etc
@@ -96,17 +100,15 @@ namespace Cosmos.Compiler.DebugStub {
       // before sending another command.
       // See notes in ProcessCommand.
       public override void Assemble() {
-        UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
-        UInt16 xComAddr = xComPortAddresses[mComNo - 1];
         // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
 
         // Disable interrupts
-        DX = (UInt16)(xComAddr + 1);
+        DX = (UInt16)(mComAddr + 1);
         AL = 0;
         Port[DX] = AL;
 
         // Enable DLAB (set baud rate divisor)
-        DX = (UInt16)(xComAddr + 3);
+        DX = (UInt16)(mComAddr + 3);
         AL = 0x80;
         Port[DX] = AL;
 
@@ -115,16 +117,16 @@ namespace Cosmos.Compiler.DebugStub {
         // 0x03 - 0x00 - 38400
         //
         // Set divisor (lo byte)
-        DX = xComAddr;
+        DX = mComAddr;
         AL = 0x01;
         Port[DX] = AL;
         // hi byte
-        DX = (UInt16)(xComAddr + 1);
+        DX = (UInt16)(mComAddr + 1);
         AL = 0x00;
         Port[DX] = AL;
 
         // 8N1
-        DX = (UInt16)(xComAddr + 3);
+        DX = (UInt16)(mComAddr + 3);
         AL = 0x03;
         Port[DX] = AL;
 
@@ -132,7 +134,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Set 14-byte threshold for IRQ.
         // We dont use IRQ, but you cant set it to 0
         // either. IRQ is enabled/diabled separately
-        DX = (UInt16)(xComAddr + 2);
+        DX = (UInt16)(mComAddr + 2);
         AL = 0xC7;
         Port[DX] = AL;
 
@@ -140,7 +142,7 @@ namespace Cosmos.Compiler.DebugStub {
         // 0x02 RTS
         // 0x01 DTR
         // Send 0x03 if no AFE
-        DX = (UInt16)(xComAddr + 4);
+        DX = (UInt16)(mComAddr + 4);
         AL = 0x03;
         Port[DX] = AL;
       }
@@ -297,6 +299,44 @@ namespace Cosmos.Compiler.DebugStub {
         // Restore AL for callers who check the command and do
         // further processing, or for commands not handled by this routine.
         EAX.Pop();
+        Return();
+      }
+    }
+
+    public class Executing : CodeBlock {
+      // This is the secondary stub routine. After the primary (main) has decided we should do some debug
+      // activities, this one is called.
+      public override void Assemble() {
+        // Look for a possible matching BP
+        EAX = Memory["DebugEIP", 32];
+        EDI = AddressOf("DebugBPs");
+        ECX = 256;
+        new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
+        JumpIf(Flags.Equal, "DebugStub_Break");
+        Label = "DebugStub_Executing_AfterBreakOnAddress";
+
+        // See if there is a break request
+        Memory["DebugBreakOnNextTrace", 32].Compare(1);
+        CallIf(Flags.Equal, "DebugStub_Break");
+
+        //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
+        Memory["DebugTraceMode", 32].Compare((int)DebugStub.Tracing.On);
+        CallIf(Flags.Equal, "DebugStub_SendTrace");
+
+        Label = "DebugStub_Executing_Normal";
+        // Is there a new incoming command? We dont want to wait for one
+        // if there isn't one already here. This is a passing check.
+        Label = "DebugStub_CheckForCmd";
+        DX = mComAddr;
+        AL = Port[DX];
+        AL.Test(0x01);
+        // If no command waiting, break from loop
+        JumpIf(Flags.Zero, "DebugStub_CheckForCmd_Break");
+        Call("DebugStub_ProcessCommand");
+        // See if there are more commands waiting
+        Jump("DebugStub_CheckForCmd");
+        Label = "DebugStub_CheckForCmd_Break";
+
         Return();
       }
     }
