@@ -15,7 +15,6 @@ namespace Cosmos.Compiler.DebugStub {
 
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
-        protected enum Tracing { Off = 0, On = 1 };
         // Current status of OS Debug Stub
         public enum Status { Run = 0, Break = 1 }
 
@@ -392,9 +391,7 @@ namespace Cosmos.Compiler.DebugStub {
             DebugResume();
             Break();
             BreakOnAddress();
-            ProcessCommand();
             ProcessCommandBatch();
-            WaitForSignature();
         }
 
         // This is the secondary stub routine. After the primary (main) has decided we should do some debug
@@ -415,7 +412,7 @@ namespace Cosmos.Compiler.DebugStub {
             CallIf(Flags.Equal, "DebugStub_Break");
 
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
-            Memory["DebugTraceMode", 32].Compare((int)Tracing.On);
+            Memory["DebugTraceMode", 32].Compare((int)DebugStub.Tracing.On);
             CallIf(Flags.Equal, "DebugStub_SendTrace");
 
             Label = "DebugStub_Executing_Normal";
@@ -435,21 +432,6 @@ namespace Cosmos.Compiler.DebugStub {
             Return();
         }
 
-        public void WaitForSignature() {
-            Label = "DebugStub_WaitForSignature";
-            EBX = 0;
-
-            Label = "DebugStub_WaitForSignature_Read";
-            Call("ReadALFromComPort");
-            BL = AL;
-            EBX.RotateRight(8);
-            EBX.Compare(Consts.SerialSignature);
-            JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read");
-
-            Label = "DebugStub_WaitForSignature_Exit";
-            Return();
-        }
-
         public void ProcessCommandBatch() {
             Label = "DebugStub_ProcessCommandBatch";
             Call("DebugStub_ProcessCommand");
@@ -462,88 +444,6 @@ namespace Cosmos.Compiler.DebugStub {
             Jump("DebugStub_ProcessCommandBatch");
 
             Label = "DebugStub_ProcessCommandBatch_Exit";
-            Return();
-        }
-
-        // Modifies: AL, DX (ReadALFromComPort)
-        // Returns: AL
-        public void ProcessCommand() {
-            Label = "DebugStub_ProcessCommand";
-            Call("ReadALFromComPort");
-            // Some callers expect AL to be returned, so we preserve it
-            // in case any commands modify AL.
-            //TODO: But in ASM wont let us push AL, so we push EAX for now
-            EAX.Push();
-
-            // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
-            AL.Compare((byte)Command.Noop);
-            JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
-
-            // Read Command ID
-            Call("ReadALFromComPort");
-            Memory["DebugStub_CommandID", 32] = EAX;
-
-            // Get AL back so we can compare it, but also put it back for later
-            EAX.Pop();
-            EAX.Push();
-
-            AL.Compare((byte)Command.TraceOff);
-            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
-            Memory["DebugTraceMode", 32] = (int)Tracing.Off;
-            Jump("DebugStub_ProcessCmd_ACK");
-            Label = "DebugStub_ProcessCmd_TraceOff_After";
-
-            AL.Compare((byte)Command.TraceOn);
-            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
-            Memory["DebugTraceMode", 32] = (int)Tracing.On;
-            Jump("DebugStub_ProcessCmd_ACK");
-            Label = "DebugStub_ProcessCmd_TraceOn_After";
-
-            AL.Compare((byte)Command.Break);
-            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
-            Call("DebugStub_Break");
-            Jump("DebugStub_ProcessCmd_ACK");
-            Label = "DebugStub_ProcessCmd_Break_After";
-
-            AL.Compare((byte)Command.BreakOnAddress);
-            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
-            Call("DebugStub_BreakOnAddress");
-            Jump("DebugStub_ProcessCmd_ACK");
-            Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
-
-            AL.Compare((byte)Command.SendMethodContext);
-            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMethodContext_After");
-            Call("DebugStub_SendMethodContext");
-            Jump("DebugStub_ProcessCmd_ACK");
-            Label = "DebugStub_ProcessCmd_SendMethodContext_After";
-
-            AL.Compare((byte)Command.SendMemory);
-            JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMemory_After");
-            Call("DebugStub_SendMemory");
-            Jump("DebugStub_ProcessCmd_ACK");
-            Label = "DebugStub_ProcessCmd_SendMemory_After";
-
-            
-            Label = "DebugStub_ProcessCmd_ACK";
-                // We acknowledge receipt of the command, not processing of it.
-                // We have to do this because sometimes callers do more processing
-                // We ACK even ones we dont process here, but do not ACK Noop.
-                // The buffers should be ok becuase more wont be sent till after our NACK
-                // is received.
-                // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
-                // UART buffer is 16.
-                // We may need to revisit this in the future to ack not commands, but data chunks
-                // and move them to a buffer.
-                AL = (int)MsgType.CmdCompleted;
-                Call<DebugStub.WriteALToComPort>();
-                EAX = Memory["DebugStub_CommandID", 32];
-                Call<DebugStub.WriteALToComPort>();
-            Label = "DebugStub_ProcessCmd_After";
-
-            Label = "DebugStub_ProcessCmd_Exit";
-            // Restore AL for callers who check the command and do
-            // further processing, or for commands not handled by this routine.
-            EAX.Pop();
             Return();
         }
 
