@@ -35,8 +35,8 @@ namespace Cosmos.Compiler.DebugStub {
                 // the calling code's ebp value
                 new DataMember("DebugOriginalEBP", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
-                // If set to 1, on next trace a break will occur
-                new DataMember("DebugBreakOnNextTrace", 0)
+                // If set non 0, on next trace a break will occur
+                new DataMember("DebugBreakOnNextTrace", DebugStub.StepTrigger.None)
                 // Command ID of last command received
                 , new DataMember("DebugStub_CommandID", 0)
                 // Breakpoint addresses
