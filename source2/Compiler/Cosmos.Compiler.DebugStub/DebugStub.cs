@@ -15,6 +15,12 @@ namespace Cosmos.Compiler.DebugStub {
     protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
     static public UInt16 mComAddr;
 
+    // Current status of OS Debug Stub
+    static public class Status {
+      public const byte Run = 0;
+      public const byte Break = 1;
+    }
+
     public DebugStub(int aComNo) {
       mComNo = aComNo;
       mComAddr = mComPortAddresses[mComNo - 1];
@@ -367,6 +373,42 @@ namespace Cosmos.Compiler.DebugStub {
         Call("ReadALFromComPort");
         Memory[EDI, 8] = AL;
         EDI++;
+      }
+    }
+
+    public class Break : CodeBlock {
+      // Should only be called internally by DebugStub. Has a lot of preconditions
+      // Externals should use BreakOnNextTrace instead
+      public override void Assemble() {
+        // Reset request in case we are currently responding to one
+        Memory["DebugBreakOnNextTrace", 32] = 0;
+        // Set break status
+        Memory["DebugStatus", 32] = Status.Break;
+        Call("DebugStub_SendTrace");
+
+        // Wait for a command
+        Label = "DebugStub_WaitCmd";
+        // Check for common commands
+        Call("DebugStub_ProcessCommand");
+
+        // Now check for commands that are only valid in break state
+        // or commands that require additional handling while in break
+        // state.
+
+        AL.Compare(Command.Continue);
+        JumpIf(Flags.Equal, "DebugStub_Break_Exit");
+
+        AL.Compare(Command.StepInto);
+        JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
+        Memory["DebugBreakOnNextTrace", 32] = 1;
+        Jump("DebugStub_Break_Exit");
+        Label = "DebugStub_Break_StepInto_After";
+
+        // Loop around and wait for another command
+        Jump("DebugStub_WaitCmd");
+
+        Label = "DebugStub_Break_Exit";
+        Memory["DebugStatus", 32] = Status.Run;
       }
     }
 

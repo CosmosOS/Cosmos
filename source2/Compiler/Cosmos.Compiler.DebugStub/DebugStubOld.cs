@@ -15,8 +15,6 @@ namespace Cosmos.Compiler.DebugStub {
 
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
-        // Current status of OS Debug Stub
-        public enum Status { Run = 0, Break = 1 }
 
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
@@ -177,47 +175,11 @@ namespace Cosmos.Compiler.DebugStub {
             Return();
         }
 
-        protected void Break() {
-            // Should only be called internally by DebugStub. Has a lot of preconditions
-            // Externals should use BreakOnNextTrace instead
-            Label = "DebugStub_Break";
-            // Reset request in case we are currently responding to one
-            Memory["DebugBreakOnNextTrace", 32] = 0;
-            // Set break status
-            Memory["DebugStatus", 32] = (int)Status.Break;
-            Call("DebugStub_SendTrace");
-
-            // Wait for a command
-            Label = "DebugStub_WaitCmd";
-            // Check for common commands
-            Call("DebugStub_ProcessCommand");
-
-            // Now check for commands that are only valid in break state
-            // or commands that require additional handling while in break
-            // state.
-
-            AL.Compare(Command.Continue);
-            JumpIf(Flags.Equal, "DebugStub_Break_Exit");
-
-            AL.Compare(Command.StepInto);
-            JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
-            Memory["DebugBreakOnNextTrace", 32] = 1;
-            Jump("DebugStub_Break_Exit");
-            Label = "DebugStub_Break_StepInto_After";
-
-            // Loop around and wait for another command
-            Jump("DebugStub_WaitCmd");
-
-            Label = "DebugStub_Break_Exit";
-            Memory["DebugStatus", 32] = (int)Status.Run;
-            Return();
-        }
-
         // Modifies: EAX, ESI
         protected void SendTrace() {
             Label = "DebugStub_SendTrace";
 
-            Memory["DebugStatus", 32].Compare((int)Status.Run);
+            Memory["DebugStatus", 32].Compare(DebugStub.Status.Run);
             JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
             AL = (int)MsgType.BreakPoint;
             Jump("DebugStub_SendTraceType");
@@ -359,7 +321,6 @@ namespace Cosmos.Compiler.DebugStub {
             SendMethodContext();
             SendMemory();
 
-            Break();
             BreakOnAddress();
         }
 
