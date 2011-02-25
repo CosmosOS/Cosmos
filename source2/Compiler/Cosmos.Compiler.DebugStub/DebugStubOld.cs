@@ -37,11 +37,11 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("InterruptsEnabledFlag", 0),
                 
                 // If set non 0, on next trace a break will occur
-                new DataMember("DebugBreakOnNextTrace", DebugStub.StepTrigger.None),
+                new DataMember("DebugBreakOnNextTrace", (uint)DebugStub.StepTrigger.None),
                 // For step out and over this is used to determine where the initial request was made
                 // EBP is logged when the trace is started and can be used to determine 
                 // what level we are "at" relative to the original step start location.
-                new DataMember("DebugBreakEBP", DebugStub.StepTrigger.None),
+                new DataMember("DebugBreakEBP", 0),
 
                 // Command ID of last command received
                 new DataMember("DebugStub_CommandID", 0),

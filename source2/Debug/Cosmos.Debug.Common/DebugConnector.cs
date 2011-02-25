@@ -25,6 +25,7 @@ namespace Cosmos.Debug.Common
 
         protected void DoDebugMsg(string aMsg) {
 //            mDebugWriter.WriteLine(aMsg);
+            System.Diagnostics.Debug.WriteLine(aMsg);
             if (OnDebugMsg != null) {
                 OnDebugMsg(aMsg);
             }

@@ -110,8 +110,13 @@ namespace Cosmos.IL2CPU.X86
                         };
                         mLocals_Arguments_Infos.Add(xInfo);
 
-                        new Comment("Local " + xLocal.LocalIndex);
-                        new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
+                        var xSize = ILOp.Align( ILOp.SizeOfType( xLocal.LocalType), 4);
+                        new Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
+                        for (int i = 0; i < xSize / 4; i++)
+                        {
+                            new Push { DestinationValue = 0 };
+                        }
+                        //new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
                     }
                     var xCecilMethod = GetCecilMethodDefinitionForSymbolReading(aMethod.MethodBase);
                     if (xCecilMethod != null && xCecilMethod.Body != null)

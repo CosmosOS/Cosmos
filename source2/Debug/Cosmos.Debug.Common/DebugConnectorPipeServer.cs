@@ -23,7 +23,7 @@ namespace Cosmos.Debug.Common
             var xPipe = (NamedPipeServerStream)aResult.AsyncState;
             xPipe.EndWaitForConnection(aResult);
             mWaitConnectEvent.Set();
-            Start(mPipe);
+            Start(xPipe);
         }
 
         public override void WaitConnect() {

@@ -14,6 +14,9 @@ namespace MatthijsPlayground
 
         protected override void Run()
         {
+            string xTest;
+            DoSomething();
+            xTest = "test";
             var xSB = new StringBuilder("AAAA");
             
             if (xSB[0] == 'A')
@@ -30,7 +33,9 @@ namespace MatthijsPlayground
 
         private static void DoSomething()
         {
-            throw new Exception("Hello, World!");
+            Console.WriteLine("Line1");
+            Console.WriteLine("Line2");
+            Console.WriteLine("Line3");
         }
     }
 }

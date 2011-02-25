@@ -274,6 +274,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX.Pop();
         EAX.Push();
 
+        #region handle commands
         AL.Compare(Command.TraceOff);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
         Memory["DebugTraceMode", 32] = Tracing.Off;
@@ -310,7 +311,7 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_SendMemory_After";
 
-        Label = "DebugStub_ProcessCmd_ACK";
+          Label = "DebugStub_ProcessCmd_ACK";
         // We acknowledge receipt of the command, not processing of it.
         // We have to do this because sometimes callers do more processing
         // We ACK even ones we dont process here, but do not ACK Noop.
@@ -323,6 +324,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL = MsgType.CmdCompleted;
         Call<DebugStub.WriteALToComPort>();
         EAX = Memory["DebugStub_CommandID", 32];
+        #endregion
         Call<DebugStub.WriteALToComPort>();
         Label = "DebugStub_ProcessCmd_After";
 
@@ -369,6 +371,7 @@ namespace Cosmos.Compiler.DebugStub {
         //
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
+        Label = "Debug__StepOver__";
         EAX = Memory["DebugOriginalEBP", 32];
         EAX.Compare(Memory["DebugBreakEBP", 32]);
         // If EBP and start EBP arent equal, dont break
@@ -393,7 +396,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Is there a new incoming command? We dont want to wait for one
         // if there isn't one already here. This is a passing check.
         Label = "DebugStub_CheckForCmd";
-        DX = mComAddr;
+        DX = (ushort)(mComAddr + 5u);
         AL = Port[DX];
         AL.Test(0x01);
         // If no command waiting, break from loop
@@ -453,7 +456,8 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
         // TODO: Change this so ,32 is not necessary, can be implied by 32 bit register - ie Memory["DebugBreakEBP", 32] = EBP;
-        Memory["DebugBreakEBP", 32] = EBP;
+        EAX = Memory["DebugOriginalEBP", 32];
+        Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
 

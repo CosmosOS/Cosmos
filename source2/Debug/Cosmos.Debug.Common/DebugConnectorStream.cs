@@ -20,6 +20,10 @@ namespace Cosmos.Debug.Common {
 
         private static string BytesToString(byte[] bytes, int index, int count)
         {
+            if (count > 100)
+            {
+                return String.Empty;
+            }
             var xSB = new StringBuilder(2 + (bytes.Length * 2));
             xSB.Append("0x");
             for (int i = index; i < index+count; i++)
@@ -67,10 +71,10 @@ namespace Cosmos.Debug.Common {
         protected void DoRead(IAsyncResult aResult) {
             try
             {
-                Console.WriteLine("DoRead");
                 var xIncoming = (Incoming)aResult.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(aResult);
-                //System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
+                
+                System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
                 xIncoming.CurrentPos += xCount;
                 // If 0, end of stream then just exit without calling BeginRead again
                 if (xCount == 0)
