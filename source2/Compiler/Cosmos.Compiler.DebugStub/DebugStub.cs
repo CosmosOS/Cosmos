@@ -184,6 +184,21 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
+    public class ProcessCommandBatch : CodeBlock {
+      public override void Assemble() {
+        Call("DebugStub_ProcessCommand");
+
+        // See if batch is complete
+        AL.Compare((byte)Command.BatchEnd);
+        JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
+
+        // Loop and wait
+        Jump("DebugStub_ProcessCommandBatch");
+
+        Label = "DebugStub_ProcessCommandBatch_Exit";
+      }
+    }
+    
     public class WaitForSignature : CodeBlock {
       public override void Assemble() {
         EBX = 0;
@@ -198,7 +213,7 @@ namespace Cosmos.Compiler.DebugStub {
         //TODO: Always emit and exit label and then make a Exit method which can
         // automatically use it. I think a label might already exist.
         Label = "DebugStub_WaitForSignature_Exit";
-        Return();
+        //Return();
       }
     }
 
@@ -299,7 +314,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Restore AL for callers who check the command and do
         // further processing, or for commands not handled by this routine.
         EAX.Pop();
-        Return();
+        //Return();
       }
     }
 
@@ -337,9 +352,38 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_CheckForCmd");
         Label = "DebugStub_CheckForCmd_Break";
 
-        Return();
+        //Return();
+      }
+    }
+
+    public class ReadByteFromComPort : CodeBlock {
+      // Input: EDI
+      // Output: [EDI]
+      // Modified: AL, DX, EDI (+1)
+      //
+      // Reads a byte into [EDI] and does EDI + 1
+      // http://wiki.osdev.org/Serial_ports
+      public override void Assemble() {
+        Call("ReadALFromComPort");
+        Memory[EDI, 8] = AL;
+        EDI++;
       }
     }
 
   }
+
+  public class DebugPoint : CodeGroup {
+    public class DebugSuspend : CodeBlock {
+      public override void Assemble() {
+        Memory["DebugSuspendLevel", 32]++;
+      }
+    }
+
+    public class DebugResume : CodeBlock {
+      public override void Assemble() {
+        Memory["DebugSuspendLevel", 32]--;
+      }
+    }
+  }
+
 }

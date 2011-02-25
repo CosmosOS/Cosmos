@@ -61,10 +61,10 @@ namespace Cosmos.Compiler.DebugStub {
             EDI = ESP;
 
             // Read address to stack via EDI
-            Call("ReadByteFromComPort");
-            Call("ReadByteFromComPort");
-            Call("ReadByteFromComPort");
-            Call("ReadByteFromComPort");
+            Call("DebugStub_ReadByteFromComPort");
+            Call("DebugStub_ReadByteFromComPort");
+            Call("DebugStub_ReadByteFromComPort");
+            Call("DebugStub_ReadByteFromComPort");
         }
 
         // Sets a breakpoint
@@ -346,32 +346,6 @@ namespace Cosmos.Compiler.DebugStub {
             Return();
         }
 
-        // Input: EDI
-        // Output: [EDI]
-        // Modified: AL, DX, EDI (+1)
-        //
-        // Reads a byte into [EDI] and does EDI + 1
-        // http://wiki.osdev.org/Serial_ports
-        protected void ReadByteFromComPort() {
-            Label = "ReadByteFromComPort";
-            Call("ReadALFromComPort");
-            Memory[EDI, 8] = AL;
-            EDI++;
-            Return();
-        }
-
-        protected void DebugSuspend() {
-            Label = "DebugPoint_DebugSuspend";
-            Memory["DebugSuspendLevel", 32]++;
-            Return();
-        }
-
-        protected void DebugResume() {
-            Label = "DebugPoint_DebugResume";
-            Memory["DebugSuspendLevel", 32]--;
-            Return();
-        }
-
         // This does not run during Cosmos execution
         // This is only used by the compiler to force emission of each of our routines.
         // Each routine must be listed here, else it wont be emitted.
@@ -380,32 +354,13 @@ namespace Cosmos.Compiler.DebugStub {
             SendText();
             SendPtr();
             WriteByteToComPort();
-            ReadByteFromComPort();
             ReadALFromComPort();
 
             SendMethodContext();
             SendMemory();
 
-            DebugSuspend();
-            DebugResume();
             Break();
             BreakOnAddress();
-            ProcessCommandBatch();
-        }
-
-        public void ProcessCommandBatch() {
-            Label = "DebugStub_ProcessCommandBatch";
-            Call("DebugStub_ProcessCommand");
-
-            // See if batch is complete
-            AL.Compare((byte)Command.BatchEnd);
-            JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
-
-            // Loop and wait
-            Jump("DebugStub_ProcessCommandBatch");
-
-            Label = "DebugStub_ProcessCommandBatch_Exit";
-            Return();
         }
 
         // This is the main debug stub routine. The parameter is used to generate it and 

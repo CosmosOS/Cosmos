@@ -125,8 +125,10 @@ namespace Cosmos.IL2CPU.X86
             new Jump { DestinationLabel = ".loop" };
 
             if (mComNumber > 0) {
-                var xStub = new DebugStub(mComNumber);
-                xStub.Assemble();
+              var xStub = new DebugStub(mComNumber);
+              xStub.Assemble();
+              var xStub2 = new DebugPoint();
+              xStub2.Assemble();
 
                 UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
                 var xStubOld = new DebugStubOld();
