@@ -446,13 +446,9 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
         mDbgConnector.SendCommand(Command.StepOver);
-        //MessageBox.Show("F10 Step Over is not supported yet.");
-        //mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
-
+      
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
         mDbgConnector.SendCommand(Command.StepOut);
-        //MessageBox.Show("Shift-F11 Step Out is not supported yet.");
-        //mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?

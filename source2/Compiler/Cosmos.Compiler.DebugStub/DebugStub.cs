@@ -352,6 +352,8 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_Executing_AfterBreakOnAddress";
 
         // See if we are stepping
+        //
+        // F11
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Into);
         //Old, can delete this line: CallIf(Flags.Equal, "DebugStub_Break");
         //TODO: I think we can use a using statement to create this type of block
@@ -369,22 +371,25 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepIntoAfter";
         //
+        // F10
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
         Label = "Debug__StepOver__";
         EAX = Memory["DebugOriginalEBP", 32];
         EAX.Compare(Memory["DebugBreakEBP", 32]);
         // If EBP and start EBP arent equal, dont break
-        CallIf(Flags.Equal, "DebugStub_Break");
+        // Dont use Equal because we aslo need to stop above if the user starts
+        // the step at the end of a method and next item is after a return
+        CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepOverAfter";
         //
+        // Shift-F11
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
         EAX = Memory["DebugOriginalEBP", 32];
         EAX.Compare(Memory["DebugBreakEBP", 32]);
-        // Matthijs - change comment and the flags below. Here we want to break if the EBP says we are "above" the start routine
-        CallIf(Flags.Equal, "DebugStub_Break");
+        CallIf(Flags.LessThan, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepOutAfter";
 

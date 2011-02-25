@@ -26,6 +26,26 @@ namespace BreakpointsKernel {
       Console.WriteLine(xDisplay);
     }
 
+    void Trace1() {
+      int x = 4;
+      Trace2();
+      int y = 5;
+      int z = 6;
+    }
+
+    void Trace2() {
+      int x2 = 4;
+      Trace3();
+      int y2 = 5;
+      int z2 = 6;
+    }
+
+    void Trace3() {
+      int x3 = 4;
+      int y3 = 5;
+      int z3 = 6;
+    }
+
     protected override void Run() {
       // This first line causes both Cosmos and VS to lock up
       //var x = BlockDevice.Devices[0];
@@ -36,6 +56,8 @@ namespace BreakpointsKernel {
       //var z = (AtaPio)x;
       // Next line barfs too
       //var xATA = (AtaPio)BlockDevice.Devices[0];
+
+      Trace1();
 
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 
