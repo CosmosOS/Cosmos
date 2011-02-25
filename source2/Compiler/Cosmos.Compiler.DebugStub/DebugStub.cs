@@ -347,16 +347,35 @@ namespace Cosmos.Compiler.DebugStub {
 
         // See if we are stepping
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Into);
-        CallIf(Flags.Equal, "DebugStub_Break");
+        //Old, can delete this line: CallIf(Flags.Equal, "DebugStub_Break");
+        //TODO: I think we can use a using statement to create this type of block
+        // and emit asm
+        // using (var xBlock = new AsmBlock()) {
+        //   JumpIf(something, xBlock.End/Begin);
+        //   also can do xBlock.Break();
+        // }
+        JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepIntoAfter");
+        Call("DebugStub_Break");
+        Jump("DebugStub_Executing_Normal");
+        Label = "DebugStub_ExecutingStepIntoAfter";
+        //
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
-        CallIf(Flags.Equal, "DebugStub_Break");
+        JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
+        Call("DebugStub_Break");
+        Jump("DebugStub_Executing_Normal");
+        Label = "DebugStub_ExecutingStepOutAfter";
+        //
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
-        CallIf(Flags.Equal, "DebugStub_Break");
+        JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
+        Call("DebugStub_Break");
+        Jump("DebugStub_Executing_Normal");
+        Label = "DebugStub_ExecutingStepOverAfter";
 
+        Label = "DebugStub_Executing_Normal";
+        // If tracing is on, send a trace message
         Memory["DebugTraceMode", 32].Compare(Tracing.On);
         CallIf(Flags.Equal, "DebugStub_SendTrace");
 
-        Label = "DebugStub_Executing_Normal";
         // Is there a new incoming command? We dont want to wait for one
         // if there isn't one already here. This is a passing check.
         Label = "DebugStub_CheckForCmd";
@@ -417,12 +436,15 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(Command.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
+        // TODO: Change this so ,32 is not necessary, can be implied by 32 bit register
+        Memory["DebugBreakEBP", 32] = EBP;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
 
         AL.Compare(Command.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
+        Memory["DebugBreakEBP", 32] = EBP;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOut_After";
 
