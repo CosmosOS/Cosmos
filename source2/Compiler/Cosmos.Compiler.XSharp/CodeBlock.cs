@@ -15,6 +15,7 @@ namespace Cosmos.Compiler.XSharp {
       GreaterThanOrEqualTo,
       LessThan,
       LessThanOrEqualTo,
+      Above, AboveOrEqual,
       Below
     };
 
@@ -117,10 +118,8 @@ namespace Cosmos.Compiler.XSharp {
       switch (aFlags) {
         //Overflow = 0,
         //NoOverflow = 1,
-        //Below = 2,
         //NotAboveOrEqual = 2,
         //NotBelow = 3,
-        //AboveOrEqual = 3,
         //BelowOrEqual = 6,
         //NotAbove = 6,
         //NotBelowOrEqual = 7,
@@ -160,6 +159,14 @@ namespace Cosmos.Compiler.XSharp {
 
         case Flags.Below:
           xCondition = ConditionalTestEnum.Below;
+          break;
+
+        case Flags.Above:
+          xCondition = ConditionalTestEnum.Above;
+          break;
+
+        case Flags.AboveOrEqual:
+          xCondition = ConditionalTestEnum.AboveOrEqual;
           break;
 
         default:
