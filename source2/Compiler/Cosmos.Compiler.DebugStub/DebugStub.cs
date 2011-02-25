@@ -9,11 +9,15 @@ using Cosmos.Compiler.XSharp;
 namespace Cosmos.Compiler.DebugStub {
   public class DebugStub : CodeGroup {
     protected const uint VidBase = 0xB8000;
-    public enum Tracing { Off = 0, On = 1 };
 
     static public int mComNo = 0;
     protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
     static public UInt16 mComAddr;
+
+    static public class Tracing {
+      public const byte Off = 0;
+      public const byte On = 1;
+    }
 
     // Current status of OS Debug Stub
     static public class Status {
@@ -226,7 +230,6 @@ namespace Cosmos.Compiler.DebugStub {
         //TODO: Always emit and exit label and then make a Exit method which can
         // automatically use it. I think a label might already exist.
         Label = "DebugStub_WaitForSignature_Exit";
-        //Return();
       }
     }
 
@@ -273,13 +276,13 @@ namespace Cosmos.Compiler.DebugStub {
 
         AL.Compare(Command.TraceOff);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
-        Memory["DebugTraceMode", 32] = (int)Tracing.Off;
+        Memory["DebugTraceMode", 32] = Tracing.Off;
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_TraceOff_After";
 
         AL.Compare(Command.TraceOn);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
-        Memory["DebugTraceMode", 32] = (int)Tracing.On;
+        Memory["DebugTraceMode", 32] = Tracing.On;
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_TraceOn_After";
 
@@ -327,7 +330,6 @@ namespace Cosmos.Compiler.DebugStub {
         // Restore AL for callers who check the command and do
         // further processing, or for commands not handled by this routine.
         EAX.Pop();
-        //Return();
       }
     }
 
@@ -343,12 +345,15 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.Equal, "DebugStub_Break");
         Label = "DebugStub_Executing_AfterBreakOnAddress";
 
-        // See if there is a break request
-        Memory["DebugBreakOnNextTrace", 32].Compare(DebugStub.StepTrigger.None);
-        CallIf(Flags.NotEqual, "DebugStub_Break");
+        // See if we are stepping
+        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Into);
+        CallIf(Flags.Equal, "DebugStub_Break");
+        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
+        CallIf(Flags.Equal, "DebugStub_Break");
+        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
+        CallIf(Flags.Equal, "DebugStub_Break");
 
-        //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
-        Memory["DebugTraceMode", 32].Compare((int)DebugStub.Tracing.On);
+        Memory["DebugTraceMode", 32].Compare(Tracing.On);
         CallIf(Flags.Equal, "DebugStub_SendTrace");
 
         Label = "DebugStub_Executing_Normal";
@@ -364,8 +369,6 @@ namespace Cosmos.Compiler.DebugStub {
         // See if there are more commands waiting
         Jump("DebugStub_CheckForCmd");
         Label = "DebugStub_CheckForCmd_Break";
-
-        //Return();
       }
     }
 
@@ -388,7 +391,7 @@ namespace Cosmos.Compiler.DebugStub {
       // Externals should use BreakOnNextTrace instead
       public override void Assemble() {
         // Reset request in case we are currently responding to one
-        Memory["DebugBreakOnNextTrace", 32] = DebugStub.StepTrigger.None;
+        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.None;
         // Set break status
         Memory["DebugStatus", 32] = Status.Break;
         Call("DebugStub_SendTrace");
@@ -407,19 +410,19 @@ namespace Cosmos.Compiler.DebugStub {
 
         AL.Compare(Command.StepInto);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
-        Memory["DebugBreakOnNextTrace", 32] = DebugStub.StepTrigger.Into;
+        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Into;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepInto_After";
 
         AL.Compare(Command.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
-        Memory["DebugBreakOnNextTrace", 32] = DebugStub.StepTrigger.Over;
+        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
 
         AL.Compare(Command.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
-        Memory["DebugBreakOnNextTrace", 32] = DebugStub.StepTrigger.Out;
+        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOut_After";
 
