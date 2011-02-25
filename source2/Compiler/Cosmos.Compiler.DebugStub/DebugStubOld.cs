@@ -196,10 +196,10 @@ namespace Cosmos.Compiler.DebugStub {
             // or commands that require additional handling while in break
             // state.
 
-            AL.Compare((byte)Command.Continue);
+            AL.Compare(Command.Continue);
             JumpIf(Flags.Equal, "DebugStub_Break_Exit");
 
-            AL.Compare((byte)Command.Step);
+            AL.Compare(Command.Step);
             JumpIf(Flags.NotEqual, "DebugStub_Break_Step_After");
             Memory["DebugBreakOnNextTrace", 32] = 1;
             Jump("DebugStub_Break_Exit");

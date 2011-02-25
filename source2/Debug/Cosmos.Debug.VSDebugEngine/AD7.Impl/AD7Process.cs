@@ -218,7 +218,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
             aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
-            mDbgConnector.CmdTrace += new Action<Cosmos.Compiler.Debug.MsgType, uint>(DbgCmdTrace);
+            mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
             mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
             mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
@@ -312,7 +312,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
         }
 
-        void DbgCmdTrace(Cosmos.Compiler.Debug.MsgType arg1, uint arg2) {
+        void DbgCmdTrace(byte arg1, uint arg2) {
             DebugMsg("DbgCmdTrace");
             switch (arg1) {
                 case Cosmos.Compiler.Debug.MsgType.BreakPoint: {

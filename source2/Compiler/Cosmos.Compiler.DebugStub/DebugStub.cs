@@ -189,7 +189,7 @@ namespace Cosmos.Compiler.DebugStub {
         Call("DebugStub_ProcessCommand");
 
         // See if batch is complete
-        AL.Compare((byte)Command.BatchEnd);
+        AL.Compare(Command.BatchEnd);
         JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
 
         // Loop and wait
@@ -247,7 +247,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX.Push();
 
         // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
-        AL.Compare((byte)Command.Noop);
+        AL.Compare(Command.Noop);
         JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
 
         // Read Command ID
@@ -258,37 +258,37 @@ namespace Cosmos.Compiler.DebugStub {
         EAX.Pop();
         EAX.Push();
 
-        AL.Compare((byte)Command.TraceOff);
+        AL.Compare(Command.TraceOff);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
         Memory["DebugTraceMode", 32] = (int)Tracing.Off;
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_TraceOff_After";
 
-        AL.Compare((byte)Command.TraceOn);
+        AL.Compare(Command.TraceOn);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
         Memory["DebugTraceMode", 32] = (int)Tracing.On;
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_TraceOn_After";
 
-        AL.Compare((byte)Command.Break);
+        AL.Compare(Command.Break);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
         Call("DebugStub_Break");
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_Break_After";
 
-        AL.Compare((byte)Command.BreakOnAddress);
+        AL.Compare(Command.BreakOnAddress);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
         Call("DebugStub_BreakOnAddress");
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
-        AL.Compare((byte)Command.SendMethodContext);
+        AL.Compare(Command.SendMethodContext);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMethodContext_After");
         Call("DebugStub_SendMethodContext");
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_SendMethodContext_After";
 
-        AL.Compare((byte)Command.SendMemory);
+        AL.Compare(Command.SendMemory);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMemory_After");
         Call("DebugStub_SendMemory");
         Jump("DebugStub_ProcessCmd_ACK");

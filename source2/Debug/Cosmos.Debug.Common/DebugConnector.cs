@@ -11,13 +11,13 @@ namespace Cosmos.Debug.Common
 {
     public abstract class DebugConnector: IDisposable {
         public Action<Exception> ConnectionLost;
-        public Action<MsgType, UInt32> CmdTrace;
+        public Action<byte, UInt32> CmdTrace;
         public Action<byte[]> CmdMethodContext;
         public Action<string> CmdText;
         public Action CmdStarted;
         public Action<string> OnDebugMsg;
 
-        protected MsgType mCurrentMsgType;
+        protected byte mCurrentMsgType;
         public abstract void WaitConnect();
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
@@ -34,7 +34,7 @@ namespace Cosmos.Debug.Common
             get;
         }
 
-        protected void SendCommandData(Command aCmd, byte[] aData, bool aWait) {
+        protected void SendCommandData(byte aCmd, byte[] aData, bool aWait) {
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
             // If not connected, we dont send anything. Things like BPs etc can be set before connected.
             // The debugger must resend these after the start command hits.
@@ -58,7 +58,7 @@ namespace Cosmos.Debug.Common
                         // channel and are often not received. Sending noop + data
                         // usually causes the data to be interpreted as a command
                         // as its often the first byte received.
-                        SendRawData(new byte[1] { (byte)Command.Noop });
+                        SendRawData(new byte[1] { Command.Noop });
                     } else {
                         var xData = new byte[aData.Length + 2];
                         // See comments about flow control in the DebugStub class
@@ -98,7 +98,7 @@ namespace Cosmos.Debug.Common
         // The debugger is user driven so should not happen, but maybe could
         // happen while a previous command is waiting on a reply msg.
         protected object mSendCmdLock = new object();
-        public void SendCommand(Command aCmd) {
+        public void SendCommand(byte aCmd) {
           SendCommandData(aCmd, new byte[0], true);
         }
 
@@ -243,21 +243,22 @@ namespace Cosmos.Debug.Common
         }
         
         protected void PacketMsg(byte[] aPacket) {
-            mCurrentMsgType = (MsgType)aPacket[0];
-            DoDebugMsg("DC Recv: " + Enum.GetName(typeof(MsgType), mCurrentMsgType));
+            mCurrentMsgType = aPacket[0];
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType) {
-
                 case MsgType.TracePoint:
                 case MsgType.BreakPoint:
+                    DoDebugMsg("DC Recv: TracePoint / BreakPoint");
                     Next(4, PacketTracePoint);            
                     break;
 
                 case MsgType.Message:
+                    DoDebugMsg("DC Recv: Message");
                     Next(2, PacketTextSize);
                     break;
 
                 case MsgType.Started:
+                    DoDebugMsg("DC Recv: Started");
                     // Call WaitForMessage first, else it blocks becuase started triggers
                     // other commands which need responses.
                     WaitForMessage();
@@ -275,6 +276,7 @@ namespace Cosmos.Debug.Common
                     break;
 
                 case MsgType.Noop:
+                    DoDebugMsg("DC Recv: Noop");
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
                     // Kudzu: Made a Noop command to handle this
@@ -282,14 +284,17 @@ namespace Cosmos.Debug.Common
                     break;
 
                 case MsgType.CmdCompleted:
+                    DoDebugMsg("DC Recv: CmdCompleted");
                     Next(1, PacketCmdCompleted);
                     break;
 
                 case MsgType.MethodContext:
+                    DoDebugMsg("DC Recv: MethodContext");
                     Next(mDataSize, PacketMethodContext);
                     break;
 
                 case MsgType.MemoryData:
+                    DoDebugMsg("DC Recv: MemoryData");
                     Next(mDataSize, PacketMemoryData);
                     break; 
                 default:
