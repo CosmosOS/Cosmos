@@ -32,7 +32,7 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugResumeLevel", 0),
                 // Last EIP value
                 new DataMember("DebugEIP", 0),
-                // the calling code's ebp value
+                // the calling code's EBP value
                 new DataMember("DebugOriginalEBP", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
                 
@@ -343,6 +343,7 @@ namespace Cosmos.Compiler.DebugStub {
             // Main entry point that IL2CPU generated code calls
             Label = "DebugStub_TracerEntry";
 
+            // Why do we save this? Do we change EBP anywhere? And if so why dont we reset EBP back again?
             Memory["DebugOriginalEBP", 32] = EBP;
 
             // If debug stub is in break, and then an IRQ happens, the IRQ
@@ -390,7 +391,7 @@ namespace Cosmos.Compiler.DebugStub {
             // So we get the stack pointer and add 32. This skips over the
             // registers we just pushed.
             EBP = ESP;
-            EBP.Add(32);
+            EBP.Add(32); // We dont need to restore this becuase it was pushed as part of PushAll32
             // Get actual EIP of caller.
             EAX = Memory[EBP];
             // EIP is pointer to op after our call. We subtract 5 (the size of our call + address)

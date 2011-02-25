@@ -336,13 +336,17 @@ namespace Cosmos.Compiler.DebugStub {
     public class Executing : CodeBlock {
       // This is the secondary stub routine. After the primary (main) has decided we should do some debug
       // activities, this one is called.
+      //
+      // Modifies: EAX, EDI, ECX
       public override void Assemble() {
         // Look for a possible matching BP
         EAX = Memory["DebugEIP", 32];
         EDI = AddressOf("DebugBPs");
         ECX = 256;
         new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
-        JumpIf(Flags.Equal, "DebugStub_Break");
+        JumpIf(Flags.NotEqual, "DebugStub_Executing_AfterBreakOnAddress");
+        Call("DebugStub_Break");
+        Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_Executing_AfterBreakOnAddress";
 
         // See if we are stepping
@@ -354,22 +358,32 @@ namespace Cosmos.Compiler.DebugStub {
         //   JumpIf(something, xBlock.End/Begin);
         //   also can do xBlock.Break();
         // }
+        //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepIntoAfter");
         Call("DebugStub_Break");
+        //TODO: Allow creating lables but issuing them later, then we can
+        // call them with early binding
+        //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepIntoAfter";
         //
-        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
-        JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
-        Call("DebugStub_Break");
-        Jump("DebugStub_Executing_Normal");
-        Label = "DebugStub_ExecutingStepOutAfter";
-        //
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
-        Call("DebugStub_Break");
+        EAX = Memory["DebugOriginalEBP", 32];
+        EAX.Compare(Memory["DebugBreakEBP", 32]);
+        // If EBP and start EBP arent equal, dont break
+        CallIf(Flags.Equal, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepOverAfter";
+        //
+        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
+        JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
+        EAX = Memory["DebugOriginalEBP", 32];
+        EAX.Compare(Memory["DebugBreakEBP", 32]);
+        // Matthijs - change comment and the flags below. Here we want to break if the EBP says we are "above" the start routine
+        CallIf(Flags.Equal, "DebugStub_Break");
+        Jump("DebugStub_Executing_Normal");
+        Label = "DebugStub_ExecutingStepOutAfter";
 
         Label = "DebugStub_Executing_Normal";
         // If tracing is on, send a trace message
@@ -409,8 +423,10 @@ namespace Cosmos.Compiler.DebugStub {
       // Should only be called internally by DebugStub. Has a lot of preconditions
       // Externals should use BreakOnNextTrace instead
       public override void Assemble() {
-        // Reset request in case we are currently responding to one
+        // Reset request in case we are currently responding to one or we hit a fixed breakpoint
+        // before our request could be serviced (if one existed)
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.None;
+        Memory["DebugBreakEBP", 32] = 0;
         // Set break status
         Memory["DebugStatus", 32] = Status.Break;
         Call("DebugStub_SendTrace");
@@ -436,7 +452,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(Command.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
-        // TODO: Change this so ,32 is not necessary, can be implied by 32 bit register
+        // TODO: Change this so ,32 is not necessary, can be implied by 32 bit register - ie Memory["DebugBreakEBP", 32] = EBP;
         Memory["DebugBreakEBP", 32] = EBP;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
