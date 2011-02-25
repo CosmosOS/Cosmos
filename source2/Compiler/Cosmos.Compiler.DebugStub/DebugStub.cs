@@ -404,6 +404,18 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepInto_After";
 
+        AL.Compare(Command.StepOver);
+        JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
+        Memory["DebugBreakOnNextTrace", 32] = 1;
+        Jump("DebugStub_Break_Exit");
+        Label = "DebugStub_Break_StepOver_After";
+
+        AL.Compare(Command.StepOut);
+        JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
+        Memory["DebugBreakOnNextTrace", 32] = 1;
+        Jump("DebugStub_Break_Exit");
+        Label = "DebugStub_Break_StepOut_After";
+
         // Loop around and wait for another command
         Jump("DebugStub_WaitCmd");
 
