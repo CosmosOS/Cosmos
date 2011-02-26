@@ -33,9 +33,14 @@ namespace MatthijsPlayground
 
         private static void DoSomething()
         {
-            Console.WriteLine("Line1");
-            Console.WriteLine("Line2");
-            Console.WriteLine("Line3");
+            WriteLine("Line1");
+            WriteLine("Line2");
+            WriteLine("Line3");
+        }
+
+        private static void WriteLine(string line)
+        {
+            Console.WriteLine(line);
         }
     }
 }

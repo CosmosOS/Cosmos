@@ -12,6 +12,7 @@ namespace Cosmos.Compiler.XSharp {
       Equal, // Zero is synonym for Equal
       NotZero,
       NotEqual, // Synonyms
+        GreaterThan,
       GreaterThanOrEqualTo,
       LessThan,
       LessThanOrEqualTo,
@@ -155,6 +156,10 @@ namespace Cosmos.Compiler.XSharp {
 
         case Flags.GreaterThanOrEqualTo:
           xCondition = ConditionalTestEnum.GreaterThanOrEqualTo;
+          break;
+
+        case Flags.GreaterThan:
+          xCondition = ConditionalTestEnum.GreaterThan;
           break;
 
         case Flags.Below:

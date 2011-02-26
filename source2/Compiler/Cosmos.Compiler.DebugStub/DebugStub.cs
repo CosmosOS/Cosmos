@@ -387,10 +387,15 @@ namespace Cosmos.Compiler.DebugStub {
         // Shift-F11
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
+        Label = "__Debug_MTW";
+		new Noop();
         EAX = Memory["DebugOriginalEBP", 32];
         EAX.Compare(Memory["DebugBreakEBP", 32]);
-        CallIf(Flags.LessThan, "DebugStub_Break");
+        JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
+        CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
+        //JumpIf(Flags.GreaterThanOrEqualTo, "DebugStub_Executing_Normal");
+        //Call("DebugStub_Break");
         Label = "DebugStub_ExecutingStepOutAfter";
 
         Label = "DebugStub_Executing_Normal";
@@ -469,7 +474,8 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(Command.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
-        Memory["DebugBreakEBP", 32] = EBP;
+        EAX = Memory["DebugOriginalEBP", 32];
+        Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOut_After";
 
