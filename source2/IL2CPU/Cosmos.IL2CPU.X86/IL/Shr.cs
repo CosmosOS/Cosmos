@@ -36,30 +36,30 @@ namespace Cosmos.IL2CPU.X86.IL
 				string HighPartIsZero = BaseLabel + "HighPartIsZero";
 				string End_Shr = BaseLabel + "End_Shr";
 
-				// [ESP] is high part
-				// [ESP + 4] is low part
+				// [ESP] is low part
+				// [ESP + 4] is high part
+
+				// move high part in EAX
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
 				new CPUx86.Compare { DestinationReg = CPUx86.Registers.CL, SourceValue = 32, Size = 16 };
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = HighPartIsZero };
 
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true};
 				// shift lower part
-				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
+				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
 				// shift higher part
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.Registers.CL };
+				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.Registers.CL };
 				new CPUx86.Jump { DestinationLabel = End_Shr };
 
 				new Label(HighPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31
 				new CPUx86.And { DestinationReg = CPUx86.Registers.CL, SourceValue = 0x1f, Size = 16 };
 
-				// move high part in EAX
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 				// shift high part and move it in low part
 				new CPUx86.ShiftRight{ DestinationReg = CPUx86.Registers.EAX, Size = 32, SourceReg = CPUx86.Registers.CL };
 				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
 				// replace unknown high part with a zero, if <= 32
-				new CPUx86.Push { DestinationValue = 0, Size = 32 };
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
 				new Label(End_Shr);
 			}

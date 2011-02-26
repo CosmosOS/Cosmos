@@ -25,14 +25,14 @@ namespace Cosmos.IL2CPU.X86.IL
 
 			if( xSize > 4 )
 			{
-				// [ESP] is high part
-				// [ESP + 4] is low part
-				// [ESP + 8] is high part
-				// [ESP + 12] is low part
+				// [ESP] is low part
+				// [ESP + 4] is high part
+				// [ESP + 8] is low part
+				// [ESP + 12] is high part
 				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EDX };
-				// [ESP] is high part
-				// [ESP + 4] is low part
+				// [ESP] is low part
+				// [ESP + 4] is high part
 				new CPU.And { DestinationReg = CPU.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPU.Registers.EAX };
 				new CPU.And { DestinationReg = CPU.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPU.Registers.EDX };
 			}
