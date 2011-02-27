@@ -61,10 +61,14 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
-      DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode, MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase));
+      DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase));
     }
 
-    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aCurrent, string currentLabel) {
+    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
+    {
+        DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition));
+    }
+    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel) {
       //if (aTargetMethod.IsVirtual) {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
       //  return;
@@ -78,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL {
         xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
       } else {
           xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
-        //throw new Exception("Call: non-concrete method called!");
+        //throw new Exception("Call: non-concrete method called: '" + aTargetMethod.GetFullName() + "'");
       }
       var xParameters = aTargetMethod.GetParameters();
       int xArgCount = xParameters.Length;
@@ -117,31 +121,9 @@ namespace Cosmos.IL2CPU.X86.IL {
                                  SourceValue = 4
                              };
                          }
-                     });
+                     }, nextLabel);
+
       }
-
-
-
-
-
-
-      //EmitExceptionLogic(Assembler,
-      //           mCurrentILOffset,
-      //           mMethodInfo,
-      //           mNextLabelName,
-      //           true,
-      //           delegate() {
-      //             var xResultSize = mTargetMethodInfo.ReturnSize;
-      //             if (xResultSize % 4 != 0) {
-      //               xResultSize += 4 - (xResultSize % 4);
-      //             }
-      //             for (int i = 0; i < xResultSize / 4; i++) {
-      //               new CPUx86.Add {
-      //                 DestinationReg = CPUx86.Registers.ESP,
-      //                 SourceValue = 4
-      //               };
-      //             }
-      //           });
       for (int i = 0; i < xParameters.Length; i++) {
         Assembler.Stack.Pop();
       }

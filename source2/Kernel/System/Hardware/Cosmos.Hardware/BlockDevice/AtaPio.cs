@@ -15,6 +15,10 @@ namespace Cosmos.Hardware.BlockDevice {
   // and thus it can also be used to read the partition table and perform other tasks before
   // initializing another ATA class in favour of AtaPio
   public class AtaPio : Ata {
+      public override string DeviceType()
+      {
+          return "AtaPio";
+      }
     protected Core.IOGroup.ATA IO;
 
     protected SpecLevel mDriveType = SpecLevel.Null;

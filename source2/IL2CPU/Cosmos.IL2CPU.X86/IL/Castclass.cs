@@ -35,7 +35,8 @@ namespace Cosmos.IL2CPU.X86.IL
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );
             System.Reflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
-            new Call( Assembler ).Execute( aMethod, new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
+            // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
+            IL.Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call");
             new Label( xCurrentMethodLabel + "_After_IsInstance_Call" );
             Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

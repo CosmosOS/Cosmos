@@ -114,7 +114,8 @@ namespace Cosmos.IL2CPU.X86
             IL.Newobj.Assemble(Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
             new Label(xCurLabel);
-            IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), 0, null, xCurLabel);
+            IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"),null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart");
+            new Label(CosmosAssembler.EntryPointName + ".AfterStart");
             new Pop { DestinationReg = Registers.EBP };
             new Return();
         }
