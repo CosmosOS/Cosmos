@@ -59,7 +59,6 @@ namespace BreakpointsKernel {
           xATA = (AtaPio)xDevice;
         }
       }
-      ////var xATA = new AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1, Ata.ControllerIdEnum.Primary, Ata.BusPositionEnum.Master);
       Console.WriteLine("--------------------------");
       Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
       Console.WriteLine("Serial No: " + xATA.SerialNo);
@@ -67,8 +66,8 @@ namespace BreakpointsKernel {
       Console.WriteLine("Model No: " + xATA.ModelNo);
       Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
 
-      //var xFS = new Cosmos.System.Filesystem.FAT(BlockDevice.Devices[1]);
-      //xFS.GetDir();
+      var xFS = new Cosmos.System.Filesystem.FAT(BlockDevice.Devices[1]);
+      xFS.GetDir();
 
       ////var xWrite = new byte[512];
       ////for (int i = 0; i < 512; i++) {
