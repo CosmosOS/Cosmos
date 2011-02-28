@@ -24,9 +24,5 @@ namespace Cosmos.Hardware.BlockDevice {
       get { return mBusPosition; }
     }
 
-    public override string DeviceType()
-    {
-        return "Ata";
-    }
   }
 }

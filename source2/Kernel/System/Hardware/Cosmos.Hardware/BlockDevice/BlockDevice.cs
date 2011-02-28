@@ -51,10 +51,5 @@ namespace Cosmos.Hardware.BlockDevice {
       }
     }
 
-    public virtual string DeviceType()
-    {
-        return "BlockDevice";
-    }
-
   }
 }
