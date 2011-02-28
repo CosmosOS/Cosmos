@@ -15,7 +15,6 @@ namespace Cosmos.Debug.VSDebugEngine
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
     class AD7Property : IDebugProperty2
     {
-
         private DebugLocalInfo m_variableInformation;
         private AD7Process mProcess;
         private AD7StackFrame mStackFrame;
@@ -108,22 +107,49 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else if (mDebugInfo.Type == typeof(long).AssemblyQualifiedName)
                 {
+					#if DEBUGGERFIXED
+					//didnt work, think because SendMethodContext didnt check the size, but sure
                     // for now, hack long/ulong support: stack values are stored in reverse order (dword-wise)
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset - 4, 8);
+					
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
                     if (xData.Length != 8)
                     {
                         throw new Exception("Length should have been 8, but is " + xData.Length);
                     }
-                    var xTypedLongValue = BitConverter.ToInt64(xData, 0);
+					
+					#else
+					byte[] xData1 = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+					byte[] xData2 = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset - 4, 4);
+					if (xData1.Length + xData2.Length != 8)
+                    {
+                        throw new Exception("Length should have been 8, but is " + (xData1.Length + xData2.Length));
+                    }
+					xData = new byte[8];
+					Array.Copy(xData2, 0, xData, 0, 4);
+					Array.Copy(xData1, 0, xData, 4, 4);
+					#endif
+					var xTypedLongValue = BitConverter.ToInt64(xData, 0);
                     propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedLongValue, xTypedLongValue.ToString("X").ToUpper());
                 }
                 else if (mDebugInfo.Type == typeof(ulong).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset - 4, 8);
+					#if DEBUGGERFIXED
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
                     if (xData.Length != 8)
                     {
                         throw new Exception("Length should have been 8, but is " + xData.Length);
                     }
+					#else
+					byte[] xData1 = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+					byte[] xData2 = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset - 4, 4);
+					if (xData1.Length + xData2.Length != 8)
+                    {
+                        throw new Exception("Length should have been 8, but is " + (xData1.Length + xData2.Length));
+                    }
+					xData = new byte[8];
+					Array.Copy(xData2, 0, xData, 0, 4);
+					Array.Copy(xData1, 0, xData, 4, 4);
+					#endif
                     var xTypedULongValue = BitConverter.ToUInt64(xData, 0);
                     propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedULongValue, xTypedULongValue.ToString("X").ToUpper());
                 }
