@@ -9,6 +9,9 @@ using System.Threading;
 
 namespace Cosmos.Debug.Common
 {
+	/// <summary>
+	/// Used for GDB.
+	/// </summary>
     public class DebugConnectorTCPServer : DebugConnectorStream {
 
         public DebugConnectorTCPServer() {

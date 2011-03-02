@@ -127,7 +127,7 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_SendMethodContext_SendByte";
             new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
             JumpIf(Flags.Equal, "DebugStub_SendMethodContext_After_SendByte");
-            Call("WriteByteToComPort");
+            Call("WriteByteToComPortFixed");
             new Dec { DestinationReg = Registers.ECX };
             Jump("DebugStub_SendMethodContext_SendByte");
 
@@ -295,6 +295,47 @@ namespace Cosmos.Compiler.DebugStub {
             Return();
         }
 
+		// Input: ESI
+		// Output: None
+		// Modifies: EAX, EDX
+		//
+		// Sends byte at [ESI] to com port and does esi - 1
+		protected void WriteByteToComPortFixed() 
+		{
+			// Trivalik: this version is used for stack read. The only change is that ESI is decremented.
+			// So we need no brain to get data from stack.
+
+			// This sucks to use the stack, but x86 can only read and write ports from AL and
+			// we need to read a port before we can write out the value to another port.
+			// The overhead is a lot, but compared to the speed of the serial and the fact
+			// that we wait on the serial port anyways, its a wash.
+			//
+			// This could be changed to use interrupts, but that then complicates
+			// the code and causes interaction with other code. DebugStub should be
+			// as isolated as possible from any other code.
+			Label = "WriteByteToComPortFixed";
+			// Sucks again to use DX just for this, but x86 only supports
+			// 8 bit address for literals on ports
+			DX = mComStatusAddr;
+
+			// Wait for serial port to be ready
+			// Bit 5 (0x20) test for Transmit Holding Register to be empty.
+			Label = "WriteByteToComPortFixed_Wait";
+			AL = Port[DX];
+			AL.Test(0x20);
+			JumpIf(Flags.Zero, "WriteByteToComPortFixed_Wait");
+
+			// Set address of port
+			DX = mComAddr;
+			// Get byte to send
+			AL = Memory[ESI];
+			// Send the byte
+			Port[DX] = AL;
+
+			new Dec { DestinationReg = Registers.ESI };
+			Return();
+		}
+
         //Modifies: AL, DX
         protected void ReadALFromComPort() {
             Label = "ReadALFromComPort";
@@ -321,8 +362,9 @@ namespace Cosmos.Compiler.DebugStub {
             SendTrace();
             SendText();
             SendPtr();
-            WriteByteToComPort();
-            ReadALFromComPort();
+			WriteByteToComPort();
+			WriteByteToComPortFixed();
+			ReadALFromComPort();
 
             SendMethodContext();
             SendMemory();

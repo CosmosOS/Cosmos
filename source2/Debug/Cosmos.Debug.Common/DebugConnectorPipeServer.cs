@@ -8,6 +8,9 @@ using System.Threading;
 
 namespace Cosmos.Debug.Common
 {
+	/// <summary>
+	/// Used for Vmware.
+	/// </summary>
     public class DebugConnectorPipeServer : DebugConnectorStream {
     
         public DebugConnectorPipeServer() {

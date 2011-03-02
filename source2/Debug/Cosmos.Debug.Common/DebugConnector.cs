@@ -188,7 +188,7 @@ namespace Cosmos.Debug.Common
         }
 
         public byte[] GetStackData(int offsetToEBP, uint size)
-        {
+		{
             // from debugstub:
             //// sends a stack value
             //// Serial Params:
@@ -201,30 +201,22 @@ namespace Cosmos.Debug.Common
             }
             var xData = new byte[8];
             mDataSize = (int)size;
+			//TODO find out wherefrom this discrepancy
+			offsetToEBP --;
+
+			// EBP is first
+			offsetToEBP += 4;
+
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCommandData(Command.SendMethodContext, xData, true);
             // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
+
             byte[] xResult;
-            if ((size % 4 == 0)
-                && size > 4)
-            {
-                // values are reversed on the stack..
-                xResult = new byte[size];
-                for (int i = 0; i < (size / 4); i++)
-                {
-                    xResult[(i * 4) + 0] = xData[size - (i * 4) - 4 + 0];
-                    xResult[(i * 4) + 1] = xData[size - (i * 4) - 4 + 1];
-                    xResult[(i * 4) + 2] = xData[size - (i * 4) - 4 + 2];
-                    xResult[(i * 4) + 3] = xData[size - (i * 4) - 4 + 3];
-                }
-            }
-            else
-            {
-                xResult = mData;
-                mData = null;
-            }
-            return xResult;
+
+			xResult = mData.Reverse().ToArray();
+			mData = null;
+			return xResult;
         }
 
         private int mDataSize;
