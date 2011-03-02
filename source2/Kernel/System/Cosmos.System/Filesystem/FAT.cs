@@ -24,6 +24,17 @@ namespace Cosmos.System.Filesystem {
     readonly public UInt32 DataSector; // First Data Sector
     readonly public UInt32 DataSectorCount;
 
+    public static class Attribs {
+      public const int Test = 0x01;
+      public const int Hidden = 0x02;
+      public const int System = 0x04;
+      public const int VolumeID = 0x08;
+      public const int Directory = 0x10;
+      public const int Archive = 0x20;
+      // LongName was created after and is a combination of other attribs. Its "special".
+      public const int LongName = 0x0F;
+    }
+
     public enum FatTypeEnum {Unknown, Fat12, Fat16, Fat32}
     readonly public FatTypeEnum FatType = FatTypeEnum.Unknown;
 
@@ -105,20 +116,28 @@ namespace Cosmos.System.Filesystem {
       }
 
       for (int i = 0; i < xData.Length; i = i + 32) {
-        byte xStatus = xData[i];
         byte xAttrib = xData[i + 11];
         byte xType = xData[i + 12];
-        if (xStatus == 0xE5) {
-          // 0xE5 = Empty slot
-        } else if (xStatus == 0x00) {
-          // Empty slot, and no more entries after this
-          break;
-        } else if (xStatus == 0x05) {
-          // Japanese characters - We dont handle this
+        byte xStatus = xData[i];
+        if (xAttrib == Attribs.LongName) {
+          // No long name support yet.
         } else {
-          string xName = xData.GetAsciiString(i, 11);
-          xResult.Add(xName);
-          int x = 4;
+          if (xStatus == 0xE5) {
+            // 0xE5 = Empty slot, skip it
+          } else if (xStatus == 0x00) {
+            // Empty slot, and no more entries after this
+            break;
+          } else if (xStatus == 0x05) {
+            // Japanese characters - We dont handle these
+          } else {
+            string xEntry = xData.GetAsciiString(i, 11);
+            string xName = xEntry.Substring(0, 8).TrimEnd();
+            string xExt = xEntry.Substring(8, 3).TrimEnd();
+            if (xExt.Length > 0) {
+              xName = xName + "." + xExt;
+            }
+            xResult.Add(xName);
+          }
         }
       }
 
