@@ -131,7 +131,7 @@ namespace Cosmos.System.Filesystem.FAT {
             // if entries are found out of order.
             // Also save buffer and only copy name if a end Ord marker is found.
             string xString1 = xData.GetAscii16String(i + 1, 5);
-            string xString2 = xData.GetAscii16String(i + 14, 5);
+            string xString2 = xData.GetAscii16String(i + 14, 6);
             string xString3 = xData.GetAscii16String(i + 28, 2);
             xLongName = xString1 + xString2 + xString3 + xLongName;
             //TODO: LDIR_Chksum 
