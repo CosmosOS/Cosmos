@@ -117,6 +117,7 @@ namespace Cosmos.System.Filesystem {
           // Japanese characters - We dont handle this
         } else {
           string xName = xData.GetAsciiString(i, 11);
+          xResult.Add(xName);
           int x = 4;
         }
       }

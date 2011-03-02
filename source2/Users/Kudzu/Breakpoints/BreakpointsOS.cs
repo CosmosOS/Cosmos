@@ -23,6 +23,7 @@ namespace BreakpointsKernel {
       xSB.Append("Hello");
       var xDisplay = xSB.ToString();
       Console.WriteLine(xDisplay.Length);
+      Console.WriteLine("First char: " + xSB[0]);
       Console.WriteLine(xDisplay);
     }
 
@@ -49,6 +50,7 @@ namespace BreakpointsKernel {
     protected override void Run() {
       //try {
       //Trace1();
+      //TestSB();
 
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 
@@ -66,23 +68,35 @@ namespace BreakpointsKernel {
       Console.WriteLine("Model No: " + xATA.ModelNo);
       Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
 
-      var xFS = new Cosmos.System.Filesystem.FAT(BlockDevice.Devices[1]);
-      xFS.GetDir();
+      Partition xPartition = null;
+      for (int i = 0; i < BlockDevice.Devices.Count; i++) {
+        var xDevice = BlockDevice.Devices[i];
+        if (xDevice is Partition) {
+          xPartition = (Partition)xDevice;
+        }
+      }
+      Console.WriteLine();
+      Console.WriteLine("Root directory");
+      var xFS = new Cosmos.System.Filesystem.FAT(xPartition);
+      var xDir = xFS.GetDir();
+      for (int i = 0; i < xDir.Count; i++) {
+        Console.WriteLine(xDir[i]);
+      }
 
-      ////var xWrite = new byte[512];
-      ////for (int i = 0; i < 512; i++) {
-      ////  xWrite[i] = (byte)i;
-      ////}
-      ////xATA.WriteBlock(0, xWrite);
+        ////var xWrite = new byte[512];
+        ////for (int i = 0; i < 512; i++) {
+        ////  xWrite[i] = (byte)i;
+        ////}
+        ////xATA.WriteBlock(0, xWrite);
 
-      ////var xRead = new byte[512];
-      ////xATA.ReadBlock(0, xRead);
-      ////string xDisplay = "";
-      ////for (int i = 0; i < 512; i++) {
-      ////  xDisplay = xDisplay + xRead[i].ToHex();
-      ////}
-      ////Console.WriteLine(xDisplay);
-      Stop();
+        ////var xRead = new byte[512];
+        ////xATA.ReadBlock(0, xRead);
+        ////string xDisplay = "";
+        ////for (int i = 0; i < 512; i++) {
+        ////  xDisplay = xDisplay + xRead[i].ToHex();
+        ////}
+        ////Console.WriteLine(xDisplay);
+        Stop();
       //} catch (Exception e) {
       //  Console.WriteLine("Exception: " + e.Message);
       //  Stop();
