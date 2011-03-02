@@ -15,6 +15,12 @@ namespace Cosmos.Debug.Kernel {
         public void SendPtr(object aObject) { } // plugged
 
         public unsafe void Send(string aText) {
+          // TODO: Need to fix this so it can send empty strings.
+          // Sending empty strings locks it up right now
+          if (aText.Length == 0) {
+            return;
+          }
+
             var xChars = aText.ToCharArray();
             fixed (char* xPtr = &xChars[0]) {
                 Send(xChars.Length, xPtr);

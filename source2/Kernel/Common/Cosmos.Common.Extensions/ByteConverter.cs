@@ -35,8 +35,8 @@ namespace Cosmos.Common.Extensions {
       return new string(xChars);
     }
 
-    static public string GetAscii16String(this byte[] n, int aStart, int aCharCount) {
-      //TODO: This routine only handles ASCII. It does not handle other types.
+    static public string GetUtf16String(this byte[] n, int aStart, int aCharCount) {
+      //TODO: This routine only handles ASCII. It does not handle unicode yet.
       var xChars = new char[aCharCount];
       for (int i = 0; i < aCharCount; i++) {
         xChars[i] = (char)n[aStart + i * 2];

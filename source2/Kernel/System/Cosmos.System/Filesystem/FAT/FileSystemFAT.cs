@@ -130,9 +130,9 @@ namespace Cosmos.System.Filesystem.FAT {
             //TODO: Check LDIR_Ord for ordering and throw exception
             // if entries are found out of order.
             // Also save buffer and only copy name if a end Ord marker is found.
-            string xString1 = xData.GetAscii16String(i + 1, 5);
-            string xString2 = xData.GetAscii16String(i + 14, 6);
-            string xString3 = xData.GetAscii16String(i + 28, 2);
+            string xString1 = xData.GetUtf16String(i + 1, 5);
+            string xString2 = xData.GetUtf16String(i + 14, 6);
+            string xString3 = xData.GetUtf16String(i + 28, 2);
             xLongName = xString1 + xString2 + xString3 + xLongName;
             //TODO: LDIR_Chksum 
           }
@@ -147,7 +147,15 @@ namespace Cosmos.System.Filesystem.FAT {
           } else if (xStatus >= 0x20) {
             string xName;
             if (xLongName.Length > 0) {
-              xName = xLongName;
+              // Leading and trailing spaces are to be ignored according to spec.
+              // Many programs (including Windows) pad trailing spaces although it 
+              // it is not required for long names.
+              // TODO: As per spec, ignore trailing periods
+              xName = xLongName.Trim();
+              //Global.Dbg.Send("");
+              Global.Dbg.Send(xName);
+              Global.Dbg.Send(xName.Length.ToString());
+              Global.Dbg.Send(((byte)xName[xName.Length - 1]).ToString());
             } else {
               string xEntry = xData.GetAsciiString(i, 11);
               xName = xEntry.Substring(0, 8).TrimEnd();
@@ -156,9 +164,10 @@ namespace Cosmos.System.Filesystem.FAT {
                 xName = xName + "." + xExt;
               }
             }
-            if ((xAttrib & Attribs.Directory) > 0) {
-              xResult.Add(new Listing.Directory(xName));
-            } else if ((xAttrib & Attribs.VolumeID) == 0) {
+            var xTest = xAttrib & (Attribs.Directory | Attribs.VolumeID);
+            if (xTest == 0) {
+              xResult.Add(new Listing.File(xName));
+            } else if (xTest == Attribs.Directory) {
               xResult.Add(new Listing.Directory(xName));
             }
             xLongName = "";

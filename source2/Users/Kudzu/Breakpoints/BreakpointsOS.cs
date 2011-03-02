@@ -47,10 +47,23 @@ namespace BreakpointsKernel {
       int z3 = 6;
     }
 
+    void TestStringCtor() {
+      char[] xChars = new char[5];
+      xChars[0] = 'A';
+      xChars[1] = 'B';
+      xChars[2] = 'C';
+      xChars[3] = 'D';
+      xChars[4] = 'E';
+      var xString = new string(xChars, 0, 3);
+      Console.WriteLine(xString);
+      Console.WriteLine(xString.Length);
+    }
+
     protected override void Run() {
       //try {
       //Trace1();
       //TestSB();
+      //TestStringCtor();
 
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 
@@ -80,7 +93,12 @@ namespace BreakpointsKernel {
       var xFS = new Cosmos.System.Filesystem.FAT.FileSystemFAT(xPartition);
       var xListing = xFS.GetDir();
       for (int i = 0; i < xListing.Count; i++) {
-        Console.WriteLine(xListing[i].Name);
+        var xItem = xListing[i];
+        if (xItem is Sys.Filesystem.Listing.Directory) {
+          Console.WriteLine("<" + xListing[i].Name + ">");
+        } else if (xItem is Sys.Filesystem.Listing.File) {
+          Console.WriteLine(xListing[i].Name);
+        }
       }
 
         ////var xWrite = new byte[512];
