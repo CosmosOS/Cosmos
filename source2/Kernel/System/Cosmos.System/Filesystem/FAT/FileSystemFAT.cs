@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using Cosmos.Common.Extensions;
 
-namespace Cosmos.System.Filesystem {
-  public class FAT : Filesystem {
+namespace Cosmos.System.Filesystem.FAT {
+  public class FileSystemFAT : FileSystem {
     readonly public UInt32 BytesPerSector;
     readonly public UInt32 SectorsPerCluster;
     
@@ -40,7 +40,7 @@ namespace Cosmos.System.Filesystem {
 
     Cosmos.Hardware.BlockDevice.BlockDevice mDevice;
 
-    public FAT(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
+    public FileSystemFAT(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
       mDevice = aDevice;
 
       var xBPB = aDevice.NewBlockArray(1);
@@ -103,8 +103,8 @@ namespace Cosmos.System.Filesystem {
       mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
     }
 
-    public List<string> GetDir() {
-      var xResult = new List<string>();
+    public List<Listing.Base> GetDir() {
+      var xResult = new List<Listing.Base>();
 
       byte[] xData;
       if (FatType == FatTypeEnum.Fat32) {
@@ -115,28 +115,53 @@ namespace Cosmos.System.Filesystem {
         mDevice.ReadBlock(RootSector, RootSectorCount, xData);
       }
 
+      //TODO: Change xLongName to StringBuilder
+      string xLongName = "";
       for (int i = 0; i < xData.Length; i = i + 32) {
         byte xAttrib = xData[i + 11];
         byte xType = xData[i + 12];
         byte xStatus = xData[i];
         if (xAttrib == Attribs.LongName) {
-          // No long name support yet.
+          if (xType == 0) {
+            byte xOrd = xData[i];
+            if ((xOrd & 0x40) > 0) {
+              xLongName = "";
+            }
+            //TODO: Check LDIR_Ord for ordering and throw exception
+            // if entries are found out of order.
+            // Also save buffer and only copy name if a end Ord marker is found.
+            string xString1 = xData.GetAscii16String(i + 1, 5);
+            string xString2 = xData.GetAscii16String(i + 14, 5);
+            string xString3 = xData.GetAscii16String(i + 28, 2);
+            xLongName = xString1 + xString2 + xString3 + xLongName;
+            //TODO: LDIR_Chksum 
+          }
         } else {
-          if (xStatus == 0xE5) {
-            // 0xE5 = Empty slot, skip it
-          } else if (xStatus == 0x00) {
+          if (xStatus == 0x00) {
             // Empty slot, and no more entries after this
             break;
           } else if (xStatus == 0x05) {
             // Japanese characters - We dont handle these
-          } else {
-            string xEntry = xData.GetAsciiString(i, 11);
-            string xName = xEntry.Substring(0, 8).TrimEnd();
-            string xExt = xEntry.Substring(8, 3).TrimEnd();
-            if (xExt.Length > 0) {
-              xName = xName + "." + xExt;
+          } else if (xStatus == 0xE5) {
+            // Empty slot, skip it
+          } else if (xStatus >= 0x20) {
+            string xName;
+            if (xLongName.Length > 0) {
+              xName = xLongName;
+            } else {
+              string xEntry = xData.GetAsciiString(i, 11);
+              xName = xEntry.Substring(0, 8).TrimEnd();
+              string xExt = xEntry.Substring(8, 3).TrimEnd();
+              if (xExt.Length > 0) {
+                xName = xName + "." + xExt;
+              }
             }
-            xResult.Add(xName);
+            if ((xAttrib & Attribs.Directory) > 0) {
+              xResult.Add(new Listing.Directory(xName));
+            } else if ((xAttrib & Attribs.VolumeID) == 0) {
+              xResult.Add(new Listing.Directory(xName));
+            }
+            xLongName = "";
           }
         }
       }

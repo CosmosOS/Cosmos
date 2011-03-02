@@ -77,10 +77,10 @@ namespace BreakpointsKernel {
       }
       Console.WriteLine();
       Console.WriteLine("Root directory");
-      var xFS = new Cosmos.System.Filesystem.FAT(xPartition);
-      var xDir = xFS.GetDir();
-      for (int i = 0; i < xDir.Count; i++) {
-        Console.WriteLine(xDir[i]);
+      var xFS = new Cosmos.System.Filesystem.FAT.FileSystemFAT(xPartition);
+      var xListing = xFS.GetDir();
+      for (int i = 0; i < xListing.Count; i++) {
+        Console.WriteLine(xListing[i].Name);
       }
 
         ////var xWrite = new byte[512];

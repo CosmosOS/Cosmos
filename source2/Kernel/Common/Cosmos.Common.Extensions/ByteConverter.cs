@@ -14,7 +14,7 @@ namespace Cosmos.Common.Extensions {
   // Since we read from disk, network etc we must be able to specify and change endianness.
   //
   // Default methods are LittleEndian
-  static public class ByteConvertor {
+  static public class ByteConverter {
 
     static public UInt16 ToUInt16(this byte[] n, int aPos) {
       return (UInt16)(n[aPos + 1] << 8 | n[aPos]);
@@ -24,14 +24,28 @@ namespace Cosmos.Common.Extensions {
       return (UInt32)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
     }
 
-    static public string GetAsciiString(this byte[] n, int aStart, int aSize) {
-      var xChars = new char[aSize];
-      for (int i = 0; i < aSize; i++) {
+    static public string GetAsciiString(this byte[] n, int aStart, int aCharCount) {
+      var xChars = new char[aCharCount];
+      for (int i = 0; i < aCharCount; i++) {
         xChars[i] = (char)n[aStart + i];
+        if (xChars[i] == 0) {
+          return new string(xChars, 0, i);
+        }
       }
       return new string(xChars);
     }
 
+    static public string GetAscii16String(this byte[] n, int aStart, int aCharCount) {
+      //TODO: This routine only handles ASCII. It does not handle other types.
+      var xChars = new char[aCharCount];
+      for (int i = 0; i < aCharCount; i++) {
+        xChars[i] = (char)n[aStart + i * 2];
+        if (xChars[i] == 0) {
+          return new string(xChars, 0, i);
+        }
+      }
+      return new string(xChars);
+    }
 
   }
 }
