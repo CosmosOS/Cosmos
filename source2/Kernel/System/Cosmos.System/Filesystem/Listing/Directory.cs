@@ -5,8 +5,7 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.Listing {
   public class Directory : Base {
-    public Directory(string aName) {
-      mName = aName;
+    public Directory(FileSystem aFileSystem, string aName) : base(aFileSystem, aName) {
     }
   }
 }

@@ -103,8 +103,8 @@ namespace Cosmos.System.Filesystem.FAT {
       mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
     }
 
-    public List<Listing.Base> GetDir() {
-      var xResult = new List<Listing.Base>();
+    public List<Cosmos.System.Filesystem.Listing.Base> GetRoot() {
+      var xResult = new List<Cosmos.System.Filesystem.Listing.Base>();
 
       byte[] xData;
       if (FatType == FatTypeEnum.Fat32) {
@@ -119,9 +119,8 @@ namespace Cosmos.System.Filesystem.FAT {
       string xLongName = "";
       for (int i = 0; i < xData.Length; i = i + 32) {
         byte xAttrib = xData[i + 11];
-        byte xType = xData[i + 12];
-        byte xStatus = xData[i];
         if (xAttrib == Attribs.LongName) {
+          byte xType = xData[i + 12];
           if (xType == 0) {
             byte xOrd = xData[i];
             if ((xOrd & 0x40) > 0) {
@@ -145,6 +144,7 @@ namespace Cosmos.System.Filesystem.FAT {
             //TODO: LDIR_Chksum 
           }
         } else {
+          byte xStatus = xData[i];
           if (xStatus == 0x00) {
             // Empty slot, and no more entries after this
             break;
@@ -168,13 +168,17 @@ namespace Cosmos.System.Filesystem.FAT {
                 xName = xName + "." + xExt;
               }
             }
+
+            UInt32 xFirstCluster = (UInt32)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
+
             var xTest = xAttrib & (Attribs.Directory | Attribs.VolumeID);
             if (xTest == 0) {
-              xResult.Add(new Listing.File(xName));
+              UInt32 xSize = xData.ToUInt32(i + 28);
+              xResult.Add(new Listing.File(this, xName, xSize, xFirstCluster));
             } else if (xTest == Attribs.VolumeID) {
               //
             } else if (xTest == Attribs.Directory) {
-              xResult.Add(new Listing.Directory(xName));
+              xResult.Add(new Listing.Directory(this, xName));
             }
             xLongName = "";
           }

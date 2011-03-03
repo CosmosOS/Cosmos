@@ -69,6 +69,8 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="Filesystem\FAT\FileSystemFAT.cs" />
+    <Compile Include="Filesystem\FAT\Listing\Directory.cs" />
+    <Compile Include="Filesystem\FAT\Listing\File.cs" />
     <Compile Include="Filesystem\FileSystem.cs" />
     <Compile Include="Filesystem\Listing\Base.cs" />
     <Compile Include="Filesystem\Listing\Directory.cs" />

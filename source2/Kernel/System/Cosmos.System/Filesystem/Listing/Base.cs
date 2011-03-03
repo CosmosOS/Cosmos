@@ -5,11 +5,19 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.Listing {
   public abstract class Base {
+    public readonly FileSystem FileSystem;
+    public readonly string Name;
 
-    protected string mName;
-    public virtual string Name {
-      get { return mName; }
-      set { mName = value; }
+    public Base(FileSystem aFileSystem, string aName) {
+      FileSystem = aFileSystem;
+      Name = aName;
+    }
+
+    // Size might be updated in an ancestor destructor or on demand,
+    // so its not a readonly field
+    protected UInt64? mSize;
+    public virtual UInt64? Size {
+      get { return mSize; }
     }
 
   }
