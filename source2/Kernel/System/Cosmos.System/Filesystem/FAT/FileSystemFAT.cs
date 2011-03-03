@@ -130,10 +130,18 @@ namespace Cosmos.System.Filesystem.FAT {
             //TODO: Check LDIR_Ord for ordering and throw exception
             // if entries are found out of order.
             // Also save buffer and only copy name if a end Ord marker is found.
-            string xString1 = xData.GetUtf16String(i + 1, 5);
-            string xString2 = xData.GetUtf16String(i + 14, 6);
-            string xString3 = xData.GetUtf16String(i + 28, 2);
-            xLongName = xString1 + xString2 + xString3 + xLongName;
+            string xLongPart = xData.GetUtf16String(i + 1, 5);
+            // We have to check the length because 0xFFFF is a valid Unicode codepoint.
+            // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
+            // this by also looking at the length. Since we short circuit the or, the length
+            // is rarely evaluated.
+            if (xData.ToUInt16(i + 14) != 0xFFFF || xLongPart.Length == 5) {
+              xLongPart = xLongPart + xData.GetUtf16String(i + 14, 6);
+              if (xData.ToUInt16(i + 28) != 0xFFFF || xLongPart.Length == 11) {
+                xLongPart = xLongPart + xData.GetUtf16String(i + 28, 2);
+              }
+            }
+            xLongName = xLongPart + xLongName;
             //TODO: LDIR_Chksum 
           }
         } else {
@@ -152,10 +160,6 @@ namespace Cosmos.System.Filesystem.FAT {
               // it is not required for long names.
               // TODO: As per spec, ignore trailing periods
               xName = xLongName.Trim();
-              //Global.Dbg.Send("");
-              Global.Dbg.Send(xName);
-              Global.Dbg.Send(xName.Length.ToString());
-              Global.Dbg.Send(((byte)xName[xName.Length - 1]).ToString());
             } else {
               string xEntry = xData.GetAsciiString(i, 11);
               xName = xEntry.Substring(0, 8).TrimEnd();
@@ -167,6 +171,8 @@ namespace Cosmos.System.Filesystem.FAT {
             var xTest = xAttrib & (Attribs.Directory | Attribs.VolumeID);
             if (xTest == 0) {
               xResult.Add(new Listing.File(xName));
+            } else if (xTest == Attribs.VolumeID) {
+              //
             } else if (xTest == Attribs.Directory) {
               xResult.Add(new Listing.Directory(xName));
             }

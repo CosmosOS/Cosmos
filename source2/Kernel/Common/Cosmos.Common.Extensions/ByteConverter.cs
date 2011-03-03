@@ -39,10 +39,12 @@ namespace Cosmos.Common.Extensions {
       //TODO: This routine only handles ASCII. It does not handle unicode yet.
       var xChars = new char[aCharCount];
       for (int i = 0; i < aCharCount; i++) {
-        xChars[i] = (char)n[aStart + i * 2];
-        if (xChars[i] == 0) {
+        int xPos = aStart + i * 2;
+        var xChar = (UInt16)(n[xPos + 1] << 8 | n[xPos]);
+        if (xChar == 0) {
           return new string(xChars, 0, i);
         }
+        xChars[i] = (char)xChar;
       }
       return new string(xChars);
     }
