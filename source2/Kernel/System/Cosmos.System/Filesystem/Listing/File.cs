@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.Listing {
   public class File : Base {
-    public File(FileSystem aFileSystem, string aName, UInt64? aSize) : base(aFileSystem, aName) {
+    //TODO:UInt64 Size
+    public File(FileSystem aFileSystem, string aName, UInt32? aSize)
+      : base(aFileSystem, aName) {
       mSize = aSize;
     }
   }

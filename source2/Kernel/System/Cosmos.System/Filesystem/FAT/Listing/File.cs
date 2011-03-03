@@ -7,7 +7,7 @@ namespace Cosmos.System.Filesystem.FAT.Listing {
   public class File : Cosmos.System.Filesystem.Listing.File {
     protected readonly UInt32 mFirstCluster;
 
-    public File(FileSystem aFileSystem, string aName, UInt64 aSize, UInt32 aFirstCluster)
+    public File(FileSystem aFileSystem, string aName, UInt32 aSize, UInt32 aFirstCluster)
       : base(aFileSystem, aName, aSize) {
       mFirstCluster = aFirstCluster;
     }

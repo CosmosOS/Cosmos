@@ -15,8 +15,9 @@ namespace Cosmos.System.Filesystem.Listing {
 
     // Size might be updated in an ancestor destructor or on demand,
     // so its not a readonly field
-    protected UInt64? mSize;
-    public virtual UInt64? Size {
+    //TODO:UInt64 Size
+    protected UInt32? mSize;
+    public virtual UInt32? Size {
       get { return mSize; }
     }
 
