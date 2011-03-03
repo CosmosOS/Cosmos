@@ -5,56 +5,65 @@ using System.Text;
 using Cosmos.Core;
 
 namespace Cosmos.Hardware {
-    // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
-    // by memory moves
-    public class TextScreen : Device {
-        protected byte Color = 0x0F; // White
+  // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
+  // by memory moves
+  public class TextScreen : Device {
+    protected byte Color = 0x0F; // White
+    // Empty + White
+    protected UInt16 mClearCellValue = 0x000F;
+    protected UInt32 mClearCellValue32;
+    protected UInt32 mRow2Addr;
+    protected UInt32 mScrollSize32;
+    protected UInt32 mRowSize32;
 
-        protected Core.IOGroup.TextScreen IO = Core.Global.BaseIOGroups.TextScreen;
-        protected readonly MemoryBlock08 mRAM;
+    protected Core.IOGroup.TextScreen IO = Core.Global.BaseIOGroups.TextScreen;
+    protected readonly MemoryBlock08 mRAM;
 
-        public TextScreen() {
-            mRAM = IO.Memory.Bytes;
-        }
-
-        public int Rows { get { return 25; } }
-        public int Cols { get { return 80; } }
-
-        public void Clear() {
-            // Empty + White + Empty + White
-            UInt32 xData = 0x000F000F;
-            IO.Memory.Fill(0, (uint)(Cols * Rows * 2 / 4), xData);
-        }
-
-        public void ScrollUp() {
-			IO.Memory.MoveDown(0, (uint)(Cols * 2 / 4), (uint)(Cols * (Rows - 1) * 2 / 4));
-        }
-
-        public char this[int aX, int aY] {
-            get {
-                var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
-                return (char)mRAM[xScreenOffset];
-            }
-            set {
-                var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
-                mRAM[xScreenOffset] = (byte)value;
-                mRAM[xScreenOffset + 1] = Color;
-            }
-        }
-
-        public void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
-            Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
-        }
-
-        public void SetCursorPos(int aX, int aY) {
-            char xPos = (char)((aY * Cols) + aX);
-            // Cursor low byte to VGA index register
-            IO.Idx3.Byte = 0x0F;
-            IO.Data3.Byte = (byte)(xPos & 0xFF);
-            // Cursor high byte to VGA index register
-            IO.Idx3.Byte = 0x0E;
-            IO.Data3.Byte = (byte)(xPos >> 8);
-        }
-
+    public TextScreen() {
+      mRAM = IO.Memory.Bytes;
+      mClearCellValue32 = (UInt32)(mClearCellValue << 16 | mClearCellValue);
+      mRow2Addr = (UInt32)(Cols * 2 / 4);
+      mScrollSize32 = (UInt32)(Cols * (Rows - 1) * 2 / 4);
+      mRowSize32 = (UInt32)Cols * 2 / 4;
     }
+
+    public UInt16 Rows { get { return 25; } }
+    public UInt16 Cols { get { return 80; } }
+
+    public void Clear() {
+      IO.Memory.Fill(mClearCellValue32);
+    }
+
+    public void ScrollUp() {
+      IO.Memory.MoveDown(0, mRow2Addr, mScrollSize32);
+      IO.Memory.Fill(mScrollSize32, mRowSize32, mClearCellValue32);
+    }
+
+    public char this[int aX, int aY] {
+      get {
+        var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
+        return (char)mRAM[xScreenOffset];
+      }
+      set {
+        var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
+        mRAM[xScreenOffset] = (byte)value;
+        mRAM[xScreenOffset + 1] = Color;
+      }
+    }
+
+    public void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
+      Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
+    }
+
+    public void SetCursorPos(int aX, int aY) {
+      char xPos = (char)((aY * Cols) + aX);
+      // Cursor low byte to VGA index register
+      IO.Idx3.Byte = 0x0F;
+      IO.Data3.Byte = (byte)(xPos & 0xFF);
+      // Cursor high byte to VGA index register
+      IO.Idx3.Byte = 0x0E;
+      IO.Data3.Byte = (byte)(xPos >> 8);
+    }
+
+  }
 }
