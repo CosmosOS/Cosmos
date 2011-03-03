@@ -136,6 +136,14 @@ namespace Cosmos.Debug.Common
             {
                 return null;
             }
+            if (size == 0) {
+              // no point in retrieving 0 bytes, better not request at all. also, debugstub "crashes" then
+              throw new NotSupportedException("Requested memory data of size = 0");
+            }
+            if (size > 512) {
+              // for now refuse to retrieve large amounts of data:
+              throw new NotSupportedException("Too large amount of data requested");
+            }
             var xData = new byte[8];
             mDataSize = (int)size;
             Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);

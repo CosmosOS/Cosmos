@@ -80,8 +80,9 @@ namespace Cosmos.Debug.VSDebugEngine
                         if (xStringLength > 100)
                         {
                             propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
-                        }
-                        else
+                        } else if (xStringLength == 0) {
+                          propertyInfo.bstrValue = "\"\"";
+                        }else 
                         {
                             xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
                             uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
