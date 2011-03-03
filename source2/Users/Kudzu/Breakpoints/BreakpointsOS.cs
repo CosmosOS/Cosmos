@@ -101,6 +101,8 @@ namespace BreakpointsKernel {
         }
       }
 
+      var xRootFile = (Cosmos.System.Filesystem.FAT.Listing.File)xListing[1];
+
         ////var xWrite = new byte[512];
         ////for (int i = 0; i < 512; i++) {
         ////  xWrite[i] = (byte)i;

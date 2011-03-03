@@ -33,7 +33,7 @@ namespace Cosmos.Hardware.BlockDevice {
       ParsePartition(aMBR, 494);
     }
 
-    protected void ParsePartition(byte[] aMBR, int aLoc) {
+    protected void ParsePartition(byte[] aMBR, UInt32 aLoc) {
       byte xSystemID = aMBR[aLoc + 4];
       // SystemID = 0 means no partition
       if (xSystemID != 0) {

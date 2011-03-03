@@ -31,6 +31,8 @@ namespace Cosmos.Hardware.BlockDevice {
     }
 
     //TODO:UInt64
+    // Only allow reading and writing whole blocks becuase many of the hardware
+    // command work that way and we dont want to add complexity at the BlockDevice level.
     public abstract void ReadBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData);
     //TODO:UInt64
     public abstract void WriteBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData);

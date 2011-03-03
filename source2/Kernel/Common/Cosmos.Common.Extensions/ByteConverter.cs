@@ -16,15 +16,15 @@ namespace Cosmos.Common.Extensions {
   // Default methods are LittleEndian
   static public class ByteConverter {
 
-    static public UInt16 ToUInt16(this byte[] n, int aPos) {
+    static public UInt16 ToUInt16(this byte[] n, UInt32 aPos) {
       return (UInt16)(n[aPos + 1] << 8 | n[aPos]);
     }
 
-    static public UInt32 ToUInt32(this byte[] n, int aPos) {
+    static public UInt32 ToUInt32(this byte[] n, UInt32 aPos) {
       return (UInt32)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
     }
 
-    static public string GetAsciiString(this byte[] n, int aStart, int aCharCount) {
+    static public string GetAsciiString(this byte[] n, UInt32 aStart, UInt32 aCharCount) {
       var xChars = new char[aCharCount];
       for (int i = 0; i < aCharCount; i++) {
         xChars[i] = (char)n[aStart + i];
@@ -35,11 +35,11 @@ namespace Cosmos.Common.Extensions {
       return new string(xChars);
     }
 
-    static public string GetUtf16String(this byte[] n, int aStart, int aCharCount) {
+    static public string GetUtf16String(this byte[] n, UInt32 aStart, UInt32 aCharCount) {
       //TODO: This routine only handles ASCII. It does not handle unicode yet.
       var xChars = new char[aCharCount];
       for (int i = 0; i < aCharCount; i++) {
-        int xPos = aStart + i * 2;
+        UInt32 xPos = (UInt32)(aStart + i * 2);
         var xChar = (UInt16)(n[xPos + 1] << 8 | n[xPos]);
         if (xChar == 0) {
           return new string(xChars, 0, i);

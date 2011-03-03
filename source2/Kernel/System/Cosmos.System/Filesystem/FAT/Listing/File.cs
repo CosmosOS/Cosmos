@@ -5,18 +5,15 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.FAT.Listing {
   public class File : Cosmos.System.Filesystem.Listing.File {
-    protected readonly UInt32 mFirstCluster;
+    public readonly FileSystemFAT FileSystem;
+    public readonly UInt32 FirstCluster;
 
-    public File(FileSystem aFileSystem, string aName, UInt32 aSize, UInt32 aFirstCluster)
+    // Size is UInt32 because FAT doesn't support bigger.
+    // Dont change to UInt64
+    public File(FileSystemFAT aFileSystem, string aName, UInt32 aSize, UInt32 aFirstCluster)
       : base(aFileSystem, aName, aSize) {
-      mFirstCluster = aFirstCluster;
-    }
-
-    // This is a temp POC function
-    public byte[] FileContents() {
-      var xResult = new byte[Size.Value];
-      
-      return xResult;
+      FileSystem = aFileSystem;
+      FirstCluster = aFirstCluster;
     }
 
   }
