@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.Common.Extensions;
 
 namespace Cosmos.System.Filesystem.FAT {
-  public class FileSystemFAT : FileSystem {
+  public class FatFileSystem : FileSystem {
     readonly public UInt32 BytesPerSector;
     readonly public UInt32 SectorsPerCluster;
     
@@ -40,7 +40,7 @@ namespace Cosmos.System.Filesystem.FAT {
 
     Cosmos.Hardware.BlockDevice.BlockDevice mDevice;
 
-    public FileSystemFAT(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
+    public FatFileSystem(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
       mDevice = aDevice;
 
       var xBPB = aDevice.NewBlockArray(1);
@@ -233,11 +233,11 @@ namespace Cosmos.System.Filesystem.FAT {
             var xTest = xAttrib & (Attribs.Directory | Attribs.VolumeID);
             if (xTest == 0) {
               UInt32 xSize = xData.ToUInt32(i + 28);
-              xResult.Add(new Listing.File(this, xName, xSize, xFirstCluster));
+              xResult.Add(new Listing.FatFile(this, xName, xSize, xFirstCluster));
             } else if (xTest == Attribs.VolumeID) {
               //
             } else if (xTest == Attribs.Directory) {
-              xResult.Add(new Listing.Directory(this, xName));
+              xResult.Add(new Listing.FatDirectory(this, xName));
             }
             xLongName = "";
           }

@@ -90,7 +90,7 @@ namespace BreakpointsKernel {
       }
       Console.WriteLine();
       Console.WriteLine("Root directory");
-      var xFS = new Cosmos.System.Filesystem.FAT.FileSystemFAT(xPartition);
+      var xFS = new Cosmos.System.Filesystem.FAT.FatFileSystem(xPartition);
       if (xFS == null) {
         Console.WriteLine("xFS is null!!!");
       }
@@ -105,7 +105,7 @@ namespace BreakpointsKernel {
       }
       Console.Write("Number of files in listing: ");
       Console.WriteLine(xListing.Count.ToString());
-      var xRootFile = (Cosmos.System.Filesystem.FAT.Listing.File)xListing[1];
+      var xRootFile = (Cosmos.System.Filesystem.FAT.Listing.FatFile)xListing[1];
 
 
 

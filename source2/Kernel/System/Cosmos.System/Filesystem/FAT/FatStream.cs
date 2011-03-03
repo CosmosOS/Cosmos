@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.FAT {
   public class FatStream : Stream {
-    protected readonly Listing.File mFileListing;
+    protected readonly Listing.FatFile mFileListing;
     protected byte[] mBuffer;
 
     public override bool CanSeek {
@@ -56,7 +56,7 @@ namespace Cosmos.System.Filesystem.FAT {
       throw new NotImplementedException();
     }
 
-    public FatStream(Listing.File aFileListing) {
+    public FatStream(Listing.FatFile aFileListing) {
       mFileListing = aFileListing;
       mBuffer = aFileListing.FileSystem.NewClusterArray();
     }
