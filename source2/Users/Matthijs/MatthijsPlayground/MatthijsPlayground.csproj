@@ -44,6 +44,10 @@
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Kernel\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>

@@ -22,10 +22,14 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
             {
                 return "Parameter name: {0}";
             }
-            Console.Write("Getting resource: '");
-            Console.Write(aResource);
-            Console.WriteLine("'");
-            Console.ReadLine();
+            if (aResource == "ArgumentOutOfRange_Index")
+            {
+                return "Argument {0} out of range!";
+            }
+            //Console.Write("Getting resource: '");
+            //Console.Write(aResource);
+            //Console.WriteLine("'");
+            //Console.ReadLine();
             return aResource;
         }
 

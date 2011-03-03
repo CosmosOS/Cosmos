@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Sys = Cosmos.System;
+using Cosmos.Common.Extensions;
 
 namespace MatthijsPlayground
 {
@@ -12,23 +13,16 @@ namespace MatthijsPlayground
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
         }
 
+        private static byte[] mTestBytes;
+
         protected override void Run()
         {
-            string xTest;
-            DoSomething();
-            xTest = "test";
-            var xSB = new StringBuilder("AAAA");
+            var xBytes = new byte[] { 65, 66, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            var xStr = ByteConverter.GetAsciiString(xBytes, 0, 6);
             
-            if (xSB[0] == 'A')
-            {
-                Console.WriteLine("1");
-            }
-            else
-            {
-                Console.WriteLine("2");
-            }
-            while (true)
-                ;
+
+            Console.WriteLine("Done");
+            Stop();
         }
 
         private static void DoSomething()

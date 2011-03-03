@@ -226,7 +226,10 @@ namespace Cosmos.IL2CPU.X86
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
             }
-            new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
+            if (aMethod.PlugMethod == null)
+            {
+                new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
+            }
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();

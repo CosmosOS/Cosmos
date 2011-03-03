@@ -172,7 +172,8 @@ namespace Cosmos.System.Filesystem.FAT {
         xData = mDevice.NewBlockArray(RootSectorCount);
         mDevice.ReadBlock(RootSector, RootSectorCount, xData);
       }
-
+      global::System.Console.Write("xData.Length: ");
+      global::System.Console.WriteLine(xData.Length.ToString());
       //TODO: Change xLongName to StringBuilder
       string xLongName = "";
       for (UInt32 i = 0; i < xData.Length; i = i + 32) {
@@ -188,10 +189,10 @@ namespace Cosmos.System.Filesystem.FAT {
             // if entries are found out of order.
             // Also save buffer and only copy name if a end Ord marker is found.
             string xLongPart = xData.GetUtf16String(i + 1, 5);
-            // We have to check the length because 0xFFFF is a valid Unicode codepoint.
-            // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
-            // this by also looking at the length. Since we short circuit the or, the length
-            // is rarely evaluated.
+              // We have to check the length because 0xFFFF is a valid Unicode codepoint.
+              // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
+              // this by also looking at the length. Since we short circuit the or, the length
+              // is rarely evaluated.
             if (xData.ToUInt16(i + 14) != 0xFFFF || xLongPart.Length == 5) {
               xLongPart = xLongPart + xData.GetUtf16String(i + 14, 6);
               if (xData.ToUInt16(i + 28) != 0xFFFF || xLongPart.Length == 11) {
@@ -199,7 +200,7 @@ namespace Cosmos.System.Filesystem.FAT {
               }
             }
             xLongName = xLongPart + xLongName;
-            //TODO: LDIR_Chksum 
+      //      //TODO: LDIR_Chksum 
           }
         } else {
           byte xStatus = xData[i];

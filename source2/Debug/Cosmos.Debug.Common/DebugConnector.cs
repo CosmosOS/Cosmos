@@ -141,48 +141,11 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCommandData(Command.SendMemory, xData, true);
-            var xResult = mData.Reverse().ToArray();
+            var xResult = mData;
+            mData = null;
             if (xResult.Length != size)
             {
                 throw new Exception("Retrieved a different size than requested!");
-            }
-            // somehow it sends the dwords in reverse order?
-            if (dataElementSize != 1)
-            {
-                if (size % dataElementSize == 0)
-                {
-                    byte[] xRealResult;
-                    int xNumElements;
-                    switch (dataElementSize)
-                    {
-                        case 4:
-                            xRealResult = new byte[xResult.Length];
-                            xNumElements = xResult.Length / 4;
-                            for (var i = xNumElements - 1; i >= 0; i--)
-                            {
-                                var xRealIdx = (xNumElements - i - 1) * 4;
-                                xRealResult[xRealIdx + 0] = xResult[(i * 4) + 3];
-                                xRealResult[xRealIdx + 1] = xResult[(i * 4) + 2];
-                                xRealResult[xRealIdx + 2] = xResult[(i * 4) + 1];
-                                xRealResult[xRealIdx + 3] = xResult[(i * 4) + 0];
-                            }
-                            xResult = xRealResult;
-                            break;
-                        case 2:
-                            xRealResult = new byte[xResult.Length];
-                            xNumElements = xResult.Length / 2;
-                            for (var i = xNumElements - 1; i >= 0; i--)
-                            {
-                                var xRealIdx = (xNumElements - i - 1) * 2;
-                                xRealResult[xRealIdx + 0] = xResult[(i * 2) + 1];
-                                xRealResult[xRealIdx + 1] = xResult[(i * 2) + 0];
-                            }
-                            xResult = xRealResult;
-                            break;
-                        default:
-                            throw new Exception("DataElement size not supported: " + dataElementSize);
-                    }
-                }
             }
             return xResult;
         }

@@ -91,6 +91,9 @@ namespace BreakpointsKernel {
       Console.WriteLine();
       Console.WriteLine("Root directory");
       var xFS = new Cosmos.System.Filesystem.FAT.FileSystemFAT(xPartition);
+      if (xFS == null) {
+        Console.WriteLine("xFS is null!!!");
+      }
       var xListing = xFS.GetRoot();
       for (int i = 0; i < xListing.Count; i++) {
         var xItem = xListing[i];
@@ -100,23 +103,27 @@ namespace BreakpointsKernel {
           Console.WriteLine(xListing[i].Name);
         }
       }
-
+      Console.Write("Number of files in listing: ");
+      Console.WriteLine(xListing.Count.ToString());
       var xRootFile = (Cosmos.System.Filesystem.FAT.Listing.File)xListing[1];
 
-        ////var xWrite = new byte[512];
-        ////for (int i = 0; i < 512; i++) {
-        ////  xWrite[i] = (byte)i;
-        ////}
-        ////xATA.WriteBlock(0, xWrite);
 
-        ////var xRead = new byte[512];
-        ////xATA.ReadBlock(0, xRead);
-        ////string xDisplay = "";
-        ////for (int i = 0; i < 512; i++) {
-        ////  xDisplay = xDisplay + xRead[i].ToHex();
-        ////}
-        ////Console.WriteLine(xDisplay);
-        Stop();
+
+      ////var xWrite = new byte[512];
+      ////for (int i = 0; i < 512; i++) {
+      ////  xWrite[i] = (byte)i;
+      ////}
+      ////xATA.WriteBlock(0, xWrite);
+
+      ////var xRead = new byte[512];
+      ////xATA.ReadBlock(0, xRead);
+      ////string xDisplay = "";
+      ////for (int i = 0; i < 512; i++) {
+      ////  xDisplay = xDisplay + xRead[i].ToHex();
+      ////}
+      ////Console.WriteLine(xDisplay);
+      Console.WriteLine("Done.");
+      Stop();
       //} catch (Exception e) {
       //  Console.WriteLine("Exception: " + e.Message);
       //  Stop();
