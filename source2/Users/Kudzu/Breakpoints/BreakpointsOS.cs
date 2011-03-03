@@ -105,9 +105,10 @@ namespace BreakpointsKernel {
       }
       Console.Write("Number of files in listing: ");
       Console.WriteLine(xListing.Count.ToString());
-      var xRootFile = (Cosmos.System.Filesystem.FAT.Listing.FatFile)xListing[1];
 
-
+      var xRootFile = (Sys.Filesystem.FAT.Listing.FatFile)xListing[1];
+      var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+      
 
       ////var xWrite = new byte[512];
       ////for (int i = 0; i < 512; i++) {
@@ -122,7 +123,6 @@ namespace BreakpointsKernel {
       ////  xDisplay = xDisplay + xRead[i].ToHex();
       ////}
       ////Console.WriteLine(xDisplay);
-      Console.WriteLine("Done.");
       Stop();
       //} catch (Exception e) {
       //  Console.WriteLine("Exception: " + e.Message);

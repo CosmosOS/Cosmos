@@ -40,6 +40,50 @@ namespace Cosmos.System.Filesystem.FAT {
 
     Cosmos.Hardware.BlockDevice.BlockDevice mDevice;
 
+    public void ReadFatTableSector(UInt32 xSectorNum, byte[] aData) {
+      mDevice.ReadBlock(ReservedSectorCount + xSectorNum, 1, aData);
+    }
+
+    public bool FatEntryIsEOF(UInt32 aValue) {
+      if (FatType == FatTypeEnum.Fat12) {
+        return aValue >= 0x0FF8;
+      } else if (FatType == FatTypeEnum.Fat16) {
+        return aValue >= 0xFFF8;
+      } else {
+        return aValue >= 0x0FFFFFF8;
+      }
+    }
+
+    public UInt32 GetFatEntry(byte[] aSector, UInt32 aClusterNum, UInt32 aOffset) {
+      if (FatType == FatTypeEnum.Fat12) {
+        if (aOffset == (BytesPerSector - 1)) {
+          throw new Exception("TODO: Sector Span");
+          /* This cluster access spans a sector boundary in the FAT */
+          /* There are a number of strategies to handling this. The */
+          /* easiest is to always load FAT sectors into memory */
+          /* in pairs if the volume is FAT12 (if you want to load */
+          /* FAT sector N, you also load FAT sector N+1 immediately */
+          /* following it in memory unless sector N is the last FAT */
+          /* sector). It is assumed that this is the strategy used here */
+          /* which makes this if test for a sector boundary span */
+          /* unnecessary. */
+        }
+        // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
+        // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
+        // we want the high 12-bits of the 16-bits we fetch. 
+        UInt32 xResult = aSector.ToUInt16(aOffset);
+        if ((aClusterNum & 0x01) == 0) { // Even
+          return xResult & 0x0FFF;
+        } else { // Odd
+          return xResult >> 4;
+        }
+      } else if (FatType == FatTypeEnum.Fat16) {
+        return aSector.ToUInt16(aOffset);
+      } else {
+        return aSector.ToUInt32(aOffset) & 0x0FFFFFFF;
+      }
+    }
+
     public FatFileSystem(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
       mDevice = aDevice;
 
@@ -104,61 +148,18 @@ namespace Cosmos.System.Filesystem.FAT {
       mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
     }
 
-    // For FAT we should cache FAT tables a bit, however on average
-    // FAT tables use 1 MB per 1 GB (160GB disk has 160MB of FAT) of disk space so its not practical to 
-    // cache the entire FAT table.
-    // One option would be to cache at least the last FAT sector and also cache the FAT entries for a file
-    // as its used.
-    public UInt32 GetNextCluster(UInt32 aCluster) {
+    public void GetFatTableSector(UInt32 aClusterNum, out UInt32 oSector, out UInt32 oOffset) {
       UInt32 xOffset = 0;
       if (FatType == FatTypeEnum.Fat12) {
         // Multiply by 1.5 without using floating point, the divide by 2 rounds DOWN
-        xOffset = aCluster + (aCluster / 2);
+        xOffset = aClusterNum + (aClusterNum / 2);
       } else if (FatType == FatTypeEnum.Fat16) {
-        xOffset = aCluster * 2;
+        xOffset = aClusterNum * 2;
       } else if (FatType == FatTypeEnum.Fat32) {
-        xOffset = aCluster * 4;
+        xOffset = aClusterNum * 4;
       }
-      UInt32 xFatSecNum = ReservedSectorCount + (xOffset / BytesPerSector);
-      UInt32 xFatEntOffset = xOffset % BytesPerSector;
-
-      byte[] xFatTable = mDevice.NewBlockArray(1);
-      mDevice.ReadBlock(xFatSecNum, 1, xFatTable);
-
-      UInt32 xResult = 0;
-      if (FatType == FatTypeEnum.Fat12) {
-        if (xFatEntOffset == (BytesPerSector - 1)) {
-          throw new Exception("TODO: Sector Span");
-          /* This cluster access spans a sector boundary in the FAT */
-          /* There are a number of strategies to handling this. The */
-          /* easiest is to always load FAT sectors into memory */
-          /* in pairs if the volume is FAT12 (if you want to load */
-          /* FAT sector N, you also load FAT sector N+1 immediately */
-          /* following it in memory unless sector N is the last FAT */
-          /* sector). It is assumed that this is the strategy used here */
-          /* which makes this if test for a sector boundary span */
-          /* unnecessary. */
-        }
-        // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number i
-        // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
-        // we want the high 12-bits of the 16-bits we fetch. 
-        xResult = xFatTable.ToUInt16(xFatEntOffset);
-        if ((aCluster & 0x01) == 0) { // Even
-          xResult = xResult & 0x0FFF;
-        } else { // Odd
-          xResult = xResult >> 4; 
-        }
-      } else if (FatType == FatTypeEnum.Fat16) {
-        xResult = xFatTable.ToUInt16(xFatEntOffset);
-      } else if (FatType == FatTypeEnum.Fat32) {
-        xResult = xFatTable.ToUInt32(xFatEntOffset) & 0x0FFFFFFF;
-      } 
-
-      return xResult;
-    }
-
-    public UInt32 FindClusterForPosition(UInt32 aFirstCluster, UInt32 aPosition) {
-      return 0;
+      oSector = xOffset / BytesPerSector;
+      oOffset = xOffset % BytesPerSector;
     }
 
     public List<Cosmos.System.Filesystem.Listing.Base> GetRoot() {

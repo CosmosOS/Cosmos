@@ -6,8 +6,28 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.FAT {
   public class FatStream : Stream {
-    protected readonly Listing.FatFile mFileListing;
-    protected byte[] mBuffer;
+    protected readonly Listing.FatFile mFile;
+    protected readonly FatFileSystem mFS = null;
+    protected byte[] mReadBuffer;
+    //TODO: In future we might read this in as needed rather than
+    // all at once. This structure will also consume 2% of file size in RAM 
+    // (for default cluster size of 2kb, ie 4 bytes per cluster)
+    // so we might consider a way to flush it and only keep parts.
+    // Example, a 100 MB file will require 2MB for this structure. That is
+    // probably acceptable for the mid term future.
+    protected List<UInt32> mFatTable;
+    //TODO:UInt64
+    protected UInt32? mReadBufferPosition;
+
+    public FatStream(Listing.FatFile aFile) {
+      mFile = aFile;
+      mFS = mFile.FileSystem;
+      mReadBuffer = mFile.FileSystem.NewClusterArray();
+
+      if (mFile.Size > 0) {
+        mFatTable = mFile.GetFatTable();
+      }
+    }
 
     public override bool CanSeek {
       get { return true; }
@@ -22,7 +42,7 @@ namespace Cosmos.System.Filesystem.FAT {
     }
 
     public override long Length {
-      get { return mFileListing.Size.Value; }
+      get { return mFile.Size.Value; }
     }
 
     protected UInt32 mPosition;
@@ -35,8 +55,22 @@ namespace Cosmos.System.Filesystem.FAT {
       }
     }
 
-    public override int Read(byte[] buffer, int offset, int count) {
-      // FirstSector can be 0 for 0 length files
+    protected void ReadCluster(UInt32 aPosition) {
+      //mFileListing.FileSystem.ReadCluster(aCluster, mReadBuffer);
+    }
+
+    public override int Read(byte[] aBuffer, int aOffset, int aCount) {
+      if (aOffset < 0 || aCount < 0) {
+        throw new ArgumentOutOfRangeException();
+      } else if (aOffset >= mFile.Size) {
+        throw new ArgumentException();
+      } else if (mFile.FirstClusterNum == 0) {
+        // FirstSector can be 0 for 0 length files
+        return 0;
+      } else if (aOffset == mFile.Size) {
+        // EOF
+        return 0;
+      }
       return 0;
     }
 
@@ -56,9 +90,5 @@ namespace Cosmos.System.Filesystem.FAT {
       throw new NotImplementedException();
     }
 
-    public FatStream(Listing.FatFile aFileListing) {
-      mFileListing = aFileListing;
-      mBuffer = aFileListing.FileSystem.NewClusterArray();
-    }
   }
 }
