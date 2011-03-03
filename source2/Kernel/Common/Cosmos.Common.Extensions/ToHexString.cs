@@ -54,10 +54,15 @@ namespace Cosmos.Common.Extensions {
         private static string ConvertToHex(UInt32 num) {
             string xHex = string.Empty;
 
-            while (num != 0) {
+            if (num == 0) {
+              xHex = "0";
+            } else {
+              while (num != 0) {
                 //Note; char is converted to string because Cosmos crashes when adding char and string. Frode, 7.june.
+                //TODO: Is this still true? I think Cosmos can handle char + string just fine now.
                 xHex = SingleDigitToHex((byte)(num & 0xf)) + xHex;
                 num = num >> 4;
+              }
             }
 
             return xHex;
