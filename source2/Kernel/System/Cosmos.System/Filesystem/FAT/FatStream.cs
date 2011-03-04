@@ -55,10 +55,6 @@ namespace Cosmos.System.Filesystem.FAT {
       }
     }
 
-    protected void ReadCluster(UInt32 aPosition) {
-      //mFileListing.FileSystem.ReadCluster(aCluster, mReadBuffer);
-    }
-
     public override int Read(byte[] aBuffer, int aOffset, int aCount) {
       if (aOffset < 0 || aCount < 0) {
         throw new ArgumentOutOfRangeException();

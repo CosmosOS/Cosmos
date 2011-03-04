@@ -6,6 +6,7 @@ using Sys = Cosmos.System;
 using Cosmos.Debug.Kernel;
 using Cosmos.Common.Extensions;
 using Cosmos.Hardware.BlockDevice;
+using FAT = Cosmos.System.Filesystem.FAT;
 
 namespace BreakpointsKernel {
   public class BreakpointsOS : Sys.Kernel {
@@ -90,23 +91,29 @@ namespace BreakpointsKernel {
       }
       Console.WriteLine();
       Console.WriteLine("Root directory");
-      var xFS = new Cosmos.System.Filesystem.FAT.FatFileSystem(xPartition);
+      var xFS = new FAT.FatFileSystem(xPartition);
       var xListing = xFS.GetRoot();
-      Sys.Filesystem.FAT.Listing.FatFile xRootFile = null;
+      FAT.Listing.FatFile xRootFile = null;
+      FAT.Listing.FatFile xKudzuFile = null;
       for (int i = 0; i < xListing.Count; i++) {
         var xItem = xListing[i];
         if (xItem is Sys.Filesystem.Listing.Directory) {
           Console.WriteLine("<" + xListing[i].Name + ">");
         } else if (xItem is Sys.Filesystem.Listing.File) {
           Console.WriteLine(xListing[i].Name);
-          if (xListing[i].Name == "ROOT.TXT") {
-            xRootFile = (Sys.Filesystem.FAT.Listing.FatFile)xListing[i];
+          if (xListing[i].Name == "Root.txt") {
+            xRootFile = (FAT.Listing.FatFile)xListing[i];
+          } else if (xListing[i].Name == "Kudzu.txt") {
+            xRootFile = (FAT.Listing.FatFile)xListing[i];
           }
         }
       }
 
-      //var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
-      
+      var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+      var xRootData = new byte[xRootFile.Size.Value];
+      xStream.Read(xRootData, 0, (int)xRootFile.Size.Value);
+
+      int dummy = 42;
 
       //var xWrite = new byte[512];
       //for (int i = 0; i < 512; i++) {
@@ -121,6 +128,7 @@ namespace BreakpointsKernel {
       //  xDisplay = xDisplay + xRead[i].ToHex();
       //}
       //Console.WriteLine(xDisplay);
+
       Stop();
       //} catch (Exception e) {
       //  Console.WriteLine("Exception: " + e.Message);
