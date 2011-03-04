@@ -48,6 +48,22 @@ namespace BreakpointsKernel {
       int z3 = 6;
     }
 
+    void TestNullableTypes() {
+      Console.WriteLine();
+
+      UInt32 x = 32;
+      UInt32? y = x;
+      Console.WriteLine(x);
+      Console.WriteLine(y.Value);
+
+      UInt32 x2 = 64;
+      UInt32? y2 = x2;
+      Console.WriteLine(x2);
+      Console.WriteLine(y2.Value);
+
+      Console.ReadLine();
+    }
+
     void TestStringCtor() {
       char[] xChars = new char[5];
       xChars[0] = 'A';
@@ -65,7 +81,9 @@ namespace BreakpointsKernel {
       //Trace1();
       //TestSB();
       //TestStringCtor();
+      TestNullableTypes();
 
+      Console.WriteLine();
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 
       AtaPio xATA = null;
@@ -100,7 +118,9 @@ namespace BreakpointsKernel {
         if (xItem is Sys.Filesystem.Listing.Directory) {
           Console.WriteLine("<" + xListing[i].Name + ">");
         } else if (xItem is Sys.Filesystem.Listing.File) {
-          Console.WriteLine(xListing[i].Name + ": " + xListing[i].Size);
+          Console.WriteLine();
+          Console.WriteLine(xListing[i].Name);
+          Console.WriteLine(xListing[i].Size.Value);
           if (xListing[i].Name == "Root.txt") {
             xRootFile = (FAT.Listing.FatFile)xListing[i];
           } else if (xListing[i].Name == "Kudzu.txt") {
