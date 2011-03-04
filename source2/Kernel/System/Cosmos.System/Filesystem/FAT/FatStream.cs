@@ -42,7 +42,7 @@ namespace Cosmos.System.Filesystem.FAT {
     }
 
     public override long Length {
-      get { return mFile.Size.Value; }
+      get { return mFile.Size; }
     }
 
     protected UInt32 mPosition;

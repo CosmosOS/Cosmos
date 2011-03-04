@@ -61,6 +61,9 @@ namespace BreakpointsKernel {
       Console.WriteLine(x2);
       Console.WriteLine(y2.Value);
 
+      UInt32? y3 = x2;
+      Console.WriteLine(y3.Value);
+
       Console.ReadLine();
     }
 
@@ -120,7 +123,7 @@ namespace BreakpointsKernel {
         } else if (xItem is Sys.Filesystem.Listing.File) {
           Console.WriteLine();
           Console.WriteLine(xListing[i].Name);
-          Console.WriteLine(xListing[i].Size.Value);
+          Console.WriteLine(xListing[i].Size);
           if (xListing[i].Name == "Root.txt") {
             xRootFile = (FAT.Listing.FatFile)xListing[i];
           } else if (xListing[i].Name == "Kudzu.txt") {
@@ -130,8 +133,8 @@ namespace BreakpointsKernel {
       }
 
       var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
-      var xRootData = new byte[xRootFile.Size.Value];
-      xStream.Read(xRootData, 0, (int)xRootFile.Size.Value);
+      var xRootData = new byte[xRootFile.Size];
+      xStream.Read(xRootData, 0, (int)xRootFile.Size);
 
       int dummy = 42;
 
