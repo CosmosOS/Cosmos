@@ -64,9 +64,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASCIIEncodingImpl.cs" />
     <Compile Include="ConsoleImpl.cs" />
     <Compile Include="Int32Impl.cs" />
     <Compile Include="MathImpl.cs" />
+    <Compile Include="MonitorImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeImpl.cs" />
   </ItemGroup>
