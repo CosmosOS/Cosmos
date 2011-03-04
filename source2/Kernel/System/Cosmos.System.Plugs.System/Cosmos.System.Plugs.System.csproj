@@ -64,13 +64,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ASCIIEncodingImpl.cs" />
-    <Compile Include="ConsoleImpl.cs" />
-    <Compile Include="Int32Impl.cs" />
-    <Compile Include="MathImpl.cs" />
-    <Compile Include="MonitorImpl.cs" />
+    <Compile Include="System\Text\ASCIIEncodingImpl.cs" />
+    <Compile Include="System\ConsoleImpl.cs" />
+    <Compile Include="System\Int32Impl.cs" />
+    <Compile Include="System\MathImpl.cs" />
+    <Compile Include="System\Threading\MonitorImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeImpl.cs" />
+    <Compile Include="System\TypeImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
@@ -89,6 +89,7 @@
   <ItemGroup>
     <None Include="Cosmos.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
