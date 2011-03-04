@@ -63,7 +63,7 @@ namespace BreakpointsKernel {
       //try {
       //Trace1();
       //TestSB();
-      //TestStringCtor();
+      TestStringCtor();
 
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 
@@ -91,38 +91,36 @@ namespace BreakpointsKernel {
       Console.WriteLine();
       Console.WriteLine("Root directory");
       var xFS = new Cosmos.System.Filesystem.FAT.FatFileSystem(xPartition);
-      if (xFS == null) {
-        Console.WriteLine("xFS is null!!!");
-      }
       var xListing = xFS.GetRoot();
+      Sys.Filesystem.FAT.Listing.FatFile xRootFile = null;
       for (int i = 0; i < xListing.Count; i++) {
         var xItem = xListing[i];
         if (xItem is Sys.Filesystem.Listing.Directory) {
           Console.WriteLine("<" + xListing[i].Name + ">");
         } else if (xItem is Sys.Filesystem.Listing.File) {
           Console.WriteLine(xListing[i].Name);
+          if (xListing[i].Name == "ROOT.TXT") {
+            xRootFile = (Sys.Filesystem.FAT.Listing.FatFile)xListing[i];
+          }
         }
       }
-      Console.Write("Number of files in listing: ");
-      Console.WriteLine(xListing.Count.ToString());
 
-      var xRootFile = (Sys.Filesystem.FAT.Listing.FatFile)xListing[1];
-      var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+      //var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
       
 
-      ////var xWrite = new byte[512];
-      ////for (int i = 0; i < 512; i++) {
-      ////  xWrite[i] = (byte)i;
-      ////}
-      ////xATA.WriteBlock(0, xWrite);
+      //var xWrite = new byte[512];
+      //for (int i = 0; i < 512; i++) {
+      //  xWrite[i] = (byte)i;
+      //}
+      //xATA.WriteBlock(0, xWrite);
 
-      ////var xRead = new byte[512];
-      ////xATA.ReadBlock(0, xRead);
-      ////string xDisplay = "";
-      ////for (int i = 0; i < 512; i++) {
-      ////  xDisplay = xDisplay + xRead[i].ToHex();
-      ////}
-      ////Console.WriteLine(xDisplay);
+      //var xRead = xATA.NewBlockArray(1);
+      //xATA.ReadBlock(0, 1, xRead);
+      //string xDisplay = "";
+      //for (int i = 0; i < 512; i++) {
+      //  xDisplay = xDisplay + xRead[i].ToHex();
+      //}
+      //Console.WriteLine(xDisplay);
       Stop();
       //} catch (Exception e) {
       //  Console.WriteLine("Exception: " + e.Message);
