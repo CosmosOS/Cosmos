@@ -48,6 +48,18 @@ namespace BreakpointsKernel {
       int z3 = 6;
     }
 
+    void TestCompare() {
+      UInt32 x = UInt32.MaxValue;
+      int y = 0;
+      if (y >= x) {
+        Console.WriteLine("Compare failed.");
+      } else {
+        Console.WriteLine("Compare OK.");
+      }
+
+      Console.ReadLine();
+    }
+
     void TestNullableTypes() {
       Console.WriteLine();
 
@@ -84,7 +96,8 @@ namespace BreakpointsKernel {
       //Trace1();
       //TestSB();
       //TestStringCtor();
-      TestNullableTypes();
+      //TestNullableTypes();
+      //TestCompare();
 
       Console.WriteLine();
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
@@ -132,9 +145,16 @@ namespace BreakpointsKernel {
         }
       }
 
-      var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+      var xRootStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
       var xRootData = new byte[xRootFile.Size];
-      xStream.Read(xRootData, 0, (int)xRootFile.Size);
+      xRootStream.Read(xRootData, 0, (int)xRootFile.Size);
+      //var xRootText = ASCIIEncoding.ASCII.GetString(xRootData);
+      var xRootText = ASCIIGetString(xRootData);
+      Console.WriteLine(xRootText);
+
+      var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
+      var xKudzuData = new byte[xKudzuFile.Size];
+      xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
 
       int dummy = 42;
 
@@ -157,6 +177,16 @@ namespace BreakpointsKernel {
       //  Console.WriteLine("Exception: " + e.Message);
       //  Stop();
       //}
+    }
+
+    // Temp hack
+    // var xRootText = ASCIIEncoding.ASCII.GetString(xRootData);
+    string ASCIIGetString(byte[] aBytes) {
+      var xChars = new char[aBytes.Length];
+      for (int i = 0; i < aBytes.Length; i++) {
+        xChars[i] = (char)aBytes[i];
+      }
+      return new string(xChars);
     }
 
     protected override void AfterRun() {

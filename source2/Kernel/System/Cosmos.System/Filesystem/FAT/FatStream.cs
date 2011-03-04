@@ -67,7 +67,28 @@ namespace Cosmos.System.Filesystem.FAT {
         // EOF
         return 0;
       }
-      return 0;
+
+      var xCluster = mFS.NewClusterArray();
+      UInt32 xClusterSize = mFS.BytesPerCluster;
+
+      while (aCount > 0) {
+        UInt32 xClusterIdx = mPosition / xClusterSize;
+        UInt32 xPosInCluster = mPosition % xClusterSize;
+        mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
+        int xReadSize;
+        if (xPosInCluster + aCount > xClusterSize) {
+          xReadSize = (int)(xClusterSize - xPosInCluster - 1);
+        } else {
+          xReadSize = aCount;
+        }
+        // (int) casts are needed so we use the 32 bit version of the copy since the 64 bit arg
+        // version is not supported currently.
+        Array.Copy(xCluster, (int)xPosInCluster, aBuffer, (int)aOffset, (int)xReadSize);
+        aOffset = aOffset + xReadSize;
+        aCount = aCount - xReadSize;
+      }
+
+      return (int)aOffset;
     }
 
     public override void Flush() {

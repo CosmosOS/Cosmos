@@ -8,6 +8,7 @@ namespace Cosmos.System.Filesystem.FAT {
   public class FatFileSystem : FileSystem {
     readonly public UInt32 BytesPerSector;
     readonly public UInt32 SectorsPerCluster;
+    readonly public UInt32 BytesPerCluster;
     
     readonly public UInt32 ReservedSectorCount;
     readonly public UInt32 TotalSectorCount;
@@ -97,6 +98,7 @@ namespace Cosmos.System.Filesystem.FAT {
 
       BytesPerSector = xBPB.ToUInt16(11);
       SectorsPerCluster = xBPB[13];
+      BytesPerCluster = BytesPerSector * SectorsPerCluster;
       ReservedSectorCount = xBPB.ToUInt16(14);
       NumberOfFATs = xBPB[16];
       RootEntryCount = xBPB.ToUInt16(17);
@@ -139,7 +141,7 @@ namespace Cosmos.System.Filesystem.FAT {
     }
 
     public byte[] NewClusterArray() {
-      return new byte[SectorsPerCluster * BytesPerSector];
+      return new byte[BytesPerCluster];
     }
 
     public void ReadCluster(UInt32 aCluster, byte[] aData) {
