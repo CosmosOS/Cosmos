@@ -100,11 +100,11 @@ namespace BreakpointsKernel {
         if (xItem is Sys.Filesystem.Listing.Directory) {
           Console.WriteLine("<" + xListing[i].Name + ">");
         } else if (xItem is Sys.Filesystem.Listing.File) {
-          Console.WriteLine(xListing[i].Name);
+          Console.WriteLine(xListing[i].Name + ": " + xListing[i].Size);
           if (xListing[i].Name == "Root.txt") {
             xRootFile = (FAT.Listing.FatFile)xListing[i];
           } else if (xListing[i].Name == "Kudzu.txt") {
-            xRootFile = (FAT.Listing.FatFile)xListing[i];
+            xKudzuFile = (FAT.Listing.FatFile)xListing[i];
           }
         }
       }
