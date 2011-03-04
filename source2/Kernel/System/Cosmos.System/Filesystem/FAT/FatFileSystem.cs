@@ -173,8 +173,6 @@ namespace Cosmos.System.Filesystem.FAT {
         xData = mDevice.NewBlockArray(RootSectorCount);
         mDevice.ReadBlock(RootSector, RootSectorCount, xData);
       }
-      global::System.Console.Write("xData.Length: ");
-      global::System.Console.WriteLine(xData.Length.ToString());
       //TODO: Change xLongName to StringBuilder
       string xLongName = "";
       for (UInt32 i = 0; i < xData.Length; i = i + 32) {
@@ -201,7 +199,7 @@ namespace Cosmos.System.Filesystem.FAT {
               }
             }
             xLongName = xLongPart + xLongName;
-      //      //TODO: LDIR_Chksum 
+            //TODO: LDIR_Chksum 
           }
         } else {
           byte xStatus = xData[i];

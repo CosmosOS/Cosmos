@@ -25,12 +25,6 @@ namespace Cosmos.Common.Extensions {
     }
 
     static public string GetAsciiString(this byte[] n, UInt32 aStart, UInt32 aCharCount) {
-        Console.Write("CharCount: ");
-        Console.WriteLine(aCharCount.ToString());
-        Console.Write("aStart: ");
-        Console.WriteLine(aStart.ToString());
-        Console.Write("n.Length: ");
-        Console.WriteLine(n.Length.ToString());
       var xChars = new char[aCharCount];
       for (int i = 0; i < aCharCount; i++) {
         xChars[i] = (char)n[(aStart) + i];

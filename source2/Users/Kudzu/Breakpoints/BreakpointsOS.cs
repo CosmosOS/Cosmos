@@ -63,7 +63,7 @@ namespace BreakpointsKernel {
       //try {
       //Trace1();
       //TestSB();
-      TestStringCtor();
+      //TestStringCtor();
 
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 
