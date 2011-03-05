@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System {
+namespace Cosmos.System.Plugs.System.System {
   [Plug(Target = typeof(Int32))]
   public class Int32Impl {
     // for instance ones still declare as static but add a aThis argument first of same type as target

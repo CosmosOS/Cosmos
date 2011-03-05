@@ -5,7 +5,7 @@ using Cosmos.IL2CPU.Plugs;
 using Cosmos.System;
 using Cosmos.Hardware;
 
-namespace Cosmos.System.Plugs.System {
+namespace Cosmos.System.Plugs.System.System {
     [Plug(Target = typeof(global::System.Console))]
     public static class ConsoleImpl {
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System.Plugs.System.System
 {
     [Plug(Target = typeof(Type))]
     public static class TypeImpl
