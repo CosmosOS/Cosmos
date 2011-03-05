@@ -19,7 +19,7 @@ namespace Cosmos.System.Plugs.System.System.Threading {
     }
     
     public static void ReliableEnter(object obj, ref bool tookLock) {
-      int i = 0;
+      tookLock = true;
     }
   }
 }
