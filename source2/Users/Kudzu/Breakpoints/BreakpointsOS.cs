@@ -123,9 +123,12 @@ namespace BreakpointsKernel {
           xPartition = (Partition)xDevice;
         }
       }
+
+      var xFS = new FAT.FatFileSystem(xPartition);
+      Sys.Filesystem.FileSystem.AddMapping("C", xFS);
+      
       Console.WriteLine();
       Console.WriteLine("Root directory");
-      var xFS = new FAT.FatFileSystem(xPartition);
       var xListing = xFS.GetRoot();
       FAT.Listing.FatFile xRootFile = null;
       FAT.Listing.FatFile xKudzuFile = null;
@@ -148,8 +151,8 @@ namespace BreakpointsKernel {
       var xRootStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
       var xRootData = new byte[xRootFile.Size];
       xRootStream.Read(xRootData, 0, (int)xRootFile.Size);
-      var xRootText = Encoding.ASCII.GetString(xRootData);
-      //var xRootText = ASCIIGetString(xRootData);
+      //var xRootText = Encoding.ASCII.GetString(xRootData);
+      var xRootText = ASCIIGetString(xRootData);
       Console.WriteLine(xRootText);
 
       var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
