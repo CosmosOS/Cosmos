@@ -12,7 +12,7 @@ namespace Cosmos.System.Filesystem {
     static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
 
     static public void AddMapping(string aPath, FileSystem aFileSystem) {
-      mMappings.Add(aPath.ToUpper(), aFileSystem);
+      //mMappings.Add(aPath.ToUpper(), aFileSystem);
     }
   }
 }

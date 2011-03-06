@@ -159,7 +159,7 @@ namespace BreakpointsKernel {
       var xKudzuData = new byte[xKudzuFile.Size];
       xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
 
-      var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
+      //var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
 
       int dummy = 42;
 
