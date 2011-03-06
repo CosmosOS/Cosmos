@@ -756,13 +756,16 @@ namespace Cosmos.IL2CPU {
         }
         if (!aType.IsGenericParameter && xVirt.DeclaringType.IsInterface)
         {
-            var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
-            if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)
+            if (aType.GetInterfaces().Contains(xVirt.DeclaringType))
             {
-                var xIdx = Array.IndexOf(xIntfMapping.InterfaceMethods, xVirt);
-                if (xIdx != -1)
+                var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
+                if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)
                 {
-                    Queue(xIntfMapping.TargetMethods[xIdx], aType, "Virtual");
+                    var xIdx = Array.IndexOf(xIntfMapping.InterfaceMethods, xVirt);
+                    if (xIdx != -1)
+                    {
+                        Queue(xIntfMapping.TargetMethods[xIdx], aType, "Virtual");
+                    }
                 }
             }
         }
