@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System.System.Threading {
+namespace Cosmos.System.Plugs.System.Threading {
   //TODO: We dont support threading at all, but a lot of .NET calls these
   // and therefore interferes with us using them. Since we don't support threading
   // currently we can just ignore them by creating empty plugs.

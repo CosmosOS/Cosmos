@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System.System.Text {
+namespace Cosmos.System.Plugs.System.Text {
   [Plug(TargetName = "System.Text.InternalDecoderBestFitFallbackBuffer")]
   public static class InternalDecoderBestFitFallbackBufferImpl {
     // See note in EncoderFallbackImpl

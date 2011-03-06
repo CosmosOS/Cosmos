@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System.System.IO {
+namespace Cosmos.System.Plugs.System.IO {
   [Plug(Target = typeof(IO::FileStream))]
   public class FileStreamImpl {
 

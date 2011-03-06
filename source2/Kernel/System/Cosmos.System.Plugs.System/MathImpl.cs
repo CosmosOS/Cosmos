@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System;
 
-namespace Cosmos.System.Plugs.System.System
+namespace Cosmos.System.Plugs.System
 {
     [Plug(Target = typeof(global::System.Math))]
     public class MathImpl
