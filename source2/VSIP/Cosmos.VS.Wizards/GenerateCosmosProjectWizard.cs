@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.TemplateWizard;
 using System.Windows.Forms;
 using System.IO;
+using EnvDTE;
 
 namespace Cosmos.VS.Package.Templates
 {
@@ -32,8 +32,9 @@ namespace Cosmos.VS.Package.Templates
         }
 
         public void ProjectFinishedGenerating(EnvDTE.Project project)
-        {
-            // read embedded template file
+		{
+			#region add Cosmos template to solution
+			// read embedded template file
             var xInputString = GetTemplateString();
             if (xInputString == null)
             {
@@ -68,71 +69,36 @@ namespace Cosmos.VS.Package.Templates
             xFilename += ".Cosmos";
             File.WriteAllText(xFilename, xInputString);
             var xCosmosProject = project.DTE.Solution.AddFromFile(xFilename, false);
+			#endregion
 
-            // Make .Cosmos project dependent on library project.
-            // not working for all people EnvDTE.BuildDependency bd = project.DTE.Solution.SolutionBuild.BuildDependencies.Item(project.Name + "Boot.Cosmos");
-            var xEnu = project.DTE.Solution.SolutionBuild.BuildDependencies.GetEnumerator();
-            while (xEnu.MoveNext())
-            {
-                EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency)xEnu.Current;
-                if (bd.Project.Name == project.Name + "Boot")
-                {
-                    bd.AddProject(project.UniqueName);
-                    break;
-                }
-            }
+			#region make .Cosmos project dependent on library project.
+			var xEnu = project.DTE.Solution.SolutionBuild.BuildDependencies.GetEnumerator();
+			dynamic xCosmosBootProjectObj = xCosmosProject.Object; // VSProjectNode
+			var xCosmosBootGuid = xCosmosBootProjectObj.ProjectIDGuid;
+			while (xEnu.MoveNext())
+			{
+				EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency)xEnu.Current;
 
-            //// found this with macro functionality in VS2010
-            // but crashes
-            //project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();
-            //EnvDTE.UIHierarchy hierarchy = project.DTE.ActiveWindow.Object as EnvDTE.UIHierarchy;
-            //hierarchy.GetItem(GetNames(xCosmosProject)).Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
-            //project.DTE.ExecuteCommand("Project.SetasStartUpProject");
-            // because
-            // project.DTE.Solution.SolutionBuild.StartupProjects = new object[] { project.Name + "Boot.Cosmos"}; 
-            // didnt work correct
+				dynamic xDependencyGUID = bd.Project.Object;
+				if (xDependencyGUID.ProjectIDGuid == xCosmosBootGuid)
+				{
+					bd.AddProject(project.UniqueName);
+					break;
+				}
+			}
+			#endregion
 
-            // set building Cosmos project
-            var xCurrent = project.DTE.Solution.SolutionBuild.ActiveConfiguration;
-            if (xCurrent != null)
-            {
-                var eno = xCurrent.SolutionContexts.GetEnumerator();
-                while (eno.MoveNext())
-                {
-                    EnvDTE.SolutionContext context = eno.Current as EnvDTE.SolutionContext;
-                    if (context.ProjectName == xCosmosProject.UniqueName || context.ProjectName == project.UniqueName)
-                    {
-                        context.ShouldBuild = true;
-                    }
-                }
-            }
-        }
-
-        private static string GetNames(EnvDTE.Project project)
-        {
-            var xCurProjectItem = project.ParentProjectItem;
-            var xResult = String.Empty;
-            do
-            {
-                if (String.IsNullOrEmpty(xResult))
-                {
-                    xResult = xCurProjectItem.Name;
-                }
-                else
-                {
-                    xResult = xCurProjectItem.Name + "\\" + xResult;
-                }
-                if (xCurProjectItem.ContainingProject != null)
-                {
-                    xCurProjectItem = xCurProjectItem.ContainingProject.ParentProjectItem;
-                }
-                else
-                {
-                    xCurProjectItem = null;
-                }
-            } while (xCurProjectItem != null);
-            return xResult;
-        }
+			#region set Cosmos Boot as startup project
+			project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();
+			EnvDTE.UIHierarchy hierarchy = project.DTE.ActiveWindow.Object as EnvDTE.UIHierarchy;
+			string fullPath = FindProject(hierarchy.UIHierarchyItems, xCosmosProject);
+			if (fullPath.Length > 0)
+			{
+				hierarchy.GetItem(fullPath).Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
+				project.DTE.ExecuteCommand("Project.SetasStartUpProject");
+			}
+			#endregion
+		}
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
         {
@@ -141,6 +107,48 @@ namespace Cosmos.VS.Package.Templates
         public void RunFinished()
         {
         }
+
+		public string FindProject(EnvDTE.UIHierarchyItems h, Project p)
+		{
+			var xEnumerator = h.GetEnumerator();
+
+			while (xEnumerator.MoveNext())
+			{
+				UIHierarchyItem xHierarchyItem = (UIHierarchyItem)xEnumerator.Current;
+				if (xHierarchyItem.Name == p.Name)
+				{
+					dynamic node = xHierarchyItem.Object;
+					dynamic nodeArg = p.Object; // Cosmos.VS.Package.VSProjectNode
+
+					try
+					{
+						if (node.Object.Project.ProjectIDGuid == nodeArg.ProjectIDGuid)
+							return p.Name;
+					}
+					catch
+					{
+					}
+
+					try
+					{
+						if (node.Project.ProjectIDGuid == nodeArg.ProjectIDGuid)
+							return p.Name;
+					}
+					catch
+					{
+					}
+				}
+				var xPartOfName = FindProject(xHierarchyItem.UIHierarchyItems, p);
+				if (xPartOfName.Length > 0)
+				{
+					SolutionClass solution = xHierarchyItem.Object as SolutionClass;
+					if (solution != null)
+						return xHierarchyItem.Name + "\\" + xPartOfName;
+					return xHierarchyItem.Name + "\\" + xPartOfName;
+				}
+			}
+			return string.Empty;
+		}
 
         private Guid mGuidKernel;
         private Guid mGuidCosmosProj;
@@ -151,7 +159,6 @@ namespace Cosmos.VS.Package.Templates
             mGuidCosmosProj = Guid.NewGuid();
             replacementsDictionary.Add("$KernelGuid$", mGuidKernel.ToString("B"));
             replacementsDictionary.Add("$CosmosProjGuid$", mGuidCosmosProj.ToString("B"));
-
         }
 
         public bool ShouldAddProjectItem(string filePath)
