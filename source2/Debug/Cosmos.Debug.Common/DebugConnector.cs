@@ -172,11 +172,11 @@ namespace Cosmos.Debug.Common
             }
             var xData = new byte[8];
             mDataSize = (int)size;
-			//TODO find out wherefrom this discrepancy
-			offsetToEBP --;
+			////TODO find out wherefrom this discrepancy
+			//offsetToEBP --;
 
 			// EBP is first
-			offsetToEBP += 4;
+			//offsetToEBP += 4;
 
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
@@ -185,7 +185,7 @@ namespace Cosmos.Debug.Common
 
             byte[] xResult;
 
-			xResult = mData.Reverse().ToArray();
+			xResult = mData;
 			mData = null;
 			return xResult;
         }

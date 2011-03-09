@@ -109,12 +109,11 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_SendMethodContext";
             PushAll32();
 
-            ReadComPortX32toStack();
-            
             AL = (int)MsgType.MethodContext;
             Call<DebugStub.WriteALToComPort>();
 
-            ReadComPortX32toStack();
+            ReadComPortX32toStack(); // offset relative to ebp
+            ReadComPortX32toStack(); // size of data to send
             ECX.Pop();
             EAX.Pop();
 
@@ -127,7 +126,7 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_SendMethodContext_SendByte";
             new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
             JumpIf(Flags.Equal, "DebugStub_SendMethodContext_After_SendByte");
-            Call("WriteByteToComPortFixed");
+            Call("WriteByteToComPort");
             new Dec { DestinationReg = Registers.ECX };
             Jump("DebugStub_SendMethodContext_SendByte");
 

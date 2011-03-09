@@ -17,19 +17,20 @@ namespace MatthijsPlayground
 
         protected override void Run()
         {
-            var xBytes = new byte[] { 65, 66, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            var xStr = ByteConverter.GetAsciiString(xBytes, 0, 6);
-            
-
-            Console.WriteLine("Done");
+            DoSomething();
             Stop();
         }
 
         private static void DoSomething()
         {
-            WriteLine("Line1");
-            WriteLine("Line2");
-            WriteLine("Line3");
+            int xValue1 = 0x00000001;
+            int xValue2 = 0x00000002;
+            int xValue3 = 0x00000003;
+
+            Console.WriteLine("Done");
+            //WriteLine("Line1");
+            //WriteLine("Line2");
+            //WriteLine("Line3");
         }
 
         private static void WriteLine(string line)
