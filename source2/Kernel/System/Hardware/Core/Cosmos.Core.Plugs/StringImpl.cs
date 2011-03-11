@@ -7,6 +7,7 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.Core.Plugs {
     //TODO: Move this and other FCL plugs to Cosmos.Plugs assembly. some plugs like Console need hardware
     // but these generics ones should be moved, this does not depend on kernel
+    [Plug(Target=typeof(string))]
     public class StringImpl {
         /*public int IndexOf(char c)
 		{
@@ -305,6 +306,11 @@ namespace Cosmos.Core.Plugs {
         }
 
         public static string ToUpper(string aThis, System.Globalization.CultureInfo aCulture) {
+            return ChangeCasing(aThis, 97, 122, -32);
+        }
+
+        public static string ToUpper(string aThis)
+        {
             return ChangeCasing(aThis, 97, 122, -32);
         }
 

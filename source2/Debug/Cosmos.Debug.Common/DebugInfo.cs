@@ -173,7 +173,7 @@ namespace Cosmos.Debug.Common
                 + ", INDEXINMETHOD   INT          NOT NULL"
                 + ", OFFSET          INT          NOT NULL"
                 + ", NAME            VARCHAR(255) NOT NULL"
-                + ", TYPENAME        VARCHAR(255) NOT NULL"
+                + ", TYPENAME        VARCHAR(4000) NOT NULL"
                 + ");"
                 );
 

@@ -3,11 +3,25 @@ using System.Collections.Generic;
 using System.Text;
 using Sys = Cosmos.System;
 using Cosmos.Common.Extensions;
+using System.IO;
+using Cosmos.Debug.Kernel;
 
 namespace MatthijsPlayground
 {
     public class Kernel : Sys.Kernel
     {
+        private class TestComparer : IEqualityComparer<int>
+        {
+            public bool Equals(int x, int y)
+            {
+                return x == y;
+            }
+
+            public int GetHashCode(int obj)
+            {
+                return obj.GetHashCode();
+            }
+        }
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
@@ -23,18 +37,26 @@ namespace MatthijsPlayground
 
         private static void DoSomething()
         {
-            int xValue1 = 0x00000001;
-            int xValue2 = 0x00000002;
-            int xValue3 = 0x00000003;
+            Console.WriteLine("Before Everything");
 
-            Console.WriteLine("Done");
-            //WriteLine("Line1");
+            var xString = "";
+            var xDbg = new Debugger("kernel", "kernel");
+            xDbg.Send(xString);
+            //var xSB = new StringBuilder();
+            //xSB.Append("Hello");
+            //xSB.Append("Hello");
+            //var xDisplay = xSB.ToString();
+            //Console.WriteLine(xDisplay.Length);
+            //Console.WriteLine(xDisplay);
+            
+            Console.WriteLine("After everything");
             //WriteLine("Line2");
             //WriteLine("Line3");
         }
 
         private static void WriteLine(string line)
         {
+            var xTheLine = line.ToUpper();
             Console.WriteLine(line);
         }
     }

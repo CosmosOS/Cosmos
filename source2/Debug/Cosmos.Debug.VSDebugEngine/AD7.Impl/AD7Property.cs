@@ -62,115 +62,116 @@ namespace Cosmos.Debug.VSDebugEngine
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
                 byte[] xData;
-                xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                propertyInfo.bstrValue = xData.Aggregate("", (r, b) => r + " " + b.ToString("X2").ToUpper());
-                //if (mDebugInfo.Type == typeof(string).AssemblyQualifiedName)
-                //{
-                //    #region string support
-                //    const uint xStringLengthOffset = 16;
-                //    const uint xStringFirstCharPtrOffset = 20;
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                //    uint xStrPointer = BitConverter.ToUInt32(xData, 0);
-                //    if (xStrPointer == 0)
-                //    {
-                //        propertyInfo.bstrValue = "(null)";
-                //    }
-                //    else
-                //    {
-                //        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
-                //        uint xStringLength = BitConverter.ToUInt32(xData, 0);
-                //        if (xStringLength > 100)
-                //        {
-                //            propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
-                //        } else if (xStringLength == 0) {
-                //          propertyInfo.bstrValue = "\"\"";
-                //        }else 
-                //        {
-                //            xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
-                //            uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
-                //            xData = mProcess.mDbgConnector.GetMemoryData(xFirstCharPtr, xStringLength * 2, 2);
-                //            propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
-                //        }
-                //    }
-                //    #endregion string support
-                //}
-                //else if (mDebugInfo.Type == typeof(byte[]).AssemblyQualifiedName)
-                //{
-                //    const uint xArrayLengthOffset = 8;
-                //    const uint xArrayFirstElementOffset = 16;
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                //    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                //    if (xArrayPointer == 0)
-                //    {
-                //        propertyInfo.bstrValue = "(null)";
-                //    }
-                //    else
-                //    {
-                //        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                //        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                //        bool xIsTooLong = xDataLength > 512;
-                //        var xSB = new StringBuilder();
-                //        xSB.AppendFormat("Byte[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                //        if (xIsTooLong)
-                //        {
-                //            xDataLength = 512;
-                //        }
-                //        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength);
-                //        for (int i = 0; i < xData.Length; i++)
-                //        {
-                //            xSB.Append(xData[i].ToString("X2").ToUpper());
-                //            if (i < (xData.Length - 1))
-                //            {
-                //                xSB.Append(" ");
-                //            }
-                //        }
-                //        if (xIsTooLong)
-                //        {
-                //            xSB.Append(", ..");
-                //        }
+                if (mDebugInfo.Type == typeof(string).AssemblyQualifiedName)
+                {
+                    #region string support
+                    const uint xStringLengthOffset = 16;
+                    const uint xStringFirstCharPtrOffset = 20;
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    uint xStrPointer = BitConverter.ToUInt32(xData, 0);
+                    if (xStrPointer == 0)
+                    {
+                        propertyInfo.bstrValue = "(null)";
+                    }
+                    else
+                    {
+                        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
+                        uint xStringLength = BitConverter.ToUInt32(xData, 0);
+                        if (xStringLength > 100)
+                        {
+                            propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
+                        }
+                        else if (xStringLength == 0)
+                        {
+                            propertyInfo.bstrValue = "\"\"";
+                        }
+                        else
+                        {
+                            xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
+                            uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
+                            xData = mProcess.mDbgConnector.GetMemoryData(xFirstCharPtr, xStringLength * 2, 2);
+                            propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
+                        }
+                    }
+                    #endregion string support
+                }
+                else if (mDebugInfo.Type == typeof(byte[]).AssemblyQualifiedName)
+                {
+                    const uint xArrayLengthOffset = 8;
+                    const uint xArrayFirstElementOffset = 16;
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
+                    if (xArrayPointer == 0)
+                    {
+                        propertyInfo.bstrValue = "(null)";
+                    }
+                    else
+                    {
+                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
+                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
+                        bool xIsTooLong = xDataLength > 512;
+                        var xSB = new StringBuilder();
+                        xSB.AppendFormat("Byte[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
+                        if (xIsTooLong)
+                        {
+                            xDataLength = 512;
+                        }
+                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength);
+                        for (int i = 0; i < xData.Length; i++)
+                        {
+                            xSB.Append(xData[i].ToString("X2").ToUpper());
+                            if (i < (xData.Length - 1))
+                            {
+                                xSB.Append(" ");
+                            }
+                        }
+                        if (xIsTooLong)
+                        {
+                            xSB.Append(", ..");
+                        }
 
-                //        xSB.Append(" }");
-                //        propertyInfo.bstrValue = xSB.ToString();
-                //    }
-                //}
-                //else if (mDebugInfo.Type == typeof(char).AssemblyQualifiedName)
-                //{
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 2);
-                //    var xTypedCharValue = BitConverter.ToChar(xData, 0);
-                //    propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
-                //}
-                //else if (mDebugInfo.Type == typeof(int).AssemblyQualifiedName)
-                //{
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                //    var xTypedIntValue = BitConverter.ToInt32(xData, 0);
-                //    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
-                //}
-                //else if (mDebugInfo.Type == typeof(long).AssemblyQualifiedName)
-                //{
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
-                //    if (xData.Length != 8)
-                //    {
-                //        throw new Exception("Length should have been 8, but is " + xData.Length);
-                //    }
-                //    var xTypedLongValue = BitConverter.ToInt64(xData, 0);
-                //    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedLongValue, xTypedLongValue.ToString("X").ToUpper());
-                //}
-                //else if (mDebugInfo.Type == typeof(ulong).AssemblyQualifiedName)
-                //{
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
-                //    if (xData.Length != 8)
-                //    {
-                //        throw new Exception("Length should have been 8, but is " + xData.Length);
-                //    }
-                //    var xTypedULongValue = BitConverter.ToUInt64(xData, 0);
-                //    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedULongValue, xTypedULongValue.ToString("X").ToUpper());
-                //}
-                //else
-                //{
-                //    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                //    var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
-                //    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
-                //}
+                        xSB.Append(" }");
+                        propertyInfo.bstrValue = xSB.ToString();
+                    }
+                }
+                else if (mDebugInfo.Type == typeof(char).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 2);
+                    var xTypedCharValue = BitConverter.ToChar(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
+                }
+                else if (mDebugInfo.Type == typeof(int).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    var xTypedIntValue = BitConverter.ToInt32(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
+                }
+                else if (mDebugInfo.Type == typeof(long).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
+                    if (xData.Length != 8)
+                    {
+                        throw new Exception("Length should have been 8, but is " + xData.Length);
+                    }
+                    var xTypedLongValue = BitConverter.ToInt64(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedLongValue, xTypedLongValue.ToString("X").ToUpper());
+                }
+                else if (mDebugInfo.Type == typeof(ulong).AssemblyQualifiedName)
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
+                    if (xData.Length != 8)
+                    {
+                        throw new Exception("Length should have been 8, but is " + xData.Length);
+                    }
+                    var xTypedULongValue = BitConverter.ToUInt64(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedULongValue, xTypedULongValue.ToString("X").ToUpper());
+                }
+                else
+                {
+                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+                    var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
+                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
+                }
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 
