@@ -94,14 +94,36 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPU.Compare { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EAX };
           new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
         } else {
+			// value 2  EBX:EAX
           new CPU.Pop { DestinationReg = CPU.Registers.EAX };
           new CPU.Pop { DestinationReg = CPU.Registers.EBX };
+			// value 1  EDX:ECX
           new CPU.Pop { DestinationReg = CPU.Registers.ECX };
           new CPU.Pop { DestinationReg = CPU.Registers.EDX };
-          new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
-          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
-          new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
-          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+		  if (xTestOp == CPU.ConditionalTestEnum.LessThan)
+		  {
+				new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+				// should jump to the negative case, but how detemine aim label? new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+				new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+		  }
+		  else if (xTestOp == CPU.ConditionalTestEnum.LessThanOrEqualTo)
+		  {
+				new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+				// should jump to the negative case, but how detemine aim label? new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+				new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+		  }
+		  else
+		  {
+			  // TODO test all other cases
+			  new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
+			  new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+			  new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
+			  new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+		  }
         }
       } else {
         // todo: improve code clarity
@@ -120,6 +142,5 @@ namespace Cosmos.IL2CPU.X86.IL {
         }
       }
     }
-
   }
 }
