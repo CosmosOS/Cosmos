@@ -9,7 +9,7 @@ namespace Cosmos.System.Filesystem {
     // NOT do this in the future, but it will be able to map paths to things that look like
     // drive letters for compatibility with Windows code.
     // For now we use Dictionary for simplicity, but in future this will change.
-    static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
+    //static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
 
     static public void AddMapping(string aPath, FileSystem aFileSystem) {
       //mMappings.Add(aPath.ToUpper(), aFileSystem);
