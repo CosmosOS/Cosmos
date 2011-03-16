@@ -148,16 +148,15 @@ namespace BreakpointsKernel {
         }
       }
 
-      //var xRootStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
-      //var xRootData = new byte[xRootFile.Size];
-      //xRootStream.Read(xRootData, 0, (int)xRootFile.Size);
-      ////var xRootText = Encoding.ASCII.GetString(xRootData);
-      //var xRootText = ASCIIGetString(xRootData);
-      //Console.WriteLine(xRootText);
+      var xRootStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+      var xRootData = new byte[xRootFile.Size];
+      xRootStream.Read(xRootData, 0, (int)xRootFile.Size);
+      var xRootText = Encoding.ASCII.GetString(xRootData);
+      Console.WriteLine(xRootText);
 
-      //var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
-      //var xKudzuData = new byte[xKudzuFile.Size];
-      //xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
+      var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
+      var xKudzuData = new byte[xKudzuFile.Size];
+      xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
 
       //var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
 
@@ -184,19 +183,10 @@ namespace BreakpointsKernel {
       //}
     }
 
-    // Temp hack
-    // var xRootText = ASCIIEncoding.ASCII.GetString(xRootData);
-    string ASCIIGetString(byte[] aBytes) {
-      var xChars = new char[aBytes.Length];
-      for (int i = 0; i < aBytes.Length; i++) {
-        xChars[i] = (char)aBytes[i];
-      }
-      return new string(xChars);
-    }
-
     protected override void AfterRun() {
       Console.Write("Done");
       Console.ReadLine();
     }
+
   }
 }

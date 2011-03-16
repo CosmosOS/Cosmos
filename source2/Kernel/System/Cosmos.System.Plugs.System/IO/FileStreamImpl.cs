@@ -13,11 +13,13 @@ namespace Cosmos.System.Plugs.System.IO {
       global::System.Console.WriteLine("File open");
     }
 
-    static public void CCtor()
-    {
+    static public void CCtor() {
         // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
     }
 
+    static public int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount) {
+      return 0;
+    }
 
     //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
     //  , IO::FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
