@@ -148,11 +148,22 @@ namespace BreakpointsKernel {
         }
       }
 
-      var xRootStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
-      var xRootData = new byte[xRootFile.Size];
-      xRootStream.Read(xRootData, 0, (int)xRootFile.Size);
-      var xRootText = Encoding.ASCII.GetString(xRootData);
-      Console.WriteLine(xRootText);
+      {
+        var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+        var xData = new byte[xRootFile.Size];
+        xStream.Read(xData, 0, (int)xRootFile.Size);
+        var xText = Encoding.ASCII.GetString(xData);
+        Console.WriteLine(xText);
+      }
+
+      {
+        Console.WriteLine();
+        Console.WriteLine("StreamReader");
+        var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+        var xReader = new System.IO.StreamReader(xStream);
+        string xText = xReader.ReadToEnd();
+        Console.WriteLine(xText);
+      }
 
       var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
       var xKudzuData = new byte[xKudzuFile.Size];

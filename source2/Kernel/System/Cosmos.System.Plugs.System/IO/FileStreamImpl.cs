@@ -9,7 +9,7 @@ namespace Cosmos.System.Plugs.System.IO {
   [Plug(Target = typeof(IO::FileStream))]
   public class FileStreamImpl {
 
-    static public void Ctor(IO::FileStream aThis, String aPathname, IO::FileMode aMode) {
+    static public void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode) {
     }
 
     static public void CCtor() {
