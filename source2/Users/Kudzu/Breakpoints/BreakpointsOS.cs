@@ -94,7 +94,7 @@ namespace BreakpointsKernel {
     protected override void Run() {
       //try {
       //Trace1();
-      //TestSB();
+      //TestSB(); Stop(); return;
       //TestStringCtor();
       //TestNullableTypes();
       //TestCompare();
