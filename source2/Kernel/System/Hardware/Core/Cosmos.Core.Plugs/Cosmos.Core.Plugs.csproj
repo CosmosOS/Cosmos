@@ -97,6 +97,7 @@
     <Compile Include="CPUImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
     <Compile Include="IOPortImpl.cs" />
+    <Compile Include="MathImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeHelpersImpl.cs" />
     <Compile Include="StringImpl.cs" />

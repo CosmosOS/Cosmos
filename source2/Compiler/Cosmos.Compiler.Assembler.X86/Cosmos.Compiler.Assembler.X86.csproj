@@ -124,6 +124,7 @@
     <Compile Include="SetInterruptFlag.cs" />
     <Compile Include="ShiftLeft.cs" />
     <Compile Include="ShiftRight.cs" />
+    <Compile Include="SSE2\SqrtSD.cs" />
     <Compile Include="SSE2\XorPD.cs" />
     <Compile Include="SSEAndMMX2\AddPS.cs" />
     <Compile Include="SSEAndMMX2\AddSS.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Sub.cs" />
     <Compile Include="SubWithCarry.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="x87\FloatSqrt.cs" />
     <Compile Include="x87\Enums.cs" />
     <Compile Include="x87\FloatABS.cs" />
     <Compile Include="x87\FloatAdd.cs" />
