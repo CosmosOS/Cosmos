@@ -116,13 +116,16 @@ namespace Cosmos.Debug.VSDebugEngine
                         {
                             xDataLength = 512;
                         }
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength);
-                        for (int i = 0; i < xData.Length; i++)
+                        if (xDataLength > 0)
                         {
-                            xSB.Append(xData[i].ToString("X2").ToUpper());
-                            if (i < (xData.Length - 1))
+                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength);
+                            for (int i = 0; i < xData.Length; i++)
                             {
-                                xSB.Append(" ");
+                                xSB.Append(xData[i].ToString("X2").ToUpper());
+                                if (i < (xData.Length - 1))
+                                {
+                                    xSB.Append(" ");
+                                }
                             }
                         }
                         if (xIsTooLong)

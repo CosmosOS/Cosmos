@@ -39,7 +39,17 @@ namespace Cosmos.IL2CPU.X86.IL
           var xParams = xMethodBase.GetParameters();
           if (aParam == 0 && !xMethodBase.IsStatic) {
             // return the this parameter, which is not in .GetParameters()
-            var xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
+              uint xCurArgSize;
+              if (xMethodBase.DeclaringType.IsValueType)
+              {
+                  // value types get a reference passed to the actual value, so pointer:
+                  xCurArgSize = 4;
+              }
+              else
+              {
+                  xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
+              }
+
             for (int i = xParams.Length - 1; i >= aParam; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
               xOffset += xSize;

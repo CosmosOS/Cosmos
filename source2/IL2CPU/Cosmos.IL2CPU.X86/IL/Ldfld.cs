@@ -69,6 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
           var xFieldInfo = (from item in xFields
                             where item.Id == xFieldId
                             select item).Single();
+          new Comment("Field = '" + xFieldId + "'");
           
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
