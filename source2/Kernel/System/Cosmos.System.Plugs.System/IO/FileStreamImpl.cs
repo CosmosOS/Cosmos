@@ -10,11 +10,10 @@ namespace Cosmos.System.Plugs.System.IO {
   public class FileStreamImpl {
 
     static public void Ctor(IO::FileStream aThis, String aPathname, IO::FileMode aMode) {
-      global::System.Console.WriteLine("File open");
     }
 
     static public void CCtor() {
-        // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
+      // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
     }
 
     static public int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount) {

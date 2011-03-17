@@ -11,8 +11,12 @@ namespace Cosmos.System.Filesystem {
     // For now we use Dictionary for simplicity, but in future this will change.
     //static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
 
+    static protected FileSystem mFS;
+
     static public void AddMapping(string aPath, FileSystem aFileSystem) {
+      // Dictionary<> doesnt work yet, so for now we just hack this and support only one FS
       //mMappings.Add(aPath.ToUpper(), aFileSystem);
+      mFS = aFileSystem;
     }
   }
 }
