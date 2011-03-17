@@ -39,6 +39,7 @@ namespace Cosmos.IL2CPU.CustomImplementation.System {
     }
 
       public static string ConcatArray(string[] values, int totalLength){
+
           char[] xResult = new char[totalLength];
           int xCurPos = 0;
           for (int i = 0; i < values.Length; i++)

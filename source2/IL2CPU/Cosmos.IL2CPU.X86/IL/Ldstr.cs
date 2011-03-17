@@ -25,16 +25,12 @@ namespace Cosmos.IL2CPU.X86.IL
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!
       #region Debug verification
       var xFields = GetFieldsInfo(typeof(string));
-      if (xFields[0].Id != "$$Storage$$"
+      if (xFields[0].Id != "System.Int32 System.String.m_stringLength"
         || xFields[0].Offset != 0) {
         throw new Exception("Fields changed!");
       }
-      if (xFields[1].Id != "System.Int32 System.String.m_stringLength"
+      if (xFields[1].Id != "System.Char System.String.m_firstChar"
         || xFields[1].Offset != 4) {
-        throw new Exception("Fields changed!");
-      }
-      if (xFields[2].Id != "System.Char System.String.m_firstChar"
-        || xFields[2].Offset != 8) {
         throw new Exception("Fields changed!");
       }
       #endregion
@@ -44,34 +40,16 @@ namespace Cosmos.IL2CPU.X86.IL
       var xAsm = CPU.Assembler.CurrentInstance;
 
       Encoding xEncoding = Encoding.Unicode;
-      byte[] xByteArray = new byte[16 + xEncoding.GetByteCount(aLiteral)];
-      //throw new NotImplementedException("Todo: implement literal strings");
-      //var xTemp = BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
-      //                                                                     "System.Array")));
-      //Array.Copy(xTemp, 0, xByteArray, 0, 4);
-      var xTemp = BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray);
-      Array.Copy(xTemp, 0, xByteArray, 4, 4);
-      xTemp = BitConverter.GetBytes(aLiteral.Length);
-      Array.Copy(xTemp, 0, xByteArray, 8, 4);
-      xTemp = BitConverter.GetBytes(2);
-      Array.Copy(xTemp, 0, xByteArray, 12, 4);
-      xTemp = xEncoding.GetBytes(aLiteral);
-      Array.Copy(xTemp, 0, xByteArray, 16, xTemp.Length);
-      DataMember xDataMember;// = null;
-      //if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember))
-      //{
+      
       string xDataName = xAsm.GetIdentifier("StringLiteral");
-      object[] xObjectData = new object[7];
-      xObjectData[0] = -1;//ElementReference.New(ILOp.GetTypeIDLabel(typeof(String)), 0);
-      xObjectData[1] = ((uint)InstanceTypeEnum.StaticEmbeddedObject);
-      xObjectData[2] = 1;
-      xObjectData[3] = ElementReference.New(xDataName + "__Contents");
-      xObjectData[4] = aLiteral.Length;
-      xObjectData[5] = ElementReference.New(xDataName + "__Contents", 16);
-      xObjectData[6] = aLiteral.Length;
+        var xBytecount = xEncoding.GetByteCount(aLiteral);
+      var xObjectData = new byte[(4*4) + (xBytecount)];
+      Array.Copy(BitConverter.GetBytes((int)-1), 0, xObjectData, 0, 4);
+      Array.Copy(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedObject), 0, xObjectData, 4, 4);
+      Array.Copy(BitConverter.GetBytes((int)1), 0, xObjectData, 8, 4);
+      Array.Copy(BitConverter.GetBytes(aLiteral.Length), 0, xObjectData, 12, 4);
+      Array.Copy(xEncoding.GetBytes(aLiteral), 0, xObjectData, 16, xBytecount); 
       xAsm.DataMembers.Add(new CPU.DataMember(xDataName, xObjectData));
-      xAsm.DataMembers.Add(new CPU.DataMember(xDataName + "__Contents", xByteArray));
-      //mDataMemberMap.Add(aLiteral, xDataMember);
       return xDataName;
     }
     

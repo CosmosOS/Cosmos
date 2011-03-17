@@ -48,16 +48,45 @@ namespace Cosmos.IL2CPU.X86.IL
                     aAssembler.Stack.Pop();
                 }
 
+                // array length +8
+
+                bool xHasCalcSize = false;
+                // try calculating size:
+                if (constructor.DeclaringType == typeof(string))
+                {
+                    if (xParams.Length == 1 && xParams[0].ParameterType == typeof(char[]))
+                    {
+                        xHasCalcSize = true;
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 2 };
+                        new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    }
+                    else if (xParams.Length == 3
+                        && xParams[0].ParameterType == typeof(char[])
+                        && xParams[1].ParameterType == typeof(int)
+                        && xParams[2].ParameterType == typeof(int))
+                    {
+                        xHasCalcSize = true;
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                    }
+                }
                 uint xMemSize = GetStorageSize(objectType);
                 int xExtraSize = 20;
                 new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
+                if (xHasCalcSize)
+                {
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                }
 
                 // todo: probably we want to check for exceptions after calling Alloc
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
-                //??? uint xObjSize;// = 0;
+                //? ?? uint xObjSize;// = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC
                 //select item ).Count();

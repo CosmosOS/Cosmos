@@ -18,8 +18,6 @@ namespace Cosmos.IL2CPU.CustomImplementation.System.Text
                 xResult[i] = aThis[i];
             }
             var xResultStr = new String(xResult);
-            Console.WriteLine("ResultStr.Length: " + xResultStr.Length);
-            Console.WriteLine("ResultStr: " + xResultStr);
             return xResultStr;
         }
     }

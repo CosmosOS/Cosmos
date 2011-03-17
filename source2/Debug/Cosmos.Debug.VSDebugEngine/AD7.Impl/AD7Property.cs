@@ -65,8 +65,8 @@ namespace Cosmos.Debug.VSDebugEngine
                 if (mDebugInfo.Type == typeof(string).AssemblyQualifiedName)
                 {
                     #region string support
-                    const uint xStringLengthOffset = 16;
-                    const uint xStringFirstCharPtrOffset = 20;
+                    const uint xStringLengthOffset = 12;
+                    const uint xStringFirstCharOffset = 16;
                     xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
                     uint xStrPointer = BitConverter.ToUInt32(xData, 0);
                     if (xStrPointer == 0)
@@ -77,6 +77,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
                         uint xStringLength = BitConverter.ToUInt32(xData, 0);
+                        propertyInfo.bstrValue = "String of length: " + xStringLength;
                         if (xStringLength > 100)
                         {
                             propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
@@ -87,9 +88,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         }
                         else
                         {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharPtrOffset, 4, 4);
-                            uint xFirstCharPtr = BitConverter.ToUInt32(xData, 0);
-                            xData = mProcess.mDbgConnector.GetMemoryData(xFirstCharPtr, xStringLength * 2, 2);
+                            xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharOffset, xStringLength * 2, 2);
                             propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
                         }
                     }
