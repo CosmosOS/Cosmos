@@ -31,6 +31,9 @@ namespace MatthijsPlayground
 
         protected override void Run()
         {
+            var xDict = new Dictionary<int, string>(new TestComparer());
+            xDict.Add(1, "One");
+            xDict.Add(2, "Two");
             DoSomething();
             Stop();
         }
@@ -39,9 +42,9 @@ namespace MatthijsPlayground
         {
             Console.WriteLine("Before Everything");
 
-            var xString = "";
-            var xDbg = new Debugger("kernel", "kernel");
-            xDbg.Send(xString);
+            //var xString = "";
+            //var xDbg = new Debugger("kernel", "kernel");
+            //xDbg.Send(xString);
             //var xSB = new StringBuilder();
             //xSB.Append("Hello");
             //xSB.Append("Hello");
