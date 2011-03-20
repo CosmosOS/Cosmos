@@ -168,6 +168,28 @@ namespace Cosmos.Debug.VSDebugEngine
                     var xTypedULongValue = BitConverter.ToUInt64(xData, 0);
                     propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedULongValue, xTypedULongValue.ToString("X").ToUpper());
                 }
+				else if (mDebugInfo.Type == typeof(float).AssemblyQualifiedName)
+				{
+					xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+					if (xData.Length != 4)
+					{
+						throw new Exception("Length should have been 4, but is " + xData.Length);
+					}
+					var xTypedFloatValue = BitConverter.ToSingle(xData, 0);
+					var xTypedFloatHexValue = BitConverter.ToUInt32(xData, 0);
+					propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedFloatValue, xTypedFloatHexValue.ToString("X").ToUpper());
+				}
+				else if (mDebugInfo.Type == typeof(double).AssemblyQualifiedName)
+				{
+					xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
+					if (xData.Length != 8)
+					{
+						throw new Exception("Length should have been 8, but is " + xData.Length);
+					}
+					var xTypedDoubleValue = BitConverter.ToDouble(xData, 0);
+					var xTypedDoubleHexValue = BitConverter.ToUInt64(xData, 0);
+					propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedDoubleValue, xTypedDoubleHexValue.ToString("X").ToUpper());
+				}
                 else
                 {
                     xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);

@@ -105,7 +105,7 @@ namespace Cosmos.IL2CPU.X86
                             IsArgument = false,
                             Index = xLocal.LocalIndex,
                             Name="Local" + xLocal.LocalIndex,
-                            Offset = 0 - (int)ILOp.GetEBPOffsetForLocal(aMethod, xLocal.LocalIndex),
+							Offset = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
                             Type=xLocal.LocalType.AssemblyQualifiedName
                         };
                         mLocals_Arguments_Infos.Add(xInfo);

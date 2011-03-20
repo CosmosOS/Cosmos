@@ -53,7 +53,15 @@ namespace Cosmos.IL2CPU.X86 {
       return xOffset;
     }
 
-
+	public static uint GetEBPOffsetForLocalForDebugger(MethodInfo aMethod, int localIndex)
+	{
+		// because the memory is readed in positiv direction, we need to add additional size if greater than 4
+		uint xOffset = GetEBPOffsetForLocal(aMethod, localIndex);
+		var xBody = aMethod.MethodBase.GetMethodBody();
+		var xField = xBody.LocalVariables[localIndex];
+		xOffset += GetStackCountForLocal(aMethod, xField) * 4 - 4;
+		return xOffset;
+	}
 
 
     protected void ThrowNotImplementedException(string aMessage) {
