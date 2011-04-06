@@ -18,9 +18,9 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
 			const string xDigits = "0123456789";
 			char[] xResultChars = new char[21];
 			int xCurrentPos = 20;
-            if (aValue != 0)
+            if (aValue > 0)
             {
-                while (aValue != 0)
+                while (aValue > 0)
                 {
                     byte xPos = (byte)(aValue % 10);
                     aValue /= 10;

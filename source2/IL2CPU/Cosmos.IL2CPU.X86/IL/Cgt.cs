@@ -27,16 +27,26 @@ namespace Cosmos.IL2CPU.X86.IL
 			string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-		  var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
+			var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
 			if( xStackItem.Size > 4 )
 			{
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+				// esi = 1
+				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
+				// edi = 0
 				if (xStackItem.IsFloat)
 				{
+					// value 1
+					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
+					// value 2
 					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
-					new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
-					new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP , DestinationIsIndirect=true};
-					new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
-					new CPUx86.x87.FloatDecTopPointer();
+					new CPUx86.x87.FloatCompareAndSet { DestinationReg = Registers.ST1 };
+					// if carry is set, ST(0) < ST(i)
+					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Below, DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESI };
+					// pops fpu stack
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
+					new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 16 };
 				}
 				else
 				{
@@ -46,17 +56,22 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
 					new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 					//value1: ECX:EBX
-					new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationLabel = LabelFalse };
-					new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
+					new Label(LabelTrue);
+					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESI };
+					new Label(LabelFalse);
 				}
+				new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
+				/*
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
 				new Label(LabelFalse);
 				new CPUx86.Push { DestinationValue = 0 };
 				new CPUx86.Jump { DestinationLabel = xNextLabel };
 				new Label( LabelTrue );
-				new CPUx86.Push { DestinationValue = 1 };
+				new CPUx86.Push { DestinationValue = 1 };*/
 			}
 			else
 			{

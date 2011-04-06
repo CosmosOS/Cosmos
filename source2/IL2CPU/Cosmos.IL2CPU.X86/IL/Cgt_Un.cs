@@ -28,38 +28,50 @@ namespace Cosmos.IL2CPU.X86.IL
             string LabelFalse = BaseLabel + "False";
             if( xStackItem.Size > 4 )
             {
-                if (xStackItem.IsFloat)
-                {
-                    new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
-                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
-                    new CPUx86.x87.FloatCompare { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
-                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
-                    new CPUx86.x87.FloatDecTopPointer();
-                }
+				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+				// esi = 1
+				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
+				// edi = 0
+				if (xStackItem.IsFloat)
+				{
+					// value 1
+					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
+					// value 2
+					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+					new CPUx86.x87.FloatCompareAndSet { DestinationReg = Registers.ST1 };
+					// if carry is set, ST(0) < ST(i)
+					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Below, DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESI };
+					// pops fpu stack
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
+					new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 16 };
+				}
                 else
                 {
-                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESI };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
-                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
-                    //esi = 1
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                     //value2: EDX:EAX
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     //value1: ECX:EBX
-                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
-                    new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
-                    //result = value1 - value2
-                    //new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
-                    //new CPUx86.Push { DestinationReg = Registers.EDI };
+
+					new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelFalse };
+					new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
+					new Label(LabelTrue);
+					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Above, DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESI };
+					new Label(LabelFalse);
                 }
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
+				new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
+				/*
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
+				new Label(LabelFalse);
                 new CPUx86.Push { DestinationValue = 0 };
                 new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                 new Label( LabelTrue );
                 new CPUx86.Push { DestinationValue = 1 };
-
+				*/
             }
             else
             {
