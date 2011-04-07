@@ -153,15 +153,19 @@ namespace Cosmos.IL2CPU.X86
 
                 var xParams = aMethod.MethodBase.GetParameters();
                 var xParamCount = (ushort)xParams.Length;
+
                 for (ushort i = 0; i < xParamCount; i++)
                 {
+					var xOffset = IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
+					// if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
+					xOffset -= (int)Cosmos.IL2CPU.X86.ILOp.Align(Cosmos.IL2CPU.X86.ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;  
                     mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
                     {
                         MethodLabelName = xMethodLabel,
                         IsArgument = true,
                         Index = (int)(i + xIdxOffset),
                         Name = xParams[i].Name,
-                        Offset = (int)IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset)),
+                        Offset = xOffset,
                         Type=xParams[i].ParameterType.AssemblyQualifiedName
                     });
                 }
