@@ -1,6 +1,6 @@
 using System;
 using Cosmos.IL2CPU.X86;
-using CPU = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -29,17 +29,17 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 				// [ESP + 8] is low part
 				// [ESP + 12] is high part
-				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
-				new CPU.Pop { DestinationReg = CPU.Registers.EDX };
+				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
 				// [ESP] is low part
 				// [ESP + 4] is high part
-				new CPU.And { DestinationReg = CPU.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPU.Registers.EAX };
-				new CPU.And { DestinationReg = CPU.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPU.Registers.EDX };
+				new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+				new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
 			}
 			else
 			{
-                new CPU.Pop { DestinationReg = CPU.Registers.EAX };
-                new CPU.And { DestinationReg = CPU.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPU.Registers.EAX };
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
 			}
 			Assembler.Stack.Push( xStackContent );
 		}
