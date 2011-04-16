@@ -42,22 +42,7 @@ namespace Cosmos.VS.Package.Templates
             }
 
             // set project extension for reference
-            string extension = null;
-            switch (project.Kind)
-            {
-                // VB.NET
-                case "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}":
-                    extension = "vbproj";
-                    break;
-                // C#
-                case "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}":
-                    extension = "csproj";
-                    break;
-                default:
-                    // unknown project type
-                    extension = project.UniqueName.Split('.')[1];
-                    break;
-            }
+            string extension = project.UniqueName.Split('.')[1];
 
             xInputString = xInputString.Replace("$KernelGuid$", mGuidKernel.ToString("b"));
             xInputString = xInputString.Replace("$CosmosProjGuid$", mGuidCosmosProj.ToString("b"));
@@ -96,6 +81,16 @@ namespace Cosmos.VS.Package.Templates
 			{
 				hierarchy.GetItem(fullPath).Select(EnvDTE.vsUISelectionType.vsUISelectionTypeSelect);
 				project.DTE.ExecuteCommand("Project.SetasStartUpProject");
+			}
+			#endregion
+
+			#region set all projects in all configurations are supposed to build
+			foreach (SolutionConfiguration item in project.DTE.Solution.SolutionBuild.SolutionConfigurations)
+			{
+				for (int i = 1; i <= item.SolutionContexts.Count; i++)
+				{
+					item.SolutionContexts.Item(i).ShouldBuild = true;
+				}
 			}
 			#endregion
 		}

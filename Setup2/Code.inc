@@ -110,6 +110,11 @@ begin
   result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
 end;
 
+function Fsharp2010_Installed(dummy: string): Boolean;
+begin
+  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}','Package');
+end;
+
 function Vb2010_Installed(dummy: string): Boolean;
 begin
 	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
