@@ -12,27 +12,32 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
         var xSource = Assembler.Stack.Peek();
-        if (!xSource.IsFloat)
-        {
-            new CPUx86.Move { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-            new CPUx86.SSE.ConvertSI2SS { SourceReg = CPUx86.Registers.EAX, DestinationReg = CPUx86.Registers.XMM0 };
-            new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-        }
+        
         Assembler.Stack.Pop();
         switch (xSource.Size)
         {
             case 1:
             case 2:
             case 4:
-                {
-
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.Push { DestinationValue = 0 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                    break;
-                }
+				if (xSource.IsFloat)
+				{
+					new CPUx86.SSE.ConvertSS2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+				}
+				else
+				{
+					new CPUx86.SSE.ConvertSI2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+				}
+				// expand stack, that moved data is valid stack
+				new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+				new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM0 };
+				break;
             case 8:
                 {
+					if (!xSource.IsFloat)
+					{
+						new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+						new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true};
+					}
                     break;
                 }
             default:
