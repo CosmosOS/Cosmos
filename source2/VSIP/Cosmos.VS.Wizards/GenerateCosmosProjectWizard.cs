@@ -89,7 +89,11 @@ namespace Cosmos.VS.Package.Templates
 			{
 				for (int i = 1; i <= item.SolutionContexts.Count; i++)
 				{
-					item.SolutionContexts.Item(i).ShouldBuild = true;
+					SolutionContext context = item.SolutionContexts.Item(i);
+					if(context.ProjectName.EndsWith(project.UniqueName))
+						context.ShouldBuild = true;
+					else if (context.ProjectName.EndsWith(xCosmosProject.UniqueName))
+						context.ShouldBuild = true;
 				}
 			}
 			#endregion
