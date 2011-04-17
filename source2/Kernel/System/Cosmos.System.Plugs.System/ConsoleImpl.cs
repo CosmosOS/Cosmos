@@ -222,10 +222,9 @@ namespace Cosmos.System.Plugs.System.System {
         #endregion
 
         public static int Read() {
-            //TODO - after this and kb, remove asm ref to Hardware2
-            //return Cosmos.Hardware2.Keyboard.ReadChar();
-            return 0;
-        }
+			// TODO special cases, if needed, that returns -1
+            return Hardware.Global.Keyboard.ReadChar();
+		}
 
         public static string ReadLine() {
             List<char> chars = new List<char>(32);
@@ -304,5 +303,22 @@ namespace Cosmos.System.Plugs.System.System {
             char[] final = chars.ToArray();
             return new string(final);
         }
+
+		public static ConsoleKeyInfo ReadKey(bool intercept)
+		{
+			var key = Cosmos.Hardware.Global.Keyboard.ReadMapping();
+			var returnValue = new ConsoleKeyInfo(
+				key.Value,
+				key.Key,
+				Cosmos.Hardware.Global.Keyboard.ShiftPressed,
+				Cosmos.Hardware.Global.Keyboard.AltPressed,
+				Cosmos.Hardware.Global.Keyboard.CtrlPressed);
+
+			if (false == intercept)
+			{
+				Write(returnValue.KeyChar);
+			}
+			return returnValue;
+		}
     }
 }
