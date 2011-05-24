@@ -126,9 +126,11 @@
     <Compile Include="ShiftRight.cs" />
     <Compile Include="SSE2\ConvertSI2SD.cs" />
     <Compile Include="SSE2\ConvertSS2SD.cs" />
+    <Compile Include="SSE2\ConvertSD2SI.cs" />
     <Compile Include="SSE2\MoveSD.cs" />
     <Compile Include="SSE2\SqrtSD.cs" />
     <Compile Include="SSE2\XorPD.cs" />
+    <Compile Include="SSE3\MoveDoubleAndDupplicate.cs" />
     <Compile Include="SSEAndMMX2\AddPS.cs" />
     <Compile Include="SSEAndMMX2\AddSS.cs" />
     <Compile Include="SSEAndMMX2\AndPS.cs" />
@@ -212,7 +214,7 @@
     <Compile Include="x87\IntMul.cs" />
     <Compile Include="x87\IntStore.cs" />
     <Compile Include="x87\IntStoreAndPop.cs" />
-    <Compile Include="x87\IntStoreWithTrunc.cs" />
+    <Compile Include="SSE3\IntStoreWithTrunc.cs" />
     <Compile Include="x87\IntSub.cs" />
     <Compile Include="x87\IntSubReverse.cs" />
     <Compile Include="Xchg.cs" />
@@ -258,7 +260,6 @@
     <Folder Include="PentiumAndUp\" />
     <Folder Include="PentiumMMXAndUp\" />
     <Folder Include="PentiumProAndUp\" />
-    <Folder Include="SSE3\" />
     <Folder Include="SSE4a\" />
     <Folder Include="SSE4dot1\" />
     <Folder Include="SSE4dot2\" />

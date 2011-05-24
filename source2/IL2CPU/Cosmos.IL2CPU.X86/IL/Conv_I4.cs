@@ -17,12 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSource = Assembler.Stack.Pop();
-            if (xSource.IsFloat)
-            {
-                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-            }
+            
 
             switch( xSource.Size )
             {
@@ -30,10 +25,23 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 2:
                 case 4:
                     {
+						if (xSource.IsFloat)
+						{
+							new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+							new CPUx86.SSE.ConvertSS2SI { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0 };
+							new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+						}
                         break;
                     }
                 case 8:
                     {
+						if (xSource.IsFloat)
+						{
+							new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+							new CPUx86.SSE.ConvertSD2SI { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0 };
+							new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+						}
+						
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
