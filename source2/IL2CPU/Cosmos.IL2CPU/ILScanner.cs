@@ -853,124 +853,185 @@ namespace Cosmos.IL2CPU {
           xResult = xImpl.GetMethod("CCtor", BindingFlags.Static | BindingFlags.Public
             , null, xParamTypes, null);
         }
-        if (xResult == null) {
-          // Search by signature
-          foreach (var xSigMethod in xImpl.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
-            // TODO: Only allow one, but this code for now takes the last one
-            // if there is more than one
-            xAttrib=null;
-            foreach (PlugMethodAttribute x in xSigMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false)) {
-              xAttrib = x;
-            }
 
-            if (xAttrib != null && (xAttrib.IsWildcard && !xAttrib.WildcardMatchParameters)) {
-              MethodBase xTargetMethod = null;
-              if (String.Compare(xSigMethod.Name, "Ctor", true) == 0 ||
-                 String.Compare(xSigMethod.Name, "Cctor", true) == 0) {
-                xTargetMethod = aTargetType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).SingleOrDefault();
-              } else {
-                xTargetMethod = (from item in aTargetType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
-                                where item.Name == xSigMethod.Name
-                                select item).SingleOrDefault();
-              }
-              if (xTargetMethod == aMethod) {
-                xResult = xSigMethod;
-              }
-            } else {
+		if (xResult == null)
+		{
+			// Search by signature
+			foreach (var xSigMethod in xImpl.GetMethods(BindingFlags.Static | BindingFlags.Public))
+			{
+				// TODO: Only allow one, but this code for now takes the last one
+				// if there is more than one
+				xAttrib = null;
+				foreach (PlugMethodAttribute x in xSigMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false))
+				{
+					xAttrib = x;
+				}
 
-              var xParams = xSigMethod.GetParameters();
-              //TODO: Static method plugs dont seem to be separated 
-              // from instance ones, so the only way seems to be to try
-              // to match instance first, and if no match try static.
-              // I really don't like this and feel we need to find
-              // an explicit way to determine or mark the method 
-              // implementations.
-              //
-              // Plug implementations take "this" as first argument
-              // so when matching we don't include it in the search
-              Type[] xTypesInst = null;
-              var xActualParamCount = xParams.Length;
-              foreach (var xParam in xParams) {
-                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                  xActualParamCount--;
-                }
-              }
-              Type[] xTypesStatic = new Type[xActualParamCount];
-              // If 0 params, has to be a static plug so we skip
-              // any copying and leave xTypesInst = null
-              // If 1 params, xTypesInst must be converted to Type[0]
-              if (xActualParamCount == 1) {
-                xTypesInst = new Type[0];
-                xTypesStatic[0] = xParams[0].ParameterType;
-              } else if (xActualParamCount > 1) {
-                xTypesInst = new Type[xActualParamCount - 1];
-                var xCurIdx = 0;
-                foreach (var xParam in xParams.Skip(1)) {
-                  if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                    continue;
-                  }
-                  xTypesInst[xCurIdx] = xParam.ParameterType;
-                  xCurIdx++;
-                }
-                xCurIdx = 0;
-                foreach (var xParam in xParams) {
-                  if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                    xCurIdx++;
-                    continue;
-                  }
-                  if (xCurIdx >= xTypesStatic.Length) {
-                    break;
-                  }
-                  xTypesStatic[xCurIdx] = xParam.ParameterType;
-                  xCurIdx++;
-                }
-              }
-              System.Reflection.MethodBase xTargetMethod = null;
-              // TODO: In future make rule that all ctor plugs are called
-              // ctor by name, or use a new attrib
-              //TODO: Document all the plug stuff in a document on website
-              //TODO: To make inclusion of plugs easy, we can make a plugs master
-              // that references the other default plugs so user exes only 
-              // need to reference that one.
-              // TODO: Skip FieldAccessAttribute if in impl
-              if (xTypesInst != null) {
-                if (string.Compare(xSigMethod.Name, "ctor", true) == 0) {
-                  xTargetMethod = aTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
-                } else {
-                  xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
-                }
-              }
-              // Not an instance method, try static
-              if (xTargetMethod == null) {
-                if (string.Compare(xSigMethod.Name, "cctor", true) == 0
-                  || string.Compare(xSigMethod.Name, "ctor", true) == 0) {
-                  xTargetMethod = aTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
-                } else {
-                  xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
-                }
-              }
-              if (xTargetMethod == aMethod) {
-                xResult = xSigMethod;
-                break;
-              }
-              if (xAttrib != null && xAttrib.Signature != null)
-              {
-                  var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(aMethod));
-                  if (string.Compare(xName, xAttrib.Signature, true) == 0)
-                  {
-                      xResult = xSigMethod;
-                      break;
-                  }
-              }
-              xAttrib = null;
-            }
-          }
-        }
+				if (xAttrib != null && (xAttrib.IsWildcard && !xAttrib.WildcardMatchParameters))
+				{
+					MethodBase xTargetMethod = null;
+					if (String.Compare(xSigMethod.Name, "Ctor", true) == 0 ||
+					   String.Compare(xSigMethod.Name, "Cctor", true) == 0)
+					{
+						xTargetMethod = aTargetType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).SingleOrDefault();
+					}
+					else
+					{
+						xTargetMethod = (from item in aTargetType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
+										 where item.Name == xSigMethod.Name
+										 select item).SingleOrDefault();
+					}
+					if (xTargetMethod == aMethod)
+					{
+						xResult = xSigMethod;
+					}
+				}
+				else
+				{
+
+					var xParams = xSigMethod.GetParameters();
+					//TODO: Static method plugs dont seem to be separated 
+					// from instance ones, so the only way seems to be to try
+					// to match instance first, and if no match try static.
+					// I really don't like this and feel we need to find
+					// an explicit way to determine or mark the method 
+					// implementations.
+					//
+					// Plug implementations take "this" as first argument
+					// so when matching we don't include it in the search
+					Type[] xTypesInst = null;
+					var xActualParamCount = xParams.Length;
+					foreach (var xParam in xParams)
+					{
+						if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0)
+						{
+							xActualParamCount--;
+						}
+					}
+					Type[] xTypesStatic = new Type[xActualParamCount];
+					// If 0 params, has to be a static plug so we skip
+					// any copying and leave xTypesInst = null
+					// If 1 params, xTypesInst must be converted to Type[0]
+					if (xActualParamCount == 1)
+					{
+						xTypesInst = new Type[0];
+						xTypesStatic[0] = xParams[0].ParameterType;
+					}
+					else if (xActualParamCount > 1)
+					{
+						xTypesInst = new Type[xActualParamCount - 1];
+						var xCurIdx = 0;
+						foreach (var xParam in xParams.Skip(1))
+						{
+							if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0)
+							{
+								continue;
+							}
+							xTypesInst[xCurIdx] = xParam.ParameterType;
+							xCurIdx++;
+						}
+						xCurIdx = 0;
+						foreach (var xParam in xParams)
+						{
+							if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0)
+							{
+								xCurIdx++;
+								continue;
+							}
+							if (xCurIdx >= xTypesStatic.Length)
+							{
+								break;
+							}
+							xTypesStatic[xCurIdx] = xParam.ParameterType;
+							xCurIdx++;
+						}
+					}
+					System.Reflection.MethodBase xTargetMethod = null;
+					// TODO: In future make rule that all ctor plugs are called
+					// ctor by name, or use a new attrib
+					//TODO: Document all the plug stuff in a document on website
+					//TODO: To make inclusion of plugs easy, we can make a plugs master
+					// that references the other default plugs so user exes only 
+					// need to reference that one.
+					// TODO: Skip FieldAccessAttribute if in impl
+					if (xTypesInst != null)
+					{
+						if (string.Compare(xSigMethod.Name, "ctor", true) == 0)
+						{
+							xTargetMethod = aTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+						}
+						else
+						{
+							xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+						}
+					}
+					// Not an instance method, try static
+					if (xTargetMethod == null)
+					{
+						if (string.Compare(xSigMethod.Name, "cctor", true) == 0
+						  || string.Compare(xSigMethod.Name, "ctor", true) == 0)
+						{
+							xTargetMethod = aTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+						}
+						else
+						{
+							xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+						}
+					}
+					if (xTargetMethod == aMethod)
+					{
+						xResult = xSigMethod;
+						break;
+					}
+					if (xAttrib != null && xAttrib.Signature != null)
+					{
+						var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(aMethod));
+						if (string.Compare(xName, xAttrib.Signature, true) == 0)
+						{
+							xResult = xSigMethod;
+							break;
+						}
+					}
+					xAttrib = null;
+				}
+			}
+		}
+		else
+		{
+			// check if signatur is equal
+			var xResPara = xResult.GetParameters();
+			var xAMethodPara = aMethod.GetParameters();
+			if (aMethod.IsStatic)
+			{
+				if (xResPara.Length != xAMethodPara.Length)
+					return null;
+			}
+			else
+			{
+				if (xResPara.Length - 1 != xAMethodPara.Length)
+					return null;
+			}
+			for (int i = 0; i < xAMethodPara.Length; i++)
+			{
+				int correctIndex = aMethod.IsStatic ? i : i + 1;
+				if (xResPara[correctIndex].ParameterType != xAMethodPara[i].ParameterType)
+					return null;
+			}
+			if (xResult.Name == "Ctor" && aMethod.Name == ".ctor")
+			{
+			}
+			else if (xResult.Name == "CCtor" && aMethod.Name == ".cctor")
+			{
+			}
+			else if (xResult.Name != aMethod.Name)
+				return null;
+		}
       }
+	  if (xResult == null)
+		  return null;
 
       // If we found a matching method, check for attributes 
       // that might disable it.
-      if (xResult != null) {
         //TODO: For signature ones, we could cache the attrib. Thats 
         // why we check for null here
         if (xAttrib == null) {
@@ -999,11 +1060,8 @@ namespace Cosmos.IL2CPU {
           //  }
           //}
         }
-      }
 
-      if (xResult != null) {
         Queue(xResult, null, "Plug Method");
-      }
       //if (xAttrib != null && xAttrib.Signature != null)
       //{
       //    var xTargetMethods = aTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
