@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Compiler.Assembler.X86.x87
+﻿namespace Cosmos.Compiler.Assembler.X86.x87
 {
     [OpCode("fstp")]
     public class FloatStoreAndPop : InstructionWithDestinationAndSize

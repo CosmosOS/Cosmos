@@ -25,36 +25,17 @@ namespace Cosmos.Compiler.Assembler.X86 {
               mSize = value;
 
               //ben will crash on output for size 0 so catch here
-                
             }
-
-            
         }
 
         protected virtual void DetermineSize() {
             if (mSize == 0) {
                 if (DestinationReg != null && !DestinationIsIndirect) {
-                    if (Registers.Is16Bit(DestinationReg.Value)) {
-                        Size = 16;
-                    } else {
-                        if (Registers.Is32Bit(DestinationReg.Value)) {
-                            Size = 32;
-                        } else {
-                            Size = 8;
-                        }
-                    }
+					Size = Registers.GetSize(DestinationReg.Value);
                     return;
                 }
                 if (SourceReg != null && !SourceIsIndirect) {
-                    if (Registers.Is16Bit(SourceReg.Value)) {
-                        Size = 16;
-                    } else {
-                        if (Registers.Is32Bit(SourceReg.Value)) {
-                            Size = 32;
-                        } else {
-                            Size = 8;
-                        }
-                    }
+					Size = Registers.GetSize(SourceReg.Value);
                     return;
                 }
                 if ((SourceRef != null && !SourceIsIndirect) || (DestinationRef != null && !DestinationIsIndirect)) {

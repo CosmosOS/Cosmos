@@ -6,7 +6,7 @@ using System.Text;
 namespace Cosmos.Compiler.Assembler.X86 {
     public static class InfraExtensions {
         public static string GetDestinationAsString(this IInstructionWithDestination aThis) {
-            string xDest = "";
+            string xDest = string.Empty;
             if((aThis.DestinationValue.HasValue ||aThis.DestinationRef != null) && 
                 aThis.DestinationIsIndirect && 
                 aThis.DestinationReg!=null) {
@@ -39,15 +39,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
         public static void DetermineSize(this IInstructionWithDestination aThis, IInstructionWithSize aThis2, byte aSize) {
             if (aSize == 0) {
                 if (aThis.DestinationReg != null && !aThis.DestinationIsIndirect) {
-                    if (Registers.Is16Bit(aThis.DestinationReg.Value)) {
-                        aThis2.Size = 16;
-                    } else {
-                        if (Registers.Is32Bit(aThis.DestinationReg.Value)) {
-                            aThis2.Size = 32;
-                        } else {
-                            aThis2.Size = 8;
-                        }
-                    }
+					aThis2.Size = Registers.GetSize(aThis.DestinationReg.Value);
                     return;
                 }
                 if (aThis.DestinationRef != null && !aThis.DestinationIsIndirect) {

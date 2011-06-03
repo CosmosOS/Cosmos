@@ -83,6 +83,8 @@ namespace Cosmos.Compiler.Assembler.X86 {
                     return "dword";
                 case 64:
                     return "qword";
+				case 80:
+					return string.Empty;
                 default:
                     return "dword";
                  //   throw new Exception("Invalid size: " + aSize);

@@ -11,7 +11,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
         AH,
         AL,
         EBX,
-        BX, 
+        BX,
         BH,
         BL,
         ECX,
@@ -335,6 +335,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
 
         public static byte GetSize(RegistersEnum aRegister) {
             if (Is128Bit(aRegister)) { return 128; }
+			if (Is80Bit(aRegister)) { return 80; }
             if (Is32Bit(aRegister)) { return 32; }
             if (Is16Bit(aRegister)) { return 16; }
             if (Is8Bit(aRegister)) { return 8; }
@@ -355,6 +356,19 @@ namespace Cosmos.Compiler.Assembler.X86 {
         }
 
         //public static Guid Get 
+
+		public static bool Is80Bit(RegistersEnum aRegister)
+		{
+			return
+				aRegister == ST0 ||
+				aRegister == ST1 ||
+				aRegister == ST2 ||
+				aRegister == ST3 ||
+				aRegister == ST4 ||
+				aRegister == ST5 ||
+				aRegister == ST6 ||
+				aRegister == ST7;
+		}
 
         public static bool Is128Bit(RegistersEnum aRegister)
         {
@@ -457,6 +471,5 @@ namespace Cosmos.Compiler.Assembler.X86 {
             registers.Add(ST7);
             return registers;
         }
-
     }
 }
