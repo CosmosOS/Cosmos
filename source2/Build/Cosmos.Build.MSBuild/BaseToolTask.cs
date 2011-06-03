@@ -7,6 +7,13 @@ using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild
 {
+	public enum WriteType
+	{
+		Warning,
+		Error,
+		Info
+	}
+
 	public abstract class BaseToolTask : AppDomainIsolatedTask
 	{
 		protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
@@ -49,21 +56,24 @@ namespace Cosmos.Build.MSBuild
 					{
 						Log.LogError("Error occurred while invoking {0}.", name);
 					}
-					foreach (var xError in mErrors)
-					{
-						Log.LogError(ExtendLineError(xError));
-					}
-					foreach (var xOutput in mOutput)
-					{
-						Log.LogError(xOutput);
-					}
+					
 					return false;
 				}
-				else
+				WriteType typ;
+				foreach (var xError in mErrors)
 				{
-					foreach (var xOutput in mOutput)
+					string error = xError;
+					if(ExtendLineError(xProcess.ExitCode, ref error, out typ))
 					{
-						Log.LogMessage(xOutput);
+						Logs(typ, error);
+					}
+				}
+				foreach (var xOutput in mOutput)
+				{
+					string output = xOutput;
+					if (ExtendLineError(xProcess.ExitCode, ref output, out typ))
+					{
+						Logs(typ, output);
 					}
 				}
 			}
@@ -73,9 +83,39 @@ namespace Cosmos.Build.MSBuild
 		private List<string> mErrors;
 		private List<string> mOutput;
 
-		public virtual string ExtendLineError(string errorMessage)
+		public virtual bool ExtendLineError(int exitCode, ref string errorMessage, out WriteType typ)
 		{
-			return errorMessage;
+			typ = WriteType.Error;
+			if (exitCode == 0)
+				return false;
+			return true;
+		}
+
+		public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out WriteType typ)
+		{
+			typ = WriteType.Info;
+			return true;
+		}
+
+		public void Logs(WriteType typ, string message)
+		{
+			//TODO remove
+			Log.LogCommandLine(message);
+			switch (typ)
+			{
+				case WriteType.Warning:
+					Log.LogWarning(message);
+					break;
+				case WriteType.Error:
+					Log.LogError(message);
+					break;
+				case WriteType.Info:
+					Log.LogMessage(message);
+					break;
+				default:
+					Log.LogError(message);
+					break;
+			}
 		}
 	}
 }

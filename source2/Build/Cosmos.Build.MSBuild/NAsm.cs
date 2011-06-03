@@ -75,21 +75,28 @@ namespace Cosmos.Build.MSBuild
             return xResult;
         }
 
-		public override string ExtendLineError(string errorMessage)
+		public override bool ExtendLineError(int exitCode, ref string errorMessage, out WriteType typ)
 		{
+			typ = WriteType.Error;
 			try
 			{
 				if (errorMessage.StartsWith(InputFile))
 				{
+					int IndexFile = errorMessage.LastIndexOf('\\', InputFile.Length);
+					string file = errorMessage.Substring(IndexFile + 1, InputFile.Length - IndexFile - 1);
 					string[] split = errorMessage.Substring(InputFile.Length).Split(':');
+					if(split.Length > 3 && split[2].Contains("warning"))
+						typ = WriteType.Warning;
 					uint lineNumber = uint.Parse(split[1]);
-					return errorMessage + " Code: " + GetLine(InputFile, lineNumber);
+					errorMessage = file + " Line: " + lineNumber + " Code: " + GetLine(InputFile, lineNumber).Trim();
+					this.BuildEngine.LogMessageEvent(new BuildMessageEventArgs(errorMessage,"","",MessageImportance.High));
+
 				}
 			}
 			catch (Exception)
 			{
 			}
-			return base.ExtendLineError(errorMessage);			
+			return true;
 		}
 
 		private static string GetLine(string fileName, uint line)
