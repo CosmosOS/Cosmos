@@ -223,7 +223,7 @@ namespace Cosmos.Debug.VSDebugEngine
 				{
 					xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
 					var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
-					propertyInfo.bstrValue = String.Format("a{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
+					propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
 				}
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
