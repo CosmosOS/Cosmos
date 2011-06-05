@@ -190,12 +190,41 @@ namespace Cosmos.Debug.VSDebugEngine
 					var xTypedDoubleHexValue = BitConverter.ToUInt64(xData, 0);
 					propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedDoubleValue, xTypedDoubleHexValue.ToString("X").ToUpper());
 				}
-                else
-                {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
-                }
+				else if (mDebugInfo.Type == typeof(char[]).AssemblyQualifiedName)
+				{
+					StringBuilder b = new StringBuilder();
+					xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+
+					const uint OFFSET_LENGTH = 8;
+					const uint OFFSET_FROM_LENGTH_TO_DATA = 8;
+					uint pointer = BitConverter.ToUInt32(xData, 0);
+					pointer += OFFSET_LENGTH;
+					xData = mProcess.mDbgConnector.GetMemoryData(pointer, 4);
+					int size = BitConverter.ToInt32(xData, 0);
+
+					b.Append("Count: ");
+					b.Append(size);
+					b.Append("; ");
+
+					for (int i = 0; i < size; i++)
+					{
+						xData = mProcess.mDbgConnector.GetMemoryData((uint)(pointer + OFFSET_FROM_LENGTH_TO_DATA + i * sizeof(char)), 2);
+						char c = BitConverter.ToChar(xData, 0);
+
+						b.Append('\'');
+						b.Append(c);
+						b.Append('\'');
+						if(i - 1 < size)
+							b.Append(' ');
+					}
+					propertyInfo.bstrValue = b.ToString();
+				}
+				else
+				{
+					xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+					var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
+					propertyInfo.bstrValue = String.Format("a{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
+				}
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 
