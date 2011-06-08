@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblerMethod.cs" />
+    <Compile Include="FieldTypeAttribute.cs" />
     <Compile Include="FieldAccessAttribute.cs" />
     <Compile Include="PlugAttribute.cs" />
     <Compile Include="PlugFieldAttribute.cs" />

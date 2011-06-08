@@ -915,7 +915,12 @@ namespace Cosmos.IL2CPU {
 					if (xActualParamCount == 1)
 					{
 						xTypesInst = new Type[0];
-						xTypesStatic[0] = xParams[0].ParameterType;
+
+						var xReplaceType = xParams[0].GetCustomAttributes(typeof(FieldTypeAttribute), false);
+						if (xReplaceType.Length == 1)
+							xTypesStatic[0] = Type.GetType(((FieldTypeAttribute)xReplaceType[0]).Name, true);
+						else
+							xTypesStatic[0] = xParams[0].ParameterType;
 					}
 					else if (xActualParamCount > 1)
 					{
@@ -927,7 +932,13 @@ namespace Cosmos.IL2CPU {
 							{
 								continue;
 							}
-							xTypesInst[xCurIdx] = xParam.ParameterType;
+
+							var xReplaceType = xParam.GetCustomAttributes(typeof(FieldTypeAttribute), false);
+							if (xReplaceType.Length == 1)
+								xTypesInst[xCurIdx] = Type.GetType(((FieldTypeAttribute)xReplaceType[0]).Name, true);
+							else
+								xTypesInst[xCurIdx] = xParam.ParameterType;
+
 							xCurIdx++;
 						}
 						xCurIdx = 0;
