@@ -110,8 +110,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 					new CPUx86.SignExtendAX { Size = 32 };
                     new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
