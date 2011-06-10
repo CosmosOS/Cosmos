@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Build.Utilities;
 using System.Diagnostics;
+using MessageImportance = Microsoft.Build.Framework.MessageImportance;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -11,6 +12,7 @@ namespace Cosmos.Build.MSBuild
 	{
 		Warning,
 		Error,
+		Message, // only issued on console
 		Info
 	}
 
@@ -99,8 +101,6 @@ namespace Cosmos.Build.MSBuild
 
 		public void Logs(WriteType typ, string message)
 		{
-			//TODO remove
-			Log.LogCommandLine(message);
 			switch (typ)
 			{
 				case WriteType.Warning:
@@ -109,8 +109,12 @@ namespace Cosmos.Build.MSBuild
 				case WriteType.Error:
 					Log.LogError(message);
 					break;
-				case WriteType.Info:
+				case WriteType.Message:
 					Log.LogMessage(message);
+					break;
+				case WriteType.Info:
+					// changed IDEBuildLogger.cs for this behavior of add to ErrorList Messages
+					Log.LogMessage(MessageImportance.High, message);
 					break;
 				default:
 					Log.LogError(message);

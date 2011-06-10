@@ -299,6 +299,8 @@ namespace Microsoft.VisualStudio.Project
         {
             // NOTE: This may run on a background thread!
             QueueOutputEvent(messageEvent.Importance, messageEvent);
+			if(messageEvent.Importance == MessageImportance.High)
+				QueueTaskEvent(messageEvent);
         }
 
         #endregion
@@ -412,6 +414,12 @@ namespace Microsoft.VisualStudio.Project
                     task.Column = warningArgs.ColumnNumber;
                     task.Priority = TaskPriority.Normal;
                 }
+				else if (errorEvent is BuildMessageEventArgs)
+				{
+					BuildMessageEventArgs messageArgs = (BuildMessageEventArgs)errorEvent;
+					task.ErrorCategory = TaskErrorCategory.Message;
+					task.Priority = TaskPriority.Normal;
+				}
 
                 task.Text = errorEvent.Message;
                 task.Category = TaskCategory.BuildCompile;

@@ -18,8 +18,13 @@ using Cosmos.Debug.Common;
 namespace Cosmos.Build.MSBuild {
     // Class is separated from MSBuild task so we can call it from debugging and standalone applications.
     public class IL2CPUTask {
+
+		// FIX THIS: when the kernel class changes, fix the name below
+		const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
+
         public Action<string> OnLogMessage;
         public Action<string> OnLogError;
+		public Action<string> OnLogWarning;
         public Action<Exception> OnLogException;
 
         protected void LogMessage(string aMsg) {
@@ -27,6 +32,12 @@ namespace Cosmos.Build.MSBuild {
                 OnLogMessage(aMsg);
             }
         }
+
+		protected void LogWarning(string aMsg) {
+			if (OnLogWarning != null) {
+				OnLogWarning(aMsg);
+			}
+		}
 
         protected void LogError(string aMsg) {
             if (OnLogError != null) {
@@ -68,19 +79,16 @@ namespace Cosmos.Build.MSBuild {
             foreach (var xDir in mSearchDirs)
             {
                 var xPath = Path.Combine(xDir, xShortName + ".dll");
-                if (File.Exists(xPath))
-                {
+                if (File.Exists(xPath)) {
                     return Assembly.LoadFrom(xPath);
                 }
                 xPath = Path.Combine(xDir, xShortName + ".exe");
-                if (File.Exists(xPath))
-                {
+                if (File.Exists(xPath)) {
                     return Assembly.LoadFrom(xPath);
                 }
             }
-            if (mStaticLog != null)
-            {
-                mStaticLog("Assembly '" + args.Name + "' not resolved!");
+            if (mStaticLog != null) {
+                mStaticLog(string.Format("Assembly '{0}' not resolved!", args.Name));
             }
             return null;
         }
@@ -147,22 +155,20 @@ namespace Cosmos.Build.MSBuild {
                     {
 						var xName = xRef.GetMetadata("FullPath");
                         var xDir = Path.GetDirectoryName(xName);
-                        if (!xSearchPaths.Contains(xDir))
-                        {
+                        if (!xSearchPaths.Contains(xDir)) {
                             xSearchPaths.Insert(0, xDir);
                         }
-                        if (xName.Length > 0)
-                        {
-							if (!File.Exists(xName))
-								LogError("File " + xName + " does not exist!");
-                            Assembly.LoadFile(xName);
+                        if (xName.Length > 0) {
+							if (File.Exists(xName))
+								Assembly.LoadFile(xName);
+							else
+								LogWarning(string.Format("File {0} does not exist!",  xName));
                         }
                     }
                 }
                 mSearchDirs = xSearchPaths.ToArray();
             }
-            if (String.IsNullOrEmpty(DebugMode))
-            {
+            if (String.IsNullOrEmpty(DebugMode)) {
                 mDebugMode = Cosmos.Build.Common.DebugMode.None;
             }
             else
@@ -174,8 +180,7 @@ namespace Cosmos.Build.MSBuild {
                 }
                 mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             }
-            if (String.IsNullOrEmpty(TraceAssemblies))
-            {
+            if (String.IsNullOrEmpty(TraceAssemblies)) {
                 mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
             }
             else
@@ -190,7 +195,6 @@ namespace Cosmos.Build.MSBuild {
             return true;
         }
 
-
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.None;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
         protected void LogTime(string message)
@@ -202,8 +206,7 @@ namespace Cosmos.Build.MSBuild {
             try
             {
                 LogMessage("Executing IL2CPU on assembly");
-                if (!Initialize())
-                {
+                if (!Initialize()) {
                     return false;
                 }
 
@@ -215,8 +218,7 @@ namespace Cosmos.Build.MSBuild {
                     return false;
                 }
                 var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
-                if (mDebugMode == Common.DebugMode.None)
-                {
+                if (mDebugMode == Common.DebugMode.None) {
                     DebugCom = 0;
                 }
                 var xAsm = new AppAssemblerNasm(DebugCom);
@@ -235,8 +237,7 @@ namespace Cosmos.Build.MSBuild {
                     using (var xScanner = new ILScanner(xAsm))
                     {
                         xScanner.TempDebug += x => LogMessage(x);
-                        if (EnableLogging)
-                        {
+                        if (EnableLogging) {
                             xScanner.EnableLogging(xOutputFilename + ".log.html");
                         }
                         // TODO: shouldn't be here?
@@ -292,16 +293,13 @@ namespace Cosmos.Build.MSBuild {
                         var xAssembly = Assembly.LoadFile(xFile);
                         foreach (var xType in xAssembly.GetExportedTypes())
                         {
-                            if (xType.IsGenericTypeDefinition)
-                            {
+                            if (xType.IsGenericTypeDefinition) {
                                 continue;
                             }
-                            if (xType.IsAbstract)
-                            {
+                            if (xType.IsAbstract) {
                                 continue;
                             }
-                            // FIX THIS: when the kernel class changes, fix the name below
-                            if (xType.BaseType.FullName == "Cosmos.System.Kernel")
+							if (xType.BaseType.FullName == FULLASSEMBLYNAME_KERNEL)
                             {
                                 // found kernel?
                                 if (xFoundType != null)

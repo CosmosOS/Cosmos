@@ -77,8 +77,16 @@ namespace Cosmos.Build.MSBuild
             Log.LogMessage(aMsg);
         }
 
+		protected void LogInformation(string aMsg) {
+			Log.LogMessage(MessageImportance.High, aMsg);
+		}
+
+		protected void LogWarning(string aMsg) {
+			Log.LogWarning(aMsg);
+		}
+
         protected void LogError(string aMsg) {
-            Log.LogMessage(aMsg);
+            Log.LogError(aMsg);
         }
 
         protected void LogException(Exception e) {
@@ -87,10 +95,12 @@ namespace Cosmos.Build.MSBuild
 
         public override bool Execute() {
             var xSW = Stopwatch.StartNew();
+
             try
             {
                 mTask.OnLogMessage = LogMessage;
                 mTask.OnLogError = LogError;
+				mTask.OnLogWarning = LogWarning;
                 mTask.OnLogException = LogException;
 
                 mTask.DebugMode = DebugMode;
@@ -106,9 +116,8 @@ namespace Cosmos.Build.MSBuild
             finally
             {
                 xSW.Stop();
-                Log.LogWarning("IL2CPU task took {0}", xSW.Elapsed);
+                Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
             }
         }
-
     }
 }
