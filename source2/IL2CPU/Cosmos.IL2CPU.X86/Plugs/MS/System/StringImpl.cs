@@ -11,8 +11,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             aStringLength = aChars.Length;
-            for (int i = 0; i < aChars.Length; i++)
-            {
+            for (int i = 0; i < aChars.Length; i++) {
                 aFirstChar[i] = aChars[i];
             }
         }
@@ -22,12 +21,10 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             aStringLength = length;
-            for (int i = 0; i < length; i++)
-            {
+			for (int i = 0; i < length; i++) {
                 aFirstChar[i] = aChars[start+i];
             }
         }
-
 
         ////[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char____System_Int32__System_Int32_")]
         //public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
@@ -53,6 +50,17 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
         //    }
         //}
 
+		//TODO didnt work
+		//public static unsafe void Ctor(String aThis, char aChar, int aLength,
+		//    [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+		//    [FieldAccess(Name = "System.Char System.String.m_firstChar")] ref char* aFirstChar)
+		//{
+		//    aStringLength = aLength;
+		//    for (int i = 0; i < aLength; i++) {
+		//        aFirstChar[i] = aChar;
+		//    }
+		//}
+
         [PlugMethod(Signature = "System_Int32__System_String_get_Length__")]
 		public static unsafe int get_Length(int* aThis, [FieldAccess(Name = "System.Int32 System.String.m_stringLength")]ref int aLength) {
 			return aLength;
@@ -69,8 +77,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
         //}
 
         public static string FastAllocateString(int length) {
-		//return new String(new char[length]);
-            throw new NotImplementedException("FastAllocateString");
+			return new String(new char[length]);
 		}
 
 		//public static unsafe string GetStringForStringBuilder(string value, int startIndex, int length, int capacity) {
@@ -89,11 +96,11 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 		//    return null;
 		//}
 
-		public static unsafe void wstrcpy(char* dmem, char* smem, int charCount) {
-			for (int i = 0; i < charCount; i++) {
-				dmem[i] = smem[i];
-			}
-		}
+		//public static unsafe void wstrcpy(char* dmem, char* smem, int charCount) {
+		//    for (int i = 0; i < charCount; i++) {
+		//        dmem[i] = smem[i];
+		//    }
+		//}
 	}
 
   //StringImpl2 plugs StringImpl which is also a plug????
