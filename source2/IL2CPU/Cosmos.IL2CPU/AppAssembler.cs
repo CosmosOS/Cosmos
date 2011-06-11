@@ -85,6 +85,12 @@ namespace Cosmos.IL2CPU
                 var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
                 xAssembler.AssembleNew(mAssembler, aMethod.PluggedMethod);
             }
+            else if (aMethod.IsInlineAssembler)
+            {
+                mLog.WriteLine("Emitted using Inline MethodAssembler", aMethod.MethodBase.GetFullName());
+                mLog.Flush();
+                aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
+            }
             else
             {
                 foreach (var xOpCode in aOpCodes)
@@ -244,8 +250,8 @@ namespace Cosmos.IL2CPU
                 if (xDataMember != null)
                 {
                     Assembler.CurrentInstance.DataMembers.Remove((from item in Assembler.CurrentInstance.DataMembers
-                                                                   where item == xDataMember
-                                                                   select item).First());
+                                                                  where item == xDataMember
+                                                                  select item).First());
                 }
                 var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
                 var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
@@ -557,7 +563,7 @@ namespace Cosmos.IL2CPU
                         {
                             try
                             {
-								xData = new byte[xTheSize];
+                                xData = new byte[xTheSize];
                                 if (xValue.GetType().IsValueType)
                                 {
                                     for (int x = 0; x < xTheSize; x++)
@@ -643,6 +649,6 @@ namespace Cosmos.IL2CPU
             }
             MethodEnd(aFrom);
         }
-    
+
     }
 }

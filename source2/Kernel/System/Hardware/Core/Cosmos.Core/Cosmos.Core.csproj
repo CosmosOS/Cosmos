@@ -79,6 +79,7 @@
     <Compile Include="Heap.cs" />
     <Compile Include="IOGroup\ATA.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
+    <Compile Include="IOGroup\Mouse.cs" />
     <Compile Include="IOGroup\PciBus.cs" />
     <Compile Include="IOGroup\PciDevice.cs" />
     <Compile Include="IOGroup\PIC.cs" />

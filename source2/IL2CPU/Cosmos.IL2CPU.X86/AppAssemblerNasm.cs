@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU.X86
                 }
             }
             #endregion
-            if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null)
+            if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 // the body of aMethod is getting emitted
                 var xBody = aMethod.MethodBase.GetMethodBody();
@@ -99,18 +99,18 @@ namespace Cosmos.IL2CPU.X86
                     var xLocalsOffset = mLocals_Arguments_Infos.Count;
                     foreach (var xLocal in xBody.LocalVariables)
                     {
-                        var xInfo=new DebugInfo.Local_Argument_Info
+                        var xInfo = new DebugInfo.Local_Argument_Info
                         {
                             MethodLabelName = xMethodLabel,
                             IsArgument = false,
                             Index = xLocal.LocalIndex,
-                            Name="Local" + xLocal.LocalIndex,
-							Offset = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
-                            Type=xLocal.LocalType.AssemblyQualifiedName
+                            Name = "Local" + xLocal.LocalIndex,
+                            Offset = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
+                            Type = xLocal.LocalType.AssemblyQualifiedName
                         };
                         mLocals_Arguments_Infos.Add(xInfo);
 
-                        var xSize = ILOp.Align( ILOp.SizeOfType( xLocal.LocalType), 4);
+                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4);
                         new Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
                         for (int i = 0; i < xSize / 4; i++)
                         {
@@ -138,13 +138,15 @@ namespace Cosmos.IL2CPU.X86
 
                 // debug info:
                 var xIdxOffset = 0u;
-                if(!aMethod.MethodBase.IsStatic){
-                    mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info{
-                        MethodLabelName=xMethodLabel,
-                        IsArgument=true,
-                        Name="this:" + IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
-                        Index=0,
-                        Offset=IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
+                if (!aMethod.MethodBase.IsStatic)
+                {
+                    mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
+                    {
+                        MethodLabelName = xMethodLabel,
+                        IsArgument = true,
+                        Name = "this:" + IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
+                        Index = 0,
+                        Offset = IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
                         Type = aMethod.MethodBase.DeclaringType.AssemblyQualifiedName
                     });
 
@@ -156,9 +158,9 @@ namespace Cosmos.IL2CPU.X86
 
                 for (ushort i = 0; i < xParamCount; i++)
                 {
-					var xOffset = IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
-					// if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
-					xOffset -= (int)Cosmos.IL2CPU.X86.ILOp.Align(Cosmos.IL2CPU.X86.ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;  
+                    var xOffset = IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
+                    // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
+                    xOffset -= (int)Cosmos.IL2CPU.X86.ILOp.Align(Cosmos.IL2CPU.X86.ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;
                     mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info
                     {
                         MethodLabelName = xMethodLabel,
@@ -166,7 +168,7 @@ namespace Cosmos.IL2CPU.X86
                         Index = (int)(i + xIdxOffset),
                         Name = xParams[i].Name,
                         Offset = xOffset,
-                        Type=xParams[i].ParameterType.AssemblyQualifiedName
+                        Type = xParams[i].ParameterType.AssemblyQualifiedName
                     });
                 }
             }
@@ -201,7 +203,7 @@ namespace Cosmos.IL2CPU.X86
                 }
                 else
                 {
-                    xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider =new Mono.Cecil.Pdb.PdbReaderProvider() });
+                    xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider() });
                     if (xModule.HasSymbols)
                     {
                         mLoadedModules.Add(xLocation, xModule);
@@ -230,7 +232,7 @@ namespace Cosmos.IL2CPU.X86
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
             }
-            if (aMethod.PlugMethod == null)
+            if (aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
             }
@@ -340,7 +342,7 @@ namespace Cosmos.IL2CPU.X86
             //  // todo: add GC code
             //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
             //}
-            if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null)
+            if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 if (xBody != null)
@@ -449,22 +451,22 @@ namespace Cosmos.IL2CPU.X86
                 xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
                 xMLSymbol.MethodName = aMethod.MethodBase.GetFullName();
 
-				var xStackSize = (from item in mAssembler.Stack
-								  let xSize = (item.Size % 4u == 0u)
-												  ? item.Size
-												  : (item.Size + (4u - (item.Size % 4u)))
-								  select xSize).Sum();
-				xMLSymbol.StackDifference = -1;
-				if (aMethod.MethodBase != null)
-				{
-					var xBody = aMethod.MethodBase.GetMethodBody();
-					if (xBody != null)
-					{
-						var xLocalsSize = (from item in xBody.LocalVariables
-										   select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
-						xMLSymbol.StackDifference = checked((int) (xLocalsSize + xStackSize));
-					}
-				}
+                var xStackSize = (from item in mAssembler.Stack
+                                  let xSize = (item.Size % 4u == 0u)
+                                                  ? item.Size
+                                                  : (item.Size + (4u - (item.Size % 4u)))
+                                  select xSize).Sum();
+                xMLSymbol.StackDifference = -1;
+                if (aMethod.MethodBase != null)
+                {
+                    var xBody = aMethod.MethodBase.GetMethodBody();
+                    if (xBody != null)
+                    {
+                        var xLocalsSize = (from item in xBody.LocalVariables
+                                           select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
+                        xMLSymbol.StackDifference = checked((int)(xLocalsSize + xStackSize));
+                    }
+                }
                 try
                 {
                     xMLSymbol.AssemblyFile = aMethod.MethodBase.DeclaringType.Assembly.Location;
