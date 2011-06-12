@@ -19,10 +19,10 @@ namespace Cosmos.Core.Plugs
 			{
 				new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.EBP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 				new CPUx86.x87.FloatSqrt{ };
-				// reservate 8 byte for double on stack
-				new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = unchecked((uint)-8) };
+				// reservate 8 byte for returntype double on stack
+				new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
 				// write double value to this reservation
-				new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.EBP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+				new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
 				// after this is the result popped
 			}
 		}

@@ -1,18 +1,49 @@
 using System;
-
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Label = Cosmos.Compiler.Assembler.Label;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I_Un)]
 	public class Conv_Ovf_I_Un: ILOp
 	{
-		public Conv_Ovf_I_Un(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Conv_Ovf_I_Un(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+			:base(aAsmblr)
 		{
 		}
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      ThrowNotImplementedException("Conv_Ovf_I_Un not implemented!");
-    }
+		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+			//TODO: What if the last ILOp in a method was Conv_Ovf_I_Un or an other?
+			var xSource = Assembler.Stack.Pop();
+			if(xSource.IsFloat)
+				ThrowNotImplementedException("Conv_Ovf_I_Un throws an ArgumentException, because float is not implemented!");
 
+			switch (xSource.Size)
+			{
+				case 1:
+				case 2:
+				case 4:
+					break;
+				case 8:
+					{
+						string NoOverflowLabel = GetLabel(aMethod, aOpCode) + "__NoOverflow";
+						new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+						// EBX is high part and should be zero for unsigned, so we test it on zero
+						{
+							new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+							new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceValue = 0 };
+							new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = NoOverflowLabel };
+							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
+						}
+						new Label(NoOverflowLabel);
+						new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+						break;
+					}
+				default:
+					ThrowNotImplementedException("Conv_Ovf_I_Un not implemented for this size!");
+					break;
+			}
+			Assembler.Stack.Push(4, typeof(uint));
+		}
     
 		// using System;
 		// using System.IO;

@@ -105,15 +105,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
                 uint xSize = (uint)(((from item in xParams
-                                      let xQSize = Align(SizeOfType(item.GetType()), 4)
+                                      let xQSize = Align(SizeOfType(item.ParameterType), 4)
                                       select (int)xQSize).Take(xParams.Length).Sum()));
 
                 foreach (var xParam in xParams)
                 {
-                    uint xParamSize = SizeOfType(xParams.GetType());
+                    uint xParamSize = Align(SizeOfType(xParam.ParameterType), 4);
                     new Comment(aAssembler, String.Format("Arg {0}: {1}", xParam.Name, xParamSize));
-                    for (int i = 0; i < xParamSize; i += 4)
-                    {
+                    for (int i = 0; i < xParamSize; i += 4) {
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
                     }
                 }
@@ -145,9 +144,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     //}
 
                     uint xESPOffset = 0;
-                    foreach (var xParam in xParams)
-                    {
-                        xESPOffset += SizeOfType(xParams.GetType());
+                    foreach (var xParam in xParams) {
+                        xESPOffset += Align(SizeOfType(xParam.ParameterType), 4);
                     }
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xESPOffset };
 
@@ -195,7 +193,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //uint xArgSize = 0;
                 var xParams = constructor.GetParameters();
                 uint xArgSize = (uint)(((from item in xParams.Skip(1)
-                                         let xQSize = Align(SizeOfType(item.GetType()), 4)
+                                         let xQSize = Align(SizeOfType(item.ParameterType), 4)
                                          select (int)xQSize).Take(xParams.Length - 1).Sum()));
 
                 //foreach( var xArg in aCtorMethodInfo.Arguments.Skip( 1 ) )
@@ -209,8 +207,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xExtraArgSize = 0;
                 }
-                if (xExtraArgSize > 0)
-                {
+                if (xExtraArgSize > 0) {
                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
                 }
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
@@ -241,7 +238,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]" );
             for( int i = 0; i < xParams.Length; i++ )
             {
-                xSize = SizeOfType( xParams[ i ].GetType() );
+                xSize = SizeOfType( xParams[ i ].ParameterType );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align( xSize, 4 ) };
             }
             new Comment("[ Newobj.PushAlignedParameterSize end ]" );
