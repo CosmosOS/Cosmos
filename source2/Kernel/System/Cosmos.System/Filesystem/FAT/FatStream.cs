@@ -58,15 +58,22 @@ namespace Cosmos.System.Filesystem.FAT {
     public override int Read(byte[] aBuffer, int aOffset, int aCount) {
       if (aOffset < 0 || aCount < 0) {
         throw new ArgumentOutOfRangeException();
-      } else if (aOffset >= mFile.Size) {
-        throw new ArgumentException();
+	  }
+	  else if(aBuffer == null || aBuffer.Length - aOffset < aCount) {
+        throw new ArgumentException("Invalid offset length!");
       } else if (mFile.FirstClusterNum == 0) {
         // FirstSector can be 0 for 0 length files
         return 0;
-      } else if (aOffset == mFile.Size) {
+      } else if (mPosition == mFile.Size) {
         // EOF
         return 0;
       }
+
+	  // reduce count, so that no out of bound exception occurs if not existing
+	  // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
+	  uint xMaxReadableBytes = mFile.Size - mPosition;
+	  if (aCount > xMaxReadableBytes)
+		  aCount = (int)xMaxReadableBytes;
 
       var xCluster = mFS.NewClusterArray();
       UInt32 xClusterSize = mFS.BytesPerCluster;
@@ -88,8 +95,9 @@ namespace Cosmos.System.Filesystem.FAT {
         aCount = aCount - xReadSize;
       }
 
+	  mPosition += (uint)aOffset;
       return (int)aOffset;
-    }
+	}
 
     public override void Flush() {
       throw new NotImplementedException();
@@ -106,6 +114,5 @@ namespace Cosmos.System.Filesystem.FAT {
     public override void Write(byte[] buffer, int offset, int count) {
       throw new NotImplementedException();
     }
-
   }
 }
