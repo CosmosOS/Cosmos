@@ -347,10 +347,28 @@ namespace Cosmos.IL2CPU.X86
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 if (xBody != null)
                 {
+                    uint xLocalsSize = 0;
                     for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--)
                     {
-                        int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
+                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+
+                        if (xLocalsSize >= 256)
+                        {
+                            new CPUx86.Add
+                            {
+                                DestinationReg = CPUx86.Registers.ESP,
+                                SourceValue = 255
+                            };
+                            xLocalsSize -= 255;
+                        }
+                    }
+                    if (xLocalsSize > 0)
+                    {
+                        new CPUx86.Add
+                        {
+                            DestinationReg = CPUx86.Registers.ESP,
+                            SourceValue = xLocalsSize
+                        };
                     }
                 }
             }
