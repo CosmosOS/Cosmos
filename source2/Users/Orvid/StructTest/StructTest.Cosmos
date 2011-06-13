@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{fc6ee0b6-0e66-43e9-bfba-9908de788936}</ProjectGuid>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>StructTest</Name>
+    <BinFormat>elf</BinFormat>
+    <RootNamespace>StructTest</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+    <EnableGDB>False</EnableGDB>
+    <DebugMode>None</DebugMode>
+    <TraceMode>User</TraceMode>
+    <BuildTarget>VMWare</BuildTarget>
+    <VMWareFlavor>Player</VMWareFlavor>
+    <StartCosmosGDB>false</StartCosmosGDB>
+    <TraceAssemblies>All</TraceAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+    <EnableGDB>False</EnableGDB>
+    <DebugMode>None</DebugMode>
+    <TraceMode>User</TraceMode>
+    <BuildTarget>VMWare</BuildTarget>
+    <VMWareFlavor>Player</VMWareFlavor>
+    <StartCosmosGDB>false</StartCosmosGDB>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <ProjectReference Include="StructTestKernel.csproj">
+      <Name>StructTestKernel</Name>
+      <Project>{086FC210-C2E9-4536-8235-9285929F904A}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+</Project>

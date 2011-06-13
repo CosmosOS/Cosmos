@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2E14EED0-F7E9-4E7C-AA21-6E519C28457D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GuessKernel</RootNamespace>
+    <AssemblyName>OrvidKernel</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
+      <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
+      <Name>Cosmos.Compiler.Assembler.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Compiler\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler.csproj">
+      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
+      <Name>Cosmos.Compiler.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
+      <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
+      <Name>Cosmos.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Project>{D9A87AAD-FCC9-4517-B31D-E904DAD00784}</Project>
+      <Name>Cosmos.Core.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsmMouse.cs" />
+    <Compile Include="GuessOS.cs" />
+    <Compile Include="Mouse.cs" />
+    <Compile Include="Plugs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
