@@ -1,4 +1,7 @@
-﻿using System;
+﻿// I dislike empty xml comments, so I disable that warning.
+#pragma warning disable 1591
+
+using System;
 
 namespace Orvid.Graphics
 {
@@ -32,11 +35,6 @@ namespace Orvid.Graphics
             this.Y = y;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="v"></param>
-        /// <returns></returns>
         public static Vec2 operator -(Vec2 v)
         {
             Vec2 vec = new Vec2();
@@ -45,12 +43,6 @@ namespace Orvid.Graphics
             return vec;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Vec2 operator -(Vec2 a, Vec2 b)
         {
             Vec2 v = new Vec2();
@@ -59,12 +51,6 @@ namespace Orvid.Graphics
             return v;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Vec2 operator +(Vec2 a, Vec2 b)
         {
             Vec2 v = new Vec2();
@@ -73,12 +59,6 @@ namespace Orvid.Graphics
             return v;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Vec2 operator /(Vec2 a, Vec2 b)
         {
             Vec2 v = new Vec2();
@@ -87,12 +67,6 @@ namespace Orvid.Graphics
             return v;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Vec2 operator /(Vec2 a, int b)
         {
             Vec2 v = new Vec2();
@@ -101,27 +75,17 @@ namespace Orvid.Graphics
             return v;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="v"></param>
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static Vec2 operator /(Vec2 v, float s)
         {
             Vec2 vec = new Vec2();
+            // Division of floats can be expensive,
+            // so we multiply instead, as it's much cheaper.
             float num = 1f / s;
             vec.X = (Int32)(v.X * num);
             vec.Y = (Int32)(v.Y * num);
             return vec;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
         public static Vec2 operator /(float s, Vec2 v)
         {
             Vec2 vec = new Vec2();
@@ -130,12 +94,6 @@ namespace Orvid.Graphics
             return vec;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static bool operator !=(Vec2 a, Vec2 b)
         {
             if (a.X != b.X || a.Y != b.Y)
@@ -143,12 +101,6 @@ namespace Orvid.Graphics
             return false;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static bool operator ==(Vec2 a, Vec2 b)
         {
             if (a.X != b.X || a.Y != b.Y)
@@ -156,23 +108,16 @@ namespace Orvid.Graphics
             return true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
         public override bool Equals(object obj)
         {
             return (this == (Vec2)obj);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
     }
 }
+// And restore the warning.
+#pragma warning restore 1591

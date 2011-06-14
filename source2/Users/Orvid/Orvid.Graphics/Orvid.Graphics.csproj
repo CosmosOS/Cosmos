@@ -39,6 +39,8 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -59,6 +61,9 @@
     <Compile Include="Drivers\VGADriver.cs" />
     <Compile Include="GraphicsDriver.cs" />
     <Compile Include="GraphicsMode.cs" />
+    <Compile Include="GraphicsPlugs.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Image.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="OForms\OButton.cs" />

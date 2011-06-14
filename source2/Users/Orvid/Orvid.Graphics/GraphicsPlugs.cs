@@ -1,48 +1,78 @@
 ﻿using System;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
+using CPUAll = Cosmos.Compiler.Assembler;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Orvid.Graphics
 {
     [Plug(Target = typeof(global::System.Math))]
     class MathImpl
     {
-        [PlugMethod()]
+        #region Calculate Sine
+        public class CalculateSinAsm : AssemblerMethod
+        {
+            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            {
+                new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.EBP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+                new CPUx86.x87.FloatSine { };
+                // reservate 8 byte for returntype double on stack
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                // write double value to this reservation
+                new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                // after this is the result popped
+            }
+        }
+        [PlugMethod(Assembler = typeof(CalculateSinAsm))]
         public static double Sin(double m)
         {
-            int x = 1;
-            for (int i = 3; i < 13; i = i + 2)
-            {
-                double factorial = 1;
-                for (int i2 = i; i2 > 0; i2--)
-                {
-                    factorial = factorial * i2;
-                }
-
-                m = m + Math.Pow(-1.0, x) * (Math.Pow(m, i)) / factorial;
-
-                x++;
-            }
-            return m;
+            return 0.0;
         }
+        #endregion
 
-        [PlugMethod()]
+        #region Calculate Cosine
+        public class CalculateCosAsm : AssemblerMethod
+        {
+            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            {
+                new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.EBP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+                new CPUx86.x87.FloatCosine { };
+                // reservate 8 byte for returntype double on stack
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                // write double value to this reservation
+                new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                // after this is the result popped
+            }
+        }
+        [PlugMethod(Assembler = typeof(CalculateCosAsm))]
         public static double Cos(double x)
         {
-            x = Math.Abs((x + Math.PI) % (2 * Math.PI) - Math.PI);
-            const double tf = 1.0 / 24.0;
-            const double vtz = -1.0 / 720.0;
-            const double fzhtz = 1.0 / 40320.0;
-            const double fukit = -1.0 / 3628800.0;
-            double p = x * x;
-            return 1 + p * (-0.5 + p * (tf + p * (vtz + p * (fzhtz + p * fukit))));
+            return 0.0;
         }
+        #endregion
 
-        [PlugMethod()]
         public static double Floor(double d)
         {
             String str = d.ToString();
             return (double)Int32.Parse(str.Substring(0, str.IndexOf('.')));
         }
+
+        #region double Sqrt(double d)
+        public class CalculateSqrtAsm : AssemblerMethod
+        {
+            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            {
+                new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.EBP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+                new CPUx86.x87.FloatSqrt { };
+                // reservate 8 byte for returntype double on stack
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                // write double value to this reservation
+                new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                // after this is the result popped
+            }
+        }
+        [PlugMethod(Assembler = typeof(CalculateSqrtAsm))]
+        public static double Sqrt(double d) { return 0.0; }
+        #endregion
     }
 }

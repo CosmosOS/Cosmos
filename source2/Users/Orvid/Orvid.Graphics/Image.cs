@@ -61,12 +61,422 @@ namespace Orvid.Graphics
             this.Data = new uint[(Height + 1) * (Width + 1)];
         }
 
+        /// <summary>
+        /// The default Disposer.
+        /// </summary>
+        ~Image()
+        {
+            this.Data = new uint[0];
+        }
+
         #region Clear
         public void Clear(uint color)
         {
             for (uint i = 0; i < Data.Length; i++)
             {
                 Data[i] = color;
+            }
+        }
+        #endregion
+        
+
+
+        #region DON'T WORK!!!
+
+        //#region DrawElipse
+        ///// <summary>
+        ///// Draws and fills an elipse.
+        ///// </summary>
+        ///// <param name="CenterPoint">The center of the elipse</param>
+        ///// <param name="height">The height of the elipse.</param>
+        ///// <param name="width">The width of the elipse.</param>
+        ///// <param name="color">The color to draw in.</param>
+        //public void DrawElipse(Vec2 CenterPoint, int height, int width, uint color)
+        //{
+        //    double angle = 0;
+        //    double range = (360 * (Math.PI / 180));
+        //    double x = (width * Math.Cos(angle));
+        //    double y = (height * Math.Sin(angle));
+        //    do
+        //    {
+        //        int X = (int)(CenterPoint.X + x + 0.5);
+        //        int Y = (int)(CenterPoint.Y - y + 0.5);
+        //        SetPixel((uint)(X), (uint)(Y), color);
+        //        DrawLine(CenterPoint, new Vec2(X, Y), color);
+        //        angle += 0.001;
+        //        x = (width * Math.Cos(angle));
+        //        y = (height * Math.Sin(angle));
+        //    }
+        //    while (angle <= range);
+        //}
+
+        ///// <summary>
+        ///// Draws and fills an elipse.
+        ///// </summary>
+        ///// <param name="CenterPoint">The center of the elipse</param>
+        ///// <param name="height">The height of the elipse.</param>
+        ///// <param name="width">The width of the elipse.</param>
+        ///// <param name="fillColor">The color to fill in.</param>
+        ///// <param name="borderColor">The color to draw the border in.</param>
+        //public void DrawElipse(Vec2 CenterPoint, int height, int width, uint fillColor, uint borderColor)
+        //{
+        //    DrawElipse(CenterPoint, height, width, fillColor);
+        //    DrawElipseOutline(CenterPoint, height, width, borderColor);
+        //}
+//        #endregion
+
+//        #region DrawElipseOutline
+//        /// <summary>
+//        /// Draws an elipse outline.
+//        /// </summary>
+//        /// <param name="CenterPoint">The center of the elipse</param>
+//        /// <param name="height">The height of the elipse.</param>
+//        /// <param name="width">The width of the elipse.</param>
+//        /// <param name="color">The color to draw in.</param>
+//        public void DrawElipseOutline(Vec2 CenterPoint, int height, int width, uint color)
+//        {
+//            DrawElipticalArc(CenterPoint, height, width, 0, 360, color);
+//        }
+//        #endregion
+
+//        #region DrawElipticalArc
+//        /// <summary>
+//        /// Draws an eliptical arc.
+//        /// </summary>
+//        /// <param name="CenterPoint">The center-point of the elipse to use.</param>
+//        /// <param name="height">The height of the elipse to use.</param>
+//        /// <param name="width">The width of the elipse to use.</param>
+//        /// <param name="startAngle">The angle to start drawing at.</param>
+//        /// <param name="endAngle">The angle to stop drawing at.</param>
+//        /// <param name="color">The color to draw in.</param>
+//        public void DrawElipticalArc(Vec2 CenterPoint, int height, int width, int startAngle, int endAngle, uint color)
+//        {
+//            double angle = (((startAngle <= endAngle) ? startAngle : endAngle) * (Math.PI / 180));
+//            double range = (((endAngle > startAngle) ? endAngle : startAngle) * (Math.PI / 180));
+//            double x = (width * Math.Cos(angle));
+//            double y = (height * Math.Sin(angle));
+//            do
+//            {
+//                SetPixel((uint)((int)(CenterPoint.X + x + 0.5)), (uint)((int)(CenterPoint.Y - y + 0.5)), color);
+//                angle += 0.001;
+//                x = (width * Math.Cos(angle));
+//                y = (height * Math.Sin(angle));
+//            }
+//            while (angle <= range);
+//        }
+//        #endregion
+
+//        #region DrawQuad
+//        /// <summary>
+//        /// Draws a quadrilateral with the specified points.
+//        /// </summary>
+//        /// <param name="p1">The first point.</param>
+//        /// <param name="p2">The second point.</param>
+//        /// <param name="p3">The third point.</param>
+//        /// <param name="p4">The fourth point.</param>
+//        /// <param name="FillColor">The color to fill in the rectangle with.</param>
+//        /// <param name="BorderColor">The color to draw the border in.</param>
+//        public void DrawQuad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, uint FillColor, uint BorderColor)
+//        {
+//            DrawPolygon(new Vec2[] { p1, p2, p3, p4 }, FillColor);
+//            DrawPolygonOutline(new Vec2[] { p1, p2, p3, p4 }, BorderColor);
+//        }
+
+//        /// <summary>
+//        /// Draws a quadrilateral with the specified points.
+//        /// </summary>
+//        /// <param name="p1">The first point.</param>
+//        /// <param name="p2">The second point.</param>
+//        /// <param name="p3">The third point.</param>
+//        /// <param name="p4">The fourth point.</param>
+//        /// <param name="color">The color to draw in.</param>
+//        public void DrawQuad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, uint color)
+//        {
+//            DrawPolygon(new Vec2[] { p1, p2, p3, p4 }, color);
+//        }
+//        #endregion
+
+//        #region DrawCircle
+//        /// <summary>
+//        /// Draws a filled circle.
+//        /// </summary>
+//        /// <param name="Center">The center of the circle.</param>
+//        /// <param name="radius">The radius of the circle.</param>
+//        /// <param name="color">The color to draw in.</param>
+//        public void DrawCircle(Vec2 Center, int radius, uint color)
+//        {
+//#if SqrtWorks
+//            int x1;
+//            int x2;
+//            int rSquared = radius * radius;
+//            int counter = (Center.Y + radius);
+//            for (int count = (Center.Y - radius); count <= counter; count++)
+//            {
+//                int ySquared = (count - Center.Y) * (count - Center.Y);
+//                double sqrt = Math.Sqrt(rSquared - ySquared) + 0.5;
+//                x1 = (int)(Center.X + sqrt);
+//                x2 = (int)(Center.X - sqrt);
+//                Vec2 p1 = new Vec2(x1, count);
+//                Vec2 p2 = new Vec2(x2, count);
+//                DrawLine(p1, p2, color);
+//            }
+//            DrawCircleOutline(Center, radius, color);
+//#else
+//            // Two is better than 1, and is almost enough to draw it....
+//            // Almost.... 
+//            // It still leaves exactly 8 pixels un-drawn.
+//            // 2 in each quarter of the circle.
+//            for (int i = 1; i <= radius; i++)
+//            {
+//                DrawCircleOutline(Center, i, color);
+//            }
+
+//            Vec2 v;
+//            int x = 0;
+//            int y = radius;
+//            int p = (5 - radius * 4) / 4;
+
+//            SetPixel((uint)(Center.X), (uint)(Center.Y + y), color);
+//            v = new Vec2(Center.X, Center.Y + y);
+//            DrawLine(Center, v, color);
+//            SetPixel((uint)(Center.X), (uint)(Center.Y - y), color);
+//            v = new Vec2(Center.X, Center.Y - y);
+//            DrawLine(Center, v, color);
+//            SetPixel((uint)(Center.X + y), (uint)(Center.Y), color);
+//            v = new Vec2(Center.X + y, Center.Y);
+//            DrawLine(Center, v, color);
+//            SetPixel((uint)(Center.X - y), (uint)(Center.Y), color);
+//            v = new Vec2(Center.X - y, Center.Y);
+//            DrawLine(Center, v, color);
+//            while (x < y)
+//            {
+//                x++;
+//                if (p < 0)
+//                {
+//                    p += 2 * x + 1;
+//                }
+//                else
+//                {
+//                    y--;
+//                    p += 2 * (x - y) + 1;
+//                }
+//                if (x == y)
+//                {
+//                    SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
+//                    v = new Vec2(Center.X + x, Center.Y + y);
+//                    DrawLine(Center, v, color);
+//                    SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
+//                    v = new Vec2(Center.X - x, Center.Y + y);
+//                    DrawLine(Center, v, color);
+//                    SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
+//                    v = new Vec2(Center.X + x, Center.Y - y);
+//                    DrawLine(Center, v, color);
+//                    SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
+//                    v = new Vec2(Center.X - x, Center.Y - y);
+//                    DrawLine(Center, v, color);
+//                }
+//                else
+//                {
+//                    if (x < y)
+//                    {
+//                        SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
+//                        v = new Vec2(Center.X + x, Center.Y + y);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
+//                        v = new Vec2(Center.X - x, Center.Y + y);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
+//                        v = new Vec2(Center.X + x, Center.Y - y);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
+//                        v = new Vec2(Center.X - x, Center.Y - y);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X + y), (uint)(Center.Y + x), color);
+//                        v = new Vec2(Center.X + y, Center.Y + x);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X - y), (uint)(Center.Y + x), color);
+//                        v = new Vec2(Center.X - y, Center.Y + x);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X + y), (uint)(Center.Y - x), color);
+//                        v = new Vec2(Center.X + y, Center.Y - x);
+//                        DrawLine(Center, v, color);
+//                        SetPixel((uint)(Center.X - y), (uint)(Center.Y - x), color);
+//                        v = new Vec2(Center.X - y, Center.Y - x);
+//                        DrawLine(Center, v, color);
+//                    }
+//                }
+//            }
+//#endif
+//        }
+//        #endregion
+
+        #endregion
+
+
+
+        #region DrawCircleOutline
+        /// <summary>
+        /// Draws the outline of a circle.
+        /// </summary>
+        /// <param name="Center">The center of the circle.</param>
+        /// <param name="radius">The radius of the circle.</param>
+        /// <param name="color">The color to draw with.</param>
+        public void DrawCircleOutline(Vec2 Center, int radius, uint color)
+        {
+            int x = 0;
+            int y = radius;
+            int p = (5 - radius * 4) / 4;
+
+            SetPixel((uint)(Center.X), (uint)(Center.Y + y), color);
+            SetPixel((uint)(Center.X), (uint)(Center.Y - y), color);
+            SetPixel((uint)(Center.X + y), (uint)(Center.Y), color);
+            SetPixel((uint)(Center.X - y), (uint)(Center.Y), color);
+            while (x < y)
+            {
+                x++;
+                if (p < 0)
+                {
+                    p += 2 * x + 1;
+                }
+                else
+                {
+                    y--;
+                    p += 2 * (x - y) + 1;
+                }
+                if (x == y)
+                {
+                    SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
+                    SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
+                    SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
+                    SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
+                }
+                else
+                {
+                    if (x < y)
+                    {
+                        SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
+                        SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
+                        SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
+                        SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
+                        SetPixel((uint)(Center.X + y), (uint)(Center.Y + x), color);
+                        SetPixel((uint)(Center.X - y), (uint)(Center.Y + x), color);
+                        SetPixel((uint)(Center.X + y), (uint)(Center.Y - x), color);
+                        SetPixel((uint)(Center.X - y), (uint)(Center.Y - x), color);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region DrawImage
+        /// <summary>
+        /// Draws the specified image, at the specified point.
+        /// </summary>
+        /// <param name="loc"></param>
+        /// <param name="i"></param>
+        public void DrawImage(Vec2 loc, Image i)
+        {
+            uint value;
+            for (uint y = 0; y < i.Height; y++)
+            {
+                for (uint x = 0; x < i.Width; x++)
+                {
+                    value = i.GetPixel(x, y);
+                    if (value != 0)
+                        SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
+                }
+            }
+        }
+        #endregion
+
+        #region DrawLine
+        /// <summary>
+        /// Draws a line between 2 points.
+        /// </summary>
+        /// <param name="Point1">The first point.</param>
+        /// <param name="Point2">The first point.</param>
+        /// <param name="color">The color to draw.</param>
+        public void DrawLine(Vec2 Point1, Vec2 Point2, uint color)
+        {
+            int x0 = Point1.X;
+            int x1 = Point2.X;
+            int y0 = Point1.Y;
+            int y1 = Point2.Y;
+            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
+            if (steep)
+            {
+                int x3 = y0;
+                y0 = x0;
+                x0 = x3;
+                int x4 = y1;
+                y1 = x1;
+                x1 = x4;
+            }
+            if (x0 > x1)
+            {
+                int x5 = x0;
+                x0 = x1;
+                x1 = x5;
+                int x6 = y0;
+                y0 = y1;
+                y1 = x6;
+            }
+            int deltax = x1 - x0;
+            int deltay = Math.Abs(y1 - y0);
+            int error = deltax / 2;
+            int ystep;
+            int y = y0;
+            if (y0 < y1)
+            {
+                ystep = 1;
+            }
+            else
+            {
+                ystep = -1;
+            }
+            for (int x = x0; x <= x1; x++)
+            {
+                if (steep)
+                {
+                    SetPixel((uint)y, (uint)x, color);
+                }
+                else
+                {
+                    SetPixel((uint)x, (uint)y, color);
+                }
+                error = error - deltay;
+                if (error < 0)
+                {
+                    y = y + ystep;
+                    error = error + deltax;
+                }
+            }
+        }
+        #endregion
+
+        #region DrawLines
+        /// <summary>
+        /// Draws a set of connected lines.
+        /// </summary>
+        /// <param name="Points">
+        /// An array of points to draw, in the order they need drawing.
+        /// </param>
+        /// <param name="color">The color to draw.</param>
+        public void DrawLines(Vec2[] Points, uint color)
+        {
+            int n = Points.Length;
+            if (n >= 2)
+            {
+                DrawLine(Points[0], Points[1], color);
+
+                for (int count = 1; count < (n - 1); count++)
+                {
+                    DrawLine(Points[count], Points[count + 1], color);
+                }
+            }
+            else
+            {
+                throw new Exception("Not enough points provided!");
             }
         }
         #endregion
@@ -84,6 +494,7 @@ namespace Orvid.Graphics
             int cnt = 0;
             #region Process
             {
+#warning TODO: Change these back to floats when their implemented fully.
                 double EPSILON = 0.0000000001f;
                 int n = contour.Length;
                 if (n < 3)
@@ -229,6 +640,57 @@ namespace Orvid.Graphics
             points.CopyTo(pts, 0);
             pts[pts.Length - 1] = points[0];
             DrawLines(pts, color);
+        }
+        #endregion
+
+        #region DrawRectangle
+        /// <summary>
+        /// This method fills in the space between
+        /// the 2 points specified in a rectangle.
+        /// </summary>
+        /// <param name="TopLeftCorner">
+        /// The point that specifies the top left 
+        /// corner of the rectangle being drawn.
+        /// </param>
+        /// <param name="BottomRightCorner">
+        /// The point that specifies the bottom right
+        /// corner of the rectangle being drawn.
+        /// </param>
+        /// <param name="color">The color to draw.</param>
+        public void DrawRectangle(Vec2 TopLeftCorner, Vec2 BottomRightCorner, uint color)
+        {
+            int height = BottomRightCorner.Y - TopLeftCorner.Y;
+            int width = BottomRightCorner.X - TopLeftCorner.X;
+            Image i = new Image(width, height);
+            i.Clear(color);
+            DrawImage(TopLeftCorner, i);
+            //DrawQuad(TopLeftCorner, new Vec2(BottomRightCorner.X, TopLeftCorner.Y), BottomRightCorner, new Vec2(TopLeftCorner.X, BottomRightCorner.Y), color);
+        }
+        #endregion
+
+        #region DrawReverseRectangle
+        /// <summary>
+        /// This method fills in the space between
+        /// the 2 points specified in a rectangle.
+        /// </summary>
+        /// <param name="TopRightCorner">
+        /// The point that specifies the top right 
+        /// corner of the rectangle being drawn.
+        /// </param>
+        /// <param name="BottomLeftCorner">
+        /// The point that specifies the bottom left
+        /// corner of the rectangle being drawn.
+        /// </param>
+        /// <param name="color">The color to draw.</param>
+        public void ReverseDrawRectangle(Vec2 TopRightCorner, Vec2 BottomLeftCorner, uint color)
+        {
+            int height = BottomLeftCorner.Y - TopRightCorner.Y;
+            int width = TopRightCorner.X - BottomLeftCorner.X;
+            Image i = new Image(width, height);
+            i.Clear(color);
+            Vec2 TopLeftCorner = new Vec2(BottomLeftCorner.X, TopRightCorner.Y);
+            DrawImage(TopLeftCorner, i);
+            //DrawQuad(new Vec2(BottomLeftCorner.X, TopRightCorner.Y), TopRightCorner, new Vec2(TopRightCorner.X, BottomLeftCorner.Y), BottomLeftCorner, color);
         }
         #endregion
 
@@ -412,442 +874,6 @@ namespace Orvid.Graphics
         public void DrawTriangleOutline(Vec2 p1, Vec2 p2, Vec2 p3, uint color)
         {
             DrawLines(new Vec2[] { p1, p2, p3, p1 }, color);
-        }
-        #endregion
-
-        /*
-        #region DrawElipse
-        /// <summary>
-        /// Draws and fills an elipse.
-        /// </summary>
-        /// <param name="CenterPoint">The center of the elipse</param>
-        /// <param name="height">The height of the elipse.</param>
-        /// <param name="width">The width of the elipse.</param>
-        /// <param name="color">The color to draw in.</param>
-        public void DrawElipse(Vec2 CenterPoint, int height, int width, uint color)
-        {
-            double angle = 0;
-            double range = (360 * (Math.PI / 180));
-            double x = (width * Math.Cos(angle));
-            double y = (height * Math.Sin(angle));
-            do
-            {
-                int X = (int)(CenterPoint.X + x + 0.5);
-                int Y = (int)(CenterPoint.Y - y + 0.5);
-                SetPixel((uint)(X), (uint)(Y), color);
-                DrawLine(CenterPoint, new Vec2(X, Y), color);
-                angle += 0.001;
-                x = (width * Math.Cos(angle));
-                y = (height * Math.Sin(angle));
-            }
-            while (angle <= range);
-        }
-
-        /// <summary>
-        /// Draws and fills an elipse.
-        /// </summary>
-        /// <param name="CenterPoint">The center of the elipse</param>
-        /// <param name="height">The height of the elipse.</param>
-        /// <param name="width">The width of the elipse.</param>
-        /// <param name="fillColor">The color to fill in.</param>
-        /// <param name="borderColor">The color to draw the border in.</param>
-        public void DrawElipse(Vec2 CenterPoint, int height, int width, uint fillColor, uint borderColor)
-        {
-            DrawElipse(CenterPoint, height, width, fillColor);
-            DrawElipseOutline(CenterPoint, height, width, borderColor);
-        }
-        #endregion
-
-        #region DrawElipseOutline
-        /// <summary>
-        /// Draws an elipse outline.
-        /// </summary>
-        /// <param name="CenterPoint">The center of the elipse</param>
-        /// <param name="height">The height of the elipse.</param>
-        /// <param name="width">The width of the elipse.</param>
-        /// <param name="color">The color to draw in.</param>
-        public void DrawElipseOutline(Vec2 CenterPoint, int height, int width, uint color)
-        {
-            DrawElipticalArc(CenterPoint, height, width, 0, 360, color);
-        }
-        #endregion
-
-        #region DrawElipticalArc
-        /// <summary>
-        /// Draws an eliptical arc.
-        /// </summary>
-        /// <param name="CenterPoint">The center-point of the elipse to use.</param>
-        /// <param name="height">The height of the elipse to use.</param>
-        /// <param name="width">The width of the elipse to use.</param>
-        /// <param name="startAngle">The angle to start drawing at.</param>
-        /// <param name="endAngle">The angle to stop drawing at.</param>
-        /// <param name="color">The color to draw in.</param>
-        public void DrawElipticalArc(Vec2 CenterPoint, int height, int width, int startAngle, int endAngle, uint color)
-        {
-            double angle = (((startAngle <= endAngle) ? startAngle : endAngle) * (Math.PI / 180));
-            double range = (((endAngle > startAngle) ? endAngle : startAngle) * (Math.PI / 180));
-            double x = (width * Math.Cos(angle));
-            double y = (height * Math.Sin(angle));
-            do
-            {
-                SetPixel((uint)((int)(CenterPoint.X + x + 0.5)), (uint)((int)(CenterPoint.Y - y + 0.5)), color);
-                angle += 0.001;
-                x = (width * Math.Cos(angle));
-                y = (height * Math.Sin(angle));
-            }
-            while (angle <= range);
-        }
-        #endregion
-        */
-
-        #region DrawCircle
-        /// <summary>
-        /// Draws a filled circle.
-        /// </summary>
-        /// <param name="Center">The center of the circle.</param>
-        /// <param name="radius">The radius of the circle.</param>
-        /// <param name="color">The color to draw in.</param>
-        public void DrawCircle(Vec2 Center, int radius, uint color)
-        {
-#if SqrtWorks
-            int x1;
-            int x2;
-            int rSquared = radius * radius;
-            int counter = (Center.Y + radius);
-            for (int count = (Center.Y - radius); count <= counter; count++)
-            {
-                int ySquared = (count - Center.Y) * (count - Center.Y);
-                double sqrt = Math.Sqrt(rSquared - ySquared) + 0.5;
-                x1 = (int)(Center.X + sqrt);
-                x2 = (int)(Center.X - sqrt);
-                Vec2 p1 = new Vec2(x1, count);
-                Vec2 p2 = new Vec2(x2, count);
-                DrawLine(p1, p2, color);
-            }
-            DrawCircleOutline(Center, radius, color);
-#else
-            // Two is better than 1, and is almost enough to draw it....
-            // Almost.... 
-            // It still leaves exactly 8 pixels un-drawn.
-            // 2 in each quarter of the circle.
-            for (int i = 1; i <= radius; i++)
-            {
-                DrawCircleOutline(Center, i, color);
-            }
-
-            Vec2 v;
-            int x = 0;
-            int y = radius;
-            int p = (5 - radius * 4) / 4;
-
-            SetPixel((uint)(Center.X), (uint)(Center.Y + y), color);
-            v = new Vec2(Center.X, Center.Y + y);
-            DrawLine(Center, v, color);
-            SetPixel((uint)(Center.X), (uint)(Center.Y - y), color);
-            v = new Vec2(Center.X, Center.Y - y);
-            DrawLine(Center, v, color);
-            SetPixel((uint)(Center.X + y), (uint)(Center.Y), color);
-            v = new Vec2(Center.X + y, Center.Y);
-            DrawLine(Center, v, color);
-            SetPixel((uint)(Center.X - y), (uint)(Center.Y), color);
-            v = new Vec2(Center.X - y, Center.Y);
-            DrawLine(Center, v, color);
-            while (x < y)
-            {
-                x++;
-                if (p < 0)
-                {
-                    p += 2 * x + 1;
-                }
-                else
-                {
-                    y--;
-                    p += 2 * (x - y) + 1;
-                }
-                if (x == y)
-                {
-                    SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
-                    v = new Vec2(Center.X + x, Center.Y + y);
-                    DrawLine(Center, v, color);
-                    SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
-                    v = new Vec2(Center.X - x, Center.Y + y);
-                    DrawLine(Center, v, color);
-                    SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
-                    v = new Vec2(Center.X + x, Center.Y - y);
-                    DrawLine(Center, v, color);
-                    SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
-                    v = new Vec2(Center.X - x, Center.Y - y);
-                    DrawLine(Center, v, color);
-                }
-                else
-                {
-                    if (x < y)
-                    {
-                        SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
-                        v = new Vec2(Center.X + x, Center.Y + y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
-                        v = new Vec2(Center.X - x, Center.Y + y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
-                        v = new Vec2(Center.X + x, Center.Y - y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
-                        v = new Vec2(Center.X - x, Center.Y - y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X + y), (uint)(Center.Y + x), color);
-                        v = new Vec2(Center.X + y, Center.Y + x);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - y), (uint)(Center.Y + x), color);
-                        v = new Vec2(Center.X - y, Center.Y + x);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X + y), (uint)(Center.Y - x), color);
-                        v = new Vec2(Center.X + y, Center.Y - x);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - y), (uint)(Center.Y - x), color);
-                        v = new Vec2(Center.X - y, Center.Y - x);
-                        DrawLine(Center, v, color);
-                    }
-                }
-            }
-#endif
-        }
-        #endregion
-
-        #region DrawCircleOutline
-        /// <summary>
-        /// Draws the outline of a circle.
-        /// </summary>
-        /// <param name="Center">The center of the circle.</param>
-        /// <param name="radius">The radius of the circle.</param>
-        /// <param name="color">The color to draw with.</param>
-        public void DrawCircleOutline(Vec2 Center, int radius, uint color)
-        {
-            int x = 0;
-            int y = radius;
-            int p = (5 - radius * 4) / 4;
-
-            SetPixel((uint)(Center.X), (uint)(Center.Y + y), color);
-            SetPixel((uint)(Center.X), (uint)(Center.Y - y), color);
-            SetPixel((uint)(Center.X + y), (uint)(Center.Y), color);
-            SetPixel((uint)(Center.X - y), (uint)(Center.Y), color);
-            while (x < y)
-            {
-                x++;
-                if (p < 0)
-                {
-                    p += 2 * x + 1;
-                }
-                else
-                {
-                    y--;
-                    p += 2 * (x - y) + 1;
-                }
-                if (x == y)
-                {
-                    SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
-                    SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
-                    SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
-                    SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
-                }
-                else
-                {
-                    if (x < y)
-                    {
-                        SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
-                        SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
-                        SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
-                        SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
-                        SetPixel((uint)(Center.X + y), (uint)(Center.Y + x), color);
-                        SetPixel((uint)(Center.X - y), (uint)(Center.Y + x), color);
-                        SetPixel((uint)(Center.X + y), (uint)(Center.Y - x), color);
-                        SetPixel((uint)(Center.X - y), (uint)(Center.Y - x), color);
-                    }
-                }
-            }
-        }
-        #endregion
-
-        #region DrawLine
-        /// <summary>
-        /// Draws a line between 2 points.
-        /// </summary>
-        /// <param name="Point1">The first point.</param>
-        /// <param name="Point2">The first point.</param>
-        /// <param name="color">The color to draw.</param>
-        public void DrawLine(Vec2 Point1, Vec2 Point2, uint color)
-        {
-            int x0 = Point1.X;
-            int x1 = Point2.X;
-            int y0 = Point1.Y;
-            int y1 = Point2.Y;
-            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
-            if (steep)
-            {
-                int x3 = y0;
-                y0 = x0;
-                x0 = x3;
-                int x4 = y1;
-                y1 = x1;
-                x1 = x4;
-            }
-            if (x0 > x1)
-            {
-                int x5 = x0;
-                x0 = x1;
-                x1 = x5;
-                int x6 = y0;
-                y0 = y1;
-                y1 = x6;
-            }
-            int deltax = x1 - x0;
-            int deltay = Math.Abs(y1 - y0);
-            int error = deltax / 2;
-            int ystep;
-            int y = y0;
-            if (y0 < y1)
-            {
-                ystep = 1;
-            }
-            else
-            {
-                ystep = -1;
-            }
-            for (int x = x0; x <= x1; x++)
-            {
-                if (steep)
-                {
-                    SetPixel((uint)y, (uint)x, color);
-                }
-                else
-                {
-                    SetPixel((uint)x, (uint)y, color);
-                }
-                error = error - deltay;
-                if (error < 0)
-                {
-                    y = y + ystep;
-                    error = error + deltax;
-                }
-            }
-        }
-        #endregion
-
-        #region DrawLines
-        /// <summary>
-        /// Draws a set of connected lines.
-        /// </summary>
-        /// <param name="Points">
-        /// An array of points to draw, in the order they need drawing.
-        /// </param>
-        /// <param name="color">The color to draw.</param>
-        public void DrawLines(Vec2[] Points, uint color)
-        {
-            int n = Points.Length;
-            if (n >= 2)
-            {
-                DrawLine(Points[0], Points[1], color);
-
-                for (int count = 1; count < (n - 1); count++)
-                {
-                    DrawLine(Points[count], Points[count + 1], color);
-                }
-            }
-            else
-            {
-                throw new Exception("Not enough points provided!");
-            }
-        }
-        #endregion
-
-        /*
-        #region DrawRectangle
-        /// <summary>
-        /// Draws a rectangle with the specified points.
-        /// </summary>
-        /// <param name="p1">The first point.</param>
-        /// <param name="p2">The second point.</param>
-        /// <param name="p3">The third point.</param>
-        /// <param name="p4">The fourth point.</param>
-        /// <param name="FillColor">The color to fill in the rectangle with.</param>
-        /// <param name="BorderColor">The color to draw the border in.</param>
-        public void DrawRectangle(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, uint FillColor, uint BorderColor)
-        {
-            DrawPolygon(new Vec2[] { p1, p2, p3, p4 }, FillColor);
-            DrawPolygonOutline(new Vec2[] { p1, p2, p3, p4 }, BorderColor);
-        }
-
-        /// <summary>
-        /// Draws a rectangle with the specified points.
-        /// </summary>
-        /// <param name="p1">The first point.</param>
-        /// <param name="p2">The second point.</param>
-        /// <param name="p3">The third point.</param>
-        /// <param name="p4">The fourth point.</param>
-        /// <param name="color">The color to draw in.</param>
-        public void DrawRectangle(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, uint color)
-        {
-            DrawPolygon(new Vec2[] { p1, p2, p3, p4 }, color);
-        }
-
-        /// <summary>
-        /// This method fills in the space between
-        /// the 2 points specified in a rectangle.
-        /// </summary>
-        /// <param name="TopLeftCorner">
-        /// The point that specifies the top left 
-        /// corner of the rectangle being drawn.
-        /// </param>
-        /// <param name="BottomRightCorner">
-        /// The point that specifies the bottom right
-        /// corner of the rectangle being drawn.
-        /// </param>
-        /// <param name="color">The color to draw.</param>
-        public void DrawRectangle(Vec2 TopLeftCorner, Vec2 BottomRightCorner, uint color)
-        {
-            DrawRectangle(TopLeftCorner, new Vec2(BottomRightCorner.X, TopLeftCorner.Y), BottomRightCorner, new Vec2(TopLeftCorner.X, BottomRightCorner.Y), color);
-        }
-        #endregion
-
-        #region DrawReverseRectangle
-        /// <summary>
-        /// This method fills in the space between
-        /// the 2 points specified in a rectangle.
-        /// </summary>
-        /// <param name="TopRightCorner">
-        /// The point that specifies the top right 
-        /// corner of the rectangle being drawn.
-        /// </param>
-        /// <param name="BottomLeftCorner">
-        /// The point that specifies the bottom left
-        /// corner of the rectangle being drawn.
-        /// </param>
-        /// <param name="color">The color to draw.</param>
-        public void ReverseDrawRectangle(Vec2 TopRightCorner, Vec2 BottomLeftCorner, uint color)
-        {
-            DrawRectangle(new Vec2(BottomLeftCorner.X, TopRightCorner.Y), TopRightCorner, new Vec2(TopRightCorner.X, BottomLeftCorner.Y), BottomLeftCorner, color);
-        }
-        #endregion
-        */
-
-        #region DrawImage
-        /// <summary>
-        /// Draws the specified image, at the specified point.
-        /// </summary>
-        /// <param name="loc"></param>
-        /// <param name="i"></param>
-        public void DrawImage(Vec2 loc, Image i)
-        {
-            uint value;
-            for (uint y = 0; y < i.Height; y++)
-            {
-                for (uint x = 0; x < i.Width; x++)
-                {
-                    value = i.GetPixel(x, y);
-                    if (value != 0)
-                        SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
-                }
-            }
         }
         #endregion
 

@@ -4,11 +4,17 @@ using System.Text;
 
 namespace Orvid.Graphics.Drivers
 {
+    /// <summary>
+    /// The default implementation of a VGA driver.
+    /// </summary>
     public class VGADriver : GraphicsDriver
     {
         private readonly Cosmos.Core.IOGroup.VGA mIO = new Cosmos.Core.IOGroup.VGA();
         private GraphicsMode curMode;
 
+        /// <summary>
+        /// The name of the driver.
+        /// </summary>
         public override string Name
         {
             get
@@ -17,6 +23,9 @@ namespace Orvid.Graphics.Drivers
             }
         }
 
+        /// <summary>
+        /// The version of the driver.
+        /// </summary>
         public override string Version
         {
             get
@@ -25,6 +34,9 @@ namespace Orvid.Graphics.Drivers
             }
         }
 
+        /// <summary>
+        /// The company responsible for the driver.
+        /// </summary>
         public override string Company
         {
             get
@@ -33,6 +45,9 @@ namespace Orvid.Graphics.Drivers
             }
         }
 
+        /// <summary>
+        /// The Author of the driver.
+        /// </summary>
         public override string Author
         {
             get
@@ -41,6 +56,9 @@ namespace Orvid.Graphics.Drivers
             }
         }
 
+        /// <summary>
+        /// The current GraphicsMode.
+        /// </summary>
         public override GraphicsMode Mode
         {
             get
@@ -349,7 +367,6 @@ namespace Orvid.Graphics.Drivers
             mIO.DAC_Data.Byte = (byte)(b >> 2);
         }
         #endregion
-
 
         public override void Shutdown()
         {
