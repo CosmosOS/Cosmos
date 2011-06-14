@@ -30,6 +30,26 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -40,94 +60,12 @@
     <Compile Include="GraphicsDriver.cs" />
     <Compile Include="GraphicsMode.cs" />
     <Compile Include="Image.cs" />
-    <Compile Include="ImageFormats\LibBmp.cs" />
-    <Compile Include="ImageFormats\LibJpeg.cs" />
-    <Compile Include="ImageFormats\LibTiff.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\CleanFaxData.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\ColorResponseUnit.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\Compression.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\ExtraSample.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\FaxMode.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\FileType.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\FillOrder.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\GrayResponseUnit.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\Group3Opt.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\InkSet.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\JpegColorMode.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\JpegProc.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\JpegTablesMode.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\OFileType.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\Orientation.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\Photometric.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\PlanarConfig.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\Predictor.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\ResUnit.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\SampleFormat.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\Threshold.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\TiffPrintFlags.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\TiffTag.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\TiffType.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Enums\YCbCrPosition.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\FieldBit.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\FieldValue.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\CCITTCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\CCITTCodecTagMethods.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\CCITTCodec_Data.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\CodecWithPredictor.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\CodecWithPredictorTagMethods.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\DeflateCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\DeflateCodecTagMethods.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\DumpModeCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\JpegCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\JpegCodecTagMethods.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\JpegStdDestination.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\JpegStdSource.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\JpegTablesDestination.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\JpegTablesSource.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\LZWCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\OJpegCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\OJpegCodecTagMethods.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\OJpegSrcManager.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\PackBitsCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TagCompare.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffCIELabToRGB.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffDirectory.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffDirEntry.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffDisplay.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffFlags.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffHeader.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffTagValue.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\TiffYCbCrToRGB.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Aux.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Codec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Dir.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_DirInfo.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_DirRead.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_DirWrite.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Internal.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Open.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Print.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Read.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Strip.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Swab.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Internal\Tiff_Write.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\Tiff.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\TiffCodec.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\TiffErrorHandler.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\TiffFieldInfo.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\TiffRgbaImage.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\TiffStream.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\LibTiff\TiffTagMethods.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\Tiff2Rgba\Converter.cs" />
-    <Compile Include="ImageFormats\LibTiff.Net\sources\Tiff2Rgba\Program.cs" />
-    <Compile Include="ImageFormats\zLib.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="OForms\OButton.cs" />
     <Compile Include="OForms\OControl.cs" />
     <Compile Include="OForms\Windows\OWindow.cs" />
     <Compile Include="OForms\Windows\OWindowManager.cs" />
     <Compile Include="Pixel.cs" />
-    <Compile Include="GraphicsPlugs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vec2.cs" />
   </ItemGroup>
@@ -152,10 +90,6 @@
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ImageFormats\LibTiff.Net\license.txt" />
-    <Content Include="ImageFormats\LibTiff.Net\sources\license.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

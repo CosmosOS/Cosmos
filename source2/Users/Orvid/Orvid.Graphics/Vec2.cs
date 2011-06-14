@@ -5,7 +5,7 @@ namespace Orvid.Graphics
     /// <summary>
     /// This is a 2d vector. aka. A point on a 2d plane.
     /// </summary>
-    public struct Vec2
+    public class Vec2
     {
         /// <summary>
         /// The X position.
@@ -15,6 +15,11 @@ namespace Orvid.Graphics
         /// The Y position.
         /// </summary>
         public int Y;
+
+        /// <summary>
+        /// The default constructor.
+        /// </summary>
+        public Vec2() { }
 
         /// <summary>
         /// The default constructor.
@@ -48,7 +53,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public static Vec2 operator -(Vec2 a, Vec2 b)
         {
-            Vec2 v;
+            Vec2 v = new Vec2();
             v.X = a.X - b.X;
             v.Y = a.Y - b.Y;
             return v;
@@ -62,7 +67,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public static Vec2 operator +(Vec2 a, Vec2 b)
         {
-            Vec2 v;
+            Vec2 v = new Vec2();
             v.X = a.X + b.X;
             v.Y = a.Y + b.Y;
             return v;
@@ -76,7 +81,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public static Vec2 operator /(Vec2 a, Vec2 b)
         {
-            Vec2 v;
+            Vec2 v = new Vec2();
             v.X = a.X / b.X;
             v.Y = a.Y / b.Y;
             return v;
@@ -90,7 +95,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public static Vec2 operator /(Vec2 a, int b)
         {
-            Vec2 v;
+            Vec2 v = new Vec2();
             v.X = (Int32)(a.X / b);
             v.Y = (Int32)(a.Y / b);
             return v;
@@ -104,7 +109,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public static Vec2 operator /(Vec2 v, float s)
         {
-            Vec2 vec;
+            Vec2 vec = new Vec2();
             float num = 1f / s;
             vec.X = (Int32)(v.X * num);
             vec.Y = (Int32)(v.Y * num);
@@ -119,7 +124,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public static Vec2 operator /(float s, Vec2 v)
         {
-            Vec2 vec;
+            Vec2 vec = new Vec2();
             vec.X = (Int32)(s / v.X);
             vec.Y = (Int32)(s / v.Y);
             return vec;

@@ -30,26 +30,12 @@ namespace Orvid.Graphics
         public static double Cos(double x)
         {
             x = Math.Abs((x + Math.PI) % (2 * Math.PI) - Math.PI);
-            const double tf = 1.0 / 24.0, vtz = -1.0 / 720.0, fzhtz = 1.0 / 40320.0, fukit = -1.0 / 3628800.0;
+            const double tf = 1.0 / 24.0;
+            const double vtz = -1.0 / 720.0;
+            const double fzhtz = 1.0 / 40320.0;
+            const double fukit = -1.0 / 3628800.0;
             double p = x * x;
             return 1 + p * (-0.5 + p * (tf + p * (vtz + p * (fzhtz + p * fukit))));
-        }
-
-        [PlugMethod()]
-        public static double Sqrt(double d)
-        {
-            long i;
-            double x, y;
-            double f = 1.5F;
-
-            x = d * 0.5F;
-            y = d;
-            i = (long)y;
-            i = 0x5f3759df - (i >> 1);
-            y = i;
-            y = y * (f - (x * y * y));
-            y = y * (f - (x * y * y));
-            return d * y;
         }
 
         [PlugMethod()]

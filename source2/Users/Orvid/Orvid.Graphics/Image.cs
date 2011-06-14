@@ -1,5 +1,5 @@
 ﻿//#define DebugDraw // If this is uncommented, all triangles will have a set-color border drawn. This is useful to debug polygon drawing code. 
-#define SqrtWorks // Only uncomment this when the square-root works 
+//#define SqrtWorks // Only uncomment this when the square-root works 
 
 using System;
 using System.Collections.Generic;
@@ -84,7 +84,7 @@ namespace Orvid.Graphics
             int cnt = 0;
             #region Process
             {
-                float EPSILON = 0.0000000001f;
+                double EPSILON = 0.0000000001f;
                 int n = contour.Length;
                 if (n < 3)
                 {
@@ -94,7 +94,7 @@ namespace Orvid.Graphics
                 int Area;
                 {
                     int n2 = contour.Length;
-                    float A = 0.0f;
+                    double A = 0.0f;
                     for (int p = n2 - 1, q = 0; q < n2; p = q++)
                     {
                         A += contour[p].X * contour[q].Y - contour[q].X * contour[p].Y;
@@ -141,7 +141,7 @@ namespace Orvid.Graphics
                     bool Snip;
                     {
                         int p;
-                        float Ax, Ay, Bx, By, Cx, Cy, Px, Py;
+                        double Ax, Ay, Bx, By, Cx, Cy, Px, Py;
                         Ax = contour[V[u]].X;
                         Ay = contour[V[u]].Y;
                         Bx = contour[V[v]].X;
@@ -162,8 +162,8 @@ namespace Orvid.Graphics
                             Py = contour[V[p]].Y;
                             bool InsideTriangle;
                             {
-                                float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
-                                float cCROSSap, bCROSScp, aCROSSbp;
+                                double ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
+                                double cCROSSap, bCROSScp, aCROSSbp;
                                 ax = Cx - Bx;
                                 ay = Cy - By;
                                 bx = Ax - Cx;
@@ -415,6 +415,7 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        /*
         #region DrawElipse
         /// <summary>
         /// Draws and fills an elipse.
@@ -497,6 +498,7 @@ namespace Orvid.Graphics
             while (angle <= range);
         }
         #endregion
+        */
 
         #region DrawCircle
         /// <summary>
@@ -514,12 +516,10 @@ namespace Orvid.Graphics
             int counter = (Center.Y + radius);
             for (int count = (Center.Y - radius); count <= counter; count++)
             {
-                int i = count - Center.Y;
-                int ySquared = (i) * (i);
-                i = rSquared - ySquared;
-                double sqrt = Math.Sqrt(i);
-                x1 = (int)(Center.X + sqrt + 0.5);
-                x2 = (int)(Center.X - sqrt + 0.5);
+                int ySquared = (count - Center.Y) * (count - Center.Y);
+                double sqrt = Math.Sqrt(rSquared - ySquared) + 0.5;
+                x1 = (int)(Center.X + sqrt);
+                x2 = (int)(Center.X - sqrt);
                 Vec2 p1 = new Vec2(x1, count);
                 Vec2 p2 = new Vec2(x2, count);
                 DrawLine(p1, p2, color);
@@ -760,6 +760,7 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        /*
         #region DrawRectangle
         /// <summary>
         /// Draws a rectangle with the specified points.
@@ -827,6 +828,7 @@ namespace Orvid.Graphics
             DrawRectangle(new Vec2(BottomLeftCorner.X, TopRightCorner.Y), TopRightCorner, new Vec2(TopRightCorner.X, BottomLeftCorner.Y), BottomLeftCorner, color);
         }
         #endregion
+        */
 
         #region DrawImage
         /// <summary>
@@ -879,7 +881,7 @@ namespace Orvid.Graphics
             {
                 SetPixel((uint)x, (uint)y, dColor);
             }
-            Queue<Vec2> q = new Queue<Vec2>();
+            Stack<Vec2> q = new Stack<Vec2>();
             Visiteds = new bool[(Height + 1) * (Width + 1)];
 
             #region Setup Start of queue
@@ -889,7 +891,7 @@ namespace Orvid.Graphics
             if ((!(p == 0) || p == sColor) && p != dColor)
             {
                 v = new Vec2(x + 1, y);
-                q.Enqueue(v);
+                q.Push(v);
                 Visiteds[((y * Width) + x + 1)] = true;
                 SetPixel((uint)x + 1, (uint)y, dColor);
             }
@@ -897,7 +899,7 @@ namespace Orvid.Graphics
             if ((!(p == 0) || p == sColor) && p != dColor)
             {
                 v = new Vec2(x, y + 1);
-                q.Enqueue(v);
+                q.Push(v);
                 Visiteds[(((y + 1) * Width) + x)] = true;
                 SetPixel((uint)x, (uint)y + 1, dColor);
             }
@@ -905,7 +907,7 @@ namespace Orvid.Graphics
             if ((!(p == 0) || p == sColor) && p != dColor)
             {
                 v = new Vec2(x - 1, y);
-                q.Enqueue(v);
+                q.Push(v);
                 Visiteds[((y * Width) + x - 1)] = true;
                 SetPixel((uint)(x - 1), (uint)y, dColor);
             }
@@ -913,7 +915,7 @@ namespace Orvid.Graphics
             if ((!(p == 0) || p == sColor) && p != dColor)
             {
                 v = new Vec2(x, y - 1);
-                q.Enqueue(v);
+                q.Push(v);
                 Visiteds[(((y - 1) * Width) + x)] = true;
                 SetPixel((uint)x, (uint)(y - 1), dColor);
             }
@@ -921,7 +923,7 @@ namespace Orvid.Graphics
 
             while (q.Count > 0)
             {
-                v = q.Dequeue();
+                v = q.Pop();
                 x = v.X;
                 y = v.Y;
                 #region Check
@@ -932,7 +934,7 @@ namespace Orvid.Graphics
                     v = new Vec2(x + 1, y);
                     if (x >= 0 && !(Visited(y, x + 1)))
                     {
-                        q.Enqueue(v);
+                        q.Push(v);
                         Visiteds[((y * Width) + x + 1)] = true;
                         SetPixel((uint)x + 1, (uint)y, dColor);
                     }
@@ -943,7 +945,7 @@ namespace Orvid.Graphics
                     v = new Vec2(x, y + 1);
                     if (x >= 0 && !(Visited(y + 1, x)))
                     {
-                        q.Enqueue(v);
+                        q.Push(v);
                         Visiteds[(((y + 1) * Width) + x)] = true;
                         SetPixel((uint)x, (uint)y + 1, dColor);
                     }
@@ -954,7 +956,7 @@ namespace Orvid.Graphics
                     v = new Vec2(x - 1, y);
                     if (x >= 0 && !(Visited(y, x - 1)))
                     {
-                        q.Enqueue(v);
+                        q.Push(v);
                         Visiteds[((y * Width) + x - 1)] = true;
                         SetPixel((uint)x - 1, (uint)y, dColor);
                     }
@@ -965,7 +967,7 @@ namespace Orvid.Graphics
                     v = new Vec2(x, y - 1);
                     if (!(Visited(y - 1, x)))
                     {
-                        q.Enqueue(v);
+                        q.Push(v);
                         Visiteds[(((y - 1) * Width) + x)] = true;
                         SetPixel((uint)x, (uint)y - 1, dColor);
                     }

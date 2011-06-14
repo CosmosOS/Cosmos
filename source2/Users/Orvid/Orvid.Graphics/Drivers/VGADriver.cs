@@ -57,7 +57,7 @@ namespace Orvid.Graphics.Drivers
             for (uint i2 = 0; i2 < 64000 /* 320 Times 200 is 64,000 so we need to loop 64k times. */; i2++)
             {
                 mIO.VGAMemoryBlock[i2] = (byte)(i.Data[i2] & 0xFF);
-            } 
+            }
         }
 
         public override List<GraphicsMode> GetSupportedModes()
