@@ -162,6 +162,8 @@
     <Compile Include="Sub.cs" />
     <Compile Include="SubWithCarry.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="x87\FloatCosine.cs" />
+    <Compile Include="x87\FloatSine.cs" />
     <Compile Include="x87\FloatSqrt.cs" />
     <Compile Include="x87\Enums.cs" />
     <Compile Include="x87\FloatABS.cs" />
