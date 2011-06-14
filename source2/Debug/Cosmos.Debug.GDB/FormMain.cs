@@ -15,7 +15,7 @@ namespace Cosmos.Debug.GDB {
             public readonly UInt32 mAddr;
             public readonly string mLabel;
             public readonly string mOp;
-            public readonly string mData = "";
+            public readonly string mData = string.Empty;
 
             public AsmLine(string aInput) {
                 //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
@@ -56,8 +56,8 @@ namespace Cosmos.Debug.GDB {
                 } else if (xCmdLine == "") {
                     // This happens on initial connect
                 } else {
-                    var xCmdParts = aResponse.Command.Split(" ".ToCharArray());
-                    string xCmd = xCmdParts[0].ToLower();
+					var xCmdParts = xCmdLine.Split(" ".ToCharArray());
+                    var xCmd = xCmdParts[0];
                     if (xCmd == "disassemble") {
                         OnDisassemble(aResponse);
                     } else if (xCmd == "symbol-file") { // nothing
@@ -72,19 +72,20 @@ namespace Cosmos.Debug.GDB {
                         Windows.mCallStackForm.OnWhere(aResponse);
                     } else if (xCmd == "break") {
                         Windows.mBreakpointsForm.OnBreak(aResponse);
+					} else if (xCmd.StartsWith("x/")) {
                     } else {
                         throw new Exception("Unrecognized command response: " + aResponse.Command);
                     }
                 }
             } catch (Exception e) {
-                MessageBox.Show("Exception: " + e.Message);
+                MessageBox.Show("Exception: " + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
             }
         }
 
         public void Disassemble(string aLabel) {
-            lablCurrentFunction.Text = "";
+            lablCurrentFunction.Text = string.Empty;
             lablCurrentFunction.Visible = true;
-            Global.GDB.SendCmd(("disassemble " + aLabel).Trim());
+            Global.GDB.SendCmd("disassemble " + aLabel.TrimEnd());
         }
 
         protected void OnDisassemble(GDB.Response xResponse) {
@@ -272,6 +273,5 @@ namespace Cosmos.Debug.GDB {
         private void butnBreakpoints_Click(object sender, EventArgs e) {
             mitmViewBreakpoints.PerformClick();
         }
-
     }
 }

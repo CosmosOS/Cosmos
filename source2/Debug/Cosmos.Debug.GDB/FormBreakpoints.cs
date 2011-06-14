@@ -44,7 +44,7 @@ namespace Cosmos.Debug.GDB {
             foreach (var xUC in mBreakpoints.Values) {
                 string xLabel = xUC.lablName.Text;
                 // We dont add address types, as most of them change between compiles.
-                if (!xLabel.StartsWith("*")) {
+                if (!xLabel.StartsWith("*") && !Settings.DS.Breakpoint.Rows.Contains(xLabel)) {
                     var xBP = Settings.DS.Breakpoint.NewBreakpointRow();
                     xBP.Label = xLabel;
                     Settings.DS.Breakpoint.AddBreakpointRow(xBP);

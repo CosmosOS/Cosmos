@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Win32;
-using System.IO;
+using Registry = Microsoft.Win32.Registry;
+using Path = System.IO.Path;
 
 namespace Cosmos.Build.Common
 {
@@ -11,6 +11,7 @@ namespace Cosmos.Build.Common
 		public static readonly string BuildVsip;
 		public static readonly string IL2CPUTask;
 		public static readonly string Kernel;
+		public static readonly string GDBClientExe;
 
 		static CosmosPaths()
 		{
@@ -25,6 +26,7 @@ namespace Cosmos.Build.Common
 			BuildVsip = Path.Combine(CosmosKit, "Build\\VSIP");
 			IL2CPUTask = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Build.IL2CPUTask.exe");
 			Kernel = Path.Combine(CosmosKit, "Kernel");
+			GDBClientExe = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Debug.GDB.exe");
 		}
 	}
 }

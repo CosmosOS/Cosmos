@@ -126,6 +126,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public string mISO;
     public string mProjectFile;
+
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
       System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
       mCallback = aCallback;
@@ -219,16 +220,9 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // Launch GDB Client
       if (xGDBDebugStub && xGDBClient) {
-        // TODO: Need to integrate the GDB client to the build
-        // But allow overrides for dev kit, I dont want to have to run the install 
-        // for each change to gdb client.
-        string xGDBClientEXE = @"m:\source\Cosmos\source2\Debug\Cosmos.Debug.GDB\bin\Debug\Cosmos.Debug.GDB.exe";
-        if (Environment.MachineName.Equals("MATTHIJS-VAST1", StringComparison.InvariantCultureIgnoreCase)) {
-          // for now, the paths are hardcoded
-          xGDBClientEXE = @"c:\Data\Sources\Cosmos\source2\Debug\Cosmos.Debug.GDB\bin\Debug\Cosmos.Debug.GDB.exe";
-        }
-        if (File.Exists(xGDBClientEXE)) {
-          var xPSInfo = new ProcessStartInfo(xGDBClientEXE);
+		if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe))
+		{
+          var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
           xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
           xPSInfo.UseShellExecute = false;
           xPSInfo.RedirectStandardInput = false;
@@ -237,6 +231,10 @@ namespace Cosmos.Debug.VSDebugEngine {
           xPSInfo.CreateNoWindow = false;
           Process.Start(xPSInfo);
         }
+		else
+			MessageBox.Show(string.Format(
+				"The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
+				Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
       }
     }
 
@@ -346,7 +344,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     public int EnumPrograms(out IEnumDebugPrograms2 ppEnum) {
       throw new NotImplementedException();
     }
-
 
     public int EnumThreads(out IEnumDebugThreads2 ppEnum) {
       var xEnum = new AD7ThreadEnum(new IDebugThread2[] { mThread });
@@ -460,6 +457,5 @@ namespace Cosmos.Debug.VSDebugEngine {
         mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
       }
     }
-
   }
 }

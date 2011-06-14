@@ -9,7 +9,8 @@ namespace Cosmos.Debug.GDB {
         static void Main() {
             var xArgs = System.Environment.GetCommandLineArgs();
             if (xArgs.Length > 1) {
-                Settings.Load(xArgs[1]);
+				if (false == Settings.Load(xArgs[1]))
+					return;
             }
             if (xArgs.Length > 2) {
                 //Settings.AutoConnect = string.Compare(xArgs[2], "/Connect", true) == 0;

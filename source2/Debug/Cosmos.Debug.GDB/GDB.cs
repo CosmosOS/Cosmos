@@ -5,14 +5,16 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading;
+using Registry = Microsoft.Win32.Registry;
+using Path = System.IO.Path;
 
 namespace Cosmos.Debug.GDB {
     public class GDB {
         public class Response {
-            public string Command = "";
-            public string Reply = "";
+            public string Command = string.Empty;
+			public string Reply = string.Empty;
             public bool Error = false;
-            public string ErrorMsg = "";
+			public string ErrorMsg = string.Empty;
             public List<string> Text = new List<string>();
 
             public override string ToString() {
@@ -98,17 +100,26 @@ namespace Cosmos.Debug.GDB {
             get { return mConnected; }
         }
 
-        //TODO: Make path dynamic
-        protected string mCosmosPath = @"m:\source\Cosmos\";
-        //static protected string mCosmosPath = @"c:\Data\sources\Cosmos\il2cpu\";
+		static readonly string mGDBExePath;
+
+		static GDB()
+		{
+			using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false))
+			{
+				if(xReg == null)
+					throw new Exception("The Key \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Cosmos\" does not exist! Are you install Cosmos Kit?");
+				var xPathToInstalled = (string)xReg.GetValue(null);
+				mGDBExePath = Path.Combine(xPathToInstalled, @"Build\Tools\gdb.exe");
+			}
+		}
 
         public GDB(int aRetry, Action<Response> aOnResponse) {
             mOnResponse = aOnResponse;
             // To handle greeting from GDB since its not associated with any command
-            mLastCmd.Enqueue("");
+            mLastCmd.Enqueue(string.Empty);
 
             var xStartInfo = new ProcessStartInfo();
-            xStartInfo.FileName = mCosmosPath+ @"Build\Tools\gdb.exe";
+            xStartInfo.FileName = mGDBExePath;
             xStartInfo.Arguments = @"--interpreter=mi2";
             xStartInfo.WorkingDirectory = Settings.OutputPath;
             xStartInfo.CreateNoWindow = true;
@@ -146,6 +157,5 @@ namespace Cosmos.Debug.GDB {
             SendCmd("continue");
             SendCmd("delete 1");
         }
-
     }
 }

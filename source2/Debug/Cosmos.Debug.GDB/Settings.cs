@@ -7,9 +7,9 @@ using System.Windows.Forms;
 
 namespace Cosmos.Debug.GDB {
     public class Settings {
-        static protected string mFilename = "";
+        static protected string mFilenameOfBreakPointXml = "";
         static public string Filename {
-            get { return mFilename; }
+            get { return mFilenameOfBreakPointXml; }
         }
 
         static protected bool mAutoConnect = false;
@@ -39,23 +39,31 @@ namespace Cosmos.Debug.GDB {
             Windows.SavePositions();
             Windows.mBreakpointsForm.SaveSettings();
             // Its often checked into TFS, so if its readonly, dont save it.
-            if ((File.GetAttributes(Filename) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
+            if (File.Exists(Filename) && (File.GetAttributes(Filename) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
                 MessageBox.Show("File is read only. Cannot save.");
             } else {
                 DS.WriteXml(Filename, System.Data.XmlWriteMode.IgnoreSchema);
             }
         }
 
-        static public void Load(string aFilename) {
-            mFilename = aFilename;
-            if (File.Exists(Filename)) {
-                //TODO: Change this and other general settings to read from the General datatable
-                mOutputPath = Path.Combine(Path.GetDirectoryName(Filename), @"bin\debug\");
-                mObjFile = Path.GetFileNameWithoutExtension(Filename) + ".obj";
-                mAsmFile = Path.GetFileNameWithoutExtension(Filename) + ".asm";
-                
-                DS.ReadXml(Filename, System.Data.XmlReadMode.IgnoreSchema);
-            }
+        static public bool Load(string aFilenameOfBreakPointXml) {
+            mFilenameOfBreakPointXml = aFilenameOfBreakPointXml;
+			try {
+				//TODO: Change this and other general settings to read from the General datatable
+				mOutputPath = Path.Combine(Path.GetDirectoryName(Filename), @"bin\debug\");
+				mObjFile = Path.GetFileNameWithoutExtension(Filename) + ".obj";
+				mAsmFile = Path.GetFileNameWithoutExtension(Filename) + ".asm";
+				if (File.Exists(Filename))
+					DS.ReadXml(Filename, System.Data.XmlReadMode.IgnoreSchema);
+				return true;
+			}
+			catch (Exception e) {
+				MessageBox.Show(string.Format(
+						"Exception on loading of settings file \"{0}\" :\n{1}\n\nStacktrace:\n{2}",
+						Filename, e.Message, e.StackTrace),
+					"Breakpoint Settings", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+			}
+			return false;
         }
 
         static public void InitWindows() {
@@ -63,5 +71,4 @@ namespace Cosmos.Debug.GDB {
             Windows.mBreakpointsForm.LoadSession();
         }
     }
-
 }

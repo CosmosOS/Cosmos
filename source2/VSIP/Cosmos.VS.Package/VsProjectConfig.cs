@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
+using Path = System.IO.Path;
+using Marshal = System.Runtime.InteropServices.Marshal;
 using Microsoft.VisualStudio.Project;
-using Microsoft.VisualStudio;
+using VSConstants = Microsoft.VisualStudio.VSConstants;
 using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell;
+using VsShellUtilities = Microsoft.VisualStudio.Shell.VsShellUtilities;
 using Microsoft.VisualStudio.Shell.Interop;
-using System.Collections.Specialized;
-using Cosmos.Debug.Common;
+using NameValueCollection = System.Collections.Specialized.NameValueCollection;
+using NameValueCollectionHelper = Cosmos.Debug.Common.NameValueCollectionHelper;
 
 namespace Cosmos.VS.Package
 {
 
     public class VsProjectConfig : ProjectConfig
     {
-
         public VsProjectConfig(ProjectNode project, string configuration) : base(project, configuration) {
             LogUtility.LogString("Entering Cosmos.VS.Package.VsProjectConfig.ctor(project, '{0}')", configuration);
             LogUtility.LogString("Exiting Cosmos.VS.Package.VsProjectConfig.ctor(project, configuration)");
@@ -49,14 +45,14 @@ namespace Cosmos.VS.Package
 
                     var xValues = new NameValueCollection();
                     xValues.Add("ISOFile", Path.Combine(Path.GetDirectoryName(ProjectMgr.GetOutputAssembly(this.ConfigName)), Path.GetFileNameWithoutExtension(ProjectMgr.GetOutputAssembly(this.ConfigName)) + ".iso"));
-                    xValues.Add("BinFormat", this.GetConfigurationProperty("BinFormat", true));
-                    xValues.Add("EnableGDB", this.GetConfigurationProperty("EnableGDB", true));
-                    xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", true));
-                    xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", true));
-                    xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", true));
+                    xValues.Add("BinFormat", this.GetConfigurationProperty("BinFormat", false)); // only first needs to force cache reset (in upper if statement)
+                    xValues.Add("EnableGDB", this.GetConfigurationProperty("EnableGDB", false));
+					xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", false));
+					xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", false));
+					xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", false));
                     xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
-                    xValues.Add("VMWareFlavor", this.GetConfigurationProperty("VMWareFlavor", true));
-                    xValues.Add("StartCosmosGDB", this.GetConfigurationProperty("StartCosmosGDB", true));
+					xValues.Add("VMWareFlavor", this.GetConfigurationProperty("VMWareFlavor", false));
+					xValues.Add("StartCosmosGDB", this.GetConfigurationProperty("StartCosmosGDB", false));
 
                     xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
@@ -73,7 +69,7 @@ namespace Cosmos.VS.Package
             }
             catch (Exception e)
             {
-                LogUtility.LogString("Error: " + e.ToString());
+                LogUtility.LogString("Error: {0}", e.ToString());
                 return Marshal.GetHRForException(e);
             }
             finally
@@ -81,7 +77,5 @@ namespace Cosmos.VS.Package
                 LogUtility.LogString("Exiting Cosmos.VS.Package.VsProjectConfig.DebugLaunch");
             }
         }
-
     }
-
 }
