@@ -14,15 +14,15 @@
  * 3. The names of the authors may not be used to endorse or promote products
  * derived from this software without specific prior written permission.
  * 
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+ * THIS Software IS PROVIDED ``AS IS'' AND Any EXPRESSED OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JCRAFT,
- * INC. OR ANY CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INC. OR Any CONTRIBUTORS TO THIS Software BE LIABLE FOR Any DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON Any THEORY OF
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * NEGLIGENCE OR OTHERWISE) ARISING IN Any WAY OUT OF THE USE OF THIS Software,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This program is based on zlib-1.1.3, so all credit should go authors
@@ -155,7 +155,7 @@ namespace ComponentAce.Compression.Libs.zlib
         internal int pending_out; // next pending byte to output to the stream
         internal int pending; // nb of bytes in the pending buffer
         internal int noheader; // suppress zlib header and adler32
-        internal byte data_type; // UNKNOWN, BINARY or ASCII
+        internal byte data_type; // Unknown, BINARY or ASCII
         internal byte method; // STORED (for zip only) or DEFLATED
         internal int last_flush; // value of flush param for previous deflate call
 

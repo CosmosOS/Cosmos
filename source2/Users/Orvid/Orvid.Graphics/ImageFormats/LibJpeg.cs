@@ -19,16 +19,16 @@
  * may be used to endorse or promote products derived from this software 
  * without specific prior written permission. 
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS 
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+ * THIS Software IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS 
+ * IS" AND Any EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
  * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BIT MIRACLE BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * LIABLE FOR Any DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * INTERRUPTION) HOWEVER CAUSED AND ON Any THEORY OF LIABILITY, WHETHER IN 
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
+ * ARISING IN Any WAY OUT OF THE USE OF THIS Software, EVEN IF ADVISED OF 
  * THE POSSIBILITY OF SUCH DAMAGE. 
  ****************************************************************************/
 using System;
@@ -3097,7 +3097,7 @@ namespace BitMiracle.LibJpeg
     /// <summary>
     /// Algorithm used for the DCT step.
     /// </summary>
-    /// <remarks>The <c>FLOAT</c> method is very slightly more accurate than the <c>ISLOW</c> method, 
+    /// <remarks>The <c>Float</c> method is very slightly more accurate than the <c>ISLOW</c> method, 
     /// but may give different results on different machines due to varying roundoff behavior. 
     /// The integer methods should give the same results on all machines. On machines with 
     /// sufficiently fast hardware, the floating-point method may also be the fastest. 
@@ -10231,8 +10231,8 @@ namespace BitMiracle.LibJpeg
         /// limiting step (just after the IDCT), a wildly out-of-range value is 
         /// possible if the input data is corrupt.  To avoid any chance of indexing
         /// off the end of memory and getting a bad-pointer trap, we perform the
-        /// post-IDCT limiting thus: <c>x = range_limit[x &amp; MASK];</c>
-        /// where MASK is 2 bits wider than legal sample data, ie 10 bits for 8-bit
+        /// post-IDCT limiting thus: <c>x = range_limit[x &amp; Mask];</c>
+        /// where Mask is 2 bits wider than legal sample data, ie 10 bits for 8-bit
         /// samples.  Under normal circumstances this is more than enough range and
         /// a correct output will be generated; with bogus input data the mask will
         /// cause wraparound, and we will safely generate a bogus-but-in-range output.
