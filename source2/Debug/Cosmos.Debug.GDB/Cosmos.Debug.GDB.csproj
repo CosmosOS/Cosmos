@@ -80,6 +80,12 @@
     <Compile Include="BreakpointUC.Designer.cs">
       <DependentUpon>BreakpointUC.cs</DependentUpon>
     </Compile>
+    <Compile Include="WatchUC.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WatchUC.Designer.cs">
+      <DependentUpon>WatchUC.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormBreakpoints.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,6 +141,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BreakpointUC.resx">
       <DependentUpon>BreakpointUC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WatchUC.resx">
+      <DependentUpon>WatchUC.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormBreakpoints.resx">
       <DependentUpon>FormBreakpoints.cs</DependentUpon>
@@ -206,6 +215,6 @@
   <Target Name="BeforeBuild">
   </Target>-->
   <Target Name="AfterBuild" Condition="$(InstallPath) != ''">
-	  <Copy SourceFiles="$(TargetPath)" DestinationFolder="$([System.IO.Path]::Combine($(InstallPath), Build\VSIP))"/>
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$([System.IO.Path]::Combine($(InstallPath), Build\VSIP))" />
   </Target>
 </Project>

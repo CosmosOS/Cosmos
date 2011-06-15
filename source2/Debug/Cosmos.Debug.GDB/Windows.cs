@@ -99,6 +99,12 @@ namespace Cosmos.Debug.GDB {
             Windows.mCallStackForm.Redo();
         }
 
+		static public void UpdateAfterRegisterUpdate()
+		{
+			// for update watches, we need first response from gdb over values of registers
+			Windows.mWatchesForm.Redo();
+		}
+
         static protected List<Form> mVisibleWindows = new List<Form>();
 
         static protected void SaveWindowState(Form aForm) {

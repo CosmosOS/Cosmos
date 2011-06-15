@@ -20,16 +20,16 @@ namespace Cosmos.Debug.GDB {
             public AsmLine(string aInput) {
                 //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
                 var s = GDB.Unescape(aInput);
-                var xSplit1 = s.Split("\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+				var xSplit1 = s.Split(Global.TabSeparator, StringSplitOptions.RemoveEmptyEntries);
 
-                var xSplit2 = xSplit1[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                mAddr = Global.FromHex(xSplit2[0]);
+				var xSplit2 = xSplit1[0].Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+                mAddr = Global.FromHexWithLeadingZeroX(xSplit2[0]);
                 string xLabel;
                 if (xSplit2.Length > 1) {
                     xLabel = xSplit2[1];
                 }
 
-                xSplit2 = xSplit1[1].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+				xSplit2 = xSplit1[1].Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
                 mOp = xSplit2[0];
                 if (xSplit2.Length > 1) {
                     for (int j = 1; j < xSplit2.Length; j++) {
@@ -41,7 +41,7 @@ namespace Cosmos.Debug.GDB {
 
             public override string ToString() {
                 // First char reserved for breakpoint (*)
-                return "  " + (mAddr.ToString("X8") + ":  " + mOp + " " + mData).TrimEnd();
+                return "  " + mAddr.ToString("X8") + ":  " + mOp + " " + mData.TrimEnd();
             }
         }
 
@@ -53,10 +53,11 @@ namespace Cosmos.Debug.GDB {
                 var xCmdLine = aResponse.Command.ToLower();
                 if (xCmdLine == "info registers") {
                     Windows.mRegistersForm.UpdateRegisters(aResponse);
+					Windows.UpdateAfterRegisterUpdate();
                 } else if (xCmdLine == "") {
                     // This happens on initial connect
                 } else {
-					var xCmdParts = xCmdLine.Split(" ".ToCharArray());
+					var xCmdParts = xCmdLine.Split(Global.SpaceSeparator);
                     var xCmd = xCmdParts[0];
                     if (xCmd == "disassemble") {
                         OnDisassemble(aResponse);
@@ -73,6 +74,7 @@ namespace Cosmos.Debug.GDB {
                     } else if (xCmd == "break") {
                         Windows.mBreakpointsForm.OnBreak(aResponse);
 					} else if (xCmd.StartsWith("x/")) {
+						Windows.mWatchesForm.OnWatchUpdate(aResponse);
                     } else {
                         throw new Exception("Unrecognized command response: " + aResponse.Command);
                     }
@@ -97,7 +99,7 @@ namespace Cosmos.Debug.GDB {
                 // In some cases GDB might return no results. This is common when no symbols are loaded.
                 if (xResult.Count > 0) {
                     // Get function name
-                    var xSplit = GDB.Unescape(xResult[0]).Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+					var xSplit = GDB.Unescape(xResult[0]).Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
                     mFuncName = xSplit[xSplit.Length - 1];
                     lablCurrentFunction.Text = mFuncName;
 
@@ -148,6 +150,7 @@ namespace Cosmos.Debug.GDB {
                 return;
             }
             mitmConnect.Enabled = false;
+			butnConnect.Enabled = false;
 
             Windows.CreateForms();
             Global.AsmSource = new AsmFile(Path.Combine(Settings.OutputPath, Settings.AsmFile));
@@ -235,8 +238,7 @@ namespace Cosmos.Debug.GDB {
             this.Activate();
         }
 
-        private void mitmWindowsToForeground_Click(object sender, EventArgs e)
-        {
+        private void mitmWindowsToForeground_Click(object sender, EventArgs e) {
             BringWindowsToTop();
         }
 

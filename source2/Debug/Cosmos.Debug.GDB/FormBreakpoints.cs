@@ -21,18 +21,18 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
-        public bool AddBreakpoint(string aLabel) {
-            string s = aLabel.Trim();
-            if (s.Length > 0) {
-                Global.GDB.SendCmd("break " + s);
+        public void AddBreakpoint(string aLabel) {
+			var xS = aLabel.Trim();
+            if (xS.Length > 0) {
+                Global.GDB.SendCmd("break " + xS);
             }
-            return false;
         }
 
         public void OnDelete(GDB.Response aResponse) {
             var xSplit = aResponse.Reply.Split(' ');
             int xID = int.Parse(xSplit[1]);
             var xUC = mBreakpoints[xID];
+			mBreakpoints.Remove(xID);
 
             // Delete UC
             Controls.Remove(xUC);
@@ -53,10 +53,10 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void OnBreak(GDB.Response aResponse) {
-            var xCmdParts = aResponse.Command.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+			var xCmdParts = aResponse.Command.Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             string xLabel = xCmdParts[1];
 
-            var xSplit = aResponse.Text[0].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+			var xSplit = aResponse.Text[0].Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (xSplit[0].ToLower() == "breakpoint") {
                 // http://stackoverflow.com/questions/27674/dynamic-top-down-list-of-controls-in-windowsforms-and-c
                 var xUC = new BreakpointUC();
@@ -76,8 +76,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void butnBreakpointAdd_Click(object sender, EventArgs e) {
-            string xLabel = textBreakpoint.Text.Trim();
-            AddBreakpoint(xLabel);
+            AddBreakpoint(textBreakpoint.Text);
             textBreakpoint.Clear();
         }
 
@@ -91,6 +90,5 @@ namespace Cosmos.Debug.GDB {
             e.Cancel = true;
             Hide();
         }
-
     }
 }

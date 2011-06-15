@@ -14,8 +14,8 @@ namespace Cosmos.Debug.GDB {
             public readonly string Label;
 
             public CallStack(string aInput) {
-                var xSplit = aInput.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                Address = Global.FromHex(xSplit[1]);
+				var xSplit = aInput.Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+                Address = Global.FromHexWithLeadingZeroX(xSplit[1]);
                 Label = xSplit[3];
             }
 
