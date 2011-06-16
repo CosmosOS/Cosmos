@@ -175,7 +175,7 @@ namespace Cosmos.Hardware.BlockDevice {
       //sectors in 28-bit addressing and shall not exceed 0FFFFFFFh.  The content of words (61:60) shall
       //be greater than or equal to one and less than or equal to 268,435,455.
       // We need 28 bit addressing - small drives on VMWare and possibly other cases are 28 bit
-      mBlockCount = (UInt32)(xBuff[61] << 16 | xBuff[60]) - 1;
+	  mBlockCount = ((UInt32)xBuff[61] << 16 | xBuff[60]) - 1;
 
       //Words (103:100) shall contain the value one greater than the total number of user-addressable
       //sectors in 48-bit addressing and shall not exceed 0000FFFFFFFFFFFFh.
@@ -183,13 +183,11 @@ namespace Cosmos.Hardware.BlockDevice {
       //supported. IDENTIFY DEVICE bit 10 word 83 indicates support for 48-bit addressing.
       bool xLba48Capable = (xBuff[83] & 0x400) != 0;
       if (xLba48Capable) {
-        //TODO:UInt64
-        mBlockCount = ((UInt32)(xBuff[102] << 32 | xBuff[101] << 16 | xBuff[100])) - 1;
+		  mBlockCount = ((UInt64)xBuff[102] << 32 | (UInt64)xBuff[101] << 16 | (UInt64)xBuff[100]) - 1;
       }
     }
 
-    //TODO:UInt64
-    protected void SelectSector(UInt32 aSectorNo, UInt32 aSectorCount) {
+    protected void SelectSector(UInt64 aSectorNo, UInt32 aSectorCount) {
       CheckBlockNo(aSectorNo, aSectorCount);
       //TODO: Check for 48 bit sectorno mode and select 48 bits
       SelectDrive((byte)(aSectorNo >> 24));
@@ -199,16 +197,17 @@ namespace Cosmos.Hardware.BlockDevice {
       IO.LBA0.Byte = (byte)(aSectorNo & 0xFF);
       IO.LBA1.Byte = (byte)((aSectorNo & 0xFF00) >> 8);
       IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
+		//TODO LBA3  ...
     }
 
-    public override void ReadBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData) {
+    public override void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData) {
       CheckDataSize(aData, aBlockCount);
       SelectSector(aBlockNo, aBlockCount);
       SendCmd(Cmd.ReadPio);
       IO.Data.Read16(aData);
     }
 
-    public override void WriteBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData) {
+    public override void WriteBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData) {
       CheckDataSize(aData, 1);
       SelectSector(aBlockNo, 1);
       SendCmd(Cmd.WritePio);
@@ -223,6 +222,5 @@ namespace Cosmos.Hardware.BlockDevice {
 
       SendCmd(Cmd.CacheFlush);
     }
-
   }
 }

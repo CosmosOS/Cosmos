@@ -145,8 +145,7 @@ namespace Cosmos.System.Filesystem.FAT {
     }
 
     public void ReadCluster(UInt32 aCluster, byte[] aData) {
-      //TODO:UInt64
-      UInt32 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
+      UInt64 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
       mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
     }
 

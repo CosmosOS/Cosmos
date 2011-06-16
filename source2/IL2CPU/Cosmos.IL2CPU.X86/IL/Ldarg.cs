@@ -54,11 +54,11 @@ namespace Cosmos.IL2CPU.X86.IL
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
               xOffset += xSize;
             }
-            uint xExtraSize = 0;
+
             if (xReturnSize > xCurArgSize) {
-              xExtraSize = xCurArgSize - xReturnSize;
+				uint xExtraSize = xReturnSize - xCurArgSize;
+				xOffset += xExtraSize;
             }
-            xOffset += xExtraSize;
 
             return (int)(xOffset + xCurArgSize - 4);
           } else {
@@ -72,11 +72,11 @@ namespace Cosmos.IL2CPU.X86.IL
               xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
             }
             xReturnSize = 0;
-            uint xExtraSize = 0;
+
             if (xReturnSize > xArgSize) {
-              xExtraSize = xArgSize - xReturnSize;
+				uint xExtraSize = xReturnSize - xArgSize;
+				xOffset += xExtraSize;
             }
-            xOffset += xExtraSize;
 
             return (int)(xOffset + xCurArgSize - 4);
           }
@@ -108,7 +108,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new Push {
               DestinationReg = Registers.EBP,
               DestinationIsIndirect = true,
-              DestinationDisplacement = (int)(xDisplacement - ((i) * 4))
+              DestinationDisplacement = (int)(xDisplacement - (i * 4))
             };
           }
           Assembler.Stack.Push(xArgSize, xArgType);

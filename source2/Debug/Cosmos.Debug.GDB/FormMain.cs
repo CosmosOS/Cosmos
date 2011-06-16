@@ -85,8 +85,8 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void Disassemble(string aLabel) {
-            lablCurrentFunction.Text = string.Empty;
-            lablCurrentFunction.Visible = true;
+            textCurrentFunction.Text = string.Empty;
+            textCurrentFunction.Visible = true;
             Global.GDB.SendCmd("disassemble " + aLabel.TrimEnd());
         }
 
@@ -101,7 +101,7 @@ namespace Cosmos.Debug.GDB {
                     // Get function name
 					var xSplit = GDB.Unescape(xResult[0]).Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
                     mFuncName = xSplit[xSplit.Length - 1];
-                    lablCurrentFunction.Text = mFuncName;
+                    textCurrentFunction.Text = mFuncName;
 
                     // 1 and -2 to eliminate header and footer line
                     for (int i = 1; i <= xResult.Count - 2; i++) {
@@ -275,5 +275,14 @@ namespace Cosmos.Debug.GDB {
         private void butnBreakpoints_Click(object sender, EventArgs e) {
             mitmViewBreakpoints.PerformClick();
         }
+
+		private void textCurrentFunction_TextChanged(object sender, EventArgs e) {
+			base.OnTextChanged(e);
+
+			using (Graphics g = textCurrentFunction.CreateGraphics()) {
+				SizeF size = g.MeasureString(textCurrentFunction.Text, textCurrentFunction.Font);
+				textCurrentFunction.Width = (int)size.Width + textCurrentFunction.Padding.Horizontal;
+			}
+		}
     }
 }

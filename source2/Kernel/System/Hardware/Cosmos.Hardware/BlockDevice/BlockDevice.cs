@@ -18,40 +18,37 @@ namespace Cosmos.Hardware.BlockDevice {
       return new byte[aBlockCount * mBlockSize];
     }
     
-    //TODO:UInt64
-    protected UInt32 mBlockCount = 0;
-    public UInt32 BlockCount {
+    protected UInt64 mBlockCount = 0;
+    public UInt64 BlockCount {
       get { return mBlockCount; }
     }
 
-    //TODO:UInt64
-    protected UInt32 mBlockSize = 0;
-    public UInt32 BlockSize {
-      get { return mBlockSize; }
+    protected UInt64 mBlockSize = 0;
+    public UInt64 BlockSize {
+      get {
+		  var xkSize = mBlockSize;
+		  
+		  return mBlockSize; }
     }
 
-    //TODO:UInt64
     // Only allow reading and writing whole blocks becuase many of the hardware
     // command work that way and we dont want to add complexity at the BlockDevice level.
-    public abstract void ReadBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData);
-    //TODO:UInt64
-    public abstract void WriteBlock(UInt32 aBlockNo, UInt32 aBlockCount, byte[] aData);
+    public abstract void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
+    public abstract void WriteBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
 
     protected void CheckDataSize(byte[] aData, UInt32 aBlockCount) {
       var xBlockSize = mBlockSize;
       var xDataLength = aData.Length;
       var xDataSize = aBlockCount * mBlockSize;
-      if (aData.Length != aBlockCount * mBlockSize) {
+      if ((ulong)aData.Length != aBlockCount * mBlockSize) {
         throw new Exception("Invalid data size.");
       }
     }
 
-    //TODO:UInt64
-    protected void CheckBlockNo(UInt32 aBlockNo, UInt32 aBlockCount) {
+    protected void CheckBlockNo(UInt64 aBlockNo, UInt32 aBlockCount) {
       if (aBlockNo + aBlockCount >= mBlockCount) {
         throw new Exception("Invalid block number.");
       }
     }
-
   }
 }

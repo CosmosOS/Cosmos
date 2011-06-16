@@ -51,7 +51,7 @@
 			this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
 			this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
 			this.panel4 = new System.Windows.Forms.Panel();
-			this.lablCurrentFunction = new System.Windows.Forms.Label();
+			this.textCurrentFunction = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.lboxDisassemble = new System.Windows.Forms.ListBox();
 			this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -291,7 +291,7 @@
 			// 
 			// panel4
 			// 
-			this.panel4.Controls.Add(this.lablCurrentFunction);
+			this.panel4.Controls.Add(this.textCurrentFunction);
 			this.panel4.Controls.Add(this.label5);
 			this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
 			this.panel4.Location = new System.Drawing.Point(0, 54);
@@ -299,15 +299,17 @@
 			this.panel4.Size = new System.Drawing.Size(589, 32);
 			this.panel4.TabIndex = 12;
 			// 
-			// lablCurrentFunction
+			// textCurrentFunction
 			// 
-			this.lablCurrentFunction.AutoSize = true;
-			this.lablCurrentFunction.Location = new System.Drawing.Point(102, 7);
-			this.lablCurrentFunction.Name = "lablCurrentFunction";
-			this.lablCurrentFunction.Size = new System.Drawing.Size(35, 13);
-			this.lablCurrentFunction.TabIndex = 1;
-			this.lablCurrentFunction.Text = "label9";
-			this.lablCurrentFunction.Visible = false;
+			this.textCurrentFunction.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.textCurrentFunction.Location = new System.Drawing.Point(102, 7);
+			this.textCurrentFunction.Name = "textCurrentFunction";
+			this.textCurrentFunction.ReadOnly = true;
+			this.textCurrentFunction.Size = new System.Drawing.Size(57, 13);
+			this.textCurrentFunction.TabIndex = 1;
+			this.textCurrentFunction.Text = "_function_";
+			this.textCurrentFunction.Visible = false;
+			this.textCurrentFunction.TextChanged += new System.EventHandler(this.textCurrentFunction_TextChanged);
 			// 
 			// label5
 			// 
@@ -409,7 +411,7 @@
         private System.Windows.Forms.Label lablRunning;
         private System.Windows.Forms.ToolStripMenuItem mitmSave;
         private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.Label lablCurrentFunction;
+        private System.Windows.Forms.TextBox textCurrentFunction;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ListBox lboxDisassemble;
         private System.Windows.Forms.ContextMenuStrip menuDisassembly;

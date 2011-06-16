@@ -38,52 +38,45 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 // return the this parameter, which is not in .GetParameters()
                 var xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
-                for (int i = xParams.Length - 1; i >= aParam; i--)
-                {
+                for (int i = xParams.Length - 1; i >= aParam; i--) {
                     var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
                     xOffset += xSize;
                 }
-                uint xExtraSize = 0;
-                if (xReturnSize > xCurArgSize)
-                {
-                    xExtraSize = xCurArgSize - xReturnSize;
+                if (xReturnSize > xCurArgSize) {
+                    uint xExtraSize = xReturnSize - xCurArgSize;
+					xOffset += xExtraSize;
                 }
-                xOffset += xExtraSize;
 
                 return (int)(xOffset);
             }
             else
             {
-                for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--)
-                {
+                for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--) {
                     var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
                     xOffset += xSize;
                 }
                 var xCurArgSize = Align(SizeOfType(xParams[xCorrectedOpValValue].ParameterType), 4);
                 uint xArgSize = 0;
-                foreach (var xParam in xParams)
-                {
+                foreach (var xParam in xParams) {
                     xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
                 }
                 xReturnSize = 0;
-                uint xExtraSize = 0;
-                if (xReturnSize > xArgSize)
-                {
-                    xExtraSize = xArgSize - xReturnSize;
+
+                if (xReturnSize > xArgSize) {
+					uint xExtraSize = xReturnSize - xArgSize;
+					xOffset += xExtraSize;
                 }
-                xOffset += xExtraSize;
 
                 return (int)(xOffset);
             }
         }
-
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xOpVar = (OpVar)aOpCode;
             var xDisplacement = Ldarga.GetArgumentDisplacement(aMethod, xOpVar.Value);
             new Move {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
-            new Move{DestinationReg = RegistersEnum.EAX, SourceReg=RegistersEnum.EBP };
+            new Move{DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
             new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
             new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
 

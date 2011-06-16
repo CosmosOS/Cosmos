@@ -16,8 +16,7 @@ namespace Cosmos.System.Filesystem.FAT {
     // Example, a 100 MB file will require 2MB for this structure. That is
     // probably acceptable for the mid term future.
     protected List<UInt32> mFatTable;
-    //TODO:UInt64
-    protected UInt32? mReadBufferPosition;
+    protected UInt64? mReadBufferPosition;
 
     public FatStream(Listing.FatFile aFile) {
       mFile = aFile;
@@ -42,22 +41,28 @@ namespace Cosmos.System.Filesystem.FAT {
     }
 
     public override long Length {
-      get { return mFile.Size; }
+      get { return (long)mFile.Size; }
     }
 
-    protected UInt32 mPosition;
+    protected UInt64 mPosition;
     public override long Position {
       get {
-        return mPosition;
+        return (long)mPosition;
       }
       set {
-        mPosition = (UInt32)value;
+		if (value < 0L) {
+		  throw new ArgumentOutOfRangeException("value");
+		}
+        mPosition = (ulong)value;
       }
     }
 
     public override int Read(byte[] aBuffer, int aOffset, int aCount) {
-      if (aOffset < 0 || aCount < 0) {
-        throw new ArgumentOutOfRangeException();
+      if (aCount < 0) {
+        throw new ArgumentOutOfRangeException("aCount");
+	  }
+	  else if (aOffset < 0) {
+		throw new ArgumentOutOfRangeException("aOffset");
 	  }
 	  else if(aBuffer == null || aBuffer.Length - aOffset < aCount) {
         throw new ArgumentException("Invalid offset length!");
@@ -71,32 +76,33 @@ namespace Cosmos.System.Filesystem.FAT {
 
 	  // reduce count, so that no out of bound exception occurs if not existing
 	  // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
-	  uint xMaxReadableBytes = mFile.Size - mPosition;
-	  if (aCount > xMaxReadableBytes)
-		  aCount = (int)xMaxReadableBytes;
+	  ulong xMaxReadableBytes = mFile.Size - mPosition;
+	  ulong xCount = (ulong)aCount;
+	  if (xCount > xMaxReadableBytes)
+		  xCount = xMaxReadableBytes;
 
       var xCluster = mFS.NewClusterArray();
       UInt32 xClusterSize = mFS.BytesPerCluster;
 
-      while (aCount > 0) {
-        UInt32 xClusterIdx = mPosition / xClusterSize;
-        UInt32 xPosInCluster = mPosition % xClusterSize;
+      while (xCount > 0) {
+        UInt64 xClusterIdx = mPosition / xClusterSize;
+        UInt64 xPosInCluster = mPosition % xClusterSize;
         mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
-        int xReadSize;
-        if (xPosInCluster + aCount > xClusterSize) {
-          xReadSize = (int)(xClusterSize - xPosInCluster - 1);
+        long xReadSize;
+        if (xPosInCluster + xCount > xClusterSize) {
+		  xReadSize = (long)(xClusterSize - xPosInCluster - 1);
         } else {
-          xReadSize = aCount;
+          xReadSize = (long)xCount;
         }
-        // (int) casts are needed so we use the 32 bit version of the copy since the 64 bit arg
-        // version is not supported currently.
-        Array.Copy(xCluster, (int)xPosInCluster, aBuffer, (int)aOffset, (int)xReadSize);
-        aOffset = aOffset + xReadSize;
-        aCount = aCount - xReadSize;
+		Array.Copy(xCluster, (int)xPosInCluster, aBuffer, (int)aOffset, (int)xReadSize);
+        //TODO Array.Copy(xCluster, (long)xPosInCluster, aBuffer, (long)aOffset, xReadSize);
+		//TODO for Kudzu: should aOffset replaced by a local Int64?
+        aOffset = (int)(aOffset + xReadSize);
+        xCount -= (ulong)xReadSize;
       }
 
-	  mPosition += (uint)aOffset;
-      return (int)aOffset;
+	  mPosition += (ulong)aOffset;
+      return aOffset;
 	}
 
     public override void Flush() {
