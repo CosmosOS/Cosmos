@@ -59,6 +59,10 @@
   <ItemGroup>
     <Compile Include="BoundingBox.cs" />
     <Compile Include="Drivers\VGADriver.cs" />
+    <Compile Include="FontSupport\Font.cs" />
+    <Compile Include="FontSupport\FontCharacter.cs" />
+    <Compile Include="FontSupport\FontCharacterSet.cs" />
+    <Compile Include="FontSupport\OPFF.cs" />
     <Compile Include="GraphicsDriver.cs" />
     <Compile Include="GraphicsMode.cs" />
     <Compile Include="GraphicsPlugs.cs">
@@ -95,6 +99,7 @@
       <Name>Cosmos.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -76,7 +76,7 @@ namespace GuessKernel
             double diff = (guess * guess) - number;
             Cosmos.System.Global.Console.WriteLine("Num of Iterations: 0 , estimate: " + guess.ToString());
             int counter = 1;
-            while (Math.Abs(diff) > precision && counter <= 100)
+            while (Math.Abs(diff) > precision && counter <= 20)
             {
                 guess = (guess - diff) / (2 * guess);
                 diff = (guess * guess) - number;
@@ -140,15 +140,15 @@ namespace GuessKernel
             v = new Vec2(150, 100);
             s.Taskbar.DrawCircleOutline(v, 10, (uint)8);
 
-            int i1 = 4;
-            int i2 = 9;
-            int i3 = 5;
-            double i1r = Sqrt(i1);
-            double i2r = Sqrt(i2);
-            double i3r = Sqrt(i3);
-            Cosmos.System.Global.Console.WriteLine("The Square root of 4 is: '" + i1r.ToString() + "'");
-            Cosmos.System.Global.Console.WriteLine("The Square root of 9 is: '" + i2r.ToString() + "'");
-            Cosmos.System.Global.Console.WriteLine("The Square root of 5 is: '" + i3r.ToString() + "'");
+            //int i1 = 4;
+            //int i2 = 9;
+            //int i3 = 5;
+            //double i1r = Sqrt(i1);
+            //double i2r = Sqrt(i2);
+            //double i3r = Sqrt(i3);
+            //Cosmos.System.Global.Console.WriteLine("The Square root of 4 is: '" + i1r.ToString() + "'");
+            //Cosmos.System.Global.Console.WriteLine("The Square root of 9 is: '" + i2r.ToString() + "'");
+            //Cosmos.System.Global.Console.WriteLine("The Square root of 5 is: '" + i3r.ToString() + "'");
 
             //Vec2 lp = new Vec2(175, 50);
             //Vec2 rp = new Vec2(225, 50);
@@ -159,11 +159,10 @@ namespace GuessKernel
             //tp = new Vec2(210, 150);
             //s.Taskbar.DrawTriangle(lp, rp, tp, 4);
 
-            //c.DrawPolygon(new Vec2[] { new Vec2(100, 50), new Vec2(150, 50), new Vec2(175, 75), new Vec2(175, 125), new Vec2(150, 150), new Vec2(100, 150), new Vec2(75, 125), new Vec2(75, 75) }, (uint)4);
+            //s.Taskbar.DrawPolygon(new Vec2[] { new Vec2(100, 50), new Vec2(150, 50), new Vec2(175, 75), new Vec2(175, 125), new Vec2(150, 150), new Vec2(100, 150), new Vec2(75, 125), new Vec2(75, 75) }, (uint)4);
             
             while (true)
             {
-
                 Tick++;
                 //m.HandleMouse();
 
@@ -229,8 +228,8 @@ namespace GuessKernel
                 //s.Taskbar.DrawCircle(v, 20, (uint)16);
                 //s.DrawCircleOutline(new Vec2(150, 100), 20, (uint)8);
                 //s.DrawCircleOutline(new Vec2(Mouse.X, Mouse.Y), 15, (uint)16);
-                //s.DrawElipticalArc(new Vec2(200, 100), 30, 10, 10, 300, (uint)4);
-                //s.DrawRectangle(new Vec2(120, 80), new Vec2(80, 140), (uint)238);
+                //s.Taskbar.DrawElipticalArc(v, 30, 10, 10, 300, (uint)90);
+                s.Taskbar.DrawRectangle(new Vec2(120, 80), new Vec2(80, 140), (uint)238);
 
 
 
