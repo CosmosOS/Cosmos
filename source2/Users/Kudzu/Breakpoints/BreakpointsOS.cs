@@ -92,6 +92,15 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
+      Test xTest;
+
+      xTest = new Int64Test();
+      xTest.Run();
+
+      TestATA();
+    }
+
+    protected void TestATA() {
       //try {
       //Trace1();
       //TestSB(); Stop(); return;
