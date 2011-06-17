@@ -246,29 +246,10 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="186-188AndUp\" />
-    <Folder Include="286Exclusive\" />
-    <Folder Include="386Exclusive\" />
     <Folder Include="3DNow!2\Geode\" />
-    <Folder Include="3DNow!\" />
-    <Folder Include="8086Exclusive\" />
-    <Folder Include="AMD-MMX\" />
-    <Folder Include="AMD-V_AndUp\" />
     <Folder Include="bin\Debug\" />
-    <Folder Include="Cyrix-EMMX\" />
-    <Folder Include="K6-2AndUp\" />
-    <Folder Include="MMX\" />
     <Folder Include="obj\Debug\TempPE\" />
-    <Folder Include="PentiumAndUp\" />
-    <Folder Include="PentiumMMXAndUp\" />
-    <Folder Include="PentiumProAndUp\" />
-    <Folder Include="SSE4a\" />
-    <Folder Include="SSE4dot1\" />
-    <Folder Include="SSE4dot2\" />
-    <Folder Include="SSSE3\" />
-    <Folder Include="VTAndUp\" />
     <Folder Include="x87\_Infra\" />
-    <Folder Include="X\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

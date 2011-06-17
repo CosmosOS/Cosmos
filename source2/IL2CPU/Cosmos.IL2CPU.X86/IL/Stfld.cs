@@ -56,6 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.Registers.EAX };
           }
+
           switch (xSize % 4) {
             case 1: {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -67,7 +68,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
                 break;
               }
-
             case 3: //TODO 
               throw new NotImplementedException();
               break;
@@ -77,6 +77,7 @@ namespace Cosmos.IL2CPU.X86.IL
             default:
               throw new Exception("Remainder size " + (xSize % 4) + " not supported!");
           }
+
 #if! SKIP_GC_CODE
           if (aNeedsGC) {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
