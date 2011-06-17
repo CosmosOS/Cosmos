@@ -15,9 +15,26 @@ namespace BreakpointsKernel {
     public virtual UInt32? Size {
       get { return mSize; }
     }
+
+    void FieldTest() {
+      mSize = 7;
+      bool xHasValue = mSize.HasValue; // .HasValue is false
+    }
     
     public override void Run() {
       UInt32 x = 32;
+
+      FieldTest();
+
+      mSize = 7;
+      bool xHasValue = mSize.HasValue; // .HasValue is false
+      Chk(xHasValue);
+      x = mSize.Value;
+      if (mSize.Value == 7) {
+        int i = 5;
+      }
+      Chk(mSize.Value == 7); // Dies with 0x05 here
+
       UInt32? y = x;
       Chk(y.HasValue);
       Chk(y.Value == 32);
@@ -30,14 +47,6 @@ namespace BreakpointsKernel {
       UInt32? y3 = x2;
       Chk(y3.Value == 64);
 
-      mSize = 7;
-      bool xHasValue = mSize.HasValue; // .HasValue is false
-      Chk(xHasValue);
-      x = mSize.Value;
-      if (mSize.Value == 7) {
-        int i = 5;
-      }
-      Chk(mSize.Value == 7); // Dies with 0x05 here
     }
 
   }
