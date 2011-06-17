@@ -94,8 +94,9 @@ namespace Cosmos.System.Filesystem.FAT {
         } else {
           xReadSize = (long)xCount;
         }
-		Array.Copy(xCluster, (int)xPosInCluster, aBuffer, (int)aOffset, (int)xReadSize);
-        //TODO Array.Copy(xCluster, (long)xPosInCluster, aBuffer, (long)aOffset, xReadSize);
+		// no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
+		// or we do a semantic change here
+		Array.Copy(xCluster, (int)xPosInCluster, aBuffer, aOffset, (int)xReadSize);
 		//TODO for Kudzu: should aOffset replaced by a local Int64?
         aOffset = (int)(aOffset + xReadSize);
         xCount -= (ulong)xReadSize;
