@@ -11,7 +11,12 @@ namespace BreakpointsKernel {
   // If you comment out the x2 and y2 you will see 32 instead.
   // How to reproduce this outside of this changeset? Cant seem to repro it here.
 
-  public override void Run() {
+    protected UInt32? mSize;
+    public virtual UInt32? Size {
+      get { return mSize; }
+    }
+    
+    public override void Run() {
       UInt32 x = 32;
       UInt32? y = x;
       Chk(y.Value == 32);
@@ -23,6 +28,9 @@ namespace BreakpointsKernel {
 
       UInt32? y3 = x2;
       Chk(y3.Value == 64);
+
+      mSize = 7;
+      Chk(mSize.Value == 7); // Dies with 0x05 here
     }
 
   }
