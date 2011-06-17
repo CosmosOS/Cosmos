@@ -67,7 +67,10 @@
   <ItemGroup>
     <Compile Include="BreakpointsOS.cs" />
     <Compile Include="Int64Test.cs" />
+    <Compile Include="NullableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringBuilderTest.cs" />
+    <Compile Include="StringTest.cs" />
     <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>

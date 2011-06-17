@@ -14,6 +14,18 @@ namespace BreakpointsKernel {
       ClearScreen = false;
     }
 
+    protected override void Run() {
+      Test xTest;
+
+      xTest = new NullableTest();
+      xTest.Run();
+
+      xTest = new Int64Test();
+      xTest.Run();
+
+      TestATA();
+    }
+
     protected override void BeforeRun() {
       Console.WriteLine("Cosmos boot complete.");
     }
@@ -60,25 +72,6 @@ namespace BreakpointsKernel {
       Console.ReadLine();
     }
 
-    void TestNullableTypes() {
-      Console.WriteLine();
-
-      UInt32 x = 32;
-      UInt32? y = x;
-      Console.WriteLine(x);
-      Console.WriteLine(y.Value);
-
-      UInt32 x2 = 64;
-      UInt32? y2 = x2;
-      Console.WriteLine(x2);
-      Console.WriteLine(y2.Value);
-
-      UInt32? y3 = x2;
-      Console.WriteLine(y3.Value);
-
-      Console.ReadLine();
-    }
-
     void TestStringCtor() {
       char[] xChars = new char[5];
       xChars[0] = 'A';
@@ -89,15 +82,6 @@ namespace BreakpointsKernel {
       var xString = new string(xChars, 0, 3);
       Console.WriteLine(xString);
       Console.WriteLine(xString.Length);
-    }
-
-    protected override void Run() {
-      Test xTest;
-
-      xTest = new Int64Test();
-      xTest.Run();
-
-      TestATA();
     }
 
     protected void TestATA() {
