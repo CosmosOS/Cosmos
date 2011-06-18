@@ -21,16 +21,10 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Assembler aAssembler, MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC) {
-          
           var xType = aMethod.MethodBase.DeclaringType;
+          int xExtraOffset = aNeedsGC ? 12 : 0;
 
-          int xExtraOffset = 0;
-          if (aNeedsGC) {
-            xExtraOffset = 12;
-          }
-
-          if (aFieldId == "MatthijsTest.Program+TEst+MyStruct MatthijsTest.Program+TEst.mStruct")
-          {
+          if (aFieldId == "MatthijsTest.Program+TEst+MyStruct MatthijsTest.Program+TEst.mStruct") {
               Console.Write("");
           }
           var xFields = GetFieldsInfo(aDeclaringObject);
@@ -48,13 +42,16 @@ namespace Cosmos.IL2CPU.X86.IL
           uint xRoundedSize = Align(xSize, 4);
 
           new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
-          new CPUx86.Add {
-            DestinationReg = CPUx86.Registers.ECX,
-            SourceValue = (uint)(xActualOffset)
-          };
+          new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
+          //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
           for (int i = 0; i < (xSize / 4); i++) {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.Registers.EAX };
+            //TODO: Only do this add if we have more.. see below
+            // Add doenst work.. sub instead? I tried sub and even dec but get an "invalid size" when I run.
+            // Add at least stops the initial crash, but one happens later.... So progress and points to the fact that this is the area that needs patched..
+            // (although hasvalue returns 7...)
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
           }
 
           switch (xSize % 4) {
