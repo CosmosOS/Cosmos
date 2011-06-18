@@ -10,16 +10,12 @@ using System.Threading;
 namespace Cosmos.Debug.VSDebugEngine
 {
     // this class represents a module loaded in the debuggee process to the debugger. 
-    public class AD7Module : IDebugModule2, IDebugModule3
-    {
+    public class AD7Module : IDebugModule2, IDebugModule3 {
         //public readonly DebuggedModule DebuggedModule;
 
-        public AD7Module()//DebuggedModule debuggedModule)
-        {
+        public AD7Module() { //DebuggedModule debuggedModule) 
             //this.DebuggedModule = debuggedModule;
         }
-
-        #region IDebugModule2 Members
 
         // Gets the MODULE_INFO that describes this module.
         // This is how the debugger obtains most of the information about the module.
@@ -94,26 +90,18 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        #endregion
-
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
-
-        int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage)
-        {
+        int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage) {
             debugMessage = null;
             System.Diagnostics.Debug.Fail("This function is not called by the debugger.");
             return VSConstants.E_NOTIMPL;
         }
 
-        int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage)
-        {
+        int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage) {
             throw new NotImplementedException();
         }
-
         #endregion
-
-        #region IDebugModule3 Members
 
         // IDebugModule3 represents a module that supports alternate locations of symbols and JustMyCode states.
         // The sample does not support alternate symbol locations or JustMyCode, but it does not display symbol load information 
@@ -171,6 +159,5 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new NotImplementedException();
         }
 
-        #endregion
     }
 }

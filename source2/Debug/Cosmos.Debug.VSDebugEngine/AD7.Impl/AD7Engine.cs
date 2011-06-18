@@ -83,8 +83,6 @@ namespace Cosmos.Debug.VSDebugEngine
             return "";// EngineUtils.GetAddressDescription(module, ip);
         }
 
-        #region IDebugEngine2 Members
-
         // Attach the debug engine to a program. 
         int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason)
         {
@@ -302,10 +300,6 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        #endregion
-
-        #region IDebugEngineLaunch2 Members
-
         // Determines if a process can be terminated.
         int IDebugEngineLaunch2.CanTerminateProcess(IDebugProcess2 process)
         {
@@ -514,10 +508,6 @@ namespace Cosmos.Debug.VSDebugEngine
                 return EngineUtils.UnexpectedException(e);
             }
         }
-
-        #endregion
-
-        #region IDebugProgram2 Members
 
         // Determines if a debug engine (DE) can detach from the program.
         public int CanDetach()
@@ -731,10 +721,6 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-        #endregion
-
-        #region IDebugProgram3 Members
-
         // ExecuteOnThread is called when the SDM wants execution to continue and have 
         // stepping state cleared.
         public int ExecuteOnThread(IDebugThread2 pThread)
@@ -752,10 +738,6 @@ namespace Cosmos.Debug.VSDebugEngine
 
             return VSConstants.S_OK;
         }
-
-        #endregion
-
-        #region IDebugEngineProgram2 Members
 
         // Stops all threads running in this program.
         // This method is called when this program is being debugged in a multi-program environment. When a stopping event from some other program 
@@ -789,8 +771,6 @@ namespace Cosmos.Debug.VSDebugEngine
 
             return VSConstants.S_OK;
         }
-
-        #endregion
 
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented

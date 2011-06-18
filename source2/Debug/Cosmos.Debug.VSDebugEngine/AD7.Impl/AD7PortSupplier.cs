@@ -11,7 +11,6 @@ namespace Cosmos.Debug.VSDebugEngine
     [Guid("2BB39582-4B39-4211-ACCF-ECDABFFBE061")]
     public class AD7PortSupplier : IDebugPortSupplier2
     {
-        #region IDebugPortSupplier2 Members
 
         int IDebugPortSupplier2.AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
@@ -48,6 +47,5 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new NotImplementedException();
         }
 
-        #endregion
     }
 }

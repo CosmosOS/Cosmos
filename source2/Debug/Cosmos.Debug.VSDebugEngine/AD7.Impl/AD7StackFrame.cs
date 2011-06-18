@@ -399,15 +399,13 @@ namespace Cosmos.Debug.VSDebugEngine
         // Gets a description of the properties of a stack frame.
         // Calling the IDebugProperty2::EnumChildren method with appropriate filters can retrieve the local variables, method parameters, registers, and "this" 
         // pointer associated with the stack frame. The debugger calls EnumProperties to obtain these values in the sample.
-        int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property)
-        {
+        int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property) {
             throw new NotImplementedException();
         }
 
         // Gets the document context for this stack frame. The debugger will call this when the current stack frame is changed
         // and will use it to open the correct source document for this stack frame.
-        int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext)
-        {
+        int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext) {
             docContext = null;
             try
             {
@@ -441,8 +439,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // Generally, an expression evaluation context can be thought of as a scope for performing expression evaluation. 
         // Call the IDebugExpressionContext2::ParseText method to parse an expression and then call the resulting IDebugExpression2::EvaluateSync 
         // or IDebugExpression2::EvaluateAsync methods to evaluate the parsed expression.
-        int IDebugStackFrame2.GetExpressionContext(out IDebugExpressionContext2 ppExprCxt)
-        {
+        int IDebugStackFrame2.GetExpressionContext(out IDebugExpressionContext2 ppExprCxt) {
             ppExprCxt = (IDebugExpressionContext2)this;
             return VSConstants.S_OK;
         }
@@ -514,26 +511,19 @@ namespace Cosmos.Debug.VSDebugEngine
 
         #endregion
 
-        #region IDebugExpressionContext2 Members
-
         // Retrieves the name of the evaluation context. 
         // The name is the description of this evaluation context. It is typically something that can be parsed by an expression evaluator 
         // that refers to this exact evaluation context. For example, in C++ the name is as follows: 
         // "{ function-name, source-file-name, module-file-name }"
-        int IDebugExpressionContext2.GetName(out string pbstrName)
-        {
+        int IDebugExpressionContext2.GetName(out string pbstrName) {
             throw new NotImplementedException();
         }
 
         // Parses a text-based expression for evaluation.
         // The engine sample only supports locals and parameters so the only task here is to check the names in those collections.
-        int IDebugExpressionContext2.ParseText(string pszCode,
-                                                enum_PARSEFLAGS dwFlags,
-                                                uint nRadix,
-                                                out IDebugExpression2 ppExpr,
+        int IDebugExpressionContext2.ParseText(string pszCode, enum_PARSEFLAGS dwFlags, uint nRadix, out IDebugExpression2 ppExpr,
                                                 out string pbstrError,
-                                                out uint pichError)
-        {
+                                                out uint pichError) {
             //System.Windows.Forms.MessageBox.Show("pszCode: " + pszCode);
             pbstrError = "";
             pichError = 0;
@@ -579,7 +569,6 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        #endregion
     }
 }
 

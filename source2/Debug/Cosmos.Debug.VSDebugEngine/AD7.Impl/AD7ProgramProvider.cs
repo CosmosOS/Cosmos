@@ -17,8 +17,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         {
         }
 
-        #region IDebugProgramProvider2 Members
-
         // Obtains information about programs running, filtered in a variety of ways.
         int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray)
         {
@@ -79,6 +77,5 @@ namespace Cosmos.Debug.VSDebugEngine {
             return VSConstants.S_OK;
         }
 
-        #endregion
     }
 }

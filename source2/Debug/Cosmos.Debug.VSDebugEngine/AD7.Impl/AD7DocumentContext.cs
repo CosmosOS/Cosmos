@@ -15,7 +15,6 @@ namespace Cosmos.Debug.VSDebugEngine
         TEXT_POSITION m_endPos;
         AD7MemoryAddress m_codeContext;
 
-
         public AD7DocumentContext(string fileName, TEXT_POSITION begPos, TEXT_POSITION endPos, AD7MemoryAddress codeContext)
         {
             m_fileName = fileName;
