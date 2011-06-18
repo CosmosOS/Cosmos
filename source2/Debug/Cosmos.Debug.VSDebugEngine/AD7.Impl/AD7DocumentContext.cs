@@ -24,8 +24,6 @@ namespace Cosmos.Debug.VSDebugEngine
             m_codeContext = codeContext;
         }
 
-        #region IDebugDocumentContext2 Members
-
         // Compares this document context to a given array of document contexts.
         int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE Compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext)
         {
@@ -126,6 +124,5 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-        #endregion
     }
 }

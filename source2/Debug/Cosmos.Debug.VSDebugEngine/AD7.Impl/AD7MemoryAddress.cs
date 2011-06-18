@@ -27,8 +27,6 @@ namespace Cosmos.Debug.VSDebugEngine
             m_documentContext = docContext;
         }
 
-        #region IDebugMemoryContext2 Members
-
         // Adds a specified value to the current context's address to create a new context.
         public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress)
         {
@@ -177,10 +175,6 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        #endregion
-
-        #region IDebugCodeContext2 Members
-
         // Gets the document context for this code-context
         public int GetDocumentContext(out IDebugDocumentContext2 ppSrcCxt)
         {
@@ -202,6 +196,5 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        #endregion
     }
 }

@@ -19,8 +19,6 @@ namespace Cosmos.Debug.VSDebugEngine
             //m_var = var;
         }
 
-        #region IDebugExpression2 Members
-
         // This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
         int IDebugExpression2.Abort()
         {
@@ -45,6 +43,5 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        #endregion
     }
 }
