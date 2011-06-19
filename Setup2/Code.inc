@@ -20,6 +20,7 @@ var
 	__VBExpress2010ProjectTemplatePath: string;
   
 procedure InitializePaths;
+var __VisualStudioLocation : string;
 begin
   if __PathsInitialized then exit;
   __PathsInitialized := true;
@@ -41,7 +42,7 @@ begin
   __SDK_INSTALL_ROOT := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework,sdkInstallRootv1.1|}');
   __SDK2_INSTALL_ROOT := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework,sdkInstallRootv2.0|}');
   
-__NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework\policy\v4.0,30128|}') <> '';
+  __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework\policy\v4.0,30128|}') <> '';
 
   __NET_FRAMEWORK_SDK_INSTALLED := (__SDK2_INSTALL_ROOT <> '') or (__SDK_INSTALL_ROOT <> '');
   if __SDK2_INSTALL_ROOT<> '' then
@@ -53,14 +54,41 @@ __NET_FRAMEWORK4_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETF
   __VSNET2010_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\10.0,InstallDir|}');
   __VSNET2010 := __VSNET2010_PATH <> '';
   if __VSNET2010 then
-  __VSNET2010_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2010_PATH)+'..\..');
-  
-  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VCSExpress\10.0', 'UserProjectTemplatesLocation', __CSharpExpress2010ProjectTemplatePath);
-  StringChangeEx(__CSharpExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+    __VSNET2010_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2010_PATH)+'..\..');
+ 
+  if RegQueryStringValue(HKCU, 'Software\Microsoft\VCSExpress\10.0', 'UserProjectTemplatesLocation', __CSharpExpress2010ProjectTemplatePath) then
+  begin
+    StringChangeEx(__CSharpExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+  end
+  else
+  begin
+    if RegQueryStringValue(HKCU, 'Software\Microsoft\VCSExpress\10.0', 'VisualStudioLocation', __VisualStudioLocation) then
+    begin
+      StringChangeEx(__VisualStudioLocation, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+	  __CSharpExpress2010ProjectTemplatePath := __VisualStudioLocation + '\Templates\ProjectTemplates';
+    end
+    else
+    begin
+      __CSharpExpress2010ProjectTemplatePath := ExpandConstant('{userdocs}\Visual Studio 2010\Templates\ProjectTemplates');
+    end;
+  end;
 
-  RegQueryStringValue(HKCU, 'SOFTWARE\Microsoft\VBExpress\10.0', 'UserProjectTemplatesLocation', __VBExpress2010ProjectTemplatePath);
-  StringChangeEx(__VBExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
-
+  if RegQueryStringValue(HKCU, 'Software\Microsoft\VBExpress\10.0', 'UserProjectTemplatesLocation', __VBExpress2010ProjectTemplatePath) then
+  begin
+    StringChangeEx(__VBExpress2010ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+  end
+  else
+  begin
+    if RegQueryStringValue(HKCU, 'Software\Microsoft\VCSExpress\10.0', 'VisualStudioLocation', __VisualStudioLocation) then
+    begin
+      StringChangeEx(__VisualStudioLocation, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
+	  __VBExpress2010ProjectTemplatePath := __VisualStudioLocation + '\Templates\ProjectTemplates';
+    end
+    else
+    begin
+      __VBExpress2010ProjectTemplatePath := ExpandConstant('{userdocs}\Visual Studio 2010\Templates\ProjectTemplates');
+    end;
+  end;
 end;
 
 procedure DeInitializePaths;
@@ -82,19 +110,19 @@ end;
 function VSNET2010_PATH(dummy: string): string;
 begin
   InitializePaths;
-  result := __VSNET2010_PATH;
+  Result := __VSNET2010_PATH;
 end;
 
 function FRAMEWORK_INSTALL_ROOT(dummy: string): string;
 begin
   InitializePaths;
-  result := __FRAMEWORK_INSTALL_ROOT;
+  Result := __FRAMEWORK_INSTALL_ROOT;
 end;
 
 function FRAMEWORK64_INSTALL_ROOT(dummy: string): string;
 begin
   InitializePaths;
-  result := __FRAMEWORK64_INSTALL_ROOT;
+  Result := __FRAMEWORK64_INSTALL_ROOT;
 end;
 
 function booltostr(value: Boolean) : string;
@@ -107,17 +135,17 @@ end;
 
 function Csharp2010_Installed(dummy: string): Boolean;
 begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
+  Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}','Package');
 end;
 
 function Fsharp2010_Installed(dummy: string): Boolean;
 begin
-  result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}','Package');
+  Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}','Package');
 end;
 
 function Vb2010_Installed(dummy: string): Boolean;
 begin
-	result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
+  Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\10.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}','Package');
 end;
 
 function VS2010_REGISTRY_HIVE(dummy: string): string;
@@ -128,13 +156,13 @@ end;
 function VSNET2010_BASE_PATH(dummy: string): string;
 begin
   InitializePaths;
-  result := __VSNET2010_BASE_PATH;
+  Result := __VSNET2010_BASE_PATH;
 end;
 
 function VS10_BASE_PATH(dummy: string): string;
 begin
   InitializePaths;
-  result := __VSNET2010_BASE_PATH;
+  Result := __VSNET2010_BASE_PATH;
 end;
 
 
@@ -172,11 +200,8 @@ end;
 
 function IsCSharpExpress2010Installed(dummy: string): Boolean;
 begin
-	InitializePaths;
-	if (Length(Trim(__CSharpExpress2010ProjectTemplatePath)) > 0) then
-		Result := True
-	else
-		Result := False;
+	Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VCSExpress\10.0','InstallDir')
+		or RegValueExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VCSExpress\10.0','InstallDir');
 end;
 
 function GetCSharpExpress2010ProjectTemplatePath(dummy: string): string;
@@ -187,11 +212,8 @@ end;
 
 function IsVBExpress2010Installed(dummy: string) : Boolean;
 begin
-InitializePaths;
-	if (Length(Trim(__VBExpress2010ProjectTemplatePath))  > 0) then
-		Result := True
-	else
-		Result := False;
+	Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VBExpress\10.0','InstallDir')
+		or RegValueExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VBExpress\10.0','InstallDir');
 end;
 
 function GetVBExpress2010ProjectTemplatePath(dummy: string) : string;
@@ -204,8 +226,8 @@ function InitializeSetup: Boolean;
 begin
   if not VSNET2010 then begin
     MsgBox(ExpandConstant('Visual Studio 2010 not installed!'), MbError, MB_OK);
-    result := false;
+    Result := false;
     exit;
    end;
-  result := true;
+  Result := true;
 end;
