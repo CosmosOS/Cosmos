@@ -36,7 +36,8 @@ namespace Cosmos.Compiler.Debug {
     public const byte SendMemory = 10;
     public const byte StepOver = 11;
     public const byte StepOut = 12;
+    public const byte SendRegisters = 13;
     // Make sure this is always the last entry. Used by DebugStub to verify commands
-    public const byte Max = 13;
+    public const byte Max = 14;
   }
 }

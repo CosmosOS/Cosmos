@@ -142,7 +142,7 @@ namespace Cosmos.Debug.VSDebugEngine
             // We catch and resend data rather than using a second serial port because
             // while this would work fine in a VM, it puts extra requirements on the setup
             // when real hardware is used.
-            DebugWindows.Test("Test");
+            //DebugWindows.Test("Test");
         }
 
         public void OnException()//DebuggedThread thread, uint code)

@@ -34,6 +34,8 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugEIP", 0),
                 // the calling code's EBP value
                 new DataMember("DebugOriginalEBP", 0),
+                // Ptr to the push all data
+                //new DataMember("DebugPushAllPtr", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
                 
                 // If set non 0, on next trace a break will occur
@@ -180,28 +182,32 @@ namespace Cosmos.Compiler.DebugStub {
             Return();
         }
 
+        protected void WriteBytesToComPort(int xCount) {
+          for (int i = 1; i <= xCount; i++) {
+            Call("WriteByteToComPort");
+          }
+        }
+
         // Modifies: EAX, ESI
         protected void SendTrace() {
-            Label = "DebugStub_SendTrace";
+          Label = "DebugStub_SendTrace";
 
-            Memory["DebugStatus", 32].Compare(DebugStub.Status.Run);
-            JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
-            AL = (int)MsgType.BreakPoint;
-            Jump("DebugStub_SendTraceType");
+          Memory["DebugStatus", 32].Compare(DebugStub.Status.Run);
+          JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
+          AL = (int)MsgType.BreakPoint;
+          Jump("DebugStub_SendTraceType");
 
-            Label = "DebugStub_SendTrace_Normal";
-            AL = (int)MsgType.TracePoint;
+          Label = "DebugStub_SendTrace_Normal";
+          AL = (int)MsgType.TracePoint;
 
-            Label = "DebugStub_SendTraceType";
-            Call<DebugStub.WriteALToComPort>();
+          Label = "DebugStub_SendTraceType";
+          Call<DebugStub.WriteALToComPort>();
             
-            // Send Calling EIP.
-            ESI = AddressOf("DebugEIP");
-            Call("WriteByteToComPort");
-            Call("WriteByteToComPort");
-            Call("WriteByteToComPort");
-            Call("WriteByteToComPort");
-            Return();
+          // Send Calling EIP.
+          ESI = AddressOf("DebugEIP");
+          WriteBytesToComPort(4);
+
+          Return();
         }
 
         // Input: Stack
@@ -386,6 +392,7 @@ namespace Cosmos.Compiler.DebugStub {
             // IRQ reenabled, call secondary debug stub
             Label = "DebugStub_NoSTI";
             PushAll32();
+            //Memory["DebugPushAllPtr", 32] = ESP;
             // We just pushed all registers to the stack so we can use them
             // So we get the stack pointer and add 32. This skips over the
             // registers we just pushed.
