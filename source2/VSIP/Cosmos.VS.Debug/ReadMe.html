@@ -10,6 +10,11 @@
       because we deploy even at dev time with a setup.exe, we need to deploy it. VS 
       Tool Window packages use WPF UserControls though, so for now we use this 
       separate standalone EXE which uses WPF UserControls.</p>
+    <p>
+      This is also easier to debug because it can just be rebuilt without affecting 
+      Visual Studio. Maybe in the future the VSIP package can just reference this 
+      package to and use the user controls, so for debugging and development of this 
+      project, it could be used instead.</p>
 	
 	</body>
 </html>

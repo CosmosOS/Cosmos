@@ -119,6 +119,7 @@
     <Compile Include="AD7.Definitions\AD7Hresult.cs" />
     <Compile Include="AD7.Impl\AD7PendingBreakpoint.cs" />
     <Compile Include="AD7.Impl\DebugLocalInfo.cs" />
+    <Compile Include="DebugWindows.cs" />
     <Compile Include="Engine.Impl\BreakpointManager.cs" />
     <Compile Include="Engine.Impl\OperationThread.cs" />
     <Compile Include="AD7.Impl\AD7Engine.cs" />
