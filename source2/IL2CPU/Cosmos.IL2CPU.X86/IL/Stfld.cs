@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // Add doenst work.. sub instead? I tried sub and even dec but get an "invalid size" when I run.
             // Add at least stops the initial crash, but one happens later.... So progress and points to the fact that this is the area that needs patched..
             // (although hasvalue returns 7...)
-            //new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = 4 };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = 4 };
           }
 
           switch (xSize % 4) {

@@ -17,14 +17,13 @@ namespace Cosmos.Debug.VSDebugEngine {
             mEngine = aEngine;
         }
 
-        public void SetDebugConnector(DebugConnector aConnector)
-        {
+        public void SetDebugConnector(DebugConnector aConnector) {
             mDbgConnector = aConnector;
         }
       
         // A helper method used to construct a new pending breakpoint.
         public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, mEngine, this);
+            var pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, mEngine, this);
             ppPendingBP = (IDebugPendingBreakpoint2)pendingBreakpoint;
             mPendingBPs.Add(pendingBreakpoint);
         }
