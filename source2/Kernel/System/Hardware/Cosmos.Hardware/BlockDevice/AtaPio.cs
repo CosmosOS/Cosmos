@@ -204,7 +204,7 @@ namespace Cosmos.Hardware.BlockDevice {
       CheckDataSize(aData, aBlockCount);
       SelectSector(aBlockNo, aBlockCount);
       SendCmd(Cmd.ReadPio);
-      IO.Data.Read16(aData);
+      IO.Data.Read8(aData);
     }
 
     public override void WriteBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData) {
