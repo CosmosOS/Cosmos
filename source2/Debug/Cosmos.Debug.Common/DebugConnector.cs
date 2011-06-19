@@ -16,6 +16,7 @@ namespace Cosmos.Debug.Common
         public Action<string> CmdText;
         public Action CmdStarted;
         public Action<string> OnDebugMsg;
+        public Action<byte[]> CmdRegisters;
 
         protected byte mCurrentMsgType;
         public abstract void WaitConnect();
@@ -328,6 +329,9 @@ namespace Cosmos.Debug.Common
 
         protected void PacketRegisters(byte[] aPacket) {
           mData = aPacket.ToArray();
+          if (CmdRegisters != null) {
+            CmdRegisters(mData);
+          }
           WaitForMessage();
         }
 

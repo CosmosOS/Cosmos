@@ -127,6 +127,10 @@ namespace Cosmos.Debug.VSDebugEngine {
     public string mISO;
     public string mProjectFile;
 
+    protected void DbgCmdRegisters(byte[] aData) {
+      //DebugWindows.SendData(DwMsgType.Registers, aData);
+    }
+
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
       System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
       mCallback = aCallback;
@@ -196,7 +200,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDbgConnector.CmdText += new Action<string>(DbgCmdText);
       mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
       mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
-      mDbgConnector.ConnectionLost = new Action<Exception>(DbgConnector_ConnectionLost);
+      mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
+      mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
 
       System.Threading.Thread.Sleep(250);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
