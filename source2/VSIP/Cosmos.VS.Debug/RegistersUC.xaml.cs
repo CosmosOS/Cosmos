@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,22 +11,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace Cosmos.VS.Debug {
-  public partial class MainWindow : Window {
-
-    public MainWindow() {
+  /// <summary>
+  /// Interaction logic for RegistersUC.xaml
+  /// </summary>
+  public partial class RegistersUC : UserControl {
+    public RegistersUC() {
       InitializeComponent();
-
-      PipeThread.DataPacketReceived += new Action<string>(PipeThread_DataPacketReceived);
-      var xServerThread = new Thread(PipeThread.ThreadStartServer);
-      xServerThread.Start();
     }
-
-    void PipeThread_DataPacketReceived(string aData) {
-      listBox1.Items.Add(aData);
-    }
-
   }
 }

@@ -15,6 +15,11 @@
       Visual Studio. Maybe in the future the VSIP package can just reference this 
       package to and use the user controls, so for debugging and development of this 
       project, it could be used instead.</p>
+    <p>
+      For nearly all purposes this is better than our GDB client and nearly deprecates 
+      our GDB client. However our GDB client is important to retain for debuggin the 
+      DebugStub. DebugStub cannot debug itself, and even if it could, if its not 
+      working correctly then neither would this debug tool as it relies on DebugStub.</p>
 	
 	</body>
 </html>
