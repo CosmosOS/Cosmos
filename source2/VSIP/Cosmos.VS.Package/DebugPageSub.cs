@@ -50,6 +50,16 @@ namespace Cosmos.VS.Package {
                     IsDirty = true;
                 }
             };
+
+            checkStartCosmosASMDBG.CheckedChanged += delegate(Object sender, EventArgs e)
+            {
+                bool x = checkStartCosmosASMDBG.Checked;
+                if (x != mProps.StartCosmosASMDBG)
+                {
+                    mProps.StartCosmosASMDBG = x;
+                    IsDirty = true;
+                }
+            };
         }
 
         protected DebugProperties mProps = new DebugProperties();
@@ -66,6 +76,9 @@ namespace Cosmos.VS.Package {
 
             mProps.SetProperty("StartCosmosGDB", GetConfigProperty("StartCosmosGDB"));
             checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
+
+            mProps.SetProperty("StartCosmosASMDBG", GetConfigProperty("StartCosmosASMDBG"));
+            checkStartCosmosASMDBG.Checked = mProps.StartCosmosASMDBG;
 
             mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
             comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);

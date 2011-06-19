@@ -143,6 +143,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       //
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
+      //
+      var xASMDBGClient = false;
+      Boolean.TryParse(mDebugInfo["StartCosmosASMDBG"], out xASMDBGClient);
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
       if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWare")) {
@@ -220,21 +223,55 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // Launch GDB Client
       if (xGDBDebugStub && xGDBClient) {
-		if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe))
-		{
-          var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
-          xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
-          xPSInfo.UseShellExecute = false;
-          xPSInfo.RedirectStandardInput = false;
-          xPSInfo.RedirectStandardError = false;
-          xPSInfo.RedirectStandardOutput = false;
-          xPSInfo.CreateNoWindow = false;
-          Process.Start(xPSInfo);
-        }
-		else
-			MessageBox.Show(string.Format(
-				"The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
-				Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+          if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe))
+          {
+              var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
+              xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
+              xPSInfo.UseShellExecute = false;
+              xPSInfo.RedirectStandardInput = false;
+              xPSInfo.RedirectStandardError = false;
+              xPSInfo.RedirectStandardOutput = false;
+              xPSInfo.CreateNoWindow = false;
+              Process.Start(xPSInfo);
+          }
+          else
+          {
+              MessageBox.Show(string.Format(
+                  "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
+                  Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+          }
+       }
+
+      // Launch ASM Debug Client
+      if (xASMDBGClient)
+      {
+          int xSourceRoot = 0;
+          xSourceRoot = mISO.IndexOf("source2\\");
+          string xASMDebugPath = mISO.Substring(0, xSourceRoot);
+          if (File.Exists(Path.Combine(xASMDebugPath, "Build\\VSIP\\Cosmos.VS.Debug.exe")))
+          {
+              xASMDebugPath =  Path.Combine(xASMDebugPath, "Build\\VSIP\\Cosmos.VS.Debug.exe");
+          }
+          else if (File.Exists(Cosmos.Build.Common.CosmosPaths.DBGClientExe))
+          {
+              xASMDebugPath = Cosmos.Build.Common.CosmosPaths.DBGClientExe;
+          }
+          if (xASMDebugPath != "")
+          {
+              var xPSInfo = new ProcessStartInfo(xASMDebugPath);
+              xPSInfo.Arguments = "";
+              xPSInfo.UseShellExecute = false;
+              xPSInfo.RedirectStandardInput = false;
+              xPSInfo.RedirectStandardError = false;
+              xPSInfo.RedirectStandardOutput = false;
+              xPSInfo.CreateNoWindow = false;
+              Process.Start(xPSInfo);
+          }
+          else
+          {
+              MessageBox.Show("The ASM Debug-Client could not be found.",
+                "ASM Debug-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+          }
       }
     }
 
