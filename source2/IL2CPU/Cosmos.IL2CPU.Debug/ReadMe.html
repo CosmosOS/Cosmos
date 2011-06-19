@@ -9,9 +9,19 @@
             Cosmos.Debug contains common classes and enums that runs on both Windows and 
             Cosmos. The Debugger uses it to receive messages from the debugstub in Cosmos, 
             and Cosmos uses it to compile into the debug stub.</p>
+      <p>
+            References - The references should be absolutely minimal.....</p>
         <p>
             Because of this extreme care must be take of which assemblies are linked and 
             this assembly should not link in any other Cosmos assemblies.</p>
+      <p>
+            Cosmos.Compiler.Debug is a bit of misnomer, it should be renamed possibly in the 
+            future (Constants? Common?). It is used by:</p>
+      <ul>
+        <li>DebugStub (running in Cosmos)</li>
+        <li>Compiler (To communicate commands to the DebugStub over serial port)</li>
+        <li>Cosmos.VS.Debug - To contain commands used by both VSIP and the debug windows</li>
+      </ul>
 	
 	    <p>
             &nbsp;</p>
