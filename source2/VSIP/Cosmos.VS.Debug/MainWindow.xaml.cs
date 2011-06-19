@@ -23,10 +23,8 @@ namespace Cosmos.VS.Debug {
     }
 
     public void ThreadStartClient(object obj) {
-      using (var xPipe = new NamedPipeClientStream(".", "CosmosDebug", PipeDirection.In)) {
-        // The connect function will indefinately wait for the pipe to become available
-        // If that is not acceptable specify a maximum waiting time (in ms)
-        xPipe.Connect();
+      using (var xPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.In)) {
+        xPipe.WaitForConnection();
         using (var xReader = new StreamReader(xPipe)) {
           string xLine = xReader.ReadLine();
 

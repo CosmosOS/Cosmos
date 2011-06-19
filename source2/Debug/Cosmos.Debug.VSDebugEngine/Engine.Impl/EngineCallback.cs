@@ -139,6 +139,7 @@ namespace Cosmos.Debug.VSDebugEngine
             var eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
             var ad7Thread = (AD7Thread)thread;
             Send(eventObject, AD7BreakpointEvent.IID, ad7Thread);
+            DebugWindows.Test("Test");
         }
 
         public void OnException()//DebuggedThread thread, uint code)
