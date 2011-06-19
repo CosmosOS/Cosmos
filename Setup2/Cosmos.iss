@@ -16,7 +16,6 @@
 # error Unsupported configuration
 #endif
 
-
 ; Cosmos Registry key
 ; Install assemblies
 ; Delete old user kit installer and task asm
@@ -25,7 +24,7 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright © 2007-2010 The Cosmos Project
+AppCopyright=Copyright © 2007-2011 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
@@ -140,8 +139,6 @@ Type: files; Name: {code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*
 Type: filesandordirs; Name: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos
 Type: filesandordirs; Name: {code:GetCSharpExpress2010ProjectTemplatePath}\*Cosmos*.*; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
 
-
-
 [Files]
 ; Cecil dll, pdb
 Source: .\Resources\Dependencies\cecil\Mono.Cecil.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
@@ -192,7 +189,6 @@ Source: .\Build\VSIP\Cosmos.zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates
 Source: .\Build\VSIP\CosmosKernel (C#).zip; DestDir: {code:GetCSharpExpress2010ProjectTemplatePath}; DestName: CosmosKernel (C#).zip; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy')
 ; ; Install templates into VB Express
 Source: ".\Build\VSIP\CosmosKernel (VB).zip";  DestDir: {code:GetVBExpress2010ProjectTemplatePath}; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2010Installed('dummy')
-
 
 [Registry]
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
@@ -290,6 +286,6 @@ Root: HKCR; SubKey: Cosmos.ProjectFile; ValueType: string; ValueName: ; ValueDat
 Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Cosmos.ico
 Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe"" ""%1"""
 
-
 [Run]
 Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
+
