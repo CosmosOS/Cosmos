@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Vsix Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
+  <Identifier Id="13b49ba3-e84c-4c50-b480-bfb1454f0ce2">
+    <Name>Cosmos.VS.Debug2</Name>
+    <Author>Cosmos</Author>
+    <Version>1.0</Version>
+    <Description xml:space="preserve">Cosmos</Description>
+    <Locale>1033</Locale>
+    <InstalledByMsi>false</InstalledByMsi>
+    <SupportedProducts>
+      <VisualStudio Version="10.0">
+        <Edition>Pro</Edition>
+      </VisualStudio>
+    </SupportedProducts>
+    <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.0" />
+  </Identifier>
+  <References>
+        <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
+            <Name>Visual Studio MPF</Name>
+        </Reference>
+  </References>
+  <Content>
+    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
+  </Content>
+</Vsix>

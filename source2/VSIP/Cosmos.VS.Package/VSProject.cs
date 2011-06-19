@@ -134,7 +134,7 @@ namespace Cosmos.VS.Package {
 
         int IVsInstalledProduct.ProductID(out string pbstrPID)
         {
-            pbstrPID = "Milestone 5";
+            pbstrPID = "User Kit";
             return VSConstants.S_OK;
         }
 
