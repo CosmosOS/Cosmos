@@ -300,7 +300,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
         }
       }
-      mDbgConnector.SendCommand(Command.BatchEnd);
+      mDbgConnector.SendCommand(DsCommand.BatchEnd);
     }
 
     void DbgCmdText(string obj) {
@@ -316,7 +316,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     void DbgCmdTrace(byte arg1, uint arg2) {
       DebugMsg("DbgCmdTrace");
       switch (arg1) {
-        case Cosmos.Compiler.Debug.MsgType.BreakPoint: {
+        case Cosmos.Compiler.Debug.DsMsgType.BreakPoint: {
             // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
             // Dont need to correct the address, becuase DebugStub does it for us.
             var xActualAddress = arg2;
@@ -471,18 +471,18 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     internal void Continue() { // F5
       mCurrentAddress = null;
-      mDbgConnector.SendCommand(Command.Continue);
+      mDbgConnector.SendCommand(DsCommand.Continue);
     }
 
     internal void Step(enum_STEPKIND aKind) {
       if (aKind == enum_STEPKIND.STEP_INTO) { // F11
-        mDbgConnector.SendCommand(Command.StepInto);
+        mDbgConnector.SendCommand(DsCommand.StepInto);
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
-        mDbgConnector.SendCommand(Command.StepOver);
+        mDbgConnector.SendCommand(DsCommand.StepOver);
       
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
-        mDbgConnector.SendCommand(Command.StepOut);
+        mDbgConnector.SendCommand(DsCommand.StepOut);
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?

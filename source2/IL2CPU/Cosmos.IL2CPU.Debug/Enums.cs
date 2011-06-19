@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Debug {
   // Messages from Guest to Host
-  static public class MsgType {
+  static public class DsMsgType {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
     public const byte Message = 2;
@@ -22,7 +22,7 @@ namespace Cosmos.Compiler.Debug {
   }
 
   // Messages from Host to Guest
-  static public class Command {
+  static public class DsCommand {
     public const byte Noop = 0;
     public const byte TraceOff = 1;
     public const byte TraceOn = 2;

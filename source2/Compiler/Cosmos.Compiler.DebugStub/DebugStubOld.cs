@@ -112,7 +112,7 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_SendMethodContext";
             PushAll32();
 
-            AL = (int)MsgType.MethodContext;
+            AL = (int)DsMsgType.MethodContext;
             Call<DebugStub.WriteALToComPort>();
 
             ReadComPortX32toStack(); // offset relative to ebp
@@ -155,7 +155,7 @@ namespace Cosmos.Compiler.DebugStub {
             //ESI.Push();
             // todo: adjust ESI to the actual offset
             Label = "DebugStub_SendMemory_1";
-            AL = (int)MsgType.MemoryData;
+            AL = (int)DsMsgType.MemoryData;
             Call<DebugStub.WriteALToComPort>();
 
             //EAX.Pop();
@@ -195,11 +195,11 @@ namespace Cosmos.Compiler.DebugStub {
 
           Memory["DebugStatus", 32].Compare(DebugStub.Status.Run);
           JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
-          AL = (int)MsgType.BreakPoint;
+          AL = (int)DsMsgType.BreakPoint;
           Jump("DebugStub_SendTraceType");
 
           Label = "DebugStub_SendTrace_Normal";
-          AL = (int)MsgType.TracePoint;
+          AL = (int)DsMsgType.TracePoint;
 
           Label = "DebugStub_SendTraceType";
           Call<DebugStub.WriteALToComPort>();
@@ -218,7 +218,7 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_SendText";
 
             // Write the type
-            AL = (int)MsgType.Message;
+            AL = (int)DsMsgType.Message;
             Call<DebugStub.WriteALToComPort>();
 
             // Write Length
@@ -251,7 +251,7 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_SendPtr";
 
             // Write the type
-            AL = (int)MsgType.Pointer;
+            AL = (int)DsMsgType.Pointer;
             Call<DebugStub.WriteALToComPort>();
 
             // pointer value

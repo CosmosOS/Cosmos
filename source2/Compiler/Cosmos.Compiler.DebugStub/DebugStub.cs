@@ -71,7 +71,7 @@ namespace Cosmos.Compiler.DebugStub {
 
 				// We could use the signature as the start signal, but I prefer
 				// to keep the logic separate, especially in DC.
-				AL = (int)MsgType.Started; // Send the actual started signal
+        AL = (int)DsMsgType.Started; // Send the actual started signal
 				Call<DebugStub.WriteALToComPort>();
 
 				Call<WaitForSignature>();
@@ -206,7 +206,7 @@ namespace Cosmos.Compiler.DebugStub {
 				Call<ProcessCommand>();
 
 				// See if batch is complete
-				AL.Compare(Command.BatchEnd);
+        AL.Compare(DsCommand.BatchEnd);
 				JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
 
 				// Loop and wait
@@ -272,7 +272,7 @@ namespace Cosmos.Compiler.DebugStub {
 				EAX.Push();
 
 				// Noop has no data at all (see notes in client DebugConnector), so skip Command ID
-				AL.Compare(Command.Noop);
+        AL.Compare(DsCommand.Noop);
 				JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
 
 				// Read Command ID
@@ -284,43 +284,43 @@ namespace Cosmos.Compiler.DebugStub {
 				EAX.Push();
 
 				#region handle commands
-				AL.Compare(Command.TraceOff);
+        AL.Compare(DsCommand.TraceOff);
 				JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
 				Memory["DebugTraceMode", 32] = Tracing.Off;
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_TraceOff_After";
 
-				AL.Compare(Command.TraceOn);
+        AL.Compare(DsCommand.TraceOn);
 				JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
 				Memory["DebugTraceMode", 32] = Tracing.On;
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_TraceOn_After";
 
-				AL.Compare(Command.Break);
+        AL.Compare(DsCommand.Break);
 				JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
 				Call("DebugStub_Break");
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_Break_After";
 
-				AL.Compare(Command.BreakOnAddress);
+        AL.Compare(DsCommand.BreakOnAddress);
 				JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
 				Call("DebugStub_BreakOnAddress");
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
-				AL.Compare(Command.SendMethodContext);
+        AL.Compare(DsCommand.SendMethodContext);
 				JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMethodContext_After");
 				Call("DebugStub_SendMethodContext");
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_SendMethodContext_After";
 
-				AL.Compare(Command.SendMemory);
+        AL.Compare(DsCommand.SendMemory);
 				JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMemory_After");
 				Call("DebugStub_SendMemory");
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_SendMemory_After";
 
-        AL.Compare(Command.SendRegisters);
+        AL.Compare(DsCommand.SendRegisters);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendRegisters_After");
         Call<SendRegisters>();
         Jump("DebugStub_ProcessCmd_ACK");
@@ -337,7 +337,7 @@ namespace Cosmos.Compiler.DebugStub {
 				// We may need to revisit this in the future to ack not commands, but data chunks
 				// and move them to a buffer.
         // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub)
-				AL = MsgType.CmdCompleted;
+        AL = DsMsgType.CmdCompleted;
 				Call<DebugStub.WriteALToComPort>();
 				EAX = Memory["DebugStub_CommandID", 32];
 				#endregion
@@ -469,16 +469,16 @@ namespace Cosmos.Compiler.DebugStub {
 				// or commands that require additional handling while in break
 				// state.
 
-				AL.Compare(Command.Continue);
+        AL.Compare(DsCommand.Continue);
 				JumpIf(Flags.Equal, "DebugStub_Break_Exit");
 
-				AL.Compare(Command.StepInto);
+        AL.Compare(DsCommand.StepInto);
 				JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
 				Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Into;
 				Jump("DebugStub_Break_Exit");
 				Label = "DebugStub_Break_StepInto_After";
 
-				AL.Compare(Command.StepOver);
+        AL.Compare(DsCommand.StepOver);
 				JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
 				Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
 				// TODO: Change this so ,32 is not necessary, can be implied by 32 bit register - ie Memory["DebugBreakEBP", 32] = EBP;
@@ -487,7 +487,7 @@ namespace Cosmos.Compiler.DebugStub {
 				Jump("DebugStub_Break_Exit");
 				Label = "DebugStub_Break_StepOver_After";
 
-				AL.Compare(Command.StepOut);
+        AL.Compare(DsCommand.StepOut);
 				JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
 				Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
 				EAX = Memory["DebugOriginalEBP", 32];
