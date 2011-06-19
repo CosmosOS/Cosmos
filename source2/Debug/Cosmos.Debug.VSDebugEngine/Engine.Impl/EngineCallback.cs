@@ -139,10 +139,6 @@ namespace Cosmos.Debug.VSDebugEngine
             var eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
             var ad7Thread = (AD7Thread)thread;
             Send(eventObject, AD7BreakpointEvent.IID, ad7Thread);
-            // We catch and resend data rather than using a second serial port because
-            // while this would work fine in a VM, it puts extra requirements on the setup
-            // when real hardware is used.
-            DebugWindows.Test("Test");
         }
 
         public void OnException()//DebuggedThread thread, uint code)

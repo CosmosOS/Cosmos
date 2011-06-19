@@ -8,8 +8,8 @@ using System.Text;
 namespace Cosmos.Debug.VSDebugEngine {
 
   static public class DebugWindows {
-    static protected NamedPipeClientStream mPipe;
-    static protected StreamWriter mWriter;
+    static private NamedPipeClientStream mPipe;
+    static private StreamWriter mWriter;
 
     static public void SendCommand(byte aCmd, byte[] aData) {
       if (mPipe == null) {
