@@ -18,12 +18,16 @@ using System.Windows.Threading;
 
 namespace Cosmos.VS.Debug {
   public partial class MainWindow : Window {
+
     public MainWindow() {
       InitializeComponent();
+
+      var xServerThread = new Thread(ThreadStartServer);
+      xServerThread.Start();
     }
 
-    public void ThreadStartClient(object obj) {
-      using (var xPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.In)) {
+    public void ThreadStartServer() {
+      using (var xPipe = new NamedPipeServerStream("CosmosDebugWindows", PipeDirection.In)) {
         xPipe.WaitForConnection();
         using (var xReader = new StreamReader(xPipe)) {
           string xLine = xReader.ReadLine();

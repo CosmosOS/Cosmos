@@ -8,15 +8,15 @@ using System.Text;
 namespace Cosmos.Debug.VSDebugEngine {
 
   public class DebugWindows {
-  
+
     public static void Test(string aData) {
-      using (var xPipe = new NamedPipeClientStream(".", "CosmosDebug", PipeDirection.Out)) {
-        // The connect function will indefinately wait for the pipe to become available
-        // If that is not acceptable specify a maximum waiting time (in ms)
+      using (var xPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out)) {
         xPipe.Connect();
         using (var xWriter = new StreamWriter(xPipe)) {
           xWriter.WriteLine(aData);
         }
+        xPipe.Flush();
+        xPipe.WaitForPipeDrain(); 
       }
     }
 
