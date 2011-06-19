@@ -7,16 +7,19 @@ using System.Text;
 
 namespace Cosmos.Debug.VSDebugEngine {
 
-  public class DebugWindows {
+  static public class DebugWindows {
+    static protected NamedPipeClientStream mPipe;
+    static protected StreamWriter mWriter;
 
-    public static void Test(string aData) {
-      using (var xPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out)) {
-        xPipe.Connect();
-        using (var xWriter = new StreamWriter(xPipe)) {
-          xWriter.WriteLine(aData);
-        }
-        xPipe.Flush();
+    static public void SendCommand(byte aCmd, byte[] aData) {
+      if (mPipe == null) {
+        mPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out);
+        mPipe.Connect();
+        mWriter = new StreamWriter(mPipe);
       }
+      mWriter.Write(aCmd);
+      mWriter.Write(aData);
+      mPipe.Flush();
     }
 
   }
