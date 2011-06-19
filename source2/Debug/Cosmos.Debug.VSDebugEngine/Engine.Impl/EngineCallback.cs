@@ -33,8 +33,6 @@ namespace Cosmos.Debug.VSDebugEngine
             Send(eventObject, iidEvent, m_engine, thread);
         }
 
-        #region ISampleEngineCallback Members
-
         public void OnError(int hrErr)
         {
             //System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
@@ -204,7 +202,6 @@ namespace Cosmos.Debug.VSDebugEngine
             Send(eventObject, AD7BreakpointBoundEvent.IID, null);
         }
 
-        #endregion
     }
 
     internal class AD7BreakEvent : AD7StoppingEvent, IDebugBreakEvent2
