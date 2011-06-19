@@ -10,7 +10,6 @@ namespace Cosmos.Debug.VSDebugEngine {
   public class DebugWindows {
 
     public static void Test(string aData) {
-      return;
       using (var xPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out)) {
         xPipe.Connect();
         using (var xWriter = new StreamWriter(xPipe)) {

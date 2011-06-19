@@ -34,8 +34,9 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugEIP", 0),
                 // the calling code's EBP value
                 new DataMember("DebugOriginalEBP", 0),
-                // Ptr to the push all data
-                //new DataMember("DebugPushAllPtr", 0),
+                // Ptr to the push all data. It points to the "bottom" after a PushAll32 op.
+                // Walk up to find the 8 x 32 bit registers.
+                new DataMember("DebugPushAllPtr", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
                 
                 // If set non 0, on next trace a break will occur
@@ -392,7 +393,7 @@ namespace Cosmos.Compiler.DebugStub {
             // IRQ reenabled, call secondary debug stub
             Label = "DebugStub_NoSTI";
             PushAll32();
-            //Memory["DebugPushAllPtr", 32] = ESP;
+            Memory["DebugPushAllPtr", 32] = ESP;
             // We just pushed all registers to the stack so we can use them
             // So we get the stack pointer and add 32. This skips over the
             // registers we just pushed.

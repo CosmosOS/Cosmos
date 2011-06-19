@@ -254,7 +254,7 @@ namespace Cosmos.Compiler.DebugStub {
 
 		public class SendRegisters : CodeBlock {
 			public override void Assemble() {
-				//ESI = Memory["DebugPushAllPtr", 32];
+				ESI = Memory["DebugPushAllPtr", 32];
 				for (int i = 1; i <= 32; i++) {
 					Call("WriteByteToComPort");
 				}
@@ -320,11 +320,11 @@ namespace Cosmos.Compiler.DebugStub {
 				Jump("DebugStub_ProcessCmd_ACK");
 				Label = "DebugStub_ProcessCmd_SendMemory_After";
 
-        //AL.Compare(Command.SendRegisters);
-        //JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendRegisters_After");
-        //Call<SendRegisters>();
-        //Jump("DebugStub_ProcessCmd_ACK");
-        //Label = "DebugStub_ProcessCmd_SendRegisters_After";
+        AL.Compare(Command.SendRegisters);
+        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendRegisters_After");
+        Call<SendRegisters>();
+        Jump("DebugStub_ProcessCmd_ACK");
+        Label = "DebugStub_ProcessCmd_SendRegisters_After";
 
 				Label = "DebugStub_ProcessCmd_ACK";
 				// We acknowledge receipt of the command, not processing of it.
@@ -336,6 +336,7 @@ namespace Cosmos.Compiler.DebugStub {
 				// UART buffer is 16.
 				// We may need to revisit this in the future to ack not commands, but data chunks
 				// and move them to a buffer.
+        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub)
 				AL = MsgType.CmdCompleted;
 				Call<DebugStub.WriteALToComPort>();
 				EAX = Memory["DebugStub_CommandID", 32];
