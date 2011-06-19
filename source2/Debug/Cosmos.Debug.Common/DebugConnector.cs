@@ -103,6 +103,10 @@ namespace Cosmos.Debug.Common
           SendCommandData(aCmd, new byte[0], true);
         }
 
+        public void SendRegisters() {
+          SendCommand(DsCommand.SendRegisters);
+        }
+
         public void SetBreakpoint(int aID, uint aAddress) {
             // Not needed as SendCommand will do it, but it saves
             // some execution, but more importantly stops it from 
@@ -260,8 +264,14 @@ namespace Cosmos.Debug.Common
               case DsMsgType.MemoryData:
                     DoDebugMsg("DC Recv: MemoryData");
                     Next(mDataSize, PacketMemoryData);
-                    break; 
-                default:
+                    break;
+
+              case DsMsgType.Registers:
+                    DoDebugMsg("DC Recv: Registers");
+                    Next(32, PacketMemoryRegisters);
+                    break;
+
+              default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");
                     break;
@@ -311,10 +321,14 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
-        protected void PacketMemoryData(byte[] aPacket)
-        {
-            mData = aPacket.ToArray();
-            WaitForMessage();
+        protected void PacketMemoryData(byte[] aPacket) {
+          mData = aPacket.ToArray();
+          WaitForMessage();
+        }
+
+        protected void PacketRegisters(byte[] aPacket) {
+          mData = aPacket.ToArray();
+          WaitForMessage();
         }
 
         protected void PacketCmdCompleted(byte[] aPacket) {

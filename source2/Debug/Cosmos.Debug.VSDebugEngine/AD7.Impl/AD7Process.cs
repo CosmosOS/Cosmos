@@ -316,7 +316,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     void DbgCmdTrace(byte arg1, uint arg2) {
       DebugMsg("DbgCmdTrace");
       switch (arg1) {
-        case Cosmos.Compiler.Debug.DsMsgType.BreakPoint: {
+        case DsMsgType.BreakPoint: {
             // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
             // Dont need to correct the address, becuase DebugStub does it for us.
             var xActualAddress = arg2;
@@ -343,10 +343,12 @@ namespace Cosmos.Debug.VSDebugEngine {
               } else {
                 // Code based break. Tell VS to break.
                 mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
+                mDbgConnector.SendRegisters();
               }
             } else {
               // Found a bound breakpoint
               mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
+              mDbgConnector.SendRegisters();
               mEngine.AfterBreak = true;
             }
             break;
@@ -358,8 +360,6 @@ namespace Cosmos.Debug.VSDebugEngine {
           }
       }
     }
-
-    #region IDebugProcess2 Members
 
     public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach) {
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
@@ -442,8 +442,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       return VSConstants.S_OK;
     }
-
-    #endregion
 
     internal void ResumeFromLaunch() {
       // This unpauses our debug host

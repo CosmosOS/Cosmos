@@ -197,7 +197,7 @@ namespace Cosmos.Compiler.DebugStub {
 				EAX.Push();
 				ESI = ESP;
 				Call("WriteByteToComPort");
-				EAX.Pop(); // Is a local, cant use Return(4)
+				EAX.Pop(); // Is a local var, cant use Return(4). X# issues the return.
 			}
 		}
 
@@ -254,7 +254,10 @@ namespace Cosmos.Compiler.DebugStub {
 
 		public class SendRegisters : CodeBlock {
 			public override void Assemble() {
-				ESI = Memory["DebugPushAllPtr", 32];
+        AL = (int)DsMsgType.Registers; // Send the actual started signal
+        Call<DebugStub.WriteALToComPort>();
+        
+        ESI = Memory["DebugPushAllPtr", 32];
 				for (int i = 1; i <= 32; i++) {
 					Call("WriteByteToComPort");
 				}
