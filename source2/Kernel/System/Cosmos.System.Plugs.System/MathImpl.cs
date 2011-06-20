@@ -75,17 +75,17 @@ namespace Cosmos.System.Plugs.System
             }
         }
 
-        public static decimal Max(decimal val1, decimal val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
+        //public static decimal Max(decimal val1, decimal val2)
+        //{
+        //    if (val1 > val2)
+        //    {
+        //        return val1;
+        //    }
+        //    else
+        //    {
+        //        return val2;
+        //    }
+        //}
 
         public static double Max(double val1, double val2)
         {
@@ -161,17 +161,17 @@ namespace Cosmos.System.Plugs.System
             }
         }
 
-        public static decimal Min(decimal val1, decimal val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
+        //public static decimal Min(decimal val1, decimal val2)
+        //{
+        //    if (val1 < val2)
+        //    {
+        //        return val1;
+        //    }
+        //    else
+        //    {
+        //        return val2;
+        //    }
+        //}
 
         public static double Min(double val1, double val2)
         {
