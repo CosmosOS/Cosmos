@@ -71,7 +71,16 @@ IF EXIST "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).
 echo .
 echo .
 echo .
-IF EXIST ..\..\Setup2\Output\CosmosUserKit.exe del /F ..\..\Setup2\Output\CosmosUserKit.exe
+
+IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
+	ren ..\..\Setup2\Output\CosmosUserKit.exe tmp 2> nul
+	if ERRORLEVEL 1 (
+		echo Old COSMOS setup could not be removed, it is locked.
+		pause
+		exit /B 1
+	)
+	del /F ..\..\Setup2\Output\tmp
+:afterSetupDelete
 
 IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Creating setup.exe
