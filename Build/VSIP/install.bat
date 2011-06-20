@@ -13,7 +13,7 @@ cd /D %~dp0
 echo Compiling cosmos
 set THE_OUTPUT_PATH=%CD%
 set ProgFiles=%ProgramFiles%
-if not "%ProgramFiles(x86)%"=="" set "ProgFiles=%ProgramFiles(x86)%
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" set "ProgFiles=%ProgramFiles(x86)%
 
 cd /D %~dp0
 cd ..\..\source
@@ -71,28 +71,17 @@ IF EXIST "..\..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\CosmosProject (C#).
 echo .
 echo .
 echo .
-IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
-
-	ren %%F tmp 2> nul
-	if ERRORLEVEL 1 (
-		echo Old COSMOS setup could not be removed, it is locked.
-		pause
-		goto exit
-	)
-	del /F ..\..\Setup2\Output\CosmosUserKit.exe
-
-:afterSetupDelete
+IF EXIST ..\..\Setup2\Output\CosmosUserKit.exe del /F ..\..\Setup2\Output\CosmosUserKit.exe
 
 IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Creating setup.exe
 	"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
 )
-rem pause
+
 ..\..\Setup2\Output\CosmosUserKit.exe /SILENT
 
 rem Relaunch VS
 IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
-	start "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
+	"%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
 )
 
-:exit
