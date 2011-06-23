@@ -67,14 +67,38 @@ namespace Orvid.Graphics.Drivers
             }
         }
 
+        private uint GetForColorizer(Pixel p)
+        {
+            byte r = getForPallet(p.R);
+            byte g = getForPallet(p.G);
+            byte b = getForPallet(p.B);
+            return (uint)(Math.Floor((double)(r / 42)) * Math.Floor((double)(g / 42)) * Math.Floor((double)(b / 42)));
+        }
+
+        private uint[] Colorize(Image i)
+        {
+            uint[] arr = new uint[i.Height * i.Width];
+            int indx = 0;
+            for (int y = 0; y < i.Height; y++)
+            {
+                for (int x = 0; x < i.Width; x++)
+                {
+                    arr[indx] = GetForColorizer(i.Data[indx]);
+                    indx++;
+                }
+            }
+            return arr;
+        }
+
         public override void Update(Image i)
         {
-            // TODO: Switch to an instance based draw mechanism,
+            // TODO: Switch to an delegate based draw mechanism,
             // it would be much faster than switch, case like statements.
 
+            uint[] data = Colorize(i);
             for (uint i2 = 0; i2 < 64000 /* 320 Times 200 is 64,000 so we need to loop 64k times. */; i2++)
             {
-                mIO.VGAMemoryBlock[i2] = (byte)(i.Data[i2] & 0xFF);
+                mIO.VGAMemoryBlock[i2] = (byte)(data[i2] & 0xFF);
             }
         }
 
@@ -283,14 +307,14 @@ namespace Orvid.Graphics.Drivers
 
         #region 640x480x16
         /*
-        public void SetPixel640x480x16(uint x, uint y, uint c)
+        public void SetPixel640x480x16(uint width, uint height, uint c)
         {
             var xSegment = GetFramebufferSegment();
-            var xOffset = (y * 32) + x >> 1;
+            var xOffset = (height * 32) + width >> 1;
 
             c = c & 0xf;
 
-            if ((x & 1) == 0)
+            if ((width & 1) == 0)
             {
                 xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf) | (c << 4));
             }

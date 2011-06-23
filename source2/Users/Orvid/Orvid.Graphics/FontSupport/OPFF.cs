@@ -188,11 +188,11 @@ namespace Orvid.Graphics.FontSupport
                 {
                     if (idata[bitnum])
                     {
-                        i.SetPixel(x, y, 1); // Color the pixel white
+                        i.SetPixel(x, y, Colors.White); // Color the pixel white
                     }
                     else
                     {
-                        i.SetPixel(x, y, 255); // Color the pixel black
+                        i.SetPixel(x, y, Colors.Black); // Color the pixel black
                     }
                     bitnum++;
                 }

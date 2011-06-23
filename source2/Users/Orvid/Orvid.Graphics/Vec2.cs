@@ -27,8 +27,8 @@ namespace Orvid.Graphics
         /// <summary>
         /// The default constructor.
         /// </summary>
-        /// <param name="x">The X position.</param>
-        /// <param name="y">The Y position.</param>
+        /// <param name="width">The X position.</param>
+        /// <param name="height">The Y position.</param>
         public Vec2(int x, int y)
         {
             this.X = x;

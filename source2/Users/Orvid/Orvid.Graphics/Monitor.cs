@@ -77,7 +77,7 @@ namespace Orvid.Graphics
 
             InitializeMouse();
 
-            Taskbar.Clear(1); // this should clear the screen white.
+            Taskbar.Clear(Colors.White); // Clear the screen white.
             CurrentDriver.Update(Taskbar);
         }
 
@@ -86,12 +86,12 @@ namespace Orvid.Graphics
             DrawCursor();
             //uint i = 0;
             //uint yPixBase = 0;
-            //for (uint y = 0; y < Taskbar.Height; y++)
+            //for (uint height = 0; height < Taskbar.Height; height++)
             //{
-            //    yPixBase = y * 320;
-            //    for (uint x = 0; x < Taskbar.Width; x++)
+            //    yPixBase = height * 320;
+            //    for (uint width = 0; width < Taskbar.Width; width++)
             //    {
-            //        Cosmos.System.Global.Console.WriteLine("The value at (" + x.ToString() + ", " + y.ToString() + ") is '" + Taskbar.GetPixel(x, y).ToString() + "'");
+            //        Cosmos.System.Global.Console.WriteLine("The value at (" + width.ToString() + ", " + height.ToString() + ") is '" + Taskbar.GetPixel(width, height).ToString() + "'");
             //        if (i >= 24)
             //        {
             //            Cosmos.System.Global.Console.Y = 0;
@@ -144,23 +144,22 @@ namespace Orvid.Graphics
         private void InitializeMouse()
         {
             // Now we need to setup the mouse
-            // The color 255 is black, and 1 is white.
-            MouseImage.SetPixel(0, 0, 255);
-            MouseImage.SetPixel(1, 0, 255);
-            MouseImage.SetPixel(2, 0, 255);
-            MouseImage.SetPixel(3, 0, 255);
-            MouseImage.SetPixel(0, 1, 255);
-            MouseImage.SetPixel(1, 1, 1);
-            MouseImage.SetPixel(2, 1, 1);
-            MouseImage.SetPixel(3, 1, 255);
-            MouseImage.SetPixel(0, 2, 255);
-            MouseImage.SetPixel(1, 2, 1);
-            MouseImage.SetPixel(2, 2, 1);
-            MouseImage.SetPixel(3, 2, 255);
-            MouseImage.SetPixel(0, 3, 255);
-            MouseImage.SetPixel(1, 3, 255);
-            MouseImage.SetPixel(2, 3, 255);
-            MouseImage.SetPixel(3, 3, 255);
+            MouseImage.SetPixel(0, 0, Colors.Black);
+            MouseImage.SetPixel(1, 0, Colors.Black);
+            MouseImage.SetPixel(2, 0, Colors.Black);
+            MouseImage.SetPixel(3, 0, Colors.Black);
+            MouseImage.SetPixel(0, 1, Colors.Black);
+            MouseImage.SetPixel(1, 1, Colors.White);
+            MouseImage.SetPixel(2, 1, Colors.White);
+            MouseImage.SetPixel(3, 1, Colors.Black);
+            MouseImage.SetPixel(0, 2, Colors.Black);
+            MouseImage.SetPixel(1, 2, Colors.White);
+            MouseImage.SetPixel(2, 2, Colors.White);
+            MouseImage.SetPixel(3, 2, Colors.Black);
+            MouseImage.SetPixel(0, 3, Colors.Black);
+            MouseImage.SetPixel(1, 3, Colors.Black);
+            MouseImage.SetPixel(2, 3, Colors.Black);
+            MouseImage.SetPixel(3, 3, Colors.Black);
         }
         #endregion
 
@@ -237,17 +236,17 @@ namespace Orvid.Graphics
     //            Screen s = Screens.First.Value;
     //            Screens.RemoveFirst();
 
-    //            for (int y = 0; y < Height; y++)
+    //            for (int height = 0; height < Height; height++)
     //            {
-    //                for (int x = 0; x < Width; x++)
+    //                for (int width = 0; width < Width; width++)
     //                {
-    //                    if (!scrn.IsFilled(x, y))
+    //                    if (!scrn.IsFilled(width, height))
     //                    {
-    //                        if (s.IsFilled(x, y))
+    //                        if (s.IsFilled(width, height))
     //                        {
-    //                            byte val = s.Data[y][x];
-    //                            scrn.Data[y][x] = val;
-    //                            scrn.Filled[y][x] = true;
+    //                            byte val = s.Data[height][width];
+    //                            scrn.Data[height][width] = val;
+    //                            scrn.Filled[height][width] = true;
     //                        }
     //                    }
     //                }
@@ -266,11 +265,11 @@ namespace Orvid.Graphics
     //            else
     //            {
     //                bool haveall = true;
-    //                for (int y = 0; y < Height; y++)
+    //                for (int height = 0; height < Height; height++)
     //                {
-    //                    for (int x = 0; x < Width; x++)
+    //                    for (int width = 0; width < Width; width++)
     //                    {
-    //                        if (s.Filled[y][x] == false)
+    //                        if (s.Filled[height][width] == false)
     //                        {
     //                            haveall = false;
     //                            break;

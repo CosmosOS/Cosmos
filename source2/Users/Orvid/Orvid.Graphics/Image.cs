@@ -1,5 +1,5 @@
 ﻿//#define DebugDraw // If this is uncommented, all triangles will have a set-color border drawn. This is useful to debug polygon drawing code. 
-#define SqrtWorks // Only uncomment this when the square-root works 
+//#define SqrtWorks // Only uncomment this when the square-root works 
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace Orvid.Graphics
         /// <summary>
         /// The raw data in the image.
         /// </summary>
-        public uint[] Data;
+        public Pixel[] Data;
         /// <summary>
         /// The height of the image.
         /// </summary>
@@ -34,17 +34,13 @@ namespace Orvid.Graphics
         //    this.Width = b.Width;
         //    this.Height = b.Height;
         //    this.Data = new Pixel[(Height + 1) * (Width + 1)];
-        //    for (int y = 0; y < this.Height; y++)
+        //    for (int height = 0; height < this.Height; height++)
         //    {
-        //        for (int x = 0; x < this.Width; x++)
+        //        for (int width = 0; width < this.Width; width++)
         //        {
-        //            System.Drawing.Color pc = b.GetPixel(x, y);
-        //            Pixel p = new Pixel();
-        //            p.R = pc.R;
-        //            p.G = pc.G;
-        //            p.B = pc.B;
-        //            p.A = pc.A;
-        //            Data[((y * Width) + x)] = p;
+        //            System.Drawing.Color pc = b.GetPixel(width, height);
+        //            Pixel p = new Pixel(pc.R, pc.G, pc.B, pc.A);
+        //            Data[((height * Width) + width)] = p;
         //        }
         //    }
         //}
@@ -58,7 +54,8 @@ namespace Orvid.Graphics
         {
             this.Width = width;
             this.Height = height;
-            this.Data = new uint[(Height + 1) * (Width + 1)];
+            this.Data = new Pixel[(Height + 1) * (Width + 1)];
+            this.Data.Initialize();
         }
 
         /// <summary>
@@ -66,11 +63,11 @@ namespace Orvid.Graphics
         /// </summary>
         ~Image()
         {
-            this.Data = new uint[0];
+            this.Data = null;
         }
 
         #region Clear
-        public void Clear(uint color)
+        public void Clear(Pixel color)
         {
             for (uint i = 0; i < Data.Length; i++)
             {
@@ -91,7 +88,7 @@ namespace Orvid.Graphics
         /// <param name="height">The height of the elipse.</param>
         /// <param name="width">The width of the elipse.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawElipse(Vec2 CenterPoint, int height, int width, uint color)
+        public void DrawElipse(Vec2 CenterPoint, int height, int width, Pixel color)
         {
             double angle = 0;
             double range = (360 * (Math.PI / 180));
@@ -118,7 +115,7 @@ namespace Orvid.Graphics
         /// <param name="width">The width of the elipse.</param>
         /// <param name="fillColor">The color to fill in.</param>
         /// <param name="borderColor">The color to draw the border in.</param>
-        public void DrawElipse(Vec2 CenterPoint, int height, int width, uint fillColor, uint borderColor)
+        public void DrawElipse(Vec2 CenterPoint, int height, int width, Pixel fillColor, Pixel borderColor)
         {
             DrawElipse(CenterPoint, height, width, fillColor);
             DrawElipseOutline(CenterPoint, height, width, borderColor);
@@ -133,7 +130,7 @@ namespace Orvid.Graphics
         /// <param name="height">The height of the elipse.</param>
         /// <param name="width">The width of the elipse.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawElipseOutline(Vec2 CenterPoint, int height, int width, uint color)
+        public void DrawElipseOutline(Vec2 CenterPoint, int height, int width, Pixel color)
         {
             DrawElipticalArc(CenterPoint, height, width, 0, 360, color);
         }
@@ -149,7 +146,7 @@ namespace Orvid.Graphics
         /// <param name="startAngle">The angle to start drawing at.</param>
         /// <param name="endAngle">The angle to stop drawing at.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawElipticalArc(Vec2 CenterPoint, int height, int width, int startAngle, int endAngle, uint color)
+        public void DrawElipticalArc(Vec2 CenterPoint, int height, int width, int startAngle, int endAngle, Pixel color)
         {
             double angle = (((startAngle <= endAngle) ? startAngle : endAngle) * (Math.PI / 180));
             double range = (((endAngle > startAngle) ? endAngle : startAngle) * (Math.PI / 180));
@@ -176,7 +173,7 @@ namespace Orvid.Graphics
         /// <param name="p4">The fourth point.</param>
         /// <param name="FillColor">The color to fill in the rectangle with.</param>
         /// <param name="BorderColor">The color to draw the border in.</param>
-        public void DrawQuad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, uint FillColor, uint BorderColor)
+        public void DrawQuad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, Pixel FillColor, Pixel BorderColor)
         {
             DrawPolygon(new Vec2[] { p1, p2, p3, p4 }, FillColor);
             DrawPolygonOutline(new Vec2[] { p1, p2, p3, p4 }, BorderColor);
@@ -190,12 +187,16 @@ namespace Orvid.Graphics
         /// <param name="p3">The third point.</param>
         /// <param name="p4">The fourth point.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawQuad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, uint color)
+        public void DrawQuad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, Pixel color)
         {
             DrawPolygon(new Vec2[] { p1, p2, p3, p4 }, color);
         }
         #endregion
 
+        #endregion
+
+
+        // This SHOULD work. (I can't gaurentee it though.)
         #region DrawCircle
         /// <summary>
         /// Draws a filled circle.
@@ -203,7 +204,7 @@ namespace Orvid.Graphics
         /// <param name="Center">The center of the circle.</param>
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawCircle(Vec2 Center, int radius, uint color)
+        public void DrawCircle(Vec2 Center, int radius, Pixel color)
         {
 #if SqrtWorks
             int x1;
@@ -222,96 +223,14 @@ namespace Orvid.Graphics
             }
             DrawCircleOutline(Center, radius, color);
 #else
-            // Two is better than 1, and is almost enough to draw it....
-            // Almost.... 
-            // It still leaves exactly 8 pixels un-drawn.
-            // 2 in each quarter of the circle.
-            for (int i = 1; i <= radius; i++)
-            {
-                DrawCircleOutline(Center, i, color);
-            }
-
-            Vec2 v;
-            int x = 0;
-            int y = radius;
-            int p = (5 - radius * 4) / 4;
-
-            SetPixel((uint)(Center.X), (uint)(Center.Y + y), color);
-            v = new Vec2(Center.X, Center.Y + y);
-            DrawLine(Center, v, color);
-            SetPixel((uint)(Center.X), (uint)(Center.Y - y), color);
-            v = new Vec2(Center.X, Center.Y - y);
-            DrawLine(Center, v, color);
-            SetPixel((uint)(Center.X + y), (uint)(Center.Y), color);
-            v = new Vec2(Center.X + y, Center.Y);
-            DrawLine(Center, v, color);
-            SetPixel((uint)(Center.X - y), (uint)(Center.Y), color);
-            v = new Vec2(Center.X - y, Center.Y);
-            DrawLine(Center, v, color);
-            while (x < y)
-            {
-                x++;
-                if (p < 0)
-                {
-                    p += 2 * x + 1;
-                }
-                else
-                {
-                    y--;
-                    p += 2 * (x - y) + 1;
-                }
-                if (x == y)
-                {
-                    SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
-                    v = new Vec2(Center.X + x, Center.Y + y);
-                    DrawLine(Center, v, color);
-                    SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
-                    v = new Vec2(Center.X - x, Center.Y + y);
-                    DrawLine(Center, v, color);
-                    SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
-                    v = new Vec2(Center.X + x, Center.Y - y);
-                    DrawLine(Center, v, color);
-                    SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
-                    v = new Vec2(Center.X - x, Center.Y - y);
-                    DrawLine(Center, v, color);
-                }
-                else
-                {
-                    if (x < y)
-                    {
-                        SetPixel((uint)(Center.X + x), (uint)(Center.Y + y), color);
-                        v = new Vec2(Center.X + x, Center.Y + y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - x), (uint)(Center.Y + y), color);
-                        v = new Vec2(Center.X - x, Center.Y + y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X + x), (uint)(Center.Y - y), color);
-                        v = new Vec2(Center.X + x, Center.Y - y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - x), (uint)(Center.Y - y), color);
-                        v = new Vec2(Center.X - x, Center.Y - y);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X + y), (uint)(Center.Y + x), color);
-                        v = new Vec2(Center.X + y, Center.Y + x);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - y), (uint)(Center.Y + x), color);
-                        v = new Vec2(Center.X - y, Center.Y + x);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X + y), (uint)(Center.Y - x), color);
-                        v = new Vec2(Center.X + y, Center.Y - x);
-                        DrawLine(Center, v, color);
-                        SetPixel((uint)(Center.X - y), (uint)(Center.Y - x), color);
-                        v = new Vec2(Center.X - y, Center.Y - x);
-                        DrawLine(Center, v, color);
-                    }
-                }
-            }
+            Vec2 tlcorn = new Vec2(Center.X - radius, Center.Y - radius);
+            Image i = new Image(radius * 2 + 2, radius * 2 + 2);
+            i.DrawCircleOutline(Center - tlcorn, radius, color);
+            i.FloodFill(Center - tlcorn, new Pixel(true), color);
+            DrawImage(tlcorn, i);
 #endif
         }
         #endregion
-
-        #endregion
-
 
 
         #region DrawCircleOutline
@@ -321,7 +240,7 @@ namespace Orvid.Graphics
         /// <param name="Center">The center of the circle.</param>
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="color">The color to draw with.</param>
-        public void DrawCircleOutline(Vec2 Center, int radius, uint color)
+        public void DrawCircleOutline(Vec2 Center, int radius, Pixel color)
         {
             int x = 0;
             int y = radius;
@@ -376,7 +295,7 @@ namespace Orvid.Graphics
         /// <param name="i"></param>
         public void DrawImage(Vec2 loc, Image i)
         {
-            uint value;
+            Pixel value;
             for (uint y = 0; y < i.Height; y++)
             {
                 for (uint x = 0; x < i.Width; x++)
@@ -396,7 +315,7 @@ namespace Orvid.Graphics
         /// <param name="Point1">The first point.</param>
         /// <param name="Point2">The first point.</param>
         /// <param name="color">The color to draw.</param>
-        public void DrawLine(Vec2 Point1, Vec2 Point2, uint color)
+        public void DrawLine(Vec2 Point1, Vec2 Point2, Pixel color)
         {
             int x0 = Point1.X;
             int x1 = Point2.X;
@@ -462,7 +381,7 @@ namespace Orvid.Graphics
         /// An array of points to draw, in the order they need drawing.
         /// </param>
         /// <param name="color">The color to draw.</param>
-        public void DrawLines(Vec2[] Points, uint color)
+        public void DrawLines(Vec2[] Points, Pixel color)
         {
             int n = Points.Length;
             if (n >= 2)
@@ -487,7 +406,7 @@ namespace Orvid.Graphics
         /// </summary>
         /// <param name="points">The points of the polygon.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawPolygon(Vec2[] points, uint color)
+        public void DrawPolygon(Vec2[] points, Pixel color)
         {
             Vec2[] contour = points;
             List<Vec2> result = new List<Vec2>();
@@ -634,7 +553,7 @@ namespace Orvid.Graphics
         /// </summary>
         /// <param name="points">An array containing the points to draw.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawPolygonOutline(Vec2[] points, uint color)
+        public void DrawPolygonOutline(Vec2[] points, Pixel color)
         {
             Vec2[] pts = new Vec2[points.Length + 1];
             points.CopyTo(pts, 0);
@@ -657,7 +576,7 @@ namespace Orvid.Graphics
         /// corner of the rectangle being drawn.
         /// </param>
         /// <param name="color">The color to draw.</param>
-        public void DrawRectangle(Vec2 TopLeftCorner, Vec2 BottomRightCorner, uint color)
+        public void DrawRectangle(Vec2 TopLeftCorner, Vec2 BottomRightCorner, Pixel color)
         {
             int height = BottomRightCorner.Y - TopLeftCorner.Y;
             int width = BottomRightCorner.X - TopLeftCorner.X;
@@ -682,7 +601,7 @@ namespace Orvid.Graphics
         /// corner of the rectangle being drawn.
         /// </param>
         /// <param name="color">The color to draw.</param>
-        public void ReverseDrawRectangle(Vec2 TopRightCorner, Vec2 BottomLeftCorner, uint color)
+        public void ReverseDrawRectangle(Vec2 TopRightCorner, Vec2 BottomLeftCorner, Pixel color)
         {
             int height = BottomLeftCorner.Y - TopRightCorner.Y;
             int width = TopRightCorner.X - BottomLeftCorner.X;
@@ -702,7 +621,7 @@ namespace Orvid.Graphics
         /// <param name="p2">The second point of the triangle.</param>
         /// <param name="p3">The third point of the triangle.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawTriangle(Vec2 p1, Vec2 p2, Vec2 p3, uint color)
+        public void DrawTriangle(Vec2 p1, Vec2 p2, Vec2 p3, Pixel color)
         {
 
             int l; // The farthest left 
@@ -747,7 +666,7 @@ namespace Orvid.Graphics
                 }
             }
 
-            // Now organize in the x direction.
+            // Now organize in the width direction.
             if (p1.X > p3.X && p1.X > p2.X)
             {
                 l = p1.X;
@@ -820,7 +739,7 @@ namespace Orvid.Graphics
             i.DrawLine(p6, p4, color);
 #endif
             Vec2 center = (p4 + p5 + p6) / 3;
-            i.FloodFill(center, 0, color);
+            i.FloodFill(center, new Pixel(true), color);
 
             /*
 
@@ -856,7 +775,7 @@ namespace Orvid.Graphics
         /// <param name="p3">The third point.</param>
         /// <param name="FillColor">The color to fill the triangle with.</param>
         /// <param name="BorderColor">The color to draw the border of the triangle.</param>
-        public void DrawTriangle(Vec2 p1, Vec2 p2, Vec2 p3, uint FillColor, uint BorderColor)
+        public void DrawTriangle(Vec2 p1, Vec2 p2, Vec2 p3, Pixel FillColor, Pixel BorderColor)
         {
             DrawTriangle(p1, p2, p3, FillColor);
             DrawTriangleOutline(p1, p2, p3, BorderColor);
@@ -871,7 +790,7 @@ namespace Orvid.Graphics
         /// <param name="p2">The second point of the triangle.</param>
         /// <param name="p3">The third point of the triangle.</param>
         /// <param name="color">The color to draw in.</param>
-        public void DrawTriangleOutline(Vec2 p1, Vec2 p2, Vec2 p3, uint color)
+        public void DrawTriangleOutline(Vec2 p1, Vec2 p2, Vec2 p3, Pixel color)
         {
             DrawLines(new Vec2[] { p1, p2, p3, p1 }, color);
         }
@@ -883,8 +802,8 @@ namespace Orvid.Graphics
         /// Returns true if the given pixel has
         /// been visited with the flood-fill algorithm.
         /// </summary>
-        /// <param name="y"></param>
-        /// <param name="x"></param>
+        /// <param name="height"></param>
+        /// <param name="width"></param>
         /// <returns></returns>
         public bool Visited(int y, int x)
         {
@@ -899,11 +818,11 @@ namespace Orvid.Graphics
         /// <param name="startPoint">The point to start filling from.</param>
         /// <param name="sColor">The color to search for.</param>
         /// <param name="dColor">The color to change it to.</param>
-        public void FloodFill(Vec2 startPoint, uint sColor, uint dColor)
+        public void FloodFill(Vec2 startPoint, Pixel sColor, Pixel dColor)
         {
             int x = startPoint.X;
             int y = startPoint.Y;
-            if (!(GetPixel((uint)x, (uint)y) == 0) || GetPixel((uint)x, (uint)y) == sColor)
+            if ((GetPixel((uint)x, (uint)y).Empty) || GetPixel((uint)x, (uint)y) == sColor)
             {
                 SetPixel((uint)x, (uint)y, dColor);
             }
@@ -911,10 +830,10 @@ namespace Orvid.Graphics
             Visiteds = new bool[(Height + 1) * (Width + 1)];
 
             #region Setup Start of queue
-            uint p;
+            Pixel p;
             Vec2 v;
             p = GetPixel((uint)x + 1, (uint)y);
-            if ((!(p == 0) || p == sColor) && p != dColor)
+            if ((p.Empty || p == sColor) && p != dColor)
             {
                 v = new Vec2(x + 1, y);
                 q.Push(v);
@@ -922,7 +841,7 @@ namespace Orvid.Graphics
                 SetPixel((uint)x + 1, (uint)y, dColor);
             }
             p = GetPixel((uint)x, (uint)y + 1);
-            if ((!(p == 0) || p == sColor) && p != dColor)
+            if ((p.Empty || p == sColor) && p != dColor)
             {
                 v = new Vec2(x, y + 1);
                 q.Push(v);
@@ -930,7 +849,7 @@ namespace Orvid.Graphics
                 SetPixel((uint)x, (uint)y + 1, dColor);
             }
             p = GetPixel((uint)x - 1, (uint)y);
-            if ((!(p == 0) || p == sColor) && p != dColor)
+            if ((p.Empty || p == sColor) && p != dColor)
             {
                 v = new Vec2(x - 1, y);
                 q.Push(v);
@@ -938,7 +857,7 @@ namespace Orvid.Graphics
                 SetPixel((uint)(x - 1), (uint)y, dColor);
             }
             p = GetPixel((uint)x, (uint)y - 1);
-            if ((!(p == 0) || p == sColor) && p != dColor)
+            if ((p.Empty || p == sColor) && p != dColor)
             {
                 v = new Vec2(x, y - 1);
                 q.Push(v);
@@ -955,7 +874,7 @@ namespace Orvid.Graphics
                 #region Check
 
                 p = GetPixel((uint)x + 1, (uint)y);
-                if (p != dColor && (!(p == 0) || p == sColor))
+                if (p != dColor && (p.Empty || p == sColor))
                 {
                     v = new Vec2(x + 1, y);
                     if (x >= 0 && !(Visited(y, x + 1)))
@@ -966,7 +885,7 @@ namespace Orvid.Graphics
                     }
                 }
                 p = GetPixel((uint)x, (uint)y + 1);
-                if (p != dColor && (!(p == 0) || p == sColor))
+                if (p != dColor && (p.Empty || p == sColor))
                 {
                     v = new Vec2(x, y + 1);
                     if (x >= 0 && !(Visited(y + 1, x)))
@@ -977,7 +896,7 @@ namespace Orvid.Graphics
                     }
                 }
                 p = GetPixel((uint)x - 1, (uint)y);
-                if (p != dColor && (!(p == 0) || p == sColor))
+                if (p != dColor && (p.Empty || p == sColor))
                 {
                     v = new Vec2(x - 1, y);
                     if (x >= 0 && !(Visited(y, x - 1)))
@@ -988,7 +907,7 @@ namespace Orvid.Graphics
                     }
                 }
                 p = GetPixel((uint)x, (uint)y - 1);
-                if (p != dColor && (!(p == 0) || p == sColor))
+                if (p != dColor && (p.Empty || p == sColor))
                 {
                     v = new Vec2(x, y - 1);
                     if (!(Visited(y - 1, x)))
@@ -1008,10 +927,10 @@ namespace Orvid.Graphics
         /// <summary>
         /// Get's the pixel a the specified location.
         /// </summary>
-        /// <param name="x">The x position of the pixel.</param>
-        /// <param name="y">The y position of the pixel.</param>
+        /// <param name="width">The width position of the pixel.</param>
+        /// <param name="height">The height position of the pixel.</param>
         /// <returns>The Pixel at the specified position.</returns>
-        public uint GetPixel(uint x, uint y)
+        public Pixel GetPixel(uint x, uint y)
         {
             return Data[(y * Width) + x];
         }
@@ -1022,12 +941,12 @@ namespace Orvid.Graphics
         /// Set's the pixel at the specified location, 
         /// to the specified pixel.
         /// </summary>
-        /// <param name="x">The x position of the pixel.</param>
-        /// <param name="y">The y position of the pixel.</param>
+        /// <param name="width">The width position of the pixel.</param>
+        /// <param name="height">The height position of the pixel.</param>
         /// <param name="p">The pixel to set to.</param>
-        public void SetPixel(uint x, uint y, uint p)
+        public void SetPixel(uint x, uint y, Pixel p)
         {
-            //Modified.Add(new Vec2(x, y));
+            //Modified.Add(new Vec2(width, height));
             Data[((y * Width) + x)] = p;
         }
 
