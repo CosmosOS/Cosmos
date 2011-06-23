@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using System.IO;
 
 namespace TTF2OPFF_Converter
 {
@@ -115,27 +112,20 @@ namespace TTF2OPFF_Converter
                         if (prevChar + 1 == ch.Key)
                         {
                             strm.WriteByte(255); // write that it's incremented from the previous char.
-                            strm.WriteByte(128); // write that it's normal style.
-                            strm.WriteByte(32); // write the height
-                            strm.WriteByte(32); // write the width
-                            int len = 128;
-                            buffer = ConvertToByteArray(new Bitmap(32, 32, g));
-                            strm.Write(buffer, 0, len);
-                            prevChar = ch.Key;
                         }
                         else
                         {
                             strm.WriteByte(0); // write that it's not incremented from the previous char.
                             buffer = BitConverter.GetBytes(ch.Key);
                             strm.Write(buffer, 0, buffer.Length); // Write the char number.
-                            strm.WriteByte(128); // write that it's normal style.
-                            strm.WriteByte(32); // write the height
-                            strm.WriteByte(32); // write the width
-                            int len = 128;
-                            buffer = ConvertToByteArray(new Bitmap(32, 32, g));
-                            strm.Write(buffer, 0, len);
-                            prevChar = ch.Key;
                         }
+                        strm.WriteByte(1); // write that it's normal style.
+                        strm.WriteByte(32); // write the height
+                        strm.WriteByte(32); // write the width
+                        int len = 128;
+                        buffer = ConvertToByteArray(new Bitmap(32, 32, g));
+                        strm.Write(buffer, 0, len);
+                        prevChar = ch.Key;
                     }
 
                     strm.Flush();
