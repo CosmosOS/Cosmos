@@ -89,8 +89,8 @@ namespace Cosmos.Build.MSBuild
 						typ = WriteType.Warning;
 					uint lineNumber = uint.Parse(split[1]);
 					errorMessage = file + " Line: " + lineNumber + " Code: " + GetLine(InputFile, lineNumber).Trim();
-					this.BuildEngine.LogMessageEvent(new BuildMessageEventArgs(errorMessage,"","",MessageImportance.High));
-
+					this.BuildEngine.LogMessageEvent(
+						new BuildMessageEventArgs(errorMessage, string.Empty, string.Empty, MessageImportance.High));
 				}
 			}
 			catch (Exception)

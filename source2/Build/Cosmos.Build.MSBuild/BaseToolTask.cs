@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Build.Utilities;
 using System.Diagnostics;
 using MessageImportance = Microsoft.Build.Framework.MessageImportance;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -47,39 +48,30 @@ namespace Cosmos.Build.MSBuild
 				xProcess.BeginErrorReadLine();
 				xProcess.BeginOutputReadLine();
 				xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
-				if (xProcess.ExitCode != 0)
-				{
-					if (!xProcess.HasExited)
-					{
+				if (xProcess.ExitCode != 0) {
+					if (!xProcess.HasExited) {
 						xProcess.Kill();
 						Log.LogError("{0} timed out.", name);
 					}
-					else
-					{
+					else {
 						Log.LogError("Error occurred while invoking {0}.", name);
 					}
-					
-					return false;
 				}
 				WriteType typ;
-				foreach (var xError in mErrors)
-				{
+				foreach (var xError in mErrors) {
 					string error = xError;
-					if(ExtendLineError(xProcess.ExitCode, ref error, out typ))
-					{
+					if(ExtendLineError(xProcess.ExitCode, ref error, out typ)) {
 						Logs(typ, error);
 					}
 				}
-				foreach (var xOutput in mOutput)
-				{
+				foreach (var xOutput in mOutput) {
 					string output = xOutput;
-					if (ExtendLineError(xProcess.ExitCode, ref output, out typ))
-					{
+					if (ExtendLineError(xProcess.ExitCode, ref output, out typ)) {
 						Logs(typ, output);
 					}
 				}
+				return xProcess.ExitCode == 0;
 			}
-			return true;
 		}
 
 		private List<string> mErrors;
