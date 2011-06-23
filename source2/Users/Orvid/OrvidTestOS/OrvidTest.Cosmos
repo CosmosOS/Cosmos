@@ -21,6 +21,7 @@
     <VMWareFlavor>Workstation</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
     <TraceAssemblies>All</TraceAssemblies>
+    <ExternalLibsForArgs>D:\Documents and Settings\Orvid\Desktop\Cosmos\Trunk\source2\Users\Orvid\StructTest\bin\Debug\StructTest.obj</ExternalLibsForArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>

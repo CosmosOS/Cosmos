@@ -35,6 +35,15 @@ namespace Cosmos.Hardware
         /// </summary>
         public void Initialize()
         {
+            Cosmos.Core.Plugs.IOPortImpl.Read8(0X60);
+            g.p60.Byte = 0x20;
+            byte statusByte = Read();
+            byte modstatusByte = (byte)(((statusByte >> 2) << 1) + 1); // Enable status byte 2
+            byte final = (byte)(((modstatusByte >> 5) << 1) + ((modstatusByte << 4) >> 4)); // Disable status byte 5
+            g.p60.Byte = 0x60;
+            Write(final);
+
+
             //Enable the auxiliary mouse device
             WaitSignal();
             g.p64.Byte = 0xA8;
@@ -46,6 +55,32 @@ namespace Cosmos.Hardware
             //Set Remote Mode
             Write(0xF0);
             Read();  //Acknowledge
+
+
+            ////Enable the auxiliary mouse device
+            //WaitSignal();
+            //g.p64.Byte = 0xA8;
+
+            ////// enable interrupt
+            //WaitSignal();
+            //g.p64.Byte = 0x20;
+            //WaitData();
+            //byte tmpst = g.p60.Byte;
+            //tmpst = (byte)(((tmpst >> 2) << 1) + 1);
+            //byte status = (byte)(((tmpst >> 5) << 1) + ((byte)(tmpst << 4) >> 4));
+            ////byte status = (byte)(g.p60.Byte | 2);
+            //WaitSignal();
+            //g.p64.Byte = 0x60;
+            //WaitSignal();
+            //g.p60.Byte = status;
+
+            ////Tell the mouse to use default settings 
+            //Write(0xF6);
+            //Read();  //Acknowledge
+
+            ////Set Remote Mode
+            //Write(0xF0);
+            //Read();  //Acknowledge
         }
 
         private byte Read()
@@ -184,9 +219,13 @@ namespace Cosmos.Hardware
                 }
                 #endregion
 
-
-                GuessOS.MouseX = X;
-                GuessOS.MouseY = Y;
+                //Console.WriteLine("X: " + X + " Y: " + Y);
+                if (GuessOS.MouseX != X || GuessOS.MouseY != Y)
+                {
+                    GuessOS.MouseX = X;
+                    GuessOS.MouseY = Y;
+                    Cosmos.System.Global.Console.WriteLine("X: " + X + " Y: " + Y);
+                }
             }
         }
     }

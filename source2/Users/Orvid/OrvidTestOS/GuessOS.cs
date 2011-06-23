@@ -56,38 +56,6 @@ namespace GuessKernel
 
         private bool HadCharPrev = false;
 
-        private const float precision = 0.01f; // 1 thousandth precision.
-
-        private static float Abs(float value)
-        {
-            if (value < 0)
-                return (0 - value);
-            else
-                return value;
-        }
-
-        public static double Sqrt(double number)
-        {
-            if (number < 0)
-                Cosmos.System.Global.Console.WriteLine("number must be non-negative!");
-
-            Cosmos.System.Global.Console.WriteLine("Value of number is: " + number.ToString());
-            double guess = number / 2;
-            double diff = (guess * guess) - number;
-            Cosmos.System.Global.Console.WriteLine("Num of Iterations: 0 , estimate: " + guess.ToString());
-            int counter = 1;
-            while (Math.Abs(diff) > precision && counter <= 20)
-            {
-                guess = (guess - diff) / (2 * guess);
-                diff = (guess * guess) - number;
-                Cosmos.System.Global.Console.WriteLine("Num of Iterations: " + counter.ToString() + " , estimate: " + guess.ToString());
-                counter++;
-            }
-            if (counter > 100)
-                Cosmos.System.Global.Console.WriteLine("100 iterations done with no good enough answer");
-            return guess;
-        }
-
         protected override void Run()
         {
 
@@ -229,7 +197,7 @@ namespace GuessKernel
                 //s.DrawCircleOutline(new Vec2(150, 100), 20, (uint)8);
                 //s.DrawCircleOutline(new Vec2(Mouse.X, Mouse.Y), 15, (uint)16);
                 //s.Taskbar.DrawElipticalArc(v, 30, 10, 10, 300, (uint)90);
-                s.Taskbar.DrawRectangle(new Vec2(120, 80), new Vec2(80, 140), (uint)238);
+                //s.Taskbar.DrawReverseRectangle(new Vec2(120, 80), new Vec2(80, 140), (uint)238);
 
 
 

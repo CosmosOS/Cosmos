@@ -38,9 +38,11 @@
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
-    <ProjectReference Include="StructTestKernel.csproj">
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\StructTest\StructTestKernel.csproj">
       <Name>StructTestKernel</Name>
-      <Project>{086FC210-C2E9-4536-8235-9285929F904A}</Project>
+      <Project>{086fc210-c2e9-4536-8235-9285929f904a}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
