@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Specialized;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -640,6 +641,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // The sample engine does not support dissassembly so it returns E_NOTIMPL
         public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
         {
+            MessageBox.Show("Disassembly");
             Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
             disassemblyStream = null;
             return VSConstants.E_NOTIMPL;

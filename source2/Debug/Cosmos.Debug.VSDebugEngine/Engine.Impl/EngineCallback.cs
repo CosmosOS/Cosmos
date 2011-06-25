@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using Cosmos.Compiler.Debug;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -153,13 +154,69 @@ namespace Cosmos.Debug.VSDebugEngine
             TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
             EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
 
+            // Get C# lines
+            TextReader xTR = new StreamReader(documentName);
+            string xFile = xTR.ReadToEnd();
+            xTR.Close();
+            xFile = xFile.Replace('\r', ' ');
+            xFile = xFile.Trim();
+            string[] xFileLines = xFile.Split('\n');
+            string xMethod = xFileLines[startPosition[0].dwLine - 1];
+            int xstart = 0, xstop = 0;
+            string[] xMethodParts = xMethod.Split(' ');
+            for (int j = 0; j < xMethodParts.Length; j++)
+            {
+                if (xMethodParts[j].Contains("()"))
+                {
+                    xMethod = xMethodParts[j];
+                    break;
+                }
+            }
+            xMethod = "_" + xMethod;
+            xMethod = xMethod.Replace("()", "__:");
+
+            // Get ASM lines
+            xstart = 0; xstop = 0;
+            xstart = documentName.LastIndexOf('\\');
+            xstop = documentName.LastIndexOf('.');
+            string xFileName = documentName.Substring(0, xstart);
+            xFileName = Path.GetDirectoryName(documentName);
+            xFileName = Path.Combine(xFileName, "bin", "Debug");
+            // TODO: Error checking for no return files.
+            string[] xFiles = Directory.GetFiles(xFileName, "*.asm");
+            xFileName = Path.Combine(xFileName, xFiles[0]);
+            xTR = new StreamReader(xFileName);
+            xFile = xTR.ReadToEnd();
+            xTR.Close();
+            xFile = xFile.Replace('\r', ' ');
+            xFile = xFile.Trim();
+            xFileLines = xFile.Split('\n');
+            int k = 0, l = 0;
+            for (int j = 0; j < xFileLines.Length; j++)
+            {
+                if (xFileLines[j].Contains(xMethod))
+                {
+                    k = j;
+                    j++;
+                }
+                if ((k != 0) && (xFileLines[j].Contains(":")))
+                {
+                    l = j - 2;
+                    break;
+                }
+            }
+            //MessageBox.Show(xFileLines[k]);
+            //MessageBox.Show(xFileLines[l]);
+            //MessageBox.Show(k.ToString());
+            //MessageBox.Show(l.ToString());
             //MessageBox.Show("Name: " + documentName);
             //MessageBox.Show("Start Pos: " + startPosition[0].dwLine + " " + startPosition[0].dwColumn);
             //MessageBox.Show("End Pos: " + endPosition[0].dwLine + " " + endPosition[0].dwColumn);
-            byte[] xMsg = new byte[255];
-            xMsg = System.Text.Encoding.ASCII.GetBytes(documentName);
-            DebugWindows.SendCommand(DwMsgType.Assembly, xMsg);
-            ////
+            for (int j = k; j < l; j++)
+            {
+                DebugWindows.SendCommand(DwMsgType.Assembly, Encoding.ASCII.GetBytes(xFileLines[j]));
+            }
+                ////
 
             // An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
             // should notify each bound breakpoint that it has been hit and evaluate conditions here.
