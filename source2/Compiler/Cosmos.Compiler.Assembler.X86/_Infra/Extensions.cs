@@ -83,6 +83,10 @@ namespace Cosmos.Compiler.Assembler.X86 {
                     return "le";
                 case ConditionalTestEnum.NotLessThanOrEqualTo:
                     return "nle";
+				case ConditionalTestEnum.CXRegisterEqualOrZeroTo:
+					return "cxe";
+				case ConditionalTestEnum.ECXRegisterEqualOrZeroTo:
+					return "ecxe";
                 default: throw new NotImplementedException();
             }
         }

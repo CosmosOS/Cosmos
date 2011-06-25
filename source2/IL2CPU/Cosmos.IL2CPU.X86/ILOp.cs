@@ -73,6 +73,14 @@ namespace Cosmos.IL2CPU.X86 {
       };
     }
 
+	protected void ThrowOverflowException()
+	{
+		new CPU.Call {
+			DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(
+				typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null, new Type[] { }, null))
+		};
+	}
+
     private static void DoGetFieldsInfo(Type aType, List<IL.FieldInfo> aFields) {
       var xCurList = new Dictionary<string, IL.FieldInfo>();
       var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)

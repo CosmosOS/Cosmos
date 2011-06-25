@@ -1,19 +1,73 @@
 using System;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Add_Ovf )]
     public class Add_Ovf : ILOp
     {
-        public Add_Ovf( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+		public Add_Ovf(Cosmos.Compiler.Assembler.Assembler aAsmblr)
             : base( aAsmblr )
         {
         }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            //throw new NotImplementedException( "Add_Ovf not implemented" );
+			// TODO overflow check for float
+            var xSize = Assembler.Stack.Pop();
+            if (xSize.Size > 8)
+            {
+                //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
+                throw new NotImplementedException("StackSize>8 not supported");
+            }
+            else
+            {
+				var xBaseLabel = GetLabel(aMethod, aOpCode) + "__";
+				var xSuccessLabel = xBaseLabel + "Success";
+                if (xSize.Size > 4)
+                {
+                    if (xSize.IsFloat)
+                    {
+						//TODO overflow check
+                        new CPUx86.x87.FloatLoad { DestinationReg=Registers.ESP,Size=64, DestinationIsIndirect=true };
+                        new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                        new CPUx86.x87.FloatAdd { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect=true, Size=64 };
+                        new CPUx86.x87.FloatStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    }
+                    else
+                    {
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX }; // low part
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // high part
+                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
+						new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EAX };
+                    }
+                }
+                else
+                {
+                    if (xSize.IsFloat) //float
+                    {
+						//TODO overflow check
+                        new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                        new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.SSE.AddSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0 };
+                        new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM1 };
+                    }
+                    else //integer
+                    {
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                    }
+                }
+				if (false == xSize.IsFloat)
+				{
+					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.NoOverflow, DestinationLabel = xSuccessLabel };
+					ThrowOverflowException();
+				}
+				new Label(xSuccessLabel);
+            }
         }
-
     }
 }

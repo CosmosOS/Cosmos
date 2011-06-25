@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Compiler.Assembler.X86 {
+﻿namespace Cosmos.Compiler.Assembler.X86 {
     public enum ConditionalTestEnum:byte {
         Overflow = 0,
         NoOverflow = 1,
         Below = 2,
+		Carry = 2,
         NotAboveOrEqual = 2,
         NotBelow = 3,
+		NotCarry = 3,
         AboveOrEqual = 3,
         Equal = 4,
         Zero = 4,
@@ -32,6 +29,8 @@ namespace Cosmos.Compiler.Assembler.X86 {
         LessThanOrEqualTo = 14, 
         NotGreaterThan = 14,
         NotLessThanOrEqualTo = 15,
-        GreaterThan = 15
+        GreaterThan = 15,
+		CXRegisterEqualOrZeroTo = 16,
+		ECXRegisterEqualOrZeroTo = 17
     }
 }
