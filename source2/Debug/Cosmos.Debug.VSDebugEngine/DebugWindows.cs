@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine {
 
@@ -17,11 +18,9 @@ namespace Cosmos.Debug.VSDebugEngine {
         mPipe.Connect();
         mWriter = new StreamWriter(mPipe);
       }
-      mWriter.Write(aCmd);
-      mWriter.Write(aData);
+      mPipe.WriteByte(aCmd);
+      mPipe.Write(aData, 0, aData.Length);
       mPipe.Flush();
     }
-
   }
-
 }

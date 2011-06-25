@@ -14,26 +14,23 @@ namespace Cosmos.VS.Debug {
 
     public static void ThreadStartServer()
     {
-      using (var xPipe = new NamedPipeServerStream("CosmosDebugWindows", PipeDirection.In))
+      using (var xPipe = new NamedPipeServerStream("CosmosDebugWindows", PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.None))
       {
         xPipe.WaitForConnection();
-        while (!KillThread)
+        using (var xReader = new StreamReader(xPipe))
         {
-            using (var xReader = new StreamReader(xPipe))
+          while ((xPipe.IsConnected) || (!KillThread))
+          {
+            if (xPipe.CanRead)
             {
-                while (!xReader.EndOfStream)
-                {
-                    string xLine = xReader.ReadLine();
-                    Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
-                      {
-                          if (DataPacketReceived != null)
-                          {
-                              DataPacketReceived((byte)1, new byte[10] { (byte)1, (byte)1, (byte)1, (byte)1, (byte)1, (byte)1, (byte)1, (byte)1, (byte)1, (byte)1 });
-                          }
-                      }
-                    );
-                }
+              byte xMsgType = 0;
+              byte[] xMsg = new byte[255];
+              xMsgType = (byte)xPipe.ReadByte();
+              xPipe.Read(xMsg, 0, 255);
+              DataPacketReceived(xMsgType, xMsg);
             }
+          }
+          xPipe.Disconnect();
         }
       }
     }

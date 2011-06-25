@@ -14,10 +14,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Cosmos.VS.Debug {
-  public partial class MainWindow : Window {
-
-    public MainWindow() {
+namespace Cosmos.VS.Debug
+{
+  public partial class MainWindow : Window
+  {
+    public MainWindow()
+    {
       InitializeComponent();
 
       PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
@@ -25,16 +27,30 @@ namespace Cosmos.VS.Debug {
       xServerThread.Start();
     }
 
-    void PipeThread_DataPacketReceived(byte aMsgType, byte[] aData) {
-        MessageBox.Show("Message");
-      listBox1.Items.Add(aData);
+    void PipeThread_DataPacketReceived(byte aCommand, byte[] aMsg)
+    {
+      // Assembly
+      if ((int)aCommand == 3)
+      {
+        if (asmUC1.listBox1.Dispatcher.CheckAccess())
+        {
+          string xData = Encoding.ASCII.GetString(aMsg);
+          asmUC1.listBox1.Items.Add(xData);
+        }
+        else
+        {
+          asmUC1.listBox1.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+          {
+            string xData = Encoding.ASCII.GetString(aMsg);
+            asmUC1.listBox1.Items.Add(xData);
+          });
+        }
+      }
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        MessageBox.Show("Window Closing");
-        PipeThread.KillThread = true;
+      PipeThread.KillThread = true;
     }
-
   }
 }
