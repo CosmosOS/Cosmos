@@ -49,5 +49,6 @@ namespace Cosmos.Compiler.Debug {
   static public class DwMsgType {
     public const byte Noop = 0;
     public const byte Registers = 1;
+    public const byte Assembly = 3;
   }
 }

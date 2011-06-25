@@ -1,9 +1,10 @@
 ﻿<Window x:Class="Cosmos.VS.Debug.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="404" Width="559" xmlns:my="clr-namespace:Cosmos.VS.Debug">
+        Title="MainWindow" Height="404" Width="559" xmlns:my="clr-namespace:Cosmos.VS.Debug" Closing="Window_Closing">
     <Grid>
-    <ListBox Height="155" HorizontalAlignment="Left" Margin="12,12,0,0" Name="listBox1" VerticalAlignment="Top" Width="141" />
+    <ListBox Height="155" HorizontalAlignment="Left" Margin="12,12,0,0" Name="listBox1" VerticalAlignment="Top" Width="192" />
     <my:RegistersUC Height="341" HorizontalAlignment="Left" Margin="210,12,0,0" x:Name="registersUC1" VerticalAlignment="Top" Width="300" />
+    <my:AssemblyUC Height="173" HorizontalAlignment="Left" Margin="12,180,0,0" x:Name="asmUC1" VerticalAlignment="Top" Width="192" />
   </Grid>
 </Window>

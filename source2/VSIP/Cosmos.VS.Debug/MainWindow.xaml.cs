@@ -20,13 +20,20 @@ namespace Cosmos.VS.Debug {
     public MainWindow() {
       InitializeComponent();
 
-      PipeThread.DataPacketReceived += new Action<string>(PipeThread_DataPacketReceived);
+      PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
       var xServerThread = new Thread(PipeThread.ThreadStartServer);
       xServerThread.Start();
     }
 
-    void PipeThread_DataPacketReceived(string aData) {
+    void PipeThread_DataPacketReceived(byte aMsgType, byte[] aData) {
+        MessageBox.Show("Message");
       listBox1.Items.Add(aData);
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        MessageBox.Show("Window Closing");
+        PipeThread.KillThread = true;
     }
 
   }

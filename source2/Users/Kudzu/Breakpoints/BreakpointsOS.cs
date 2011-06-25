@@ -15,15 +15,16 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      Test xTest;
+        int i = 0;
+        Test xTest;
 
-      xTest = new NullableTest();
-      xTest.Run();
+      //xTest = new NullableTest();
+      //xTest.Run();
 
-      xTest = new Int64Test();
-      xTest.Run();
+      //xTest = new Int64Test();
+      //xTest.Run();
 
-      TestATA();
+      //TestATA();
     }
 
     protected override void BeforeRun() {

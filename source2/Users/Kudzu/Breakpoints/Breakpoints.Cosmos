@@ -22,9 +22,10 @@
     <EnableGDB>False</EnableGDB>
     <TraceMode>
     </TraceMode>
-    <VMWareFlavor>Workstation</VMWareFlavor>
+    <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
     <TraceAssemblies>Cosmos</TraceAssemblies>
+    <StartCosmosASMDBG>False</StartCosmosASMDBG>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>

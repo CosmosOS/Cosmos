@@ -4,6 +4,9 @@ using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using Cosmos.Compiler.Debug;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -131,6 +134,32 @@ namespace Cosmos.Debug.VSDebugEngine
                 boundBreakpoints[i] = objCurrentBreakpoint;
                 i++;
             }
+            
+            ////
+            IDebugPendingBreakpoint2 ppend;
+            IDebugBreakpointRequest2 req;
+            BP_REQUEST_INFO[] reqinf = new BP_REQUEST_INFO[i];
+            ((IDebugBoundBreakpoint2)boundBreakpoints[0]).GetPendingBreakpoint(out ppend);
+            ppend.GetBreakpointRequest(out req);
+            req.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION, reqinf);
+            IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(reqinf[0].bpLocation.unionmember2));
+
+            // Get the name of the document that the breakpoint was put in
+            string documentName;
+            EngineUtils.CheckOk(docPosition.GetFileName(out documentName));
+
+            // Get the location in the document that the breakpoint is in.
+            TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
+            TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
+            EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
+
+            //MessageBox.Show("Name: " + documentName);
+            //MessageBox.Show("Start Pos: " + startPosition[0].dwLine + " " + startPosition[0].dwColumn);
+            //MessageBox.Show("End Pos: " + endPosition[0].dwLine + " " + endPosition[0].dwColumn);
+            byte[] xMsg = new byte[255];
+            xMsg = System.Text.Encoding.ASCII.GetBytes(documentName);
+            DebugWindows.SendCommand(DwMsgType.Assembly, xMsg);
+            ////
 
             // An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
             // should notify each bound breakpoint that it has been hit and evaluate conditions here.
