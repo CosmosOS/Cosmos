@@ -231,7 +231,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe))
           {
               var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
-              xPSInfo.Arguments = Path.ChangeExtension(mProjectFile, ".cgdb") + @" /Connect";
+			  xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
               xPSInfo.UseShellExecute = false;
               xPSInfo.RedirectStandardInput = false;
               xPSInfo.RedirectStandardError = false;
