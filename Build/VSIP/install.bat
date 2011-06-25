@@ -90,11 +90,12 @@ IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 ..\..\Setup2\Output\CosmosUserKit.exe /SILENT
 
 echo Launching Visual Studio 2010
+REM - Emit thise before we actually launch VS, since the bat will stick there
+echo Install Completed.
+echo You can close this window now.
 
 rem Relaunch VS
 IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
 	"%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
 )
 
-echo Install Completed.
-echo You can close this window now.
