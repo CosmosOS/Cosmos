@@ -31,27 +31,13 @@ namespace Cosmos.VS.Debug
       xServerThread.Start();
     }
 
-    void CommandAsmSource(byte[] aData) {
-      string xData = Encoding.ASCII.GetString(aData);
-      xData = xData.Replace("\t", "  ");
-      asmUC1.tboxSource.Text = xData;
-      //string[] xLines = xData.Split('\n');
-      //foreach (var xLine in xLines) {
-      //  asmUC1.lboxSource.Items.Add(xLine);
-      //}
-    }
-
-    void CommandRegisters(byte[] aData) {
-      int i = 0;
-    }
-
     void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aData) {
       switch (aCommand) {
         case DwMsgType.Noop:
           break;
 
         case DwMsgType.Registers:
-          CommandRegisters(aData);
+          uctlRegisters.Update(aData);
           break;
 
         case DwMsgType.Quit:
@@ -59,7 +45,7 @@ namespace Cosmos.VS.Debug
           break;
 
         case DwMsgType.AssemblySource:
-          CommandAsmSource(aData);
+          uctlAsmSource.Update(aData);
           break;
       }
     }

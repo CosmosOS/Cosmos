@@ -13,12 +13,13 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Cosmos.VS.Debug {
-  /// <summary>
-  /// Interaction logic for RegistersUC.xaml
-  /// </summary>
   public partial class RegistersUC : UserControl {
     public RegistersUC() {
       InitializeComponent();
     }
+
+    public void Update(byte[] aData) {
+    }
+
   }
 }
