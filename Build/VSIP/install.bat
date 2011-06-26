@@ -82,7 +82,7 @@ IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
 	del /F ..\..\Setup2\Output\tmp
 :afterSetupDelete
 
-IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
+IF NOT EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Cannot find Inno Setup!
 	pause
 )
