@@ -37,11 +37,14 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mPipe.WriteByte(aCmd);
-      mPipe.WriteByte((byte)(aData.Length >> 8));
-      mPipe.WriteByte((byte)(aData.Length & 0xFF));
-      if (aData.Length > 0) {
-        mPipe.Write(aData, 0, aData.Length);
+
+      int xLength = Math.Min(aData.Length, 32000);
+      mPipe.WriteByte((byte)(xLength >> 8));
+      mPipe.WriteByte((byte)(xLength & 0xFF));
+      if (xLength > 0) {
+        mPipe.Write(aData, 0, xLength);
       }
+
       mPipe.Flush();
     }
 
