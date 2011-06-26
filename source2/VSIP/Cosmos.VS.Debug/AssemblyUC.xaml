@@ -6,6 +6,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
   <DockPanel LastChildFill="True">
-     <ListBox Name="lboxSource"/>
+     <TextBox Name="tboxSource" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
   </DockPanel>
 </UserControl>

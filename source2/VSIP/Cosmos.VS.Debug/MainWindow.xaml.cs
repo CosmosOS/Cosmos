@@ -32,13 +32,13 @@ namespace Cosmos.VS.Debug
     }
 
     void CommandAsmSource(byte[] aData) {
-      asmUC1.lboxSource.Items.Clear();
       string xData = Encoding.ASCII.GetString(aData);
       xData = xData.Replace("\t", "  ");
-      string[] xLines = xData.Split('\n');
-      foreach (var xLine in xLines) {
-        asmUC1.lboxSource.Items.Add(xLine);
-      }
+      asmUC1.tboxSource.Text = xData;
+      //string[] xLines = xData.Split('\n');
+      //foreach (var xLine in xLines) {
+      //  asmUC1.lboxSource.Items.Add(xLine);
+      //}
     }
 
     void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aData) {
