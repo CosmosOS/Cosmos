@@ -38,6 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
 					string LabelShiftRight = BaseLabel + "ShiftRightLoop";
 					string LabelNoLoop = BaseLabel + "NoLoop";
+					string LabelEnd = BaseLabel + "End";
 
 					// divisor
 					//low
@@ -59,8 +60,8 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set ecx to zero for counting the shift operations
 					new CPUx86.Xor { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX};
 
-					new Cosmos.Compiler.Assembler.Label(LabelShiftRight);
-					
+					new Label(LabelShiftRight);
+
 					// shift divisor 1 bit right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EDI, ArgumentValue = 1 };
 					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDI, SourceValue = 1 };
@@ -78,7 +79,8 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX, ArgumentReg = CPUx86.Registers.CL };
 					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.CL };
 
-					new Label(LabelNoLoop);
+					
+
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
 					new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ESI };
@@ -95,6 +97,25 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					//TODO: implement proper derivation correction and overflow detection
 
+					new CPUx86.Jump { DestinationLabel = LabelEnd };
+
+					new Label(LabelNoLoop);
+					//save high dividend
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
+					// extend that sign is in edx
+					new CPUx86.SignExtendAX { Size = 32 };
+					// divide high part
+					new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ESI };
+					// save high result
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+					// divide low part
+					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
+					// save low result
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+
+					new Label(LabelEnd);
 					Assembler.Stack.Push(8, typeof(long));
                 }
             }
