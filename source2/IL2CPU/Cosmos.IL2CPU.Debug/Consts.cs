@@ -50,5 +50,6 @@ namespace Cosmos.Compiler.Debug {
     public const byte Noop = 0;
     public const byte Registers = 1;
     public const byte Assembly = 3;
+    public const byte Quit = 4;
   }
 }
