@@ -83,19 +83,26 @@ IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
 :afterSetupDelete
 
 IF EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
-	echo Creating setup.exe
-	"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
+	echo Cannot find Inno Setup!
+	pause
 )
 
+echo Creating setup.exe
+"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
+
+echo Running setup.exe
 ..\..\Setup2\Output\CosmosUserKit.exe /SILENT
 
-echo Launching Visual Studio 2010
-REM - Emit thise before we actually launch VS, since the bat will stick there
 echo Install Completed.
-echo You can close this window now.
 
 rem Relaunch VS
 IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
+	echo Resetting hive keys
+	"%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" /setup /rootsuffix Exp /ranu
+
+	echo Launching Visual Studio 2010
+	REM - Emit thise before we actually launch VS, since the bat will stick there
+	echo You can close this window now.
 	"%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
 )
 

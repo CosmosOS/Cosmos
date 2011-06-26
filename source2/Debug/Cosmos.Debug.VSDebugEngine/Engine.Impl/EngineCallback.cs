@@ -129,7 +129,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         public void OnBreakpoint(AD7Thread thread, IList<IDebugBoundBreakpoint2> clients) {
-            var boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
+          var boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
             int i = 0;
             foreach (var objCurrentBreakpoint in clients) {
                 boundBreakpoints[i] = objCurrentBreakpoint;
@@ -176,7 +176,8 @@ namespace Cosmos.Debug.VSDebugEngine
             xMethod = xMethod.Replace("()", "__:");
 
             // Get ASM lines
-            xstart = 0; xstop = 0;
+            xstart = 0; 
+            xstop = 0;
             xstart = documentName.LastIndexOf('\\');
             xstop = documentName.LastIndexOf('.');
             string xFileName = documentName.Substring(0, xstart);
@@ -214,7 +215,7 @@ namespace Cosmos.Debug.VSDebugEngine
             //MessageBox.Show("End Pos: " + endPosition[0].dwLine + " " + endPosition[0].dwColumn);
             for (int j = k; j < l; j++)
             {
-                DebugWindows.SendCommand(DwMsgType.Assembly, Encoding.ASCII.GetBytes(xFileLines[j]));
+              DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xFileLines[j]));
             }
                 ////
 
