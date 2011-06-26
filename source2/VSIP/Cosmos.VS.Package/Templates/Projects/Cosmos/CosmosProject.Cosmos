@@ -18,6 +18,7 @@
         <BuildTarget>VMWare</BuildTarget>
         <VMWareFlavor>Player</VMWareFlavor>
         <StartCosmosGDB>false</StartCosmosGDB>
+        <StartCosmosASMDBG>false</StartCosmosASMDBG>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DebugSymbols>true</DebugSymbols>
@@ -30,6 +31,7 @@
         <BuildTarget>VMWare</BuildTarget>
         <VMWareFlavor>Player</VMWareFlavor>
         <StartCosmosGDB>false</StartCosmosGDB>
+        <StartCosmosASMDBG>false</StartCosmosASMDBG>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>

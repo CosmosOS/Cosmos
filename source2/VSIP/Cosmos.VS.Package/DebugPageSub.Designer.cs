@@ -45,7 +45,8 @@
             // 
             this.checkStartCosmosGDB.AutoSize = true;
             this.checkStartCosmosGDB.Enabled = false;
-            this.checkStartCosmosGDB.Location = new System.Drawing.Point(42, 143);
+            this.checkStartCosmosGDB.Location = new System.Drawing.Point(64, 143);
+            this.checkStartCosmosGDB.Margin = new System.Windows.Forms.Padding(25, 3, 3, 3);
             this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
             this.checkStartCosmosGDB.Size = new System.Drawing.Size(147, 17);
             this.checkStartCosmosGDB.TabIndex = 22;
@@ -146,8 +147,8 @@
             this.table.Controls.Add(this.comboDebugMode, 2, 1);
             this.table.Controls.Add(this.comboTraceMode, 2, 3);
             this.table.Controls.Add(this.checkEnableGDB, 1, 5);
-            this.table.Controls.Add(this.checkStartCosmosGDB, 1, 6);
             this.table.Controls.Add(this.checkStartCosmosASMDBG, 1, 12);
+            this.table.Controls.Add(this.checkStartCosmosGDB, 1, 6);
             this.table.Dock = System.Windows.Forms.DockStyle.Fill;
             this.table.Location = new System.Drawing.Point(0, 0);
             this.table.Margin = new System.Windows.Forms.Padding(0);
@@ -177,7 +178,7 @@
             this.checkStartCosmosASMDBG.Name = "checkStartCosmosASMDBG";
             this.checkStartCosmosASMDBG.Size = new System.Drawing.Size(218, 20);
             this.checkStartCosmosASMDBG.TabIndex = 23;
-            this.checkStartCosmosASMDBG.Text = "Use Assembly Level Debugger";
+            this.checkStartCosmosASMDBG.Text = "Enable Assembly Level Debugger";
             this.checkStartCosmosASMDBG.UseVisualStyleBackColor = true;
             // 
             // DebugPageSub
