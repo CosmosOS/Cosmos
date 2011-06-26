@@ -350,17 +350,17 @@ namespace Cosmos.Debug.VSDebugEngine {
               if (mEngine.AfterBreak) {
                 mCallback.OnStepComplete();
               } else {
-                // Code based break. Tell VS to break.
-                mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
                 // We catch and resend data rather than using a second serial port because
                 // while this would work fine in a VM, it puts extra requirements on the setup
                 // when real hardware is used.
                 mDbgConnector.SendRegisters();
+                // Code based break. Tell VS to break.
+                mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               }
             } else {
               // Found a bound breakpoint
-              mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               mDbgConnector.SendRegisters();
+              mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               mEngine.AfterBreak = true;
             }
             break;
