@@ -44,7 +44,7 @@ namespace Cosmos.VS.Debug
           Close();
           break;
 
-        case DwMsgType.Assembly:
+        case DwMsgType.AssemblySource:
           string xData = Encoding.ASCII.GetString(aMsg);
           xData = xData.Replace("\t", "  ");
           asmUC1.listBox1.Items.Add(xData);
