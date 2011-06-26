@@ -27,6 +27,11 @@ namespace Cosmos.VS.Debug
       PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
       var xServerThread = new Thread(PipeThread.ThreadStartServer);
       xServerThread.Start();
+
+      return;
+      Thread.Sleep(1000);
+      var xPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out);
+      xPipe.Connect(100);
     }
 
     void PipeThread_DataPacketReceived(byte aCommand, byte[] aMsg)
@@ -52,12 +57,7 @@ namespace Cosmos.VS.Debug
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-      PipeThread.KillThread = true;
-      if (!PipeThread.Connected) {
-        // Kick it out of the WaitForConnection
-        var xPipe = new NamedPipeClientStream(".", PipeThread.PipeName, PipeDirection.Out);
-        xPipe.Connect(100);
-      }
+      PipeThread.Stop();
     }
   }
 }
