@@ -27,10 +27,6 @@ namespace Cosmos.VS.Debug
       PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
       var xServerThread = new Thread(PipeThread.ThreadStartServer);
       xServerThread.Start();
-
-      Thread.Sleep(1000);
-      var xPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out);
-      xPipe.Connect(100);
     }
 
     void PipeThread_DataPacketReceived(byte aCommand, byte[] aMsg)
