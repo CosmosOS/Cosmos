@@ -50,28 +50,30 @@ namespace Cosmos.VS.Debug {
         //
         // Here is an interesting approach using async and polling... If need be we can go that way:
         // http://stackoverflow.com/questions/2700472/how-to-terminate-a-managed-thread-blocked-in-unmanaged-code
-        using (mPipe = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
-          mPipe.WaitForConnection();
-          if (KillThread) {
-            return;
-          }
 
-          byte xCmd;
-          int xSize;
-          while (mPipe.IsConnected && !KillThread) {
-            xCmd = ReadByte();
+        while (!KillThread) { // Loop again to allow mult incoming connections between debug sessions
+          using (mPipe = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
+            mPipe.WaitForConnection();
 
-            xSize = ReadByte() << 8;
-            xSize = xSize | ReadByte();
+            byte xCmd;
+            int xSize;
+            while (mPipe.IsConnected && !KillThread) {
+              xCmd = ReadByte();
 
-            byte[] xMsg = new byte[xSize];
-            mPipe.Read(xMsg, 0, xSize);
+              xSize = ReadByte() << 8;
+              xSize = xSize | ReadByte();
 
-            DataPacketReceived(xCmd, xMsg);
+              byte[] xMsg = new byte[xSize];
+              mPipe.Read(xMsg, 0, xSize);
+
+              DataPacketReceived(xCmd, xMsg);
+            }
           }
         }
-      } catch (Exception ex) {
-      }
+      } catch (Exception ex) { 
+        // Threads MUST have an exception handler
+        // Otherwise there are side effects when an exception occurs
+      } 
     }
   
   }
