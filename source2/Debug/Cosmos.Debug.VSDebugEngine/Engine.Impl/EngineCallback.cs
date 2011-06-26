@@ -154,6 +154,10 @@ namespace Cosmos.Debug.VSDebugEngine
             TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
             EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
 
+          //TODO: In future put enough info in cgdb so we can just look this up right away
+          //NOTE: For BPs we already can go from c# line to EIP and reverse.. which I think requires
+          // going through the IL labels.. if so I think this code can be shortened and I dont think we need
+          // to go through the cs file?
             // Get C# lines
             String xFile;
             using (var xTR = new StreamReader(documentName)) { 
