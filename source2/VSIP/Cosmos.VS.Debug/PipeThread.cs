@@ -23,7 +23,7 @@ namespace Cosmos.VS.Debug {
         Connected = true;
 
         using (var xReader = new StreamReader(xPipe)) {
-          while ((xPipe.IsConnected) || (!KillThread)) {
+          while ((xPipe.IsConnected) && (!KillThread)) {
             byte xMsgType = 0;
             byte[] xMsg = new byte[255];
             xMsgType = (byte)xPipe.ReadByte();
