@@ -19,7 +19,11 @@ namespace Cosmos.Debug.VSDebugEngine {
         mWriter = new StreamWriter(mPipe);
       }
       mPipe.WriteByte(aCmd);
-      mPipe.Write(aData, 0, aData.Length);
+      mPipe.WriteByte((byte)(aData.Length >> 8));
+      mPipe.WriteByte((byte)(aData.Length & 0xFF));
+      if (aData.Length > 0) {
+        mPipe.Write(aData, 0, aData.Length);
+      }
       mPipe.Flush();
     }
   }

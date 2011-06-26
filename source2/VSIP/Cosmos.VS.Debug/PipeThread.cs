@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Threading;
 using System.Windows;
+using Cosmos.Compiler.Debug;
 
 namespace Cosmos.VS.Debug {
   class PipeThread {
@@ -23,6 +24,15 @@ namespace Cosmos.VS.Debug {
         var xPipe = new NamedPipeClientStream(".", PipeThread.PipeName, PipeDirection.Out);
         xPipe.Connect(100);
       }
+    }
+
+    // See comment in ctor as to why we have to make this new ReadByte replacement
+    static byte ReadByte() {
+      byte[] xByte = new byte[1];
+      if (mPipe.Read(xByte, 0, 1) == 0) {
+        throw new Exception("Pipe has been closed.");
+      }
+      return xByte[0];
     }
 
     static public void ThreadStartServer() {
@@ -44,16 +54,18 @@ namespace Cosmos.VS.Debug {
           return;
         }
 
-        byte xMsgType = 0;
-        byte[] xMsg = new byte[255];
+        byte xCmd;
+        int xSize;
         while (mPipe.IsConnected && !KillThread) {
-          if (mPipe.Read(xMsg, 0, 1) > 0) {
-            // Use consts in Cosmos.Compiler.Debug here...
-            xMsgType = xMsg[0];
+          xCmd = ReadByte();
+          
+          xSize = ReadByte() << 8;
+          xSize = xSize | ReadByte();
 
-            mPipe.Read(xMsg, 0, 255);
-            DataPacketReceived(xMsgType, xMsg);
-          }
+          byte[] xMsg = new byte[xSize];
+          mPipe.Read(xMsg, 0, xSize);
+          
+          DataPacketReceived(xCmd, xMsg);
         }
       }
     }
