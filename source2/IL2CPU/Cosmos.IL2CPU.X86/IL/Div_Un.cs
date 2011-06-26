@@ -38,6 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
 					string LabelShiftRight = BaseLabel + "ShiftRightLoop";
 					string LabelNoLoop = BaseLabel + "NoLoop";
+					string LabelEnd = BaseLabel + "End";
 
 					// divisor
 					//low
@@ -78,7 +79,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX, ArgumentReg = CPUx86.Registers.CL };
 					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.CL };
 
-					new Label(LabelNoLoop);
+					
 
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
@@ -93,6 +94,26 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					//TODO: implement proper derivation correction and overflow detection
 
+					new CPUx86.Jump { DestinationLabel = LabelEnd };
+
+					new Label(LabelNoLoop);
+
+					//save high dividend
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
+					// zero EDX, so that high part is zero -> reduce overflow case
+					new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+					// divide high part
+					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
+					// save high result
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+					// divide low part
+					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
+					// save low result
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+
+					new Label(LabelEnd);
 					Assembler.Stack.Push(8, typeof(ulong));
 				}
             }
