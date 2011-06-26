@@ -6,6 +6,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-            
+        <ListBox Height="300" HorizontalAlignment="Left" Name="listBox1" VerticalAlignment="Top" Width="300" />
     </Grid>
 </UserControl>
