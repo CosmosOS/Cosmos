@@ -128,7 +128,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public string mProjectFile;
 
     protected void DbgCmdRegisters(byte[] aData) {
-      //DebugWindows.SendData(DwMsgType.Registers, aData);
+      DebugWindows.SendCommand(DwMsgType.Registers, aData);
     }
 
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
