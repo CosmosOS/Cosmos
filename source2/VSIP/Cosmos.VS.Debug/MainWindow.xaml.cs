@@ -41,13 +41,17 @@ namespace Cosmos.VS.Debug
       //}
     }
 
+    void CommandRegisters(byte[] aData) {
+      int i = 0;
+    }
+
     void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aData) {
       switch (aCommand) {
         case DwMsgType.Noop:
           break;
 
         case DwMsgType.Registers:
-          //TODO
+          CommandRegisters(aData);
           break;
 
         case DwMsgType.Quit:
