@@ -15,9 +15,7 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      Console.WriteLine("Before breakpoint.");
       int i = 0;
-      Console.WriteLine("After breakpoint.");
       Test xTest;
 
       //xTest = new NullableTest();
