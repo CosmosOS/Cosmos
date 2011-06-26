@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -51,6 +53,11 @@ namespace Cosmos.VS.Debug
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
       PipeThread.KillThread = true;
+      if (!PipeThread.Connected) {
+        // Kick it out of the WaitForConnection
+        var xPipe = new NamedPipeClientStream(".", PipeThread.PipeName, PipeDirection.Out);
+        xPipe.Connect(100);
+      }
     }
   }
 }
