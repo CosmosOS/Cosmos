@@ -53,6 +53,7 @@ namespace Cosmos.VS.Package
                     xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
 					xValues.Add("VMWareFlavor", this.GetConfigurationProperty("VMWareFlavor", false));
 					xValues.Add("StartCosmosGDB", this.GetConfigurationProperty("StartCosmosGDB", false));
+                    xValues.Add("StartCosmosASMDBG", this.GetConfigurationProperty("StartCosmosASMDBG", false));
 
                     xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
