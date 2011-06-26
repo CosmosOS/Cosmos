@@ -13,7 +13,7 @@ namespace Cosmos.VS.Debug {
     static protected bool KillThread = false;
     static protected NamedPipeServerStream mPipe;
     static public event Action<byte, byte[]> DataPacketReceived;
-    protected const string PipeName = "CosmosDebugWindows";
+    protected const string PipeName = @"Cosmos\DebugWindows";
 
     static public void Stop() {
       PipeThread.KillThread = true;

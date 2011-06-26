@@ -247,6 +247,10 @@ namespace Cosmos.Debug.VSDebugEngine {
           }
        }
 
+      // Cosmos ASM debugger
+      //
+      // Reenable on each run
+      DebugWindows.Enabled = true;
       // Launch ASM Debug Client
       if (xASMDBGClient)
       {

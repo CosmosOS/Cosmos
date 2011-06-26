@@ -9,21 +9,25 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.VSDebugEngine {
 
   static public class DebugWindows {
-    static private bool Enabled = true;
+    static public bool Enabled = true;
     static private NamedPipeClientStream mPipe;
     static private StreamWriter mWriter;
 
     static public void SendCommand(byte aCmd, byte[] aData) {
       if (!Enabled) {
-        return;
+        //return;
       }
 
       if (mPipe == null) {
-        mPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out);
+        mPipe = new NamedPipeClientStream(".", @"Cosmos\DebugWindows", PipeDirection.Out);
         try {
           // For now we assume its there or not from the first call.
           // If we don't find the server, we disable it to avoid causing lag.
-          mPipe.Connect(500);
+          // TODO: In future - try this instead:
+          // String[] listOfPipes = System.IO.Directory.GetFiles(@"\.\pipe\");
+
+          //mPipe.Connect(1000);
+          mPipe.Connect();
         } catch (TimeoutException ex) {
           mPipe.Close();
           mPipe = null;
