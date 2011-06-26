@@ -162,7 +162,8 @@ namespace Cosmos.Debug.VSDebugEngine
             xFile = xFile.Trim();
             string[] xFileLines = xFile.Split('\n');
             string xMethod = xFileLines[startPosition[0].dwLine - 1];
-            int xstart = 0, xstop = 0;
+            int xstart = 0;
+            int xstop = 0;
             string[] xMethodParts = xMethod.Split(' ');
             for (int j = 0; j < xMethodParts.Length; j++)
             {
@@ -213,11 +214,12 @@ namespace Cosmos.Debug.VSDebugEngine
             //MessageBox.Show("Name: " + documentName);
             //MessageBox.Show("Start Pos: " + startPosition[0].dwLine + " " + startPosition[0].dwColumn);
             //MessageBox.Show("End Pos: " + endPosition[0].dwLine + " " + endPosition[0].dwColumn);
+            var xData = new StringBuilder();
             for (int j = k; j < l; j++)
             {
-              DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xFileLines[j]));
+              xData.AppendLine(xFileLines[j]);
             }
-                ////
+            DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xData.ToString()));
 
             // An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
             // should notify each bound breakpoint that it has been hit and evaluate conditions here.

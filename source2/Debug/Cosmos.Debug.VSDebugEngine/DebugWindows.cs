@@ -26,8 +26,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           // TODO: In future - try this instead:
           // String[] listOfPipes = System.IO.Directory.GetFiles(@"\.\pipe\");
 
-          //mPipe.Connect(1000);
-          mPipe.Connect();
+          mPipe.Connect(500);
         } catch (TimeoutException ex) {
           mPipe.Close();
           mPipe = null;

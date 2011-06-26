@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <ListBox HorizontalAlignment="Left" Name="listBox1" VerticalAlignment="Top" />
-    </Grid>
+  <DockPanel LastChildFill="True">
+     <ListBox Name="lboxSource"/>
+  </DockPanel>
 </UserControl>

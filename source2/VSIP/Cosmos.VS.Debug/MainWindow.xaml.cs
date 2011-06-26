@@ -31,7 +31,17 @@ namespace Cosmos.VS.Debug
       xServerThread.Start();
     }
 
-    void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aMsg) {
+    void CommandAsmSource(byte[] aData) {
+      asmUC1.lboxSource.Items.Clear();
+      string xData = Encoding.ASCII.GetString(aData);
+      xData = xData.Replace("\t", "  ");
+      string[] xLines = xData.Split('\n');
+      foreach (var xLine in xLines) {
+        asmUC1.lboxSource.Items.Add(xLine);
+      }
+    }
+
+    void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aData) {
       switch (aCommand) {
         case DwMsgType.Noop:
           break;
@@ -45,9 +55,7 @@ namespace Cosmos.VS.Debug
           break;
 
         case DwMsgType.AssemblySource:
-          string xData = Encoding.ASCII.GetString(aMsg);
-          xData = xData.Replace("\t", "  ");
-          asmUC1.listBox1.Items.Add(xData);
+          CommandAsmSource(aData);
           break;
       }
     }
