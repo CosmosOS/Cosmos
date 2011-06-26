@@ -31,24 +31,32 @@ namespace Cosmos.VS.Debug
       xServerThread.Start();
     }
 
-    void PipeThread_DataPacketReceived(byte aCommand, byte[] aMsg) {
+    void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aMsg) {
       switch (aCommand) {
         case DwMsgType.Noop:
           break;
-      
+
         case DwMsgType.Registers:
           //TODO
           break;
-      
+
         case DwMsgType.Quit:
           Close();
           break;
-      
+
         case DwMsgType.Assembly:
           string xData = Encoding.ASCII.GetString(aMsg);
           asmUC1.listBox1.Items.Add(xData);
           break;
       }
+    }
+
+    void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg) {
+      Dispatcher.Invoke(DispatcherPriority.Normal,
+        (Action)delegate() {
+          PipeThread_DataPacketReceivedInvoke(aCmd, aMsg);
+        }
+      );
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
