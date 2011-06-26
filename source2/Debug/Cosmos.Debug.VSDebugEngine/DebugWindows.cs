@@ -15,9 +15,15 @@ namespace Cosmos.Debug.VSDebugEngine {
     static public void SendCommand(byte aCmd, byte[] aData) {
       if (mPipe == null) {
         mPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out);
-        mPipe.Connect();
+        try {
+          mPipe.Connect(100);
+        } catch (TimeoutException ex) {
+          mPipe = null;
+          return;
+        }
         mWriter = new StreamWriter(mPipe);
       }
+
       mPipe.WriteByte(aCmd);
       mPipe.WriteByte((byte)(aData.Length >> 8));
       mPipe.WriteByte((byte)(aData.Length & 0xFF));
@@ -26,5 +32,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       mPipe.Flush();
     }
+
   }
+
 }

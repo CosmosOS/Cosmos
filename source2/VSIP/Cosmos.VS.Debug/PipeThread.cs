@@ -41,7 +41,8 @@ namespace Cosmos.VS.Debug {
         // cancel WaitForConnection, or ReadByte. (pipes introduced in 3.5, I thought one time I read
         // that 4.0 added an abort option, but I cannot find it)
         // If you set Async as the option, but use sync calls, .Close can kind of kill them.
-        // It causes exceptions to be raised in WaitForConnection and ReadByte, but they just
+        // It causes exceptions to be raised in WaitForConnection and ReadByte (possibly due to another
+        // issue with threads and exceptions without handlers, maybe check again later), but they just
         // loop over and over on it... READ however with the async option WILL exit with 0....
         // Its like VB1 and adding to sorted listboxes over all again... no one dogfooded this stuff.
         // And yes we could use async.. but its SOOO much messier and far more complicated than it ever
@@ -69,7 +70,7 @@ namespace Cosmos.VS.Debug {
             DataPacketReceived(xCmd, xMsg);
           }
         }
-      } finally {
+      } catch (Exception ex) {
       }
     }
   
