@@ -15,32 +15,46 @@ namespace Cosmos.VS.Debug {
     protected const string PipeName = "CosmosDebugWindows";
 
     static public void Stop() {
-      if (!mPipe.IsConnected) {
-        PipeThread.KillThread = true;
+      PipeThread.KillThread = true;
+      if (mPipe.IsConnected) {
+        mPipe.Close();
+      } else {
         // Kick it out of the WaitForConnection
         var xPipe = new NamedPipeClientStream(".", PipeThread.PipeName, PipeDirection.Out);
         xPipe.Connect(100);
-      } else {
-        mPipe.Close();
       }
     }
 
     static public void ThreadStartServer() {
-      mPipe = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.None);
-      mPipe.WaitForConnection();
-      if (KillThread) {
-        return;
-      }
-
-      using (var xReader = new StreamReader(mPipe)) {
-        while ((mPipe.IsConnected) && (!KillThread)) {
-          byte xMsgType = 0;
-          byte[] xMsg = new byte[255];
-          xMsgType = (byte)mPipe.ReadByte();
-          mPipe.Read(xMsg, 0, 255);
-          DataPacketReceived(xMsgType, xMsg);
+      // Some idiot MS intern must have written the blocking part of pipes. There is no way to
+      // cancel WaitForConnection, or ReadByte. (pipes introduced in 3.5, I thought one time I read
+      // that 4.0 added an abort option, but I cannot find it)
+      // If you set Async as the option, but use sync calls, .Close can kind of kill them.
+      // It causes exceptions to be raised in WaitForConnection and ReadByte, but they just
+      // loop over and over on it... READ however with the async option WILL exit with 0....
+      // Its like VB1 and adding to sorted listboxes over all again... no one dogfooded this stuff.
+      // And yes we could use async.. but its SOOO much messier and far more complicated than it ever
+      // should be.
+      //
+      // Here is an interesting approach using async and polling... If need be we can go that way:
+      // http://stackoverflow.com/questions/2700472/how-to-terminate-a-managed-thread-blocked-in-unmanaged-code
+      using (mPipe = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
+        mPipe.WaitForConnection();
+        if (KillThread) {
+          return;
         }
-        mPipe.Disconnect();
+
+        byte xMsgType = 0;
+        byte[] xMsg = new byte[255];
+        while (mPipe.IsConnected && !KillThread) {
+          if (mPipe.Read(xMsg, 0, 1) > 0) {
+            // Use consts in Cosmos.Compiler.Debug here...
+            xMsgType = xMsg[0];
+
+            mPipe.Read(xMsg, 0, 255);
+            DataPacketReceived(xMsgType, xMsg);
+          }
+        }
       }
     }
   

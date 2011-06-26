@@ -28,7 +28,6 @@ namespace Cosmos.VS.Debug
       var xServerThread = new Thread(PipeThread.ThreadStartServer);
       xServerThread.Start();
 
-      return;
       Thread.Sleep(1000);
       var xPipe = new NamedPipeClientStream(".", "CosmosDebugWindows", PipeDirection.Out);
       xPipe.Connect(100);
