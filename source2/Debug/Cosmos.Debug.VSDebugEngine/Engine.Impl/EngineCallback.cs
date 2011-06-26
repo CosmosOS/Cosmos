@@ -155,15 +155,13 @@ namespace Cosmos.Debug.VSDebugEngine
             EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
 
             // Get C# lines
-            TextReader xTR = new StreamReader(documentName);
-            string xFile = xTR.ReadToEnd();
-            xTR.Close();
+            String xFile;
+            using (var xTR = new StreamReader(documentName)) { 
+              xFile = xTR.ReadToEnd();
+            }
             xFile = xFile.Replace('\r', ' ');
-            xFile = xFile.Trim();
             string[] xFileLines = xFile.Split('\n');
             string xMethod = xFileLines[startPosition[0].dwLine - 1];
-            int xstart = 0;
-            int xstop = 0;
             string[] xMethodParts = xMethod.Split(' ');
             for (int j = 0; j < xMethodParts.Length; j++)
             {
@@ -177,19 +175,17 @@ namespace Cosmos.Debug.VSDebugEngine
             xMethod = xMethod.Replace("()", "__:");
 
             // Get ASM lines
-            xstart = 0; 
-            xstop = 0;
-            xstart = documentName.LastIndexOf('\\');
-            xstop = documentName.LastIndexOf('.');
-            string xFileName = documentName.Substring(0, xstart);
+            int xStart = documentName.LastIndexOf('\\');
+            int xStop = documentName.LastIndexOf('.');
+            string xFileName = documentName.Substring(0, xStart);
             xFileName = Path.GetDirectoryName(documentName);
             xFileName = Path.Combine(xFileName, "bin", "Debug");
             // TODO: Error checking for no return files.
             string[] xFiles = Directory.GetFiles(xFileName, "*.asm");
             xFileName = Path.Combine(xFileName, xFiles[0]);
-            xTR = new StreamReader(xFileName);
-            xFile = xTR.ReadToEnd();
-            xTR.Close();
+            using (var xTR = new StreamReader(xFileName)) {
+              xFile = xTR.ReadToEnd();
+            }
             xFile = xFile.Replace('\r', ' ');
             xFile = xFile.Trim();
             xFileLines = xFile.Split('\n');
