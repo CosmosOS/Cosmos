@@ -15,6 +15,7 @@ using Cosmos.Build.Common;
 using System.Windows.Forms;
 using System.Threading;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.VSDebugEngine {
   public class AD7Process : IDebugProcess2 {
@@ -202,7 +203,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
       mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
       mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
-
+      
       System.Threading.Thread.Sleep(250);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
       mProcess = Process.Start(mProcessStartInfo);
@@ -350,15 +351,19 @@ namespace Cosmos.Debug.VSDebugEngine {
               if (mEngine.AfterBreak) {
                 mCallback.OnStepComplete();
               } else {
+                
                 // We catch and resend data rather than using a second serial port because
                 // while this would work fine in a VM, it puts extra requirements on the setup
                 // when real hardware is used.
+                SendAssembly();
                 mDbgConnector.SendRegisters();
                 // Code based break. Tell VS to break.
+                
                 mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               }
             } else {
               // Found a bound breakpoint
+              SendAssembly();  
               mDbgConnector.SendRegisters();
               mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               mEngine.AfterBreak = true;
@@ -503,6 +508,43 @@ namespace Cosmos.Debug.VSDebugEngine {
         MessageBox.Show("Unknown step type requested.");
         mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
       }
+    }
+
+    public void SendAssembly()
+    {
+      //Get Current BP Label
+      string xCurrendBPLabel = mAddressLabelMappings[(uint)mCurrentAddress];
+      // Get ASM lines
+      string xAsmDocumentName = Path.ChangeExtension(mISO, "asm");
+      string xFile;
+      string[] xFileLines;
+      using (var xTR = new StreamReader(xAsmDocumentName))
+      {
+        xFile = xTR.ReadToEnd();
+      }
+      xFile = xFile.Replace('\r', ' ');
+      xFile = xFile.Trim();
+      xFileLines = xFile.Split('\n');
+      int k = 0, l = 0;
+      for (int j = 0; j < xFileLines.Length; j++)
+      {
+        if (xFileLines[j].Contains(xCurrendBPLabel))
+        {
+          k = j;
+          j++;
+        }
+        if ((k != 0) && (xFileLines[j].Contains(":")))
+        {
+          l = j - 2;
+          break;
+        }
+      }
+      var xData = new StringBuilder();
+      for (int j = k; j < l; j++)
+      {
+        xData.AppendLine(xFileLines[j]);
+      }
+      DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xData.ToString()));
     }
   }
 }

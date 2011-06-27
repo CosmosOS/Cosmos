@@ -106,10 +106,6 @@ namespace Cosmos.Debug.VSDebugEngine {
                         var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
                         mBoundBPs.Add(xBBP);
                     }
-                    //MessageBox.Show("Name: " + documentName);
-                    //MessageBox.Show("Start Pos: " + startPosition[0].dwLine + " " + startPosition[0].dwColumn);
-                    //MessageBox.Show("End Pos: " + endPosition[0].dwLine + " " + endPosition[0].dwColumn);
-                    //MessageBox.Show(xAddress.ToString());
 
                     // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
                     //uint[] addresses = mEngine.DebuggedProcess.GetAddressesForSourceLocation(null, 
