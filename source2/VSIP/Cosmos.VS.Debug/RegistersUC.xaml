@@ -7,7 +7,7 @@
              d:DesignHeight="310" d:DesignWidth="300">
     <Grid>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="32" />
+      <ColumnDefinition Width="37" />
       <ColumnDefinition Width="75" />
       <ColumnDefinition Width="27" />
       <ColumnDefinition Width="40" />
@@ -18,15 +18,16 @@
     </Grid.ColumnDefinitions>
     <Grid.RowDefinitions>
       <RowDefinition Height="25" />
-      <RowDefinition Height="25" />
-      <RowDefinition Height="25" />
-      <RowDefinition Height="25" />
-      <RowDefinition Height="40" />
       <RowDefinition Height="27" />
-      <RowDefinition Height="40" />
-      <RowDefinition Height="25" />
-      <RowDefinition Height="25" />
-      <RowDefinition Height="25" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
+      <RowDefinition Height="27" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
     <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Registers" HorizontalAlignment="Left" FontWeight="Bold" />
@@ -61,16 +62,16 @@
     <Label Grid.Column="4" Grid.Row="4" Content="DH" HorizontalAlignment="Right" />
     <Label Grid.Column="5" Grid.Row="4" Content="12" Name="lablDH" />
     <Label Grid.Column="6" Grid.Row="4" Content="DL" HorizontalAlignment="Right" />
-    <Label Grid.Column="7" Grid.Row="1" Content="12" Name="lablDL" />
-    <Label Grid.Column="0" Grid.Row="5" Content="EIP" HorizontalAlignment="Right" />
-    <Label Grid.Column="3" Grid.Row="5" Grid.ColumnSpan="2" Content="Flags" HorizontalAlignment="Right" />
-    <Label Grid.Column="0" Grid.Row="7" Content="ESP" HorizontalAlignment="Right" />
-    <Label Grid.Column="1" Grid.Row="7" Content="12345678" Name="lablESP" />
-    <Label Grid.Column="0" Grid.Row="8" Content="EBP" HorizontalAlignment="Right" />
-    <Label Grid.Column="1" Grid.Row="8" Content="12345678" Name="lablEBP" />
-    <Label Grid.Column="0" Grid.Row="9" Content="ESI" HorizontalAlignment="Right" />
-    <Label Grid.Column="1" Grid.Row="9" Content="12345678" Name="lablESI" />
-    <Label Grid.Column="0" Grid.Row="10" Content="EDI" HorizontalAlignment="Right" />
-    <Label Grid.Column="1" Grid.Row="10" Content="12345678" Name="lablEDI" />
+    <Label Grid.Column="7" Grid.Row="4" Content="12" Name="lablDL" />
+    <Label Grid.Column="0" Grid.Row="9" Content="EIP" HorizontalAlignment="Right" />
+    <Label Grid.Column="0" Grid.Row="10" Content="Flags" HorizontalAlignment="Right" />
+    <Label Grid.Column="0" Grid.Row="8" Content="ESP" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="8" Content="12345678" Name="lablESP" />
+    <Label Grid.Column="0" Grid.Row="5" Content="EBP" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="5" Content="12345678" Name="lablEBP" />
+    <Label Grid.Column="0" Grid.Row="6" Content="ESI" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="6" Content="12345678" Name="lablESI" />
+    <Label Grid.Column="0" Grid.Row="7" Content="EDI" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="7" Content="12345678" Name="lablEDI" />
   </Grid>
 </UserControl>
