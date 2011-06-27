@@ -21,9 +21,9 @@ namespace Cosmos.VS.Debug {
     protected void UpdateRegisters(byte[] aData, int aOffset, Label a32, Label a16, Label a8Hi, Label a8Lo) {
       byte x8Lo = aData[aOffset];
       byte x8Hi = aData[aOffset + 1];
-      a8Lo.Content = x8Lo.ToString("X2");
-      a8Hi.Content = x8Hi.ToString("X2");
-      a16.Content = x8Hi.ToString("X2") + x8Lo.ToString("X2");
+      SetLabel(a8Lo, x8Lo.ToString("X2"));
+      SetLabel(a8Hi, x8Hi.ToString("X2"));
+      SetLabel(a16, x8Hi.ToString("X2") + x8Lo.ToString("X2"));
       UpdateRegister32(aData, aOffset, a32);
     }
 
@@ -33,7 +33,13 @@ namespace Cosmos.VS.Debug {
         aData[aOffset + 2] << 16 |
         aData[aOffset + 1] << 8 |
         aData[aOffset]);
-      a32.Content = x32.ToString("X8");
+      SetLabel(a32, x32.ToString("X8"));
+    }
+
+    protected void SetLabel(Label aLabel, string aContent) {
+      string xOldContent = (string)aLabel.Content;
+      aLabel.Content = aContent;
+      aLabel.Foreground = (xOldContent == aContent) ? Brushes.Black : Brushes.Red;
     }
 
     public void Update(byte[] aData) {
