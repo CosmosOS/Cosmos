@@ -30,7 +30,7 @@
       <RowDefinition Height="27" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
-    <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Registers" HorizontalAlignment="Left" FontWeight="Bold" />
+    <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="8" Content="Registers" HorizontalAlignment="Left" FontWeight="Bold" />
     <Label Grid.Column="0" Grid.Row="1" Content="EAX" HorizontalAlignment="Right" />
     <Label Grid.Column="1" Grid.Row="1" Content="12345678" Name="lablEAX" />
     <Label Grid.Column="2" Grid.Row="1" Content="AX" HorizontalAlignment="Right" />
@@ -64,9 +64,11 @@
     <Label Grid.Column="6" Grid.Row="4" Content="DL" HorizontalAlignment="Right" />
     <Label Grid.Column="7" Grid.Row="4" Content="12" Name="lablDL" />
     <Label Grid.Column="0" Grid.Row="9" Content="EIP" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="9" Content="12345678" Name="lablEIP" />
     <Label Grid.Column="0" Grid.Row="10" Content="Flags" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="7" Content="Unknown" Name="lablFlags" />
     <Label Grid.Column="0" Grid.Row="8" Content="ESP" HorizontalAlignment="Right" />
-    <Label Grid.Column="1" Grid.Row="8" Content="12345678" Name="lablESP" />
+    <Label Grid.Column="1" Grid.Row="8" Content="Unknown" Name="lablESP" />
     <Label Grid.Column="0" Grid.Row="5" Content="EBP" HorizontalAlignment="Right" />
     <Label Grid.Column="1" Grid.Row="5" Content="12345678" Name="lablEBP" />
     <Label Grid.Column="0" Grid.Row="6" Content="ESI" HorizontalAlignment="Right" />

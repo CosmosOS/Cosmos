@@ -37,26 +37,31 @@ namespace Cosmos.VS.Debug {
     }
 
     public void Update(byte[] aData) {
-      //Temp = (ESP);
-      //Push(EAX); 28
-      //Push(ECX); 24
-      //Push(EDX); 20
-      //Push(EBX); 16
-      //Push(Temp); 12 // TODO - Have to get from another source, ESP is already in DS when we pushall
-      //Push(EBP); 8
-      //Push(ESI); 4
-      //Push(EDI); 0
+      //Push All
+      //  Temp = (ESP);
+      //  Push(EAX); 28
+      //  Push(ECX); 24
+      //  Push(EDX); 20
+      //  Push(EBX); 16
+      //  Push(Temp); 12 // Have to get from another source, ESP is already in DS when we pushall
+      //  Push(EBP); 8
+      //  Push(ESI); 4
+      //  Push(EDI); 0
       // We get them from bottom up, so we receive them in reverse order as shown above. That is 0-3 is EDI.
+      //
+      // Additional ones sent manually (at end, not from stack)
+      // EIP 32
+      //
       UpdateRegisters(aData, 28, lablEAX, lablAX, lablAH, lablAL);
       UpdateRegisters(aData, 16, lablEBX, lablBX, lablBH, lablBL);
       UpdateRegisters(aData, 24, lablECX, lablCX, lablCH, lablCL);
       UpdateRegisters(aData, 20, lablEDX, lablDX, lablDH, lablDL);
-      //TODO: EIP
-      //TODO: Flags
       //TODO: ESP
       UpdateRegister32(aData, 8, lablEBP);
       UpdateRegister32(aData, 4, lablESI);
       UpdateRegister32(aData, 0, lablEDI);
+      UpdateRegister32(aData, 32, lablEIP);
+      //TODO: Flags
     }
 
   }

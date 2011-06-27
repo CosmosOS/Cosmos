@@ -350,6 +350,9 @@ namespace Cosmos.Compiler.DebugStub {
             Label = "DebugStub_TracerEntry";
 
             // Why do we save this? Do we change EBP anywhere? And if so why dont we reset EBP back again?
+            //
+            // EBP is restored by PopAll, but it appears there are times we might need EBP (past, or future)
+            // for the DebugStub
             Memory["DebugOriginalEBP", 32] = EBP;
 
             // If debug stub is in break, and then an IRQ happens, the IRQ
