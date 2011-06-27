@@ -36,6 +36,12 @@ namespace Cosmos.VS.Debug
         case DwMsgType.Noop:
           break;
 
+        case DwMsgType.Stack:
+          break;
+
+        case DwMsgType.Frame:
+          break;
+
         case DwMsgType.Registers:
           uctlRegisters.Update(aData);
           break;

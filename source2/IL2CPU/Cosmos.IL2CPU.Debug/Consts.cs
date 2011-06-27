@@ -56,6 +56,6 @@ namespace Cosmos.Compiler.Debug {
     public const byte AssemblySource = 3;
     public const byte Quit = 4;
     public const byte Frame = 5;
-    public const byte Stack = 5;
+    public const byte Stack = 6;
   }
 }

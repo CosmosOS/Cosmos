@@ -13,12 +13,13 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Cosmos.VS.Debug {
-  /// <summary>
-  /// Interaction logic for StackUC.xaml
-  /// </summary>
   public partial class StackUC : UserControl {
     public StackUC() {
       InitializeComponent();
+    }
+
+    public void Update(byte[] aData) {
+
     }
   }
 }
