@@ -47,7 +47,7 @@
     <Label Grid.Column="6" Grid.Row="2" Content="BL" HorizontalAlignment="Right" />
     <Label Grid.Column="7" Grid.Row="2" Content="12" Name="lablBL" />
     <Label Grid.Column="0" Grid.Row="3" Content="ECX" HorizontalAlignment="Right" />
-    <Label Grid.Column="1" Grid.Row="4" Content="12345678" Name="lablECX" />
+    <Label Grid.Column="1" Grid.Row="3" Content="12345678" Name="lablECX" />
     <Label Grid.Column="2" Grid.Row="3" Content="CX" HorizontalAlignment="Right" />
     <Label Grid.Column="3" Grid.Row="3" Content="1234" Name="lablCX" />
     <Label Grid.Column="4" Grid.Row="3" Content="CH" HorizontalAlignment="Right" />
@@ -65,8 +65,12 @@
     <Label Grid.Column="0" Grid.Row="5" Content="EIP" HorizontalAlignment="Right" />
     <Label Grid.Column="3" Grid.Row="5" Grid.ColumnSpan="2" Content="Flags" HorizontalAlignment="Right" />
     <Label Grid.Column="0" Grid.Row="7" Content="ESP" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="7" Content="12345678" Name="lablESP" />
     <Label Grid.Column="0" Grid.Row="8" Content="EBP" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="8" Content="12345678" Name="lablEBP" />
     <Label Grid.Column="0" Grid.Row="9" Content="ESI" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="9" Content="12345678" Name="lablESI" />
     <Label Grid.Column="0" Grid.Row="10" Content="EDI" HorizontalAlignment="Right" />
+    <Label Grid.Column="1" Grid.Row="10" Content="12345678" Name="lablEDI" />
   </Grid>
 </UserControl>
