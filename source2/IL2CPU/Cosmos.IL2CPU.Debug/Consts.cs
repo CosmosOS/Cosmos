@@ -24,6 +24,8 @@ namespace Cosmos.Compiler.Debug {
     // Sent after commands to acknowledge receipt during batch mode
     public const byte CmdCompleted = 9;
     public const byte Registers = 10;
+    public const byte Frame = 11;
+    public const byte Stack = 12;
   }
 
   // Messages from Host to Guest
@@ -42,8 +44,10 @@ namespace Cosmos.Compiler.Debug {
     public const byte StepOver = 11;
     public const byte StepOut = 12;
     public const byte SendRegisters = 13;
+    public const byte SendFrame = 14;
+    public const byte SendStack = 15;
     // Make sure this is always the last entry. Used by DebugStub to verify commands
-    public const byte Max = 14;
+    public const byte Max = 16;
   }
 
   static public class DwMsgType {
@@ -51,5 +55,7 @@ namespace Cosmos.Compiler.Debug {
     public const byte Registers = 1;
     public const byte AssemblySource = 3;
     public const byte Quit = 4;
+    public const byte Frame = 5;
+    public const byte Stack = 5;
   }
 }
