@@ -533,7 +533,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           k = j;
           j++;
         }
-        if ((k != 0) && (xFileLines[j].Contains(":")))
+        if ((k != 0) && (xFileLines[j].Contains("System")))
         {
           l = j - 2;
           break;
