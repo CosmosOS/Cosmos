@@ -117,11 +117,15 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyControl.xaml.cs">
-      <DependentUpon>MyControl.xaml</DependentUpon>
+    <Compile Include="CosmosVSAssembly_UserControl.xaml.cs">
+      <DependentUpon>CosmosVSAssembly_UserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MyToolWindow.cs" />
+    <Compile Include="CosmosVSRegisters_UserControl.xaml.cs">
+      <DependentUpon>CosmosVSRegisters_UserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CosmosVSAssembly_ToolWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="CosmosVSRegisters_ToolWindow.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -154,6 +158,7 @@
   <ItemGroup>
     <VSCTCompile Include="Cosmos.VS.Windows.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,7 +169,11 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MyControl.xaml">
+    <Page Include="CosmosVSAssembly_UserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CosmosVSRegisters_UserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

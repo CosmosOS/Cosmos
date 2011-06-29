@@ -23,9 +23,6 @@
   <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
   <Extern href="msobtnid.h"/>
 
-
-
-
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidCosmos_VS_WindowsPkg">
@@ -37,16 +34,13 @@
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
 
-    
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-
-
     </Groups>
-    
+
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button 
         or combo box in a toolbar. -->
@@ -58,8 +52,6 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
-
-
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="bmpPic2" />
@@ -68,8 +60,14 @@
           <ButtonText>Cosmos Assembly Window</ButtonText>
         </Strings>
       </Button>
-
-
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <CommandName>cmdidCosmosRegisters</CommandName>
+          <ButtonText>Cosmos Registers Window</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -85,22 +83,16 @@
  
   </Commands>
 
-
-
-
-
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidCosmos_VS_WindowsPkg" value="{a82b45e9-2a89-43bd-925d-c7f0edd212aa}" />
     
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidCosmos_VS_WindowsCmdSet" value="{3d4b3f35-36e7-4cea-8acc-d9601e45c0b9}">
-
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidCosmosAssembly" value="0x0101" />
-    </GuidSymbol>
-    
-    
+      <IDSymbol name="cmdidCosmosRegisters" value="0x0102" />
+    </GuidSymbol> 
     
     <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >
       <IDSymbol name="bmpPic1" value="1" />

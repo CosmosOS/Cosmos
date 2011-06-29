@@ -19,17 +19,16 @@ namespace Cosmos.Cosmos_VS_Windows
     /// This class derives from the ToolWindowPane class provided from the MPF in order to use its 
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
-    [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
-    public class MyToolWindow : ToolWindowPane
+    [Guid("CE2A2D0F-0F1B-4A1F-A9AC-5A5F2A5E2C25")]
+    public class CosmosVSRegisters_ToolWindow : ToolWindowPane
     {
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public MyToolWindow() :
-            base(null)
+        public CosmosVSRegisters_ToolWindow() : base(null)
         {
             // Set the window title reading it from the resources.
-            this.Caption = Resources.ToolWindowTitle;
+            this.Caption = "Cosmos x86 Registers Window"; // Resources.ToolWindowTitle;
             // Set the image that will appear on the tab of the window frame
             // when docked with an other window
             // The resource ID correspond to the one defined in the resx file
@@ -41,7 +40,7 @@ namespace Cosmos.Cosmos_VS_Windows
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            base.Content = new MyControl();
+            base.Content = new CosmosVSRegisters_UserControl();
         }
     }
 }
