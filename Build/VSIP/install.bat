@@ -42,6 +42,7 @@ REM xcopy /Y ..\..\source\Cosmos\Cosmos.Sys.Plugs\bin\Debug\Cosmos.Sys.Plugs.* .
 REM xcopy /Y ..\..\source\Cosmos.Kernel.FileSystems\bin\debug\Cosmos.Sys.FileSystem.* .
 REM xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Package\bin\Debug\Cosmos.VS.Package.* .
 REM xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Wizards\bin\Debug\Cosmos.VS.Wizards.* .
+REM xcopy /Y ..\..\source2\VSIP\Cosmos.VS.Windows\bin\Debug\Cosmos.VS.Windows.* .
 
 REM xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosProject (VB).zip" .
 REM xcopy /Y "..\..\source2\VSIP\Cosmos.VS.Package\obj\Debug\CosmosKernel (VB).zip" .

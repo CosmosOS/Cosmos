@@ -171,6 +171,7 @@ Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uni
 Source: .\Build\VSIP\fbembed.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\icu*.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\FirebirdSql.Data.FirebirdClient.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.VS.Windows.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 
 ; wizards
 Source: .\Build\VSIP\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2010_PATH}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
