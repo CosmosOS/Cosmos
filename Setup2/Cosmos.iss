@@ -276,6 +276,24 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{B4DE9307-C062-4
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
 
+; debug window
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos_VS_WindowsPackage; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos_VS_WindowsPackage; ValueType: string; ValueData: #110
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos_VS_WindowsPackage; ValueName: Package; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos_VS_WindowsPackage; ValueName: PID; ValueType: string; ValueData: 1.0
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos_VS_WindowsPackage; ValueName: ProductDetails; ValueType: string; ValueData: #112
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos_VS_WindowsPackage; ValueName: LogoID; ValueType: string; ValueData: #400
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.Cosmos_VS_WindowsPackage, Cosmos.VS.Windows, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fe99f43f2598173f
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueName: InprocServer32; ValueType: string; ValueData: {sys}\MSCOREE.DLL
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueName: Class; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.Cosmos_VS_WindowsPackage
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueName: CodeBase; ValueType: string; ValueData: {app}\Build\VSIP\Cosmos.VS.Windows.dll
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Menus; ValueName: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueType: string; ValueData: , Menus.ctmenu, 1
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueName: Name; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.MyToolWindow
+
+
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
 Root: HKCU; SubKey: Software\Microsoft\VisualStudio\10.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
