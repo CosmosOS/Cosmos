@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Cosmos.Cosmos_VS_Windows.CosmosVSRegisters_UserControl"
+﻿<UserControl x:Class="Cosmos.Cosmos_VS_Windows.AssemblyUC"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,12 +6,9 @@
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Name="MyToolWindow1"
+             Name="CosmosAssemblyUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
-    <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}">This is a toolwindow with WPF content</TextBlock>
-            <Button Content="_Click Me!" Width="80" Height="80" Name="button1" Click="button1_Click" />
-        </StackPanel>
-    </Grid>
+    <DockPanel LastChildFill="True">
+        <TextBox Name="tboxSource" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
+    </DockPanel>
 </UserControl>

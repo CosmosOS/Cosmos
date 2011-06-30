@@ -117,15 +117,16 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CosmosVSAssembly_UserControl.xaml.cs">
-      <DependentUpon>CosmosVSAssembly_UserControl.xaml</DependentUpon>
+    <Compile Include="AssemblyUC.xaml.cs">
+      <DependentUpon>AssemblyUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CosmosVSRegisters_UserControl.xaml.cs">
-      <DependentUpon>CosmosVSRegisters_UserControl.xaml</DependentUpon>
+    <Compile Include="PipeThread.cs" />
+    <Compile Include="RegistersUC.xaml.cs">
+      <DependentUpon>RegistersUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CosmosVSAssembly_ToolWindow.cs" />
+    <Compile Include="AssemblyTW.cs" />
     <Compile Include="Guids.cs" />
-    <Compile Include="CosmosVSRegisters_ToolWindow.cs" />
+    <Compile Include="RegistersTW.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -169,14 +170,20 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CosmosVSAssembly_UserControl.xaml">
+    <Page Include="AssemblyUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CosmosVSRegisters_UserControl.xaml">
+    <Page Include="RegistersUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+      <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
+      <Name>Cosmos.Compiler.Debug</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

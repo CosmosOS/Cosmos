@@ -20,12 +20,12 @@ namespace Cosmos.Cosmos_VS_Windows
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
     [Guid("CE2A2D0F-0F1B-4A1F-A9AC-5A5F2A5E2C25")]
-    public class CosmosVSRegisters_ToolWindow : ToolWindowPane
+    public class RegistersTW : ToolWindowPane
     {
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public CosmosVSRegisters_ToolWindow() : base(null)
+        public RegistersTW() : base(null)
         {
             // Set the window title reading it from the resources.
             this.Caption = "Cosmos x86 Registers Window"; // Resources.ToolWindowTitle;
@@ -40,7 +40,7 @@ namespace Cosmos.Cosmos_VS_Windows
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            base.Content = new CosmosVSRegisters_UserControl();
+            base.Content = new RegistersUC();
         }
     }
 }

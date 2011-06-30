@@ -30,8 +30,8 @@ namespace Cosmos.Cosmos_VS_Windows
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
-    [ProvideToolWindow(typeof(CosmosVSAssembly_ToolWindow))]
-    [ProvideToolWindow(typeof(CosmosVSRegisters_ToolWindow))]
+    [ProvideToolWindow(typeof(AssemblyTW))]
+    [ProvideToolWindow(typeof(RegistersTW))]
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
@@ -57,7 +57,7 @@ namespace Cosmos.Cosmos_VS_Windows
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
-            ToolWindowPane window = this.FindToolWindow(typeof(CosmosVSAssembly_ToolWindow), 0, true);
+            ToolWindowPane window = this.FindToolWindow(typeof(AssemblyTW), 0, true);
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
@@ -71,7 +71,7 @@ namespace Cosmos.Cosmos_VS_Windows
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
-            ToolWindowPane window = this.FindToolWindow(typeof(CosmosVSRegisters_ToolWindow), 0, true);
+            ToolWindowPane window = this.FindToolWindow(typeof(RegistersTW), 0, true);
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
@@ -97,12 +97,12 @@ namespace Cosmos.Cosmos_VS_Windows
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
-                // Create the command for the tool window
+                // Create the command for the assembly tool window
                 CommandID CosmosVSAssemblyToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosAssembly);
                 MenuCommand CosmosVSAssemblyToolWindowMenuCommand = new MenuCommand(ShowCosmosVSAssemblyToolWindow, CosmosVSAssemblyToolWindowCommandID);
                 mcs.AddCommand(CosmosVSAssemblyToolWindowMenuCommand);
 
-                // Create the command for the tool window
+                // Create the command for the registers tool window
                 CommandID CosmosVSRegistersToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosRegisters);
                 MenuCommand CosmosVSRegistersToolWindowMenuCommand = new MenuCommand(ShowCosmosVSRegistersToolWindow, CosmosVSRegistersToolWindowCommandID);
                 mcs.AddCommand(CosmosVSRegistersToolWindowMenuCommand);
