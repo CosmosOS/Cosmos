@@ -107,6 +107,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 MenuCommand CosmosVSRegistersToolWindowMenuCommand = new MenuCommand(ShowCosmosVSRegistersToolWindow, CosmosVSRegistersToolWindowCommandID);
                 mcs.AddCommand(CosmosVSRegistersToolWindowMenuCommand);
             }
+            PipeCallback xPipeCallback = new PipeCallback();
         }
         #endregion
 

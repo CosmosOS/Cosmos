@@ -22,11 +22,8 @@ namespace Cosmos.Cosmos_VS_Windows
     [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
     public class AssemblyTW : ToolWindowPane
     {
-        /// <summary>
-        /// Standard constructor for the tool window.
-        /// </summary>
-        public AssemblyTW() :
-            base(null)
+        public static AssemblyUC m_UC;
+        public AssemblyTW() : base(null)
         {
             // Set the window title reading it from the resources.
             this.Caption = Resources.ToolWindowTitle;
@@ -42,6 +39,7 @@ namespace Cosmos.Cosmos_VS_Windows
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
             base.Content = new AssemblyUC();
+            m_UC = (AssemblyUC)base.Content;
         }
     }
 }

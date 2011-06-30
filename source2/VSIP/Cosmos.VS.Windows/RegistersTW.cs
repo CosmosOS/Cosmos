@@ -22,6 +22,7 @@ namespace Cosmos.Cosmos_VS_Windows
     [Guid("CE2A2D0F-0F1B-4A1F-A9AC-5A5F2A5E2C25")]
     public class RegistersTW : ToolWindowPane
     {
+        public static RegistersUC m_UC;
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
@@ -41,6 +42,7 @@ namespace Cosmos.Cosmos_VS_Windows
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
             base.Content = new RegistersUC();
+            m_UC = (RegistersUC)base.Content;
         }
     }
 }

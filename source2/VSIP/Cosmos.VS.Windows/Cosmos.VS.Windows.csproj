@@ -120,6 +120,7 @@
     <Compile Include="AssemblyUC.xaml.cs">
       <DependentUpon>AssemblyUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PipeCallback.cs" />
     <Compile Include="PipeThread.cs" />
     <Compile Include="RegistersUC.xaml.cs">
       <DependentUpon>RegistersUC.xaml</DependentUpon>
