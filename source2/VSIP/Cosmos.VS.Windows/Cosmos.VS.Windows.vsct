@@ -68,6 +68,14 @@
           <ButtonText>Cosmos Registers Window</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <CommandName>cmdidCosmosStack</CommandName>
+          <ButtonText>Cosmos Stack Window</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -92,6 +100,7 @@
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidCosmosAssembly" value="0x0101" />
       <IDSymbol name="cmdidCosmosRegisters" value="0x0102" />
+      <IDSymbol name="cmdidCosmosStack" value="0x0103" />
     </GuidSymbol> 
     
     <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >

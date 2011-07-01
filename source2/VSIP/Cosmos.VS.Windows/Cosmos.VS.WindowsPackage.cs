@@ -32,6 +32,7 @@ namespace Cosmos.Cosmos_VS_Windows
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(AssemblyTW))]
     [ProvideToolWindow(typeof(RegistersTW))]
+    [ProvideToolWindow(typeof(StackTW))]
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
@@ -80,6 +81,19 @@ namespace Cosmos.Cosmos_VS_Windows
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
+        private void ShowCosmosVSStackToolWindow(object sender, EventArgs e)
+        {
+            // Get the instance number 0 of this tool window. This window is single instance so this instance
+            // is actually the only one.
+            // The last flag is set to true so that if the tool window does not exists it will be created.
+            ToolWindowPane window = this.FindToolWindow(typeof(StackTW), 0, true);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException(Resources.CanNotCreateWindow);
+            }
+            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+        }
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
         #region Package Members
@@ -106,6 +120,11 @@ namespace Cosmos.Cosmos_VS_Windows
                 CommandID CosmosVSRegistersToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosRegisters);
                 MenuCommand CosmosVSRegistersToolWindowMenuCommand = new MenuCommand(ShowCosmosVSRegistersToolWindow, CosmosVSRegistersToolWindowCommandID);
                 mcs.AddCommand(CosmosVSRegistersToolWindowMenuCommand);
+
+                // Create the command for the stack tool window
+                CommandID CosmosVSStackToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosStack);
+                MenuCommand CosmosVSStackToolWindowMenuCommand = new MenuCommand(ShowCosmosVSStackToolWindow, CosmosVSStackToolWindowCommandID);
+                mcs.AddCommand(CosmosVSStackToolWindowMenuCommand);
             }
             PipeCallback xPipeCallback = new PipeCallback();
         }

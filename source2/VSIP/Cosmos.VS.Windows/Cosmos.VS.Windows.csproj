@@ -137,6 +137,10 @@
     <Compile Include="Cosmos.VS.WindowsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
+    <Compile Include="StackTW.cs" />
+    <Compile Include="StackUC.xaml.cs">
+      <DependentUpon>StackUC.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -176,6 +180,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RegistersUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StackUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

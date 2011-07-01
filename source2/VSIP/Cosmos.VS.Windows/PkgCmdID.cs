@@ -8,5 +8,6 @@ namespace Cosmos.Cosmos_VS_Windows
     {
         public const uint cmdidCosmosAssembly = 0x101;
         public const uint cmdidCosmosRegisters = 0x102;
+        public const uint cmdidCosmosStack = 0x103;
     };
 }
