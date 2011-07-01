@@ -26,7 +26,7 @@ namespace Cosmos.Cosmos_VS_Windows
         public AssemblyTW() : base(null)
         {
             // Set the window title reading it from the resources.
-            this.Caption = Resources.ToolWindowTitle;
+            this.Caption = "Cosmos Assembly Window"; // Resources.ToolWindowTitle;
             // Set the image that will appear on the tab of the window frame
             // when docked with an other window
             // The resource ID correspond to the one defined in the resx file
