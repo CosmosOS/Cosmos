@@ -25,11 +25,5 @@ namespace Cosmos.Build.Common {
             get { return GetProperty("StartCosmosGDB", false); }
             set { SetProperty("StartCosmosGDB", value); }
         }
-
-        public bool StartCosmosASMDBG
-        {
-            get { return GetProperty("StartCosmosASMDBG", false); }
-            set { SetProperty("StartCosmosASMDBG", value); }
-        }
     }
 }

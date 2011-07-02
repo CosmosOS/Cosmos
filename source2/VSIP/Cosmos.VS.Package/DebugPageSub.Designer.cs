@@ -37,7 +37,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
             this.table = new System.Windows.Forms.TableLayoutPanel();
-            this.checkStartCosmosASMDBG = new System.Windows.Forms.CheckBox();
             this.table.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -147,7 +146,6 @@
             this.table.Controls.Add(this.comboDebugMode, 2, 1);
             this.table.Controls.Add(this.comboTraceMode, 2, 3);
             this.table.Controls.Add(this.checkEnableGDB, 1, 5);
-            this.table.Controls.Add(this.checkStartCosmosASMDBG, 1, 12);
             this.table.Controls.Add(this.checkStartCosmosGDB, 1, 6);
             this.table.Dock = System.Windows.Forms.DockStyle.Fill;
             this.table.Location = new System.Drawing.Point(0, 0);
@@ -170,16 +168,6 @@
             this.table.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.table.Size = new System.Drawing.Size(492, 288);
             this.table.TabIndex = 0;
-            // 
-            // checkStartCosmosASMDBG
-            // 
-            this.checkStartCosmosASMDBG.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkStartCosmosASMDBG.Location = new System.Drawing.Point(42, 166);
-            this.checkStartCosmosASMDBG.Name = "checkStartCosmosASMDBG";
-            this.checkStartCosmosASMDBG.Size = new System.Drawing.Size(218, 20);
-            this.checkStartCosmosASMDBG.TabIndex = 23;
-            this.checkStartCosmosASMDBG.Text = "Enable Assembly Level Debugger";
-            this.checkStartCosmosASMDBG.UseVisualStyleBackColor = true;
             // 
             // DebugPageSub
             // 
@@ -206,7 +194,6 @@
         private System.Windows.Forms.TableLayoutPanel table;
         private TitleDivision titleDivision1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox checkStartCosmosASMDBG;
 
     }
 }

@@ -132,157 +132,135 @@ namespace Cosmos.Debug.VSDebugEngine {
       DebugWindows.SendCommand(DwMsgType.Registers, aData);
     }
 
-    internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
-      System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
-      mCallback = aCallback;
+    internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
+    {
+        System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
+        mCallback = aCallback;
 
-      // Load passed in values
-      mDebugInfo = aDebugInfo;
+        // Load passed in values
+        mDebugInfo = aDebugInfo;
 
-      //
-      mISO = mDebugInfo["ISOFile"];
-      mProjectFile = mDebugInfo["ProjectFile"];
-      //
-      var xGDBDebugStub = false;
-      Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
-      //
-      var xGDBClient = false;
-      Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
-      //
-      var xASMDBGClient = false;
-      Boolean.TryParse(mDebugInfo["StartCosmosASMDBG"], out xASMDBGClient);
+        //
+        mISO = mDebugInfo["ISOFile"];
+        mProjectFile = mDebugInfo["ProjectFile"];
+        //
+        var xGDBDebugStub = false;
+        Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
+        //
+        var xGDBClient = false;
+        Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
 
-      mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
-      if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWare")) {
-        mTargetHost = TargetHost.VMWare;
-        if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Player")) {
-          mVMWareFlavor = VMwareFlavor.Player;
-        } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Workstation")) {
-          mVMWareFlavor = VMwareFlavor.Workstation;
-        } else {
-          throw new Exception("VMWare Flavor '" + mDebugInfo["VMWareFlavor"] + "' not implemented!");
+        mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
+        if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWare"))
+        {
+            mTargetHost = TargetHost.VMWare;
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Player"))
+            {
+                mVMWareFlavor = VMwareFlavor.Player;
+            }
+            else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Workstation"))
+            {
+                mVMWareFlavor = VMwareFlavor.Workstation;
+            }
+            else
+            {
+                throw new Exception("VMWare Flavor '" + mDebugInfo["VMWareFlavor"] + "' not implemented!");
+            }
+            LaunchVMWare(xGDBDebugStub);
         }
-        LaunchVMWare(xGDBDebugStub);
-      } else {
-        throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
-      }
+        else
+        {
+            throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
+        }
 
-      mProcessStartInfo.UseShellExecute = false;
-      mProcessStartInfo.RedirectStandardInput = true;
-      mProcessStartInfo.RedirectStandardError = true;
-      mProcessStartInfo.RedirectStandardOutput = true;
-      mProcessStartInfo.CreateNoWindow = true;
+        mProcessStartInfo.UseShellExecute = false;
+        mProcessStartInfo.RedirectStandardInput = true;
+        mProcessStartInfo.RedirectStandardError = true;
+        mProcessStartInfo.RedirectStandardOutput = true;
+        mProcessStartInfo.CreateNoWindow = true;
 
-      string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
-      if (!File.Exists(xCpdbPath)) {
-        throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
-      }
+        string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
+        if (!File.Exists(xCpdbPath))
+        {
+            throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
+        }
 
-      mDebugInfoDb = new DebugInfo(xCpdbPath);
-      mDebugInfoDb.ReadAddressLabelMappings(out mAddressLabelMappings, out mLabelAddressMappings);
-      if (mAddressLabelMappings.Count == 0) {
-        throw new Exception("Debug data not found: LabelByAddressMapping");
-      }
+        mDebugInfoDb = new DebugInfo(xCpdbPath);
+        mDebugInfoDb.ReadAddressLabelMappings(out mAddressLabelMappings, out mLabelAddressMappings);
+        if (mAddressLabelMappings.Count == 0)
+        {
+            throw new Exception("Debug data not found: LabelByAddressMapping");
+        }
 
-      mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(mAddressLabelMappings, mLabelAddressMappings, mDebugInfoDb);
+        mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(mAddressLabelMappings, mLabelAddressMappings, mDebugInfoDb);
 
-      if (mSourceMappings.Count == 0) {
-        throw new Exception("Debug data not found: SourceMappings");
-      }
-      mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
-      if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
-        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
-      } else {
-        throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
-      }
-      aEngine.BPMgr.SetDebugConnector(mDbgConnector);
+        if (mSourceMappings.Count == 0)
+        {
+            throw new Exception("Debug data not found: SourceMappings");
+        }
+        mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
+        if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware"))
+        {
+            mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
+        }
+        else
+        {
+            throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
+        }
+        aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
-      mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
-      mDbgConnector.CmdText += new Action<string>(DbgCmdText);
-      mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
-      mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
-      mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
-      mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
-      
-      System.Threading.Thread.Sleep(250);
-      System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
-      mProcess = Process.Start(mProcessStartInfo);
+        mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
+        mDbgConnector.CmdText += new Action<string>(DbgCmdText);
+        mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
+        mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
+        mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
+        mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
 
-      mProcess.EnableRaisingEvents = true;
-      mProcess.Exited += new EventHandler(mProcess_Exited);
+        System.Threading.Thread.Sleep(250);
+        System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
+        mProcess = Process.Start(mProcessStartInfo);
 
-      // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
-      // if so, why not hook before start? 
-      // MtW: we do this for the potential situation where it might exit before the Exited event is hooked. Iirc i had this situation before..
-      System.Threading.Thread.Sleep(250);
-      if (mProcess.HasExited) {
-        Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
-        Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-        Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
-        throw new Exception("Error while starting application");
-      }
+        mProcess.EnableRaisingEvents = true;
+        mProcess.Exited += new EventHandler(mProcess_Exited);
 
-      mEngine = aEngine;
-      mThread = new AD7Thread(aEngine, this);
-      mCallback.OnThreadStart(mThread);
-      mPort = aPort;
+        // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
+        // if so, why not hook before start? 
+        // MtW: we do this for the potential situation where it might exit before the Exited event is hooked. Iirc i had this situation before..
+        System.Threading.Thread.Sleep(250);
+        if (mProcess.HasExited)
+        {
+            Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
+            Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+            Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
+            throw new Exception("Error while starting application");
+        }
 
-      // Launch GDB Client
-      if (xGDBDebugStub && xGDBClient) {
-          if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe))
-          {
-              var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
-			  xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
-              xPSInfo.UseShellExecute = false;
-              xPSInfo.RedirectStandardInput = false;
-              xPSInfo.RedirectStandardError = false;
-              xPSInfo.RedirectStandardOutput = false;
-              xPSInfo.CreateNoWindow = false;
-              Process.Start(xPSInfo);
-          }
-          else
-          {
-              MessageBox.Show(string.Format(
-                  "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
-                  Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
-          }
-       }
+        mEngine = aEngine;
+        mThread = new AD7Thread(aEngine, this);
+        mCallback.OnThreadStart(mThread);
+        mPort = aPort;
 
-      // Cosmos ASM debugger
-      //
-      // Reenable on each run
-      DebugWindows.Enabled = true;
-      // Launch ASM Debug Client
-      if (xASMDBGClient)
-      {
-          int xSourceRoot = 0;
-          xSourceRoot = mISO.IndexOf("source2\\");
-          string xASMDebugPath = mISO.Substring(0, xSourceRoot);
-          if (File.Exists(Path.Combine(xASMDebugPath, "Build\\VSIP\\Cosmos.VS.Debug.exe")))
-          {
-              xASMDebugPath =  Path.Combine(xASMDebugPath, "Build\\VSIP\\Cosmos.VS.Debug.exe");
-          }
-          else if (File.Exists(Cosmos.Build.Common.CosmosPaths.DBGClientExe))
-          {
-              xASMDebugPath = Cosmos.Build.Common.CosmosPaths.DBGClientExe;
-          }
-          if (xASMDebugPath != "")
-          {
-              var xPSInfo = new ProcessStartInfo(xASMDebugPath);
-              xPSInfo.Arguments = "";
-              xPSInfo.UseShellExecute = false;
-              xPSInfo.RedirectStandardInput = false;
-              xPSInfo.RedirectStandardError = false;
-              xPSInfo.RedirectStandardOutput = false;
-              xPSInfo.CreateNoWindow = false;
-              Process.Start(xPSInfo);
-          }
-          else
-          {
-              MessageBox.Show("The ASM Debug-Client could not be found.",
-                "ASM Debug-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
-          }
-      }
+        // Launch GDB Client
+        if (xGDBDebugStub && xGDBClient)
+        {
+            if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe))
+            {
+                var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
+                xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
+                xPSInfo.UseShellExecute = false;
+                xPSInfo.RedirectStandardInput = false;
+                xPSInfo.RedirectStandardError = false;
+                xPSInfo.RedirectStandardOutput = false;
+                xPSInfo.CreateNoWindow = false;
+                Process.Start(xPSInfo);
+            }
+            else
+            {
+                MessageBox.Show(string.Format(
+                    "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
+                    Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+            }
+        }
     }
 
     private void DbgConnector_ConnectionLost(Exception e) {
