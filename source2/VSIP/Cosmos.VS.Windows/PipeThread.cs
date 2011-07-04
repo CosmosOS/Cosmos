@@ -93,47 +93,4 @@ namespace Cosmos.VS.Debug
             }
         }
     }
-
-    class PipeCallback
-    {
-        static public void InitPipe()
-        {
-            PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
-            var xServerThread = new Thread(PipeThread.ThreadStartServer);
-            xServerThread.Start();
-        }
-
-        static void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
-        {
-            switch (aCmd)
-            {
-                case DwMsgType.Noop:
-                    break;
-
-                case DwMsgType.Stack:
-                    break;
-
-                case DwMsgType.Frame:
-                    break;
-
-                case DwMsgType.Registers:
-                    RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
-                    {
-                        RegistersTW.mUC.Update(aMsg);
-                    });
-                    break;
-
-                case DwMsgType.Quit:
-                    //Close();
-                    break;
-
-                case DwMsgType.AssemblySource:
-                    AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
-                    {
-                        AssemblyTW.mUC.Update(aMsg);
-                    });
-                    break;
-            }
-        }
-    }
 }
