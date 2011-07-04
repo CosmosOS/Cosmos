@@ -7,6 +7,8 @@ using System.Text;
 using System.Windows.Threading;
 using System.Windows;
 using Cosmos.Compiler.Debug;
+using System.Threading;
+using Cosmos.Cosmos_VS_Windows;
 
 namespace Cosmos.VS.Debug
 {
@@ -90,6 +92,48 @@ namespace Cosmos.VS.Debug
                 // Otherwise there are side effects when an exception occurs
             }
         }
+    }
 
+    class PipeCallback
+    {
+        static public void InitPipe()
+        {
+            PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
+            var xServerThread = new Thread(PipeThread.ThreadStartServer);
+            xServerThread.Start();
+        }
+
+        static void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
+        {
+            switch (aCmd)
+            {
+                case DwMsgType.Noop:
+                    break;
+
+                case DwMsgType.Stack:
+                    break;
+
+                case DwMsgType.Frame:
+                    break;
+
+                case DwMsgType.Registers:
+                    RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                    {
+                        RegistersTW.mUC.Update(aMsg);
+                    });
+                    break;
+
+                case DwMsgType.Quit:
+                    //Close();
+                    break;
+
+                case DwMsgType.AssemblySource:
+                    AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                    {
+                        AssemblyTW.mUC.Update(aMsg);
+                    });
+                    break;
+            }
+        }
     }
 }

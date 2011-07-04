@@ -11,6 +11,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using Cosmos.VS.Debug;
+using System.Threading;
+using Cosmos.Compiler.Debug;
 
 namespace Cosmos.Cosmos_VS_Windows
 {

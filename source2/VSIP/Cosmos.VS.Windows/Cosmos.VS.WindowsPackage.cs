@@ -50,44 +50,7 @@ namespace Cosmos.Cosmos_VS_Windows
         /// initialization is the Initialize method.
         public Cosmos_VS_WindowsPackage()
         {
-            PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
-            var xServerThread = new Thread(PipeThread.ThreadStartServer);
-            xServerThread.Start();
-
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-        }
-
-        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
-        {
-            switch (aCmd)
-            {
-                case DwMsgType.Noop:
-                    break;
-
-                case DwMsgType.Stack:
-                    break;
-
-                case DwMsgType.Frame:
-                    break;
-
-                case DwMsgType.Registers:
-                    RegistersTW.m_UC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
-                    {
-                        RegistersTW.m_UC.Update(aMsg);
-                    });
-                    break;
-
-                case DwMsgType.Quit:
-                    //Close();
-                    break;
-
-                case DwMsgType.AssemblySource:
-                    AssemblyTW.m_UC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
-                    {
-                        AssemblyTW.m_UC.Update(aMsg);
-                    });
-                    break;
-            }
         }
 
         /// This function is called when the user clicks the menu item that shows the 
