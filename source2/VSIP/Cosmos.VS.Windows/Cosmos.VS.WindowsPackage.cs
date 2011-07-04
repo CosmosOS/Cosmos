@@ -126,7 +126,6 @@ namespace Cosmos.Cosmos_VS_Windows
                 MenuCommand CosmosVSStackToolWindowMenuCommand = new MenuCommand(ShowCosmosVSStackToolWindow, CosmosVSStackToolWindowCommandID);
                 mcs.AddCommand(CosmosVSStackToolWindowMenuCommand);
             }
-            PipeCallback xPipeCallback = new PipeCallback();
         }
         #endregion
 

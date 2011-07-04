@@ -11,6 +11,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cosmos.VS.Debug;
+using System.Threading;
+using Cosmos.Compiler.Debug;
+using System.Windows.Threading;
 
 namespace Cosmos.Cosmos_VS_Windows
 {
@@ -18,6 +22,10 @@ namespace Cosmos.Cosmos_VS_Windows
     {
         public RegistersUC()
         {
+            PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
+            var xServerThread = new Thread(PipeThread.ThreadStartServer);
+            xServerThread.Start();
+
             InitializeComponent();
         }
 
@@ -75,6 +83,43 @@ namespace Cosmos.Cosmos_VS_Windows
             UpdateRegister32(aData, 0, lablEDI);
             UpdateRegister32(aData, 32, lablEIP);
             //TODO: Flags
+        }
+
+        void PipeThread_DataPacketReceivedInvoke(byte aCommand, byte[] aData)
+        {
+            switch (aCommand)
+            {
+                case DwMsgType.Noop:
+                    break;
+
+                case DwMsgType.Stack:
+                    break;
+
+                case DwMsgType.Frame:
+                    break;
+
+                case DwMsgType.Registers:
+                    RegistersTW.m_UC.Update(aData);
+                    break;
+
+                case DwMsgType.Quit:
+                    //Close();
+                    break;
+
+                case DwMsgType.AssemblySource:
+
+                    AssemblyTW.m_UC.Update(aData);
+                    break;
+            }
+        }
+
+        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
+        {
+            //Trace.TraceError("Data Packet Received");
+            this.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+            {
+            PipeThread_DataPacketReceivedInvoke(aCmd, aMsg);
+            });
         }
     }
 }
