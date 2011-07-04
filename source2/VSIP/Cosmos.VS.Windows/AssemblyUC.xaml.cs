@@ -26,10 +26,6 @@ namespace Cosmos.Cosmos_VS_Windows
             string xData = Encoding.ASCII.GetString(aData);
             xData = xData.Replace("\t", "  ");
             tboxSource.Text = xData;
-            //string[] xLines = xData.Split('\n');
-            //foreach (var xLine in xLines) {
-            //  asmUC1.lboxSource.Items.Add(xLine);
-            //}
         }
     }
 }
