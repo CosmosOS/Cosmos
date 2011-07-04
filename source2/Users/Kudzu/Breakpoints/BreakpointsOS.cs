@@ -18,8 +18,8 @@ namespace BreakpointsKernel {
       int i = 0;
       Test xTest;
 
-      //xTest = new NullableTest();
-      //xTest.Run();
+      xTest = new NullableTest();
+      xTest.Run();
 
       //xTest = new Int64Test();
       //xTest.Run();
