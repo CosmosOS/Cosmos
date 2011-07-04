@@ -22,11 +22,12 @@ namespace Cosmos.Cosmos_VS_Windows
     [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
     public class AssemblyTW : ToolWindowPane
     {
-        public static AssemblyUC m_UC;
+        public static AssemblyUC mUC;
+
         public AssemblyTW() : base(null)
         {
-            // Set the window title reading it from the resources.
-            this.Caption = "Cosmos Assembly Window"; // Resources.ToolWindowTitle;
+            this.Caption = "Cosmos Assembly Window";
+
             // Set the image that will appear on the tab of the window frame
             // when docked with an other window
             // The resource ID correspond to the one defined in the resx file
@@ -38,8 +39,8 @@ namespace Cosmos.Cosmos_VS_Windows
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            base.Content = new AssemblyUC();
-            m_UC = (AssemblyUC)base.Content;
+            mUC = new AssemblyUC();
+            base.Content = mUC;
         }
     }
 }
