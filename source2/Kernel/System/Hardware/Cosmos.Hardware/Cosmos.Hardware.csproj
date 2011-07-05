@@ -79,6 +79,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="BlockDevice\AtaPio.cs" />
+    <Compile Include="Mouse.cs" />
     <Compile Include="PciDevice.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
