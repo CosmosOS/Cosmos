@@ -143,8 +143,13 @@ namespace Cosmos.Cosmos_VS_Windows
 
         void ProcessMessage(object sender, EventArgs e)
         {
-            var xCmd = mCommand.Dequeue();
-            var xMsg = mMessage.Dequeue();
+            byte xCmd = 0x0;
+            byte[] xMsg = {0x0};
+            if ((mCommand.Count > 0) && (mMessage.Count > 0))
+            {
+                xCmd = mCommand.Dequeue();
+                xMsg = mMessage.Dequeue();
+            }
             switch (xCmd)
             {
                 case DwMsgType.Noop:

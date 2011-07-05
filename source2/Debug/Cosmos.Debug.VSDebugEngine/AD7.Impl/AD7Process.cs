@@ -491,37 +491,68 @@ namespace Cosmos.Debug.VSDebugEngine {
     public void SendAssembly()
     {
       //Get Current BP Label
-      string xCurrendBPLabel = mAddressLabelMappings[(uint)mCurrentAddress];
+      bool xDone = false;
+      string xFile = string.Empty;
+      int xLine = 0;
+      int xCol = 0;
+      IList<uint> xKeys = mSourceMappings.Keys;
+      IList<SourceInfo> xValues = mSourceMappings.Values;
+      List<string> xCurrentBPLabel = new List<string>();
+      xCurrentBPLabel.Add(mAddressLabelMappings[(uint)mCurrentAddress]);
+      int xIdx = xKeys.IndexOf((uint)mCurrentAddress);
+      xFile = xValues[xIdx].SourceFile;
+      xLine = xValues[xIdx].Line;
+      xCol = xValues[xIdx].Column;
+      while (!xDone)
+      {
+          xIdx++;
+          if (xIdx < xValues.Count)
+          {
+              SourceInfo xSI = xValues[xIdx];
+              if ((xSI.SourceFile == xFile) && (xSI.Line == xLine) && (xSI.Column == xCol))
+              {
+                  xCurrentBPLabel.Add(mAddressLabelMappings[xKeys[xIdx]]);
+              }
+              else
+              {
+                  xDone = true;
+              }
+          }
+      }
+
       // Get ASM lines
       string xAsmDocumentName = Path.ChangeExtension(mISO, "asm");
-      string xFile;
+      string xAsmFile;
       string[] xFileLines;
+      var xData = new StringBuilder();
       using (var xTR = new StreamReader(xAsmDocumentName))
       {
-        xFile = xTR.ReadToEnd();
+          xAsmFile = xTR.ReadToEnd();
       }
-      xFile = xFile.Replace('\r', ' ');
-      xFile = xFile.Trim();
-      xFileLines = xFile.Split('\n');
-      int k = 0, l = 0;
-      for (int j = 0; j < xFileLines.Length; j++)
+      xAsmFile = xAsmFile.Replace('\r', ' ');
+      xAsmFile = xAsmFile.Trim();
+      xFileLines = xAsmFile.Split('\n');
+      for (int a = 0; a < xCurrentBPLabel.Count; a++)
       {
-        if (xFileLines[j].Contains(xCurrendBPLabel))
-        {
-          k = j;
-          j++;
-        }
-        if ((k != 0) && (xFileLines[j].Contains("System")))
-        {
-          l = j - 2;
-          break;
-        }
-      }
-      var xData = new StringBuilder();
-      for (int j = k; j < l; j++)
-      {
-        xData.AppendLine(xFileLines[j]);
-      }
+          int k = 0, l = 0;
+          for (int j = 0; j < xFileLines.Length; j++)
+          {
+              if (xFileLines[j].Contains(xCurrentBPLabel[a]))
+              {
+                  k = j;
+                  j++;
+              }
+              if ((k != 0) && (xFileLines[j].Contains("System")))
+              {
+                  l = j - 2;
+                  break;
+              }
+          }
+          for (int j = k; j < l; j++)
+          {
+              xData.AppendLine(xFileLines[j]);
+          }
+      } 
       DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xData.ToString()));
     }
   }
