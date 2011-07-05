@@ -12,6 +12,7 @@ using System.Threading;
 using Cosmos.Compiler.Debug;
 using System.Windows.Threading;
 using Cosmos.VS.Debug;
+using System.Collections.Generic;
 
 namespace Cosmos.Cosmos_VS_Windows
 {
@@ -43,6 +44,9 @@ namespace Cosmos.Cosmos_VS_Windows
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
+        Queue<byte> mCommand;
+        Queue<byte[]> mMessage;
+
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
         /// any Visual Studio service because at this point the package object is created but 
@@ -50,6 +54,12 @@ namespace Cosmos.Cosmos_VS_Windows
         /// initialization is the Initialize method.
         public Cosmos_VS_WindowsPackage()
         {
+            mCommand = new Queue<byte>();
+            mMessage = new Queue<byte[]>();
+            System.Timers.Timer xTimer = new System.Timers.Timer(250);
+            xTimer.AutoReset = true;
+            xTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
+            xTimer.Start();
             PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
             var xServerThread = new Thread(PipeThread.ThreadStartServer);
             xServerThread.Start();
@@ -131,9 +141,11 @@ namespace Cosmos.Cosmos_VS_Windows
             }
         }
 
-        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
+        void ProcessMessage(object sender, EventArgs e)
         {
-            switch (aCmd)
+            var xCmd = mCommand.Dequeue();
+            var xMsg = mMessage.Dequeue();
+            switch (xCmd)
             {
                 case DwMsgType.Noop:
                     break;
@@ -147,7 +159,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 case DwMsgType.Registers:
                     RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
                     {
-                        RegistersTW.mUC.Update(aMsg);
+                        RegistersTW.mUC.Update(xMsg);
                     });
                     break;
 
@@ -158,10 +170,16 @@ namespace Cosmos.Cosmos_VS_Windows
                 case DwMsgType.AssemblySource:
                     AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
                     {
-                        AssemblyTW.mUC.Update(aMsg);
+                        AssemblyTW.mUC.Update(xMsg);
                     });
                     break;
             }
+        }
+
+        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
+        {
+            mCommand.Enqueue(aCmd);
+            mMessage.Enqueue(aMsg);
         }
     }
 }
