@@ -46,6 +46,7 @@ namespace Cosmos.Cosmos_VS_Windows
     {
         Queue<byte> mCommand;
         Queue<byte[]> mMessage;
+        System.Timers.Timer mTimer = new System.Timers.Timer(250);
 
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -59,10 +60,9 @@ namespace Cosmos.Cosmos_VS_Windows
 
             // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work
             // So instead we use a stack and a timer to poll it for data.
-            System.Timers.Timer xTimer = new System.Timers.Timer(250);
-            xTimer.AutoReset = true;
-            xTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
-            xTimer.Start();
+            mTimer.AutoReset = true;
+            mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
+            mTimer.Start();
 
             PipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
             var xServerThread = new Thread(PipeThread.ThreadStartServer);
