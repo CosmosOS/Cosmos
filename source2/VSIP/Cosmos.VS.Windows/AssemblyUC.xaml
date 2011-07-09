@@ -9,6 +9,14 @@
              Name="CosmosAssemblyUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <DockPanel LastChildFill="True">
-        <TextBox Name="tboxSource" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
-    </DockPanel>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+      <TextBlock Name="tblkSource">
+        <TextBlock.ContextMenu>
+          <ContextMenu>
+            <MenuItem Name="mitmCopy" Header="Copy" />
+          </ContextMenu>
+        </TextBlock.ContextMenu>
+      </TextBlock>
+    </ScrollViewer>
+  </DockPanel>
 </UserControl>

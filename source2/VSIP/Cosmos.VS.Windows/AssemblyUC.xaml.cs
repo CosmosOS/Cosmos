@@ -16,20 +16,30 @@ using System.Windows.Threading;
 using Cosmos.VS.Debug;
 using System.Threading;
 
-namespace Cosmos.Cosmos_VS_Windows
-{
-    public partial class AssemblyUC : UserControl
-    {
-        public AssemblyUC()
-        {
-            InitializeComponent();
-        }
+namespace Cosmos.Cosmos_VS_Windows {
+  public partial class AssemblyUC : UserControl {
+    protected string mCode;
 
-        public void Update(byte[] aData)
-        {
-            string xData = Encoding.ASCII.GetString(aData);
-            xData = xData.Replace("\t", "  ");
-            tboxSource.Text = xData;
-        }
+    public AssemblyUC() {
+      InitializeComponent();
+
+      mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
     }
+
+    void mitmCopy_Click(object sender, RoutedEventArgs e) {
+      Clipboard.SetText(mCode);
+    }
+
+    public void Update(byte[] aData) {
+      mCode = Encoding.ASCII.GetString(aData);
+      mCode = mCode.Replace("\t", "  ");
+
+      string[] xLines = mCode.Split('\n');
+      foreach (string xLine in xLines) {
+        var xRun = new Run(xLine);
+        tblkSource.Inlines.Add(xRun);
+      }
+    }
+
+  }
 }
