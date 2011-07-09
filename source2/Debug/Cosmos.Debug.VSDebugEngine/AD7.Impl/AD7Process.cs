@@ -339,10 +339,10 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (xBoundBreakpoints.Count == 0) {
               // Is it a result of stepping operation?
               if (mEngine.AfterBreak) {
+                RequestFullDebugStubUpdate();
                 mCallback.OnStepComplete();
               } else {
                 RequestFullDebugStubUpdate();
-
                 // Code based break. Tell VS to break.
                 mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               }
