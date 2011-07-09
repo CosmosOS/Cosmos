@@ -276,7 +276,7 @@ namespace Cosmos.Compiler.DebugStub {
         {
             public override void Assemble()
             {
-                AL = (int)DsMsgType.Frame; // Send the actual started signal
+                AL = (int)DsMsgType.Frame; 
                 Call<DebugStub.WriteALToComPort>();
 
                 ESI = Memory["DebugEBP", 32];
@@ -287,28 +287,27 @@ namespace Cosmos.Compiler.DebugStub {
             }
         }
 
-        public class SendStack : CodeBlock
-        {
-            public override void Assemble()
-            {
-                //AL = (int)DsMsgType.Stack; // Send the actual started signal
-                //Call<DebugStub.WriteALToComPort>();
+        public class SendStack : CodeBlock {
+          public override void Assemble() {
+            AL = (int)DsMsgType.Stack;
+            Call<DebugStub.WriteALToComPort>();
 
-                //ESI = Memory["DebugESP", 32];
-                //EAX = Memory["DebugEBP", 32];
-                //EAX.Sub(ESP);
-                //while (!(EAX.Equals(ESP)))
-                //{
-                //    Call("WriteByteToComPort");
-                //    EAX.Add(1);
-                //}
+            ESI = Memory["DebugESP", 32];
 
-                //ESI = Memory["DebugEBP", 32];
-                //for (int i = 1; i <= 128; i++)
-                //{
-                //    Call("WriteByteToComPort");
-                //}
-            }
+            // Send number of bytes
+            ESI = Memory["DebugEBP", 32];
+            EAX.Sub(ESI);
+            Call<DebugStub.WriteALToComPort>();
+            EAX.RotateRight(8); // Should be ShiftRight, but its no in X# ops yet
+            Call<DebugStub.WriteALToComPort>();
+
+            Label = "DebugStub_SendStack_SendByte";
+            ESI.Compare(Memory["DebugEBP", 32]);
+            JumpIf(Flags.Equal, "DebugStub_SendStack_Exit");
+            Jump("DebugStub_SendStack_SendByte");
+
+            Label = "DebugStub_SendStack_Exit";
+          }
         }
 
         public class ProcessCommand : CodeBlock {
@@ -387,8 +386,8 @@ namespace Cosmos.Compiler.DebugStub {
                 Call<SendStack>();
                 Jump("DebugStub_ProcessCmd_ACK");
                 Label = "DebugStub_ProcessCmd_SendStack_After";
-        Label = "DebugStub_ProcessCmd_ACK";
 
+        Label = "DebugStub_ProcessCmd_ACK";
         // We acknowledge receipt of the command, not processing of it.
         // We have to do this because sometimes callers do more processing
         // We ACK even ones we dont process here, but do not ACK Noop.
@@ -403,6 +402,7 @@ namespace Cosmos.Compiler.DebugStub {
         Call<DebugStub.WriteALToComPort>();
         EAX = Memory["DebugStub_CommandID", 32];
         #endregion
+
         Call<DebugStub.WriteALToComPort>();
         Label = "DebugStub_ProcessCmd_After";
 
@@ -465,8 +465,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Shift-F11
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
-        Label = "__Debug_MTW";
-    new Noop();
+
         EAX = Memory["DebugEBP", 32];
         EAX.Compare(Memory["DebugBreakEBP", 32]);
         JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
