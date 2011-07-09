@@ -281,7 +281,7 @@ namespace Cosmos.Debug.Common
 
               case DsMsgType.Registers:
                     DoDebugMsg("DC Recv: Registers");
-                    Next(36, PacketRegisters);
+                    Next(40, PacketRegisters);
                     break;
 
               case DsMsgType.Frame:

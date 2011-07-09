@@ -67,7 +67,8 @@ namespace Cosmos.Cosmos_VS_Windows
             // We get them from bottom up, so we receive them in reverse order as shown above. That is 0-3 is EDI.
             //
             // Additional ones sent manually (at end, not from stack)
-            // EIP 32
+            // ESP 32
+            // EIP 36
             //
             UpdateRegisters(aData, 28, lablEAX, lablAX, lablAH, lablAL);
             UpdateRegisters(aData, 16, lablEBX, lablBX, lablBH, lablBL);
@@ -76,8 +77,9 @@ namespace Cosmos.Cosmos_VS_Windows
             UpdateRegister32(aData, 8, lablEBP);
             UpdateRegister32(aData, 4, lablESI);
             UpdateRegister32(aData, 0, lablEDI);
-            UpdateRegister32(aData, 32, lablEIP);
-            //TODO: Flags
+            UpdateRegister32(aData, 32, lablESP);
+            UpdateRegister32(aData, 36, lablEIP);
+          //TODO: Flags
         }
     }
 }
