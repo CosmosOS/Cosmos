@@ -32,8 +32,10 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugResumeLevel", 0),
                 // Last EIP value
                 new DataMember("DebugEIP", 0),
-                // the calling code's EBP value
+                // Calling code's EBP value
                 new DataMember("DebugOriginalEBP", 0),
+                // Calling code's ESP value
+                new DataMember("DebugOriginalESP", 0),
                 // Ptr to the push all data. It points to the "bottom" after a PushAll32 op.
                 // Walk up to find the 8 x 32 bit registers.
                 new DataMember("DebugPushAllPtr", 0),
@@ -349,11 +351,17 @@ namespace Cosmos.Compiler.DebugStub {
             // Main entry point that IL2CPU generated code calls
             Label = "DebugStub_TracerEntry";
 
-            // Why do we save this? Do we change EBP anywhere? And if so why dont we reset EBP back again?
-            //
-            // EBP is restored by PopAll, but it appears there are times we might need EBP (past, or future)
-            // for the DebugStub
+            // EBP is restored by PopAll, but SendFrame uses it. Could
+            // get it from the PushAll data, but this is easier
             Memory["DebugOriginalEBP", 32] = EBP;
+            // Could also get ESP from PushAll but this is easier
+            // We cant modify any registers since we havent done PushAll yet
+            // Maybe we could do a sub(4) on memory direct.. 
+            // But for now we remove the 4 from ESP which the call to us produces,
+            // store ESP, then restore ESP so we don't cause stack corruption.
+            ESP.Add(4);
+            Memory["DebugOriginalESP", 32] = ESP;
+            ESP.Sub(4);
 
             // If debug stub is in break, and then an IRQ happens, the IRQ
             // can call debug stub again. This causes two debug stubs to 
