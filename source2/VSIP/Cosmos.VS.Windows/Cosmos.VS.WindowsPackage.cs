@@ -159,6 +159,10 @@ namespace Cosmos.Cosmos_VS_Windows
                     break;
 
                 case DwMsgType.Frame:
+                    StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                    {
+                        StackTW.mUC.Update(xMsg);
+                    });
                     break;
 
                 case DwMsgType.Registers:

@@ -17,6 +17,7 @@ namespace Cosmos.Debug.Common
         public Action CmdStarted;
         public Action<string> OnDebugMsg;
         public Action<byte[]> CmdRegisters;
+        public Action<byte[]> CmdFrame;
 
         protected byte mCurrentMsgType;
         public abstract void WaitConnect();
@@ -106,6 +107,11 @@ namespace Cosmos.Debug.Common
 
         public void SendRegisters() {
           SendCommand(DsCommand.SendRegisters);
+        }
+
+        public void SendFrame()
+        {
+            SendCommand(DsCommand.SendFrame);
         }
 
         public void SetBreakpoint(int aID, uint aAddress) {
@@ -333,6 +339,16 @@ namespace Cosmos.Debug.Common
             CmdRegisters(mData);
           }
           WaitForMessage();
+        }
+
+        protected void PacketFrame(byte[] aPacket)
+        {
+            mData = aPacket.ToArray();
+            if (CmdRegisters != null)
+            {
+                CmdFrame(mData);
+            }
+            WaitForMessage();
         }
 
         protected void PacketCmdCompleted(byte[] aPacket) {

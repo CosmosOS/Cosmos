@@ -268,6 +268,22 @@ namespace Cosmos.Compiler.DebugStub {
 			}
 		}
 
+        public class SendFrame : CodeBlock
+        {
+            public override void Assemble()
+            {
+                AL = (int)DsMsgType.Frame; // Send the actual started signal
+                Call<DebugStub.WriteALToComPort>();
+
+                ESI = Memory["DebugOriginalEBP", 32];
+                ESI.Sub(32);
+                for (int i = 1; i <= 256; i++)
+                {
+                    Call("WriteByteToComPort");
+                }
+            }
+        }
+
 		public class ProcessCommand : CodeBlock {
 			// Modifies: AL, DX (ReadALFromComPort)
 			// Returns: AL
@@ -328,10 +344,16 @@ namespace Cosmos.Compiler.DebugStub {
 				Label = "DebugStub_ProcessCmd_SendMemory_After";
 
         AL.Compare(DsCommand.SendRegisters);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendRegisters_After");
-        Call<SendRegisters>();
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_SendRegisters_After";
+                JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendRegisters_After");
+                Call<SendRegisters>();
+                Jump("DebugStub_ProcessCmd_ACK");
+                Label = "DebugStub_ProcessCmd_SendRegisters_After";
+
+        AL.Compare(DsCommand.SendFrame);
+                JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendFrame_After");
+                Call<SendFrame>();
+                Jump("DebugStub_ProcessCmd_ACK");
+                Label = "DebugStub_ProcessCmd_SendFrame_After";
 
 				Label = "DebugStub_ProcessCmd_ACK";
 				// We acknowledge receipt of the command, not processing of it.

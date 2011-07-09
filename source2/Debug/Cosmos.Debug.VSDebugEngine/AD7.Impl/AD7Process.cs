@@ -132,6 +132,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       DebugWindows.SendCommand(DwMsgType.Registers, aData);
     }
 
+    protected void DbgCmdFrame(byte[] aData)
+    {
+        DebugWindows.SendCommand(DwMsgType.Frame, aData);
+    }
+
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
     {
         System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
@@ -335,6 +340,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 // when real hardware is used.
                 SendAssembly();
                 mDbgConnector.SendRegisters();
+                mDbgConnector.SendFrame();
                 // Code based break. Tell VS to break.
                 
                 mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
@@ -343,6 +349,7 @@ namespace Cosmos.Debug.VSDebugEngine {
               // Found a bound breakpoint
               SendAssembly();  
               mDbgConnector.SendRegisters();
+              mDbgConnector.SendFrame();
               mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               mEngine.AfterBreak = true;
             }

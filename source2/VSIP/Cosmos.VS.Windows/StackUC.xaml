@@ -9,6 +9,6 @@
              Name="CosmosStackUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <DockPanel>
-
+        <TextBox Name="tboxSource" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
     </DockPanel>
 </UserControl>

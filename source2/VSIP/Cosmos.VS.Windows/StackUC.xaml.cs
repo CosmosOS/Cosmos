@@ -26,7 +26,9 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public void Update(byte[] aData)
         {
-
+            string xData = Encoding.ASCII.GetString(aData);
+            //xData = xData.Replace("\t", "  ");
+            tboxSource.Text = xData;
         }
     }
 }
