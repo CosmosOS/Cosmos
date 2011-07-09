@@ -54,7 +54,7 @@
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpPic2" />
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
         <Strings>
           <CommandName>cmdidCosmosAssembly</CommandName>
           <ButtonText>Cosmos Assembly Window</ButtonText>
@@ -62,7 +62,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpPic2" />
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
         <Strings>
           <CommandName>cmdidCosmosRegisters</CommandName>
           <ButtonText>Cosmos Registers Window</ButtonText>
@@ -70,7 +70,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpPic2" />
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
         <Strings>
           <CommandName>cmdidCosmosStack</CommandName>
           <ButtonText>Cosmos Stack Window</ButtonText>
@@ -85,10 +85,8 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Images_32bit.bmp" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
-
+      <Bitmap guid="guidImages" href="Resources\Cosmos.ico" usedList="bmpCosmosIcon1"/>
     </Bitmaps>
- 
   </Commands>
 
   <Symbols>
@@ -104,12 +102,7 @@
     </GuidSymbol> 
     
     <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpCosmosIcon1" value="1"/>
     </GuidSymbol>
   </Symbols>
-
 </CommandTable>

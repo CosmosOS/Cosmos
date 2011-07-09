@@ -287,14 +287,33 @@ namespace Cosmos.Compiler.DebugStub {
         {
             public override void Assemble()
             {
-                //AL = (int)DsMsgType.Frame; // Send the actual started signal
+                //AL = (int)DsMsgType.Stack; // Send the actual started signal
                 //Call<DebugStub.WriteALToComPort>();
+
+                //ESI = Memory["DebugOrigESP", 32];
+                //EAX = Memory["DebugOriginalEBP", 32];
+                //EAX.Sub(ESP);
+                //while (!(EAX.Equals(ESP)))
+                //{
+                //    Call("WriteByteToComPort");
+                //    EAX.Add(1);
+                //}
 
                 //ESI = Memory["DebugOriginalEBP", 32];
                 //for (int i = 1; i <= 128; i++)
                 //{
                 //    Call("WriteByteToComPort");
                 //}
+
+//                Kudzu (Home): 1) a length byte.. this is new.. the dc will have ot adapt to this, its not used to getting a length byte and currently only knows how to handle fixed lengths...
+//Kudzu (Home): mayeb -1 as a parm tells it to read 2 more bytes  which contain a lenght byte....
+//Kudzu (Home): so for send stack, we need to set ESI to DebugOrigESP
+//Kudzu (Home): and send up to but not including EBP
+//Kudzu (Home): so the byte count would be EBP - ESP
+//Kudzu (Home): make sense?
+//Kudzu (Home): can set AX to EBP-ESP and transmit that
+//Kudzu (Home): then can set ESI to ESP
+//Kudzu (Home): and send a byteutnil ESI=DebugOrigEBP... then quit sending
             }
         }
 

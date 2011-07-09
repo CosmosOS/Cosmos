@@ -150,6 +150,7 @@
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +172,7 @@
     <None Include="Resources\Images_24bit.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Cosmos.ico" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>

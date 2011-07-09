@@ -1,13 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-    VS SDK Notes: This resx file contains the resources that will be consumed directly by your package.
-    For example, if you chose to create a tool window, there is a resource with ID 'CanNotCreateWindow'. This
-    is used in VsPkg.cs to determine the string to show the user if there is an error when attempting to create
-    the tool window.
-
-    Resources that are accessed directly from your package *by Visual Studio* are stored in the VSPackage.resx 
-    file.
--->
 <root>
   <!-- 
     Microsoft ResX Schema 
