@@ -281,12 +281,6 @@ namespace Cosmos.Compiler.DebugStub {
                 {
                     Call("WriteByteToComPort");
                 }
-
-                ESI = AddressOf("DebugEIP");
-                for (int i = 1; i <= 4; i++)
-                {
-                    Call("WriteByteToComPort");
-                }
             }
         }
 
