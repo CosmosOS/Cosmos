@@ -344,7 +344,7 @@ namespace Cosmos.Debug.Common
         protected void PacketFrame(byte[] aPacket)
         {
             mData = aPacket.ToArray();
-            if (CmdRegisters != null)
+            if (CmdFrame != null)
             {
                 CmdFrame(mData);
             }
