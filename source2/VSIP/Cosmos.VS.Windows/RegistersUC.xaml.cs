@@ -23,7 +23,29 @@ namespace Cosmos.Cosmos_VS_Windows
         public RegistersUC()
         {
             InitializeComponent();
-        }
+            lablEAX.Content = "";
+            lablAX.Content = "";
+            lablAH.Content = "";
+            lablAL.Content = "";
+            lablEBX.Content = "";
+            lablBX.Content = "";
+            lablBH.Content = "";
+            lablBL.Content = "";
+            lablECX.Content = "";
+            lablCX.Content = "";
+            lablCH.Content = "";
+            lablCL.Content = "";
+            lablEDX.Content = "";
+            lablDX.Content = "";
+            lablDH.Content = "";
+            lablDL.Content = "";
+            lablEBP.Content = "";
+            lablESI.Content = "";
+            lablEDI.Content = "";
+            lablESP.Content = "";
+            lablEIP.Content = "";
+            lablFlags.Content = "";
+      }
 
         protected void UpdateRegisters(byte[] aData, int aOffset, Label a32, Label a16, Label a8Hi, Label a8Lo)
         {
