@@ -17,7 +17,12 @@ namespace Cosmos.VS.Debug
         static protected bool KillThread = false;
         static protected NamedPipeServerStream mPipe;
         static public event Action<byte, byte[]> DataPacketReceived;
-        protected const string PipeName = @"Cosmos\DebugWindows";
+        static protected string mPipeName;
+
+        static PipeThread() {
+          IntPtr xPID = System.Diagnostics.Process.GetCurrentProcess().Handle;
+          mPipeName = @"Cosmos\DebugWindows-" + xPID.ToString();
+        }
 
         static public void Stop()
         {
@@ -29,7 +34,7 @@ namespace Cosmos.VS.Debug
             else
             {
                 // Kick it out of the WaitForConnection
-                var xPipe = new NamedPipeClientStream(".", PipeThread.PipeName, PipeDirection.Out);
+                var xPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);
                 xPipe.Connect(100);
             }
         }
@@ -65,7 +70,7 @@ namespace Cosmos.VS.Debug
 
                 while (!KillThread)
                 { // Loop again to allow mult incoming connections between debug sessions
-                    using (mPipe = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous))
+                    using (mPipe = new NamedPipeServerStream(mPipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous))
                     {
                         mPipe.WaitForConnection();
 

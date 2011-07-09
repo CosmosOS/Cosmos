@@ -19,7 +19,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       if (mPipe == null) {
-        mPipe = new NamedPipeClientStream(".", @"Cosmos\DebugWindows", PipeDirection.Out);
+        // User might run mult instances of VS, so we need to make sure the pipe name
+        // is unique but also predictable since the pipe is the only way to talk
+        // between the debugger and ToolWindows project.
+        IntPtr xPID = System.Diagnostics.Process.GetCurrentProcess().Handle;
+        mPipe = new NamedPipeClientStream(".", @"Cosmos\DebugWindows-" + xPID.ToString(), PipeDirection.Out);
         try {
           // For now we assume its there or not from the first call.
           // If we don't find the server, we disable it to avoid causing lag.
