@@ -26,7 +26,7 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public void Update(byte[] aData)
         {
-            int xOffset = 32;
+            int xOffset = 128;
             string xData = BitConverter.ToString(aData);
             xData = xData.Trim();
             xData = xData.Replace("-", "");
@@ -36,7 +36,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 {
                     string xTemp = xData.Substring(i, 8);
                     tboxSource.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");
-                    xOffset -= 8;
+                    xOffset -= 4;
                 }
             }
             else tboxSource.Text = "Error loading the frame.";
