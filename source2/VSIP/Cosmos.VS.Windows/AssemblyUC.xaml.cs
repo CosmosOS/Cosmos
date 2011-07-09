@@ -36,7 +36,22 @@ namespace Cosmos.Cosmos_VS_Windows {
 
       string[] xLines = mCode.Split('\n');
       foreach (string xLine in xLines) {
+        string xTestLine = xLine.Trim();
+
+        if (string.Compare(xTestLine, "call DebugStub_TracerEntry", true) == 0) {
+          continue;
+        }
+
         var xRun = new Run(xLine);
+        if (xTestLine.EndsWith(":")) {
+          tblkSource.Inlines.Add(new LineBreak());
+          xRun.Foreground = Brushes.Black;
+        } else if (xTestLine.StartsWith(";")) {
+          xRun.Foreground = Brushes.Green;
+        } else {
+          xRun.Foreground = Brushes.Blue;
+        }
+
         tblkSource.Inlines.Add(xRun);
       }
     }
