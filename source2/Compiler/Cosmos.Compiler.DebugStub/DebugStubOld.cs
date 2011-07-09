@@ -299,7 +299,7 @@ namespace Cosmos.Compiler.DebugStub {
             // Send the byte
             Port[DX] = AL;
 
-            new Inc { DestinationReg = Registers.ESI };
+            new Inc { DestinationReg = Registers.ESI }; // TODO: ESI++ instead
             Return();
         }
 
