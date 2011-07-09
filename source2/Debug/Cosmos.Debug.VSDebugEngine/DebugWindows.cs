@@ -22,7 +22,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // User might run mult instances of VS, so we need to make sure the pipe name
         // is unique but also predictable since the pipe is the only way to talk
         // between the debugger and ToolWindows project.
-        IntPtr xPID = System.Diagnostics.Process.GetCurrentProcess().Handle;
+        int xPID = System.Diagnostics.Process.GetCurrentProcess().Id;
         mPipe = new NamedPipeClientStream(".", @"Cosmos\DebugWindows-" + xPID.ToString(), PipeDirection.Out);
         try {
           // For now we assume its there or not from the first call.

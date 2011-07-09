@@ -20,7 +20,7 @@ namespace Cosmos.VS.Debug
         static protected string mPipeName;
 
         static PipeThread() {
-          IntPtr xPID = System.Diagnostics.Process.GetCurrentProcess().Handle;
+          int xPID = System.Diagnostics.Process.GetCurrentProcess().Id;
           mPipeName = @"Cosmos\DebugWindows-" + xPID.ToString();
         }
 
