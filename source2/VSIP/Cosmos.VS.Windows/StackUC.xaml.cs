@@ -30,14 +30,13 @@ namespace Cosmos.Cosmos_VS_Windows
             string xData = BitConverter.ToString(aData);
             xData = xData.Trim();
             xData = xData.Replace("-", "");
-            if (xData.Length == 256)
+            if (xData.Length == 512)
             {
-                for (int i = 0; i < 256; i += 8)
+                for (int i = 0; i < 512; i += 8)
                 {
                     string xTemp = xData.Substring(i, 8);
                     tboxSource.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");  
                 }
-                tboxSource.Text = xData;
             }
             else tboxSource.Text = "Error loading the frame.";
         }
