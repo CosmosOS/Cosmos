@@ -35,7 +35,8 @@ namespace Cosmos.Cosmos_VS_Windows
                 for (int i = 0; i < 512; i += 8)
                 {
                     string xTemp = xData.Substring(i, 8);
-                    tboxSource.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");  
+                    tboxSource.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");
+                    xOffset -= 8;
                 }
             }
             else tboxSource.Text = "Error loading the frame.";
