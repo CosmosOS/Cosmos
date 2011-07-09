@@ -137,6 +137,11 @@ namespace Cosmos.Debug.VSDebugEngine {
         DebugWindows.SendCommand(DwMsgType.Frame, aData);
     }
 
+    protected void DbgCmdStack(byte[] aData)
+    {
+        DebugWindows.SendCommand(DwMsgType.Stack, aData);
+    }
+
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
     {
         System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
@@ -221,6 +226,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
         mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
         mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
+        mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
 
         System.Threading.Thread.Sleep(250);
         System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
@@ -342,6 +348,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 SendAssembly();
                 mDbgConnector.SendRegisters();
                 mDbgConnector.SendFrame();
+                mDbgConnector.SendStack();
                 // Code based break. Tell VS to break.
                 
                 mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
@@ -351,6 +358,7 @@ namespace Cosmos.Debug.VSDebugEngine {
               SendAssembly();  
               mDbgConnector.SendRegisters();
               mDbgConnector.SendFrame();
+              mDbgConnector.SendStack();
               mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               mEngine.AfterBreak = true;
             }

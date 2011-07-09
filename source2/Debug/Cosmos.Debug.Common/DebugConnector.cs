@@ -18,6 +18,7 @@ namespace Cosmos.Debug.Common
         public Action<string> OnDebugMsg;
         public Action<byte[]> CmdRegisters;
         public Action<byte[]> CmdFrame;
+        public Action<byte[]> CmdStack;
 
         protected byte mCurrentMsgType;
         public abstract void WaitConnect();
@@ -112,6 +113,11 @@ namespace Cosmos.Debug.Common
         public void SendFrame()
         {
             SendCommand(DsCommand.SendFrame);
+        }
+
+        public void SendStack()
+        {
+            SendCommand(DsCommand.SendStack);
         }
 
         public void SetBreakpoint(int aID, uint aAddress) {
@@ -280,9 +286,13 @@ namespace Cosmos.Debug.Common
 
               case DsMsgType.Frame:
                     DoDebugMsg("DC Recv: Frame");
-                    Next(256, PacketFrame);
+                    Next(128, PacketFrame);
                     break;
 
+              case DsMsgType.Stack:
+                    DoDebugMsg("DC Recv: Stack");
+                    Next(128, PacketStack);
+                    break;
               default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");
@@ -352,6 +362,16 @@ namespace Cosmos.Debug.Common
             if (CmdFrame != null)
             {
                 CmdFrame(mData);
+            }
+            WaitForMessage();
+        }
+
+        protected void PacketStack(byte[] aPacket)
+        {
+            mData = aPacket.ToArray();
+            if (CmdStack != null)
+            {
+                CmdStack(mData);
             }
             WaitForMessage();
         }

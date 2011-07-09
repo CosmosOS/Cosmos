@@ -276,15 +276,29 @@ namespace Cosmos.Compiler.DebugStub {
                 Call<DebugStub.WriteALToComPort>();
 
                 ESI = Memory["DebugOriginalEBP", 32];
-                ESI.Sub(32);
-                for (int i = 1; i <= 256; i++)
+                for (int i = 1; i <= 128; i++)
                 {
                     Call("WriteByteToComPort");
                 }
             }
         }
 
-		public class ProcessCommand : CodeBlock {
+        public class SendStack : CodeBlock
+        {
+            public override void Assemble()
+            {
+                //AL = (int)DsMsgType.Frame; // Send the actual started signal
+                //Call<DebugStub.WriteALToComPort>();
+
+                //ESI = Memory["DebugOriginalEBP", 32];
+                //for (int i = 1; i <= 128; i++)
+                //{
+                //    Call("WriteByteToComPort");
+                //}
+            }
+        }
+
+        public class ProcessCommand : CodeBlock {
 			// Modifies: AL, DX (ReadALFromComPort)
 			// Returns: AL
 			public override void Assemble() {
@@ -355,7 +369,13 @@ namespace Cosmos.Compiler.DebugStub {
                 Jump("DebugStub_ProcessCmd_ACK");
                 Label = "DebugStub_ProcessCmd_SendFrame_After";
 
+        AL.Compare(DsCommand.SendStack);
+                JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendStack_After");
+                Call<SendStack>();
+                Jump("DebugStub_ProcessCmd_ACK");
+                Label = "DebugStub_ProcessCmd_SendStack_After";
 				Label = "DebugStub_ProcessCmd_ACK";
+
 				// We acknowledge receipt of the command, not processing of it.
 				// We have to do this because sometimes callers do more processing
 				// We ACK even ones we dont process here, but do not ACK Noop.
