@@ -24,7 +24,7 @@ namespace Cosmos.Cosmos_VS_Windows
             InitializeComponent();
         }
 
-        public void Update(byte[] aData)
+        public void UpdateFrame(byte[] aData)
         {
             int xOffset = 0;
             string xData = BitConverter.ToString(aData);
@@ -35,11 +35,29 @@ namespace Cosmos.Cosmos_VS_Windows
                 for (int i = 0; i < 256; i += 8)
                 {
                     string xTemp = xData.Substring(i, 8);
-                    tboxSource.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");
+                    tboxSourceFrame.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");
                     xOffset += 4;
                 }
             }
-            else tboxSource.Text = "Error loading the frame.";
+            else tboxSourceFrame.Text = "Error loading the frame.";
+        }
+
+        public void UpdateStack(byte[] aData)
+        {
+            int xOffset = -124;
+            string xData = BitConverter.ToString(aData);
+            xData = xData.Trim();
+            xData = xData.Replace("-", "");
+            if (xData.Length == 256)
+            {
+                for (int i = 0; i < 256; i += 8)
+                {
+                    string xTemp = xData.Substring(i, 8);
+                    tboxSourceStack.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");
+                    xOffset += 4;
+                }
+            }
+            else tboxSourceStack.Text = "Error loading the stack.";
         }
     }
 }
