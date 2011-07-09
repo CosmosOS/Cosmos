@@ -61,7 +61,7 @@ namespace Cosmos.Debug.Common {
 
         protected Action<byte[]> mCompleted; // Action to call after size received
         protected void SizePacket(byte[] aPacket) {
-          int xSize = aPacket[0] + aPacket[1] << 8;
+          int xSize = aPacket[0] + (aPacket[1] << 8);
           Next(xSize, mCompleted);
         }
   
