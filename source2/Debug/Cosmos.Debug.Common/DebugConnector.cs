@@ -277,10 +277,12 @@ namespace Cosmos.Debug.Common
                     DoDebugMsg("DC Recv: Registers");
                     Next(36, PacketRegisters);
                     break;
+
               case DsMsgType.Frame:
                     DoDebugMsg("DC Recv: Frame");
-                    Next(36, PacketFrame);
+                    Next(256, PacketFrame);
                     break;
+
               default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");

@@ -26,9 +26,20 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public void Update(byte[] aData)
         {
-            string xData = Encoding.ASCII.GetString(aData);
-            //xData = xData.Replace("\t", "  ");
-            tboxSource.Text = xData;
+            int xOffset = 32;
+            string xData = BitConverter.ToString(aData);
+            xData = xData.Trim();
+            xData = xData.Replace("-", "");
+            if (xData.Length == 256)
+            {
+                for (int i = 0; i < 256; i += 8)
+                {
+                    string xTemp = xData.Substring(i, 8);
+                    tboxSource.Text += ("EBP + " + xOffset.ToString() + " : " + xTemp + "\n");  
+                }
+                tboxSource.Text = xData;
+            }
+            else tboxSource.Text = "Error loading the frame.";
         }
     }
 }
