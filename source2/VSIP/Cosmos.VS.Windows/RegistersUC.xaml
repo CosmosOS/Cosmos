@@ -73,7 +73,7 @@
                 <RowDefinition Height="27" />
             </Grid.RowDefinitions>
             <Label Grid.Column="0" Grid.Row="0" Content="ESP" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="0" Content="Unknown" Name="lablESP" />
+      <Label Grid.Column="1" Grid.Row="0" Content="12345678" Name="lablESP" />
             <Label Grid.Column="0" Grid.Row="1" Content="EBP" HorizontalAlignment="Right" />
             <Label Grid.Column="1" Grid.Row="1" Content="12345678" Name="lablEBP" />
             <Label Grid.Column="0" Grid.Row="2" Content="ESI" HorizontalAlignment="Right" />

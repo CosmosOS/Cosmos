@@ -73,7 +73,6 @@ namespace Cosmos.Cosmos_VS_Windows
             UpdateRegisters(aData, 16, lablEBX, lablBX, lablBH, lablBL);
             UpdateRegisters(aData, 24, lablECX, lablCX, lablCH, lablCL);
             UpdateRegisters(aData, 20, lablEDX, lablDX, lablDH, lablDL);
-            //TODO: ESP
             UpdateRegister32(aData, 8, lablEBP);
             UpdateRegister32(aData, 4, lablESI);
             UpdateRegister32(aData, 0, lablEDI);
