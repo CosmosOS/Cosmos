@@ -341,24 +341,14 @@ namespace Cosmos.Debug.VSDebugEngine {
               if (mEngine.AfterBreak) {
                 mCallback.OnStepComplete();
               } else {
-                
-                // We catch and resend data rather than using a second serial port because
-                // while this would work fine in a VM, it puts extra requirements on the setup
-                // when real hardware is used.
-                SendAssembly();
-                mDbgConnector.SendRegisters();
-                mDbgConnector.SendFrame();
-                mDbgConnector.SendStack();
+                RequestFullDebugStubUpdate();
+
                 // Code based break. Tell VS to break.
-                
                 mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               }
             } else {
               // Found a bound breakpoint
-              SendAssembly();  
-              mDbgConnector.SendRegisters();
-              mDbgConnector.SendFrame();
-              mDbgConnector.SendStack();
+              RequestFullDebugStubUpdate();
               mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
               mEngine.AfterBreak = true;
             }
@@ -370,6 +360,16 @@ namespace Cosmos.Debug.VSDebugEngine {
             break;
           }
       }
+    }
+
+    protected void RequestFullDebugStubUpdate() {
+      // We catch and resend data rather than using a second serial port because
+      // while this would work fine in a VM, it puts extra requirements on the setup
+      // when real hardware is used.
+      SendAssembly();
+      mDbgConnector.SendRegisters();
+      mDbgConnector.SendFrame();
+      mDbgConnector.SendStack();
     }
 
     public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach) {
