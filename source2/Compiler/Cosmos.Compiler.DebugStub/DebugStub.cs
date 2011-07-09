@@ -192,12 +192,46 @@ namespace Cosmos.Compiler.DebugStub {
     public class WriteALToComPort : CodeBlock {
       // Input: AL
       // Output: None
-      // Modifies: EAX, EDX, ESI
+      // Modifies: EDX, ESI
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
         Call("WriteByteToComPort");
-        EAX.Pop(); // Is a local var, cant use Return(4). X# issues the return.
+        // Is a local var, cant use Return(4). X# issues the return.
+        // This also allow the function to preserve EAX.
+        EAX.Pop();
+      }
+    }
+
+    public class WriteAXToComPort : CodeBlock {
+      // Input: AX
+      // Output: None
+      // Modifies: EDX, ESI
+      public override void Assemble() {
+        EAX.Push();
+        ESI = ESP;
+        Call("WriteByteToComPort");
+        Call("WriteByteToComPort");
+        // Is a local var, cant use Return(4). X# issues the return.
+        // This also allow the function to preserve EAX.
+        EAX.Pop();
+      }
+    }
+
+    public class WriteEAXToComPort : CodeBlock {
+      // Input: EAX
+      // Output: None
+      // Modifies: EDX, ESI
+      public override void Assemble() {
+        EAX.Push();
+        ESI = ESP;
+        Call("WriteByteToComPort");
+        Call("WriteByteToComPort");
+        Call("WriteByteToComPort");
+        Call("WriteByteToComPort");
+        // Is a local var, cant use Return(4). X# issues the return.
+        // This also allow the function to preserve EAX.
+        EAX.Pop();
       }
     }
 
@@ -295,11 +329,9 @@ namespace Cosmos.Compiler.DebugStub {
             ESI = Memory["DebugESP", 32];
 
             // Send number of bytes
-            ESI = Memory["DebugEBP", 32];
+            EAX = Memory["DebugEBP", 32];
             EAX.Sub(ESI);
-            Call<DebugStub.WriteALToComPort>();
-            EAX.RotateRight(8); // Should be ShiftRight, but its no in X# ops yet
-            Call<DebugStub.WriteALToComPort>();
+            Call<DebugStub.WriteAXToComPort>();
 
             Label = "DebugStub_SendStack_SendByte";
             ESI.Compare(Memory["DebugEBP", 32]);

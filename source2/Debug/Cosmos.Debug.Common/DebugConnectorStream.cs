@@ -58,14 +58,26 @@ namespace Cosmos.Debug.Common {
             }
             base.Dispose();
         }
-        
+
+        protected Action<byte[]> mCompleted; // Action to call after size received
+        protected void SizePacket(byte[] aPacket) {
+          int xSize = aPacket[0] + aPacket[1] << 8;
+          Next(xSize, mCompleted);
+        }
+  
         protected override void Next(int aPacketSize, Action<byte[]> aCompleted) {
-            var xIncoming = new Incoming() {
-                Packet = new byte[aPacketSize]
-                , Stream = mStream
-                , Completed = aCompleted
-            };
-            mStream.BeginRead(xIncoming.Packet, 0, aPacketSize, new AsyncCallback(DoRead), xIncoming);
+          var xIncoming = new Incoming();
+          if (aPacketSize == -1) {
+            // Variable size packet, split into two reads
+            mCompleted = aCompleted;
+            aPacketSize = 2;
+            xIncoming.Completed = SizePacket;
+          } else {
+            xIncoming.Completed = aCompleted;
+          }
+          xIncoming.Packet = new byte[aPacketSize];
+          xIncoming.Stream = mStream;
+          mStream.BeginRead(xIncoming.Packet, 0, aPacketSize, new AsyncCallback(DoRead), xIncoming);
         }
         
         protected void DoRead(IAsyncResult aResult) {

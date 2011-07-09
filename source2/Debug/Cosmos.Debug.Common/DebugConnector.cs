@@ -291,8 +291,9 @@ namespace Cosmos.Debug.Common
 
               case DsMsgType.Stack:
                     DoDebugMsg("DC Recv: Stack");
-                    Next(128, PacketStack);
+                    Next(-1, PacketStack);
                     break;
+
               default:
                     // Exceptions crash VS.
                     MessageBox.Show("Unknown debug command");
@@ -368,7 +369,7 @@ namespace Cosmos.Debug.Common
 
         protected void PacketStack(byte[] aPacket)
         {
-            mData = aPacket.ToArray();
+            mData = aPacket;
             if (CmdStack != null)
             {
                 CmdStack(mData);

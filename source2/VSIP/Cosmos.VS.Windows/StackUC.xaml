@@ -8,8 +8,8 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Name="CosmosStackUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
-    <WrapPanel Orientation="Horizontal">
-        <TextBox Name="tboxSourceFrame" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="300" Width="150" />
-        <TextBox Name="tboxSourceStack" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="150" Height="300" />
-    </WrapPanel>
+    <DockPanel>
+        <TextBox DockPanel.Dock="Left" Name="tboxSourceFrame" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Width="160" Text="[EBP + 124] 0x12345678" />
+        <TextBox Name="tboxSourceStack" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Text="0x12345678" />
+    </DockPanel>
 </UserControl>

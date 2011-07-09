@@ -8,9 +8,7 @@ using System.Threading;
 
 namespace Cosmos.Debug.Common
 {
-	/// <summary>
-	/// Used for Vmware.
-	/// </summary>
+	/// Used for Vmware. VMWare uses a pipe to expose guest serial ports to the host.
     public class DebugConnectorPipeServer : DebugConnectorStream {
     
         public DebugConnectorPipeServer() {
