@@ -26,7 +26,7 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public void Update(byte[] aData)
         {
-            int xOffset = 128;
+            int xOffset = 124;
             string xData = BitConverter.ToString(aData);
             xData = xData.Trim();
             xData = xData.Replace("-", "");
