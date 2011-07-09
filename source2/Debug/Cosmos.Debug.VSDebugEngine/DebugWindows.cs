@@ -9,15 +9,10 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.VSDebugEngine {
 
   static public class DebugWindows {
-    static public bool Enabled = true;
     static private NamedPipeClientStream mPipe;
     static private StreamWriter mWriter;
 
     static public void SendCommand(byte aCmd, byte[] aData) {
-      if (!Enabled) {
-        //return;
-      }
-
       if (mPipe == null) {
         // User might run mult instances of VS, so we need to make sure the pipe name
         // is unique but also predictable since the pipe is the only way to talk
@@ -34,7 +29,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         } catch (TimeoutException ex) {
           mPipe.Close();
           mPipe = null;
-          Enabled = false;
           return;
         }
         mWriter = new StreamWriter(mPipe);
