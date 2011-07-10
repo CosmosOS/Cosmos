@@ -316,6 +316,7 @@ namespace Cosmos.Compiler.DebugStub {
         Call<DebugStub.WriteAXToComPort>();
 
         ESI = Memory["DebugEBP", 32];
+        ESI.Add(4); // Dont transmit [EBP], its the saved EIP and not needed
         for (int i = 1; i <= xCount; i++) {
           Call("WriteByteToComPort");
         }
@@ -347,7 +348,7 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-        public class ProcessCommand : CodeBlock {
+    public class ProcessCommand : CodeBlock {
       // Modifies: AL, DX (ReadALFromComPort)
       // Returns: AL
       public override void Assemble() {

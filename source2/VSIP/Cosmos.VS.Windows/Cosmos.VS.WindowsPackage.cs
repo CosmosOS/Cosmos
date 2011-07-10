@@ -46,7 +46,7 @@ namespace Cosmos.Cosmos_VS_Windows
     {
         Queue<byte> mCommand;
         Queue<byte[]> mMessage;
-        System.Timers.Timer mTimer = new System.Timers.Timer(250);
+        System.Timers.Timer mTimer = new System.Timers.Timer(100);
 
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -140,62 +140,65 @@ namespace Cosmos.Cosmos_VS_Windows
             }
         }
 
-        void ProcessMessage(object sender, EventArgs e)
-        {
-            byte xCmd = 0x0;
-            byte[] xMsg = {0x0};
-            if ((mCommand.Count > 0) && (mMessage.Count > 0))
-            {
-                xCmd = mCommand.Dequeue();
-                xMsg = mMessage.Dequeue();
+        void ProcessMessage(object sender, EventArgs e) {
+          byte xCmd;
+          byte[] xMsg;
+          while (true) {
+            lock (mCommand) {
+              if (mCommand.Count == 0) {
+                break;
+              }
+              xCmd = mCommand.Dequeue();
+              xMsg = mMessage.Dequeue();
             }
-            switch (xCmd)
-            {
-                case DwMsgType.Noop:
-                    break;
+            switch (xCmd) {
+              case DwMsgType.Noop:
+                break;
 
-                case DwMsgType.Stack:
-                    if (StackTW.mUC != null) {
-                      StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                        StackTW.mUC.UpdateStack(xMsg);
-                      });
-                    }
-                    break;
+              case DwMsgType.Stack:
+                if (StackTW.mUC != null) {
+                  StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                    StackTW.mUC.UpdateStack(xMsg);
+                  });
+                }
+                break;
 
-                case DwMsgType.Frame:
-                    if (StackTW.mUC != null) {
-                      StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                        StackTW.mUC.UpdateFrame(xMsg);
-                      });
-                    }
-                    break;
+              case DwMsgType.Frame:
+                if (StackTW.mUC != null) {
+                  StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                    StackTW.mUC.UpdateFrame(xMsg);
+                  });
+                }
+                break;
 
-                case DwMsgType.Registers:
-                    if (RegistersTW.mUC != null) {
-                      RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                        RegistersTW.mUC.Update(xMsg);
-                      });
-                    }
-                    break;
+              case DwMsgType.Registers:
+                if (RegistersTW.mUC != null) {
+                  RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                    RegistersTW.mUC.Update(xMsg);
+                  });
+                }
+                break;
 
-                case DwMsgType.Quit:
-                    //Close();
-                    break;
+              case DwMsgType.Quit:
+                //Close();
+                break;
 
-                case DwMsgType.AssemblySource:
-                    if (AssemblyTW.mUC != null) {
-                      AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                        AssemblyTW.mUC.Update(xMsg);
-                      });
-                    }
-                    break;
+              case DwMsgType.AssemblySource:
+                if (AssemblyTW.mUC != null) {
+                  AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                    AssemblyTW.mUC.Update(xMsg);
+                  });
+                }
+                break;
             }
+          }
         }
 
-        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
-        {
+        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg) {
+          lock (mCommand) {
             mCommand.Enqueue(aCmd);
             mMessage.Enqueue(aMsg);
+          }
         }
     }
 }
