@@ -34,11 +34,23 @@
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
 
+    <Menus>
+      <Menu guid="guidIDEToolbarCmdSet" id="Toolbar" type="Toolbar" >
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Debugger Toolbar</ButtonText>
+          <CommandName>Cosmos Debugger Toolbar</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
+      <Group guid="guidIDEToolbarCmdSet" id="ToolbarGroup" priority="0x0000">
+        <Parent guid="guidIDEToolbarCmdSet" id="Toolbar"/>
+      </Group>
     </Groups>
 
     <!--Buttons section. -->
@@ -51,7 +63,32 @@
           You can add more than one CommandFlag node e.g.:
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
+              
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup" />
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Strings>
+          <CommandName>cmdidCosmosAssembly</CommandName>
+          <ButtonText>Cosmos Assembly Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Strings>
+          <CommandName>cmdidCosmosRegisters</CommandName>
+          <ButtonText>Cosmos Registers Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Strings>
+          <CommandName>cmdidCosmosStack</CommandName>
+          <ButtonText>Cosmos Stack Window</ButtonText>
+        </Strings>
+      </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="bmpCosmosIcon1" />
@@ -92,7 +129,11 @@
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidCosmos_VS_WindowsPkg" value="{a82b45e9-2a89-43bd-925d-c7f0edd212aa}" />
-    
+
+    <GuidSymbol name="guidIDEToolbarCmdSet" value="{3d4b3f35-36e7-4cea-8acc-d9601e45c0b5}">
+      <IDSymbol name="Toolbar" value="0x1000" />
+      <IDSymbol name="ToolbarGroup" value="0x1050" />
+    </GuidSymbol>
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidCosmos_VS_WindowsCmdSet" value="{3d4b3f35-36e7-4cea-8acc-d9601e45c0b9}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
