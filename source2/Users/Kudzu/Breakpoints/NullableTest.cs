@@ -11,6 +11,7 @@ namespace BreakpointsKernel {
   // If you comment out the x2 and y2 you will see 32 instead.
   // How to reproduce this outside of this changeset? Cant seem to repro it here.
 
+    protected UInt32? aSize;
     protected UInt32? mSize;
     public virtual UInt32? Size {
       get { return mSize; }
