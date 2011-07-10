@@ -311,11 +311,12 @@ namespace Cosmos.Compiler.DebugStub {
         AL = (int)DsMsgType.Frame;
         Call<DebugStub.WriteALToComPort>();
 
-        EAX = 128;
+        int xCount = 8 * 4;
+        EAX = (uint)xCount;
         Call<DebugStub.WriteAXToComPort>();
 
         ESI = Memory["DebugEBP", 32];
-        for (int i = 1; i <= 128; i++) {
+        for (int i = 1; i <= xCount; i++) {
           Call("WriteByteToComPort");
         }
       }

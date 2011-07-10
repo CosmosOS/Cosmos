@@ -109,7 +109,7 @@ namespace Cosmos.IL2CPU
                     mLog.WriteLine("\t{0} {1}", mAssembler.Stack.Count, xILOp.GetType().Name);
                     mLog.Flush();
                     BeforeOp(aMethod, xOpCode);
-                    new Comment("[" + xILOp.ToString() + "]");
+                    new Comment(xILOp.ToString());
                     var xNextPosition = xOpCode.Position + 1;
                     #region Exception handling support code
                     ExceptionHandlingClause xCurrentHandler = null;

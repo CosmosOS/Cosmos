@@ -50,5 +50,10 @@ namespace Cosmos.IL2CPU {
     public static string GetLabel(MethodInfo aMethod, int aPos) {
       return GetMethodLabel(aMethod) + "__DOT__" + aPos.ToString("X8").ToUpper();
     }
+
+    public override string ToString() {
+      return GetType().Name;
+    }
+
   }
 }
