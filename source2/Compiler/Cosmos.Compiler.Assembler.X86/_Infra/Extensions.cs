@@ -25,8 +25,8 @@ namespace Cosmos.Compiler.Assembler.X86 {
             if (aThis.DestinationDisplacement != 0) {
                 if (aThis.DestinationDisplacement > 255) {
                     xDest += " + 0x" + aThis.DestinationDisplacement.ToString("X");
-                }else {
-                    xDest += " + " + aThis.DestinationDisplacement;
+                } else {
+                  xDest += (aThis.DestinationDisplacement < 0 ? " - " : " + ") + Math.Abs(aThis.DestinationDisplacement);
                 }
             }
             if (aThis.DestinationIsIndirect) {

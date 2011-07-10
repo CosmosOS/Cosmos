@@ -26,19 +26,16 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public void UpdateFrame(byte[] aData)
         {
-            int xOffset = 0;
             string xData = BitConverter.ToString(aData);
             xData = xData.Trim();
             xData = xData.Replace("-", "");
-            if (xData.Length == 256) {
-              for (int i = 0; i < 256; i += 8) {
-                string xTemp = xData.Substring(i, 8);
-                tboxSourceFrame.Text += ("[EBP + " + xOffset + "] " + xTemp + "\n");
-                xOffset += 4;
-              }
-            } else {
-              tboxSourceFrame.Text = "Error loading the frame.";
+
+            var xSB = new StringBuilder();
+            for (int i = 0; i < aData.Length; i += 8) {
+              xSB.Insert(0, "[EBP + " + (i / 8) + "] 0x" + xData.Substring(i, 8) + "\n");
             }
+            xSB.Insert(0, "Arguments\n");
+            tboxSourceFrame.Text = xSB.ToString();
         }
 
         public void UpdateStack(byte[] aData)
@@ -47,16 +44,12 @@ namespace Cosmos.Cosmos_VS_Windows
             xData = xData.Trim();
             xData = xData.Replace("-", "");
 
-            if (xData.Length == 256) {
-              var xSB = new StringBuilder();
-              xSB.AppendLine("Stack Contents");
-              for (int i = 0; i < 256; i += 8) {
-                xSB.AppendLine("0x" + xData.Substring(i, 8));
-              }
-              tboxSourceStack.Text = xSB.ToString();
-            } else {
-              tboxSourceStack.Text = "Error loading the stack.";
+            var xSB = new StringBuilder();
+            xSB.AppendLine("Stack Contents");
+            for (int i = 0; i < xData.Length; i += 8) {
+              xSB.AppendLine("[EBP - " + ((i / 8) + 4) + "] 0x" + xData.Substring(i, 8));
             }
+            tboxSourceStack.Text = xSB.ToString();
         }
     }
 }
