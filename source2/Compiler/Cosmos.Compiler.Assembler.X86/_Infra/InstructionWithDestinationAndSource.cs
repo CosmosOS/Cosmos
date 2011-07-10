@@ -55,7 +55,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
                 }
             }
             if (SourceDisplacement != 0) {
-                xDest += " + " + SourceDisplacement;
+              xDest += (SourceDisplacement < 0 ? " - " : " + ") + Math.Abs(SourceDisplacement);
             }
             if (SourceIsIndirect) {
                 return "[" + xDest + "]";

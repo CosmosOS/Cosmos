@@ -32,7 +32,7 @@ namespace Cosmos.Cosmos_VS_Windows
 
             var xSB = new StringBuilder();
             for (int i = 0; i < aData.Length; i += 8) {
-              xSB.Insert(0, "[EBP + " + (i / 8) + "] 0x" + xData.Substring(i, 8) + "\n");
+              xSB.Insert(0, "[EBP + " + (i / 2) + "] 0x" + xData.Substring(i, 8) + "\n");
             }
             xSB.Insert(0, "Arguments\n");
             tboxSourceFrame.Text = xSB.ToString();
@@ -44,10 +44,16 @@ namespace Cosmos.Cosmos_VS_Windows
             xData = xData.Trim();
             xData = xData.Replace("-", "");
 
+            int xCount = xData.Length / 8;
+            var xValues = new List<string>(xCount);
+            for (int i = 0; i < xCount; i++) {
+              xValues.Add(xData.Substring(i * 8, 8));
+            }
+
             var xSB = new StringBuilder();
             xSB.AppendLine("Stack Contents");
-            for (int i = 0; i < xData.Length; i += 8) {
-              xSB.AppendLine("[EBP - " + ((i / 8) + 4) + "] 0x" + xData.Substring(i, 8));
+            for (int i = xCount - 1; i >= 0; i--) {
+              xSB.AppendLine("[EBP - " + ((xCount - i) * 4) + "] 0x" + xValues[i]);
             }
             tboxSourceStack.Text = xSB.ToString();
         }
