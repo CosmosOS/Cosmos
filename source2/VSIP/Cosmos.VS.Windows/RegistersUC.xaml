@@ -5,95 +5,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="166" d:DesignWidth="300"
              Name="CosmosRegistersUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <WrapPanel>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="37" />
-                <ColumnDefinition Width="75" />
-                <ColumnDefinition Width="27" />
-                <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="27" />
-                <ColumnDefinition Width="30" />
-                <ColumnDefinition Width="27" />
-                <ColumnDefinition Width="30" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-            </Grid.RowDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="EAX" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="0" Content="12345678" Name="lablEAX" />
-            <Label Grid.Column="2" Grid.Row="0" Content="AX" HorizontalAlignment="Right" />
-            <Label Grid.Column="3" Grid.Row="0" Content="1234" Name="lablAX" />
-            <Label Grid.Column="4" Grid.Row="0" Content="AH" HorizontalAlignment="Right" />
-            <Label Grid.Column="5" Grid.Row="0" Content="12" Name="lablAH" />
-            <Label Grid.Column="6" Grid.Row="0" Content="AL" HorizontalAlignment="Right" />
-            <Label Grid.Column="7" Grid.Row="0" Content="12" Name="lablAL" />
-            <Label Grid.Column="0" Grid.Row="1" Content="EBX" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="1" Content="12345678" Name="lablEBX" />
-            <Label Grid.Column="2" Grid.Row="1" Content="BX" HorizontalAlignment="Right" />
-            <Label Grid.Column="3" Grid.Row="1" Content="1234" Name="lablBX" />
-            <Label Grid.Column="4" Grid.Row="1" Content="BH" HorizontalAlignment="Right" />
-            <Label Grid.Column="5" Grid.Row="1" Content="12" Name="lablBH" />
-            <Label Grid.Column="6" Grid.Row="1" Content="BL" HorizontalAlignment="Right" />
-            <Label Grid.Column="7" Grid.Row="1" Content="12" Name="lablBL" />
-            <Label Grid.Column="0" Grid.Row="2" Content="ECX" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="2" Content="12345678" Name="lablECX" />
-            <Label Grid.Column="2" Grid.Row="2" Content="CX" HorizontalAlignment="Right" />
-            <Label Grid.Column="3" Grid.Row="2" Content="1234" Name="lablCX" />
-            <Label Grid.Column="4" Grid.Row="2" Content="CH" HorizontalAlignment="Right" />
-            <Label Grid.Column="5" Grid.Row="2" Content="12" Name="lablCH" />
-            <Label Grid.Column="6" Grid.Row="2" Content="CL" HorizontalAlignment="Right" />
-            <Label Grid.Column="7" Grid.Row="2" Content="12" Name="lablCL" />
-            <Label Grid.Column="0" Grid.Row="3" Content="EDX" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="3" Content="12345678" Name="lablEDX" />
-            <Label Grid.Column="2" Grid.Row="3" Content="DX" HorizontalAlignment="Right" />
-            <Label Grid.Column="3" Grid.Row="3" Content="1234" Name="lablDX" />
-            <Label Grid.Column="4" Grid.Row="3" Content="DH" HorizontalAlignment="Right" />
-            <Label Grid.Column="5" Grid.Row="3" Content="12" Name="lablDH" />
-            <Label Grid.Column="6" Grid.Row="3" Content="DL" HorizontalAlignment="Right" />
-            <Label Grid.Column="7" Grid.Row="3" Content="12" Name="lablDL" />
-        </Grid>
-    <WrapPanel>
-      <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="37" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-            </Grid.RowDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="ESP" HorizontalAlignment="Right" />
-      <Label Grid.Column="1" Grid.Row="0" Content="12345678" Name="lablESP" />
-            <Label Grid.Column="0" Grid.Row="1" Content="EBP" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="1" Content="12345678" Name="lablEBP" />
-            <Label Grid.Column="0" Grid.Row="2" Content="ESI" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="2" Content="12345678" Name="lablESI" />
-            <Label Grid.Column="0" Grid.Row="3" Content="EDI" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="3" Content="12345678" Name="lablEDI" />
-        </Grid>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="37" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="27" />
-                <RowDefinition Height="27" />
-            </Grid.RowDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="EIP" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="0" Content="12345678" Name="lablEIP" />
-            <Label Grid.Column="0" Grid.Row="1" Content="Flags" HorizontalAlignment="Right" />
-            <Label Grid.Column="1" Grid.Row="1" Content="Unknown" Name="lablFlags" />
-        </Grid>
-    </WrapPanel>
+    <StackPanel Orientation="Horizontal">
+      <TextBlock Margin="5">EAX<LineBreak/>EBX<LineBreak/>ECX<LineBreak/>EDX</TextBlock>
+      <TextBlock Margin="5"><Run Name="runEAX" Text="0x00000000"/><LineBreak/><Run Name="runEBX" Text="0x00000000"/><LineBreak/><Run Name="runECX" Text="0x00000000"/><LineBreak/><Run Name="runEDX" Text="0x00000000"/></TextBlock>
+      <TextBlock Margin="5">AX<LineBreak/>BX<LineBreak/>CX<LineBreak/>DX</TextBlock>
+      <TextBlock Margin="5"><Run Name="runAX" Text="0x0000"/><LineBreak/><Run Name="runBX" Text="0x0000"/><LineBreak/><Run Name="runCX" Text="0x0000"/><LineBreak/><Run Name="runDX" Text="0x0000"/></TextBlock>
+      <TextBlock Margin="5">AH<LineBreak/>BH<LineBreak/>CH<LineBreak/>DH</TextBlock>
+      <TextBlock Margin="5"><Run Name="runAH" Text="0x00"/><LineBreak/><Run Name="runBH" Text="0x00"/><LineBreak/><Run Name="runCH" Text="0x00"/><LineBreak/><Run Name="runDH" Text="0x00"/></TextBlock>
+      <TextBlock Margin="5">AL<LineBreak/>BL<LineBreak/>CL<LineBreak/>DL</TextBlock>
+      <TextBlock Margin="5"><Run Name="runAL" Text="0x00"/><LineBreak/><Run Name="runBL" Text="0x00"/><LineBreak/><Run Name="runCL" Text="0x00"/><LineBreak/><Run Name="runDL" Text="0x00"/></TextBlock>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal">
+      <TextBlock Margin="5">ESP<LineBreak/>EBP<LineBreak/>ESI<LineBreak/>EDI</TextBlock>
+      <TextBlock Margin="5"><Run Name="runESP" Text="0x00000000"/><LineBreak/><Run Name="runEBP" Text="0x00000000"/><LineBreak/><Run Name="runESI" Text="0x00000000"/><LineBreak/><Run Name="runEDI" Text="0x00000000"/></TextBlock>
+      <TextBlock Margin="5">EIP<LineBreak/>Flags</TextBlock>
+      <TextBlock Margin="5"><Run Name="runEIP" Text="0x00000000"/><LineBreak/><Run Name="runFlags" Text="--------"/></TextBlock>
+    </StackPanel>
   </WrapPanel>
 </UserControl>
