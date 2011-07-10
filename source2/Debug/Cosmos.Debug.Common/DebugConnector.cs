@@ -286,7 +286,7 @@ namespace Cosmos.Debug.Common
 
               case DsMsgType.Frame:
                     DoDebugMsg("DC Recv: Frame");
-                    Next(128, PacketFrame);
+                    Next(-1, PacketFrame);
                     break;
 
               case DsMsgType.Stack:

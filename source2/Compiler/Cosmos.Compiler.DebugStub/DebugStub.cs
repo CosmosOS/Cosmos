@@ -306,46 +306,45 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-        public class SendFrame : CodeBlock
-        {
-            public override void Assemble()
-            {
-                AL = (int)DsMsgType.Frame; 
-                Call<DebugStub.WriteALToComPort>();
+    public class SendFrame : CodeBlock {
+      public override void Assemble() {
+        AL = (int)DsMsgType.Frame;
+        Call<DebugStub.WriteALToComPort>();
 
-                ESI = Memory["DebugEBP", 32];
-                for (int i = 1; i <= 128; i++)
-                {
-                    Call("WriteByteToComPort");
-                }
-            }
+        EAX = 128;
+        Call<DebugStub.WriteAXToComPort>();
+
+        ESI = Memory["DebugEBP", 32];
+        for (int i = 1; i <= 128; i++) {
+          Call("WriteByteToComPort");
         }
+      }
+    }
 
-        public class SendStack : CodeBlock {
-          public override void Assemble() {
-            AL = (int)DsMsgType.Stack;
-            Call<DebugStub.WriteALToComPort>();
+    public class SendStack : CodeBlock {
+      public override void Assemble() {
+        AL = (int)DsMsgType.Stack;
+        Call<DebugStub.WriteALToComPort>();
 
+        // Send size of bytes
+        ESI = Memory["DebugESP", 32];
+        EAX = Memory["DebugEBP", 32];
+        EAX.Sub(ESI);
+        Call<DebugStub.WriteAXToComPort>();
 
-            // Send size of bytes
-            ESI = Memory["DebugESP", 32];
-            EAX = Memory["DebugEBP", 32];
-            EAX.Sub(ESI);
-            Call<DebugStub.WriteAXToComPort>();
+        // Send actual bytes
+        //
+        // Need to reload ESI, WriteAXToCompPort modifies it
+        ESI = Memory["DebugESP", 32];
+        Label = "DebugStub_SendStack_SendByte";
+        ESI.Compare(Memory["DebugEBP", 32]);
+        JumpIf(Flags.Equal, "DebugStub_SendStack_Exit");
+        Call("WriteByteToComPort");
+        Jump("DebugStub_SendStack_SendByte");
 
-            // Send actual bytes
-            //
-            // Need to reload ESI, WriteAXToCompPort modifies it
-            ESI = Memory["DebugESP", 32];
-            Label = "DebugStub_SendStack_SendByte";
-            ESI.Compare(Memory["DebugEBP", 32]);
-            JumpIf(Flags.Equal, "DebugStub_SendStack_Exit");
-            Call("WriteByteToComPort");
-            Jump("DebugStub_SendStack_SendByte");
-
-            Label = "DebugStub_SendStack_Exit";
-          }
-        }
+        Label = "DebugStub_SendStack_Exit";
+      }
+    }
 
         public class ProcessCommand : CodeBlock {
       // Modifies: AL, DX (ReadALFromComPort)
