@@ -326,16 +326,21 @@ namespace Cosmos.Compiler.DebugStub {
             AL = (int)DsMsgType.Stack;
             Call<DebugStub.WriteALToComPort>();
 
-            ESI = Memory["DebugESP", 32];
 
-            // Send number of bytes
+            // Send size of bytes
+            ESI = Memory["DebugESP", 32];
             EAX = Memory["DebugEBP", 32];
             EAX.Sub(ESI);
             Call<DebugStub.WriteAXToComPort>();
 
+            // Send actual bytes
+            //
+            // Need to reload ESI, WriteAXToCompPort modifies it
+            ESI = Memory["DebugESP", 32];
             Label = "DebugStub_SendStack_SendByte";
             ESI.Compare(Memory["DebugEBP", 32]);
             JumpIf(Flags.Equal, "DebugStub_SendStack_Exit");
+            Call("WriteByteToComPort");
             Jump("DebugStub_SendStack_SendByte");
 
             Label = "DebugStub_SendStack_Exit";

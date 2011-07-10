@@ -295,8 +295,11 @@ namespace Cosmos.Debug.Common
                     break;
 
               default:
-                    // Exceptions crash VS.
-                    MessageBox.Show("Unknown debug command");
+                    // Exceptions crash VS so use MsgBox instead
+                    MessageBox.Show("Unknown debug command: " + mCurrentMsgType);
+                    // Despite it being unkonwn, we try again. Normally this will
+                    // just cause more unknowns, but can be useful for debugging.
+                    WaitForMessage();
                     break;
             }
         }

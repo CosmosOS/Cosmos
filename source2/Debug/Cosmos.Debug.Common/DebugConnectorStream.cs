@@ -88,22 +88,22 @@ namespace Cosmos.Debug.Common {
                 
                 System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
                 xIncoming.CurrentPos += xCount;
-                // If 0, end of stream then just exit without calling BeginRead again
                 if (xCount == 0)
                 {
-                    return;
-                    // Packet is not full yet, read more data
+                  // If 0, end of stream then just exit without calling BeginRead again
+                  return;
                 }
                 else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
                 {
-                    xIncoming.Stream.BeginRead(xIncoming.Packet, xIncoming.CurrentPos
+                  // Packet is not full yet, read more data
+                  xIncoming.Stream.BeginRead(xIncoming.Packet, xIncoming.CurrentPos
                         , xIncoming.Packet.Length - xIncoming.CurrentPos
                         , new AsyncCallback(DoRead), xIncoming);
-                    // Full packet received, process it
                 }
                 else
                 {
-                    xIncoming.Completed(xIncoming.Packet);
+                  // Full packet received, process it
+                  xIncoming.Completed(xIncoming.Packet);
                 }
             }
             catch (System.IO.IOException ex)
