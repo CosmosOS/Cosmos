@@ -33,6 +33,7 @@ namespace Cosmos.Cosmos_VS_Windows {
     public void Update(byte[] aData) {
       mCode = Encoding.ASCII.GetString(aData);
       mCode = mCode.Replace("\t", "  ");
+      tblkSource.Inlines.Clear();
 
       string[] xLines = mCode.Split('\n');
       foreach (string xLine in xLines) {

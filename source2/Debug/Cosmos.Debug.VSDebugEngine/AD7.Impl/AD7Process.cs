@@ -508,39 +508,55 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Scan and make a list of labels that belong to this line of code
       int xIdx = mSourceMappings.Keys.IndexOf((uint)mCurrentAddress);
       string xFile = mSourceMappings.Values[xIdx].SourceFile;
-      int xLine = mSourceMappings.Values[xIdx].Line;
+      int xLineNo = mSourceMappings.Values[xIdx].Line;
       int xCol = mSourceMappings.Values[xIdx].Column;
 
       var xLabels = new List<string>();
-      xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress]);
+      xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress].Trim().ToUpper());
       for (int i = xIdx; i < mSourceMappings.Values.Count; i++) {
         var xSI = mSourceMappings.Values[i];
-        if ((xSI.SourceFile != xFile) || (xSI.Line != xLine) || (xSI.Column != xCol)) {
+        if ((xSI.SourceFile != xFile) || (xSI.Line != xLineNo) || (xSI.Column != xCol)) {
           break;
         }
-        xLabels.Add(mAddressLabelMappings[mSourceMappings.Keys[i]]);
+        xLabels.Add(mAddressLabelMappings[mSourceMappings.Keys[i]].Trim().ToUpper());
       }
 
-      // Get ASM lines
+      // Extract relevant lines from .ASM file.
       var xLines = File.ReadAllLines(Path.ChangeExtension(mISO, ".asm"));
-      var xData = new StringBuilder();
-      for (int a = 0; a < xLabels.Count; a++) {
-        int k = 0, l = 0;
-        for (int j = 0; j < xLines.Length; j++) {
-          if (xLines[j].Contains(xLabels[a])) {
-            k = j;
-            j++;
-          }
-          if ((k != 0) && (xLines[j].Contains("System"))) {
-            l = j - 2;
+
+      // Fine line in ASM that starts the code block
+      int xStart = -1;
+      for (int i = 0; i < xLines.Length; i++) {
+        string xLine = xLines[i].Trim();
+        if (xLine.EndsWith(":")) {
+          if (xLabels.Contains(xLine.Substring(0, xLine.Length - 1).ToUpper())) {
+            // Found the first match, store and break.
+            xStart = i;
             break;
           }
         }
-        for (int j = k; j < l; j++) {
-          xData.AppendLine(xLines[j]);
+      }
+
+      var xCode = new StringBuilder();
+      if (xStart > -1) {
+        // Extract the actual lines
+        for (int i = xStart; i < xLines.Length; i++) {
+          string xLine = xLines[i].TrimEnd();
+          if (xLine.EndsWith(":")) {
+            string xTest = xLine.Trim().ToUpper();
+            if (xLabels.Contains(xTest.Substring(0, xTest.Length - 1))) {
+              xCode.AppendLine(xLine);
+            } else {
+              // Found the first non-match, stop here
+              break;
+            }
+          } else {
+            xCode.AppendLine(xLine);
+          }
         }
       }
-      DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xData.ToString()));
+
+      DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
     }
 
   }
