@@ -504,72 +504,44 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
-    public void SendAssembly()
-    {
-      //Get Current BP Label
-      bool xDone = false;
-      string xFile = string.Empty;
-      int xLine = 0;
-      int xCol = 0;
-      IList<uint> xKeys = mSourceMappings.Keys;
-      IList<SourceInfo> xValues = mSourceMappings.Values;
-      List<string> xCurrentBPLabel = new List<string>();
-      xCurrentBPLabel.Add(mAddressLabelMappings[(uint)mCurrentAddress]);
-      int xIdx = xKeys.IndexOf((uint)mCurrentAddress);
-      xFile = xValues[xIdx].SourceFile;
-      xLine = xValues[xIdx].Line;
-      xCol = xValues[xIdx].Column;
-      while (!xDone)
-      {
-          xIdx++;
-          if (xIdx < xValues.Count)
-          {
-              SourceInfo xSI = xValues[xIdx];
-              if ((xSI.SourceFile == xFile) && (xSI.Line == xLine) && (xSI.Column == xCol))
-              {
-                  xCurrentBPLabel.Add(mAddressLabelMappings[xKeys[xIdx]]);
-              }
-              else
-              {
-                  xDone = true;
-              }
-          }
+    public void SendAssembly() {
+      // Scan and make a list of labels that belong to this line of code
+      int xIdx = mSourceMappings.Keys.IndexOf((uint)mCurrentAddress);
+      string xFile = mSourceMappings.Values[xIdx].SourceFile;
+      int xLine = mSourceMappings.Values[xIdx].Line;
+      int xCol = mSourceMappings.Values[xIdx].Column;
+
+      var xLabels = new List<string>();
+      xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress]);
+      for (int i = xIdx; i < mSourceMappings.Values.Count; i++) {
+        var xSI = mSourceMappings.Values[i];
+        if ((xSI.SourceFile != xFile) || (xSI.Line != xLine) || (xSI.Column != xCol)) {
+          break;
+        }
+        xLabels.Add(mAddressLabelMappings[mSourceMappings.Keys[i]]);
       }
 
       // Get ASM lines
-      string xAsmDocumentName = Path.ChangeExtension(mISO, "asm");
-      string xAsmFile;
-      string[] xFileLines;
+      var xLines = File.ReadAllLines(Path.ChangeExtension(mISO, ".asm"));
       var xData = new StringBuilder();
-      using (var xTR = new StreamReader(xAsmDocumentName))
-      {
-          xAsmFile = xTR.ReadToEnd();
+      for (int a = 0; a < xLabels.Count; a++) {
+        int k = 0, l = 0;
+        for (int j = 0; j < xLines.Length; j++) {
+          if (xLines[j].Contains(xLabels[a])) {
+            k = j;
+            j++;
+          }
+          if ((k != 0) && (xLines[j].Contains("System"))) {
+            l = j - 2;
+            break;
+          }
+        }
+        for (int j = k; j < l; j++) {
+          xData.AppendLine(xLines[j]);
+        }
       }
-      xAsmFile = xAsmFile.Replace('\r', ' ');
-      xAsmFile = xAsmFile.Trim();
-      xFileLines = xAsmFile.Split('\n');
-      for (int a = 0; a < xCurrentBPLabel.Count; a++)
-      {
-          int k = 0, l = 0;
-          for (int j = 0; j < xFileLines.Length; j++)
-          {
-              if (xFileLines[j].Contains(xCurrentBPLabel[a]))
-              {
-                  k = j;
-                  j++;
-              }
-              if ((k != 0) && (xFileLines[j].Contains("System")))
-              {
-                  l = j - 2;
-                  break;
-              }
-          }
-          for (int j = k; j < l; j++)
-          {
-              xData.AppendLine(xFileLines[j]);
-          }
-      } 
       DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xData.ToString()));
     }
+
   }
 }
