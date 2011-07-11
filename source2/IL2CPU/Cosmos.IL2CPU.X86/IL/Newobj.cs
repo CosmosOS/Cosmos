@@ -33,6 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
 
       if (objectType.IsValueType) {
+        new Comment("ValueType");
         /*
          * Current sitation on stack:
          *   $ESP       Arg
@@ -48,45 +49,52 @@ namespace Cosmos.IL2CPU.X86.IL {
          *  + pointer should be set
          *  + call .ctor
          */
-        var xStorageSize = Align(SizeOfType(objectType), 4);
-        //var xStorageSize = aCtorDeclTypeInfo.StorageSize;
-        //uint xArgSize = 0;
-        var xParams = constructor.GetParameters();
-        uint xArgSize = (uint)(((from item in xParams.Skip(1)
-                                 let xQSize = Align(SizeOfType(item.ParameterType), 4)
-                                 select (int)xQSize).Take(xParams.Length - 1).Sum()));
 
-        //foreach( var xArg in aCtorMethodInfo.Arguments.Skip( 1 ) )
-        //{
-        //    xArgSize += xArg.Size + ( xArg.Size % 4 == 0
-        //                                            ? 0
-        //                                            : ( 4 - ( xArg.Size % 4 ) ) );
-        //}
-        int xExtraArgSize = (int)(xStorageSize - xArgSize);
-        if (xExtraArgSize < 0) {
-          xExtraArgSize = 0;
+        // Size of return value - we need to make room for this on the stack.
+        uint xStorageSize = Align(SizeOfType(objectType), 4);
+        new Comment("StorageSize: " + xStorageSize);
+        if (xStorageSize == 0) {
+          throw new Exception("ValueType storage size cannot be 0.");
         }
-        if (xExtraArgSize > 0) {
-          new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
+        //var xStorageSize = aCtorDeclTypeInfo.StorageSize;
+
+        uint xArgSize = 0;
+        foreach (var xParam in constructor.GetParameters()) {
+          xArgSize = xArgSize + Align(SizeOfType(xParam.ParameterType), 4);
         }
-        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
-        aAssembler.Stack.Push(new StackContents.Item(4, null));
-        //at this point, we need to move copy all arguments over. 
-        for (int i = 0; i < (xArgSize / 4); i++) {
-          new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4) }; // + 4 because the ptr is pushed too
-          new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4 + 4), SourceValue = 0, Size = 32 };
+        new Comment("ArgSize: " + xArgSize);
+
+        // Set ESP so we can push the struct ptr
+        int xShift = (int)(xArgSize - xStorageSize);
+        new Comment("Shift: " + xShift);
+        if (xShift < 0) {
+          new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)Math.Abs(xShift) };
+        } else if (xShift > 0) {
+          new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xShift };
         }
+        // Find struct ptr
+        if (xStorageSize == 4) {
+          // If xStorageSize = 4, we dont need to find it because it is ESP.
+          new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
+        } else {
+          new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP};
+          new CPUx86.Sub { DestinationReg = CPUx86.Registers.EAX, SourceValue = xStorageSize - 4 };
+          new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+        }
+        // Shift args
+        for (int i = 1; i <= xArgSize / 4; i++) {
+          new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = -(int)xStorageSize };
+        }
+
         new Call(aAssembler).Execute(aMethod, xMethod);
-        //var xCall = new Call( aCtorDef,
-        //                     ( uint )aCurrentILOffset,
-        //                     true,
-        //                     aNextLabel );
-        //xCall.SetServiceProvider( aServiceProvider );
-        //xCall.Assembler = aAssembler;
-        //xCall.Assemble();
-        aAssembler.Stack.Push(new StackContents.Item(xStorageSize, objectType));
+        // Need to put these *after* the call because the Call pops from the stack
+        // and we have mucked about on the stack, so this makes it right before the next
+        // op.
+        aAssembler.Stack.Push(xStorageSize, objectType);
+        aAssembler.Stack.Push(4, typeof(IntPtr));
       } else {
         // If not ValueType, then we need gc
+
         var xParams = constructor.GetParameters();
         for (int i = 0; i < xParams.Length; i++) {
           aAssembler.Stack.Pop();
