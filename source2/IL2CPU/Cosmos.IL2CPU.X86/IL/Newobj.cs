@@ -73,14 +73,14 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xShift };
         }
         // Find struct ptr
-        if (xStorageSize == 4) {
+        //if (xStorageSize == 4) {
           // If xStorageSize = 4, we dont need to find it because it is ESP.
           new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
-        } else {
-          new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP};
-          new CPUx86.Sub { DestinationReg = CPUx86.Registers.EAX, SourceValue = xStorageSize - 4 };
-          new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-        }
+        //} else {
+        //  new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP};
+        //  new CPUx86.Sub { DestinationReg = CPUx86.Registers.EAX, SourceValue = xStorageSize - 4 };
+        //  new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+        //}
         // Shift args
         for (int i = 1; i <= xArgSize / 4; i++) {
           new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = -(int)xStorageSize };

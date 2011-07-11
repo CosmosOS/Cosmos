@@ -12,7 +12,7 @@ namespace BreakpointsKernel {
     }
 
     public override void Run() {
-      mSize = 7;
+      mSize = 255;
       bool xHasValue = mSize.HasValue; // .HasValue is false
       Chk(xHasValue);
       UInt32 x = mSize.Value;
