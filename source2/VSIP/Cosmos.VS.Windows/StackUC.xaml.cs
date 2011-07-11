@@ -42,8 +42,8 @@ namespace Cosmos.Cosmos_VS_Windows {
       for (int i = 0; i < xCount; i++) {
         // We start at EBP + 8, because lower is not transmitted
         // [EBP] is old EBP - not needed
-        // [EBP + 4] is saved EEP - not needed
-        xSB.AppendLine("[EBP + " + (i * 4 + 4) + "] 0x" + xValues[i]);
+        // [EBP + 4] is saved EIP - not needed
+        xSB.AppendLine("[EBP + " + (i * 4 + 8) + "] 0x" + xValues[i]);
       }
       tboxSourceFrame.Text = xSB.ToString();
     }

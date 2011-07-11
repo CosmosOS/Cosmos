@@ -24,21 +24,21 @@ namespace Cosmos.Cosmos_VS_Windows
         {
             InitializeComponent();
             runEAX.Text = "0x--------";
-            runAX.Text = "0x----";
-            runAH.Text = "0x--";
-            runAL.Text = "0x--";
+            runAX.Text = "----";
+            runAH.Text = "--";
+            runAL.Text = "--";
             runEBX.Text = "0x--------";
-            runBX.Text = "0x----";
-            runBH.Text = "0x--";
-            runBL.Text = "0x--";
+            runBX.Text = "----";
+            runBH.Text = "--";
+            runBL.Text = "--";
             runECX.Text = "0x--------";
-            runCX.Text = "0x----";
-            runCH.Text = "0x--";
-            runCL.Text = "0x--";
+            runCX.Text = "----";
+            runCH.Text = "--";
+            runCL.Text = "--";
             runEDX.Text = "0x--------";
-            runDX.Text = "0x----";
-            runDH.Text = "0x--";
-            runDL.Text = "0x--";
+            runDX.Text = "----";
+            runDH.Text = "--";
+            runDL.Text = "--";
             runEBP.Text = "0x--------";
             runESI.Text = "0x--------";
             runEDI.Text = "0x--------";
@@ -51,9 +51,9 @@ namespace Cosmos.Cosmos_VS_Windows
         {
             byte x8Lo = aData[aOffset];
             byte x8Hi = aData[aOffset + 1];
-            SetText(a8Lo, "0x" + x8Lo.ToString("X2"));
-            SetText(a8Hi, "0x" + x8Hi.ToString("X2"));
-            SetText(a16, "0x" + x8Hi.ToString("X2") + x8Lo.ToString("X2"));
+            SetText(a8Lo, x8Lo.ToString("X2"));
+            SetText(a8Hi, x8Hi.ToString("X2"));
+            SetText(a16, x8Hi.ToString("X2") + x8Lo.ToString("X2"));
             UpdateRegister32(aData, aOffset, a32);
         }
 
