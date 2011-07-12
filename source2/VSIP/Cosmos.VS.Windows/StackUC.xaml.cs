@@ -16,47 +16,27 @@ namespace Cosmos.Cosmos_VS_Windows {
   public partial class StackUC : UserControl {
     public StackUC() {
       InitializeComponent();
-
-      tboxSourceFrame.Text = "";
-      tboxSourceStack.Text = "";
-    }
-
-    protected List<string> SplitValues(byte[] aData) {
-      string xData = BitConverter.ToString(aData);
-      xData = xData.Trim();
-      xData = xData.Replace("-", "");
-
-      int xCount = xData.Length / 8;
-      var xResult = new List<string>(xCount);
-      for (int i = 0; i < xCount; i++) {
-        xResult.Add(xData.Substring(i * 8, 8));
-      }
-      return xResult;
     }
 
     public void UpdateFrame(byte[] aData) {
-      var xValues = SplitValues(aData);
+      var xValues = MemoryViewUC.Split(aData);
       int xCount = xValues.Count;
-      var xSB = new StringBuilder();
-      xSB.AppendLine("Arguments");
+      memvEBP.Clear();
       for (int i = 0; i < xCount; i++) {
         // We start at EBP + 8, because lower is not transmitted
         // [EBP] is old EBP - not needed
         // [EBP + 4] is saved EIP - not needed
-        xSB.AppendLine("[EBP + " + (i * 4 + 8) + "] 0x" + xValues[i]);
+        memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
       }
-      tboxSourceFrame.Text = xSB.ToString();
     }
 
     public void UpdateStack(byte[] aData) {
-      var xValues = SplitValues(aData);
+      var xValues = MemoryViewUC.Split(aData);
       int xCount = xValues.Count;
-      var xSB = new StringBuilder();
-      xSB.AppendLine("Locals and Stack");
+      memvESP.Clear();
       for (int i = 0; i < xCount; i++) {
-        xSB.AppendLine("[EBP - " + ((xCount - i) * 4) + "] 0x" + xValues[i]);
+        memvESP.Add("[EBP - " + ((xCount - i) * 4) + "] [ESP + " + (i * 4) + "]", xValues[i]);
       }
-      tboxSourceStack.Text = xSB.ToString();
     }
   }
 }

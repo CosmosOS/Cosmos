@@ -7,9 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              Name="CosmosStackUserControl"
-             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
-    <DockPanel>
-        <TextBox DockPanel.Dock="Left" Name="tboxSourceFrame" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Width="160" Text="[EBP + 124] 0x12345678" />
-        <TextBox Name="tboxSourceStack" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Text="0x12345678" />
-    </DockPanel>
+             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" xmlns:my="clr-namespace:Cosmos.Cosmos_VS_Windows">
+    <WrapPanel>
+        <my:MemoryViewUC Margin="5,0,0,0" x:Name="memvEBP" Title="Arguments" />
+        <my:MemoryViewUC Margin="5,0,0,0" x:Name="memvESP" Title="Stack" />
+    </WrapPanel>
 </UserControl>
