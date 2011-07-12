@@ -5,25 +5,80 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
              mc:Ignorable="d" 
-             d:DesignHeight="166" d:DesignWidth="300"
              Name="CosmosRegistersUserControl"
-             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
+             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" xmlns:my="clr-namespace:Cosmos.Cosmos_VS_Windows">
     <WrapPanel>
-    <StackPanel Orientation="Horizontal">
-      <TextBlock Margin="5">EAX<LineBreak/>EBX<LineBreak/>ECX<LineBreak/>EDX</TextBlock>
-      <TextBlock Margin="5"><Run Name="runEAX" Text="0x00000000"/><LineBreak/><Run Name="runEBX" Text="0x00000000"/><LineBreak/><Run Name="runECX" Text="0x00000000"/><LineBreak/><Run Name="runEDX" Text="0x00000000"/></TextBlock>
-      <TextBlock Margin="5">AX<LineBreak/>BX<LineBreak/>CX<LineBreak/>DX</TextBlock>
-      <TextBlock Margin="5"><Run Name="runAX" Text="0x0000"/><LineBreak/><Run Name="runBX" Text="0x0000"/><LineBreak/><Run Name="runCX" Text="0x0000"/><LineBreak/><Run Name="runDX" Text="0x0000"/></TextBlock>
-      <TextBlock Margin="5">AH<LineBreak/>BH<LineBreak/>CH<LineBreak/>DH</TextBlock>
-      <TextBlock Margin="5"><Run Name="runAH" Text="0x00"/><LineBreak/><Run Name="runBH" Text="0x00"/><LineBreak/><Run Name="runCH" Text="0x00"/><LineBreak/><Run Name="runDH" Text="0x00"/></TextBlock>
-      <TextBlock Margin="5">AL<LineBreak/>BL<LineBreak/>CL<LineBreak/>DL</TextBlock>
-      <TextBlock Margin="5"><Run Name="runAL" Text="0x00"/><LineBreak/><Run Name="runBL" Text="0x00"/><LineBreak/><Run Name="runCL" Text="0x00"/><LineBreak/><Run Name="runDL" Text="0x00"/></TextBlock>
-    </StackPanel>
-    <StackPanel Orientation="Horizontal">
-      <TextBlock Margin="5">ESP<LineBreak/>EBP<LineBreak/>ESI<LineBreak/>EDI</TextBlock>
-      <TextBlock Margin="5"><Run Name="runESP" Text="0x00000000"/><LineBreak/><Run Name="runEBP" Text="0x00000000"/><LineBreak/><Run Name="runESI" Text="0x00000000"/><LineBreak/><Run Name="runEDI" Text="0x00000000"/></TextBlock>
-      <TextBlock Margin="5">EIP<LineBreak/>Flags</TextBlock>
-      <TextBlock Margin="5"><Run Name="runEIP" Text="0x00000000"/><LineBreak/><Run Name="runFlags" Text="--------"/></TextBlock>
-    </StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="5">
+            <StackPanel Margin="0,0,5,0">
+                <TextBlock Text="EAX" />
+                <TextBlock Text="EBX" />
+                <TextBlock Text="ECX" />
+                <TextBlock Text="EDX" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <my:DataBytesUC x:Name="dataEAX" />
+                <my:DataBytesUC x:Name="dataEBX" />
+                <my:DataBytesUC x:Name="dataECX" />
+                <my:DataBytesUC x:Name="dataEDX" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <TextBlock Text="AX" />
+                <TextBlock Text="BX" />
+                <TextBlock Text="CX" />
+                <TextBlock Text="DX" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <my:DataBytesUC Prefix="" Digits="4" x:Name="dataAX" />
+                <my:DataBytesUC Prefix="" Digits="4" x:Name="dataBX" />
+                <my:DataBytesUC Prefix="" Digits="4" x:Name="dataCX" />
+                <my:DataBytesUC Prefix="" Digits="4" x:Name="dataDX" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <TextBlock Text="AH" />
+                <TextBlock Text="BH" />
+                <TextBlock Text="CH" />
+                <TextBlock Text="DH" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataAH" />
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataBH" />
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataCH" />
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataDH" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <TextBlock Text="AL" />
+                <TextBlock Text="BL" />
+                <TextBlock Text="CL" />
+                <TextBlock Text="DL" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataAL" />
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataBL" />
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataCL" />
+                <my:DataBytesUC Prefix="" Digits="2" x:Name="dataDL" />
+            </StackPanel>
+        </StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="5">
+            <StackPanel Margin="0,0,5,0">
+                <TextBlock Text="ESP" />
+                <TextBlock Text="EBP" />
+                <TextBlock Text="ESI" />
+                <TextBlock Text="EDI" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <my:DataBytesUC x:Name="dataESP" />
+                <my:DataBytesUC x:Name="dataEBP" />
+                <my:DataBytesUC x:Name="dataESI" />
+                <my:DataBytesUC x:Name="dataEDI" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <TextBlock Text="EIP" />
+                <TextBlock Text="Flags" />
+            </StackPanel>
+            <StackPanel Margin="0,0,5,0">
+                <my:DataBytesUC x:Name="dataEIP" />
+                <my:DataBytesUC x:Name="dataFlags" />
+            </StackPanel>
+      </StackPanel>
   </WrapPanel>
 </UserControl>
