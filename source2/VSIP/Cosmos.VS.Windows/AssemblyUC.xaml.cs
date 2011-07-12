@@ -45,7 +45,6 @@ namespace Cosmos.Cosmos_VS_Windows {
 
         var xRun = new Run(xLine);
         if (xTestLine.EndsWith(":")) {
-          tblkSource.Inlines.Add(new LineBreak());
           xRun.Foreground = Brushes.Black;
         } else if (xTestLine.StartsWith(";")) {
           xRun.Foreground = Brushes.Green;
