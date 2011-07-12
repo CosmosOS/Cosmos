@@ -120,6 +120,9 @@
     <Compile Include="AssemblyUC.xaml.cs">
       <DependentUpon>AssemblyUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DataBytesUC.xaml.cs">
+      <DependentUpon>DataBytesUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PipeThread.cs" />
     <Compile Include="RegistersUC.xaml.cs">
       <DependentUpon>RegistersUC.xaml</DependentUpon>
@@ -177,6 +180,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="AssemblyUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataBytesUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
