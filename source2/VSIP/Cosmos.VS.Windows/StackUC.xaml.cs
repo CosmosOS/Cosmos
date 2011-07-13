@@ -14,8 +14,14 @@ using System.Windows.Shapes;
 
 namespace Cosmos.Cosmos_VS_Windows {
   public partial class StackUC : UserControl {
+
+    public static byte[] mFrameData;
+    public static byte[] mStackData;
+
     public StackUC() {
       InitializeComponent();
+      UpdateFrame(mFrameData);
+      UpdateStack(mStackData);
     }
 
     public void UpdateFrame(byte[] aData) {

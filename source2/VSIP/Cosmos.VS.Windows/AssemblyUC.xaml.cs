@@ -18,12 +18,15 @@ using System.Threading;
 
 namespace Cosmos.Cosmos_VS_Windows {
   public partial class AssemblyUC : UserControl {
+    
+    public static byte[] mData;
     protected string mCode;
 
     public AssemblyUC() {
       InitializeComponent();
 
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
+      Update(mData); 
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e) {

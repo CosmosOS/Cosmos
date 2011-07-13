@@ -156,26 +156,44 @@ namespace Cosmos.Cosmos_VS_Windows
                 break;
 
               case DwMsgType.Stack:
-                if (StackTW.mUC != null) {
-                  StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                if (StackTW.mUC != null)
+                {
+                  StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                  {
                     StackTW.mUC.UpdateStack(xMsg);
                   });
+                }
+                else
+                {
+                  StackUC.mStackData = xMsg;
                 }
                 break;
 
               case DwMsgType.Frame:
-                if (StackTW.mUC != null) {
-                  StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                if (StackTW.mUC != null)
+                {
+                  StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                  {
                     StackTW.mUC.UpdateFrame(xMsg);
                   });
+                }
+                else
+                {
+                  StackUC.mFrameData = xMsg;
                 }
                 break;
 
               case DwMsgType.Registers:
-                if (RegistersTW.mUC != null) {
-                  RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                    RegistersTW.mUC.Update(xMsg);
-                  });
+                if (RegistersTW.mUC != null)
+                {
+                    RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                    {
+                        RegistersTW.mUC.Update(xMsg);
+                    });
+                }
+                else
+                {
+                    RegistersUC.mData = xMsg;
                 }
                 break;
 
@@ -184,10 +202,16 @@ namespace Cosmos.Cosmos_VS_Windows
                 break;
 
               case DwMsgType.AssemblySource:
-                if (AssemblyTW.mUC != null) {
-                  AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+                if (AssemblyTW.mUC != null)
+                {
+                  AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+                  {
                     AssemblyTW.mUC.Update(xMsg);
                   });
+                }
+                else
+                {
+                  AssemblyUC.mData = xMsg;
                 }
                 break;
             }
