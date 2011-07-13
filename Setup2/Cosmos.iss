@@ -294,7 +294,6 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueName: Name; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.MyToolWindow
 
-
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
 Root: HKCU; SubKey: Software\Microsoft\VisualStudio\10.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
@@ -306,5 +305,6 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName
 Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe"" ""%1"""
 
 [Run]
+; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 
