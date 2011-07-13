@@ -10,6 +10,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
     // http://wiki.osdev.org/Global_Descriptor_Table
     // http://http://wiki.osdev.org/GDT_Tutorial  
     // http://www.osdever.net/bkerndev/Docs/gdt.htm
+    // http://en.wikibooks.org/wiki/X86_Assembly/Global_Descriptor_Table
 
     //TODO: Modify this to support the flags and access as individual input rather
     // than requiring user to pass pre-calculated numbers.
@@ -84,13 +85,18 @@ namespace Cosmos.Core.Plugs.Assemblers {
       byte xDataSelector = (byte)xGDT.Count;
       xGDT.AddRange(Descriptor(0x00000000, 0xFFFFFFFF, false));
       xAsm.DataMembers.Add(new CPUAll.DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
-      
-      xAsm.DataMembers.Add(new CPUAll.DataMember("_NATIVE_GDT_Pointer", new ushort[] { 0x17, 0, 0 }));
-      new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer") };
-      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer"), DestinationIsIndirect = true, DestinationDisplacement = 2
-        , SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Contents") };
 
-      new CPUAll.Label(".RegisterGDT");
+
+      new CPUAll.Comment("Tell CPU about GDT");
+      var xGdtDescription = new UInt16[3];
+      // Size of GDT Table - 1
+      xGdtDescription[0] = (UInt16)(xGDT.Count - 1); 
+      xAsm.DataMembers.Add(new CPUAll.DataMember("_NATIVE_GDT_Pointer", xGdtDescription));
+      new CPUx86.Move {
+        DestinationRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer"),
+        DestinationIsIndirect = true,
+        DestinationDisplacement = 2
+        , SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Contents") };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer") };
       new CPUx86.Lgdt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
 
