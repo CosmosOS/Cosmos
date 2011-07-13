@@ -80,21 +80,22 @@ namespace Cosmos.Core.Plugs.Assemblers {
       // Code Segment
       byte xCodeSelector = (byte)xGDT.Count;
       xGDT.AddRange(Descriptor(0x00000000, 0xFFFFFFFF, true));
-      // Data Segment - Selector 0x0B
+      // Data Segment - Selector
       byte xDataSelector = (byte)xGDT.Count;
       xGDT.AddRange(Descriptor(0x00000000, 0xFFFFFFFF, false));
       xAsm.DataMembers.Add(new CPUAll.DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
       
       xAsm.DataMembers.Add(new CPUAll.DataMember("_NATIVE_GDT_Pointer", new ushort[] { 0x17, 0, 0 }));
-
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer") };
-      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer"), DestinationIsIndirect = true, DestinationDisplacement = 2, SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Contents") };
+      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer"), DestinationIsIndirect = true, DestinationDisplacement = 2
+        , SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Contents") };
 
       new CPUAll.Label(".RegisterGDT");
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("_NATIVE_GDT_Pointer") };
       new CPUx86.Lgdt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
 
-      new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceValue = 0x10 };
+      new CPUAll.Comment("Set data segments");
+      new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceValue = xDataSelector };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.DS, SourceReg = CPUx86.Registers.AX };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.ES, SourceReg = CPUx86.Registers.AX };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.FS, SourceReg = CPUx86.Registers.AX };
@@ -102,7 +103,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
       new CPUx86.Move { DestinationReg = CPUx86.Registers.SS, SourceReg = CPUx86.Registers.AX };
 
       new CPUAll.Comment("Force reload of code segment");
-      new CPUx86.JumpToSegment { Segment = 0x08, DestinationLabel = "flush__GDT__table" };
+      new CPUx86.JumpToSegment { Segment = xCodeSelector, DestinationLabel = "flush__GDT__table" };
       new CPUAll.Label("flush__GDT__table");
     }
   }
