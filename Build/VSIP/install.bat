@@ -98,12 +98,14 @@ echo Install Completed.
 
 rem Relaunch VS
 IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
+    IF "%1"=="HIVE" goto ResetHive
+	goto ResetHiveAfter
+:ResetHive
 	echo Resetting hive keys
 	"%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" /setup /rootsuffix Exp /ranu
-
+:ResetHiveAfter
 	echo Launching Visual Studio 2010
 	REM - Emit thise before we actually launch VS, since the bat will stick there
 	echo You can close this window now.
 	"%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
 )
-
