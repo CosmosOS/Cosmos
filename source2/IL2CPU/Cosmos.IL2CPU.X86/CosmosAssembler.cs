@@ -48,6 +48,7 @@ namespace Cosmos.IL2CPU.X86
             new Comment(this, "EBX=multiboot_info ");
             new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
             new Comment(this, "                ;- copy mb info - some stuff for you  ");
+            new Comment(this, "BEGIN - Multiboot Info");
             //new Move { DestinationReg = Registers.ESI, SourceReg = Registers.EBX };
             //new Move { DestinationReg = Registers.EDI, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
             //new Move { DestinationReg = Registers.ECX, SourceValue = 0x58 };
@@ -56,12 +57,7 @@ namespace Cosmos.IL2CPU.X86
             //new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
             new Move { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
             new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
-            new Move
-            {
-                DestinationReg = Registers.EAX,
-                SourceReg = Registers.EBX,
-                SourceIsIndirect = true
-            };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
             new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
             new Move
@@ -76,6 +72,8 @@ namespace Cosmos.IL2CPU.X86
                 DestinationReg = Registers.ESP,
                 SourceRef = ElementReference.New("Kernel_Stack")
             };
+            new Comment(this, "END - Multiboot Info");
+
 #if LFB_1024_8
             new Comment("Set graphics fields");
             new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
@@ -86,9 +84,8 @@ namespace Cosmos.IL2CPU.X86
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 80 };
             new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
-            new Comment(this, "some more startups todo");
 
-            // SSE init
+            new Comment(this, "BEGIN - SSE Init");
             // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
             new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
@@ -104,7 +101,7 @@ namespace Cosmos.IL2CPU.X86
 
             new And { DestinationReg = Registers.EAX, SourceValue = 1 };
             new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-            // END SSE INIT
+            new Comment(this, "END - SSE Init");
 
             if (mComNumber > 0)
             {
@@ -118,7 +115,7 @@ namespace Cosmos.IL2CPU.X86
             // Jump to Kernel entry point
             new Call { DestinationLabel = EntryPointName };
 
-            // After Kernel is done, sit here and halt till next IRQ.
+            new Comment(this, "Kernel done - loop till next IRQ");
             new Label(".loop");
                 new ClrInterruptFlag();
                 new Halt();
