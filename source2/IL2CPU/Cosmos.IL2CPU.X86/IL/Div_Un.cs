@@ -1,6 +1,5 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler.X86;
 using Label = Cosmos.Compiler.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -24,13 +23,13 @@ namespace Cosmos.IL2CPU.X86.IL
 				if (xStackItem.IsFloat)
 				{// TODO add 0/0 infinity/infinity X/infinity
 					// value 1
-					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// value 2
 					new CPUx86.x87.FloatDivide { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
 					// override value 1
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// pop value 2
-					new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 8 };
+					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
 					Assembler.Stack.Push(8, typeof(Double));
 				}
 				else
@@ -52,10 +51,13 @@ namespace Cosmos.IL2CPU.X86.IL
 					//high
 					new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 
+					// pop both 8 byte values
+					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 16 };
+
 					// set flags
 					new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
 					// if high dword of divisor is already zero, we dont need the loop
-					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
 
 					// set ecx to zero for counting the shift operations
 					new CPUx86.Xor { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX };
@@ -72,25 +74,20 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set flags
 					new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
 					// loop while high dword of divisor till it is zero
-					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
 
 					// shift the divident now in one step
 					// shift divident CL bits right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX, ArgumentReg = CPUx86.Registers.CL };
 					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.CL };
 
-					
-
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
 					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
 
-					// pop both 8 byte values
-					new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 16 };
-
 					// save result to stack
 					new CPUx86.Push { DestinationValue = 0 };
-					new CPUx86.Push { DestinationReg = Registers.EAX };
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 
 					//TODO: implement proper derivation correction and overflow detection
 
