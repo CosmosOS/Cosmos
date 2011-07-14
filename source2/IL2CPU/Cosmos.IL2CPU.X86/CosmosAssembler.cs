@@ -87,7 +87,13 @@ namespace Cosmos.IL2CPU.X86 {
       return xResult;
     }
 
+    public void CreateIDT() {
+      new Comment(this, "BEGIN - Create IDT");
+      new Comment(this, "END - Create IDT");
+    }
+
     public void CreateGDT() {
+      new Comment(this, "BEGIN - Create GDT");
       var xGDT = new List<byte>();
       // Null Segment - Selector 0x00
       // Not used, but required by many emulators.
@@ -125,8 +131,9 @@ namespace Cosmos.IL2CPU.X86 {
       new Move { DestinationReg = Registers.SS, SourceReg = Registers.AX };
 
       new Comment("Force reload of code segment");
-      new JumpToSegment { Segment = xCodeSelector, DestinationLabel = "flush__GDT__table" };
-      new Label("flush__GDT__table");
+      new JumpToSegment { Segment = xCodeSelector, DestinationLabel = "Boot_FlushCsGDT" };
+      new Label("Boot_FlushCsGDT");
+      new Comment(this, "END - Create GDT");
     }
 
     public override void Initialize() {
@@ -144,12 +151,6 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
       new Comment(this, "                ;- copy mb info - some stuff for you  ");
       new Comment(this, "BEGIN - Multiboot Info");
-      //new Move { DestinationReg = Registers.ESI, SourceReg = Registers.EBX };
-      //new Move { DestinationReg = Registers.EDI, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
-      //new Move { DestinationReg = Registers.ECX, SourceValue = 0x58 };
-      //new Movs { Prefixes = InstructionPrefixes.Repeat, Size = 8 };
-
-      //new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
       new Move { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
       new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
       new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
@@ -167,9 +168,8 @@ namespace Cosmos.IL2CPU.X86 {
       };
       new Comment(this, "END - Multiboot Info");
 
-      new Comment(this, "BEGIN - Create GDT");
       CreateGDT();
-      new Comment(this, "END - Create GDT");
+      CreateIDT();
 
 #if LFB_1024_8
             new Comment("Set graphics fields");
