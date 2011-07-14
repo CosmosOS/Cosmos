@@ -87,6 +87,8 @@ namespace Cosmos.IL2CPU.X86 {
       return xResult;
     }
 
+    byte mGdCode;
+    byte mGdData;
     public void CreateGDT() {
       new Comment(this, "BEGIN - Create GDT");
       var xGDT = new List<byte>();
@@ -94,10 +96,10 @@ namespace Cosmos.IL2CPU.X86 {
       // Not used, but required by many emulators.
       xGDT.AddRange(new byte[8] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
       // Code Segment
-      byte xCodeSelector = (byte)xGDT.Count;
+      mGdCode = (byte)xGDT.Count;
       xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, true));
       // Data Segment - Selector
-      byte xDataSelector = (byte)xGDT.Count;
+      mGdData = (byte)xGDT.Count;
       xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, false));
       DataMembers.Add(new DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
 
@@ -118,7 +120,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment("Set data segments");
-      new Move { DestinationReg = Registers.AX, SourceValue = xDataSelector };
+      new Move { DestinationReg = Registers.AX, SourceValue = mGdData };
       new Move { DestinationReg = Registers.DS, SourceReg = Registers.AX };
       new Move { DestinationReg = Registers.ES, SourceReg = Registers.AX };
       new Move { DestinationReg = Registers.FS, SourceReg = Registers.AX };
@@ -126,21 +128,40 @@ namespace Cosmos.IL2CPU.X86 {
       new Move { DestinationReg = Registers.SS, SourceReg = Registers.AX };
 
       new Comment("Force reload of code segment");
-      new JumpToSegment { Segment = xCodeSelector, DestinationLabel = "Boot_FlushCsGDT" };
+      new JumpToSegment { Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT" };
       new Label("Boot_FlushCsGDT");
       new Comment(this, "END - Create GDT");
     }
 
-    protected void SetIdtDescriptor(byte[] aIDT, int aNo) {
+    protected void SetIdtDescriptor(int aNo, string aLabel) {
+      int xOffset = aNo * 8;
+      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(aLabel) };
+      var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = Registers.AL };
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = Registers.AH };
+      new ShiftRight { DestinationReg = Registers.EAX, SourceValue = 16 };
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = Registers.AL };
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = Registers.AH };
+
+      // Code Segment
+      //TODO: Selectors are 16 bit, convert it to 16 bit but also check GDT settings first (prob just old code)
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 2, SourceValue = mGdCode, Size = 8 };
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 3, SourceValue = 0x00, Size = 8 };
+
+      // Reserved
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 4, SourceValue = 0x00, Size = 8 };
+
+      // Type
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 5, SourceValue = 0x8E, Size = 8 };
     }
 
     public void CreateIDT() {
       new Comment(this, "BEGIN - Create IDT");
-      var xIDT = new byte[8 * 256];
-      SetIdtDescriptor(xIDT, 3);
-
-      DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", xIDT));
-      DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { (UInt16)xIDT.Length, 0, 0 }));
+      UInt16 xIdtSize = 8 * 256;
+      DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", new byte[xIdtSize]));
+      DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { xIdtSize, 0, 0 }));
+      SetIdtDescriptor(3, "DebugStub_INT3");
+      new Label("DebugStub_INT3");
       new Comment(this, "END - Create IDT");
     }
 
