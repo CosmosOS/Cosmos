@@ -189,7 +189,6 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assembler\" />
     <Folder Include="Plugs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
