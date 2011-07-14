@@ -87,8 +87,8 @@ namespace Cosmos.IL2CPU.X86 {
       return xResult;
     }
 
-    byte mGdCode;
-    byte mGdData;
+    UInt16 mGdCode;
+    UInt16 mGdData;
     public void CreateGDT() {
       new Comment(this, "BEGIN - Create GDT");
       var xGDT = new List<byte>();
@@ -102,7 +102,6 @@ namespace Cosmos.IL2CPU.X86 {
       mGdData = (byte)xGDT.Count;
       xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, false));
       DataMembers.Add(new DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
-
 
       new Comment("Tell CPU about GDT");
       var xGdtPtr = new UInt16[3];
@@ -120,12 +119,12 @@ namespace Cosmos.IL2CPU.X86 {
       new Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment("Set data segments");
-      new Move { DestinationReg = Registers.AX, SourceValue = mGdData };
-      new Move { DestinationReg = Registers.DS, SourceReg = Registers.AX };
-      new Move { DestinationReg = Registers.ES, SourceReg = Registers.AX };
-      new Move { DestinationReg = Registers.FS, SourceReg = Registers.AX };
-      new Move { DestinationReg = Registers.GS, SourceReg = Registers.AX };
-      new Move { DestinationReg = Registers.SS, SourceReg = Registers.AX };
+      new Move { DestinationReg = Registers.EAX, SourceValue = mGdData };
+      new Move { DestinationReg = Registers.DS, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.ES, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.FS, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.GS, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.SS, SourceReg = Registers.EAX };
 
       new Comment("Force reload of code segment");
       new JumpToSegment { Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT" };
@@ -144,9 +143,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = Registers.AH };
 
       // Code Segment
-      //TODO: Selectors are 16 bit, convert it to 16 bit but also check GDT settings first (prob just old code)
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 2, SourceValue = mGdCode, Size = 8 };
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 3, SourceValue = 0x00, Size = 8 };
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 2, SourceValue = mGdCode, Size = 16 };
 
       // Reserved
       new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 4, SourceValue = 0x00, Size = 8 };
