@@ -92,7 +92,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assemblers\CreateGDT.cs" />
     <Compile Include="Assemblers\CreateIDT.cs" />
     <Compile Include="CPUImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />

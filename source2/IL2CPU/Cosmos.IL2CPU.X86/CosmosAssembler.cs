@@ -13,66 +13,163 @@ using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.DebugStub;
 using Cosmos.Compiler.XSharp;
 
-namespace Cosmos.IL2CPU.X86
-{
-    // TODO: I think we need to later elminate this class
-    // Much of it is left over from the old build stuff, and info 
-    // here actually belongs else where, not in the assembler
-    public class CosmosAssembler : Cosmos.Compiler.Assembler.Assembler
-    {
-        //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
-        protected byte mComNumber = 0;
+namespace Cosmos.IL2CPU.X86 {
+  // TODO: I think we need to later elminate this class
+  // Much of it is left over from the old build stuff, and info 
+  // here actually belongs else where, not in the assembler
+  public class CosmosAssembler : Cosmos.Compiler.Assembler.Assembler {
+    //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
+    protected byte mComNumber = 0;
 
-        public CosmosAssembler(byte aComNumber) {
-            mComNumber = aComNumber;
-        }
+    public CosmosAssembler(byte aComNumber) {
+      mComNumber = aComNumber;
+    }
 
-        private static string GetValidGroupName(string aGroup)
-        {
-            return aGroup.Replace('-', '_').Replace('.', '_');
-        }
-        public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
-        public override void Initialize()
-        {
-            base.Initialize();
-            if (mComNumber > 0)
-            {
-                new Define("DEBUGSTUB");
-            }
-            new Label("Kernel_Start") { IsGlobal = true };
-            
-            // CLI ASAP
-            new ClrInterruptFlag();
+    private static string GetValidGroupName(string aGroup) {
+      return aGroup.Replace('-', '_').Replace('.', '_');
+    }
+    public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
 
-            new Comment(this, "MultiBoot-compliant loader (e.g. GRUB or X.exe) provides info in registers: ");
-            new Comment(this, "EBX=multiboot_info ");
-            new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
-            new Comment(this, "                ;- copy mb info - some stuff for you  ");
-            new Comment(this, "BEGIN - Multiboot Info");
-            //new Move { DestinationReg = Registers.ESI, SourceReg = Registers.EBX };
-            //new Move { DestinationReg = Registers.EDI, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
-            //new Move { DestinationReg = Registers.ECX, SourceValue = 0x58 };
-            //new Movs { Prefixes = InstructionPrefixes.Repeat, Size = 8 };
+    protected byte[] GdtDescriptor(UInt32 aBase, UInt32 aSize, bool aCode) {
+      // Limit is a confusing word. Is it the max physical address or size?
+      // In fact it is the size, and 286 docs actually refer to it as size 
+      // rather than limit.
+      // It is also size - 1, else there would be no way to specify
+      // all of RAM, and a limit of 0 is invalid.
 
-            //new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
-            new Move { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
-            new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
-            new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
-            new Move
-            {
-                DestinationReg = Registers.EAX,
-                SourceReg = Registers.EBX,
-                SourceIsIndirect = true
-            };
-            new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            new Move
-            {
-                DestinationReg = Registers.ESP,
-                SourceRef = ElementReference.New("Kernel_Stack")
-            };
-            new Comment(this, "END - Multiboot Info");
+      var xResult = new byte[8];
+
+      // Check the limit to make sure that it can be encoded
+      if ((aSize > 65536) && (aSize & 0x0FFF) != 0x0FFF) {
+        // If larger than 16 bit, must be an even page (4kb) size
+        throw new Exception("Invalid size in GDT descriptor.");
+      }
+      // Flags nibble
+      // 7: Granularity 
+      //    0 = bytes
+      //    1 = 4kb pages
+      // 6: 1 = 32 bit mode
+      // 5: 0 - Reserved
+      // 4: 0 - Reserved 
+      xResult[6] = 0x40;
+      if (aSize > 65536) {
+        // Set page sizing instead of byte sizing
+        aSize = aSize >> 12;
+        xResult[6] = (byte)(xResult[6] | 0x80);
+      }
+
+      xResult[0] = (byte)(aSize & 0xFF);
+      xResult[1] = (byte)((aSize >> 8) & 0xFF);
+      xResult[6] = (byte)(xResult[6] | ((aSize >> 16) & 0x0F));
+
+      xResult[2] = (byte)(aBase & 0xFF);
+      xResult[3] = (byte)((aBase >> 8) & 0xFF);
+      xResult[4] = (byte)((aBase >> 16) & 0xFF);
+      xResult[7] = (byte)((aBase >> 24) & 0xFF);
+
+      xResult[5] = (byte)(
+        // Bit 7: Present, must be 1
+        0x80 |
+        // Bit 6-5: Privilege, 0=kernel, 3=user
+        0x00 |
+        // Reserved, must be 1
+        0x10 |
+        // Bit 3: 1=Code, 0=Data
+        (aCode ? 0x08 : 0x00) |
+        // Bit 2: Direction/Conforming
+        0x00 |
+        // Bit 1: R/W  Data (1=Writeable, 0=Read only) Code (1=Readable, 0=Not readable)
+        0x02 |
+        // Bit 0: Accessed - Set to 0. Updated by CPU later.       
+        0x00
+        );
+
+      return xResult;
+    }
+
+    public void CreateGDT() {
+      var xGDT = new List<byte>();
+      // Null Segment - Selector 0x00
+      // Not used, but required by many emulators.
+      xGDT.AddRange(new byte[8] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+      // Code Segment
+      byte xCodeSelector = (byte)xGDT.Count;
+      xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, true));
+      // Data Segment - Selector
+      byte xDataSelector = (byte)xGDT.Count;
+      xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, false));
+      DataMembers.Add(new DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
+
+
+      new Comment("Tell CPU about GDT");
+      var xGdtPtr = new UInt16[3];
+      // Size of GDT Table - 1
+      xGdtPtr[0] = (UInt16)(xGDT.Count - 1);
+      DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", xGdtPtr));
+      new Move {
+        DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"),
+        DestinationIsIndirect = true,
+        DestinationDisplacement = 2
+        ,
+        SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
+      };
+      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer") };
+      new Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
+
+      new Comment("Set data segments");
+      new Move { DestinationReg = Registers.AX, SourceValue = xDataSelector };
+      new Move { DestinationReg = Registers.DS, SourceReg = Registers.AX };
+      new Move { DestinationReg = Registers.ES, SourceReg = Registers.AX };
+      new Move { DestinationReg = Registers.FS, SourceReg = Registers.AX };
+      new Move { DestinationReg = Registers.GS, SourceReg = Registers.AX };
+      new Move { DestinationReg = Registers.SS, SourceReg = Registers.AX };
+
+      new Comment("Force reload of code segment");
+      new JumpToSegment { Segment = xCodeSelector, DestinationLabel = "flush__GDT__table" };
+      new Label("flush__GDT__table");
+    }
+
+    public override void Initialize() {
+      base.Initialize();
+      if (mComNumber > 0) {
+        new Define("DEBUGSTUB");
+      }
+      new Label("Kernel_Start") { IsGlobal = true };
+
+      // CLI ASAP
+      new ClrInterruptFlag();
+
+      new Comment(this, "MultiBoot compliant loader provides info in registers: ");
+      new Comment(this, "EBX=multiboot_info ");
+      new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
+      new Comment(this, "                ;- copy mb info - some stuff for you  ");
+      new Comment(this, "BEGIN - Multiboot Info");
+      //new Move { DestinationReg = Registers.ESI, SourceReg = Registers.EBX };
+      //new Move { DestinationReg = Registers.EDI, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
+      //new Move { DestinationReg = Registers.ECX, SourceValue = 0x58 };
+      //new Movs { Prefixes = InstructionPrefixes.Repeat, Size = 8 };
+
+      //new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure") };
+      new Move { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
+      new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
+      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
+      new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
+      new Move {
+        DestinationReg = Registers.EAX,
+        SourceReg = Registers.EBX,
+        SourceIsIndirect = true
+      };
+      new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      new Move {
+        DestinationReg = Registers.ESP,
+        SourceRef = ElementReference.New("Kernel_Stack")
+      };
+      new Comment(this, "END - Multiboot Info");
+
+      new Comment(this, "BEGIN - Create GDT");
+      CreateGDT();
+      new Comment(this, "END - Create GDT");
 
 #if LFB_1024_8
             new Comment("Set graphics fields");
@@ -85,80 +182,77 @@ namespace Cosmos.IL2CPU.X86
             new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 
-            new Comment(this, "BEGIN - SSE Init");
-            // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
-            new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
-            new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      new Comment(this, "BEGIN - SSE Init");
+      // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
+      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
+      new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
+      new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
-            new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
+      new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            new And { DestinationReg = Registers.EAX, SourceValue = 1 };
-            new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-            new Comment(this, "END - SSE Init");
+      new And { DestinationReg = Registers.EAX, SourceValue = 1 };
+      new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      new Comment(this, "END - SSE Init");
 
-            if (mComNumber > 0)
-            {
-                CodeBlock.Call<DebugStub.Init>();
-            }
-            else
-            {
-                DataMembers.Add(new DataMember("InterruptsEnabledFlag", new int[] { 0 }));
-            }
+      if (mComNumber > 0) {
+        CodeBlock.Call<DebugStub.Init>();
+      } else {
+        DataMembers.Add(new DataMember("InterruptsEnabledFlag", new int[] { 0 }));
+      }
 
-            // Jump to Kernel entry point
-            new Call { DestinationLabel = EntryPointName };
+      // Jump to Kernel entry point
+      new Call { DestinationLabel = EntryPointName };
 
-            new Comment(this, "Kernel done - loop till next IRQ");
-            new Label(".loop");
-                new ClrInterruptFlag();
-                new Halt();
-            new Jump { DestinationLabel = ".loop" };
+      new Comment(this, "Kernel done - loop till next IRQ");
+      new Label(".loop");
+      new ClrInterruptFlag();
+      new Halt();
+      new Jump { DestinationLabel = ".loop" };
 
-            if (mComNumber > 0) {
-              var xStub = new DebugStub(mComNumber);
-              xStub.Assemble();
-              var xStub2 = new DebugPoint();
-              xStub2.Assemble();
+      if (mComNumber > 0) {
+        var xStub = new DebugStub(mComNumber);
+        xStub.Assemble();
+        var xStub2 = new DebugPoint();
+        xStub2.Assemble();
 
-                UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
-                var xStubOld = new DebugStubOld();
-                xStubOld.Main(xComPortAddresses[mComNumber - 1]);
-            } else {
-                new Label("DebugStub_Step");
-                new Return();
-            }
+        UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
+        var xStubOld = new DebugStubOld();
+        xStubOld.Main(xComPortAddresses[mComNumber - 1]);
+      } else {
+        new Label("DebugStub_Step");
+        new Return();
+      }
 
 #if !LFB_1024_8
-            DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
-            uint xFlags = 0x10003;
-            DataMembers.Add(new DataMember("MultibootSignature",
-                                   new uint[] { 0x1BADB002 }));
-            DataMembers.Add(new DataMember("MultibootFlags",
-                           xFlags));
-            DataMembers.Add(new DataMember("MultibootChecksum",
-                                               (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
-            DataMembers.Add(new DataEndIfDefined());
-            DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));                                                    
-            xFlags = 0x00003;
-            DataMembers.Add(new DataMember("MultibootSignature",
-                                   new uint[] { 0x1BADB002 }));
-            DataMembers.Add(new DataMember("MultibootFlags",
-                           xFlags));
-            DataMembers.Add(new DataMember("MultibootChecksum",
-                                               (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataEndIfDefined());
+      DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
+      uint xFlags = 0x10003;
+      DataMembers.Add(new DataMember("MultibootSignature",
+                             new uint[] { 0x1BADB002 }));
+      DataMembers.Add(new DataMember("MultibootFlags",
+                     xFlags));
+      DataMembers.Add(new DataMember("MultibootChecksum",
+                                         (int)(0 - (xFlags + 0x1BADB002))));
+      DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
+      DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
+      DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
+      DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
+      DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
+      DataMembers.Add(new DataEndIfDefined());
+      DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
+      xFlags = 0x00003;
+      DataMembers.Add(new DataMember("MultibootSignature",
+                             new uint[] { 0x1BADB002 }));
+      DataMembers.Add(new DataMember("MultibootFlags",
+                     xFlags));
+      DataMembers.Add(new DataMember("MultibootChecksum",
+                                         (int)(0 - (xFlags + 0x1BADB002))));
+      DataMembers.Add(new DataEndIfDefined());
 #else
             DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
             uint xFlags = 0x10007;
@@ -190,32 +284,30 @@ namespace Cosmos.IL2CPU.X86
             DataMembers.Add(new DataEndIfDefined());
 
 #endif
-            // graphics info fields 
-            DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
-            DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
-            DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
-            // memory
-            DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
-            DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
-            DataMembers.Add(new DataMember("Before_Kernel_Stack",
-                           new byte[0x50000]));
-            DataMembers.Add(new DataMember("Kernel_Stack",
-                           new byte[0]));
-            DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
-        }
+      // graphics info fields 
+      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
+      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
+      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
+      // memory
+      DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
+      DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
+      DataMembers.Add(new DataMember("Before_Kernel_Stack",
+                     new byte[0x50000]));
+      DataMembers.Add(new DataMember("Kernel_Stack",
+                     new byte[0]));
+      DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
+    }
 
-        protected override void OnBeforeFlush()
-        {
-            base.OnBeforeFlush();
-            DataMembers.AddRange(new DataMember[]{
+    protected override void OnBeforeFlush() {
+      base.OnBeforeFlush();
+      DataMembers.AddRange(new DataMember[]{
                     new DataMember("_end_data",
                                    new byte[0])});
-            new Label("_end_code");
-        }
-
-        public override void FlushText(TextWriter aOutput)
-        {
-            base.FlushText(aOutput);
-        }
+      new Label("_end_code");
     }
+
+    public override void FlushText(TextWriter aOutput) {
+      base.FlushText(aOutput);
+    }
+  }
 }

@@ -13,9 +13,6 @@ namespace Cosmos.Core.Plugs {
         public static void CreateIDT(CPU aThis, bool aEnableInterruptsImmediately) {
         }
 
-        [PlugMethod(Assembler = typeof(Assemblers.CreateGDT))]
-        public static void CreateGDT(CPU aThis) { }
-
         public class GetAmountOfRAMAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };

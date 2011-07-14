@@ -11,7 +11,6 @@ namespace Cosmos.Core {
         public static uint GetAmountOfRAM() { return 0; } // Plugged
         // needs to be static, as Heap needs it before we can instantiate objects
         public static uint GetEndOfKernel() { return 0; } // Plugged
-        public void CreateGDT() { } // Plugged
         public void CreateIDT(bool aEnableInterruptsImmediately) { } // Plugged
         public void InitFloat() { } // Plugged
         public void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged

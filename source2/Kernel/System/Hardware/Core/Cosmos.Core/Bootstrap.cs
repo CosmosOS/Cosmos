@@ -14,12 +14,12 @@ namespace Cosmos.Core {
 
         // Bootstrap is a class designed only to get the essentials done.
         // ie the stuff needed to "pre boot". Do only the very minimal here.
-        // GDT, IDT, PIC, and Float
+        // IDT, PIC, and Float
+        // Note: This is changing a bit GDT (already) and IDT are moving to a real preboot area.
         public static void Init() {
             // Drag this stuff in to the compiler manually until we add the always include attrib
             INTs.Dummy();
 
-            CPU.CreateGDT();
             PIC = new PIC();
             CPU.CreateIDT(true);
             CPU.InitFloat();
