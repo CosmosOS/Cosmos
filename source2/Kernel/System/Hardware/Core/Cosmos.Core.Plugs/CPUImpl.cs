@@ -9,8 +9,8 @@ using CPUx86 = Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.Core.Plugs {
     [Plug(Target = typeof(Core.CPU))]
     public class CPUImpl {
-        [PlugMethod(Assembler = typeof(Assemblers.CreateIDT))]
-        public static void CreateIDT(CPU aThis, bool aEnableInterruptsImmediately) {
+        [PlugMethod(Assembler = typeof(Assemblers.UpdateIDT))]
+      public static void UpdateIDT(CPU aThis, bool aEnableInterruptsImmediately) {
         }
 
         public class GetAmountOfRAMAsm : AssemblerMethod {
@@ -23,6 +23,7 @@ namespace Cosmos.Core.Plugs {
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }
+
         [PlugMethod(Assembler = typeof(GetAmountOfRAMAsm))]
         public static uint GetAmountOfRAM() { return 0; }
 
@@ -31,8 +32,11 @@ namespace Cosmos.Core.Plugs {
                 new CPUx86.Push { DestinationRef = CPUAll.ElementReference.New("_end_code") };
             }
         }
+
         [PlugMethod(Assembler = typeof(GetEndOfKernelAsm))]
-        public static uint GetEndOfKernel() { return 0; }
+        public static uint GetEndOfKernel() { 
+          return 0; 
+        }
 
         public class ZeroFillAsm : AssemblerMethod {
             public override void AssembleNew(object aAssembler, object aMethodInfo) {
@@ -60,7 +64,8 @@ namespace Cosmos.Core.Plugs {
                 new CPUx86.x87.FloatInit();
             }
         }
-        [PlugMethod(Assembler = typeof(InitFloatAsm))]
+      
+      [PlugMethod(Assembler = typeof(InitFloatAsm))]
         public static void InitFloat(CPU aThis) { }
 
         public class HaltAsm : AssemblerMethod {
@@ -68,7 +73,8 @@ namespace Cosmos.Core.Plugs {
                 new CPUx86.Halt();
             }
         }
-        [PlugMethod(Assembler = typeof(HaltAsm))]
+        
+      [PlugMethod(Assembler = typeof(HaltAsm))]
         public static void Halt(CPU aThis) { }
 
 

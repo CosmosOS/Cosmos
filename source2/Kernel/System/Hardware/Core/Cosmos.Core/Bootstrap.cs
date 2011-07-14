@@ -21,7 +21,7 @@ namespace Cosmos.Core {
             INTs.Dummy();
 
             PIC = new PIC();
-            CPU.CreateIDT(true);
+            CPU.UpdateIDT(true);
             CPU.InitFloat();
 
             // Not sure if this is necessary, heap is already used before we get here

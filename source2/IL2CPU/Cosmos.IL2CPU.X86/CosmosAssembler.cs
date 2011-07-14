@@ -87,11 +87,6 @@ namespace Cosmos.IL2CPU.X86 {
       return xResult;
     }
 
-    public void CreateIDT() {
-      new Comment(this, "BEGIN - Create IDT");
-      new Comment(this, "END - Create IDT");
-    }
-
     public void CreateGDT() {
       new Comment(this, "BEGIN - Create GDT");
       var xGDT = new List<byte>();
@@ -134,6 +129,19 @@ namespace Cosmos.IL2CPU.X86 {
       new JumpToSegment { Segment = xCodeSelector, DestinationLabel = "Boot_FlushCsGDT" };
       new Label("Boot_FlushCsGDT");
       new Comment(this, "END - Create GDT");
+    }
+
+    protected void SetIdtDescriptor(byte[] aIDT, int aNo) {
+    }
+
+    public void CreateIDT() {
+      new Comment(this, "BEGIN - Create IDT");
+      var xIDT = new byte[8 * 256];
+      SetIdtDescriptor(xIDT, 3);
+
+      DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", xIDT));
+      DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { (UInt16)xIDT.Length, 0, 0 }));
+      new Comment(this, "END - Create IDT");
     }
 
     public override void Initialize() {

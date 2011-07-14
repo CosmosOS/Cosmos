@@ -92,7 +92,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assemblers\CreateIDT.cs" />
+    <Compile Include="UpdateIDT.cs" />
     <Compile Include="CPUImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
     <Compile Include="IOPortImpl.cs" />
@@ -124,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assemblers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

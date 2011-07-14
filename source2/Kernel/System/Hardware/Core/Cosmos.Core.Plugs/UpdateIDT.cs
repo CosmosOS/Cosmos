@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Cosmos.Core.Plugs.Assemblers {
   //TODO: This asm refs Hardware.. should not.. its a higher ring
-  public class CreateIDT : AssemblerMethod {
+  public class UpdateIDT : AssemblerMethod {
     private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound) {
       System.Type xType = aAssembly.GetType(aType, false);
       if (xType != null) {
@@ -29,10 +29,23 @@ namespace Cosmos.Core.Plugs.Assemblers {
     }
 
     public override void AssembleNew(object aAssembler, object aMethodInfo) {
+      // IDT is already initialized but just for base hooks, and asm only.
+      // ie Int 1, 3 and GPF
+      // This routine updates the IDT now that we have C# running to allow C# hooks to handle
+      // the other INTs
       var xAssembler = (Assembler)aAssembler;
-      // IDT
-      xAssembler.DataMembers.Add(new CPUAll.DataMember("_NATIVE_IDT_Contents", new byte[8 * 256]));
+
+      // We are updating the IDT, disable interrupts
+      new CPUx86.ClrInterruptFlag();
+
       for (int i = 0; i < 256; i++) {
+        // These are already mapped, don't remap them.
+        // Maybe in the future we can look at ones that are present
+        // and skip them, but some we may want to overwrite anyways.
+        if (i == 1 || i == 3) {
+          continue;
+        }
+
         new CPUx86.Move {DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("__ISR_Handler_" + i.ToString("X2")) };
         new CPUx86.Move {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
@@ -74,7 +87,6 @@ namespace Cosmos.Core.Plugs.Assemblers {
       }
 
       new CPUAll.Label("______AFTER__IDT__TABLE__INIT__");
-      xAssembler.DataMembers.Add(new CPUAll.DataMember("_NATIVE_IDT_Pointer", new ushort[] { 0x7FF, 0, 0 }));
       new CPUx86.Move {
         DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Pointer"),
         DestinationIsIndirect = true,
@@ -134,11 +146,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
 
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
-        // MtW: Appearantly, we dont need to enable interrupts on exit
-        //if (j < 0x20 || j > 0x2F) {
-        //new CPUx86.Sti();
         new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
-        //} 
         new CPUx86.InterruptReturn();
       }
       new CPUAll.Label("__INTERRUPT_OCCURRED__");
@@ -148,8 +156,11 @@ namespace Cosmos.Core.Plugs.Assemblers {
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
       new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
       new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
+
+      // Reenable interrupts
       new CPUx86.Sti();
       new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+      
       new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
     }
   }
