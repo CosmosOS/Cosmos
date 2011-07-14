@@ -86,20 +86,6 @@ namespace Cosmos.Core.Plugs.Assemblers {
         };
       }
 
-      new CPUAll.Label("______AFTER__IDT__TABLE__INIT__");
-      new CPUx86.Move {
-        DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Pointer"),
-        DestinationIsIndirect = true,
-        DestinationDisplacement = 2,
-        SourceRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents")
-      };
-
-      new CPUx86.Move {
-        DestinationReg = CPUx86.Registers.EAX,
-        SourceRef = CPUAll.ElementReference.New("_NATIVE_IDT_Pointer")
-      };
-      new CPUAll.Label(".RegisterIDT");
-      new CPUx86.Lidt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
       new CPUx86.Jump { DestinationLabel = "__AFTER__ALL__ISR__HANDLER__STUBS__" };
       var xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
       for (int j = 0; j < 256; j++) {

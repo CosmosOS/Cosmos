@@ -157,11 +157,25 @@ namespace Cosmos.IL2CPU.X86 {
 
     public void CreateIDT() {
       new Comment(this, "BEGIN - Create IDT");
+      
+      // Create IDT
       UInt16 xIdtSize = 8 * 256;
       DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", new byte[xIdtSize]));
-      DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { xIdtSize, 0, 0 }));
+      //
+      //SetIdtDescriptor(1, "DebugStub_INT0");
       SetIdtDescriptor(3, "DebugStub_INT3");
-      new Label("DebugStub_INT3");
+      //SetIdtDescriptor(1, "DebugStub_INT0"); - Change to GPF
+
+      // Set IDT
+      DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { xIdtSize, 0, 0 }));
+      new Move { DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
+        DestinationIsIndirect = true, DestinationDisplacement = 2,
+        SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
+      };
+      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer") };
+      new Lidt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
+
+      new Label("DebugStub_INT3"); // Dummy for now
       new Comment(this, "END - Create IDT");
     }
 
