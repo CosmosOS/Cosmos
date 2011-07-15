@@ -15,11 +15,6 @@ namespace Cosmos.Debug.Common {
         set;
       }
 
-      public uint Address {
-        get;
-        set;
-      }
-
       public int StackDifference {
         get;
         set;
@@ -128,7 +123,6 @@ namespace Cosmos.Debug.Common {
       xExec.SqlStatements.Add(
           "CREATE TABLE MLSYMBOL ("
           + "   LABELNAME   VARCHAR(255)  NOT NULL"
-          + " , ADDRESS     BIGINT        NOT NULL"
           + " , STACKDIFF   INT           NOT NULL"
           + " , ILASMFILE   VARCHAR(255)  NOT NULL"
           + " , TYPETOKEN   INT           NOT NULL"
@@ -160,16 +154,14 @@ namespace Cosmos.Debug.Common {
       mConnection.Open();
     }
 
-    #region MLDebugSymbol code
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
       using (FbTransaction transaction = mConnection.BeginTransaction()) {
         using (var xCmd = mConnection.CreateCommand()) {
           xCmd.Transaction = transaction;
-          xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                       " VALUES (@LABELNAME, @ADDRESS, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
+          xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                       " VALUES (@LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
 
           xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
-          xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
           xCmd.Parameters.Add("@STACKDIFF", FbDbType.Integer);
           xCmd.Parameters.Add("@ILASMFILE", FbDbType.VarChar);
           xCmd.Parameters.Add("@TYPETOKEN", FbDbType.Integer);
@@ -181,13 +173,12 @@ namespace Cosmos.Debug.Common {
           // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
           foreach (var xItem in aSymbols) {
             xCmd.Parameters[0].Value = xItem.LabelName;
-            xCmd.Parameters[1].Value = xItem.Address;
-            xCmd.Parameters[2].Value = xItem.StackDifference;
-            xCmd.Parameters[3].Value = xItem.AssemblyFile;
-            xCmd.Parameters[4].Value = xItem.TypeToken;
-            xCmd.Parameters[5].Value = xItem.MethodToken;
-            xCmd.Parameters[6].Value = xItem.ILOffset;
-            xCmd.Parameters[7].Value = xItem.MethodName;
+            xCmd.Parameters[1].Value = xItem.StackDifference;
+            xCmd.Parameters[2].Value = xItem.AssemblyFile;
+            xCmd.Parameters[3].Value = xItem.TypeToken;
+            xCmd.Parameters[4].Value = xItem.MethodToken;
+            xCmd.Parameters[5].Value = xItem.ILOffset;
+            xCmd.Parameters[6].Value = xItem.MethodName;
             xCmd.ExecuteNonQuery();
           }
         }
@@ -195,20 +186,20 @@ namespace Cosmos.Debug.Common {
         transaction.Commit();
       }
     }
+
     public void ReadSymbolsList(List<MLDebugSymbol> aSymbols) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL";
+        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
             aSymbols.Add(new MLDebugSymbol {
               LabelName = xReader.GetString(0),
-              Address = (uint)xReader.GetInt64(1),
-              StackDifference = xReader.GetInt32(2),
-              AssemblyFile = xReader.GetString(3),
-              TypeToken = xReader.GetInt32(4),
-              MethodToken = xReader.GetInt32(5),
-              ILOffset = xReader.GetInt32(6),
-              MethodName = xReader.GetString(7)
+              StackDifference = xReader.GetInt32(1),
+              AssemblyFile = xReader.GetString(2),
+              TypeToken = xReader.GetInt32(3),
+              MethodToken = xReader.GetInt32(4),
+              ILOffset = xReader.GetInt32(5),
+              MethodName = xReader.GetString(6)
             });
           }
         }
@@ -217,20 +208,19 @@ namespace Cosmos.Debug.Common {
 
     public MLDebugSymbol ReadSymbolByLabelName(string labelName) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, ADDRESS, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL "
+        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL "
             + "WHERE LABELNAME = @LABELNAME";
         xCmd.Parameters.Add("@LABELNAME", labelName);
         using (var xReader = xCmd.ExecuteReader()) {
           if (xReader.Read()) {
             return new MLDebugSymbol {
               LabelName = xReader.GetString(0),
-              Address = (uint)xReader.GetInt64(1),
-              StackDifference = xReader.GetInt32(2),
-              AssemblyFile = xReader.GetString(3),
-              TypeToken = xReader.GetInt32(4),
-              MethodToken = xReader.GetInt32(5),
-              ILOffset = xReader.GetInt32(6),
-              MethodName = xReader.GetString(7)
+              StackDifference = xReader.GetInt32(1),
+              AssemblyFile = xReader.GetString(2),
+              TypeToken = xReader.GetInt32(3),
+              MethodToken = xReader.GetInt32(4),
+              ILOffset = xReader.GetInt32(5),
+              MethodName = xReader.GetString(6)
             };
           } else {
             return null;
@@ -238,10 +228,6 @@ namespace Cosmos.Debug.Common {
         }
       }
     }
-
-    #endregion
-
-    #region Param/Local locations
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
     public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
@@ -312,9 +298,6 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    #endregion
-
-    #region address-label mappings
     public void ReadAddressLabelMappings(out IDictionary<uint, string> oAddressLabelMappings, out IDictionary<string, uint> oLabelAddressMappings) {
       oAddressLabelMappings = new Dictionary<uint, string>();
       oLabelAddressMappings = new Dictionary<string, uint>();
@@ -346,7 +329,6 @@ namespace Cosmos.Debug.Common {
         }
       }
     }
-    #endregion
 
     public void Dispose() {
       if (mConnection != null) {
@@ -357,4 +339,5 @@ namespace Cosmos.Debug.Common {
       GC.SuppressFinalize(this);
     }
   }
+
 }
