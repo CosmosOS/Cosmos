@@ -24,7 +24,6 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public RegistersUC() {
             InitializeComponent();
-            Update(mData);
         }
 
         protected void UpdateRegisters(byte[] aData, int aOffset, DataBytesUC a32, DataBytesUC a16, DataBytesUC a8Hi, DataBytesUC a8Lo)

@@ -20,8 +20,6 @@ namespace Cosmos.Cosmos_VS_Windows {
 
     public StackUC() {
       InitializeComponent();
-      UpdateFrame(mFrameData);
-      UpdateStack(mStackData);
     }
 
     public void UpdateFrame(byte[] aData) {

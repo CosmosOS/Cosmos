@@ -40,7 +40,6 @@ namespace Cosmos.Cosmos_VS_Windows
     [ProvideToolWindow(typeof(AssemblyTW))]
     [ProvideToolWindow(typeof(RegistersTW))]
     [ProvideToolWindow(typeof(StackTW))]
-
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
@@ -85,6 +84,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            UpdateAssembly();
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -96,6 +96,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            UpdateRegisters();
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -107,6 +108,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            UpdateStackFrame();
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
       
@@ -222,6 +224,56 @@ namespace Cosmos.Cosmos_VS_Windows
           lock (mCommand) {
             mCommand.Enqueue(aCmd);
             mMessage.Enqueue(aMsg);
+          }
+        }
+
+        private void UpdateRegisters()
+        {
+          if ((RegistersUC.mData != null) && (RegistersUC.mData.Length > 0))
+          {
+            if (RegistersTW.mUC != null)
+            {
+              RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+              {
+                RegistersTW.mUC.Update(RegistersUC.mData);
+              });
+            }
+          }
+        }
+
+        private void UpdateStackFrame()
+        {
+          if (StackTW.mUC != null)
+          {
+            if ((StackUC.mStackData != null) && (StackUC.mStackData.Length > 0))
+            {
+              StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+              {
+                StackTW.mUC.UpdateStack(StackUC.mStackData);
+              });
+            }
+
+            if ((StackUC.mFrameData != null) && (StackUC.mFrameData.Length > 0))
+            {
+              StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+              {
+                StackTW.mUC.UpdateFrame(StackUC.mFrameData);
+              });
+            }
+          }
+        }
+
+        private void UpdateAssembly()
+        {
+          if ((AssemblyUC.mData != null) && (AssemblyUC.mData.Length > 0))
+          {
+            if (AssemblyTW.mUC != null)
+            {
+              AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
+              {
+                AssemblyTW.mUC.Update(AssemblyUC.mData);
+              });
+            }
           }
         }
     }
