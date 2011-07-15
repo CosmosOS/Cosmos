@@ -98,8 +98,9 @@ namespace Cosmos.Build.MSBuild
                 xResult.Add(xAddress, xLabel);
             }
             #endregion
-            using (var xDebugInfo = new DebugInfo(DebugInfoFile))
+            using (var xDebugInfo = new DebugInfo())
             {
+              xDebugInfo.OpenCPDB(DebugInfoFile);
                 xDebugInfo.WriteAddressLabelMappings(xResult);
             }
             return true;

@@ -19,7 +19,7 @@ namespace BreakpointsKernel {
       Chk(mSize.Value == 7); // Dies with 0x05 here
 
       UInt32? xSize;
-      xSize = 2;
+      xSize = 4;
 
       UInt32? y = x;
       Chk(y.HasValue);

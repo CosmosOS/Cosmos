@@ -195,7 +195,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
         }
 
-        mDebugInfoDb = new DebugInfo(xCpdbPath);
+        mDebugInfoDb = new DebugInfo();
+        mDebugInfoDb.OpenCPDB(xCpdbPath);
         mDebugInfoDb.ReadAddressLabelMappings(out mAddressLabelMappings, out mLabelAddressMappings);
         if (mAddressLabelMappings.Count == 0)
         {

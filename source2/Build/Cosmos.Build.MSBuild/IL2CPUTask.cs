@@ -222,9 +222,9 @@ namespace Cosmos.Build.MSBuild {
                     DebugCom = 0;
                 }
                 var xAsm = new AppAssemblerNasm(DebugCom);
-                File.Delete(xOutputFilename + ".cpdb");
-                using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cpdb"))
+                using (var xDebugInfo = new DebugInfo())
                 {
+                  xDebugInfo.CreateCPDB(xOutputFilename + ".cpdb");
                     xAsm.DebugInfo = xDebugInfo;
                     xAsm.DebugMode = mDebugMode;
                     xAsm.TraceAssemblies = mTraceAssemblies;
