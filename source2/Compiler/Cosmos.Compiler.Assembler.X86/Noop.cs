@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿namespace Cosmos.Compiler.Assembler.X86 {
 
-namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("nop")]
+  [OpCode("NOP")]
 	public class Noop: Instruction {
 	}
+
 }

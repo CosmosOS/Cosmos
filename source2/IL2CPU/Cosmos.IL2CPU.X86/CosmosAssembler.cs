@@ -132,7 +132,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "END - Create GDT");
     }
 
-    protected void SetIdtDescriptor(int aNo, string aLabel) {
+    protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts) {
       int xOffset = aNo * 8;
       new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(aLabel) };
       var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
@@ -149,7 +149,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 4, SourceValue = 0x00, Size = 8 };
 
       // Type
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 5, SourceValue = 0x8E, Size = 8 };
+      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 5, SourceValue = (byte)(aDisableInts ? 0x8E : 0x8F), Size = 8 };
     }
 
     public void CreateIDT() {
@@ -160,7 +160,7 @@ namespace Cosmos.IL2CPU.X86 {
       DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", new byte[xIdtSize]));
       //
       //SetIdtDescriptor(1, "DebugStub_INT0");
-      SetIdtDescriptor(3, "DebugStub_INT3");
+      SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
       //SetIdtDescriptor(1, "DebugStub_INT0"); - Change to GPF
 
       // Set IDT
@@ -172,7 +172,6 @@ namespace Cosmos.IL2CPU.X86 {
       new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer") };
       new Lidt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
-      new Label("DebugStub_INT3"); // Dummy for now
       new Comment(this, "END - Create IDT");
     }
 

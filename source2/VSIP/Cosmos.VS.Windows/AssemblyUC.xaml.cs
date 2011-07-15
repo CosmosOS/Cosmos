@@ -42,7 +42,7 @@ namespace Cosmos.Cosmos_VS_Windows {
       foreach (string xLine in xLines) {
         string xTestLine = xLine.Trim();
 
-        if (string.Compare(xTestLine, "call DebugStub_TracerEntry", true) == 0) {
+        if (string.Compare(xTestLine, "Int3", true) == 0) {
           continue;
         }
 

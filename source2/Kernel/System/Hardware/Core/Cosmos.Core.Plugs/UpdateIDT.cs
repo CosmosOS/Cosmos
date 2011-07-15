@@ -92,14 +92,11 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2"));
         new CPUx86.Call { DestinationLabel = "__INTERRUPT_OCCURRED__" };
         new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
-        if (Array.IndexOf(xInterruptsWithParam,
-                          j) ==
-            -1) {
+        if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
           new CPUx86.Push { DestinationValue = 0 };
         }
         new CPUx86.Push { DestinationValue = (uint)j };
         new CPUx86.Pushad();
-
 
         new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
         new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP }; // preserve old stack address for passing to interrupt handler

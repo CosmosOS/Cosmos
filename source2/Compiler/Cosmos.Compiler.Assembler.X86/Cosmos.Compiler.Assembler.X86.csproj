@@ -96,6 +96,8 @@
     <Compile Include="IDivide.cs" />
     <Compile Include="In.cs" />
     <Compile Include="Inc.cs" />
+    <Compile Include="Int1.cs" />
+    <Compile Include="Int3.cs" />
     <Compile Include="Interrupt.cs" />
     <Compile Include="InterruptReturn.cs" />
     <Compile Include="JumpAlways.cs" />

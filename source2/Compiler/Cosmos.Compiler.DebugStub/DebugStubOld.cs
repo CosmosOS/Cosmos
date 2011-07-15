@@ -354,17 +354,18 @@ namespace Cosmos.Compiler.DebugStub {
             // EBP is restored by PopAll, but SendFrame uses it. Could
             // get it from the PushAll data, but this is easier
             Memory["DebugEBP", 32] = EBP;
+            
             // Could also get ESP from PushAll but this is easier
             // Another reason to do it here is that soem day we may need to use 
             // the stack before PushAll.
             //
             // We cant modify any registers since we havent done PushAll yet
             // Maybe we could do a sub(4) on memory direct.. 
-            // But for now we remove the 4 from ESP which the call to us produces,
+            // But for now we remove from ESP which the call to us produces,
             // store ESP, then restore ESP so we don't cause stack corruption.
-            ESP.Add(4);
+            ESP.Add(12); // 12 bytes for EFLAGS, CS, EIP
             Memory["DebugESP", 32] = ESP;
-            ESP.Sub(4);
+            ESP.Sub(12);
 
             // If debug stub is in break, and then an IRQ happens, the IRQ
             // can call debug stub again. This causes two debug stubs to 
@@ -413,17 +414,21 @@ namespace Cosmos.Compiler.DebugStub {
             // registers we just pushed.
             EBP = ESP;
             EBP.Add(32); // We dont need to restore this becuase it was pushed as part of PushAll32
+
             // Get actual EIP of caller.
             EAX = Memory[EBP];
-            // EIP is pointer to op after our call. We subtract 5 (the size of our call + address)
+            // EIP is pointer to op after our call. We subtract 1 for the opcode size of Int3
+            // Note - when we used call it was 5 (the size of our call + address)
             // so we get the EIP as IL2CPU records it. Its also useful for when we will
             // be changing ops that call this stub.
-            EAX.Sub(5);
+            EAX.Sub(1);
             // Store it for later use.
             Memory["DebugEIP", 32] = EAX;
 
             // Call secondary stub
             Call("DebugStub_Executing");
+
+            // Restore registers
             PopAll32();
             // Complete, mark that DebugStub is complete
             Memory["DebugRunning", 32] = 0;
@@ -433,7 +438,8 @@ namespace Cosmos.Compiler.DebugStub {
             EnableInterrupts();
 
             Label = "DebugStub_Return";
-            Return();
+            IntReturn();
         }
+
     }
 }

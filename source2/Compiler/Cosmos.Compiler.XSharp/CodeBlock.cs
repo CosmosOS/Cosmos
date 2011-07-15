@@ -200,6 +200,10 @@ namespace Cosmos.Compiler.XSharp {
       new Return();
     }
 
+    public void IntReturn() {
+      new InterruptReturn();
+    }
+
     public void Return(UInt16 aBytes) {
       new Return { DestinationValue = aBytes };
     }

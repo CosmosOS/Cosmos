@@ -582,7 +582,7 @@ namespace Cosmos.IL2CPU.X86
                 }
             }
             // If we made it this far, emit the Tracer
-            new CPUx86.Call { DestinationLabel = "DebugStub_TracerEntry" };
+            new CPUx86.Int3();
         }
 
         private int[] xCodeOffsets;
