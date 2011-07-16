@@ -492,7 +492,7 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
         Label = "Debug__StepOver__";
         EAX = Memory["DebugEBP", 32];
-        EAX.Compare(Memory["DebugEBP", 32]);
+        EAX.Compare(Memory["DebugBreakEBP", 32]);
         // If EBP and start EBP arent equal, dont break
         // Dont use Equal because we aslo need to stop above if the user starts
         // the step at the end of a method and next item is after a return
