@@ -10,68 +10,27 @@ namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
 
     public class MLDebugSymbol {
-      public string LabelName {
-        get;
-        set;
-      }
-
-      public int StackDifference {
-        get;
-        set;
-      }
-
-      public string AssemblyFile {
-        get;
-        set;
-      }
-      public int TypeToken {
-        get;
-        set;
-      }
-      public int MethodToken {
-        get;
-        set;
-      }
+      public string LabelName { get; set; }
+      public int StackDifference { get; set; }
+      public string AssemblyFile { get; set; }
+      public int TypeToken { get; set; }
+      public int MethodToken { get; set; }
       public int ILOffset { get; set; }
       public string MethodName { get; set; }
     }
 
     public class Local_Argument_Info {
-      public bool IsArgument {
-        get;
-        set;
-      }
-
-      public string MethodLabelName {
-        get;
-        set;
-      }
-
-      public int Index {
-        get;
-        set;
-      }
-
-      public int Offset {
-        get;
-        set;
-      }
-
-      public string Name {
-        get;
-        set;
-      }
-
-      public string Type {
-        get;
-        set;
-      }
+      public bool IsArgument { get; set; }
+      public string MethodLabelName { get; set; }
+      public int Index { get; set; }
+      public int Offset { get; set; }
+      public string Name { get; set; }
+      public string Type { get; set; }
     }
 
     private FbConnection mConnection;
 
-    public DebugInfo() { 
-    }
+    public DebugInfo() { }
 
     public void OpenCPDB(string aPathname) {
       OpenCPDB(aPathname, false);
@@ -132,7 +91,7 @@ namespace Cosmos.Debug.Common {
       );
 
       xExec.SqlStatements.Add(
-          "CREATE TABLE ADDRESSLABELMAPPING ("
+          "CREATE TABLE Label ("
           + "  LABELNAME VARCHAR(255) NOT NULL"
           + ", ADDRESS   BIGINT NOT NULL"
           + ");");
@@ -297,14 +256,14 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void ReadAddressLabelMappings(out IDictionary<uint, string> oAddressLabelMappings, out IDictionary<string, uint> oLabelAddressMappings) {
-      oAddressLabelMappings = new Dictionary<uint, string>();
+    public void ReadLabels(out IDictionary<uint, string> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
+      oLabels = new Dictionary<uint, string>();
       oLabelAddressMappings = new Dictionary<string, uint>();
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, ADDRESS from ADDRESSLABELMAPPING";
+        xCmd.CommandText = "select LABELNAME, ADDRESS from Label";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
-            oAddressLabelMappings.Add((uint)xReader.GetInt64(1), xReader.GetString(0));
+            oLabels.Add((uint)xReader.GetInt64(1), xReader.GetString(0));
             oLabelAddressMappings.Add(xReader.GetString(0), (uint)xReader.GetInt64(1));
           }
         }
@@ -334,11 +293,11 @@ namespace Cosmos.Debug.Common {
       return mMethodId;
     }
 
-    public void WriteAddressLabelMappings(SortedList<uint, String> aMap) {
+    public void WriteLabels(SortedList<uint, String> aMap) {
       using (var xTrans = mConnection.BeginTransaction()) {
         using (var xCmd = mConnection.CreateCommand()) {
           xCmd.Transaction = xTrans;
-          xCmd.CommandText = "insert into ADDRESSLABELMAPPING (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
+          xCmd.CommandText = "insert into Label (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
           xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
           xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
           xCmd.Prepare();

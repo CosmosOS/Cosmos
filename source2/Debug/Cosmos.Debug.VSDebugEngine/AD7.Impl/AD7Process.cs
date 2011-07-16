@@ -197,7 +197,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         mDebugInfoDb = new DebugInfo();
         mDebugInfoDb.OpenCPDB(xCpdbPath);
-        mDebugInfoDb.ReadAddressLabelMappings(out mAddressLabelMappings, out mLabelAddressMappings);
+        mDebugInfoDb.ReadLabels(out mAddressLabelMappings, out mLabelAddressMappings);
         if (mAddressLabelMappings.Count == 0)
         {
             throw new Exception("Debug data not found: LabelByAddressMapping");

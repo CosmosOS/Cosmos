@@ -101,7 +101,7 @@ namespace Cosmos.Build.MSBuild
             using (var xDebugInfo = new DebugInfo())
             {
               xDebugInfo.OpenCPDB(DebugInfoFile);
-                xDebugInfo.WriteAddressLabelMappings(xResult);
+                xDebugInfo.WriteLabels(xResult);
             }
             return true;
         }
