@@ -55,7 +55,6 @@ namespace Orvid.Graphics
             this.Width = width;
             this.Height = height;
             this.Data = new Pixel[(Height + 1) * (Width + 1)];
-            this.Data.Initialize();
         }
 
         /// <summary>

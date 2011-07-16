@@ -14,13 +14,14 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>False</EnableGDB>
-    <DebugMode>None</DebugMode>
+    <EnableGDB>True</EnableGDB>
+    <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>false</StartCosmosGDB>
+    <StartCosmosGDB>True</StartCosmosGDB>
     <TraceAssemblies>All</TraceAssemblies>
+    <StartCosmosASMDBG />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
