@@ -385,7 +385,9 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
       base.BeforeOp(aMethod, aOpCode);
-      new Label(TmpPosLabel(aMethod, aOpCode));
+      string xLabel = TmpPosLabel(aMethod, aOpCode);
+      Assembler.CurrentIlLabel = xLabel;
+      new Label(xLabel);
       
       if (mSymbols != null) {
         var xMLSymbol = new DebugInfo.MLDebugSymbol();

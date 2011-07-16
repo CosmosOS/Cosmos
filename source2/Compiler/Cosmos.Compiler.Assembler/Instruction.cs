@@ -28,8 +28,15 @@ namespace Cosmos.Compiler.Assembler {
 
     public Instruction(bool aAddToAssembler) {
       if (aAddToAssembler) {
-        mAsmMethodIdx = Assembler.CurrentInstance.Add(this);
-        mMethodID = Assembler.CurrentInstance.CurrentMethodID;
+        var xAsm = Assembler.CurrentInstance;
+        int mMethodID = xAsm.CurrentMethodID;
+
+        // Only emit label if its executable code.
+        if (this is Label || this is Comment) {
+        } else {
+          new Label("." + Assembler.CurrentInstance.AsmIlIdx.ToString("X2"));
+        }
+        xAsm.Add(this);
       }
       var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
       if (xAttribs != null && xAttribs.Length > 0) {

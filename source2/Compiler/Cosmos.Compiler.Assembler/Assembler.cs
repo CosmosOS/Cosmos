@@ -23,51 +23,44 @@ namespace Cosmos.Compiler.Assembler {
     // as it will also cause problems when we thread the compiler
     private static Assembler mCurrentInstance;
 
-    // These are a hacks too to get Asm stepping working
-    // until we can redo the compiler as its currently phased
-    // and doesn't allow us to easily add this information
-    // in a manner that we need.
     protected int mCurrentMethodID;
     public int CurrentMethodID {
       get { return mCurrentMethodID; }
+      set { mCurrentMethodID = value; }
+    }
+    //
+    protected string mCurrentIlLabel;
+    public string CurrentIlLabel {
+      get { return mCurrentIlLabel; }
       set {
-        mCurrentMethodID = value;
-        mAsmMethodIdx = 0;
+        mCurrentIlLabel = value;
+        mAsmIlIdx = 0;
       }
     }
-    protected int mAsmMethodIdx;
-    public int AsmMethodIdx {
-      get { return mAsmMethodIdx; }
+    //
+    protected int mAsmIlIdx;
+    public int AsmIlIdx {
+      get { return mAsmIlIdx; }
     }
 
     protected internal List<Instruction> mInstructions = new List<Instruction>();
     private List<DataMember> mDataMembers = new List<DataMember>();
     
-      #region Properties
     public List<DataMember> DataMembers {
-      get {
-        return mDataMembers;
-      }
+      get { return mDataMembers; }
     }
 
     public List<Instruction> Instructions {
-      get {
-        return mInstructions;
-      }
+      get { return mInstructions; }
     }
+
     public static Assembler CurrentInstance {
-      get {
-        return mCurrentInstance;
-      }
+      get { return mCurrentInstance; }
     }
 
     internal int AllAssemblerElementCount {
-      get {
-        return mInstructions.Count + mDataMembers.Count;
-      }
+      get { return mInstructions.Count + mDataMembers.Count; }
     }
-
-    #endregion
 
     public Assembler() {
       mCurrentInstance = this;
@@ -108,12 +101,13 @@ namespace Cosmos.Compiler.Assembler {
       return null;
     }
 
-	public int Add(Instruction aReader){
+	public void Add(Instruction aReader){
 		mInstructions.Add(aReader);
-
-    int xResult = mAsmMethodIdx;
-    mAsmMethodIdx++;
-    return mAsmMethodIdx;
+    // Only increment if its executable code.
+    if (aReader is Label || aReader is Comment) {
+    } else {
+      mAsmIlIdx++;
+    }
 	}
 
     public void Add(params Instruction[] aReaders) {

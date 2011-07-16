@@ -23,9 +23,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public Assembler Assembler {
-      get {
-        return mAssembler;
-      }
+      get { return mAssembler; }
     }
 
     public DebugInfo DebugInfo {
@@ -65,7 +63,7 @@ namespace Cosmos.IL2CPU {
       // todo: MtW: how to do this? we need some extra space.
       //		see ConstructLabel for extra info
       if (aMethod.UID > 0x00FFFFFF) {
-        throw new Exception("For now, too much methods");
+        throw new Exception("Too many methods.");
       }
 
       MethodBegin(aMethod);
@@ -82,7 +80,9 @@ namespace Cosmos.IL2CPU {
         mLog.Flush();
         aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
       } else {
-        Assembler.CurrentInstance.CurrentMethodID = DebugInfo.AddMethod(ILOp.GetMethodLabel(aMethod.MethodBase));
+        string xMethodLabelPrefix = ILOp.GetMethodLabel(aMethod.MethodBase);
+        int xMethodID = DebugInfo.AddMethod(xMethodLabelPrefix);
+        Assembler.CurrentInstance.CurrentMethodID = xMethodID;
 
         foreach (var xOpCode in aOpCodes) {
           ushort xOpCodeVal = (ushort)xOpCode.OpCode;
@@ -92,9 +92,9 @@ namespace Cosmos.IL2CPU {
           } else {
             xILOp = mILOpsHi[xOpCodeVal & 0xFF];
           }
-          //mLog.WriteLine ( "\t[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
           mLog.WriteLine("\t{0} {1}", mAssembler.Stack.Count, xILOp.GetType().Name);
           mLog.Flush();
+
           BeforeOp(aMethod, xOpCode);
           new Comment(xILOp.ToString());
           var xNextPosition = xOpCode.Position + 1;
@@ -148,7 +148,9 @@ namespace Cosmos.IL2CPU {
             Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
             mAssembler.Stack.Push(4, typeof(Exception));
           }
+
           xILOp.Execute(aMethod, xOpCode);
+
           AfterOp(aMethod, xOpCode);
           //mLog.WriteLine( " end: " + Stack.Count.ToString() );
         }
@@ -184,7 +186,6 @@ namespace Cosmos.IL2CPU {
     protected abstract void Move(string aDestLabelName, int aValue);
     protected abstract void Jump(string aLabelName);
     protected abstract int GetVTableEntrySize();
-
 
     public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
     public void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
