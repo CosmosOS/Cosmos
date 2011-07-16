@@ -15,7 +15,7 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      int i = 0;
+      int i = 5;
       Test xTest;
 
       xTest = new NullableTest();

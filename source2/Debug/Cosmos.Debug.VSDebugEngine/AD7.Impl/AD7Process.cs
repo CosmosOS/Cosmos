@@ -547,6 +547,9 @@ namespace Cosmos.Debug.VSDebugEngine {
             string xTest = xLine.Trim().ToUpper();
             if (xLabels.Contains(xTest.Substring(0, xTest.Length - 1))) {
               xCode.AppendLine(xLine);
+            }
+            else if (xLabels.Contains(xTest.Substring(0, xTest.Length - (xTest.Length - xTest.LastIndexOf('.'))))) {
+              xCode.AppendLine(xLine);  
             } else {
               // Found the first non-match, stop here
               break;
