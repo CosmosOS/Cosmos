@@ -292,7 +292,13 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{a82b45e9-2a8
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Menus; ValueName: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}; ValueType: string; ValueData: , Menus.ctmenu, 1
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueName: Name; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.MyToolWindow
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{f019fb29-c2c2-4d27-9abf-739533c939be}; ValueName: Name; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.AssemblyTW
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{ce2a2d0f-0f1b-4a1f-a9ac-5a5f2a5e2c25}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{ce2a2d0f-0f1b-4a1f-a9ac-5a5f2a5e2c25}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{ce2a2d0f-0f1b-4a1f-a9ac-5a5f2a5e2c25}; ValueName: Name; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.RegistersTW
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{a64d0fcc-8dcc-439a-9b16-3c43128aad51}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{a64d0fcc-8dcc-439a-9b16-3c43128aad51}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{a64d0fcc-8dcc-439a-9b16-3c43128aad51}; ValueName: Name; ValueType: string; ValueData: Cosmos.Cosmos_VS_Windows.StackTW
 
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
