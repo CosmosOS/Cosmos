@@ -19,7 +19,27 @@ namespace Cosmos.Compiler.Assembler {
     // Contains info on the current stack structure. What type are on the stack, etc
     public readonly StackContents Stack = new StackContents();
 
+    // This is a hack, hope to fix it in the future
+    // as it will also cause problems when we thread the compiler
     private static Assembler mCurrentInstance;
+
+    // These are a hacks too to get Asm stepping working
+    // until we can redo the compiler as its currently phased
+    // and doesn't allow us to easily add this information
+    // in a manner that we need.
+    protected int mCurrentMethodID;
+    public int CurrentMethodID {
+      get { return mCurrentMethodID; }
+      set {
+        mCurrentMethodID = value;
+        mAsmMethodIdx = 0;
+      }
+    }
+    protected int mAsmMethodIdx;
+    public int AsmMethodIdx {
+      get { return mAsmMethodIdx; }
+    }
+
     protected internal List<Instruction> mInstructions = new List<Instruction>();
     private List<DataMember> mDataMembers = new List<DataMember>();
     
@@ -88,8 +108,12 @@ namespace Cosmos.Compiler.Assembler {
       return null;
     }
 
-	public void Add(Instruction aReader){
+	public int Add(Instruction aReader){
 		mInstructions.Add(aReader);
+
+    int xResult = mAsmMethodIdx;
+    mAsmMethodIdx++;
+    return mAsmMethodIdx;
 	}
 
     public void Add(params Instruction[] aReaders) {

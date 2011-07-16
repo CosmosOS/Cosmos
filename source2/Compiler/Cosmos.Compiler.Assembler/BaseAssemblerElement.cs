@@ -8,11 +8,9 @@ namespace Cosmos.Compiler.Assembler
 {
     public abstract class BaseAssemblerElement
     {
-        /// <summary>
         /// Gets/sets the address at which the element could start emitting data. Note that if
         /// the element needs any alignment, start address is unaligned, and the element should 
         /// do the alignment itself. ActualAddress is used for referencing the actual address.
-        /// </summary>
         public virtual ulong? StartAddress
         {
             get

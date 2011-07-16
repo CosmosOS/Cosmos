@@ -5,9 +5,18 @@ using System.Linq;
 namespace Cosmos.Compiler.Assembler {
   public abstract class Instruction : BaseAssemblerElement {
     protected string mMnemonic;
-
     public string Mnemonic {
       get { return mMnemonic; }
+    }
+
+    protected int mMethodID;
+    public int MethodID {
+      get { return mMethodID; }
+    }
+
+    protected int mAsmMethodIdx;
+    public int AsmMethodIdx {
+      get { return mAsmMethodIdx; }
     }
 
     public override void WriteText(Assembler aAssembler, TextWriter aOutput) {
@@ -19,7 +28,8 @@ namespace Cosmos.Compiler.Assembler {
 
     public Instruction(bool aAddToAssembler) {
       if (aAddToAssembler) {
-        Assembler.CurrentInstance.Add(this);
+        mAsmMethodIdx = Assembler.CurrentInstance.Add(this);
+        mMethodID = Assembler.CurrentInstance.CurrentMethodID;
       }
       var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
       if (xAttribs != null && xAttribs.Length > 0) {
