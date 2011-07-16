@@ -99,10 +99,7 @@ namespace Cosmos.Compiler.Assembler {
       }
     }
 
-
-    /// <summary>
-    /// allows to emit footers to the code and datamember sections
-    /// </summary>
+    // Allows to emit footers to the code and datamember sections
     protected virtual void OnBeforeFlush() {
     }
     private uint mDataMemberCounter = 0;
@@ -141,41 +138,38 @@ namespace Cosmos.Compiler.Assembler {
 
     public virtual void FlushText(TextWriter aOutput) {
       BeforeFlush();
-      if (mDataMembers.Count > 0) {
-        aOutput.WriteLine();
-        foreach (DataMember xMember in mDataMembers) {
-          aOutput.Write("\t");
-          if (xMember.IsComment) {
-            aOutput.Write(xMember.Name);
-          } else {
-            xMember.WriteText(this, aOutput);
-          }
-          aOutput.WriteLine();
+
+      // Write out data declarations
+      aOutput.WriteLine();
+      foreach (DataMember xMember in mDataMembers) {
+        aOutput.Write("\t");
+        if (xMember.IsComment) {
+          aOutput.Write(xMember.Name);
+        } else {
+          xMember.WriteText(this, aOutput);
         }
         aOutput.WriteLine();
       }
-      if (mInstructions.Count > 0) {
-        for (int i = 0; i < mInstructions.Count; i++) {
-          //foreach (Instruction x in mInstructions) {
-          var x = mInstructions[i];
-          string prefix = "\t\t\t";
-          Label xLabel = x as Label;
-          if (xLabel != null) {
-            aOutput.WriteLine();
-            if (xLabel.Name[0] == '.') {
-              prefix = "\t\t";
-            } else {
-              prefix = "\t";
-            }
-            //string xFullName;
-            aOutput.Write(prefix);
-            x.WriteText(this, aOutput);
-            aOutput.WriteLine();
-            //aOutput.WriteLine(prefix + Label.FilterStringForIncorrectChars(xFullName) + ":");
-            continue;
+      aOutput.WriteLine();
+
+      // Write out code
+      for (int i = 0; i < mInstructions.Count; i++) {
+        var xOp = mInstructions[i];
+        string prefix = "\t\t\t";
+        if (xOp is Label) {
+          var xLabel = (Label)xOp;
+          aOutput.WriteLine();
+          if (xLabel.Name[0] == '.') {
+            prefix = "\t\t";
+          } else {
+            prefix = "\t";
           }
           aOutput.Write(prefix);
-          x.WriteText(this, aOutput);
+          xLabel.WriteText(this, aOutput);
+          aOutput.WriteLine();
+        } else {
+          aOutput.Write(prefix);
+          xOp.WriteText(this, aOutput);
           aOutput.WriteLine();
         }
       }

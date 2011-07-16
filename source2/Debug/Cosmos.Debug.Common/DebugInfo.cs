@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FirebirdSql.Data.FirebirdClient;
 using System.IO;
 using Microsoft.Win32;
+using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 
 namespace Cosmos.Debug.Common {
@@ -32,15 +32,8 @@ namespace Cosmos.Debug.Common {
         get;
         set;
       }
-      public int ILOffset {
-        get;
-        set;
-      }
-
-      public string MethodName {
-        get;
-        set;
-      }
+      public int ILOffset { get; set; }
+      public string MethodName { get; set; }
     }
 
     public class Local_Argument_Info {
@@ -119,6 +112,12 @@ namespace Cosmos.Debug.Common {
     public void CreateCPDB(string aPathname) {
       OpenCPDB(aPathname, true);
       var xExec = new FbBatchExecution(mConnection);
+
+      xExec.SqlStatements.Add(
+          "CREATE TABLE Method ("
+          + "    MethodId      INT            NOT NULL PRIMARY KEY"
+          + "  , LabelPrefix   VARCHAR(255)   NOT NULL"
+          + ");");
 
       xExec.SqlStatements.Add(
           "CREATE TABLE MLSYMBOL ("
@@ -208,8 +207,8 @@ namespace Cosmos.Debug.Common {
 
     public MLDebugSymbol ReadSymbolByLabelName(string labelName) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL "
-            + "WHERE LABELNAME = @LABELNAME";
+        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL"
+            + " WHERE LABELNAME = @LABELNAME";
         xCmd.Parameters.Add("@LABELNAME", labelName);
         using (var xReader = xCmd.ExecuteReader()) {
           if (xReader.Read()) {
@@ -310,6 +309,29 @@ namespace Cosmos.Debug.Common {
           }
         }
       }
+    }
+
+    // This is a heck of a lot easier than using sequences
+    protected int mMethodId = 0;
+    public int AddMethod(string aLabelPrefix) {
+      mMethodId++;
+      using (var xTrans = mConnection.BeginTransaction()) {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTrans;
+          xCmd.CommandText = "INSERT INTO Method (MethodId, LabelPrefix) values (@MethodId, @LabelPrefix)";
+          
+          xCmd.Parameters.Add("@MethodId", FbDbType.Integer);
+          xCmd.Parameters.Add("@LabelPrefix", FbDbType.VarChar);
+          xCmd.Prepare();
+
+          xCmd.Parameters[0].Value = mMethodId;
+          xCmd.Parameters[1].Value = aLabelPrefix;
+          xCmd.ExecuteNonQuery();
+
+          xTrans.Commit();
+        }
+      }
+      return mMethodId;
     }
 
     public void WriteAddressLabelMappings(SortedList<uint, String> aMap) {
