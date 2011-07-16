@@ -89,6 +89,14 @@
           <ButtonText>Cosmos Stack Window</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Strings>
+          <CommandName>cmdidCosmosShowAll</CommandName>
+          <ButtonText>Show All Cosmos Debug Windows</ButtonText>
+        </Strings>
+      </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="bmpCosmosIcon1" />
@@ -111,6 +119,14 @@
         <Strings>
           <CommandName>cmdidCosmosStack</CommandName>
           <ButtonText>Cosmos Stack Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Strings>
+          <CommandName>cmdidCosmosShowAll</CommandName>
+          <ButtonText>Show All Cosmos Debug Windows</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -140,6 +156,7 @@
       <IDSymbol name="cmdidCosmosAssembly" value="0x0101" />
       <IDSymbol name="cmdidCosmosRegisters" value="0x0102" />
       <IDSymbol name="cmdidCosmosStack" value="0x0103" />
+      <IDSymbol name="cmdidCosmosShowAll" value="0x0104"/>
     </GuidSymbol> 
     
     <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >

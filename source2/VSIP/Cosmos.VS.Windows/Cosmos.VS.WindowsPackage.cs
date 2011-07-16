@@ -84,7 +84,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-            UpdateAssembly();
+            if (windowFrame.IsVisible() == 0) UpdateAssembly();
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -96,7 +96,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-            UpdateRegisters();
+            if (windowFrame.IsVisible() == 0) UpdateRegisters();
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -108,10 +108,38 @@ namespace Cosmos.Cosmos_VS_Windows
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-            UpdateStackFrame();
+            if (windowFrame.IsVisible() == 0) UpdateStackFrame();
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
-      
+
+        private void ShowCosmosVSShowAllToolWindows(object sender, EventArgs e)
+        {
+          ToolWindowPane asmWindow = this.FindToolWindow(typeof(AssemblyTW), 0, true);
+          ToolWindowPane registersWindow = this.FindToolWindow(typeof(RegistersTW), 0, true);
+          ToolWindowPane stackWindow = this.FindToolWindow(typeof(StackTW), 0, true);
+          if ((null == asmWindow) || (null == asmWindow.Frame))
+          {
+            throw new NotSupportedException(Resources.CanNotCreateWindow);
+          }
+          if ((null == registersWindow) || (null == registersWindow.Frame))
+          {
+            throw new NotSupportedException(Resources.CanNotCreateWindow);
+          }
+          if ((null == stackWindow) || (null == stackWindow.Frame))
+          {
+            throw new NotSupportedException(Resources.CanNotCreateWindow);
+          }
+          IVsWindowFrame asmWindowFrame = (IVsWindowFrame)asmWindow.Frame;
+          IVsWindowFrame registersWindowFrame = (IVsWindowFrame)registersWindow.Frame;
+          IVsWindowFrame stackWindowFrame = (IVsWindowFrame)stackWindow.Frame;
+          if (asmWindowFrame.IsVisible() == 0) UpdateAssembly();
+          if (asmWindowFrame.IsVisible() == 0) UpdateRegisters();
+          if (stackWindowFrame.IsVisible() == 0) UpdateStackFrame();
+          Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(asmWindowFrame.Show());
+          Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(registersWindowFrame.Show());
+          Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(stackWindowFrame.Show());
+        }
+
         // Overriden Package Implementation
 
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -139,6 +167,11 @@ namespace Cosmos.Cosmos_VS_Windows
                 CommandID CosmosVSStackToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosStack);
                 MenuCommand CosmosVSStackToolWindowMenuCommand = new MenuCommand(ShowCosmosVSStackToolWindow, CosmosVSStackToolWindowCommandID);
                 mcs.AddCommand(CosmosVSStackToolWindowMenuCommand);
+
+                // Create the command to show all tool windows
+                CommandID CosmosVSShowAllToolWindowsCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosShowAll);
+                MenuCommand CosmosVSShowAllToolWindowMenuCommand = new MenuCommand(ShowCosmosVSShowAllToolWindows, CosmosVSShowAllToolWindowsCommandID);
+                mcs.AddCommand(CosmosVSShowAllToolWindowMenuCommand);
             }
         }
 
