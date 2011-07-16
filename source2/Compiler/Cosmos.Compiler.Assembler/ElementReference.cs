@@ -194,11 +194,11 @@ namespace Cosmos.Compiler.Assembler
         {
             if( Offset != 0 )
             {
-                return Label.FilterStringForIncorrectChars( Name ) + " + " + Offset;
+                return Name + " + " + Offset;
             }
             else
             {
-                return Label.FilterStringForIncorrectChars( Name );
+                return Name;
             }
         }
     }
