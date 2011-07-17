@@ -12,6 +12,7 @@ namespace Cosmos.Compiler.XSharp {
       var xThisType = this.GetType();
       var xAsm = Assembler.Assembler.CurrentInstance;
 
+      // Generate DataMembers
       foreach (var xMember in xThisType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
         if (xMember.FieldType.IsSubclassOf(typeof(DataMember))) {
           var xCtor = xMember.FieldType.GetConstructor(new Type[] { typeof(string) });
@@ -21,6 +22,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       }
 
+      // Genereate code
       foreach (var xType in xThisType.GetNestedTypes()) {
         if (xType.IsSubclassOf(typeof(CodeBlock))) {
           var xCtor = xType.GetConstructor(new Type[0]);

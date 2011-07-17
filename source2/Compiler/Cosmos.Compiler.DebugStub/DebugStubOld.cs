@@ -33,8 +33,6 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugResumeLevel", 0),
                 // Last EIP value
                 new DataMember("DebugEIP", 0),
-                // Calling code's EBP value
-                new DataMember("DebugEBP", 0),
                 // Calling code's ESP value
                 new DataMember("DebugESP", 0),
                 // Ptr to the push all data. It points to the "bottom" after a PushAll op.
@@ -125,7 +123,7 @@ namespace Cosmos.Compiler.DebugStub {
       // now ECX contains size of data (count)
       // EAX contains relative to EBP
       Label = "DebugStub_SendMethodContext2";
-      ESI = Memory["DebugEBP", 32];
+      ESI = Memory["DebugStub_OldEBP", 32];
       ESI.Add(EAX);
 
       Label = "DebugStub_SendMethodContext_SendByte";

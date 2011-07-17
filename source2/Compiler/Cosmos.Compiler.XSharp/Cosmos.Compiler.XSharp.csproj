@@ -70,6 +70,7 @@
     <Compile Include="AddressDirect.cs" />
     <Compile Include="AddressIndirect.cs" />
     <Compile Include="CodeGroup.cs" />
+    <Compile Include="InteruptHandlerAttribute.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="MemoryAction.cs" />
     <Compile Include="PortNumber.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="RegisterESI.cs" />
     <Compile Include="RegisterESP.cs" />
     <Compile Include="CodeBlock.cs" />
+    <Compile Include="XSharpAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
