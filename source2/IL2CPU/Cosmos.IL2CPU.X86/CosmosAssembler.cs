@@ -260,10 +260,6 @@ namespace Cosmos.IL2CPU.X86 {
 
         var xStub2 = new DebugPoint();
         xStub2.Assemble();
-
-        UInt16[] xComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
-        var xStubOld = new DebugStubOld();
-        xStubOld.Main(xComPortAddresses[mComNumber - 1]);
       } else {
         new Label("DebugStub_Step");
         new Return();
