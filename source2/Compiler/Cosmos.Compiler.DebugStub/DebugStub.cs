@@ -157,18 +157,16 @@ namespace Cosmos.Compiler.DebugStub {
 
         // now ECX contains size of data (count)
         // EAX contains relative to EBP
-        Label = "DebugStub_SendMethodContext2";
         ESI = Memory[DebugStub.CallerEBP.Name, 32];
         ESI.Add(EAX);
 
-        Label = "DebugStub_SendMethodContext_SendByte";
-        new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
-        JumpIf(Flags.Equal, "DebugStub_SendMethodContext_After_SendByte");
+        Label = ".SendByte";
+        ECX.Compare(0);
+        JumpIf(Flags.Equal, ".AfterSendByte");
         Call<WriteByteToComPort>();
-        new Dec { DestinationReg = Registers.ECX };
-        Jump("DebugStub_SendMethodContext_SendByte");
-
-        Label = "DebugStub_SendMethodContext_After_SendByte";
+        ECX--;
+        Jump(".SendByte");
+        Label = ".AfterSendByte";
 
         PopAll();
       }
