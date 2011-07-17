@@ -37,15 +37,31 @@ namespace Cosmos.Compiler.XSharp {
           var xCtor = xType.GetConstructor(new Type[0]);
           var xBlock = (CodeBlock)(xCtor.Invoke(new Object[0]));
 
+          var xMethod = xType.GetMethod("Assemble");
+          var xAttribs = xMethod.GetCustomAttributes(typeof(XSharpAttribute), false);
+          bool xPreserveStack = false;
+          bool xIsInterruptHandler = false;
+          if (xAttribs.Length > 0) {
+            var xAttrib = (XSharpAttribute)xAttribs[0];
+            xPreserveStack = xAttrib.PreserveStack;
+            xIsInterruptHandler = xAttrib.IsInteruptHandler;
+          }
+
           // Generate Local DataMembers
           SetDataMembers(xBlock);
 
-          // Genereate code
-          //
           // Issue label for the routine
           xBlock.Label = CodeBlock.MakeLabel(xType);
+
+          if (xPreserveStack) {
+            xBlock.PushAll();
+          }
           // Assemble the routine itself
           xBlock.Assemble();
+          if (xPreserveStack) {
+            xBlock.PopAll();
+          }
+
           // Issue the return for the routine
           xBlock.Return();
         }

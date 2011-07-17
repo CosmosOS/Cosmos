@@ -113,9 +113,8 @@ namespace Cosmos.Compiler.DebugStub {
       // Sets a breakpoint
       // Serial Params:
       //   1: x32 - EIP to break on, or 0 to disable breakpoint.
+      [XSharp(PreserveStack = true)]
       public override void Assemble() {
-        PushAll();
-
         // BP Address
         ReadComPortX32toStack(1);
         ECX.Pop();
@@ -133,8 +132,6 @@ namespace Cosmos.Compiler.DebugStub {
         EBX.Add(EAX);
 
         Memory[EBX, 32] = ECX;
-
-        PopAll();
       }
     }
 
@@ -143,9 +140,8 @@ namespace Cosmos.Compiler.DebugStub {
       // Serial Params:
       //  1: x32 - offset relative to EBP
       //  2: x32 - size of data to send
+      [XSharp(PreserveStack = true)]
       public override void Assemble() {
-        PushAll();
-
         AL = (int)DsMsgType.MethodContext;
         Call<DebugStub.WriteALToComPort>();
 
@@ -167,8 +163,6 @@ namespace Cosmos.Compiler.DebugStub {
         ECX--;
         Jump(".SendByte");
         Label = ".AfterSendByte";
-
-        PopAll();
       }
     }
 
@@ -177,9 +171,8 @@ namespace Cosmos.Compiler.DebugStub {
       // Serial Params:
       //  1: x32 - offset relative to EBP
       //  2: x32 - size of data to send
+      [XSharp(PreserveStack = true)]
       public override void Assemble() {
-        PushAll();
-
         ReadComPortX32toStack(1);
         //EAX.Pop();
         //ESI = EBP;
@@ -210,8 +203,6 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_SendMemory_SendByte");
 
         Label = "DebugStub_SendMemory_After_SendByte";
-
-        PopAll();
       }
     }
 

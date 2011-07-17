@@ -8,6 +8,7 @@ namespace Cosmos.Compiler.XSharp {
   [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
   public class XSharpAttribute : Attribute {
     public bool IsInteruptHandler { get; set; }
+    public bool PreserveStack { get; set; }
   }
 
 }
