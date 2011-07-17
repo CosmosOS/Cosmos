@@ -51,7 +51,10 @@ namespace Cosmos.Compiler.XSharp {
           SetDataMembers(xBlock);
 
           // Issue label for the routine
-          xBlock.Label = CodeBlock.MakeLabel(xType);
+          // TODO: Instead of issuing IL label, allow ASM option to turn
+          // off ASM labeling.
+          mAsm.CurrentIlLabel = CodeBlock.MakeLabel(xType);
+          xBlock.Label = mAsm.CurrentIlLabel;
 
           if (xPreserveStack) {
             xBlock.PushAll();
@@ -63,7 +66,11 @@ namespace Cosmos.Compiler.XSharp {
           }
 
           // Issue the return for the routine
-          xBlock.Return();
+          if (xIsInterruptHandler) {
+            xBlock.ReturnFromInterrupt();
+          } else {
+            xBlock.Return();
+          }
         }
       }
     }

@@ -884,6 +884,7 @@ namespace Cosmos.Compiler.DebugStub {
       // 0 = Not in, 1 = already running
       public DataMember32 IsRunning;
 
+      [XSharp(IsInteruptHandler = true)]
       public override void Assemble() {
         // Main entry point for the DebugStub which is executed at the 
         // beginning of all IL ops.
@@ -981,7 +982,6 @@ namespace Cosmos.Compiler.DebugStub {
         EnableInterrupts();
 
         Label = "DebugStub_Return";
-        ReturnFromInterrupt();
       }
     }
 
