@@ -248,9 +248,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="386AndUp\" />
     <Folder Include="3DNow!2\Geode\" />
-    <Folder Include="486AndUp\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
