@@ -336,115 +336,12 @@ namespace Cosmos.Compiler.DebugStub {
       BreakOnAddress();
     }
 
-    // This is the main debug stub routine. The parameter is used to generate it and 
-    // the code is embedded.
-    // This routine is called repeatedly by Cosmos code and it checks various flags
-    // to decide the state and what to do.
     public void Main(UInt16 aComAddr) {
       mComAddr = aComAddr;
       mComStatusAddr = (UInt16)(aComAddr + 5);
       EmitDataSection();
       Emit();
-
-      // Main entry point for the DebugStub which is executed at the 
-      // beginning of all IL ops.
-      Label = "DebugStub_TracerEntry";
-
-      // EBP is restored by PopAll, but SendFrame uses it. Could
-      // get it from the PushAll data, but this is easier.
-      Memory["DebugEBP", 32] = EBP;
-
-      // Could also get ESP from PushAll but this is easier
-      // Another reason to do it here is that soem day we may need to use 
-      // the stack before PushAll.
-      //
-      // We cant modify any registers since we havent done PushAll yet
-      // Maybe we could do a sub(4) on memory direct.. 
-      // But for now we remove from ESP which the call to us produces,
-      // store ESP, then restore ESP so we don't cause stack corruption.
-      ESP.Add(12); // 12 bytes for EFLAGS, CS, EIP
-      Memory["DebugESP", 32] = ESP;
-      ESP.Sub(12);
-
-      // If debug stub is in break, and then an IRQ happens, the IRQ
-      // can call DebugStub again. This causes two DebugStubs to 
-      // run which causes havoc. So we only allow one to run.
-      // We arent multi threaded yet, so this works fine.
-      // IRQ's are disabled between Compare and JumpIf so an IRQ cant
-      // happen in between them which could also cause double entry.
-      DisableInterrupts();
-      Memory["DebugSuspendLevel", 32].Compare(0);
-      JumpIf(Flags.Equal, "DebugStub_Running");
-      // DebugStub is already running, so exit.
-      // But we need to see if IRQs are disabled.
-      // If IRQ disabled, we dont reenable them after our disable
-      // in this routine.
-      Memory["InterruptsEnabledFlag", 32].Compare(0);
-      JumpIf(Flags.Equal, "DebugStub_Return");
-      EnableInterrupts();
-      Jump("DebugStub_Return");
-
-      Label = "DebugStub_Running";
-      Memory["DebugRunning", 32].Compare(0);
-      JumpIf(Flags.Equal, "DebugStub_Start");
-      // If we made it this far we exit because DebugStub is already running.
-      // We need to see if IRQs were originally enabled or disabled and
-      // re-enable them if they were enabled on entry.
-      Jump("DebugStub_CheckIntAndReturn");
-
-      // All clear, mark that we are entering the debug stub
-      Label = "DebugStub_Start";
-      Memory["DebugRunning", 32] = 1;
-
-      // DS is now marked not to re-enter, so re-enable interrupts if
-      // they were enabled on entry
-      Memory["InterruptsEnabledFlag", 32].Compare(0);
-      JumpIf(Flags.Equal, "DebugStub_NoSTI");
-      EnableInterrupts(); 
-
-      // Call secondary debug stub
-      Label = "DebugStub_NoSTI";
-      PushAll32();
-      Memory["DebugPushAllPtr", 32] = ESP;
-      // We just pushed all registers to the stack so we can use them
-      // So we get the stack pointer and add 32. This skips over the
-      // registers we just pushed.
-      EBP = ESP;
-      EBP.Add(32); // We dont need to restore this becuase it was pushed as part of PushAll32
-
-      // Get actual EIP of caller.
-      EAX = Memory[EBP];
-      // EIP is pointer to op after our call. We subtract 1 for the opcode size of Int3
-      // Note - when we used call it was 5 (the size of our call + address)
-      // so we get the EIP as IL2CPU records it. Its also useful for when we will
-      // be changing ops that call this stub.
-      EAX.Sub(1);
-      // Store it for later use.
-      Memory["DebugEIP", 32] = EAX;
-
-      // Call secondary stub
-      Call("DebugStub_Executing");
-
-      // Restore registers
-      PopAll32();
-
-      // Setting the DebugRuning flag is atomic, but in the future
-      // we might have other code as we do in the entry to check.
-      // So just to be safe, we disable interrupts while we do this.
-      DisableInterrupts();
-      // Complete, mark that DebugStub is complete
-      Memory["DebugRunning", 32] = 0;
-
-      Label = "DebugStub_CheckIntAndReturn";
-      // Re-enable interrupts if needed. This happens on normal exit, or call from above
-      // when there would have been a re-entry to DS.
-      Memory["InterruptsEnabledFlag", 32].Compare(0);
-      JumpIf(Flags.Equal, "DebugStub_Return");
-      EnableInterrupts();
-
-      Label = "DebugStub_Return";
-      IntReturn();
-    }
+   }
 
   }
 
