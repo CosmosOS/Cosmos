@@ -663,7 +663,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Call secondary debug stub
         Label = "DebugStub_NoSTI";
-        PushAll32();
+        PushAll();
         Memory["DebugPushAllPtr", 32] = ESP;
         // We just pushed all registers to the stack so we can use them
         // So we get the stack pointer and add 32. This skips over the
@@ -677,7 +677,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Note - when we used call it was 5 (the size of our call + address)
         // so we get the EIP as IL2CPU records it. Its also useful for when we will
         // be changing ops that call this stub.
-        EAX.Sub(1);
+        EAX.Sub(1); //TODO: EAX-- and EAX = EAX - 1;
         // Store it for later use.
         Memory["DebugEIP", 32] = EAX;
 
@@ -685,7 +685,7 @@ namespace Cosmos.Compiler.DebugStub {
         Call("DebugStub_Executing");
 
         // Restore registers
-        PopAll32();
+        PopAll();
 
         // Setting the DebugRuning flag is atomic, but in the future
         // we might have other code as we do in the entry to check.
@@ -702,7 +702,7 @@ namespace Cosmos.Compiler.DebugStub {
         EnableInterrupts();
 
         Label = "DebugStub_Return";
-        IntReturn();
+        ReturnFromInterrupt();
       }
     }
 

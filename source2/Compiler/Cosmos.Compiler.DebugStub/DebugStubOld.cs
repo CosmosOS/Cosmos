@@ -36,7 +36,7 @@ namespace Cosmos.Compiler.DebugStub {
                 new DataMember("DebugEBP", 0),
                 // Calling code's ESP value
                 new DataMember("DebugESP", 0),
-                // Ptr to the push all data. It points to the "bottom" after a PushAll32 op.
+                // Ptr to the push all data. It points to the "bottom" after a PushAll op.
                 // Walk up to find the 8 x 32 bit registers.
                 new DataMember("DebugPushAllPtr", 0),
                 new DataMember("InterruptsEnabledFlag", 0),
@@ -81,7 +81,7 @@ namespace Cosmos.Compiler.DebugStub {
     //   1: x32 - EIP to break on, or 0 to disable breakpoint.
     protected void BreakOnAddress() {
       Label = "DebugStub_BreakOnAddress";
-      PushAll32();
+      PushAll();
 
       // BP Address
       ReadComPortX32toStack();
@@ -101,7 +101,7 @@ namespace Cosmos.Compiler.DebugStub {
 
       Memory[EBX, 32] = ECX;
 
-      PopAll32();
+      PopAll();
       Return();
     }
 
@@ -111,7 +111,7 @@ namespace Cosmos.Compiler.DebugStub {
     //  2: x32 - size of data to send
     protected void SendMethodContext() {
       Label = "DebugStub_SendMethodContext";
-      PushAll32();
+      PushAll();
 
       AL = (int)DsMsgType.MethodContext;
       Call<DebugStub.WriteALToComPort>();
@@ -136,7 +136,7 @@ namespace Cosmos.Compiler.DebugStub {
 
       Label = "DebugStub_SendMethodContext_After_SendByte";
 
-      PopAll32();
+      PopAll();
       Return();
     }
 
@@ -146,7 +146,7 @@ namespace Cosmos.Compiler.DebugStub {
     //  2: x32 - size of data to send
     protected void SendMemory() {
       Label = "DebugStub_SendMemory";
-      PushAll32();
+      PushAll();
 
       ReadComPortX32toStack();
       //EAX.Pop();
@@ -179,7 +179,7 @@ namespace Cosmos.Compiler.DebugStub {
 
       Label = "DebugStub_SendMemory_After_SendByte";
 
-      PopAll32();
+      PopAll();
       Return();
     }
 

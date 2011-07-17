@@ -36,33 +36,33 @@ namespace Cosmos.Debug.Kernel.Plugs {
 
         public void SendText() {
             IfDefined("DEBUGSTUB");
-            PushAll32();
+            PushAll();
             Call("DebugStub_SendText");
-            PopAll32();
+            PopAll();
             EndIfDefined(); // DEBUGSTUB
         }
 
         public void SendPtr() {
             IfDefined("DEBUGSTUB");
-            PushAll32();
+            PushAll();
             Call("DebugStub_SendPtr");
-            PopAll32();
+            PopAll();
             EndIfDefined(); // DEBUGSTUB
         }
 
         public void TraceOff() {
             IfDefined("DEBUGSTUB");
-            PushAll32();
+            PushAll();
             Call("DebugStub_TraceOff");
-            PopAll32();
+            PopAll();
             EndIfDefined(); // DEBUGSTUB
         }
 
         public void TraceOn() {
             IfDefined("DEBUGSTUB");
-            PushAll32();
+            PushAll();
             Call("DebugStub_TraceOn");
-            PopAll32();
+            PopAll();
             EndIfDefined(); // DEBUGSTUB
         }
     }

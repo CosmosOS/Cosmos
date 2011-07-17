@@ -188,30 +188,29 @@ namespace Cosmos.Compiler.XSharp {
       new Push { DestinationValue = aValue, Size = aSize };
     }
 
-    public void PopAll32() {
+    // Since 32 bit is the default, we don't call
+    // it PopAll32 any more. If the smaller versions are need
+    // they can be suffixed.
+    public void PopAll() {
       new Popad();
     }
-
-    public void PushAll32() {
+    public void PushAll() {
       new Pushad();
     }
 
     public void Return() {
       new Return();
     }
-
-    public void IntReturn() {
-      new InterruptReturn();
-    }
-
     public void Return(UInt16 aBytes) {
       new Return { DestinationValue = aBytes };
+    }
+    public void ReturnFromInterrupt() {
+      new InterruptReturn();
     }
 
     public void EnableInterrupts() {
       new Sti();
     }
-
     public void DisableInterrupts() {
       new ClrInterruptFlag();
     }
