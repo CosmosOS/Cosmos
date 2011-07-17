@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Compiler.Assembler;
 
 namespace Cosmos.Compiler.XSharp {
     public class Address {
@@ -15,7 +16,11 @@ namespace Cosmos.Compiler.XSharp {
         }
 
         public static implicit operator Address(string aLabel) {
-            return new AddressDirect(aLabel);
+          return new AddressDirect(aLabel);
+        }
+
+        public static implicit operator Address(DataMember aMember) {
+          return new AddressDirect(aMember.Name);
         }
 
     }
