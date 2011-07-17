@@ -74,21 +74,6 @@ namespace Cosmos.Compiler.XSharp {
 
         public byte Size { get; set; }
 
-        public static string SizeToString(byte aSize) {
-            switch (aSize) {
-                case 8:
-                    return "byte";
-                case 16:
-                    return "word";
-                case 32:
-                    return "dword";
-                case 64:
-                    return "qword";
-                default:
-                    throw new Exception("Invalid size: " + aSize);
-            }
-        }
-
         //TODO: Put memory compare here - will later have to limit it to the size
         // variant and if possible to self usage, ie no assignments. May however result 
         // in too many class variants to be worth while.

@@ -953,7 +953,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Note - when we used call it was 5 (the size of our call + address)
         // so we get the EIP as IL2CPU records it. Its also useful for when we will
         // be changing ops that call this stub.
-        EAX.Sub(1); //TODO: EAX-- and EAX = EAX - 1;
+        EAX--; 
         // Store it for later use.
         Memory[CallerEIP, 32] = EAX;
 
