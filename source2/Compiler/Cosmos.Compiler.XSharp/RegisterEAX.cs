@@ -13,8 +13,16 @@ namespace Cosmos.Compiler.XSharp {
       new Inc { DestinationReg = aRegister.GetId() };
       return aRegister;
     }
+    public static RegisterEAX operator +(RegisterEAX aRegister, UInt32 aValue) {
+      Instance.Add(aValue);
+      return aRegister;
+    }
     public static RegisterEAX operator --(RegisterEAX aRegister) {
       new Dec { DestinationReg = aRegister.GetId() };
+      return aRegister;
+    }
+    public static RegisterEAX operator -(RegisterEAX aRegister, UInt32 aValue) {
+      Instance.Sub(aValue);
       return aRegister;
     }
     public static RegisterEAX operator <<(RegisterEAX aRegister, int aCount) {

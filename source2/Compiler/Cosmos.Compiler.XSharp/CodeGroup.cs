@@ -61,6 +61,7 @@ namespace Cosmos.Compiler.XSharp {
           }
           // Assemble the routine itself
           xBlock.Assemble();
+          xBlock.Label = ".Exit";
           if (xPreserveStack) {
             xBlock.PopAll();
           }

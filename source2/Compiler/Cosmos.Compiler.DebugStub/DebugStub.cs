@@ -237,23 +237,21 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Write Length
         ESI = EBP;
-        new Add { DestinationReg = Registers.ESI, SourceValue = 12 };
+        ESI = ESI + 12;
         ECX = Memory[ESI];
         WriteBytesToComPort(2);
 
         // Address of string
         ESI = Memory[EBP + 8];
-        Label = "DebugStub_SendTextWriteChar";
+        Label = ".WriteChar";
         ECX.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_SendTextExit");
+        JumpIf(Flags.Equal, ".Exit");
         Call<WriteByteToComPort>();
-        new Dec { DestinationReg = Registers.ECX };
+        ECX--;
         // We are storing as 16 bits, but for now I will transmit 8 bits
         // So we inc again to skip the 0
-        new Inc { DestinationReg = Registers.ESI };
-        Jump("DebugStub_SendTextWriteChar");
-
-        Label = "DebugStub_SendTextExit";
+        ESI++;
+        Jump(".WriteChar");
       }
     }
 
@@ -294,10 +292,10 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Wait for serial port to be ready
         // Bit 5 (0x20) test for Transmit Holding Register to be empty.
-        Label = "WriteByteToComPort_Wait";
+        Label = ".Wait";
         AL = Port[DX];
         AL.Test(0x20);
-        JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
+        JumpIf(Flags.Zero, ".Wait");
 
         // Set address of port
         DX = mComAddr;
@@ -306,7 +304,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Send the byte
         Port[DX] = AL;
 
-        new Inc { DestinationReg = Registers.ESI }; // TODO: ESI++ instead
+        ESI++;
       }
     }
 
@@ -619,8 +617,6 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.Equal, ".Exit");
         Call<WriteByteToComPort>();
         Jump(".SendByte");
-
-        Label = ".Exit";
       }
     }
 
@@ -901,9 +897,9 @@ namespace Cosmos.Compiler.DebugStub {
         // Maybe we could do a sub(4) on memory direct.. 
         // But for now we remove from ESP which the call to us produces,
         // store ESP, then restore ESP so we don't cause stack corruption.
-        ESP.Add(12); // 12 bytes for EFLAGS, CS, EIP
+        ESP = ESP + 12; // 12 bytes for EFLAGS, CS, EIP
         Memory[CallerESP.Name, 32] = ESP;
-        ESP.Sub(12);
+        ESP = ESP - 12;
 
         // If debug stub is in break, and then an IRQ happens, the IRQ
         // can call DebugStub again. This causes two DebugStubs to 
@@ -949,7 +945,7 @@ namespace Cosmos.Compiler.DebugStub {
         // So we get the stack pointer and add 32. This skips over the
         // registers we just pushed.
         EBP = ESP;
-        EBP.Add(32); // We dont need to restore this becuase it was pushed as part of PushAll32
+        EBP = EBP + 32; // We dont need to restore this becuase it was pushed as part of PushAll32
 
         // Get actual EIP of caller.
         EAX = Memory[EBP];

@@ -51,6 +51,10 @@ namespace Cosmos.Compiler.XSharp {
 
     public abstract void Assemble();
 
+    public void Exit() {
+      Jump(".Exit");
+    }
+
     static public string MakeLabel(Type aType) {
       var xParts = aType.FullName.Split('.');
       string xLabel = xParts[xParts.Length - 1];
