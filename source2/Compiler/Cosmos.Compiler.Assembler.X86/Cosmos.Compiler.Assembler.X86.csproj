@@ -248,7 +248,6 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="286AndUp\" />
     <Folder Include="3DNow!2\Geode\" />
     <Folder Include="bin\Debug\" />
     <Folder Include="obj\Debug\TempPE\" />
