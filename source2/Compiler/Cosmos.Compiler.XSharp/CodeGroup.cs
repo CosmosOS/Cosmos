@@ -8,27 +8,39 @@ using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Compiler.XSharp {
   public class CodeGroup {
+    protected Assembler.Assembler mAsm = Assembler.Assembler.CurrentInstance;
+
+    protected void SetDataMembers(object aInst) {
+      var xThisType = aInst.GetType();
+      var xParts = xThisType.FullName.Split('.');
+      string xBaseLabel = xParts[xParts.Length - 1].Replace('+', '_') + "_";
+
+      foreach (var xMember in xThisType.GetFields(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
+        if (xMember.FieldType.IsSubclassOf(typeof(DataMember))) {
+          var xCtor = xMember.FieldType.GetConstructor(new Type[] { typeof(string) });
+          var xInst = (DataMember)(xCtor.Invoke(new Object[] { xBaseLabel + xMember.Name }));
+          xMember.SetValue(aInst, xInst);
+          mAsm.DataMembers.Add(xInst);
+        }
+      }
+    }
 
     public void Assemble() {
       var xThisType = this.GetType();
-      var xAsm = Assembler.Assembler.CurrentInstance;
 
-      // Generate DataMembers
-      foreach (var xMember in xThisType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)) {
-        if (xMember.FieldType.IsSubclassOf(typeof(DataMember))) {
-          var xCtor = xMember.FieldType.GetConstructor(new Type[] { typeof(string) });
-          var xInstance = (DataMember)(xCtor.Invoke(new Object[] { xThisType.Name + "_" + xMember.Name }));
-          xMember.SetValue(this, xInstance);
-          xAsm.DataMembers.Add(xInstance);
-        }
-      }
+      // Generate Global DataMembers
+      SetDataMembers(this);
 
-      // Genereate code - Old style
       foreach (var xType in xThisType.GetNestedTypes()) {
         if (xType.IsSubclassOf(typeof(CodeBlock))) {
           var xCtor = xType.GetConstructor(new Type[0]);
           var xBlock = (CodeBlock)(xCtor.Invoke(new Object[0]));
 
+          // Generate Local DataMembers
+          SetDataMembers(xBlock);
+
+          // Genereate code
+          //
           // Issue label for the routine
           xBlock.Label = CodeBlock.MakeLabel(xType);
           // Assemble the routine itself

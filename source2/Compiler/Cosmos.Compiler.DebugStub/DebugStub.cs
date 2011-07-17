@@ -605,12 +605,13 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-    // 0 = Not in, 1 = already running
-    static public DataMember32 IsRunning;
     // Calling code's EBP value
     static public DataMember32 OldEBP;
 
     public class TracerEntry : CodeBlock {
+      // 0 = Not in, 1 = already running
+      public DataMember32 IsRunning;
+
       public override void Assemble() {
         // Main entry point for the DebugStub which is executed at the 
         // beginning of all IL ops.
