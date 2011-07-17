@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				else
 				{
-					string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
+					string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
 					string LabelShiftRight = BaseLabel + "ShiftRightLoop";
 					string LabelNoLoop = BaseLabel + "NoLoop";
 					string LabelEnd = BaseLabel + "End";

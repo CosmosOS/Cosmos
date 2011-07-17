@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            string xBaseLabel = GetLabel( aMethod, aOpCode ) + "__";
+            string xBaseLabel = GetLabel( aMethod, aOpCode ) + ".";
             var xStackItem_ShiftAmount = Assembler.Stack.Pop();
             var xStackItem_Value = Assembler.Stack.Pop();
             if( xStackItem_Value.IsFloat ) { throw new NotImplementedException( "Floats not yet supported!" ); }

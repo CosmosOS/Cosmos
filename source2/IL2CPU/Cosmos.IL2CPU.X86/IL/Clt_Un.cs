@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 throw new NotImplementedException("StackSizes>8 not supported");
             }
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( bool ) ) );
-            string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
+            string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";
             if( xStackItem.Size > 4 )

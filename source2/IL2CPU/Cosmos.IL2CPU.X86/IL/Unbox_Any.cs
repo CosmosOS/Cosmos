@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             OpType xType = ( OpType )aOpCode; 
-            string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
+            string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
 
             string xTypeID = GetTypeIDLabel(xType.Value);
 

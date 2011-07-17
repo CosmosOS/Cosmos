@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				throw new Exception("StackSize>8 not supported");
         // 			}
         // 
-        // 			string BaseLabel = CurInstructionLabel + "__";
+        // 			string BaseLabel = CurInstructionLabel + ".";
         // 			string LabelTrue = BaseLabel + "True";
         // 			string LabelFalse = BaseLabel + "False";
         // 

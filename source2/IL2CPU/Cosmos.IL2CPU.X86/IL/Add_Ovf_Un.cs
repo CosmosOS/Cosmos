@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-				var xBaseLabel = GetLabel(aMethod, aOpCode) + "__";
+				var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
 				var xSuccessLabel = xBaseLabel + "Success";
                 if (xSize.Size > 4)
                 {

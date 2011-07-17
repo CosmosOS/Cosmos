@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			else if (xStackItem_Value.Size <= 8)
 #endif
 			{
-				string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
+				string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
 				string LowPartIsZero = BaseLabel + "LowPartIsZero";
 				string End_Shl = BaseLabel + "End_Shl";
 

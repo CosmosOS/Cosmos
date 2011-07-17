@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             Assembler.Stack.Pop();
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( bool ) ) );
-            string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
+            string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";
             if( xStackItem.Size > 4 )
@@ -142,7 +142,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 return;
         //             }
         // 			Assembler.Stack.Push(new StackContent(4, typeof(bool)));
-        // 			string BaseLabel = CurInstructionLabel + "__";
+        // 			string BaseLabel = CurInstructionLabel + ".";
         // 			string LabelTrue = BaseLabel + "True";
         // 			string LabelFalse = BaseLabel + "False";
         // 			if (xStackItem.Size > 4)

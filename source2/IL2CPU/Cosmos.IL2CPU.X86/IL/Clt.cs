@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL
 #else
 			Assembler.Stack.Push( new StackContents.Item( 1, typeof( bool ) ) );
 #endif
-            string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
+            string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";
             if( xStackItem.Size > 4 )

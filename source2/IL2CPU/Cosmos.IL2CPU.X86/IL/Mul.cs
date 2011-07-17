@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 else
                 {
 					// div of both == LEFT_LOW * RIGHT_LOW + ((LEFT_LOW * RIGHT_HIGH + RIGHT_LOW * LEFT_HIGH) << 32)
-					string BaseLabel = GetLabel(aMethod, aOpCode) + "__";
+					string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
 					string Simple32Multiply = BaseLabel + "Simple32Multiply";
 					string MoveReturnValue = BaseLabel + "MoveReturnValue";
 

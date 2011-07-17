@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				//return;
 			}
 			Assembler.Stack.Push( new StackContents.Item( 4, typeof( bool ) ) );
-			string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
+			string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
 			var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
