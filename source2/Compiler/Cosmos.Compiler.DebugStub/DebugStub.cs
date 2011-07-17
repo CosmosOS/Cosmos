@@ -91,15 +91,15 @@ namespace Cosmos.Compiler.DebugStub {
         EDI = ESP;
 
         // Read address to stack via EDI
-        Call("DebugStub_ReadByteFromComPort");
-        Call("DebugStub_ReadByteFromComPort");
-        Call("DebugStub_ReadByteFromComPort");
-        Call("DebugStub_ReadByteFromComPort");
+        Call<ReadByteFromComPort>();
+        Call<ReadByteFromComPort>();
+        Call<ReadByteFromComPort>();
+        Call<ReadByteFromComPort>();
       }
 
       protected void WriteBytesToComPort(int xCount) {
         for (int i = 1; i <= xCount; i++) {
-          Call("DebugStub_WriteByteToComPort");
+          Call<WriteByteToComPort>();
         }
       }
     }
@@ -119,7 +119,7 @@ namespace Cosmos.Compiler.DebugStub {
         // BP ID Number is sent after BP Address, becuase
         // reading BP address uses AL (EAX).
         EAX = 0;
-        Call("DebugStub_ReadALFromComPort");
+        Call<ReadALFromComPort>();
 
         // Calculate location in table
         // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
@@ -158,7 +158,7 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_SendMethodContext_SendByte";
         new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
         JumpIf(Flags.Equal, "DebugStub_SendMethodContext_After_SendByte");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
         new Dec { DestinationReg = Registers.ECX };
         Jump("DebugStub_SendMethodContext_SendByte");
 
@@ -201,7 +201,7 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_SendMemory_SendByte";
         new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
         JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
         new Dec { DestinationReg = Registers.ECX };
         Jump("DebugStub_SendMemory_SendByte");
 
@@ -244,15 +244,15 @@ namespace Cosmos.Compiler.DebugStub {
         ESI = EBP;
         new Add { DestinationReg = Registers.ESI, SourceValue = 12 };
         ECX = Memory[ESI];
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
 
         // Address of string
         ESI = Memory[EBP + 8];
         Label = "DebugStub_SendTextWriteChar";
         ECX.Compare(0);
         JumpIf(Flags.Equal, "DebugStub_SendTextExit");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
         new Dec { DestinationReg = Registers.ECX };
         // We are storing as 16 bits, but for now I will transmit 8 bits
         // So we inc again to skip the 0
@@ -274,10 +274,10 @@ namespace Cosmos.Compiler.DebugStub {
 
         // pointer value
         ESI = Memory[EBP + 8];
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
       }
     }
 
@@ -363,10 +363,10 @@ namespace Cosmos.Compiler.DebugStub {
         // feature so we kept it.
         Push(Consts.SerialSignature);
         ESI = ESP;
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
         // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
         EAX.Pop();
 
@@ -497,7 +497,7 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();
@@ -511,8 +511,8 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();
@@ -526,10 +526,10 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
+        Call<WriteByteToComPort>();
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();
@@ -556,7 +556,7 @@ namespace Cosmos.Compiler.DebugStub {
         EBX = 0;
 
         Label = "DebugStub_WaitForSignature_Read";
-        Call("DebugStub_ReadALFromComPort");
+        Call<ReadALFromComPort>();
         BL = AL;
         EBX.RotateRight(8);
         EBX.Compare(Consts.SerialSignature);
@@ -594,15 +594,15 @@ namespace Cosmos.Compiler.DebugStub {
         
         ESI = Memory["DebugPushAllPtr", 32];
         for (int i = 1; i <= 32; i++) {
-          Call("DebugStub_WriteByteToComPort");
+          Call<WriteByteToComPort>();
         }
         ESI = AddressOf(CallerESP);
         for (int i = 1; i <= 4; i++) {
-          Call("DebugStub_WriteByteToComPort");
+          Call<WriteByteToComPort>();
         }
         ESI = AddressOf(CallerEIP);
         for (int i = 1; i <= 4; i++) {
-          Call("DebugStub_WriteByteToComPort");
+          Call<WriteByteToComPort>();
         }
       }
     }
@@ -619,7 +619,7 @@ namespace Cosmos.Compiler.DebugStub {
         ESI = Memory[CallerEBP.Name, 32];
         ESI.Add(8); // Dont transmit EIP or old EBP
         for (int i = 1; i <= xCount; i++) {
-          Call("DebugStub_WriteByteToComPort");
+          Call<WriteByteToComPort>();
         }
       }
     }
@@ -642,7 +642,7 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_SendStack_SendByte";
         ESI.Compare(Memory[CallerEBP.Name, 32]);
         JumpIf(Flags.Equal, "DebugStub_SendStack_Exit");
-        Call("DebugStub_WriteByteToComPort");
+        Call<WriteByteToComPort>();
         Jump("DebugStub_SendStack_SendByte");
 
         Label = "DebugStub_SendStack_Exit";
@@ -653,7 +653,7 @@ namespace Cosmos.Compiler.DebugStub {
       // Modifies: AL, DX (ReadALFromComPort)
       // Returns: AL
       public override void Assemble() {
-        Call("DebugStub_ReadALFromComPort");
+        Call<ReadALFromComPort>();
         // Some callers expect AL to be returned, so we preserve it
         // in case any commands modify AL.
         //TODO: But in ASM wont let us push AL, so we push EAX for now
@@ -664,7 +664,7 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
 
         // Read Command ID
-        Call("DebugStub_ReadALFromComPort");
+        Call<ReadALFromComPort>();
         Memory["DebugStub_CommandID", 32] = EAX;
 
         // Get AL back so we can compare it, but also put it back for later
@@ -686,25 +686,25 @@ namespace Cosmos.Compiler.DebugStub {
 
         AL.Compare(DsCommand.Break);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
-        Call("DebugStub_Break");
+        Call<Break>();
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_Break_After";
 
         AL.Compare(DsCommand.BreakOnAddress);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
-        Call("DebugStub_BreakOnAddress");
+        Call<BreakOnAddress>();
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
 
         AL.Compare(DsCommand.SendMethodContext);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMethodContext_After");
-        Call("DebugStub_SendMethodContext");
+        Call<SendMethodContext>();
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_SendMethodContext_After";
 
         AL.Compare(DsCommand.SendMemory);
         JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMemory_After");
-        Call("DebugStub_SendMemory");
+        Call<SendMemory>();
         Jump("DebugStub_ProcessCmd_ACK");
         Label = "DebugStub_ProcessCmd_SendMemory_After";
 
@@ -764,7 +764,7 @@ namespace Cosmos.Compiler.DebugStub {
         ECX = 256;
         new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
         JumpIf(Flags.NotEqual, "DebugStub_Executing_AfterBreakOnAddress");
-        Call("DebugStub_Break");
+        Call<Break>();
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_Executing_AfterBreakOnAddress";
 
@@ -781,7 +781,7 @@ namespace Cosmos.Compiler.DebugStub {
         // }
         //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepIntoAfter");
-        Call("DebugStub_Break");
+        Call<Break>();
         //TODO: Allow creating labels but issuing them later, then we can
         // call them with early binding
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
@@ -829,7 +829,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Test(0x01);
         // If no command waiting, break from loop
         JumpIf(Flags.Zero, "DebugStub_CheckForCmd_Break");
-        Call("DebugStub_ProcessCommand");
+        Call<ProcessCommand>();
         // See if there are more commands waiting
         Jump("DebugStub_CheckForCmd");
         Label = "DebugStub_CheckForCmd_Break";
@@ -844,7 +844,7 @@ namespace Cosmos.Compiler.DebugStub {
       // Reads a byte into [EDI] and does EDI + 1
       // http://wiki.osdev.org/Serial_ports
       public override void Assemble() {
-        Call("DebugStub_ReadALFromComPort");
+        Call<ReadALFromComPort>();
         Memory[EDI, 8] = AL;
         EDI++;
       }
@@ -860,7 +860,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakEBP", 32] = 0;
         // Set break status
         Memory["DebugStatus", 32] = Status.Break;
-        Call("DebugStub_SendTrace");
+        Call<SendTrace>();
 
         // Wait for a command
         Label = "DebugStub_WaitCmd";
@@ -986,7 +986,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory[CallerEIP.Name, 32] = EAX;
 
         // Call secondary stub
-        Call("DebugStub_Executing");
+        Call<Executing>();
 
         // Restore registers
         PopAll();
