@@ -16,7 +16,7 @@ namespace Cosmos.Compiler.DebugStub {
     protected UInt16 mComAddr;
     protected UInt16 mComStatusAddr;
 
-    // A bit of a hack as a static? Other ideas?
+    //TODO: A bit of a hack as a static? Other ideas?
     public static void EmitDataSection() {
       Assembler.Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
                 // Tracing: 0=Off, 1=On

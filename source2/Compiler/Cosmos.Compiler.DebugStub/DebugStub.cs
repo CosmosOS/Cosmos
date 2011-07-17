@@ -481,7 +481,7 @@ namespace Cosmos.Compiler.DebugStub {
         //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepIntoAfter");
         Call("DebugStub_Break");
-        //TODO: Allow creating lables but issuing them later, then we can
+        //TODO: Allow creating labels but issuing them later, then we can
         // call them with early binding
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump("DebugStub_Executing_Normal");
@@ -504,23 +504,25 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
 
-        EAX = Memory["DebugEBP", 32];
-        EAX.Compare(Memory["DebugBreakEBP", 32]);
+        EAX = Memory["DebugEBP", 32]; // TODO: X# Allow memory object instead of string, maybe the Datamember object itself. ie EAX = DebugEBP, and below inside Compare
+        EAX.Compare(Memory["DebugBreakEBP", 32]); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
-        //JumpIf(Flags.GreaterThanOrEqualTo, "DebugStub_Executing_Normal");
-        //Call("DebugStub_Break");
         Label = "DebugStub_ExecutingStepOutAfter";
 
         Label = "DebugStub_Executing_Normal";
+        
         // If tracing is on, send a trace message
+        // Tracing isnt really used any more, was used
+        // by the old stand alone debugger. Might be upgraded
+        // and resused in the future.
         Memory["DebugTraceMode", 32].Compare(Tracing.On);
         CallIf(Flags.Equal, "DebugStub_SendTrace");
 
         // Is there a new incoming command? We dont want to wait for one
         // if there isn't one already here. This is a passing check.
-        Label = "DebugStub_CheckForCmd";
+        Label = "DebugStub_CheckForCmd"; //TODO: ".CheckForCmd" and make it local to our class
         DX = (ushort)(mComAddr + 5u);
         AL = Port[DX];
         AL.Test(0x01);
