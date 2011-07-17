@@ -64,8 +64,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="286AndUp\Lgdt.cs" />
-    <Compile Include="286AndUp\Lidt.cs" />
+    <Compile Include="Lgdt.cs" />
+    <Compile Include="Lidt.cs" />
     <Compile Include="386AndUp\Shrd.cs" />
     <Compile Include="386AndUp\Popad.cs" />
     <Compile Include="386AndUp\Popfd.cs" />
@@ -248,6 +248,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="286AndUp\" />
     <Folder Include="3DNow!2\Geode\" />
     <Folder Include="bin\Debug\" />
     <Folder Include="obj\Debug\TempPE\" />
