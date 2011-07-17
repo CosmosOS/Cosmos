@@ -218,5 +218,8 @@ namespace Cosmos.Compiler.XSharp {
     public ElementReference AddressOf(string aDataName) {
       return ElementReference.New(aDataName);
     }
+    public ElementReference AddressOf(DataMember aMember) {
+      return ElementReference.New(aMember.Name);
+    }
   }
 }
