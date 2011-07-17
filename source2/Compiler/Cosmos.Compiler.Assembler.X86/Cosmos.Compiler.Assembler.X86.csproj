@@ -156,7 +156,7 @@
     <Compile Include="SSEAndMMX2\SubPS.cs" />
     <Compile Include="SSEAndMMX2\SubSS.cs" />
     <Compile Include="SSEAndMMX2\XorPS.cs" />
-    <Compile Include="SSEAndMMX2\_Infra\InstructionWithDestinationAndSourceAndPseudoOpcodes.cs" />
+    <Compile Include="SSEAndMMX2\InstructionWithDestinationAndSourceAndPseudoOpcodes.cs" />
     <Compile Include="StoreByteInString.cs" />
     <Compile Include="StoreSD.cs" />
     <Compile Include="StoreWordInString.cs" />
@@ -249,9 +249,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="3DNow!2\Geode\" />
-    <Folder Include="bin\Debug\" />
-    <Folder Include="obj\Debug\TempPE\" />
-    <Folder Include="x87\_Infra\" />
+    <Folder Include="SSEAndMMX2\_Infra\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
