@@ -84,17 +84,22 @@ namespace Cosmos.Compiler.DebugStub {
       // repeated use of an inline will fail with conflicting labels.
       // TODO: Allow methods to emit a start label and return automatically
       // and mark inlines so this does not happen.
-      protected void ReadComPortX32toStack() {
-        // Make room on the stack for the address
-        Push(0);
-        // ReadByteFromComPort writes to EDI, then increments
-        EDI = ESP;
+      protected void ReadComPortX32toStack(int xCount) {
+        for (int i = 1; i <= xCount; i++) {
+          // Make room on the stack for the address
+          Push(0);
+          // ReadByteFromComPort writes to EDI, then increments
+          EDI = ESP;
 
-        // Read address to stack via EDI
-        Call<ReadByteFromComPort>();
-        Call<ReadByteFromComPort>();
-        Call<ReadByteFromComPort>();
-        Call<ReadByteFromComPort>();
+          // Read address to stack via EDI
+          ReadBytesFromComPort(4);
+        }
+      }
+
+      protected void ReadBytesFromComPort(int xCount) {
+        for (int i = 1; i <= xCount; i++) {
+          Call<ReadByteFromComPort>();
+        }
       }
 
       protected void WriteBytesToComPort(int xCount) {
@@ -112,7 +117,7 @@ namespace Cosmos.Compiler.DebugStub {
         PushAll();
 
         // BP Address
-        ReadComPortX32toStack();
+        ReadComPortX32toStack(1);
         ECX.Pop();
 
         // BP ID Number
@@ -144,8 +149,9 @@ namespace Cosmos.Compiler.DebugStub {
         AL = (int)DsMsgType.MethodContext;
         Call<DebugStub.WriteALToComPort>();
 
-        ReadComPortX32toStack(); // offset relative to ebp
-        ReadComPortX32toStack(); // size of data to send
+        // offset relative to ebp
+        // size of data to send
+        ReadComPortX32toStack(2);
         ECX.Pop();
         EAX.Pop();
 
@@ -176,7 +182,7 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         PushAll();
 
-        ReadComPortX32toStack();
+        ReadComPortX32toStack(1);
         //EAX.Pop();
         //ESI = EBP;
         //ESI.Add(EAX);
@@ -189,7 +195,7 @@ namespace Cosmos.Compiler.DebugStub {
         //EAX.Pop();
         //EAX.Push();
 
-        ReadComPortX32toStack();
+        ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_2";
         ECX.Pop();
         ESI.Pop();
@@ -244,8 +250,7 @@ namespace Cosmos.Compiler.DebugStub {
         ESI = EBP;
         new Add { DestinationReg = Registers.ESI, SourceValue = 12 };
         ECX = Memory[ESI];
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
+        WriteBytesToComPort(2);
 
         // Address of string
         ESI = Memory[EBP + 8];
@@ -274,10 +279,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // pointer value
         ESI = Memory[EBP + 8];
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
+        WriteBytesToComPort(4);
       }
     }
 
@@ -349,7 +351,7 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-    public class WaitForDbgHandshake : CodeBlock {
+    public class WaitForDbgHandshake : Inlines {
       public override void Assemble() {
         // "Clear" the UART out
         AL = 0;
@@ -363,10 +365,7 @@ namespace Cosmos.Compiler.DebugStub {
         // feature so we kept it.
         Push(Consts.SerialSignature);
         ESI = ESP;
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
+        WriteBytesToComPort(4);
         // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
         EAX.Pop();
 
@@ -504,32 +503,28 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-    public class WriteAXToComPort : CodeBlock {
+    public class WriteAXToComPort : Inlines {
       // Input: AX
       // Output: None
       // Modifies: EDX, ESI
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
+        WriteBytesToComPort(2);
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();
       }
     }
 
-    public class WriteEAXToComPort : CodeBlock {
+    public class WriteEAXToComPort : Inlines {
       // Input: EAX
       // Output: None
       // Modifies: EDX, ESI
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
-        Call<WriteByteToComPort>();
+        WriteBytesToComPort(4);
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();
@@ -587,27 +582,21 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-    public class SendRegisters : CodeBlock {
+    public class SendRegisters : Inlines {
       public override void Assemble() {
         AL = (int)DsMsgType.Registers; // Send the actual started signal
         Call<WriteALToComPort>();
         
         ESI = Memory["DebugPushAllPtr", 32];
-        for (int i = 1; i <= 32; i++) {
-          Call<WriteByteToComPort>();
-        }
+        WriteBytesToComPort(32);
         ESI = AddressOf(CallerESP);
-        for (int i = 1; i <= 4; i++) {
-          Call<WriteByteToComPort>();
-        }
+        WriteBytesToComPort(4);
         ESI = AddressOf(CallerEIP);
-        for (int i = 1; i <= 4; i++) {
-          Call<WriteByteToComPort>();
-        }
+        WriteBytesToComPort(4);
       }
     }
 
-    public class SendFrame : CodeBlock {
+    public class SendFrame : Inlines {
       public override void Assemble() {
         AL = (int)DsMsgType.Frame;
         Call<WriteALToComPort>();
@@ -618,9 +607,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         ESI = Memory[CallerEBP.Name, 32];
         ESI.Add(8); // Dont transmit EIP or old EBP
-        for (int i = 1; i <= xCount; i++) {
-          Call<WriteByteToComPort>();
-        }
+        WriteBytesToComPort(xCount);
       }
     }
 

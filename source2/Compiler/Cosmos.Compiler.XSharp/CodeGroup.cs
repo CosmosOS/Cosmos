@@ -32,6 +32,7 @@ namespace Cosmos.Compiler.XSharp {
       SetDataMembers(this);
 
       foreach (var xType in xThisType.GetNestedTypes()) {
+        // Skip abstracts so inlines can be supported. See DebugStub.
         if (xType.IsSubclassOf(typeof(CodeBlock)) && !xType.IsAbstract) {
           var xCtor = xType.GetConstructor(new Type[0]);
           var xBlock = (CodeBlock)(xCtor.Invoke(new Object[0]));
