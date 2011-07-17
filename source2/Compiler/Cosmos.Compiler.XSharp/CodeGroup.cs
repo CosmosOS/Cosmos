@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Compiler.XSharp {
   public class CodeGroup {
@@ -13,7 +14,7 @@ namespace Cosmos.Compiler.XSharp {
       var xAsm = Assembler.Assembler.CurrentInstance;
 
       // Generate DataMembers
-      foreach (var xMember in xThisType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
+      foreach (var xMember in xThisType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)) {
         if (xMember.FieldType.IsSubclassOf(typeof(DataMember))) {
           var xCtor = xMember.FieldType.GetConstructor(new Type[] { typeof(string) });
           var xInstance = (DataMember)(xCtor.Invoke(new Object[] { xThisType.Name + "_" + xMember.Name }));
@@ -22,7 +23,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       }
 
-      // Genereate code
+      // Genereate code - Old style
       foreach (var xType in xThisType.GetNestedTypes()) {
         if (xType.IsSubclassOf(typeof(CodeBlock))) {
           var xCtor = xType.GetConstructor(new Type[0]);
@@ -39,4 +40,5 @@ namespace Cosmos.Compiler.XSharp {
     }
 
   }
+
 }

@@ -25,8 +25,6 @@ namespace Cosmos.Compiler.DebugStub {
                 // enum Status
                 new DataMember("DebugStatus", 0),
                     
-                // 0 = Not in, 1 = already running
-                new DataMember("DebugRunning", 0),
                 // Nesting control for non steppable routines
                 new DataMember("DebugSuspendLevel", 0),
                 // Nesting control for non steppable routines 
@@ -123,7 +121,7 @@ namespace Cosmos.Compiler.DebugStub {
       // now ECX contains size of data (count)
       // EAX contains relative to EBP
       Label = "DebugStub_SendMethodContext2";
-      ESI = Memory["DebugStub_OldEBP", 32];
+      ESI = Memory[DebugStub.OldEBP.Name, 32];
       ESI.Add(EAX);
 
       Label = "DebugStub_SendMethodContext_SendByte";
