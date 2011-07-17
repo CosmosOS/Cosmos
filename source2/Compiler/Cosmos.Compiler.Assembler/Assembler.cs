@@ -102,12 +102,15 @@ namespace Cosmos.Compiler.Assembler {
     }
 
 	public void Add(Instruction aReader){
-		mInstructions.Add(aReader);
-    // Only increment if its executable code.
     if (aReader is Label || aReader is Comment) {
     } else {
+      // Only issue label if its executable code.
+      // Also above if statement will prevent this new label
+      // from causing a stack overflow
+      new Label("." + AsmIlIdx.ToString("X2"));
       mAsmIlIdx++;
     }
+    mInstructions.Add(aReader);
 	}
 
     public void Add(params Instruction[] aReaders) {

@@ -100,7 +100,7 @@ namespace Cosmos.IL2CPU.X86.IL
           //                    GetServiceProvider() );
           // todo: add exception support
 
-          new Label(xCurrentMethodLabel + "_AfterNullRefCheck");
+          new Label(xCurrentMethodLabel + ".AfterNullRefCheck");
 
           if (!String.IsNullOrEmpty(xNormalAddress)) {
             if (xExtraStackSize > 0) {
@@ -137,7 +137,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //                        true,
             //                        xEmitCleanup );
 
-            new Label(xCurrentMethodLabel + "_AfterAddressCheck");
+            new Label(xCurrentMethodLabel + ".AfterAddressCheck");
             if (xMethodInfo.DeclaringType == typeof(object)) {
               /*
                * On the stack now:
@@ -159,7 +159,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * 
                * EAX contains the method to call
                */
-              new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xCurrentMethodLabel + "_NOT_BOXED_THIS" };
+              new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xCurrentMethodLabel + ".NotBoxedThis" };
               new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
               /*
                * On the stack now:
@@ -198,13 +198,13 @@ namespace Cosmos.IL2CPU.X86.IL
                * $esp + mThisOffset + 4  This
                */
             }
-            new Label(xCurrentMethodLabel + "_NOT_BOXED_THIS");
+            new Label(xCurrentMethodLabel + ".NotBoxedThis");
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             if (xExtraStackSize > 0) {
               new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = xExtraStackSize };
             }
             new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
-            new Label(xCurrentMethodLabel + "__AFTER_NOT_BOXED_THIS");
+            new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
           }
           ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true, 
                                   delegate()
@@ -219,7 +219,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                                       }
                                   });
-          new Label(xCurrentMethodLabel + "__NO_EXCEPTION_AFTER_CALL");
+          new Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
           new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
           if (xReturnSize > 0) {
             Assembler.Stack.Push(new StackContents.Item(xReturnSize, typeof(Int32)));

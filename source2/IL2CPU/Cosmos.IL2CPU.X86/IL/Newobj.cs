@@ -166,7 +166,7 @@ namespace Cosmos.IL2CPU.X86.IL {
         new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(constructor) };
         if (aMethod != null) {
           new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
-          string xNoErrorLabel = currentLabel + "_NO_ERROR_" + MethodInfoLabelGenerator.LabelCount.ToString();
+          string xNoErrorLabel = currentLabel + ".NoError" + MethodInfoLabelGenerator.LabelCount.ToString();
           new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
 
           //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )

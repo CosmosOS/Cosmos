@@ -17,8 +17,15 @@ namespace Cosmos.Compiler.Assembler {
       if (aName.StartsWith(".")) {
         QualifiedName = LastFullLabel + aName;
       } else {
-        LastFullLabel = aName;
         QualifiedName = aName;
+        // Some older code passes the whole label in the argument, so we check for any . in it.
+        // That assumes that the main prefix can never have a . in it.
+        // This code isnt perfect and doenst label X# code properly, but we don't care about
+        // auto emitted X# labels for now.
+        var xParts = aName.Split('.');
+        if (xParts.Length < 3) {
+          LastFullLabel = aName;
+        }
       }
     }
 
