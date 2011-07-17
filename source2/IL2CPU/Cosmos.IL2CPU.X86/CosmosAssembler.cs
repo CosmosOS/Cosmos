@@ -257,6 +257,7 @@ namespace Cosmos.IL2CPU.X86 {
       if (mComNumber > 0) {
         var xStub = new DebugStub(mComNumber);
         xStub.Assemble();
+
         var xStub2 = new DebugPoint();
         xStub2.Assemble();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.Debug;
 using Cosmos.Compiler.XSharp;
@@ -604,6 +605,7 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
+    protected DataMemberInt Test;
     public class TracerEntry : CodeBlock {
       public override void Assemble() {
         // Main entry point for the DebugStub which is executed at the 

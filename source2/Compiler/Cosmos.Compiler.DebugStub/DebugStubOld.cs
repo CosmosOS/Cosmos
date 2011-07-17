@@ -17,6 +17,7 @@ namespace Cosmos.Compiler.DebugStub {
     protected UInt16 mComStatusAddr;
 
     //TODO: A bit of a hack as a static? Other ideas?
+    // Change to fields of CodeGroups and use reflection
     public static void EmitDataSection() {
       Assembler.Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
                 // Tracing: 0=Off, 1=On
