@@ -70,7 +70,6 @@
     <Compile Include="AddressDirect.cs" />
     <Compile Include="AddressIndirect.cs" />
     <Compile Include="CodeGroup.cs" />
-    <Compile Include="InteruptHandlerAttribute.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="MemoryAction.cs" />
     <Compile Include="PortNumber.cs" />
