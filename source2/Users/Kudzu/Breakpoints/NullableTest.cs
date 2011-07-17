@@ -32,7 +32,6 @@ namespace BreakpointsKernel {
 
       UInt32? y3 = x2;
       Chk(y3.Value == 64);
-
     }
 
   }
