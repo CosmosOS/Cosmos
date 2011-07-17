@@ -219,14 +219,14 @@ namespace Cosmos.Compiler.DebugStub {
       // Modifies: EAX, ESI
       public override void Assemble() {
         Memory["DebugStatus", 32].Compare(DebugStub.Status.Run);
-        JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
+        JumpIf(Flags.Equal, ".Normal");
         AL = (int)DsMsgType.BreakPoint;
-        Jump("DebugStub_SendTraceType");
+        Jump(".Type");
 
-        Label = "DebugStub_SendTrace_Normal";
+        Label = ".Normal";
         AL = (int)DsMsgType.TracePoint;
 
-        Label = "DebugStub_SendTraceType";
+        Label = ".Type";
         Call<DebugStub.WriteALToComPort>();
 
         // Send Calling EIP.
@@ -325,12 +325,11 @@ namespace Cosmos.Compiler.DebugStub {
         DX = mComStatusAddr;
 
         // Wait for port to be ready
-        Label = "ReadALFromComPort_Wait";
+        Label = ".Wait";
         AL = Port[DX];
         AL.Test(0x01);
-        JumpIf(Flags.Zero, "ReadALFromComPort_Wait");
+        JumpIf(Flags.Zero, ".Wait");
 
-        Label = "ReadALFromComPortNoCheck";
         // Set address of port
         DX = mComAddr;
         // Read byte
@@ -473,17 +472,17 @@ namespace Cosmos.Compiler.DebugStub {
         EDI = VidBase + (10 * 80 + 20) * 2;
 
         // Read and copy string till 0 terminator
-        Label = "DebugStub_Init_ReadChar";
+        Label = ".ReadChar";
         AL = Memory[ESI, 8];
         AL.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_Init_AfterMsg");
+        JumpIf(Flags.Equal, ".AfterMsg");
         ESI++;
         Memory[EDI, 8] = AL;
         EDI++;
         EDI++;
-        Jump("DebugStub_Init_ReadChar");
+        Jump(".ReadChar");
         //TODO: Local labels in X#
-        Label = "DebugStub_Init_AfterMsg";
+        Label = ".AfterMsg";
       }
     }
 
@@ -624,13 +623,13 @@ namespace Cosmos.Compiler.DebugStub {
         //
         // Need to reload ESI, WriteAXToCompPort modifies it
         ESI = Memory[CallerESP.Name, 32];
-        Label = "DebugStub_SendStack_SendByte";
+        Label = ".SendByte";
         ESI.Compare(Memory[CallerEBP.Name, 32]);
-        JumpIf(Flags.Equal, "DebugStub_SendStack_Exit");
+        JumpIf(Flags.Equal, ".Exit");
         Call<WriteByteToComPort>();
-        Jump("DebugStub_SendStack_SendByte");
+        Jump(".SendByte");
 
-        Label = "DebugStub_SendStack_Exit";
+        Label = ".Exit";
       }
     }
 
