@@ -110,7 +110,7 @@ namespace Cosmos.Compiler.Assembler {
           // Only issue label if its executable code.
           // Also above if statement will prevent this new label
           // from causing a stack overflow
-          new Label("." + AsmIlIdx.ToString("X2") + "#");
+          new Label("." + AsmIlIdx.ToString("X2"), "Asm");
           mAsmIlIdx++;
         }
       }
@@ -130,7 +130,7 @@ namespace Cosmos.Compiler.Assembler {
     private uint mDataMemberCounter = 0;
     public string GetIdentifier(string aPrefix) {
       mDataMemberCounter++;
-      return aPrefix + mDataMemberCounter.ToString("X8").ToUpper();
+      return aPrefix + mDataMemberCounter.ToString("X4");
     }
     private bool mFlushInitializationDone = false;
     protected void BeforeFlush() {

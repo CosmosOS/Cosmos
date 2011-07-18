@@ -10,9 +10,14 @@ namespace Cosmos.Compiler.Assembler {
       return MethodInfoLabelGenerator.GenerateLabelName(aMethod);
     }
 
-    public Label(MethodBase aMethod) : this(MethodInfoLabelGenerator.GenerateLabelName(aMethod)) { }
-    
-    public Label(string aName) {
+    public string Comment { get; set; }
+
+    public Label(MethodBase aMethod) : this(MethodInfoLabelGenerator.GenerateLabelName(aMethod), "") { }
+
+    public Label(string aName) : this(aName, "") {
+    }
+
+    public Label(string aName, string aComment) {
       mName = aName;
       if (aName.StartsWith(".")) {
         QualifiedName = LastFullLabel + aName;
@@ -27,6 +32,7 @@ namespace Cosmos.Compiler.Assembler {
           LastFullLabel = aName;
         }
       }
+      Comment = aComment;
     }
 
     public static string GetLabel(object aObject) {
@@ -55,11 +61,12 @@ namespace Cosmos.Compiler.Assembler {
 
     public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput) {
       if (IsGlobal) {
-        aOutput.Write("global ");
-        aOutput.WriteLine(QualifiedName);
+        aOutput.WriteLine("global " + QualifiedName);
       }
-      aOutput.Write(QualifiedName);
-      aOutput.Write(":");
+      aOutput.Write(QualifiedName + ":");
+      if (Comment != "") {
+        aOutput.Write(" ;" + Comment);
+      }
     }
 
     public override bool IsComplete(Assembler aAssembler) {

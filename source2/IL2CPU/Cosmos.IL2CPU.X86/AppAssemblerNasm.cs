@@ -387,7 +387,7 @@ namespace Cosmos.IL2CPU.X86 {
       base.BeforeOp(aMethod, aOpCode);
       string xLabel = TmpPosLabel(aMethod, aOpCode);
       Assembler.CurrentIlLabel = xLabel;
-      new Label(xLabel);
+      new Label(xLabel, "IL");
       
       if (mSymbols != null) {
         var xMLSymbol = new DebugInfo.MLDebugSymbol();

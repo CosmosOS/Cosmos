@@ -506,20 +506,26 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public void SendAssembly() {
+      DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes("test"));
+      return;
+
       // Scan and make a list of labels that belong to this line of code
       int xIdx = mSourceMappings.Keys.IndexOf((uint)mCurrentAddress);
       string xFile = mSourceMappings.Values[xIdx].SourceFile;
       int xLineNo = mSourceMappings.Values[xIdx].Line;
       int xCol = mSourceMappings.Values[xIdx].Column;
       //
-      var xLabels = new List<string>();
-      xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress].Trim().ToUpper());
+      var xLabels = new Dictionary<string, int>();
+      xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress] + ":", 0);
       for (int i = xIdx; i < mSourceMappings.Values.Count; i++) {
         var xSI = mSourceMappings.Values[i];
         if ((xSI.SourceFile != xFile) || (xSI.Line != xLineNo) || (xSI.Column != xCol)) {
           break;
         }
-        xLabels.Add(mAddressLabelMappings[mSourceMappings.Keys[i]].Trim().ToUpper());
+        string xLabel = mAddressLabelMappings[mSourceMappings.Keys[i]] + ":";
+        if (!xLabels.ContainsKey(mAddressLabelMappings[mSourceMappings.Keys[i]] + ":")) {
+          xLabels.Add(xLabel, 0);
+        }
       }
 
       var xLines = File.ReadAllLines(Path.ChangeExtension(mISO, ".asm"));
@@ -527,9 +533,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Find line in ASM that starts the code block.
       int xStart = -1;
       for (int i = 0; i < xLines.Length; i++) {
-        string xLine = xLines[i].Trim();
-        if (xLine.EndsWith(":")) {
-          if (xLabels.Contains(xLine.Substring(0, xLine.Length - 1).ToUpper())) {
+        var xParts = xLines[i].Trim().Split(' ');
+        if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
+          if (xLabels.ContainsKey(xParts[0])) {
             // Found the first match, store the index and break.
             xStart = i;
             break;
@@ -541,23 +547,23 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (xStart > -1) {
         // Extract the actual lines
         for (int i = xStart; i < xLines.Length; i++) {
-          string xLine = xLines[i].TrimEnd();
-          if (xLine.EndsWith(":")) {
+          string xLine = xLines[i].Trim();
+          var xParts = xLine.Split(' ');
+          if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
             // Its a label, lets check it
-            string xTest = xLine.Trim().ToUpper();
-            if (xTest.EndsWith("#:")) {
-              // Found an ASM label.
+            if (xParts.Length == 1) {
+              // Found an normal label.
               xCode.AppendLine(xLine);
-            } else if (xLabels.Contains(xTest.Substring(0, xTest.Length - 1))) {
-              // Found an exact match. Our label is in the label list
-              xCode.AppendLine(xLine);
-            } else {
-              // We need to check to see if its a local label. ie .True, etc.
-              int xLastDot = xTest.LastIndexOf('.');
-              if (xLabels.Contains(xTest.Substring(0, xLastDot - 1))) {
+            } else if (xParts.Length > 1) {
+              if (xParts[1] == ";Asm") {
+                // Found an ASM label.
+                xCode.AppendLine(xLine);
+              } else if (xParts[1] == ";IL" && xLabels.ContainsKey(xParts[0])) {
+                // Found an exact match. Our label is in the label list
                 xCode.AppendLine(xLine);
               } else {
-                // Found the first non-match, stop here
+                // Its a label with an unrecognized comment, or its an IL label that doesn't match.
+                // We are done.
                 break;
               }
             }
@@ -567,7 +573,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           }
         }
       }
-
+      // Send source code to the tool window
       DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
     }
 
