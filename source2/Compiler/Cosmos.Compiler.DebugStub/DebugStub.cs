@@ -15,12 +15,19 @@ namespace Cosmos.Compiler.DebugStub {
     static public UInt16 mComAddr;
     static public UInt16 mComStatusAddr;
 
-    // Caller's EBP
+    // Caller's Registers
     static public DataMember32 CallerEBP;
-    // Caller's EIP
     static public DataMember32 CallerEIP;
-    // Caller's ESP
     static public DataMember32 CallerESP;
+
+    // ASM Stepping
+    //
+    // Location where INT1 has been injected
+    // 0 if no INT1 is active
+    static public DataMember32 AsmBreakEIP;
+    // Old byte before INT1 was injected
+    // Only 1 byte is used
+    static public DataMember32 AsmOrigByte;
 
     static public class Tracing {
       public const byte Off = 0;
@@ -627,77 +634,75 @@ namespace Cosmos.Compiler.DebugStub {
         Call<ReadALFromComPort>();
         // Some callers expect AL to be returned, so we preserve it
         // in case any commands modify AL.
-        //TODO: But in ASM wont let us push AL, so we push EAX for now
+        // We push EAX to keep stack aligned. 
         EAX.Push();
 
         // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
         AL.Compare(DsCommand.Noop);
-        JumpIf(Flags.Equal, "DebugStub_ProcessCmd_Exit");
+        JumpIf(Flags.Equal, ".End");
 
         // Read Command ID
         Call<ReadALFromComPort>();
         Memory["DebugStub_CommandID"] = EAX;
 
         // Get AL back so we can compare it, but also put it back for later
-        EAX.Pop();
-        EAX.Push();
+        EAX = Memory[ESP];
 
-        #region handle commands
         AL.Compare(DsCommand.TraceOff);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOff_After");
+        JumpIf(Flags.NotEqual, ".TraceOffAfter");
         Memory["DebugTraceMode", 32] = Tracing.Off;
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_TraceOff_After";
+        Jump(".SendACK");
+        Label = ".TraceOffAfter";
 
         AL.Compare(DsCommand.TraceOn);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_TraceOn_After");
+        JumpIf(Flags.NotEqual, ".TraceOnAfter");
         Memory["DebugTraceMode", 32] = Tracing.On;
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_TraceOn_After";
+        Jump(".SendACK");
+        Label = ".TraceOnAfter";
 
         AL.Compare(DsCommand.Break);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_Break_After");
+        JumpIf(Flags.NotEqual, ".BreakAfter");
         Call<Break>();
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_Break_After";
+        Jump(".SendACK");
+        Label = ".BreakAfter";
 
         AL.Compare(DsCommand.BreakOnAddress);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_BreakOnAddress_After");
+        JumpIf(Flags.NotEqual, ".BreakOnAddressAfter");
         Call<BreakOnAddress>();
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_BreakOnAddress_After";
+        Jump(".SendACK");
+        Label = ".BreakOnAddressAfter";
 
         AL.Compare(DsCommand.SendMethodContext);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMethodContext_After");
+        JumpIf(Flags.NotEqual, ".SendMethodContextAfter");
         Call<SendMethodContext>();
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_SendMethodContext_After";
+        Jump(".SendACK");
+        Label = ".SendMethodContextAfter";
 
         AL.Compare(DsCommand.SendMemory);
-        JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendMemory_After");
+        JumpIf(Flags.NotEqual, ".SendMemoryAfter");
         Call<SendMemory>();
-        Jump("DebugStub_ProcessCmd_ACK");
-        Label = "DebugStub_ProcessCmd_SendMemory_After";
+        Jump(".SendACK");
+        Label = ".SendMemoryAfter";
 
         AL.Compare(DsCommand.SendRegisters);
-                JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendRegisters_After");
-                Call<SendRegisters>();
-                Jump("DebugStub_ProcessCmd_ACK");
-                Label = "DebugStub_ProcessCmd_SendRegisters_After";
+        JumpIf(Flags.NotEqual, ".SendRegistersAfter");
+        Call<SendRegisters>();
+        Jump(".SendACK");
+        Label = ".SendRegistersAfter";
 
         AL.Compare(DsCommand.SendFrame);
-                JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendFrame_After");
-                Call<SendFrame>();
-                Jump("DebugStub_ProcessCmd_ACK");
-                Label = "DebugStub_ProcessCmd_SendFrame_After";
+        JumpIf(Flags.NotEqual, ".SendFrameAfter");
+        Call<SendFrame>();
+        Jump(".SendACK");
+        Label = ".SendFrameAfter";
 
         AL.Compare(DsCommand.SendStack);
-                JumpIf(Flags.NotEqual, "DebugStub_ProcessCmd_SendStack_After");
-                Call<SendStack>();
-                Jump("DebugStub_ProcessCmd_ACK");
-                Label = "DebugStub_ProcessCmd_SendStack_After";
+        JumpIf(Flags.NotEqual, ".SendStackAfter");
+        Call<SendStack>();
+        Jump(".SendACK");
+        Label = ".SendStackAfter";
 
-        Label = "DebugStub_ProcessCmd_ACK";
+        Label = ".SendACK";
         // We acknowledge receipt of the command, not processing of it.
         // We have to do this because sometimes callers do more processing
         // We ACK even ones we dont process here, but do not ACK Noop.
@@ -710,13 +715,11 @@ namespace Cosmos.Compiler.DebugStub {
         // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub)
         AL = DsMsgType.CmdCompleted;
         Call<WriteALToComPort>();
+        //
         EAX = Memory["DebugStub_CommandID", 32];
-        #endregion
-
         Call<WriteALToComPort>();
-        Label = "DebugStub_ProcessCmd_After";
 
-        Label = "DebugStub_ProcessCmd_Exit";
+        Label = ".End";
         // Restore AL for callers who check the command and do
         // further processing, or for commands not handled by this routine.
         EAX.Pop();
