@@ -70,11 +70,14 @@ namespace Cosmos.Compiler.XSharp {
     private uint mLabelCounter = 0;
     public string NewLabel() {
       mLabelCounter++;
-      return GetType().Name + mLabelCounter.ToString("X8").ToUpper();
+      return "." + mLabelCounter.ToString("X8").ToUpper();
     }
 
     static public void Call<T>() {
       new Call { DestinationLabel = MakeLabel(typeof(T)) };
+    }
+    static public void Call(Type aFunction) {
+      new Call { DestinationLabel = MakeLabel(aFunction) };
     }
     public void Call(string aLabel) {
       new Call { DestinationLabel = aLabel };

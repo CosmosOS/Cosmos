@@ -43,11 +43,13 @@ namespace Cosmos.Compiler.Debug {
     public const byte SendMemory = 10;
     public const byte StepOver = 11;
     public const byte StepOut = 12;
-    public const byte SendRegisters = 13;
+    public const byte SendRegisters = 13; // Send the register values to DC
     public const byte SendFrame = 14;
     public const byte SendStack = 15;
+    public const byte SetAsmBreak = 16; // Set an assembly level break point
+    //
     // Make sure this is always the last entry. Used by DebugStub to verify commands
-    public const byte Max = 16;
+    public const byte Max = 17;
   }
 
   static public class DwMsgType {

@@ -696,11 +696,7 @@ namespace Cosmos.Compiler.DebugStub {
         Jump(".SendACK");
         Label = ".SendFrameAfter";
 
-        AL.Compare(DsCommand.SendStack);
-        JumpIf(Flags.NotEqual, ".SendStackAfter");
-        Call<SendStack>();
-        Jump(".SendACK");
-        Label = ".SendStackAfter";
+        CheckCmd(DsCommand.SendStack, typeof(SendStack));
 
         Label = ".SendACK";
         // We acknowledge receipt of the command, not processing of it.
@@ -723,6 +719,15 @@ namespace Cosmos.Compiler.DebugStub {
         // Restore AL for callers who check the command and do
         // further processing, or for commands not handled by this routine.
         EAX.Pop();
+      }
+
+      protected void CheckCmd(byte aCmd, Type aFunction) {
+        AL.Compare(aCmd);
+        string xAfterLabel = NewLabel();
+        JumpIf(Flags.NotEqual, xAfterLabel);
+        Call(aFunction);
+        Jump(".SendACK");
+        Label = xAfterLabel;
       }
     }
 
