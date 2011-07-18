@@ -264,6 +264,8 @@ namespace Cosmos.IL2CPU.X86 {
         new Label("DebugStub_Step");
         new Return();
       }
+      // Start emitting assembly labels
+      Assembler.CurrentInstance.EmitAsmLabels = true;
 
 #if !LFB_1024_8
       DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));

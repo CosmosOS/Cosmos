@@ -14,14 +14,16 @@ using System.Xml;
 namespace Cosmos.Compiler.Assembler {
 
   public abstract class Assembler {
-    public virtual void Initialize() {
-    }
+    public virtual void Initialize() { }
+    
     // Contains info on the current stack structure. What type are on the stack, etc
     public readonly StackContents Stack = new StackContents();
 
     // This is a hack, hope to fix it in the future
     // as it will also cause problems when we thread the compiler
     private static Assembler mCurrentInstance;
+
+    public bool EmitAsmLabels { get; set; }
 
     protected int mCurrentMethodID;
     public int CurrentMethodID {
@@ -45,7 +47,7 @@ namespace Cosmos.Compiler.Assembler {
 
     protected internal List<Instruction> mInstructions = new List<Instruction>();
     private List<DataMember> mDataMembers = new List<DataMember>();
-    
+
     public List<DataMember> DataMembers {
       get { return mDataMembers; }
     }
@@ -101,20 +103,22 @@ namespace Cosmos.Compiler.Assembler {
       return null;
     }
 
-	public void Add(Instruction aReader){
-    if (aReader is Label || aReader is Comment) {
-    } else {
-      // Only issue label if its executable code.
-      // Also above if statement will prevent this new label
-      // from causing a stack overflow
-      new Label("." + AsmIlIdx.ToString("X2"));
-      mAsmIlIdx++;
+    public void Add(Instruction aReader) {
+      if (aReader is Label || aReader is Comment) {
+      } else {
+        if (EmitAsmLabels) {
+          // Only issue label if its executable code.
+          // Also above if statement will prevent this new label
+          // from causing a stack overflow
+          new Label("." + AsmIlIdx.ToString("X2"));
+          mAsmIlIdx++;
+        }
+      }
+      mInstructions.Add(aReader);
     }
-    mInstructions.Add(aReader);
-	}
 
     public void Add(params Instruction[] aReaders) {
-	  mInstructions.Capacity += aReaders.Length;
+      mInstructions.Capacity += aReaders.Length;
       foreach (Instruction xInstruction in aReaders) {
         mInstructions.Add(xInstruction);
       }
