@@ -42,6 +42,13 @@
           <CommandName>Cosmos Debugger Toolbar</CommandName>
         </Strings>
       </Menu>
+      <Menu guid="guidAsmToolbarCmdSet" id="AsmToolbar" type="ToolWindowToolbar" >
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Assembly Toolbar</ButtonText>
+          <CommandName>Cosmos Assembly Toolbar</CommandName>
+        </Strings>
+      </Menu>
     </Menus>
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
@@ -50,6 +57,9 @@
     <Groups>
       <Group guid="guidIDEToolbarCmdSet" id="ToolbarGroup" priority="0x0000">
         <Parent guid="guidIDEToolbarCmdSet" id="Toolbar"/>
+      </Group>
+      <Group guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup" priority="0x0000">
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbar"/>
       </Group>
     </Groups>
 
@@ -129,6 +139,30 @@
           <ButtonText>Show All Cosmos Debug Windows</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmFilter" priority="0x0100" type="Button">
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpAllIcon" />
+        <Strings>
+          <CommandName>cmdidAsmFilter</CommandName>
+          <ButtonText>Filter Assembly Labels</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmStep" priority="0x0100" type="Button">
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpAllIcon" />
+        <Strings>
+          <CommandName>cmdidAsmStep</CommandName>
+          <ButtonText>Step</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmCopy" priority="0x0100" type="Button">
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpAllIcon" />
+        <Strings>
+          <CommandName>cmdidAsmCopy</CommandName>
+          <ButtonText>Copy Assembly</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -150,9 +184,15 @@
       <IDSymbol name="Toolbar" value="0x1000" />
       <IDSymbol name="ToolbarGroup" value="0x1050" />
     </GuidSymbol>
+    <GuidSymbol name ="guidAsmToolbarCmdSet" value="{A875EA24-689A-4EAB-B9C2-DAC3EACB9501}">
+      <IDSymbol name ="AsmToolbar" value="0x1001" />
+      <IDSymbol name ="AsmToolbarGroup" value="0x1002" />
+      <IDSymbol name ="cmdidAsmFilter" value="0x0105" />
+      <IDSymbol name ="cmdidAsmStep" value="0x0106" />
+      <IDSymbol name ="cmdidAsmCopy" value="0x0107" />
+    </GuidSymbol>
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidCosmos_VS_WindowsCmdSet" value="{3d4b3f35-36e7-4cea-8acc-d9601e45c0b9}">
-      <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidCosmosAssembly" value="0x0101" />
       <IDSymbol name="cmdidCosmosRegisters" value="0x0102" />
       <IDSymbol name="cmdidCosmosStack" value="0x0103" />
