@@ -67,7 +67,7 @@
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup" />
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpAssemblyIcon" />
         <Strings>
           <CommandName>cmdidCosmosAssembly</CommandName>
           <ButtonText>Cosmos Assembly Window</ButtonText>
@@ -75,7 +75,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
         <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpRegisterIcon" />
         <Strings>
           <CommandName>cmdidCosmosRegisters</CommandName>
           <ButtonText>Cosmos Registers Window</ButtonText>
@@ -83,7 +83,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
         <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpStackIcon" />
         <Strings>
           <CommandName>cmdidCosmosStack</CommandName>
           <ButtonText>Cosmos Stack Window</ButtonText>
@@ -91,7 +91,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
         <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidCosmosShowAll</CommandName>
           <ButtonText>Show All Cosmos Debug Windows</ButtonText>
@@ -99,7 +99,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpAssemblyIcon" />
         <Strings>
           <CommandName>cmdidCosmosAssembly</CommandName>
           <ButtonText>Cosmos Assembly Window</ButtonText>
@@ -107,7 +107,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpRegisterIcon" />
         <Strings>
           <CommandName>cmdidCosmosRegisters</CommandName>
           <ButtonText>Cosmos Registers Window</ButtonText>
@@ -115,7 +115,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpStackIcon" />
         <Strings>
           <CommandName>cmdidCosmosStack</CommandName>
           <ButtonText>Cosmos Stack Window</ButtonText>
@@ -123,7 +123,7 @@
       </Button>
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpCosmosIcon1" />
+        <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidCosmosShowAll</CommandName>
           <ButtonText>Show All Cosmos Debug Windows</ButtonText>
@@ -138,7 +138,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Cosmos.ico" usedList="bmpCosmosIcon1"/>
+      <Bitmap guid="guidImages" href="Resources\Cosmos.ico" usedList="bmpCosmosIcon, bmpAssemblyIcon, bmpRegisterIcon, bmpStackIcon, bmpAllIcon"/>
     </Bitmaps>
   </Commands>
 
@@ -160,7 +160,11 @@
     </GuidSymbol> 
     
     <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >
-      <IDSymbol name="bmpCosmosIcon1" value="1"/>
+      <IDSymbol name="bmpCosmosIcon" value="1"/>
+      <IDSymbol name="bmpAssemblyIcon" value="2"/>
+      <IDSymbol name="bmpRegisterIcon" value="3"/>
+      <IDSymbol name="bmpStackIcon" value="4"/>
+      <IDSymbol name="bmpAllIcon" value="5"/>
     </GuidSymbol>
   </Symbols>
 </CommandTable>
