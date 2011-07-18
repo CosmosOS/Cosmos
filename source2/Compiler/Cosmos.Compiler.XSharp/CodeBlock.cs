@@ -70,7 +70,7 @@ namespace Cosmos.Compiler.XSharp {
     private uint mLabelCounter = 0;
     public string NewLabel() {
       mLabelCounter++;
-      return "." + mLabelCounter.ToString("X8").ToUpper();
+      return "." + mLabelCounter.ToString("X").ToUpper();
     }
 
     static public void Call<T>() {

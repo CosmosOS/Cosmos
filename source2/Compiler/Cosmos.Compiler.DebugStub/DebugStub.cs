@@ -20,15 +20,6 @@ namespace Cosmos.Compiler.DebugStub {
     static public DataMember32 CallerEIP;
     static public DataMember32 CallerESP;
 
-    // ASM Stepping
-    //
-    // Location where INT1 has been injected
-    // 0 if no INT1 is active
-    static public DataMember32 AsmBreakEIP;
-    // Old byte before INT1 was injected
-    // Only 1 byte is used
-    static public DataMember32 AsmOrigByte;
-
     static public class Tracing {
       public const byte Off = 0;
       public const byte On = 1;
@@ -45,6 +36,70 @@ namespace Cosmos.Compiler.DebugStub {
       public const byte Into = 1;
       public const byte Over = 2;
       public const byte Out = 3;
+    }
+
+    public class ProcessCommand : CodeBlock {
+      // Modifies: AL, DX (ReadALFromComPort)
+      // Returns: AL
+      public override void Assemble() {
+        Call<ReadALFromComPort>();
+        // Some callers expect AL to be returned, so we preserve it
+        // in case any commands modify AL.
+        // We push EAX to keep stack aligned. 
+        EAX.Push();
+
+        // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
+        AL.Compare(DsCommand.Noop);
+        JumpIf(Flags.Equal, ".End");
+
+        // Read Command ID
+        Call<ReadALFromComPort>();
+        Memory["DebugStub_CommandID"] = EAX;
+
+        // Get AL back so we can compare it, but also put it back for later
+        EAX = Memory[ESP];
+        CheckCmd(DsCommand.TraceOff, typeof(TraceOff));
+        CheckCmd(DsCommand.TraceOn, typeof(TraceOn));
+        CheckCmd(DsCommand.Break, typeof(Break));
+        CheckCmd(DsCommand.BreakOnAddress, typeof(BreakOnAddress));
+        CheckCmd(DsCommand.SendMethodContext, typeof(SendMethodContext));
+        CheckCmd(DsCommand.SendMemory, typeof(SendMemory));
+        CheckCmd(DsCommand.SendRegisters, typeof(SendRegisters));
+        CheckCmd(DsCommand.SendFrame, typeof(SendFrame));
+        CheckCmd(DsCommand.SendStack, typeof(SendStack));
+        CheckCmd(DsCommand.SetAsmBreak, typeof(SetAsmBreak));
+
+        Label = ".SendACK";
+        // We acknowledge receipt of the command, not processing of it.
+        // We have to do this because sometimes callers do more processing
+        // We ACK even ones we dont process here, but do not ACK Noop.
+        // The buffers should be ok becuase more wont be sent till after our NACK
+        // is received.
+        // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
+        // UART buffer is 16.
+        // We may need to revisit this in the future to ack not commands, but data chunks
+        // and move them to a buffer.
+        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub)
+        AL = DsMsgType.CmdCompleted;
+        Call<WriteALToComPort>();
+        //
+        EAX = Memory["DebugStub_CommandID", 32];
+        Call<WriteALToComPort>();
+
+        Label = ".End";
+        // Restore AL for callers who check the command and do
+        // further processing, or for commands not handled by this routine.
+        EAX.Pop();
+      }
+
+      protected void CheckCmd(byte aCmd, Type aFunction) {
+        AL.Compare(aCmd);
+        string xAfterLabel = NewLabel();
+        JumpIf(Flags.NotEqual, xAfterLabel);
+        Call(aFunction);
+        Jump(".SendACK");
+        Label = xAfterLabel;
+      }
     }
 
     public DebugStub(int aComNo) {
@@ -627,66 +682,42 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-    public class ProcessCommand : CodeBlock {
-      // Modifies: AL, DX (ReadALFromComPort)
-      // Returns: AL
+    // ASM Stepping
+    //
+    // Location where INT1 has been injected
+    // 0 if no INT1 is active
+    static public DataMember32 AsmBreakEIP;
+    // Old byte before INT1 was injected
+    // Only 1 byte is used
+    static public DataMember32 AsmOrigByte;
+    //
+    public class SetAsmBreak : Inlines {
       public override void Assemble() {
-        Call<ReadALFromComPort>();
-        // Some callers expect AL to be returned, so we preserve it
-        // in case any commands modify AL.
-        // We push EAX to keep stack aligned. 
-        EAX.Push();
+        EDI = Memory[AsmBreakEIP];
+        EDI.Compare(0);
+        // If 0, we don't need to clear an older one.
+        JumpIf(Flags.Equal, ".Set");
+        Call<ClrAsmBreak>();
 
-        // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
-        AL.Compare(DsCommand.Noop);
-        JumpIf(Flags.Equal, ".End");
-
-        // Read Command ID
-        Call<ReadALFromComPort>();
-        Memory["DebugStub_CommandID"] = EAX;
-
-        // Get AL back so we can compare it, but also put it back for later
-        EAX = Memory[ESP];
-        CheckCmd(DsCommand.TraceOff, typeof(TraceOff));
-        CheckCmd(DsCommand.TraceOn, typeof(TraceOn));
-        CheckCmd(DsCommand.Break, typeof(Break));
-        CheckCmd(DsCommand.BreakOnAddress, typeof(BreakOnAddress));
-        CheckCmd(DsCommand.SendMethodContext, typeof(SendMethodContext));
-        CheckCmd(DsCommand.SendMemory, typeof(SendMemory));
-        CheckCmd(DsCommand.SendRegisters, typeof(SendRegisters));
-        CheckCmd(DsCommand.SendFrame, typeof(SendFrame));
-        CheckCmd(DsCommand.SendStack, typeof(SendStack));
-
-        Label = ".SendACK";
-        // We acknowledge receipt of the command, not processing of it.
-        // We have to do this because sometimes callers do more processing
-        // We ACK even ones we dont process here, but do not ACK Noop.
-        // The buffers should be ok becuase more wont be sent till after our NACK
-        // is received.
-        // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
-        // UART buffer is 16.
-        // We may need to revisit this in the future to ack not commands, but data chunks
-        // and move them to a buffer.
-        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub)
-        AL = DsMsgType.CmdCompleted;
-        Call<WriteALToComPort>();
-        //
-        EAX = Memory["DebugStub_CommandID", 32];
-        Call<WriteALToComPort>();
-
-        Label = ".End";
-        // Restore AL for callers who check the command and do
-        // further processing, or for commands not handled by this routine.
-        EAX.Pop();
+        Label = ".Set";
+        ReadComPortX32toStack(1);
+        EDI.Pop();
+        // Save the old byte
+        EAX = Memory[EDI];
+        Memory[AsmOrigByte] = EAX;
+        // Inject INT3
+        Memory[EDI] = 0xCC;
+        // Save EIP of the break
+        Memory[AsmBreakEIP] = EDI;
       }
+    }
 
-      protected void CheckCmd(byte aCmd, Type aFunction) {
-        AL.Compare(aCmd);
-        string xAfterLabel = NewLabel();
-        JumpIf(Flags.NotEqual, xAfterLabel);
-        Call(aFunction);
-        Jump(".SendACK");
-        Label = xAfterLabel;
+    public class ClrAsmBreak : Inlines {
+      public override void Assemble() {
+        // Clear old break point
+        EAX = Memory[AsmOrigByte];
+        Memory[EDI] = EAX;
+        Memory[AsmOrigByte] = 0;
       }
     }
 

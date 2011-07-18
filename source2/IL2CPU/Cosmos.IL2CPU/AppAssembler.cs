@@ -95,6 +95,7 @@ namespace Cosmos.IL2CPU {
           mLog.WriteLine("\t{0} {1}", mAssembler.Stack.Count, xILOp.GetType().Name);
           mLog.Flush();
 
+          new Comment("#IL.BEGIN");
           BeforeOp(aMethod, xOpCode);
           new Comment(xILOp.ToString());
           var xNextPosition = xOpCode.Position + 1;

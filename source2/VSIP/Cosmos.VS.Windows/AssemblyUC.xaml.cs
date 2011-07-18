@@ -18,34 +18,42 @@ using System.Threading;
 
 namespace Cosmos.Cosmos_VS_Windows {
   public partial class AssemblyUC : UserControl {
-    
-    public static byte[] mData;
-    protected string mCode;
+    static public byte[] mData = new byte[0];
+    string mCode = "";
+    bool mFilter = true;
 
     public AssemblyUC() {
       InitializeComponent();
 
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
-      if ((mData != null) && (mData.Length > 0)) {
-        Update(mData);
-      }
+      Update(mData);
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e) {
       Clipboard.SetText(mCode);
     }
 
-    public void Update(byte[] aData) {
-      mCode = Encoding.ASCII.GetString(aData);
-      mCode = mCode.Replace("\t", "  ");
+    protected void Display(bool aFilter) {
       tblkSource.Inlines.Clear();
+      if (mData.Length == 0) {
+        return;
+      }
+
+      mCode = Encoding.ASCII.GetString(mData);
+      mCode = mCode.Replace("\t", "  ");
 
       string[] xLines = mCode.Split('\n');
       foreach (string xLine in xLines) {
         string xTestLine = xLine.Trim();
 
-        if (string.Compare(xTestLine, "Int3", true) == 0) {
-          continue;
+        if (aFilter) {
+          if (string.Compare(xTestLine, "INT3", true) == 0) {
+            continue;
+          } else if (xTestLine.StartsWith("; #")) {
+            continue;
+          } else if (xTestLine.EndsWith("#:")) {
+            continue;
+          }
         }
 
         var xRun = new Run(xLine);
@@ -59,6 +67,11 @@ namespace Cosmos.Cosmos_VS_Windows {
 
         tblkSource.Inlines.Add(xRun);
       }
+    }
+
+    public void Update(byte[] aData) {
+      mData = aData;
+      Display(mFilter);
     }
 
   }
