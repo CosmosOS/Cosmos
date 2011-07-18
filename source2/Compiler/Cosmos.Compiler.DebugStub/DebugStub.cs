@@ -131,7 +131,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX = EAX << 2;
         EBX.Add(EAX);
 
-        Memory[EBX, 32] = ECX;
+        Memory[EBX] = ECX;
       }
     }
 

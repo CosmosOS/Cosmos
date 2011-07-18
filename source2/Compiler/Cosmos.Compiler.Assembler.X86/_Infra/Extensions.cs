@@ -9,7 +9,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             string xDest = string.Empty;
             if((aThis.DestinationValue.HasValue ||aThis.DestinationRef != null) && 
                 aThis.DestinationIsIndirect && 
-                aThis.DestinationReg!=null) {
+                aThis.DestinationReg!=null && aThis.DestinationDisplacement > 0) {
                 throw new Exception("[Scale*index+base] style addressing not supported at the moment");
             }
             if (aThis.DestinationRef != null) {
