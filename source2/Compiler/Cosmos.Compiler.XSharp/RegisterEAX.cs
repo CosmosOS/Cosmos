@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
     public static readonly RegisterEAX Instance = new RegisterEAX();
 
     public static RegisterEAX operator ++(RegisterEAX aRegister) {
-      new Inc { DestinationReg = aRegister.GetId() };
+      new INC { DestinationReg = aRegister.GetId() };
       return aRegister;
     }
     public static RegisterEAX operator +(RegisterEAX aRegister, UInt32 aValue) {

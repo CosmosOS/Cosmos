@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
         public static readonly RegisterEDI Instance = new RegisterEDI();
 
         public static RegisterEDI operator ++(RegisterEDI aRegister) {
-            new Inc { DestinationReg = aRegister.GetId() };
+            new INC { DestinationReg = aRegister.GetId() };
             return aRegister;
         }
         public static RegisterEDI operator --(RegisterEDI aRegister) {

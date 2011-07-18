@@ -25,7 +25,7 @@ namespace Cosmos.Compiler.XSharp {
         }
 
         public static implicit operator RegisterAL(PortNumber aPort) {
-            new In { DestinationReg = Registers.AL };
+            new IN { DestinationReg = Registers.AL };
             return Instance;
         }
 

@@ -45,7 +45,7 @@ namespace Cosmos.Core.Plugs
             //TODO: Do we need to clear rest of EAX first?
             //    MTW: technically not, as in other places, it _should_ be working with AL too..
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.In { DestinationReg = CPUx86.Registers.AL };
+            new CPUx86.IN { DestinationReg = CPUx86.Registers.AL };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             return 0;
         }
@@ -55,7 +55,7 @@ namespace Cosmos.Core.Plugs
         {
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.In { DestinationReg = CPUx86.Registers.AX };
+            new CPUx86.IN { DestinationReg = CPUx86.Registers.AX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             return 0;
         }
@@ -64,7 +64,7 @@ namespace Cosmos.Core.Plugs
         public static UInt32 Read32(UInt16 aPort)
         {
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-            new CPUx86.In { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.IN { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             return 0;
         }

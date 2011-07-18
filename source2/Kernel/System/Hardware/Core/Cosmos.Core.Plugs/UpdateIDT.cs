@@ -130,7 +130,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
         new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
-        new CPUx86.InterruptReturn();
+        new CPUx86.IRET();
       }
       new CPUAll.Label("__INTERRUPT_OCCURRED__");
       new CPUx86.Return();

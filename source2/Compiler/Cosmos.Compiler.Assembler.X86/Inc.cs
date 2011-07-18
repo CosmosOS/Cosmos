@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     [OpCode("inc")]
-    public class Inc : InstructionWithDestinationAndSize {
+    public class INC : InstructionWithDestinationAndSize {
     }
 }

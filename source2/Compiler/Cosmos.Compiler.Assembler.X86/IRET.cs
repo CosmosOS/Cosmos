@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     [OpCode("iret")]
-	public class InterruptReturn: Instruction {
+	public class IRET: Instruction {
 	}
 }

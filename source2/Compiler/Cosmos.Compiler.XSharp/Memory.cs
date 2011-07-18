@@ -27,7 +27,8 @@ namespace Cosmos.Compiler.XSharp {
                             return new MemoryAction(xAddrIndirect.Reference, xAddrIndirect.Displacement) { IsIndirect = true };
                         } else {
                             if (xAddrIndirect.Register != null) {
-                                return new MemoryAction(xAddrIndirect.Register.Value, xAddrIndirect.Displacement) { IsIndirect = true };
+                                //TODO: HACK.... This defaults all registers without the size argument to 32. We need to really rebuild this code
+                                return new MemoryAction(xAddrIndirect.Register.Value, xAddrIndirect.Displacement) { Size = 32, IsIndirect = true };
                             } else {
                                 return new MemoryAction(xAddrIndirect.Address, xAddrIndirect.Displacement) { IsIndirect = true };
                             }
@@ -58,7 +59,8 @@ namespace Cosmos.Compiler.XSharp {
                     var xAddrDirect = aAddress as AddressDirect;
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                          // Default is 32, in future save type that created the label, ie DataMemberInt vs DataMemberByte and set the size
+                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }

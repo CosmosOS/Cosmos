@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
     public static readonly RegisterEBX Instance = new RegisterEBX();
 
     public static RegisterEBX operator ++(RegisterEBX aRegister) {
-      new Inc { DestinationReg = aRegister.GetId() };
+      new INC { DestinationReg = aRegister.GetId() };
       return aRegister;
     }
     public static RegisterEBX operator --(RegisterEBX aRegister) {

@@ -8,7 +8,7 @@
   // are cases where the long form could be preferred. Thus instead we have 
   // chosen to follow the NASM model in our code.
   [OpCode("Int3")]
-  public class Int3 : Instruction {
+  public class INT3 : Instruction {
   }
 
 }

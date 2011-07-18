@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
         public static readonly RegisterESP Instance = new RegisterESP();
 
         public static RegisterESP operator ++(RegisterESP aRegister) {
-          new Inc { DestinationReg = aRegister.GetId() };
+          new INC { DestinationReg = aRegister.GetId() };
           return aRegister;
         }
         public static RegisterESP operator +(RegisterESP aRegister, UInt32 aValue) {

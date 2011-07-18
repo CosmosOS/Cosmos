@@ -69,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDI, SourceValue = 1 };
 
 					// increment shift counter
-					new CPUx86.Inc { DestinationReg = CPUx86.Registers.ECX};
+					new CPUx86.INC { DestinationReg = CPUx86.Registers.ECX};
 
 					// set flags
 					new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };

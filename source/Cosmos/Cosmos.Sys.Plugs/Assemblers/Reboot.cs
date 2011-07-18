@@ -16,7 +16,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             SourceValue = 0x64,
             DestinationReg = CPUx86.Registers.DX
           };
-          new CPUx86.In {
+          new CPUx86.IN {
             DestinationReg = CPUx86.Registers.AL
           };
           new CPUx86.Test {
@@ -43,7 +43,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             SourceValue = 0x64,
             DestinationReg = CPUx86.Registers.DX
           };
-          new CPUx86.In {
+          new CPUx86.IN {
             DestinationReg = CPUx86.Registers.AL
           };
           new CPUx86.Test {

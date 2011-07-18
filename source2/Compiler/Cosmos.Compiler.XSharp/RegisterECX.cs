@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
     public static readonly RegisterECX Instance = new RegisterECX();
 
     public static RegisterECX operator ++(RegisterECX aRegister) {
-      new Inc { DestinationReg = aRegister.GetId() };
+      new INC { DestinationReg = aRegister.GetId() };
       return aRegister;
     }
     public static RegisterECX operator --(RegisterECX aRegister) {

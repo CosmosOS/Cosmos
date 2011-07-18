@@ -32,7 +32,7 @@ namespace Cosmos.Compiler.XSharp {
         }
 
         public static MemoryAction operator ++(MemoryAction aTarget) {
-            aTarget.ApplyToDest(new Inc());
+            aTarget.ApplyToDest(new INC());
             return null;
         }
 

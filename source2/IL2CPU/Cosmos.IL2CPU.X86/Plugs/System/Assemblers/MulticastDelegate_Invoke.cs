@@ -128,7 +128,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 			//new CPUx86.Move("[esp]", "edi");
 			new CPU.Label(".noTHIStoPop");
 			new CPUx86.Popad();
-            new CPUx86.Inc { DestinationReg = Registers.EDX };
+            new CPUx86.INC { DestinationReg = Registers.EDX };
             new CPUx86.Add { DestinationReg = Registers.EAX, SourceValue = 4 };
             new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
 			new CPU.Label(".END_OF_INVOKE_");

@@ -209,7 +209,7 @@ namespace Cosmos.Compiler.XSharp {
       new Return { DestinationValue = aBytes };
     }
     public void ReturnFromInterrupt() {
-      new InterruptReturn();
+      new IRET();
     }
 
     public void EnableInterrupts() {

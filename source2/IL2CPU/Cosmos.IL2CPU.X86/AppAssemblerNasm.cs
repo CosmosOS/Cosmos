@@ -478,7 +478,7 @@ namespace Cosmos.IL2CPU.X86 {
       }
 
       // If we made it this far without a return, emit the Tracer
-      new CPUx86.Int3();
+      new CPUx86.INT3();
     }
 
     private int[] xCodeOffsets;
