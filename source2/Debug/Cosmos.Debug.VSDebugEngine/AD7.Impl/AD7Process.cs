@@ -511,7 +511,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       string xFile = mSourceMappings.Values[xIdx].SourceFile;
       int xLineNo = mSourceMappings.Values[xIdx].Line;
       int xCol = mSourceMappings.Values[xIdx].Column;
-
+      //
       var xLabels = new List<string>();
       xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress].Trim().ToUpper());
       for (int i = xIdx; i < mSourceMappings.Values.Count; i++) {
@@ -522,16 +522,15 @@ namespace Cosmos.Debug.VSDebugEngine {
         xLabels.Add(mAddressLabelMappings[mSourceMappings.Keys[i]].Trim().ToUpper());
       }
 
-      // Extract relevant lines from .ASM file.
       var xLines = File.ReadAllLines(Path.ChangeExtension(mISO, ".asm"));
 
-      // Fine line in ASM that starts the code block
+      // Find line in ASM that starts the code block.
       int xStart = -1;
       for (int i = 0; i < xLines.Length; i++) {
         string xLine = xLines[i].Trim();
         if (xLine.EndsWith(":")) {
           if (xLabels.Contains(xLine.Substring(0, xLine.Length - 1).ToUpper())) {
-            // Found the first match, store and break.
+            // Found the first match, store the index and break.
             xStart = i;
             break;
           }
@@ -544,17 +543,26 @@ namespace Cosmos.Debug.VSDebugEngine {
         for (int i = xStart; i < xLines.Length; i++) {
           string xLine = xLines[i].TrimEnd();
           if (xLine.EndsWith(":")) {
+            // Its a label, lets check it
             string xTest = xLine.Trim().ToUpper();
-            if (xLabels.Contains(xTest.Substring(0, xTest.Length - 1))) {
+            if (xTest.EndsWith("#:")) {
+              // Found an ASM label.
               xCode.AppendLine(xLine);
-            }
-            else if (xLabels.Contains(xTest.Substring(0, xTest.Length - (xTest.Length - xTest.LastIndexOf('.'))))) {
-              xCode.AppendLine(xLine);  
+            } else if (xLabels.Contains(xTest.Substring(0, xTest.Length - 1))) {
+              // Found an exact match. Our label is in the label list
+              xCode.AppendLine(xLine);
             } else {
-              // Found the first non-match, stop here
-              break;
+              // We need to check to see if its a local label. ie .True, etc.
+              int xLastDot = xTest.LastIndexOf('.');
+              if (xLabels.Contains(xTest.Substring(0, xLastDot - 1))) {
+                xCode.AppendLine(xLine);
+              } else {
+                // Found the first non-match, stop here
+                break;
+              }
             }
           } else {
+            // Not a label, just output it
             xCode.AppendLine(xLine);
           }
         }

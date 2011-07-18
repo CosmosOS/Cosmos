@@ -60,8 +60,10 @@ namespace Cosmos.Cosmos_VS_Windows {
           }
           
           xDisplayLine = xDisplayLine.Trim();
-          if (!xTestLine.EndsWith(":")) {
-            tblkSource.Inlines.Add(new LineBreak()); // Add blank line before labels
+          if (xTestLine.EndsWith(":")) {
+            // Insert a blank line before labels
+            tblkSource.Inlines.Add(new LineBreak());
+          } else {
             xDisplayLine = "\t" + xDisplayLine;
           }
         }
