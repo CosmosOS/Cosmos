@@ -11,8 +11,6 @@ namespace Cosmos.Hardware
     /// </summary>
     public class Mouse
     {
-        private Cosmos.Core.IOGroup.Mouse g = new Core.IOGroup.Mouse();
-
         /// <summary>
         /// The X location of the mouse.
         /// </summary>
@@ -34,18 +32,18 @@ namespace Cosmos.Hardware
         {
             ////enable mouse
             WaitSignal();
-            g.p64.Byte = (byte)0xA8;
+            BaseIOGroups.Mouse.p64.Byte = (byte)0xA8;
 
             //// enable interrupt
             WaitSignal();
-            g.p64.Byte = (byte)0x20;
+            BaseIOGroups.Mouse.p64.Byte = (byte)0x20;
             WaitData();
-            //byte status1 = (byte)(g.p60.Byte);
-            byte status = (byte)(g.p60.Byte | 2);
+            //byte status1 = (byte)(BaseIOGroups.Mouse.p60.Byte);
+            byte status = (byte)(BaseIOGroups.Mouse.p60.Byte | 2);
             WaitSignal();
-            g.p64.Byte = (byte)0x60;
+            BaseIOGroups.Mouse.p64.Byte = (byte)0x60;
             WaitSignal();
-            g.p60.Byte = (byte)status;
+            BaseIOGroups.Mouse.p60.Byte = (byte)status;
 
             ////default 
             Write(0xF6);
@@ -68,20 +66,20 @@ namespace Cosmos.Hardware
         private void Write(byte b)
         {
             WaitSignal();
-            g.p64.Byte = 0xD4;
+            BaseIOGroups.Mouse.p64.Byte = 0xD4;
             WaitSignal();
-            g.p60.Byte = b;
+            BaseIOGroups.Mouse.p60.Byte = b;
         }
 
         private void WaitData()
         {
-            for (int i = 0; i < 100 & ((g.p64.Byte & 1) == 1); i++)
+            for (int i = 0; i < 100 & ((BaseIOGroups.Mouse.p64.Byte & 1) == 1); i++)
                 ;
         }
 
         private void WaitSignal()
         {
-            for (int i = 0; i < 100 & ((g.p64.Byte & 2) != 0); i++)
+            for (int i = 0; i < 100 & ((BaseIOGroups.Mouse.p64.Byte & 2) != 0); i++)
                 ;
         }
 
