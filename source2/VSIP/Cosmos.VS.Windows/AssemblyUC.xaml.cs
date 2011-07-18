@@ -26,7 +26,9 @@ namespace Cosmos.Cosmos_VS_Windows {
       InitializeComponent();
 
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
-      if ((mData != null) && (mData.Length > 0)) Update(mData); 
+      if ((mData != null) && (mData.Length > 0)) {
+        Update(mData);
+      }
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e) {
