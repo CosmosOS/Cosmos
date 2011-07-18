@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
@@ -8,6 +7,7 @@ namespace Cosmos.Core
 {
     public class INTs
     {
+        #region Enums
         // TODO: Protect IRQs like memory and ports are
         // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
         public enum EFlagsEnum : uint
@@ -140,6 +140,7 @@ namespace Cosmos.Core
             [FieldOffset(56)]
             public uint UserESP;
         }
+        #endregion
 
         private static InterruptDelegate[] mIRQ_Handlers = new InterruptDelegate[256];
 
@@ -147,10 +148,12 @@ namespace Cosmos.Core
         //Interrupts.IRQ01 += HandleKeyboardInterrupt;
         // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
         // [1:48:37 PM] Matthijs ter Woord: the issues were: "they didn't work, would crash kernel". not sure if we still have them..
-        public static void SetIntHandler(byte aIntNo, InterruptDelegate aHandler) {
+        public static void SetIntHandler(byte aIntNo, InterruptDelegate aHandler)
+        {
             mIRQ_Handlers[aIntNo] = aHandler;
         }
-        public static void SetIrqHandler(byte aIrqNo, InterruptDelegate aHandler) {
+        public static void SetIrqHandler(byte aIrqNo, InterruptDelegate aHandler)
+        {
             SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
         }
 
@@ -180,6 +183,8 @@ namespace Cosmos.Core
 
         public delegate void InterruptDelegate(ref IRQContext aContext);
         public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
+
+        #region Default Interrupt Handlers
 
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(ref IRQContext aContext)
@@ -295,8 +300,7 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_35(ref IRQContext aContext)
         {
-            Global.Dbg.SendMessage("Interrupts",
-                                                  "Interrupt 35 handler");
+            Global.Dbg.SendMessage("Interrupts", "Interrupt 35 handler");
             aContext.EAX *= 2;
             aContext.EBX *= 2;
             aContext.ECX *= 2;
@@ -310,21 +314,17 @@ namespace Cosmos.Core
             Global.Dbg.SendMessage("IRQ", "Secondary IDE");
             Global.PIC.EoiSlave();
         }
+        #endregion
 
+        #region CPU Exceptions
         public static void HandleInterrupt_00(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Divide by zero",
-                            "EDivideByZero",
-                            ref aContext);
+            HandleException(aContext.EIP, "Divide by zero", "EDivideByZero", ref aContext);
         }
 
         public static void HandleInterrupt_06(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Invalid Opcode",
-                            "EInvalidOpcode",
-                            ref aContext);
+            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext);
         }
 
         public static event ExceptionInterruptDelegate GeneralProtectionFault;
@@ -334,155 +334,101 @@ namespace Cosmos.Core
             bool xHandled = false;
             if (GeneralProtectionFault != null)
             {
-                GeneralProtectionFault(ref aContext,
-                                       ref xHandled);
+                GeneralProtectionFault(ref aContext, ref xHandled);
             }
             if (!xHandled)
             {
-                HandleException(aContext.EIP,
-                                "General Protection Fault",
-                                "GPF",
-                                ref aContext);
+                HandleException(aContext.EIP, "General Protection Fault", "GPF", ref aContext);
             }
         }
 
         public static void HandleInterrupt_01(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Debug Exception",
-                            "Debug Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Debug Exception", "Debug Exception", ref aContext);
         }
 
         public static void HandleInterrupt_02(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Non Maskable Interrupt Exception",
-                            "Non Maskable Interrupt Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Non Maskable Interrupt Exception", "Non Maskable Interrupt Exception", ref aContext);
         }
 
         public static void HandleInterrupt_03(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Breakpoint Exception",
-                            "Breakpoint Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Breakpoint Exception", "Breakpoint Exception", ref aContext);
         }
 
         public static void HandleInterrupt_04(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Into Detected Overflow Exception",
-                            "Into Detected Overflow Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Into Detected Overflow Exception", "Into Detected Overflow Exception", ref aContext);
         }
 
         public static void HandleInterrupt_05(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Out of Bounds Exception",
-                            "Out of Bounds Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Out of Bounds Exception", "Out of Bounds Exception", ref aContext);
         }
 
         public static void HandleInterrupt_07(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "No Coprocessor Exception",
-                            "No Coprocessor Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "No Coprocessor Exception", "No Coprocessor Exception", ref aContext);
         }
 
         public static void HandleInterrupt_08(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Double Fault Exception",
-                            "Double Fault Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Double Fault Exception", "Double Fault Exception", ref aContext);
         }
 
         public static void HandleInterrupt_09(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Coprocessor Segment Overrun Exception",
-                            "Coprocessor Segment Overrun Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Coprocessor Segment Overrun Exception", "Coprocessor Segment Overrun Exception", ref aContext);
         }
 
         public static void HandleInterrupt_0A(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Bad TSS Exception",
-                            "Bad TSS Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Bad TSS Exception", "Bad TSS Exception", ref aContext);
         }
 
         public static void HandleInterrupt_0B(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Segment Not Present",
-                            "Segment Not Present",
-                            ref aContext);
+            HandleException(aContext.EIP, "Segment Not Present", "Segment Not Present", ref aContext);
         }
 
         public static void HandleInterrupt_0C(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Stack Fault Exception",
-                            "Stack Fault Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Stack Fault Exception", "Stack Fault Exception", ref aContext);
         }
 
         public static void HandleInterrupt_0E(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Page Fault Exception",
-                            "Page Fault Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Page Fault Exception", "Page Fault Exception", ref aContext);
         }
 
         public static void HandleInterrupt_0F(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Unknown Interrupt Exception",
-                            "Unknown Interrupt Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", ref aContext);
         }
 
         public static void HandleInterrupt_10(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Coprocessor Fault Exception",
-                            "Coprocessor Fault Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Coprocessor Fault Exception", "Coprocessor Fault Exception", ref aContext);
         }
 
         public static void HandleInterrupt_11(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Alignment Exception",
-                            "Alignment Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Alignment Exception", "Alignment Exception", ref aContext);
         }
 
         public static void HandleInterrupt_12(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP,
-                            "Machine Check Exception",
-                            "Machine Check Exception",
-                            ref aContext);
+            HandleException(aContext.EIP, "Machine Check Exception", "Machine Check Exception", ref aContext);
         }
+        #endregion
 
-        private static void HandleException(uint aEIP,
-                                            string aDescription,
-                                            string aName,
-                                            ref IRQContext ctx)
+        private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx)
         {
           // At this point we are in a very unstable state.
           // Try not to use any Cosmos routines, just
           // report a crash dump.
-            const string SysFault = "*** System Fault ***  ";
+            const string SysFault = " *** System Fault ***  ";
             const string xHex = "0123456789ABCDEF";
             uint xPtr = ctx.EIP;
 
@@ -492,12 +438,60 @@ namespace Cosmos.Core
             unsafe
             {
                 byte* xAddress = (byte*)0xB8000;
+                xAddress[0] = (byte)' ';
                 xAddress[1] = 0x0C;
-                xAddress[0] = (byte)'x';
+                xAddress[2] = (byte)'*';
                 xAddress[3] = 0x0C;
-                xAddress[2] = (byte)xHex[(int)((ctx.Interrupt >> 4) & 0xF)];
+                xAddress[4] = (byte)'*';
                 xAddress[5] = 0x0C;
-                xAddress[4] = (byte)xHex[(int)(ctx.Interrupt & 0xF)];
+                xAddress[6] = (byte)'*';
+                xAddress[7] = 0x0C;
+                xAddress[8] = (byte)' ';
+                xAddress[9] = 0x0C;
+                xAddress[10] = (byte)'C';
+                xAddress[11] = 0x0C;
+                xAddress[12] = (byte)'P';
+                xAddress[13] = 0x0C;
+                xAddress[14] = (byte)'U';
+                xAddress[15] = 0x0C;
+                xAddress[16] = (byte)' ';
+                xAddress[17] = 0x0C;
+                xAddress[18] = (byte)'E';
+                xAddress[19] = 0x0C;
+                xAddress[20] = (byte)'x';
+                xAddress[21] = 0x0C;
+                xAddress[22] = (byte)'c';
+                xAddress[23] = 0x0C;
+                xAddress[24] = (byte)'e';
+                xAddress[25] = 0x0C;
+                xAddress[26] = (byte)'p';
+                xAddress[27] = 0x0C;
+                xAddress[28] = (byte)'t';
+                xAddress[29] = 0x0C;
+                xAddress[30] = (byte)'i';
+                xAddress[31] = 0x0C;
+                xAddress[32] = (byte)'o';
+                xAddress[33] = 0x0C;
+                xAddress[34] = (byte)'n';
+                xAddress[35] = 0x0C;
+                xAddress[36] = (byte)' ';
+                xAddress[37] = 0x0C;
+                xAddress[38] = (byte)'x';
+                xAddress[39] = 0x0C;
+                xAddress[40] = (byte)xHex[(int)((ctx.Interrupt >> 4) & 0xF)];
+                xAddress[41] = 0x0C;
+                xAddress[42] = (byte)xHex[(int)(ctx.Interrupt & 0xF)];
+                xAddress[43] = 0x0C;
+                xAddress[44] = (byte)' ';
+                xAddress[45] = 0x0C;
+                xAddress[46] = (byte)'*';
+                xAddress[47] = 0x0C;
+                xAddress[48] = (byte)'*';
+                xAddress[49] = 0x0C;
+                xAddress[50] = (byte)'*';
+                xAddress[51] = 0x0C;
+                xAddress[52] = (byte)' ';
+                xAddress[53] = 0x0C;
             }
 
           // lock up
