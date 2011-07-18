@@ -40,23 +40,33 @@ namespace Cosmos.Cosmos_VS_Windows {
       }
 
       mCode = Encoding.ASCII.GetString(mData);
-      mCode = mCode.Replace("\t", "  ");
 
       string[] xLines = mCode.Split('\n');
       foreach (string xLine in xLines) {
-        string xTestLine = xLine.Trim();
+        string xDisplayLine = xLine;
+        string xTestLine = xLine.Trim().ToUpper();
 
         if (aFilter) {
-          if (string.Compare(xTestLine, "INT3", true) == 0) {
+          if (xTestLine == "INT3") {
             continue;
           } else if (xTestLine.StartsWith("; #")) {
+            // Comments which are signals for the parser
             continue;
           } else if (xTestLine.EndsWith("#:")) {
+            // Hidden labels (ASM stepping, only add noise for user)
             continue;
+          } else if (xTestLine.Length == 0) {
+            continue;
+          }
+          
+          xDisplayLine = xDisplayLine.Trim();
+          if (!xTestLine.EndsWith(":")) {
+            tblkSource.Inlines.Add(new LineBreak()); // Add blank line before labels
+            xDisplayLine = "\t" + xDisplayLine;
           }
         }
 
-        var xRun = new Run(xLine);
+        var xRun = new Run(xDisplayLine);
         if (xTestLine.EndsWith(":")) {
           xRun.Foreground = Brushes.Black;
         } else if (xTestLine.StartsWith(";")) {
@@ -66,6 +76,7 @@ namespace Cosmos.Cosmos_VS_Windows {
         }
 
         tblkSource.Inlines.Add(xRun);
+        tblkSource.Inlines.Add(new LineBreak());
       }
     }
 
