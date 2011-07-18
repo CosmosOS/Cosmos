@@ -647,55 +647,14 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Get AL back so we can compare it, but also put it back for later
         EAX = Memory[ESP];
-
-        AL.Compare(DsCommand.TraceOff);
-        JumpIf(Flags.NotEqual, ".TraceOffAfter");
-        Memory["DebugTraceMode", 32] = Tracing.Off;
-        Jump(".SendACK");
-        Label = ".TraceOffAfter";
-
-        AL.Compare(DsCommand.TraceOn);
-        JumpIf(Flags.NotEqual, ".TraceOnAfter");
-        Memory["DebugTraceMode", 32] = Tracing.On;
-        Jump(".SendACK");
-        Label = ".TraceOnAfter";
-
-        AL.Compare(DsCommand.Break);
-        JumpIf(Flags.NotEqual, ".BreakAfter");
-        Call<Break>();
-        Jump(".SendACK");
-        Label = ".BreakAfter";
-
-        AL.Compare(DsCommand.BreakOnAddress);
-        JumpIf(Flags.NotEqual, ".BreakOnAddressAfter");
-        Call<BreakOnAddress>();
-        Jump(".SendACK");
-        Label = ".BreakOnAddressAfter";
-
-        AL.Compare(DsCommand.SendMethodContext);
-        JumpIf(Flags.NotEqual, ".SendMethodContextAfter");
-        Call<SendMethodContext>();
-        Jump(".SendACK");
-        Label = ".SendMethodContextAfter";
-
-        AL.Compare(DsCommand.SendMemory);
-        JumpIf(Flags.NotEqual, ".SendMemoryAfter");
-        Call<SendMemory>();
-        Jump(".SendACK");
-        Label = ".SendMemoryAfter";
-
-        AL.Compare(DsCommand.SendRegisters);
-        JumpIf(Flags.NotEqual, ".SendRegistersAfter");
-        Call<SendRegisters>();
-        Jump(".SendACK");
-        Label = ".SendRegistersAfter";
-
-        AL.Compare(DsCommand.SendFrame);
-        JumpIf(Flags.NotEqual, ".SendFrameAfter");
-        Call<SendFrame>();
-        Jump(".SendACK");
-        Label = ".SendFrameAfter";
-
+        CheckCmd(DsCommand.TraceOff, typeof(TraceOff));
+        CheckCmd(DsCommand.TraceOn, typeof(TraceOn));
+        CheckCmd(DsCommand.Break, typeof(Break));
+        CheckCmd(DsCommand.BreakOnAddress, typeof(BreakOnAddress));
+        CheckCmd(DsCommand.SendMethodContext, typeof(SendMethodContext));
+        CheckCmd(DsCommand.SendMemory, typeof(SendMemory));
+        CheckCmd(DsCommand.SendRegisters, typeof(SendRegisters));
+        CheckCmd(DsCommand.SendFrame, typeof(SendFrame));
         CheckCmd(DsCommand.SendStack, typeof(SendStack));
 
         Label = ".SendACK";
@@ -728,6 +687,18 @@ namespace Cosmos.Compiler.DebugStub {
         Call(aFunction);
         Jump(".SendACK");
         Label = xAfterLabel;
+      }
+    }
+
+    public class TraceOff : CodeBlock {
+      public override void Assemble() {
+        Memory["DebugTraceMode", 32] = Tracing.Off;
+      }
+    }
+
+    public class TraceOn : CodeBlock {
+      public override void Assemble() {
+        Memory["DebugTraceMode", 32] = Tracing.On;
       }
     }
 
