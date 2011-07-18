@@ -153,7 +153,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // now ECX contains size of data (count)
         // EAX contains relative to EBP
-        ESI = Memory[CallerEBP, 32];
+        ESI = Memory[CallerEBP];
         ESI.Add(EAX);
 
         Label = ".SendByte";
@@ -573,7 +573,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL = (int)DsMsgType.Registers; // Send the actual started signal
         Call<WriteALToComPort>();
         
-        ESI = Memory["DebugPushAllPtr", 32];
+        ESI = Memory["DebugPushAllPtr"];
         WriteBytesToComPort(32);
         ESI = AddressOf(CallerESP);
         WriteBytesToComPort(4);
@@ -591,7 +591,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX = (uint)xCount;
         Call<WriteAXToComPort>();
 
-        ESI = Memory[CallerEBP, 32];
+        ESI = Memory[CallerEBP];
         ESI.Add(8); // Dont transmit EIP or old EBP
         WriteBytesToComPort(xCount);
       }
@@ -603,15 +603,15 @@ namespace Cosmos.Compiler.DebugStub {
         Call<WriteALToComPort>();
 
         // Send size of bytes
-        ESI = Memory[CallerESP, 32];
-        EAX = Memory[CallerEBP, 32];
+        ESI = Memory[CallerESP];
+        EAX = Memory[CallerEBP];
         EAX.Sub(ESI);
         Call<WriteAXToComPort>();
 
         // Send actual bytes
         //
         // Need to reload ESI, WriteAXToCompPort modifies it
-        ESI = Memory[CallerESP, 32];
+        ESI = Memory[CallerESP];
         Label = ".SendByte";
         ESI.Compare(Memory[CallerEBP, 32]);
         JumpIf(Flags.Equal, ".Exit");
@@ -636,7 +636,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Read Command ID
         Call<ReadALFromComPort>();
-        Memory["DebugStub_CommandID", 32] = EAX;
+        Memory["DebugStub_CommandID"] = EAX;
 
         // Get AL back so we can compare it, but also put it back for later
         EAX.Pop();
@@ -730,7 +730,7 @@ namespace Cosmos.Compiler.DebugStub {
       // Modifies: EAX, EDI, ECX
       public override void Assemble() {
         // Look for a possible matching BP
-        EAX = Memory[CallerEIP, 32];
+        EAX = Memory[CallerEIP];
         EDI = AddressOf("DebugBPs");
         ECX = 256;
         new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
@@ -763,7 +763,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
         Label = "Debug__StepOver__";
-        EAX = Memory[CallerEBP, 32];
+        EAX = Memory[CallerEBP];
         EAX.Compare(Memory["DebugBreakEBP", 32]);
         // If EBP and start EBP arent equal, dont break
         // Dont use Equal because we aslo need to stop above if the user starts
@@ -776,7 +776,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
 
-        EAX = Memory[CallerEBP, 32]; // TODO: X# Allow memory object instead of string, maybe the Datamember object itself. ie EAX = DebugEBP, and below inside Compare
+        EAX = Memory[CallerEBP]; 
         EAX.Compare(Memory["DebugBreakEBP", 32]); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
@@ -854,8 +854,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(DsCommand.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
-        // TODO: Change this so ,32 is not necessary, can be implied by 32 bit register - ie Memory["DebugBreakEBP", 32] = EBP;
-        EAX = Memory[CallerEBP, 32];
+        EAX = Memory[CallerEBP];
         Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
@@ -863,7 +862,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(DsCommand.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
-        EAX = Memory[CallerEBP, 32];
+        EAX = Memory[CallerEBP];
         Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOut_After";
@@ -887,7 +886,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // EBP is restored by PopAll, but SendFrame uses it. Could
         // get it from the PushAll data, but this is easier.
-        Memory[CallerEBP, 32] = EBP;
+        Memory[CallerEBP] = EBP;
 
         // Could also get ESP from PushAll but this is easier
         // Another reason to do it here is that soem day we may need to use 
@@ -898,7 +897,7 @@ namespace Cosmos.Compiler.DebugStub {
         // But for now we remove from ESP which the call to us produces,
         // store ESP, then restore ESP so we don't cause stack corruption.
         ESP = ESP + 12; // 12 bytes for EFLAGS, CS, EIP
-        Memory[CallerESP, 32] = ESP;
+        Memory[CallerESP] = ESP;
         ESP = ESP - 12;
 
         // If debug stub is in break, and then an IRQ happens, the IRQ
@@ -929,7 +928,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // All clear, mark that we are entering the debug stub
         Label = "DebugStub_Start";
-        Memory[IsRunning, 32] = 1;
+        Memory[IsRunning] = 1;
 
         // DS is now marked not to re-enter, so re-enable interrupts if
         // they were enabled on entry
@@ -955,7 +954,7 @@ namespace Cosmos.Compiler.DebugStub {
         // be changing ops that call this stub.
         EAX--; 
         // Store it for later use.
-        Memory[CallerEIP, 32] = EAX;
+        Memory[CallerEIP] = EAX;
 
         // Call secondary stub
         Call<Executing>();
@@ -968,7 +967,7 @@ namespace Cosmos.Compiler.DebugStub {
         // So just to be safe, we disable interrupts while we do this.
         DisableInterrupts();
         // Complete, mark that DebugStub is complete
-        Memory[IsRunning, 32] = 0;
+        Memory[IsRunning] = 0;
 
         Label = "DebugStub_CheckIntAndReturn";
         // Re-enable interrupts if needed. This happens on normal exit, or call from above

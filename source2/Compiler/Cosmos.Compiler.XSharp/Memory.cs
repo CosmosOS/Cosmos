@@ -60,7 +60,7 @@ namespace Cosmos.Compiler.XSharp {
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
                           // Default is 32, in future save type that created the label, ie DataMemberInt vs DataMemberByte and set the size
-                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }

@@ -20,7 +20,7 @@ namespace Cosmos.Compiler.XSharp {
         }
 
         public static implicit operator Address(DataMember aMember) {
-          return new AddressDirect(aMember.Name);
+          return new AddressIndirect(aMember.Name, 0);
         }
 
     }
