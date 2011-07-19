@@ -193,7 +193,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX = EAX << 2;
         EBX.Add(EAX);
 
-        Memory[EBX] = ECX;
+        EBX[0] = ECX;
       }
     }
 
@@ -516,11 +516,11 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Read and copy string till 0 terminator
         Label = ".ReadChar";
-        AL = ESI[8];
+        AL = ESI[0];
         AL.Compare(0);
         JumpIf(Flags.Equal, ".AfterMsg");
         ESI++;
-        Memory[EDI, 8] = AL;
+        EDI[0] = AL;
         EDI++;
         EDI++;
         Jump(".ReadChar");
@@ -606,15 +606,14 @@ namespace Cosmos.Compiler.DebugStub {
     public class Cls : CodeBlock {
       public override void Assemble() {
         ESI = VidBase;
-        // TODO: X# upgrade this
         Label = "DebugStub_Cls_More";
-        //TODO: Fix to direct memory write after we fix the X# bug with Memory[ESI, 8] = 0x0A;
         AL = 0x00;
-        Memory[ESI, 8] = AL; // Text
+        // Why add 8 to ESI every time? Why not just add 8 in the first place?
+        ESI[0] = AL; // Text
         ESI++;
 
         AL = 0x0A;
-        Memory[ESI, 8] = AL; // Colour
+        ESI[0] = AL; // Colour
         ESI++;
 
         ESI.Compare(VidBase + 25 * 80 * 2);
@@ -698,7 +697,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX = EDI[0];
         Memory[AsmOrigByte] = EAX;
         // Inject INT3
-        Memory[EDI] = 0xCC;
+        EDI[0] = 0xCC;
         // Save EIP of the break
         Memory[AsmBreakEIP] = EDI;
       }
@@ -708,7 +707,7 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         // Clear old break point
         EAX = Memory[AsmOrigByte];
-        Memory[EDI] = EAX;
+        EDI[0] = EAX;
         Memory[AsmOrigByte] = 0;
       }
     }
@@ -818,7 +817,7 @@ namespace Cosmos.Compiler.DebugStub {
       // http://wiki.osdev.org/Serial_ports
       public override void Assemble() {
         Call<ReadALFromComPort>();
-        Memory[EDI, 8] = AL;
+        EDI[0] = AL;
         EDI++;
       }
     }

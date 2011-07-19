@@ -18,13 +18,12 @@ namespace Cosmos.Compiler.XSharp {
     // -Operator overloading and implicits must exist ON the final class
     // -Generics cannot be used because of above
 
-    public static AddressIndirect operator +(Register32 aBaseRegister, Int32 aDisplacement) {
-      return new AddressIndirect(aBaseRegister, aDisplacement);
-    }
-
     public MemoryAction this[int aOffset] {
       get {
         return new MemoryAction(GetId(), aOffset);
+      }
+      set {
+        new Move { DestinationReg = GetId(), DestinationDisplacement = aOffset, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
       }
     }
 

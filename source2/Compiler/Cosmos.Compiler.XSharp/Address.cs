@@ -7,10 +7,6 @@ using Cosmos.Compiler.Assembler;
 namespace Cosmos.Compiler.XSharp {
     public class Address {
 
-        public static implicit operator Address(Register32 aRegister) {
-            return new AddressIndirect(aRegister, 0);
-        }
-
         public static implicit operator Address(UInt32 aAddress) {
             return new AddressIndirect(aAddress, 0);
         }
