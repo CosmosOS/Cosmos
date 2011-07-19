@@ -45,6 +45,7 @@ namespace Cosmos.Cosmos_VS_Windows {
       foreach (string xLine in xLines) {
         string xDisplayLine = xLine;
         string xTestLine = xLine.Trim().ToUpper();
+        var xParts = xTestLine.Split(' ');
 
         if (aFilter) {
           if (xTestLine == "INT3") {
@@ -52,7 +53,6 @@ namespace Cosmos.Cosmos_VS_Windows {
           } else if (xTestLine.Length == 0) {
             continue;
           } else {
-            var xParts = xTestLine.Split(' ');
             if (xParts.Length > 1) {
               if (xParts[1] == ";ASM") {
                 continue;
@@ -61,7 +61,7 @@ namespace Cosmos.Cosmos_VS_Windows {
           }
           
           xDisplayLine = xDisplayLine.Trim();
-          if (xTestLine.EndsWith(":")) {
+          if (xParts[0].EndsWith(":")) {
             // Insert a blank line before labels
             tblkSource.Inlines.Add(new LineBreak());
           } else {
@@ -70,7 +70,7 @@ namespace Cosmos.Cosmos_VS_Windows {
         }
 
         var xRun = new Run(xDisplayLine);
-        if (xTestLine.EndsWith(":")) {
+        if (xParts[0].EndsWith(":")) {
           xRun.Foreground = Brushes.Black;
         } else if (xTestLine.StartsWith(";")) {
           xRun.Foreground = Brushes.Green;
