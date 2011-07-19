@@ -506,9 +506,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public void SendAssembly() {
-      //DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes("test"));
-      //return;
-
       // Scan and make a list of labels that belong to this line of code
       int xIdx = mSourceMappings.Keys.IndexOf((uint)mCurrentAddress);
       string xFile = mSourceMappings.Values[xIdx].SourceFile;
@@ -528,27 +525,28 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
 
-      var xLines = File.ReadAllLines(Path.ChangeExtension(mISO, ".asm"));
-
-      // Find line in ASM that starts the code block.
-      int xStart = -1;
-      for (int i = 0; i < xLines.Length; i++) {
-        var xParts = xLines[i].Trim().Split(' ');
-        if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
-          if (xLabels.ContainsKey(xParts[0])) {
-            // Found the first match, store the index and break.
-            xStart = i;
+      var xCode = new StringBuilder();
+      using (var xSR = new StreamReader(Path.ChangeExtension(mISO, ".asm"))) {
+        // Find line in ASM that starts the code block.
+        string xLine;
+        while (true) {
+          xLine = xSR.ReadLine();
+          if (xLine == null) {
             break;
           }
-        }
-      }
 
-      var xCode = new StringBuilder();
-      if (xStart > -1) {
-        // Extract the actual lines
-        for (int i = xStart; i < xLines.Length; i++) {
-          string xLine = xLines[i].Trim();
-          var xParts = xLine.Split(' ');
+          var xParts = xLine.Trim().Split(' ');
+          if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
+            if (xLabels.ContainsKey(xParts[0])) {
+              // Found the first match, break.
+              break;
+            }
+          }
+        } 
+
+        while (xLine != null) {
+          // Extract the pertinent lines
+          var xParts = xLine.Trim().Split(' ');
           if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
             // Its a label, lets check it
             if (xParts.Length == 1) {
@@ -571,6 +569,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             // Not a label, just output it
             xCode.AppendLine(xLine);
           }
+          xLine = xSR.ReadLine();
         }
       }
       // Send source code to the tool window
