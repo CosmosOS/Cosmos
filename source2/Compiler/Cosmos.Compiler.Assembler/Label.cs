@@ -18,18 +18,19 @@ namespace Cosmos.Compiler.Assembler {
     }
 
     public Label(string aName, string aComment) {
-      mName = aName;
-      if (aName.StartsWith(".")) {
-        QualifiedName = LastFullLabel + aName;
+      // Dont use . in labels. Although they are legal in NASM, GDB cannot handle them in labels while debugging.
+      // Some older code still passes in full dotted labels, so we replace.
+      mName = aName.Replace('.', '#');
+      if (mName.StartsWith("#")) {
+        QualifiedName = LastFullLabel + mName;
       } else {
-        QualifiedName = aName;
-        // Some older code passes the whole label in the argument, so we check for any . in it.
-        // That assumes that the main prefix can never have a . in it.
-        // This code isnt perfect and doenst label X# code properly, but we don't care about
-        // auto emitted X# labels for now.
-        var xParts = aName.Split('.');
+        QualifiedName = mName;
+        // Some older code passes the whole label in the argument, so we check for any ./# in it.
+        // That assumes that the main prefix can never have a # in it.
+        // This code isnt perfect and doenst always label X# code properly.
+        var xParts = mName.Split('#');
         if (xParts.Length < 3) {
-          LastFullLabel = aName;
+          LastFullLabel = mName;
         }
       }
       Comment = aComment;
@@ -37,8 +38,9 @@ namespace Cosmos.Compiler.Assembler {
 
     public static string GetLabel(object aObject) {
       Label xLabel = aObject as Label;
-      if (xLabel == null)
+      if (xLabel == null) { 
         return "";
+      }
       return xLabel.Name;
     }
 

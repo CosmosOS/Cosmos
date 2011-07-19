@@ -13,8 +13,8 @@ namespace Cosmos.IL2CPU.X86
 {
     public abstract class AppAssembler: IL2CPU.AppAssembler
     {
-      public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
-      public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
+      public const string EndOfMethodLabelNameNormal = "#END__OF__METHOD_NORMAL";
+      public const string EndOfMethodLabelNameException = "#END__OF__METHOD_EXCEPTION";
 
 
         public AppAssembler(byte comportNumber)
