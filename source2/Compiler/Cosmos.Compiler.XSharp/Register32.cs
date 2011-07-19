@@ -13,11 +13,19 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     // Not all overloads can go here.
-    // 1- C# overloads specifically by exact class and does not inherit in many cases
-    // 2- x86 does not support all operations on all registers
+    // -C# overloads specifically by exact class and does not inherit in many cases
+    // -x86 does not support all operations on all registers
+    // -Operator overloading and implicits must exist ON the final class
+    // -Generics cannot be used because of above
 
     public static AddressIndirect operator +(Register32 aBaseRegister, Int32 aDisplacement) {
       return new AddressIndirect(aBaseRegister, aDisplacement);
+    }
+
+    public MemoryAction this[int aOffset] {
+      get {
+        return new MemoryAction(GetId(), aOffset);
+      }
     }
 
     public void Add(UInt32 aValue) {

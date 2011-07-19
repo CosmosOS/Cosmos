@@ -34,12 +34,6 @@ namespace Cosmos.Compiler.XSharp {
       return aRegister;
     }
 
-    public MemoryAction this[int aOffset] {
-      get {
-        return new MemoryAction(GetId(), aOffset);
-      }
-    }
-
     public static implicit operator RegisterESI(ElementReference aReference) {
       Instance.Move(aReference);
       return Instance;
