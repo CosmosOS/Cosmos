@@ -89,6 +89,22 @@ namespace Cosmos.Cosmos_VS_Windows {
       mData = aData;
       Display(mFilter);
     }
+
+    private void asmFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+      mFilter = !mFilter;
+      Display(mFilter);
+    }
+
+    private void asmFCopyButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void asmStepButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
  
   }
 }

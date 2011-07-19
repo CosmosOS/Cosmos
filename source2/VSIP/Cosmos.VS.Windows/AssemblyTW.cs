@@ -27,7 +27,7 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public AssemblyTW() : base(null)
         {
-            this.ToolBar = new CommandID(GuidList.guidAsmToolbarCmdSet, (int)PkgCmdIDList.AsmToolbar);
+            //this.ToolBar = new CommandID(GuidList.guidAsmToolbarCmdSet, (int)PkgCmdIDList.AsmToolbar);
             this.Caption = "Cosmos Assembly Window";
 
             // Set the image that will appear on the tab of the window frame
