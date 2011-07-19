@@ -49,14 +49,15 @@ namespace Cosmos.Cosmos_VS_Windows {
         if (aFilter) {
           if (xTestLine == "INT3") {
             continue;
-          } else if (xTestLine.StartsWith("; #")) {
-            // Comments which are signals for the parser
-            continue;
-          } else if (xTestLine.EndsWith("#:")) {
-            // Hidden labels (ASM stepping, only add noise for user)
-            continue;
           } else if (xTestLine.Length == 0) {
             continue;
+          } else {
+            var xParts = xTestLine.Split(' ');
+            if (xParts.Length > 1) {
+              if (xParts[1] == ";ASM") {
+                continue;
+              }
+            }
           }
           
           xDisplayLine = xDisplayLine.Trim();
@@ -86,6 +87,6 @@ namespace Cosmos.Cosmos_VS_Windows {
       mData = aData;
       Display(mFilter);
     }
-
+ 
   }
 }

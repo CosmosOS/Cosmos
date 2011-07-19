@@ -506,8 +506,8 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public void SendAssembly() {
-      DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes("test"));
-      return;
+      //DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes("test"));
+      //return;
 
       // Scan and make a list of labels that belong to this line of code
       int xIdx = mSourceMappings.Keys.IndexOf((uint)mCurrentAddress);
