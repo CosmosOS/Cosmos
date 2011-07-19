@@ -57,7 +57,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugStub_CommandID"] = EAX;
 
         // Get AL back so we can compare it, but also put it back for later
-        EAX = Memory[ESP];
+        EAX = ESP[0];
         CheckCmd(DsCommand.TraceOff, typeof(TraceOff));
         CheckCmd(DsCommand.TraceOn, typeof(TraceOn));
         CheckCmd(DsCommand.Break, typeof(Break));
@@ -292,12 +292,11 @@ namespace Cosmos.Compiler.DebugStub {
         // Write Length
         ESI = EBP;
         ESI = ESI + 12;
-        //ECX = Memory[ESI];
         ECX = ESI[0];
         WriteBytesToComPort(2);
 
         // Address of string
-        ESI = Memory[EBP + 8];
+        ESI = EBP[8];
         Label = ".WriteChar";
         ECX.Compare(0);
         JumpIf(Flags.Equal, ".Exit");
@@ -320,7 +319,7 @@ namespace Cosmos.Compiler.DebugStub {
         Call<WriteALToComPort>();
 
         // pointer value
-        ESI = Memory[EBP + 8];
+        ESI = EBP[8];
         WriteBytesToComPort(4);
       }
     }
@@ -355,7 +354,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Set address of port
         DX = mComAddr;
         // Get byte to send
-        AL = Memory[ESI];
+        AL = ESI[0];
         // Send the byte
         Port[DX] = AL;
 
@@ -517,7 +516,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Read and copy string till 0 terminator
         Label = ".ReadChar";
-        AL = Memory[ESI, 8];
+        AL = ESI[8];
         AL.Compare(0);
         JumpIf(Flags.Equal, ".AfterMsg");
         ESI++;
@@ -696,7 +695,7 @@ namespace Cosmos.Compiler.DebugStub {
         ReadComPortX32toStack(1);
         EDI.Pop();
         // Save the old byte
-        EAX = Memory[EDI];
+        EAX = EDI[0];
         Memory[AsmOrigByte] = EAX;
         // Inject INT3
         Memory[EDI] = 0xCC;
@@ -950,7 +949,7 @@ namespace Cosmos.Compiler.DebugStub {
         EBP = EBP + 32; // We dont need to restore this becuase it was pushed as part of PushAll32
 
         // Get actual EIP of caller.
-        EAX = Memory[EBP];
+        EAX = EBP[0];
         // EIP is pointer to op after our call. We subtract 1 for the opcode size of Int3
         // Note - when we used call it was 5 (the size of our call + address)
         // so we get the EIP as IL2CPU records it. Its also useful for when we will
