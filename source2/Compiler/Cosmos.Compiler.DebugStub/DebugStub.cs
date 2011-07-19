@@ -216,7 +216,7 @@ namespace Cosmos.Compiler.DebugStub {
         // now ECX contains size of data (count)
         // EAX contains relative to EBP
         ESI = Memory[CallerEBP];
-        ESI.Add(EAX);
+        ESI.Add(EAX); //TODO: ESI = ESI + EAX
 
         Label = ".SendByte";
         ECX.Compare(0);
@@ -236,17 +236,9 @@ namespace Cosmos.Compiler.DebugStub {
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
         ReadComPortX32toStack(1);
-        //EAX.Pop();
-        //ESI = EBP;
-        //ESI.Add(EAX);
-        //ESI.Push();
-        // todo: adjust ESI to the actual offset
         Label = "DebugStub_SendMemory_1";
         AL = (int)DsMsgType.MemoryData;
         Call<WriteALToComPort>();
-
-        //EAX.Pop();
-        //EAX.Push();
 
         ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_2";
@@ -261,7 +253,7 @@ namespace Cosmos.Compiler.DebugStub {
         new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
         JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte");
         Call<WriteByteToComPort>();
-        new Dec { DestinationReg = Registers.ECX };
+        ECX--;
         Jump("DebugStub_SendMemory_SendByte");
 
         Label = "DebugStub_SendMemory_After_SendByte";
@@ -300,7 +292,8 @@ namespace Cosmos.Compiler.DebugStub {
         // Write Length
         ESI = EBP;
         ESI = ESI + 12;
-        ECX = Memory[ESI];
+        //ECX = Memory[ESI];
+        ECX = ESI[0];
         WriteBytesToComPort(2);
 
         // Address of string

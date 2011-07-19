@@ -46,12 +46,17 @@ namespace Cosmos.Compiler.XSharp {
         public MemoryAction(RegistersEnum aRegister)
         {
             Register = aRegister;
+            // Apparently MemoryAction is sometimes used for registers, which it should not :(
+            // so for memory, use the regsiter, int variant.. Its hacked for now till this can
+            // be rewritten.
+            //IsIndirect = true;
         }
 
         public MemoryAction(RegistersEnum aRegister, int aDisplacement)
             : this(aRegister)
         {
             Displacement = aDisplacement;
+            IsIndirect = true;
         }
         // This form used for reading memory - Addresses are passed in
         public MemoryAction(ElementReference aValue, int aDisplacement)

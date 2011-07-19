@@ -39,11 +39,10 @@ namespace Cosmos.Compiler.Assembler.X86 {
         }
         protected string GetSourceAsString() {
             string xDest = "";
-            if ((SourceValue.HasValue || SourceRef != null) &&
-                SourceIsIndirect &&
-                SourceReg != null) {
-                throw new Exception("[Scale*index+base] style addressing not supported at the moment");
-            }
+            //if ((SourceValue.HasValue || SourceRef != null) &&
+            //    SourceIsIndirect && SourceReg != null) {
+            //    throw new Exception("[Scale*index+base] style addressing not supported at the moment");
+            //}
             if (SourceRef != null) {
                 xDest = SourceRef.ToString();
             } else {
