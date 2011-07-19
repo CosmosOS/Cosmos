@@ -62,8 +62,10 @@ namespace Cosmos.Cosmos_VS_Windows {
           
           xDisplayLine = xDisplayLine.Trim();
           if (xParts[0].EndsWith(":")) {
-            // Insert a blank line before labels
-            tblkSource.Inlines.Add(new LineBreak());
+            // Insert a blank line before labels, but not if its the top line
+            if (tblkSource.Inlines.Count > 0) {
+              tblkSource.Inlines.Add(new LineBreak());
+            }
           } else {
             xDisplayLine = "\t" + xDisplayLine;
           }

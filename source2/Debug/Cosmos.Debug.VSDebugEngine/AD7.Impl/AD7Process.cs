@@ -552,18 +552,16 @@ namespace Cosmos.Debug.VSDebugEngine {
             if (xParts.Length == 1) {
               // Found an normal label.
               xCode.AppendLine(xLine);
-            } else if (xParts.Length > 1) {
-              if (xParts[1] == ";Asm") {
-                // Found an ASM label.
-                xCode.AppendLine(xLine);
-              } else if (xParts[1] == ";IL" && xLabels.ContainsKey(xParts[0])) {
-                // Found an exact match. Our label is in the label list
-                xCode.AppendLine(xLine);
-              } else {
-                // Its a label with an unrecognized comment, or its an IL label that doesn't match.
-                // We are done.
-                break;
-              }
+            } else if (xParts[1] == ";Asm") {
+              // Found an ASM label.
+              xCode.AppendLine(xLine);
+            } else if (xParts[1] == ";IL" && xLabels.ContainsKey(xParts[0])) {
+              // Found an exact match. Our label is in the label list
+              xCode.AppendLine(xLine);
+            } else {
+              // Its a label with an unrecognized comment, or its an IL label that doesn't match.
+              // We are done.
+              break;
             }
           } else {
             // Not a label, just output it
