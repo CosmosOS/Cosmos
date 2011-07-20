@@ -102,6 +102,9 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
+    // Tracing: 0=Off, 1=On
+    static protected DataMember32 DebugTraceMode;
+
     public DebugStub(int aComNo) {
       mComNo = aComNo;
       mComAddr = mComPortAddresses[mComNo - 1];
@@ -109,8 +112,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // Tracing: 0=Off, 1=On
-        new DataMember("DebugTraceMode", 0),
         // enum Status
         new DataMember("DebugStatus", 0),
                     
@@ -714,13 +715,13 @@ namespace Cosmos.Compiler.DebugStub {
 
     public class TraceOff : CodeBlock {
       public override void Assemble() {
-        Memory["DebugTraceMode", 32] = Tracing.Off;
+        DebugTraceMode.Value = Tracing.Off;
       }
     }
 
     public class TraceOn : CodeBlock {
       public override void Assemble() {
-        Memory["DebugTraceMode", 32] = Tracing.On;
+        DebugTraceMode.Value = Tracing.On;
       }
     }
 
@@ -790,7 +791,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Tracing isnt really used any more, was used
         // by the old stand alone debugger. Might be upgraded
         // and resused in the future.
-        Memory["DebugTraceMode", 32].Compare(Tracing.On);
+        DebugTraceMode.Value.Compare(Tracing.On);
         CallIf(Flags.Equal, "DebugStub_SendTrace");
 
         // Is there a new incoming command? We dont want to wait for one
