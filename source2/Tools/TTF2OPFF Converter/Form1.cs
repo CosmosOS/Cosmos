@@ -48,6 +48,9 @@ namespace TTF2OPFF_Converter
             {
 #if DeflateCompression || GZipCompression
                 FileStream str;
+#elif LZMACompression
+                FileStream final;
+                MemoryStream strm = new MemoryStream();
 #else
                 FileStream strm;
 #endif
@@ -55,6 +58,8 @@ namespace TTF2OPFF_Converter
                 {
 #if DeflateCompression || GZipCompression
                     str = File.Create(OutputFileName);
+#elif LZMACompression
+                    final = File.Create(OutputFileName);
 #else
                     strm = File.Create(OutputFileName);
 #endif
@@ -65,6 +70,8 @@ namespace TTF2OPFF_Converter
                     {
 #if DeflateCompression || GZipCompression
                         str = new FileStream(OutputFileName, FileMode.Truncate);
+#elif LZMACompression
+                        final = new FileStream(OutputFileName, FileMode.Truncate);
 #else
                         strm = new FileStream(OutputFileName, FileMode.Truncate);
 #endif
@@ -88,8 +95,8 @@ namespace TTF2OPFF_Converter
                 strm.WriteByte(0);
                 strm.WriteByte(0);
                 strm.WriteByte(0);
-                
-                
+
+
                 string FontName = (string)FontComboBox.SelectedItem;
 
                 byte[] buffer = ASCIIEncoding.ASCII.GetBytes(FontName);
@@ -114,55 +121,76 @@ namespace TTF2OPFF_Converter
                     t = null;
                     IDictionary<int, ushort> charKeyMap = (IDictionary<int, ushort>)glyph.CharacterToGlyphMap;
                     glyph = null;
-                    SortedList<int, int> chars = new SortedList<int, int>();
+                    SortedSet<int> chars = new SortedSet<int>();
                     foreach (KeyValuePair<int, ushort> c in charKeyMap)
                     {
-                        chars.Add(c.Key, c.Key);
+                        chars.Add(c.Key);
                     }
                     charKeyMap = null;
                     Font f = new Font(FontName, 30, GraphicsUnit.Pixel);
 
-                    UInt64 charsToWrite = (ulong)chars.Keys.Count;
+                    UInt64 charsToWrite = (ulong)chars.Count * 16;
                     buffer = BitConverter.GetBytes(charsToWrite);
                     strm.Write(buffer, 0, buffer.Length); // Write the number of chars to read.
-                    
+
                     int prevChar = 0;
-                    foreach (KeyValuePair<int, int> ch in chars)
+
+                    for (byte style = 0; style < 16; style++)
                     {
-                        Bitmap Backend = new Bitmap(32, 32);
-                        Graphics g = Graphics.FromImage(Backend);
-                        g.Clear(Color.White);
-                        g.DrawString(new String(new char[] { (char)ch.Key }), f, new SolidBrush(Color.Black), 0, 0);
-                        g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
-                        if (prevChar + 1 == ch.Key)
+                        f = new Font(FontName, 30, (FontStyle)style, GraphicsUnit.Pixel);
+                        foreach (int ch in chars)
                         {
-                            strm.WriteByte(255); // write that it's incremented from the previous char.
+                            Bitmap Backend = new Bitmap(1, 1);
+                            Graphics g = Graphics.FromImage(Backend);
+                            SizeF sz = g.MeasureString(new String(new char[] { (char)ch }), f);
+                            byte height = (byte)Math.Ceiling(sz.Height + 2);
+                            byte width = (byte)Math.Ceiling(sz.Width + 4);
+                            Backend = new Bitmap(width, height);
+                            g = Graphics.FromImage(Backend);
+                            g.Clear(Color.White);
+
+                            g.DrawString(new String(new char[] { (char)ch }), f, new SolidBrush(Color.Black), 2, 2);
+                            g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
+                            if (prevChar + 1 == ch)
+                            {
+                                strm.WriteByte(255); // write that it's incremented from the previous char.
+                            }
+                            else
+                            {
+                                strm.WriteByte(0); // write that it's not incremented from the previous char.
+                                buffer = BitConverter.GetBytes(ch);
+                                strm.Write(buffer, 0, buffer.Length); // Write the char number.
+                            }
+                            pictureBox1.Image = Backend;
+                            pictureBox1.Refresh();
+
+                            strm.WriteByte(style); // write it's style
+                            strm.WriteByte(height); // write the height
+                            strm.WriteByte(width); // write the width
+                            buffer = ConvertToByteArray(Backend);
+                            strm.Write(buffer, 0, buffer.Length);
+                            prevChar = ch;
                         }
-                        else
-                        {
-                            strm.WriteByte(0); // write that it's not incremented from the previous char.
-                            buffer = BitConverter.GetBytes(ch.Key);
-                            strm.Write(buffer, 0, buffer.Length); // Write the char number.
-                        }
-                        pictureBox1.Image = Image.FromHbitmap(Backend.GetHbitmap());
-                        pictureBox1.Refresh();
-                        //for (int isoa = 0; isoa < 10000; isoa++)
-                        //{
-                        //}
-                        strm.WriteByte(1); // write that it's normal style.
-                        strm.WriteByte(32); // write the height
-                        strm.WriteByte(32); // write the width
-                        int len = 128;
-                        buffer = ConvertToByteArray(Backend);
-                        strm.Write(buffer, 0, len);
-                        prevChar = ch.Key;
+                        f.Dispose();
+#if !LZMACompression
+                        strm.Flush();
+#endif
+                        System.GC.Collect();
                     }
+#if LZMACompression
+                    buffer = Orvid.Compression.LZMACoder.Compress(strm.GetBuffer());
+                    final.WriteByte(255);
+                    final.Write(buffer, 0, buffer.Length);
+                    final.Flush();
+                    final.Close();
+                    final.Dispose();
+#endif
 
                     strm.Flush();
                     strm.Close();
                     strm.Dispose();
-					//pictureBox1.Image = null;
-					
+                    //pictureBox1.Image = null;
+
                     MessageBox.Show("Conversion Completed Successfully!");
                 }
                 else
@@ -174,7 +202,7 @@ namespace TTF2OPFF_Converter
 
         private byte[] ConvertToByteArray(Bitmap b)
         {
-            bool[] bits = new bool[1024];
+            bool[] bits = new bool[b.Height * b.Width];
             int bitnum = 0;
             for (int x = 0; x < b.Width; x++)
             {
