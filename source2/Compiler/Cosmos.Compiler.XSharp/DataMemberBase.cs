@@ -10,7 +10,9 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     public ElementReference Address {
-      get { return ElementReference.New(Name); }
+      get {
+        return ElementReference.New(Name); 
+      }
     }
   }
 }

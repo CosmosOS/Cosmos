@@ -215,7 +215,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // now ECX contains size of data (count)
         // EAX contains relative to EBP
-        ESI = Memory[CallerEBP];
+        ESI = CallerEBP.Value;
         ESI.Add(EAX); //TODO: ESI = ESI + EAX
 
         Label = ".SendByte";
@@ -644,7 +644,7 @@ namespace Cosmos.Compiler.DebugStub {
         EAX = (uint)xCount;
         Call<WriteAXToComPort>();
 
-        ESI = Memory[CallerEBP];
+        ESI = CallerEBP.Value;
         ESI.Add(8); // Dont transmit EIP or old EBP
         WriteBytesToComPort(xCount);
       }
@@ -656,15 +656,15 @@ namespace Cosmos.Compiler.DebugStub {
         Call<WriteALToComPort>();
 
         // Send size of bytes
-        ESI = Memory[CallerESP];
-        EAX = Memory[CallerEBP];
+        ESI = CallerESP.Value;
+        EAX = CallerEBP.Value;
         EAX.Sub(ESI);
         Call<WriteAXToComPort>();
 
         // Send actual bytes
         //
         // Need to reload ESI, WriteAXToCompPort modifies it
-        ESI = Memory[CallerESP];
+        ESI = CallerESP.Value;
         Label = ".SendByte";
         ESI.Compare(Memory[CallerEBP, 32]);
         JumpIf(Flags.Equal, ".Exit");
@@ -684,7 +684,7 @@ namespace Cosmos.Compiler.DebugStub {
     //
     public class SetAsmBreak : Inlines {
       public override void Assemble() {
-        EDI = Memory[AsmBreakEIP];
+        EDI = AsmBreakEIP.Value;
         EDI.Compare(0);
         // If 0, we don't need to clear an older one.
         JumpIf(Flags.Equal, ".Set");
@@ -706,7 +706,7 @@ namespace Cosmos.Compiler.DebugStub {
     public class ClrAsmBreak : Inlines {
       public override void Assemble() {
         // Clear old break point
-        EAX = Memory[AsmOrigByte];
+        EAX = AsmOrigByte.Value;
         EDI[0] = EAX;
         Memory[AsmOrigByte] = 0;
       }
@@ -731,7 +731,7 @@ namespace Cosmos.Compiler.DebugStub {
       // Modifies: EAX, EDI, ECX
       public override void Assemble() {
         // Look for a possible matching BP
-        EAX = Memory[CallerEIP];
+        EAX = CallerEIP.Value;
         EDI = AddressOf("DebugBPs");
         ECX = 256;
         new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
@@ -764,7 +764,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
         Label = "Debug__StepOver__";
-        EAX = Memory[CallerEBP];
+        EAX = CallerEBP.Value;
         EAX.Compare(Memory["DebugBreakEBP", 32]);
         // If EBP and start EBP arent equal, dont break
         // Dont use Equal because we aslo need to stop above if the user starts
@@ -777,7 +777,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
 
-        EAX = Memory[CallerEBP]; 
+        EAX = CallerEBP.Value; 
         EAX.Compare(Memory["DebugBreakEBP", 32]); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
@@ -855,7 +855,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(DsCommand.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
-        EAX = Memory[CallerEBP];
+        EAX = CallerEBP.Value;
         Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
@@ -863,7 +863,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL.Compare(DsCommand.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
-        EAX = Memory[CallerEBP];
+        EAX = CallerEBP.Value;
         Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOut_After";
