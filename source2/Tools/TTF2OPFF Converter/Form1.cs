@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.IO.Compression;
 
 namespace TTF2OPFF_Converter
 {
@@ -66,7 +67,7 @@ namespace TTF2OPFF_Converter
                 strm.WriteByte(0);
                 strm.WriteByte(0);
                 strm.WriteByte(0);
-
+                
                 string FontName = (string)FontComboBox.SelectedItem;
 
                 byte[] buffer = ASCIIEncoding.ASCII.GetBytes(FontName);
@@ -106,9 +107,11 @@ namespace TTF2OPFF_Converter
                     int prevChar = 0;
                     foreach (KeyValuePair<int, int> ch in chars)
                     {
-                        Graphics g = Graphics.FromImage(new Bitmap(32, 32));
+                        Bitmap Backend = new Bitmap(32, 32);
+                        Graphics g = Graphics.FromImage(Backend);
                         g.Clear(Color.White);
                         g.DrawString(new String(new char[] { (char)ch.Key }), f, new SolidBrush(Color.Black), 0, 0);
+                        g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
                         if (prevChar + 1 == ch.Key)
                         {
                             strm.WriteByte(255); // write that it's incremented from the previous char.
@@ -119,11 +122,16 @@ namespace TTF2OPFF_Converter
                             buffer = BitConverter.GetBytes(ch.Key);
                             strm.Write(buffer, 0, buffer.Length); // Write the char number.
                         }
+                        pictureBox1.Image = Image.FromHbitmap(Backend.GetHbitmap());
+                        pictureBox1.Refresh();
+                        //for (int isoa = 0; isoa < 10000; isoa++)
+                        //{
+                        //}
                         strm.WriteByte(1); // write that it's normal style.
                         strm.WriteByte(32); // write the height
                         strm.WriteByte(32); // write the width
                         int len = 128;
-                        buffer = ConvertToByteArray(new Bitmap(32, 32, g));
+                        buffer = ConvertToByteArray(Backend);
                         strm.Write(buffer, 0, len);
                         prevChar = ch.Key;
                     }
@@ -131,7 +139,8 @@ namespace TTF2OPFF_Converter
                     strm.Flush();
                     strm.Close();
                     strm.Dispose();
-
+					//pictureBox1.Image = null;
+					
                     MessageBox.Show("Conversion Completed Successfully!");
                 }
                 else
@@ -149,7 +158,7 @@ namespace TTF2OPFF_Converter
             {
                 for (int y = 0; y < b.Height; y++)
                 {
-                    if (b.GetPixel(x, y) == Color.Black)
+                    if (b.GetPixel(x, y) == Color.FromArgb(255, 255, 255))
                     {
                         bits[bitnum] = false;
                     }

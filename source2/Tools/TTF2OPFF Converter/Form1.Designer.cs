@@ -35,6 +35,8 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.BrowseButton = new System.Windows.Forms.Button();
             this.ConvertButton = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -97,11 +99,20 @@
             this.ConvertButton.UseVisualStyleBackColor = true;
             this.ConvertButton.Click += new System.EventHandler(this.ConvertButton_Click);
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(344, 106);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(32, 32);
+            this.pictureBox1.TabIndex = 6;
+            this.pictureBox1.TabStop = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(449, 363);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.ConvertButton);
             this.Controls.Add(this.BrowseButton);
             this.Controls.Add(this.textBox1);
@@ -111,6 +122,7 @@
             this.Name = "Form1";
             this.Text = "Orvid\'s TTF to OPFF Converter";
             this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -125,6 +137,7 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button BrowseButton;
         private System.Windows.Forms.Button ConvertButton;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
