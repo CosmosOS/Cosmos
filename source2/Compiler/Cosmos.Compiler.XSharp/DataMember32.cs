@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Assembler;
+using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Compiler.XSharp {
   // This is the new type of DataMember, eventually we can eliminate much of the
@@ -18,7 +19,9 @@ namespace Cosmos.Compiler.XSharp {
         return new MemoryAction(ElementReference.New(Name)) { IsIndirect = true };
       }
       set {
-
+        new Move {
+          DestinationRef = ElementReference.New(Name),  DestinationIsIndirect = true
+          , SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
       }
     }
   }

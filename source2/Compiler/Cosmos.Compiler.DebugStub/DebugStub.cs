@@ -666,7 +666,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Need to reload ESI, WriteAXToCompPort modifies it
         ESI = CallerESP.Value;
         Label = ".SendByte";
-        ESI.Compare(Memory[CallerEBP, 32]);
+        ESI.Compare(CallerEBP.Value);
         JumpIf(Flags.Equal, ".Exit");
         Call<WriteByteToComPort>();
         Jump(".SendByte");
@@ -695,11 +695,11 @@ namespace Cosmos.Compiler.DebugStub {
         EDI.Pop();
         // Save the old byte
         EAX = EDI[0];
-        Memory[AsmOrigByte] = EAX;
+        AsmOrigByte.Value = EAX;
         // Inject INT3
         EDI[0] = 0xCC;
         // Save EIP of the break
-        Memory[AsmBreakEIP] = EDI;
+        AsmBreakEIP.Value = EDI;
       }
     }
 
@@ -708,7 +708,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Clear old break point
         EAX = AsmOrigByte.Value;
         EDI[0] = EAX;
-        Memory[AsmOrigByte] = 0;
+        AsmOrigByte.Value = 0;
       }
     }
 
@@ -887,7 +887,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // EBP is restored by PopAll, but SendFrame uses it. Could
         // get it from the PushAll data, but this is easier.
-        Memory[CallerEBP] = EBP;
+        CallerEBP.Value = EBP;
 
         // Could also get ESP from PushAll but this is easier
         // Another reason to do it here is that soem day we may need to use 
@@ -898,7 +898,7 @@ namespace Cosmos.Compiler.DebugStub {
         // But for now we remove from ESP which the call to us produces,
         // store ESP, then restore ESP so we don't cause stack corruption.
         ESP = ESP + 12; // 12 bytes for EFLAGS, CS, EIP
-        Memory[CallerESP] = ESP;
+        CallerESP.Value = ESP;
         ESP = ESP - 12;
 
         // If debug stub is in break, and then an IRQ happens, the IRQ
@@ -929,7 +929,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // All clear, mark that we are entering the debug stub
         Label = "DebugStub_Start";
-        Memory[IsRunning] = 1;
+        IsRunning.Value = 1;
 
         // DS is now marked not to re-enter, so re-enable interrupts if
         // they were enabled on entry
@@ -955,7 +955,7 @@ namespace Cosmos.Compiler.DebugStub {
         // be changing ops that call this stub.
         EAX--; 
         // Store it for later use.
-        Memory[CallerEIP] = EAX;
+        CallerEIP.Value = EAX;
 
         // Call secondary stub
         Call<Executing>();
@@ -968,7 +968,7 @@ namespace Cosmos.Compiler.DebugStub {
         // So just to be safe, we disable interrupts while we do this.
         DisableInterrupts();
         // Complete, mark that DebugStub is complete
-        Memory[IsRunning] = 0;
+        IsRunning.Value = 0;
 
         Label = "DebugStub_CheckIntAndReturn";
         // Re-enable interrupts if needed. This happens on normal exit, or call from above
