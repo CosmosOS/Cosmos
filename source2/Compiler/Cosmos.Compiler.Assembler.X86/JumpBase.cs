@@ -43,6 +43,16 @@ namespace Cosmos.Compiler.Assembler.X86 {
       }
       base.WriteData(aAssembler, aOutput);
     }
-
+    //public override string ToString() {
+    //    var xResult = base.ToString();
+    //    if (mNear) {
+    //        if (!xResult.StartsWith(Mnemonic + " near", StringComparison.InvariantCultureIgnoreCase)) {
+    //            if (xResult.StartsWith(Mnemonic)) {
+    //                return Mnemonic + " near " + xResult.Substring(Mnemonic.Length + 1);
+    //            }
+    //        }
+    //    }
+    //    return xResult;
+    //}
   }
 }

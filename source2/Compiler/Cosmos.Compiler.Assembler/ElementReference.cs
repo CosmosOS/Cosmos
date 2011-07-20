@@ -9,8 +9,7 @@ namespace Cosmos.Compiler.Assembler {
     private static Dictionary<string, ElementReference> mLookup = new Dictionary<string, ElementReference>(StringComparer.InvariantCultureIgnoreCase);
     public static ElementReference New(string aName, int aOffset) {
       ElementReference xResult;
-      aName = aName.Replace('.', '#');
-      if (aName.StartsWith("#")) {
+      if (aName.StartsWith(".")) {
         aName = Label.LastFullLabel + aName;
       }
       string xId = String.Intern(aName + "@@" + aOffset);
@@ -36,17 +35,17 @@ namespace Cosmos.Compiler.Assembler {
     }
 
     private ElementReference(string aName) {
-      aName = aName.Replace('.', '#');
       if (String.IsNullOrEmpty(aName)) {
         throw new ArgumentNullException("aName");
-      } else if (aName == "00h") {
+      }
+      if (aName == "00h") {
         Console.Write("");
-      } else if (aName.StartsWith("#")) {
+      }
+      if (aName.StartsWith(".")) {
         Name = Label.LastFullLabel + aName;
       } else {
         Name = aName;
       }
-      // Some older code still passes in full labels, so we search and replace
     }
 
     private ulong? mActualAddress;

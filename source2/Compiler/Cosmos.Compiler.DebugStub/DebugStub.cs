@@ -275,7 +275,8 @@ namespace Cosmos.Compiler.DebugStub {
         Call<WriteALToComPort>();
 
         // Send Calling EIP.
-        ESI = CallerEIP.Address;
+        //ESI = CallerEIP.Address;
+        ESI = AddressOf(CallerEIP);
         WriteBytesToComPort(4);
       }
     }
@@ -628,9 +629,11 @@ namespace Cosmos.Compiler.DebugStub {
         
         ESI = Memory["DebugPushAllPtr"];
         WriteBytesToComPort(32);
-        ESI = CallerESP.Address;
+        //ESI = CallerESP.Address;
+        ESI = AddressOf(CallerESP);
         WriteBytesToComPort(4);
-        ESI = CallerEIP.Address;
+        //ESI = CallerEIP.Address;
+        ESI = AddressOf(CallerEIP);
         WriteBytesToComPort(4);
       }
     }

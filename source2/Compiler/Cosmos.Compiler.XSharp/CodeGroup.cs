@@ -16,9 +16,9 @@ namespace Cosmos.Compiler.XSharp {
       string xBaseLabel = xParts[xParts.Length - 1].Replace('+', '_') + "_";
 
       foreach (var xMember in xThisType.GetFields(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
-        if (xMember.FieldType.IsSubclassOf(typeof(DataMember))) {
+        if (xMember.FieldType.IsSubclassOf(typeof(DataMemberBase))) {
           var xCtor = xMember.FieldType.GetConstructor(new Type[] { typeof(string) });
-          var xInst = (DataMember)(xCtor.Invoke(new Object[] { xBaseLabel + xMember.Name }));
+          var xInst = (DataMemberBase)(xCtor.Invoke(new Object[] { xBaseLabel + xMember.Name }));
           xMember.SetValue(aInst, xInst);
           mAsm.DataMembers.Add(xInst);
         }

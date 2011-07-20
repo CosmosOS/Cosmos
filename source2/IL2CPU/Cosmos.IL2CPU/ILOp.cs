@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public static string GetLabel(MethodInfo aMethod, int aPos) {
-      return GetMethodLabel(aMethod) + "#" + aPos.ToString("X4");
+      return GetMethodLabel(aMethod) + "." + aPos.ToString("X4");
     }
 
     public override string ToString() {
