@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define GZipCompression
+//#define DeflateCompression
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -43,22 +46,40 @@ namespace TTF2OPFF_Converter
             }
             else
             {
+#if DeflateCompression || GZipCompression
+                FileStream str;
+#else
                 FileStream strm;
+#endif
                 if (!File.Exists(OutputFileName))
                 {
+#if DeflateCompression || GZipCompression
+                    str = File.Create(OutputFileName);
+#else
                     strm = File.Create(OutputFileName);
+#endif
                 }
                 else
                 {
                     if (MessageBox.Show("A file at '" + OutputFileName + "' already exists! Would you like to overwrite it?", "File Already Exists", MessageBoxButtons.YesNoCancel) == System.Windows.Forms.DialogResult.Yes)
                     {
+#if DeflateCompression || GZipCompression
+                        str = new FileStream(OutputFileName, FileMode.Truncate);
+#else
                         strm = new FileStream(OutputFileName, FileMode.Truncate);
+#endif
                     }
                     else
                     {
                         return;
                     }
                 }
+#if DeflateCompression
+                DeflateStream strm = new DeflateStream(str, CompressionMode.Compress);
+#elif GZipCompression
+                GZipStream strm = new GZipStream(str, CompressionMode.Compress);
+#endif
+
                 strm.WriteByte(0);
                 strm.WriteByte(0);
                 strm.WriteByte(0);
@@ -67,6 +88,7 @@ namespace TTF2OPFF_Converter
                 strm.WriteByte(0);
                 strm.WriteByte(0);
                 strm.WriteByte(0);
+                
                 
                 string FontName = (string)FontComboBox.SelectedItem;
 
