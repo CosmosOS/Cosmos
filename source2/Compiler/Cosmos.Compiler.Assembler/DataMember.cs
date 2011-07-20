@@ -281,14 +281,4 @@ namespace Cosmos.Compiler.Assembler {
       }
     }
   }
-
-  // This is the new type of DataMember, eventually we can eliminate many of the
-  // code in DataMember (base)
-  public class DataMember32 : DataMember {
-    public DataMember32(string aName) : base(aName) {
-      int[] xValue = { 0 };
-      UntypedDefaultValue = xValue.Cast<object>().ToArray();
-    }
-  }
-
 }
