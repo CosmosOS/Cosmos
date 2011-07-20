@@ -16,7 +16,7 @@ namespace Cosmos.Compiler.XSharp {
 
     public MemoryAction Value {
       get {
-        return new MemoryAction(ElementReference.New(Name)) { IsIndirect = true };
+        return new MemoryAction(ElementReference.New(Name)) { IsIndirect = true, Size = 32 };
       }
       set {
         new Move {

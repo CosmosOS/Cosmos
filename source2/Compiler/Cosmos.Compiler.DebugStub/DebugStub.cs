@@ -920,7 +920,7 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_Return");
 
         Label = "DebugStub_Running";
-        Memory[IsRunning, 32].Compare(0);
+        IsRunning.Value.Compare(0);
         JumpIf(Flags.Equal, "DebugStub_Start");
         // If we made it this far we exit because DebugStub is already running.
         // We need to see if IRQs were originally enabled or disabled and
