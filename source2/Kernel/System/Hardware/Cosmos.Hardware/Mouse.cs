@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Cosmos.Core;
 
@@ -31,56 +30,56 @@ namespace Cosmos.Hardware
         public void Initialize()
         {
             ////enable mouse
-            //WaitSignal();
-            //BaseIOGroups.Mouse.p64.Byte = (byte)0xA8;
+            WaitSignal();
+            BaseIOGroups.Mouse.p64.Byte = (byte)0xA8;
 
             //// enable interrupt
-            //WaitSignal();
-            //BaseIOGroups.Mouse.p64.Byte = (byte)0x20;
-            //WaitData();
+            WaitSignal();
+            BaseIOGroups.Mouse.p64.Byte = (byte)0x20;
+            WaitData();
             //byte status1 = (byte)(BaseIOGroups.Mouse.p60.Byte);
-            //byte status = (byte)(BaseIOGroups.Mouse.p60.Byte | 2);
-            //WaitSignal();
-            //BaseIOGroups.Mouse.p64.Byte = (byte)0x60;
-            //WaitSignal();
-            //BaseIOGroups.Mouse.p60.Byte = (byte)status;
+            byte status = (byte)(BaseIOGroups.Mouse.p60.Byte | 2);
+            WaitSignal();
+            BaseIOGroups.Mouse.p64.Byte = (byte)0x60;
+            WaitSignal();
+            BaseIOGroups.Mouse.p60.Byte = (byte)status;
 
             ////default 
-            //Write(0xF6);
-            //Read();  //Acknowledge
+            Write(0xF6);
+            Read();  //Acknowledge
 
             ////Enable the mouse
-            //Write(0xF4);
-            //Read();  //Acknowledge
+            Write(0xF4);
+            Read();  //Acknowledge
 
             //Set the IRQ 12, to the method HandleMouse
-            //INTs.SetIrqHandler(12, HandleMouse);
+            INTs.SetIrqHandler(12, HandleMouse);
         }
 
-        //private byte Read()
-        //{
-        //    WaitData();
-        //    return g.p60.Byte;
-        //}
+        private byte Read()
+        {
+            WaitData();
+            return BaseIOGroups.Mouse.p60.Byte;
+        }
 
         private void Write(byte b)
         {
-            //WaitSignal();
-            //BaseIOGroups.Mouse.p64.Byte = 0xD4;
-            //WaitSignal();
-            //BaseIOGroups.Mouse.p60.Byte = b;
+            WaitSignal();
+            BaseIOGroups.Mouse.p64.Byte = 0xD4;
+            WaitSignal();
+            BaseIOGroups.Mouse.p60.Byte = b;
         }
 
         private void WaitData()
         {
-            //for (int i = 0; i < 100 & ((BaseIOGroups.Mouse.p64.Byte & 1) == 1); i++)
-            //    ;
+            for (int i = 0; i < 100 & ((BaseIOGroups.Mouse.p64.Byte & 1) == 1); i++)
+                ;
         }
 
         private void WaitSignal()
         {
-            //for (int i = 0; i < 100 & ((BaseIOGroups.Mouse.p64.Byte & 2) != 0); i++)
-            //    ;
+            for (int i = 0; i < 100 & ((BaseIOGroups.Mouse.p64.Byte & 2) != 0); i++)
+                ;
         }
 
         /// <summary>
@@ -115,7 +114,7 @@ namespace Cosmos.Hardware
             switch (mouse_cycle)
             {
                 case 0:
-                    //mouse_byte[0] = Read();
+                    mouse_byte[0] = Read();
 
                     //Bit 3 of byte 0 is 1, then we have a good package
                     if ((mouse_byte[0] & 0x8) == 0x8)
@@ -123,11 +122,11 @@ namespace Cosmos.Hardware
 
                     break;
                 case 1:
-                    //mouse_byte[1] = Read();
+                    mouse_byte[1] = Read();
                     mouse_cycle++;
                     break;
                 case 2:
-                    //mouse_byte[2] = Read();
+                    mouse_byte[2] = Read();
                     mouse_cycle = 0;
 
                     if ((mouse_byte[0] & 0x10) == 0x10)
