@@ -108,6 +108,8 @@ namespace Cosmos.Compiler.DebugStub {
     static protected DataMember32 DebugStatus;
     // Nesting control for non steppable routines
     static protected DataMember32 DebugSuspendLevel;
+    // Nesting control for non steppable routines 
+    new DataMember("DebugResumeLevel", 0),
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -116,8 +118,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // Nesting control for non steppable routines 
-        new DataMember("DebugResumeLevel", 0),
         // Ptr to the push all data. It points to the "bottom" after a PushAll op.
         // Walk up to find the 8 x 32 bit registers.
         new DataMember("DebugPushAllPtr", 0),
