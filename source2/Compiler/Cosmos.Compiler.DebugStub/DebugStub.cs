@@ -104,6 +104,8 @@ namespace Cosmos.Compiler.DebugStub {
 
     // Tracing: 0=Off, 1=On
     static protected DataMember32 DebugTraceMode;
+    // enum Status
+    static protected DataMember32 DebugStatus;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -112,9 +114,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // enum Status
-        new DataMember("DebugStatus", 0),
-                    
         // Nesting control for non steppable routines
         new DataMember("DebugSuspendLevel", 0),
         // Nesting control for non steppable routines 
@@ -264,7 +263,7 @@ namespace Cosmos.Compiler.DebugStub {
     public class SendTrace : Inlines {
       // Modifies: EAX, ESI
       public override void Assemble() {
-        Memory["DebugStatus", 32].Compare(Status.Run);
+        DebugStatus.Value.Compare(Status.Run);
         JumpIf(Flags.Equal, ".Normal");
         AL = (int)DsMsgType.BreakPoint;
         Jump(".Type");
@@ -832,7 +831,7 @@ namespace Cosmos.Compiler.DebugStub {
         Memory["DebugBreakOnNextTrace", 32] = StepTrigger.None;
         Memory["DebugBreakEBP", 32] = 0;
         // Set break status
-        Memory["DebugStatus", 32] = Status.Break;
+        DebugStatus.Value = Status.Break;
         Call<SendTrace>();
 
         // Wait for a command
@@ -873,7 +872,7 @@ namespace Cosmos.Compiler.DebugStub {
         Jump("DebugStub_WaitCmd");
 
         Label = "DebugStub_Break_Exit";
-        Memory["DebugStatus", 32] = Status.Run;
+        DebugStatus.Value = Status.Run;
       }
     }
 
