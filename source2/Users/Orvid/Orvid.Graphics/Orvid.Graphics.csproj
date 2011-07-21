@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C9E995CF-CB65-4410-A7D2-63EBBE02AABB}</ProjectGuid>
@@ -81,6 +81,10 @@
     <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orvid.Compression\Orvid.Compression.csproj">
+      <Project>{931E9514-6750-4700-8B20-364DD1B78038}</Project>
+      <Name>Orvid.Compression</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

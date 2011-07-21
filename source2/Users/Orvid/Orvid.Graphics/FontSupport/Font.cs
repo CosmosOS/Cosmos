@@ -24,5 +24,13 @@ namespace Orvid.Graphics.FontSupport
         BoldUnderline = 5,
         ItalicUnderline = 6,
         BoldItalicUnderline = 7,
+		Strikeout = 8, // Main
+		StrikeoutBold = 9,
+		StrikoutItalic = 10,
+		StrikeoutBoldItalic = 11,
+		StrikoutUnderline = 12,
+		StrikoutBoldUnderline = 13,
+		StrikoutItalicUnderline = 14,
+		StrikoutBoldItalicUnderline = 15,
     }
 }

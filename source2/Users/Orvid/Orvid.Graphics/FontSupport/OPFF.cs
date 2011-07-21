@@ -66,13 +66,17 @@ namespace Orvid.Graphics.FontSupport
             r += data[2];
             r <<= 8;
             r += data[3];
-            r <<= 8;
 
             return r;
         }
 
         private void Load(byte[] data)
         {
+            if (data[0] == 0xFF) // this means it's been compressed in LZMA format.
+            {
+                data = Orvid.Compression.LZMA.Decompress(data);
+            }
+
             int curloc = 8; // There are 8 empty bytes at the start of the header.
 
             byte[] datarr = new byte[256];
