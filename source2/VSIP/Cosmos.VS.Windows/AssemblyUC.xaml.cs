@@ -27,7 +27,6 @@ namespace Cosmos.Cosmos_VS_Windows
     public AssemblyUC()
     {
       InitializeComponent();
-
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
       Update(mData);
     }
