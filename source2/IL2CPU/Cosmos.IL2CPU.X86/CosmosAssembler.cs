@@ -258,9 +258,6 @@ namespace Cosmos.IL2CPU.X86 {
       if (mComNumber > 0) {
         var xStub = new DebugStub(mComNumber);
         xStub.Assemble();
-
-        var xStub2 = new DebugPoint();
-        xStub2.Assemble();
       } else {
         new Label("DebugStub_Step");
         new Return();
@@ -271,12 +268,9 @@ namespace Cosmos.IL2CPU.X86 {
 #if !LFB_1024_8
       DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
       uint xFlags = 0x10003;
-      DataMembers.Add(new DataMember("MultibootSignature",
-                             new uint[] { 0x1BADB002 }));
-      DataMembers.Add(new DataMember("MultibootFlags",
-                     xFlags));
-      DataMembers.Add(new DataMember("MultibootChecksum",
-                                         (int)(0 - (xFlags + 0x1BADB002))));
+      DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
+      DataMembers.Add(new DataMember("MultibootFlags", xFlags));
+      DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
       DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
       DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
       DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
@@ -285,12 +279,9 @@ namespace Cosmos.IL2CPU.X86 {
       DataMembers.Add(new DataEndIfDefined());
       DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
       xFlags = 0x00003;
-      DataMembers.Add(new DataMember("MultibootSignature",
-                             new uint[] { 0x1BADB002 }));
-      DataMembers.Add(new DataMember("MultibootFlags",
-                     xFlags));
-      DataMembers.Add(new DataMember("MultibootChecksum",
-                                         (int)(0 - (xFlags + 0x1BADB002))));
+      DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
+      DataMembers.Add(new DataMember("MultibootFlags", xFlags));
+      DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
       DataMembers.Add(new DataEndIfDefined());
 #else
             DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
@@ -330,10 +321,8 @@ namespace Cosmos.IL2CPU.X86 {
       // memory
       DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
       DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
-      DataMembers.Add(new DataMember("Before_Kernel_Stack",
-                     new byte[0x50000]));
-      DataMembers.Add(new DataMember("Kernel_Stack",
-                     new byte[0]));
+      DataMembers.Add(new DataMember("Before_Kernel_Stack",  new byte[0x50000]));
+      DataMembers.Add(new DataMember("Kernel_Stack", new byte[0]));
       DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
     }
 

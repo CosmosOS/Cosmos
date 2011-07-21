@@ -106,6 +106,8 @@ namespace Cosmos.Compiler.DebugStub {
     static protected DataMember32 DebugTraceMode;
     // enum Status
     static protected DataMember32 DebugStatus;
+    // Nesting control for non steppable routines
+    static protected DataMember32 DebugSuspendLevel;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -114,8 +116,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // Nesting control for non steppable routines
-        new DataMember("DebugSuspendLevel", 0),
         // Nesting control for non steppable routines 
         new DataMember("DebugResumeLevel", 0),
         // Ptr to the push all data. It points to the "bottom" after a PushAll op.
@@ -908,7 +908,7 @@ namespace Cosmos.Compiler.DebugStub {
         // IRQ's are disabled between Compare and JumpIf so an IRQ cant
         // happen in between them which could also cause double entry.
         DisableInterrupts();
-        Memory["DebugSuspendLevel", 32].Compare(0);
+        DebugSuspendLevel.Value.Compare(0);
         JumpIf(Flags.Equal, "DebugStub_Running");
         // DebugStub is already running, so exit.
         // But we need to see if IRQs are disabled.
@@ -981,18 +981,15 @@ namespace Cosmos.Compiler.DebugStub {
       }
     }
 
-  }
-
-  public class DebugPoint : CodeGroup {
     public class DebugSuspend : CodeBlock {
       public override void Assemble() {
-        Memory["DebugSuspendLevel", 32]++;
+        DebugSuspendLevel.Value++;
       }
     }
 
     public class DebugResume : CodeBlock {
       public override void Assemble() {
-        Memory["DebugSuspendLevel", 32]--;
+        DebugSuspendLevel.Value--;
       }
     }
   }

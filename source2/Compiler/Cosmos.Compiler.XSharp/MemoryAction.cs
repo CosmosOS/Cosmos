@@ -33,11 +33,13 @@ namespace Cosmos.Compiler.XSharp {
 
         public static MemoryAction operator ++(MemoryAction aTarget) {
             aTarget.ApplyToDest(new INC());
+            // Must return null, see DataMember.this[] comment
             return null;
         }
 
         public static MemoryAction operator --(MemoryAction aTarget) {
             aTarget.ApplyToDest(new Dec());
+            // Must return null, see DataMember.this[] comment
             return null;
         }
 

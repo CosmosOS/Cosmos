@@ -19,9 +19,18 @@ namespace Cosmos.Compiler.XSharp {
         return new MemoryAction(ElementReference.New(Name)) { IsIndirect = true, Size = 32 };
       }
       set {
-        new Move {
-          DestinationRef = ElementReference.New(Name),  DestinationIsIndirect = true
-          , SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+        // For DataMember32 value will be null with ++ and --, this is important and purposeful.
+        // ++ and -- try to set again, but for us we dont want that.
+        if (value != null) {
+          new Move {
+            DestinationRef = ElementReference.New(Name),
+            DestinationIsIndirect = true,
+            SourceValue = value.Value.GetValueOrDefault(),
+            SourceRef = value.Reference,
+            SourceReg = value.Register,
+            SourceIsIndirect = value.IsIndirect
+          };
+        }
       }
     }
   }
