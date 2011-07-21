@@ -53,7 +53,7 @@ namespace Cosmos.Cosmos_VS_Windows
         string xTestLine = xLine.Trim().ToUpper();
         var xParts = xTestLine.Split(' ');
 
-        if (aFilter)
+        if (!aFilter)
         {
           if (xTestLine == "INT3")
           {
