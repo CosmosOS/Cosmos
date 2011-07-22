@@ -113,6 +113,8 @@ namespace Cosmos.Compiler.DebugStub {
     static protected DataMember32 DebugPushAllPtr;
     // State of Interrupts on entry
     static protected DataMember32 InterruptsEnabledFlag;
+    // If set non 0, on next trace a break will occur
+    static protected DataMember32 DebugBreakOnNextTrace;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -121,8 +123,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // If set non 0, on next trace a break will occur
-        new DataMember("DebugBreakOnNextTrace", (uint)StepTrigger.None),
         // For step out and over this is used to determine where the initial request was made
         // EBP is logged when the trace is started and can be used to determine 
         // what level we are "at" relative to the original step start location.
@@ -741,7 +741,7 @@ namespace Cosmos.Compiler.DebugStub {
         // See if we are stepping
         //
         // F11
-        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Into);
+        DebugBreakOnNextTrace.Value.Compare(StepTrigger.Into);
         //Old, can delete this line: CallIf(Flags.Equal, "DebugStub_Break");
         //TODO: I think we can use a using statement to create this type of block
         // and emit asm
@@ -759,7 +759,7 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_ExecutingStepIntoAfter";
         //
         // F10
-        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Over);
+        DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
         Label = "Debug__StepOver__";
         EAX = CallerEBP.Value;
@@ -772,7 +772,7 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_ExecutingStepOverAfter";
         //
         // Shift-F11
-        Memory["DebugBreakOnNextTrace", 32].Compare(StepTrigger.Out);
+        DebugBreakOnNextTrace.Value.Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
 
         EAX = CallerEBP.Value; 
@@ -826,7 +826,7 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         // Reset request in case we are currently responding to one or we hit a fixed breakpoint
         // before our request could be serviced (if one existed)
-        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.None;
+        DebugBreakOnNextTrace.Value = StepTrigger.None;
         Memory["DebugBreakEBP", 32] = 0;
         // Set break status
         DebugStatus.Value = Status.Break;
@@ -846,13 +846,13 @@ namespace Cosmos.Compiler.DebugStub {
 
         AL.Compare(DsCommand.StepInto);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
-        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Into;
+        DebugBreakOnNextTrace.Value = StepTrigger.Into;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepInto_After";
 
         AL.Compare(DsCommand.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
-        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Over;
+        DebugBreakOnNextTrace.Value = StepTrigger.Over;
         EAX = CallerEBP.Value;
         Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
@@ -860,7 +860,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         AL.Compare(DsCommand.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
-        Memory["DebugBreakOnNextTrace", 32] = StepTrigger.Out;
+        DebugBreakOnNextTrace.Value = StepTrigger.Out;
         EAX = CallerEBP.Value;
         Memory["DebugBreakEBP", 32] = EAX;
         Jump("DebugStub_Break_Exit");
