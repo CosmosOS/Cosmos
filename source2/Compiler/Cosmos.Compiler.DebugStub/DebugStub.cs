@@ -108,8 +108,6 @@ namespace Cosmos.Compiler.DebugStub {
     static protected DataMember32 DebugStatus;
     // Nesting control for non steppable routines
     static protected DataMember32 DebugSuspendLevel;
-    // Nesting control for non steppable routines 
-    new DataMember("DebugResumeLevel", 0),
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
