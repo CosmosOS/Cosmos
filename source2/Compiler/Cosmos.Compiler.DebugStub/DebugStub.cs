@@ -54,7 +54,7 @@ namespace Cosmos.Compiler.DebugStub {
 
         // Read Command ID
         Call<ReadALFromComPort>();
-        Memory["DebugStub_CommandID"] = EAX;
+        DebugStub_CommandID.Value = EAX;
 
         // Get AL back so we can compare it, but also put it back for later
         EAX = ESP[0];
@@ -83,7 +83,7 @@ namespace Cosmos.Compiler.DebugStub {
         AL = DsMsgType.CmdCompleted;
         Call<WriteALToComPort>();
         //
-        EAX = Memory["DebugStub_CommandID", 32];
+        EAX = DebugStub_CommandID.Value;
         Call<WriteALToComPort>();
 
         Label = ".End";
@@ -119,6 +119,8 @@ namespace Cosmos.Compiler.DebugStub {
     // EBP is logged when the trace is started and can be used to determine 
     // what level we are "at" relative to the original step start location.
     static protected DataMember32 DebugBreakEBP;
+    // Command ID of last command received
+    static protected DataMember32 DebugStub_CommandID;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -127,8 +129,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // Command ID of last command received
-        new DataMember("DebugStub_CommandID", 0),
         // Breakpoint addresses
         new DataMember("DebugBPs", new int[256]),
         //TODO: Move to DebugStub (new)
