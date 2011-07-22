@@ -108,6 +108,11 @@ namespace Cosmos.Compiler.DebugStub {
     static protected DataMember32 DebugStatus;
     // Nesting control for non steppable routines
     static protected DataMember32 DebugSuspendLevel;
+    // Ptr to the push all data. It points to the "bottom" after a PushAll op.
+    // Walk up to find the 8 x 32 bit registers.
+    static protected DataMember32 DebugPushAllPtr;
+    // State of Interrupts on entry
+    static protected DataMember32 InterruptsEnabledFlag;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -116,11 +121,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // Ptr to the push all data. It points to the "bottom" after a PushAll op.
-        // Walk up to find the 8 x 32 bit registers.
-        new DataMember("DebugPushAllPtr", 0),
-        new DataMember("InterruptsEnabledFlag", 0),
-                
         // If set non 0, on next trace a break will occur
         new DataMember("DebugBreakOnNextTrace", (uint)StepTrigger.None),
         // For step out and over this is used to determine where the initial request was made
@@ -623,8 +623,8 @@ namespace Cosmos.Compiler.DebugStub {
       public override void Assemble() {
         AL = (int)DsMsgType.Registers; // Send the actual started signal
         Call<WriteALToComPort>();
-        
-        ESI = Memory["DebugPushAllPtr"];
+
+        ESI = DebugPushAllPtr.Value;
         WriteBytesToComPort(32);
         ESI = CallerESP.Address;
         WriteBytesToComPort(4);
@@ -912,7 +912,7 @@ namespace Cosmos.Compiler.DebugStub {
         // But we need to see if IRQs are disabled.
         // If IRQ disabled, we dont reenable them after our disable
         // in this routine.
-        Memory["InterruptsEnabledFlag", 32].Compare(0);
+        InterruptsEnabledFlag.Value.Compare(0);
         JumpIf(Flags.Equal, "DebugStub_Return");
         EnableInterrupts();
         Jump("DebugStub_Return");
@@ -931,14 +931,14 @@ namespace Cosmos.Compiler.DebugStub {
 
         // DS is now marked not to re-enter, so re-enable interrupts if
         // they were enabled on entry
-        Memory["InterruptsEnabledFlag", 32].Compare(0);
+        InterruptsEnabledFlag.Value.Compare(0);
         JumpIf(Flags.Equal, "DebugStub_NoSTI");
         EnableInterrupts();
 
         // Call secondary debug stub
         Label = "DebugStub_NoSTI";
         PushAll();
-        Memory["DebugPushAllPtr", 32] = ESP;
+        DebugPushAllPtr.Value = ESP;
         // We just pushed all registers to the stack so we can use them
         // So we get the stack pointer and add 32. This skips over the
         // registers we just pushed.
@@ -971,7 +971,7 @@ namespace Cosmos.Compiler.DebugStub {
         Label = "DebugStub_CheckIntAndReturn";
         // Re-enable interrupts if needed. This happens on normal exit, or call from above
         // when there would have been a re-entry to DS.
-        Memory["InterruptsEnabledFlag", 32].Compare(0);
+        InterruptsEnabledFlag.Value.Compare(0);
         JumpIf(Flags.Equal, "DebugStub_Return");
         EnableInterrupts();
 

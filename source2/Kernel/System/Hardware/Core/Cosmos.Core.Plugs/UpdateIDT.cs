@@ -91,7 +91,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
       for (int j = 0; j < 256; j++) {
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2"));
         new CPUx86.Call { DestinationLabel = "__INTERRUPT_OCCURRED__" };
-        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
+        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
         if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
           new CPUx86.Push { DestinationValue = 0 };
         }
@@ -129,7 +129,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
 
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
-        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
         new CPUx86.IRET();
       }
       new CPUAll.Label("__INTERRUPT_OCCURRED__");
@@ -142,7 +142,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
 
       // Reenable interrupts
       new CPUx86.Sti();
-      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
       
       new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
     }
