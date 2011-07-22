@@ -115,6 +115,10 @@ namespace Cosmos.Compiler.DebugStub {
     static protected DataMember32 InterruptsEnabledFlag;
     // If set non 0, on next trace a break will occur
     static protected DataMember32 DebugBreakOnNextTrace;
+    // For step out and over this is used to determine where the initial request was made
+    // EBP is logged when the trace is started and can be used to determine 
+    // what level we are "at" relative to the original step start location.
+    static protected DataMember32 DebugBreakEBP;
 
     public DebugStub(int aComNo) {
       mComNo = aComNo;
@@ -123,11 +127,6 @@ namespace Cosmos.Compiler.DebugStub {
 
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
-        // For step out and over this is used to determine where the initial request was made
-        // EBP is logged when the trace is started and can be used to determine 
-        // what level we are "at" relative to the original step start location.
-        new DataMember("DebugBreakEBP", 0),
-
         // Command ID of last command received
         new DataMember("DebugStub_CommandID", 0),
         // Breakpoint addresses
@@ -763,7 +762,7 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
         Label = "Debug__StepOver__";
         EAX = CallerEBP.Value;
-        EAX.Compare(Memory["DebugBreakEBP", 32]);
+        EAX.Compare(DebugBreakEBP.Value);
         // If EBP and start EBP arent equal, dont break
         // Dont use Equal because we aslo need to stop above if the user starts
         // the step at the end of a method and next item is after a return
@@ -776,7 +775,7 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
 
         EAX = CallerEBP.Value; 
-        EAX.Compare(Memory["DebugBreakEBP", 32]); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
+        EAX.Compare(DebugBreakEBP.Value); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
@@ -827,7 +826,7 @@ namespace Cosmos.Compiler.DebugStub {
         // Reset request in case we are currently responding to one or we hit a fixed breakpoint
         // before our request could be serviced (if one existed)
         DebugBreakOnNextTrace.Value = StepTrigger.None;
-        Memory["DebugBreakEBP", 32] = 0;
+        DebugBreakEBP.Value = 0;
         // Set break status
         DebugStatus.Value = Status.Break;
         Call<SendTrace>();
@@ -854,7 +853,7 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         DebugBreakOnNextTrace.Value = StepTrigger.Over;
         EAX = CallerEBP.Value;
-        Memory["DebugBreakEBP", 32] = EAX;
+        DebugBreakEBP.Value = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
 
@@ -862,7 +861,7 @@ namespace Cosmos.Compiler.DebugStub {
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
         DebugBreakOnNextTrace.Value = StepTrigger.Out;
         EAX = CallerEBP.Value;
-        Memory["DebugBreakEBP", 32] = EAX;
+        DebugBreakEBP.Value = EAX;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOut_After";
 
