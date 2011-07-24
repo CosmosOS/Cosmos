@@ -1,5 +1,3 @@
-
-#if LZMACompression
 using System;
 using System.IO;
 
@@ -3239,4 +3237,3 @@ namespace Orvid.Compression
     #endregion
 
 }
-#endif

@@ -11,9 +11,19 @@ using System.IO.Compression;
 
 namespace TTF2OPFF_Converter
 {
+    internal enum CompressionType
+    {
+        None,
+        Deflate,
+        LZMA,
+        GZip,
+        BZip2,
+    }
+
     public partial class Form1 : Form
     {
         private string OutputFileName;
+        private CompressionType CompressionMode = CompressionType.None;
 
         public Form1()
         {
@@ -46,46 +56,52 @@ namespace TTF2OPFF_Converter
             }
             else
             {
-#if DeflateCompression || GZipCompression
-                FileStream str;
-#elif LZMACompression
+                //FileStream str;
                 FileStream final;
-                MemoryStream strm = new MemoryStream();
-#else
-                FileStream strm;
-#endif
-                if (!File.Exists(OutputFileName))
-                {
-#if DeflateCompression || GZipCompression
-                    str = File.Create(OutputFileName);
-#elif LZMACompression
-                    final = File.Create(OutputFileName);
-#else
-                    strm = File.Create(OutputFileName);
-#endif
-                }
-                else
+                dynamic strm;
+
+                #region Already Exists
+                if (File.Exists(OutputFileName))
                 {
                     if (MessageBox.Show("A file at '" + OutputFileName + "' already exists! Would you like to overwrite it?", "File Already Exists", MessageBoxButtons.YesNoCancel) == System.Windows.Forms.DialogResult.Yes)
                     {
-#if DeflateCompression || GZipCompression
-                        str = new FileStream(OutputFileName, FileMode.Truncate);
-#elif LZMACompression
-                        final = new FileStream(OutputFileName, FileMode.Truncate);
-#else
-                        strm = new FileStream(OutputFileName, FileMode.Truncate);
-#endif
+                        
                     }
                     else
                     {
                         return;
                     }
                 }
-#if DeflateCompression
-                DeflateStream strm = new DeflateStream(str, CompressionMode.Compress);
-#elif GZipCompression
-                GZipStream strm = new GZipStream(str, CompressionMode.Compress);
-#endif
+                #endregion
+
+                #region Compression Config
+                //if (CompressionMode == CompressionType.Deflate)
+                //{
+                //    str = new FileStream(OutputFileName, FileMode.Truncate);
+                //    strm = new DeflateStream(str, System.IO.Compression.CompressionMode.Compress);
+                //    final = null;
+                //}
+                //else if (CompressionMode == CompressionType.GZip)
+                //{
+                //    str = new FileStream(OutputFileName, FileMode.Truncate);
+                //    strm = new GZipStream(str, System.IO.Compression.CompressionMode.Compress);
+                //    final = null;
+                //}
+                if (CompressionMode == CompressionType.LZMA)
+                {
+                    if (File.Exists(OutputFileName + ".uncmpr"))
+                    {
+                        File.Delete(OutputFileName + ".uncmpr");
+                    }
+                    strm = File.Create(OutputFileName + ".uncmpr");
+                    final = new FileStream(OutputFileName, FileMode.Truncate);
+                }
+                else
+                {
+                    strm = new FileStream(OutputFileName, FileMode.Truncate);
+                    final = null;
+                }
+                #endregion
 
                 strm.WriteByte(0);
                 strm.WriteByte(0);
@@ -127,7 +143,7 @@ namespace TTF2OPFF_Converter
                         chars.Add(c.Key);
                     }
                     charKeyMap = null;
-                    Font f = new Font(FontName, 30, GraphicsUnit.Pixel);
+                    Font f = new Font(FontName, 128, GraphicsUnit.Pixel);
 
                     UInt64 charsToWrite = (ulong)chars.Count * 16;
                     buffer = BitConverter.GetBytes(charsToWrite);
@@ -137,7 +153,7 @@ namespace TTF2OPFF_Converter
 
                     for (byte style = 0; style < 16; style++)
                     {
-                        f = new Font(FontName, 30, (FontStyle)style, GraphicsUnit.Pixel);
+                        f = new Font(FontName, 128, (FontStyle)style, GraphicsUnit.Pixel);
                         foreach (int ch in chars)
                         {
                             Bitmap Backend = new Bitmap(1, 1);
@@ -172,23 +188,30 @@ namespace TTF2OPFF_Converter
                             prevChar = ch;
                         }
                         f.Dispose();
-#if !LZMACompression
                         strm.Flush();
-#endif
                         System.GC.Collect();
                     }
-#if LZMACompression
-                    buffer = Orvid.Compression.LZMACoder.Compress(strm.GetBuffer());
-                    final.WriteByte(255);
-                    final.Write(buffer, 0, buffer.Length);
-                    final.Flush();
-                    final.Close();
-                    final.Dispose();
-#endif
+
+                    if (CompressionMode == CompressionType.LZMA)
+                    {
+                        strm.Position = 0;
+                        buffer = new byte[strm.Length];
+                        strm.Read(buffer, 0, (Int32)strm.Length);
+                        buffer = Orvid.Compression.LZMACoder.Compress(buffer);
+                        final.WriteByte(255);
+                        final.Write(buffer, 0, buffer.Length);
+                        final.Flush();
+                        final.Close();
+                        final.Dispose();
+                    }
 
                     strm.Flush();
                     strm.Close();
                     strm.Dispose();
+                    if (CompressionMode == CompressionType.LZMA)
+                    {
+                        File.Delete(OutputFileName + ".uncmpr");
+                    }
                     //pictureBox1.Image = null;
 
                     MessageBox.Show("Conversion Completed Successfully!");
@@ -204,11 +227,12 @@ namespace TTF2OPFF_Converter
         {
             bool[] bits = new bool[b.Height * b.Width];
             int bitnum = 0;
+            Color White = Color.FromArgb(0, 0, 0);
             for (int x = 0; x < b.Width; x++)
             {
                 for (int y = 0; y < b.Height; y++)
                 {
-                    if (b.GetPixel(x, y) == Color.FromArgb(255, 255, 255))
+                    if (b.GetPixel(x, y) != White)
                     {
                         bits[bitnum] = false;
                     }
@@ -243,6 +267,39 @@ namespace TTF2OPFF_Converter
         }
 
         private void FontComboBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            FileStream str = new FileStream("TimesNewRoman.opff", FileMode.Open);
+            byte[] data = new byte[str.Length];
+            str.Read(data, 0, (int)str.Length);
+            Orvid.Graphics.FontSupport.OPFF f = new Orvid.Graphics.FontSupport.OPFF(data);
+            Orvid.Graphics.Image i = f.GetCharacter(33, Orvid.Graphics.FontSupport.FontFlag.Normal);
+            Bitmap b = new Bitmap(i.Width, i.Height);
+            for (uint x = 0; x < i.Width; x++)
+            {
+                for (uint y = 0; y < i.Height; y++)
+                {
+                    if (i.GetPixel(x, y) == null)
+                        throw new Exception();
+                    b.SetPixel((int)x, (int)y, i.GetPixel(x, y));
+                }
+            }
+            pictureBox1.Image = b;
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox1.Size = new Size(128, 128);
+            str.Close();
+        }
+
+        private void CompressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CompressionMode = (CompressionType)Enum.Parse(typeof(CompressionType), (String)CompressionComboBox.Items[CompressionComboBox.SelectedIndex]);
+        }
+
+        private void CompressionComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
