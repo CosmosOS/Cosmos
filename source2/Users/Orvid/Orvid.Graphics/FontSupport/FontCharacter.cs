@@ -11,7 +11,7 @@ namespace Orvid.Graphics.FontSupport
         public FontCharacter(Image character, FontFlag flags)
         {
             Int32 i = (Int32)flags;
-            forms = new Image[i];
+            forms = new Image[i + 1];
             forms[i] = character;
         }
 
@@ -20,7 +20,7 @@ namespace Orvid.Graphics.FontSupport
             Int32 i = (Int32)flags;
             if (i > forms.Length)
             {
-                Image[] forms2 = new Image[i];
+                Image[] forms2 = new Image[i + 1];
                 Array.Copy(forms, forms2, forms.Length);
                 forms = forms2;
             }

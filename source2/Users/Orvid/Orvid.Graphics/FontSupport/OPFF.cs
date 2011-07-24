@@ -36,21 +36,21 @@ namespace Orvid.Graphics.FontSupport
         {
             UInt64 r = 0;
 
-            r += data[0];
-            r <<= 8;
-            r += data[1];
-            r <<= 8;
-            r += data[2];
-            r <<= 8;
-            r += data[3];
-            r <<= 8;
-            r += data[4];
-            r <<= 8;
-            r += data[5];
+            r += data[7];
             r <<= 8;
             r += data[6];
             r <<= 8;
-            r += data[7];
+            r += data[5];
+            r <<= 8;
+            r += data[4];
+            r <<= 8;
+            r += data[3];
+            r <<= 8;
+            r += data[2];
+            r <<= 8;
+            r += data[1];
+            r <<= 8;
+            r += data[0];
 
             return r;
         }
@@ -59,13 +59,13 @@ namespace Orvid.Graphics.FontSupport
         {
             Int32 r = 0;
 
-            r += data[0];
-            r <<= 8;
-            r += data[1];
+            r += data[3];
             r <<= 8;
             r += data[2];
             r <<= 8;
-            r += data[3];
+            r += data[1];
+            r <<= 8;
+            r += data[0];
 
             return r;
         }
@@ -90,10 +90,10 @@ namespace Orvid.Graphics.FontSupport
             UInt64 charsToRead = ReadUInt64(datarr);
 
             Int32 prevCharNumber = 0;
-            for (UInt64 i = 0; i < charsToRead; i++)
+            for (UInt64 i = 0; i < 2; i++)
             {
                 // Check if the character number is incremented from the last item.
-                if ((data[curloc] & 1) == 1) // this means increment it.
+                if (data[curloc] == 255) // this means increment it.
                 {
                     curloc++;
                     prevCharNumber++;
@@ -129,6 +129,7 @@ namespace Orvid.Graphics.FontSupport
                     curloc += len;
                     Image im = LoadFromBinary(datarr, height, width);
                     foundChars.AddCharacter(prevCharNumber, im, flags);
+                    curloc++;
                 }
             }
         }
@@ -185,18 +186,19 @@ namespace Orvid.Graphics.FontSupport
 
             bitnum = 0;
             Image i = new Image(width, height);
-
+            //for (uint x = 0; x < width; x++)
             for (uint y = 0; y < height; y++)
             {
+                //for (uint y = 0; y < height; y++)
                 for (uint x = 0; x < width; x++)
                 {
                     if (idata[bitnum])
                     {
-                        i.SetPixel(x, y, Colors.White); // Color the pixel white
+                        i.SetPixel(x, y, Colors.Black); // Color the pixel white
                     }
                     else
                     {
-                        i.SetPixel(x, y, Colors.Black); // Color the pixel black
+                        i.SetPixel(x, y, Colors.White); // Color the pixel black
                     }
                     bitnum++;
                 }

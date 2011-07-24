@@ -1,4 +1,4 @@
-﻿//#define DebugDraw // If this is uncommented, all triangles will have a set-color border drawn. This is useful to debug polygon drawing code. 
+﻿#define DebugDraw // If this is uncommented, all triangles will have a set-color border drawn. This is useful to debug polygon drawing code. 
 //#define SqrtWorks // Only uncomment this when the square-root works 
 
 using System;
@@ -300,7 +300,7 @@ namespace Orvid.Graphics
                 for (uint x = 0; x < i.Width; x++)
                 {
                     value = i.GetPixel(x, y);
-                    if (value != 0)
+                    if (!value.Empty)
                         SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
                 }
             }
@@ -751,11 +751,11 @@ namespace Orvid.Graphics
             Vec2 m2 = (p5 + p6) / 2;
             Vec2 m3 = (p4 + p6) / 2;
 #if DebugDraw
-            Pixel p9 = new Pixel();
-            p9.B = 200;
-            i.DrawLine(p4, p5, p9);
-            i.DrawLine(p5, p6, p9);
-            i.DrawLine(p6, p4, p9);
+            Pixel p50 = new Pixel();
+            p50.B = 200;
+            i.DrawLine(p4, p5, p50);
+            i.DrawLine(p5, p6, p50);
+            i.DrawLine(p6, p4, p50);
 #else
             i.DrawLine(p6, m1, color);
             i.DrawLine(p4, m2, color);
@@ -929,7 +929,7 @@ namespace Orvid.Graphics
         /// <param name="width">The width position of the pixel.</param>
         /// <param name="height">The height position of the pixel.</param>
         /// <returns>The Pixel at the specified position.</returns>
-        public Pixel GetPixel(uint x, uint y)
+        public virtual Pixel GetPixel(uint x, uint y)
         {
             return Data[(y * Width) + x];
         }
@@ -943,7 +943,7 @@ namespace Orvid.Graphics
         /// <param name="width">The width position of the pixel.</param>
         /// <param name="height">The height position of the pixel.</param>
         /// <param name="p">The pixel to set to.</param>
-        public void SetPixel(uint x, uint y, Pixel p)
+        public virtual void SetPixel(uint x, uint y, Pixel p)
         {
             //Modified.Add(new Vec2(width, height));
             Data[((y * Width) + x)] = p;

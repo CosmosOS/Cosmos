@@ -4,14 +4,14 @@ namespace Orvid.Graphics
 {
     public class Colors
     {
-        public static Pixel Black = new Pixel(0, 0, 0, 0);
-        public static Pixel White = new Pixel(255, 255, 255, 0);
+        public static Pixel Black = new Pixel(0, 0, 0, 255);
+        public static Pixel White = new Pixel(255, 255, 255, 255);
     }
 
     /// <summary>
     /// This class describes a single pixel.
     /// </summary>
-    public class Pixel
+    public struct Pixel
     {
         /// <summary>
         /// The byte that describes the amount of Red in the pixel.
@@ -32,12 +32,18 @@ namespace Orvid.Graphics
         /// <summary>
         /// This tells if the pixel is empty, and should be ignored.
         /// </summary>
-        public bool Empty = false;
-
-        public Pixel() : this(true)
+        public bool Empty
         {
+            get
+            {
+                return (A + R + B + G == 0);
+            }
         }
 
+        //public Pixel() : this(true)
+        //{
+        //}
+        
         public Pixel(byte r, byte g, byte b, byte a)
         {
             this.R = r;
@@ -48,24 +54,36 @@ namespace Orvid.Graphics
 
         public Pixel(bool empty)
         {
-            if (empty)
-                this.Empty = true;
+            this.R = 0;
+            this.G = 0;
+            this.B = 0;
+            this.A = 0;
+        }
+
+        public static implicit operator System.Drawing.Color(Pixel a)
+        {
+            return System.Drawing.Color.FromArgb(a.A, a.R, a.G, a.B);
+        }
+
+        public static implicit operator Pixel(System.Drawing.Color a)
+        {
+            return new Pixel(a.R, a.G, a.B, a.A);
         }
 
         public static bool operator !=(Pixel a, Pixel b)
         {
-            if (!(a is Pixel) || !(b is Pixel))
-            {
-                if (!(a is Pixel) && !(b is Pixel))
-                    return false;
-                return true;
-            }
-            else
-            {
+            //if (!(a is Pixel) || !(b is Pixel))
+            //{
+            //    if (!(a is Pixel) && !(b is Pixel))
+            //        return false;
+            //    return true;
+            //}
+            //else
+            //{
                 if (a.A != b.A || a.B != b.B || a.G != b.G || a.R != b.R)
                     return true;
                 return false;
-            }
+            //}
         }
 
         public static bool operator !=(Pixel a, int b)
@@ -81,18 +99,18 @@ namespace Orvid.Graphics
         public static bool operator ==(Pixel a, Pixel b)
         {
 
-            if (!(a is Pixel) || !(b is Pixel))
-            {
-                if (!(a is Pixel) && !(b is Pixel))
-                    return true;
-                return false;
-            }
-            else
-            {
+            //if (!(a is Pixel) || !(b is Pixel))
+            //{
+            //    if (!(a is Pixel) && !(b is Pixel))
+            //        return true;
+            //    return false;
+            //}
+            //else
+            //{
                 if (a.A != b.A || a.B != b.B || a.G != b.G || a.R != b.R)
                     return false;
                 return true;
-            }
+            //}
         }
 
         public override bool Equals(object obj)

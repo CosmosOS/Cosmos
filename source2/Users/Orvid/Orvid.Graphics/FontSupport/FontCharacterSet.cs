@@ -6,7 +6,8 @@ namespace Orvid.Graphics.FontSupport
 {
     public class FontCharacterSet
     {
-        List<FontCharacter> foundChars = new List<FontCharacter>();
+        FontCharacter[] foundChars = new FontCharacter[ushort.MaxValue];
+        uint chars = 0;
 
         public void AddCharacter(int charNumber, Image ch, FontFlag flags)
         {
@@ -18,6 +19,7 @@ namespace Orvid.Graphics.FontSupport
             {
                 foundChars[charNumber].AddForm(ch, flags);
             }
+            chars++;
         }
 
         public Image GetCharacter(int charNumber, FontFlag flags)

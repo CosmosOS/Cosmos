@@ -41,8 +41,10 @@
     <Compile Include="Checksums\CRC32.cs" />
     <Compile Include="Checksums\StrangeCRC.cs" />
     <Compile Include="LZMA.cs" />
+    <Compile Include="Lzw.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Streams\BZip2.cs" />
+    <Compile Include="Streams\Lzw.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
