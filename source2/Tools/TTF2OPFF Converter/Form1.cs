@@ -46,6 +46,7 @@ namespace TTF2OPFF_Converter
                 FontComboBox.Items.Add(f.Name);
             }
             FontComboBox.SelectedIndex = 0;
+            CompressionComboBox.SelectedIndex = 0;
         }
 
         private void ConvertButton_Click(object sender, EventArgs e)
@@ -65,7 +66,7 @@ namespace TTF2OPFF_Converter
                 {
                     if (MessageBox.Show("A file at '" + OutputFileName + "' already exists! Would you like to overwrite it?", "File Already Exists", MessageBoxButtons.YesNoCancel) == System.Windows.Forms.DialogResult.Yes)
                     {
-                        
+
                     }
                     else
                     {
@@ -145,13 +146,13 @@ namespace TTF2OPFF_Converter
                     charKeyMap = null;
                     Font f = new Font(FontName, 128, GraphicsUnit.Pixel);
 
-                    UInt64 charsToWrite = (ulong)chars.Count * 16;
+                    UInt64 charsToWrite = (ulong)chars.Count * 1;
                     buffer = BitConverter.GetBytes(charsToWrite);
                     strm.Write(buffer, 0, buffer.Length); // Write the number of chars to read.
 
                     int prevChar = 0;
 
-                    for (byte style = 0; style < 16; style++)
+                    for (byte style = 0; style < 1; style++)
                     {
                         f = new Font(FontName, 128, (FontStyle)style, GraphicsUnit.Pixel);
                         foreach (int ch in chars)
@@ -174,7 +175,7 @@ namespace TTF2OPFF_Converter
                             else
                             {
                                 strm.WriteByte(0); // write that it's not incremented from the previous char.
-                                buffer = BitConverter.GetBytes(ch);
+                                buffer = BitConverter.GetBytes((UInt32)ch);
                                 strm.Write(buffer, 0, buffer.Length); // Write the char number.
                             }
                             pictureBox1.Image = Backend;
@@ -187,9 +188,6 @@ namespace TTF2OPFF_Converter
                             strm.Write(buffer, 0, buffer.Length);
                             prevChar = ch;
                         }
-                        f.Dispose();
-                        strm.Flush();
-                        System.GC.Collect();
                     }
 
                     if (CompressionMode == CompressionType.LZMA)
@@ -227,12 +225,12 @@ namespace TTF2OPFF_Converter
         {
             bool[] bits = new bool[b.Height * b.Width];
             int bitnum = 0;
-            Color White = Color.FromArgb(0, 0, 0);
+            Color Black = Color.FromArgb(255, 255, 255);
             for (int x = 0; x < b.Width; x++)
             {
                 for (int y = 0; y < b.Height; y++)
                 {
-                    if (b.GetPixel(x, y) != White)
+                    if (b.GetPixel(x, y) == Black)
                     {
                         bits[bitnum] = false;
                     }
@@ -243,11 +241,7 @@ namespace TTF2OPFF_Converter
                     bitnum++;
                 }
             }
-            int bytes = bits.Length / 8;
-            if ((bits.Length % 8) != 0)
-            {
-                bytes++;
-            }
+            int bytes = (Int32)Math.Ceiling((double)((b.Width * b.Height) / 8));
             byte[] arr2 = new byte[bytes];
             int bitIndex = 0, byteIndex = 0;
             for (int i = 0; i < bits.Length; i++)
@@ -263,6 +257,7 @@ namespace TTF2OPFF_Converter
                     byteIndex++;
                 }
             }
+
             return arr2;
         }
 
@@ -273,25 +268,34 @@ namespace TTF2OPFF_Converter
 
         private void button1_Click(object sender, EventArgs e)
         {
-            FileStream str = new FileStream("TimesNewRoman.opff", FileMode.Open);
+            FileStream str = new FileStream("AgencyFB.opff", FileMode.Open);
             byte[] data = new byte[str.Length];
             str.Read(data, 0, (int)str.Length);
             Orvid.Graphics.FontSupport.OPFF f = new Orvid.Graphics.FontSupport.OPFF(data);
-            Orvid.Graphics.Image i = f.GetCharacter(33, Orvid.Graphics.FontSupport.FontFlag.Normal);
+            str.Close();
+            str.Dispose();
+            Orvid.Graphics.Image i = f.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontFlag.Normal);
             Bitmap b = new Bitmap(i.Width, i.Height);
             for (uint x = 0; x < i.Width; x++)
             {
                 for (uint y = 0; y < i.Height; y++)
                 {
-                    if (i.GetPixel(x, y) == null)
-                        throw new Exception();
+                    //if (i.GetPixel(x, y) == null)
+                    //    throw new Exception();
                     b.SetPixel((int)x, (int)y, i.GetPixel(x, y));
                 }
             }
             pictureBox1.Image = b;
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox1.Size = new Size(128, 128);
-            str.Close();
+            pictureBox1.Size = new Size(i.Width, i.Height);
+
+            Font f2 = new Font("Agency FB", 128, (FontStyle)0, GraphicsUnit.Pixel);
+            Bitmap Backend = new Bitmap(i.Width, i.Height);
+            Graphics g = Graphics.FromImage(Backend);
+            g.Clear(Color.White);
+            g.DrawString(new String(new char[] { (char)Int32.Parse(textBox2.Text) }), f2, new SolidBrush(Color.Black), 2, 2);
+            g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
+            pictureBox2.Image = Backend;
+            pictureBox2.Size = new Size(i.Width, i.Height);
         }
 
         private void CompressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
