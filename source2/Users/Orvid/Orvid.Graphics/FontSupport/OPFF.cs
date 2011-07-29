@@ -55,9 +55,9 @@ namespace Orvid.Graphics.FontSupport
             return r;
         }
 
-        private Int32 ReadInt32(byte[] data)
+        private UInt32 ReadInt32(byte[] data)
         {
-            Int32 r = 0;
+            UInt32 r = 0;
 
             r += data[3];
             r <<= 8;
@@ -89,8 +89,8 @@ namespace Orvid.Graphics.FontSupport
             curloc += 8;
             UInt64 charsToRead = ReadUInt64(datarr);
 
-            Int32 prevCharNumber = 0;
-            for (UInt64 i = 0; i < 2; i++)
+            UInt32 prevCharNumber = 0;
+            for (UInt64 i = 0; i < charsToRead; i++)
             {
                 // Check if the character number is incremented from the last item.
                 if (data[curloc] == 255) // this means increment it.
@@ -108,7 +108,11 @@ namespace Orvid.Graphics.FontSupport
                     Array.Copy(data, curloc, datarr, 0, len);
                     curloc += len;
                     Image im = LoadFromBinary(datarr, height, width);
-                    foundChars.AddCharacter(prevCharNumber, im, flags);
+                    if (prevCharNumber > ushort.MaxValue)
+                    {
+                        throw new Exception();
+                    }
+                    foundChars.AddCharacter((int)prevCharNumber, im, flags);
                 }
                 else
                 {
@@ -117,6 +121,10 @@ namespace Orvid.Graphics.FontSupport
                     Array.Copy(data, curloc, datarr, 0, 4);
                     curloc += 4;
                     prevCharNumber = ReadInt32(datarr);
+                    if (prevCharNumber > ushort.MaxValue)
+                    {
+                        throw new Exception();
+                    }
                     FontFlag flags = (FontFlag)data[curloc];
                     curloc++;
                     byte height = data[curloc];
@@ -128,8 +136,7 @@ namespace Orvid.Graphics.FontSupport
                     Array.Copy(data, curloc, datarr, 0, len);
                     curloc += len;
                     Image im = LoadFromBinary(datarr, height, width);
-                    foundChars.AddCharacter(prevCharNumber, im, flags);
-                    curloc++;
+                    foundChars.AddCharacter((int)prevCharNumber, im, flags);
                 }
             }
         }
@@ -141,42 +148,57 @@ namespace Orvid.Graphics.FontSupport
             int bitnum = 0;
             for (int inc = 0; inc < data.Length; inc++)
             {
-                if ((data[inc] & 1) == 1)
+                //int a1 = (data[inc] >> 7);
+                //int a2 = ((byte)(data[inc] << 1) >> 7);
+                //int a3 = ((byte)(data[inc] << 2) >> 7);
+                //int a4 = ((byte)(data[inc] << 3) >> 7);
+                //int a5 = ((byte)(data[inc] << 4) >> 7);
+                //int a6 = ((byte)(data[inc] << 5) >> 7);
+                //int a7 = ((byte)(data[inc] << 6) >> 7);
+                //int a8 = ((byte)(data[inc] << 7) >> 7);
+
+                //int aFinal = a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8;
+                //if (aFinal >= 8)
+                //{
+                //    throw new Exception();
+                //}
+
+                if ((data[inc] >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 2) == 1)
+                if (((byte)(data[inc] << 1) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 3) == 1)
+                if (((byte)(data[inc] << 2) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 4) == 1)
+                if (((byte)(data[inc] << 3) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 5) == 1)
+                if (((byte)(data[inc] << 4) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 6) == 1)
+                if (((byte)(data[inc] << 5) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 7) == 1)
+                if (((byte)(data[inc] << 6) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if ((data[inc] & 8) == 1)
+                if (((byte)(data[inc] << 7) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
@@ -186,11 +208,9 @@ namespace Orvid.Graphics.FontSupport
 
             bitnum = 0;
             Image i = new Image(width, height);
-            //for (uint x = 0; x < width; x++)
-            for (uint y = 0; y < height; y++)
+            for (uint x = 0; x < width; x++)
             {
-                //for (uint y = 0; y < height; y++)
-                for (uint x = 0; x < width; x++)
+                for (uint y = 0; y < height; y++)
                 {
                     if (idata[bitnum])
                     {
