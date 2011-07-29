@@ -18,7 +18,7 @@ namespace Orvid.Graphics.FontSupport
         public void AddForm(Image character, FontFlag flags)
         {
             Int32 i = (Int32)flags;
-            if (i > forms.Length)
+            if (i > forms.Length - 1)
             {
                 Image[] forms2 = new Image[i + 1];
                 Array.Copy(forms, forms2, forms.Length);

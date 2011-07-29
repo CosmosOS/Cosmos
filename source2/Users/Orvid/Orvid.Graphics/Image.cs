@@ -1,4 +1,4 @@
-﻿#define DebugDraw // If this is uncommented, all triangles will have a set-color border drawn. This is useful to debug polygon drawing code. 
+﻿#define DebugDraw // If this is uncommented, all triangles will have a set-color border drawn. This is useful to debug polygon drawing code.
 //#define SqrtWorks // Only uncomment this when the square-root works 
 
 using System;
@@ -74,7 +74,7 @@ namespace Orvid.Graphics
             }
         }
         #endregion
-        
+
 
 
         #region DON'T WORK!!!
@@ -923,6 +923,156 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        #region AntiAlias
+        public void AntiAlias()
+        {
+            Image i = new Image(this.Width, this.Height);
+
+            for (uint y = 0; y < this.Height; y++)
+            {
+                for (uint x = 0; x < this.Width; x++)
+                {
+                    uint R = 0, G = 0, B = 0;
+                    byte divBy = 0;
+                    Pixel p = this.GetPixel(x, y);
+                    R += p.R;
+                    G += p.G;
+                    B += p.B;
+                    divBy++;
+
+                    p = this.GetPixel(x - 1, y - 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x, y - 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x + 1, y - 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x - 1, y);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x + 1, y);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x - 1, y + 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x, y + 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x + 1, y + 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    i.SetPixel(x, y, new Pixel(((byte)(R / divBy)), ((byte)(G / divBy)), ((byte)(B / divBy)), 255));
+                }
+            }
+            this.Data = i.Data;
+        }
+        #endregion
+
+        #region HalveSize
+        public void HalveSize()
+        {
+            Image i = new Image(this.Width / 2, this.Height / 2);
+
+            for (uint y = 0; y < this.Height; y = y + 2)
+            {
+                for (uint x = 0; x < this.Width; x = x + 2)
+                {
+                    uint R = 0, G = 0, B = 0;
+                    byte divBy = 0;
+                    Pixel p = this.GetPixel(x, y);
+                    R += p.R;
+                    G += p.G;
+                    B += p.B;
+                    divBy++;
+
+                    p = this.GetPixel(x + 1, y);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x, y + 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    p = this.GetPixel(x + 1, y + 1);
+                    if (!p.Empty)
+                    {
+                        R += p.R;
+                        G += p.G;
+                        B += p.B;
+                        divBy++;
+                    }
+
+                    i.SetPixel(x / 2, y / 2, new Pixel(((byte)(R / divBy)), ((byte)(G / divBy)), ((byte)(B / divBy)), 255));
+                }
+            }
+            this.Data = i.Data;
+            this.Height = i.Height;
+            this.Width = i.Width;
+        }
+        #endregion
+
+
         /// <summary>
         /// Get's the pixel a the specified location.
         /// </summary>
@@ -931,7 +1081,10 @@ namespace Orvid.Graphics
         /// <returns>The Pixel at the specified position.</returns>
         public virtual Pixel GetPixel(uint x, uint y)
         {
-            return Data[(y * Width) + x];
+            if (x > 0 && x < Width && y > 0 && y < Height)
+                return Data[(y * Width) + x];
+            else
+                return new Pixel(true);
         }
 
         //public List<Vec2> Modified = new List<Vec2>();
