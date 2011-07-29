@@ -73,6 +73,10 @@ namespace TTF2OPFF_Converter
                         return;
                     }
                 }
+                else
+                {
+                    File.Create(OutputFileName).Close();
+                }
                 #endregion
 
                 #region Compression Config
