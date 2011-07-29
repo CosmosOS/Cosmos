@@ -193,6 +193,7 @@ namespace TTF2OPFF_Converter
                             prevChar = ch;
                         }
                         strm.Flush();
+                        System.GC.Collect();
                     }
 
                     if (CompressionMode == CompressionType.LZMA)
