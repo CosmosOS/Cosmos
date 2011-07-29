@@ -163,32 +163,7 @@ namespace Orvid.Graphics.FontSupport
                 //    throw new Exception();
                 //}
 
-                if ((data[inc] >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 1) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 2) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 3) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 4) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 5) >> 7) == 1)
+                if (((byte)(data[inc] << 7) >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
@@ -198,7 +173,32 @@ namespace Orvid.Graphics.FontSupport
                     idata[bitnum] = true;
                 }
                 bitnum++;
-                if (((byte)(data[inc] << 7) >> 7) == 1)
+                if (((byte)(data[inc] << 5) >> 7) == 1)
+                {
+                    idata[bitnum] = true;
+                }
+                bitnum++;
+                if (((byte)(data[inc] << 4) >> 7) == 1)
+                {
+                    idata[bitnum] = true;
+                }
+                bitnum++;
+                if (((byte)(data[inc] << 3) >> 7) == 1)
+                {
+                    idata[bitnum] = true;
+                }
+                bitnum++;
+                if (((byte)(data[inc] << 2) >> 7) == 1)
+                {
+                    idata[bitnum] = true;
+                }
+                bitnum++;
+                if (((byte)(data[inc] << 1) >> 7) == 1)
+                {
+                    idata[bitnum] = true;
+                }
+                bitnum++;
+                if ((data[inc] >> 7) == 1)
                 {
                     idata[bitnum] = true;
                 }
@@ -208,8 +208,11 @@ namespace Orvid.Graphics.FontSupport
 
             bitnum = 0;
             Image i = new Image(width, height);
+
+            //for (uint y = 0; y < height; y++)
             for (uint x = 0; x < width; x++)
             {
+                //for (uint x = 0; x < width; x++)
                 for (uint y = 0; y < height; y++)
                 {
                     if (idata[bitnum])
