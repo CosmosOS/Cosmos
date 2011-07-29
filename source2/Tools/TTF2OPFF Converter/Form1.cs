@@ -150,15 +150,15 @@ namespace TTF2OPFF_Converter
                     charKeyMap = null;
                     Font f = new Font(FontName, 128, GraphicsUnit.Pixel);
 
-                    UInt64 charsToWrite = (ulong)chars.Count * 1;
+                    UInt64 charsToWrite = (ulong)chars.Count * 16;
                     buffer = BitConverter.GetBytes(charsToWrite);
                     strm.Write(buffer, 0, buffer.Length); // Write the number of chars to read.
 
                     int prevChar = 0;
 
-                    for (byte style = 0; style < 1; style++)
+                    for (byte style = 0; style < 16; style++)
                     {
-                        f = new Font(FontName, 128, (FontStyle)style, GraphicsUnit.Pixel);
+                        f = new Font(FontName, 64, (FontStyle)style, GraphicsUnit.Pixel);
                         foreach (int ch in chars)
                         {
                             Bitmap Backend = new Bitmap(1, 1);
@@ -192,6 +192,7 @@ namespace TTF2OPFF_Converter
                             strm.Write(buffer, 0, buffer.Length);
                             prevChar = ch;
                         }
+                        strm.Flush();
                     }
 
                     if (CompressionMode == CompressionType.LZMA)
@@ -276,9 +277,13 @@ namespace TTF2OPFF_Converter
             byte[] data = new byte[str.Length];
             str.Read(data, 0, (int)str.Length);
             Orvid.Graphics.FontSupport.OPFF f = new Orvid.Graphics.FontSupport.OPFF(data);
+            data = null;
             str.Close();
             str.Dispose();
             Orvid.Graphics.Image i = f.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontFlag.Normal);
+            //i.AntiAlias();
+            //i.HalveSize();
+            i.HalveSize();
             Bitmap b = new Bitmap(i.Width, i.Height);
             for (uint x = 0; x < i.Width; x++)
             {
@@ -291,8 +296,10 @@ namespace TTF2OPFF_Converter
             }
             pictureBox1.Image = b;
             pictureBox1.Size = new Size(i.Width, i.Height);
+            f = null;
+            System.GC.Collect();
 
-            Font f2 = new Font("Agency FB", 128, (FontStyle)0, GraphicsUnit.Pixel);
+            Font f2 = new Font("Agency FB", 32, (FontStyle)0, GraphicsUnit.Pixel);
             Bitmap Backend = new Bitmap(i.Width, i.Height);
             Graphics g = Graphics.FromImage(Backend);
             g.Clear(Color.White);
@@ -300,6 +307,10 @@ namespace TTF2OPFF_Converter
             g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
             pictureBox2.Image = Backend;
             pictureBox2.Size = new Size(i.Width, i.Height);
+            f2 = null;
+            g = null;
+            i = null;
+            System.GC.Collect();
         }
 
         private void CompressionComboBox_SelectedIndexChanged(object sender, EventArgs e)
