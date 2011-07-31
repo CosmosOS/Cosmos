@@ -45,11 +45,11 @@ namespace Orvid.Graphics.Shapes
                 modified = value;
                 if (modified)
                 {
-                    //Parent.Modified = true;
+                    Parent.Modified = true;
                 }
             }
         }
-        //public ShapedImage Parent { get; protected set; }
+        public ShapedImage Parent { get; protected set; }
         public abstract void Draw();
     }
 }
