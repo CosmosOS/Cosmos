@@ -7,7 +7,7 @@ namespace Orvid.Graphics.Shapes
     public class Square : Shape
     {
         private Image i;
-        private Pixel fillColor = new Pixel(255, 255, 255, 0); // Initialize white.
+        private Pixel fillColor = new Pixel(255, 255, 255, 255); // Initialize white.
         public Pixel FillColor
         {
             get
@@ -16,11 +16,14 @@ namespace Orvid.Graphics.Shapes
             }
             set
             {
-                Modified = true;
-                fillColor = value;
+                if (fillColor != value)
+                {
+                    Modified = true;
+                    fillColor = value;
+                }
             }
         }
-        private Pixel borderColor = new Pixel(0, 0, 0, 0); // Initialize black.
+        private Pixel borderColor = new Pixel(0, 0, 0, 255); // Initialize black.
         public Pixel BorderColor
         {
             get
@@ -29,8 +32,11 @@ namespace Orvid.Graphics.Shapes
             }
             set
             {
-                Modified = true;
-                borderColor = value;
+                if (borderColor != value)
+                {
+                    Modified = true;
+                    borderColor = value;
+                }
             }
         }
         private int size;
@@ -42,9 +48,12 @@ namespace Orvid.Graphics.Shapes
             }
             set
             {
-                Modified = true;
-                size = value;
-                i = new Image(this.Size, this.Size);
+                if (size != value)
+                {
+                    Modified = true;
+                    size = value;
+                    i = new Image(this.Size, this.Size);
+                }
             }
         }
 

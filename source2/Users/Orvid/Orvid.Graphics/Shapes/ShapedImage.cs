@@ -17,7 +17,12 @@ namespace Orvid.Graphics.Shapes
         {
             if (Modified)
             {
-
+                this.Clear(new Pixel(true));
+                foreach (Shape s in Shapes)
+                {
+                    s.Draw();
+                }
+                this.Modified = false;
             }
             return this;
         }
