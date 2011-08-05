@@ -43,7 +43,7 @@ namespace Orvid.Graphics
         //public Pixel() : this(true)
         //{
         //}
-        
+
         public Pixel(byte r, byte g, byte b, byte a)
         {
             this.R = r;
@@ -80,9 +80,9 @@ namespace Orvid.Graphics
             //}
             //else
             //{
-                if (a.A != b.A || a.B != b.B || a.G != b.G || a.R != b.R)
-                    return true;
-                return false;
+            if (a.A != b.A || a.B != b.B || a.G != b.G || a.R != b.R)
+                return true;
+            return false;
             //}
         }
 
@@ -107,9 +107,9 @@ namespace Orvid.Graphics
             //}
             //else
             //{
-                if (a.A != b.A || a.B != b.B || a.G != b.G || a.R != b.R)
-                    return false;
-                return true;
+            if (a.A != b.A || a.B != b.B || a.G != b.G || a.R != b.R)
+                return false;
+            return true;
             //}
         }
 

@@ -10,7 +10,7 @@ namespace Orvid.Graphics
     /// <summary>
     /// This class is used to describe an image.
     /// </summary>
-    public class Image
+    public class Image : Shapes.Shape, IDisposable
     {
         /// <summary>
         /// The raw data in the image.
@@ -57,12 +57,22 @@ namespace Orvid.Graphics
             this.Data = new Pixel[(Height + 1) * (Width + 1)];
         }
 
+        public Image(Vec2 v) : this(v.X, v.Y) 
+        {
+        }
+
         /// <summary>
-        /// The default Disposer.
+        /// The default Destructor.
         /// </summary>
         ~Image()
         {
             this.Data = null;
+        }
+
+        public void Dispose()
+        {
+            this.Data = null;
+            System.GC.Collect();
         }
 
         #region Clear
@@ -195,7 +205,7 @@ namespace Orvid.Graphics
         #endregion
 
 
-        // This SHOULD work. (I can't gaurentee it though.)
+        // This SHOULD work. (I can't guarantee it though.)
         #region DrawCircle
         /// <summary>
         /// Draws a filled circle.
@@ -922,156 +932,7 @@ namespace Orvid.Graphics
             Visiteds = new bool[0];
         }
         #endregion
-
-        #region AntiAlias
-        public void AntiAlias()
-        {
-            Image i = new Image(this.Width, this.Height);
-
-            for (uint y = 0; y < this.Height; y++)
-            {
-                for (uint x = 0; x < this.Width; x++)
-                {
-                    uint R = 0, G = 0, B = 0;
-                    byte divBy = 0;
-                    Pixel p = this.GetPixel(x, y);
-                    R += p.R;
-                    G += p.G;
-                    B += p.B;
-                    divBy++;
-
-                    p = this.GetPixel(x - 1, y - 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x, y - 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x + 1, y - 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x - 1, y);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x + 1, y);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x - 1, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x + 1, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    i.SetPixel(x, y, new Pixel(((byte)(R / divBy)), ((byte)(G / divBy)), ((byte)(B / divBy)), 255));
-                }
-            }
-            this.Data = i.Data;
-        }
-        #endregion
-
-        #region HalveSize
-        public void HalveSize()
-        {
-            Image i = new Image(this.Width / 2, this.Height / 2);
-
-            for (uint y = 0; y < this.Height; y = y + 2)
-            {
-                for (uint x = 0; x < this.Width; x = x + 2)
-                {
-                    uint R = 0, G = 0, B = 0;
-                    byte divBy = 0;
-                    Pixel p = this.GetPixel(x, y);
-                    R += p.R;
-                    G += p.G;
-                    B += p.B;
-                    divBy++;
-
-                    p = this.GetPixel(x + 1, y);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = this.GetPixel(x + 1, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    i.SetPixel(x / 2, y / 2, new Pixel(((byte)(R / divBy)), ((byte)(G / divBy)), ((byte)(B / divBy)), 255));
-                }
-            }
-            this.Data = i.Data;
-            this.Height = i.Height;
-            this.Width = i.Width;
-        }
-        #endregion
-
+        
 
         /// <summary>
         /// Get's the pixel a the specified location.
@@ -1081,7 +942,7 @@ namespace Orvid.Graphics
         /// <returns>The Pixel at the specified position.</returns>
         public virtual Pixel GetPixel(uint x, uint y)
         {
-            if (x > 0 && x < Width && y > 0 && y < Height)
+            if (/*x > 0 &&*/ x < Width /*&& y > 0 */&& y < Height)
                 return Data[(y * Width) + x];
             else
                 return new Pixel(true);
@@ -1118,5 +979,10 @@ namespace Orvid.Graphics
         //        WriteChar(c);
         //    }
         //}
+
+        public override void Draw()
+        {
+            Parent.DrawImage(new Vec2(base.X, base.Y), this);
+        }
     }
 }

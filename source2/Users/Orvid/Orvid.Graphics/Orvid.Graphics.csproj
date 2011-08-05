@@ -52,8 +52,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Image.cs" />
+    <Compile Include="ImageFormats\FormatManager.cs" />
     <Compile Include="ImageFormats\ImageFormat.cs" />
-    <Compile Include="ImageFormats\OIFSupport.cs" />
+    <Compile Include="ImageFormats\OifSupport.cs" />
+    <Compile Include="ImageFormats\VbpSupport.cs" />
+    <Compile Include="ImageManipulator.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="OForms\OControl.cs" />
     <Compile Include="OForms\Windows\OWindow.cs" />

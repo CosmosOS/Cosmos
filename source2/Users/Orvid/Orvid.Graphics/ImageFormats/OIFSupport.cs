@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Orvid.Graphics.ImageFormats
 {
-    public class OIFSupport : ImageFormat
+    public class OIFImage : ImageFormat
     {
 
         public override void Save(Image i, System.IO.Stream dest)
