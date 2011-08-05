@@ -984,5 +984,33 @@ namespace Orvid.Graphics
         {
             Parent.DrawImage(new Vec2(base.X, base.Y), this);
         }
+
+        #region Operators
+        public static explicit operator System.Drawing.Bitmap(Image i)
+        {
+            System.Drawing.Bitmap b = new System.Drawing.Bitmap(i.Width, i.Height);
+            for (uint x = 0; x < i.Width; x++)
+            {
+                for (uint y = 0; y < i.Height; y++)
+                {
+                    b.SetPixel((int)x, (int)y, i.GetPixel(x, y));
+                }
+            }
+            return b;
+        }
+
+        public static explicit operator Image(System.Drawing.Bitmap b)
+        {
+            Image i = new Image(b.Width, b.Height);
+            for (uint x = 0; x < b.Width; x++)
+            {
+                for (uint y = 0; y < b.Height; y++)
+                {
+                    i.SetPixel(x, y, b.GetPixel((int)x, (int)y));
+                }
+            }
+            return i;
+        }
+        #endregion
     }
 }

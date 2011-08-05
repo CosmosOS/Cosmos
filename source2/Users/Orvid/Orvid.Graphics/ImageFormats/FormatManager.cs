@@ -10,7 +10,9 @@ namespace Orvid.Graphics.ImageFormats
         public FormatManager()
         {
             Formats.Add(new OIFImage());
+            //Formats.Add(new PngImage());
             Formats.Add(new VbpImage());
+            Formats.Add(new JpgImage());
         }
 
     }
