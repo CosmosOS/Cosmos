@@ -40,7 +40,6 @@
     <Compile Include="Checksums\Adler32.cs" />
     <Compile Include="Checksums\CRC32.cs" />
     <Compile Include="Checksums\StrangeCRC.cs" />
-    <Compile Include="GZip\GZIPConstants.cs" />
     <Compile Include="LZMA.cs" />
     <Compile Include="Lzw.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
