@@ -126,7 +126,7 @@
     <Compile Include="MemoryViewUC.xaml.cs">
       <DependentUpon>MemoryViewUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PipeThread.cs" />
+    <Compile Include="DebuggerPipe.cs" />
     <Compile Include="RegistersUC.xaml.cs">
       <DependentUpon>RegistersUC.xaml</DependentUpon>
     </Compile>
