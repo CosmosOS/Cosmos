@@ -88,7 +88,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "4516"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "..\source2\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -1125,7 +1124,6 @@ Global
 		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Bootstrap|x86.ActiveCfg = Release|x86
 		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Debug|x86.ActiveCfg = Debug|x86
 		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Debug|x86.Build.0 = Debug|x86
 		{D3E61B1B-154A-4AA6-9EE9-0E0003073AD5}.Release|Any CPU.ActiveCfg = Release|x86
