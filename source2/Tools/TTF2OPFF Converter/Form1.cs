@@ -284,7 +284,7 @@ namespace TTF2OPFF_Converter
             Orvid.Graphics.Image i = f.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontFlag.Normal);
             //i.AntiAlias();
             //i.HalveSize();
-            i.HalveSize();
+            //i.HalveSize();
             Bitmap b = new Bitmap(i.Width, i.Height);
             for (uint x = 0; x < i.Width; x++)
             {

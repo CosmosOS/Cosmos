@@ -5077,7 +5077,7 @@ namespace BitMiracle.LibTiff
         /// </returns>
         /// <overloads>Allocates new array of specified size and copies data from the existing to
         /// the new array.</overloads>
-        public static byte[] Realloc(byte[] array, int size)
+        internal static byte[] Realloc(byte[] array, int size)
         {
             byte[] newArray = new byte[size];
             if (array != null)
@@ -5099,7 +5099,7 @@ namespace BitMiracle.LibTiff
         /// The new integer array of specified size with data from the existing array.
         /// </returns>
         /// <remarks>Size of the array is in elements, not bytes.</remarks>
-        public static int[] Realloc(int[] array, int size)
+        private static int[] Realloc(int[] array, int size)
         {
             int[] newArray = new int[size];
             if (array != null)
@@ -5120,7 +5120,7 @@ namespace BitMiracle.LibTiff
         /// <returns>
         /// The difference between compared elements or 0 if all elements are equal.
         /// </returns>
-        public static int Compare(short[] first, short[] second, int elementCount)
+        private static int Compare(short[] first, short[] second, int elementCount)
         {
             for (int i = 0; i < elementCount; i++)
             {
@@ -5247,6 +5247,13 @@ namespace BitMiracle.LibTiff
             else
                 tif.m_fileStream = stream;
 
+            return tif;
+        }
+
+        public static Tiff Open(Stream s)
+        {
+            Tiff tif = ClientOpen("Temp.tiff", "r", s, new TiffStream());
+            tif.m_fileStream = s;
             return tif;
         }
 

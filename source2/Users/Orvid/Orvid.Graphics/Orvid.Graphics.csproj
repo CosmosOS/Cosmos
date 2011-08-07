@@ -52,14 +52,21 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Image.cs" />
+    <Compile Include="ImageFormats\BitMiracle\LibTiff.cs" />
+    <Compile Include="ImageFormats\BmpSupport.cs" />
     <Compile Include="ImageFormats\FormatManager.cs" />
     <Compile Include="ImageFormats\ImageFormat.cs" />
     <Compile Include="ImageFormats\JpegSupport.cs" />
-    <Compile Include="ImageFormats\Jpeg Support\LibJpeg.cs" />
+    <Compile Include="ImageFormats\BitMiracle\LibJpeg.cs" />
     <Compile Include="ImageFormats\OifSupport.cs" />
+    <Compile Include="ImageFormats\PngSupport.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ImageFormats\TiffSupport.cs" />
     <Compile Include="ImageFormats\VbpSupport.cs" />
-    <Compile Include="ImageFormats\Jpeg Support\zLib.cs" />
+    <Compile Include="ImageFormats\BitMiracle\Deps\zLib.cs" />
     <Compile Include="ImageManipulator.cs" />
+    <Compile Include="MiImage.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="OForms\OControl.cs" />
     <Compile Include="OForms\Windows\OWindow.cs" />

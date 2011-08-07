@@ -9,10 +9,12 @@ namespace Orvid.Graphics.ImageFormats
         internal List<ImageFormat> Formats = new List<ImageFormat>();
         public FormatManager()
         {
+            Formats.Add(new BmpImage());
             Formats.Add(new OIFImage());
-            //Formats.Add(new PngImage());
+            Formats.Add(new PngImage());
             Formats.Add(new VbpImage());
-            Formats.Add(new JpgImage());
+            Formats.Add(new JpegImage());
+            Formats.Add(new TiffImage());
         }
 
     }

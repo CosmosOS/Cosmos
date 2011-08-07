@@ -1,0 +1,458 @@
+Index: Form1.cs
+===================================================================
+--- Form1.cs	(revision 81403)
++++ Form1.cs	(working copy)
+@@ -117,10 +117,13 @@
+                 strm.WriteByte(0);
+                 strm.WriteByte(0);
+ 
++                byte[] buffer = BitConverter.GetBytes((UInt16)47);
++                strm.Write(buffer, 0, buffer.Length); // write the format version.
+ 
++
+                 string FontName = (string)FontComboBox.SelectedItem;
+ 
+-                byte[] buffer = ASCIIEncoding.ASCII.GetBytes(FontName);
++                buffer = ASCIIEncoding.ASCII.GetBytes(FontName);
+                 int i = 256 - buffer.Length;
+                 if (i < 0)
+                 {
+@@ -150,13 +153,13 @@
+                     charKeyMap = null;
+                     Font f = new Font(FontName, 128, GraphicsUnit.Pixel);
+ 
+-                    UInt64 charsToWrite = (ulong)chars.Count * 16;
++                    UInt64 charsToWrite = (ulong)chars.Count /** 16*/;
+                     buffer = BitConverter.GetBytes(charsToWrite);
+                     strm.Write(buffer, 0, buffer.Length); // Write the number of chars to read.
+ 
+                     int prevChar = 0;
+ 
+-                    for (byte style = 0; style < 16; style++)
++                    for (byte style = 0; style < 1 /*16*/; style++)
+                     {
+                         f = new Font(FontName, 64, (FontStyle)style, GraphicsUnit.Pixel);
+                         foreach (int ch in chars)
+@@ -229,31 +232,71 @@
+ 
+         private byte[] ConvertToByteArray(Bitmap b)
+         {
+-            bool[] bits = new bool[b.Height * b.Width];
++            bool[] pbits = new bool[b.Height * b.Width * 10];
+             int bitnum = 0;
++            Color White = Color.FromArgb(0, 0, 0);
+             Color Black = Color.FromArgb(255, 255, 255);
++            Color curPix;
+             for (int x = 0; x < b.Width; x++)
+             {
+                 for (int y = 0; y < b.Height; y++)
+                 {
+-                    if (b.GetPixel(x, y) == Black)
++                    curPix = b.GetPixel(x,y);
++                    if (curPix != White)
+                     {
+-                        bits[bitnum] = false;
++                        if (curPix == Black)
++                        {
++                            pbits[bitnum] = false;
++                            bitnum++;
++                            pbits[bitnum] = false;
++                            bitnum++;
++                        }
++                        else // Write that it's a greyscale pixel, and it's value.
++                        {
++                            pbits[bitnum] = false;
++                            bitnum++;
++                            pbits[bitnum] = true;
++                            bitnum++;
++                            bool[] dat = ConvertByteToBoolArray(GetGreyscaleByte(curPix));
++                            pbits[bitnum] = dat[0];
++                            bitnum++;
++                            pbits[bitnum] = dat[1];
++                            bitnum++;
++                            pbits[bitnum] = dat[2];
++                            bitnum++;
++                            pbits[bitnum] = dat[3];
++                            bitnum++;
++                            pbits[bitnum] = dat[4];
++                            bitnum++;
++                            pbits[bitnum] = dat[5];
++                            bitnum++;
++                            pbits[bitnum] = dat[6];
++                            bitnum++;
++                            pbits[bitnum] = dat[7];
++                            bitnum++;
++                        }
+                     }
+                     else
+                     {
+-                        bits[bitnum] = true;
++                        pbits[bitnum] = true;
++                        bitnum++;
+                     }
+-                    bitnum++;
+                 }
+             }
+-            int bytes = (Int32)Math.Ceiling((double)((b.Width * b.Height) / 8));
+-            byte[] arr2 = new byte[bytes];
+-            int bitIndex = 0, byteIndex = 0;
++            bool[] bits = new bool[bitnum];
++            Array.Copy(pbits, bits, bitnum);
++
++            int bytes = (Int32)Math.Ceiling((double)(bitnum / 8));
++            byte[] arr2 = new byte[bytes + 4];
++            byte[] tmp = BitConverter.GetBytes((UInt32)bitnum);
++            Array.Copy(tmp, arr2, 4);
++            int bitIndex = 0, byteIndex = 4;
+             for (int i = 0; i < bits.Length; i++)
+             {
+                 if (bits[i])
+                 {
++                    //arr2[byteIndex] += 1;
++                    //arr2[byteIndex] <<= 1;
+                     arr2[byteIndex] |= (byte)(((byte)1) << bitIndex);
+                 }
+                 bitIndex++;
+@@ -267,40 +310,92 @@
+             return arr2;
+         }
+ 
++        private byte GetGreyscaleByte(Color c)
++        {
++            return (byte)((0.2125 * c.R) + (0.7154 * c.G) + (0.0721 * c.B));
++        }
++
++        private bool[] ConvertByteToBoolArray(byte b)
++        {
++            bool[] r = new bool[8];
++
++            if ((b & 1) == 1)
++            {
++                r[0] = true;
++            }
++            if ((b & 2) == 2)
++            {
++                r[1] = true;
++            }
++            if ((b & 4) == 4)
++            {
++                r[2] = true;
++            }
++            if ((b & 8) == 8)
++            {
++                r[3] = true;
++            }
++            if ((b & 16) == 16)
++            {
++                r[4] = true;
++            }
++            if ((b & 32) == 32)
++            {
++                r[5] = true;
++            }
++            if ((b & 64) == 64)
++            {
++                r[6] = true;
++            }
++            if ((b & 128) == 128)
++            {
++                r[7] = true;
++            }
++
++            return r;
++        }
++
+         private void FontComboBox_KeyPress(object sender, KeyPressEventArgs e)
+         {
+             e.Handled = true;
+         }
+ 
++        private static Orvid.Graphics.FontSupport.OPFF opfFont = null;
++
+         private void button1_Click(object sender, EventArgs e)
+         {
+-            FileStream str = new FileStream("AgencyFB.opff", FileMode.Open);
+-            byte[] data = new byte[str.Length];
+-            str.Read(data, 0, (int)str.Length);
+-            Orvid.Graphics.FontSupport.OPFF f = new Orvid.Graphics.FontSupport.OPFF(data);
+-            data = null;
+-            str.Close();
+-            str.Dispose();
+-            Orvid.Graphics.Image i = f.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontFlag.Normal);
+-            //i.AntiAlias();
+-            //i.HalveSize();
+-            i.HalveSize();
++            if (opfFont == null)
++            {
++                FileStream str = new FileStream("Chiller.opff", FileMode.Open);
++                byte[] data = new byte[str.Length];
++                str.Read(data, 0, (int)str.Length);
++                opfFont = new Orvid.Graphics.FontSupport.OPFF(data);
++                data = null;
++                str.Close();
++                str.Dispose();
++            }
++            Orvid.Graphics.Image i = opfFont.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontFlag.Normal);
++            //i = Orvid.Graphics.ImageManipulator.Resize(i, new Orvid.Graphics.Vec2(i.Width * 4, i.Height * 4));
++            //o.AntiAlias();
++            //o.HalveSize();
++            //o.HalveSize();
+             Bitmap b = new Bitmap(i.Width, i.Height);
+             for (uint x = 0; x < i.Width; x++)
+             {
+                 for (uint y = 0; y < i.Height; y++)
+                 {
+-                    //if (i.GetPixel(x, y) == null)
++                    //if (o.GetPixel(x, y) == null)
+                     //    throw new Exception();
+                     b.SetPixel((int)x, (int)y, i.GetPixel(x, y));
+                 }
+             }
+             pictureBox1.Image = b;
+             pictureBox1.Size = new Size(i.Width, i.Height);
+-            f = null;
++            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
++            pictureBox1.BringToFront();
+             System.GC.Collect();
+ 
+-            Font f2 = new Font("Agency FB", 32, (FontStyle)0, GraphicsUnit.Pixel);
++            Font f2 = new Font("Chiller", 64, (FontStyle)0, GraphicsUnit.Pixel);
+             Bitmap Backend = new Bitmap(i.Width, i.Height);
+             Graphics g = Graphics.FromImage(Backend);
+             g.Clear(Color.White);
+@@ -323,5 +418,180 @@
+         {
+             e.Handled = true;
+         }
++
++
++        bool thso = false;
++        bool t2 = false;
++        bool t3 = false;
++        private void TestButton2_Click(object sender, EventArgs e)
++        {
++            //Bitmap b = (Bitmap)Bitmap.FromFile(Path.GetFullPath("IMGP4154.JPG"));
++            //FileStream s = new FileStream(Path.GetFullPath("test2.oif"), FileMode.OpenOrCreate);
++            //Orvid.Graphics.Image i = new Orvid.Graphics.Image(b.Width, b.Height);
++            //for (uint x = 0; x < i.Width; x++)
++            //{
++            //    for (uint y = 0; y < i.Height; y++)
++            //    {
++            //        i.SetPixel(x, y, b.GetPixel((int)x, (int)y));
++            //    }
++            //}
++            //Orvid.Graphics.ImageFormats.OIFImage oif = new Orvid.Graphics.ImageFormats.OIFImage();
++            //oif.Save(i, s);
++            //s.Flush();
++            //s.Close();
++
++            if (!thso)
++            {
++                FileStream s = new FileStream(Path.GetFullPath("Building.png"), FileMode.Open);
++                Orvid.Graphics.ImageFormats.PngImage p = new Orvid.Graphics.ImageFormats.PngImage();
++                Orvid.Graphics.Image i = p.Load(s);
++                s.Close();
++                s.Dispose();
++                Bitmap b = new Bitmap(i.Width, i.Height);
++                for (uint x = 0; x < i.Width; x++)
++                {
++                    for (uint y = 0; y < i.Height; y++)
++                    {
++                        b.SetPixel((int)x, (int)y, i.GetPixel(x, y));
++                    }
++                }
++                pictureBox1.Image = b;
++                thso = true;
++            }
++            else
++            {
++                if (!t2)
++                {
++                    Bitmap b = (Bitmap)pictureBox1.Image;
++                    Orvid.Graphics.Image i = new Orvid.Graphics.Image(b.Width, b.Height);
++                    for (uint x = 0; x < i.Width; x++)
++                    {
++                        for (uint y = 0; y < i.Height; y++)
++                        {
++                            i.SetPixel(x, y, b.GetPixel((int)x, (int)y));
++                        }
++                    }
++                    i = Orvid.Graphics.ImageManipulator.Resize(i, new Orvid.Graphics.Vec2(b.Width / 4, b.Height / 4), Orvid.Graphics.ImageManipulator.ScalingAlgorithm.Bicubic);
++                    Bitmap b2 = new Bitmap(i.Width, i.Height);
++                    for (uint x = 0; x < i.Width; x++)
++                    {
++                        for (uint y = 0; y < i.Height; y++)
++                        {
++                            b2.SetPixel((int)x, (int)y, i.GetPixel(x, y));
++                        }
++                    }
++                    pictureBox2.Image = b2;
++                    pictureBox2.Size = new Size(b2.Width, b2.Height);
++                    t2 = true;
++                }
++                else
++                {
++                    if (!t3)
++                    {
++                        Bitmap b = (Bitmap)pictureBox1.Image;
++                        Orvid.Graphics.Image i = new Orvid.Graphics.Image(b.Width, b.Height);
++                        for (uint x = 0; x < i.Width; x++)
++                        {
++                            for (uint y = 0; y < i.Height; y++)
++                            {
++                                i.SetPixel(x, y, b.GetPixel((int)x, (int)y));
++                            }
++                        }
++                        i = Orvid.Graphics.ImageManipulator.Resize(i, new Orvid.Graphics.Vec2(b.Width / 4, b.Height / 4), Orvid.Graphics.ImageManipulator.ScalingAlgorithm.Bilinear);
++                        Bitmap b2 = new Bitmap(i.Width, i.Height);
++                        for (uint x = 0; x < i.Width; x++)
++                        {
++                            for (uint y = 0; y < i.Height; y++)
++                            {
++                                b2.SetPixel((int)x, (int)y, i.GetPixel(x, y));
++                            }
++                        }
++                        pictureBox2.Image = b2;
++                        pictureBox2.Size = new Size(b2.Width, b2.Height);
++                        t3 = true;
++                    }
++                    else
++                    {
++
++                        Bitmap b = (Bitmap)pictureBox1.Image;
++                        Orvid.Graphics.Image i = new Orvid.Graphics.Image(b.Width, b.Height);
++                        for (uint x = 0; x < i.Width; x++)
++                        {
++                            for (uint y = 0; y < i.Height; y++)
++                            {
++                                i.SetPixel(x, y, b.GetPixel((int)x, (int)y));
++                            }
++                        }
++                        i = Orvid.Graphics.ImageManipulator.Resize(i, new Orvid.Graphics.Vec2(b.Width / 2, b.Height / 2), Orvid.Graphics.ImageManipulator.ScalingAlgorithm.NearestNeighbor);
++                        Bitmap b2 = new Bitmap(i.Width, i.Height);
++                        for (uint x = 0; x < i.Width; x++)
++                        {
++                            for (uint y = 0; y < i.Height; y++)
++                            {
++                                b2.SetPixel((int)x, (int)y, i.GetPixel(x, y));
++                            }
++                        }
++                        pictureBox2.Image = b2;
++                        pictureBox2.Size = new Size(b2.Width, b2.Height);
++                        t2 = false;
++                        t3 = false;
++                    }
++                }
++            }
++
++            //Font f = new Font("Chiller", 64, (FontStyle)0, GraphicsUnit.Pixel);
++            //Bitmap b = new Bitmap(1, 1);
++            //Graphics g = Graphics.FromImage(b);
++            //SizeF sz = g.MeasureString(new String(new char[] { (char)6 }), f);
++            //byte height = (byte)Math.Ceiling(sz.Height + 2);
++            //byte width = (byte)Math.Ceiling(sz.Width + 4);
++            //b = new Bitmap(width, height);
++            //g = Graphics.FromImage(b);
++            //g.Clear(Color.White);
++            //g.DrawString(new String(new char[] { (char)Int32.Parse(textBox2.Text) }), f, new SolidBrush(Color.Black), 2, 2);
++            //g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
++            //pictureBox1.Image = b;
++            //pictureBox1.Size = new Size(b.Width, b.Height);
++
++            //Orvid.Graphics.Image i = new Orvid.Graphics.Image(b.Width, b.Height);
++            //for (uint x = 0; x < i.Width; x++)
++            //{
++            //    for (uint y = 0; y < i.Height; y++)
++            //    {
++            //        i.SetPixel(x, y, b.GetPixel((int)x, (int)y));
++            //    }
++            //}
++            //FileStream s = new FileStream("Test.oif", FileMode.OpenOrCreate);
++            //Orvid.Graphics.ImageFormats.OIFImage t = new Orvid.Graphics.ImageFormats.OIFImage();
++            //t.Save(i, s);
++            //s.Flush();
++            //s.Close();
++            //s.Dispose();
++
++            //s = new FileStream("Test.oif", FileMode.Open);
++            //Orvid.Graphics.Image i2 = t.Load(s);
++            //Bitmap b2 = new Bitmap(i2.Width, i2.Height);
++            //for (uint x = 0; x < i2.Width; x++)
++            //{
++            //    for (uint y = 0; y < i2.Height; y++)
++            //    {
++            //        b2.SetPixel((int)x, (int)y, i2.GetPixel(x, y));
++            //    }
++            //}
++            //pictureBox2.Image = b2;
++            //pictureBox2.Size = new Size(b2.Width, b2.Height);
++            //s.Close();
++            //s.Dispose();
++        }
++
++        private void textBox2_KeyDown(object sender, KeyEventArgs e)
++        {
++            if (e.KeyData == Keys.Enter || e.KeyData == Keys.Return)
++            {
++                e.Handled = true;
++                button1_Click(button1, new EventArgs());
++            }
++        }
++        
+     }
+ }
+Index: Form1.Designer.cs
+===================================================================
+--- Form1.Designer.cs	(revision 81403)
++++ Form1.Designer.cs	(working copy)
+@@ -41,6 +41,7 @@
+             this.label3 = new System.Windows.Forms.Label();
+             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+             this.textBox2 = new System.Windows.Forms.TextBox();
++            this.TestButton2 = new System.Windows.Forms.Button();
+             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+             this.SuspendLayout();
+@@ -148,8 +149,7 @@
+             // 
+             // pictureBox2
+             // 
+-            this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+-                        | System.Windows.Forms.AnchorStyles.Right)));
++            this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+             this.pictureBox2.Location = new System.Drawing.Point(311, 12);
+             this.pictureBox2.Name = "pictureBox2";
+             this.pictureBox2.Size = new System.Drawing.Size(32, 32);
+@@ -162,12 +162,24 @@
+             this.textBox2.Name = "textBox2";
+             this.textBox2.Size = new System.Drawing.Size(100, 20);
+             this.textBox2.TabIndex = 11;
++            this.textBox2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox2_KeyDown);
+             // 
++            // TestButton2
++            // 
++            this.TestButton2.Location = new System.Drawing.Point(42, 268);
++            this.TestButton2.Name = "TestButton2";
++            this.TestButton2.Size = new System.Drawing.Size(75, 44);
++            this.TestButton2.TabIndex = 12;
++            this.TestButton2.Text = "Test Image Fomat";
++            this.TestButton2.UseVisualStyleBackColor = true;
++            this.TestButton2.Click += new System.EventHandler(this.TestButton2_Click);
++            // 
+             // Form1
+             // 
+             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+             this.ClientSize = new System.Drawing.Size(449, 363);
++            this.Controls.Add(this.TestButton2);
+             this.Controls.Add(this.textBox2);
+             this.Controls.Add(this.pictureBox2);
+             this.Controls.Add(this.label3);
+@@ -205,6 +217,7 @@
+         private System.Windows.Forms.Label label3;
+         private System.Windows.Forms.PictureBox pictureBox2;
+         private System.Windows.Forms.TextBox textBox2;
++        private System.Windows.Forms.Button TestButton2;
+     }
+ }
+ 

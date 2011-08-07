@@ -41,72 +41,27 @@ using System.Collections.ObjectModel;
 namespace BitMiracle.LibJpeg
 {
     #region JpegImage
-    /// <summary>
-    /// Main class for work with JPEG images.
-    /// </summary>
     public sealed class JpegImage : IDisposable
     {
         private bool m_alreadyDisposed;
-
-        /// <summary>
-        /// Description of image pixels (samples)
-        /// </summary>
         private List<SampleRow> m_rows = new List<SampleRow>();
-
         private int m_width;
         private int m_height;
         private byte m_bitsPerComponent;
         private byte m_componentsPerSample;
         private ColorSpace m_colorspace;
-
-        // Fields below (m_compressedData, m_decompressedData, m_bitmap) are not initialized in constructors necessarily.
-        // Instead direct access to these field you should use corresponding properties (compressedData, decompressedData, bitmap)
-        // Such agreement allows to load required data (e.g. compress image) only by request.
-
-        /// <summary>
-        /// Bytes of jpeg image. Refreshed when m_compressionParameters changed.
-        /// </summary>
         private MemoryStream m_compressedData;
-
-        /// <summary>
-        /// Current compression parameters corresponding with compressed data.
-        /// </summary>
         private CompressionParameters m_compressionParameters;
-
-        /// <summary>
-        /// Bytes of decompressed image (bitmap)
-        /// </summary>
         private MemoryStream m_decompressedData;
-
-        /// <summary>
-        /// .NET bitmap associated with this image
-        /// </summary>
         private Bitmap m_bitmap;
-
-        /// <summary>
-        /// Creates <see cref="JpegImage"/> from <see cref="System.Drawing.Bitmap">.NET bitmap</see>
-        /// </summary>
-        /// <param name="bitmap">Source .NET bitmap.</param>
         public JpegImage(System.Drawing.Bitmap bitmap)
         {
             createFromBitmap(bitmap);
         }
-
-        /// <summary>
-        /// Creates <see cref="JpegImage"/> from stream with an arbitrary image data
-        /// </summary>
-        /// <param name="imageData">Stream containing bytes of image in 
-        /// arbitrary format (BMP, Jpeg, GIF, PNG, TIFF, e.t.c)</param>
         public JpegImage(Stream imageData)
         {
             createFromStream(imageData);
         }
-
-        /// <summary>
-        /// Creates <see cref="JpegImage"/> from file with an arbitrary image
-        /// </summary>
-        /// <param name="fileName">Path to file with image in 
-        /// arbitrary format (BMP, Jpeg, GIF, PNG, TIFF, e.t.c)</param>
         public JpegImage(string fileName)
         {
             if (fileName == null)
@@ -115,13 +70,6 @@ namespace BitMiracle.LibJpeg
             using (FileStream input = new FileStream(fileName, FileMode.Open))
                 createFromStream(input);
         }
-
-        /// <summary>
-        /// Creates <see cref="JpegImage"/> from pixels
-        /// </summary>
-        /// <param name="sampleData">Description of pixels.</param>
-        /// <param name="colorspace">ColorSpace of image.</param>
-        /// <seealso cref="SampleRow"/>
         public JpegImage(SampleRow[] sampleData, ColorSpace colorspace)
         {
             if (sampleData == null)
@@ -144,34 +92,21 @@ namespace BitMiracle.LibJpeg
             m_componentsPerSample = firstSample.ComponentCount;
             m_colorspace = colorspace;
         }
-
-        /// <summary>
-        /// Creates <see cref="JpegImage"/> from <see cref="System.Drawing.Bitmap">.NET bitmap</see>
-        /// </summary>
-        /// <param name="bitmap">Source .NET bitmap.</param>
-        /// <returns>Created instance of <see cref="JpegImage"/> class.</returns>
-        /// <remarks>Same as corresponding <see cref="M:BitMiracle.LibJpeg.JpegImage.#ctor(System.Drawing.Bitmap)">constructor</see>.</remarks>
         public static JpegImage FromBitmap(Bitmap bitmap)
         {
             return new JpegImage(bitmap);
         }
-
-        /// <summary>
-        /// Frees and releases all resources allocated by this <see cref="JpegImage"/>
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         private void Dispose(bool disposing)
         {
             if (!m_alreadyDisposed)
             {
                 if (disposing)
                 {
-                    // dispose managed resources
                     if (m_compressedData != null)
                         m_compressedData.Dispose();
 
@@ -180,8 +115,6 @@ namespace BitMiracle.LibJpeg
                     if (m_bitmap != null)
                         m_bitmap.Dispose();
                 }
-
-                // free native resources
                 m_compressionParameters = null;
                 m_compressedData = null;
                 m_decompressedData = null;
@@ -191,10 +124,6 @@ namespace BitMiracle.LibJpeg
             }
         }
 
-        /// <summary>
-        /// Gets the width of image in <see cref="Sample">samples</see>.
-        /// </summary>
-        /// <value>The width of image.</value>
         public int Width
         {
             get
@@ -206,11 +135,6 @@ namespace BitMiracle.LibJpeg
                 m_width = value;
             }
         }
-
-        /// <summary>
-        /// Gets the height of image in <see cref="Sample">samples</see>.
-        /// </summary>
-        /// <value>The height of image.</value>
         public int Height
         {
             get
@@ -222,11 +146,6 @@ namespace BitMiracle.LibJpeg
                 m_height = value;
             }
         }
-
-        /// <summary>
-        /// Gets the number of color components per <see cref="Sample">sample</see>.
-        /// </summary>
-        /// <value>The number of color components per sample.</value>
         public byte ComponentsPerSample
         {
             get
@@ -238,11 +157,6 @@ namespace BitMiracle.LibJpeg
                 m_componentsPerSample = value;
             }
         }
-
-        /// <summary>
-        /// Gets the number of bits per color component of <see cref="Sample">sample</see>.
-        /// </summary>
-        /// <value>The number of bits per color component.</value>
         public byte BitsPerComponent
         {
             get
@@ -254,11 +168,6 @@ namespace BitMiracle.LibJpeg
                 m_bitsPerComponent = value;
             }
         }
-
-        /// <summary>
-        /// Gets the colorspace of image.
-        /// </summary>
-        /// <value>The colorspace of image.</value>
         public ColorSpace Colorspace
         {
             get
@@ -270,56 +179,27 @@ namespace BitMiracle.LibJpeg
                 m_colorspace = value;
             }
         }
-
-
-        /// <summary>
-        /// Retrieves the required row of image.
-        /// </summary>
-        /// <param name="rowNumber">The number of row.</param>
-        /// <returns>Image row of samples.</returns>
         public SampleRow GetRow(int rowNumber)
         {
             return m_rows[rowNumber];
         }
-
-        /// <summary>
-        /// Writes compressed JPEG image to stream.
-        /// </summary>
-        /// <param name="output">Output stream.</param>
         public void WriteJpeg(Stream output)
         {
             WriteJpeg(output, new CompressionParameters());
         }
-
-        /// <summary>
-        /// Compresses image to JPEG with given parameters and writes it to stream.
-        /// </summary>
-        /// <param name="output">Output stream.</param>
-        /// <param name="parameters">The parameters of compression.</param>
         public void WriteJpeg(Stream output, CompressionParameters parameters)
         {
             compress(parameters);
             compressedData.WriteTo(output);
         }
-
-        /// <summary>
-        /// Writes decompressed image data as bitmap to stream.
-        /// </summary>
-        /// <param name="output">Output stream.</param>
         public void WriteBitmap(Stream output)
         {
             decompressedData.WriteTo(output);
         }
-
-        /// <summary>
-        /// Retrieves image as .NET Bitmap.
-        /// </summary>
-        /// <returns>.NET Bitmap</returns>
         public Bitmap ToBitmap()
         {
             return bitmap.Clone() as Bitmap;
         }
-
         private MemoryStream compressedData
         {
             get
@@ -329,7 +209,6 @@ namespace BitMiracle.LibJpeg
                 return m_compressedData;
             }
         }
-
         private MemoryStream decompressedData
         {
             get
@@ -339,7 +218,6 @@ namespace BitMiracle.LibJpeg
                 return m_decompressedData;
             }
         }
-
         private Bitmap bitmap
         {
             get
@@ -354,10 +232,6 @@ namespace BitMiracle.LibJpeg
                 return m_bitmap;
             }
         }
-
-        /// <summary>
-        /// Needs for DecompressorToJpegImage class
-        /// </summary>
         internal void addSampleRow(SampleRow row)
         {
             if (row == null)
@@ -365,10 +239,6 @@ namespace BitMiracle.LibJpeg
 
             m_rows.Add(row);
         }
-
-        /// <summary>
-        /// Checks if imageData contains jpeg image
-        /// </summary>
         private static bool isCompressed(Stream imageData)
         {
             if (imageData == null)
@@ -382,13 +252,11 @@ namespace BitMiracle.LibJpeg
             int second = imageData.ReadByte();
             return (first == 0xFF && second == (int)JpegMarkerType.SOI);
         }
-
         private void createFromBitmap(Bitmap bitmap)
         {
             initializeFromBitmap(bitmap);
             compress(new CompressionParameters());
         }
-
         private void createFromStream(Stream imageData)
         {
             if (imageData == null)
@@ -404,7 +272,6 @@ namespace BitMiracle.LibJpeg
                 createFromBitmap(new Bitmap(imageData));
             }
         }
-
         private void initializeFromBitmap(Bitmap bitmap)
         {
             if (bitmap == null)
@@ -416,7 +283,6 @@ namespace BitMiracle.LibJpeg
             processPixelFormat(bitmap.PixelFormat);
             fillSamplesFromBitmap();
         }
-
         private void compress(CompressionParameters parameters)
         {
 
@@ -430,7 +296,6 @@ namespace BitMiracle.LibJpeg
             RawImage source = new RawImage(m_rows, m_colorspace);
             compress(source, parameters);
         }
-
         private void compress(IRawImage source, CompressionParameters parameters)
         {
             if (source == null)
@@ -446,20 +311,17 @@ namespace BitMiracle.LibJpeg
             jpeg.CompressionParameters = m_compressionParameters;
             jpeg.Compress(source, m_compressedData);
         }
-
         private bool needCompressWith(CompressionParameters parameters)
         {
             return m_compressedData == null ||
                    m_compressionParameters == null ||
                    !m_compressionParameters.Equals(parameters);
         }
-
         private void decompress()
         {
             Jpeg jpeg = new Jpeg();
             jpeg.Decompress(compressedData, new DecompressorToJpegImage(this));
         }
-
         private void fillDecompressedData()
         {
             if (m_decompressedData != null)
@@ -474,8 +336,6 @@ namespace BitMiracle.LibJpeg
 
         private void processPixelFormat(System.Drawing.Imaging.PixelFormat pixelFormat)
         {
-            //See GdiPlusPixelFormats.h for details
-
             if (pixelFormat == System.Drawing.Imaging.PixelFormat.Format16bppGrayScale)
             {
                 m_bitsPerComponent = 16;
@@ -487,7 +347,7 @@ namespace BitMiracle.LibJpeg
             byte formatIndexByte = (byte)((int)pixelFormat & 0x000000FF);
             byte pixelSizeByte = (byte)((int)pixelFormat & 0x0000FF00);
 
-            if (pixelSizeByte == 32 && formatIndexByte == 15) //PixelFormat32bppCMYK (15 | (32 << 8))
+            if (pixelSizeByte == 32 && formatIndexByte == 15)
             {
                 m_bitsPerComponent = 8;
                 m_componentsPerSample = 4;
@@ -506,7 +366,6 @@ namespace BitMiracle.LibJpeg
             else if (pixelSizeByte == 48 || pixelSizeByte == 64)
                 m_bitsPerComponent = 16;
         }
-
         private void fillSamplesFromBitmap()
         {
             if (m_bitmap == null)
@@ -531,18 +390,9 @@ namespace BitMiracle.LibJpeg
     #region BitmapDestination
     class BitmapDestination : IDecompressor
     {
-        /// <summary>
-        /// Target file spec; filled in by djpeg.c after object is created.
-        /// </summary>
         private Stream m_output;
         private byte[][] m_pixels;
-        /// <summary>
-        /// physical width of one row in the BMP file
-        /// </summary>
         private int m_rowWidth;
-        /// <summary>
-        /// next row# to write to virtual array
-        /// </summary>
         private int m_currentRow;
         private LoadedImageAttributes m_parameters;
 
@@ -566,14 +416,8 @@ namespace BitMiracle.LibJpeg
 
             m_parameters = parameters;
         }
-
-        /// <summary>
-        /// Startup: normally writes the file header.
-        /// In this module we may as well postpone everything until finish_output.
-        /// </summary>
         public override void BeginWrite()
         {
-            //Determine width of rows in the BMP file (padded to 4-byte boundary).
             m_rowWidth = m_parameters.Width * m_parameters.Components;
             while (m_rowWidth % 4 != 0)
                 m_rowWidth++;
@@ -584,10 +428,6 @@ namespace BitMiracle.LibJpeg
 
             m_currentRow = 0;
         }
-
-        /// <summary>
-        /// Write some pixel data.
-        /// </summary>
         public override void ProcessPixelsRow(byte[] row)
         {
             if (m_parameters.Colorspace == ColorSpace.Grayscale || m_parameters.QuantizeColors)
@@ -604,38 +444,19 @@ namespace BitMiracle.LibJpeg
 
             ++m_currentRow;
         }
-
-        /// <summary>
-        /// Finish up at the end of the file.
-        /// Here is where we really output the BMP file.
-        /// </summary>
         public override void EndWrite()
         {
             writeHeader();
             writePixels();
-
-            /* Make sure we wrote the output file OK */
             m_output.Flush();
         }
-
-
-        /// <summary>
-        /// This version is for grayscale OR quantized color output
-        /// </summary>
         private void putGrayRow(byte[] row)
         {
             for (int i = 0; i < m_parameters.Width; ++i)
                 m_pixels[i][m_currentRow] = row[i];
         }
-
-        /// <summary>
-        /// This version is for writing 24-bit pixels
-        /// </summary>
         private void putRgbRow(byte[] row)
         {
-            /* Transfer data.  Note destination values must be in BGR order
-             * (even though Microsoft's own documents say the opposite).
-             */
             for (int i = 0; i < m_parameters.Width; ++i)
             {
                 int firstComponent = i * 3;
@@ -647,15 +468,8 @@ namespace BitMiracle.LibJpeg
                 m_pixels[firstComponent + 2][m_currentRow] = red;
             }
         }
-
-        /// <summary>
-        /// This version is for writing 24-bit pixels
-        /// </summary>
         private void putCmykRow(byte[] row)
         {
-            /* Transfer data.  Note destination values must be in BGR order
-             * (even though Microsoft's own documents say the opposite).
-             */
             for (int i = 0; i < m_parameters.Width; ++i)
             {
                 int firstComponent = i * 4;
@@ -665,16 +479,11 @@ namespace BitMiracle.LibJpeg
                 m_pixels[firstComponent + 3][m_currentRow] = row[firstComponent + 3];
             }
         }
-
-        /// <summary>
-        /// Write a Windows-style BMP file header, including colormap if needed
-        /// </summary>
         private void writeHeader()
         {
             int bits_per_pixel;
             int cmap_entries;
 
-            /* Compute colormap size and total file size */
             if (m_parameters.Colorspace == ColorSpace.Grayscale || m_parameters.QuantizeColors)
             {
                 bits_per_pixel = 8;
@@ -698,11 +507,10 @@ namespace BitMiracle.LibJpeg
             else
                 infoHeader = createBitmapV4InfoHeader(bits_per_pixel);
 
-            /* File size */
             const int fileHeaderSize = 14;
             int infoHeaderSize = infoHeader.Length;
             int paletteSize = cmap_entries * 4;
-            int offsetToPixels = fileHeaderSize + infoHeaderSize + paletteSize; /* Header and colormap */
+            int offsetToPixels = fileHeaderSize + infoHeaderSize + paletteSize;
             int fileSize = offsetToPixels + m_rowWidth * m_parameters.Height;
 
             byte[] fileHeader = createBitmapFileHeader(offsetToPixels, fileSize);
@@ -717,11 +525,10 @@ namespace BitMiracle.LibJpeg
         private static byte[] createBitmapFileHeader(int offsetToPixels, int fileSize)
         {
             byte[] bmpfileheader = new byte[14];
-            bmpfileheader[0] = 0x42;    /* first 2 bytes are ASCII 'B', 'M' */
+            bmpfileheader[0] = 0x42;
             bmpfileheader[1] = 0x4D;
             PUT_4B(bmpfileheader, 2, fileSize);
-            /* we leave bfReserved1 & bfReserved2 = 0 */
-            PUT_4B(bmpfileheader, 10, offsetToPixels); /* bfOffBits */
+            PUT_4B(bmpfileheader, 10, offsetToPixels);
             return bmpfileheader;
         }
 
@@ -734,23 +541,18 @@ namespace BitMiracle.LibJpeg
 
         private void fillBitmapInfoHeader(int bitsPerPixel, int cmap_entries, byte[] infoHeader)
         {
-            /* Fill the info header (Microsoft calls this a BITMAPINFOHEADER) */
-            PUT_2B(infoHeader, 0, infoHeader.Length);   /* biSize */
-            PUT_4B(infoHeader, 4, m_parameters.Width); /* biWidth */
-            PUT_4B(infoHeader, 8, m_parameters.Height); /* biHeight */
-            PUT_2B(infoHeader, 12, 1);   /* biPlanes - must be 1 */
-            PUT_2B(infoHeader, 14, bitsPerPixel); /* biBitCount */
-            /* we leave biCompression = 0, for none */
-            /* we leave biSizeImage = 0; this is correct for uncompressed data */
+            PUT_2B(infoHeader, 0, infoHeader.Length);
+            PUT_4B(infoHeader, 4, m_parameters.Width);
+            PUT_4B(infoHeader, 8, m_parameters.Height);
+            PUT_2B(infoHeader, 12, 1);
+            PUT_2B(infoHeader, 14, bitsPerPixel);
 
             if (m_parameters.DensityUnit == DensityUnit.DotsCm)
             {
-                /* if have density in dots/cm, then */
-                PUT_4B(infoHeader, 24, m_parameters.DensityX * 100); /* XPels/M */
-                PUT_4B(infoHeader, 28, m_parameters.DensityY * 100); /* XPels/M */
+                PUT_4B(infoHeader, 24, m_parameters.DensityX * 100);
+                PUT_4B(infoHeader, 28, m_parameters.DensityY * 100);
             }
-            PUT_2B(infoHeader, 32, cmap_entries); /* biClrUsed */
-            /* we leave biClrImportant = 0 */
+            PUT_2B(infoHeader, 32, cmap_entries);
         }
 
         private byte[] createBitmapV4InfoHeader(int bitsPerPixel)
@@ -758,15 +560,11 @@ namespace BitMiracle.LibJpeg
             byte[] infoHeader = new byte[40 + 68];
             fillBitmapInfoHeader(bitsPerPixel, 0, infoHeader);
 
-            PUT_4B(infoHeader, 56, 0x02); /* CSType == 0x02 (CMYK) */
+            PUT_4B(infoHeader, 56, 0x02);
 
             return infoHeader;
         }
 
-        /// <summary>
-        /// Write the colormap.
-        /// Windows uses BGR0 map entries; OS/2 uses BGR entries.
-        /// </summary>
         private void writeColormap(int map_colors, int map_entry_size)
         {
             byte[][] colormap = m_parameters.Colormap;
@@ -777,7 +575,6 @@ namespace BitMiracle.LibJpeg
             {
                 if (m_parameters.ComponentsPerSample == 3)
                 {
-                    /* Normal case with RGB colormap */
                     for (i = 0; i < num_colors; i++)
                     {
                         m_output.WriteByte(colormap[2][i]);
@@ -789,7 +586,6 @@ namespace BitMiracle.LibJpeg
                 }
                 else
                 {
-                    /* Grayscale colormap (only happens with grayscale quantization) */
                     for (i = 0; i < num_colors; i++)
                     {
                         m_output.WriteByte(colormap[0][i]);
@@ -802,7 +598,6 @@ namespace BitMiracle.LibJpeg
             }
             else
             {
-                /* If no colormap, must be grayscale data.  Generate a linear "map". */
                 for (i = 0; i < 256; i++)
                 {
                     m_output.WriteByte((byte)i);
@@ -813,7 +608,6 @@ namespace BitMiracle.LibJpeg
                 }
             }
 
-            /* Pad colormap with zeros to ensure specified number of colormap entries */
             if (i > map_colors)
                 throw new InvalidOperationException("Too many colors");
 
@@ -826,21 +620,17 @@ namespace BitMiracle.LibJpeg
                     m_output.WriteByte(0);
             }
         }
-
         private void writePixels()
         {
             for (int row = m_parameters.Height - 1; row >= 0; --row)
                 for (int col = 0; col < m_rowWidth; ++col)
                     m_output.WriteByte(m_pixels[col][row]);
         }
-
-
         private static void PUT_2B(byte[] array, int offset, int value)
         {
             array[offset] = (byte)((value) & 0xFF);
             array[offset + 1] = (byte)(((value) >> 8) & 0xFF);
         }
-
         private static void PUT_4B(byte[] array, int offset, int value)
         {
             array[offset] = (byte)((value) & 0xFF);
@@ -967,11 +757,6 @@ namespace BitMiracle.LibJpeg
 
         private int read(int bitsCount)
         {
-            //Codes are packed into a continuous bit stream, high-order bit first. 
-            //This stream is then divided into 8-bit bytes, high-order bit first. 
-            //Thus, codes can straddle byte boundaries arbitrarily. After the EOD marker (code value 257), 
-            //any leftover bits in the final byte are set to 0.
-
             if (bitsCount < 0 || bitsCount > 32)
                 throw new ArgumentOutOfRangeException("bitsCount");
 
@@ -1067,35 +852,19 @@ namespace BitMiracle.LibJpeg
     {
         private BufferMode m_passModeSetByLastStartPass;
         private JpegCompressor m_cinfo;
-
-        private int m_iMCU_row_num;    /* iMCU row # within image */
-        private int m_mcu_ctr;     /* counts MCUs processed in current row */
-        private int m_MCU_vert_offset;        /* counts MCU rows within iMCU row */
-        private int m_MCU_rows_per_iMCU_row;  /* number of such rows needed */
-
-        /* For single-pass compression, it's sufficient to buffer just one MCU
-        * (although this may prove a bit slow in practice).  We allocate a
-        * workspace of CompressorMaxBlocksInMCU coefficient blocks, and reuse it for each
-        * MCU constructed and sent.  (On 80x86, the workspace is FAR even though
-        * it's not really very big; this is to keep the module interfaces unchanged
-        * when a large coefficient buffer is necessary.)
-        * In multi-pass modes, this array points to the current MCU's blocks
-        * within the virtual arrays.
-        */
+        private int m_iMCU_row_num;
+        private int m_mcu_ctr;
+        private int m_MCU_vert_offset;
+        private int m_MCU_rows_per_iMCU_row;
         private JpegBlock[][] m_MCU_buffer = new JpegBlock[JpegConstants.CompressorMaxBlocksInMCU][];
 
-        /* In multi-pass modes, we need a virtual block array for each component. */
         private JpegVirtualArray<JpegBlock>[] m_whole_image = new JpegVirtualArray<JpegBlock>[JpegConstants.MaxComponents];
 
         public CoefControllerImpl(JpegCompressor cinfo, bool need_full_buffer)
         {
             m_cinfo = cinfo;
-
-            /* Create the coefficient buffer. */
             if (need_full_buffer)
             {
-                /* Allocate a full-image virtual array for each component, */
-                /* padded to a multiple of samp_factor DCT blocks in each direction. */
                 for (int ci = 0; ci < cinfo.m_num_components; ci++)
                 {
                     m_whole_image[ci] = JpegCommonBase.CreateBlocksArray(
@@ -1106,7 +875,6 @@ namespace BitMiracle.LibJpeg
             }
             else
             {
-                /* We only need a single-MCU buffer. */
                 JpegBlock[] buffer = new JpegBlock[JpegConstants.CompressorMaxBlocksInMCU];
                 for (int i = 0; i < JpegConstants.CompressorMaxBlocksInMCU; i++)
                     buffer[i] = new JpegBlock();
@@ -1117,13 +885,9 @@ namespace BitMiracle.LibJpeg
                     for (int j = i; j < JpegConstants.CompressorMaxBlocksInMCU; j++)
                         m_MCU_buffer[i][j - i] = buffer[j];
                 }
-
-                /* flag for no virtual arrays */
                 m_whole_image[0] = null;
             }
         }
-
-        // Initialize for a processing pass.
         public virtual void start_pass(BufferMode pass_mode)
         {
             m_iMCU_row_num = 0;
@@ -1169,35 +933,14 @@ namespace BitMiracle.LibJpeg
 
             return false;
         }
-
-        /// <summary>
-        /// Process some data in the single-pass case.
-        /// We process the equivalent of one fully interleaved MCU row ("iMCU" row)
-        /// per call, ie, v_samp_factor block rows for each component in the image.
-        /// Returns true if the iMCU row is completed, false if suspended.
-        /// 
-        /// NB: input_buf contains a plane for each component in image,
-        /// which we index according to the component's SOF position.
-        /// </summary>
         private bool compressDataImpl(byte[][][] input_buf)
         {
             int last_MCU_col = m_cinfo.m_MCUs_per_row - 1;
             int last_iMCU_row = m_cinfo.m_total_iMCU_rows - 1;
-
-            /* Loop to write as much as one whole iMCU row */
             for (int yoffset = m_MCU_vert_offset; yoffset < m_MCU_rows_per_iMCU_row; yoffset++)
             {
                 for (int MCU_col_num = m_mcu_ctr; MCU_col_num <= last_MCU_col; MCU_col_num++)
                 {
-                    /* Determine where data comes from in input_buf and do the DCT thing.
-                     * Each call on forward_DCT processes a horizontal row of DCT blocks
-                     * as wide as an MCU; we rely on having allocated the MCU_buffer[] blocks
-                     * sequentially.  Dummy blocks at the right or bottom edge are filled in
-                     * specially.  The data in them does not matter for image reconstruction,
-                     * so we fill them with values that will encode to the smallest amount of
-                     * data, viz: all zeroes in the AC entries, DC entries equal to previous
-                     * block's DC value.  (Thanks to Thomas Kinsman for this idea.)
-                     */
                     int blkn = 0;
                     for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
                     {
@@ -1215,7 +958,6 @@ namespace BitMiracle.LibJpeg
 
                                 if (blockcnt < componentInfo.MCU_width)
                                 {
-                                    /* Create some dummy blocks at the right edge of the image. */
                                     for (int i = 0; i < (componentInfo.MCU_width - blockcnt); i++)
                                         Array.Clear(m_MCU_buffer[blkn + blockcnt][i].data, 0, m_MCU_buffer[blkn + blockcnt][i].data.Length);
 
@@ -1225,7 +967,6 @@ namespace BitMiracle.LibJpeg
                             }
                             else
                             {
-                                /* Create a row of dummy blocks at the bottom of the image. */
                                 for (int i = 0; i < componentInfo.MCU_width; i++)
                                     Array.Clear(m_MCU_buffer[blkn][i].data, 0, m_MCU_buffer[blkn][i].data.Length);
 
@@ -1237,49 +978,19 @@ namespace BitMiracle.LibJpeg
                             ypos += JpegConstants.DCTSize;
                         }
                     }
-
-                    /* Try to write the MCU.  In event of a suspension failure, we will
-                     * re-DCT the MCU on restart (a bit inefficient, could be fixed...)
-                     */
                     if (!m_cinfo.m_entropy.encode_mcu(m_MCU_buffer))
                     {
-                        /* Suspension forced; update state counters and exit */
                         m_MCU_vert_offset = yoffset;
                         m_mcu_ctr = MCU_col_num;
                         return false;
                     }
                 }
-
-                /* Completed an MCU row, but perhaps not an iMCU row */
                 m_mcu_ctr = 0;
             }
-
-            /* Completed the iMCU row, advance counters for next one */
             m_iMCU_row_num++;
             start_iMCU_row();
             return true;
         }
-
-        /// <summary>
-        /// Process some data in the first pass of a multi-pass case.
-        /// We process the equivalent of one fully interleaved MCU row ("iMCU" row)
-        /// per call, ie, v_samp_factor block rows for each component in the image.
-        /// This amount of data is read from the source buffer, DCT'd and quantized,
-        /// and saved into the virtual arrays.  We also generate suitable dummy blocks
-        /// as needed at the right and lower edges.  (The dummy blocks are constructed
-        /// in the virtual arrays, which have been padded appropriately.)  This makes
-        /// it possible for subsequent passes not to worry about real vs. dummy blocks.
-        /// 
-        /// We must also emit the data to the entropy encoder.  This is conveniently
-        /// done by calling compress_output() after we've loaded the current strip
-        /// of the virtual arrays.
-        /// 
-        /// NB: input_buf contains a plane for each component in image.  All
-        /// components are DCT'd and loaded into the virtual arrays in this pass.
-        /// However, it may be that only a subset of the components are emitted to
-        /// the entropy encoder during this first pass; be careful about looking
-        /// at the scan-dependent variables (MCU dimensions, etc).
-        /// </summary>
         private bool compressFirstPass(byte[][][] input_buf)
         {
             int last_iMCU_row = m_cinfo.m_total_iMCU_rows - 1;
@@ -1287,12 +998,7 @@ namespace BitMiracle.LibJpeg
             for (int ci = 0; ci < m_cinfo.m_num_components; ci++)
             {
                 JpegComponent componentInfo = m_cinfo.Component_info[ci];
-
-                /* Align the virtual buffer for this component. */
-                JpegBlock[][] buffer = m_whole_image[ci].Access(m_iMCU_row_num * componentInfo.V_samp_factor,
-                    componentInfo.V_samp_factor);
-
-                /* Count non-dummy DCT block rows in this iMCU row. */
+                JpegBlock[][] buffer = m_whole_image[ci].Access(m_iMCU_row_num * componentInfo.V_samp_factor, componentInfo.V_samp_factor);
                 int block_rows;
                 if (m_iMCU_row_num < last_iMCU_row)
                 {
@@ -1300,7 +1006,6 @@ namespace BitMiracle.LibJpeg
                 }
                 else
                 {
-                    /* NB: can't use last_row_height here, since may not be set! */
                     block_rows = componentInfo.height_in_blocks % componentInfo.V_samp_factor;
                     if (block_rows == 0)
                         block_rows = componentInfo.V_samp_factor;
@@ -1308,15 +1013,9 @@ namespace BitMiracle.LibJpeg
 
                 int blocks_across = componentInfo.Width_in_blocks;
                 int h_samp_factor = componentInfo.H_samp_factor;
-
-                /* Count number of dummy blocks to be added at the right margin. */
                 int ndummy = blocks_across % h_samp_factor;
                 if (ndummy > 0)
                     ndummy = h_samp_factor - ndummy;
-
-                /* Perform DCT for all non-dummy blocks in this iMCU row.  Each call
-                 * on forward_DCT processes a complete horizontal row of DCT blocks.
-                 */
                 for (int block_row = 0; block_row < block_rows; block_row++)
                 {
                     m_cinfo.m_fdct.forward_DCT(componentInfo.Quant_tbl_no, input_buf[ci],
@@ -1324,7 +1023,6 @@ namespace BitMiracle.LibJpeg
 
                     if (ndummy > 0)
                     {
-                        /* Create dummy blocks at the right edge of the image. */
                         Array.Clear(buffer[block_row][blocks_across].data, 0, buffer[block_row][blocks_across].data.Length);
 
                         short lastDC = buffer[block_row][blocks_across - 1][0];
@@ -1333,14 +1031,9 @@ namespace BitMiracle.LibJpeg
                     }
                 }
 
-                /* If at end of image, create dummy block rows as needed.
-                 * The tricky part here is that within each MCU, we want the DC values
-                 * of the dummy blocks to match the last real block's DC value.
-                 * This squeezes a few more bytes out of the resulting file...
-                 */
                 if (m_iMCU_row_num == last_iMCU_row)
                 {
-                    blocks_across += ndummy;    /* include lower right corner */
+                    blocks_across += ndummy;
                     int MCUs_across = blocks_across / h_samp_factor;
                     for (int block_row = block_rows; block_row < componentInfo.V_samp_factor; block_row++)
                     {
@@ -1355,32 +1048,16 @@ namespace BitMiracle.LibJpeg
                             for (int bi = 0; bi < h_samp_factor; bi++)
                                 buffer[block_row][thisOffset + bi][0] = lastDC;
 
-                            thisOffset += h_samp_factor; /* advance to next MCU in row */
+                            thisOffset += h_samp_factor;
                             lastOffset += h_samp_factor;
                         }
                     }
                 }
             }
-
-            /* NB: compress_output will increment iMCU_row_num if successful.
-             * A suspension return will result in redoing all the work above next time.
-             */
-
-            /* Emit data to the entropy encoder, sharing code with subsequent passes */
             return compressOutput();
         }
-
-        /// <summary>
-        /// Process some data in subsequent passes of a multi-pass case.
-        /// We process the equivalent of one fully interleaved MCU row ("iMCU" row)
-        /// per call, ie, v_samp_factor block rows for each component in the scan.
-        /// The data is obtained from the virtual arrays and fed to the entropy coder.
-        /// Returns true if the iMCU row is completed, false if suspended.
-        /// </summary>
         private bool compressOutput()
         {
-            /* Align the virtual buffers for the components used in this scan.
-             */
             JpegBlock[][][] buffer = new JpegBlock[JpegConstants.MaxComponentsInScan][][];
             for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
             {
@@ -1388,14 +1065,11 @@ namespace BitMiracle.LibJpeg
                 buffer[ci] = m_whole_image[componentInfo.Component_index].Access(
                     m_iMCU_row_num * componentInfo.V_samp_factor, componentInfo.V_samp_factor);
             }
-
-            /* Loop to process one whole iMCU row */
             for (int yoffset = m_MCU_vert_offset; yoffset < m_MCU_rows_per_iMCU_row; yoffset++)
             {
                 for (int MCU_col_num = m_mcu_ctr; MCU_col_num < m_cinfo.m_MCUs_per_row; MCU_col_num++)
                 {
-                    /* Construct list of pointers to DCT blocks belonging to this MCU */
-                    int blkn = 0;           /* index of current DCT block within MCU */
+                    int blkn = 0;
                     for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
                     {
                         JpegComponent componentInfo = m_cinfo.Component_info[m_cinfo.m_cur_comp_info[ci]];
@@ -1414,34 +1088,21 @@ namespace BitMiracle.LibJpeg
                             }
                         }
                     }
-
-                    /* Try to write the MCU. */
                     if (!m_cinfo.m_entropy.encode_mcu(m_MCU_buffer))
                     {
-                        /* Suspension forced; update state counters and exit */
                         m_MCU_vert_offset = yoffset;
                         m_mcu_ctr = MCU_col_num;
                         return false;
                     }
                 }
-
-                /* Completed an MCU row, but perhaps not an iMCU row */
                 m_mcu_ctr = 0;
             }
-
-            /* Completed the iMCU row, advance counters for next one */
             m_iMCU_row_num++;
             start_iMCU_row();
             return true;
         }
-
-        // Reset within-iMCU-row counters for a new row
         private void start_iMCU_row()
         {
-            /* In an interleaved scan, an MCU row is the same as an iMCU row.
-             * In a noninterleaved scan, an iMCU row has v_samp_factor MCU rows.
-             * But at the bottom of the image, process only what's left.
-             */
             if (m_cinfo.m_comps_in_scan > 1)
             {
                 m_MCU_rows_per_iMCU_row = 1;
@@ -1461,50 +1122,34 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region ColorConverter
-    /// <summary>
-    /// ColorSpace conversion
-    /// </summary>
     class ColorConverter
     {
-        private const int SCALEBITS = 16;  /* speediest right-shift on some machines */
+        private const int SCALEBITS = 16;
         private const int CBCR_OFFSET = JpegConstants.MediumSampleValue << SCALEBITS;
         private const int ONE_HALF = 1 << (SCALEBITS - 1);
-
-        // We allocate one big table and divide it up into eight parts, instead of
-        // doing eight alloc_small requests.  This lets us use a single table base
-        // address, which can be held in a register in the inner loops on many
-        // machines (more than can hold all eight addresses, anyway).
-        private const int R_Y_OFF = 0;           /* offset to R => Y section */
-        private const int G_Y_OFF = (1 * (JpegConstants.MaxSampleValue + 1));  /* offset to G => Y section */
-        private const int B_Y_OFF = (2 * (JpegConstants.MaxSampleValue + 1));  /* etc. */
+        private const int R_Y_OFF = 0;
+        private const int G_Y_OFF = (1 * (JpegConstants.MaxSampleValue + 1));
+        private const int B_Y_OFF = (2 * (JpegConstants.MaxSampleValue + 1));
         private const int R_CB_OFF = (3 * (JpegConstants.MaxSampleValue + 1));
         private const int G_CB_OFF = (4 * (JpegConstants.MaxSampleValue + 1));
         private const int B_CB_OFF = (5 * (JpegConstants.MaxSampleValue + 1));
-        private const int R_CR_OFF = B_CB_OFF;        /* B=>Cb, R=>Cr are the same */
+        private const int R_CR_OFF = B_CB_OFF;
         private const int G_CR_OFF = (6 * (JpegConstants.MaxSampleValue + 1));
         private const int B_CR_OFF = (7 * (JpegConstants.MaxSampleValue + 1));
         private const int TABLE_SIZE = (8 * (JpegConstants.MaxSampleValue + 1));
-
         private JpegCompressor m_cinfo;
-
         private bool m_useNullStart;
-
         private bool m_useCmykYcckConvert;
         private bool m_useGrayscaleConvert;
         private bool m_useNullConvert;
         private bool m_useRgbGrayConvert;
         private bool m_useRgbYccConvert;
-
-        private int[] m_rgb_ycc_tab;     /* => table for RGB to YCbCr conversion */
+        private int[] m_rgb_ycc_tab;
 
         public ColorConverter(JpegCompressor cinfo)
         {
             m_cinfo = cinfo;
-
-            /* set start_pass to null method until we find out differently */
             m_useNullStart = true;
-
-            /* Make sure input_components agrees with in_color_space */
             switch (cinfo.m_in_color_space)
             {
                 case ColorSpace.Grayscale:
@@ -1525,13 +1170,10 @@ namespace BitMiracle.LibJpeg
                     break;
 
                 default:
-                    /* JCS_UNKNOWN can be anything */
                     if (cinfo.m_input_components < 1)
                         throw new Exception("Bogus input colorspace!");
                     break;
             }
-
-            /* Check num_components, set conversion method based on requested space */
             clearConvertFlags();
             switch (cinfo.m_jpeg_color_space)
             {
@@ -1547,7 +1189,7 @@ namespace BitMiracle.LibJpeg
                         }
                         else if (cinfo.m_in_color_space == ColorSpace.RGB)
                         {
-                            m_useNullStart = false; // use rgb_ycc_start
+                            m_useNullStart = false;
                             m_useRgbGrayConvert = true;
                         }
                         else if (cinfo.m_in_color_space == ColorSpace.YCbCr)
@@ -1586,7 +1228,7 @@ namespace BitMiracle.LibJpeg
 
                         if (cinfo.m_in_color_space == ColorSpace.RGB)
                         {
-                            m_useNullStart = false; // use rgb_ycc_start
+                            m_useNullStart = false;
                             m_useRgbYccConvert = true;
                         }
                         else if (cinfo.m_in_color_space == ColorSpace.YCbCr)
@@ -1625,7 +1267,7 @@ namespace BitMiracle.LibJpeg
 
                         if (cinfo.m_in_color_space == ColorSpace.CMYK)
                         {
-                            m_useNullStart = false; // use rgb_ycc_start
+                            m_useNullStart = false;
                             m_useCmykYcckConvert = true;
                         }
                         else if (cinfo.m_in_color_space == ColorSpace.YCCK)
@@ -1641,7 +1283,6 @@ namespace BitMiracle.LibJpeg
                     }
 
                 default:
-                    /* allow null conversion of JCS_UNKNOWN */
                     if (cinfo.m_jpeg_color_space != cinfo.m_in_color_space || cinfo.m_num_components != cinfo.m_input_components)
                         throw new Exception("Unsupported color conversion request.");
 
@@ -1655,18 +1296,6 @@ namespace BitMiracle.LibJpeg
             if (!m_useNullStart)
                 rgb_ycc_start();
         }
-
-        /// <summary>
-        /// Convert some rows of samples to the JPEG colorspace.
-        /// 
-        /// Note that we change from the application's interleaved-pixel format
-        /// to our internal non-interleaved, one-plane-per-component format.
-        /// The input buffer is therefore three times as wide as the output buffer.
-        /// 
-        /// A starting row offset is provided only for the output buffer.  The caller
-        /// can easily adjust the passed input_buf value to accommodate any row
-        /// offset required on that side.
-        /// </summary>
         public void color_convert(byte[][] input_buf, int input_row, byte[][][] output_buf, int output_row, int num_rows)
         {
             if (m_useCmykYcckConvert)
@@ -1698,12 +1327,8 @@ namespace BitMiracle.LibJpeg
         }
 
         #region RGB to YCC
-        /// <summary>
-        /// Initialize for RGB->YCC colorspace conversion.
-        /// </summary>
         private void rgb_ycc_start()
         {
-            /* Allocate and fill in the conversion tables. */
             m_rgb_ycc_tab = new int[TABLE_SIZE];
 
             for (int i = 0; i <= JpegConstants.MaxSampleValue; i++)
@@ -1713,42 +1338,11 @@ namespace BitMiracle.LibJpeg
                 m_rgb_ycc_tab[i + B_Y_OFF] = FIX(0.11400) * i + ONE_HALF;
                 m_rgb_ycc_tab[i + R_CB_OFF] = (-FIX(0.16874)) * i;
                 m_rgb_ycc_tab[i + G_CB_OFF] = (-FIX(0.33126)) * i;
-
-                /* We use a rounding fudge-factor of 0.5-epsilon for Cb and Cr.
-                 * This ensures that the maximum output will round to MaxSampleValue
-                 * not MaxSampleValue+1, and thus that we don't have to range-limit.
-                 */
                 m_rgb_ycc_tab[i + B_CB_OFF] = FIX(0.50000) * i + CBCR_OFFSET + ONE_HALF - 1;
-
-                /*  B=>Cb and R=>Cr tables are the same
-                    rgb_ycc_tab[i+R_CR_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
-                */
                 m_rgb_ycc_tab[i + G_CR_OFF] = (-FIX(0.41869)) * i;
                 m_rgb_ycc_tab[i + B_CR_OFF] = (-FIX(0.08131)) * i;
             }
         }
-
-        /// <summary>
-        /// RGB -&gt; YCbCr conversion: most common case
-        /// YCbCr is defined per CCIR 601-1, except that Cb and Cr are
-        /// normalized to the range 0..MaxSampleValue rather than -0.5 .. 0.5.
-        /// The conversion equations to be implemented are therefore
-        /// Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
-        /// Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + MediumSampleValue
-        /// Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + MediumSampleValue
-        /// (These numbers are derived from TIFF 6.0 section 21, dated 3-June-92.)
-        /// To avoid floating-point arithmetic, we represent the fractional constants
-        /// as integers scaled up by 2^16 (about 4 digits precision); we have to divide
-        /// the products by 2^16, with appropriate rounding, to get the correct answer.
-        /// For even more speed, we avoid doing any multiplications in the inner loop
-        /// by pre-calculating the constants times R,G,B for all possible values.
-        /// For 8-bit JSAMPLEs this is very reasonable (only 256 entries per table);
-        /// for 12-bit samples it is still acceptable.  It's not very reasonable for
-        /// 16-bit samples, but if you want lossless storage you shouldn't be changing
-        /// colorspace anyway.
-        /// The MediumSampleValue offsets and the rounding fudge-factor of 0.5 are included
-        /// in the tables to save adding them separately in the inner loop.
-        /// </summary>
         private void rgb_ycc_convert(byte[][] input_buf, int input_row, byte[][][] output_buf, int output_row, int num_rows)
         {
             int num_cols = m_cinfo.m_image_width;
@@ -1761,32 +1355,16 @@ namespace BitMiracle.LibJpeg
                     int g = input_buf[input_row + row][columnOffset + JpegConstants.Offset_RGB_Green];
                     int b = input_buf[input_row + row][columnOffset + JpegConstants.Offset_RGB_Blue];
                     columnOffset += JpegConstants.RGB_PixelLength;
-
-                    /* If the inputs are 0..MaxSampleValue, the outputs of these equations
-                     * must be too; we do not need an explicit range-limiting operation.
-                     * Hence the value being shifted is never negative, and we don't
-                     * need the general RIGHT_SHIFT macro.
-                     */
-                    /* Y */
                     output_buf[0][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_Y_OFF] + m_rgb_ycc_tab[g + G_Y_OFF] + m_rgb_ycc_tab[b + B_Y_OFF]) >> SCALEBITS);
-                    /* Cb */
                     output_buf[1][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_CB_OFF] + m_rgb_ycc_tab[g + G_CB_OFF] + m_rgb_ycc_tab[b + B_CB_OFF]) >> SCALEBITS);
-                    /* Cr */
                     output_buf[2][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_CR_OFF] + m_rgb_ycc_tab[g + G_CR_OFF] + m_rgb_ycc_tab[b + B_CR_OFF]) >> SCALEBITS);
                 }
-
                 output_row++;
             }
         }
         #endregion
 
         #region RGB to Grayscale
-        /// <summary>
-        /// Convert some rows of samples to the JPEG colorspace.
-        /// This version handles RGB->grayscale conversion, which is the same
-        /// as the RGB->Y portion of RGB->YCbCr.
-        /// We assume rgb_ycc_start has been called (we only use the Y tables).
-        /// </summary>
         private void rgb_gray_convert(byte[][] input_buf, int input_row, byte[][][] output_buf, int output_row, int num_rows)
         {
             int num_cols = m_cinfo.m_image_width;
@@ -1799,24 +1377,14 @@ namespace BitMiracle.LibJpeg
                     int g = input_buf[input_row + row][columnOffset + JpegConstants.Offset_RGB_Green];
                     int b = input_buf[input_row + row][columnOffset + JpegConstants.Offset_RGB_Blue];
                     columnOffset += JpegConstants.RGB_PixelLength;
-
-                    /* Y */
                     output_buf[0][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_Y_OFF] + m_rgb_ycc_tab[g + G_Y_OFF] + m_rgb_ycc_tab[b + B_Y_OFF]) >> SCALEBITS);
                 }
-
                 output_row++;
             }
         }
         #endregion
 
         #region CMYK to YCCK
-        /// <summary>
-        /// Convert some rows of samples to the JPEG colorspace.
-        /// This version handles Adobe-style CMYK->YCCK conversion,
-        /// where we convert R=1-C, G=1-M, and B=1-Y to YCbCr using the same
-        /// conversion as above, while passing K (black) unchanged.
-        /// We assume rgb_ycc_start has been called.
-        /// </summary>
         private void cmyk_ycck_convert(byte[][] input_buf, int input_row, byte[][][] output_buf, int output_row, int num_rows)
         {
             int num_cols = m_cinfo.m_image_width;
@@ -1828,36 +1396,18 @@ namespace BitMiracle.LibJpeg
                     int r = JpegConstants.MaxSampleValue - input_buf[input_row + row][columnOffset];
                     int g = JpegConstants.MaxSampleValue - input_buf[input_row + row][columnOffset + 1];
                     int b = JpegConstants.MaxSampleValue - input_buf[input_row + row][columnOffset + 2];
-
-                    /* K passes through as-is */
-                    /* don't need GETJSAMPLE here */
                     output_buf[3][output_row][col] = input_buf[input_row + row][columnOffset + 3];
                     columnOffset += 4;
-
-                    /* If the inputs are 0..MaxSampleValue, the outputs of these equations
-                     * must be too; we do not need an explicit range-limiting operation.
-                     * Hence the value being shifted is never negative, and we don't
-                     * need the general RIGHT_SHIFT macro.
-                     */
-                    /* Y */
                     output_buf[0][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_Y_OFF] + m_rgb_ycc_tab[g + G_Y_OFF] + m_rgb_ycc_tab[b + B_Y_OFF]) >> SCALEBITS);
-                    /* Cb */
                     output_buf[1][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_CB_OFF] + m_rgb_ycc_tab[g + G_CB_OFF] + m_rgb_ycc_tab[b + B_CB_OFF]) >> SCALEBITS);
-                    /* Cr */
                     output_buf[2][output_row][col] = (byte)((m_rgb_ycc_tab[r + R_CR_OFF] + m_rgb_ycc_tab[g + G_CR_OFF] + m_rgb_ycc_tab[b + B_CR_OFF]) >> SCALEBITS);
                 }
-
                 output_row++;
             }
         }
         #endregion
 
         #region Grayscale Conversion
-        /// <summary>
-        /// Convert some rows of samples to the JPEG colorspace.
-        /// This version handles grayscale output with no conversion.
-        /// The source can be either plain grayscale or YCbCr (since Y == gray).
-        /// </summary>
         private void grayscale_convert(byte[][] input_buf, int input_row, byte[][][] output_buf, int output_row, int num_rows)
         {
             int num_cols = m_cinfo.m_image_width;
@@ -1868,22 +1418,15 @@ namespace BitMiracle.LibJpeg
                 int columnOffset = 0;
                 for (int col = 0; col < num_cols; col++)
                 {
-                    /* don't need GETJSAMPLE() here */
                     output_buf[0][output_row][col] = input_buf[input_row + row][columnOffset];
                     columnOffset += instride;
                 }
-
                 output_row++;
             }
         }
         #endregion
 
         #region Null Conversion
-        /// <summary>
-        /// Convert some rows of samples to the JPEG colorspace.
-        /// This version handles multi-component colorspaces without conversion.
-        /// We assume input_components == num_components.
-        /// </summary>
         private void null_convert(byte[][] input_buf, int input_row, byte[][][] output_buf, int output_row, int num_rows)
         {
             int nc = m_cinfo.m_num_components;
@@ -1891,13 +1434,11 @@ namespace BitMiracle.LibJpeg
 
             for (int row = 0; row < num_rows; row++)
             {
-                /* It seems fastest to make a separate pass for each component. */
                 for (int ci = 0; ci < nc; ci++)
                 {
                     int columnOffset = 0;
                     for (int col = 0; col < num_cols; col++)
                     {
-                        /* don't need GETJSAMPLE() here */
                         output_buf[ci][output_row][col] = input_buf[input_row + row][columnOffset + ci];
                         columnOffset += nc;
                     }
@@ -1911,12 +1452,9 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region ColorDeconverter
-    /// <summary>
-    /// ColorSpace conversion
-    /// </summary>
     class ColorDeconverter
     {
-        private const int SCALEBITS = 16;  /* speediest right-shift on some machines */
+        private const int SCALEBITS = 16;
         private const int ONE_HALF = 1 << (SCALEBITS - 1);
 
         private enum ColorConverter
@@ -1932,21 +1470,13 @@ namespace BitMiracle.LibJpeg
         private JpegDecompressor m_cinfo;
 
         private int[] m_perComponentOffsets;
-
-        /* Private state for YCC->RGB conversion */
-        private int[] m_Cr_r_tab;      /* => table for Cr to R conversion */
-        private int[] m_Cb_b_tab;      /* => table for Cb to B conversion */
-        private int[] m_Cr_g_tab;        /* => table for Cr to G conversion */
-        private int[] m_Cb_g_tab;        /* => table for Cb to G conversion */
-
-        /// <summary>
-        /// Module initialization routine for output colorspace conversion.
-        /// </summary>
+        private int[] m_Cr_r_tab;
+        private int[] m_Cb_b_tab;
+        private int[] m_Cr_g_tab;
+        private int[] m_Cb_g_tab;
         public ColorDeconverter(JpegDecompressor cinfo)
         {
             m_cinfo = cinfo;
-
-            /* Make sure num_components agrees with jpeg_color_space */
             switch (cinfo.m_jpeg_color_space)
             {
                 case ColorSpace.Grayscale:
@@ -1967,16 +1497,10 @@ namespace BitMiracle.LibJpeg
                     break;
 
                 default:
-                    /* JCS_UNKNOWN can be anything */
                     if (cinfo.m_num_components < 1)
                         throw new Exception("Bogus Jpeg colorspace!");
                     break;
             }
-
-            /* Set out_color_components and conversion method based on requested space.
-            * Also clear the component_needed flags for any unused components,
-            * so that earlier pipeline stages can avoid useless computation.
-            */
 
             switch (cinfo.m_out_color_space)
             {
@@ -1985,7 +1509,6 @@ namespace BitMiracle.LibJpeg
                     if (cinfo.m_jpeg_color_space == ColorSpace.Grayscale || cinfo.m_jpeg_color_space == ColorSpace.YCbCr)
                     {
                         m_converter = ColorConverter.grayscale_converter;
-                        /* For color->grayscale conversion, only the Y (0) component is needed */
                         for (int ci = 1; ci < cinfo.m_num_components; ci++)
                             cinfo.Comp_info[ci].component_needed = false;
                     }
@@ -2022,7 +1545,6 @@ namespace BitMiracle.LibJpeg
                     break;
 
                 default:
-                    /* Permit null conversion to same output space */
                     if (cinfo.m_out_color_space == cinfo.m_jpeg_color_space)
                     {
                         cinfo.m_out_color_components = cinfo.m_num_components;
@@ -2030,28 +1552,16 @@ namespace BitMiracle.LibJpeg
                     }
                     else
                     {
-                        /* unsupported non-null conversion */
                         throw new Exception("Unsupported color conversion request.");
                     }
                     break;
             }
 
             if (cinfo.m_quantize_colors)
-                cinfo.m_output_components = 1; /* single colormapped output component */
+                cinfo.m_output_components = 1;
             else
                 cinfo.m_output_components = cinfo.m_out_color_components;
         }
-
-        /// <summary>
-        /// Convert some rows of samples to the output colorspace.
-        /// 
-        /// Note that we change from non-interleaved, one-plane-per-component format
-        /// to interleaved-pixel format.  The output buffer is therefore three times
-        /// as wide as the input buffer.
-        /// A starting row offset is provided only for the input buffer.  The caller
-        /// can easily adjust the passed output_buf value to accommodate any row
-        /// offset required on that side.
-        /// </summary>
         public void color_convert(ComponentBuffer[] input_buf, int[] perComponentOffsets, int input_row, byte[][] output_buf, int output_row, int num_rows)
         {
             m_perComponentOffsets = perComponentOffsets;
@@ -2085,38 +1595,6 @@ namespace BitMiracle.LibJpeg
 
 
         #region YCbCr to RGB
-        /**************** YCbCr -> RGB conversion: most common case **************/
-
-        /*
-         * YCbCr is defined per CCIR 601-1, except that Cb and Cr are
-         * normalized to the range 0..MaxSampleValue rather than -0.5 .. 0.5.
-         * The conversion equations to be implemented are therefore
-         *  R = Y                + 1.40200 * Cr
-         *  G = Y - 0.34414 * Cb - 0.71414 * Cr
-         *  B = Y + 1.77200 * Cb
-         * where Cb and Cr represent the incoming values less MediumSampleValue.
-         * (These numbers are derived from TIFF 6.0 section 21, dated 3-June-92.)
-         *
-         * To avoid floating-point arithmetic, we represent the fractional constants
-         * as integers scaled up by 2^16 (about 4 digits precision); we have to divide
-         * the products by 2^16, with appropriate rounding, to get the correct answer.
-         * Notice that Y, being an integral input, does not contribute any fraction
-         * so it need not participate in the rounding.
-         *
-         * For even more speed, we avoid doing any multiplications in the inner loop
-         * by pre-calculating the constants times Cb and Cr for all possible values.
-         * For 8-bit JSAMPLEs this is very reasonable (only 256 entries per table);
-         * for 12-bit samples it is still acceptable.  It's not very reasonable for
-         * 16-bit samples, but if you want lossless storage you shouldn't be changing
-         * colorspace anyway.
-         * The Cr=>R and Cb=>B values can be rounded to integers in advance; the
-         * values for the G calculation are left scaled up, since we must add them
-         * together before rounding.
-         */
-
-        /// <summary>
-        /// Initialize tables for YCC->RGB colorspace conversion.
-        /// </summary>
         private void build_ycc_rgb_table()
         {
             m_Cr_r_tab = new int[JpegConstants.MaxSampleValue + 1];
@@ -2126,19 +1604,9 @@ namespace BitMiracle.LibJpeg
 
             for (int i = 0, x = -JpegConstants.MediumSampleValue; i <= JpegConstants.MaxSampleValue; i++, x++)
             {
-                /* i is the actual input pixel value, in the range 0..MaxSampleValue */
-                /* The Cb or Cr value we are thinking of is x = i - MediumSampleValue */
-                /* Cr=>R value is nearest int to 1.40200 * x */
                 m_Cr_r_tab[i] = JpegUtils.RIGHT_SHIFT(FIX(1.40200) * x + ONE_HALF, SCALEBITS);
-
-                /* Cb=>B value is nearest int to 1.77200 * x */
                 m_Cb_b_tab[i] = JpegUtils.RIGHT_SHIFT(FIX(1.77200) * x + ONE_HALF, SCALEBITS);
-
-                /* Cr=>G value is scaled-up -0.71414 * x */
                 m_Cr_g_tab[i] = (-FIX(0.71414)) * x;
-
-                /* Cb=>G value is scaled-up -0.34414 * x */
-                /* We also add in ONE_HALF so that need not do it in inner loop */
                 m_Cb_g_tab[i] = (-FIX(0.34414)) * x + ONE_HALF;
             }
         }
@@ -2148,10 +1616,8 @@ namespace BitMiracle.LibJpeg
             int component0RowOffset = m_perComponentOffsets[0];
             int component1RowOffset = m_perComponentOffsets[1];
             int component2RowOffset = m_perComponentOffsets[2];
-
             byte[] limit = m_cinfo.m_sample_range_limit;
             int limitOffset = m_cinfo.m_sampleRangeLimitOffset;
-
             for (int row = 0; row < num_rows; row++)
             {
                 int columnOffset = 0;
@@ -2160,36 +1626,25 @@ namespace BitMiracle.LibJpeg
                     int y = input_buf[0][input_row + component0RowOffset][col];
                     int cb = input_buf[1][input_row + component1RowOffset][col];
                     int cr = input_buf[2][input_row + component2RowOffset][col];
-
-                    /* Range-limiting is essential due to noise introduced by DCT losses. */
                     output_buf[output_row + row][columnOffset + JpegConstants.Offset_RGB_Red] = limit[limitOffset + y + m_Cr_r_tab[cr]];
                     output_buf[output_row + row][columnOffset + JpegConstants.Offset_RGB_Green] = limit[limitOffset + y + JpegUtils.RIGHT_SHIFT(m_Cb_g_tab[cb] + m_Cr_g_tab[cr], SCALEBITS)];
                     output_buf[output_row + row][columnOffset + JpegConstants.Offset_RGB_Blue] = limit[limitOffset + y + m_Cb_b_tab[cb]];
                     columnOffset += JpegConstants.RGB_PixelLength;
                 }
-
                 input_row++;
             }
         }
         #endregion
 
         #region YCCK to CMYK
-        /// <summary>
-        /// Adobe-style YCCK->CMYK conversion.
-        /// We convert YCbCr to R=1-C, G=1-M, and B=1-Y using the same
-        /// conversion as above, while passing K (black) unchanged.
-        /// We assume build_ycc_rgb_table has been called.
-        /// </summary>
         private void ycck_cmyk_convert(ComponentBuffer[] input_buf, int input_row, byte[][] output_buf, int output_row, int num_rows)
         {
             int component0RowOffset = m_perComponentOffsets[0];
             int component1RowOffset = m_perComponentOffsets[1];
             int component2RowOffset = m_perComponentOffsets[2];
             int component3RowOffset = m_perComponentOffsets[3];
-
             byte[] limit = m_cinfo.m_sample_range_limit;
             int limitOffset = m_cinfo.m_sampleRangeLimitOffset;
-
             int num_cols = m_cinfo.m_output_width;
             for (int row = 0; row < num_rows; row++)
             {
@@ -2199,59 +1654,40 @@ namespace BitMiracle.LibJpeg
                     int y = input_buf[0][input_row + component0RowOffset][col];
                     int cb = input_buf[1][input_row + component1RowOffset][col];
                     int cr = input_buf[2][input_row + component2RowOffset][col];
-
-                    /* Range-limiting is essential due to noise introduced by DCT losses. */
-                    output_buf[output_row + row][columnOffset] = limit[limitOffset + JpegConstants.MaxSampleValue - (y + m_Cr_r_tab[cr])]; /* red */
-                    output_buf[output_row + row][columnOffset + 1] = limit[limitOffset + JpegConstants.MaxSampleValue - (y + JpegUtils.RIGHT_SHIFT(m_Cb_g_tab[cb] + m_Cr_g_tab[cr], SCALEBITS))]; /* green */
-                    output_buf[output_row + row][columnOffset + 2] = limit[limitOffset + JpegConstants.MaxSampleValue - (y + m_Cb_b_tab[cb])]; /* blue */
-
-                    /* K passes through unchanged */
-                    /* don't need GETJSAMPLE here */
+                    output_buf[output_row + row][columnOffset] = limit[limitOffset + JpegConstants.MaxSampleValue - (y + m_Cr_r_tab[cr])];
+                    output_buf[output_row + row][columnOffset + 1] = limit[limitOffset + JpegConstants.MaxSampleValue - (y + JpegUtils.RIGHT_SHIFT(m_Cb_g_tab[cb] + m_Cr_g_tab[cr], SCALEBITS))];
+                    output_buf[output_row + row][columnOffset + 2] = limit[limitOffset + JpegConstants.MaxSampleValue - (y + m_Cb_b_tab[cb])];
                     output_buf[output_row + row][columnOffset + 3] = input_buf[3][input_row + component3RowOffset][col];
                     columnOffset += 4;
                 }
-
                 input_row++;
             }
         }
         #endregion
 
         #region Grayscale to RGB
-        /// <summary>
-        /// Convert grayscale to RGB: just duplicate the gray-level three times.
-        /// This is provided to support applications that don't want to cope
-        /// with grayscale as a separate case.
-        /// </summary>
         private void gray_rgb_convert(ComponentBuffer[] input_buf, int input_row, byte[][] output_buf, int output_row, int num_rows)
         {
             int component0RowOffset = m_perComponentOffsets[0];
             int component1RowOffset = m_perComponentOffsets[1];
             int component2RowOffset = m_perComponentOffsets[2];
-
             int num_cols = m_cinfo.m_output_width;
             for (int row = 0; row < num_rows; row++)
             {
                 int columnOffset = 0;
                 for (int col = 0; col < num_cols; col++)
                 {
-                    /* We can dispense with GETJSAMPLE() here */
                     output_buf[output_row + row][columnOffset + JpegConstants.Offset_RGB_Red] = input_buf[0][input_row + component0RowOffset][col];
                     output_buf[output_row + row][columnOffset + JpegConstants.Offset_RGB_Green] = input_buf[0][input_row + component1RowOffset][col];
                     output_buf[output_row + row][columnOffset + JpegConstants.Offset_RGB_Blue] = input_buf[0][input_row + component2RowOffset][col];
                     columnOffset += JpegConstants.RGB_PixelLength;
                 }
-
                 input_row++;
             }
         }
         #endregion
 
         #region Grayscale Conversion
-        /// <summary>
-        /// Color conversion for grayscale: just copy the data.
-        /// This also works for YCbCr -> grayscale conversion, in which
-        /// we just copy the Y (luminance) component and ignore chrominance.
-        /// </summary>
         private void grayscale_convert(ComponentBuffer[] input_buf, int input_row, byte[][] output_buf, int output_row, int num_rows)
         {
             JpegUtils.jcopy_sample_rows(input_buf[0], input_row + m_perComponentOffsets[0], output_buf, output_row, num_rows, m_cinfo.m_output_width);
@@ -2259,10 +1695,6 @@ namespace BitMiracle.LibJpeg
         #endregion
 
         #region Null Conversion
-        /// <summary>
-        /// Color conversion for no colorspace change: just copy the data,
-        /// converting from separate-planes to interleaved representation.
-        /// </summary>
         private void null_convert(ComponentBuffer[] input_buf, int input_row, byte[][] output_buf, int output_row, int num_rows)
         {
             for (int row = 0; row < num_rows; row++)
@@ -2275,13 +1707,11 @@ namespace BitMiracle.LibJpeg
 
                     for (int count = m_cinfo.m_output_width; count > 0; count--)
                     {
-                        /* needn't bother with GETJSAMPLE() here */
                         output_buf[output_row + row][ci + componentOffset] = input_buf[ci][input_row + perComponentOffset][columnIndex];
                         componentOffset += m_cinfo.m_num_components;
                         columnIndex++;
                     }
                 }
-
                 input_row++;
             }
         }
@@ -2290,9 +1720,6 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region ColorQuantizer
-    /// <summary>
-    /// Color quantization or color precision reduction
-    /// </summary>
     interface ColorQuantizer
     {
         void start_pass(bool is_pre_scan);
@@ -2305,21 +1732,10 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region ComponentBuffer
-    /// <summary>
-    /// Encapsulates buffer of image samples for one color component
-    /// When provided with funny indices (see JpegDecompressorMainController for 
-    /// explanation of what it is) uses them for non-linear row access.
-    /// </summary>
     class ComponentBuffer
     {
         private byte[][] m_buffer;
-
-        // array of funny indices
         private int[] m_funnyIndices;
-
-        // index of "first funny index" (used because some code uses negative 
-        // indices when retrieve rows)
-        // see for example UpsamplerImpl.h2v2_fancy_upsample
         private int m_funnyOffset;
 
         public ComponentBuffer()
@@ -2352,19 +1768,11 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region CompressionParameters
-    /// <summary>
-    /// Parameters of compression.
-    /// </summary>
-    /// <remarks>Being used in <see cref="M:BitMiracle.LibJpeg.JpegImage.WriteJpeg(System.IO.Stream,BitMiracle.LibJpeg.CompressionParameters)"/></remarks>
     public class CompressionParameters
     {
         private int m_quality = 75;
         private int m_smoothingFactor;
         private bool m_simpleProgressive;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CompressionParameters"/> class.
-        /// </summary>
         public CompressionParameters()
         {
         }
@@ -2378,14 +1786,6 @@ namespace BitMiracle.LibJpeg
             m_smoothingFactor = parameters.m_smoothingFactor;
             m_simpleProgressive = parameters.m_simpleProgressive;
         }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.
-        /// </returns>
         public override bool Equals(object obj)
         {
             CompressionParameters parameters = obj as CompressionParameters;
@@ -2396,53 +1796,20 @@ namespace BitMiracle.LibJpeg
                     m_smoothingFactor == parameters.m_smoothingFactor &&
                     m_simpleProgressive == parameters.m_simpleProgressive);
         }
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms 
-        /// and data structures like a hash table. 
-        /// </returns>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
-
-        /// <summary>
-        /// Gets or sets the quality of JPEG image.
-        /// </summary>
-        /// <remarks>Default value: 75<br/>
-        /// The quality value is expressed on the 0..100 scale.
-        /// </remarks>
-        /// <value>The quality of JPEG image.</value>
         public int Quality
         {
             get { return m_quality; }
             set { m_quality = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the coefficient of image smoothing.
-        /// </summary>
-        /// <remarks>Default value: 0<br/>
-        /// If non-zero, the input image is smoothed; the value should be 1 for
-        /// minimal smoothing to 100 for maximum smoothing.
-        /// </remarks>
-        /// <value>The coefficient of image smoothing.</value>
         public int SmoothingFactor
         {
             get { return m_smoothingFactor; }
             set { m_smoothingFactor = value; }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to write a progressive-JPEG file.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> for writing a progressive-JPEG file; <c>false</c> 
-        /// for non-progressive JPEG files.
-        /// </value>
         public bool SimpleProgressive
         {
             get { return m_simpleProgressive; }
@@ -2482,15 +1849,6 @@ namespace BitMiracle.LibJpeg
                 m_traceLevel = value;
             }
         }
-
-        /* Decompression processing parameters --- these fields must be set before
-         * calling jpeg_start_decompress().  Note that jpeg_read_header() initializes
-         * them to default values.
-         */
-
-        /// <summary>
-        /// colorspace for output
-        /// </summary>
         public ColorSpace OutColorspace
         {
             get
@@ -2502,10 +1860,6 @@ namespace BitMiracle.LibJpeg
                 m_outColorspace = value;
             }
         }
-
-        /// <summary>
-        /// fraction by which to scale image
-        /// </summary>
         public int ScaleNumerator
         {
             get
@@ -2529,10 +1883,6 @@ namespace BitMiracle.LibJpeg
                 m_scaleDenominator = value;
             }
         }
-
-        /// <summary>
-        /// true=multiple output passes
-        /// </summary>
         public bool BufferedImage
         {
             get
@@ -2544,10 +1894,6 @@ namespace BitMiracle.LibJpeg
                 m_bufferedImage = value;
             }
         }
-
-        /// <summary>
-        /// true=downsampled data wanted
-        /// </summary>
         public bool RawDataOut
         {
             get
@@ -2559,10 +1905,6 @@ namespace BitMiracle.LibJpeg
                 m_rawDataOut = value;
             }
         }
-
-        /// <summary>
-        /// IDCT algorithm selector
-        /// </summary>
         public DCTMethod DCTMethod
         {
             get
@@ -2574,10 +1916,6 @@ namespace BitMiracle.LibJpeg
                 m_dctMethod = value;
             }
         }
-
-        /// <summary>
-        /// true=apply fancy upsampling
-        /// </summary>
         public bool DoFancyUpsampling
         {
             get
@@ -2589,10 +1927,6 @@ namespace BitMiracle.LibJpeg
                 m_doFancyUpsampling = value;
             }
         }
-
-        /// <summary>
-        /// true=apply interblock smoothing
-        /// </summary>
         public bool DoBlockSmoothing
         {
             get
@@ -2604,10 +1938,6 @@ namespace BitMiracle.LibJpeg
                 m_doBlockSmoothing = value;
             }
         }
-
-        /// <summary>
-        /// true=colormapped output wanted
-        /// </summary>
         public bool QuantizeColors
         {
             get
@@ -2619,12 +1949,6 @@ namespace BitMiracle.LibJpeg
                 m_quantizeColors = value;
             }
         }
-
-        /* the following are ignored if not quantize_colors: */
-
-        /// <summary>
-        /// type of color dithering to use
-        /// </summary>
         public DitherMode DitherMode
         {
             get
@@ -2636,10 +1960,6 @@ namespace BitMiracle.LibJpeg
                 m_ditherMode = value;
             }
         }
-
-        /// <summary>
-        /// true=use two-pass color quantization
-        /// </summary>
         public bool TwoPassQuantize
         {
             get
@@ -2651,10 +1971,6 @@ namespace BitMiracle.LibJpeg
                 m_twoPassQuantize = value;
             }
         }
-
-        /// <summary>
-        /// max # colors to use in created colormap
-        /// </summary>
         public int DesiredNumberOfColors
         {
             get
@@ -2666,12 +1982,6 @@ namespace BitMiracle.LibJpeg
                 m_desiredNumberOfColors = value;
             }
         }
-
-        /* these are significant only in buffered-image mode: */
-
-        /// <summary>
-        /// enable future use of 1-pass quantizer
-        /// </summary>
         public bool EnableOnePassQuantizer
         {
             get
@@ -2683,10 +1993,6 @@ namespace BitMiracle.LibJpeg
                 m_enableOnePassQuantizer = value;
             }
         }
-
-        /// <summary>
-        /// enable future use of external colormap
-        /// </summary>
         public bool EnableExternalQuant
         {
             get
@@ -2698,10 +2004,6 @@ namespace BitMiracle.LibJpeg
                 m_enableExternalQuant = value;
             }
         }
-
-        /// <summary>
-        /// enable future use of 2-pass quantizer
-        /// </summary>
         public bool EnableTwoPassQuantizer
         {
             get
@@ -2760,64 +2062,25 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region DerivedTable
-    /// <summary>
-    /// Derived data constructed for each Huffman table
-    /// </summary>
     class DerivedTable
     {
-        /* Basic tables: (element [0] of each array is unused) */
-        public int[] maxcode = new int[18];      /* largest code of length k (-1 if none) */
-        /* (maxcode[17] is a sentinel to ensure jpeg_huff_decode terminates) */
-        public int[] valoffset = new int[17];        /* huffval[] offset for codes of length k */
-        /* valoffset[k] = huffval[] index of 1st symbol of code length k, less
-        * the smallest code of length k; so given a code of length k, the
-        * corresponding symbol is huffval[code + valoffset[k]]
-        */
-
-        /* Link to public Huffman table (needed only in jpeg_huff_decode) */
+        public int[] maxcode = new int[18];
+        public int[] valoffset = new int[17];
         public JpegHuffmanTable pub;
-
-        /* Lookahead tables: indexed by the next HuffmanLookaheadDistance bits of
-        * the input data stream.  If the next Huffman code is no more
-        * than HuffmanLookaheadDistance bits long, we can obtain its length and
-        * the corresponding symbol directly from these tables.
-        */
-        public int[] look_nbits = new int[1 << JpegConstants.HuffmanLookaheadDistance]; /* # bits, or 0 if too long */
-        public byte[] look_sym = new byte[1 << JpegConstants.HuffmanLookaheadDistance]; /* symbol, or unused */
+        public int[] look_nbits = new int[1 << JpegConstants.HuffmanLookaheadDistance];
+        public byte[] look_sym = new byte[1 << JpegConstants.HuffmanLookaheadDistance];
     }
     #endregion
 
     #region DestinationManager
-    /// <summary>
-    /// Data destination object for compression.
-    /// </summary>
     public abstract class DestinationManager
     {
         private byte[] m_buffer;
         private int m_position;
-        private int m_free_in_buffer;  /* # of byte spaces remaining in buffer */
-
-        /// <summary>
-        /// Initializes this instance.
-        /// </summary>
+        private int m_free_in_buffer;
         public abstract void init_destination();
-
-        /// <summary>
-        /// Empties output buffer.
-        /// </summary>
-        /// <returns><c>true</c> if operation succeed; otherwise, <c>false</c></returns>
         public abstract bool empty_output_buffer();
-
-        /// <summary>
-        /// Term_destinations this instance.
-        /// </summary>
         public abstract void term_destination();
-
-        /// <summary>
-        /// Emits a byte.
-        /// </summary>
-        /// <param name="val">The byte value.</param>
-        /// <returns><c>true</c> if operation succeed; otherwise, <c>false</c></returns>
         public virtual bool emit_byte(int val)
         {
             m_buffer[m_position] = (byte)val;
@@ -2831,23 +2094,12 @@ namespace BitMiracle.LibJpeg
 
             return true;
         }
-
-        /// <summary>
-        /// Initializes the internal buffer.
-        /// </summary>
-        /// <param name="buffer">The buffer.</param>
-        /// <param name="offset">The offset.</param>
         protected void initInternalBuffer(byte[] buffer, int offset)
         {
             m_buffer = buffer;
             m_free_in_buffer = buffer.Length - offset;
             m_position = offset;
         }
-
-        /// <summary>
-        /// Gets the number of free bytes in buffer.
-        /// </summary>
-        /// <value>The number of free bytes in buffer.</value>
         protected int freeInBuffer
         {
             get
@@ -2859,77 +2111,32 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region DestinationManagerImpl
-    /// <summary>
-    /// Expanded data destination object for output to Stream
-    /// </summary>
     class DestinationManagerImpl : DestinationManager
     {
-        private const int OUTPUT_BUF_SIZE = 4096;   /* choose an efficiently fwrite'able size */
-
+        private const int OUTPUT_BUF_SIZE = 4096;
         private JpegCompressor m_cinfo;
-
-        private Stream m_outfile;      /* target stream */
-        private byte[] m_buffer;     /* start of buffer */
+        private Stream m_outfile;
+        private byte[] m_buffer;
 
         public DestinationManagerImpl(JpegCompressor cinfo, Stream alreadyOpenFile)
         {
             m_cinfo = cinfo;
             m_outfile = alreadyOpenFile;
         }
-
-        /// <summary>
-        /// Initialize destination --- called by jpeg_start_compress
-        /// before any data is actually written.
-        /// </summary>
         public override void init_destination()
         {
-            /* Allocate the output buffer --- it will be released when done with image */
             m_buffer = new byte[OUTPUT_BUF_SIZE];
             initInternalBuffer(m_buffer, 0);
         }
-
-        /// <summary>
-        /// Empty the output buffer --- called whenever buffer fills up.
-        /// 
-        /// In typical applications, this should write the entire output buffer
-        /// (ignoring the current state of next_output_byte and free_in_buffer),
-        /// reset the pointer and count to the start of the buffer, and return true
-        /// indicating that the buffer has been dumped.
-        /// 
-        /// In applications that need to be able to suspend compression due to output
-        /// overrun, a false return indicates that the buffer cannot be emptied now.
-        /// In this situation, the compressor will return to its caller (possibly with
-        /// an indication that it has not accepted all the supplied scanlines).  The
-        /// application should resume compression after it has made more room in the
-        /// output buffer.  Note that there are substantial restrictions on the use of
-        /// suspension --- see the documentation.
-        /// 
-        /// When suspending, the compressor will back up to a convenient restart point
-        /// (typically the start of the current MCU). next_output_byte and free_in_buffer
-        /// indicate where the restart point will be if the current call returns false.
-        /// Data beyond this point will be regenerated after resumption, so do not
-        /// write it out when emptying the buffer externally.
-        /// </summary>
         public override bool empty_output_buffer()
         {
             writeBuffer(m_buffer.Length);
             initInternalBuffer(m_buffer, 0);
             return true;
         }
-
-        /// <summary>
-        /// Terminate destination --- called by jpeg_finish_compress
-        /// after all data has been written.  Usually needs to flush buffer.
-        /// 
-        /// NB: *not* called by jpeg_abort or jpeg_destroy; surrounding
-        /// application must deal with any cleanup that should happen even
-        /// for error exit.
-        /// </summary>
         public override void term_destination()
         {
             int datacount = m_buffer.Length - freeInBuffer;
-
-            /* Write any data remaining in the buffer */
             if (datacount > 0)
                 writeBuffer(datacount);
 
@@ -2961,174 +2168,53 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region Enumerations
-    /// <summary>
-    /// Operating modes for buffer controllers
-    /// </summary>
     enum BufferMode
     {
-        /// <summary>
-        /// Plain strip-wise operation.
-        /// </summary>
         PassThru,
-        /* Remaining modes require a full-image buffer to have been created */
-        /// <summary>
-        /// Run source sub-object only, save output.
-        /// </summary>
         SaveSource,
-        /// <summary>
-        /// Run dest sub-object only, using saved data.
-        /// </summary>
         CrankDest,
-        /// <summary>
-        /// Run both sub-objects, save output
-        /// </summary>
         SaveAndPass
     }
-
-    /// <summary>
-    /// The unit of density.
-    /// </summary>
-    /// <seealso cref="JpegCompressor.Density_unit"/>
-    /// <seealso cref="JpegDecompressor.Density_unit"/>
     public enum DensityUnit
     {
-        /// <summary>
-        /// Unknown density
-        /// </summary>
         Unknown = 0,
-        /// <summary>
-        /// Dots/inch
-        /// </summary>
         DotsInch = 1,
-        /// <summary>
-        /// Dots/cm
-        /// </summary>
         DotsCm = 2
     }
-
-    /// <summary>
-    /// Dithering options for decompression.
-    /// </summary>
-    /// <seealso cref="JpegDecompressor.Dither_mode"/>
     public enum DitherMode
     {
-        /// <summary>
-        /// No dithering: fast, very low quality
-        /// </summary>
         None,
-        /// <summary>
-        /// Ordered dither: moderate speed and quality
-        /// </summary>
         Ordered,
-        /// <summary>
-        /// Floyd-Steinberg dither: slow, high quality
-        /// </summary>
         FloydStein
     }
-
-    /// <summary>
-    /// Describes a result of read operation.
-    /// </summary>
-    /// <seealso cref="JpegDecompressor.jpeg_consume_input"/>
     public enum ReadResult
     {
-        /// <summary>
-        /// Suspended due to lack of input data.
-        /// Can occur only if a suspending data source is used.
-        /// </summary>
         Suspended = 0,
-        /// <summary>
-        /// Found valid image data-stream.
-        /// </summary>
         Header_Ok = 1,
-        /// <summary>
-        /// Found valid table-specs-only data-stream.
-        /// </summary>
         Header_Tables_Only = 2,
-        /// <summary>
-        /// Reached a SOS marker (the start of a new scan)
-        /// </summary>
         Reached_SOS = 3,
-        /// <summary>
-        /// Reached the EOI marker (end of image)
-        /// </summary>
         Reached_EOI = 4,
-        /// <summary>
-        /// Completed reading one MCU row of compressed data.
-        /// </summary>
         Row_Completed = 5,
-        /// <summary>
-        /// Completed reading last MCU row of current scan.
-        /// </summary>
         Scan_Completed = 6
     }
-
-    /// <summary>
-    /// Known color spaces. 
-    /// </summary>
     public enum ColorSpace
     {
-        /// <summary>
-        /// Unspecified colorspace
-        /// </summary>
         Unknown,
-        /// <summary>
-        /// Grayscale
-        /// </summary>
         Grayscale,
-        /// <summary>
-        /// RGB
-        /// </summary>
         RGB,
-        /// <summary>
-        /// YCbCr (also known as YUV)
-        /// </summary>
         YCbCr,
-        /// <summary>
-        /// CMYK
-        /// </summary>
         CMYK,
-        /// <summary>
-        /// YCbCrK
-        /// </summary>
         YCCK
     }
-
-    /// <summary>
-    /// Algorithm used for the DCT step.
-    /// </summary>
-    /// <remarks>The <c>Float</c> method is very slightly more accurate than the <c>ISLOW</c> method, 
-    /// but may give different results on different machines due to varying roundoff behavior. 
-    /// The integer methods should give the same results on all machines. On machines with 
-    /// sufficiently fast hardware, the floating-point method may also be the fastest. 
-    /// The <c>IFAST</c> method is considerably less accurate than the other two; its use is not recommended 
-    /// if high quality is a concern.</remarks>
-    /// <seealso cref="JpegCompressor.Dct_method"/>
-    /// <seealso cref="JpegDecompressor.Dct_method"/>
     public enum DCTMethod
     {
-        /// <summary>
-        /// Slow but accurate integer algorithm.
-        /// </summary>
         IntSlow,
-        /// <summary>
-        /// Faster, less accurate integer method.
-        /// </summary>
         IntFast,
-        /// <summary>
-        /// Floating-point method.
-        /// </summary>
         Float
     }
     #endregion
 
     #region HuffEntropyDecoder
-    /// <summary>
-    /// Expanded entropy decoder object for Huffman decoding.
-    /// 
-    /// The savable_state sub-record contains fields that change within an MCU,
-    /// but must not be updated permanently until we complete the MCU.
-    /// </summary>
     class HuffEntropyDecoder : JpegEntropyDecoder
     {
         private class savable_state
@@ -3140,42 +2226,22 @@ namespace BitMiracle.LibJpeg
                 Buffer.BlockCopy(ss.last_dc_val, 0, last_dc_val, 0, last_dc_val.Length * sizeof(int));
             }
         }
-
-        /* These fields are loaded into local variables at start of each MCU.
-        * In case of suspension, we exit WITHOUT updating them.
-        */
-        private SavedBitreadState m_bitstate;    /* Bit buffer at start of MCU */
-        private savable_state m_saved = new savable_state();        /* Other state at start of MCU */
-
-        /* These fields are NOT loaded into local working state. */
-        private int m_restarts_to_go;    /* MCUs left in this restart interval */
-
-        /* Pointers to derived tables (these workspaces have image lifespan) */
+        private SavedBitreadState m_bitstate;
+        private savable_state m_saved = new savable_state();
+        private int m_restarts_to_go;
         private DerivedTable[] m_dc_derived_tbls = new DerivedTable[JpegConstants.NumberOfHuffmanTables];
         private DerivedTable[] m_ac_derived_tbls = new DerivedTable[JpegConstants.NumberOfHuffmanTables];
-
-        /* Precalculated info set up by start_pass for use in decode_mcu: */
-
-        /* Pointers to derived tables to be used for each block within an MCU */
         private DerivedTable[] m_dc_cur_tbls = new DerivedTable[JpegConstants.DecompressorMaxBlocksInMCU];
         private DerivedTable[] m_ac_cur_tbls = new DerivedTable[JpegConstants.DecompressorMaxBlocksInMCU];
-
-        /* Whether we care about the DC and AC coefficient values for each block */
         private bool[] m_dc_needed = new bool[JpegConstants.DecompressorMaxBlocksInMCU];
         private bool[] m_ac_needed = new bool[JpegConstants.DecompressorMaxBlocksInMCU];
 
         public HuffEntropyDecoder(JpegDecompressor cinfo)
         {
             m_cinfo = cinfo;
-
-            /* Mark tables unallocated */
             for (int i = 0; i < JpegConstants.NumberOfHuffmanTables; i++)
                 m_dc_derived_tbls[i] = m_ac_derived_tbls[i] = null;
         }
-
-        /// <summary>
-        /// Initialize for a Huffman-compressed scan.
-        /// </summary>
         public override void start_pass()
         {
             for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
@@ -3183,31 +2249,19 @@ namespace BitMiracle.LibJpeg
                 JpegComponent componentInfo = m_cinfo.Comp_info[m_cinfo.m_cur_comp_info[ci]];
                 int dctbl = componentInfo.Dc_tbl_no;
                 int actbl = componentInfo.Ac_tbl_no;
-
-                /* Compute derived values for Huffman tables */
-                /* We may do this more than once for a table, but it's not expensive */
                 jpeg_make_d_derived_tbl(true, dctbl, ref m_dc_derived_tbls[dctbl]);
                 jpeg_make_d_derived_tbl(false, actbl, ref m_ac_derived_tbls[actbl]);
-
-                /* Initialize DC predictions to 0 */
                 m_saved.last_dc_val[ci] = 0;
             }
-
-            /* Precalculate decoding info for each block in an MCU of this scan */
             for (int blkn = 0; blkn < m_cinfo.m_blocks_in_MCU; blkn++)
             {
                 int ci = m_cinfo.m_MCU_membership[blkn];
                 JpegComponent componentInfo = m_cinfo.Comp_info[m_cinfo.m_cur_comp_info[ci]];
-
-                /* Precalculate which table to use for each block */
                 m_dc_cur_tbls[blkn] = m_dc_derived_tbls[componentInfo.Dc_tbl_no];
                 m_ac_cur_tbls[blkn] = m_ac_derived_tbls[componentInfo.Ac_tbl_no];
-
-                /* Decide whether we really care about the coefficient values */
                 if (componentInfo.component_needed)
                 {
                     m_dc_needed[blkn] = true;
-                    /* we don't need the ACs if producing a 1/8th-size image */
                     m_ac_needed[blkn] = (componentInfo.DCT_scaled_size > 1);
                 }
                 else
@@ -3215,33 +2269,13 @@ namespace BitMiracle.LibJpeg
                     m_dc_needed[blkn] = m_ac_needed[blkn] = false;
                 }
             }
-
-            /* Initialize bitread state variables */
             m_bitstate.bits_left = 0;
             m_bitstate.get_buffer = 0;
             m_insufficient_data = false;
-
-            /* Initialize restart counter */
             m_restarts_to_go = m_cinfo.m_restart_interval;
         }
-
-        /// <summary>
-        /// Decode and return one MCU's worth of Huffman-compressed coefficients.
-        /// The coefficients are reordered from zigzag order into natural array order,
-        /// but are not dequantized.
-        /// 
-        /// The i'th block of the MCU is stored into the block pointed to by
-        /// MCU_data[i].  WE ASSUME THIS AREA HAS BEEN ZEROED BY THE CALLER.
-        /// (Wholesale zeroing is usually a little faster than retail...)
-        /// 
-        /// Returns false if data source requested suspension.  In that case no
-        /// changes have been made to permanent state.  (Exception: some output
-        /// coefficients may already have been assigned.  This is harmless for
-        /// this module, since we'll just re-assign them on the next call.)
-        /// </summary>
         public override bool decode_mcu(JpegBlock[] MCU_data)
         {
-            /* Process restart marker if needed; may have to suspend */
             if (m_cinfo.m_restart_interval != 0)
             {
                 if (m_restarts_to_go == 0)
@@ -3250,27 +2284,16 @@ namespace BitMiracle.LibJpeg
                         return false;
                 }
             }
-
-            /* If we've run out of data, just leave the MCU set to zeroes.
-             * This way, we return uniform gray for the remainder of the segment.
-             */
             if (!m_insufficient_data)
             {
-                /* Load up working state */
                 int get_buffer;
                 int bits_left;
                 WorkingBitreadState br_state = new WorkingBitreadState();
                 BITREAD_LOAD_STATE(m_bitstate, out get_buffer, out bits_left, ref br_state);
                 savable_state state = new savable_state();
                 state.Assign(m_saved);
-
-                /* Outer loop handles each block in the MCU */
-
                 for (int blkn = 0; blkn < m_cinfo.m_blocks_in_MCU; blkn++)
                 {
-                    /* Decode a single block's worth of coefficients */
-
-                    /* Section F.2.2.1: decode the DC coefficient difference */
                     int s;
                     if (!HUFF_DECODE(out s, ref br_state, m_dc_cur_tbls[blkn], ref get_buffer, ref bits_left))
                         return false;
@@ -3286,19 +2309,14 @@ namespace BitMiracle.LibJpeg
 
                     if (m_dc_needed[blkn])
                     {
-                        /* Convert DC difference to actual value, update last_dc_val */
                         int ci = m_cinfo.m_MCU_membership[blkn];
                         s += state.last_dc_val[ci];
                         state.last_dc_val[ci] = s;
-
-                        /* Output the DC coefficient (assumes jpeg_natural_order[0] = 0) */
                         MCU_data[blkn][0] = (short)s;
                     }
 
                     if (m_ac_needed[blkn])
                     {
-                        /* Section F.2.2.2: decode the AC coefficients */
-                        /* Since zeroes are skipped, output area must be cleared beforehand */
                         for (int k = 1; k < JpegConstants.DCTSize2; k++)
                         {
                             if (!HUFF_DECODE(out s, ref br_state, m_ac_cur_tbls[blkn], ref get_buffer, ref bits_left))
@@ -3314,11 +2332,6 @@ namespace BitMiracle.LibJpeg
                                     return false;
                                 r = GET_BITS(s, get_buffer, ref bits_left);
                                 s = HUFF_EXTEND(r, s);
-
-                                /* Output coefficient in natural (dezigzagged) order.
-                                   * Note: the extra entries in jpeg_natural_order[] will save us
-                                   * if k >= DCTSize2, which could happen if the data is corrupted.
-                                   */
                                 MCU_data[blkn][JpegUtils.jpeg_natural_order[k]] = (short)s;
                             }
                             else
@@ -3332,8 +2345,6 @@ namespace BitMiracle.LibJpeg
                     }
                     else
                     {
-                        /* Section F.2.2.2: decode the AC coefficients */
-                        /* In this path we just discard the values */
                         for (int k = 1; k < JpegConstants.DCTSize2; k++)
                         {
                             if (!HUFF_DECODE(out s, ref br_state, m_ac_cur_tbls[blkn], ref get_buffer, ref bits_left))
@@ -3360,46 +2371,23 @@ namespace BitMiracle.LibJpeg
                         }
                     }
                 }
-
-                /* Completed MCU, so update state */
                 BITREAD_SAVE_STATE(ref m_bitstate, get_buffer, bits_left);
                 m_saved.Assign(state);
             }
-
-            /* Account for restart interval (no-op if not using restarts) */
             m_restarts_to_go--;
 
             return true;
 
         }
-
-        /// <summary>
-        /// Check for a restart marker and resynchronize decoder.
-        /// Returns false if must suspend.
-        /// </summary>
         private bool process_restart()
         {
-            /* Throw away any unused bits remaining in bit buffer; */
-            /* include any full bytes in next_marker's count of discarded bytes */
             m_cinfo.m_marker.SkipBytes(m_bitstate.bits_left / 8);
             m_bitstate.bits_left = 0;
-
-            /* Advance past the RSTn marker */
             if (!m_cinfo.m_marker.read_restart_marker())
                 return false;
-
-            /* Re-initialize DC predictions to 0 */
             for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
                 m_saved.last_dc_val[ci] = 0;
-
-            /* Reset restart counter */
             m_restarts_to_go = m_cinfo.m_restart_interval;
-
-            /* Reset out-of-data flag, unless read_restart_marker left us smack up
-             * against a marker.  In that case we will end up treating the next data
-             * segment as empty, and we can avoid producing bogus output pixels by
-             * leaving the flag set.
-             */
             if (m_cinfo.m_unread_marker == 0)
                 m_insufficient_data = false;
 
@@ -3409,54 +2397,32 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region HuffEntropyEncoder
-    /// <summary>
-    /// Expanded entropy encoder object for Huffman encoding.
-    /// </summary>
     class HuffEntropyEncoder : JpegEntropyEncoder
     {
-        /* The savable_state sub-record contains fields that change within an MCU,
-        * but must not be updated permanently until we complete the MCU.
-        */
         private class savable_state
         {
-            public int put_buffer;       /* current bit-accumulation buffer */
-            public int put_bits;           /* # of bits now in it */
-            public int[] last_dc_val = new int[JpegConstants.MaxComponentsInScan]; /* last DC coef for each component */
+            public int put_buffer;
+            public int put_bits;
+            public int[] last_dc_val = new int[JpegConstants.MaxComponentsInScan];
         }
-
         private bool m_gather_statistics;
-
-        private savable_state m_saved = new savable_state();        /* Bit buffer & DC state at start of MCU */
-
-        /* These fields are NOT loaded into local working state. */
-        private int m_restarts_to_go;    /* MCUs left in this restart interval */
-        private int m_next_restart_num;       /* next restart number to write (0-7) */
-
-        /* Pointers to derived tables (these workspaces have image lifespan) */
+        private savable_state m_saved = new savable_state();
+        private int m_restarts_to_go;
+        private int m_next_restart_num;
         private c_derived_tbl[] m_dc_derived_tbls = new c_derived_tbl[JpegConstants.NumberOfHuffmanTables];
         private c_derived_tbl[] m_ac_derived_tbls = new c_derived_tbl[JpegConstants.NumberOfHuffmanTables];
-
-        /* Statistics tables for optimization */
         private long[][] m_dc_count_ptrs = new long[JpegConstants.NumberOfHuffmanTables][];
         private long[][] m_ac_count_ptrs = new long[JpegConstants.NumberOfHuffmanTables][];
 
         public HuffEntropyEncoder(JpegCompressor cinfo)
         {
             m_cinfo = cinfo;
-
-            /* Mark tables unallocated */
             for (int i = 0; i < JpegConstants.NumberOfHuffmanTables; i++)
             {
                 m_dc_derived_tbls[i] = m_ac_derived_tbls[i] = null;
                 m_dc_count_ptrs[i] = m_ac_count_ptrs[i] = null;
             }
         }
-
-        /// <summary>
-        /// Initialize for a Huffman-compressed scan.
-        /// If gather_statistics is true, we do not output anything during the scan,
-        /// just count the Huffman symbols used and generate Huffman code tables.
-        /// </summary>
         public override void start_pass(bool gather_statistics)
         {
             m_gather_statistics = gather_statistics;
@@ -3467,16 +2433,11 @@ namespace BitMiracle.LibJpeg
                 int actbl = m_cinfo.Component_info[m_cinfo.m_cur_comp_info[ci]].Ac_tbl_no;
                 if (m_gather_statistics)
                 {
-                    /* Check for invalid table indexes */
-                    /* (make_c_derived_tbl does this in the other path) */
                     if (dctbl < 0 || dctbl >= JpegConstants.NumberOfHuffmanTables)
                         throw new Exception(String.Format("Huffman table 0x{0:X2} was not defined", dctbl));
 
                     if (actbl < 0 || actbl >= JpegConstants.NumberOfHuffmanTables)
                         throw new Exception(String.Format("Huffman table 0x{0:X2} was not defined", actbl));
-
-                    /* Allocate and zero the statistics tables */
-                    /* Note that jpeg_gen_optimal_table expects 257 entries in each table! */
                     if (m_dc_count_ptrs[dctbl] == null)
                         m_dc_count_ptrs[dctbl] = new long[257];
 
@@ -3489,21 +2450,13 @@ namespace BitMiracle.LibJpeg
                 }
                 else
                 {
-                    /* Compute derived values for Huffman tables */
-                    /* We may do this more than once for a table, but it's not expensive */
                     jpeg_make_c_derived_tbl(true, dctbl, ref m_dc_derived_tbls[dctbl]);
                     jpeg_make_c_derived_tbl(false, actbl, ref m_ac_derived_tbls[actbl]);
                 }
-
-                /* Initialize DC predictions to 0 */
                 m_saved.last_dc_val[ci] = 0;
             }
-
-            /* Initialize bit buffer to empty */
             m_saved.put_buffer = 0;
             m_saved.put_bits = 0;
-
-            /* Initialize restart stuff */
             m_restarts_to_go = m_cinfo.m_restart_interval;
             m_next_restart_num = 0;
         }
@@ -3523,17 +2476,10 @@ namespace BitMiracle.LibJpeg
             else
                 finish_pass_huff();
         }
-
-        /// <summary>
-        /// Encode and output one MCU's worth of Huffman-compressed coefficients.
-        /// </summary>
         private bool encode_mcu_huff(JpegBlock[][] MCU_data)
         {
-            /* Load up working state */
             savable_state state;
             state = m_saved;
-
-            /* Emit restart marker if needed */
             if (m_cinfo.m_restart_interval != 0)
             {
                 if (m_restarts_to_go == 0)
@@ -3542,8 +2488,6 @@ namespace BitMiracle.LibJpeg
                         return false;
                 }
             }
-
-            /* Encode the MCU data blocks */
             for (int blkn = 0; blkn < m_cinfo.m_blocks_in_MCU; blkn++)
             {
                 int ci = m_cinfo.m_MCU_membership[blkn];
@@ -3553,15 +2497,9 @@ namespace BitMiracle.LibJpeg
                 {
                     return false;
                 }
-
-                /* Update last_dc_val */
                 state.last_dc_val[ci] = MCU_data[blkn][0][0];
             }
-
-            /* Completed MCU, so update state */
             m_saved = state;
-
-            /* Update restart-interval state too */
             if (m_cinfo.m_restart_interval != 0)
             {
                 if (m_restarts_to_go == 0)
@@ -3576,40 +2514,22 @@ namespace BitMiracle.LibJpeg
 
             return true;
         }
-
-        /// <summary>
-        /// Finish up at the end of a Huffman-compressed scan.
-        /// </summary>
         private void finish_pass_huff()
         {
-            /* Load up working state ... flush_bits needs it */
             savable_state state;
             state = m_saved;
-
-            /* Flush out the last data */
             if (!flush_bits(state))
                 throw new Exception("Suspension not allowed here!");
-
-            /* Update state */
             m_saved = state;
         }
-
-        /// <summary>
-        /// Trial-encode one MCU's worth of Huffman-compressed coefficients.
-        /// No data is actually output, so no suspension return is possible.
-        /// </summary>
         private bool encode_mcu_gather(JpegBlock[][] MCU_data)
         {
-            /* Take care of restart intervals if needed */
             if (m_cinfo.m_restart_interval != 0)
             {
                 if (m_restarts_to_go == 0)
                 {
-                    /* Re-initialize DC predictions to 0 */
                     for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
                         m_saved.last_dc_val[ci] = 0;
-
-                    /* Update restart state */
                     m_restarts_to_go = m_cinfo.m_restart_interval;
                 }
 
@@ -3627,15 +2547,8 @@ namespace BitMiracle.LibJpeg
 
             return true;
         }
-
-        /// <summary>
-        /// Finish up a statistics-gathering pass and create the new Huffman tables.
-        /// </summary>
         private void finish_pass_gather()
         {
-            /* It's important not to apply jpeg_gen_optimal_table more than once
-             * per table, because it clobbers the input frequency counts!
-             */
             bool[] did_dc = new bool[JpegConstants.NumberOfHuffmanTables];
             bool[] did_ac = new bool[JpegConstants.NumberOfHuffmanTables];
 
@@ -3662,52 +2575,32 @@ namespace BitMiracle.LibJpeg
                 }
             }
         }
-
-        /// <summary>
-        /// Encode a single block's worth of coefficients
-        /// </summary>
         private bool encode_one_block(savable_state state, short[] block, int last_dc_val, c_derived_tbl dctbl, c_derived_tbl actbl)
         {
-            /* Encode the DC coefficient difference per section F.1.2.1 */
             int temp = block[0] - last_dc_val;
             int temp2 = temp;
             if (temp < 0)
             {
-                temp = -temp;       /* temp is abs value of input */
-                /* For a negative input, want temp2 = bitwise complement of abs(input) */
-                /* This code assumes we are on a two's complement machine */
+                temp = -temp;
                 temp2--;
             }
 
-            /* Find the number of bits needed for the magnitude of the coefficient */
             int nbits = 0;
             while (temp != 0)
             {
                 nbits++;
                 temp >>= 1;
             }
-
-            /* Check for out-of-range coefficient values.
-             * Since we're encoding a difference, the range limit is twice as much.
-             */
             if (nbits > MAX_HUFFMAN_COEF_BITS + 1)
                 throw new Exception("DCT coefficient is out of range!");
-
-            /* Emit the Huffman-coded symbol for the number of bits */
             if (!emit_bits(state, dctbl.ehufco[nbits], dctbl.ehufsi[nbits]))
                 return false;
-
-            /* Emit that number of bits of the value, if positive, */
-            /* or the complement of its magnitude, if negative. */
             if (nbits != 0)
             {
-                /* emit_bits rejects calls with size 0 */
                 if (!emit_bits(state, temp2, nbits))
                     return false;
             }
-
-            /* Encode the AC coefficients per section F.1.2.2 */
-            int r = 0;          /* r = run length of zeros */
+            int r = 0;
             for (int k = 1; k < JpegConstants.DCTSize2; k++)
             {
                 temp = block[JpegUtils.jpeg_natural_order[k]];
@@ -3717,7 +2610,6 @@ namespace BitMiracle.LibJpeg
                 }
                 else
                 {
-                    /* if run length > 15, must emit special run-length-16 codes (0xF0) */
                     while (r > 15)
                     {
                         if (!emit_bits(state, actbl.ehufco[0xF0], actbl.ehufsi[0xF0]))
@@ -3728,35 +2620,23 @@ namespace BitMiracle.LibJpeg
                     temp2 = temp;
                     if (temp < 0)
                     {
-                        temp = -temp;       /* temp is abs value of input */
-                        /* This code assumes we are on a two's complement machine */
+                        temp = -temp;
                         temp2--;
                     }
-
-                    /* Find the number of bits needed for the magnitude of the coefficient */
-                    nbits = 1;      /* there must be at least one 1 bit */
+                    nbits = 1;
                     while ((temp >>= 1) != 0)
                         nbits++;
-
-                    /* Check for out-of-range coefficient values */
                     if (nbits > MAX_HUFFMAN_COEF_BITS)
                         throw new Exception("DCT coefficient is out of range!");
-
-                    /* Emit Huffman symbol for run length / number of bits */
                     int i = (r << 4) + nbits;
                     if (!emit_bits(state, actbl.ehufco[i], actbl.ehufsi[i]))
                         return false;
-
-                    /* Emit that number of bits of the value, if positive, */
-                    /* or the complement of its magnitude, if negative. */
                     if (!emit_bits(state, temp2, nbits))
                         return false;
 
                     r = 0;
                 }
             }
-
-            /* If the last coef(s) were zero, emit an end-of-block code */
             if (r > 0)
             {
                 if (!emit_bits(state, actbl.ehufco[0], actbl.ehufsi[0]))
@@ -3765,43 +2645,21 @@ namespace BitMiracle.LibJpeg
 
             return true;
         }
-
-        /// <summary>
-        /// Huffman coding optimization.
-        /// 
-        /// We first scan the supplied data and count the number of uses of each symbol
-        /// that is to be Huffman-coded. (This process MUST agree with the code above.)
-        /// Then we build a Huffman coding tree for the observed counts.
-        /// Symbols which are not needed at all for the particular image are not
-        /// assigned any code, which saves space in the DHT marker as well as in
-        /// the compressed data.
-        /// </summary>
         private void htest_one_block(short[] block, int last_dc_val, long[] dc_counts, long[] ac_counts)
         {
-            /* Encode the DC coefficient difference per section F.1.2.1 */
             int temp = block[0] - last_dc_val;
             if (temp < 0)
                 temp = -temp;
-
-            /* Find the number of bits needed for the magnitude of the coefficient */
             int nbits = 0;
             while (temp != 0)
             {
                 nbits++;
                 temp >>= 1;
             }
-
-            /* Check for out-of-range coefficient values.
-             * Since we're encoding a difference, the range limit is twice as much.
-             */
             if (nbits > MAX_HUFFMAN_COEF_BITS + 1)
                 throw new Exception("DCT coefficient is out of range!");
-
-            /* Count the Huffman symbol for the number of bits */
             dc_counts[nbits]++;
-
-            /* Encode the AC coefficients per section F.1.2.2 */
-            int r = 0;          /* r = run length of zeros */
+            int r = 0;
             for (int k = 1; k < JpegConstants.DCTSize2; k++)
             {
                 temp = block[JpegUtils.jpeg_natural_order[k]];
@@ -3811,34 +2669,23 @@ namespace BitMiracle.LibJpeg
                 }
                 else
                 {
-                    /* if run length > 15, must emit special run-length-16 codes (0xF0) */
                     while (r > 15)
                     {
                         ac_counts[0xF0]++;
                         r -= 16;
                     }
-
-                    /* Find the number of bits needed for the magnitude of the coefficient */
                     if (temp < 0)
                         temp = -temp;
-
-                    /* Find the number of bits needed for the magnitude of the coefficient */
-                    nbits = 1;      /* there must be at least one 1 bit */
+                    nbits = 1;
                     while ((temp >>= 1) != 0)
                         nbits++;
-
-                    /* Check for out-of-range coefficient values */
                     if (nbits > MAX_HUFFMAN_COEF_BITS)
                         throw new Exception("DCT coefficient is out of range!");
-
-                    /* Count Huffman symbol for run length / number of bits */
                     ac_counts[(r << 4) + nbits]++;
 
                     r = 0;
                 }
             }
-
-            /* If the last coef(s) were zero, emit an end-of-block code */
             if (r > 0)
                 ac_counts[0]++;
         }
@@ -3847,28 +2694,17 @@ namespace BitMiracle.LibJpeg
         {
             return m_cinfo.m_dest.emit_byte(val);
         }
-
-        /// <summary>
-        /// Only the right 24 bits of put_buffer are used; the valid bits are
-        /// left-justified in this part.  At most 16 bits can be passed to emit_bits
-        /// in one call, and we never retain more than 7 bits in put_buffer
-        /// between calls, so 24 bits are sufficient.
-        /// </summary>
         private bool emit_bits(savable_state state, int code, int size)
         {
-            // Emit some bits; return true if successful, false if must suspend
-            /* This routine is heavily used, so it's worth coding tightly. */
             int put_buffer = code;
             int put_bits = state.put_bits;
-
-            /* if size is 0, caller used an invalid Huffman table entry */
             if (size == 0)
                 throw new Exception("Missing Huffman code table entry");
 
-            put_buffer &= (1 << size) - 1; /* mask off any extra bits in code */
-            put_bits += size;       /* new number of bits in buffer */
-            put_buffer <<= 24 - put_bits; /* align incoming bits */
-            put_buffer |= state.put_buffer; /* and merge with old buffer contents */
+            put_buffer &= (1 << size) - 1;
+            put_bits += size;
+            put_buffer <<= 24 - put_bits;
+            put_buffer |= state.put_buffer;
 
             while (put_bits >= 8)
             {
@@ -3878,7 +2714,6 @@ namespace BitMiracle.LibJpeg
 
                 if (c == 0xFF)
                 {
-                    /* need to stuff a zero byte? */
                     if (!emit_byte(0))
                         return false;
                 }
@@ -3887,7 +2722,7 @@ namespace BitMiracle.LibJpeg
                 put_bits -= 8;
             }
 
-            state.put_buffer = put_buffer; /* update state variables */
+            state.put_buffer = put_buffer;
             state.put_bits = put_bits;
 
             return true;
@@ -3895,17 +2730,13 @@ namespace BitMiracle.LibJpeg
 
         private bool flush_bits(savable_state state)
         {
-            if (!emit_bits(state, 0x7F, 7)) /* fill any partial byte with ones */
+            if (!emit_bits(state, 0x7F, 7))
                 return false;
 
-            state.put_buffer = 0;  /* and reset bit-buffer to empty */
+            state.put_buffer = 0;
             state.put_bits = 0;
             return true;
         }
-
-        /// <summary>
-        /// Emit a restart marker and resynchronize predictions.
-        /// </summary>
         private bool emit_restart(savable_state state, int restart_num)
         {
             if (!flush_bits(state))
@@ -3916,54 +2747,22 @@ namespace BitMiracle.LibJpeg
 
             if (!emit_byte((int)(JpegMarkerType.RST0 + restart_num)))
                 return false;
-
-            /* Re-initialize DC predictions to 0 */
             for (int ci = 0; ci < m_cinfo.m_comps_in_scan; ci++)
                 state.last_dc_val[ci] = 0;
-
-            /* The restart counter is not updated until we successfully write the MCU. */
             return true;
         }
     }
     #endregion
 
     #region IDecompressDestination
-    /// <summary>
-    /// Common interface for processing of decompression.
-    /// </summary>
     abstract class IDecompressor
     {
-        /// <summary>
-        /// Stream with decompressed data
-        /// </summary>
         public abstract Stream Output { get; }
-
-        /// <summary>
-        /// Implementor of this interface should process image properties received from decompressor.
-        /// </summary>
-        /// <param name="parameters">Image properties</param>
         public abstract void SetImageAttributes(LoadedImageAttributes parameters);
-
-        /// <summary>
-        /// Called before decompression
-        /// </summary>
         public abstract void BeginWrite();
-
-        /// <summary>
-        /// It called during decompression - pass row of pixels from JPEG
-        /// </summary>
-        /// <param name="row"></param>
         public abstract void ProcessPixelsRow(byte[] row);
-
-        /// <summary>
-        /// Called after decompression
-        /// </summary>
         public abstract void EndWrite();
     }
-
-    /// <summary>
-    /// Holds parameters of image for decompression (IDecomressDesination)
-    /// </summary>
     class LoadedImageAttributes
     {
         private ColorSpace m_colorspace;
@@ -3977,15 +2776,6 @@ namespace BitMiracle.LibJpeg
         private DensityUnit m_densityUnit;
         private int m_densityX;
         private int m_densityY;
-
-        /* Decompression processing parameters --- these fields must be set before
-         * calling jpeg_start_decompress().  Note that jpeg_read_header() initializes
-         * them to default values.
-         */
-
-        /// <summary>
-        /// colorspace for output
-        /// </summary>
         public ColorSpace Colorspace
         {
             get
@@ -3997,10 +2787,6 @@ namespace BitMiracle.LibJpeg
                 m_colorspace = value;
             }
         }
-
-        /// <summary>
-        /// true=colormapped output wanted
-        /// </summary>
         public bool QuantizeColors
         {
             get
@@ -4012,16 +2798,6 @@ namespace BitMiracle.LibJpeg
                 m_quantizeColors = value;
             }
         }
-
-        /* Description of actual output image that will be returned to application.
-         * These fields are computed by jpeg_start_decompress().
-         * You can also use jpeg_calc_output_dimensions() to determine these values
-         * in advance of calling jpeg_start_decompress().
-         */
-
-        /// <summary>
-        /// scaled image width
-        /// </summary>
         public int Width
         {
             get
@@ -4033,10 +2809,6 @@ namespace BitMiracle.LibJpeg
                 m_width = value;
             }
         }
-
-        /// <summary>
-        /// scaled image height
-        /// </summary>
         public int Height
         {
             get
@@ -4048,10 +2820,6 @@ namespace BitMiracle.LibJpeg
                 m_height = value;
             }
         }
-
-        /// <summary>
-        /// # of color components in out_color_space
-        /// </summary>
         public int ComponentsPerSample
         {
             get
@@ -4063,11 +2831,6 @@ namespace BitMiracle.LibJpeg
                 m_componentsPerSample = value;
             }
         }
-
-        /// <summary>
-        ///  # of color components returned. it is 1 (a colormap index) when 
-        /// quantizing colors; otherwise it equals out_color_components.
-        /// </summary>
         public int Components
         {
             get
@@ -4079,17 +2842,6 @@ namespace BitMiracle.LibJpeg
                 m_components = value;
             }
         }
-
-        /* When quantizing colors, the output colormap is described by these fields.
-         * The application can supply a colormap by setting colormap non-null before
-         * calling jpeg_start_decompress; otherwise a colormap is created during
-         * jpeg_start_decompress or jpeg_start_output.
-         * The map has out_color_components rows and actual_number_of_colors columns.
-         */
-
-        /// <summary>
-        /// number of entries in use
-        /// </summary>
         public int ActualNumberOfColors
         {
             get
@@ -4101,10 +2853,6 @@ namespace BitMiracle.LibJpeg
                 m_actualNumberOfColors = value;
             }
         }
-
-        /// <summary>
-        /// The color map as a 2-D pixel array
-        /// </summary>
         public byte[][] Colormap
         {
             get
@@ -4116,13 +2864,6 @@ namespace BitMiracle.LibJpeg
                 m_colormap = value;
             }
         }
-
-        /// <summary>
-        /// These fields record data obtained from optional markers 
-        /// recognized by the JPEG library.
-        ///
-        /// JFIF code for pixel size units
-        /// </summary>
         public DensityUnit DensityUnit
         {
             get
@@ -4134,10 +2875,6 @@ namespace BitMiracle.LibJpeg
                 m_densityUnit = value;
             }
         }
-
-        /// <summary>
-        /// Horizontal pixel density
-        /// </summary>
         public int DensityX
         {
             get
@@ -4149,10 +2886,6 @@ namespace BitMiracle.LibJpeg
                 m_densityX = value;
             }
         }
-
-        /// <summary>
-        /// Vertical pixel density
-        /// </summary>
         public int DensityY
         {
             get
@@ -4182,20 +2915,12 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region Jpeg
-    /// <summary>
-    /// Internal wrapper for classic jpeg compressor and decompressor
-    /// </summary>
     class Jpeg
     {
         private JpegCompressor m_compressor = new JpegCompressor();
         private JpegDecompressor m_decompressor = new JpegDecompressor();
-
         private CompressionParameters m_compressionParameters = new CompressionParameters();
         private DecompressionParameters m_decompressionParameters = new DecompressionParameters();
-
-        /// <summary>
-        /// Advanced users may set specific parameters of compression
-        /// </summary>
         public CompressionParameters CompressionParameters
         {
             get
@@ -4210,10 +2935,6 @@ namespace BitMiracle.LibJpeg
                 m_compressionParameters = value;
             }
         }
-
-        /// <summary>
-        /// Advanced users may set specific parameters of decompression
-        /// </summary>
         public DecompressionParameters DecompressionParameters
         {
             get
@@ -4228,12 +2949,6 @@ namespace BitMiracle.LibJpeg
                 m_decompressionParameters = value;
             }
         }
-
-        /// <summary>
-        /// Compresses any image described as ICompressSource to JPEG
-        /// </summary>
-        /// <param name="source">Contains description of input image</param>
-        /// <param name="output">Stream for output of compressed JPEG</param>
         public void Compress(IRawImage source, Stream output)
         {
             if (source == null)
@@ -4246,24 +2961,10 @@ namespace BitMiracle.LibJpeg
             m_compressor.Image_height = source.Height;
             m_compressor.In_color_space = (ColorSpace)source.Colorspace;
             m_compressor.Input_components = source.ComponentsPerPixel;
-            //m_compressor.Data_precision = source.DataPrecision;
-
             m_compressor.jpeg_set_defaults();
-
-            //we need to set density parameters after setting of default jpeg parameters
-            //m_compressor.Density_unit = source.DensityUnit;
-            //m_compressor.X_density = (short)source.DensityX;
-            //m_compressor.Y_density = (short)source.DensityY;
-
             applyParameters(m_compressionParameters);
-
-            // Specify data destination for compression
             m_compressor.jpeg_stdio_dest(output);
-
-            // Start compression
             m_compressor.jpeg_start_compress(true);
-
-            // Process  pixels
             source.BeginRead();
             while (m_compressor.Next_scanline < m_compressor.Image_height)
             {
@@ -4278,16 +2979,8 @@ namespace BitMiracle.LibJpeg
                 m_compressor.jpeg_write_scanlines(rowForDecompressor, 1);
             }
             source.EndRead();
-
-            // Finish compression and release memory
             m_compressor.jpeg_finish_compress();
         }
-
-        /// <summary>
-        /// Decompresses JPEG image to any image described as ICompressDestination
-        /// </summary>
-        /// <param name="jpeg">Stream with JPEG data</param>
-        /// <param name="destination">Stream for output of compressed JPEG</param>
         public void Decompress(Stream jpeg, IDecompressor destination)
         {
             if (jpeg == null)
@@ -4297,15 +2990,11 @@ namespace BitMiracle.LibJpeg
                 throw new ArgumentNullException("destination");
 
             beforeDecompress(jpeg);
-
-            // Start decompression
             m_decompressor.jpeg_start_decompress();
 
             LoadedImageAttributes parameters = getImageParametersFromDecompressor();
             destination.SetImageAttributes(parameters);
             destination.BeginWrite();
-
-            /* Process data */
             while (m_decompressor.Output_scanline < m_decompressor.Output_height)
             {
                 byte[][] row = JpegCommonBase.AllocJpegSamples(m_decompressor.Output_width * m_decompressor.Output_components, 1);
@@ -4314,21 +3003,12 @@ namespace BitMiracle.LibJpeg
             }
 
             destination.EndWrite();
-
-            // Finish decompression and release memory.
             m_decompressor.jpeg_finish_decompress();
         }
-
-        /// <summary>
-        /// Tunes decompressor
-        /// </summary>
-        /// <param name="jpeg">Stream with input compressed JPEG data</param>
         private void beforeDecompress(Stream jpeg)
         {
             m_decompressor.jpeg_stdio_src(jpeg);
-            /* Read file header, set default decompression parameters */
             m_decompressor.jpeg_read_header(true);
-
             applyParameters(m_decompressionParameters);
             m_decompressor.jpeg_calc_output_dimensions();
         }
@@ -4365,14 +3045,7 @@ namespace BitMiracle.LibJpeg
                 return m_decompressor;
             }
         }
-
-        /// <summary>
-        /// Delegate for application-supplied marker processing methods.
-        /// Need not pass marker code since it is stored in cinfo.unread_marker.
-        /// </summary>
         public delegate bool MarkerParser(Jpeg decompressor);
-
-        /* Install a special processing method for COM or APPn markers. */
         public void SetMarkerProcessor(int markerCode, MarkerParser routine)
         {
             JpegDecompressor.jpeg_marker_parser_method f = delegate { return routine(this); };
@@ -4417,18 +3090,9 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region JpegBlock
-    /// <summary>
-    /// One block of coefficients.
-    /// </summary>
     public class JpegBlock
     {
         internal short[] data = new short[JpegConstants.DCTSize2];
-
-        /// <summary>
-        /// Gets or sets the element at the specified index.
-        /// </summary>
-        /// <param name="index">The index of required element.</param>
-        /// <value>The required element.</value>
         public short this[int index]
         {
             get
@@ -4444,16 +3108,8 @@ namespace BitMiracle.LibJpeg
     #endregion
 
     #region JpegCompressor
-    /// <summary>
-    /// JPEG compression routine.
-    /// </summary>
-    /// <seealso cref="JpegDecompressor"/>
     public class JpegCompressor : JpegCommonBase
     {
-        /* These are the sample quantization tables given in JPEG spec section K.1.
-         * The spec says that the values given produce "good" quality, and
-         * when divided by 2, "very good" quality.
-         */
         private static int[] std_luminance_quant_tbl = { 
             16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26,
             58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17,
@@ -4469,19 +3125,15 @@ namespace BitMiracle.LibJpeg
             99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99,
             99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99,
             99, 99, 99, 99 };
-
-        // Standard Huffman tables (cf. JPEG standard section K.3)
-        // 
-        // IMPORTANT: these are only valid for 8-bit data precision!
-        private static byte[] bits_dc_luminance = { /* 0-base */ 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
+        private static byte[] bits_dc_luminance = { 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
 
         private static byte[] val_dc_luminance = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-        private static byte[] bits_dc_chrominance = { /* 0-base */ 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
+        private static byte[] bits_dc_chrominance = { 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
 
         private static byte[] val_dc_chrominance = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-        private static byte[] bits_ac_luminance = { /* 0-base */ 0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7d };
+        private static byte[] bits_ac_luminance = { 0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7d };
 
         private static byte[] val_ac_luminance = 
             { 0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12, 0x21, 0x31, 0x41, 0x06,
@@ -4499,7 +3151,7 @@ namespace BitMiracle.LibJpeg
               0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xf1, 0xf2, 0xf3, 0xf4,
               0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa };
 
-        private static byte[] bits_ac_chrominance = { /* 0-base */ 0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77 };
+        private static byte[] bits_ac_chrominance = { 0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77 };
 
         private static byte[] val_ac_chrominance = 
             { 0x00, 0x01, 0x02, 0x03, 0x11, 0x04, 0x05, 0x21, 0x31, 0x06, 0x12, 0x41,
@@ -4517,100 +3169,49 @@ namespace BitMiracle.LibJpeg
               0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xf2, 0xf3, 0xf4,
               0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa };
 
-        /* Destination for compressed data */
         internal DestinationManager m_dest;
-
-        internal int m_image_width; /* input image width */
-        internal int m_image_height;    /* input image height */
-        internal int m_input_components;       /* # of color components in input image */
-        internal ColorSpace m_in_color_space;   /* colorspace of input image */
-
-        internal int m_data_precision;     /* bits of precision in image data */
-        internal int m_num_components;     /* # of color components in JPEG image */
-        internal ColorSpace m_jpeg_color_space; /* colorspace of JPEG image */
-
-        /* comp_info[i] describes component that appears i'th in SOF */
+        internal int m_image_width;
+        internal int m_image_height;
+        internal int m_input_components;
+        internal ColorSpace m_in_color_space;
+        internal int m_data_precision;
+        internal int m_num_components;
+        internal ColorSpace m_jpeg_color_space;
         private JpegComponent[] m_comp_info;
-
-        /* ptrs to coefficient quantization tables, or null if not defined */
         internal JpegQuantizationTable[] m_quant_tbl_ptrs = new JpegQuantizationTable[JpegConstants.NumberOfQuantTables];
-
-        /* ptrs to Huffman coding tables, or null if not defined */
         internal JpegHuffmanTable[] m_dc_huff_tbl_ptrs = new JpegHuffmanTable[JpegConstants.NumberOfHuffmanTables];
         internal JpegHuffmanTable[] m_ac_huff_tbl_ptrs = new JpegHuffmanTable[JpegConstants.NumberOfHuffmanTables];
-
-        /* The default value of scan_info is null, which causes a single-scan
-         * sequential JPEG file to be emitted.  To create a multi-scan file,
-         * set num_scans and scan_info to point to an array of scan definitions.
-         */
-        internal int m_num_scans;      /* # of entries in scan_info array */
-
-        /* script for multi-scan file, or null */
+        internal int m_num_scans;
         internal JpegScanInfo[] m_scan_info;
-
-        internal bool m_raw_data_in;       /* true=caller supplies downsampled data */
-        internal bool m_optimize_coding;   /* true=optimize entropy encoding parms */
-        internal bool m_CCIR601_sampling;  /* true=first samples are cosited */
-        internal int m_smoothing_factor;       /* 1..100, or 0 for no input smoothing */
-        internal DCTMethod m_dct_method;    /* DCT algorithm selector */
-
-        internal int m_restart_interval; /* MCUs per restart, or 0 for no restart */
-        internal int m_restart_in_rows;        /* if > 0, MCU rows per restart interval */
-
-        internal bool m_write_JFIF_header; /* should a JFIF marker be written? */
-        internal byte m_JFIF_major_version;   /* What to write for the JFIF version number */
+        internal bool m_raw_data_in;
+        internal bool m_optimize_coding;
+        internal bool m_CCIR601_sampling;
+        internal int m_smoothing_factor;
+        internal DCTMethod m_dct_method;
+        internal int m_restart_interval;
+        internal int m_restart_in_rows;
+        internal bool m_write_JFIF_header;
+        internal byte m_JFIF_major_version;
         internal byte m_JFIF_minor_version;
-
-        internal DensityUnit m_density_unit;     /* JFIF code for pixel size units */
-        internal short m_X_density;       /* Horizontal pixel density */
-        internal short m_Y_density;       /* Vertical pixel density */
-        internal bool m_write_Adobe_marker;    /* should an Adobe marker be written? */
-
-        internal int m_next_scanline;   /* 0 .. image_height-1  */
-
-        /* Remaining fields are known throughout compressor, but generally
-         * should not be touched by a surrounding application.
-         */
-
-        /*
-         * These fields are computed during compression startup
-         */
-        internal bool m_progressive_mode;  /* true if scan script uses progressive mode */
-        internal int m_max_h_samp_factor;  /* largest h_samp_factor */
-        internal int m_max_v_samp_factor;  /* largest v_samp_factor */
-
-        internal int m_total_iMCU_rows; /* # of iMCU rows to be input to coefficient controller */
-        /* The coefficient controller receives data in units of MCU rows as defined
-         * for fully interleaved scans (whether the JPEG file is interleaved or not).
-         * There are v_samp_factor * DCTSize sample rows of each component in an
-         * "iMCU" (interleaved MCU) row.
-         */
-
-        /*
-         * These fields are valid during any one scan.
-         * They describe the components and MCUs actually appearing in the scan.
-         */
-        internal int m_comps_in_scan;      /* # of JPEG components in this scan */
+        internal DensityUnit m_density_unit;
+        internal short m_X_density;
+        internal short m_Y_density;
+        internal bool m_write_Adobe_marker;
+        internal int m_next_scanline;
+        internal bool m_progressive_mode;
+        internal int m_max_h_samp_factor;
+        internal int m_max_v_samp_factor;
+        internal int m_total_iMCU_rows;
+        internal int m_comps_in_scan;
         internal int[] m_cur_comp_info = new int[JpegConstants.MaxComponentsInScan];
-        /* *cur_comp_info[i] is index of m_comp_info that describes component that appears i'th in SOS */
-
-        internal int m_MCUs_per_row;    /* # of MCUs across the image */
-        internal int m_MCU_rows_in_scan;    /* # of MCU rows in the image */
-
-        internal int m_blocks_in_MCU;      /* # of DCT blocks per MCU */
+        internal int m_MCUs_per_row;
+        internal int m_MCU_rows_in_scan;
+        internal int m_blocks_in_MCU;
         internal int[] m_MCU_membership = new int[JpegConstants.CompressorMaxBlocksInMCU];
-        /* MCU_membership[i] is index in cur_comp_info of component owning */
-        /* i'th block in an MCU */
-
-        /* progressive JPEG parameters for scan */
         internal int m_Ss;
         internal int m_Se;
         internal int m_Ah;
         internal int m_Al;
-
-        /*
-         * Links to compression subobjects (methods and private variables of modules)
-         */
         internal JpegCompressorMaster m_master;
         internal JpegCompressorMainController m_main;
         internal JpegCompressorPrepController m_prep;
@@ -4620,432 +3221,155 @@ namespace BitMiracle.LibJpeg
         internal JpegDownsampler m_downsample;
         internal JpegFowardDCT m_fdct;
         internal JpegEntropyEncoder m_entropy;
-        internal JpegScanInfo[] m_script_space; /* workspace for jpeg_simple_progression */
+        internal JpegScanInfo[] m_script_space;
         internal int m_script_space_size;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JpegCompressor"/> class.
-        /// </summary>
         public JpegCompressor()
             : base()
         {
             initialize();
         }
-
-        /// <summary>
-        /// Retrieves <c>false</c> because this is not decompressor.
-        /// </summary>
-        /// <value><c>false</c></value>
         public override bool IsDecompressor
         {
             get { return false; }
         }
-
-        /// <summary>
-        /// Gets or sets the destination for compressed data
-        /// </summary>
-        /// <value>The destination for compressed data.</value>
         public LibJpeg.DestinationManager Dest
         {
             get { return m_dest; }
             set { m_dest = value; }
         }
-
-        /* Description of source image --- these fields must be filled in by
-         * outer application before starting compression.  in_color_space must
-         * be correct before you can even call jpeg_set_defaults().
-         */
-
-        /// <summary>
-        /// Gets or sets the width of image, in pixels.
-        /// </summary>
-        /// <value>The width of image.</value>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
         public int Image_width
         {
             get { return m_image_width; }
             set { m_image_width = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the height of image, in pixels.
-        /// </summary>
-        /// <value>The height of image.</value>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
         public int Image_height
         {
             get { return m_image_height; }
             set { m_image_height = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the number of color channels (components per pixel)
-        /// </summary>
-        /// <value>The number of color channels.</value>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
         public int Input_components
         {
             get { return m_input_components; }
             set { m_input_components = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the color space of source image.
-        /// </summary>
-        /// <value>The color space.</value>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
-        /// <seealso href="c90654b9-f3f4-4319-80d1-979c73d84e76.htm" target="_self">Special color spaces</seealso>
         public LibJpeg.ColorSpace In_color_space
         {
             get { return m_in_color_space; }
             set { m_in_color_space = value; }
         }
-
-        /* Compression parameters --- these fields must be set before calling
-         * jpeg_start_compress().  We recommend calling jpeg_set_defaults() to
-         * initialize everything to reasonable defaults, then changing anything
-         * the application specifically wants to change.  That way you won't get
-         * burnt when new parameters are added.  Also note that there are several
-         * helper routines to simplify changing parameters.
-         */
-
-        // bits of precision in image data
-
-
-        /// <summary>
-        /// Gets or sets the number of bits of precision in image data.
-        /// </summary>
-        /// <remarks>Default value: 8<br/>
-        /// The number of bits.
-        /// </remarks>
-        /// <value>The data precision.</value>
         public int Data_precision
         {
             get { return m_data_precision; }
             set { m_data_precision = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the number of color components for JPEG color space.
-        /// </summary>
-        /// <value>The number of color components for JPEG color space.</value>
         public int Num_components
         {
             get { return m_num_components; }
             set { m_num_components = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the JPEG color space.
-        /// </summary>
-        /// <remarks>We recommend to use <see cref="jpeg_set_colorspace"/> if you want to change this.</remarks>
-        /// <value>The JPEG color space.</value>
         public ColorSpace Jpeg_color_space
         {
             get { return m_jpeg_color_space; }
             set { m_jpeg_color_space = value; }
         }
-
-        // true=caller supplies downsampled data
-
-
-        /// <summary>
-        /// Gets or sets a value indicating whether you will be supplying raw data.
-        /// </summary>
-        /// <remarks>Default value: <c>false</c></remarks>
-        /// <value><c>true</c> if you will be supplying raw data; otherwise, <c>false</c>.</value>
-        /// <seealso cref="JpegCompressor.jpeg_write_raw_data"/>
         public bool Raw_data_in
         {
             get { return m_raw_data_in; }
             set { m_raw_data_in = value; }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating a way of using Huffman coding tables.
-        /// </summary>
-        /// <remarks>When this is <c>true</c>, you need not supply Huffman tables at all, and any you do supply will be overwritten.</remarks>
-        /// <value><c>true</c> causes the compressor to compute optimal Huffman coding tables 
-        /// for the image. This requires an extra pass over the data and therefore costs a good 
-        /// deal of space and time. The default is <c>false</c>, which tells the compressor to use the 
-        /// supplied or default Huffman tables. In most cases optimal tables save only a few 
-        /// percent of file size compared to the default tables.</value>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public bool Optimize_coding
         {
             get { return m_optimize_coding; }
             set { m_optimize_coding = value; }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether first samples are cosited.
-        /// </summary>
-        /// <value><c>true</c> if first samples are cosited; otherwise, <c>false</c>.</value>
         public bool CCIR601_sampling
         {
             get { return m_CCIR601_sampling; }
             set { m_CCIR601_sampling = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the coefficient of image smoothing.
-        /// </summary>
-        /// <remarks>Default value: 0<br/>
-        /// If non-zero, the input image is smoothed; the value should be 1 for minimal smoothing 
-        /// to 100 for maximum smoothing.</remarks>
-        /// <value>The coefficient of image smoothing.</value>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public int Smoothing_factor
         {
             get { return m_smoothing_factor; }
             set { m_smoothing_factor = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the algorithm used for the DCT step.
-        /// </summary>
-        /// <value>The DCT algorithm.</value>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public DCTMethod Dct_method
         {
             get { return m_dct_method; }
             set { m_dct_method = value; }
         }
-
-        /* The restart interval can be specified in absolute MCUs by setting
-         * restart_interval, or in MCU rows by setting restart_in_rows
-         * (in which case the correct restart_interval will be figured
-         * for each scan).
-         */
-
-        /// <summary>
-        /// Gets or sets the exact interval in MCU blocks.
-        /// </summary>
-        /// <remarks>Default value: 0<br/>
-        /// One restart marker per MCU row is often a good choice. The overhead of restart markers 
-        /// is higher in grayscale JPEG files than in color files, and MUCH higher in progressive JPEGs. 
-        /// If you use restarts, you may want to use larger intervals in those cases.</remarks>
-        /// <value>The restart interval.</value>
-        /// <seealso cref="JpegCompressor.Restart_in_rows"/>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public int Restart_interval
         {
             get { return m_restart_interval; }
             set { m_restart_interval = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the interval in MCU rows.
-        /// </summary>
-        /// <remarks>Default value: 0<br/>
-        /// If Restart_in_rows is not 0, then <see cref="JpegCompressor.Restart_interval"/> is set 
-        /// after the image width in MCUs is computed.<br/>
-        /// One restart marker per MCU row is often a good choice. 
-        /// The overhead of restart markers is higher in grayscale JPEG files than in color files, and MUCH higher in progressive JPEGs. If you use restarts, you may want to use larger intervals in those cases.
-        /// </remarks>
-        /// <value>The restart interval in MCU rows.</value>
-        /// <seealso cref="JpegCompressor.Restart_interval"/>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public int Restart_in_rows
         {
             get { return m_restart_in_rows; }
             set { m_restart_in_rows = value; }
         }
-
-        /* Parameters controlling emission of special markers. */
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the JFIF APP0 marker is emitted.
-        /// </summary>
-        /// <remarks><see cref="JpegCompressor.jpeg_set_defaults"/> and 
-        /// <see cref="JpegCompressor.jpeg_set_colorspace"/> set this <c>true</c> 
-        /// if a JFIF-legal JPEG color space (i.e., YCbCr or grayscale) is selected, otherwise <c>false</c>.</remarks>
-        /// <value><c>true</c> if JFIF APP0 marker is emitted; otherwise, <c>false</c>.</value>
-        /// <seealso cref="JpegCompressor.JFIF_major_version"/>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public bool Write_JFIF_header
         {
             get { return m_write_JFIF_header; }
             set { m_write_JFIF_header = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the version number to be written into the JFIF marker.
-        /// </summary>
-        /// <remarks><see cref="JpegCompressor.jpeg_set_defaults"/> initializes the version to 
-        /// 1.01 (major=minor=1). You should set it to 1.02 (major=1, minor=2) if you plan to write any 
-        /// JFIF 1.02 extension markers.</remarks>
-        /// <value>The version number to be written into the JFIF marker.</value>
-        /// <seealso cref="JpegCompressor.JFIF_minor_version"/>
-        /// <seealso cref="JpegCompressor.Write_JFIF_header"/>
         public byte JFIF_major_version
         {
             get { return m_JFIF_major_version; }
             set { m_JFIF_major_version = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the version number to be written into the JFIF marker.
-        /// </summary>
-        /// <remarks><see cref="JpegCompressor.jpeg_set_defaults"/> initializes the version to 
-        /// 1.01 (major=minor=1). You should set it to 1.02 (major=1, minor=2) if you plan to write any 
-        /// JFIF 1.02 extension markers.</remarks>
-        /// <value>The version number to be written into the JFIF marker.</value>
-        /// <seealso cref="JpegCompressor.JFIF_major_version"/>
-        /// <seealso cref="JpegCompressor.Write_JFIF_header"/>
         public byte JFIF_minor_version
         {
             get { return m_JFIF_minor_version; }
             set { m_JFIF_minor_version = value; }
         }
-
-        /* These three values are not used by the JPEG code, merely copied */
-        /* into the JFIF APP0 marker.  density_unit can be 0 for unknown, */
-        /* 1 for dots/inch, or 2 for dots/cm.  Note that the pixel aspect */
-        /* ratio is defined by X_density/Y_density even when density_unit=0. */
-
-        /// <summary>
-        /// Gets or sets the resolution information to be written into the JFIF marker; not used otherwise.
-        /// </summary>
-        /// <remarks>Default value: <see cref="F:BitMiracle.LibJpeg.Classic.DensityUnit.Unknown"/><br/>
-        /// The pixel aspect ratio is defined by 
-        /// <see cref="JpegCompressor.X_density"/>/<see cref="JpegCompressor.Y_density"/> 
-        /// even when Density_unit is <see cref="F:BitMiracle.LibJpeg.Classic.DensityUnit.Unknown">Unknown</see>.</remarks>
-        /// <value>The density unit.</value>
-        /// <seealso cref="JpegCompressor.X_density"/>
-        /// <seealso cref="JpegCompressor.Y_density"/>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public DensityUnit Density_unit
         {
             get { return m_density_unit; }
             set { m_density_unit = value; }
         }
-
-        // Horizontal pixel density
-
-        /// <summary>
-        /// Gets or sets the horizontal component of pixel ratio.
-        /// </summary>
-        /// <remarks>Default value: 1</remarks>
-        /// <value>The horizontal density.</value>
-        /// <seealso cref="JpegCompressor.Density_unit"/>
-        /// <seealso cref="JpegCompressor.Y_density"/>
         public short X_density
         {
             get { return m_X_density; }
             set { m_X_density = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the vertical component of pixel ratio.
-        /// </summary>
-        /// <remarks>Default value: 1</remarks>
-        /// <value>The vertical density.</value>
-        /// <seealso cref="JpegCompressor.Density_unit"/>
-        /// <seealso cref="JpegCompressor.X_density"/>
         public short Y_density
         {
             get { return m_Y_density; }
             set { m_Y_density = value; }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to emit Adobe APP14 marker.
-        /// </summary>
-        /// <remarks><see cref="JpegCompressor.jpeg_set_defaults"/> and <see cref="JpegCompressor.jpeg_set_colorspace"/> 
-        /// set this <c>true</c> if JPEG color space RGB, CMYK, or YCCK is selected, otherwise <c>false</c>. 
-        /// It is generally a bad idea to set both <see cref="JpegCompressor.Write_JFIF_header"/> and 
-        /// <see cref="JpegCompressor.Write_Adobe_marker"/>. 
-        /// In fact, you probably shouldn't change the default settings at all - the default behavior ensures that the JPEG file's 
-        /// color space can be recognized by the decoder.</remarks>
-        /// <value>If <c>true</c> an Adobe APP14 marker is emitted; <c>false</c>, otherwise.</value>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public bool Write_Adobe_marker
         {
             get { return m_write_Adobe_marker; }
             set { m_write_Adobe_marker = value; }
         }
-
-        /// <summary>
-        /// Gets the largest vertical sample factor.
-        /// </summary>
-        /// <value>The largest vertical sample factor.</value>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public int Max_v_samp_factor
         {
             get { return m_max_v_samp_factor; }
         }
-
-        /// <summary>
-        /// Gets the components that appears in SOF.
-        /// </summary>
-        /// <value>The component info array.</value>
         public JpegComponent[] Component_info
         {
             get { return m_comp_info; }
         }
-
-        /* ptrs to coefficient quantization tables, or null if not defined */
-        /* ptrs to coefficient quantization tables, or null if not defined */
-        /// <summary>
-        /// Gets the coefficient quantization tables.
-        /// </summary>
-        /// <value>The coefficient quantization tables or null if not defined.</value>
         public JpegQuantizationTable[] Quant_tbl_ptrs
         {
             get { return m_quant_tbl_ptrs; }
         }
-
-        /// <summary>
-        /// Gets the Huffman coding tables.
-        /// </summary>
-        /// <value>The Huffman coding tables or null if not defined.</value>
         public JpegHuffmanTable[] Dc_huff_tbl_ptrs
         {
             get { return m_dc_huff_tbl_ptrs; }
         }
-
-        /// <summary>
-        /// Gets the Huffman coding tables.
-        /// </summary>
-        /// <value>The Huffman coding tables or null if not defined.</value>
         public JpegHuffmanTable[] Ac_huff_tbl_ptrs
         {
             get { return m_ac_huff_tbl_ptrs; }
         }
-
-        /// <summary>
-        /// Gets the index of next scanline to be written to <see cref="JpegCompressor.jpeg_write_scanlines"/>.
-        /// </summary>
-        /// <remarks>Application may use this to control its processing loop, 
-        /// e.g., "while (Next_scanline &lt; Image_height)"</remarks>
-        /// <value>Range: from 0 to (Image_height - 1)</value>
-        /// <seealso cref="JpegCompressor.jpeg_write_scanlines"/>
         public int Next_scanline
         {
             get { return m_next_scanline; }
         }
-
-        /// <summary>
-        /// Abort processing of a JPEG compression operation.
-        /// </summary>
         public void jpeg_abort_compress()
         {
-            // use common routine
             jpeg_abort();
         }
-
-        /// <summary>
-        /// Forcibly suppress or un-suppress all quantization and Huffman tables.
-        /// </summary>
-        /// <remarks>Marks all currently defined tables as already written (if suppress)
-        /// or not written (if !suppress). This will control whether they get 
-        /// emitted by a subsequent <see cref="JpegCompressor.jpeg_start_compress"/> call.<br/>
-        /// 
-        /// This routine is exported for use by applications that want to produce
-        /// abbreviated JPEG datastreams.</remarks>
-        /// <param name="suppress">if set to <c>true</c> then suppress tables; 
-        /// otherwise unsuppress.</param>
         public void jpeg_suppress_tables(bool suppress)
         {
             for (int i = 0; i < JpegConstants.NumberOfQuantTables; i++)
@@ -5063,19 +3387,12 @@ namespace BitMiracle.LibJpeg
                     m_ac_huff_tbl_ptrs[i].Sent_table = suppress;
             }
         }
-
-        /// <summary>
-        /// Finishes JPEG compression.
-        /// </summary>
-        /// <remarks>If a multipass operating mode was selected, this may do a great 
-        /// deal of work including most of the actual output.</remarks>
         public void jpeg_finish_compress()
         {
             int iMCU_row;
 
             if (m_global_state == JpegState.CSTATE_SCANNING || m_global_state == JpegState.CSTATE_RAW_OK)
             {
-                /* Terminate first pass */
                 if (m_next_scanline < m_image_height)
                     throw new Exception("Application transferred too few scanlines");
                 m_master.finish_pass();
@@ -5083,45 +3400,21 @@ namespace BitMiracle.LibJpeg
             else if (m_global_state != JpegState.CSTATE_WRCOEFS)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
-            /* Perform any remaining passes */
             while (!m_master.IsLastPass())
             {
                 m_master.prepare_for_pass();
                 for (iMCU_row = 0; iMCU_row < m_total_iMCU_rows; iMCU_row++)
                 {
-
-                    /* We bypass the main controller and invoke coef controller directly;
-                    * all work is being done from the coefficient buffer.
-                    */
                     if (!m_coef.compress_data(null))
                         throw new Exception("Suspension not allowed here");
                 }
 
                 m_master.finish_pass();
             }
-
-            /* Write EOI, do final cleanup */
             m_marker.write_file_trailer();
             m_dest.term_destination();
-
-            /* We can use jpeg_abort to release memory and reset global_state */
             jpeg_abort();
         }
-
-
-        /// <summary>
-        /// Write a special marker.
-        /// </summary>
-        /// <remarks>This is only recommended for writing COM or APPn markers. 
-        /// Must be called after <see cref="JpegCompressor.jpeg_start_compress"/> and before first call to 
-        /// <see cref="JpegCompressor.jpeg_write_scanlines"/> or <see cref="JpegCompressor.jpeg_write_raw_data"/>.
-        /// </remarks>
-        /// <param name="marker">Specify the marker type parameter as <see cref="JpegMarkerType"/>.COM for COM or 
-        /// <see cref="JpegMarkerType"/>.APP0 + n for APPn. (Actually, jpeg_write_marker will let you write any marker type, 
-        /// but we don't recommend writing any other kinds of marker)</param>
-        /// <param name="data">The data associated with the marker.</param>
-        /// <seealso href="81c88818-a5d7-4550-9ce5-024a768f7b1e.htm" target="_self">Special markers</seealso>
-        /// <seealso cref="JpegMarkerType"/>
         public void jpeg_write_marker(int marker, byte[] data)
         {
             if (m_next_scanline != 0 || (m_global_state != JpegState.CSTATE_SCANNING && m_global_state != JpegState.CSTATE_RAW_OK && m_global_state != JpegState.CSTATE_WRCOEFS))
@@ -5132,20 +3425,6 @@ namespace BitMiracle.LibJpeg
             for (int i = 0; i < data.Length; i++)
                 m_marker.write_marker_byte(data[i]);
         }
-
-        /// <summary>
-        /// Writes special marker's header.
-        /// </summary>
-        /// <param name="marker">Special marker.</param>
-        /// <param name="datalen">Length of data associated with the marker.</param>
-        /// <remarks>After calling this method you need to call <see cref="JpegCompressor.jpeg_write_m_byte"/>
-        /// exactly the number of times given in the length parameter.<br/>
-        /// This method lets you empty the output buffer partway through a marker, which might be important when 
-        /// using a suspending data destination module. In any case, if you are using a suspending destination, 
-        /// you should flush its buffer after inserting any special markers.</remarks>
-        /// <seealso cref="JpegCompressor.jpeg_write_m_byte"/>
-        /// <seealso cref="JpegCompressor.jpeg_write_marker"/>
-        /// <seealso href="81c88818-a5d7-4550-9ce5-024a768f7b1e.htm" target="_self">Special markers</seealso>
         public void jpeg_write_m_header(int marker, int datalen)
         {
             if (m_next_scanline != 0 || (m_global_state != JpegState.CSTATE_SCANNING && m_global_state != JpegState.CSTATE_RAW_OK && m_global_state != JpegState.CSTATE_WRCOEFS))
@@ -5153,217 +3432,94 @@ namespace BitMiracle.LibJpeg
 
             m_marker.write_marker_header(marker, datalen);
         }
-
-        /// <summary>
-        /// Writes a byte of special marker's data.
-        /// </summary>
-        /// <param name="val">The byte of data.</param>
-        /// <seealso cref="JpegCompressor.jpeg_write_m_header"/>
         public void jpeg_write_m_byte(byte val)
         {
             m_marker.write_marker_byte(val);
         }
-
-        /// <summary>
-        /// Alternate compression function: just write an abbreviated table file.
-        /// </summary>
-        /// <remarks>Before calling this, all parameters and a data destination must be set up.<br/>
-        /// 
-        /// To produce a pair of files containing abbreviated tables and abbreviated
-        /// image data, one would proceed as follows:<br/>
-        /// 
-        /// <c>Initialize JPEG object<br/>
-        /// Set JPEG parameters<br/>
-        /// Set destination to table file<br/>
-        /// <see cref="JpegCompressor.jpeg_write_tables">jpeg_write_tables();</see><br/>
-        /// Set destination to image file<br/>
-        /// <see cref="JpegCompressor.jpeg_start_compress">jpeg_start_compress(false);</see><br/>
-        /// Write data...<br/>
-        /// <see cref="JpegCompressor.jpeg_finish_compress">jpeg_finish_compress();</see><br/>
-        /// </c><br/>
-        /// 
-        /// jpeg_write_tables has the side effect of marking all tables written
-        /// (same as <see cref="JpegCompressor.jpeg_suppress_tables">jpeg_suppress_tables(true)</see>).
-        /// Thus a subsequent <see cref="JpegCompressor.jpeg_start_compress">jpeg_start_compress</see> 
-        /// will not re-emit the tables unless it is passed <c>write_all_tables=true</c>.
-        /// </remarks>
         public void jpeg_write_tables()
         {
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
-            /* (Re)initialize destination modules */
             m_dest.init_destination();
-
-            /* Initialize the marker writer ... bit of a crock to do it here. */
             m_marker = new JpegMarkerWriter(this);
-
-            /* Write them tables! */
             m_marker.write_tables_only();
-
-            /* And clean up. */
             m_dest.term_destination();
         }
-
-        /// <summary>
-        /// Sets output stream.
-        /// </summary>
-        /// <param name="outfile">The output stream.</param>
-        /// <remarks>The caller must have already opened the stream, and is responsible
-        /// for closing it after finishing compression.</remarks>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
         public void jpeg_stdio_dest(Stream outfile)
         {
             m_dest = new DestinationManagerImpl(this, outfile);
         }
-
-        /// <summary>
-        /// Jpeg_set_defaultses this instance.
-        /// </summary>
-        /// <remarks>Uses only the input image's color space (property <see cref="JpegCompressor.In_color_space"/>, 
-        /// which must already be set in <see cref="JpegCompressor"/>). Many applications will only need 
-        /// to use this routine and perhaps <see cref="JpegCompressor.jpeg_set_quality"/>.
-        /// </remarks>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public void jpeg_set_defaults()
         {
-            /* Safety check to ensure start_compress not called yet. */
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
-
-            /* Allocate comp_info array large enough for maximum component count.
-            * Array is made permanent in case application wants to compress
-            * multiple images at same param settings.
-            */
             if (m_comp_info == null)
             {
                 m_comp_info = JpegComponent.createArrayOfComponents(JpegConstants.MaxComponents);
             }
-
-            /* Initialize everything not dependent on the color space */
-
             m_data_precision = JpegConstants.BitsInSample;
-
-            /* Set up two quantization tables using default quality of 75 */
             jpeg_set_quality(75, true);
-
-            /* Set up two Huffman tables */
             std_huff_tables();
-
-            /* Default is no multiple-scan output */
             m_scan_info = null;
             m_num_scans = 0;
-
-            /* Expect normal source image, not raw downsampled data */
             m_raw_data_in = false;
-
-            /* By default, don't do extra passes to optimize entropy coding */
             m_optimize_coding = false;
-
-            /* The standard Huffman tables are only valid for 8-bit data precision.
-            * If the precision is higher, force optimization on so that usable
-            * tables will be computed.  This test can be removed if default tables
-            * are supplied that are valid for the desired precision.
-            */
             if (m_data_precision > 8)
                 m_optimize_coding = true;
-
-            /* By default, use the simpler non-cosited sampling alignment */
             m_CCIR601_sampling = false;
-
-            /* No input smoothing */
             m_smoothing_factor = 0;
-
-            /* DCT algorithm preference */
             m_dct_method = JpegConstants.DefaultDCTMethod;
-
-            /* No restart markers */
             m_restart_interval = 0;
             m_restart_in_rows = 0;
-
-            /* Fill in default JFIF marker parameters.  Note that whether the marker
-            * will actually be written is determined by jpeg_set_colorspace.
-            *
-            * By default, the library emits JFIF version code 1.01.
-            * An application that wants to emit JFIF 1.02 extension markers should set
-            * JFIF_minor_version to 2.  We could probably get away with just defaulting
-            * to 1.02, but there may still be some decoders in use that will complain
-            * about that; saying 1.01 should minimize compatibility problems.
-            */
-            m_JFIF_major_version = 1; /* Default JFIF version = 1.01 */
+            m_JFIF_major_version = 1;
             m_JFIF_minor_version = 1;
-            m_density_unit = DensityUnit.Unknown;    /* Pixel size is unknown by default */
-            m_X_density = 1;       /* Pixel aspect ratio is square by default */
+            m_density_unit = DensityUnit.Unknown;
+            m_X_density = 1;
             m_Y_density = 1;
-
-            /* Choose JPEG colorspace based on input space, set defaults accordingly */
             jpeg_default_colorspace();
         }
-
-        // Compression parameter setup aids
-
-        /// <summary>
-        /// Set the JPEG colorspace (property <see cref="JpegCompressor.Jpeg_color_space"/>,
-        /// and choose colorspace-dependent parameters appropriately.
-        /// </summary>
-        /// <param name="colorspace">The required colorspace.</param>
-        /// <remarks>See <see href="c90654b9-f3f4-4319-80d1-979c73d84e76.htm" target="_self">Special color spaces</see>, 
-        /// below, before using this. A large number of parameters, including all per-component parameters, 
-        /// are set by this routine; if you want to twiddle individual parameters you should call 
-        /// <c>jpeg_set_colorspace</c> before rather than after.</remarks>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
-        /// <seealso href="c90654b9-f3f4-4319-80d1-979c73d84e76.htm" target="_self">Special color spaces</seealso>
         public void jpeg_set_colorspace(ColorSpace colorspace)
         {
             int ci;
-
-            /* Safety check to ensure start_compress not called yet. */
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
-            /* For all colorspaces, we use Q and Huff tables 0 for luminance components,
-            * tables 1 for chrominance components.
-            */
-
             m_jpeg_color_space = colorspace;
-
-            m_write_JFIF_header = false; /* No marker for non-JFIF colorspaces */
-            m_write_Adobe_marker = false; /* write no Adobe marker by default */
+            m_write_JFIF_header = false;
+            m_write_Adobe_marker = false;
 
             switch (colorspace)
             {
                 case ColorSpace.Grayscale:
-                    m_write_JFIF_header = true; /* Write a JFIF marker */
+                    m_write_JFIF_header = true;
                     m_num_components = 1;
-                    /* JFIF specifies component ID 1 */
                     jpeg_set_colorspace_SET_COMP(0, 1, 1, 1, 0, 0, 0);
                     break;
                 case ColorSpace.RGB:
-                    m_write_Adobe_marker = true; /* write Adobe marker to flag RGB */
+                    m_write_Adobe_marker = true;
                     m_num_components = 3;
-                    jpeg_set_colorspace_SET_COMP(0, 0x52 /* 'R' */, 1, 1, 0, 0, 0);
-                    jpeg_set_colorspace_SET_COMP(1, 0x47 /* 'G' */, 1, 1, 0, 0, 0);
-                    jpeg_set_colorspace_SET_COMP(2, 0x42 /* 'B' */, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(0, 0x52, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(1, 0x47, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(2, 0x42, 1, 1, 0, 0, 0);
                     break;
                 case ColorSpace.YCbCr:
-                    m_write_JFIF_header = true; /* Write a JFIF marker */
+                    m_write_JFIF_header = true;
                     m_num_components = 3;
-                    /* JFIF specifies component IDs 1,2,3 */
-                    /* We default to 2x2 subsamples of chrominance */
                     jpeg_set_colorspace_SET_COMP(0, 1, 2, 2, 0, 0, 0);
                     jpeg_set_colorspace_SET_COMP(1, 2, 1, 1, 1, 1, 1);
                     jpeg_set_colorspace_SET_COMP(2, 3, 1, 1, 1, 1, 1);
                     break;
                 case ColorSpace.CMYK:
-                    m_write_Adobe_marker = true; /* write Adobe marker to flag CMYK */
+                    m_write_Adobe_marker = true;
                     m_num_components = 4;
-                    jpeg_set_colorspace_SET_COMP(0, 0x43 /* 'C' */, 1, 1, 0, 0, 0);
-                    jpeg_set_colorspace_SET_COMP(1, 0x4D /* 'M' */, 1, 1, 0, 0, 0);
-                    jpeg_set_colorspace_SET_COMP(2, 0x59 /* 'Y' */, 1, 1, 0, 0, 0);
-                    jpeg_set_colorspace_SET_COMP(3, 0x4B /* 'K' */, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(0, 0x43, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(1, 0x4D, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(2, 0x59, 1, 1, 0, 0, 0);
+                    jpeg_set_colorspace_SET_COMP(3, 0x4B, 1, 1, 0, 0, 0);
                     break;
                 case ColorSpace.YCCK:
-                    m_write_Adobe_marker = true; /* write Adobe marker to flag YCCK */
+                    m_write_Adobe_marker = true;
                     m_num_components = 4;
                     jpeg_set_colorspace_SET_COMP(0, 1, 2, 2, 0, 0, 0);
                     jpeg_set_colorspace_SET_COMP(1, 2, 1, 1, 1, 1, 1);
@@ -5383,14 +3539,6 @@ namespace BitMiracle.LibJpeg
                     throw new Exception("Bad Jpeg ColorSpace.");
             }
         }
-
-        /// <summary>
-        /// Select an appropriate JPEG colorspace based on <see cref="JpegCompressor.In_color_space"/>,
-        /// and calls <see cref="JpegCompressor.jpeg_set_colorspace"/>
-        /// </summary>
-        /// <remarks>This is actually a subroutine of <see cref="jpeg_set_defaults"/>. 
-        /// It's broken out in case you want to change just the colorspace-dependent JPEG parameters.</remarks>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public void jpeg_default_colorspace()
         {
             switch (m_in_color_space)
@@ -5405,7 +3553,7 @@ namespace BitMiracle.LibJpeg
                     jpeg_set_colorspace(ColorSpace.YCbCr);
                     break;
                 case ColorSpace.CMYK:
-                    jpeg_set_colorspace(ColorSpace.CMYK); /* By default, no translation */
+                    jpeg_set_colorspace(ColorSpace.CMYK);
                     break;
                 case ColorSpace.YCCK:
                     jpeg_set_colorspace(ColorSpace.YCCK);
@@ -5417,69 +3565,18 @@ namespace BitMiracle.LibJpeg
                     throw new Exception("Bad input colorspace!");
             }
         }
-
-        /// <summary>
-        /// Constructs JPEG quantization tables appropriate for the indicated quality setting.
-        /// </summary>
-        /// <param name="quality">The quality value is expressed on the 0..100 scale recommended by IJG.</param>
-        /// <param name="force_baseline">If <c>true</c>, then the quantization table entries are constrained 
-        /// to the range 1..255 for full JPEG baseline compatibility. In the current implementation, 
-        /// this only makes a difference for quality settings below 25, and it effectively prevents 
-        /// very small/low quality files from being generated. The IJG decoder is capable of reading 
-        /// the non-baseline files generated at low quality settings when <c>force_baseline</c> is <c>false</c>,
-        /// but other decoders may not be.</param>
-        /// <remarks>Note that the exact mapping from quality values to tables may change in future IJG releases 
-        /// as more is learned about DCT quantization.</remarks>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public void jpeg_set_quality(int quality, bool force_baseline)
         {
-            /* Convert user 0-100 rating to percentage scaling */
             quality = jpeg_quality_scaling(quality);
-
-            /* Set up standard quality tables */
             jpeg_set_linear_quality(quality, force_baseline);
         }
-
-        /// <summary>
-        /// Same as <see cref="jpeg_set_quality"/> except that the generated tables are the 
-        /// sample tables given in the JPEG specification section K.1, multiplied by 
-        /// the specified scale factor.
-        /// </summary>
-        /// <param name="scale_factor">The scale_factor.</param>
-        /// <param name="force_baseline">If <c>true</c>, then the quantization table entries are 
-        /// constrained to the range 1..255 for full JPEG baseline compatibility. In the current 
-        /// implementation, this only makes a difference for quality settings below 25, and it 
-        /// effectively prevents very small/low quality files from being generated. The IJG decoder 
-        /// is capable of reading the non-baseline files generated at low quality settings when 
-        /// <c>force_baseline</c> is <c>false</c>, but other decoders may not be.</param>
-        /// <remarks>Note that larger scale factors give lower quality. This entry point is 
-        /// useful for conforming to the Adobe PostScript DCT conventions, but we do not 
-        /// recommend linear scaling as a user-visible quality scale otherwise.
-        /// </remarks>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public void jpeg_set_linear_quality(int scale_factor, bool force_baseline)
         {
-            /* Set up two quantization tables using the specified scaling */
             jpeg_add_quant_table(0, std_luminance_quant_tbl, scale_factor, force_baseline);
             jpeg_add_quant_table(1, std_chrominance_quant_tbl, scale_factor, force_baseline);
         }
-
-        /// <summary>
-        /// Allows an arbitrary quantization table to be created.
-        /// </summary>
-        /// <param name="which_tbl">Indicates which table slot to fill.</param>
-        /// <param name="basic_table">An array of 64 unsigned integers given in normal array order.
-        /// These values are multiplied by <c>scale_factor/100</c> and then clamped to the range 1..65535 
-        /// (or to 1..255 if <c>force_baseline</c> is <c>true</c>).<br/>
-        /// The basic table should be given in JPEG zigzag order.
-        /// </param>
-        /// <param name="scale_factor">Multiplier for values in <c>basic_table</c>.</param>
-        /// <param name="force_baseline">Defines range of values in <c>basic_table</c>. 
-        /// If <c>true</c> - 1..255, otherwise - 1..65535.</param>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public void jpeg_add_quant_table(int which_tbl, int[] basic_table, int scale_factor, bool force_baseline)
         {
-            /* Safety check to ensure start_compress not called yet. */
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
@@ -5492,47 +3589,25 @@ namespace BitMiracle.LibJpeg
             for (int i = 0; i < JpegConstants.DCTSize2; i++)
             {
                 int temp = (basic_table[i] * scale_factor + 50) / 100;
-
-                /* limit the values to the valid range */
                 if (temp <= 0)
                     temp = 1;
-
-                /* max quantizer needed for 12 bits */
                 if (temp > 32767)
                     temp = 32767;
-
-                /* limit to baseline range if requested */
                 if (force_baseline && temp > 255)
                     temp = 255;
 
                 m_quant_tbl_ptrs[which_tbl].quantval[i] = (short)temp;
             }
-
-            /* Initialize sent_table false so table will be written to JPEG file. */
             m_quant_tbl_ptrs[which_tbl].Sent_table = false;
         }
-
-        /// <summary>
-        /// Converts a value on the IJG-recommended quality scale to a linear scaling percentage.
-        /// </summary>
-        /// <param name="quality">The IJG-recommended quality scale. Should be 0 (terrible) to 100 (very good).</param>
-        /// <returns>The linear scaling percentage.</returns>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public static int jpeg_quality_scaling(int quality)
         {
-            /* Safety limit on quality factor.  Convert 0 to 1 to avoid zero divide. */
             if (quality <= 0)
                 quality = 1;
 
             if (quality > 100)
                 quality = 100;
 
-            /* The basic table is used as-is (scaling 100) for a quality of 50.
-            * Qualities 50..100 are converted to scaling percentage 200 - 2*Q;
-            * note that at Q=100 the scaling is 0, which will cause jpeg_add_quant_table
-            * to make all the table entries 1 (hence, minimum quantization loss).
-            * Qualities 1..50 are converted to scaling percentage 5000/Q.
-            */
             if (quality < 50)
                 quality = 5000 / quality;
             else
@@ -5540,49 +3615,27 @@ namespace BitMiracle.LibJpeg
 
             return quality;
         }
-
-        /// <summary>
-        /// Generates a default scan script for writing a progressive-JPEG file.
-        /// </summary>
-        /// <remarks>This is the recommended method of creating a progressive file, unless you want 
-        /// to make a custom scan sequence. You must ensure that the JPEG color space is 
-        /// set correctly before calling this routine.</remarks>
-        /// <seealso href="ce3f6712-3633-4a58-af07-626a4fba9ae4.htm" target="_self">Compression parameter selection</seealso>
         public void jpeg_simple_progression()
         {
-            /* Safety check to ensure start_compress not called yet. */
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
-            /* Figure space needed for script.  Calculation must match code below! */
             int nscans;
             if (m_num_components == 3 && m_jpeg_color_space == ColorSpace.YCbCr)
             {
-                /* Custom script for YCbCr color images. */
                 nscans = 10;
             }
             else
             {
-                /* All-purpose script for other color spaces. */
                 if (m_num_components > JpegConstants.MaxComponentsInScan)
                 {
-                    /* 2 DC + 4 AC scans per component */
                     nscans = 6 * m_num_components;
                 }
                 else
                 {
-                    /* 2 DC scans; 4 AC scans per component */
                     nscans = 2 + 4 * m_num_components;
                 }
             }
-
-            /* Allocate space for script.
-            * We need to put it in the permanent pool in case the application performs
-            * multiple compressions without changing the settings.  To avoid a memory
-            * leak if jpeg_simple_progression is called repeatedly for the same JPEG
-            * object, we try to re-use previously allocated space, and we allocate
-            * enough space to handle YCbCr even if initially asked for grayscale.
-            */
             if (m_script_space == null || m_script_space_size < nscans)
             {
                 m_script_space_size = Math.Max(nscans, 10);
@@ -5597,113 +3650,48 @@ namespace BitMiracle.LibJpeg
             int scanIndex = 0;
             if (m_num_components == 3 && m_jpeg_color_space == ColorSpace.YCbCr)
             {
-                /* Custom script for YCbCr color images. */
-                /* Initial DC scan */
                 fill_dc_scans(ref scanIndex, m_num_components, 0, 1);
-
-                /* Initial AC scan: get some luma data out in a hurry */
                 fill_a_scan(ref scanIndex, 0, 1, 5, 0, 2);
-
-                /* Chroma data is too small to be worth expending many scans on */
                 fill_a_scan(ref scanIndex, 2, 1, 63, 0, 1);
                 fill_a_scan(ref scanIndex, 1, 1, 63, 0, 1);
-
-                /* Complete spectral selection for luma AC */
                 fill_a_scan(ref scanIndex, 0, 6, 63, 0, 2);
-
-                /* Refine next bit of luma AC */
                 fill_a_scan(ref scanIndex, 0, 1, 63, 2, 1);
-
-                /* Finish DC successive approximation */
                 fill_dc_scans(ref scanIndex, m_num_components, 1, 0);
-
-                /* Finish AC successive approximation */
                 fill_a_scan(ref scanIndex, 2, 1, 63, 1, 0);
                 fill_a_scan(ref scanIndex, 1, 1, 63, 1, 0);
-
-                /* Luma bottom bit comes last since it's usually largest scan */
                 fill_a_scan(ref scanIndex, 0, 1, 63, 1, 0);
             }
             else
             {
-                /* All-purpose script for other color spaces. */
-                /* Successive approximation first pass */
                 fill_dc_scans(ref scanIndex, m_num_components, 0, 1);
                 fill_scans(ref scanIndex, m_num_components, 1, 5, 0, 2);
                 fill_scans(ref scanIndex, m_num_components, 6, 63, 0, 2);
-
-                /* Successive approximation second pass */
                 fill_scans(ref scanIndex, m_num_components, 1, 63, 2, 1);
-
-                /* Successive approximation final pass */
                 fill_dc_scans(ref scanIndex, m_num_components, 1, 0);
                 fill_scans(ref scanIndex, m_num_components, 1, 63, 1, 0);
             }
         }
-
-        // Main entry points for compression
-
-        /// <summary>
-        /// Starts JPEG compression.
-        /// </summary>
-        /// <param name="write_all_tables">Write or not write all quantization and Huffman tables.</param>
-        /// <remarks>Before calling this, all parameters and a data destination must be set up.</remarks>
-        /// <seealso cref="JpegCompressor.jpeg_suppress_tables"/>
-        /// <seealso cref="JpegCompressor.jpeg_write_tables"/>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
         public void jpeg_start_compress(bool write_all_tables)
         {
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
             if (write_all_tables)
-                jpeg_suppress_tables(false); /* mark all tables to be written */
-
-            /* (Re)initialize destination modules */
+                jpeg_suppress_tables(false);
             m_dest.init_destination();
-
-            /* Perform master selection of active modules */
             jinit_compress_master();
-
-            /* Set up for the first pass */
             m_master.prepare_for_pass();
-
-            /* Ready for application to drive first pass through jpeg_write_scanlines
-            * or jpeg_write_raw_data.
-            */
             m_next_scanline = 0;
             m_global_state = (m_raw_data_in ? JpegState.CSTATE_RAW_OK : JpegState.CSTATE_SCANNING);
         }
-
-        /// <summary>
-        /// Write some scanlines of data to the JPEG compressor.
-        /// </summary>
-        /// <param name="scanlines">The array of scanlines.</param>
-        /// <param name="num_lines">The number of scanlines for writing.</param>
-        /// <returns>The return value will be the number of lines actually written.<br/>
-        /// This should be less than the supplied <c>num_lines</c> only in case that 
-        /// the data destination module has requested suspension of the compressor, 
-        /// or if more than image_height scanlines are passed in.
-        /// </returns>
-        /// <remarks>We warn about excess calls to <c>jpeg_write_scanlines()</c> since this likely 
-        /// signals an application programmer error. However, excess scanlines passed in the last 
-        /// valid call are "silently" ignored, so that the application need not adjust <c>num_lines</c>
-        /// for end-of-image when using a multiple-scanline buffer.</remarks>
-        /// <seealso href="07136fd7-d482-48de-b88c-1a4b9658c69e.htm" target="_self">Compression details</seealso>
         public int jpeg_write_scanlines(byte[][] scanlines, int num_lines)
         {
             if (m_global_state != JpegState.CSTATE_SCANNING)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
-            /* Give master control module another chance if this is first call to
-            * jpeg_write_scanlines.  This lets output of the frame/scan headers be
-            * delayed so that application can write COM, etc, markers between
-            * jpeg_start_compress and jpeg_write_scanlines.
-            */
             if (m_master.MustCallPassStartup())
                 m_master.pass_startup();
 
-            /* Ignore any extra scanlines at bottom of image. */
             int rows_left = m_image_height - m_next_scanline;
             if (num_lines > rows_left)
                 num_lines = rows_left;
@@ -5713,15 +3701,6 @@ namespace BitMiracle.LibJpeg
             m_next_scanline += row_ctr;
             return row_ctr;
         }
-
-        /// <summary>
-        /// Alternate entry point to write raw data.
-        /// </summary>
-        /// <param name="data">The raw data.</param>
-        /// <param name="num_lines">The number of scanlines for writing.</param>
-        /// <returns>The number of lines actually written.</returns>
-        /// <remarks>Processes exactly one iMCU row per call, unless suspended.
-        /// Replaces <see cref="jpeg_write_scanlines"/> when writing raw downsampled data.</remarks>
         public int jpeg_write_raw_data(byte[][][] data, int num_lines)
         {
             if (m_global_state != JpegState.CSTATE_RAW_OK)
@@ -5731,66 +3710,33 @@ namespace BitMiracle.LibJpeg
             {
                 return 0;
             }
-
-            /* Give master control module another chance if this is first call to
-            * jpeg_write_raw_data.  This lets output of the frame/scan headers be
-            * delayed so that application can write COM, etc, markers between
-            * jpeg_start_compress and jpeg_write_raw_data.
-            */
             if (m_master.MustCallPassStartup())
                 m_master.pass_startup();
 
-            /* Verify that at least one iMCU row has been passed. */
+
             int lines_per_iMCU_row = m_max_v_samp_factor * JpegConstants.DCTSize;
             if (num_lines < lines_per_iMCU_row)
                 throw new Exception("Buffer passed to JPEG library is too small");
 
-            /* Directly compress the row. */
             if (!m_coef.compress_data(data))
             {
-                /* If compressor did not consume the whole row, suspend processing. */
                 return 0;
             }
 
-            /* OK, we processed one iMCU row. */
             m_next_scanline += lines_per_iMCU_row;
             return lines_per_iMCU_row;
         }
-
-        /// <summary>
-        /// Compression initialization for writing raw-coefficient data. Useful for lossless transcoding.
-        /// </summary>
-        /// <param name="coef_arrays">The virtual arrays need not be filled or even realized at the time 
-        /// <c>jpeg_write_coefficients</c> is called; indeed, the virtual arrays typically will be realized 
-        /// during this routine and filled afterwards.
-        /// </param>
-        /// <remarks>Before calling this, all parameters and a data destination must be set up.
-        /// Call <see cref="jpeg_finish_compress"/> to actually write the data.
-        /// </remarks>
         public void jpeg_write_coefficients(JpegVirtualArray<JpegBlock>[] coef_arrays)
         {
             if (m_global_state != JpegState.CSTATE_START)
                 throw new Exception(String.Format("Improper call to JPEG library in state {0}", (int)m_global_state));
 
-            /* Mark all tables to be written */
             jpeg_suppress_tables(false);
-
-            /* (Re)initialize destination modules */
             m_dest.init_destination();
-
-            /* Perform master selection of active modules */
             transencode_master_selection(coef_arrays);
-
-            /* Wait for jpeg_finish_compress() call */
-            m_next_scanline = 0;   /* so jpeg_write_marker works */
+            m_next_scanline = 0;
             m_global_state = JpegState.CSTATE_WRCOEFS;
         }
-
-        // Compression module initialization routines
-
-        /// <summary>
-        /// Initialization of a JPEG compression object
-        /// </summary>
         private void initialize()
         {
             m_dest = null;
@@ -5804,60 +3750,30 @@ namespace BitMiracle.LibJpeg
                 m_dc_huff_tbl_ptrs[i] = null;
                 m_ac_huff_tbl_ptrs[i] = null;
             }
-
             m_script_space = null;
-
-            /* OK, I'm ready */
             m_global_state = JpegState.CSTATE_START;
         }
-
-        /// <summary>
-        /// Master selection of compression modules.
-        /// This is done once at the start of processing an image.  We determine
-        /// which modules will be used and give them appropriate initialization calls.
-        /// This routine is in charge of selecting the modules to be executed and
-        /// making an initialization call to each one.
-        /// </summary>
         private void jinit_compress_master()
         {
-            /* Initialize master control (includes parameter checking/processing) */
-            jinit_c_master_control(false /* full compression */);
-
-            /* Preprocessing */
+            jinit_c_master_control(false);
             if (!m_raw_data_in)
             {
                 m_cconvert = new ColorConverter(this);
                 m_downsample = new JpegDownsampler(this);
                 m_prep = new JpegCompressorPrepController(this);
             }
-
-            /* Forward DCT */
             m_fdct = new JpegFowardDCT(this);
-
-            /* Entropy encoding: only Huffman coding supported. */
             if (m_progressive_mode)
                 m_entropy = new ProgressiveHuffmanEncoder(this);
             else
                 m_entropy = new HuffEntropyEncoder(this);
-
-            /* Need a full-image coefficient buffer in any multi-pass mode. */
             m_coef = new CoefControllerImpl(this, (bool)(m_num_scans > 1 || m_optimize_coding));
-            jinit_c_main_controller(false /* never need full buffer here */);
+            jinit_c_main_controller(false);
             m_marker = new JpegMarkerWriter(this);
-
-            /* Write the datastream header (SOI) immediately.
-            * Frame and scan headers are postponed till later.
-            * This lets application insert special markers after the SOI.
-            */
             m_marker.write_file_header();
         }
-
-        /// <summary>
-        /// Initialize master compression control.
-        /// </summary>
         private void jinit_c_master_control(bool transcode_only)
         {
-            /* Validate parameters, determine derived values */
             initial_setup();
 
             if (m_scan_info != null)
@@ -5870,88 +3786,51 @@ namespace BitMiracle.LibJpeg
                 m_num_scans = 1;
             }
 
-            if (m_progressive_mode)    /*  TEMPORARY HACK ??? */
-                m_optimize_coding = true; /* assume default tables no good for progressive mode */
+            if (m_progressive_mode)
+                m_optimize_coding = true;
 
             m_master = new JpegCompressorMaster(this, transcode_only);
         }
-
-        /// <summary>
-        /// Initialize main buffer controller.
-        /// </summary>
         private void jinit_c_main_controller(bool need_full_buffer)
         {
-            /* We don't need to create a buffer in raw-data mode. */
             if (m_raw_data_in)
                 return;
-
-            /* Create the buffer.  It holds downsampled data, so each component
-            * may be of a different size.
-            */
             if (need_full_buffer)
                 throw new Exception("Bogus buffer control mode");
             else
                 m_main = new JpegCompressorMainController(this);
         }
-
-        /// <summary>
-        /// Master selection of compression modules for transcoding.
-        /// </summary>
         private void transencode_master_selection(JpegVirtualArray<JpegBlock>[] coef_arrays)
         {
-            /* Although we don't actually use input_components for transcoding, 
-             * jcmaster.c's initial_setup will complain if input_components is 0.
-             */
             m_input_components = 1;
-
-            /* Initialize master control (includes parameter checking/processing) */
-            jinit_c_master_control(true /* transcode only */);
-
-            /* Entropy encoding: only Huffman coding supported. */
+            jinit_c_master_control(true);
             if (m_progressive_mode)
                 m_entropy = new ProgressiveHuffmanEncoder(this);
             else
                 m_entropy = new HuffEntropyEncoder(this);
-
-            /* We need a special coefficient buffer controller. */
             m_coef = new TransCoefControllerImpl(this, coef_arrays);
             m_marker = new JpegMarkerWriter(this);
-
-            /* Write the datastream header (SOI, JFIF) immediately.
-            * Frame and scan headers are postponed till later.
-            * This lets application insert special markers after the SOI.
-            */
             m_marker.write_file_header();
         }
-
-        /// <summary>
-        /// Do computations that are needed before master selection phase
-        /// </summary>
         private void initial_setup()
         {
-            /* Sanity check on image dimensions */
             if (m_image_height <= 0 || m_image_width <= 0 || m_num_components <= 0 || m_input_components <= 0)
                 throw new Exception("Empty JPEG image (DNL not supported)");
 
-            /* Make sure image isn't bigger than I can handle */
             if (m_image_height > JpegConstants.JpegMaxDimention || m_image_width > JpegConstants.JpegMaxDimention)
                 throw new Exception(String.Format("Maximum supported image dimension is {0} pixels", (int)JpegConstants.JpegMaxDimention));
 
-            /* Width of an input scanline must be representable as int. */
             long samplesperrow = m_image_width * m_input_components;
             int jd_samplesperrow = (int)samplesperrow;
             if ((long)jd_samplesperrow != samplesperrow)
                 throw new Exception("Image too wide for this implementation");
 
-            /* For now, precision must match compiled-in value... */
             if (m_data_precision != JpegConstants.BitsInSample)
                 throw new Exception(String.Format("Unsupported JPEG data precision {0}", m_data_precision));
 
-            /* Check that number of components won't exceed internal array sizes */
             if (m_num_components > JpegConstants.MaxComponents)
                 throw new Exception(String.Format("Too many color components: {0}, max {1}", m_num_components, JpegConstants.MaxComponents));
 
-            /* Compute maximum sampling factors; check factor validity */
             m_max_h_samp_factor = 1;
             m_max_v_samp_factor = 1;
             for (int ci = 0; ci < m_num_components; ci++)
@@ -5966,56 +3845,32 @@ namespace BitMiracle.LibJpeg
                 m_max_v_samp_factor = Math.Max(m_max_v_samp_factor, m_comp_info[ci].V_samp_factor);
             }
 
-            /* Compute dimensions of components */
             for (int ci = 0; ci < m_num_components; ci++)
             {
-                /* Fill in the correct component_index value; don't rely on application */
                 m_comp_info[ci].Component_index = ci;
-
-                /* For compression, we never do DCT scaling. */
                 m_comp_info[ci].DCT_scaled_size = JpegConstants.DCTSize;
-
-                /* Size in DCT blocks */
                 m_comp_info[ci].Width_in_blocks = JpegUtils.jdiv_round_up(
                     m_image_width * m_comp_info[ci].H_samp_factor, m_max_h_samp_factor * JpegConstants.DCTSize);
                 m_comp_info[ci].height_in_blocks = JpegUtils.jdiv_round_up(
                     m_image_height * m_comp_info[ci].V_samp_factor, m_max_v_samp_factor * JpegConstants.DCTSize);
-
-                /* Size in samples */
                 m_comp_info[ci].downsampled_width = JpegUtils.jdiv_round_up(
                     m_image_width * m_comp_info[ci].H_samp_factor, m_max_h_samp_factor);
                 m_comp_info[ci].downsampled_height = JpegUtils.jdiv_round_up(
                     m_image_height * m_comp_info[ci].V_samp_factor, m_max_v_samp_factor);
-
-                /* Mark component needed (this flag isn't actually used for compression) */
                 m_comp_info[ci].component_needed = true;
             }
-
-            /* Compute number of fully interleaved MCU rows (number of times that
-            * main controller will call coefficient controller).
-            */
             m_total_iMCU_rows = JpegUtils.jdiv_round_up(m_image_height, m_max_v_samp_factor * JpegConstants.DCTSize);
         }
-
-        /// <summary>
-        /// Verify that the scan script in scan_info[] is valid; 
-        /// also determine whether it uses progressive JPEG, and set progressive_mode.
-        /// </summary>
         private void validate_script()
         {
             if (m_num_scans <= 0)
                 throw new Exception(String.Format("Invalid scan script at entry {0}", 0));
 
-            /* For sequential JPEG, all scans must have Ss=0, Se=DCTSize2-1;
-            * for progressive JPEG, no scan can have this.
-            */
             int[][] last_bitpos = new int[JpegConstants.MaxComponents][];
             for (int i = 0; i < JpegConstants.MaxComponents; i++)
                 last_bitpos[i] = new int[JpegConstants.DCTSize2];
 
             bool[] component_sent = new bool[JpegConstants.MaxComponents];
-
-            /* -1 until that coefficient has been seen; then last Al for it */
             if (m_scan_info[0].Ss != 0 || m_scan_info[0].Se != JpegConstants.DCTSize2 - 1)
             {
                 m_progressive_mode = true;
@@ -6036,7 +3891,6 @@ namespace BitMiracle.LibJpeg
             {
                 JpegScanInfo scanInfo = m_scan_info[scanno - 1];
 
-                /* Validate component indexes */
                 int ncomps = scanInfo.comps_in_scan;
                 if (ncomps <= 0 || ncomps > JpegConstants.MaxComponentsInScan)
                     throw new Exception(String.Format("Too many color components: {0}, max {1}", ncomps, JpegConstants.MaxComponentsInScan));
@@ -6047,25 +3901,16 @@ namespace BitMiracle.LibJpeg
                     if (thisi < 0 || thisi >= m_num_components)
                         throw new Exception(String.Format("Invalid scan script at entry {0}", scanno));
 
-                    /* Components must appear in SOF order within each scan */
                     if (ci > 0 && thisi <= scanInfo.component_index[ci - 1])
                         throw new Exception(String.Format("Invalid scan script at entry {0}", scanno));
                 }
 
-                /* Validate progression parameters */
                 int Ss = scanInfo.Ss;
                 int Se = scanInfo.Se;
                 int Ah = scanInfo.Ah;
                 int Al = scanInfo.Al;
                 if (m_progressive_mode)
                 {
-                    /* The JPEG spec simply gives the ranges 0..13 for Ah and Al, but that
-                    * seems wrong: the upper bound ought to depend on data precision.
-                    * Perhaps they really meant 0..N+1 for N-bit precision.
-                    * Here we allow 0..10 for 8-bit data; Al larger than 10 results in
-                    * out-of-range reconstructed DC values during the first DC scan,
-                    * which might cause problems for some decoders.
-                    */
                     const int MAX_AH_AL = 10;
                     if (Ss < 0 || Ss >= JpegConstants.DCTSize2 || Se < Ss || Se >= JpegConstants.DCTSize2 ||
                         Ah < 0 || Ah > MAX_AH_AL || Al < 0 || Al > MAX_AH_AL)
@@ -6075,32 +3920,30 @@ namespace BitMiracle.LibJpeg
 
                     if (Ss == 0)
                     {
-                        if (Se != 0)        /* DC and AC together not OK */
+                        if (Se != 0)
                             throw new Exception(String.Format("Invalid progressive parameters at scan script entry {0}", scanno));
                     }
                     else
                     {
-                        if (ncomps != 1)    /* AC scans must be for only one component */
+                        if (ncomps != 1)
                             throw new Exception(String.Format("Invalid progressive parameters at scan script entry {0}", scanno));
                     }
 
                     for (int ci = 0; ci < ncomps; ci++)
                     {
                         int lastBitComponentIndex = scanInfo.component_index[ci];
-                        if (Ss != 0 && last_bitpos[lastBitComponentIndex][0] < 0) /* AC without prior DC scan */
+                        if (Ss != 0 && last_bitpos[lastBitComponentIndex][0] < 0)
                             throw new Exception(String.Format("Invalid progressive parameters at scan script entry {0}", scanno));
 
                         for (int coefi = Ss; coefi <= Se; coefi++)
                         {
                             if (last_bitpos[lastBitComponentIndex][coefi] < 0)
                             {
-                                /* first scan of this coefficient */
                                 if (Ah != 0)
                                     throw new Exception(String.Format("Invalid progressive parameters at scan script entry {0}", scanno));
                             }
                             else
                             {
-                                /* not first scan */
                                 if (Ah != last_bitpos[lastBitComponentIndex][coefi] || Al != Ah - 1)
                                     throw new Exception(String.Format("Invalid progressive parameters at scan script entry {0}", scanno));
                             }
@@ -6111,11 +3954,9 @@ namespace BitMiracle.LibJpeg
                 }
                 else
                 {
-                    /* For sequential JPEG, all progression parameters must be these: */
                     if (Ss != 0 || Se != JpegConstants.DCTSize2 - 1 || Ah != 0 || Al != 0)
                         throw new Exception(String.Format("Invalid progressive parameters at scan script entry {0}", scanno));
 
-                    /* Make sure components are not sent twice */
                     for (int ci = 0; ci < ncomps; ci++)
                     {
                         int thisi = scanInfo.component_index[ci];
@@ -6127,14 +3968,8 @@ namespace BitMiracle.LibJpeg
                 }
             }
 
-            /* Now verify that everything got sent. */
             if (m_progressive_mode)
             {
-                /* For progressive mode, we only check that at least some DC data
-                * got sent for each component; the spec does not require that all bits
-                * of all coefficients be transmitted.  Would it be wiser to enforce
-                * transmission of all coefficient bits??
-                */
                 for (int ci = 0; ci < m_num_components; ci++)
                 {
                     if (last_bitpos[ci][0] < 0)
@@ -6150,14 +3985,6 @@ namespace BitMiracle.LibJpeg
                 }
             }
         }
-
-        // Huffman table setup routines
-
-        /// <summary>
-        /// Set up the standard Huffman tables (cf. JPEG standard section K.3)
-        /// 
-        /// IMPORTANT: these are only valid for 8-bit data precision!
-        /// </summary>
         private void std_huff_tables()
         {
             add_huff_table(ref m_dc_huff_tbl_ptrs[0], bits_dc_luminance, val_dc_luminance);
@@ -6165,22 +3992,11 @@ namespace BitMiracle.LibJpeg
             add_huff_table(ref m_dc_huff_tbl_ptrs[1], bits_dc_chrominance, val_dc_chrominance);
             add_huff_table(ref m_ac_huff_tbl_ptrs[1], bits_ac_chrominance, val_ac_chrominance);
         }
-
-        /// <summary>
-        /// Define a Huffman table
-        /// </summary>
         private void add_huff_table(ref JpegHuffmanTable htblptr, byte[] bits, byte[] val)
         {
             if (htblptr == null)
                 htblptr = new JpegHuffmanTable();
-
-            /* Copy the number-of-symbols-of-each-code-length counts */
             Buffer.BlockCopy(bits, 0, htblptr.Bits, 0, htblptr.Bits.Length);
-
-            /* Validate the counts.  We do this here mainly so we can copy the right
-            * number of symbols from the val[] array, without risking marching off
-            * the end of memory. HuffEntropyEncoder will do a more thorough test later.
-            */
             int nsymbols = 0;
             for (int len = 1; len <= 16; len++)
                 nsymbols += bits[len];
@@ -6189,14 +4005,8 @@ namespace BitMiracle.LibJpeg
                 throw new Exception("Bogus Huffman table definition");
 
             Buffer.BlockCopy(val, 0, htblptr.Huffval, 0, nsymbols);
-
-            /* Initialize sent_table false so table will be written to JPEG file. */
             htblptr.Sent_table = false;
         }
-
-        /// <summary>
-        /// Support routine: generate one scan for specified component
-        /// </summary>
         private void fill_a_scan(ref int scanIndex, int ci, int Ss, int Se, int Ah, int Al)
         {
             m_script_space[scanIndex].comps_in_scan = 1;
@@ -6207,15 +4017,10 @@ namespace BitMiracle.LibJpeg
             m_script_space[scanIndex].Al = Al;
             scanIndex++;
         }
-
-        /// <summary>
-        /// Support routine: generate interleaved DC scan if possible, else N scans
-        /// </summary>
         private void fill_dc_scans(ref int scanIndex, int ncomps, int Ah, int Al)
         {
             if (ncomps <= JpegConstants.MaxComponentsInScan)
             {
-                /* Single interleaved DC scan */
                 m_script_space[scanIndex].comps_in_scan = ncomps;
                 for (int ci = 0; ci < ncomps; ci++)
                     m_script_space[scanIndex].component_index[ci] = ci;
@@ -6228,14 +4033,9 @@ namespace BitMiracle.LibJpeg
             }
             else
             {
-                /* Non-interleaved DC scan for each component */
                 fill_scans(ref scanIndex, ncomps, 0, 0, Ah, Al);
             }
         }
-
-        /// <summary>
-        /// Support routine: generate one scan for each component
-        /// </summary>
         private void fill_scans(ref int scanIndex, int ncomps, int Ss, int Se, int Ah, int Al)
         {
             for (int ci = 0; ci < ncomps; ci++)
@@ -6261,6 +4061,12 @@ namespace BitMiracle.LibJpeg
         }
     }
     #endregion
+
+
+
+    // STOPPED REMOVING COMMENTS HERE.
+
+
 
     #region JpegCompressorCoefController
     /// <summary>
@@ -22409,47 +20215,16 @@ namespace BitMiracle.LibJpeg
             red = (byte)(R * 255);
             green = (byte)(G * 255);
             blue = (byte)(B * 255);
-
-            //C = (double)c;
-            //M = (double)m;
-            //Y = (double)y;
-            //K = (double)k;
-
-            //C = C / 255.0;
-            //M = M / 255.0;
-            //Y = Y / 255.0;
-            //K = K / 255.0;
-
-            //R = C * (1.0 - K) + K;
-            //G = M * (1.0 - K) + K;
-            //B = Y * (1.0 - K) + K;
-
-            //R = (1.0 - R) * 255.0 + 0.5;
-            //G = (1.0 - G) * 255.0 + 0.5;
-            //B = (1.0 - B) * 255.0 + 0.5;
-
-            //r = (byte)R;
-            //g = (byte)G;
-            //b = (byte)B;
-
-            //rgb = RGB(r, g, b);
-
-            //return rgb;
         }
     }
     #endregion
     
     #region WorkingBitreadState
-    /// <summary>
-    /// Bitreading working state within an MCU
-    /// </summary>
     struct WorkingBitreadState
     {
-        public int get_buffer;    /* current bit-extraction buffer */
-        public int bits_left;      /* # of unused bits in it */
-
-        /* Pointer needed by jpeg_fill_bit_buffer. */
-        public JpegDecompressor cinfo;  /* back link to decompress master record */
+        public int get_buffer;
+        public int bits_left;
+        public JpegDecompressor cinfo;
     }
     #endregion
 }

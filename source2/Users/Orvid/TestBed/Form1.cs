@@ -28,22 +28,18 @@ namespace TestBed
             i.DrawCircleOutline(new Vec2(300, 128), 32, Colors.Black);
             i.DrawElipse(new Vec2(400, 400), 30, 60, new Pixel(0, 128, 0, 255));
         }
-        uint x;
-        uint y;
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            i.SetPixel(x, y, new Pixel(255, 0, 0, 255));
-            if (x < 511)
-                x++;
-            else
-                x = 2;
-            if (y < 511)
-                y++;
-            else
-                y = 0;
 
-            pictureBox1.Refresh();
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
         }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+
+
     }
 
     public class TestbedImage : Orvid.Graphics.Image

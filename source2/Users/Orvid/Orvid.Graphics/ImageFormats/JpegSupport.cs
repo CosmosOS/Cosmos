@@ -6,18 +6,26 @@ using BitMiracle.LibJpeg;
 
 namespace Orvid.Graphics.ImageFormats
 {
-    public class JpgImage : ImageFormat
+    public class JpegImage : ImageFormat
     {
         public override void Save(Image i, Stream dest)
         {
-            JpegImage j = JpegImage.FromBitmap((System.Drawing.Bitmap)i);
-            j.WriteJpeg(dest);
+            BitMiracle.LibJpeg.JpegImage j = BitMiracle.LibJpeg.JpegImage.FromBitmap((System.Drawing.Bitmap)i);
+            CompressionParameters c = new CompressionParameters();
+            c.Quality = 100;
+            c.SimpleProgressive = false;
+            j.WriteJpeg(dest, c);
+            j.Dispose();
+            System.GC.Collect();
         }
 
         public override Image Load(Stream s)
         {
-            JpegImage j = new JpegImage(s);
-            return (Image)j.ToBitmap();
+            BitMiracle.LibJpeg.JpegImage j = new BitMiracle.LibJpeg.JpegImage(s);
+            Image i = (Image)j.ToBitmap();
+            j.Dispose();
+            System.GC.Collect();
+            return i;
         }
     }
 }
