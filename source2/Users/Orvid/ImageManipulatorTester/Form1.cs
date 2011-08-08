@@ -12,6 +12,7 @@ namespace ImageManipulatorTester
     public partial class Form1 : System.Windows.Forms.Form
     {
         private StreamWriter st;
+
         public Form1()
         {
             InitializeComponent();
@@ -363,10 +364,51 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
+            #region Load Gif
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Test.gif"), FileMode.Open);
+
+                t.Start();
+                anim = Orvid.Graphics.ImageFormats.GifSupport.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Gif  took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+
+                Bitmap b = (Bitmap)anim[0];
+                GifPictureBox = new PictureBox();
+                GifPictureBox.BorderStyle = BorderStyle.FixedSingle;
+                GifPictureBox.Parent = flowLayoutPanel2;
+                GifPictureBox.Height = b.Height;
+                GifPictureBox.Width = b.Width;
+                GifPictureBox.Image = b;
+                animpar = new Orvid.Graphics.Shapes.ShapedImage(anim.Width, anim.Height);
+                anim.Parent = animpar;
+                animpar.Shapes.Add(anim);
+
+                //time.Interval = anim.TimePerFrame * 4;
+                //time.Tick += new EventHandler(time_Tick);
+                //time.Start();
+            }
+            #endregion
+
             st.Flush();
             st.Close();
             st.Dispose();
 
+        }
+
+        private PictureBox GifPictureBox;
+        private Orvid.Graphics.AnimatedImage anim;
+        private Orvid.Graphics.Shapes.ShapedImage animpar;
+        private Timer time = new Timer();
+        private void time_Tick(object sender, EventArgs e)
+        {
+            animpar.Modified = true;
+            GifPictureBox.Image = (Bitmap)animpar.Render();
+            GifPictureBox.Refresh();
         }
     }
 }

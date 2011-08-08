@@ -42,6 +42,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimatedImage.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="Drivers\VGADriver.cs" />
     <Compile Include="FontSupport\Font.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Image.cs" />
     <Compile Include="ImageFormats\BmpSupport.cs" />
     <Compile Include="ImageFormats\FormatManager.cs" />
+    <Compile Include="ImageFormats\GifSupport.cs" />
     <Compile Include="ImageFormats\ImageFormat.cs" />
     <Compile Include="ImageFormats\JpegSupport.cs" />
     <Compile Include="ImageFormats\OifSupport.cs" />

@@ -49,7 +49,7 @@ namespace Orvid.Graphics.Shapes
                 }
             }
         }
-        public ShapedImage Parent { get; protected set; }
+        public ShapedImage Parent { get; set; }
         public abstract void Draw();
     }
 }

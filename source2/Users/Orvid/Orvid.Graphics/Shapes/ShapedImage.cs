@@ -6,8 +6,8 @@ namespace Orvid.Graphics.Shapes
 {
     public class ShapedImage : Image
     {
-        public bool Modified { get; internal set; }
-        internal List<Shape> Shapes = new List<Shape>();
+        public bool Modified { get; set; }
+        public List<Shape> Shapes = new List<Shape>();
 
         public ShapedImage(int width, int height) : base(width, height)
         {
