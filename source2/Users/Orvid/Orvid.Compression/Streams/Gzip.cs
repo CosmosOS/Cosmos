@@ -272,7 +272,7 @@ namespace Orvid.Compression.Streams
     /// }	
     /// </code>
     /// </example>
-    public class GZipInputStream : InflaterInputStream
+    public class GZipInputStream : DeflaterInputStream
     {
         #region Instance Fields
         /// <summary>

@@ -130,9 +130,24 @@ namespace Orvid.Graphics
             //Quadratic,
             //Quadratic_BSpline,
             //Triangle,
+            Hq2x,
+            Hq3x,
+            Hq4x,
+            //Lq2x,
+            //Lq3x,
+            //Lq4x,
+            //Scale2x,
+            //Scale3x,
         }
         #endregion
 
+        /// <summary>
+        /// Resizes an image using the given algorithm.
+        /// </summary>
+        /// <param name="i">Input image.</param>
+        /// <param name="outSize">Output size. (If Applicable)</param>
+        /// <param name="method">Scaling method.</param>
+        /// <returns>The resized image.</returns>
         public static Image Resize(Image i, Vec2 outSize, ScalingAlgorithm method = ScalingAlgorithm.NearestNeighbor)
         {
             Image o;
@@ -149,6 +164,18 @@ namespace Orvid.Graphics
 
                 case ScalingAlgorithm.Bicubic:
                     o = ResizeBicubic(i, outSize);
+                    break;
+
+                case ScalingAlgorithm.Hq2x:
+                    o = ResizeHq2x(i);
+                    break;
+
+                case ScalingAlgorithm.Hq3x:
+                    o = ResizeHq3x(i);
+                    break;
+
+                case ScalingAlgorithm.Hq4x:
+                    o = ResizeHq4x(i);
                     break;
 
                 default:
@@ -215,7 +242,7 @@ namespace Orvid.Graphics
                     used = (d.Empty ? false : true);
 
                     red = green = blue = alpha = 0;
-                    
+
                     // Alpha
                     if (usea)
                         red += (a.R) * (1 - x_diff) * (1 - y_diff);
@@ -245,7 +272,7 @@ namespace Orvid.Graphics
                         blue += (c.B) * (y_diff) * (1 - x_diff);
                     if (used)
                         blue += (d.B) * (x_diff * y_diff);
-                    
+
                     // Alpha
                     if (usea)
                         alpha += (a.A) * (1 - x_diff) * (1 - y_diff);
@@ -362,66 +389,71 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        #region Hqx
 
-        #endregion
-
-        #endregion
-
-        #region HalveSize
-        /// <summary>
-        /// Halves the size of the given image.
-        /// </summary>
-        /// <param name="i">The image to Halve the size of.</param>
-        /// <returns>The half-size image.</returns>
-        public static Image HalveSize(Image i)
+        #region 2x
+        private static Image ResizeHq2x(Image i)
         {
-            Image o = new Image(i.Width / 2, i.Height / 2);
-
-            for (uint y = 0; y < i.Height; y = y + 2)
-            {
-                for (uint x = 0; x < i.Width; x = x + 2)
-                {
-                    uint R = 0, G = 0, B = 0;
-                    byte divBy = 0;
-                    Pixel p = i.GetPixel(x, y);
-                    R += p.R;
-                    G += p.G;
-                    B += p.B;
-                    divBy++;
-
-                    p = i.GetPixel(x + 1, y);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = i.GetPixel(x, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    p = i.GetPixel(x + 1, y + 1);
-                    if (!p.Empty)
-                    {
-                        R += p.R;
-                        G += p.G;
-                        B += p.B;
-                        divBy++;
-                    }
-
-                    o.SetPixel(x / 2, y / 2, new Pixel(((byte)(R / divBy)), ((byte)(G / divBy)), ((byte)(B / divBy)), 255));
-                }
-            }
-            i.Dispose();
-            return o;
+            return (Image)Hqx.HqxSharp.Scale2((System.Drawing.Bitmap)i);
         }
         #endregion
+
+        #region 3x
+        private static Image ResizeHq3x(Image i)
+        {
+            return (Image)Hqx.HqxSharp.Scale3((System.Drawing.Bitmap)i);
+        }
+        #endregion
+
+        #region 4x
+        private static Image ResizeHq4x(Image i)
+        {
+            return (Image)Hqx.HqxSharp.Scale4((System.Drawing.Bitmap)i);
+        }
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Greyscale
+        public static Image ConvertToGreyscale(Image i)
+        {
+            Image i2 = new Image(i.Width, i.Height);
+
+            uint Len = (uint)(i.Height * i.Width);
+            byte b;
+            Pixel p;
+            for (uint t = 0; t < Len; t++)
+            {
+                p = i.Data[t];
+                b = (byte)((0.2125 * p.R) + (0.7154 * p.G) + (0.0721 * p.B));
+                i2.Data[t] = new Pixel(b, b, b, 255);
+            }
+
+            return i2;
+        }
+        #endregion
+
+        #region Invert Colors
+        public static Image InvertColors(Image i)
+        {
+            Image i2 = new Image(i.Width, i.Height);
+
+            uint Len = (uint)(i.Height * i.Width);
+            Pixel p;
+            for (uint t = 0; t < Len; t++)
+            {
+                p = i.Data[t];
+                i2.Data[t] = new Pixel((byte)(255 - p.R), (byte)(255 - p.G), (byte)(255 - p.B), 255);
+            }
+
+            return i2;
+        }
+        #endregion
+
+
     }
 }

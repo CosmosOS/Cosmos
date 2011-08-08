@@ -46,7 +46,7 @@ using Orvid.Compression.Checksums;
 namespace Orvid.Compression.Streams
 {
 
-    #region InflaterInputStream
+    #region DeflaterInputStream
     /// <summary>
     /// This filter stream is used to decompress data compressed using the "deflate"
     /// format. The "deflate" format is described in RFC 1951.
@@ -56,23 +56,23 @@ namespace Orvid.Compression.Streams
     ///
     /// Author of the original java version : John Leuner.
     /// </summary>
-    public class InflaterInputStream : Stream
+    public class DeflaterInputStream : Stream
     {
         #region Constructors
         /// <summary>
-        /// Create an InflaterInputStream with the default decompressor
+        /// Create an DeflaterInputStream with the default decompressor
         /// and a default buffer size of 4KB.
         /// </summary>
         /// <param name = "baseInputStream">
         /// The InputStream to read bytes from
         /// </param>
-        public InflaterInputStream(Stream baseInputStream)
+        public DeflaterInputStream(Stream baseInputStream)
             : this(baseInputStream, new Inflater(), 4096)
         {
         }
 
         /// <summary>
-        /// Create an InflaterInputStream with the specified decompressor
+        /// Create an DeflaterInputStream with the specified decompressor
         /// and the specified buffer size.
         /// </summary>
         /// <param name = "baseInputStream">
@@ -84,7 +84,7 @@ namespace Orvid.Compression.Streams
         /// <param name = "bufferSize">
         /// Size of the buffer to use
         /// </param>
-        internal InflaterInputStream(Stream baseInputStream, Inflater inflater, int bufferSize)
+        internal DeflaterInputStream(Stream baseInputStream, Inflater inflater, int bufferSize)
         {
             if (baseInputStream == null)
             {
@@ -4108,7 +4108,7 @@ namespace Orvid.Compression.Streams
         OutputWindow outputWindow;
         InflaterDynHeader dynHeader;
         InflaterHuffmanTree litlenTree, distTree;
-        Adler32 adler;
+        //Adler32 adler;
         #endregion
 
         #region Constructors
@@ -4136,7 +4136,7 @@ namespace Orvid.Compression.Streams
         public Inflater(bool noHeader)
         {
             this.noHeader = noHeader;
-            this.adler = new Adler32();
+            //this.adler = new Adler32();
             input = new StreamManipulator();
             outputWindow = new OutputWindow();
             mode = noHeader ? DECODE_BLOCKS : DECODE_HEADER;
@@ -4158,7 +4158,7 @@ namespace Orvid.Compression.Streams
             litlenTree = null;
             distTree = null;
             isLastBlock = false;
-            adler.Reset();
+            //adler.Reset();
         }
 
         /// <summary>
@@ -4370,10 +4370,10 @@ namespace Orvid.Compression.Streams
                 neededBits -= 8;
             }
 
-            if ((int)adler.Value != readAdler)
-            {
-                throw new Exception("Adler chksum doesn't match: " + (int)adler.Value + " vs. " + readAdler);
-            }
+            //if ((int)adler.Value != readAdler)
+            //{
+            //    throw new Exception("Adler chksum doesn't match: " + (int)adler.Value + " vs. " + readAdler);
+            //}
 
             mode = FINISHED;
             return false;
@@ -4570,13 +4570,13 @@ namespace Orvid.Compression.Streams
                 throw new InvalidOperationException("Dictionary is not needed");
             }
 
-            adler.Update(buffer, index, count);
+            //adler.Update(buffer, index, count);
 
-            if ((int)adler.Value != readAdler)
-            {
-                throw new Exception("Wrong adler checksum");
-            }
-            adler.Reset();
+            //if ((int)adler.Value != readAdler)
+            //{
+            //    throw new Exception("Wrong adler checksum");
+            //}
+            //adler.Reset();
             outputWindow.CopyDict(buffer, index, count);
             mode = DECODE_BLOCKS;
         }
@@ -4676,25 +4676,25 @@ namespace Orvid.Compression.Streams
         /// </exception>
         public int Inflate(byte[] buffer, int offset, int count)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException("buffer");
-            }
+            //if (buffer == null)
+            //{
+            //    throw new ArgumentNullException("buffer");
+            //}
 
-            if (count < 0)
-            {
-                throw new ArgumentOutOfRangeException("count", "count cannot be negative");
-            }
+            //if (count < 0)
+            //{
+            //    throw new ArgumentOutOfRangeException("count", "count cannot be negative");
+            //}
 
-            if (offset < 0)
-            {
-                throw new ArgumentOutOfRangeException("offset", "offset cannot be negative");
-            }
+            //if (offset < 0)
+            //{
+            //    throw new ArgumentOutOfRangeException("offset", "offset cannot be negative");
+            //}
 
-            if (offset + count > buffer.Length)
-            {
-                throw new ArgumentException("count exceeds buffer bounds");
-            }
+            //if (offset + count > buffer.Length)
+            //{
+            //    throw new ArgumentException("count exceeds buffer bounds");
+            //}
 
             // Special case: count may be zero
             if (count == 0)
@@ -4722,7 +4722,7 @@ namespace Orvid.Compression.Streams
                     int more = outputWindow.CopyOutput(buffer, offset, count);
                     if (more > 0)
                     {
-                        adler.Update(buffer, offset, more);
+                        //adler.Update(buffer, offset, more);
                         offset += more;
                         bytesCopied += more;
                         totalOut += (long)more;
@@ -4773,22 +4773,22 @@ namespace Orvid.Compression.Streams
             }
         }
 
-        /// <summary>
-        /// Gets the adler checksum.  This is either the checksum of all
-        /// uncompressed bytes returned by inflate(), or if needsDictionary()
-        /// returns true (and thus no output was yet produced) this is the
-        /// adler checksum of the expected dictionary.
-        /// </summary>
-        /// <returns>
-        /// the adler checksum.
-        /// </returns>
-        public int Adler
-        {
-            get
-            {
-                return IsNeedingDictionary ? readAdler : (int)adler.Value;
-            }
-        }
+        ///// <summary>
+        ///// Gets the adler checksum.  This is either the checksum of all
+        ///// uncompressed bytes returned by inflate(), or if needsDictionary()
+        ///// returns true (and thus no output was yet produced) this is the
+        ///// adler checksum of the expected dictionary.
+        ///// </summary>
+        ///// <returns>
+        ///// the adler checksum.
+        ///// </returns>
+        //public int Adler
+        //{
+        //    get
+        //    {
+        //        return IsNeedingDictionary ? readAdler : (int)adler.Value;
+        //    }
+        //}
 
         /// <summary>
         /// Gets the total number of output bytes returned by Inflate().
@@ -4839,7 +4839,7 @@ namespace Orvid.Compression.Streams
 
     #region InflaterInputBuffer
     /// <summary>
-    /// An input buffer customised for use by <see cref="InflaterInputStream"/>
+    /// An input buffer customised for use by <see cref="DeflaterInputStream"/>
     /// </summary>
     /// <remarks>
     /// The buffer supports decryption of incoming data.

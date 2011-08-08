@@ -693,7 +693,7 @@ namespace Orvid.Graphics.ImageFormats
 
                 int row = 0, filter = 0, column = -1;
 
-                using (InflaterInputStream compressedStream = new InflaterInputStream(dataStream))
+                using (DeflaterInputStream compressedStream = new DeflaterInputStream(dataStream))
                 {
                     int readByte = 0;
                     while ((readByte = compressedStream.ReadByte()) >= 0)
@@ -879,26 +879,26 @@ namespace Orvid.Graphics.ImageFormats
 
             private void ReadChunkCrc(PngChunk chunk, byte[] typeBuffer)
             {
-                byte[] crcBuffer = new byte[4];
+                //    byte[] crcBuffer = new byte[4];
 
-                int numBytes = _stream.Read(crcBuffer, 0, 4);
-                if (numBytes >= 1 && numBytes <= 3)
-                {
-                    throw new Exception("Image stream is not valid!");
-                }
+                _stream.Position += 4;
+                //    if (numBytes >= 1 && numBytes <= 3)
+                //    {
+                //        throw new Exception("Image stream is not valid!");
+                //    }
 
-                Array.Reverse(crcBuffer);
+                //    Array.Reverse(crcBuffer);
 
-                chunk.Crc = BitConverter.ToUInt32(crcBuffer, 0);
+                //    chunk.Crc = BitConverter.ToUInt32(crcBuffer, 0);
 
-                Crc32 crc = new Crc32();
-                crc.Update(typeBuffer);
-                crc.Update(chunk.Data);
+                //    Crc32 crc = new Crc32();
+                //    crc.Update(typeBuffer);
+                //    crc.Update(chunk.Data);
 
-                if (crc.Value != chunk.Crc)
-                {
-                    throw new Exception("CRC Error. PNG Image chunk is corrupt!");
-                }
+                //    if (crc.Value != chunk.Crc)
+                //    {
+                //        throw new Exception("CRC Error. PNG Image chunk is corrupt!");
+                //    }
             }
 
             private void ReadChunkData(PngChunk chunk)
@@ -1188,12 +1188,12 @@ namespace Orvid.Graphics.ImageFormats
             /// This field can be of zero length. 
             /// </summary>
             public byte[] Data;
-            /// <summary>
-            /// A CRC (Cyclic Redundancy Check) calculated on the preceding bytes in the chunk, 
-            /// including the chunk type code and chunk data fields, but not including the length field. 
-            /// The CRC is always present, even for chunks containing no data
-            /// </summary>
-            public uint Crc;
+            ///// <summary>
+            ///// A CRC (Cyclic Redundancy Check) calculated on the preceding bytes in the chunk, 
+            ///// including the chunk type code and chunk data fields, but not including the length field. 
+            ///// The CRC is always present, even for chunks containing no data
+            ///// </summary>
+            //public uint Crc;
         }
         #endregion
 

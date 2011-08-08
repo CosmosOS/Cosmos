@@ -24,6 +24,7 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <DocumentationFile>
     </DocumentationFile>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -34,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,19 +54,17 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Image.cs" />
-    <Compile Include="ImageFormats\BitMiracle\LibTiff.cs" />
     <Compile Include="ImageFormats\BmpSupport.cs" />
     <Compile Include="ImageFormats\FormatManager.cs" />
     <Compile Include="ImageFormats\ImageFormat.cs" />
     <Compile Include="ImageFormats\JpegSupport.cs" />
-    <Compile Include="ImageFormats\BitMiracle\LibJpeg.cs" />
     <Compile Include="ImageFormats\OifSupport.cs" />
     <Compile Include="ImageFormats\PngSupport.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ImageFormats\TgaSupport.cs" />
     <Compile Include="ImageFormats\TiffSupport.cs" />
     <Compile Include="ImageFormats\VbpSupport.cs" />
-    <Compile Include="ImageFormats\BitMiracle\Deps\zLib.cs" />
     <Compile Include="ImageManipulator.cs" />
     <Compile Include="MiImage.cs" />
     <Compile Include="Monitor.cs" />
@@ -102,6 +102,10 @@
     <ProjectReference Include="..\Orvid.Compression\Orvid.Compression.csproj">
       <Project>{931E9514-6750-4700-8B20-364DD1B78038}</Project>
       <Name>Orvid.Compression</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orvid.Graphics.Dependancies\Orvid.Graphics.Dependancies.csproj">
+      <Project>{6B3ABC85-0A7B-4941-A4BE-BE5A5BE3D3F8}</Project>
+      <Name>Orvid.Graphics.Dependancies</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
