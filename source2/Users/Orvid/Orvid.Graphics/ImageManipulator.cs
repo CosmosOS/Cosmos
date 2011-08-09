@@ -454,6 +454,22 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        #region ReverseRGB
+        public static Image ReverseRGB(Image i)
+        {
+            Image i2 = new Image(i.Width, i.Height);
+
+            uint Len = (uint)(i.Height * i.Width);
+            Pixel p;
+            for (uint t = 0; t < Len; t++)
+            {
+                p = i.Data[t];
+                i2.Data[t] = new Pixel(p.B, p.G, p.R, 255);
+            }
+
+            return i2;
+        }
+        #endregion
 
     }
 }

@@ -17,6 +17,7 @@ namespace Orvid.Graphics.ImageFormats
             Formats.Add(new TiffImage());
             Formats.Add(new TgaImage());
             Formats.Add(new XpmImage());
+            Formats.Add(new PnmFamilyImage());
         }
 
     }

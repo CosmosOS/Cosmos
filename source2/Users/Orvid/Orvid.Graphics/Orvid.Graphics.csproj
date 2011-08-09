@@ -64,6 +64,7 @@
     <Compile Include="ImageFormats\PngSupport.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ImageFormats\PnmFamilySupport.cs" />
     <Compile Include="ImageFormats\TgaSupport.cs" />
     <Compile Include="ImageFormats\TiffSupport.cs" />
     <Compile Include="ImageFormats\VbpSupport.cs" />

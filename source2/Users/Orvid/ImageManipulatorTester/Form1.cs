@@ -210,6 +210,85 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
+            #region Load Pbm
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building.pbm"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.PnmFamilyImage pm = new Orvid.Graphics.ImageFormats.PnmFamilyImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = pm.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Pbm Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Pbm Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region Load Pgm
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building.pgm"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.PnmFamilyImage pm = new Orvid.Graphics.ImageFormats.PnmFamilyImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = pm.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Pgm Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Pgm Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region Load Ppm
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building.ppm"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.PnmFamilyImage pm = new Orvid.Graphics.ImageFormats.PnmFamilyImage();
+
+                t.Start();
+#warning TODO: Make it so this isn't needed.
+                Orvid.Graphics.Image I2 = Orvid.Graphics.ImageManipulator.ReverseRGB(pm.Load(s));
+                t.Stop();
+                WriteToLog("Loading a Ppm Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Ppm Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
             #region Load Tiff
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building.tiff"), FileMode.Open);
