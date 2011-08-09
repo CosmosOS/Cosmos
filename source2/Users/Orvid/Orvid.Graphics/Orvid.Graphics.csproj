@@ -67,6 +67,7 @@
     <Compile Include="ImageFormats\TgaSupport.cs" />
     <Compile Include="ImageFormats\TiffSupport.cs" />
     <Compile Include="ImageFormats\VbpSupport.cs" />
+    <Compile Include="ImageFormats\XpmSupport.cs" />
     <Compile Include="ImageManipulator.cs" />
     <Compile Include="MiImage.cs" />
     <Compile Include="Monitor.cs" />

@@ -26,8 +26,11 @@ namespace Orvid.Graphics.ImageFormats
         // Library, available here:
         // http://imagetools.codeplex.com/
         //
+        //
+        // The source has been modified for use in this library.
+        // 
         // This disclaimer was last
-        // modified on August 6, 2011.
+        // modified on August 9, 2011.
 
         #region Encoder
         /// <summary>

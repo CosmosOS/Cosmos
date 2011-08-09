@@ -17,6 +17,19 @@ namespace Orvid.Graphics.ImageFormats
             return VbpFile.ReadBitmap(s);
         }
 
+
+        // Please note, everything below this
+        // point was originally from a plugin 
+        // for Paint.Net, the plugin is available here:
+        // http://forums.getpaint.net/index.php?/topic/14711-vantage-preview-images-vbp/
+        //
+        //
+        // The source has been modified for use in this library.
+        // 
+        // This disclaimer was last
+        // modified on August 9, 2011.
+
+
         #region VbpFile
         private static class VbpFile
         {
