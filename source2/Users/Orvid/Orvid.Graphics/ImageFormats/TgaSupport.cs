@@ -9,8 +9,6 @@ namespace Orvid.Graphics.ImageFormats
     {
         public override void Save(Image i, Stream dest)
         {
-#warning TODO: Fix This.
-            throw new Exception("This currently doesn't work.");
             dest.WriteByte(0); // Write No Image ID
             dest.WriteByte(0); // Write No Color-Map
             dest.WriteByte(2); // Write Image Type (Uncompressed- True Color)
@@ -28,7 +26,7 @@ namespace Orvid.Graphics.ImageFormats
             dest.WriteByte(32); // Write the Color-Depth
 
             byte ImageDescriptor = 0;
-            ImageDescriptor |= (byte)(1 << 3); // Set 8-Bit Alpha data.
+            ImageDescriptor |= 8; // Set 8-Bit Alpha data.
             ImageDescriptor |= (byte)(1 << 5); // Set Top-Left Image origin
             dest.WriteByte(ImageDescriptor); // Write Image Descriptor Byte
 
@@ -37,10 +35,10 @@ namespace Orvid.Graphics.ImageFormats
             for (int loc = 0; loc < len; loc++) // Write the Image Data.
             {
                 p = i.Data[loc];
-                dest.WriteByte(p.A);
-                dest.WriteByte(p.R);
-                dest.WriteByte(p.G);
                 dest.WriteByte(p.B);
+                dest.WriteByte(p.G);
+                dest.WriteByte(p.R);
+                dest.WriteByte(p.A);
             }
         }
 

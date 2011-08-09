@@ -454,7 +454,6 @@ namespace Orvid.Graphics.ImageFormats
         private class PngDecoder
         {
             private static readonly Dictionary<int, PngColorTypeInformation> _colorTypes = new Dictionary<int, PngColorTypeInformation>();
-            private Image _image;
             private Stream _stream;
             private PngHeader _header;
 

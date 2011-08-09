@@ -5257,6 +5257,13 @@ namespace BitMiracle.LibTiff
             return tif;
         }
 
+        //public static Tiff OpenForWrite(Stream s)
+        //{
+        //    Tiff tif = ClientOpen("Temp.tiff", "w", s, new TiffStream());
+        //    tif.m_fileStream = s;
+        //    return tif;
+        //}
+
         /// <summary>
         /// Initializes new instance of <see cref="Tiff"/> class and opens a stream with TIFF data
         /// for reading or writing.

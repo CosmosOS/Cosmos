@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define AnimateGif
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -159,17 +161,17 @@ namespace ImageManipulatorTester
             #region Load Jpeg
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building.jpg"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.JpegImage p = new Orvid.Graphics.ImageFormats.JpegImage();
+                Orvid.Graphics.ImageFormats.JpegImage jp = new Orvid.Graphics.ImageFormats.JpegImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = jp.Load(s);
                 t.Stop();
                 WriteToLog("Loading a Jpeg Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -185,17 +187,17 @@ namespace ImageManipulatorTester
             #region Load Tga
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building.tga"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.TgaImage p = new Orvid.Graphics.ImageFormats.TgaImage();
+                Orvid.Graphics.ImageFormats.TgaImage tg = new Orvid.Graphics.ImageFormats.TgaImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = tg.Load(s);
                 t.Stop();
                 WriteToLog("Loading a Tga  took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -211,17 +213,17 @@ namespace ImageManipulatorTester
             #region Load Tiff
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building.tiff"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.TiffImage p = new Orvid.Graphics.ImageFormats.TiffImage();
+                Orvid.Graphics.ImageFormats.TiffImage tf = new Orvid.Graphics.ImageFormats.TiffImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = tf.Load(s);
                 t.Stop();
                 WriteToLog("Loading a Tiff Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -240,14 +242,14 @@ namespace ImageManipulatorTester
                 Orvid.Graphics.ImageFormats.PngImage p = new Orvid.Graphics.ImageFormats.PngImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = p.Load(s);
                 t.Stop();
                 WriteToLog("Loading a Png Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -263,17 +265,17 @@ namespace ImageManipulatorTester
             #region Load 24-Bit Bmp
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building-24Bit.bmp"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.BmpImage p = new Orvid.Graphics.ImageFormats.BmpImage();
+                Orvid.Graphics.ImageFormats.BmpImage bm = new Orvid.Graphics.ImageFormats.BmpImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = bm.Load(s);
                 t.Stop();
                 WriteToLog("Loading a 24-Bit Bmp took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -289,17 +291,17 @@ namespace ImageManipulatorTester
             #region Load 256-Color Bmp
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building-256Color.bmp"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.BmpImage p = new Orvid.Graphics.ImageFormats.BmpImage();
+                Orvid.Graphics.ImageFormats.BmpImage bm = new Orvid.Graphics.ImageFormats.BmpImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = bm.Load(s);
                 t.Stop();
                 WriteToLog("Loading a 256-Color Bmp  took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -315,17 +317,17 @@ namespace ImageManipulatorTester
             #region Load 16-Color Bmp
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building-16Color.bmp"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.BmpImage p = new Orvid.Graphics.ImageFormats.BmpImage();
+                Orvid.Graphics.ImageFormats.BmpImage bm = new Orvid.Graphics.ImageFormats.BmpImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = bm.Load(s);
                 t.Stop();
                 WriteToLog("Loading a 16-Color Bmp  took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -341,17 +343,17 @@ namespace ImageManipulatorTester
             #region Load Monochrome Bmp
             {
                 FileStream s = new FileStream(Path.GetFullPath("Building-Monochrome.bmp"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.BmpImage p = new Orvid.Graphics.ImageFormats.BmpImage();
+                Orvid.Graphics.ImageFormats.BmpImage bm = new Orvid.Graphics.ImageFormats.BmpImage();
 
                 t.Start();
-                i = p.Load(s);
+                Orvid.Graphics.Image I2 = bm.Load(s);
                 t.Stop();
                 WriteToLog("Loading a Monochrome Bmp  took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
                 s.Dispose();
-                Bitmap b = (Bitmap)i;
+                Bitmap b = (Bitmap)I2;
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
@@ -369,7 +371,11 @@ namespace ImageManipulatorTester
                 FileStream s = new FileStream(Path.GetFullPath("Test.gif"), FileMode.Open);
 
                 t.Start();
+#if AnimateGif
                 anim = Orvid.Graphics.ImageFormats.GifSupport.Load(s);
+#else
+                Orvid.Graphics.AnimatedImage anim = Orvid.Graphics.ImageFormats.GifSupport.Load(s);
+#endif
                 t.Stop();
                 WriteToLog("Loading a Gif  took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
@@ -378,6 +384,16 @@ namespace ImageManipulatorTester
                 s.Dispose();
 
                 Bitmap b = (Bitmap)anim[0];
+#if !AnimateGif
+                anim.Dispose();
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Gif Image";
+                l.Height = b.Height * 4;
+                l.Width = b.Width * 2;
+                l.Image = b;
+#else
                 GifPictureBox = new PictureBox();
                 GifPictureBox.BorderStyle = BorderStyle.FixedSingle;
                 GifPictureBox.Parent = flowLayoutPanel2;
@@ -388,11 +404,15 @@ namespace ImageManipulatorTester
                 anim.Parent = animpar;
                 animpar.Shapes.Add(anim);
 
-                //time.Interval = anim.TimePerFrame * 4;
-                //time.Tick += new EventHandler(time_Tick);
-                //time.Start();
+                time.Interval = anim.TimePerFrame * 4;
+                time.Tick += new EventHandler(time_Tick);
+                time.Start();
+#endif
             }
             #endregion
+
+            System.GC.Collect();
+
 
             st.Flush();
             st.Close();
@@ -400,6 +420,7 @@ namespace ImageManipulatorTester
 
         }
 
+#if AnimateGif
         private PictureBox GifPictureBox;
         private Orvid.Graphics.AnimatedImage anim;
         private Orvid.Graphics.Shapes.ShapedImage animpar;
@@ -410,5 +431,6 @@ namespace ImageManipulatorTester
             GifPictureBox.Image = (Bitmap)animpar.Render();
             GifPictureBox.Refresh();
         }
+#endif
     }
 }
