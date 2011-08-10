@@ -518,15 +518,17 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
-            #region Load Dds
+            #region Dds Loading
+
+            #region Dxt1
             {
-                FileStream s = new FileStream(Path.GetFullPath("Building.dds"), FileMode.Open);
+                FileStream s = new FileStream(Path.GetFullPath("Building-Dxt1.dds"), FileMode.Open);
                 Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
 
                 t.Start();
                 Orvid.Graphics.Image I2 = x.Load(s);
                 t.Stop();
-                WriteToLog("Loading a Dds Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                WriteToLog("Loading a Dds-Dxt1 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
                 t.Reset();
 
                 s.Close();
@@ -535,11 +537,273 @@ namespace ImageManipulatorTester
                 LabeledImage l = new LabeledImage();
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel2;
-                l.Text = "Loaded Dds Image";
+                l.Text = "Loaded Dds-Dxt1 Image";
                 l.Height = b.Height;
                 l.Width = b.Width;
                 l.Image = b;
             }
+            #endregion
+
+            System.GC.Collect();
+
+            #region Dxt3
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-Dxt3.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-Dxt3 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-Dxt3 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region Dxt5
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-Dxt5.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-Dxt5 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-Dxt5 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region A1R5G5B5
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-A1R5G5B5.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-A1R5G5B5 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-A1R5G5B5 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region A4R4G4B4
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-A4R4G4B4.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-A4R4G4B4 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-A4R4G4B4 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region A8B8G8R8
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-A8B8G8R8.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-A8B8G8R8 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-A8B8G8R8 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region A8R8G8B8
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-A8R8G8B8.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-A8R8G8B8 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-A8R8G8B8 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region R5G6B5
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-R5G6B5.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-R5G6B5 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-R5G6B5 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region R8G8B8
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-R8G8B8.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-R8G8B8 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-R8G8B8 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region X8B8G8R8
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-X8B8G8R8.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-X8B8G8R8 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-X8B8G8R8 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region X8R8G8B8
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building-X8R8G8B8.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-X8R8G8B8 Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-X8R8G8B8 Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
             #endregion
 
             System.GC.Collect();
