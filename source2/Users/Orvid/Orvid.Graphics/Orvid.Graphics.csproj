@@ -56,6 +56,9 @@
     </Compile>
     <Compile Include="Image.cs" />
     <Compile Include="ImageFormats\BmpSupport.cs" />
+    <Compile Include="ImageFormats\DdsSupport.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ImageFormats\FormatManager.cs" />
     <Compile Include="ImageFormats\GifSupport.cs" />
     <Compile Include="ImageFormats\ImageFormat.cs" />

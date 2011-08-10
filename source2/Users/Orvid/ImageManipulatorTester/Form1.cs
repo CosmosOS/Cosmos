@@ -518,6 +518,32 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
+            #region Load Dds
+            {
+                FileStream s = new FileStream(Path.GetFullPath("Building.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
 
             st.Flush();
             st.Close();
