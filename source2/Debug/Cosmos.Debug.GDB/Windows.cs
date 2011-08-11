@@ -94,9 +94,9 @@ namespace Cosmos.Debug.GDB {
         }
 
         static public void UpdateAllWindows() {
-            Windows.mMainForm.Disassemble("");
+            Windows.mMainForm.Disassemble(string.Empty);
             Windows.mRegistersForm.Redo();
-            Windows.mCallStackForm.Redo();
+			Windows.mCallStackForm.Redo();
         }
 
 		static public void UpdateAfterRegisterUpdate()

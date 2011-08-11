@@ -54,11 +54,17 @@ namespace Cosmos.Debug.GDB {
             if (xResponse.Error) {
                 lboxDebug.Items.Add("ERROR: " + xResponse.ErrorMsg);
             }
-            lboxDebug.Items.Add("");
+            lboxDebug.Items.Add(string.Empty);
 
             foreach (var x in xResponse.Text) {
                 lboxDebug.Items.Add(x);
             }
+
+			if (xResponse.Reply != xResponse.Command)
+			{
+				lboxDebug.Items.Add(string.Empty);
+				lboxDebug.Items.Add(xResponse.Reply);
+			}
         }
 
     }

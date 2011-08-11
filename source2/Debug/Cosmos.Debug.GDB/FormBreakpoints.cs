@@ -29,7 +29,7 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void OnDelete(GDB.Response aResponse) {
-            var xSplit = aResponse.Reply.Split(' ');
+			string[] xSplit = aResponse.Reply.Split(' ');
             int xID = int.Parse(xSplit[1]);
             var xUC = mBreakpoints[xID];
 			mBreakpoints.Remove(xID);

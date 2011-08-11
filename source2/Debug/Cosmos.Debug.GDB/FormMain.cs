@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.GDB {
     public partial class FormMain : Form {
@@ -16,6 +17,7 @@ namespace Cosmos.Debug.GDB {
             public readonly string mLabel;
             public readonly string mOp;
             public readonly string mData = string.Empty;
+			public readonly bool mEIPHere;
 
             public AsmLine(string aInput) {
                 //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
@@ -23,10 +25,18 @@ namespace Cosmos.Debug.GDB {
 				var xSplit1 = s.Split(Global.TabSeparator, StringSplitOptions.RemoveEmptyEntries);
 
 				var xSplit2 = xSplit1[0].Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
-                mAddr = Global.FromHexWithLeadingZeroX(xSplit2[0]);
+
+				int xIndex = 0;
+				//newer gdb above 6.6 or higher versions
+				if (xSplit2[0] == "=>")
+				{
+					mEIPHere = true;
+					xIndex = 1;
+				}
+                mAddr = Global.FromHexWithLeadingZeroX(xSplit2[xIndex]);
                 string xLabel;
-                if (xSplit2.Length > 1) {
-                    xLabel = xSplit2[1];
+                if (xSplit2.Length > xIndex + 1) {
+                    xLabel = xSplit2[xIndex + 1];
                 }
 
 				xSplit2 = xSplit1[1].Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
@@ -45,7 +55,10 @@ namespace Cosmos.Debug.GDB {
             }
         }
 
+		const int MAX_RETRY = 3;
         protected string mFuncName;
+		protected bool mCreated;
+		protected int mConnectRetry;
 
         protected void OnGDBResponse(GDB.Response aResponse) {
             try {
@@ -54,21 +67,75 @@ namespace Cosmos.Debug.GDB {
                 if (xCmdLine == "info registers") {
                     Windows.mRegistersForm.UpdateRegisters(aResponse);
 					Windows.UpdateAfterRegisterUpdate();
-                } else if (xCmdLine == "") {
-                    // This happens on initial connect
+				}else if(xCmdLine.Length == 0) {
+					if (aResponse.Text.Count == 2 && aResponse.Text[0] == "Breakpoint")
+					{
+						// program breaks on aResponse.Text[1]
+					}
+					else
+					{
+						// contains address where we are
+					}
                 } else {
 					var xCmdParts = xCmdLine.Split(Global.SpaceSeparator);
                     var xCmd = xCmdParts[0];
+					bool asyncCmd = false;
+					if (xCmd.EndsWith("&"))
+					{
+						asyncCmd = true;
+						xCmd = xCmd.Substring(0, xCmd.Length - 1);
+					}
                     if (xCmd == "disassemble") {
                         OnDisassemble(aResponse);
                     } else if (xCmd == "symbol-file") { // nothing
                     } else if (xCmd == "set") { // nothing
-                    } else if (xCmd == "target") { // nothing
+                    } else if (xCmd == "target") {
+
+						if (Global.GDB.Connected)
+						{
+							lablConnected.Visible = true;
+							lablRunning.Visible = true;
+
+							mitmConnect.Enabled = true;
+							butnConnect.Enabled = true;
+							mitmConnect.Text = "&Disconnect";
+							butnConnect.Text = "&Disconnect";
+
+							Settings.InitWindows();
+						}
+						else
+						{
+							if (mConnectRetry < MAX_RETRY + 1)
+							{
+								Connect();
+							}
+							else
+							{
+								mitmConnect.Enabled = true;
+								butnConnect.Enabled = true;
+								mitmConnect.Text = "&Connect";
+								butnConnect.Text = "&Connect";
+							}
+						}
+					} else if (xCmd == "detach") {
+						if (false == Global.GDB.Connected)
+						{
+							mitmConnect.Text = "&Connect";
+							butnConnect.Text = "&Connect";
+							mitmContinue.Enabled = false;
+							butnContinue.Enabled = false;
+							mitmStepInto.Enabled = false;
+							mitmStepOver.Enabled = false;
+							lboxDisassemble.Items.Clear();
+							lablConnected.Visible = false;
+							lablRunning.Visible = false;
+							textCurrentFunction.Visible = false;
+						}
                     } else if (xCmd == "delete") {
                         Windows.mBreakpointsForm.OnDelete(aResponse);
-                    } else if ((xCmd == "stepi") || (xCmd == "nexti") || (xCmd == "continue")) {
-                        lablRunning.Text = "Stopped";
-                        Windows.UpdateAllWindows();
+                    } else if ((xCmd == "stepi") || (xCmd == "nexti")) {
+					} else if (xCmd == "continue" || xCmd== "fg") {
+						lboxDisassemble.Items.Clear();
                     } else if (xCmd == "where") {
                         Windows.mCallStackForm.OnWhere(aResponse);
                     } else if (xCmd == "break") {
@@ -87,7 +154,12 @@ namespace Cosmos.Debug.GDB {
         public void Disassemble(string aLabel) {
             textCurrentFunction.Text = string.Empty;
             textCurrentFunction.Visible = true;
-            Global.GDB.SendCmd("disassemble " + aLabel.TrimEnd());
+			// force space free at end
+			var xDisAsmCmd = "disassemble";
+			var xLabelTrimed = aLabel.TrimEnd();
+			if (xLabelTrimed.Length > 0)
+				xDisAsmCmd += " " + xLabelTrimed;
+            Global.GDB.SendCmd(xDisAsmCmd);
         }
 
         protected void OnDisassemble(GDB.Response xResponse) {
@@ -136,45 +208,84 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmStepInto_Click(object sender, EventArgs e) {
-            lablRunning.Text = "Running";
             Global.GDB.SendCmd("stepi");
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
-            lablRunning.Text = "Running";
             Global.GDB.SendCmd("nexti");
         }
 
-        protected void Connect(int aRetry) {
-            if (!mitmConnect.Enabled) {
-                return;
-            }
+        protected void Connect() {
             mitmConnect.Enabled = false;
 			butnConnect.Enabled = false;
 
-            Windows.CreateForms();
-            Global.AsmSource = new AsmFile(Path.Combine(Settings.OutputPath, Settings.AsmFile));
-            Global.GDB = new GDB(aRetry, OnGDBResponse);
-            if (Global.GDB.Connected) {
-                lablConnected.Visible = true;
-                lablRunning.Visible = true;
-                lablRunning.Text = "Stopped";
-                Settings.InitWindows();
-                Windows.UpdateAllWindows();
-            }
+			mitmConnect.Text = "Try " + mConnectRetry;
+			butnConnect.Text = "Try " + mConnectRetry++;
+
+			if (false == mCreated)
+			{
+				Windows.CreateForms();
+				Global.AsmSource = new AsmFile(Path.Combine(Settings.OutputPath, Settings.AsmFile));
+				Global.GDB = new GDB(OnGDBResponse, OnRunStateChanged);
+				mCreated = true;
+			}
+			Global.GDB.Connect();
         }
 
+		private void OnRunStateChanged(bool stopped)
+		{
+			if (InvokeRequired)
+			{
+				Invoke((MethodInvoker) delegate{OnRunStateChanged(stopped);});
+				return;
+			}
+			if (stopped)
+			{
+				lablRunning.Text = "Stopped";
+				mitmContinue.Enabled = true;
+				butnContinue.Enabled = true;
+				mitmBreak.Enabled = false;
+				butnBreak.Enabled = false;
+				mitmConnect.Enabled = true;
+				butnConnect.Enabled = true;
+				mitmStepInto.Enabled = true;
+				mitmStepOver.Enabled = true;
+				Windows.UpdateAllWindows();
+			}
+			else
+			{
+				lablRunning.Text = "Running";
+				mitmContinue.Enabled = false;
+				butnContinue.Enabled = false;
+				mitmBreak.Enabled = true;
+				butnBreak.Enabled = true;
+				mitmConnect.Enabled = false;
+				butnConnect.Enabled = false;
+				mitmStepInto.Enabled = false;
+				mitmStepOver.Enabled = false;
+			}
+		}
+
         private void mitmConnect_Click(object sender, EventArgs e) {
-            Connect(30);
+			if (!mitmConnect.Enabled)
+				return;
+			if (mCreated && Global.GDB.Connected)
+			{
+				Global.GDB.Disconnect();
+			}
+			else
+			{
+				mConnectRetry = 1;
+				Connect();
+			}
         }
 
         private void mitmRefresh_Click(object sender, EventArgs e) {
             Windows.UpdateAllWindows();
         }
 
-        private void continueToolStripMenuItem_Click(object sender, EventArgs e) {
-            lablRunning.Text = "Running";
-            Global.GDB.SendCmd("continue");
+        private void mitmContinue_Click(object sender, EventArgs e) {
+            Global.GDB.SendCmd("continue&");
         }
 
         private void mitmMainViewCallStack_Click(object sender, EventArgs e) {
@@ -214,13 +325,21 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void FormMain_Shown(object sender, EventArgs e) {
+			mitmContinue.Enabled = false;
+			butnContinue.Enabled = false;
+			mitmBreak.Enabled = false;
+			butnBreak.Enabled = false;
+			mitmStepInto.Enabled = false;
+			mitmStepOver.Enabled = false;
+
             // Dont put this in load. Load happens in main call from Main.cs and on exceptions just
-            // goes out, no message. 
+            // goes out, no message.
             // Also we want to show other forms after main form, not before.
             // We also only want to run this once, not on each possible show.
             if (mitmConnect.Enabled) {
                 if (Settings.AutoConnect) {
-                    Connect(30);
+					mConnectRetry = 1;
+                    Connect();
                 }
             }
         }
@@ -269,9 +388,6 @@ namespace Cosmos.Debug.GDB {
             Clipboard.SetText(x.ToString());
         }
 
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e) {
-        }
-
         private void butnBreakpoints_Click(object sender, EventArgs e) {
             mitmViewBreakpoints.PerformClick();
         }
@@ -282,6 +398,19 @@ namespace Cosmos.Debug.GDB {
 			using (Graphics g = textCurrentFunction.CreateGraphics()) {
 				SizeF size = g.MeasureString(textCurrentFunction.Text, textCurrentFunction.Font);
 				textCurrentFunction.Width = (int)size.Width + textCurrentFunction.Padding.Horizontal;
+			}
+		}
+
+		private void mitmBreak_Click(object sender, EventArgs e) {
+			Global.GDB.SendCmd("-exec-interrupt");
+		}
+
+		private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			if (mCreated && Global.GDB.Connected)
+			{
+				Global.GDB.Disconnect();
+				Global.GDB.SendCmd("quit");
 			}
 		}
     }

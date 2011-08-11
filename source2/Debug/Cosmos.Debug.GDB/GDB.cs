@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Registry = Microsoft.Win32.Registry;
 using Path = System.IO.Path;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.GDB {
     public class GDB {
@@ -23,8 +24,9 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected Queue<string> mLastCmd = new Queue<string>();
-        protected System.Diagnostics.Process mGDBProcess;
+        public System.Diagnostics.Process mGDBProcess;
         protected Action<Response> mOnResponse;
+		protected Action<bool> mOnRunStateChange;
         protected List<string> mBuffer = new List<string>();
 
         // DO  NOT change to sync reads.. with process output there are SERIOUS bugs in the StreamReader..
@@ -33,19 +35,67 @@ namespace Cosmos.Debug.GDB {
         // StreamReader in general has other issues on non seekable streams as well and accounts for why even our
         // implementation looks poor in places.
         void mGDBProcess_OutputDataReceived(object sender, DataReceivedEventArgs e) {
-            string xData = e.Data.Trim();
-            if (xData == "(gdb)") {
-                ProcessResponse();
-            } else {
-                mBuffer.Add(xData);
-            }
+			all.Add(e.Data);
+			if (e.Data == null)
+				return;
+			ProcessResponse(e.Data);
         }
 
-        protected void ProcessResponse() {
+		bool firstRun = true;
+
+		List<string> all = new List<string>();
+		protected bool m_IsStopped = true;
+
+		void OnRunStateChanged(bool stopped)
+		{
+			m_IsStopped = stopped;
+			mOnRunStateChange(stopped);
+		}
+
+        protected void ProcessResponse(string line) {
+			switch (line)
+			{
+				case "(gdb) ":
+					if (firstRun)
+					{
+						// remove start things, like versions etc.
+						mBuffer.Clear();
+						firstRun = false;
+						return;
+					}
+					else if (mBuffer.Count == 0)
+					{
+						// occures if CTRL + C the program breaks
+						return;
+					}
+					break;
+				default:
+					// only 7.x
+					if (line[0] == '*')
+					{	// represents start or stopped
+						int xIndex = line.IndexOf(',');
+						string xState = line.Substring(1, xIndex - 1);
+						switch (xState)
+						{
+							case "stopped":
+								OnRunStateChanged(true);
+								break;
+							case "running":
+								OnRunStateChanged(false);
+								break;
+						}
+					}
+					else
+						mBuffer.Add(line);
+					return;
+			}
             var xResponse = new Response();
-            lock (mLastCmd) {
-                xResponse.Command = mLastCmd.Dequeue();
-            }
+			
+			string xCmd = mBuffer[0];
+			if (xCmd[0] == '&')
+			{
+				xResponse.Command = Unescape(xCmd.Substring(1));
+			}
             
             foreach (string xLine in mBuffer) {
                 var xType = xLine[0];
@@ -65,16 +115,33 @@ namespace Cosmos.Debug.GDB {
 
                 string sData = Unescape(xLine.Substring(1));
                 if (xType == '&') {
-                    xResponse.Reply = sData;
-                } else if (xType == '^') {
-                    xResponse.Error = sData != "done";
+					if (xResponse.Reply.Length == 0)
+						xResponse.Reply = sData;
+					else
+						xResponse.Reply += Environment.NewLine + sData;
                 } else if (xType == '~') {
                     xResponse.Text.Add(Unescape(sData));
                 }
+				else if (xType == '^') {
+					xResponse.Error = sData.StartsWith("error");
+				}
             }
 
             mBuffer.Clear();
-            Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
+
+			// detect manual input of cmds
+			var xSplit = xResponse.Command.Split(new char[]{' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
+			if (xSplit.Length == 1 && xSplit[0] == "detach")
+			{
+				if (false == xResponse.Error)
+					mConnected = false;
+			}
+			else if (xSplit.Length > 2 && xSplit[0] == "target" && xSplit[1] == "remote")
+			{
+				TargetCmdReply(xResponse);
+			}
+			if (false == Windows.mMainForm.IsDisposed)
+				Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
         }
 
         static public string Unescape(string aInput) {
@@ -89,16 +156,19 @@ namespace Cosmos.Debug.GDB {
         }
 
         public void SendCmd(string aCmd) {
-            lock (mLastCmd) {
-                mLastCmd.Enqueue(aCmd);
-            }
-            mGDBProcess.StandardInput.WriteLine(aCmd);
+			all.Add("Cmd: " + aCmd);
+			mGDBProcess.StandardInput.WriteLine(aCmd);
         }
 
         protected bool mConnected = false;
         public bool Connected {
             get { return mConnected; }
         }
+
+		public bool Stopped
+		{
+			get { return m_IsStopped; }
+		}
 
 		static readonly string mGDBExePath;
 
@@ -113,49 +183,59 @@ namespace Cosmos.Debug.GDB {
 			}
 		}
 
-        public GDB(int aRetry, Action<Response> aOnResponse) {
+		public GDB(Action<Response> aOnResponse, Action<bool> aOnRunStateChange)
+		{
             mOnResponse = aOnResponse;
-            // To handle greeting from GDB since its not associated with any command
-            mLastCmd.Enqueue(string.Empty);
+			mOnRunStateChange = aOnRunStateChange;
 
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = mGDBExePath;
-            xStartInfo.Arguments = @"--interpreter=mi2";
+			xStartInfo.Arguments = @"--interpreter=mi2 -silent -nx";
             xStartInfo.WorkingDirectory = Settings.OutputPath;
             xStartInfo.CreateNoWindow = true;
             xStartInfo.UseShellExecute = false;
             xStartInfo.RedirectStandardError = true;
             xStartInfo.RedirectStandardInput = true;
             xStartInfo.RedirectStandardOutput = true;
+
             mGDBProcess = System.Diagnostics.Process.Start(xStartInfo);
-            mGDBProcess.StandardInput.AutoFlush = true;
 
             mGDBProcess.OutputDataReceived += new DataReceivedEventHandler(mGDBProcess_OutputDataReceived);
             mGDBProcess.BeginOutputReadLine();
 
-            mConnected = true;
-
+			SendCmd("set target-async 1"); // doc http://sourceware.org/gdb/onlinedocs/gdb/Asynchronous-and-non_002dstop-modes.html
             SendCmd("symbol-file " + Settings.ObjFile);
-            SendCmd("target remote :8832");
-
-            //while (!mConnected) {
-            //    var x = SendCmd("target remote :8832");
-            //    mConnected = !x.Error;
-            //    aRetry--;
-            //    if (aRetry == 0) {
-            //        return;
-            //    }
-
-            //    System.Threading.Thread.Sleep(1000);
-            //    System.Windows.Forms.Application.DoEvents();
-            //}
-
-            SendCmd("set architecture i386");
-            SendCmd("set language asm");
-            SendCmd("set disassembly-flavor intel");
-            SendCmd("break Kernel_Start");
-            SendCmd("continue");
-            SendCmd("delete 1");
+			SendCmd("set architecture i386");
+			SendCmd("set language asm");
+			SendCmd("set disassembly-flavor intel");
         }
+
+		public void Connect()
+		{
+			SendCmd("target remote :8832");
+		}
+
+		public void Disconnect()
+		{
+			SendCmd("detach");
+		}
+
+		protected void TargetCmdReply(Response res)
+		{
+			mConnected = !res.Error;
+			if (false == res.Error)
+			{
+				// get current address
+				var xAddr = Global.FromHexWithLeadingZeroX(res.Text[1].Substring(0, res.Text[1].IndexOf(' ')));
+				// only use breakpoint if not already deep in OS
+				const int START_ADDRESS = 0x000ffff0;
+				if (xAddr <= START_ADDRESS)
+				{
+					SendCmd("break Kernel_Start");
+					SendCmd("continue");
+					SendCmd("delete 1");
+				}
+			}
+		}
     }
 }

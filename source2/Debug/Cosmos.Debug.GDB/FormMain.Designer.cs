@@ -25,6 +25,7 @@
         private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.butnBreak = new System.Windows.Forms.Button();
 			this.butnBreakpoints = new System.Windows.Forms.Button();
 			this.lablRunning = new System.Windows.Forms.Label();
 			this.lablConnected = new System.Windows.Forms.Label();
@@ -42,6 +43,7 @@
 			this.mitmStepOver = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.mitmContinue = new System.Windows.Forms.ToolStripMenuItem();
+			this.mitmBreak = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mitmViewBreakpoints = new System.Windows.Forms.ToolStripMenuItem();
 			this.mitmMainViewCallStack = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,6 +67,7 @@
 			// 
 			// panel1
 			// 
+			this.panel1.Controls.Add(this.butnBreak);
 			this.panel1.Controls.Add(this.butnBreakpoints);
 			this.panel1.Controls.Add(this.lablRunning);
 			this.panel1.Controls.Add(this.lablConnected);
@@ -76,9 +79,19 @@
 			this.panel1.Size = new System.Drawing.Size(589, 30);
 			this.panel1.TabIndex = 3;
 			// 
+			// butnBreak
+			// 
+			this.butnBreak.Location = new System.Drawing.Point(117, 4);
+			this.butnBreak.Name = "butnBreak";
+			this.butnBreak.Size = new System.Drawing.Size(26, 23);
+			this.butnBreak.TabIndex = 4;
+			this.butnBreak.Text = "| |";
+			this.butnBreak.UseVisualStyleBackColor = true;
+			this.butnBreak.Click += new System.EventHandler(this.mitmBreak_Click);
+			// 
 			// butnBreakpoints
 			// 
-			this.butnBreakpoints.Location = new System.Drawing.Point(118, 3);
+			this.butnBreakpoints.Location = new System.Drawing.Point(152, 4);
 			this.butnBreakpoints.Name = "butnBreakpoints";
 			this.butnBreakpoints.Size = new System.Drawing.Size(75, 23);
 			this.butnBreakpoints.TabIndex = 2;
@@ -110,19 +123,19 @@
 			// 
 			// butnContinue
 			// 
-			this.butnContinue.Location = new System.Drawing.Point(70, 4);
+			this.butnContinue.Location = new System.Drawing.Point(87, 4);
 			this.butnContinue.Name = "butnContinue";
 			this.butnContinue.Size = new System.Drawing.Size(26, 23);
 			this.butnContinue.TabIndex = 1;
 			this.butnContinue.Text = ">";
 			this.butnContinue.UseVisualStyleBackColor = true;
-			this.butnContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
+			this.butnContinue.Click += new System.EventHandler(this.mitmContinue_Click);
 			// 
 			// butnConnect
 			// 
 			this.butnConnect.Location = new System.Drawing.Point(3, 3);
 			this.butnConnect.Name = "butnConnect";
-			this.butnConnect.Size = new System.Drawing.Size(56, 23);
+			this.butnConnect.Size = new System.Drawing.Size(78, 23);
 			this.butnConnect.TabIndex = 0;
 			this.butnConnect.Text = "Connect";
 			this.butnConnect.UseVisualStyleBackColor = true;
@@ -194,7 +207,8 @@
             this.mitmStepInto,
             this.mitmStepOver,
             this.toolStripMenuItem1,
-            this.mitmContinue});
+            this.mitmContinue,
+            this.mitmBreak});
 			this.executeToolStripMenuItem.Name = "executeToolStripMenuItem";
 			this.executeToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
 			this.executeToolStripMenuItem.Text = "&Run";
@@ -226,7 +240,15 @@
 			this.mitmContinue.ShortcutKeys = System.Windows.Forms.Keys.F5;
 			this.mitmContinue.Size = new System.Drawing.Size(150, 22);
 			this.mitmContinue.Text = "&Continue";
-			this.mitmContinue.Click += new System.EventHandler(this.continueToolStripMenuItem_Click);
+			this.mitmContinue.Click += new System.EventHandler(this.mitmContinue_Click);
+			// 
+			// mitmBreak
+			// 
+			this.mitmBreak.Name = "mitmBreak";
+			this.mitmBreak.ShortcutKeys = System.Windows.Forms.Keys.F6;
+			this.mitmBreak.Size = new System.Drawing.Size(150, 22);
+			this.mitmBreak.Text = "&Break";
+			this.mitmBreak.Click += new System.EventHandler(this.mitmBreak_Click);
 			// 
 			// viewToolStripMenuItem
 			// 
@@ -367,7 +389,7 @@
 			this.Name = "FormMain";
 			this.Text = "Cosmos GDB Debugger";
 			this.Activated += new System.EventHandler(this.FormMain_Activated);
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
 			this.Load += new System.EventHandler(this.FormMain_Load);
 			this.Shown += new System.EventHandler(this.FormMain_Shown);
 			this.Resize += new System.EventHandler(this.FormMain_Resize);
@@ -418,6 +440,8 @@
         private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
         private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;
         private System.Windows.Forms.Button butnBreakpoints;
+		private System.Windows.Forms.Button butnBreak;
+		private System.Windows.Forms.ToolStripMenuItem mitmBreak;
     }
 }
 
