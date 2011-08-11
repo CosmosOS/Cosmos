@@ -362,6 +362,7 @@ namespace au.id.micolous.libs.DDSReader
             if (CompFormat == PixelFormat.UNKNOWN)
             {
                 throw new Exception("Invalid Header Format!");
+                return;
             }
 
             if ((this.flags1 & (DDS_LINEARSIZE | DDS_PITCH)) == 0
@@ -379,7 +380,7 @@ namespace au.id.micolous.libs.DDSReader
             this.bpp = this.PixelFormatToBpp(this.CompFormat);
             this.bps = this.width * this.bpp * this.PixelFormatToBpc(this.CompFormat);
             this.sizeofplane = this.bps * this.height;
-            this.rawidata = new byte[this.depth * this.sizeofplane + this.height * this.bps + this.width * this.bpp];
+            this.rawidata = new byte[this.width * this.height * 4];
 
             Check16BitComponents();
 
@@ -397,8 +398,18 @@ namespace au.id.micolous.libs.DDSReader
                     this.DecompressDXT1();
                     break;
 
+                case PixelFormat.DXT2:
+                    this.DecompressDXT3();
+                    //this.CorrectPreMult();
+                    break;
+
                 case PixelFormat.DXT3:
                     this.DecompressDXT3();
+                    break;
+
+                case PixelFormat.DXT4:
+                    this.DecompressDXT5();
+                    //this.CorrectPreMult();
                     break;
 
                 case PixelFormat.DXT5:
@@ -412,22 +423,39 @@ namespace au.id.micolous.libs.DDSReader
 
             this.img = new Image((int)this.width, (int)this.height);
 
-            // now fill bitmap with raw image datas.
-            uint pos = 0;
-            for (int y = 0; y < this.height; y++)
-            {
-                for (int x = 0; x < this.width; x++)
+            //try
+            //{
+                // now fill bitmap with raw image datas.
+                uint pos = 0;
+                for (int y = 0; y < this.height; y++)
                 {
-                    // draw
-                    this.img.SetPixel((uint)x, (uint)y, new Pixel(this.rawidata[pos], this.rawidata[pos + 1], this.rawidata[pos + 2], this.rawidata[pos + 3]));
-                    pos += 4;
+                    for (int x = 0; x < this.width; x++)
+                    {
+                        // draw
+                        this.img.SetPixel((uint)x, (uint)y, new Pixel(this.rawidata[pos], this.rawidata[pos + 1], this.rawidata[pos + 2], this.rawidata[pos + 3]));
+                        pos += 4;
+                    }
                 }
-            }
+            //}
+            //catch { }
 
             // cleanup
             this.rawidata = null;
             this.compdata = null;
 
+        }
+
+        private void CorrectPreMult()
+        {
+            for (uint i = 0; i < this.rawidata.Length; i += 4)
+            {
+                if (this.rawidata[i + 3] != 0) // Cannot divide by 0.
+                {
+                    this.rawidata[i    ] = (byte)((uint)(this.rawidata[i    ] << 8) / this.rawidata[i + 3]);
+                    this.rawidata[i + 1] = (byte)((uint)(this.rawidata[i + 1] << 8) / this.rawidata[i + 3]);
+                    this.rawidata[i + 2] = (byte)((uint)(this.rawidata[i + 2] << 8) / this.rawidata[i + 3]);
+                }
+            }
         }
 
         private void Check16BitComponents()
@@ -480,9 +508,9 @@ namespace au.id.micolous.libs.DDSReader
                 case PixelFormat.LUMINANCE:
                 case PixelFormat.LUMINANCE_ALPHA:
                 case PixelFormat.ARGB:
-                    return this.rgbbitcount / 8;
-
                 case PixelFormat.RGB:
+                    return this.rgbbitcount / 8;
+                    
                 case PixelFormat.THREEDC:
                 case PixelFormat.RXGB:
                     return 3;
@@ -566,8 +594,8 @@ namespace au.id.micolous.libs.DDSReader
             }
             else
             {
-                bps = this.width * (this.rgbbitcount / 8);
-                this.compsize = bps * this.height * this.depth;
+                this.bps = this.width * (this.rgbbitcount / 8);
+                this.compsize = this.bps * this.height * this.depth;
                 this.compdata = new byte[this.compsize];
 
                 MemoryStream mem = new MemoryStream((int)this.compsize);
@@ -578,7 +606,7 @@ namespace au.id.micolous.libs.DDSReader
                 {
                     for (int y = 0; y < this.height; y++)
                     {
-                        temp = this.br.ReadBytes((int)bps);
+                        temp = this.br.ReadBytes((int)this.bps);
                         mem.Write(temp, 0, temp.Length);
                     }
                 }
@@ -636,75 +664,109 @@ namespace au.id.micolous.libs.DDSReader
         #region ARGB
         private void DecompressARGB()
         {
-            uint ReadI = 0, TempBpp, i;
-            byte RedL, RedR;
-            byte GreenL, GreenR;
-            byte BlueL, BlueR;
-            byte AlphaL, AlphaR;
-            uint curloc = 0;
-
-            if (Has16BitComponents)
+            if (CompFormat == PixelFormat.LUMINANCE)
             {
-                throw new Exception();
-                DecompressARGB16();
-                return;
-            }
-
-
-            if (CompFormat == PixelFormat.LUMINANCE && rgbbitcount == 16 && rbitmask == 0xFFFF)
-            {
-                Array.Copy(this.compdata, this.rawidata, this.compdata.Length);
-                return;
-            }
-
-            GetBitsFromMask(rbitmask, out RedL, out RedR);
-            GetBitsFromMask(gbitmask, out GreenL, out GreenR);
-            GetBitsFromMask(bbitmask, out BlueL, out BlueR);
-            GetBitsFromMask(alphabitmask, out AlphaL, out AlphaR);
-            TempBpp = rgbbitcount / 8;
-
-            for (i = 0; i < this.compdata.Length; i += this.bpp)
-            {
-                if (this.compdata.Length - i < 4)
+                byte ReadI = 0;
+                uint i, curloc = 0;
+                this.rawidata = new byte[this.compdata.Length * 4];
+                for (i = 0; i < this.compdata.Length; i += 1)
                 {
-                    if (TempBpp == 3)
+                    ReadI = compdata[i];
+                    this.rawidata[curloc] = ReadI;
+                    this.rawidata[curloc + 1] = ReadI;
+                    this.rawidata[curloc + 2] = ReadI;
+                    this.rawidata[curloc + 3] = 0xff;
+                    curloc += 4;
+                }
+                return;
+            }
+            else if (CompFormat == PixelFormat.LUMINANCE_ALPHA)
+            {
+                if (this.bpp == 2)
+                {
+                    byte ReadI = 0;
+                    uint i, curloc = 0;
+                    for (i = 0; i < this.compdata.Length; i += 2)
+                    {
+                        ReadI = compdata[i];
+                        this.rawidata[curloc] = (byte)ReadI;
+                        this.rawidata[curloc + 1] = (byte)ReadI;
+                        this.rawidata[curloc + 2] = (byte)ReadI;
+                        this.rawidata[curloc + 3] = compdata[i + 1];
+                        curloc += 4;
+                    }
+                }
+                else if (this.bpp == 1)
+                {
+                    byte ReadI = 0;
+                    uint i, curloc = 0;
+                    for (i = 0; i < this.compdata.Length; i++)
+                    {
+                        ReadI = (byte)((compdata[i] & 15) << 4);
+                        this.rawidata[curloc] = ReadI;
+                        this.rawidata[curloc + 1] = ReadI;
+                        this.rawidata[curloc + 2] = ReadI;
+                        this.rawidata[curloc + 3] = (byte)(compdata[i] & 240);
+                        curloc += 4;
+                    }
+                }
+                else
+                {
+                    throw new Exception("Unknown Luminance-Alpha Type!");
+                }
+                return;
+            }
+            else
+            {
+                uint ReadI = 0, TempBpp, i;
+                byte RedL, RedR;
+                byte GreenL, GreenR;
+                byte BlueL, BlueR;
+                byte AlphaL, AlphaR;
+                uint curloc = 0;
+
+                if (Has16BitComponents)
+                {
+                    DecompressARGB16();
+                    return;
+                }
+
+
+                GetBitsFromMask(rbitmask, out RedL, out RedR);
+                GetBitsFromMask(gbitmask, out GreenL, out GreenR);
+                GetBitsFromMask(bbitmask, out BlueL, out BlueR);
+                GetBitsFromMask(alphabitmask, out AlphaL, out AlphaR);
+                TempBpp = rgbbitcount / 8;
+
+                for (i = 0; i < this.compdata.Length; i += this.bpp)
+                {
+                    if (this.bpp == 4)
+                    {
+                        ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16) | (uint)(compdata[i + 3] << 24);
+                    }
+                    else if (this.bpp == 3)
                     {
                         ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16);
                     }
-                    else if (TempBpp == 1)
-                    {
-                        ReadI = compdata[i];
-                    }
-                    else if (TempBpp == 2)
+                    else if (this.bpp == 2)
                     {
                         ReadI = compdata[i] | (uint)(compdata[i + 1] << 8);
                     }
-                }
-                else if (TempBpp == 4)
-                {
-                    ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16) | (uint)(compdata[i + 3] << 24);
-                }
-                else if (TempBpp == 3)
-                {
-                    ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16);
-                }
-                else if (TempBpp == 1)
-                {
-                    ReadI = compdata[i];
-                }
-                else if (TempBpp == 2)
-                {
-                    ReadI = compdata[i] | (uint)(compdata[i + 1] << 8);
-                }
+                    else if (this.bpp == 1)
+                    {
+                        ReadI = compdata[i];
+                    }
+                    else
+                    {
+                        throw new Exception("Un-recognized bit depth!");
+                    }
 
-                this.rawidata[curloc] = (byte)(((ReadI & rbitmask) >> RedR) << RedL);
 
-                if (this.bpp >= 3)
-                {
+                    this.rawidata[curloc] = (byte)(((ReadI & rbitmask) >> RedR) << RedL);
                     this.rawidata[curloc + 1] = (byte)(((ReadI & gbitmask) >> GreenR) << GreenL);
                     this.rawidata[curloc + 2] = (byte)(((ReadI & bbitmask) >> BlueR) << BlueL);
 
-                    if (this.bpp == 4)
+                    if (this.alphabitmask > 0)
                     {
                         this.rawidata[curloc + 3] = (byte)(((ReadI & alphabitmask) >> AlphaR) << AlphaL);
                         if (AlphaL >= 7)
@@ -718,14 +780,67 @@ namespace au.id.micolous.libs.DDSReader
                     }
                     else
                     {
-                        rawidata[curloc + 3] = 0xFF;
+                        this.rawidata[curloc + 3] = 0xff;
                     }
+
+                    curloc += 4;
+                }
+            }
+        }
+        #endregion
+
+        #region ARGB16
+        private void DecompressARGB16()
+        {
+            uint ReadI = 0,  i;
+            byte RedL, RedR;
+            byte GreenL, GreenR;
+            byte BlueL, BlueR;
+            byte AlphaL, AlphaR;
+            uint curloc = 0;
+
+
+            GetBitsFromMask(rbitmask, out RedL, out RedR);
+            GetBitsFromMask(gbitmask, out GreenL, out GreenR);
+            GetBitsFromMask(bbitmask, out BlueL, out BlueR);
+            GetBitsFromMask(alphabitmask, out AlphaL, out AlphaR);
+            RedL = (byte)(RedL + (16 - CountBitsFromMask(rbitmask)));
+            GreenL = (byte)(GreenL + (16 - CountBitsFromMask(gbitmask)));
+            BlueL = (byte)(BlueL + (16 - CountBitsFromMask(bbitmask)));
+            AlphaL = (byte)(AlphaL + (16 - CountBitsFromMask(alphabitmask)));
+
+
+            for (i = 0; i < this.compdata.Length; i += this.bpp)
+            {
+                if (this.bpp == 4)
+                {
+                    ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16) | (uint)(compdata[i + 3] << 24);
+                }
+                else if (this.bpp == 3)
+                {
+                    ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16);
                 }
                 else if (this.bpp == 2)
                 {
-                    this.rawidata[curloc + 1] = (byte)(((ReadI & gbitmask) >> GreenR) << GreenL);
-                    this.rawidata[curloc + 2] = (byte)(((ReadI & bbitmask) >> BlueR) << BlueL);
-                    this.rawidata[curloc + 3] = (byte)(((ReadI & alphabitmask) >> AlphaR) << AlphaL);
+                    ReadI = compdata[i] | (uint)(compdata[i + 1] << 8);
+                }
+                else if (this.bpp == 1)
+                {
+                    ReadI = compdata[i];
+                }
+                else
+                {
+                    throw new Exception("Un-recognized bit depth!");
+                }
+
+
+                this.rawidata[curloc + 2] = (byte)((ReadI & rbitmask) >> (RedR + 2));// << RedL);
+                this.rawidata[curloc + 1] = (byte)((ReadI & gbitmask) >> (GreenR + 2));// << GreenL);
+                this.rawidata[curloc    ] = (byte)((ReadI & bbitmask) >> (BlueR + 2));// << BlueL);
+
+                if (this.alphabitmask > 0)
+                {
+                    this.rawidata[curloc + 3] = (byte)(((ReadI & alphabitmask) >> AlphaR) << 6);
                     if (AlphaL >= 7)
                     {
                         this.rawidata[curloc + 3] = (byte)(this.rawidata[curloc + 3] > 0 ? 0xFF : 0x00);
@@ -734,91 +849,15 @@ namespace au.id.micolous.libs.DDSReader
                     {
                         this.rawidata[curloc + 3] = (byte)(this.rawidata[curloc + 3] | (this.rawidata[curloc + 3] >> 4));
                     }
-                    else
-                    {
-                        this.rawidata[curloc + 3] = 0xFF;
-                    }
-                }
-                curloc += 4;
-            }
-        }
-        #endregion
-
-        #region ARGB16
-        private void DecompressARGB16()
-        {
-            uint ReadI = 0, TempBpp, i;
-            byte RedL, RedR;
-            byte GreenL, GreenR;
-            byte BlueL, BlueR;
-            byte AlphaL, AlphaR;
-            byte RedPad, GreenPad, BluePad, AlphaPad;
-
-
-            GetBitsFromMask(rbitmask, out RedL, out RedR);
-            GetBitsFromMask(gbitmask, out GreenL, out GreenR);
-            GetBitsFromMask(bbitmask, out BlueL, out BlueR);
-            GetBitsFromMask(alphabitmask, out AlphaL, out AlphaR);
-            RedPad = (byte)(16 - CountBitsFromMask(rbitmask));
-            GreenPad = (byte)(16 - CountBitsFromMask(gbitmask));
-            BluePad = (byte)(16 - CountBitsFromMask(bbitmask));
-            AlphaPad = (byte)(16 - CountBitsFromMask(alphabitmask));
-
-            RedL = (byte)(RedL + RedPad);
-            GreenL = (byte)(GreenL + GreenPad);
-            BlueL = (byte)(BlueL + BluePad);
-            AlphaL = (byte)(AlphaL + AlphaPad);
-
-            TempBpp = this.rgbbitcount / 8;
-
-            for (i = 0; i < this.compdata.Length / 2; i += this.bpp)
-            {
-                if (this.compdata.Length - i < 4)
-                {
-                    if (TempBpp == 3)
-                    {
-                        ReadI = compdata[i] | (uint)(compdata[i + 1] << 8) | (uint)(compdata[i + 2] << 16);
-                    }
-                    else if (TempBpp == 1)
-                        ReadI = compdata[i];
-                    else if (TempBpp == 2)
-                        ReadI = (uint)(compdata[i] | (compdata[i + 1] << 8));
                 }
                 else
-                    ReadI = (uint)(compdata[i] | (compdata[i + 1] << 8) | (compdata[i + 2] << 16) | (compdata[i + 3] << 24));
-
-                this.rawidata[i + 2] = (byte)(((ReadI & rbitmask) >> RedR) << RedL);
-
-                if (this.bpp >= 3)
                 {
-                    this.rawidata[i + 1] = (byte)(((ReadI & gbitmask) >> GreenR) << GreenL);
-                    this.rawidata[i] = (byte)(((ReadI & bbitmask) >> BlueR) << BlueL);
+                    this.rawidata[curloc + 3] = 0xff;
+                }
 
-                    if (this.bpp == 4)
-                    {
-                        this.rawidata[i + 3] = (byte)(((ReadI & alphabitmask) >> AlphaR) << AlphaL);
-                        if (AlphaL >= 7)
-                        {
-                            this.rawidata[i + 3] = (byte)(this.rawidata[i + 3] > 0 ? 0xFF : 0x00);
-                        }
-                        else if (AlphaL >= 4)
-                        {
-                            this.rawidata[i + 3] = (byte)(this.rawidata[i + 3] | (this.rawidata[i + 3] >> 4));
-                        }
-                    }
-                }
-                else if (this.bpp == 2)
-                {
-                    this.rawidata[i + 1] = (byte)(((ReadI & alphabitmask) >> AlphaR) << AlphaL);
-                    if (AlphaL >= 7)
-                    {
-                        this.rawidata[i + 1] = (byte)(this.rawidata[i + 1] > 0 ? 0xFF : 0x00);
-                    }
-                    else if (AlphaL >= 4)
-                    {
-                        this.rawidata[i + 1] = (byte)(this.rawidata[i + 1] | (this.rawidata[i + 3] >> 4));
-                    }
-                }
+                //throw new Exception();
+                curloc += 4; 
+
             }
         }
         #endregion

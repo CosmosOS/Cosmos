@@ -71,52 +71,115 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="Building-A1R5G5B5.dds">
+    <None Include="ImageFormats\dds\Building-Dxt2.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-A4R4G4B4.dds">
+    <None Include="ImageFormats\dds\Building-Dxt4.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-A8B8G8R8.dds">
+    <None Include="ImageFormats\pnm\Building.pbm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-A8R8G8B8.dds">
+    <None Include="ImageFormats\pnm\Building.pgm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-Dxt1.dds">
+    <None Include="ImageFormats\pnm\Building.ppm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-Dxt3.dds">
+    <None Include="ImageFormats\tga\Building.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-Dxt5.dds">
+    <None Include="ImageFormats\xpm\Building.xpm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-R5G6B5.dds">
+    <None Include="ImageFormats\dds\Building-A16B16G16R16.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-R8G8B8.dds">
+    <None Include="ImageFormats\dds\Building-A16B16G16R16F.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-X8B8G8R8.dds">
+    <None Include="ImageFormats\dds\Building-A1R5G5B5.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building-X8R8G8B8.dds">
+    <None Include="ImageFormats\dds\Building-A2B10G10R10.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building.pbm">
+    <None Include="ImageFormats\dds\Building-A2R10G10B10.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building.pgm">
+    <None Include="ImageFormats\dds\Building-A2W10V10U10.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building.ppm">
+    <None Include="ImageFormats\dds\Building-A32B32G32R32F.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building.tga">
+    <None Include="ImageFormats\dds\Building-A4L4.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Building.xpm">
+    <None Include="ImageFormats\dds\Building-A4R4G4B4.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-A8B8G8R8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-A8R3G3B2.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-A8R8G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-Dxt1.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-Dxt3.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-Dxt5.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-G8R8_G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-L8A8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-L8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-Q16W16V16U16.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-Q8W8V8U8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-R3G3B2.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-R5G6B5.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-R8G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-R8G8_B8G8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-UYVY.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-X1R5G5B5.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-X4R4G4B4.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-X8B8G8R8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-X8R8G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ImageFormats\dds\Building-YUY2.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\Settings.settings">
@@ -136,31 +199,32 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Building-16Color.bmp">
+    <Content Include="ImageFormats\bmp\Building-16Color.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Building-24Bit.bmp">
+    <Content Include="ImageFormats\bmp\Building-24Bit.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Building-256Color.bmp">
+    <Content Include="ImageFormats\bmp\Building-256Color.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Building-Monochrome.bmp">
+    <Content Include="ImageFormats\bmp\Building-Monochrome.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Building.JPG">
+    <Content Include="ImageFormats\jpeg\Building.JPG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Building.png">
+    <Content Include="ImageFormats\png\Building.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Building.tiff">
+    <Content Include="ImageFormats\tiff\Building.tiff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Test.gif">
+    <Content Include="ImageFormats\gif\Test.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
