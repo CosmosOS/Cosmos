@@ -10,10 +10,11 @@
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <DockPanel LastChildFill="True">
         <ToolBar Height="26" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
-            <ToggleButton Content="Filter" Height="23" Name="asmFilterButton" Width="75" Click="asmFilterButton_Click" IsChecked="True" />
-            <Button Content="Copy" Height="23" Name="asmFCopyButton" Width="75" Click="asmFCopyButton_Click" />
-            <Button Content="Step" Height="23" Name="asmStepButton" Width="75" Click="asmStepButton_Click" />
-        </ToolBar>
+            <ToggleButton Content="Filter" Name="asmFilterButton" Click="asmFilterButton_Click" IsChecked="True" />
+            <Button Content="Copy" Name="asmFCopyButton" Click="asmFCopyButton_Click" />
+      <Button Content="Step" Name="asmStepButton"  Click="asmStepButton_Click" />
+      <Button Content="Ping" Name="butnPing" />
+    </ToolBar>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
       <TextBlock Name="tblkSource">
         <TextBlock.ContextMenu>

@@ -27,8 +27,15 @@ namespace Cosmos.Cosmos_VS_Windows
     public AssemblyUC()
     {
       InitializeComponent();
+
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
+      butnPing.Click += new RoutedEventHandler(butnPing_Click);
+      
       Update(mData);
+    }
+
+    void butnPing_Click(object sender, RoutedEventArgs e) {
+      
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e)

@@ -249,6 +249,11 @@ namespace Cosmos.Cosmos_VS_Windows
                   AssemblyUC.mData = xMsg;
                 }
                 break;
+
+              case DwMsg.Pong:
+                System.Windows.MessageBox.Show("Pong!");
+                break;
+
             }
           }
         }
