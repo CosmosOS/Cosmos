@@ -19,6 +19,7 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdRegisters;
         public Action<byte[]> CmdFrame;
         public Action<byte[]> CmdStack;
+        public Action<byte[]> CmdPong;
 
         protected byte mCurrentMsgType;
         public abstract void WaitConnect();
@@ -294,6 +295,11 @@ namespace Cosmos.Debug.Common
                     Next(-1, PacketStack);
                     break;
 
+              case DsMsgType.Pong:
+                    DoDebugMsg("DC Recv: Pong");
+                    Next(1, PacketPong);
+                    break;
+
               default:
                     // Exceptions crash VS so use MsgBox instead
                     MessageBox.Show("Unknown debug command: " + mCurrentMsgType);
@@ -370,7 +376,15 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
-        protected void PacketStack(byte[] aPacket)
+        protected void PacketPong(byte[] aPacket) {
+          mData = aPacket;
+          if (CmdPong != null) {
+            CmdPong(mData);
+          }
+          WaitForMessage();
+        }
+
+      protected void PacketStack(byte[] aPacket)
         {
             mData = aPacket;
             if (CmdStack != null)

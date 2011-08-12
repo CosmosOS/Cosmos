@@ -8,7 +8,7 @@ namespace Cosmos.Compiler.Debug {
     static public UInt32 SerialSignature = 0x19740807;
   }
 
-  // Messages from Guest to Host
+  // Messages from Guest (Cosmos) to Host (VS)
   static public class DsMsgType {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
@@ -26,9 +26,10 @@ namespace Cosmos.Compiler.Debug {
     public const byte Registers = 10;
     public const byte Frame = 11;
     public const byte Stack = 12;
+    public const byte Pong = 13;
   }
 
-  // Messages from Host to Guest
+  // Messages from Host (VS) to Guest (Cosmos)
   static public class DsCommand {
     public const byte Noop = 0;
     public const byte TraceOff = 1;
@@ -47,11 +48,13 @@ namespace Cosmos.Compiler.Debug {
     public const byte SendFrame = 14;
     public const byte SendStack = 15;
     public const byte SetAsmBreak = 16; // Set an assembly level break point
+    public const byte Ping = 17; 
     //
     // Make sure this is always the last entry. Used by DebugStub to verify commands
-    public const byte Max = 17;
+    public const byte Max = 18;
   }
 
+  // Commands from VS Debug Engine to VS Debug Window
   static public class DwMsgType {
     public const byte Noop = 0;
     public const byte Registers = 1;

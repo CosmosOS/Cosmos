@@ -68,6 +68,7 @@ namespace Cosmos.Compiler.DebugStub {
         CheckCmd(DsCommand.SendFrame, typeof(SendFrame));
         CheckCmd(DsCommand.SendStack, typeof(SendStack));
         CheckCmd(DsCommand.SetAsmBreak, typeof(SetAsmBreak));
+        CheckCmd(DsCommand.Ping, typeof(Ping));
 
         Label = ".SendACK";
         // We acknowledge receipt of the command, not processing of it.
@@ -697,6 +698,13 @@ namespace Cosmos.Compiler.DebugStub {
         EDI[0] = 0xCC;
         // Save EIP of the break
         AsmBreakEIP.Value = EDI;
+      }
+    }
+
+    public class Ping : Inlines {
+      public override void Assemble() {
+        AL = DsMsgType.Pong; 
+        Call<WriteALToComPort>();
       }
     }
 
