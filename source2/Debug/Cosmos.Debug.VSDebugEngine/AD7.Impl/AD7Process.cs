@@ -129,17 +129,17 @@ namespace Cosmos.Debug.VSDebugEngine {
     public string mProjectFile;
 
     protected void DbgCmdRegisters(byte[] aData) {
-      DebugWindows.SendCommand(DwMsgType.Registers, aData);
+      DebugWindows.SendCommand(DwMsg.Registers, aData);
     }
 
     protected void DbgCmdFrame(byte[] aData)
     {
-        DebugWindows.SendCommand(DwMsgType.Frame, aData);
+        DebugWindows.SendCommand(DwMsg.Frame, aData);
     }
 
     protected void DbgCmdStack(byte[] aData)
     {
-        DebugWindows.SendCommand(DwMsgType.Stack, aData);
+        DebugWindows.SendCommand(DwMsg.Stack, aData);
     }
 
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
@@ -301,7 +301,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
         }
       }
-      mDbgConnector.SendCommand(DsCommand.BatchEnd);
+      mDbgConnector.SendCommand(DsCmd.BatchEnd);
     }
 
     void DbgCmdText(string obj) {
@@ -317,7 +317,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     void DbgCmdTrace(byte arg1, uint arg2) {
       DebugMsg("DbgCmdTrace");
       switch (arg1) {
-        case DsMsgType.BreakPoint: {
+        case DsMsg.BreakPoint: {
             // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
             // Dont need to correct the address, becuase DebugStub does it for us.
             var xActualAddress = arg2;
@@ -481,18 +481,18 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     internal void Continue() { // F5
       mCurrentAddress = null;
-      mDbgConnector.SendCommand(DsCommand.Continue);
+      mDbgConnector.SendCommand(DsCmd.Continue);
     }
 
     internal void Step(enum_STEPKIND aKind) {
       if (aKind == enum_STEPKIND.STEP_INTO) { // F11
-        mDbgConnector.SendCommand(DsCommand.StepInto);
+        mDbgConnector.SendCommand(DsCmd.StepInto);
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
-        mDbgConnector.SendCommand(DsCommand.StepOver);
+        mDbgConnector.SendCommand(DsCmd.StepOver);
       
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
-        mDbgConnector.SendCommand(DsCommand.StepOut);
+        mDbgConnector.SendCommand(DsCmd.StepOut);
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?
@@ -571,7 +571,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
       // Send source code to the tool window
-      DebugWindows.SendCommand(DwMsgType.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
+      DebugWindows.SendCommand(DwMsg.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
     }
 
   }

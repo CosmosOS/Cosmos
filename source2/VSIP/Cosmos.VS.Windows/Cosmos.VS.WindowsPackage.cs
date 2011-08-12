@@ -187,10 +187,10 @@ namespace Cosmos.Cosmos_VS_Windows
               xMsg = mMessage.Dequeue();
             }
             switch (xCmd) {
-              case DwMsgType.Noop:
+              case DwMsg.Noop:
                 break;
 
-              case DwMsgType.Stack:
+              case DwMsg.Stack:
                 if (StackTW.mUC != null)
                 {
                   StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
@@ -204,7 +204,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 }
                 break;
 
-              case DwMsgType.Frame:
+              case DwMsg.Frame:
                 if (StackTW.mUC != null)
                 {
                   StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
@@ -218,7 +218,7 @@ namespace Cosmos.Cosmos_VS_Windows
                 }
                 break;
 
-              case DwMsgType.Registers:
+              case DwMsg.Registers:
                 if (RegistersTW.mUC != null)
                 {
                     RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()
@@ -232,11 +232,11 @@ namespace Cosmos.Cosmos_VS_Windows
                 }
                 break;
 
-              case DwMsgType.Quit:
+              case DwMsg.Quit:
                 //Close();
                 break;
 
-              case DwMsgType.AssemblySource:
+              case DwMsg.AssemblySource:
                 if (AssemblyTW.mUC != null)
                 {
                   AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate()

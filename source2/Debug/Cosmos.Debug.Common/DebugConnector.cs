@@ -57,13 +57,13 @@ namespace Cosmos.Debug.Common
                     //System.Windows.Forms.MessageBox.Show(xSB.ToString());
                     DoDebugMsg("DC Send: " + aCmd.ToString());
 
-                    if (aCmd == DsCommand.Noop) {
+                    if (aCmd == DsCmd.Noop) {
                         // Noops dont have any data.
                         // This is becuase Noops are used to clear out the 
                         // channel and are often not received. Sending noop + data
                         // usually causes the data to be interpreted as a command
                         // as its often the first byte received.
-                      SendRawData(new byte[1] { DsCommand.Noop });
+                      SendRawData(new byte[1] { DsCmd.Noop });
                     } else {
                         var xData = new byte[aData.Length + 2];
                         // See comments about flow control in the DebugStub class
@@ -108,17 +108,17 @@ namespace Cosmos.Debug.Common
         }
 
         public void SendRegisters() {
-          SendCommand(DsCommand.SendRegisters);
+          SendCommand(DsCmd.SendRegisters);
         }
 
         public void SendFrame()
         {
-            SendCommand(DsCommand.SendFrame);
+            SendCommand(DsCmd.SendFrame);
         }
 
         public void SendStack()
         {
-            SendCommand(DsCommand.SendStack);
+            SendCommand(DsCmd.SendStack);
         }
 
         public void SetBreakpoint(int aID, uint aAddress) {
@@ -139,7 +139,7 @@ namespace Cosmos.Debug.Common
             var xData = new byte[5];
             Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 0, 4);
             xData[4] = (byte)aID;
-            SendCommandData(DsCommand.BreakOnAddress, xData, true);
+            SendCommandData(DsCmd.BreakOnAddress, xData, true);
         }
 
         public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1)
@@ -166,7 +166,7 @@ namespace Cosmos.Debug.Common
             mDataSize = (int)size;
             Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-            SendCommandData(DsCommand.SendMemory, xData, true);
+            SendCommandData(DsCmd.SendMemory, xData, true);
             var xResult = mData;
             mData = null;
             if (xResult.Length != size)
@@ -198,7 +198,7 @@ namespace Cosmos.Debug.Common
 
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-            SendCommandData(DsCommand.SendMethodContext, xData, true);
+            SendCommandData(DsCmd.SendMethodContext, xData, true);
             // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
             byte[] xResult;
@@ -228,18 +228,18 @@ namespace Cosmos.Debug.Common
             mCurrentMsgType = aPacket[0];
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType) {
-              case DsMsgType.TracePoint:
-              case DsMsgType.BreakPoint:
+              case DsMsg.TracePoint:
+              case DsMsg.BreakPoint:
                     DoDebugMsg("DC Recv: TracePoint / BreakPoint");
                     Next(4, PacketTracePoint);            
                     break;
 
-              case DsMsgType.Message:
+              case DsMsg.Message:
                     DoDebugMsg("DC Recv: Message");
                     Next(2, PacketTextSize);
                     break;
 
-              case DsMsgType.Started:
+              case DsMsg.Started:
                     DoDebugMsg("DC Recv: Started");
                     // Call WaitForMessage first, else it blocks becuase started triggers
                     // other commands which need responses.
@@ -247,7 +247,7 @@ namespace Cosmos.Debug.Common
                     // Guests never get the first byte sent. So we send a noop.
                     // This dummy byte seems to clear out the serial channel.
                     // Its never received, but if it ever is, its a noop anyways.
-                    SendCommand(DsCommand.Noop);
+                    SendCommand(DsCmd.Noop);
 
                     // Send signature
                     var xData = new byte[4];
@@ -257,7 +257,7 @@ namespace Cosmos.Debug.Common
                     CmdStarted();
                     break;
 
-              case DsMsgType.Noop:
+              case DsMsg.Noop:
                     DoDebugMsg("DC Recv: Noop");
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
@@ -265,37 +265,37 @@ namespace Cosmos.Debug.Common
                     WaitForMessage();
                     break;
 
-              case DsMsgType.CmdCompleted:
+              case DsMsg.CmdCompleted:
                     DoDebugMsg("DC Recv: CmdCompleted");
                     Next(1, PacketCmdCompleted);
                     break;
 
-              case DsMsgType.MethodContext:
+              case DsMsg.MethodContext:
                     DoDebugMsg("DC Recv: MethodContext");
                     Next(mDataSize, PacketMethodContext);
                     break;
 
-              case DsMsgType.MemoryData:
+              case DsMsg.MemoryData:
                     DoDebugMsg("DC Recv: MemoryData");
                     Next(mDataSize, PacketMemoryData);
                     break;
 
-              case DsMsgType.Registers:
+              case DsMsg.Registers:
                     DoDebugMsg("DC Recv: Registers");
                     Next(40, PacketRegisters);
                     break;
 
-              case DsMsgType.Frame:
+              case DsMsg.Frame:
                     DoDebugMsg("DC Recv: Frame");
                     Next(-1, PacketFrame);
                     break;
 
-              case DsMsgType.Stack:
+              case DsMsg.Stack:
                     DoDebugMsg("DC Recv: Stack");
                     Next(-1, PacketStack);
                     break;
 
-              case DsMsgType.Pong:
+              case DsMsg.Pong:
                     DoDebugMsg("DC Recv: Pong");
                     Next(1, PacketPong);
                     break;

@@ -9,7 +9,7 @@ namespace Cosmos.Compiler.Debug {
   }
 
   // Messages from Guest (Cosmos) to Host (VS)
-  static public class DsMsgType {
+  static public class DsMsg {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
     public const byte Message = 2;
@@ -30,7 +30,7 @@ namespace Cosmos.Compiler.Debug {
   }
 
   // Messages from Host (VS) to Guest (Cosmos)
-  static public class DsCommand {
+  static public class DsCmd {
     public const byte Noop = 0;
     public const byte TraceOff = 1;
     public const byte TraceOn = 2;
@@ -55,7 +55,7 @@ namespace Cosmos.Compiler.Debug {
   }
 
   // Commands from VS Debug Engine to VS Debug Window
-  static public class DwMsgType {
+  static public class DwMsg {
     public const byte Noop = 0;
     public const byte Registers = 1;
     public const byte AssemblySource = 3;
