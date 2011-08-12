@@ -54,6 +54,15 @@ namespace Cosmos.Compiler.Debug {
     public const byte Max = 18;
   }
 
+  static public class DebugWindow {
+    public static readonly string PipeName;
+
+    static DebugWindow() {
+      int xPID = System.Diagnostics.Process.GetCurrentProcess().Id;
+      PipeName = @"Cosmos\DebugWindows-" + xPID.ToString();
+    }
+  }
+
   // Commands from VS Debug Engine to VS Debug Window
   static public class DwMsg {
     public const byte Noop = 0;
