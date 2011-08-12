@@ -58,6 +58,7 @@ namespace Cosmos.Debug.GDB {
 				return true;
 			}
 			catch (Exception e) {
+				mOutputPath = null;
 				MessageBox.Show(string.Format(
 						"Exception on loading of settings file \"{0}\" :\n{1}\n\nStacktrace:\n{2}",
 						Filename, e.Message, e.StackTrace),
@@ -65,6 +66,41 @@ namespace Cosmos.Debug.GDB {
 			}
 			return false;
         }
+
+		static public bool LoadOnFly(string aFilenameOfBreakPointXml)
+		{
+			mFilenameOfBreakPointXml = aFilenameOfBreakPointXml;
+			try
+			{
+				//TODO: Change this and other general settings to read from the General datatable
+				mOutputPath = Path.GetDirectoryName(Filename);
+				mObjFile = Path.GetFileNameWithoutExtension(Filename) + ".obj";
+				mAsmFile = Path.GetFileNameWithoutExtension(Filename) + ".asm";
+				// for save function needed
+				if (mOutputPath.ToLower().EndsWith("\\bin\\debug"))
+				{
+					// create path for cgdb like VS it does
+					int len = "\\bin\\debug".Length;
+					mFilenameOfBreakPointXml = Path.Combine(mOutputPath.Substring(0, mOutputPath.Length - len), Path.GetFileNameWithoutExtension(Filename) + ".cgdb");
+				}
+				else
+					mFilenameOfBreakPointXml = Path.Combine(mOutputPath, Path.GetFileNameWithoutExtension(Filename) + ".cgdb");
+
+				if (false == File.Exists(Path.Combine(mOutputPath, mObjFile))
+					|| false == File.Exists(Path.Combine(mOutputPath, mAsmFile))
+					|| false == File.Exists(Path.Combine(mOutputPath, Path.GetFileNameWithoutExtension(Filename) + ".cpdb")))
+				{
+					mOutputPath = null;
+					return false;
+				}
+				return true;
+			}
+			catch (Exception)
+			{
+				mOutputPath = null;
+			}
+			return false;
+		}
 
         static public void InitWindows() {
             Windows.RestorePositions();

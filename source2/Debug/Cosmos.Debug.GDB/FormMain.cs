@@ -93,6 +93,7 @@ namespace Cosmos.Debug.GDB {
 
 						if (Global.GDB.Connected)
 						{
+							mitmRefresh.Enabled = true;
 							lablConnected.Visible = true;
 							lablRunning.Visible = true;
 
@@ -122,6 +123,7 @@ namespace Cosmos.Debug.GDB {
 						{
 							mitmConnect.Text = "&Connect";
 							butnConnect.Text = "&Connect";
+							mitmRefresh.Enabled = false;
 							mitmContinue.Enabled = false;
 							butnContinue.Enabled = false;
 							mitmStepInto.Enabled = false;
@@ -216,6 +218,27 @@ namespace Cosmos.Debug.GDB {
         }
 
         protected void Connect() {
+			if (Settings.OutputPath == null)
+			{
+				// path of asm, obj and cgdb
+				using(var xDialog = new OpenFileDialog())
+				{
+					xDialog.Filter = "Symbols (*.asm;*.obj;*.cpdb)|*.asm;*.obj;*.cpdb";
+					xDialog.ShowHelp = true;
+					xDialog.HelpRequest += new EventHandler(xDialog_HelpRequest);
+
+					if (xDialog.ShowDialog(this) != System.Windows.Forms.DialogResult.OK)
+						return;
+
+					if (false == Settings.LoadOnFly(xDialog.FileName))
+					{
+						MessageBox.Show("Error on loading selection!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+						return;
+					}
+					mitmSave.Enabled = true;
+				}
+			}
+
             mitmConnect.Enabled = false;
 			butnConnect.Enabled = false;
 
@@ -231,6 +254,11 @@ namespace Cosmos.Debug.GDB {
 			}
 			Global.GDB.Connect();
         }
+
+		void xDialog_HelpRequest(object sender, EventArgs e)
+		{
+			MessageBox.Show("Select a folder which contain files of type asm, obj and cpdb with same name.", "Help", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+		}
 
 		private void OnRunStateChanged(bool stopped)
 		{
@@ -331,6 +359,13 @@ namespace Cosmos.Debug.GDB {
 			butnBreak.Enabled = false;
 			mitmStepInto.Enabled = false;
 			mitmStepOver.Enabled = false;
+			mitmRefresh.Enabled = false;
+
+			if (Settings.OutputPath == null)
+			{
+				mitmSave.Enabled = false;
+			}
+
 
             // Dont put this in load. Load happens in main call from Main.cs and on exceptions just
             // goes out, no message.
@@ -372,7 +407,6 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmSave_Click(object sender, EventArgs e) {
-            Windows.SavePositions();
             Settings.Save();
         }
 

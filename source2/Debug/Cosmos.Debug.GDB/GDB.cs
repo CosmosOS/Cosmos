@@ -140,8 +140,13 @@ namespace Cosmos.Debug.GDB {
 			{
 				TargetCmdReply(xResponse);
 			}
-			if (false == Windows.mMainForm.IsDisposed)
+			try
+			{
 				Windows.mMainForm.Invoke(mOnResponse, new object[] { xResponse });
+			}
+			catch (ObjectDisposedException)
+			{ // check the propertie IsDisposed didnt solve the problem, so we catch
+			}
         }
 
         static public string Unescape(string aInput) {
