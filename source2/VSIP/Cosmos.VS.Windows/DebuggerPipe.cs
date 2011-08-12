@@ -64,7 +64,7 @@ namespace Cosmos.VS.Debug
 
                 while (!KillThread)
                 { // Loop again to allow mult incoming connections between debug sessions
-                  using (mPipe = new NamedPipeServerStream(DebugWindow.PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous))
+                  using (mPipe = new NamedPipeServerStream(DebugWindow.PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous))
                     {
                         mPipe.WaitForConnection();
 
