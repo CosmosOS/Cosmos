@@ -7,13 +7,11 @@
 #if BuildConfiguration == "Devkit"
 	; devkit releases are not compressed
 	#pragma warning "Building Devkit release"
-#elif BuildConfiguration == "Userkit"
+#else 
 	; userkit releases get compressed, and get languages included
 	#pragma message "Building Userkit release"
 	#define Compress true
 	#define IncludeUILanguages true
-#else
-# error Unsupported configuration
 #endif
 
 ; Cosmos Registry key
@@ -31,17 +29,18 @@ AppSupportURL=http://www.goCosmos.org/
 AppUpdatesURL=http://www.goCosmos.org/
 AppVersion={#ChangeSetVersion}
 DefaultDirName={userappdata}\Cosmos User Kit
+;DefaultDirName=m:\Cosmos User Kit -- Only about 2-3 seconds faster. The GAC and other things seem to be the majority of the slowness
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
 OutputBaseFilename=CosmosUserKit
 #ifdef Compress
 Compression=lzma2/ultra64
 InternalCompressLevel=ultra64
+SolidCompression=true
 #else
 Compression=none
 InternalCompressLevel=none
 #endif
-SolidCompression=true
 SourceDir=..
 ;Left Image should be 164x314
 WizardImageFile=.\setup2\images\cosmos.bmp
