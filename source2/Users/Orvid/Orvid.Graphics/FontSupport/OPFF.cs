@@ -14,15 +14,102 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
+using System.Collections;
 
 namespace Orvid.Graphics.FontSupport
 {
     public class OPFF : Font
     {
+        private class BinaryReader : System.IO.BinaryReader
+        {
+            private bool[] curByte = new bool[8];
+            private byte curBitIndx = 0;
+            private BitArray ba;
+
+            public BinaryReader(Stream s) : base(s)
+            {
+                ba = new BitArray(new byte[] { base.ReadByte() });
+                ba.CopyTo(curByte, 0);
+                ba = null;
+            }
+
+            public override bool ReadBoolean()
+            {
+                if (curBitIndx == 8)
+                {
+                    ba = new BitArray(new byte[] { base.ReadByte() });
+                    ba.CopyTo(curByte, 0);
+                    ba = null;
+                    this.curBitIndx = 0;
+                }
+
+                bool b = curByte[curBitIndx];
+                curBitIndx++;
+                return b;
+            }
+
+            public override byte ReadByte()
+            {
+                bool[] bar = new bool[8];
+                byte i;
+                for (i = 0; i < 8; i++)
+                {
+                    bar[i] = this.ReadBoolean();
+                }
+
+                byte b = 0;
+                byte bitIndex = 0;
+                for (i = 0; i < 8; i++)
+                {
+                    if (bar[i])
+                    {
+                        b |= (byte)(((byte)1) << bitIndex);
+                    }
+                    bitIndex++;
+                }
+                return b;
+            }
+
+            public override byte[] ReadBytes(int count)
+            {
+                byte[] bytes = new byte[count];
+                for (int i = 0; i < count; i++)
+                {
+                    bytes[i] = this.ReadByte();
+                }
+                return bytes;
+            }
+
+            public override ushort ReadUInt16()
+            {
+                byte[] bytes = ReadBytes(2);
+                return BitConverter.ToUInt16(bytes, 0);
+            }
+
+            public override uint ReadUInt32()
+            {
+                byte[] bytes = ReadBytes(4);
+                return BitConverter.ToUInt32(bytes, 0);
+            }
+
+            public override ulong ReadUInt64()
+            {
+                byte[] bytes = ReadBytes(8);
+                return BitConverter.ToUInt64(bytes, 0);
+            }
+        }
+
         private string name;
         public override string Name
         {
             get { return name; }
+        }
+
+        private UInt16 ver;
+        public UInt16 FileFormatVersion
+        {
+            get { return ver; }
         }
 
         FontCharacterSet foundChars = new FontCharacterSet();
@@ -30,44 +117,6 @@ namespace Orvid.Graphics.FontSupport
         public OPFF(byte[] data)
         {
             Load(data);
-        }
-
-        private UInt64 ReadUInt64(byte[] data)
-        {
-            UInt64 r = 0;
-
-            r += data[7];
-            r <<= 8;
-            r += data[6];
-            r <<= 8;
-            r += data[5];
-            r <<= 8;
-            r += data[4];
-            r <<= 8;
-            r += data[3];
-            r <<= 8;
-            r += data[2];
-            r <<= 8;
-            r += data[1];
-            r <<= 8;
-            r += data[0];
-
-            return r;
-        }
-
-        private UInt32 ReadInt32(byte[] data)
-        {
-            UInt32 r = 0;
-
-            r += data[3];
-            r <<= 8;
-            r += data[2];
-            r <<= 8;
-            r += data[1];
-            r <<= 8;
-            r += data[0];
-
-            return r;
         }
 
         private void Load(byte[] data)
@@ -79,157 +128,90 @@ namespace Orvid.Graphics.FontSupport
                 data = Orvid.Compression.LZMA.Decompress(tmp);
                 tmp = null;
             }
+            MemoryStream m = new MemoryStream(data);
+            BinaryReader br = new BinaryReader(m);
+            br.ReadBytes(8); // There are 8 empty bytes at the start of the header.
+            byte[] datarr;
+            ver = br.ReadUInt16();
+            if (ver > 47)
+            {
+                throw new Exception("Format version is to high!");
+            }
 
-            int curloc = 8; // There are 8 empty bytes at the start of the header.
+            datarr = br.ReadBytes(256);
+            name = new String(ASCIIEncoding.ASCII.GetChars(datarr)).Replace("\0","");
 
-            byte[] datarr = new byte[256];
-            Array.Copy(data, curloc, datarr, 0, 256);
-            curloc += 256;
-            name = new String(ASCIIEncoding.ASCII.GetChars(datarr));
-
-            datarr = new byte[8];
-            Array.Copy(data, curloc, datarr, 0, 8);
-            curloc += 8;
-            UInt64 charsToRead = ReadUInt64(datarr);
+            UInt64 charsToRead = br.ReadUInt64();
 
             UInt32 prevCharNumber = 0;
+            byte height, width;
+            FontFlag flags;
+            int bits, len;
+            Image im;
             for (UInt64 i = 0; i < charsToRead; i++)
             {
                 // Check if the character number is incremented from the last item.
-                if (data[curloc] == 255) // this means increment it.
+                if (br.ReadByte() == 255) // this means increment it.
                 {
-                    curloc++;
+                    //throw new Exception();
                     prevCharNumber++;
-                    FontFlag flags = (FontFlag)data[curloc];
-                    curloc++;
-                    byte height = data[curloc];
-                    curloc++;
-                    byte width = data[curloc];
-                    curloc++;
-                    int len = (Int32)Math.Ceiling((double)((width * height) / 8));
-                    datarr = new byte[len];
-                    Array.Copy(data, curloc, datarr, 0, len);
-                    curloc += len;
-                    Image im = LoadFromBinary(datarr, height, width);
-                    if (prevCharNumber > ushort.MaxValue)
-                    {
-                        throw new Exception();
-                    }
+                    flags = (FontFlag)br.ReadByte();
+                    height = br.ReadByte();
+                    width = br.ReadByte();
+                    bits = (int)br.ReadUInt32();
+                    len = (Int32)Math.Ceiling((double)(bits / 8));
+                    datarr = br.ReadBytes(len);
+                    im = LoadFromBinary(datarr, height, width, bits);
                     foundChars.AddCharacter((int)prevCharNumber, im, flags);
                 }
                 else
                 {
-                    curloc++;
-                    datarr = new byte[4];
-                    Array.Copy(data, curloc, datarr, 0, 4);
-                    curloc += 4;
-                    prevCharNumber = ReadInt32(datarr);
-                    if (prevCharNumber > ushort.MaxValue)
-                    {
-                        throw new Exception();
-                    }
-                    FontFlag flags = (FontFlag)data[curloc];
-                    curloc++;
-                    byte height = data[curloc];
-                    curloc++;
-                    byte width = data[curloc];
-                    curloc++;
-                    int len = (Int32)Math.Ceiling((double)((width * height) / 8));
-                    datarr = new byte[len];
-                    Array.Copy(data, curloc, datarr, 0, len);
-                    curloc += len;
-                    Image im = LoadFromBinary(datarr, height, width);
+                    prevCharNumber = br.ReadUInt32();
+                    flags = (FontFlag)br.ReadByte();
+                    height = br.ReadByte();
+                    width = br.ReadByte();
+                    bits = (int)br.ReadUInt32();
+                    len = (Int32)Math.Ceiling((double)(bits / 8));
+                    datarr = br.ReadBytes(len);
+                    im = LoadFromBinary(datarr, height, width, bits);
                     foundChars.AddCharacter((int)prevCharNumber, im, flags);
                 }
             }
         }
 
-        private Image LoadFromBinary(byte[] data, byte height, byte width)
+        private Image LoadFromBinary(byte[] data, byte height, byte width, int bits)
         {
-            #region LoadData
-            bool[] idata = new bool[height * width];
-            int bitnum = 0;
-            for (int inc = 0; inc < data.Length; inc++)
-            {
-                //int a1 = (data[inc] >> 7);
-                //int a2 = ((byte)(data[inc] << 1) >> 7);
-                //int a3 = ((byte)(data[inc] << 2) >> 7);
-                //int a4 = ((byte)(data[inc] << 3) >> 7);
-                //int a5 = ((byte)(data[inc] << 4) >> 7);
-                //int a6 = ((byte)(data[inc] << 5) >> 7);
-                //int a7 = ((byte)(data[inc] << 6) >> 7);
-                //int a8 = ((byte)(data[inc] << 7) >> 7);
-
-                //int aFinal = a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8;
-                //if (aFinal >= 8)
-                //{
-                //    throw new Exception();
-                //}
-
-                if (((byte)(data[inc] << 7) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 6) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 5) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 4) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 3) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 2) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if (((byte)(data[inc] << 1) >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-                if ((data[inc] >> 7) == 1)
-                {
-                    idata[bitnum] = true;
-                }
-                bitnum++;
-            }
-            #endregion
-
-            bitnum = 0;
+            MemoryStream m = new MemoryStream(data);
+            BinaryReader br = new BinaryReader(m);
             Image i = new Image(width, height);
 
-            //for (uint y = 0; y < height; y++)
             for (uint x = 0; x < width; x++)
+            //for (uint y = 0; y < height; y++)
             {
-                //for (uint x = 0; x < width; x++)
                 for (uint y = 0; y < height; y++)
+                //for (uint x = 0; x < width; x++)
                 {
-                    if (idata[bitnum])
-                    {
-                        i.SetPixel(x, y, Colors.Black); // Color the pixel white
-                    }
-                    else
-                    {
-                        i.SetPixel(x, y, Colors.White); // Color the pixel black
-                    }
-                    bitnum++;
+                    //if (br.ReadBoolean())
+                    //{
+                    //    if (br.ReadBoolean())
+                    //    {
+                    //        i.SetPixel(x, y, Colors.Black); // Color the pixel black
+                    //    }
+                    //    else
+                    //    {
+                            byte greyscale = br.ReadByte();
+                            i.SetPixel(x, y, new Pixel(greyscale, greyscale, greyscale, 255)); // Color the pixel as greyscale
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    i.SetPixel(x, y, Colors.White); // Color the pixel white
+                    //}
                 }
             }
-
+            data = null;
+            br.Dispose();
+            m.Dispose();
             return i;
         }
 
