@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataFormats\Half.cs" />
     <Compile Include="Image Formats\BitMiracle\Deps\zLib.cs" />
     <Compile Include="Image Formats\BitMiracle\LibJpeg.cs" />
     <Compile Include="Image Formats\BitMiracle\LibTiff.cs" />

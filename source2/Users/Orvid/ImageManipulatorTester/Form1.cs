@@ -1,4 +1,5 @@
 ﻿//#define AnimateGif
+//#define DebugAllFormats
 
 using System;
 using System.Collections.Generic;
@@ -520,6 +521,7 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
+#endif
 
             #region Dds Loading
 
@@ -1333,6 +1335,58 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
+            #region 3Dc
+            {
+                FileStream s = new FileStream(Path.GetFullPath("ImageFormats/dds/Building-3Dc.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-3Dc Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-3Dc Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region Ati1n
+            {
+                FileStream s = new FileStream(Path.GetFullPath("ImageFormats/dds/Building-Ati1n.dds"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.DdsImage x = new Orvid.Graphics.ImageFormats.DdsImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = x.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Dds-Ati1n Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Dds-Ati1n Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
+
             #region YUY2
             {
                 //FileStream s = new FileStream(Path.GetFullPath("ImageFormats/dds/Building-YUY2.dds"), FileMode.Open);
@@ -1362,33 +1416,32 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
-#endif
-            
-            #region Load Pcx
-            {
-                FileStream s = new FileStream(Path.GetFullPath("ImageFormats/pcx/Building.pcx"), FileMode.Open);
-                Orvid.Graphics.ImageFormats.PcxImage px = new Orvid.Graphics.ImageFormats.PcxImage();
 
-                t.Start();
-                Orvid.Graphics.Image I2 = px.Load(s);
-                t.Stop();
-                WriteToLog("Loading a Pcx Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
-                t.Reset();
+            //#region Load Pcx
+            //{
+            //    FileStream s = new FileStream(Path.GetFullPath("ImageFormats/pcx/Building.pcx"), FileMode.Open);
+            //    Orvid.Graphics.ImageFormats.PcxImage px = new Orvid.Graphics.ImageFormats.PcxImage();
 
-                s.Close();
-                s.Dispose();
-                Bitmap b = (Bitmap)I2;
-                LabeledImage l = new LabeledImage();
-                l.BorderStyle = BorderStyle.FixedSingle;
-                l.Parent = flowLayoutPanel2;
-                l.Text = "Loaded Pcx Image";
-                l.Height = b.Height;
-                l.Width = b.Width;
-                l.Image = b;
-            }
-            #endregion
+            //    t.Start();
+            //    Orvid.Graphics.Image I2 = px.Load(s);
+            //    t.Stop();
+            //    WriteToLog("Loading a Pcx Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+            //    t.Reset();
 
-            System.GC.Collect();
+            //    s.Close();
+            //    s.Dispose();
+            //    Bitmap b = (Bitmap)I2;
+            //    LabeledImage l = new LabeledImage();
+            //    l.BorderStyle = BorderStyle.FixedSingle;
+            //    l.Parent = flowLayoutPanel2;
+            //    l.Text = "Loaded Pcx Image";
+            //    l.Height = b.Height;
+            //    l.Width = b.Width;
+            //    l.Image = b;
+            //}
+            //#endregion
+
+            //System.GC.Collect();
 
 
             st.Flush();

@@ -19,7 +19,7 @@ namespace Orvid.Graphics.ImageFormats
         public override Image Load(Stream s)
         {
             DDSImage im = new DDSImage(s);
-            return (Image)im.BitmapImage;
+            return im.BitmapImage;
         }
     }
 }
@@ -182,9 +182,6 @@ namespace au.id.micolous.libs.DDSReader
         private BinaryReader br;
         private Image img;
 
-        /// <summary>
-        /// Returns a System.Imaging.Bitmap containing the DDS image.
-        /// </summary>
         public Image BitmapImage { get { return this.img; } }
 
         /// <summary>
@@ -416,6 +413,28 @@ namespace au.id.micolous.libs.DDSReader
                     this.DecompressDXT5();
                     break;
 
+                case PixelFormat.THREEDC:
+                    this.Decompress3Dc();
+                    break;
+
+                case PixelFormat.ATI1N:
+                    //throw new Exception();
+                    this.DecompressAti1n();
+                    break;
+
+                case PixelFormat.A16B16G16R16:
+                    this.DecompressA16B16G16R16();
+                    break;
+
+                case PixelFormat.R16F:
+                case PixelFormat.G16R16F:
+                case PixelFormat.A16B16G16R16F:
+                case PixelFormat.R32F:
+                case PixelFormat.G32R32F:
+                case PixelFormat.A32B32G32R32F:
+                    this.DecompressFloat();
+                    break;
+
                 default:
                     //throw new Exception("Unknown file format!");
                     break;
@@ -425,17 +444,17 @@ namespace au.id.micolous.libs.DDSReader
 
             //try
             //{
-                // now fill bitmap with raw image datas.
-                uint pos = 0;
-                for (int y = 0; y < this.height; y++)
+            // now fill bitmap with raw image datas.
+            uint pos = 0;
+            for (int y = 0; y < this.height; y++)
+            {
+                for (int x = 0; x < this.width; x++)
                 {
-                    for (int x = 0; x < this.width; x++)
-                    {
-                        // draw
-                        this.img.SetPixel((uint)x, (uint)y, new Pixel(this.rawidata[pos], this.rawidata[pos + 1], this.rawidata[pos + 2], this.rawidata[pos + 3]));
-                        pos += 4;
-                    }
+                    // draw
+                    this.img.SetPixel((uint)x, (uint)y, new Pixel(this.rawidata[pos], this.rawidata[pos + 1], this.rawidata[pos + 2], this.rawidata[pos + 3]));
+                    pos += 4;
                 }
+            }
             //}
             //catch { }
 
@@ -445,13 +464,14 @@ namespace au.id.micolous.libs.DDSReader
 
         }
 
+        #region Support Methods
         private void CorrectPreMult()
         {
             for (uint i = 0; i < this.rawidata.Length; i += 4)
             {
                 if (this.rawidata[i + 3] != 0) // Cannot divide by 0.
                 {
-                    this.rawidata[i    ] = (byte)((uint)(this.rawidata[i    ] << 8) / this.rawidata[i + 3]);
+                    this.rawidata[i] = (byte)((uint)(this.rawidata[i] << 8) / this.rawidata[i + 3]);
                     this.rawidata[i + 1] = (byte)((uint)(this.rawidata[i + 1] << 8) / this.rawidata[i + 3]);
                     this.rawidata[i + 2] = (byte)((uint)(this.rawidata[i + 2] << 8) / this.rawidata[i + 3]);
                 }
@@ -510,7 +530,7 @@ namespace au.id.micolous.libs.DDSReader
                 case PixelFormat.ARGB:
                 case PixelFormat.RGB:
                     return this.rgbbitcount / 8;
-                    
+
                 case PixelFormat.THREEDC:
                 case PixelFormat.RXGB:
                     return 3;
@@ -660,6 +680,483 @@ namespace au.id.micolous.libs.DDSReader
 
             return Count;
         }
+        #endregion
+
+
+        #region 3Dc
+        private void Decompress3Dc()
+        {
+            int x, y, z, i, j, k, t1, t2;
+            int t, tx, ty;
+            //double d;
+            //double r, g, b;
+            int TempLoc = 0, Temp2Loc = 0;
+            byte[] XColours = new byte[8], YColours = new byte[8];
+            uint bitmask, bitmask2, Offset, CurrOffset;
+
+
+            Offset = 0;
+            for (z = 0; z < depth; z++)
+            {
+                for (y = 0; y < height; y += 4)
+                {
+                    for (x = 0; x < width; x += 4)
+                    {
+                        Temp2Loc = TempLoc + 8;
+
+                        //Read Y palette
+                        t1 = YColours[0] = compdata[TempLoc];
+                        t2 = YColours[1] = compdata[TempLoc + 1];
+                        TempLoc += 2;
+                        if (t1 > t2)
+                        {
+                            for (i = 2; i < 8; ++i)
+                            {
+                                YColours[i] = (byte)(t1 + ((t2 - t1) * (i - 1)) / 7);
+                            }
+                        }
+                        else
+                        {
+                            for (i = 2; i < 6; ++i)
+                            {
+                                YColours[i] = (byte)(t1 + ((t2 - t1) * (i - 1)) / 5);
+                            }
+                            YColours[6] = 0;
+                            YColours[7] = 255;
+                        }
+
+                        // Read X palette
+                        t1 = XColours[0] = compdata[Temp2Loc];
+                        t2 = XColours[1] = compdata[Temp2Loc + 1];
+                        Temp2Loc += 2;
+                        if (t1 > t2)
+                        {
+                            for (i = 2; i < 8; ++i)
+                            {
+                                XColours[i] = (byte)(t1 + ((t2 - t1) * (i - 1)) / 7);
+                            }
+                        }
+                        else
+                        {
+                            for (i = 2; i < 6; ++i)
+                            {
+                                XColours[i] = (byte)(t1 + ((t2 - t1) * (i - 1)) / 5);
+                            }
+                            XColours[6] = 0;
+                            XColours[7] = 255;
+                        }
+
+                        //decompress pixel data
+                        CurrOffset = Offset;
+                        for (k = 0; k < 4; k += 2)
+                        {
+                            // First three bytes
+                            bitmask = (compdata[TempLoc]) | ((uint)(compdata[TempLoc + 1]) << 8) | ((uint)(compdata[TempLoc + 2]) << 16);
+                            bitmask2 = (compdata[Temp2Loc]) | ((uint)(compdata[Temp2Loc + 1]) << 8) | ((uint)(compdata[Temp2Loc + 2]) << 16);
+                            for (j = 0; j < 2; j++)
+                            {
+                                // only put pixels out < height
+                                if ((y + k + j) < height)
+                                {
+                                    for (i = 0; i < 4; i++)
+                                    {
+                                        // only put pixels out < width
+                                        if (((x + i) < width))
+                                        {
+
+                                            t1 = (int)(CurrOffset + ((x + i) * 4));
+                                            rawidata[t1 + 1] = YColours[bitmask & 7];
+                                            rawidata[t1 + 0] = XColours[bitmask2 & 7];
+                                            tx = XColours[bitmask2 & 7];
+                                            ty = YColours[bitmask & 7];
+
+                                            //calculate b (z) component ((r/255)^2 + (g/255)^2 + (b/255)^2 = 1
+                                            //d = (double)255 * Math.Sqrt(((double)tx / 255) + ((double)ty / 255));
+                                            //if (d > 255)
+                                            //{
+                                            //    rawidata[t1 + 2] = (byte)((d - 255) + 127);
+                                            //    //rawidata[t1    ] = (byte)(rawidata[t1    ] + 127);
+                                            //    //rawidata[t1 + 1] = (byte)((255 - rawidata[t1 + 1]) + 127);
+                                            //}
+                                            //else
+                                            //{
+                                            //    rawidata[t1 + 2] = (byte)(d);
+                                            //}
+                                            //rawidata[t1 + 2] = (d > 255 ? (byte)((d - 255) + 128) : (byte)d);
+
+                                            //if (rawidata[t1 + 2] == 0 && d != 0)
+                                            //{
+                                            //    throw new Exception();
+                                            //}
+
+                                            //r = XColours[bitmask2 & 7];
+                                            //g = YColours[bitmask & 7];
+                                            //b = (d > 255 ? (byte)255 : (byte)d);
+                                            //if ((((r / 255) * (r / 255)) + ((g / 255) * (g / 255)) + ((b / 255) * (b / 255))) != 1)
+                                            //{
+                                                //throw new Exception();
+                                                //rawidata[t1 + 2] = 127;
+                                            //}
+
+                                            t = (int)(127 * 128 - ((tx - 127) * (tx - 128)) - ((ty - 127) * (ty - 128)));
+                                            if (t > 0)
+                                            {
+                                                //rawidata[t1 + 2] = 0x7F;
+                                                rawidata[t1 + 2] = (byte)(Math.Sqrt(t) + 128);// > 255 ? (byte)255 : (Math.Sqrt(t) + 128));
+                                            }
+                                            else
+                                            {
+                                                rawidata[t1 + 2] = 0x7F;
+                                            }
+                                            rawidata[t1 + 3] = 255;
+                                        }
+                                        bitmask >>= 3;
+                                        bitmask2 >>= 3;
+                                    }
+                                    CurrOffset += width * 4;
+                                }
+                            }
+                            TempLoc += 3;
+                            Temp2Loc += 3;
+                        }
+                        TempLoc += 8;
+                    }
+                    Offset += this.width * 16;
+                }
+            }
+        }
+        #endregion
+
+        #region Ati1n
+        private void DecompressAti1n()
+        {
+            int x, y, z, i, j, k, t1, t2;
+            uint TempLoc = 0;
+            byte[] Colours = new byte[8];
+            uint bitmask, Offset, CurrOffset;
+
+            Offset = 0;
+            for (z = 0; z < depth; z++)
+            {
+                for (y = 0; y < height; y += 4)
+                {
+                    for (x = 0; x < width; x += 4)
+                    {
+                        //Read palette
+                        t1 = Colours[0] = compdata[TempLoc];
+                        t2 = Colours[1] = compdata[TempLoc + 1];
+                        TempLoc += 2;
+                        if (t1 > t2)
+                        {
+                            for (i = 2; i < 8; ++i)
+                            {
+                                Colours[i] = (byte)(t1 + ((t2 - t1) * (i - 1)) / 7);
+                            }
+                        }
+                        else
+                        {
+                            for (i = 2; i < 6; ++i)
+                            {
+                                Colours[i] = (byte)(t1 + ((t2 - t1) * (i - 1)) / 5);
+                            }
+                            Colours[6] = 0;
+                            Colours[7] = 255;
+                        }
+
+                        //decompress pixel data
+                        CurrOffset = Offset;
+                        for (k = 0; k < 4; k += 2)
+                        {
+                            // First three bytes
+                            bitmask = ((compdata[TempLoc]) | ((uint)(compdata[TempLoc + 1]) << 8) | ((uint)(compdata[TempLoc + 2]) << 16));
+                            for (j = 0; j < 2; j++)
+                            {
+                                // only put pixels out < height
+                                if ((y + k + j) < height)
+                                {
+                                    for (i = 0; i < 4; i++)
+                                    {
+                                        // only put pixels out < width
+                                        if (((x + i) < width))
+                                        {
+                                            t1 = (byte)(CurrOffset + ((x + i) * 4));
+                                            rawidata[t1    ] = Colours[bitmask & 0x07];
+                                            rawidata[t1 + 1] = Colours[bitmask & 0x07];
+                                            rawidata[t1 + 2] = Colours[bitmask & 0x07];
+                                            rawidata[t1 + 3] = 255;
+                                        }
+                                        bitmask >>= 3;
+                                    }
+                                    CurrOffset += width * 4;
+                                }
+                            }
+                            TempLoc += 3;
+                        }
+                    }
+                    Offset += this.width * 16;
+                }
+            }
+        }
+        #endregion
+
+
+        //        #region RXGB
+        //        ILboolean DecompressRXGB()
+        //{
+        //    int			x, y, z, i, j, k, Select;
+        //    ILubyte		*Temp;
+        //    Color565	*color_0, *color_1;
+        //    Color8888	colours[4], *col;
+        //    ILuint		bitmask, Offset;
+        //    ILubyte		alphas[8], *alphamask;
+        //    ILuint		bits;
+
+        //    if (!CompData)
+        //        return IL_FALSE;
+
+        //    Temp = CompData;
+        //    for (z = 0; z < Depth; z++) {
+        //        for (y = 0; y < Height; y += 4) {
+        //            for (x = 0; x < Width; x += 4) {
+        //                if (y >= Height || x >= Width)
+        //                    break;
+        //                alphas[0] = Temp[0];
+        //                alphas[1] = Temp[1];
+        //                alphamask = Temp + 2;
+        //                Temp += 8;
+        //                color_0 = ((Color565*)Temp);
+        //                color_1 = ((Color565*)(Temp+2));
+        //                bitmask = ((ILuint*)Temp)[1];
+        //                Temp += 8;
+
+        //                colours[0].r = color_0->nRed << 3;
+        //                colours[0].g = color_0->nGreen << 2;
+        //                colours[0].b = color_0->nBlue << 3;
+        //                colours[0].a = 0xFF;
+
+        //                colours[1].r = color_1->nRed << 3;
+        //                colours[1].g = color_1->nGreen << 2;
+        //                colours[1].b = color_1->nBlue << 3;
+        //                colours[1].a = 0xFF;
+
+        //                // Four-color block: derive the other two colors.    
+        //                // 00 = color_0, 01 = color_1, 10 = color_2, 11 = color_3
+        //                // These 2-bit codes correspond to the 2-bit fields 
+        //                // stored in the 64-bit block.
+        //                colours[2].b = (2 * colours[0].b + colours[1].b + 1) / 3;
+        //                colours[2].g = (2 * colours[0].g + colours[1].g + 1) / 3;
+        //                colours[2].r = (2 * colours[0].r + colours[1].r + 1) / 3;
+        //                colours[2].a = 0xFF;
+
+        //                colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
+        //                colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
+        //                colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
+        //                colours[3].a = 0xFF;
+
+        //                k = 0;
+        //                for (j = 0; j < 4; j++) {
+        //                    for (i = 0; i < 4; i++, k++) {
+
+        //                        Select = (bitmask & (0x03 << k*2)) >> k*2;
+        //                        col = &colours[Select];
+
+        //                        // only put pixels out < width or height
+        //                        if (((x + i) < Width) && ((y + j) < Height)) {
+        //                            Offset = z * Image->SizeOfPlane + (y + j) * Image->Bps + (x + i) * Image->Bpp;
+        //                            Image->Data[Offset + 0] = col->r;
+        //                            Image->Data[Offset + 1] = col->g;
+        //                            Image->Data[Offset + 2] = col->b;
+        //                        }
+        //                    }
+        //                }
+
+        //                // 8-alpha or 6-alpha block?    
+        //                if (alphas[0] > alphas[1]) {    
+        //                    // 8-alpha block:  derive the other six alphas.    
+        //                    // Bit code 000 = alpha_0, 001 = alpha_1, others are interpolated.
+        //                    alphas[2] = (6 * alphas[0] + 1 * alphas[1] + 3) / 7;	// bit code 010
+        //                    alphas[3] = (5 * alphas[0] + 2 * alphas[1] + 3) / 7;	// bit code 011
+        //                    alphas[4] = (4 * alphas[0] + 3 * alphas[1] + 3) / 7;	// bit code 100
+        //                    alphas[5] = (3 * alphas[0] + 4 * alphas[1] + 3) / 7;	// bit code 101
+        //                    alphas[6] = (2 * alphas[0] + 5 * alphas[1] + 3) / 7;	// bit code 110
+        //                    alphas[7] = (1 * alphas[0] + 6 * alphas[1] + 3) / 7;	// bit code 111
+        //                }
+        //                else {
+        //                    // 6-alpha block.
+        //                    // Bit code 000 = alpha_0, 001 = alpha_1, others are interpolated.
+        //                    alphas[2] = (4 * alphas[0] + 1 * alphas[1] + 2) / 5;	// Bit code 010
+        //                    alphas[3] = (3 * alphas[0] + 2 * alphas[1] + 2) / 5;	// Bit code 011
+        //                    alphas[4] = (2 * alphas[0] + 3 * alphas[1] + 2) / 5;	// Bit code 100
+        //                    alphas[5] = (1 * alphas[0] + 4 * alphas[1] + 2) / 5;	// Bit code 101
+        //                    alphas[6] = 0x00;										// Bit code 110
+        //                    alphas[7] = 0xFF;										// Bit code 111
+        //                }
+
+        //                // Note: Have to separate the next two loops,
+        //                //	it operates on a 6-byte system.
+        //                // First three bytes
+        //                bits = *((ILint*)alphamask);
+        //                for (j = 0; j < 2; j++) {
+        //                    for (i = 0; i < 4; i++) {
+        //                        // only put pixels out < width or height
+        //                        if (((x + i) < Width) && ((y + j) < Height)) {
+        //                            Offset = z * Image->SizeOfPlane + (y + j) * Image->Bps + (x + i) * Image->Bpp + 0;
+        //                            Image->Data[Offset] = alphas[bits & 0x07];
+        //                        }
+        //                        bits >>= 3;
+        //                    }
+        //                }
+
+        //                // Last three bytes
+        //                bits = *((ILint*)&alphamask[3]);
+        //                for (j = 2; j < 4; j++) {
+        //                    for (i = 0; i < 4; i++) {
+        //                        // only put pixels out < width or height
+        //                        if (((x + i) < Width) && ((y + j) < Height)) {
+        //                            Offset = z * Image->SizeOfPlane + (y + j) * Image->Bps + (x + i) * Image->Bpp + 0;
+        //                            Image->Data[Offset] = alphas[bits & 0x07];
+        //                        }
+        //                        bits >>= 3;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return IL_TRUE;
+        //}
+        //        #endregion
+
+        #region Float
+        private void DecompressFloat()
+        {
+            uint i, j, Size;
+
+            switch (this.CompFormat)
+            {
+                case PixelFormat.R32F:  // Red float, green = blue = max
+                    Size = this.width * this.height * 4;
+                    for (i = 0, j = 0; i < Size; i += 4, j += 4)
+                    {
+                        rawidata[i] = (byte)((BitConverter.ToSingle(compdata, (int)j)) * 255);
+                        rawidata[i + 1] = 255;
+                        rawidata[i + 2] = 255;
+                        rawidata[i + 3] = 255;
+                    }
+                    return;
+
+                case PixelFormat.A32B32G32R32F:  // Direct copy of float RGBA data
+                    Size = this.width * this.height * 4;
+                    for (i = 0, j = 0; i < Size; i += 4, j += 16)
+                    {
+                        rawidata[i] = (byte)((BitConverter.ToSingle(compdata, (int)j)) * 255);
+                        rawidata[i + 1] = (byte)((BitConverter.ToSingle(compdata, (int)j + 4)) * 255);
+                        rawidata[i + 2] = (byte)((BitConverter.ToSingle(compdata, (int)j + 8)) * 255); ;
+                        rawidata[i + 3] = (byte)((BitConverter.ToSingle(compdata, (int)j + 12)) * 255); ;
+                    }
+
+                    return;
+                case PixelFormat.G32R32F:  // Red double, green float, blue = max
+                    Size = this.width * this.height * 4;
+                    for (i = 0, j = 0; i < Size; i += 4, j += 8)
+                    {
+                        rawidata[i] = (byte)((BitConverter.ToSingle(compdata, (int)j)) * 255);
+                        rawidata[i + 1] = (byte)((BitConverter.ToSingle(compdata, (int)j + 4)) * 255);
+                        rawidata[i + 2] = 255;
+                        rawidata[i + 3] = 255;
+                    }
+                    return;
+
+                case PixelFormat.R16F:  // Red float, green = blue = max
+                    iConvR16ToFloat32();
+                    return;
+
+                case PixelFormat.A16B16G16R16F:  // Just convert from half to float.
+                    iConvFloat16ToFloat32();
+                    return;
+
+                case PixelFormat.G16R16F:  // Convert from half to float, set blue = max.
+                    iConvG16R16ToFloat32();
+                    return;
+
+                default:
+                    throw new Exception("Unknown Float Type!");
+            }
+        }
+
+        private float[] compFloatData;
+
+        private void iConvFloat16ToFloat32()
+        {
+            uint flen = (uint)Math.Ceiling((double)(compdata.Length / 2));
+            compFloatData = new float[flen];
+            for (uint i = 0, cloc = 0; i < flen; i++, cloc += 2)
+            {
+                compFloatData[i] = (float)Half.ToHalf(compdata, (int)cloc);
+            }
+
+            DecompressFloatData();
+        }
+
+        private void DecompressFloatData()
+        {
+            uint Size = this.width * this.height * 4;
+            for (uint i = 0, j = 0; i < Size; i += 4, j += 4)
+            {
+                rawidata[i] = (byte)((compFloatData[j]) * 255);
+                rawidata[i + 1] = (byte)((compFloatData[j + 1]) * 255);
+                rawidata[i + 2] = (byte)((compFloatData[j + 2]) * 255);
+                rawidata[i + 3] = (byte)((compFloatData[j + 3]) * 255);
+            }
+            compFloatData = null;
+        }
+
+        private void iConvG16R16ToFloat32()
+        {
+            uint flen = (uint)Math.Ceiling((double)(compdata.Length / 2));
+            compFloatData = new float[flen];
+            for (uint i = 0, cloc = 0; i < flen; i += 4, cloc += 4)
+            {
+                compFloatData[i] = (float)Half.ToHalf(compdata, (int)cloc);
+                compFloatData[i + 1] = (float)Half.ToHalf(compdata, (int)cloc + 2);
+                compFloatData[i + 2] = 1.0f;
+                compFloatData[i + 3] = 1.0f;
+            }
+
+            DecompressFloatData();
+        }
+
+        private void iConvR16ToFloat32()
+        {
+            uint flen = (uint)Math.Ceiling((double)(compdata.Length / 2));
+            compFloatData = new float[flen];
+            for (uint i = 0, cloc = 0; i < flen; i += 4, cloc += 2)
+            {
+                compFloatData[i] = (float)Half.ToHalf(compdata, (int)cloc);
+                compFloatData[i + 1] = 1.0f;
+                compFloatData[i + 2] = 1.0f;
+                compFloatData[i + 3] = 1.0f;
+            }
+
+            DecompressFloatData();
+        }
+        #endregion
+
+        #region A16B16G16R16
+        private void DecompressA16B16G16R16()
+        {
+            uint curloc = 0;
+            for (uint i = 0; i < compdata.Length; i += 8)
+            {
+                rawidata[curloc] = compdata[i + 0];
+                rawidata[curloc + 1] = compdata[i + 2];
+                rawidata[curloc + 2] = compdata[i + 4];
+                rawidata[curloc + 3] = compdata[i + 6];
+
+                curloc += 4;
+            }
+        }
+        #endregion
 
         #region ARGB
         private void DecompressARGB()
@@ -792,7 +1289,7 @@ namespace au.id.micolous.libs.DDSReader
         #region ARGB16
         private void DecompressARGB16()
         {
-            uint ReadI = 0,  i;
+            uint ReadI = 0, i;
             byte RedL, RedR;
             byte GreenL, GreenR;
             byte BlueL, BlueR;
@@ -836,7 +1333,7 @@ namespace au.id.micolous.libs.DDSReader
 
                 this.rawidata[curloc + 2] = (byte)((ReadI & rbitmask) >> (RedR + 2));// << RedL);
                 this.rawidata[curloc + 1] = (byte)((ReadI & gbitmask) >> (GreenR + 2));// << GreenL);
-                this.rawidata[curloc    ] = (byte)((ReadI & bbitmask) >> (BlueR + 2));// << BlueL);
+                this.rawidata[curloc] = (byte)((ReadI & bbitmask) >> (BlueR + 2));// << BlueL);
 
                 if (this.alphabitmask > 0)
                 {
@@ -856,7 +1353,7 @@ namespace au.id.micolous.libs.DDSReader
                 }
 
                 //throw new Exception();
-                curloc += 4; 
+                curloc += 4;
 
             }
         }
