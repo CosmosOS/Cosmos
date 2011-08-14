@@ -64,6 +64,7 @@
     <Compile Include="ImageFormats\ImageFormat.cs" />
     <Compile Include="ImageFormats\JpegSupport.cs" />
     <Compile Include="ImageFormats\OifSupport.cs" />
+    <Compile Include="ImageFormats\PcxSupport.cs" />
     <Compile Include="ImageFormats\PngSupport.cs">
       <SubType>Code</SubType>
     </Compile>

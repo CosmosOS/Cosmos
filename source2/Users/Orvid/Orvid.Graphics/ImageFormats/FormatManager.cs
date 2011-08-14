@@ -19,6 +19,7 @@ namespace Orvid.Graphics.ImageFormats
             Formats.Add(new XpmImage());
             Formats.Add(new PnmFamilyImage());
             Formats.Add(new DdsImage());
+            Formats.Add(new PcxImage());
         }
 
     }

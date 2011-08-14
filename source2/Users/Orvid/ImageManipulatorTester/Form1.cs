@@ -520,7 +520,6 @@ namespace ImageManipulatorTester
 
             System.GC.Collect();
 
-#else
 
             #region Dds Loading
 
@@ -1364,6 +1363,32 @@ namespace ImageManipulatorTester
             System.GC.Collect();
 
 #endif
+            
+            #region Load Pcx
+            {
+                FileStream s = new FileStream(Path.GetFullPath("ImageFormats/pcx/Building.pcx"), FileMode.Open);
+                Orvid.Graphics.ImageFormats.PcxImage px = new Orvid.Graphics.ImageFormats.PcxImage();
+
+                t.Start();
+                Orvid.Graphics.Image I2 = px.Load(s);
+                t.Stop();
+                WriteToLog("Loading a Pcx Image took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                s.Close();
+                s.Dispose();
+                Bitmap b = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel2;
+                l.Text = "Loaded Pcx Image";
+                l.Height = b.Height;
+                l.Width = b.Width;
+                l.Image = b;
+            }
+            #endregion
+
+            System.GC.Collect();
 
 
             st.Flush();

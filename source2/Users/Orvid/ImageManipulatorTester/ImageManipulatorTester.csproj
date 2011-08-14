@@ -77,6 +77,9 @@
     <None Include="ImageFormats\dds\Building-Dxt4.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ImageFormats\pcx\Building.pcx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="ImageFormats\pnm\Building.pbm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
