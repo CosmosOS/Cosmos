@@ -11,7 +11,6 @@ using Microsoft.VisualStudio.Shell;
 using System.Threading;
 using Cosmos.Compiler.Debug;
 using System.Windows.Threading;
-using Cosmos.VS.Debug;
 using System.Collections.Generic;
 
 namespace Cosmos.Cosmos_VS_Windows
