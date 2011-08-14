@@ -311,5 +311,10 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 
 [Run]
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
-Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
+#if BuildConfiguration == "Devkit"
+	; /setup without nosetupvstemplates takesa LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit
+	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup /nosetupvstemplates; Flags: waituntilterminated
+#else 
+	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
+#endif
 
