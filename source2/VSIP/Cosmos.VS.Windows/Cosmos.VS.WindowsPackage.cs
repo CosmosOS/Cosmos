@@ -64,10 +64,9 @@ namespace Cosmos.Cosmos_VS_Windows
             mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
             mTimer.Start();
 
-            mPipeThread = new PipeThread();
+            mPipeThread = new PipeThread(DebugWindow.PipeName);
             mPipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
-            var xServerThread = new Thread(mPipeThread.ThreadStartServer);
-            xServerThread.Start();
+            mPipeThread.Start();
 
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }

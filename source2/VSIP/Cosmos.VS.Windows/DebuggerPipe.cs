@@ -15,6 +15,11 @@ namespace Cosmos.VS.Debug {
     protected bool KillThread = false;
     protected NamedPipeServerStream mPipe;
     public event Action<byte, byte[]> DataPacketReceived;
+    protected string mPipeName;
+
+    public PipeThread(string aPipeName) {
+      mPipeName = aPipeName;
+    }
 
     public void Stop() {
       KillThread = true;
@@ -36,7 +41,13 @@ namespace Cosmos.VS.Debug {
       return xByte[0];
     }
 
-    public void ThreadStartServer() {
+    protected Thread mThread;
+    public void Start() {
+      mThread = new Thread(ThreadStartServer);
+      mThread.Start();
+    }
+
+    protected void ThreadStartServer() {
       try {
         // Some idiot MS intern must have written the blocking part of pipes. There is no way to
         // cancel WaitForConnection, or ReadByte. (pipes introduced in 3.5, I thought one time I read
@@ -53,7 +64,7 @@ namespace Cosmos.VS.Debug {
         // http://stackoverflow.com/questions/2700472/how-to-terminate-a-managed-thread-blocked-in-unmanaged-code
 
         while (!KillThread) { // Loop again to allow mult incoming connections between debug sessions
-          using (mPipe = new NamedPipeServerStream(DebugWindow.PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
+          using (mPipe = new NamedPipeServerStream(mPipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
             mPipe.WaitForConnection();
 
             byte xCmd;
