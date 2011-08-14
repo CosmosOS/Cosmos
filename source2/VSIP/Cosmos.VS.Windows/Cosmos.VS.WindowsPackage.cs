@@ -46,7 +46,7 @@ namespace Cosmos.Cosmos_VS_Windows
         Queue<byte> mCommand;
         Queue<byte[]> mMessage;
         System.Timers.Timer mTimer = new System.Timers.Timer(100);
-        PipeThread mPipeThread;
+        Cosmos.Compiler.Debug.Pipe mPipe;
 
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -64,9 +64,9 @@ namespace Cosmos.Cosmos_VS_Windows
             mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
             mTimer.Start();
 
-            mPipeThread = new PipeThread(DebugWindow.PipeName);
-            mPipeThread.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
-            mPipeThread.Start();
+            mPipe = new Cosmos.Compiler.Debug.Pipe(DebugWindow.PipeName);
+            mPipe.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
+            mPipe.Start();
 
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }

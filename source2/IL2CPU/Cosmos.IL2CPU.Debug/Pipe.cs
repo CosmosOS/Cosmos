@@ -8,16 +8,15 @@ using System.Windows.Threading;
 using System.Windows;
 using Cosmos.Compiler.Debug;
 using System.Threading;
-using Cosmos.Cosmos_VS_Windows;
 
-namespace Cosmos.VS.Debug {
-  class PipeThread {
+namespace Cosmos.Compiler.Debug {
+  public class Pipe {
     protected bool KillThread = false;
     protected NamedPipeServerStream mPipe;
     public event Action<byte, byte[]> DataPacketReceived;
     protected string mPipeName;
 
-    public PipeThread(string aPipeName) {
+    public Pipe(string aPipeName) {
       mPipeName = aPipeName;
     }
 

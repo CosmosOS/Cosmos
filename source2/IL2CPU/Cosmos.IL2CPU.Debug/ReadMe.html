@@ -20,7 +20,15 @@
       <ul>
         <li>DebugStub (running in Cosmos)</li>
         <li>Compiler (To communicate commands to the DebugStub over serial port)</li>
-        <li>Cosmos.VS.Debug - To contain commands used by both VSIP and the debug windows</li>
+        <li>Cosmos.VS.Debug<ul>
+          <li>To contain commands used by both VSIP and the debug windows</li>
+          <li>Pipe Class</li>
+          </ul>
+        </li>
+        <li>Cosmos.VS.Windows<ul>
+          <li>Uses Pipe class</li>
+          </ul>
+        </li>
       </ul>
 	
 	    <p>
