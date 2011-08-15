@@ -471,5 +471,50 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        #region AddNoise
+        public enum NoiseGenerationMethod
+        {
+            Additive,
+            SaltAndPepper,
+        }
+        public static Image AddNoise(Image i, BoundingBox bounds, int strength = 10, NoiseGenerationMethod method = NoiseGenerationMethod.Additive)
+        {
+            Image im = null;
+            switch (method)
+            {
+                case NoiseGenerationMethod.Additive:
+                    im = AddAdditiveNoise(i, bounds, strength);
+                    break;
+
+                //case NoiseGenerationMethod.SaltAndPepper:
+                //    im = AddSaltAndPepperNoise(i, bounds);
+                //    break;
+            }
+            return im;
+        }
+
+        private static Image AddAdditiveNoise(Image i, BoundingBox b, int strength)
+        {
+            Random r = new Random(0);
+            uint startY = (uint)b.Top;
+            uint stopY = (uint)(startY + b.Height);
+
+            uint startX = (uint)b.Left;
+            uint stopX = (uint)(startX + b.Width);
+
+            Pixel p;
+            for (uint y = startY; y < stopY; y++)
+            {
+                for (uint x = startX; x < stopX; x++)
+                {
+                    p = i.GetPixel(x, y);
+                    i.SetPixel(x, y, new Pixel((byte)Math.Max(0, Math.Min(255, p.R + (r.NextDouble() * strength - strength))), (byte)Math.Max(0, Math.Min(255, p.G + (r.NextDouble() * strength - strength))), (byte)Math.Max(0, Math.Min(255, p.B + (r.NextDouble() * strength - strength))), 255));
+                }
+            }
+            return i;
+        }
+
+        #endregion
+
     }
 }

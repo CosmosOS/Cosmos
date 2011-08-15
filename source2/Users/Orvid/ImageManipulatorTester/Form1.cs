@@ -1,5 +1,5 @@
 ﻿//#define AnimateGif
-//#define DebugAllFormats
+#define DebugAllFormats
 
 using System;
 using System.Collections.Generic;
@@ -153,6 +153,27 @@ namespace ImageManipulatorTester
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Parent = flowLayoutPanel1;
                 l.Text = "Invert Colors";
+                l.Height = b2.Height;
+                l.Width = b2.Width;
+                l.Image = b2;
+            }
+            #endregion
+
+            System.GC.Collect();
+
+            #region AddNoise Additive
+            {
+                t.Start();
+                Orvid.Graphics.Image I2 = Orvid.Graphics.ImageManipulator.AddNoise(i, new Orvid.Graphics.BoundingBox(0, i.Width, 0, i.Height), 200, Orvid.Graphics.ImageManipulator.NoiseGenerationMethod.Additive);
+                t.Stop();
+                WriteToLog("Additive Add-Noise took '" + t.ElapsedMilliseconds.ToString() + " ms'");
+                t.Reset();
+
+                Bitmap b2 = (Bitmap)I2;
+                LabeledImage l = new LabeledImage();
+                l.BorderStyle = BorderStyle.FixedSingle;
+                l.Parent = flowLayoutPanel1;
+                l.Text = "Additive Add-Noise";
                 l.Height = b2.Height;
                 l.Width = b2.Width;
                 l.Image = b2;

@@ -6,10 +6,27 @@ namespace Orvid.Graphics
     /// </summary>
     public class BoundingBox
     {
-        private int right;
-        private int left;
-        private int top;
-        private int bottom;
+        public int Right;
+        public int Left;
+        public int Top;
+        public int Bottom;
+
+        public int Width
+        {
+            get
+            {
+                return Right - Left;
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                return Bottom - Top;
+            }
+        }
+        
         /// <summary>
         /// The default constructor.
         /// </summary>
@@ -19,10 +36,10 @@ namespace Orvid.Graphics
         /// <param name="ibottom">The farthest down side of the bounding box.</param>
         public BoundingBox(int ileft, int iright, int itop, int ibottom)
         {
-            this.left = ileft;
-            this.right = iright;
-            this.top = itop;
-            this.bottom = ibottom;
+            this.Left = ileft;
+            this.Right = iright;
+            this.Top = itop;
+            this.Bottom = ibottom;
         }
         /// <summary>
         /// Returns true if the given point is inside the bounding box.
@@ -31,7 +48,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public bool IsInBounds(Vec2 p)
         {
-            return ((p.X < right && p.X > left) && (p.Y < top && p.Y > bottom));
+            return ((p.X < Right && p.X > Left) && (p.Y < Top && p.Y > Bottom));
         }
     }
 }

@@ -899,7 +899,6 @@ namespace au.id.micolous.libs.DDSReader
         }
         #endregion
 
-
         //        #region RXGB
         //        ILboolean DecompressRXGB()
         //{
