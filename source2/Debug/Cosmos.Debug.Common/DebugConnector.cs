@@ -41,6 +41,7 @@ namespace Cosmos.Debug.Common
 
         protected void SendCommandData(byte aCmd, byte[] aData, bool aWait) {
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
+          
             // If not connected, we dont send anything. Things like BPs etc can be set before connected.
             // The debugger must resend these after the start command hits.
             // We dont queue them, as it would end up with a lot of overlapping ops, ie set and then remove.
@@ -49,6 +50,9 @@ namespace Cosmos.Debug.Common
             // that the caller (Debugger) knows when the Start msg is received that it must
             // send over initializing information such as breakpoints.
             if (Connected) {
+                // This lock is used for:
+                //  1) VSDebugEngine is threaded and could send commands concurrently
+                //  2) Becuase in VSDebugEngine and commands from Debug.Windows can occur concurrently
                 lock (mSendCmdLock) {
                     //var xSB = new StringBuilder();
                     //foreach(byte x in aBytes) {
