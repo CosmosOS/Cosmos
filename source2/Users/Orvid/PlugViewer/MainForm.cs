@@ -7,18 +7,12 @@ using System.Text;
 using System.Windows.Forms;
 using Mono.Cecil;
 using System.IO;
+using PlugViewer.TreeViewNodes;
 
 namespace PlugViewer
 {
     public partial class MainForm : Form
     {
-        private Dictionary<string, AssemblyDefinition> LoadedAssemblies = new Dictionary<string, AssemblyDefinition>();
-        private Dictionary<string, TreeNode> Namespaces = new Dictionary<string, TreeNode>();
-        private List<string> MethodsNeedingPlugging = new List<string>();
-        private const int WarningIconIndex = 156;
-        private const int ErrorIconIndex = 157;
-
-
         public MainForm()
         {
             InitializeComponent();
@@ -26,31 +20,28 @@ namespace PlugViewer
 
         private void AddAssemblyToView(AssemblyDefinition a)
         {
-            TreeNode nd = treeView1.Nodes.Add(a.FullName, a.Name.Name, 0, 0);
-            MethodsNeedingPlugging.Add("Assembly: " + a.Name.Name);
+            TreeNode nd = new AssemblyTreeNode(a);
+            treeView1.Nodes.Add(nd);
             foreach (ModuleDefinition md in a.Modules)
             {
                 LoadModule(nd, md);
             }
-            LoadedAssemblies.Add(a.Name.Name, a);
-            MethodsNeedingPlugging.Add("");
-            MethodsNeedingPlugging.Add("");
-            MethodsNeedingPlugging.Add("");
         }
 
         private void LoadModule(TreeNode parent, ModuleDefinition md)
         {
-            TreeNode tn = parent.Nodes.Add(md.FullyQualifiedName, md.Name, 89, 89);
+            ModuleTreeNode tn = new ModuleTreeNode(md);
+            parent.Nodes.Add(tn);
             foreach (TypeDefinition t in md.Types)
             {
-                if (!Namespaces.ContainsKey(t.Namespace))
+                if (!tn.Namespaces.ContainsKey(t.Namespace))
                 {
-                    TreeNode tnd = tn.Nodes.Add(t.Namespace, t.Namespace, 95, 95);
-                    Namespaces.Add(t.Namespace, tnd);
+                    TreeNode tnd = new NamespaceTreeNode(t.Namespace);
+                    tn.Nodes.Add(tnd);
+                    tn.Namespaces.Add(t.Namespace, tnd);
                 }
-                LoadType(Namespaces[t.Namespace], t);
+                LoadType(tn.Namespaces[t.Namespace], t);
             }
-            Namespaces = new Dictionary<string, TreeNode>();
         }
 
         private void LoadType(TreeNode parentNode, TypeDefinition type)
@@ -60,22 +51,24 @@ namespace PlugViewer
                 TreeNode node;
                 if (type.IsPublic)
                 {
-                    // It must be public
-                    node = parentNode.Nodes.Add(type.FullName, type.Name, 3, 3);
+                    node = new ClassTreeNode(type, ClassType.Class, Access.Public);
+                    parentNode.Nodes.Add(node);
                 }
                 else if (type.IsNestedPrivate)
                 {
-                    // It must be private.
-                    node = parentNode.Nodes.Add(type.FullName, type.Name, 5, 5);
+                    node = new ClassTreeNode(type, ClassType.Class, Access.Private);
+                    parentNode.Nodes.Add(node);
                 }
                 else if (type.IsNestedFamily)
                 {
-                    node = parentNode.Nodes.Add(type.FullName, type.Name, 4, 4);
+                    node = new ClassTreeNode(type, ClassType.Class, Access.Internal);
+                    parentNode.Nodes.Add(node);
                 }
                 else
                 {
-                    // It must be NestedProtected.
-                    node = parentNode.Nodes.Add(type.FullName, type.Name, 6, 6);
+                    // It must be Protected.
+                    node = new ClassTreeNode(type, ClassType.Class, Access.Protected);
+                    parentNode.Nodes.Add(node);
                 }
 
 
@@ -90,7 +83,7 @@ namespace PlugViewer
                 }
                 foreach (TypeReference ntd in type.Interfaces)
                 {
-                    LoadInterface(node, ntd);
+                    LoadImplementedInterface(node, ntd);
                 }
                 foreach (EventDefinition ed in type.Events)
                 {
@@ -124,150 +117,116 @@ namespace PlugViewer
 
         }
 
-        uint i = 0;
         private void LoadMethod(TreeNode parentNode, MethodDefinition method)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(method.Name);
-            sb.Append("(");
-            int cnt = 0;
-            while (cnt < method.Parameters.Count)
-            {
-                if (cnt > 0)
-                {
-                    sb.Append(", ");
-                }
-                ParameterDefinition pd = method.Parameters[cnt];
-                //foreach (CustomAttribute c in pd.CustomAttributes)
-                //{
-                //    if (c.AttributeType.Name == "OutAttribute")
-                //    {
-                //        sb.Append("out ");
-                //    }
-                //    else if (c.AttributeType.Name == "InAttribute")
-                //    {
-                //        sb.Append("in ");
-                //    }
-                //}
-                sb.Append(pd.ParameterType.Name);
-                sb.Append(" ");
-                sb.Append(pd.Name);
-                cnt++;
-            }
-            sb.Append(")");
-            string dispkey = sb.ToString();
-            string fullkey = (method.FullName + sb.ToString().Substring(method.Name.Length));
-
-            #region Check if plug needed
-            if ((method.Attributes & MethodAttributes.PInvokeImpl) != 0)
-            {
-                // pinvoke methods dont have an embedded implementation
-                parentNode.Nodes.Add(fullkey, dispkey, ErrorIconIndex, ErrorIconIndex);
-                i++;
-                MethodsNeedingPlugging.Add(i.ToString().PadLeft(7, ' ') + ". " + method.FullName + " ~ PInvoke Impl");
-                return;
-            }
-            else
-            {
-                MethodImplAttributes xImplFlags = method.ImplAttributes;
-                // todo: prob even more
-                if ((xImplFlags & MethodImplAttributes.Native) != 0)
-                {
-                    // native implementations cannot be compiled
-                    parentNode.Nodes.Add(fullkey, dispkey, ErrorIconIndex, ErrorIconIndex);
-                    i++;
-                    MethodsNeedingPlugging.Add(i.ToString().PadLeft(7, ' ') + ". " + method.FullName + " ~ Method Implementation: Native");
-                    return;
-                }
-                else if ((xImplFlags & MethodImplAttributes.InternalCall) != 0)
-                {
-                    parentNode.Nodes.Add(fullkey, dispkey, ErrorIconIndex, ErrorIconIndex);
-                    i++;
-                    MethodsNeedingPlugging.Add(i.ToString().PadLeft(7, ' ') + ". " + method.FullName + " ~ Method Implementation: Internal Call");
-                    return;
-                }
-                else if ((xImplFlags & MethodImplAttributes.Unmanaged) != 0)
-                {
-                    parentNode.Nodes.Add(fullkey, dispkey, ErrorIconIndex, ErrorIconIndex);
-                    i++;
-                    MethodsNeedingPlugging.Add(i.ToString().PadLeft(7, ' ') + ". " + method.FullName + " ~ Method Implementation: Unmanaged");
-                    return;
-                }
-            }
-            #endregion
-
+            string dispkey = NameBuilder.BuildMethodDisplayName(method);
+            string fullkey = (method.FullName + NameBuilder.BuildMethodDisplayName(method).Substring(method.Name.Length));
+            TreeNode tn;
             // Check that the method isn't part of a property or event definition.
             if (!method.IsGetter && !method.IsSetter)
             {
                 if (method.IsVirtual)
                 {
-                    // The method is an override (or at least overridable)
-                    if (method.IsPublic)
+                    if (method.HasBody) // The method is an override
                     {
-                        parentNode.Nodes.Add(fullkey, dispkey, 83, 83);
+                        if (method.IsPublic)
+                        {
+                            tn = new MethodTreeNode(method, MethodType.OverrideMethod, Access.Public);
+                            parentNode.Nodes.Add(tn);
+                        }
+                        else if (method.IsPrivate)
+                        {
+                            tn = new MethodTreeNode(method, MethodType.OverrideMethod, Access.Private);
+                            parentNode.Nodes.Add(tn);
+                        }
+                        else if (method.IsInternalCall)
+                        {
+                            tn = new MethodTreeNode(method, MethodType.OverrideMethod, Access.Internal);
+                            parentNode.Nodes.Add(tn);
+                        }
+                        else
+                        {
+                            // It must be protected.
+                            tn = new MethodTreeNode(method, MethodType.OverrideMethod, Access.Protected);
+                            parentNode.Nodes.Add(tn);
+                        }
                     }
-                    else if (method.IsPrivate)
+                    else // The method is virtual, but not an override.
                     {
-                        parentNode.Nodes.Add(fullkey, dispkey, 85, 85);
-                    }
-                    else if (method.IsInternalCall)
-                    {
-                        parentNode.Nodes.Add(fullkey, dispkey, 84, 84);
-                    }
-                    else
-                    {
-                        // It must be protected.
-                        parentNode.Nodes.Add(fullkey, dispkey, 86, 86);
+                        if (method.IsPublic)
+                        {
+                            tn = new MethodTreeNode(method, MethodType.VirtualMethod, Access.Public);
+                            parentNode.Nodes.Add(tn);
+                        }
+                        else if (method.IsPrivate)
+                        {
+                            tn = new MethodTreeNode(method, MethodType.VirtualMethod, Access.Private);
+                            parentNode.Nodes.Add(tn);
+                        }
+                        else if (method.IsInternalCall)
+                        {
+                            tn = new MethodTreeNode(method, MethodType.VirtualMethod, Access.Internal);
+                            parentNode.Nodes.Add(tn);
+                        }
+                        else
+                        {
+                            // It must be protected.
+                            tn = new MethodTreeNode(method, MethodType.VirtualMethod, Access.Protected);
+                            parentNode.Nodes.Add(tn);
+                        }
                     }
                 }
-                else
+                else // The method is a regular method
                 {
                     if (method.IsPublic)
                     {
-                        parentNode.Nodes.Add(fullkey, dispkey, 77, 77);
+                        tn = new MethodTreeNode(method, MethodType.BasicMethod, Access.Public);
+                        parentNode.Nodes.Add(tn);
                     }
                     else if (method.IsPrivate)
                     {
-                        parentNode.Nodes.Add(fullkey, dispkey, 79, 79);
+                        tn = new MethodTreeNode(method, MethodType.BasicMethod, Access.Private);
+                        parentNode.Nodes.Add(tn);
                     }
                     else if (method.IsInternalCall)
                     {
-                        // It's internal.
-                        parentNode.Nodes.Add(fullkey, dispkey, 78, 78);
+                        tn = new MethodTreeNode(method, MethodType.BasicMethod, Access.Internal);
+                        parentNode.Nodes.Add(tn);
                     }
                     else
                     {
                         // It must be protected.
-                        parentNode.Nodes.Add(fullkey, dispkey, 80, 80);
+                        tn = new MethodTreeNode(method, MethodType.BasicMethod, Access.Protected);
+                        parentNode.Nodes.Add(tn);
                     }
                 }
             }
         }
 
-        private void LoadInterface(TreeNode parentNode, TypeReference intface)
+        private void LoadImplementedInterface(TreeNode parentNode, TypeReference intface)
         {
             TypeDefinition type = intface.Resolve();
             TreeNode node;
             if (intface.Resolve().IsPublic)
             {
-                node = parentNode.Nodes.Add(intface.FullName, intface.Name, 52, 52);
+                node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Public);
+                parentNode.Nodes.Add(node);
             }
             else if (intface.Resolve().IsNestedPrivate)
             {
-                node = parentNode.Nodes.Add(intface.FullName, intface.Name, 54, 54);
+                node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Private);
+                parentNode.Nodes.Add(node);
             }
             else if (intface.Resolve().IsNestedFamily)
             {
-                node = parentNode.Nodes.Add(intface.FullName, intface.Name, 53, 53);
-            }
-            else if (intface.Resolve().IsSealed)
-            {
-                node = parentNode.Nodes.Add(intface.FullName, intface.Name, 56, 56);
+                node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Internal);
+                parentNode.Nodes.Add(node);
             }
             else
             {
                 // It must be protected.
-                node = parentNode.Nodes.Add(intface.FullName, intface.Name, 55, 55);
+                node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Protected);
+                parentNode.Nodes.Add(node);
             }
 
             foreach (TypeDefinition ntd in type.NestedTypes)
@@ -280,7 +239,59 @@ namespace PlugViewer
             }
             foreach (TypeReference ntd in type.Interfaces)
             {
-                LoadInterface(node, ntd);
+                LoadImplementedInterface(node, ntd);
+            }
+            foreach (EventDefinition ed in type.Events)
+            {
+                LoadEvent(node, ed);
+            }
+            foreach (PropertyDefinition pd in type.Properties)
+            {
+                LoadProperty(node, pd);
+            }
+            foreach (FieldDefinition fd in type.Fields)
+            {
+                LoadField(node, fd);
+            }
+        }
+
+        private void LoadInterface(TreeNode parentNode, TypeReference intface)
+        {
+            TypeDefinition type = intface.Resolve();
+            TreeNode node;
+            if (intface.Resolve().IsPublic)
+            {
+                node = new ClassTreeNode(intface, ClassType.Interface, Access.Public);
+                parentNode.Nodes.Add(node);
+            }
+            else if (intface.Resolve().IsNestedPrivate)
+            {
+                node = new ClassTreeNode(intface, ClassType.Interface, Access.Private);
+                parentNode.Nodes.Add(node);
+            }
+            else if (intface.Resolve().IsNestedFamily)
+            {
+                node = new ClassTreeNode(intface, ClassType.Interface, Access.Internal);
+                parentNode.Nodes.Add(node);
+            }
+            else
+            {
+                // It must be protected.
+                node = new ClassTreeNode(intface, ClassType.Interface, Access.Protected);
+                parentNode.Nodes.Add(node);
+            }
+
+            foreach (TypeDefinition ntd in type.NestedTypes)
+            {
+                LoadType(node, ntd);
+            }
+            foreach (MethodDefinition md in type.Methods)
+            {
+                LoadMethod(node, md);
+            }
+            foreach (TypeReference ntd in type.Interfaces)
+            {
+                LoadImplementedInterface(node, ntd);
             }
             foreach (EventDefinition ed in type.Events)
             {
@@ -298,38 +309,58 @@ namespace PlugViewer
 
         private void LoadEvent(TreeNode parentNode, EventDefinition evnt)
         {
-            parentNode.Nodes.Add(evnt.FullName, evnt.Name, 34, 34);
+            TreeNode n = new EventTreeNode(evnt);
+            parentNode.Nodes.Add(n);
         }
 
         private void LoadProperty(TreeNode parentNode, PropertyDefinition ptd)
         {
-            parentNode.Nodes.Add(ptd.FullName, ptd.Name, 113, 113);
+            TreeNode n;
+            if (ptd.HasConstant)
+                LoadConstant(parentNode, ptd);
+            if (ptd.SetMethod != null)
+            {
+                n = new PropertyTreeNode(ptd, true);
+                parentNode.Nodes.Add(n);
+            }
+            else
+            {
+                n = new PropertyTreeNode(ptd, false);
+                parentNode.Nodes.Add(n);
+            }
+        }
+
+        private void LoadConstant(TreeNode parentNode, PropertyDefinition ptd)
+        {
+            //TreeNode tr = new FieldTreeNode(fd, Access.Protected, false);
+            //parentNode.Nodes.Add(tr);
+            parentNode.Nodes.Add(ptd.FullName, ptd.Name, Constants.ConstantIcon, Constants.ConstantIcon);
         }
 
         private void LoadEnum(TreeNode parentNode, TypeDefinition td)
         {
             TreeNode enode;
+            TreeNode tr;
             if (td.IsPublic)
             {
-                enode = parentNode.Nodes.Add(td.FullName, td.Name, 22, 22);
+                enode = new ClassTreeNode(td, ClassType.Enum, Access.Public);
+                parentNode.Nodes.Add(enode);
             }
             else if (td.IsNestedPrivate)
             {
-                // It must be private.
-                enode = parentNode.Nodes.Add(td.FullName, td.Name, 24, 24);
+                enode = new ClassTreeNode(td, ClassType.Enum, Access.Private);
+                parentNode.Nodes.Add(enode);
             }
             else if (td.IsNestedFamily)
             {
-                enode = parentNode.Nodes.Add(td.FullName, td.Name, 23, 23);
-            }
-            else if (td.IsSealed)
-            {
-                enode = parentNode.Nodes.Add(td.FullName, td.Name, 25, 25);
+                enode = new ClassTreeNode(td, ClassType.Enum, Access.Internal);
+                parentNode.Nodes.Add(enode);
             }
             else
             {
                 // It must be protected.
-                enode = parentNode.Nodes.Add(td.FullName, td.Name, 24, 24);
+                enode = new ClassTreeNode(td, ClassType.Enum, Access.Protected);
+                parentNode.Nodes.Add(enode);
             }
             // Now we get to load it's values.
             foreach (FieldDefinition fd in td.Fields)
@@ -338,56 +369,87 @@ namespace PlugViewer
                 // by the compiler.
                 if (fd.Name != "value__")
                 {
-                    enode.Nodes.Add(fd.FullName, fd.Name, 9, 9);
+                    tr = new FieldTreeNode(fd, Access.Public, true);
+                    enode.Nodes.Add(tr);
                 }
             }
         }
 
         private void LoadStruct(TreeNode parentNode, TypeDefinition td)
         {
+            TreeNode node;
             if (td.IsPublic)
             {
-                parentNode.Nodes.Add(td.FullName, td.Name, 120, 120);
+                node = new ClassTreeNode(td, ClassType.Struct, Access.Public);
+                parentNode.Nodes.Add(node);
             }
             else if (td.IsNestedPrivate)
             {
-                // It must be private.
-                parentNode.Nodes.Add(td.FullName, td.Name, 122, 122);
+                node = new ClassTreeNode(td, ClassType.Struct, Access.Private);
+                parentNode.Nodes.Add(node);
             }
             else if (td.IsNestedFamily)
             {
-                parentNode.Nodes.Add(td.FullName, td.Name, 121, 121);
-            }
-            else if (td.IsSealed)
-            {
-                parentNode.Nodes.Add(td.FullName, td.Name, 124, 124);
+                node = new ClassTreeNode(td, ClassType.Struct, Access.Internal);
+                parentNode.Nodes.Add(node);
             }
             else
             {
                 // It must be protected.
-                parentNode.Nodes.Add(td.FullName, td.Name, 123, 123);
+                node = new ClassTreeNode(td, ClassType.Struct, Access.Protected);
+                parentNode.Nodes.Add(node);
+            }
+
+
+            foreach (TypeDefinition ntd in td.NestedTypes)
+            {
+                LoadType(node, ntd);
+            }
+            foreach (MethodDefinition md in td.Methods)
+            {
+                LoadMethod(node, md);
+            }
+            foreach (TypeReference ntd in td.Interfaces)
+            {
+                LoadImplementedInterface(node, ntd);
+            }
+            foreach (EventDefinition ed in td.Events)
+            {
+                LoadEvent(node, ed);
+            }
+            foreach (PropertyDefinition pd in td.Properties)
+            {
+                LoadProperty(node, pd);
+            }
+            foreach (FieldDefinition fd in td.Fields)
+            {
+                LoadField(node, fd);
             }
         }
 
         private void LoadField(TreeNode parentNode, FieldDefinition fd)
         {
+            TreeNode tr;
             if (fd.IsPublic)
             {
-                parentNode.Nodes.Add(fd.FullName, fd.Name, 46, 46);
+                tr = new FieldTreeNode(fd, Access.Public, false);
+                parentNode.Nodes.Add(tr);
             }
             else if (fd.IsPrivate)
             {
-                parentNode.Nodes.Add(fd.FullName, fd.Name, 48, 48);
+                tr = new FieldTreeNode(fd, Access.Private, false);
+                parentNode.Nodes.Add(tr);
             }
             else if (fd.IsFamily)
             {
-                // This means internal
-                parentNode.Nodes.Add(fd.FullName, fd.Name, 47, 47);
+                tr = new FieldTreeNode(fd, Access.Internal, false);
+                parentNode.Nodes.Add(tr);
             }
             else
             {
                 // It must be protected.
-                parentNode.Nodes.Add(fd.FullName, fd.Name, 49, 49);
+                tr = new FieldTreeNode(fd, Access.Protected, false);
+                parentNode.Nodes.Add(tr);
             }
         }
 
@@ -412,17 +474,47 @@ namespace PlugViewer
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            StreamWriter s = new StreamWriter(Application.StartupPath + "\\analysis.txt");
-            string mnpl = MethodsNeedingPlugging.Count.ToString();
-            foreach (string str in MethodsNeedingPlugging)
+            OTreeNode n = (OTreeNode)e.Node;
+            n.ShowNodeInfo(Rtb);
+
+            bool hErr = false;
+            bool hWarn = false;
+            int ErrSelStart = 0;
+            int WarnSelStart = 0;
+            if (n.Errors.Count > 0)
             {
-                s.WriteLine(str);
+                ErrSelStart = Rtb.Text.Length - 1;
+                foreach (Errors.BaseError er in n.Errors)
+                {
+                    Rtb.Text += er.Name + ": " + er.Description + "\r\n";
+                }
+                hErr = true;
             }
-            s.Flush();
-            s.Close();
-            s.Dispose();
+            if (n.Warnings.Count > 0)
+            {
+                WarnSelStart = Rtb.Text.Length - 1;
+                foreach (Warnings.BaseWarning b in n.Warnings)
+                {
+                    Rtb.Text += b.Name + ": " + b.Description + "\r\n";
+                }
+                hWarn = true;
+            }
+            if (hErr)
+            {
+                Rtb.SelectionStart = ErrSelStart;
+                Rtb.SelectionLength = Rtb.Text.Length - Rtb.SelectionStart;
+                Rtb.SelectionColor = System.Drawing.Color.FromArgb(0xff, 0x00, 0x00);
+                Rtb.SelectionLength = 0;
+            }
+            if (hWarn)
+            {
+                Rtb.SelectionStart = WarnSelStart;
+                Rtb.SelectionLength = Rtb.Text.Length - Rtb.SelectionStart;
+                Rtb.SelectionColor = System.Drawing.Color.FromArgb(0xff, 0x99, 0x00);
+                Rtb.SelectionLength = 0;
+            }
         }
     }
 }
