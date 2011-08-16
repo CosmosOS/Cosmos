@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace PlugViewer.TreeViewNodes
 {
     internal class PropertyTreeNode : OTreeNode
     {
-        public PropertyTreeNode(PropertyDefinition definition, bool writable) : base(TreeNodeType.Property)
+        public PropertyTreeNode(PropertyInfo definition, bool writable) : base(TreeNodeType.Property)
         {
             this.wrtble = writable;
             this.def = definition;
@@ -33,7 +33,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Event; }
         }
 
-        private PropertyDefinition def;
+        private PropertyInfo def;
         private bool wrtble;
 
         public bool ReadOnly

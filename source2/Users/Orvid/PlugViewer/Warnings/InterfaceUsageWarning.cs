@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using PlugViewer.TreeViewNodes;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace PlugViewer.Warnings
 {
@@ -15,21 +15,21 @@ namespace PlugViewer.Warnings
 
         public override void EvaluateNode(OTreeNode node)
         {
-            MethodDefinition m = (MethodDefinition)node.Definition;
-            if (m.HasBody)
+            MethodInfo m = (MethodInfo)node.Definition;
+            if (m.GetMethodBody() != null)
             {
-                foreach (Mono.Cecil.Cil.VariableDefinition i in m.Body.Variables)
+                foreach (LocalVariableInfo i in m.GetMethodBody().LocalVariables)
                 {
-                    if (!i.VariableType.IsGenericParameter && !i.VariableType.IsGenericInstance)
+                    if (!i.LocalType.IsGenericParameter && !i.LocalType.IsGenericType)
                     {
-                        if (i.VariableType.IsArray)
+                        if (i.LocalType.IsArray)
                         {
-                            if (((TypeSpecification)i.VariableType).ElementType.IsGenericParameter || ((TypeSpecification)i.VariableType).ElementType.IsGenericInstance)
+                            if (i.LocalType.GetElementType().IsGenericParameter || i.LocalType.GetElementType().IsGenericType)
                             {
                                 continue;
                             }
                         }
-                        if (i.VariableType.Resolve().IsInterface)
+                        if (i.LocalType.IsInterface)
                         {
 #if DebugWarnings
                             Log.WriteLine("Warning: " + NameBuilder.BuildMethodName(m) + " Uses an interface");

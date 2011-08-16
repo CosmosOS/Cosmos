@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace PlugViewer.TreeViewNodes
 {
     internal class AssemblyTreeNode : OTreeNode
     {
-        public AssemblyTreeNode(AssemblyDefinition definition) : base(TreeNodeType.Assembly)
+        public AssemblyTreeNode(Assembly definition) : base(TreeNodeType.Assembly)
         {
             this.def = definition;
             this.SelectedImageIndex = Constants.AssemblyIcon;
             this.ImageIndex = Constants.AssemblyIcon;
-            this.Text = definition.Name.Name;
+            this.Text = definition.GetName().Name;
 #if DebugTreeNodeLoading
             Log.WriteLine("Assembly '" + this.Text + "' Was loaded successfully.");
 #endif
@@ -24,7 +24,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Assembly; }
         }
 
-        private AssemblyDefinition def;
+        private Assembly def;
 
         public override object Definition
         {
@@ -34,8 +34,8 @@ namespace PlugViewer.TreeViewNodes
         public override void ShowNodeInfo(RichTextBox rtb)
         {
             rtb.Text =
-                "Assembly '" + def.Name.Name + "' contains:\r\n" +
-                def.Modules.Count.ToString() + " Modules.\r\n";
+                "Assembly '" + def.GetName().Name + "' contains:\r\n" +
+                def.GetModules().Length.ToString() + " Modules.\r\n";
         }
     }
 }

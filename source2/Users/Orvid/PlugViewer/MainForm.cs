@@ -5,7 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Mono.Cecil;
+using System.Reflection;
 using System.IO;
 using PlugViewer.TreeViewNodes;
 
@@ -16,35 +16,40 @@ namespace PlugViewer
         public MainForm()
         {
             InitializeComponent();
+            treeView1.TreeViewNodeSorter = new TreeViewSorter();
         }
 
-        private void AddAssemblyToView(AssemblyDefinition a)
+        private void AddAssemblyToView(Assembly a)
         {
             TreeNode nd = new AssemblyTreeNode(a);
             treeView1.Nodes.Add(nd);
-            foreach (ModuleDefinition md in a.Modules)
+            foreach (Module md in a.GetModules())
             {
                 LoadModule(nd, md);
             }
+            treeView1.Sort();
         }
 
-        private void LoadModule(TreeNode parent, ModuleDefinition md)
+        #region LoadModule
+        private void LoadModule(TreeNode parent, Module md)
         {
             ModuleTreeNode tn = new ModuleTreeNode(md);
             parent.Nodes.Add(tn);
-            foreach (TypeDefinition t in md.Types)
+            foreach (Type t in md.GetTypes())
             {
-                if (!tn.Namespaces.ContainsKey(t.Namespace))
+                if (!tn.Namespaces.ContainsKey((t.Namespace == null ? "-" : t.Namespace)))
                 {
-                    TreeNode tnd = new NamespaceTreeNode(t.Namespace);
+                    TreeNode tnd = new NamespaceTreeNode((t.Namespace == null ? "-" : t.Namespace));
                     tn.Nodes.Add(tnd);
-                    tn.Namespaces.Add(t.Namespace, tnd);
+                    tn.Namespaces.Add((t.Namespace == null ? "-" : t.Namespace), tnd);
                 }
-                LoadType(tn.Namespaces[t.Namespace], t);
+                LoadType(tn.Namespaces[(t.Namespace == null ? "-" : t.Namespace)], t);
             }
         }
+        #endregion
 
-        private void LoadType(TreeNode parentNode, TypeDefinition type)
+        #region LoadType
+        private void LoadType(TreeNode parentNode, Type type)
         {
             if (!type.IsEnum && !type.IsInterface && !type.IsValueType && type.IsClass)
             {
@@ -59,7 +64,7 @@ namespace PlugViewer
                     node = new ClassTreeNode(type, ClassType.Class, Access.Private);
                     parentNode.Nodes.Add(node);
                 }
-                else if (type.IsNestedFamily)
+                else if (type.IsNestedFamORAssem)
                 {
                     node = new ClassTreeNode(type, ClassType.Class, Access.Internal);
                     parentNode.Nodes.Add(node);
@@ -73,27 +78,27 @@ namespace PlugViewer
 
 
                 //TreeNode node = (treeView1.Nodes.Find(type.FullName, true))[0];
-                foreach (TypeDefinition ntd in type.NestedTypes)
+                foreach (Type ntd in type.GetNestedTypes())
                 {
                     LoadType(node, ntd);
                 }
-                foreach (MethodDefinition md in type.Methods)
+                foreach (MethodInfo md in type.GetMethods())
                 {
                     LoadMethod(node, md);
                 }
-                foreach (TypeReference ntd in type.Interfaces)
+                foreach (Type ntd in type.GetInterfaces())
                 {
                     LoadImplementedInterface(node, ntd);
                 }
-                foreach (EventDefinition ed in type.Events)
+                foreach (EventInfo ed in type.GetEvents())
                 {
                     LoadEvent(node, ed);
                 }
-                foreach (PropertyDefinition pd in type.Properties)
+                foreach (PropertyInfo pd in type.GetProperties())
                 {
                     LoadProperty(node, pd);
                 }
-                foreach (FieldDefinition fd in type.Fields)
+                foreach (FieldInfo fd in type.GetFields())
                 {
                     LoadField(node, fd);
                 }
@@ -114,20 +119,56 @@ namespace PlugViewer
             {
                 throw new Exception();
             }
+        }
+        #endregion
+
+        /// <summary>
+        /// Checks if the method is part of an event or property definition.
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        private bool ShouldLoadMethod(MethodInfo method)
+        {
+            string s;
+            if (method.Name.Length <= 4) // Too short to be one of things being tested
+            {
+                return true;
+            }
+            else if (method.Name.Length < 7) // only check add, get, and set
+            {
+                s = method.Name.Substring(0,4);
+                if (s == "add_" || s == "get_" || s == "set_")
+                {
+                    return false;
+                }
+                return true;
+            }
+            else // Check add, remove, get, and set
+            {
+                s = method.Name.Substring(0, 4);
+                if (s == "add_" || s == "get_" || s == "set_")
+                {
+                    return false;
+                }
+                else if (method.Name.Substring(0, 7) == "remove_")
+                {
+                    return false;
+                }
+                return true;
+            }
 
         }
 
-        private void LoadMethod(TreeNode parentNode, MethodDefinition method)
+        private void LoadMethod(TreeNode parentNode, MethodInfo method)
         {
             string dispkey = NameBuilder.BuildMethodDisplayName(method);
-            string fullkey = (method.FullName + NameBuilder.BuildMethodDisplayName(method).Substring(method.Name.Length));
             TreeNode tn;
             // Check that the method isn't part of a property or event definition.
-            if (!method.IsGetter && !method.IsSetter)
+            if (ShouldLoadMethod(method))
             {
                 if (method.IsVirtual)
                 {
-                    if (method.HasBody) // The method is an override
+                    if (method.GetMethodBody() != null) // The method is an override
                     {
                         if (method.IsPublic)
                         {
@@ -139,7 +180,7 @@ namespace PlugViewer
                             tn = new MethodTreeNode(method, MethodType.OverrideMethod, Access.Private);
                             parentNode.Nodes.Add(tn);
                         }
-                        else if (method.IsInternalCall)
+                        else if (method.IsFamilyOrAssembly)
                         {
                             tn = new MethodTreeNode(method, MethodType.OverrideMethod, Access.Internal);
                             parentNode.Nodes.Add(tn);
@@ -163,7 +204,7 @@ namespace PlugViewer
                             tn = new MethodTreeNode(method, MethodType.VirtualMethod, Access.Private);
                             parentNode.Nodes.Add(tn);
                         }
-                        else if (method.IsInternalCall)
+                        else if (method.IsFamilyOrAssembly)
                         {
                             tn = new MethodTreeNode(method, MethodType.VirtualMethod, Access.Internal);
                             parentNode.Nodes.Add(tn);
@@ -188,7 +229,7 @@ namespace PlugViewer
                         tn = new MethodTreeNode(method, MethodType.BasicMethod, Access.Private);
                         parentNode.Nodes.Add(tn);
                     }
-                    else if (method.IsInternalCall)
+                    else if (method.IsFamilyOrAssembly)
                     {
                         tn = new MethodTreeNode(method, MethodType.BasicMethod, Access.Internal);
                         parentNode.Nodes.Add(tn);
@@ -203,21 +244,21 @@ namespace PlugViewer
             }
         }
 
-        private void LoadImplementedInterface(TreeNode parentNode, TypeReference intface)
+        #region LoadImplementedInterface
+        private void LoadImplementedInterface(TreeNode parentNode, Type intface)
         {
-            TypeDefinition type = intface.Resolve();
             TreeNode node;
-            if (intface.Resolve().IsPublic)
+            if (intface.IsPublic)
             {
                 node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Public);
                 parentNode.Nodes.Add(node);
             }
-            else if (intface.Resolve().IsNestedPrivate)
+            else if (intface.IsNestedPrivate)
             {
                 node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Private);
                 parentNode.Nodes.Add(node);
             }
-            else if (intface.Resolve().IsNestedFamily)
+            else if (intface.IsNestedFamORAssem)
             {
                 node = new ClassTreeNode(intface, ClassType.ImplementedInterface, Access.Internal);
                 parentNode.Nodes.Add(node);
@@ -229,47 +270,48 @@ namespace PlugViewer
                 parentNode.Nodes.Add(node);
             }
 
-            foreach (TypeDefinition ntd in type.NestedTypes)
+            foreach (Type ntd in intface.GetNestedTypes())
             {
                 LoadType(node, ntd);
             }
-            foreach (MethodDefinition md in type.Methods)
+            foreach (MethodInfo md in intface.GetMethods())
             {
                 LoadMethod(node, md);
             }
-            foreach (TypeReference ntd in type.Interfaces)
+            foreach (Type ntd in intface.GetInterfaces())
             {
                 LoadImplementedInterface(node, ntd);
             }
-            foreach (EventDefinition ed in type.Events)
+            foreach (EventInfo ed in intface.GetEvents())
             {
                 LoadEvent(node, ed);
             }
-            foreach (PropertyDefinition pd in type.Properties)
+            foreach (PropertyInfo pd in intface.GetProperties())
             {
                 LoadProperty(node, pd);
             }
-            foreach (FieldDefinition fd in type.Fields)
+            foreach (FieldInfo fd in intface.GetFields())
             {
                 LoadField(node, fd);
             }
         }
+        #endregion
 
-        private void LoadInterface(TreeNode parentNode, TypeReference intface)
+        #region LoadInterface
+        private void LoadInterface(TreeNode parentNode, Type intface)
         {
-            TypeDefinition type = intface.Resolve();
             TreeNode node;
-            if (intface.Resolve().IsPublic)
+            if (intface.IsPublic)
             {
                 node = new ClassTreeNode(intface, ClassType.Interface, Access.Public);
                 parentNode.Nodes.Add(node);
             }
-            else if (intface.Resolve().IsNestedPrivate)
+            else if (intface.IsNestedPrivate)
             {
                 node = new ClassTreeNode(intface, ClassType.Interface, Access.Private);
                 parentNode.Nodes.Add(node);
             }
-            else if (intface.Resolve().IsNestedFamily)
+            else if (intface.IsNestedFamORAssem)
             {
                 node = new ClassTreeNode(intface, ClassType.Interface, Access.Internal);
                 parentNode.Nodes.Add(node);
@@ -281,44 +323,46 @@ namespace PlugViewer
                 parentNode.Nodes.Add(node);
             }
 
-            foreach (TypeDefinition ntd in type.NestedTypes)
+            foreach (Type ntd in intface.GetNestedTypes())
             {
                 LoadType(node, ntd);
             }
-            foreach (MethodDefinition md in type.Methods)
+            foreach (MethodInfo md in intface.GetMethods())
             {
                 LoadMethod(node, md);
             }
-            foreach (TypeReference ntd in type.Interfaces)
+            foreach (Type ntd in intface.GetInterfaces())
             {
                 LoadImplementedInterface(node, ntd);
             }
-            foreach (EventDefinition ed in type.Events)
+            foreach (EventInfo ed in intface.GetEvents())
             {
                 LoadEvent(node, ed);
             }
-            foreach (PropertyDefinition pd in type.Properties)
+            foreach (PropertyInfo pd in intface.GetProperties())
             {
                 LoadProperty(node, pd);
             }
-            foreach (FieldDefinition fd in type.Fields)
+            foreach (FieldInfo fd in intface.GetFields())
             {
                 LoadField(node, fd);
             }
         }
+        #endregion
 
-        private void LoadEvent(TreeNode parentNode, EventDefinition evnt)
+        #region LoadEvent
+        private void LoadEvent(TreeNode parentNode, EventInfo evnt)
         {
             TreeNode n = new EventTreeNode(evnt);
             parentNode.Nodes.Add(n);
         }
+        #endregion
 
-        private void LoadProperty(TreeNode parentNode, PropertyDefinition ptd)
+        #region LoadProperty
+        private void LoadProperty(TreeNode parentNode, PropertyInfo ptd)
         {
             TreeNode n;
-            if (ptd.HasConstant)
-                LoadConstant(parentNode, ptd);
-            if (ptd.SetMethod != null)
+            if (ptd.CanWrite)
             {
                 n = new PropertyTreeNode(ptd, true);
                 parentNode.Nodes.Add(n);
@@ -329,15 +373,17 @@ namespace PlugViewer
                 parentNode.Nodes.Add(n);
             }
         }
+        #endregion
 
-        private void LoadConstant(TreeNode parentNode, PropertyDefinition ptd)
-        {
-            //TreeNode tr = new FieldTreeNode(fd, Access.Protected, false);
-            //parentNode.Nodes.Add(tr);
-            parentNode.Nodes.Add(ptd.FullName, ptd.Name, Constants.ConstantIcon, Constants.ConstantIcon);
-        }
+        //private void LoadConstant(TreeNode parentNode, PropertyInfo ptd)
+        //{
+        //    //TreeNode tr = new FieldTreeNode(fd, Access.Protected, false);
+        //    //parentNode.Nodes.Add(tr);
+        //    parentNode.Nodes.Add(ptd.FullName, ptd.Name, Constants.ConstantIcon, Constants.ConstantIcon);
+        //}
 
-        private void LoadEnum(TreeNode parentNode, TypeDefinition td)
+        #region LoadEnum
+        private void LoadEnum(TreeNode parentNode, Type td)
         {
             TreeNode enode;
             TreeNode tr;
@@ -351,7 +397,7 @@ namespace PlugViewer
                 enode = new ClassTreeNode(td, ClassType.Enum, Access.Private);
                 parentNode.Nodes.Add(enode);
             }
-            else if (td.IsNestedFamily)
+            else if (td.IsNestedFamORAssem)
             {
                 enode = new ClassTreeNode(td, ClassType.Enum, Access.Internal);
                 parentNode.Nodes.Add(enode);
@@ -363,7 +409,7 @@ namespace PlugViewer
                 parentNode.Nodes.Add(enode);
             }
             // Now we get to load it's values.
-            foreach (FieldDefinition fd in td.Fields)
+            foreach (FieldInfo fd in td.GetFields())
             {
                 // We don't want to show "value__" because it's automatically added 
                 // by the compiler.
@@ -374,8 +420,10 @@ namespace PlugViewer
                 }
             }
         }
+        #endregion
 
-        private void LoadStruct(TreeNode parentNode, TypeDefinition td)
+        #region LoadStruct
+        private void LoadStruct(TreeNode parentNode, Type td)
         {
             TreeNode node;
             if (td.IsPublic)
@@ -388,7 +436,7 @@ namespace PlugViewer
                 node = new ClassTreeNode(td, ClassType.Struct, Access.Private);
                 parentNode.Nodes.Add(node);
             }
-            else if (td.IsNestedFamily)
+            else if (td.IsNestedFamORAssem)
             {
                 node = new ClassTreeNode(td, ClassType.Struct, Access.Internal);
                 parentNode.Nodes.Add(node);
@@ -401,36 +449,38 @@ namespace PlugViewer
             }
 
 
-            foreach (TypeDefinition ntd in td.NestedTypes)
+            foreach (Type ntd in td.GetNestedTypes())
             {
                 LoadType(node, ntd);
             }
-            foreach (MethodDefinition md in td.Methods)
+            foreach (MethodInfo md in td.GetMethods())
             {
                 LoadMethod(node, md);
             }
-            foreach (TypeReference ntd in td.Interfaces)
+            foreach (Type ntd in td.GetInterfaces())
             {
                 LoadImplementedInterface(node, ntd);
             }
-            foreach (EventDefinition ed in td.Events)
+            foreach (EventInfo ed in td.GetEvents())
             {
                 LoadEvent(node, ed);
             }
-            foreach (PropertyDefinition pd in td.Properties)
+            foreach (PropertyInfo pd in td.GetProperties())
             {
                 LoadProperty(node, pd);
             }
-            foreach (FieldDefinition fd in td.Fields)
+            foreach (FieldInfo fd in td.GetFields())
             {
                 LoadField(node, fd);
             }
         }
+        #endregion
 
-        private void LoadField(TreeNode parentNode, FieldDefinition fd)
+        #region LoadField
+        private void LoadField(TreeNode parentNode, FieldInfo fd)
         {
             TreeNode tr;
-            if (fd.HasConstant)
+            if (fd.IsLiteral)
             {
                 tr = new FieldTreeNode(fd, Access.Public, true);
                 parentNode.Nodes.Add(tr);
@@ -445,7 +495,7 @@ namespace PlugViewer
                 tr = new FieldTreeNode(fd, Access.Private, false);
                 parentNode.Nodes.Add(tr);
             }
-            else if (fd.IsFamily)
+            else if (fd.IsFamilyOrAssembly)
             {
                 tr = new FieldTreeNode(fd, Access.Internal, false);
                 parentNode.Nodes.Add(tr);
@@ -457,15 +507,17 @@ namespace PlugViewer
                 parentNode.Nodes.Add(tr);
             }
         }
+        #endregion
 
         private void OpenDll(string loc)
         {
+            Assembly asmb = null;
             try
             {
-                AssemblyDefinition asmb = AssemblyDefinition.ReadAssembly(loc);
-                AddAssemblyToView(asmb);
+                asmb = Assembly.LoadFrom(loc);
             }
             catch { }
+            AddAssemblyToView(asmb);
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)

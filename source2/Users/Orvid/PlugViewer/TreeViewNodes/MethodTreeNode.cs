@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace PlugViewer.TreeViewNodes
@@ -15,10 +15,10 @@ namespace PlugViewer.TreeViewNodes
 
     internal class MethodTreeNode : OTreeNode
     {
-        public MethodTreeNode(MethodReference definition, MethodType mType, Access mAccess) : base(TreeNodeType.Method)
+        public MethodTreeNode(MethodInfo definition, MethodType mType, Access mAccess) : base(TreeNodeType.Method)
         {
             this.def = definition;
-            this.Text = NameBuilder.BuildMethodDisplayName(definition.Resolve());
+            this.Text = NameBuilder.BuildMethodDisplayName(definition);
             this.mType = mType;
             this.acc = mAccess;
             switch (mType)
@@ -105,7 +105,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Method; }
         }
 
-        private MethodReference def;
+        private MethodInfo def;
         private MethodType mType;
         private Access acc;
 
@@ -132,15 +132,15 @@ namespace PlugViewer.TreeViewNodes
                 case MethodType.BasicMethod:
                     {
                         sb.AppendLine("Basic Method '" + this.Text + "' contains:");
-                        sb.AppendLine(def.GenericParameters.Count.ToString() + " Generic Parameters,");
-                        sb.AppendLine(def.Parameters.Count.ToString() + " Parameters,");
-                        sb.AppendLine(def.Resolve().SecurityDeclarations.Count.ToString() + " Security Declarations,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Custom Attributes,");
-                        if (def.Resolve().HasBody)
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
+                        sb.AppendLine(def.GetParameters().Length.ToString() + " Parameters,");
+                        //sb.AppendLine(def.SecurityDeclarations.Count.ToString() + " Security Declarations,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Custom Attributes,");
+                        if (def.GetMethodBody() != null)
                         {
-                            sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
-                            sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
-                            sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                            sb.AppendLine(def.GetMethodBody().GetILAsByteArray().Length.ToString() + " Instructions,");
+                            sb.AppendLine(def.GetMethodBody().ExceptionHandlingClauses.Count.ToString() + " Exception Handlers,");
+                            sb.AppendLine(def.GetMethodBody().LocalVariables.Count.ToString() + " Variables,");
                         }
                         else
                         {
@@ -154,21 +154,21 @@ namespace PlugViewer.TreeViewNodes
                 case MethodType.OverrideMethod:
                     {
                         sb.AppendLine("Override Method '" + this.Text + "' contains:");
-                        sb.AppendLine(def.GenericParameters.Count.ToString() + " Generic Parameters,");
-                        sb.AppendLine(def.Parameters.Count.ToString() + " Parameters,");
-                        sb.AppendLine(def.Resolve().SecurityDeclarations.Count.ToString() + " Security Declarations,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Custom Attributes,");
-                        if (def.Resolve().HasBody)
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
+                        sb.AppendLine(def.GetParameters().Length.ToString() + " Parameters,");
+                        //sb.AppendLine(def.SecurityDeclarations.Count.ToString() + " Security Declarations,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Custom Attributes,");
+                        if (def.GetMethodBody() != null)
                         {
-                            sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
-                            sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
-                            sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                            sb.AppendLine(def.GetMethodBody().GetILAsByteArray().Length.ToString() + " Instructions,");
+                            sb.AppendLine(def.GetMethodBody().ExceptionHandlingClauses.Count.ToString() + " Exception Handlers,");
+                            sb.AppendLine(def.GetMethodBody().LocalVariables.Count.ToString() + " Variables,");
                         }
                         else
                         {
                             sb.AppendLine("Doesn't have a body.");
                         }
-                        sb.AppendLine("Overrides " + def.Resolve().Overrides.Count.ToString() + " methods,");
+                        //sb.AppendLine("Overrides " + def..Resolve().Overrides.Count.ToString() + " methods,");
                         sb.AppendLine("Has a calling convention of '" + def.CallingConvention.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();
@@ -177,15 +177,15 @@ namespace PlugViewer.TreeViewNodes
                 case MethodType.VirtualMethod:
                     {
                         sb.AppendLine("Virtual Method '" + this.Text + "' contains:");
-                        sb.AppendLine(def.GenericParameters.Count.ToString() + " Generic Parameters,");
-                        sb.AppendLine(def.Parameters.Count.ToString() + " Parameters,");
-                        sb.AppendLine(def.Resolve().SecurityDeclarations.Count.ToString() + " Security Declarations,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Custom Attributes,");
-                        if (def.Resolve().HasBody)
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
+                        sb.AppendLine(def.GetParameters().Length.ToString() + " Parameters,");
+                        //sb.AppendLine(def.SecurityDeclarations.Count.ToString() + " Security Declarations,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Custom Attributes,");
+                        if (def.GetMethodBody() != null)
                         {
-                            sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
-                            sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
-                            sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                            sb.AppendLine(def.GetMethodBody().GetILAsByteArray().Length.ToString() + " Instructions,");
+                            sb.AppendLine(def.GetMethodBody().ExceptionHandlingClauses.Count.ToString() + " Exception Handlers,");
+                            sb.AppendLine(def.GetMethodBody().LocalVariables.Count.ToString() + " Variables,");
                         }
                         else
                         {

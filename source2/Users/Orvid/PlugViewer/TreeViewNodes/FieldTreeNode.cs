@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace PlugViewer.TreeViewNodes
 {
     internal class FieldTreeNode : OTreeNode
     {
-        public FieldTreeNode(FieldDefinition definition, Access mAccess, bool Constant) : base(TreeNodeType.Field)
+        public FieldTreeNode(FieldInfo definition, Access mAccess, bool Constant) : base(TreeNodeType.Field)
         {
             this.def = definition;
             acc = mAccess;
@@ -57,7 +57,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Module; }
         }
 
-        private FieldDefinition def;
+        private FieldInfo def;
         private Access acc;
         private bool sconst;
 

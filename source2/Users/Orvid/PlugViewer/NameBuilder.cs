@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace PlugViewer
 {
     public static class NameBuilder
     {
-        public static string BuildMethodName(MethodDefinition m)
+        public static string BuildMethodName(MethodInfo m)
         {
             return m.ReturnType.Name + "\t\t" + BuildMethodDisplayName(m);
         }
 
-        public static string BuildMethodDisplayName(MethodDefinition m)
+        public static string BuildMethodDisplayName(MethodInfo m)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(m.Name);
@@ -20,31 +21,33 @@ namespace PlugViewer
             int cnt = 0;
             bool optional = false;
             string defValue = "";
-            while (cnt < m.Parameters.Count)
+            ParameterInfo[] prms = m.GetParameters();
+            while (cnt < prms.Length)
             {
                 if (cnt > 0)
                 {
                     sb.Append(", ");
                 }
-                ParameterDefinition pd = m.Parameters[cnt];
-                foreach (CustomAttribute c in pd.CustomAttributes)
+                ParameterInfo pd = prms[cnt];
+                foreach (object c in pd.GetCustomAttributes(true))
                 {
-                    if (c.AttributeType.Name == "OutAttribute")
+                    if (c is OutAttribute)
                     {
                         sb.Append("out ");
                     }
-                    else if (c.AttributeType.Name == "InAttribute")
+                    else if (c is InAttribute)
                     {
                         sb.Append("in ");
                     }
-                    else if (c.AttributeType.Name == "OptionalAttribute")
+                    else if (c is OptionalAttribute)
                     {
                         optional = true;
                     }
-                    else if (c.AttributeType.Name == "DefaultParameterValueAttribute")
+                    else if (c is DefaultParameterValueAttribute)
                     {
-                        String s = c.ConstructorArguments[0].Type.FullName;
-                        Object o = c.ConstructorArguments[0].Value;
+                        DefaultParameterValueAttribute d = (DefaultParameterValueAttribute)c;
+                        String s = d.Value.ToString();
+                        Object o = d.Value;
                         switch (s)
                         {
                             case "System.SByte":

@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace PlugViewer.TreeViewNodes
 {
     internal class EventTreeNode : OTreeNode
     {
-        public EventTreeNode(EventDefinition definition) : base(TreeNodeType.Event)
+        public EventTreeNode(EventInfo definition) : base(TreeNodeType.Event)
         {
             this.def = definition;
             this.SelectedImageIndex = Constants.EventIcon;
@@ -24,7 +24,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Event; }
         }
 
-        private EventDefinition def;
+        private EventInfo def;
 
         public override object Definition
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace PlugViewer.TreeViewNodes
@@ -27,7 +27,7 @@ namespace PlugViewer.TreeViewNodes
 
     internal class ClassTreeNode : OTreeNode
     {
-        public ClassTreeNode(TypeReference definition, ClassType type, Access access) : base(TreeNodeType.Class)
+        public ClassTreeNode(Type definition, ClassType type, Access access) : base(TreeNodeType.Class)
         {
             this.def = definition;
             this.acc = access;
@@ -164,7 +164,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Class; }
         }
 
-        private TypeReference def;
+        private Type def;
         private ClassType tp;
         private Access acc;
 
@@ -191,14 +191,14 @@ namespace PlugViewer.TreeViewNodes
                 case ClassType.Class:
                     {
                         sb.AppendLine("Type '" + def.Name + "' contains:");
-                        sb.AppendLine(def.Resolve().NestedTypes.Count.ToString() + " Nested Types,");
-                        sb.AppendLine(def.Resolve().Properties.Count.ToString() + " Properties,");
-                        sb.AppendLine(def.Resolve().Methods.Count.ToString() + " Methods,");
-                        sb.AppendLine(def.Resolve().Fields.Count.ToString() + " Fields,");
-                        sb.AppendLine(def.Resolve().Events.Count.ToString() + " Events,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Attributes,");
-                        sb.AppendLine(def.Resolve().GenericParameters.Count.ToString() + " Generic Parameters,");
-                        sb.AppendLine("Implements " + def.Resolve().Interfaces.Count.ToString() + " Interfaces,");
+                        sb.AppendLine(def.GetNestedTypes().Length.ToString() + " Nested Types,");
+                        sb.AppendLine(def.GetProperties().Length.ToString() + " Properties,");
+                        sb.AppendLine(def.GetMethods().Length.ToString() + " Methods,");
+                        sb.AppendLine(def.GetFields().Length.ToString() + " Fields,");
+                        sb.AppendLine(def.GetEvents().Length.ToString() + " Events,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Attributes,");
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
+                        sb.AppendLine("Implements " + def.GetInterfaces().Length.ToString() + " Interfaces,");
                         sb.AppendLine("and has an access modifier of '" + acc.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();
@@ -207,8 +207,8 @@ namespace PlugViewer.TreeViewNodes
                 case ClassType.Enum:
                     {
                         sb.AppendLine("Enum '" + def.Name + "' contains:");
-                        sb.AppendLine((def.Resolve().Fields.Count - 1).ToString() + " Values,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Attributes,");
+                        sb.AppendLine((def.GetFields().Length - 1).ToString() + " Values,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Attributes,");
                         sb.AppendLine("and has an access modifier of '" + acc.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();
@@ -217,14 +217,14 @@ namespace PlugViewer.TreeViewNodes
                 case ClassType.Interface:
                     {
                         sb.AppendLine("Interface '" + def.Name + "' contains:");
-                        sb.AppendLine(def.Resolve().NestedTypes.Count.ToString() + " Nested Types,");
-                        sb.AppendLine(def.Resolve().Properties.Count.ToString() + " Properties,");
-                        sb.AppendLine(def.Resolve().Methods.Count.ToString() + " Methods,");
-                        sb.AppendLine(def.Resolve().Fields.Count.ToString() + " Fields,");
-                        sb.AppendLine(def.Resolve().Events.Count.ToString() + " Events,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Attributes,");
-                        sb.AppendLine(def.Resolve().GenericParameters.Count.ToString() + " Generic Parameters,");
-                        sb.AppendLine("Implements " + def.Resolve().Interfaces.Count.ToString() + " Interfaces,");
+                        sb.AppendLine(def.GetNestedTypes().Length.ToString() + " Nested Types,");
+                        sb.AppendLine(def.GetProperties().Length.ToString() + " Properties,");
+                        sb.AppendLine(def.GetMethods().Length.ToString() + " Methods,");
+                        sb.AppendLine(def.GetFields().Length.ToString() + " Fields,");
+                        sb.AppendLine(def.GetEvents().Length.ToString() + " Events,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Attributes,");
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
+                        sb.AppendLine("Implements " + def.GetInterfaces().Length.ToString() + " Interfaces,");
                         sb.AppendLine("and has an access modifier of '" + acc.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();
@@ -233,13 +233,13 @@ namespace PlugViewer.TreeViewNodes
                 case ClassType.ImplementedInterface:
                     {
                         sb.AppendLine("Implemented Interface '" + def.Name + "' contains:");
-                        sb.AppendLine(def.Resolve().NestedTypes.Count.ToString() + " Nested Types,");
-                        sb.AppendLine(def.Resolve().Properties.Count.ToString() + " Properties,");
-                        sb.AppendLine(def.Resolve().Methods.Count.ToString() + " Methods,");
-                        sb.AppendLine(def.Resolve().Fields.Count.ToString() + " Fields,");
-                        sb.AppendLine(def.Resolve().Events.Count.ToString() + " Events,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Attributes,");
-                        sb.AppendLine(def.Resolve().GenericParameters.Count.ToString() + " Generic Parameters,");
+                        sb.AppendLine(def.GetNestedTypes().Length.ToString() + " Nested Types,");
+                        sb.AppendLine(def.GetProperties().Length.ToString() + " Properties,");
+                        sb.AppendLine(def.GetMethods().Length.ToString() + " Methods,");
+                        sb.AppendLine(def.GetFields().Length.ToString() + " Fields,");
+                        sb.AppendLine(def.GetEvents().Length.ToString() + " Events,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Attributes,");
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
                         sb.AppendLine("and has an access modifier of '" + acc.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();
@@ -248,14 +248,14 @@ namespace PlugViewer.TreeViewNodes
                 case ClassType.Struct:
                     {
                         sb.AppendLine("Struct '" + def.Name + "' contains:");
-                        sb.AppendLine(def.Resolve().NestedTypes.Count.ToString() + " Nested Types,");
-                        sb.AppendLine(def.Resolve().Properties.Count.ToString() + " Properties,");
-                        sb.AppendLine(def.Resolve().Methods.Count.ToString() + " Methods,");
-                        sb.AppendLine(def.Resolve().Fields.Count.ToString() + " Fields,");
-                        sb.AppendLine(def.Resolve().Events.Count.ToString() + " Events,");
-                        sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Attributes,");
-                        sb.AppendLine(def.Resolve().GenericParameters.Count.ToString() + " Generic Parameters,");
-                        sb.AppendLine("Implements " + def.Resolve().Interfaces.Count.ToString() + " Interfaces,");
+                        sb.AppendLine(def.GetNestedTypes().Length.ToString() + " Nested Types,");
+                        sb.AppendLine(def.GetProperties().Length.ToString() + " Properties,");
+                        sb.AppendLine(def.GetMethods().Length.ToString() + " Methods,");
+                        sb.AppendLine(def.GetFields().Length.ToString() + " Fields,");
+                        sb.AppendLine(def.GetEvents().Length.ToString() + " Events,");
+                        sb.AppendLine(def.GetCustomAttributes(true).Length.ToString() + " Attributes,");
+                        sb.AppendLine(def.GetGenericArguments().Length.ToString() + " Generic Parameters,");
+                        sb.AppendLine("Implements " + def.GetInterfaces().Length.ToString() + " Interfaces,");
                         sb.AppendLine("and has an access modifier of '" + acc.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();

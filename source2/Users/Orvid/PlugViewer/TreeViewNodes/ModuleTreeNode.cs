@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace PlugViewer.TreeViewNodes
@@ -10,7 +10,7 @@ namespace PlugViewer.TreeViewNodes
     {
         public Dictionary<string, TreeNode> Namespaces = new Dictionary<string, TreeNode>();
 
-        public ModuleTreeNode(ModuleDefinition definition) : base(TreeNodeType.Module)
+        public ModuleTreeNode(Module definition) : base(TreeNodeType.Module)
         {
             this.def = definition;
             this.SelectedImageIndex = Constants.ModuleIcon;
@@ -26,7 +26,7 @@ namespace PlugViewer.TreeViewNodes
             get { return TreeNodeType.Module; }
         }
 
-        private ModuleDefinition def;
+        private Module def;
 
         public override object Definition
         {
@@ -37,10 +37,10 @@ namespace PlugViewer.TreeViewNodes
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Module '" + def.Name + "' contains:");
-            sb.AppendLine(def.Types.Count.ToString() + " Types,");
+            sb.AppendLine(def.GetTypes().Length.ToString() + " Types,");
             sb.AppendLine(Namespaces.Count.ToString() + " Namespaces,");
-            sb.AppendLine(def.Resources.Count.ToString() + " Resources,");
-            sb.AppendLine("and " + (def.EntryPoint != null ? "does " : "doesn't ") + "contain an entry point.");
+            //sb.AppendLine(def.Resources.Count.ToString() + " Resources,");
+            //sb.AppendLine("and " + (def.EntryPoint != null ? "does " : "doesn't ") + "contain an entry point.");
             sb.AppendLine();
             sb.AppendLine();
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using PlugViewer.TreeViewNodes;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace PlugViewer.Errors
 {
@@ -15,8 +15,8 @@ namespace PlugViewer.Errors
 
         public override void EvaluateNode(OTreeNode node)
         {
-            MethodDefinition m = (MethodDefinition)node.Definition;
-            if ((m.Attributes & MethodAttributes.PInvokeImpl) != 0)
+            MethodInfo m = (MethodInfo)node.Definition;
+            if ((m.Attributes & MethodAttributes.PinvokeImpl) != 0)
             {
 #if DebugErrors
                 Log.WriteLine(NameBuilder.BuildMethodName(m) + " ~ PInvoke Impl");
