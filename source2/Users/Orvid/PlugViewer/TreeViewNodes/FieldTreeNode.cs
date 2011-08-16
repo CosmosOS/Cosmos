@@ -8,7 +8,7 @@ namespace PlugViewer.TreeViewNodes
 {
     internal class FieldTreeNode : OTreeNode
     {
-        public FieldTreeNode(FieldDefinition definition, Access mAccess, bool Constant)
+        public FieldTreeNode(FieldDefinition definition, Access mAccess, bool Constant) : base(TreeNodeType.Field)
         {
             this.def = definition;
             acc = mAccess;
@@ -38,13 +38,17 @@ namespace PlugViewer.TreeViewNodes
                         this.ImageIndex = Constants.Field_Internal;
                         break;
                 }
+#if DebugTreeNodeLoading
                 Log.WriteLine("Field '" + this.Text + "' was loaded.");
+#endif
             }
             else
             {
                 this.SelectedImageIndex = Constants.ConstantIcon;
                 this.ImageIndex = Constants.ConstantIcon;
+#if DebugTreeNodeLoading
                 Log.WriteLine("Constant '" + this.Text + "' was loaded.");
+#endif
             }
         }
 

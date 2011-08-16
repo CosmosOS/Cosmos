@@ -8,13 +8,15 @@ namespace PlugViewer.TreeViewNodes
 {
     internal class AssemblyTreeNode : OTreeNode
     {
-        public AssemblyTreeNode(AssemblyDefinition definition)
+        public AssemblyTreeNode(AssemblyDefinition definition) : base(TreeNodeType.Assembly)
         {
             this.def = definition;
             this.SelectedImageIndex = Constants.AssemblyIcon;
             this.ImageIndex = Constants.AssemblyIcon;
             this.Text = definition.Name.Name;
+#if DebugTreeNodeLoading
             Log.WriteLine("Assembly '" + this.Text + "' Was loaded successfully.");
+#endif
         }
 
         public override TreeNodeType Type

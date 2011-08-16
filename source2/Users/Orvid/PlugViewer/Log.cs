@@ -7,7 +7,7 @@ namespace PlugViewer
 {
     public static class Log
     {
-        private static StreamWriter streamWriter = new StreamWriter(System.Windows.Forms.Application.StartupPath + "\\analysis.txt");
+        private static StreamWriter streamWriter = new StreamWriter(System.Windows.Forms.Application.StartupPath + "\\log.txt");
 
         public static void WriteLine(string s)
         {

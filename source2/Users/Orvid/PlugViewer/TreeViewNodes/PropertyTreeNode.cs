@@ -8,7 +8,7 @@ namespace PlugViewer.TreeViewNodes
 {
     internal class PropertyTreeNode : OTreeNode
     {
-        public PropertyTreeNode(PropertyDefinition definition, bool writable)
+        public PropertyTreeNode(PropertyDefinition definition, bool writable) : base(TreeNodeType.Property)
         {
             this.wrtble = writable;
             this.def = definition;
@@ -23,7 +23,9 @@ namespace PlugViewer.TreeViewNodes
                 this.ImageIndex = Constants.ReadOnlyPropertyIcon;
             }
             this.Text = definition.Name;
+#if DebugTreeNodeLoading
             Log.WriteLine("Property '" + this.Text + "' was loaded.");
+#endif
         }
 
         public override TreeNodeType Type

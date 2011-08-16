@@ -8,13 +8,15 @@ namespace PlugViewer.TreeViewNodes
 {
     internal class EventTreeNode : OTreeNode
     {
-        public EventTreeNode(EventDefinition definition)
+        public EventTreeNode(EventDefinition definition) : base(TreeNodeType.Event)
         {
             this.def = definition;
             this.SelectedImageIndex = Constants.EventIcon;
             this.ImageIndex = Constants.EventIcon;
             this.Text = definition.Name;
+#if DebugTreeNodeLoading
             Log.WriteLine("Event '" + this.Text + "' was loaded.");
+#endif
         }
 
         public override TreeNodeType Type

@@ -10,13 +10,15 @@ namespace PlugViewer.TreeViewNodes
     {
         public Dictionary<string, TreeNode> Namespaces = new Dictionary<string, TreeNode>();
 
-        public ModuleTreeNode(ModuleDefinition definition)
+        public ModuleTreeNode(ModuleDefinition definition) : base(TreeNodeType.Module)
         {
             this.def = definition;
             this.SelectedImageIndex = Constants.ModuleIcon;
             this.ImageIndex = Constants.ModuleIcon;
             this.Text = definition.Name;
+#if DebugTreeNodeLoading
             Log.WriteLine("Module '" + this.Text + "' was loaded.");
+#endif
         }
 
         public override TreeNodeType Type

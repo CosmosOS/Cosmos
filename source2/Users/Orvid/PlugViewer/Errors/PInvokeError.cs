@@ -18,7 +18,11 @@ namespace PlugViewer.Errors
             MethodDefinition m = (MethodDefinition)node.Definition;
             if ((m.Attributes & MethodAttributes.PInvokeImpl) != 0)
             {
+#if DebugErrors
                 Log.WriteLine(NameBuilder.BuildMethodName(m) + " ~ PInvoke Impl");
+#endif
+                node.SelectedImageIndex = Constants.ErrorIcon;
+                node.ImageIndex = Constants.ErrorIcon;
                 node.Errors.Add(this);
             }
         }

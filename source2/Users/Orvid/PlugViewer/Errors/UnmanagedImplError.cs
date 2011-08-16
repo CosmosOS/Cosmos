@@ -19,7 +19,11 @@ namespace PlugViewer.Errors
             MethodImplAttributes xImplFlags = m.ImplAttributes;
             if ((xImplFlags & MethodImplAttributes.Unmanaged) != 0)
             {
+#if DebugErrors
                 Log.WriteLine(NameBuilder.BuildMethodName(m) + " ~ Method Implementation: Unmanaged");
+#endif
+                node.SelectedImageIndex = Constants.ErrorIcon;
+                node.ImageIndex = Constants.ErrorIcon;
                 node.Errors.Add(this);
             }
         }

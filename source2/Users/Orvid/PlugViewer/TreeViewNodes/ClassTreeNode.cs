@@ -27,7 +27,7 @@ namespace PlugViewer.TreeViewNodes
 
     internal class ClassTreeNode : OTreeNode
     {
-        public ClassTreeNode(TypeReference definition, ClassType type, Access access)
+        public ClassTreeNode(TypeReference definition, ClassType type, Access access) : base(TreeNodeType.Class)
         {
             this.def = definition;
             this.acc = access;
@@ -154,7 +154,9 @@ namespace PlugViewer.TreeViewNodes
                     }
 
             }
+#if DebugTreeNodeLoading
             Log.WriteLine("Type '" + this.Text + "' was loaded.");
+#endif
         }
 
         public override TreeNodeType Type
@@ -168,10 +170,10 @@ namespace PlugViewer.TreeViewNodes
 
         public ClassType TypeOfClass
         {
-            get { return tp; } 
+            get { return tp; }
         }
 
-        public Access AccessModifier 
+        public Access AccessModifier
         {
             get { return acc; }
         }

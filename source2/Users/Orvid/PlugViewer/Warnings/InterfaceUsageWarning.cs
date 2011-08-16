@@ -16,13 +16,33 @@ namespace PlugViewer.Warnings
         public override void EvaluateNode(OTreeNode node)
         {
             MethodDefinition m = (MethodDefinition)node.Definition;
-            foreach (Mono.Cecil.Cil.Instruction i in m.Body.Instructions)
+            if (m.HasBody)
             {
-                if (i.OpCode.Code == Mono.Cecil.Cil.Code.Calli)
+                foreach (Mono.Cecil.Cil.VariableDefinition i in m.Body.Variables)
                 {
-                    Log.WriteLine("Warning: " + NameBuilder.BuildMethodName(m) + " Uses an interface");
-                    node.Warnings.Add(this);
-                    return;
+                    if (!i.VariableType.IsGenericParameter && !i.VariableType.IsGenericInstance)
+                    {
+                        if (i.VariableType.IsArray)
+                        {
+                            if (((TypeSpecification)i.VariableType).ElementType.IsGenericParameter || ((TypeSpecification)i.VariableType).ElementType.IsGenericInstance)
+                            {
+                                continue;
+                            }
+                        }
+                        if (i.VariableType.Resolve().IsInterface)
+                        {
+#if DebugWarnings
+                            Log.WriteLine("Warning: " + NameBuilder.BuildMethodName(m) + " Uses an interface");
+#endif
+                            if (node.SelectedImageIndex != Constants.ErrorIcon)
+                            {
+                                node.SelectedImageIndex = Constants.WarningIcon;
+                                node.ImageIndex = Constants.WarningIcon;
+                            }
+                            node.Warnings.Add(this);
+                            return;
+                        }
+                    }
                 }
             }
         }

@@ -166,7 +166,7 @@
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.Filter = ".Net Dll |*.dll";
+            this.openFileDialog1.Filter = ".Net Dll |*.dll;*.exe";
             this.openFileDialog1.Multiselect = true;
             // 
             // menuStrip1
@@ -176,7 +176,8 @@
             this.menuStrip1.Size = new System.Drawing.Size(627, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, debugToolStripMenuItem });
+            this.menuStrip1.Items.Add(fileToolStripMenuItem);
+            this.menuStrip1.Items.Add(debugToolStripMenuItem);
             // 
             // fileToolStripMenuItem
             // 

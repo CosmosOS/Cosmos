@@ -15,7 +15,7 @@ namespace PlugViewer.TreeViewNodes
 
     internal class MethodTreeNode : OTreeNode
     {
-        public MethodTreeNode(MethodReference definition, MethodType mType, Access mAccess)
+        public MethodTreeNode(MethodReference definition, MethodType mType, Access mAccess) : base(TreeNodeType.Method)
         {
             this.def = definition;
             this.Text = NameBuilder.BuildMethodDisplayName(definition.Resolve());
@@ -95,7 +95,9 @@ namespace PlugViewer.TreeViewNodes
                     }
                     break;
             }
+#if DebugTreeNodeLoading
             Log.WriteLine("Method '" + this.Text + "' was loaded.");
+#endif
         }
 
         public override TreeNodeType Type
@@ -134,9 +136,16 @@ namespace PlugViewer.TreeViewNodes
                         sb.AppendLine(def.Parameters.Count.ToString() + " Parameters,");
                         sb.AppendLine(def.Resolve().SecurityDeclarations.Count.ToString() + " Security Declarations,");
                         sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Custom Attributes,");
-                        sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
-                        sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
-                        sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                        if (def.Resolve().HasBody)
+                        {
+                            sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
+                            sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
+                            sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                        }
+                        else
+                        {
+                            sb.AppendLine("Doesn't have a body.");
+                        }
                         sb.AppendLine("Has a calling convention of '" + def.CallingConvention.ToString() + "'");
                         sb.AppendLine();
                         sb.AppendLine();
@@ -149,9 +158,16 @@ namespace PlugViewer.TreeViewNodes
                         sb.AppendLine(def.Parameters.Count.ToString() + " Parameters,");
                         sb.AppendLine(def.Resolve().SecurityDeclarations.Count.ToString() + " Security Declarations,");
                         sb.AppendLine(def.Resolve().CustomAttributes.Count.ToString() + " Custom Attributes,");
-                        sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
-                        sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
-                        sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                        if (def.Resolve().HasBody)
+                        {
+                            sb.AppendLine(def.Resolve().Body.Instructions.Count.ToString() + " Instructions,");
+                            sb.AppendLine(def.Resolve().Body.ExceptionHandlers.Count.ToString() + " Exception Handlers,");
+                            sb.AppendLine(def.Resolve().Body.Variables.Count.ToString() + " Variables,");
+                        }
+                        else
+                        {
+                            sb.AppendLine("Doesn't have a body.");
+                        }
                         sb.AppendLine("Overrides " + def.Resolve().Overrides.Count.ToString() + " methods,");
                         sb.AppendLine("Has a calling convention of '" + def.CallingConvention.ToString() + "'");
                         sb.AppendLine();

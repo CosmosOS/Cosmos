@@ -98,10 +98,6 @@ namespace PlugViewer
                     LoadField(node, fd);
                 }
             }
-            else if (type.IsValueType)
-            {
-                LoadStruct(parentNode, type);
-            }
             else if (type.IsEnum)
             {
                 LoadEnum(parentNode, type);
@@ -109,6 +105,10 @@ namespace PlugViewer
             else if (type.IsInterface)
             {
                 LoadInterface(parentNode, type.GetElementType());
+            }
+            else if (type.IsValueType)
+            {
+                LoadStruct(parentNode, type);
             }
             else
             {
@@ -430,7 +430,12 @@ namespace PlugViewer
         private void LoadField(TreeNode parentNode, FieldDefinition fd)
         {
             TreeNode tr;
-            if (fd.IsPublic)
+            if (fd.HasConstant)
+            {
+                tr = new FieldTreeNode(fd, Access.Public, true);
+                parentNode.Nodes.Add(tr);
+            }
+            else if (fd.IsPublic)
             {
                 tr = new FieldTreeNode(fd, Access.Public, false);
                 parentNode.Nodes.Add(tr);
@@ -471,6 +476,7 @@ namespace PlugViewer
                 {
                     OpenDll(str);
                 }
+                TestRunner.RunTests();
             }
         }
 

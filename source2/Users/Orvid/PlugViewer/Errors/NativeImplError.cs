@@ -19,7 +19,11 @@ namespace PlugViewer.Errors
             MethodImplAttributes xImplFlags = m.ImplAttributes;
             if ((xImplFlags & MethodImplAttributes.Native) != 0)
             {
+#if DebugErrors
                 Log.WriteLine(NameBuilder.BuildMethodName(m) + " ~ Method Implementation: Native");
+#endif
+                node.SelectedImageIndex = Constants.ErrorIcon;
+                node.ImageIndex = Constants.ErrorIcon;
                 node.Errors.Add(this);
             }
         }

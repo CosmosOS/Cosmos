@@ -8,12 +8,14 @@ namespace PlugViewer.TreeViewNodes
 {
     internal class NamespaceTreeNode : OTreeNode
     {
-        public NamespaceTreeNode(string name)
+        public NamespaceTreeNode(string name) : base(TreeNodeType.Namespace)
         {
             this.SelectedImageIndex = Constants.NamespaceIcon;
             this.ImageIndex = Constants.NamespaceIcon;
             this.Text = name;
+#if DebugTreeNodeLoading
             Log.WriteLine("Namespace '" + this.Text + "' was discovered.");
+#endif
         }
 
         public override TreeNodeType Type
