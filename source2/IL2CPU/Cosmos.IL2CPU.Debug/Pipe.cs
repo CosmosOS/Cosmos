@@ -26,7 +26,7 @@ namespace Cosmos.Compiler.Debug {
         mPipe.Close();
       } else {
         // Kick it out of the WaitForConnection
-        var xPipe = new NamedPipeClientStream(".", DebugWindow.PipeName, PipeDirection.Out);
+        var xPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);
         xPipe.Connect(100);
       }
     }
@@ -63,7 +63,7 @@ namespace Cosmos.Compiler.Debug {
         // http://stackoverflow.com/questions/2700472/how-to-terminate-a-managed-thread-blocked-in-unmanaged-code
 
         while (!KillThread) { // Loop again to allow mult incoming connections between debug sessions
-          using (mPipe = new NamedPipeServerStream(mPipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
+          using (mPipe = new NamedPipeServerStream(mPipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous)) {
             mPipe.WaitForConnection();
 
             byte xCmd;

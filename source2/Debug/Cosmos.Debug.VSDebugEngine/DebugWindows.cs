@@ -18,7 +18,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         // is unique but also predictable since the pipe is the only way to talk
         // between the debugger and ToolWindows project.
         int xPID = System.Diagnostics.Process.GetCurrentProcess().Id;
-        mPipe = new NamedPipeClientStream(".", Cosmos.Compiler.Debug.DebugWindow.PipeName, PipeDirection.InOut);
+        mPipe = new NamedPipeClientStream(".", Cosmos.Compiler.Debug.DebugWindow.PipeName, PipeDirection.Out);
         try {
           // For now we assume its there or not from the first call.
           // If we don't find the server, we disable it to avoid causing lag.
