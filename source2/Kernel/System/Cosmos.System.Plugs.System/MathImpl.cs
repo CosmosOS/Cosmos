@@ -234,6 +234,7 @@ namespace Cosmos.System.Plugs.System
         }
         #endregion
 
+        #region Pow
         public static double Pow(double x, double y)
         {
             if (y == 0)
@@ -256,5 +257,81 @@ namespace Cosmos.System.Plugs.System
                 return xResult;
             }
         }
+        #endregion
+
+        #region Sin
+        public static double Sin(double a)
+        {
+            double result = 0;
+
+            //TO radians
+            double radians = a * (Math.PI / 180);
+
+            result = (radians) - (Math.Pow(radians, 3) / Factorial(3));
+            result += (Math.Pow(radians, 5) / Factorial(5)) - (Math.Pow(radians, 7) / Factorial(7)) + (Math.Pow(radians, 9) / Factorial(9));
+
+            //HARD FIX! Delete when doubles are working!
+            result *= -1;
+
+            /* USE WHEN Modulus Works
+             * int sign = 0;
+            for (int i = 3; i < 19; i += 2)
+            {
+                if (sign % 2 == 0)
+                    result += -Math.Pow(radians, i) / fact(i);
+                else
+                    result += Math.Pow(radians, i) / fact(i);
+                sign++;
+            }*/
+
+            return result;
+        }
+        #endregion
+
+        #region Cos
+        public static double Cos(double a)
+        {
+            double result = 0;
+
+            //TO radians
+            double radians = a * (Math.PI / 180);
+
+            result = 1 - (Math.Pow(radians, 2) / Factorial(2));
+            result += (Math.Pow(radians, 4) / Factorial(4)) - (Math.Pow(radians, 6) / Factorial(6)) + (Math.Pow(radians, 8) / Factorial(8));
+
+            //HARD FIX! Delete when doubles are working!
+            result *= -1;
+
+            /* USE WHEN Modulus Works
+              int sign = 0;
+            for (int i = 2; i < 20; i += 2)
+            {
+                if (sign % 2 == 0)
+                    result += -Math.Pow(radians, i) / Factorial(i);
+                else
+                    result += Math.Pow(radians, i) / Factorial(i);
+                sign++;
+            }*/
+
+            return result;
+        }
+        #endregion
+
+        #region Tan
+        public static double Tan(double a)
+        {
+            return Sin(a) / Cos(a);
+        }
+        #endregion
+
+        #region Factorial
+        public static int Factorial(int n)
+        {
+            if (n == 0)
+                return 1;
+            else
+                return n * Factorial(n - 1);
+        }
+        #endregion
     }
 }
