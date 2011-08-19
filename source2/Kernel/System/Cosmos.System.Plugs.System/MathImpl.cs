@@ -262,11 +262,23 @@ namespace Cosmos.System.Plugs.System
         #region Sin
         public static double Sin(double a)
         {
+            bool signSwitch = false;
             double result = 0;
 
             //TO radians
             double radians = a * (Math.PI / 180);
+            if (radians > Math.PI)
+            {
+                radians = radians - Math.PI;
+                signSwitch = true;
+            }
+            else if (radians > Math.PI / 2)
+            {
+                radians = radians - Math.PI;
+                signSwitch = true;
+            }
 
+            //Temp function to increase precision make more factorial calculations
             result = (radians) - (Math.Pow(radians, 3) / Factorial(3));
             result += (Math.Pow(radians, 5) / Factorial(5)) - (Math.Pow(radians, 7) / Factorial(7)) + (Math.Pow(radians, 9) / Factorial(9));
 
@@ -284,36 +296,17 @@ namespace Cosmos.System.Plugs.System
                 sign++;
             }*/
 
-            return result;
+            if (signSwitch)
+                return result * -1;
+            else
+                return result;
         }
         #endregion
 
         #region Cos
         public static double Cos(double a)
         {
-            double result = 0;
-
-            //TO radians
-            double radians = a * (Math.PI / 180);
-
-            result = 1 - (Math.Pow(radians, 2) / Factorial(2));
-            result += (Math.Pow(radians, 4) / Factorial(4)) - (Math.Pow(radians, 6) / Factorial(6)) + (Math.Pow(radians, 8) / Factorial(8));
-
-            //HARD FIX! Delete when doubles are working!
-            result *= -1;
-
-            /* USE WHEN Modulus Works
-              int sign = 0;
-            for (int i = 2; i < 20; i += 2)
-            {
-                if (sign % 2 == 0)
-                    result += -Math.Pow(radians, i) / Factorial(i);
-                else
-                    result += Math.Pow(radians, i) / Factorial(i);
-                sign++;
-            }*/
-
-            return result;
+            return Sin(90 - a);
         }
         #endregion
 
