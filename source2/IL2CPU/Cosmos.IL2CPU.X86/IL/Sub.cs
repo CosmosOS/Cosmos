@@ -40,9 +40,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 8:
                     if (stackTop.IsFloat)
                     {
-                        new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
-                        new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+                        new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
                         new CPUx86.x87.FloatSub { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+						new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
                         new CPUx86.x87.FloatStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
                     }
                     else
