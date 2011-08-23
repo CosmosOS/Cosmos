@@ -19,13 +19,151 @@ namespace TestBed
         List<ObjectEvents> Objects = new List<ObjectEvents>();
         Image i = new Image(DesktopWidth, DesktopHeight);
         WindowManager windowManager = new WindowManager(new Vec2(DesktopWidth, DesktopHeight));
+        Window w1;
 
         public Form1()
         {
             InitializeComponent();
         }
 
-        Window w1;
+        void bt_Click(Vec2 loc, MouseButtons buttons)
+        {
+            //if (w1.CurrentState == OForms.Windows.WindowState.Normal)
+            //{
+            //    windowManager.MaximizeWindow(w1);
+            //}
+            //else
+            //{
+            //    windowManager.RestoreWindow(w1);
+            //}
+            Window w = new Window(new Vec2(130, 30), new Vec2(120, 80), "Test Window 3");
+            w.ClearColor = Colors.Blue;
+            windowManager.AddWindow(w);
+        }
+
+        #region Mouse Functions
+        /// <summary>
+        /// This image contains everything that is behind the mouse.
+        /// </summary>
+        private Image behindMouseImage = new Image(5, 5); // This means max mouse size is 4x4
+        private Image MouseImage;
+        public uint MouseX = 0;
+        public uint MouseY = 0;
+        private void DrawCursor()
+        {
+
+            #region SaveBehindMouse
+
+            behindMouseImage.SetPixel(0, 0, i.GetPixel(MouseX, MouseY));
+            behindMouseImage.SetPixel(1, 0, i.GetPixel(MouseX + 1, MouseY));
+            behindMouseImage.SetPixel(2, 0, i.GetPixel(MouseX + 2, MouseY));
+            behindMouseImage.SetPixel(0, 1, i.GetPixel(MouseX, MouseY + 1));
+            behindMouseImage.SetPixel(0, 2, i.GetPixel(MouseX, MouseY + 2));
+            behindMouseImage.SetPixel(1, 1, i.GetPixel(MouseX + 1, MouseY + 1));
+            behindMouseImage.SetPixel(2, 2, i.GetPixel(MouseX + 2, MouseY + 2));
+            behindMouseImage.SetPixel(3, 3, i.GetPixel(MouseX + 3, MouseY + 3));
+            behindMouseImage.SetPixel(4, 4, i.GetPixel(MouseX + 4, MouseY + 4));
+
+            #region Old Block Mouse
+            //behindMouseImage.SetPixel(0, 0, i.GetPixel(MouseX, MouseY));
+            //behindMouseImage.SetPixel(1, 0, i.GetPixel(MouseX + 1, MouseY));
+            //behindMouseImage.SetPixel(2, 0, i.GetPixel(MouseX + 2, MouseY));
+            //behindMouseImage.SetPixel(3, 0, i.GetPixel(MouseX + 3, MouseY));
+            //behindMouseImage.SetPixel(4, 0, i.GetPixel(MouseX + 4, MouseY));
+
+            //behindMouseImage.SetPixel(0, 1, i.GetPixel(MouseX, MouseY + 1));
+            //behindMouseImage.SetPixel(1, 1, i.GetPixel(MouseX + 1, MouseY + 1));
+            //behindMouseImage.SetPixel(2, 1, i.GetPixel(MouseX + 2, MouseY + 1));
+            //behindMouseImage.SetPixel(3, 1, i.GetPixel(MouseX + 3, MouseY + 1));
+            //behindMouseImage.SetPixel(4, 1, i.GetPixel(MouseX + 4, MouseY + 1));
+
+            //behindMouseImage.SetPixel(0, 2, i.GetPixel(MouseX, MouseY + 2));
+            //behindMouseImage.SetPixel(1, 2, i.GetPixel(MouseX + 1, MouseY + 2));
+            //behindMouseImage.SetPixel(2, 2, i.GetPixel(MouseX + 2, MouseY + 2));
+            //behindMouseImage.SetPixel(3, 2, i.GetPixel(MouseX + 3, MouseY + 2));
+            //behindMouseImage.SetPixel(4, 2, i.GetPixel(MouseX + 4, MouseY + 2));
+
+            //behindMouseImage.SetPixel(0, 3, i.GetPixel(MouseX, MouseY + 3));
+            //behindMouseImage.SetPixel(1, 3, i.GetPixel(MouseX + 1, MouseY + 3));
+            //behindMouseImage.SetPixel(2, 3, i.GetPixel(MouseX + 2, MouseY + 3));
+            //behindMouseImage.SetPixel(3, 3, i.GetPixel(MouseX + 3, MouseY + 3));
+            //behindMouseImage.SetPixel(4, 3, i.GetPixel(MouseX + 4, MouseY + 3));
+
+            //behindMouseImage.SetPixel(0, 4, i.GetPixel(MouseX, MouseY + 4));
+            //behindMouseImage.SetPixel(1, 4, i.GetPixel(MouseX + 1, MouseY + 4));
+            //behindMouseImage.SetPixel(2, 4, i.GetPixel(MouseX + 2, MouseY + 4));
+            //behindMouseImage.SetPixel(3, 4, i.GetPixel(MouseX + 3, MouseY + 4));
+            //behindMouseImage.SetPixel(4, 4, i.GetPixel(MouseX + 4, MouseY + 4));
+            #endregion
+
+            #endregion
+
+            #region Draw Mouse
+            Vec2 v = new Vec2((int)MouseX, (int)MouseY);
+            i.DrawImage(v, MouseImage);
+            #endregion
+
+        }
+
+        private void SetMouseDown()
+        {
+            MouseImage.SetPixel(0, 0, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(1, 0, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(2, 0, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(0, 1, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(0, 2, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(1, 1, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(2, 2, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(3, 3, new Pixel(128, 128, 128, 255));
+            MouseImage.SetPixel(4, 4, new Pixel(128, 128, 128, 255));
+        }
+
+        private void SetMouseUp()
+        {
+            MouseImage.SetPixel(0, 0, Colors.Black);
+            MouseImage.SetPixel(1, 0, Colors.Black);
+            MouseImage.SetPixel(2, 0, Colors.Black);
+            MouseImage.SetPixel(0, 1, Colors.Black);
+            MouseImage.SetPixel(0, 2, Colors.Black);
+            MouseImage.SetPixel(1, 1, Colors.Black);
+            MouseImage.SetPixel(2, 2, Colors.Black);
+            MouseImage.SetPixel(3, 3, Colors.Black);
+            MouseImage.SetPixel(4, 4, Colors.Black);
+        }
+
+        private void InitializeMouse()
+        {
+            MouseImage = new Image(5, 5);
+            // Now we need to setup the mouse
+            MouseImage.SetPixel(0, 0, Colors.Black);
+            MouseImage.SetPixel(1, 0, Colors.Black);
+            MouseImage.SetPixel(2, 0, Colors.Black);
+            MouseImage.SetPixel(0, 1, Colors.Black);
+            MouseImage.SetPixel(0, 2, Colors.Black);
+            MouseImage.SetPixel(1, 1, Colors.Black);
+            MouseImage.SetPixel(2, 2, Colors.Black);
+            MouseImage.SetPixel(3, 3, Colors.Black);
+            MouseImage.SetPixel(4, 4, Colors.Black);
+
+            // Old mouse
+            //MouseImage.SetPixel(0, 0, Colors.Black);
+            //MouseImage.SetPixel(1, 0, Colors.Black);
+            //MouseImage.SetPixel(2, 0, Colors.Black);
+            //MouseImage.SetPixel(3, 0, Colors.Black);
+            //MouseImage.SetPixel(0, 1, Colors.Black);
+            //MouseImage.SetPixel(1, 1, Colors.White);
+            //MouseImage.SetPixel(2, 1, Colors.White);
+            //MouseImage.SetPixel(3, 1, Colors.Black);
+            //MouseImage.SetPixel(0, 2, Colors.Black);
+            //MouseImage.SetPixel(1, 2, Colors.White);
+            //MouseImage.SetPixel(2, 2, Colors.White);
+            //MouseImage.SetPixel(3, 2, Colors.Black);
+            //MouseImage.SetPixel(0, 3, Colors.Black);
+            //MouseImage.SetPixel(1, 3, Colors.Black);
+            //MouseImage.SetPixel(2, 3, Colors.Black);
+            //MouseImage.SetPixel(3, 3, Colors.Black);
+        }
+        #endregion
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -60,21 +198,6 @@ namespace TestBed
             // Now we need to restore what was behind the mouse.
             Vec2 v = new Vec2((int)MouseX, (int)MouseY);
             i.DrawImage(v, behindMouseImage);
-        }
-
-        void bt_Click(Vec2 loc, MouseButtons buttons)
-        {
-            //if (w1.CurrentState == OForms.Windows.WindowState.Normal)
-            //{
-            //    windowManager.MaximizeWindow(w1);
-            //}
-            //else
-            //{
-            //    windowManager.RestoreWindow(w1);
-            //}
-            Window w = new Window(new Vec2(130, 30), new Vec2(120, 80), "Test Window 3");
-            w.ClearColor = Colors.Blue;
-            windowManager.AddWindow(w);
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -148,129 +271,6 @@ namespace TestBed
             Vec2 v = new Vec2((int)MouseX, (int)MouseY);
             i.DrawImage(v, behindMouseImage);
         }
-
-        #region Mouse Functions
-        /// <summary>
-        /// This image contains everything that is behind the mouse.
-        /// </summary>
-        private Image behindMouseImage = new Image(5, 5); // This means max mouse size is 4x4
-        private Image MouseImage;
-        public uint MouseX = 0;
-        public uint MouseY = 0;
-        private void DrawCursor()
-        {
-
-            #region SaveBehindMouse
-
-            behindMouseImage.SetPixel(0, 0, i.GetPixel(MouseX, MouseY));
-            behindMouseImage.SetPixel(1, 0, i.GetPixel(MouseX + 1, MouseY));
-            behindMouseImage.SetPixel(2, 0, i.GetPixel(MouseX + 2, MouseY));
-            behindMouseImage.SetPixel(0, 1, i.GetPixel(MouseX, MouseY + 1));
-            behindMouseImage.SetPixel(0, 2, i.GetPixel(MouseX, MouseY + 2));
-            behindMouseImage.SetPixel(1, 1, i.GetPixel(MouseX + 1, MouseY + 1));
-            behindMouseImage.SetPixel(2, 2, i.GetPixel(MouseX + 2, MouseY + 2));
-            behindMouseImage.SetPixel(3, 3, i.GetPixel(MouseX + 3, MouseY + 3));
-            behindMouseImage.SetPixel(4, 4, i.GetPixel(MouseX + 4, MouseY + 4));
-
-            #region Old Block Mouse
-            //behindMouseImage.SetPixel(0, 0, i.GetPixel(MouseX, MouseY));
-            //behindMouseImage.SetPixel(1, 0, i.GetPixel(MouseX + 1, MouseY));
-            //behindMouseImage.SetPixel(2, 0, i.GetPixel(MouseX + 2, MouseY));
-            //behindMouseImage.SetPixel(3, 0, i.GetPixel(MouseX + 3, MouseY));
-            //behindMouseImage.SetPixel(4, 0, i.GetPixel(MouseX + 4, MouseY));
-
-            //behindMouseImage.SetPixel(0, 1, i.GetPixel(MouseX, MouseY + 1));
-            //behindMouseImage.SetPixel(1, 1, i.GetPixel(MouseX + 1, MouseY + 1));
-            //behindMouseImage.SetPixel(2, 1, i.GetPixel(MouseX + 2, MouseY + 1));
-            //behindMouseImage.SetPixel(3, 1, i.GetPixel(MouseX + 3, MouseY + 1));
-            //behindMouseImage.SetPixel(4, 1, i.GetPixel(MouseX + 4, MouseY + 1));
-
-            //behindMouseImage.SetPixel(0, 2, i.GetPixel(MouseX, MouseY + 2));
-            //behindMouseImage.SetPixel(1, 2, i.GetPixel(MouseX + 1, MouseY + 2));
-            //behindMouseImage.SetPixel(2, 2, i.GetPixel(MouseX + 2, MouseY + 2));
-            //behindMouseImage.SetPixel(3, 2, i.GetPixel(MouseX + 3, MouseY + 2));
-            //behindMouseImage.SetPixel(4, 2, i.GetPixel(MouseX + 4, MouseY + 2));
-
-            //behindMouseImage.SetPixel(0, 3, i.GetPixel(MouseX, MouseY + 3));
-            //behindMouseImage.SetPixel(1, 3, i.GetPixel(MouseX + 1, MouseY + 3));
-            //behindMouseImage.SetPixel(2, 3, i.GetPixel(MouseX + 2, MouseY + 3));
-            //behindMouseImage.SetPixel(3, 3, i.GetPixel(MouseX + 3, MouseY + 3));
-            //behindMouseImage.SetPixel(4, 3, i.GetPixel(MouseX + 4, MouseY + 3));
-
-            //behindMouseImage.SetPixel(0, 4, i.GetPixel(MouseX, MouseY + 4));
-            //behindMouseImage.SetPixel(1, 4, i.GetPixel(MouseX + 1, MouseY + 4));
-            //behindMouseImage.SetPixel(2, 4, i.GetPixel(MouseX + 2, MouseY + 4));
-            //behindMouseImage.SetPixel(3, 4, i.GetPixel(MouseX + 3, MouseY + 4));
-            //behindMouseImage.SetPixel(4, 4, i.GetPixel(MouseX + 4, MouseY + 4));
-            #endregion
-
-            #endregion
-
-            #region Draw Mouse
-            Vec2 v = new Vec2((int)MouseX, (int)MouseY);
-            i.DrawImage(v, MouseImage);
-            #endregion
-        }
-
-        private void SetMouseDown()
-        {
-            MouseImage.SetPixel(0, 0, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(1, 0, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(2, 0, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(0, 1, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(0, 2, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(1, 1, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(2, 2, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(3, 3, new Pixel(128, 128, 128, 255));
-            MouseImage.SetPixel(4, 4, new Pixel(128, 128, 128, 255));
-        }
-
-        private void SetMouseUp()
-        {
-            MouseImage.SetPixel(0, 0, Colors.Black);
-            MouseImage.SetPixel(1, 0, Colors.Black);
-            MouseImage.SetPixel(2, 0, Colors.Black);
-            MouseImage.SetPixel(0, 1, Colors.Black);
-            MouseImage.SetPixel(0, 2, Colors.Black);
-            MouseImage.SetPixel(1, 1, Colors.Black);
-            MouseImage.SetPixel(2, 2, Colors.Black);
-            MouseImage.SetPixel(3, 3, Colors.Black);
-            MouseImage.SetPixel(4, 4, Colors.Black);
-        }
-
-        private void InitializeMouse()
-        {
-            MouseImage = new Image(5, 5);
-            // Now we need to setup the mouse
-            MouseImage.SetPixel(0, 0, Colors.Black);
-            MouseImage.SetPixel(1, 0, Colors.Black);
-            MouseImage.SetPixel(2, 0, Colors.Black);
-            MouseImage.SetPixel(0, 1, Colors.Black);
-            MouseImage.SetPixel(0, 2, Colors.Black);
-            MouseImage.SetPixel(1, 1, Colors.Black);
-            MouseImage.SetPixel(2, 2, Colors.Black);
-            MouseImage.SetPixel(3, 3, Colors.Black);
-            MouseImage.SetPixel(4, 4, Colors.Black);
-
-            // Old mouse
-            //MouseImage.SetPixel(0, 0, Colors.Black);
-            //MouseImage.SetPixel(1, 0, Colors.Black);
-            //MouseImage.SetPixel(2, 0, Colors.Black);
-            //MouseImage.SetPixel(3, 0, Colors.Black);
-            //MouseImage.SetPixel(0, 1, Colors.Black);
-            //MouseImage.SetPixel(1, 1, Colors.White);
-            //MouseImage.SetPixel(2, 1, Colors.White);
-            //MouseImage.SetPixel(3, 1, Colors.Black);
-            //MouseImage.SetPixel(0, 2, Colors.Black);
-            //MouseImage.SetPixel(1, 2, Colors.White);
-            //MouseImage.SetPixel(2, 2, Colors.White);
-            //MouseImage.SetPixel(3, 2, Colors.Black);
-            //MouseImage.SetPixel(0, 3, Colors.Black);
-            //MouseImage.SetPixel(1, 3, Colors.Black);
-            //MouseImage.SetPixel(2, 3, Colors.Black);
-            //MouseImage.SetPixel(3, 3, Colors.Black);
-        }
-        #endregion
 
         private void pictureBox1_MouseDown(object sender, Forms.MouseEventArgs e)
         {

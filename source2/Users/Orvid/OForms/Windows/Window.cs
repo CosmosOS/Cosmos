@@ -44,6 +44,14 @@ namespace OForms.Windows
             }
         }
         /// <summary>
+        /// The minimum allowable window size in the X direction.
+        /// </summary>
+        private const int MinXWindowSize = 50;
+        /// <summary>
+        /// The minimum allowable window size in the Y direction.
+        /// </summary>
+        private const int MinYWindowSize = 40;
+        /// <summary>
         /// The size of the window. Use this internally only
         /// if you are reading the size. If you are changing 
         /// the size, use the public Size property instead, 
@@ -62,6 +70,14 @@ namespace OForms.Windows
             set
             {
                 Parent.NeedToRedrawAll = true;
+                if (value.X < MinXWindowSize)
+                {
+                    value.X = MinXWindowSize;
+                }
+                if (value.Y < MinYWindowSize)
+                {
+                    value.Y = MinYWindowSize;
+                }
                 iSize = value;
                 ComputeBounds();
                 ResetBuffers();
@@ -202,9 +218,94 @@ namespace OForms.Windows
         /// </summary>
         private bool WasMaximized = false;
         /// <summary>
+        /// True if we're currently resizing.
+        /// </summary>
+        private bool IsResizing = false;
+        /// <summary>
+        /// The size of the window when resizing started.
+        /// </summary>
+        private Vec2 InitSizeOnResizeStart;
+        /// <summary>
+        /// The location of the mouse when resizing started.
+        /// </summary>
+        private Vec2 InitResizeLocation;
+        /// <summary>
+        /// The location of the window when window dragging started.
+        /// </summary>
+        private Vec2 InitWindowLocOnDragStart;
+        /// <summary>
+        /// The location of the mouse when window dragging started.
+        /// </summary>
+        private Vec2 InitDraggingLocation;
+        /// <summary>
+        /// True if the last mouse move event had the mouse in
+        /// the window header.
+        /// </summary>
+        private bool WasInHeader = false;
+        /// <summary>
+        /// True if the last mouse move event had the mouse
+        /// over the Close button.
+        /// </summary>
+        private bool WasOverClose = false;
+        /// <summary>
+        /// True if the last mouse move event had the mouse
+        /// over the Maximize/Restore button.
+        /// </summary>
+        private bool WasOverMax = false;
+        /// <summary>
+        /// True if the last mouse move event had the mouse
+        /// over the Minimize button.
+        /// </summary>
+        private bool WasOverMin = false;
+        /// <summary>
+        /// The color to clear the ContentBuffer with when the window is inactive.
+        /// </summary>
+        public Pixel ClearInactiveColor = Colors.Brown;
+        /// <summary>
+        /// The color to clear the ContentBuffer with when the window is active.
+        /// </summary>
+        public Pixel ClearColor = Colors.Brown;
+        /// <summary>
+        /// True if the header has been drawn.
+        /// </summary>
+        private bool DrawnHeader = false;
+        /// <summary>
         /// The controls in the window.
         /// </summary>
         public List<Control> Controls = new List<Control>();
+
+
+        #region Colors
+        /// <summary>
+        /// The current background color of the Close button.
+        /// </summary>
+        private Pixel CurCloseButtonColor = Colors.Red;
+        /// <summary>
+        /// The current background color of the Maximize/Restore button.
+        /// </summary>
+        private Pixel CurMaxButtonColor = Colors.Red;
+        /// <summary>
+        /// The current background color of the Minimize button.
+        /// </summary>
+        private Pixel CurMinButtonColor = Colors.Red;
+
+        #region Default Colors
+        /// <summary>
+        /// The default background color of the Close button.
+        /// </summary>
+        private static Pixel DefaultCloseButtonColor = Colors.Red;
+        /// <summary>
+        /// The default background color of the Maximize/Restore button.
+        /// </summary>
+        private static Pixel DefaultMaxButtonColor = Colors.Red;
+        /// <summary>
+        /// The default background color of the Minimize button.
+        /// </summary>
+        private static Pixel DefaultMinButtonColor = Colors.Red;
+        #endregion
+
+        #endregion
+
 
         /// <summary>
         /// The default constructor for a window.
@@ -230,11 +331,17 @@ namespace OForms.Windows
             return this.Name;
         }
 
+        /// <summary>
+        /// Closes this window.
+        /// </summary>
         public void Close()
         {
             Parent.CloseWindow(this);
         }
 
+        /// <summary>
+        /// Does the actual closing of this window.
+        /// </summary>
         internal void DoClose()
         {
             foreach (Control c in Controls)
@@ -283,35 +390,9 @@ namespace OForms.Windows
             ContentBuffer = new Image(new Vec2(iSize.X - WindowBorderSize - WindowBorderSize, iSize.Y - HeaderHeight));
         }
 
-
         /// <summary>
-        /// The current background color of the Close button.
+        /// Redraws the header.
         /// </summary>
-        private Pixel CurCloseButtonColor = Colors.Red;
-        /// <summary>
-        /// The current background color of the Maximize/Restore button.
-        /// </summary>
-        private Pixel CurMaxButtonColor = Colors.Red;
-        /// <summary>
-        /// The current background color of the Minimize button.
-        /// </summary>
-        private Pixel CurMinButtonColor = Colors.Red;
-
-        #region Default Colors
-        /// <summary>
-        /// The default background color of the Close button.
-        /// </summary>
-        private static Pixel DefaultCloseButtonColor = Colors.Red;
-        /// <summary>
-        /// The default background color of the Maximize/Restore button.
-        /// </summary>
-        private static Pixel DefaultMaxButtonColor = Colors.Red;
-        /// <summary>
-        /// The default background color of the Minimize button.
-        /// </summary>
-        private static Pixel DefaultMinButtonColor = Colors.Red;
-        #endregion
-
         private void RedrawHeader()
         {
             HeaderBuffer = new Image(new Vec2(iSize.X, HeaderHeight));
@@ -432,8 +513,8 @@ namespace OForms.Windows
             );
             this.ContentBounds = new BoundingBox(
                 iLocation.X + WindowBorderSize,
-                iLocation.X + iSize.X - WindowBorderSize - WindowBorderSize,
-                iLocation.Y + iSize.Y - HeaderHeight,
+                iLocation.X + (iSize.X - WindowBorderSize - WindowBorderSize),
+                iLocation.Y + (iSize.Y - HeaderHeight),
                 iLocation.Y + HeaderHeight
             );
 
@@ -456,17 +537,6 @@ namespace OForms.Windows
                 iLocation.Y + (WindowBorderSize + 1)
             );
         }
-
-        /// <summary>
-        /// The color to clear the ContentBuffer with when the window is inactive.
-        /// </summary>
-        public Pixel ClearInactiveColor = Colors.Brown;
-        /// <summary>
-        /// The color to clear the ContentBuffer with when the window is active.
-        /// </summary>
-        public Pixel ClearColor = Colors.Brown;
-        
-        private bool DrawnHeader = false;
 
         /// <summary>
         /// Draws this window on the specified image.
@@ -504,6 +574,11 @@ namespace OForms.Windows
 
 
         #region Do Events
+        /// <summary>
+        /// Processes a MouseClick event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="button">The buttons that are pressed.</param>
         internal void DoClick(Vec2 loc, MouseButtons button)
         {
             if (IsActiveWindow)
@@ -556,6 +631,11 @@ namespace OForms.Windows
             }
         }
 
+        /// <summary>
+        /// Processes a MouseUp event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="button">The buttons that are still pressed down.</param>
         internal void DoMouseUp(Vec2 loc, MouseButtons button)
         {
             if (IsDragging)
@@ -563,6 +643,12 @@ namespace OForms.Windows
                 IsDragging = false;
                 InitDraggingLocation = null;
                 InitWindowLocOnDragStart = null;
+            }
+            else if (IsResizing)
+            {
+                IsResizing = false;
+                InitResizeLocation = null;
+                InitSizeOnResizeStart = null;
             }
             else
             {
@@ -579,6 +665,11 @@ namespace OForms.Windows
             }
         }
 
+        /// <summary>
+        /// Processes a MouseDown event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="button">The buttons that are down.</param>
         internal void DoMouseDown(Vec2 loc, MouseButtons button)
         {
             if (ContentBounds.IsInBounds(loc))
@@ -602,41 +693,16 @@ namespace OForms.Windows
                     InitDraggingLocation = loc;
                     InitWindowLocOnDragStart = this.iLocation;
                 }
-                else // The border of the window was clicked.
+                else // The border of the window was pressed, begin resize.
                 {
-                    //throw new Exception("Unknown part of the window clicked!");
+                    IsResizing = true;
+                    InitSizeOnResizeStart = this.iSize;
+                    InitResizeLocation = loc;
                 }
             }
         }
 
-        /// <summary>
-        /// The location of the window when window dragging started.
-        /// </summary>
-        private Vec2 InitWindowLocOnDragStart;
-        /// <summary>
-        /// The location of the mouse when window dragging started.
-        /// </summary>
-        private Vec2 InitDraggingLocation;
-        /// <summary>
-        /// True if the last mouse move event had the mouse in
-        /// the window header.
-        /// </summary>
-        private bool WasInHeader = false;
-        /// <summary>
-        /// True if the last mouse move event had the mouse
-        /// over the Close button.
-        /// </summary>
-        private bool WasOverClose = false;
-        /// <summary>
-        /// True if the last mouse move event had the mouse
-        /// over the Maximize/Restore button.
-        /// </summary>
-        private bool WasOverMax = false;
-        /// <summary>
-        /// True if the last mouse move event had the mouse
-        /// over the Minimize button.
-        /// </summary>
-        private bool WasOverMin = false;
+
 
         /// <summary>
         /// Checks if we were over buttons,
@@ -664,12 +730,22 @@ namespace OForms.Windows
             }
         }
 
+        /// <summary>
+        /// Processes a MouseMove event.
+        /// </summary>
+        /// <param name="newLoc">The new location of the mouse.</param>
+        /// <param name="button">The buttons on the mouse that are pressed.</param>
         internal void DoMouseMove(Vec2 newLoc, MouseButtons button)
         {
             if (IsDragging)
             {
                 Vec2 Transform = newLoc - InitDraggingLocation;
                 this.Location = InitWindowLocOnDragStart + Transform;
+            }
+            else if (IsResizing)
+            {
+                Vec2 Transform = newLoc - InitResizeLocation;
+                this.Size = InitSizeOnResizeStart + Transform;
             }
             else
             {

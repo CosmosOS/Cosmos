@@ -3,6 +3,9 @@ using Orvid.Graphics;
 
 namespace OForms.Windows
 {
+    /// <summary>
+    /// The class that represents the Taskbar.
+    /// </summary>
     internal class Taskbar
     {
         /// <summary>

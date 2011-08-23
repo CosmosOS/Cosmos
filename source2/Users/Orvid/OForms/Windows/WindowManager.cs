@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace OForms.Windows
 {
+    /// <summary>
+    /// The class that represents a WindowManager.
+    /// </summary>
     public class WindowManager
     {
         /// <summary>
@@ -14,8 +17,6 @@ namespace OForms.Windows
         /// The taskbar.
         /// </summary>
         private Taskbar Taskbar;
-
-        #region Mouse Properties
         /// <summary>
         /// The location of the mouse.
         /// </summary>
@@ -34,90 +35,6 @@ namespace OForms.Windows
         {
             get { return MouseLocation.Y; }
         }
-        #endregion
-
-        #region Handle Events
-
-        #region Mouse Click
-        public void HandleMouseClick(Vec2 loc, MouseButtons buttons, Image i)
-        {
-            MouseLocation = loc;
-            if (Taskbar.Bounds.IsInBounds(loc))
-            {
-                Taskbar.DoClick(loc, buttons);
-            }
-            else
-            {
-                if (Taskbar.WasOverButton)
-                {
-                    Taskbar.UndrawOverButton(Taskbar.WindowButtonBounds[Taskbar.overButtonIndx], Taskbar.Windows[Taskbar.overButtonIndx]);
-                }
-                foreach (Window w in ActiveWindows)
-                {
-                    if (w.Bounds.IsInBounds(loc))
-                    {
-                        w.DoClick(loc, OForms.MouseButtons.Left);
-                        break;
-                    }
-                }
-            }
-            this.Draw(i);
-        }
-        #endregion
-
-        #region Mouse Move
-        public void HandleMouseMove(Vec2 loc, MouseButtons buttons, Image i)
-        {
-            MouseLocation = loc;
-            if (Taskbar.Bounds.IsInBounds(loc))
-            {
-                Taskbar.DoMouseMove(loc);
-            }
-            else
-            {
-                if (Taskbar.WasOverButton)
-                {
-                    Taskbar.UndrawOverButton(Taskbar.WindowButtonBounds[Taskbar.overButtonIndx], Taskbar.Windows[Taskbar.overButtonIndx]);
-                }
-                if (ActiveWindows.Length > 0)
-                {
-                    ActiveWindow.DoMouseMove(loc, buttons);
-                }
-            }
-            this.Draw(i);
-        }
-        #endregion
-
-        #region Mouse Down
-        public void HandleMouseDown(Vec2 loc, MouseButtons buttons, Image i)
-        {
-            MouseLocation = loc;
-            if (ActiveWindows.Length > 0)
-            {
-                if (ActiveWindow.Bounds.IsInBounds(loc))
-                {
-                    ActiveWindow.DoMouseDown(loc, buttons);
-                    this.Draw(i);
-                }
-            }
-        }
-        #endregion
-
-        #region Mouse Up
-        public void HandleMouseUp(Vec2 loc, MouseButtons buttons, Image i)
-        {
-            MouseLocation = loc;
-            if (ActiveWindows.Length > 0)
-            {
-                ActiveWindow.DoMouseUp(loc, buttons);
-                this.Draw(i);
-            }
-        }
-        #endregion
-
-        #endregion
-
-
         /// <summary>
         /// Is true when all the windows need to be re-drawn,
         /// in other-words, is true if a window has been moved,
@@ -347,5 +264,113 @@ namespace OForms.Windows
                 }
             }
         }
+
+
+        #region Handle Events
+
+        #region Mouse Click
+        /// <summary>
+        /// Handles a MouseClick event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="buttons">The MouseButtons that are pressed.</param>
+        /// <param name="i">The image to draw to.</param>
+        public void HandleMouseClick(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (Taskbar.Bounds.IsInBounds(loc))
+            {
+                Taskbar.DoClick(loc, buttons);
+            }
+            else
+            {
+                if (Taskbar.WasOverButton)
+                {
+                    Taskbar.UndrawOverButton(Taskbar.WindowButtonBounds[Taskbar.overButtonIndx], Taskbar.Windows[Taskbar.overButtonIndx]);
+                }
+                foreach (Window w in ActiveWindows)
+                {
+                    if (w.Bounds.IsInBounds(loc))
+                    {
+                        w.DoClick(loc, OForms.MouseButtons.Left);
+                        break;
+                    }
+                }
+            }
+            this.Draw(i);
+        }
+        #endregion
+
+        #region Mouse Move
+        /// <summary>
+        /// Processes a MouseMove event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="buttons">The buttons of the mouse that are pressed.</param>
+        /// <param name="i">The image to draw to.</param>
+        public void HandleMouseMove(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (Taskbar.Bounds.IsInBounds(loc))
+            {
+                Taskbar.DoMouseMove(loc);
+            }
+            else
+            {
+                if (Taskbar.WasOverButton)
+                {
+                    Taskbar.UndrawOverButton(Taskbar.WindowButtonBounds[Taskbar.overButtonIndx], Taskbar.Windows[Taskbar.overButtonIndx]);
+                }
+                if (ActiveWindows.Length > 0)
+                {
+                    ActiveWindow.DoMouseMove(loc, buttons);
+                }
+            }
+            this.Draw(i);
+        }
+        #endregion
+
+        #region Mouse Down
+        /// <summary>
+        /// Processes a MouseDown event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="buttons">The MouseButtons that are pressed.</param>
+        /// <param name="i">The Image to draw to.</param>
+        public void HandleMouseDown(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (ActiveWindows.Length > 0)
+            {
+                if (ActiveWindow.Bounds.IsInBounds(loc))
+                {
+                    ActiveWindow.DoMouseDown(loc, buttons);
+                    this.Draw(i);
+                }
+            }
+        }
+        #endregion
+
+        #region Mouse Up
+        /// <summary>
+        /// Processes a MouseUp event.
+        /// </summary>
+        /// <param name="loc">The location of the mouse.</param>
+        /// <param name="buttons">The MouseButtons that are still pressed.</param>
+        /// <param name="i">The Image to draw to.</param>
+        public void HandleMouseUp(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (ActiveWindows.Length > 0)
+            {
+                ActiveWindow.DoMouseUp(loc, buttons);
+                this.Draw(i);
+            }
+        }
+        #endregion
+
+        #endregion
+
+
     }
 }
