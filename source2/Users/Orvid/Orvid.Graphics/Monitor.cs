@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Orvid.Graphics;
-using OForms.Windows;
 
 namespace Orvid.Graphics
 {
@@ -21,10 +20,6 @@ namespace Orvid.Graphics
         /// This layer holds all of the desktop icons.
         /// </summary>
         public Image DesktopIcons;
-        /// <summary>
-        /// This layer contains all of the windows.
-        /// </summary>
-        public LinkedList<OWindow> Windows = new LinkedList<OWindow>();
         /// <summary>
         /// This image contains the taskbar.
         /// </summary>

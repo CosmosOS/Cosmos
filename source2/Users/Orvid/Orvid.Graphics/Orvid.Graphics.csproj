@@ -77,9 +77,6 @@
     <Compile Include="ImageManipulator.cs" />
     <Compile Include="MiImage.cs" />
     <Compile Include="Monitor.cs" />
-    <Compile Include="OForms\OControl.cs" />
-    <Compile Include="OForms\Windows\OWindow.cs" />
-    <Compile Include="OForms\Windows\OWindowManager.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\Shape.cs" />
