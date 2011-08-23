@@ -81,6 +81,10 @@ namespace OForms.Windows
         /// </summary>
         internal int overButtonIndx = 0;
         /// <summary>
+        /// True if the over button has been drawn.
+        /// </summary>
+        private bool DrawnOverButton = false;
+        /// <summary>
         /// True if the taskbar needs to be re-drawn.
         /// </summary>
         internal bool Modified = true;
@@ -146,19 +150,71 @@ namespace OForms.Windows
         }
 
         /// <summary>
-        /// Draws the taskbar on the specified image.
+        /// Redraws the Buffer.
         /// </summary>
-        /// <param name="i">The image to draw on.</param>
-        public void Draw(Image i)
+        private void RedrawBuffer()
         {
-            if (Modified)
+            WindowButtonBounds = new BoundingBox[Windows.Length];
+            Buffer.Clear(TaskbarClearColor);
+            int loc = 20;
+            if (Windows.Length * (WindowButtonWidth + (2 * WindowButtonMargin)) < Manager.Size.X - 20)
             {
-                WindowButtonBounds = new BoundingBox[Windows.Length];
-                Buffer.Clear(TaskbarClearColor);
-                int loc = 20;
-                if (Windows.Length * (WindowButtonWidth + (2 * WindowButtonMargin)) < Manager.Size.X - 20)
+                #region No Dynamic Size
+                Vec2 tl;
+                Vec2 tr;
+                Vec2 br;
+                Vec2 bl;
+                Window w;
+                for (uint ind = 0; ind < Windows.Length; ind++)
                 {
-                    #region No Dynamic Size
+                    w = Windows[ind];
+
+                    tl = new Vec2(
+                        loc + WindowButtonMargin,
+                        (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin))
+                    );
+                    tr = new Vec2(
+                        loc + WindowButtonMargin + WindowButtonWidth,
+                        (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin))
+                    );
+                    br = new Vec2(
+                        loc + WindowButtonMargin + WindowButtonWidth,
+                        (TaskBarHeight - 2 - WindowButtonMargin)
+                    );
+                    bl = new Vec2(
+                        loc + WindowButtonMargin,
+                        (TaskBarHeight - 2 - WindowButtonMargin)
+                    );
+
+                    WindowButtonBounds[ind] = new BoundingBox(
+                        loc + WindowButtonMargin,
+                        loc + WindowButtonMargin + WindowButtonWidth,
+                        Manager.Size.Y - (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin)),
+                        Manager.Size.Y - (TaskBarHeight - 2 - WindowButtonMargin)
+                    );
+
+                    if (w.IsActiveWindow && w.CurrentState != WindowState.Minimized)
+                    {
+                        Buffer.DrawRectangle(tl, br, WindowActiveBackColor);
+                        Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowActiveLineColor);
+                    }
+                    else
+                    {
+                        Buffer.DrawRectangle(tl, br, WindowInactiveBackColor);
+                        Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
+                    }
+
+                    loc += WindowButtonMargin + WindowButtonMargin + WindowButtonWidth;
+                }
+                #endregion
+            }
+            else
+            {
+                #region Dynamic Size
+                uint len = (uint)Manager.Size.X - 20;
+                int ButtonWidth = (int)Math.Floor((double)((len / Windows.Length) - 2));
+                if (ButtonWidth > 5)
+                {
                     Vec2 tl;
                     Vec2 tr;
                     Vec2 br;
@@ -173,11 +229,11 @@ namespace OForms.Windows
                             (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin))
                         );
                         tr = new Vec2(
-                            loc + WindowButtonMargin + WindowButtonWidth,
+                            loc + WindowButtonMargin + ButtonWidth,
                             (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin))
                         );
                         br = new Vec2(
-                            loc + WindowButtonMargin + WindowButtonWidth,
+                            loc + WindowButtonMargin + ButtonWidth,
                             (TaskBarHeight - 2 - WindowButtonMargin)
                         );
                         bl = new Vec2(
@@ -187,7 +243,7 @@ namespace OForms.Windows
 
                         WindowButtonBounds[ind] = new BoundingBox(
                             loc + WindowButtonMargin,
-                            loc + WindowButtonMargin + WindowButtonWidth,
+                            loc + WindowButtonMargin + ButtonWidth,
                             Manager.Size.Y - (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin)),
                             Manager.Size.Y - (TaskBarHeight - 2 - WindowButtonMargin)
                         );
@@ -203,71 +259,28 @@ namespace OForms.Windows
                             Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
                         }
 
-                        loc += WindowButtonMargin + WindowButtonMargin + WindowButtonWidth;
+                        loc += WindowButtonMargin + WindowButtonMargin + ButtonWidth;
                     }
-                    #endregion
                 }
                 else
                 {
-                    #region Dynamic Size
-                    uint len = (uint)Manager.Size.X - 20;
-                    int ButtonWidth = (int)Math.Floor((double)((len / Windows.Length) - 2));
-                    if (ButtonWidth > 5)
-                    {
-                        Vec2 tl;
-                        Vec2 tr;
-                        Vec2 br;
-                        Vec2 bl;
-                        Window w;
-                        for (uint ind = 0; ind < Windows.Length; ind++)
-                        {
-                            w = Windows[ind];
-
-                            tl = new Vec2(
-                                loc + WindowButtonMargin,
-                                (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin))
-                            );
-                            tr = new Vec2(
-                                loc + WindowButtonMargin + ButtonWidth,
-                                (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin))
-                            );
-                            br = new Vec2(
-                                loc + WindowButtonMargin + ButtonWidth,
-                                (TaskBarHeight - 2 - WindowButtonMargin)
-                            );
-                            bl = new Vec2(
-                                loc + WindowButtonMargin,
-                                (TaskBarHeight - 2 - WindowButtonMargin)
-                            );
-
-                            WindowButtonBounds[ind] = new BoundingBox(
-                                loc + WindowButtonMargin,
-                                loc + WindowButtonMargin + ButtonWidth,
-                                Manager.Size.Y - (TaskBarHeight - (TaskBarHeight - 2 - WindowButtonMargin)),
-                                Manager.Size.Y - (TaskBarHeight - 2 - WindowButtonMargin)
-                            );
-
-                            if (w.IsActiveWindow && w.CurrentState != WindowState.Minimized)
-                            {
-                                Buffer.DrawRectangle(tl, br, WindowActiveBackColor);
-                                Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowActiveLineColor);
-                            }
-                            else
-                            {
-                                Buffer.DrawRectangle(tl, br, WindowInactiveBackColor);
-                                Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
-                            }
-
-                            loc += WindowButtonMargin + WindowButtonMargin + ButtonWidth;
-                        }
-                    }
-                    else
-                    {
-                        Buffer.DrawRectangle(new Vec2(24, 4), new Vec2(Buffer.Width - 10, Buffer.Height - 4), Colors.Cyan);
-                    }
-                    #endregion
+                    Buffer.DrawRectangle(new Vec2(24, 4), new Vec2(Buffer.Width - 10, Buffer.Height - 4), Colors.Cyan);
                 }
-                Modified = false;
+                #endregion
+            }
+            Modified = false;
+            Drawn = true;
+        }
+
+        /// <summary>
+        /// Draws the taskbar on the specified image.
+        /// </summary>
+        /// <param name="i">The image to draw on.</param>
+        public void Draw(Image i)
+        {
+            if (Modified)
+            {
+                RedrawBuffer();
             }
             i.DrawImage(TaskbarLocation, Buffer);
             Drawn = true;
@@ -329,10 +342,27 @@ namespace OForms.Windows
         /// <param name="loc">Location of the mouse.</param>
         internal void DoMouseMove(Vec2 loc)
         {
-            if (Drawn)
+            if (!Drawn)
             {
-                if (!WasOverButton)
+                RedrawBuffer();
+            }
+            if (!WasOverButton)
+            {
+                for (int i = 0; i < Windows.Length; i++)
                 {
+                    if (WindowButtonBounds[i].IsInBounds(loc))
+                    {
+                        DrawOverButton(WindowButtonBounds[i], Windows[i]);
+                        overButtonIndx = i;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (WindowButtonBounds[overButtonIndx].IsInBounds(loc) || !DrawnOverButton)
+                {
+                    UndrawOverButton(WindowButtonBounds[overButtonIndx], Windows[overButtonIndx]);
                     for (int i = 0; i < Windows.Length; i++)
                     {
                         if (WindowButtonBounds[i].IsInBounds(loc))
@@ -342,24 +372,9 @@ namespace OForms.Windows
                             return;
                         }
                     }
-                }
-                else
-                {
-                    if (!WindowButtonBounds[overButtonIndx].IsInBounds(loc))
-                    {
-                        UndrawOverButton(WindowButtonBounds[overButtonIndx], Windows[overButtonIndx]);
-                        for (int i = 0; i < Windows.Length; i++)
-                        {
-                            if (WindowButtonBounds[i].IsInBounds(loc))
-                            {
-                                DrawOverButton(WindowButtonBounds[i], Windows[i]);
-                                overButtonIndx = i;
-                                return;
-                            }
-                        }
-                        overButtonIndx = 0;
-                        return;
-                    }
+                    overButtonIndx = 0;
+                    DrawnOverButton = true;
+                    return;
                 }
             }
         }
@@ -371,49 +386,28 @@ namespace OForms.Windows
         /// <param name="buttons">The buttons that are pressed.</param>
         internal void DoClick(Vec2 loc, MouseButtons buttons)
         {
-            if (Drawn)
+            if (!Drawn)
             {
-                if (WasOverButton)
+                RedrawBuffer();
+            }
+            if (WasOverButton)
+            {
+                if (WindowButtonBounds[overButtonIndx].IsInBounds(loc))
                 {
-                    if (WindowButtonBounds[overButtonIndx].IsInBounds(loc))
+                    if (Windows[overButtonIndx].IsActiveWindow)
                     {
-                        if (Windows[overButtonIndx].IsActiveWindow)
-                        {
-                            Manager.MinimizeWindow(Windows[overButtonIndx]);
-                        }
-                        else if (Windows[overButtonIndx].CurrentState == WindowState.Minimized)
-                        {
-                            Manager.RestoreWindow(Windows[overButtonIndx]);
-                        }
-                        else
-                        {
-                            Manager.BringWindowToFront(Windows[overButtonIndx]);
-                        }
+                        Manager.MinimizeWindow(Windows[overButtonIndx]);
+                    }
+                    else if (Windows[overButtonIndx].CurrentState == WindowState.Minimized)
+                    {
+                        Manager.RestoreWindow(Windows[overButtonIndx]);
                     }
                     else
                     {
-                        for (int i = 0; i < Windows.Length; i++)
-                        {
-                            if (WindowButtonBounds[i].IsInBounds(loc))
-                            {
-                                DrawOverButton(WindowButtonBounds[i], Windows[i]);
-                                overButtonIndx = i;
-                                if (Windows[i].IsActiveWindow)
-                                {
-                                    Manager.MinimizeWindow(Windows[i]);
-                                }
-                                else if (Windows[i].CurrentState == WindowState.Minimized)
-                                {
-                                    Manager.RestoreWindow(Windows[i]);
-                                }
-                                else
-                                {
-                                    Manager.BringWindowToFront(Windows[i]);
-                                }
-                                return;
-                            }
-                        }
+                        Manager.BringWindowToFront(Windows[overButtonIndx]);
                     }
+                    DrawnOverButton = false;
+                    DoMouseMove(loc);
                 }
                 else
                 {
@@ -423,6 +417,7 @@ namespace OForms.Windows
                         {
                             DrawOverButton(WindowButtonBounds[i], Windows[i]);
                             overButtonIndx = i;
+                            DrawnOverButton = false;
                             if (Windows[i].IsActiveWindow)
                             {
                                 Manager.MinimizeWindow(Windows[i]);
@@ -435,8 +430,35 @@ namespace OForms.Windows
                             {
                                 Manager.BringWindowToFront(Windows[i]);
                             }
+                            DoMouseMove(loc);
                             return;
                         }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < Windows.Length; i++)
+                {
+                    if (WindowButtonBounds[i].IsInBounds(loc))
+                    {
+                        DrawOverButton(WindowButtonBounds[i], Windows[i]);
+                        overButtonIndx = i;
+                        DrawnOverButton = false;
+                        if (Windows[i].IsActiveWindow)
+                        {
+                            Manager.MinimizeWindow(Windows[i]);
+                        }
+                        else if (Windows[i].CurrentState == WindowState.Minimized)
+                        {
+                            Manager.RestoreWindow(Windows[i]);
+                        }
+                        else
+                        {
+                            Manager.BringWindowToFront(Windows[i]);
+                        }
+                        DoMouseMove(loc);
+                        return;
                     }
                 }
             }
