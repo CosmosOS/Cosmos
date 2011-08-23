@@ -41,6 +41,7 @@
     <Compile Include="Controls\Delegates.cs" />
     <Compile Include="Controls\MouseButtons.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\Taskbar.cs" />
     <Compile Include="Windows\Window.cs" />
     <Compile Include="Windows\WindowManager.cs" />
     <Compile Include="Windows\WindowState.cs" />

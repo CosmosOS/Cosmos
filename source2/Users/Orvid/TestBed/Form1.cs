@@ -64,17 +64,17 @@ namespace TestBed
 
         void bt_Click(Vec2 loc, MouseButtons buttons)
         {
-            if (w1.CurrentState == OForms.Windows.WindowState.Normal)
-            {
-                windowManager.MaximizeWindow(w1);
-            }
-            else
-            {
-                windowManager.RestoreWindow(w1);
-            }
-            //Window w = new Window(new Vec2(130, 30), new Vec2(120, 80), "Test Window 3");
-            //w.ClearColor = Colors.Blue;
-            //windowManager.AddWindow(w);
+            //if (w1.CurrentState == OForms.Windows.WindowState.Normal)
+            //{
+            //    windowManager.MaximizeWindow(w1);
+            //}
+            //else
+            //{
+            //    windowManager.RestoreWindow(w1);
+            //}
+            Window w = new Window(new Vec2(130, 30), new Vec2(120, 80), "Test Window 3");
+            w.ClearColor = Colors.Blue;
+            windowManager.AddWindow(w);
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -86,15 +86,8 @@ namespace TestBed
                     o.MouseClick(sender, new Forms.MouseEventArgs(Forms.MouseButtons.Left, 1, (int)MouseX, (int)MouseY, 0));
                 }
             }
-            foreach (Window w in windowManager.ActiveWindows)
-            {
-                if (w.Bounds.IsInBounds(new Vec2((int)MouseX, (int)MouseY)))
-                {
-                    w.DoClick(new Vec2((int)MouseX, (int)MouseY), OForms.MouseButtons.Left);
-                    windowManager.Draw(i);
-                    break;
-                }
-            }
+
+            windowManager.HandleMouseClick(new Vec2((int)MouseX, (int)MouseY), OForms.MouseButtons.Left, i);
 
             DrawCursor();
             pictureBox1.Image = (System.Drawing.Bitmap)i;
@@ -118,11 +111,8 @@ namespace TestBed
             }
 
 
-            if (windowManager.ActiveWindows.Length > 0)
-            {
-                windowManager.ActiveWindow.DoMouseMove(new Vec2(e.X, e.Y), Utils.GetButtons(e.Button));
-            }
-            windowManager.Draw(i);
+            windowManager.HandleMouseMove(new Vec2((int)MouseX, (int)MouseY), Utils.GetButtons(e.Button), i);
+
 
             foreach (ObjectEvents c in Objects)
             {
@@ -172,11 +162,11 @@ namespace TestBed
 
             #region SaveBehindMouse
 
-            behindMouseImage.SetPixel(0, 0, i.GetPixel(MouseX    , MouseY    ));
-            behindMouseImage.SetPixel(1, 0, i.GetPixel(MouseX + 1, MouseY    ));
-            behindMouseImage.SetPixel(2, 0, i.GetPixel(MouseX + 2, MouseY    ));
-            behindMouseImage.SetPixel(0, 1, i.GetPixel(MouseX    , MouseY + 1));
-            behindMouseImage.SetPixel(0, 2, i.GetPixel(MouseX    , MouseY + 2));
+            behindMouseImage.SetPixel(0, 0, i.GetPixel(MouseX, MouseY));
+            behindMouseImage.SetPixel(1, 0, i.GetPixel(MouseX + 1, MouseY));
+            behindMouseImage.SetPixel(2, 0, i.GetPixel(MouseX + 2, MouseY));
+            behindMouseImage.SetPixel(0, 1, i.GetPixel(MouseX, MouseY + 1));
+            behindMouseImage.SetPixel(0, 2, i.GetPixel(MouseX, MouseY + 2));
             behindMouseImage.SetPixel(1, 1, i.GetPixel(MouseX + 1, MouseY + 1));
             behindMouseImage.SetPixel(2, 2, i.GetPixel(MouseX + 2, MouseY + 2));
             behindMouseImage.SetPixel(3, 3, i.GetPixel(MouseX + 3, MouseY + 3));
@@ -284,34 +274,14 @@ namespace TestBed
 
         private void pictureBox1_MouseDown(object sender, Forms.MouseEventArgs e)
         {
-            if (windowManager.ActiveWindows.Length > 0)
+            windowManager.HandleMouseDown(new Vec2(e.X, e.Y), Utils.GetButtons(e.Button), i);
+            
+            foreach (ObjectEvents c in Objects)
             {
-                if (windowManager.ActiveWindow.Bounds.IsInBounds(new Vec2(e.X, e.Y)))
+                if (c.Bounds.IsInBounds(new Vec2(e.X, e.Y)))
                 {
-                    windowManager.ActiveWindow.DoMouseDown(new Vec2(e.X, e.Y), Utils.GetButtons(e.Button));
-                    windowManager.Draw(i);
-                }
-                else
-                {
-                    foreach (ObjectEvents c in Objects)
-                    {
-                        if (c.Bounds.IsInBounds(new Vec2(e.X, e.Y)))
-                        {
-                            c.IsMouseDown = true;
-                            c.MouseDown(sender, new Forms.MouseEventArgs(Forms.MouseButtons.Left, 1, (int)MouseX, (int)MouseY, 0));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (ObjectEvents c in Objects)
-                {
-                    if (c.Bounds.IsInBounds(new Vec2(e.X, e.Y)))
-                    {
-                        c.IsMouseDown = true;
-                        c.MouseDown(sender, new Forms.MouseEventArgs(Forms.MouseButtons.Left, 1, (int)MouseX, (int)MouseY, 0));
-                    }
+                    c.IsMouseDown = true;
+                    c.MouseDown(sender, new Forms.MouseEventArgs(Forms.MouseButtons.Left, 1, (int)MouseX, (int)MouseY, 0));
                 }
             }
 
@@ -325,11 +295,8 @@ namespace TestBed
 
         private void pictureBox1_MouseUp(object sender, Forms.MouseEventArgs e)
         {
-            if (windowManager.ActiveWindows.Length > 0)
-            {
-                windowManager.ActiveWindow.DoMouseUp(new Vec2(e.X, e.Y), Utils.GetButtons(e.Button));
-                windowManager.Draw(i);
-            }
+            windowManager.HandleMouseUp(new Vec2(e.X, e.Y), Utils.GetButtons(e.Button), i);
+
             foreach (ObjectEvents c in Objects)
             {
                 if (c.IsMouseDown)

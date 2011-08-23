@@ -6,8 +6,124 @@ namespace OForms.Windows
 {
     public class WindowManager
     {
-        internal const int TaskBarHeight = 15;
+        /// <summary>
+        /// The height of the taskbar.
+        /// </summary>
+        internal const int TaskBarHeight = Taskbar.TaskBarHeight;
+        /// <summary>
+        /// The taskbar.
+        /// </summary>
+        private Taskbar Taskbar;
 
+        #region Mouse Properties
+        /// <summary>
+        /// The location of the mouse.
+        /// </summary>
+        public Vec2 MouseLocation = Vec2.Zero;
+        /// <summary>
+        /// The X location of the mouse.
+        /// </summary>
+        public int MouseX
+        {
+            get { return MouseLocation.X; }
+        }
+        /// <summary>
+        /// The Y location of the mouse.
+        /// </summary>
+        public int MouseY
+        {
+            get { return MouseLocation.Y; }
+        }
+        #endregion
+
+        #region Handle Events
+
+        #region Mouse Click
+        public void HandleMouseClick(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (Taskbar.Bounds.IsInBounds(loc))
+            {
+                Taskbar.DoClick(loc, buttons);
+            }
+            else
+            {
+                if (Taskbar.WasOverButton)
+                {
+                    Taskbar.UndrawOverButton(Taskbar.WindowButtonBounds[Taskbar.overButtonIndx], Taskbar.Windows[Taskbar.overButtonIndx]);
+                }
+                foreach (Window w in ActiveWindows)
+                {
+                    if (w.Bounds.IsInBounds(loc))
+                    {
+                        w.DoClick(loc, OForms.MouseButtons.Left);
+                        break;
+                    }
+                }
+            }
+            this.Draw(i);
+        }
+        #endregion
+
+        #region Mouse Move
+        public void HandleMouseMove(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (Taskbar.Bounds.IsInBounds(loc))
+            {
+                Taskbar.DoMouseMove(loc);
+            }
+            else
+            {
+                if (Taskbar.WasOverButton)
+                {
+                    Taskbar.UndrawOverButton(Taskbar.WindowButtonBounds[Taskbar.overButtonIndx], Taskbar.Windows[Taskbar.overButtonIndx]);
+                }
+                if (ActiveWindows.Length > 0)
+                {
+                    ActiveWindow.DoMouseMove(loc, buttons);
+                }
+            }
+            this.Draw(i);
+        }
+        #endregion
+
+        #region Mouse Down
+        public void HandleMouseDown(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (ActiveWindows.Length > 0)
+            {
+                if (ActiveWindow.Bounds.IsInBounds(loc))
+                {
+                    ActiveWindow.DoMouseDown(loc, buttons);
+                    this.Draw(i);
+                }
+            }
+        }
+        #endregion
+
+        #region Mouse Up
+        public void HandleMouseUp(Vec2 loc, MouseButtons buttons, Image i)
+        {
+            MouseLocation = loc;
+            if (ActiveWindows.Length > 0)
+            {
+                ActiveWindow.DoMouseUp(loc, buttons);
+                this.Draw(i);
+            }
+        }
+        #endregion
+
+        #endregion
+
+
+        /// <summary>
+        /// Is true when all the windows need to be re-drawn,
+        /// in other-words, is true if a window has been moved,
+        /// resized, added, or removed.
+        /// </summary>
+        internal bool NeedToRedrawAll = false;
         /// <summary>
         /// An array containing all of the active windows 
         /// in the current window manager instance.
@@ -28,7 +144,9 @@ namespace OForms.Windows
                 BringWindowToFront(value);
             }
         }
-
+        /// <summary>
+        /// The size of the screen.
+        /// </summary>
         public Vec2 Size;
 
         /// <summary>
@@ -38,6 +156,7 @@ namespace OForms.Windows
         {
             ActiveWindows = new Window[0];
             this.Size = size;
+            this.Taskbar = new Taskbar(this);
         }
 
         /// <summary>
@@ -69,23 +188,31 @@ namespace OForms.Windows
             {
                 if (ActiveWindows.Length > 0)
                 {
-                    ActiveWindows[0].Draw(i);
+                    if (ActiveWindows[0].CurrentState != WindowState.Minimized)
+                    {
+                        ActiveWindows[0].Draw(i);
+                    }
                 }
             }
-        }
 
-        /// <summary>
-        /// Is true when all the windows need to be re-drawn,
-        /// in other-words, is true if a window has been moved,
-        /// resized, added, or removed.
-        /// </summary>
-        internal bool NeedToRedrawAll = false;
+            Taskbar.Draw(i);
+        }
 
         /// <summary>
         /// Adds a window at the front.
         /// </summary>
         /// <param name="w">The window to add.</param>
         public void AddWindow(Window w)
+        {
+            InternalAddWindow(w);
+            Taskbar.AddWindow(w);
+        }
+
+        /// <summary>
+        /// Adds the specified window without modifing the taskbar.
+        /// </summary>
+        /// <param name="w">The window to add.</param>
+        private void InternalAddWindow(Window w)
         {
             w.Parent = this;
             w.IsActiveWindow = true;
@@ -153,6 +280,7 @@ namespace OForms.Windows
                     winds[winds.Length - 1] = w;
                     ActiveWindows = winds;
                     ActiveWindows[0].IsActiveWindow = true;
+                    Taskbar.Modified = true;
                     return;
                 }
             }
@@ -175,8 +303,9 @@ namespace OForms.Windows
                 if (ActiveWindows[i] == w)
                 {
                     RemoveWindow(i);
-                    AddWindow(w);
+                    InternalAddWindow(w);
                     NeedToRedrawAll = true;
+                    Taskbar.Modified = true;
                     return;
                 }
             }
@@ -213,11 +342,10 @@ namespace OForms.Windows
                     RemoveWindow(i);
                     NeedToRedrawAll = true;
                     w.DoClose();
+                    Taskbar.RemoveWindow(w);
                     return;
                 }
             }
         }
-
-
     }
 }

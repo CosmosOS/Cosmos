@@ -17,6 +17,16 @@ namespace Orvid.Graphics
         public static Pixel BlueViolet = new Pixel(0x8A, 0x2B, 0xE2, 255);
         public static Pixel Brown = new Pixel(0xA5, 0x2A, 0x2A, 255);
         public static Pixel BurlyWood = new Pixel(0xDE, 0xB8, 0x87, 255);
+        public static Pixel CadetBlue = new Pixel(0x5F, 0x9E, 0xA0, 255);
+        public static Pixel Chartreuse = new Pixel(0x7F, 0xFF, 0x00, 255);
+        public static Pixel Chocolate = new Pixel(0xD2, 0x69, 0x1E, 255);
+        public static Pixel Coral = new Pixel(0xFF, 0x7F, 0x50, 255);
+        public static Pixel CornflowerBlue = new Pixel(0x64, 0x95, 0xED, 255);
+        public static Pixel Cornsilk = new Pixel(0xFF, 0xF8, 0xDC, 255);
+        public static Pixel Crimson = new Pixel(0xDC, 0x14, 0x3C, 255);
+        public static Pixel Cyan = new Pixel(0x00, 0xFF, 0xFF, 255);
+
+
 
         public static Pixel Green = new Pixel(0x00, 0xFF, 0x00, 255);
 
@@ -26,14 +36,6 @@ namespace Orvid.Graphics
     }
 
     /*
-			0xFF5F9EA0,	/* 041 - CadetBlue 
-			0xFF7FFF00,	/* 042 - Chartreuse 
-			0xFFD2691E,	/* 043 - Chocolate 
-			0xFFFF7F50,	/* 044 - Coral 
-			0xFF6495ED,	/* 045 - CornflowerBlue 
-			0xFFFFF8DC,	/* 046 - Cornsilk 
-			0xFFDC143C,	/* 047 - Crimson
-			0xFF00FFFF,	/* 048 - Cyan 
 			0xFF00008B,	/* 049 - DarkBlue 
 			0xFF008B8B,	/* 050 - DarkCyan 
 			0xFFB8860B,	/* 051 - DarkGoldenrod 

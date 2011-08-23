@@ -541,8 +541,7 @@ namespace OForms.Windows
                         }
                         else if (MinButtonBounds.IsInBounds(loc))
                         {
-                            CurMinButtonColor = Colors.Beige;
-                            RedrawMinButton();
+                            Parent.MinimizeWindow(this);
                         }
                     }
                     else // Window border was clicked, and we don't care about it.
