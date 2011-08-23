@@ -10,6 +10,8 @@ namespace Orvid.Graphics
     /// </summary>
     public class Vec2
     {
+        public static Vec2 Zero = new Vec2(0, 0);
+
         /// <summary>
         /// The X position.
         /// </summary>
@@ -48,6 +50,14 @@ namespace Orvid.Graphics
             Vec2 v = new Vec2();
             v.X = a.X - b.X;
             v.Y = a.Y - b.Y;
+            return v;
+        }
+
+        public static Vec2 operator -(Vec2 a, int b)
+        {
+            Vec2 v = new Vec2();
+            v.X = a.X - b;
+            v.Y = a.Y - b;
             return v;
         }
 

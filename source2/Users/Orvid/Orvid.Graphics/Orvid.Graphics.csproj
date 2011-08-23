@@ -27,7 +27,7 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\x86\Release2\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AnimatedImage.cs" />
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="Drivers\VGADriver.cs" />
     <Compile Include="FontSupport\Font.cs" />
     <Compile Include="FontSupport\FontCharacter.cs" />

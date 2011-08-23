@@ -2,12 +2,6 @@
 
 namespace Orvid.Graphics
 {
-    public class Colors
-    {
-        public static Pixel Black = new Pixel(0, 0, 0, 255);
-        public static Pixel White = new Pixel(255, 255, 255, 255);
-    }
-
     /// <summary>
     /// This class describes a single pixel.
     /// </summary>
@@ -40,7 +34,8 @@ namespace Orvid.Graphics
             }
         }
 
-        //public Pixel() : this(true)
+        //public Pixel()
+        //    : this(true)
         //{
         //}
 

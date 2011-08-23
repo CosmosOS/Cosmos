@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Sys = Cosmos.System;
-using Cosmos.System;
 
 namespace CrashTest
 {
@@ -10,7 +9,7 @@ namespace CrashTest
     {
         public void DrwCrcle(Vec2 v, int i, uint c)
         {
-            Global.Console.WriteLine("value of v: " + v.X + ", " + v.Y);
+            Sys.Global.Console.WriteLine("value of v: " + v.X + ", " + v.Y);
         }
     }
 

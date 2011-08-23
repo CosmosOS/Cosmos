@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orvid.Graphics.Dependancies
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlugViewer", "..\PlugViewer\PlugViewer.csproj", "{2B45BB4D-8AE3-4AC5-B1E9-9F93C847F2CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OForms", "..\OForms\OForms.csproj", "{039E2C8F-E73C-48AF-B249-FC953072D9A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +209,16 @@ Global
 		{2B45BB4D-8AE3-4AC5-B1E9-9F93C847F2CF}.Release|Mixed Platforms.Build.0 = Release|x86
 		{2B45BB4D-8AE3-4AC5-B1E9-9F93C847F2CF}.Release|x86.ActiveCfg = Release|x86
 		{2B45BB4D-8AE3-4AC5-B1E9-9F93C847F2CF}.Release|x86.Build.0 = Release|x86
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{039E2C8F-E73C-48AF-B249-FC953072D9A0}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

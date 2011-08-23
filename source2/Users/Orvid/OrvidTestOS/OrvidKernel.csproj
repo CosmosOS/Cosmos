@@ -75,11 +75,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsmMouse.cs" />
     <Compile Include="GuessOS.cs" />
-    <Compile Include="Mouse.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Plugs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

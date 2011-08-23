@@ -29,7 +29,7 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <EnableGDB>False</EnableGDB>
-    <DebugMode>Source</DebugMode>
+    <DebugMode>None</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>

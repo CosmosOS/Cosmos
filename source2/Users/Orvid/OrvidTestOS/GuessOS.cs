@@ -58,6 +58,7 @@ namespace GuessKernel
 
         protected override void Run()
         {
+            Console.WriteLine("This is just a test.");
 
             Vec2 v;
             s.Taskbar.Clear(new Pixel(0,255,0,0));
@@ -132,6 +133,8 @@ namespace GuessKernel
             while (true)
             {
                 Tick++;
+                MouseX = (uint)m.X;
+                MouseY = (uint)m.Y;
                 //m.HandleMouse();
 
                 if (OddRefresh)

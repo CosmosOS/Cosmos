@@ -57,7 +57,8 @@ namespace Orvid.Graphics
             this.Data = new Pixel[(Height + 1) * (Width + 1)];
         }
 
-        public Image(Vec2 v) : this(v.X, v.Y) 
+        public Image(Vec2 v)
+            : this(v.X, v.Y)
         {
         }
 
@@ -76,7 +77,7 @@ namespace Orvid.Graphics
         }
 
         #region Clear
-        public void Clear(Pixel color)
+        public virtual void Clear(Pixel color)
         {
             for (uint i = 0; i < Data.Length; i++)
             {
@@ -305,13 +306,58 @@ namespace Orvid.Graphics
         public void DrawImage(Vec2 loc, Image i)
         {
             Pixel value;
-            for (uint y = 0; y < i.Height; y++)
+            if (loc.X < 0)
             {
-                for (uint x = 0; x < i.Width; x++)
+                if (loc.Y < 0) // Both X and Y are negative
                 {
-                    value = i.GetPixel(x, y);
-                    if (!value.Empty)
-                        SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
+                    for (uint y = (uint)i.Height; y >= 0 && y + loc.Y >= 0; y--)
+                    {
+                        for (uint x = (uint)i.Width; x >= 0 && x + loc.X >= 0; x--)
+                        {
+                            value = i.GetPixel(x, y);
+                            if (!value.Empty)
+                                SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
+                        }
+                    }
+                }
+                else // Only X is negative.
+                {
+                    for (uint y = 0; y < i.Height && y + loc.Y < this.Height; y++)
+                    {
+                        for (uint x = (uint)i.Width; x >= 0 && x + loc.X >= 0; x--)
+                        {
+                            value = i.GetPixel(x, y);
+                            if (!value.Empty)
+                                SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (loc.Y < 0) // Only X Positive
+                {
+                    for (uint y = (uint)i.Height; y >= 0 && y + loc.Y >= 0; y--)
+                    {
+                        for (uint x = 0; x < i.Width && x + loc.X < this.Width; x++)
+                        {
+                            value = i.GetPixel(x, y);
+                            if (!value.Empty)
+                                SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
+                        }
+                    }
+                }
+                else // Both positive
+                {
+                    for (uint y = 0; y < i.Height && y + loc.Y < this.Height; y++)
+                    {
+                        for (uint x = 0; x < i.Width && x + loc.X < this.Width; x++)
+                        {
+                            value = i.GetPixel(x, y);
+                            if (!value.Empty)
+                                SetPixel((uint)(x + loc.X), (uint)(y + loc.Y), value);
+                        }
+                    }
                 }
             }
         }
@@ -932,7 +978,7 @@ namespace Orvid.Graphics
             Visiteds = new bool[0];
         }
         #endregion
-        
+
 
         /// <summary>
         /// Get's the pixel a the specified location.
@@ -989,13 +1035,25 @@ namespace Orvid.Graphics
         public static explicit operator System.Drawing.Bitmap(Image i)
         {
             System.Drawing.Bitmap b = new System.Drawing.Bitmap(i.Width, i.Height);
-            for (uint x = 0; x < i.Width; x++)
+            System.Drawing.Imaging.BitmapData bd = b.LockBits(new System.Drawing.Rectangle(0, 0, i.Width, i.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            int bytes  = Math.Abs(bd.Stride) * bd.Height;
+            byte[] rgbValues = new byte[bytes];
+            System.Runtime.InteropServices.Marshal.Copy(bd.Scan0, rgbValues, 0, bytes);
+            uint len = (uint)(i.Height * i.Width);
+            for (uint d = 0, ind = 0; d < len; d++)
             {
-                for (uint y = 0; y < i.Height; y++)
-                {
-                    b.SetPixel((int)x, (int)y, i.GetPixel(x, y));
-                }
+                rgbValues[ind] = i.Data[d].B;
+                ind++;
+                rgbValues[ind] = i.Data[d].G;
+                ind++;
+                rgbValues[ind] = i.Data[d].R;
+                ind++;
+                rgbValues[ind] = i.Data[d].A;
+                ind++;
             }
+            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, bd.Scan0, bytes);
+            rgbValues = null;
+            b.UnlockBits(bd);
             return b;
         }
 

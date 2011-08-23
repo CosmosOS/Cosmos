@@ -9,30 +9,32 @@ namespace Orvid.Graphics
     [Plug(Target = typeof(global::System.Math))]
     class MathImpl
     {
-        [Inline]
+        //[Inline]
         public static double Sin(double m)
         {
-            new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
-            new CPUx86.x87.FloatSine { };
-            // reservate 8 byte for returntype double on stack
-            new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-            // write double value to this reservation
-            new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
-            // after this is the result popped
-            return 0.0;
+            return 0;
+            //new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+            //new CPUx86.x87.FloatSine { };
+            //// reservate 8 byte for returntype double on stack
+            //new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+            //// write double value to this reservation
+            //new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+            //// after this is the result popped
+            //return 0.0;
         }
 
-        [Inline]
+        //[Inline]
         public static double Cos(double x)
         {
-            new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
-            new CPUx86.x87.FloatCosine { };
-            // reservate 8 byte for returntype double on stack
-            new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-            // write double value to this reservation
-            new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
-            // after this is the result popped
-            return 0.0;
+            return 0;
+            //new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+            //new CPUx86.x87.FloatCosine { };
+            //// reservate 8 byte for returntype double on stack
+            //new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+            //// write double value to this reservation
+            //new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+            //// after this is the result popped
+            //return 0.0;
         }
 
         public static double Floor(double d)

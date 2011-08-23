@@ -48,6 +48,7 @@ namespace Orvid.Graphics
         /// <returns></returns>
         public bool IsInBounds(Vec2 p)
         {
+            //throw new Exception();
             return ((p.X < Right && p.X > Left) && (p.Y < Top && p.Y > Bottom));
         }
     }
