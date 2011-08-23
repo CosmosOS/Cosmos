@@ -265,29 +265,32 @@ namespace Cosmos.System.Plugs.System
             bool signSwitch = false;
             double result = 0;
 
-            if (a > Math.PI)
+            //TO radians
+            double radians = a * (Math.PI / 180);
+
+            if (radians > Math.PI)
             {
-                a = a - Math.PI;
+                radians = radians - Math.PI;
                 signSwitch = true;
             }
             else if (a > Math.PI / 2)
             {
-                a = a - Math.PI;
+                radians = radians - Math.PI;
                 signSwitch = true;
             }
 
             //Temp function to increase precision make more factorial calculations
-            result = (a) - (Math.Pow(a, 3) / Factorial(3));
-            result += (Math.Pow(a, 5) / Factorial(5)) - (Math.Pow(a, 7) / Factorial(7)) + (Math.Pow(a, 9) / Factorial(9));
+            result = (radians) - (Math.Pow(radians, 3) / Factorial(3));
+            result += (Math.Pow(radians, 5) / Factorial(5)) - (Math.Pow(radians, 7) / Factorial(7)) + (Math.Pow(radians, 9) / Factorial(9));
 
             /* USE WHEN Modulus Works
              * int sign = 0;
             for (int i = 3; i < 19; i += 2)
             {
                 if (sign % 2 == 0)
-                    result += -Math.Pow(a, i) / fact(i);
+                    result += -Math.Pow(radians, i) / fact(i);
                 else
-                    result += Math.Pow(a, i) / fact(i);
+                    result += Math.Pow(radiansa, i) / fact(i);
                 sign++;
             }*/
 
@@ -301,8 +304,8 @@ namespace Cosmos.System.Plugs.System
         #region Cos
         public static double Cos(double a)
         {
-            //Cos(x) = Sin(Pi/2 - radians)
-            return Sin(Math.PI / 2 - a);
+            //Cos(x) = Sin(90degrees - radians)
+            return Sin(90 - a);
         }
         #endregion
 
