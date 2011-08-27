@@ -55,7 +55,7 @@
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.textCurrentFunction = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.lboxDisassemble = new System.Windows.Forms.ListBox();
+			this.lboxDisassemble = new ToolTipListBox();
 			this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
@@ -435,7 +435,7 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.TextBox textCurrentFunction;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ListBox lboxDisassemble;
+		private ToolTipListBox lboxDisassemble;
         private System.Windows.Forms.ContextMenuStrip menuDisassembly;
         private System.Windows.Forms.ToolStripMenuItem mitemDisassemblyAddBreakpoint;
         private System.Windows.Forms.ToolStripMenuItem mitmCopyToClipboard;

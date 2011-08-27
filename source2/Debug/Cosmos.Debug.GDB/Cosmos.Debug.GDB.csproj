@@ -74,11 +74,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsmFile.cs" />
+    <Compile Include="AsmLine.cs" />
     <Compile Include="BreakpointUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="BreakpointUC.Designer.cs">
       <DependentUpon>BreakpointUC.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolTipListBox.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="WatchUC.cs">
       <SubType>UserControl</SubType>

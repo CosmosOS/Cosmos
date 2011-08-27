@@ -12,14 +12,14 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.GDB {
     public partial class FormMain : Form {
-        protected class AsmLine {
+        protected class GdbAsmLine {
             public readonly UInt32 mAddr;
             public readonly string mLabel;
             public readonly string mOp;
             public readonly string mData = string.Empty;
 			public readonly bool mEIPHere;
 
-            public AsmLine(string aInput) {
+            public GdbAsmLine(string aInput) {
                 //"0x0056d2b9 <_end_data+0>:\tmov    DWORD PTR ds:0x550020,ebx\n"
                 var s = GDB.Unescape(aInput);
 				var xSplit1 = s.Split(Global.TabSeparator, StringSplitOptions.RemoveEmptyEntries);
@@ -79,10 +79,7 @@ namespace Cosmos.Debug.GDB {
                 } else {
 					var xCmdParts = xCmdLine.Split(Global.SpaceSeparator);
                     var xCmd = xCmdParts[0];
-					bool asyncCmd = false;
-					if (xCmd.EndsWith("&"))
-					{
-						asyncCmd = true;
+					if (xCmd.EndsWith("&")) {
 						xCmd = xCmd.Substring(0, xCmd.Length - 1);
 					}
                     if (xCmd == "disassemble") {
@@ -103,6 +100,8 @@ namespace Cosmos.Debug.GDB {
 							butnConnect.Text = "&Disconnect";
 
 							Settings.InitWindows();
+
+							lboxDisassemble.Items.AddRange(Global.AsmSource.Lines.ToArray());
 						}
 						else
 						{
@@ -116,6 +115,7 @@ namespace Cosmos.Debug.GDB {
 								butnConnect.Enabled = true;
 								mitmConnect.Text = "&Connect";
 								butnConnect.Text = "&Connect";
+								lboxDisassemble.Items.Clear();
 							}
 						}
 					} else if (xCmd == "detach") {
@@ -137,7 +137,7 @@ namespace Cosmos.Debug.GDB {
                         Windows.mBreakpointsForm.OnDelete(aResponse);
                     } else if ((xCmd == "stepi") || (xCmd == "nexti")) {
 					} else if (xCmd == "continue" || xCmd== "fg") {
-						lboxDisassemble.Items.Clear();
+						//lboxDisassemble.Items.Clear();
                     } else if (xCmd == "where") {
                         Windows.mCallStackForm.OnWhere(aResponse);
                     } else if (xCmd == "break") {
@@ -164,32 +164,55 @@ namespace Cosmos.Debug.GDB {
             Global.GDB.SendCmd(xDisAsmCmd);
         }
 
-        protected void OnDisassemble(GDB.Response xResponse) {
-            var xResult = xResponse.Text;
-            lboxDisassemble.BeginUpdate();
-            try {
-                lboxDisassemble.Items.Clear();
+		protected void OnDisassemble(GDB.Response xResponse)
+		{
+			var xResult = xResponse.Text;
+			// In some cases GDB might return no results. This is common when no symbols are loaded.
+			if (xResult.Count == 0)
+				return;
+			// Get function name
+			var xSplit = GDB.Unescape(xResult[0]).Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+			mFuncName = xSplit[xSplit.Length - 1];
+			textCurrentFunction.Text = mFuncName;
 
-                // In some cases GDB might return no results. This is common when no symbols are loaded.
-                if (xResult.Count > 0) {
-                    // Get function name
-					var xSplit = GDB.Unescape(xResult[0]).Split(Global.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
-                    mFuncName = xSplit[xSplit.Length - 1];
-                    textCurrentFunction.Text = mFuncName;
+			// remove ':'
+			mFuncName = mFuncName.Substring(0, mFuncName.Length - 1);
 
-                    // 1 and -2 to eliminate header and footer line
-                    for (int i = 1; i <= xResult.Count - 2; i++) {
-                        lboxDisassemble.Items.Add(new AsmLine(xResult[i]));
-                    }
-                }
-            } finally {
-                lboxDisassemble.EndUpdate();
-            }
-        }
+			int labelLine = Global.AsmSource.GetLineOfLabel(mFuncName);
+			labelLine++;
+
+			// 1 and -2 to eliminate header and footer line
+			for (int i = 1; i <= xResult.Count - 2; i++, labelLine++)
+			{
+				var asmLine = Global.AsmSource.Lines[labelLine];
+
+				while (asmLine.IsLabel ||
+					(asmLine.FirstToken != null && (asmLine.FirstToken == "global" || asmLine.FirstToken.StartsWith(";"))))
+				{
+					labelLine++;
+					asmLine = Global.AsmSource.Lines[labelLine];
+				}
+
+				var gdbLine = new GdbAsmLine(xResult[i]);
+				asmLine.Address = gdbLine.mAddr;
+
+				// check if line different, if so, we set a line for tooltip
+				string strGdbLine = gdbLine.ToString();
+				string gdbLineWithoutAddress = strGdbLine.Substring(strGdbLine.IndexOf(":") + 3);
+				string gdbLineWithoutAddressLower = gdbLineWithoutAddress.Replace(" ", string.Empty).ToLower().Replace("dwordptr",string.Empty);
+
+				string asmlineFromFile = asmLine.OrignalLine.TrimStart('\t', ' ').ToLower().Replace("dword", string.Empty);
+				string asmlineFromFileWithoutspace = asmlineFromFile.Replace(" ", string.Empty);
+				if (gdbLineWithoutAddressLower != asmlineFromFileWithoutspace)
+				{
+					asmLine.GDBLine = gdbLineWithoutAddress;
+				}
+			}
+		}
 
         public void SetEIP(UInt32 aAddr) {
             foreach (AsmLine x in lboxDisassemble.Items) {
-                if (x.mAddr == aAddr) {
+                if (x.Address == aAddr) {
                     lboxDisassemble.SelectedItem = x;
                     break;
                 }
@@ -210,11 +233,11 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitmStepInto_Click(object sender, EventArgs e) {
-            Global.GDB.SendCmd("stepi");
+            Global.GDB.SendCmd("stepi&");
         }
 
         private void mitmStepOver_Click(object sender, EventArgs e) {
-            Global.GDB.SendCmd("nexti");
+            Global.GDB.SendCmd("nexti&");
         }
 
         protected void Connect() {
@@ -411,14 +434,14 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitemDisassemblyAddBreakpoint_Click(object sender, EventArgs e) {
-            var x = (AsmLine)lboxDisassemble.SelectedItem;
+            var x = (GdbAsmLine)lboxDisassemble.SelectedItem;
             if (x != null) {
                 Windows.mBreakpointsForm.AddBreakpoint("*0x" + x.mAddr.ToString("X8"));
             }
         }
 
         private void mitmCopyToClipboard_Click(object sender, EventArgs e) {
-            var x = (AsmLine)lboxDisassemble.SelectedItem;
+            var x = (GdbAsmLine)lboxDisassemble.SelectedItem;
             Clipboard.SetText(x.ToString());
         }
 
