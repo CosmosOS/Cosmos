@@ -266,7 +266,7 @@ namespace Cosmos.System.Plugs.System
             double result = 0;
 
             //TO radians
-            double radians = a * (Math.PI / 180);
+            double radians = a;// *(Math.PI / 180);
 
             if (radians > Math.PI)
             {
@@ -282,6 +282,8 @@ namespace Cosmos.System.Plugs.System
             //Temp function to increase precision make more factorial calculations
             result = (radians) - (Math.Pow(radians, 3) / Factorial(3));
             result += (Math.Pow(radians, 5) / Factorial(5)) - (Math.Pow(radians, 7) / Factorial(7)) + (Math.Pow(radians, 9) / Factorial(9));
+
+            //result *= -1;
 
             /* USE WHEN Modulus Works
              * int sign = 0;
@@ -305,7 +307,7 @@ namespace Cosmos.System.Plugs.System
         public static double Cos(double a)
         {
             //Cos(x) = Sin(90degrees - radians)
-            return Sin(90 - a);
+            return Sin((Math.PI / 2) - a);
         }
         #endregion
 
@@ -323,6 +325,29 @@ namespace Cosmos.System.Plugs.System
                 return 1;
             else
                 return n * Factorial(n - 1);
+        }
+        #endregion
+
+        #region Ceiling
+        public static double Ceiling(double a)
+        {
+            int returnval = (int)Floor(a);
+            returnval += 1;
+            return returnval;
+        }
+        #endregion
+
+        #region Floor
+        public static double Floor(double a)
+        {
+            int returnval = (int)a;
+
+            if (a < 0)
+            {
+                returnval -= 1;
+            }
+
+            return returnval;
         }
         #endregion
     }
