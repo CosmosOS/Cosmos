@@ -101,7 +101,7 @@ namespace Cosmos.Debug.GDB {
 
 							Settings.InitWindows();
 
-							lboxDisassemble.Items.AddRange(Global.AsmSource.Lines.ToArray());
+							lboxDisassemble.SetItems(Global.AsmSource.Lines);
 						}
 						else
 						{
@@ -211,12 +211,7 @@ namespace Cosmos.Debug.GDB {
 		}
 
         public void SetEIP(UInt32 aAddr) {
-            foreach (AsmLine x in lboxDisassemble.Items) {
-                if (x.Address == aAddr) {
-                    lboxDisassemble.SelectedItem = x;
-                    break;
-                }
-            }
+			lboxDisassemble.SelectedAddress = aAddr;
         }
 
         public FormMain() {
@@ -434,14 +429,18 @@ namespace Cosmos.Debug.GDB {
         }
 
         private void mitemDisassemblyAddBreakpoint_Click(object sender, EventArgs e) {
-            var x = (GdbAsmLine)lboxDisassemble.SelectedItem;
-            if (x != null) {
-                Windows.mBreakpointsForm.AddBreakpoint("*0x" + x.mAddr.ToString("X8"));
+			if (lboxDisassemble.SelectedIndices.Count == 0)
+				return;
+            var x = Global.AsmSource.Lines[lboxDisassemble.SelectedIndices[0]];
+            if (x.Address  != 0) {
+                Windows.mBreakpointsForm.AddBreakpoint("*0x" + x.Address.ToString("X8"));
             }
         }
 
         private void mitmCopyToClipboard_Click(object sender, EventArgs e) {
-            var x = (GdbAsmLine)lboxDisassemble.SelectedItem;
+            if (lboxDisassemble.SelectedIndices.Count == 0)
+				return;
+            var x = Global.AsmSource.Lines[lboxDisassemble.SelectedIndices[0]];
             Clipboard.SetText(x.ToString());
         }
 

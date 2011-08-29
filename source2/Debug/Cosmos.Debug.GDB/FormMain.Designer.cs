@@ -55,7 +55,7 @@
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.textCurrentFunction = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.lboxDisassemble = new ToolTipListBox();
+			this.lboxDisassemble = new Cosmos.Debug.GDB.ToolTipListBox();
 			this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.mitmCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
@@ -346,12 +346,11 @@
 			// 
 			this.lboxDisassemble.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.lboxDisassemble.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lboxDisassemble.FormattingEnabled = true;
-			this.lboxDisassemble.ItemHeight = 19;
 			this.lboxDisassemble.Location = new System.Drawing.Point(0, 86);
 			this.lboxDisassemble.Name = "lboxDisassemble";
 			this.lboxDisassemble.Size = new System.Drawing.Size(589, 310);
 			this.lboxDisassemble.TabIndex = 13;
+			this.lboxDisassemble.UseCompatibleStateImageBehavior = false;
 			// 
 			// menuDisassembly
 			// 
