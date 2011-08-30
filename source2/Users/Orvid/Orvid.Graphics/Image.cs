@@ -1006,25 +1006,29 @@ namespace Orvid.Graphics
         public virtual void SetPixel(uint x, uint y, Pixel p)
         {
             //Modified.Add(new Vec2(width, height));
-            Data[((y * Width) + x)] = p;
+            if (p.A != 255)
+            {
+                if (p.A != 0)
+                {
+                    double r1 = ((double)p.A / 255);
+                    double r2 = 1.0d - r1;
+                    Pixel cur = Data[((y * Width) + x)];
+                    //throw new Exception();
+
+                    Data[((y * Width) + x)] = new Pixel((byte)((p.R * r1) + (cur.R * r2)), (byte)((p.G * r1) + (cur.G * r2)), (byte)((p.B * r1) + (cur.B * r2)), 255);
+                }
+                // else nothing gets drawn.
+            }
+            else
+            {
+                Data[((y * Width) + x)] = p;
+            }
         }
 
-        //private int curXConsole = 0;
-        //private int curYConsole = 0;
-
-        //private void WriteChar(char c)
-        //{
-
-        //}
-
-        //internal void WriteToConsole(string s)
-        //{
-        //    for (int i = 0; i < s.Length; i++)
-        //    {
-        //        char c = s[i];
-        //        WriteChar(c);
-        //    }
-        //}
+        public void DrawString(Vec2 loc, String s, FontSupport.Font f, int stringHeight, FontSupport.FontStyle flags, Pixel color)
+        {
+            FontSupport.FontManager.Instance.DrawText(this, null, null, s, f, loc, color);
+        }
 
         public override void Draw()
         {

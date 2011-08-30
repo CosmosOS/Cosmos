@@ -118,6 +118,11 @@ namespace Orvid.Graphics
             return true;
         }
 
+        public Vec2 Double()
+        {
+            return new Vec2(this.X * 2, this.Y * 2);
+        }
+
         public override bool Equals(object obj)
         {
             return (this == (Vec2)obj);

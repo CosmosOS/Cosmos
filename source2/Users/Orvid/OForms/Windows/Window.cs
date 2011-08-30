@@ -399,6 +399,8 @@ namespace OForms.Windows
             HeaderBuffer.Clear(Colors.BlueViolet);
             DrawnHeader = false;
 
+            HeaderBuffer.DrawString(new Vec2(3, 3), Name, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, Colors.Black);
+
             RedrawCloseButton();
             RedrawMaxRestButton();
             RedrawMinButton();

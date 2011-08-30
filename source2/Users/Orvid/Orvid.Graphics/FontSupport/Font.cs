@@ -4,33 +4,60 @@ using System.Text;
 
 namespace Orvid.Graphics.FontSupport
 {
+    /// <summary>
+    /// The base type for a font.
+    /// </summary>
     public abstract class Font
     {
-        public abstract String Name { get; }
-        public abstract Image GetCharacter(Int32 charNumber, FontFlag flags);
-    }
+        private static Dictionary<string, Font> LoadedFonts = new Dictionary<string, Font>();
 
-    /// <summary>
-    /// There can be up to 8 different flags.
-    /// </summary>
-    [Flags]
-    public enum FontFlag
-    {
-        Normal = 0, // Main
-        Bold = 1, // Main
-        Italic = 2, // Main
-        BoldItalic = 3,
-        Underline = 4, // Main
-        BoldUnderline = 5,
-        ItalicUnderline = 6,
-        BoldItalicUnderline = 7,
-		Strikeout = 8, // Main
-		StrikeoutBold = 9,
-		StrikoutItalic = 10,
-		StrikeoutBoldItalic = 11,
-		StrikoutUnderline = 12,
-		StrikoutBoldUnderline = 13,
-		StrikoutItalicUnderline = 14,
-		StrikoutBoldItalicUnderline = 15,
+        public static Font LoadFont(string s)
+        {
+            if (LoadedFonts.ContainsKey(s))
+            {
+                return LoadedFonts[s];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// The name of the font.
+        /// </summary>
+        public string Name;
+        /// <summary>
+        /// The style of the font.
+        /// </summary>
+        public FontStyle Style;
+        /// <summary>
+        /// The point-size of the Font rounded to an int.
+        /// </summary>
+        public int Size;
+
+        /// <summary>
+        /// The default constructor.
+        /// </summary>
+        /// <param name="name">The name of the font.</param>
+        /// <param name="style">The style of the font.</param>
+        /// <param name="size">The point-size of the font.</param>
+        public Font(string name, FontStyle style, int size)
+        {
+            this.Name = name;
+            this.Style = style;
+            this.Size = size;
+            LoadedFonts.Add(name, this);
+        }
+
+        /// <summary>
+        /// The default constructor.
+        /// </summary>
+        /// <param name="name">The name of the font.</param>
+        /// <param name="style">The style of the font.</param>
+        /// <param name="size">The point-size of the font.</param>
+        public Font(string name, FontStyle style, double size)
+        {
+            this.Name = name;
+            this.Style = style;
+            this.Size = (int)size;
+        }
     }
 }

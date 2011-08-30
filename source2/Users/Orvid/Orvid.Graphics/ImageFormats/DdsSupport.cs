@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Orvid.Graphics;
-using au.id.micolous.libs.DDSReader;
 
 namespace Orvid.Graphics.ImageFormats
 {
@@ -43,7 +42,7 @@ namespace Orvid.Graphics.ImageFormats
 // This disclaimer and license was last
 // modified on August 10, 2011.
 
-namespace au.id.micolous.libs.DDSReader
+namespace Orvid.Graphics.ImageFormats
 {
     public class DDSImage
     {
@@ -102,15 +101,6 @@ namespace au.id.micolous.libs.DDSReader
             UNKNOWN
         }
         #endregion
-
-        /*
-         * This class is based on parts of DevIL.net, specifically;
-         * /DevIL-1.6.8/src-IL/src/il_dds.c
-         *
-         * All ported to c#/.net.
-         * 
-         * http://msdn.microsoft.com/library/default.asp?url=/library/en-us/directx9_c/Opaque_and_1_Bit_Alpha_Textures.asp
-         */
 
         private static byte[] DDS_HEADER = Convert.FromBase64String("RERTIA==");
 

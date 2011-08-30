@@ -87,7 +87,7 @@ namespace OForms.Controls
         /// <summary>
         /// The fill of the button in the 'Over' state.
         /// </summary>
-        public Pixel OverFill = Colors.Beige;
+        public Pixel OverFill = Colors.Crimson;
         /// <summary>
         /// The outline of the button in the 'Down' state.
         /// </summary>
@@ -110,9 +110,9 @@ namespace OForms.Controls
         /// </summary>
         private void DrawMouseDown()
         {
-            Buffer.DrawRectangle(new Vec2(0, 0), new Vec2(iSize.X, Size.Y), DownFill);
+            Buffer.DrawRectangle(Vec2.Zero, new Vec2(iSize.X, Size.Y), DownFill);
             Buffer.DrawPolygonOutline(new Vec2[] { 
-                new Vec2(0,0),
+                Vec2.Zero,
                 new Vec2(iSize.X,0),
                 new Vec2(iSize.X,iSize.Y),
                 new Vec2(0,iSize.Y) }, DownOutline);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Orvid.Graphics.FontSupport
+namespace Orvid.Graphics.FontSupport.Old
 {
     public class FontCharacterSet
     {

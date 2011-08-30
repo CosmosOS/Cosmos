@@ -17,7 +17,7 @@ using System.Text;
 using System.IO;
 using System.Collections;
 
-namespace Orvid.Graphics.FontSupport
+namespace Orvid.Graphics.FontSupport.Old
 {
     public class OPFF : Font
     {
@@ -200,7 +200,10 @@ namespace Orvid.Graphics.FontSupport
                     //    else
                     //    {
                             byte greyscale = br.ReadByte();
-                            i.SetPixel(x, y, new Pixel(greyscale, greyscale, greyscale, 255)); // Color the pixel as greyscale
+                            if (greyscale != 255)
+                            {
+                                i.SetPixel(x, y, new Pixel(greyscale, greyscale, greyscale, 255)); // Color the pixel as greyscale
+                            }
                     //    }
                     //}
                     //else

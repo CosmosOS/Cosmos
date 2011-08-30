@@ -6,11 +6,26 @@ namespace Orvid.Graphics
     /// </summary>
     public class BoundingBox
     {
+        /// <summary>
+        /// The right side of the BoundingBox.
+        /// </summary>
         public int Right;
+        /// <summary>
+        /// The left side of the BoundingBox.
+        /// </summary>
         public int Left;
+        /// <summary>
+        /// The top of the BoundingBox.
+        /// </summary>
         public int Top;
+        /// <summary>
+        /// The bottom of the BoundingBox.
+        /// </summary>
         public int Bottom;
 
+        /// <summary>
+        /// Gets the Width of the BoundingBox.
+        /// </summary>
         public int Width
         {
             get
@@ -19,11 +34,14 @@ namespace Orvid.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets the Height of the BoundingBox.
+        /// </summary>
         public int Height
         {
             get
             {
-                return Bottom - Top;
+                return Top - Bottom;
             }
         }
         
@@ -41,11 +59,44 @@ namespace Orvid.Graphics
             this.Top = itop;
             this.Bottom = ibottom;
         }
+
         /// <summary>
         /// Returns true if the given point is inside the bounding box.
         /// </summary>
         /// <param name="p">The point to check.</param>
-        /// <returns></returns>
+        /// <returns>True if the specified point is inside the bounding box.</returns>
+        public bool Contains(Vec2 p)
+        {
+            return IsInBounds(p);
+        }
+
+        /// <summary>
+        /// Returns true if the given point is inside the bounding box.
+        /// </summary>
+        /// <param name="x">X location.</param>
+        /// <param name="y">Y location.</param>
+        /// <returns>True if the given point is inside the bounding box.</returns>
+        public bool Contains(int x, int y)
+        {
+            return IsInBounds(new Vec2(x, y));
+        }
+
+        /// <summary>
+        /// Returns true if the given point is inside the bounding box.
+        /// </summary>
+        /// <param name="x">X location.</param>
+        /// <param name="y">Y location.</param>
+        /// <returns>True if the given point is inside the bounding box.</returns>
+        public bool IsInBounds(int x, int y)
+        {
+            return IsInBounds(new Vec2(x, y));
+        }
+
+        /// <summary>
+        /// Returns true if the given point is inside the bounding box.
+        /// </summary>
+        /// <param name="p">The point to check.</param>
+        /// <returns>True if the specified point is inside the bounding box.</returns>
         public bool IsInBounds(Vec2 p)
         {
             //throw new Exception();

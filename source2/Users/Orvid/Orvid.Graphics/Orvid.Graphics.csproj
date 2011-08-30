@@ -27,7 +27,7 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release2\</OutputPath>
+    <OutputPath>bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -36,6 +36,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <DocumentationFile>bin\x86\Release\Orvid.Graphics.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -46,10 +47,28 @@
     <Compile Include="BoundingBox.cs" />
     <Compile Include="Colors.cs" />
     <Compile Include="Drivers\VGADriver.cs" />
+    <Compile Include="FontSupport\Abstracts\AbstractFontProvider.cs" />
+    <Compile Include="FontSupport\bdf\BDFFont.cs" />
+    <Compile Include="FontSupport\bdf\BDFFontContainer.cs" />
+    <Compile Include="FontSupport\bdf\BDFFontMetrics.cs" />
+    <Compile Include="FontSupport\bdf\BDFFontProvider.cs" />
+    <Compile Include="FontSupport\bdf\BDFMetrics.cs" />
+    <Compile Include="FontSupport\bdf\BDFParser.cs" />
+    <Compile Include="FontSupport\bdf\BDFGlyph.cs" />
+    <Compile Include="FontSupport\bdf\BDFTextRenderer.cs" />
+    <Compile Include="FontSupport\bdf\StringBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FontSupport\bdf\Token.cs" />
+    <Compile Include="FontSupport\Defaults\DefaultFontManager.cs" />
     <Compile Include="FontSupport\Font.cs" />
-    <Compile Include="FontSupport\FontCharacter.cs" />
-    <Compile Include="FontSupport\FontCharacterSet.cs" />
-    <Compile Include="FontSupport\OPFF.cs" />
+    <Compile Include="FontSupport\FontMetrics.cs" />
+    <Compile Include="FontSupport\Interfaces\IFontProvider.cs" />
+    <Compile Include="FontSupport\FontStyle.cs" />
+    <Compile Include="FontSupport\FontManager.cs" />
+    <Compile Include="FontSupport\Interfaces\ITextRenderer.cs" />
+    <Compile Include="FontSupport\OFontPeer.cs" />
+    <Compile Include="FontSupport\SupportClasses\AffineTransform.cs" />
     <Compile Include="GraphicsDriver.cs" />
     <Compile Include="GraphicsMode.cs" />
     <Compile Include="GraphicsPlugs.cs">
