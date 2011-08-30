@@ -51,13 +51,21 @@ namespace Cosmos.IL2CPU.X86.IL {
         xExtraStackSize -= (int)Align(SizeOfType(xItem.ParameterType), 4);
       }
       if (!xMethodInfo.IsStatic) {
-        xExtraStackSize -= (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
+		  xExtraStackSize -= GetNativePointerSize(xMethodInfo);
       }
       if (xExtraStackSize > 0) {
         return (uint)xExtraStackSize;
       }
       return 0;
     }
+
+	private static int GetNativePointerSize(System.Reflection.MethodInfo xMethodInfo)
+	{
+		// old code, which goof up everything for structs
+		//return (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
+		// TODO native pointer size, so that COSMOS could be 64 bit OS
+		return 4;
+	}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
