@@ -34,16 +34,9 @@ namespace Cosmos.IL2CPU.X86.IL
 				switch (xSize)
 				{
 					case 1:
-						{
-							new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
-							new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
-							new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-							break;
-						}
 					case 2:
 						{
-							new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
-							new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
+							new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 							break;
 						}
@@ -53,13 +46,8 @@ namespace Cosmos.IL2CPU.X86.IL
 							break;
 						}
 				}
-				
 			}
-#if DOTNETCOMPATIBLE
 			Assembler.Stack.Push(ILOp.Align(xSize, 4), xVar.LocalType);
-#else
-			Assembler.Stack.Push(xSize, xVar.LocalType);
-#endif
 		}
 	}
 }

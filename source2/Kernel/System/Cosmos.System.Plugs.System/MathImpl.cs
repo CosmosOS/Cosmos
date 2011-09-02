@@ -12,6 +12,7 @@ namespace Cosmos.System.Plugs.System
         public const double PI = 3.14159265358979;
         public const double E = 2.71828182845905;
 
+		// TODO Abs decimal
         #region Abs
         public static double Abs(double value)
         {
@@ -37,6 +38,7 @@ namespace Cosmos.System.Plugs.System
             }
         }
 
+		/* should work from ms .net
         public static long Abs(long value)
         {
             if (value < 0)
@@ -59,23 +61,13 @@ namespace Cosmos.System.Plugs.System
             {
                 return value;
             }
-        }
+        }*/
         #endregion
 
+		// TODO Max decimal
         #region Max
-        public static byte Max(byte val1, byte val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        //public static decimal Max(decimal val1, decimal val2)
+    
+		//public static decimal Max(decimal val1, decimal val2)
         //{
         //    if (val1 > val2)
         //    {
@@ -87,79 +79,10 @@ namespace Cosmos.System.Plugs.System
         //    }
         //}
 
-        public static double Max(double val1, double val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static short Max(short val1, short val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static int Max(int val1, int val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static long Max(long val1, long val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static float Max(float val1, float val2)
-        {
-            if (val1 > val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
         #endregion
 
+		//TODO Min decimal
         #region Min
-        public static byte Min(byte val1, byte val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
 
         //public static decimal Min(decimal val1, decimal val2)
         //{
@@ -173,65 +96,6 @@ namespace Cosmos.System.Plugs.System
         //    }
         //}
 
-        public static double Min(double val1, double val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static short Min(short val1, short val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static int Min(int val1, int val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static long Min(long val1, long val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
-
-        public static float Min(float val1, float val2)
-        {
-            if (val1 < val2)
-            {
-                return val1;
-            }
-            else
-            {
-                return val2;
-            }
-        }
         #endregion
 
         #region Pow
@@ -261,7 +125,7 @@ namespace Cosmos.System.Plugs.System
 
         #region Sin
         public static double Sin(double a)
-        {
+        { // should be using assembler instruction
             bool signSwitch = false;
             double result = 0;
 
@@ -282,8 +146,6 @@ namespace Cosmos.System.Plugs.System
             //Temp function to increase precision make more factorial calculations
             result = (radians) - (Math.Pow(radians, 3) / Factorial(3));
             result += (Math.Pow(radians, 5) / Factorial(5)) - (Math.Pow(radians, 7) / Factorial(7)) + (Math.Pow(radians, 9) / Factorial(9));
-
-            //result *= -1;
 
             /* USE WHEN Modulus Works
              * int sign = 0;
@@ -318,7 +180,7 @@ namespace Cosmos.System.Plugs.System
         }
         #endregion
 
-        #region Factorial
+        #region Factorial (only used in Sin(), not plug )
         public static int Factorial(int n)
         {
             if (n == 0)
@@ -329,26 +191,23 @@ namespace Cosmos.System.Plugs.System
         #endregion
 
         #region Ceiling
-        public static double Ceiling(double a)
-        {
-            int returnval = (int)Floor(a);
-            returnval += 1;
-            return returnval;
-        }
+		public static double Ceiling(double a)
+		{ // should be using assembler for bigger values than int or long max
+			if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
+				return a;
+			int i = (a - (int)a > 0) ? (int)(a + 1) : (int)a;
+			return i;
+		}
         #endregion
 
         #region Floor
-        public static double Floor(double a)
-        {
-            int returnval = (int)a;
-
-            if (a < 0)
-            {
-                returnval -= 1;
-            }
-
-            return returnval;
-        }
+		public static double Floor(double a)
+		{ // should be using assembler for bigger values than int or long max
+			if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
+				return a;
+			int i = (a - (int)a < 0) ? (int)(a - 1) : (int)a;
+			return i;
+		}
         #endregion
     }
 }

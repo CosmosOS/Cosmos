@@ -1,6 +1,5 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler.X86;
 using Label = Cosmos.Compiler.Assembler.Label;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -19,10 +18,10 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackContent.IsFloat)
                 {
-                    new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
-                    new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
+					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+					new CPUx86.Add { SourceValue = 8, DestinationReg = CPUx86.Registers.ESP };
                     new CPUx86.x87.FloatMul { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
-                    new CPUx86.x87.FloatStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
                 }
                 else
                 {
@@ -47,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					//mov RIGHT_HIGH to eax, is useable on Full 64 multiply
 					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 					new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
-					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = Simple32Multiply };
+					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = Simple32Multiply };
 					// Full 64 Multiply
 					
 					// eax contains already RIGHT_HIGH

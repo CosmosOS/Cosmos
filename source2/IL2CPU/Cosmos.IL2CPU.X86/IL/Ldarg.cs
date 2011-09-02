@@ -3,6 +3,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.X86;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -83,7 +84,6 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
-          uint xArgSize = 0u;
           var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
           Type xArgType;
           if (aMethod.MethodBase.IsStatic) {
@@ -101,16 +101,25 @@ namespace Cosmos.IL2CPU.X86.IL
           }
           new Comment("Ldarg");
           new Comment("Arg idx = " + aParam);
-          xArgSize = Align(SizeOfType(xArgType), 4);
-          new Comment("Arg type = " + xArgType.ToString());
-            new Comment("Arg size = " + xArgSize);
-          for (int i = 0; i < (xArgSize / 4); i++) {
-            new Push {
-              DestinationReg = Registers.EBP,
-              DestinationIsIndirect = true,
-              DestinationDisplacement = (int)(xDisplacement - (i * 4))
-            };
-          }
+		  uint xArgRealSize = SizeOfType(xArgType);
+          uint xArgSize = Align(xArgRealSize, 4);
+		  new Comment("Arg type = " + xArgType.ToString());
+		  new Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
+		  if (xArgRealSize < 4)
+		  {
+				new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement };
+				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+		  }
+		  else
+		  {
+			  for (int i = 0; i < (xArgSize / 4); i++) {
+				  new Push {
+					  DestinationReg = Registers.EBP,
+					  DestinationIsIndirect = true,
+					  DestinationDisplacement = xDisplacement - (i * 4)
+				  };
+			  }
+		  }
           Assembler.Stack.Push(xArgSize, xArgType);
         }
     }

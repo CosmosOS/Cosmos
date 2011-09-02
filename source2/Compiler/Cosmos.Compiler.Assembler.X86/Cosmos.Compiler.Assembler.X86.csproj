@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MoveSignExtend.cs" />
     <Compile Include="Lgdt.cs" />
     <Compile Include="Lidt.cs" />
     <Compile Include="Shrd.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="SignExtendAX.cs" />
     <Compile Include="CmpXchg.cs" />
     <Compile Include="CpuId.cs" />
+    <Compile Include="x87\FloatNegate.cs" />
     <Compile Include="XchgAndAdd.cs" />
     <Compile Include="Add.cs" />
     <Compile Include="AddWithCarry.cs" />
