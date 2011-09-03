@@ -7,7 +7,7 @@ using Assembler = Cosmos.Compiler.Assembler.Assembler;
 using CPUAll = Cosmos.Compiler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.Core.Plugs
+namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System
 {
 	[Plug(Target = typeof(global::System.Math))]
 	class MathImpl

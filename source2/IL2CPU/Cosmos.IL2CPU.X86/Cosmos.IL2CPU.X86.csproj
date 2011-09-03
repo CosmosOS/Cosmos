@@ -262,6 +262,7 @@
     <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImplRefs.cs" />
+    <Compile Include="Plugs\MS\System\MathImpl.cs" />
     <Compile Include="Plugs\MS\System\StringImpl.cs" />
     <Compile Include="Plugs\NEW_PLUGS\CtorImplAssembler.cs" />
     <Compile Include="Plugs\NEW_PLUGS\DelegateImpl.cs" />
