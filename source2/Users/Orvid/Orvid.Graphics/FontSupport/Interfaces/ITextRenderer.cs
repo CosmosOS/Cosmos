@@ -1,5 +1,4 @@
 ﻿using System;
-using Orvid.Graphics.FontSupport.SupportClasses;
 
 namespace Orvid.Graphics.FontSupport
 {

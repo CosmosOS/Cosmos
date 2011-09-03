@@ -19,11 +19,16 @@ namespace TestBed
         List<ObjectEvents> Objects = new List<ObjectEvents>();
         Image i = new Image(DesktopWidth, DesktopHeight);
         WindowManager windowManager = new WindowManager(new Vec2(DesktopWidth, DesktopHeight));
+        //Orvid.Graphics.FontSupport.Font fnt;
         Window w1;
 
         public Form1()
         {
             InitializeComponent();
+            //System.IO.StreamReader sr = new System.IO.StreamReader("Vera-10.bdf");
+            //Orvid.Graphics.FontSupport.FontManager.Instance.LoadFont(1, sr.BaseStream);
+            //System.IO.StreamReader sr = new System.IO.StreamReader("MS-Sans-Serif_24.FNT");
+            //fnt = Orvid.Graphics.FontSupport.FontManager.Instance.LoadFont(2, sr.BaseStream);
         }
 
         void bt_Click(Vec2 loc, MouseButtons buttons)
@@ -186,6 +191,8 @@ namespace TestBed
             Forms.Cursor.Hide();
 
             i.Clear(Colors.White);
+
+            //i.DrawString(new Vec2(30, 30), "T", fnt, 20, Orvid.Graphics.FontSupport.FontStyle.Normal, Colors.Black);
 
             // Draw exit button.
             ExitButton b = new ExitButton(new Vec2(DesktopWidth - 21, 1), new Vec2(20, 20), i, this);

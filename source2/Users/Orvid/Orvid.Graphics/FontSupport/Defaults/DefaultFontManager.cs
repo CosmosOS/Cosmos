@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Orvid.Graphics.FontSupport.SupportClasses;
 using System.IO;
 
 namespace Orvid.Graphics.FontSupport
@@ -10,14 +9,13 @@ namespace Orvid.Graphics.FontSupport
     /// </summary>
     public class DefaultFontManager : FontManager
     {
-        List<AbstractFontProvider<Font, object>> Providers = new List<AbstractFontProvider<Font, object>>();
-        Dictionary<int, string> FontTypeToProviderNameMap = new Dictionary<int, string>();
+    	Dictionary<int, Font> Providers = new Dictionary<int, Font>();
 
 
         public DefaultFontManager()
         {
-            Providers.Add(new bdf.BDFFontProvider());
-            FontTypeToProviderNameMap.Add(1, "bdf");
+            Providers.Add(1, new bdf.BDFFont());
+            Providers.Add(2, new fnt.FntFont());
         }
 
 
@@ -28,33 +26,24 @@ namespace Orvid.Graphics.FontSupport
 
         public override FontMetrics GetFontMetrics(Font font)
         {
-            return GetProvider(font).GetFontMetrics(font);
+        	return font.GetFontMetrics();
         }
 
         public override void DrawText(Image i, BoundingBox clip, AffineTransform trans, string s, Font f, Vec2 Loc, Pixel p)
         {
-            ITextRenderer renderer = GetProvider(f).GetTextRenderer(f);
-            renderer.Render(i, clip, trans, s, Loc, p);
+            f.Render(i, clip, trans, s, Loc, p);
         }
 
-        public override Font CreateFont(int format, Stream s)
+        public override Font LoadFont(int format, Stream s)
         {
-            String name = FontTypeToProviderNameMap[format];
+        	if (!Providers.ContainsKey(format))
+        	{
+        		throw new Exception("Unknown format!");
+        	}
+        	
+        	return Providers[format].LoadFont(s);
 
-            if (name == null)
-            {
-                throw new ArgumentException("unknown format " + format.ToString());
-            }
-
-            foreach (IFontProvider<Font> prv in Providers)
-            {
-                if (prv.Name == name)
-                {
-                    return prv.LoadFont(s);
-                }
-            }
-
-            throw new Exception("can't create font with format " + name);
+            throw new Exception("can't create font with format #'" + format.ToString() + "'");
         }
 
         public override Font[] Fonts
@@ -62,25 +51,12 @@ namespace Orvid.Graphics.FontSupport
             get
             {
                 List<Font> all = new List<Font>();
-                foreach (IFontProvider<Font> prv in Providers)
+                foreach (KeyValuePair<int,Font> prv in Providers)
                 {
-                    all.AddRange(prv.Fonts);
+                    all.AddRange(prv.Value.DefaultFonts);
                 }
                 return all.ToArray();
             }
-        }
-
-        private IFontProvider<Font> GetProvider(Font font)
-        {
-            foreach (IFontProvider<Font> prv in Providers)
-            {
-                if (prv.SupportsFormat(font))
-                {
-                    return prv;
-                }
-            }
-
-            return null;
         }
     }
 }

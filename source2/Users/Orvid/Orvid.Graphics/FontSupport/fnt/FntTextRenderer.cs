@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace Orvid.Graphics.FontSupport.bdf
+namespace Orvid.Graphics.FontSupport.fnt
 {
-    public class BDFTextRenderer : ITextRenderer
+	internal class FntTextRenderer : ITextRenderer
     {
-        private BDFFontContainer bdfFont;
+        private FntLoader ldr;
 
-        public BDFTextRenderer(BDFFontContainer BdfFont)
+        public FntTextRenderer(FntLoader loadr)
         {
-            this.bdfFont = BdfFont;
+            this.ldr = loadr;
         }
 
         public override void Render(Image im, BoundingBox clip, AffineTransform tx, string text, Vec2 loc, Pixel color)
@@ -18,7 +18,7 @@ namespace Orvid.Graphics.FontSupport.bdf
 
             int offset = 0, 
                 x = 0, y = 0,
-                bdfFontDepth = bdfFont.getDepth(),
+                FontDepth = ldr.GetDepth(),
                 x_min = int.MaxValue,
                 y_min = int.MaxValue,
                 x_max = int.MinValue,
@@ -31,11 +31,11 @@ namespace Orvid.Graphics.FontSupport.bdf
                 ;
             int[] fData;
             Vec2 src, dst;
-            BDFParser.Rectangle glyph_box = new BDFParser.Rectangle();
-            BDFGlyph glyph;
+            Rectangle glyph_box = new Rectangle();
+            FntGlyph glyph;
             Image img;
 
-            if ((bdfFont != null) && (charsCount > 0))
+            if ((ldr != null) && (charsCount > 0))
             {
                 char[] chrs = text.ToCharArray();
                 int mH = 0;
@@ -45,21 +45,21 @@ namespace Orvid.Graphics.FontSupport.bdf
                 int tH = 0;
                 for (uint m = 0; m < text.Length; m++)
                 {
-                    glyph = bdfFont.getGlyph(chrs[m]);
-                    glyph_box = glyph.getBbx(glyph_box);
-                    if (glyph_box.height > mH)
+                    glyph = ldr.GetGlyph(chrs[m]);
+                    glyph_box = glyph.GetBounds();
+                    if (glyph_box.Height > mH)
                     {
-                        mH = glyph_box.height + 2;
+                        mH = glyph_box.Height + 2;
                     }
-                    if (glyph_box.y < mY)
+                    if (glyph_box.Y < mY)
                     {
-                        mY = glyph_box.y;
+                        mY = glyph_box.Y;
                     }
-                    if (glyph_box.y > mxY)
+                    if (glyph_box.Y > mxY)
                     {
-                        mxY = glyph_box.y;
+                        mxY = glyph_box.Y;
                     }
-                    tW += glyph_box.width + glyph_box.x + 2;
+                    tW += glyph_box.Width + glyph_box.X + 2;
                 }
 
                 tH = mH + (mxY - mY);
@@ -67,36 +67,42 @@ namespace Orvid.Graphics.FontSupport.bdf
                 img = new Image(tW, tH);
 
 
-                float f_max = (1 << bdfFontDepth) - 1;
+                float f_max = (1 << FontDepth) - 1;
                 if (f_max == 0)
                     f_max = 1;
 
-                glyph_box = new BDFParser.Rectangle();
+                glyph_box = new Rectangle();
                 src = new Vec2();
                 dst = new Vec2();
 
+                //throw new Exception();
+
                 for (int i = 0; i < charsCount; i++)
                 {
-                    glyph = bdfFont.getGlyph(chrs[i]);
+                    glyph = ldr.GetGlyph(chrs[i]);
+                    //throw new Exception();
                     if (glyph == null)
                     {
                         continue;
                     }
                     
-                    glyph_box = glyph.getBbx(glyph_box);
+                    glyph_box = glyph.GetBounds();
 
-                    fHeight = glyph_box.height;
-                    fData = glyph.getData();
+                    fHeight = glyph_box.Height;
+                    fData = glyph.Data;
                     scan = fData.Length / fHeight;
 
+                    //throw new Exception();
                     fg_r = color.R;
                     fg_g = color.G;
                     fg_b = color.B;
 
+                    //throw new Exception();
                     //box location
-                    bx = x + offset + glyph_box.x;
-                    by = y - fHeight - glyph_box.y;
+                    bx = x + offset + glyph_box.X;
+                    by = y - fHeight - glyph_box.Y;
 
+                    throw new Exception();
                     for (int k = 0; k < fHeight; k++)
                     {
                         offsetLine = k * scan;
@@ -153,11 +159,12 @@ namespace Orvid.Graphics.FontSupport.bdf
                             }
                         }
                     }
-                    offset += glyph.getDWidth().width;
+                    offset += glyph.Width;
                 }
                 //img = ImageManipulator.Resize(img, new Vec2(img.Width * 8, img.Height * 8), ImageManipulator.ScalingAlgorithm.Bicubic);
                 //img = ImageManipulator.Resize(img, Vec2.Zero, ImageManipulator.ScalingAlgorithm.Hq2x);
                 //img = ImageManipulator.Resize(img, Vec2.Zero, ImageManipulator.ScalingAlgorithm.Hq4x);
+                img.FloodFill(new Vec2(3,3), new Pixel(true), Colors.Green);
                 im.DrawImage(loc, img);
             }
         }

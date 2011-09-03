@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU {
 
     private System.IO.TextWriter mLog;
 
-    protected readonly Assembler mAssembler;
+    protected Assembler mAssembler;
     public AppAssembler(Assembler assembler) {
       mAssembler = assembler;
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
@@ -24,6 +24,7 @@ namespace Cosmos.IL2CPU {
 
     public Assembler Assembler {
       get { return mAssembler; }
+        set { mAssembler = value; }
     }
 
     public DebugInfo DebugInfo {

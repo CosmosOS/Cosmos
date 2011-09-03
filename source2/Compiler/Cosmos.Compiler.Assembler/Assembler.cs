@@ -50,10 +50,12 @@ namespace Cosmos.Compiler.Assembler {
 
     public List<DataMember> DataMembers {
       get { return mDataMembers; }
+        set { mDataMembers = value; }
     }
 
     public List<Instruction> Instructions {
       get { return mInstructions; }
+        set { mInstructions = value; }
     }
 
     public static Assembler CurrentInstance {

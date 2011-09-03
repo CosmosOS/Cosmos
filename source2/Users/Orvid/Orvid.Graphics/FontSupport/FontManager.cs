@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Orvid.Graphics.FontSupport.SupportClasses;
 
 namespace Orvid.Graphics.FontSupport
 {
@@ -73,7 +72,7 @@ namespace Orvid.Graphics.FontSupport
         /// <param name="format">The format of the font.</param>
         /// <param name="s">The Stream to load from.</param>
         /// <returns>The loaded font.</returns>
-        public abstract Font CreateFont(int format, Stream s);
+        public abstract Font LoadFont(int format, Stream s);
 #warning TODO: Remove the need for the format parameter.
     }
 }

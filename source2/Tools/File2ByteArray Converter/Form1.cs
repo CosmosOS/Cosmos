@@ -76,7 +76,7 @@ namespace File2ByteArray_Converter
                 }
             }
 
-            return "0x" + xHex;
+            return "0x" + (xHex.PadLeft(2,'0'));
         }
 
         private static string SingleDigitToHex(byte d)

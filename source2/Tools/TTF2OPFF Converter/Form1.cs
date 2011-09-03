@@ -384,43 +384,43 @@ namespace TTF2OPFF_Converter
             e.Handled = true;
         }
 
-        private static Orvid.Graphics.FontSupport.OPFF opfFont = null;
+        //private static Orvid.Graphics.FontSupport.OPFF opfFont = null;
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (opfFont == null)
-            {
-                FileStream str = new FileStream("Arial-Compressed.opff", FileMode.Open);
-                byte[] data = new byte[str.Length];
-                str.Read(data, 0, (int)str.Length);
-                opfFont = new Orvid.Graphics.FontSupport.OPFF(data);
-                data = null;
-                str.Close();
-                str.Dispose();
-            }
-            Orvid.Graphics.Image i = opfFont.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontFlag.Normal);
-            //i = Orvid.Graphics.ImageManipulator.Resize(i, new Orvid.Graphics.Vec2(i.Width * 4, i.Height * 4));
-            //o.AntiAlias();
-            //o.HalveSize();
-            //o.HalveSize();
-            pictureBox1.Image = (Bitmap)i;
-            pictureBox1.Size = new Size(i.Width, i.Height);
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox1.BringToFront();
-            System.GC.Collect();
+            //if (opfFont == null)
+            //{
+            //    FileStream str = new FileStream("Arial-Compressed.opff", FileMode.Open);
+            //    byte[] data = new byte[str.Length];
+            //    str.Read(data, 0, (int)str.Length);
+            //    opfFont = new Orvid.Graphics.FontSupport.OPFF(data);
+            //    data = null;
+            //    str.Close();
+            //    str.Dispose();
+            //}
+            //Orvid.Graphics.Image i = opfFont.GetCharacter(Int32.Parse(textBox2.Text), Orvid.Graphics.FontSupport.FontStyle.Normal);
+            ////i = Orvid.Graphics.ImageManipulator.Resize(i, new Orvid.Graphics.Vec2(i.Width * 4, i.Height * 4));
+            ////o.AntiAlias();
+            ////o.HalveSize();
+            ////o.HalveSize();
+            //pictureBox1.Image = (Bitmap)i;
+            //pictureBox1.Size = new Size(i.Width, i.Height);
+            //pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            //pictureBox1.BringToFront();
+            //System.GC.Collect();
 
-            Font f2 = new Font("Arial", 64, (FontStyle)0, GraphicsUnit.Pixel);
-            Bitmap Backend = new Bitmap(i.Width, i.Height);
-            Graphics g = Graphics.FromImage(Backend);
-            g.Clear(Color.White);
-            g.DrawString(new String(new char[] { (char)Int32.Parse(textBox2.Text) }), f2, new SolidBrush(Color.Black), 2, 2);
-            g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
-            pictureBox2.Image = Backend;
-            pictureBox2.Size = new Size(i.Width, i.Height);
-            f2 = null;
-            g = null;
-            i = null;
-            System.GC.Collect();
+            //Font f2 = new Font("Arial", 64, (FontStyle)0, GraphicsUnit.Pixel);
+            //Bitmap Backend = new Bitmap(i.Width, i.Height);
+            //Graphics g = Graphics.FromImage(Backend);
+            //g.Clear(Color.White);
+            //g.DrawString(new String(new char[] { (char)Int32.Parse(textBox2.Text) }), f2, new SolidBrush(Color.Black), 2, 2);
+            //g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
+            //pictureBox2.Image = Backend;
+            //pictureBox2.Size = new Size(i.Width, i.Height);
+            //f2 = null;
+            //g = null;
+            //i = null;
+            //System.GC.Collect();
         }
 
         private void CompressionComboBox_SelectedIndexChanged(object sender, EventArgs e)

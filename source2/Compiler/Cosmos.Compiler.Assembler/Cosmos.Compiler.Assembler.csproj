@@ -106,7 +106,7 @@
     <Compile Include="DataMember.cs" />
     <Compile Include="Define.cs" />
     <Compile Include="ElementReference.cs" />
-	<Compile Include="Else.cs" />
+    <Compile Include="Else.cs" />
     <Compile Include="EndIfDefined.cs" />
     <Compile Include="IDefine.cs" />
     <Compile Include="IEndIfDefined.cs" />

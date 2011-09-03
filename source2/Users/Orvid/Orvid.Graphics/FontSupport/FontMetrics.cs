@@ -16,43 +16,43 @@ namespace Orvid.Graphics.FontSupport
             return font;
         }
 
-        public int GetLeading()
+        public virtual int GetLeading()
         {
             return 0;
         }
 
-        public int GetAscent()
+        public virtual int GetAscent()
         {
-            return font.Size;
+            return (int)font.Size;
         }
 
-        public int GetDescent()
+        public virtual int GetDescent()
         {
             return 0;
         }
 
-        public int getHeight()
+        public virtual int GetHeight()
         {
             return GetLeading() + GetAscent() + GetDescent();
         }
 
-        public int GetMaxAscent()
+        public virtual int GetMaxAscent()
         {
             return GetAscent();
         }
 
-        public int GetMaxDescent()
+        public virtual int GetMaxDescent()
         {
             return GetDescent();
         }
 
-        public int GetMaxAdvance()
+        public virtual int GetMaxAdvance()
         {
             return -1;
         }
 
 
-        public int CharWidth(char ch)
+        public virtual int CharWidth(char ch)
         {
             if (ch < 256)
             {
@@ -70,12 +70,14 @@ namespace Orvid.Graphics.FontSupport
             return CharsWidth(data, 0, len);
         }
 
-        public int CharsWidth(char[] data, int off, int len)
+        public abstract int[] CharsWidths(char[] chars, int start, int len);
+
+        public virtual int CharsWidth(char[] data, int off, int len)
         {
             return StringWidth(new String(data, off, len));
         }
 
-        public int[] GetWidths()
+        public virtual int[] GetWidths()
         {
             int[] widths = new int[256];
             for (char ch = (char)0; ch < 256; ch++)

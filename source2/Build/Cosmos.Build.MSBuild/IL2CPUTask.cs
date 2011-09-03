@@ -246,15 +246,23 @@ namespace Cosmos.Build.MSBuild {
 
                         using (var xOut = new StreamWriter(OutputFilename, false))
                         {
-                            if (EmitDebugSymbols)
-                            {
-                                xNasmAsm.FlushText(xOut);
-                                xAsm.FinalizeDebugInfo();
-                            }
-                            else
-                            {
-                                xAsm.Assembler.FlushText(xOut);
-                            }
+                            //if (mDebugMode == Common.DebugMode.None)
+                            //{
+                            //    xAsm.Assembler = Orvid.Optimizer.Optimize(xAsm.Assembler);
+                            //    xAsm.Assembler.FlushText(xOut);
+                            //}
+                            //else
+                            //{
+                                if (EmitDebugSymbols)
+                                {
+                                    xNasmAsm.FlushText(xOut);
+                                    xAsm.FinalizeDebugInfo();
+                                }
+                                else
+                                {
+                                    xAsm.Assembler.FlushText(xOut);
+                                }
+                            //}
                         }
                     }
                 }

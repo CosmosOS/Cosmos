@@ -76,6 +76,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="MS-Sans-Serif_24.FNT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Vera-10.bdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
