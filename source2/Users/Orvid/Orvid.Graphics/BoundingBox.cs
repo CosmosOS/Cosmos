@@ -44,7 +44,7 @@ namespace Orvid.Graphics
                 return Top - Bottom;
             }
         }
-        
+
         /// <summary>
         /// The default constructor.
         /// </summary>
@@ -101,6 +101,14 @@ namespace Orvid.Graphics
         {
             //throw new Exception();
             return ((p.X < Right && p.X > Left) && (p.Y < Top && p.Y > Bottom));
+        }
+
+        /// <summary>
+        /// Lowers all values in the BoundingBox by the specified Vec2.
+        /// </summary>
+        public static BoundingBox operator -(BoundingBox b, Vec2 v)
+        {
+            return new BoundingBox(b.Left - v.X, b.Right - v.X, b.Top - v.Y, b.Bottom - v.Y);
         }
     }
 }

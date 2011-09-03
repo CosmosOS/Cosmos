@@ -61,9 +61,13 @@ namespace OForms.Windows
         /// </summary>
         public Pixel WindowInactiveOverBackColor = Colors.Chocolate;
         /// <summary>
+        /// The color to draw the text on the taskbar in.
+        /// </summary>
+        public Pixel TaskbarTextColor = Colors.Black;
+        /// <summary>
         /// The default width of a button for a window.
         /// </summary>
-        private const int WindowButtonWidth = 20;
+        private const int WindowButtonWidth = 160;
         /// <summary>
         /// The margin around a window button.
         /// </summary>
@@ -71,7 +75,11 @@ namespace OForms.Windows
         /// <summary>
         /// The height of the taskbar.
         /// </summary>
-        public const int TaskBarHeight = 15;
+        public const int TaskBarHeight = 20;
+        /// <summary>
+        /// The maximum width for the text on a window button.
+        /// </summary>
+        public const int MaxTextWidth = WindowButtonWidth - 6;
         /// <summary>
         /// The bounds of all of the window buttons.
         /// </summary>
@@ -204,6 +212,8 @@ namespace OForms.Windows
                         Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
                     }
 
+                    DrawWindowName(WindowButtonBounds[ind], w);
+
                     loc += WindowButtonMargin + WindowButtonMargin + WindowButtonWidth;
                 }
                 #endregion
@@ -259,6 +269,8 @@ namespace OForms.Windows
                             Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
                         }
 
+                        DrawWindowName(WindowButtonBounds[ind], w);
+
                         loc += WindowButtonMargin + WindowButtonMargin + ButtonWidth;
                     }
                 }
@@ -270,6 +282,42 @@ namespace OForms.Windows
             }
             Modified = false;
             Drawn = true;
+        }
+
+        /// <summary>
+        /// Draws the window's name on the taskbar,
+        /// using the specified bounds.
+        /// </summary>
+        /// <param name="bounds">Bounds to use.</param>
+        /// <param name="w">Window to draw.</param>
+        private void DrawWindowName(BoundingBox bounds, Window w)
+        {
+            BoundingBox bnds = bounds - TaskbarLocation;
+            //throw new Exception();
+            if (WindowManager.WindowFont.GetFontMetrics().StringWidth(w.Name) > bnds.Width - 6)
+            {
+                // Doesn't fit on the button, need to remove some characters.
+                string s = w.Name.Substring(0, w.Name.Length - 3) + "...";
+                while (WindowManager.WindowFont.GetFontMetrics().StringWidth(s) > bnds.Width - 6)
+                {
+                    if (s.Length == 3)
+                    {
+                        s = "."; // button is to small to have a name drawn.
+                        break;
+                    }
+                    else
+                    {
+                        // It's 4 to make up for the 3 extra characters we add.
+                        s = s.Substring(0, s.Length - 4) + "...";
+                    }
+                }
+                //throw new Exception();
+                Buffer.DrawString(new Vec2(bnds.Left + 2, bnds.Bottom + 2), s, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, TaskbarTextColor);
+            }
+            else // Fits on button.
+            {
+                Buffer.DrawString(new Vec2(bnds.Left + 2, bnds.Bottom + 2), w.Name, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, TaskbarTextColor);
+            }
         }
 
         /// <summary>
@@ -308,6 +356,9 @@ namespace OForms.Windows
                 Buffer.DrawRectangle(tl, br, WindowInactiveBackColor);
                 Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
             }
+
+            DrawWindowName(bounds, w);
+
             WasOverButton = false;
         }
 
@@ -333,6 +384,9 @@ namespace OForms.Windows
                 Buffer.DrawRectangle(tl, br, WindowInactiveOverBackColor);
                 Buffer.DrawLines(new Vec2[] { tl, tr, br, bl, tl }, WindowInactiveLineColor);
             }
+
+            DrawWindowName(bounds, w);
+
             WasOverButton = true;
         }
 
@@ -360,7 +414,7 @@ namespace OForms.Windows
             }
             else
             {
-                if (WindowButtonBounds[overButtonIndx].IsInBounds(loc) || !DrawnOverButton)
+                if (!WindowButtonBounds[overButtonIndx].IsInBounds(loc) || !DrawnOverButton)
                 {
                     UndrawOverButton(WindowButtonBounds[overButtonIndx], Windows[overButtonIndx]);
                     for (int i = 0; i < Windows.Length; i++)

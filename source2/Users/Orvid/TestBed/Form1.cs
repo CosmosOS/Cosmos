@@ -14,8 +14,8 @@ namespace TestBed
 {
     public partial class Form1 : Forms.Form
     {
-        private const int DesktopWidth = 320;
-        private const int DesktopHeight = 200;
+        private const int DesktopWidth = 640;
+        private const int DesktopHeight = 480;
         List<ObjectEvents> Objects = new List<ObjectEvents>();
         Image i = new Image(DesktopWidth, DesktopHeight);
         WindowManager windowManager = new WindowManager(new Vec2(DesktopWidth, DesktopHeight));
