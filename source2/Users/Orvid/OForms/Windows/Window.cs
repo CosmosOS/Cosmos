@@ -130,11 +130,40 @@ namespace OForms.Windows
         /// <summary>
         /// True if this is the currently active window.
         /// </summary>
-        public bool IsActiveWindow = false;
+        private bool isActiveWindow = false;  
+        /// <summary>
+        /// True if this is the currently active window.
+        /// </summary>
+        public bool IsActiveWindow
+        {
+            get
+            {
+                return isActiveWindow;
+            }
+            set
+            {
+                if (value != isActiveWindow)
+                {
+                    if (value)
+                    {
+                        FadingIn = true;
+                    }
+                    isActiveWindow = value;
+                }
+            }
+        }
         /// <summary>
         /// True if the window is in the process of being dragged.
         /// </summary>
         private bool IsDragging = false;
+        /// <summary>
+        /// True if the window should fade in when selected.
+        /// </summary>
+        public bool ShouldFadeIn = true;
+        /// <summary>
+        /// True if we are fading in.
+        /// </summary>
+        private bool FadingIn = false;
         /// <summary>
         /// The current state of the window. 
         /// Don't use this field, use CurrentState
@@ -557,7 +586,15 @@ namespace OForms.Windows
 
             if (IsActiveWindow)
             {
-                ContentBuffer.Clear(ClearColor);
+                if (FadingIn)
+                {
+                    ContentBuffer.Clear(new Pixel(ClearColor.R, ClearColor.G, ClearColor.B, 128));
+                    FadingIn = false;
+                }
+                else
+                {
+                    ContentBuffer.Clear(ClearColor);
+                }
             }
             else
             {
