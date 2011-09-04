@@ -59,6 +59,9 @@ namespace Cosmos.Compiler.Debug {
     public static readonly string UpName;
 
     static Pipes() {
+      // User might run mult instances of VS, so we need to make sure the pipe name
+      // is unique but also predictable since the pipe is the only way to talk
+      // between the debugger and ToolWindows project.
       int xPID = System.Diagnostics.Process.GetCurrentProcess().Id;
       DownName = @"Cosmos\DebugDown-" + xPID;
       UpName = @"Cosmos\DebugUp-" + xPID;
