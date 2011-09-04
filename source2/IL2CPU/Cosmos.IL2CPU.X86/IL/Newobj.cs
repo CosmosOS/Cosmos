@@ -59,7 +59,8 @@ namespace Cosmos.IL2CPU.X86.IL {
         //var xStorageSize = aCtorDeclTypeInfo.StorageSize;
 
         uint xArgSize = 0;
-        foreach (var xParam in constructor.GetParameters()) {
+		var xParameterList = constructor.GetParameters();
+        foreach (var xParam in xParameterList) {
           xArgSize = xArgSize + Align(SizeOfType(xParam.ParameterType), 4);
         }
         new Comment("ArgSize: " + xArgSize);
@@ -72,26 +73,25 @@ namespace Cosmos.IL2CPU.X86.IL {
         } else if (xShift > 0) {
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xShift };
         }
-        // Find struct ptr
-        //if (xStorageSize == 4) {
-          // If xStorageSize = 4, we dont need to find it because it is ESP.
-          new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
-        //} else {
-        //  new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP};
-        //  new CPUx86.Sub { DestinationReg = CPUx86.Registers.EAX, SourceValue = xStorageSize - 4 };
-        //  new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-        //}
+        // push struct ptr
+		new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
+		aAssembler.Stack.Push(4u, typeof(IntPtr));
         // Shift args
-        for (int i = 1; i <= xArgSize / 4; i++) {
-          new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = -(int)xStorageSize };
-        }
+		int xPushPosition = 0;
+		foreach (var xParam in xParameterList) {
+			uint xArgSizeForThis = Align(SizeOfType(xParam.ParameterType), 4);
+			aAssembler.Stack.Push(xArgSizeForThis, xParam.ParameterType);
+			for (int i = 1; i <= xArgSizeForThis / 4; i++) {
+				new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = -(int)xStorageSize - (xPushPosition * 4) };
+				xPushPosition++;
+			}
+		}
 
         new Call(aAssembler).Execute(aMethod, xMethod);
-        // Need to put these *after* the call because the Call pops from the stack
+        // Need to put these *after* the call because the Call pops the args from the stack
         // and we have mucked about on the stack, so this makes it right before the next
         // op.
         aAssembler.Stack.Push(xStorageSize, objectType);
-        aAssembler.Stack.Push(4, typeof(IntPtr));
       } else {
         // If not ValueType, then we need gc
 
