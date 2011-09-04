@@ -173,15 +173,15 @@ namespace TestBed
         private void Form1_Load(object sender, EventArgs e)
         {
             w1 = new Window(new Vec2(30, 30), new Vec2(120, 80), "Test Window 1");
-            w1.ClearColor = Colors.Green;
+            w1.ClearColor = new Pixel(0, 255, 0, 128); ;
             Button bt = new Button(new Vec2(10, 10), new Vec2(30, 10));
             bt.Click += new MouseEvent(bt_Click);
             bt.Parent = w1;
             w1.Controls.Add(bt);
             Window w2 = new Window(new Vec2(80, 30), new Vec2(120, 80), "Test Window 2");
-            w2.ClearColor = Colors.Red;
+            w2.ClearColor = new Pixel(255, 0, 0, 128);
             Window w3 = new Window(new Vec2(130, 30), new Vec2(120, 80), "Test Window 3");
-            w3.ClearColor = Colors.Blue;
+            w3.ClearColor = new Pixel(0, 0, 255, 128); ;
             windowManager.AddWindow(w1);
             windowManager.AddWindow(w2);
             windowManager.AddWindow(w3);
