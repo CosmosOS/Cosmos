@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using Microsoft.Win32;
@@ -45,15 +46,19 @@ namespace Cosmos.Cosmos_VS_Windows
         Queue<byte> mCommand;
         Queue<byte[]> mMessage;
         System.Timers.Timer mTimer = new System.Timers.Timer(100);
-        Cosmos.Compiler.Debug.Pipe mPipe;
+        Cosmos.Compiler.Debug.PipeServer mPipeDown;
+        //static public NamedPipeClientStream mPipeUp;
+
+        static Cosmos_VS_WindowsPackage() {
+          //mPipeUp = new NamedPipeClientStream(".", Pipes.UpName, PipeDirection.Out);
+        }
 
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
         /// any Visual Studio service because at this point the package object is created but 
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
-        public Cosmos_VS_WindowsPackage()
-        {
+        public Cosmos_VS_WindowsPackage() {
             mCommand = new Queue<byte>();
             mMessage = new Queue<byte[]>();
 
@@ -63,9 +68,9 @@ namespace Cosmos.Cosmos_VS_Windows
             mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
             mTimer.Start();
 
-            mPipe = new Cosmos.Compiler.Debug.Pipe(Pipes.DownName);
-            mPipe.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
-            mPipe.Start();
+            mPipeDown = new Cosmos.Compiler.Debug.PipeServer(Pipes.DownName);
+            mPipeDown.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
+            mPipeDown.Start();
 
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }

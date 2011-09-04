@@ -10,13 +10,13 @@ using Cosmos.Compiler.Debug;
 using System.Threading;
 
 namespace Cosmos.Compiler.Debug {
-  public class Pipe {
+  public class PipeServer {
     protected bool KillThread = false;
     protected NamedPipeServerStream mPipe;
     public event Action<byte, byte[]> DataPacketReceived;
     protected string mPipeName;
 
-    public Pipe(string aPipeName) {
+    public PipeServer(string aPipeName) {
       mPipeName = aPipeName;
     }
 
