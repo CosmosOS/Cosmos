@@ -9,7 +9,7 @@
              Name="CosmosAssemblyUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <DockPanel LastChildFill="True">
-        <ToolBar Height="26" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
+        <ToolBar Height="30" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
             <ToggleButton Content="Filter" Name="asmFilterButton" Click="asmFilterButton_Click" IsChecked="True" />
             <Button Content="Copy" Name="asmFCopyButton" Click="asmFCopyButton_Click" />
       <Button Content="Step" Name="asmStepButton"  Click="asmStepButton_Click" />

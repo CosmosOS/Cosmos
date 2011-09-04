@@ -50,16 +50,18 @@ namespace Cosmos.Compiler.Debug {
     public const byte SetAsmBreak = 16; // Set an assembly level break point
     public const byte Ping = 17; 
     //
-    // Make sure this is always the last entry. Used by DebugStub to verify commands
+    // Make sure this is always the last entry. Used by DebugStub to verify commands.
     public const byte Max = 18;
   }
 
-  static public class DebugWindow {
-    public static readonly string PipeName;
+  static public class Pipes {
+    public static readonly string DownName;
+    public static readonly string UpName;
 
-    static DebugWindow() {
+    static Pipes() {
       int xPID = System.Diagnostics.Process.GetCurrentProcess().Id;
-      PipeName = @"Cosmos\DebugWindows-" + xPID.ToString();
+      DownName = @"Cosmos\DebugDown-" + xPID;
+      UpName = @"Cosmos\DebugUp-" + xPID;
     }
   }
 

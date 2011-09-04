@@ -16,7 +16,7 @@ namespace Cosmos.Cosmos_VS_Windows
         public static StackUC mUC;
         public StackTW() : base(null)
         {
-            this.Caption = "Cosmos Stack Window"; // Resources.ToolWindowTitle;
+            this.Caption = "Cosmos Stack";
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
 

@@ -57,13 +57,13 @@ namespace Cosmos.Cosmos_VS_Windows
             mCommand = new Queue<byte>();
             mMessage = new Queue<byte[]>();
 
-            // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work
+            // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work.
             // So instead we use a stack and a timer to poll it for data.
             mTimer.AutoReset = true;
             mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
             mTimer.Start();
 
-            mPipe = new Cosmos.Compiler.Debug.Pipe(DebugWindow.PipeName);
+            mPipe = new Cosmos.Compiler.Debug.Pipe(Pipes.DownName);
             mPipe.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
             mPipe.Start();
 

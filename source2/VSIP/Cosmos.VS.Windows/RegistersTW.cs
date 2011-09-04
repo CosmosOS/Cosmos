@@ -17,7 +17,7 @@ namespace Cosmos.Cosmos_VS_Windows
 
         public RegistersTW() : base(null)
         {
-            this.Caption = "Cosmos x86 Registers Window"; // Resources.ToolWindowTitle;
+            this.Caption = "Cosmos x86 Registers";
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
 
