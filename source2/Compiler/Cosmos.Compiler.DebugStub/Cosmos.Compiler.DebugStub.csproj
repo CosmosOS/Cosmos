@@ -71,9 +71,9 @@
     <Content Include="ReadMe.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
-      <Name>Cosmos.Compiler.Debug</Name>
+      <Name>Cosmos.Debug.Consts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>

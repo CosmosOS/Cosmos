@@ -5,7 +5,7 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Debug {
+namespace Cosmos.Debug.Common {
   public class PipeClient {
     private string mPipeName;
     private NamedPipeClientStream mPipe;

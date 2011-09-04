@@ -93,6 +93,8 @@
     <Compile Include="KeyState.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />
     <Compile Include="ObjDump.cs" />
+    <Compile Include="PipeClient.cs" />
+    <Compile Include="PipeServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReverseSourceInfo.cs" />
     <Compile Include="SourceInfo.cs" />
@@ -116,9 +118,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
-      <Name>Cosmos.Compiler.Debug</Name>
+      <Name>Cosmos.Debug.Consts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -9,11 +9,11 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.VSDebugEngine {
 
   static public class DebugWindows {
-    static Cosmos.Compiler.Debug.PipeClient mPipe;
+    static Cosmos.Debug.Common.PipeClient mPipe;
 
     static public void SendCommand(byte aCmd, byte[] aData) {
       if (mPipe == null) {
-        mPipe = new Cosmos.Compiler.Debug.PipeClient(Cosmos.Compiler.Debug.Pipes.DownName);
+        mPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Compiler.Debug.Pipes.DownName);
       }
       mPipe.SendCommand(aCmd, aData);
     }

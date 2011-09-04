@@ -46,7 +46,7 @@ namespace Cosmos.Cosmos_VS_Windows
         Queue<byte> mCommand;
         Queue<byte[]> mMessage;
         System.Timers.Timer mTimer = new System.Timers.Timer(100);
-        Cosmos.Compiler.Debug.PipeServer mPipeDown;
+        Cosmos.Debug.Common.PipeServer mPipeDown;
         //static public NamedPipeClientStream mPipeUp;
 
         static Cosmos_VS_WindowsPackage() {
@@ -68,7 +68,7 @@ namespace Cosmos.Cosmos_VS_Windows
             mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
             mTimer.Start();
 
-            mPipeDown = new Cosmos.Compiler.Debug.PipeServer(Pipes.DownName);
+            mPipeDown = new Cosmos.Debug.Common.PipeServer(Pipes.DownName);
             mPipeDown.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
             mPipeDown.Start();
 

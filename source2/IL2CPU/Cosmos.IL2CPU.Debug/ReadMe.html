@@ -10,6 +10,9 @@
             Cosmos. The Debugger uses it to receive messages from the debugstub in Cosmos, 
             and Cosmos uses it to compile into the debug stub.</p>
       <p>
+            This unit should only contain constants and basic structures. No executable code 
+            should exist in this assembly.</p>
+      <p>
             References - The references should be absolutely minimal.....</p>
         <p>
             Because of this extreme care must be take of which assemblies are linked and 
@@ -20,20 +23,9 @@
       <ul>
         <li>DebugStub (running in Cosmos)</li>
         <li>Compiler (To communicate commands to the DebugStub over serial port)</li>
-        <li>Cosmos.VS.Debug<ul>
-          <li>To contain commands used by both VSIP and the debug windows</li>
-          <li>Pipe Class</li>
-          </ul>
-        </li>
-        <li>Cosmos.VS.Windows<ul>
-          <li>Uses Pipe class</li>
-          </ul>
-        </li>
+        <li>Cosmos.VS.Debug</li>
+        <li>Cosmos.VS.Windows</li>
       </ul>
-	
-	    <p>
-        The pipe class should NOT be in here since it cannot be used from the Guest 
-        debugger. Move possibly to Cosmos.Debug.Common?</p>
 	
 	    <p>
             &nbsp;</p>

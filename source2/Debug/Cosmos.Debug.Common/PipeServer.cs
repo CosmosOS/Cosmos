@@ -4,12 +4,11 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
-using System.Windows.Threading;
 using System.Windows;
 using Cosmos.Compiler.Debug;
 using System.Threading;
 
-namespace Cosmos.Compiler.Debug {
+namespace Cosmos.Debug.Common {
   public class PipeServer {
     protected bool KillThread = false;
     protected NamedPipeServerStream mPipe;
