@@ -77,13 +77,11 @@ namespace Cosmos.IL2CPU.X86.IL {
 		new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
 		aAssembler.Stack.Push(4u, typeof(IntPtr));
         // Shift args
-		int xPushPosition = 0;
 		foreach (var xParam in xParameterList) {
 			uint xArgSizeForThis = Align(SizeOfType(xParam.ParameterType), 4);
 			aAssembler.Stack.Push(xArgSizeForThis, xParam.ParameterType);
 			for (int i = 1; i <= xArgSizeForThis / 4; i++) {
-				new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = -(int)xStorageSize - (xPushPosition * 4) };
-				xPushPosition++;
+				new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xStorageSize };
 			}
 		}
 
