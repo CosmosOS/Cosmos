@@ -35,6 +35,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     internal DebugInfo mDebugInfoDb;
     internal IDictionary<uint, string> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
+    private Cosmos.Debug.Common.PipeClient mDebugDownPipe;
 
     private int mProcessExitEventSent = 0;
 
@@ -129,17 +130,17 @@ namespace Cosmos.Debug.VSDebugEngine {
     public string mProjectFile;
 
     protected void DbgCmdRegisters(byte[] aData) {
-      DebugWindows.SendCommand(DwMsg.Registers, aData);
+      mDebugDownPipe.SendCommand(DwMsg.Registers, aData);
     }
 
     protected void DbgCmdFrame(byte[] aData)
     {
-        DebugWindows.SendCommand(DwMsg.Frame, aData);
+      mDebugDownPipe.SendCommand(DwMsg.Frame, aData);
     }
 
     protected void DbgCmdStack(byte[] aData)
     {
-        DebugWindows.SendCommand(DwMsg.Stack, aData);
+      mDebugDownPipe.SendCommand(DwMsg.Stack, aData);
     }
 
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
@@ -150,7 +151,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         // Load passed in values
         mDebugInfo = aDebugInfo;
 
-        //
+        mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
+
         mISO = mDebugInfo["ISOFile"];
         mProjectFile = mDebugInfo["ProjectFile"];
         //
@@ -571,7 +573,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
       // Send source code to the tool window
-      DebugWindows.SendCommand(DwMsg.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
+      mDebugDownPipe.SendCommand(DwMsg.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
     }
 
   }
