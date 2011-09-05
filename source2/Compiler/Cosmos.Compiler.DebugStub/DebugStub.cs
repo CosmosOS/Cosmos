@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Debug;
+using Cosmos.Debug.Consts;
 using Cosmos.Compiler.XSharp;
 
-namespace Cosmos.Compiler.DebugStub {
+namespace Cosmos.Debug.DebugStub {
   public class DebugStub : CodeGroup {
     protected const uint VidBase = 0xB8000;
     static public int mComNo = 0;
@@ -401,7 +401,7 @@ namespace Cosmos.Compiler.DebugStub {
         // To work around this we send a signature. DC then discards everything before the signature.
         // QEMU has other serial issues too, and we dont support it anymore, but this signature is a good
         // feature so we kept it.
-        Push(Consts.SerialSignature);
+        Push(Cosmos.Debug.Consts.Consts.SerialSignature);
         ESI = ESP;
         WriteBytesToComPort(4);
         // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
@@ -592,7 +592,7 @@ namespace Cosmos.Compiler.DebugStub {
         Call<ReadALFromComPort>();
         BL = AL;
         EBX.RotateRight(8);
-        EBX.Compare(Consts.SerialSignature);
+        EBX.Compare(Cosmos.Debug.Consts.Consts.SerialSignature);
         JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read");
 
         //TODO: Always emit and exit label and then make a Exit method which can

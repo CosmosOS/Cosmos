@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Threading;
-using Cosmos.Compiler.Debug;
+using Cosmos.Debug.Consts;
 
 namespace Cosmos.Cosmos_VS_Windows
 {

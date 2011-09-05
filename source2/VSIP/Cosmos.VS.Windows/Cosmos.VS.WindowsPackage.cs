@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.Threading;
-using Cosmos.Compiler.Debug;
+using Cosmos.Debug.Consts;
 using System.Windows.Threading;
 using System.Collections.Generic;
 
@@ -47,11 +47,6 @@ namespace Cosmos.Cosmos_VS_Windows
         Queue<byte[]> mMessage;
         System.Timers.Timer mTimer = new System.Timers.Timer(100);
         Cosmos.Debug.Common.PipeServer mPipeDown;
-        //static public NamedPipeClientStream mPipeUp;
-
-        static Cosmos_VS_WindowsPackage() {
-          //mPipeUp = new NamedPipeClientStream(".", Pipes.UpName, PipeDirection.Out);
-        }
 
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -68,7 +63,7 @@ namespace Cosmos.Cosmos_VS_Windows
             mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
             mTimer.Start();
 
-            mPipeDown = new Cosmos.Debug.Common.PipeServer(Pipes.DownName);
+            mPipeDown = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.DownName);
             mPipeDown.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
             mPipeDown.Start();
 

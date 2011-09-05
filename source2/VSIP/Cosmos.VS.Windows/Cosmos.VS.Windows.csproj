@@ -122,6 +122,7 @@
     <Compile Include="DataBytesUC.xaml.cs">
       <DependentUpon>DataBytesUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Global.cs" />
     <Compile Include="MemoryViewUC.xaml.cs">
       <DependentUpon>MemoryViewUC.xaml</DependentUpon>
     </Compile>

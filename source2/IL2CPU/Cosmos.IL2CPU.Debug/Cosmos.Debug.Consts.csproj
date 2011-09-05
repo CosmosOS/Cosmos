@@ -8,8 +8,8 @@
     <ProjectGuid>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Compiler.Debug</RootNamespace>
-    <AssemblyName>Cosmos.Compiler.Debug</AssemblyName>
+    <RootNamespace>Cosmos.Debug.Consts</RootNamespace>
+    <AssemblyName>Cosmos.Debug.Consts</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>

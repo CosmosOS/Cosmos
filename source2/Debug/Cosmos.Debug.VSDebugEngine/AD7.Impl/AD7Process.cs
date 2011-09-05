@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Collections.Specialized;
 using Cosmos.Debug.Common;
-using Cosmos.Compiler.Debug;
+using Cosmos.Debug.Consts;
 using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 using System.Windows.Forms;

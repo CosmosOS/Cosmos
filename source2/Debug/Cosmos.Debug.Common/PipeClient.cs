@@ -19,7 +19,7 @@ namespace Cosmos.Debug.Common {
       // We need to delay creation and connect until its used, so we guarantee
       // that the server side is active and ready.
       if (mPipe == null) {
-        mPipe = new NamedPipeClientStream(".", Cosmos.Compiler.Debug.Pipes.DownName, PipeDirection.Out);
+        mPipe = new NamedPipeClientStream(".", Cosmos.Debug.Consts.Pipes.DownName, PipeDirection.Out);
         try {
           // For now we assume its there or not from the first call.
           // If we don't find the server, we disable it to avoid causing lag.

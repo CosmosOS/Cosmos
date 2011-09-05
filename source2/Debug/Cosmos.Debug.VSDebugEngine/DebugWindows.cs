@@ -13,7 +13,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     static public void SendCommand(byte aCmd, byte[] aData) {
       if (mPipe == null) {
-        mPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Compiler.Debug.Pipes.DownName);
+        mPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
       }
       mPipe.SendCommand(aCmd, aData);
     }

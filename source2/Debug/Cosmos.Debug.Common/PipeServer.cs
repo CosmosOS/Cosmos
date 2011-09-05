@@ -5,7 +5,7 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using Cosmos.Compiler.Debug;
+using Cosmos.Debug.Consts;
 using System.Threading;
 
 namespace Cosmos.Debug.Common {
