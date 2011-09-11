@@ -173,6 +173,7 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ReadMe.html" />
     <Content Include="Resources\Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>
