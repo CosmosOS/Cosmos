@@ -34,7 +34,7 @@ namespace Cosmos.Cosmos_VS_Windows
     }
 
     void butnPing_Click(object sender, RoutedEventArgs e) {
-      
+      Global.mPipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.Ping, null);
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e)

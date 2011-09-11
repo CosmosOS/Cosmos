@@ -25,6 +25,7 @@ namespace Cosmos.Debug.Common {
           // If we don't find the server, we disable it to avoid causing lag.
           // TODO: In future - try this instead:
           // String[] listOfPipes = System.IO.Directory.GetFiles(@"\.\pipe\");
+          // or maybe not - what we have seems to work just fine...
 
           mPipe.Connect(500);
         } catch (TimeoutException ex) {
@@ -37,7 +38,11 @@ namespace Cosmos.Debug.Common {
 
       mPipe.WriteByte(aCmd);
 
-      int xLength = Math.Min(aData.Length, 32000);
+      byte[] xData = aData;
+      if (xData == null) {
+        xData = new byte[0];
+      }
+      int xLength = Math.Min(aData.Length, 32768);
       mPipe.WriteByte((byte)(xLength >> 8));
       mPipe.WriteByte((byte)(xLength & 0xFF));
       if (xLength > 0) {
