@@ -172,7 +172,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Cosmos.ico" usedList="bmpCosmosIcon, bmpAssemblyIcon, bmpRegisterIcon, bmpStackIcon, bmpAllIcon"/>
+      <Bitmap guid="guidImages" href="Resources\Cosmos.png" usedList="bmpCosmosIcon, bmpAssemblyIcon, bmpRegisterIcon, bmpStackIcon, bmpAllIcon"/>
     </Bitmaps>
   </Commands>
 
