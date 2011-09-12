@@ -36,6 +36,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     internal IDictionary<uint, string> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
     private Cosmos.Debug.Common.PipeClient mDebugDownPipe;
+    private Cosmos.Debug.Common.PipeServer mDebugUpPipe;
 
     private int mProcessExitEventSent = 0;
 
@@ -152,6 +153,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDebugInfo = aDebugInfo;
 
         mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
+        mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.UpName);
 
         mISO = mDebugInfo["ISOFile"];
         mProjectFile = mDebugInfo["ProjectFile"];
