@@ -258,6 +258,7 @@
     <Compile Include="IL\Unbox_Any.cs" />
     <Compile Include="IL\Volatile.cs" />
     <Compile Include="IL\Xor.cs" />
+    <Compile Include="Optimizer.cs" />
     <Compile Include="Plugs\Diagnostics\BreakAssembler.cs" />
     <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />

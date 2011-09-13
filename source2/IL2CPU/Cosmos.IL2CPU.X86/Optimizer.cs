@@ -24,6 +24,17 @@ namespace Orvid
                 {
                     labels.Add(((Label)ins).QualifiedName, ins);
                 }
+                else if (ins is x86.JumpToSegment)
+                {
+                    if (((x86.JumpToSegment)ins).DestinationRef != null)
+                    {
+                        usedLabels.Add(((x86.JumpToSegment)ins).DestinationRef.Name);
+                    }
+                    else
+                    {
+                        usedLabels.Add(((x86.JumpToSegment)ins).DestinationLabel);
+                    }
+                }
                 else if (ins is x86.JumpBase)
                 {
                     usedLabels.Add(((x86.JumpBase)ins).DestinationLabel);
@@ -31,6 +42,20 @@ namespace Orvid
                 else if (ins is x86.Call)
                 {
                     usedLabels.Add(((x86.Call)ins).DestinationLabel);
+                }
+                else if (ins is x86.Push)
+                {
+                    if (((x86.Push)ins).DestinationRef != null)
+                    {
+                        usedLabels.Add(((x86.Push)ins).DestinationRef.Name);
+                    }
+                }
+                else if (ins is x86.Move)
+                {
+                    if (((x86.Move)ins).SourceRef != null)
+                    {
+                        usedLabels.Add(((x86.Move)ins).SourceRef.Name);
+                    }
                 }
             }
             foreach (string s in usedLabels)

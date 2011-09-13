@@ -22,6 +22,8 @@ namespace Cosmos.IL2CPU {
       InitILOps();
     }
 
+    public bool ShouldOptimize = false;
+
     public Assembler Assembler {
       get { return mAssembler; }
         set { mAssembler = value; }
@@ -189,7 +191,7 @@ namespace Cosmos.IL2CPU {
     protected abstract int GetVTableEntrySize();
 
     public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
-    public void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
+    public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
       // initialization
       MethodBegin(InitVMTCodeLabel);
       {

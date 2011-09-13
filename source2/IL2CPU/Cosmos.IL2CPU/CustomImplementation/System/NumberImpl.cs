@@ -12,7 +12,20 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
     {
         public static string FormatInt32(int aInt, string aStr, NumberFormatInfo aFormat)
         {
-            return "fix me in Cosmos.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatInt32";
+            bool xIsNegative = false;
+            if (aInt < 0)
+            {
+                xIsNegative = true;
+                aInt *= -1;
+            }
+            var xResult = UInt32Impl2.GetNumberString((uint)aInt, xIsNegative);
+            if (xResult == null)
+            {
+                return UInt32Impl2.GetNumberString((uint)aInt, xIsNegative);
+            }
+            return xResult;
+
+            //return "fix me in Cosmos.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatInt32";
         }
         public static string FormatDouble(double aInt, string aStr, NumberFormatInfo aFormat)
         {

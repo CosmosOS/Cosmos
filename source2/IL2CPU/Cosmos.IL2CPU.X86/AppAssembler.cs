@@ -99,6 +99,12 @@ namespace Cosmos.IL2CPU.X86 {
       new Label(CosmosAssembler.EntryPointName + ".AfterStart");
       new Pop { DestinationReg = Registers.EBP };
       new Return();
+
+
+      if (ShouldOptimize)
+      {
+          //Orvid.Optimizer.Optimize(Assembler);
+      }
     }
 
     protected override void Ldarg(MethodInfo aMethod, int aIndex) {

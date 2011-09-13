@@ -78,7 +78,6 @@
     <Compile Include="Ld.cs" />
     <Compile Include="MakeISO.cs" />
     <Compile Include="NAsm.cs" />
-    <Compile Include="Optimizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadNAsmMapToDebugInfo.cs" />
     <Compile Include="TestClass.cs" />

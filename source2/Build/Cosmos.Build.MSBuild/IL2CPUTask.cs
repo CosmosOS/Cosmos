@@ -228,6 +228,10 @@ namespace Cosmos.Build.MSBuild {
                     xAsm.DebugInfo = xDebugInfo;
                     xAsm.DebugMode = mDebugMode;
                     xAsm.TraceAssemblies = mTraceAssemblies;
+                    if (this.DebugMode.ToLower() == "none")
+                    {
+                        xAsm.ShouldOptimize = true;
+                    }
 #if OUTPUT_ELF
                 xAsm.EmitELF = true;
 #endif
@@ -246,13 +250,6 @@ namespace Cosmos.Build.MSBuild {
 
                         using (var xOut = new StreamWriter(OutputFilename, false))
                         {
-                            //if (mDebugMode == Common.DebugMode.None)
-                            //{
-                            //    xAsm.Assembler = Orvid.Optimizer.Optimize(xAsm.Assembler);
-                            //    xAsm.Assembler.FlushText(xOut);
-                            //}
-                            //else
-                            //{
                                 if (EmitDebugSymbols)
                                 {
                                     xNasmAsm.FlushText(xOut);
@@ -262,7 +259,6 @@ namespace Cosmos.Build.MSBuild {
                                 {
                                     xAsm.Assembler.FlushText(xOut);
                                 }
-                            //}
                         }
                     }
                 }
