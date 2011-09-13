@@ -125,25 +125,29 @@ namespace Cosmos.Debug.Common
             SendCommand(DsCmd.SendStack);
         }
 
+        public void Ping() {
+          SendCommand(DsCmd.Ping);
+        }
+
         public void SetBreakpoint(int aID, uint aAddress) {
-            // Not needed as SendCommand will do it, but it saves
-            // some execution, but more importantly stops it from 
-            // logging messages to debug output for events that
-            // dont happen.
-            if (!Connected) {
-                return;
-            }
+          // Not needed as SendCommand will do it, but it saves
+          // some execution, but more importantly stops it from 
+          // logging messages to debug output for events that
+          // dont happen.
+          if (!Connected) {
+            return;
+          }
 
-            if (aAddress == 0) {
-                DoDebugMsg("DS Cmd: BP " + aID + " deleted");
-            } else {
-                DoDebugMsg("DS Cmd: BP " + aID + " @ " + aAddress.ToString("X8").ToUpper());
-            }
+          if (aAddress == 0) {
+            DoDebugMsg("DS Cmd: BP " + aID + " deleted");
+          } else {
+            DoDebugMsg("DS Cmd: BP " + aID + " @ " + aAddress.ToString("X8").ToUpper());
+          }
 
-            var xData = new byte[5];
-            Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 0, 4);
-            xData[4] = (byte)aID;
-            SendCommandData(DsCmd.BreakOnAddress, xData, true);
+          var xData = new byte[5];
+          Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 0, 4);
+          xData[4] = (byte)aID;
+          SendCommandData(DsCmd.BreakOnAddress, xData, true);
         }
 
         public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1)
