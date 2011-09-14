@@ -66,13 +66,13 @@ namespace Orvid.Graphics
             Taskbar = new Image(width, height);
             Mouse = new Image(width, height);
             this.curdriver = new Drivers.VGADriver();
-            //this.curdriver.Initialize();
+            this.curdriver.Initialize();
             this.Width = width;
             this.Height = height;
 
             InitializeMouse();
 
-            Taskbar.Clear(Colors.White); // Clear the screen white.
+            Taskbar.Clear(Colors.Aqua); // Clear the screen white.
             CurrentDriver.Update(Taskbar);
         }
 

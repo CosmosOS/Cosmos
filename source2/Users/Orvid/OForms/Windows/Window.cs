@@ -856,14 +856,7 @@ namespace OForms.Windows
                             if (c.Bounds.IsInBounds(RelativeLoc))
                             {
                                 c.IsIn = true;
-                                if (c.IsMouseDown)
-                                {
-                                    c.DoMouseDown(RelativeLoc, button);
-                                }
-                                else
-                                {
-                                    c.DoMouseEnter(RelativeLoc, button);
-                                }
+                                c.DoMouseEnter(RelativeLoc, button);
                             }
                         }
                         else

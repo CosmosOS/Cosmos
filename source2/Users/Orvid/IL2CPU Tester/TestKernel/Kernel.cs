@@ -1,33 +1,27 @@
+﻿#pragma warning disable 162 
+// The compiler doesn't like the fact that true == true might not necessarily be true.
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Sys = Cosmos.System;
-using Orvid.Graphics;
 
-namespace StructTest
+namespace TestKernel
 {
     public class Kernel : Sys.Kernel
     {
-        public Kernel()
+        public Kernel() : base()
         {
-            base.ClearScreen = true;
+            this.ClearScreen = false;
         }
-
-        protected override void BeforeRun()
-        {
-            Console.WriteLine("Hello, and welcome to the TestOS by Orvid.");
-            Console.WriteLine("To see a list of supported commands, type '?'");
-        }
-
-
-        public void DoRun()
-        {
-            this.Run();
-        }
+        protected override void BeforeRun() { }
 
         protected override void Run()
         {
-            //Monitor m = new Monitor();
+            #region Byte Conversions
+
+            #endregion
+
+
             //byte r = 255;
             //sbyte r = -128;
             //char r = '\u0127';
@@ -52,11 +46,18 @@ namespace StructTest
             Console.WriteLine("Byte->Long: " + (unchecked((long)r)).ToString());
             Console.WriteLine("Byte->Float: " + (unchecked((float)r)).ToString());
             Console.WriteLine("Byte->Double: " + (unchecked((double)r)).ToString());
-            Console.WriteLine("Byte->Decimal: " + (unchecked((decimal)r)).ToString());
-            while (true)
+            if (unchecked((decimal)r) != 123.7m)
             {
 
             }
+
+            while (true) { } // Prevent the check from being run again, and display results.
+        }
+
+        public static void WriteError(string s)
+        {
+            Console.WriteLine("Error: " + s);
         }
     }
 }
+#pragma warning restore 162

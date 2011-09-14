@@ -70,7 +70,14 @@ namespace OForms.Controls
 
         private void ButtonEnter(Vec2 loc, MouseButtons buttons)
         {
-            this.DrawMouseOver();
+            if (IsMouseDown)
+            {
+                this.DrawMouseDown();
+            }
+            else
+            {
+                this.DrawMouseOver();
+            }
         }
 
         private void ButtonLeave(Vec2 loc, MouseButtons buttons)

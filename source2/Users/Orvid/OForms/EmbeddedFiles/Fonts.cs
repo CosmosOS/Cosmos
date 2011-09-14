@@ -6,7 +6,7 @@ namespace OForms.EmbeddedFiles
     {
 
         #region Vera10_bdf
-        public static byte[] Vera10_bdf = new byte[] 
+        public static readonly byte[] Vera10_bdf = new byte[] 
         {
             0x53, 0x54, 0x41, 0x52, 0x54, 0x46, 0x4F, 0x4E, 
             0x54, 0x20, 0x32, 0x2E, 0x31, 0x0A, 0x46, 0x4F, 
@@ -3448,7 +3448,7 @@ namespace OForms.EmbeddedFiles
         #endregion
 
         #region MS-Sans-Serif-24_fnt
-        public static byte[] MsSansSerif24_fnt = new byte[]
+        public static readonly byte[] MsSansSerif24_fnt = new byte[]
         {
             0x00, 0x02, 0xB7, 0x57, 0x00, 0x00, 0x43, 0x6F, 
 0x70, 0x79, 0x72, 0x69, 0x67, 0x68, 0x74, 0x20, 

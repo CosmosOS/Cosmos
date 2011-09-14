@@ -71,14 +71,19 @@
       <Project>{6a991d03-1435-4005-9809-b8bacdf3b021}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\Orvid.Graphics.Cosmos\Orvid.Graphics.Cosmos.csproj">
+      <Name>Orvid.Graphics.Cosmos</Name>
+      <Project>{167d46d2-f0f2-4f59-ba0f-2452941e0450}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Orvid.Graphics\Orvid.Graphics.csproj">
       <Name>Orvid.Graphics</Name>
       <Project>{c9e995cf-cb65-4410-a7d2-63ebbe02aabb}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="OrvidKernel.csproj">
+    <ProjectReference Include="..\OrvidTestOS\OrvidKernel.csproj">
       <Name>OrvidKernel</Name>
-      <Project>{73cf15c1-0ab6-4b3a-8142-d326ada72970}</Project>
+      <Project>{2e14eed0-f7e9-4e7c-aa21-6e519c28457d}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

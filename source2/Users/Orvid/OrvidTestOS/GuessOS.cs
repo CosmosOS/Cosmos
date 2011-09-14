@@ -61,7 +61,7 @@ namespace GuessKernel
             Console.WriteLine("This is just a test.");
 
             Vec2 v;
-            s.Taskbar.Clear(new Pixel(0,255,0,0));
+            s.Taskbar.Clear(new Pixel(0,255,0,255));
 
             //#region Draw myself a palette reference
             //uint i = 0;
@@ -107,7 +107,7 @@ namespace GuessKernel
             //#endregion
 
             v = new Vec2(150, 100);
-            s.Taskbar.DrawCircleOutline(v, 10, new Pixel(0, 0, 128, 0));
+            s.Taskbar.DrawCircleOutline(v, 10, new Pixel(0, 0, 128, 255));
 
             //int i1 = 4;
             //int i2 = 9;
@@ -132,6 +132,7 @@ namespace GuessKernel
             
             while (true)
             {
+                Console.WriteLine("This is just a test.");
                 Tick++;
                 MouseX = (uint)m.X;
                 MouseY = (uint)m.Y;
@@ -147,10 +148,10 @@ namespace GuessKernel
                 }
                 else
                 {
-                    s.Taskbar.SetPixel(312, 4, new Pixel(0,255,0,0));
-                    s.Taskbar.SetPixel(313, 4, new Pixel(0,255,0,0));
-                    s.Taskbar.SetPixel(312, 5, new Pixel(0,255,0,0));
-                    s.Taskbar.SetPixel(313, 5, new Pixel(0,255,0,0));
+                    s.Taskbar.SetPixel(312, 4, new Pixel(0,255,0,255));
+                    s.Taskbar.SetPixel(313, 4, new Pixel(0,255,0,255));
+                    s.Taskbar.SetPixel(312, 5, new Pixel(0,255,0,255));
+                    s.Taskbar.SetPixel(313, 5, new Pixel(0,255,0,255));
                     OddRefresh = true;
                 }
 
@@ -165,14 +166,14 @@ namespace GuessKernel
                 if (k.GetChar(out c))
                 {
                     v = new Vec2(150, 100);
-                    s.Taskbar.DrawCircleOutline(v, 20, new Pixel(255, 0, 0, 0));
+                    s.Taskbar.DrawCircleOutline(v, 20, new Pixel(255, 0, 0, 255));
                     ProcessKeyboard(c);
                     HadCharPrev = true;
                 }
                 else if (HadCharPrev)
                 {
                     v = new Vec2(150, 100);
-                    s.Taskbar.DrawCircleOutline(v, 20, new Pixel(0, 255, 0, 0));
+                    s.Taskbar.DrawCircleOutline(v, 20, new Pixel(0, 255, 0, 255));
                     HadCharPrev = false;
                 }
                 chrsProcd = 0;
@@ -180,12 +181,12 @@ namespace GuessKernel
                 if (m.Buttons != Mouse.MouseState.None)
                 {
                     v = new Vec2(150, 100);
-                    s.Taskbar.DrawCircleOutline(v, 30, new Pixel(255, 0, 0, 0));
+                    s.Taskbar.DrawCircleOutline(v, 30, new Pixel(255, 0, 0, 255));
                 }
                 else
                 {
                     v = new Vec2(150, 100);
-                    s.Taskbar.DrawCircleOutline(v, 30, new Pixel(0, 255, 0, 0));
+                    s.Taskbar.DrawCircleOutline(v, 30, new Pixel(0, 255, 0, 255));
                 }
 
                 //for (uint height = 0; height < s.s.PixelHeight; height++)

@@ -84,6 +84,7 @@ namespace Orvid.Graphics.Drivers
                 for (int x = 0; x < i.Width; x++)
                 {
                     arr[indx] = GetForColorizer(i.Data[indx]);
+                    //Console.WriteLine("Colorized value: " + GetForColorizer(i.Data[indx]).ToString());
                     indx++;
                 }
             }
@@ -92,6 +93,8 @@ namespace Orvid.Graphics.Drivers
 
         public override void Update(Image i)
         {
+
+            //Console.WriteLine("Well Update is getting called....");
             // TODO: Switch to an delegate based draw mechanism,
             // it would be much faster than switch, case like statements.
 

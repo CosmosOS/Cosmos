@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "File2ByteArray Converter", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orvid.Graphics.Cosmos", "..\Orvid.Graphics.Cosmos\Orvid.Graphics.Cosmos.csproj", "{167D46D2-F0F2-4F59-BA0F-2452941E0450}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orvid.Concurrent", "..\Orvid.Concurrent\Orvid.Concurrent.csproj", "{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -199,6 +201,12 @@ Global
 		{167D46D2-F0F2-4F59-BA0F-2452941E0450}.Release|Any CPU.Build.0 = Release|Any CPU
 		{167D46D2-F0F2-4F59-BA0F-2452941E0450}.Release|x86.ActiveCfg = Release|Any CPU
 		{167D46D2-F0F2-4F59-BA0F-2452941E0450}.Release|x86.Build.0 = Release|Any CPU
+		{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}.Debug|x86.ActiveCfg = Debug|x86
+		{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}.Debug|x86.Build.0 = Debug|x86
+		{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}.Release|Any CPU.ActiveCfg = Release|x86
+		{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}.Release|x86.ActiveCfg = Release|x86
+		{FC0B18FE-6D0A-481C-8007-2138A88D0DB3}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
