@@ -36,7 +36,11 @@ namespace Cosmos.IL2CPU.X86.IL
 					case 1:
 					case 2:
 						{
-							new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
+							bool signed = IsIntegerSigned(xVar.LocalType);
+							if (signed)
+								new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
+							else
+								new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 							break;
 						}

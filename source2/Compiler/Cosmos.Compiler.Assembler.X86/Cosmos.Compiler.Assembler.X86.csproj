@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MoveZeroExtend.cs" />
     <Compile Include="MoveSignExtend.cs" />
     <Compile Include="Lgdt.cs" />
     <Compile Include="Lidt.cs" />

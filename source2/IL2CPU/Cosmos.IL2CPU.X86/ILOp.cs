@@ -229,6 +229,21 @@ namespace Cosmos.IL2CPU.X86 {
         }
     }
 
+	public static bool IsIntegerSigned(Type aType)
+	{
+		switch (aType.FullName)
+		{
+			case "System.SByte":
+			case "System.Int16":
+			case "System.Int32":
+			case "System.Int64":
+			//TODO not sure about this case "System.IntPtr":
+			//TODO not sure aobut this case "System.Enum":
+				return true;
+		}
+		return false;
+	}
+
     public static uint SizeOfType(Type aType)
     {
         if (aType.FullName == "System.Void")
