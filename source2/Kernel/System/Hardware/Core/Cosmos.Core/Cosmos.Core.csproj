@@ -73,6 +73,10 @@
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="PCIBaseAddressBar.cs" />
+    <Compile Include="PCIDeviceNormal.cs" />
+    <Compile Include="PCIDeviceBridge.cs" />
+    <Compile Include="PCIDeviceCardbus.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="DeviceIDAttribute.cs" />
     <Compile Include="Global.cs" />
@@ -80,8 +84,7 @@
     <Compile Include="IOGroup\ATA.cs" />
     <Compile Include="IOGroup\Keyboard.cs" />
     <Compile Include="IOGroup\Mouse.cs" />
-    <Compile Include="IOGroup\PciBus.cs" />
-    <Compile Include="IOGroup\PciDevice.cs" />
+    <Compile Include="IOGroup\PCI.cs" />
     <Compile Include="IOGroup\PIC.cs" />
     <Compile Include="INTs.cs" />
     <Compile Include="IOGroup\IOGroup.cs" />
@@ -91,7 +94,8 @@
     <Compile Include="IOGroup\VGA.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
-    <Compile Include="PciBus.cs" />
+    <Compile Include="PCI.cs" />
+    <Compile Include="PCIDevice.cs" />
     <Compile Include="PIC.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -112,7 +116,7 @@
     <Content Include="IOPort.html" />
     <Content Include="INTs.html" />
     <Content Include="MemoryBlock.html" />
-    <Content Include="PciBus.html" />
+    <Content Include="PCI.html" />
     <Content Include="PIC.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

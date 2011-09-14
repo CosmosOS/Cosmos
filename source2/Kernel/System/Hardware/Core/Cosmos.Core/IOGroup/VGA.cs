@@ -35,7 +35,5 @@ namespace Cosmos.Core.IOGroup
         /// 32KB at 0xB8000
         /// </summary>
         public readonly MemoryBlock08 CGATextMemoryBlock = new MemoryBlock08(0xB8000, 1024 * 32);
-
-
     }
 }

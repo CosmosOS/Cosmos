@@ -17,11 +17,11 @@ namespace Cosmos.Core
         public readonly UInt16 Port;
 
         // all ctors are internal - Only Core ring can create it.. but hardware ring can use it.
-        internal IOPortBase(UInt16 aPort)
+        public IOPortBase(UInt16 aPort)
         {
             Port = aPort;
         }
-        internal IOPortBase(UInt16 aBase, UInt16 aOffset)
+        public IOPortBase(UInt16 aBase, UInt16 aOffset)
         {
             // C# math promotes things to integers, so we have this constructor
             // to relieve the use from having to do so many casts
@@ -67,8 +67,8 @@ namespace Cosmos.Core
 
     public class IOPort : IOPortBase
     {
-        internal IOPort(UInt16 aPort) : base(aPort) { }
-        internal IOPort(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
+        public IOPort(UInt16 aPort) : base(aPort) { }
+        public IOPort(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
 
         static public void Wait()
         {
@@ -105,8 +105,8 @@ namespace Cosmos.Core
     // than checking at runtime.
     public class IOPortRead : IOPortBase
     {
-        internal IOPortRead(UInt16 aPort) : base(aPort) { }
-        internal IOPortRead(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
+        public IOPortRead(UInt16 aPort) : base(aPort) { }
+        public IOPortRead(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
 
         public byte Byte
         {
@@ -126,8 +126,8 @@ namespace Cosmos.Core
 
     public class IOPortWrite : IOPortBase
     {
-        internal IOPortWrite(UInt16 aPort) : base(aPort) { }
-        internal IOPortWrite(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
+        public IOPortWrite(UInt16 aPort) : base(aPort) { }
+        public IOPortWrite(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
 
         public byte Byte
         {

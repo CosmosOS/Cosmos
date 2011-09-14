@@ -13,13 +13,15 @@ namespace Cosmos.Core
 
         public readonly MemoryBlock08 Bytes;
         public readonly MemoryBlock16 Words;
+        public readonly MemoryBlock32 DWords;
 
-        internal MemoryBlock(UInt32 aBase, UInt32 aSize)
+        public MemoryBlock(UInt32 aBase, UInt32 aSize)
         {
             Base = aBase;
             Size = aSize;
             Bytes = new MemoryBlock08(aBase, aSize * 4);
             Words = new MemoryBlock16(aBase, aSize * 2);
+            DWords = new MemoryBlock32(aBase, aSize);
         }
 
         //TODO: Fill all these methods with fast ASM
@@ -141,6 +143,39 @@ namespace Cosmos.Core
                     throw new Exception("Memory access violation");
                 }
                 (*(UInt16*)(Base + aOffset * 2)) = value;
+            }
+        }
+
+    }
+
+    public class MemoryBlock32
+    {
+        public readonly UInt32 Base;
+        public readonly UInt32 Size;
+
+        internal MemoryBlock32(UInt32 aBase, UInt32 aSize)
+        {
+            Base = aBase;
+            Size = aSize;
+        }
+
+        public unsafe UInt32 this[UInt32 aOffset]
+        {
+            get
+            {
+                if (aOffset >= Size)
+                {
+                    throw new Exception("Memory access violation");
+                }
+                return *(UInt32*)(Base + aOffset);
+            }
+            set
+            {
+                if (aOffset >= Size)
+                {
+                    throw new Exception("Memory access violation");
+                }
+                (*(UInt32*)(Base + aOffset)) = value;
             }
         }
 
