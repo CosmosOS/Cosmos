@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 DestinationReg = CPUx86.Registers.EAX,
                 DestinationIsIndirect = true
             };
-			Assembler.Stack.Push(ILOp.Align(4, 4), typeof(long));
+			Assembler.Stack.Push(ILOp.Align(4, 4), typeof(int));
         }
     }
 }

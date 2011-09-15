@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-			Assembler.Stack.Push(ILOp.Align(4, 4), typeof(ushort));
+			Assembler.Stack.Push(ILOp.Align(4, 4), typeof(int));
         }
     }
 }

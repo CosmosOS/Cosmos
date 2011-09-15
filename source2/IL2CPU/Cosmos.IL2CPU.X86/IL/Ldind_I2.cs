@@ -13,16 +13,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.DX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-            Assembler.Stack.Pop();
-#if DOTNETCOMPATIBLE
-            Assembler.Stack.Push(ILOp.Align(2, 4), typeof( short ) ) ;
-#else
-			Assembler.Stack.Push( 2, typeof( short ) );
-#endif
+			new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+			new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = 16, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+			new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+			Assembler.Stack.Pop();
+			Assembler.Stack.Push(ILOp.Align(2, 4), typeof(int));
         }
     }
 }

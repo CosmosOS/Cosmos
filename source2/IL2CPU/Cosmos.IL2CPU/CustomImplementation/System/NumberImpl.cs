@@ -19,13 +19,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
                 aInt *= -1;
             }
             var xResult = UInt32Impl2.GetNumberString((uint)aInt, xIsNegative);
-            if (xResult == null)
-            {
-                return UInt32Impl2.GetNumberString((uint)aInt, xIsNegative);
-            }
             return xResult;
-
-            //return "fix me in Cosmos.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatInt32";
         }
         public static string FormatDouble(double aInt, string aStr, NumberFormatInfo aFormat)
         {
