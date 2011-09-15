@@ -47,7 +47,7 @@ namespace Cosmos.Hardware.BlockDevice {
 
     protected void CheckBlockNo(UInt64 aBlockNo, UInt32 aBlockCount) {
       if (aBlockNo + aBlockCount >= mBlockCount) {
-        throw new Exception("Invalid block number.");
+        //throw new Exception("Invalid block number.");
       }
     }
   }
