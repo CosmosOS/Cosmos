@@ -205,5 +205,53 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
         {
             return Video_Memory[(uint)((y * ReadRegister(Register.Width)) + x)];
         }
+
+
+        public void Clear(uint color)
+        {
+            Fill(0, 0, 800, 600, color);
+        }
+
+        public void Fill(ushort x, ushort y, ushort width, ushort height, uint color)
+        {
+            WriteToFifo((uint)FIFOCommand.RECT_FILL);
+            WriteToFifo(color);
+            WriteToFifo(x);
+            WriteToFifo(y);
+            WriteToFifo(width);
+            WriteToFifo(height);
+            WaitForFifo();
+        }
+
+        public void DefineCursor()
+        {
+            WaitForFifo();
+            WriteToFifo((uint)FIFOCommand.DEFINE_CURSOR);
+            WriteToFifo(1);
+            WriteToFifo(0);
+            WriteToFifo(0);
+            WriteToFifo(2);
+            WriteToFifo(2);
+            WriteToFifo(1);
+            WriteToFifo(1);
+            for (int i = 0; i < 4; i++)
+                WriteToFifo(0);
+            for (int i = 0; i < 4; i++)
+                WriteToFifo(0xFFFFFF);
+            WaitForFifo();
+        }
+
+        public void SetCursor(bool visible, uint x, uint y)
+        {
+            WriteRegister(Register.CursorID, 1);
+            if (visible)
+            {
+                WaitForFifo();
+                WriteToFifo((uint)FIFOCommand.MOVE_CURSOR);
+                WriteToFifo(x);
+                WriteToFifo(y);
+            }
+            WriteRegister(Register.CursorOn, (uint)(visible ? 1 : 0));
+        }
     }
 }
