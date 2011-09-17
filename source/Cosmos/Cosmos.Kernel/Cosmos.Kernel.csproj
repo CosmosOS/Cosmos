@@ -72,8 +72,6 @@
   <ItemGroup>
     <Compile Include="Heap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="AddressSpace.cs" />
     <Compile Include="IOAddressSpace.cs" />
     <Compile Include="MemoryAddressSpace.cs" />
@@ -91,15 +89,5 @@
   <ItemGroup>
     <None Include="Cosmos.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="NewFolder1\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
