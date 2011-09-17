@@ -3,13 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B75AE496-E7AC-4EC4-9904-43D6B84D9705}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{59E2210F-3F41-42DF-8B26-9CAE87273562}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestKernel</RootNamespace>
-    <AssemblyName>TestKernel</AssemblyName>
+    <RootNamespace>RawILTests</RootNamespace>
+    <AssemblyName>RawILTests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -44,36 +45,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>StructTest.Program</StartupObject>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Kernel.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="TestDriver.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
-      <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
-      <Name>Cosmos.System</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.Hardware</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CsTests\CsTests.csproj">
-      <Project>{7CEE0541-0107-47F3-B422-70C55E81CE42}</Project>
-      <Name>CsTests</Name>
-    </ProjectReference>
+    <Compile Include="iltests.il" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -97,12 +70,8 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <None Include="MSIL.targets" />
+  </ItemGroup>
+  <Import Project="MSIL.targets" />
 </Project>
