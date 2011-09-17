@@ -117,6 +117,7 @@
     <Compile Include="CustomImplementation\System\RuntimeTypeHandle.cs" />
     <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
     <Compile Include="CustomImplementation\System\Runtime\InteropServices\SafeHandleImpl.cs" />
+    <Compile Include="CustomImplementation\System\SByteImpl.cs" />
     <Compile Include="CustomImplementation\System\Security\Cryptography\Utils.cs" />
     <Compile Include="CustomImplementation\System\SingleImpl.cs" />
     <Compile Include="CustomImplementation\System\SRImpl.cs" />

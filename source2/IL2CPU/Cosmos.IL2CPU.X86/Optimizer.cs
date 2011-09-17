@@ -18,10 +18,15 @@ namespace Orvid
             SortedDictionary<string, Instruction> labels = new SortedDictionary<string, Instruction>();
             List<Instruction> comments = new List<Instruction>();
             List<String> usedLabels = new List<string>();
+            usedLabels.Add("KernelStart");
             foreach (Instruction ins in instr)
             {
                 if (ins is Label)
                 {
+                    if (((Label)ins).IsGlobal)
+                    {
+                        usedLabels.Add(((Label)ins).QualifiedName);
+                    }
                     labels.Add(((Label)ins).QualifiedName, ins);
                 }
                 else if (ins is x86.JumpToSegment)

@@ -103,7 +103,7 @@ namespace Cosmos.IL2CPU.X86 {
 
       if (ShouldOptimize)
       {
-          //Orvid.Optimizer.Optimize(Assembler);
+          Orvid.Optimizer.Optimize(Assembler);
       }
     }
 

@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="DictionaryImpl.cs" />
     <Compile Include="IO\FileStreamImpl.cs" />
+    <Compile Include="RandomImpl.cs" />
     <Compile Include="Text\DecoderFallbackImpl.cs" />
     <Compile Include="Text\EncoderFallbackImpl.cs" />
     <Compile Include="Text\ASCIIEncodingImpl.cs" />
