@@ -115,7 +115,7 @@ namespace Cosmos.Core
             InterruptLine = ReadRegister8(0x3C);
             InterruptPIN = (PCIInterruptPIN)ReadRegister8(0x3D);
 
-            DeviceExists = (uint)VendorID != 0xFFFFFFFF && (uint)DeviceID != 0xFFFFFFFF;
+            DeviceExists = (uint)VendorID != 0xFFFF && (uint)DeviceID != 0xFFFF;
         }
 
         protected UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
