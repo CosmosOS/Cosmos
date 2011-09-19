@@ -21,13 +21,21 @@ namespace PlugViewer
 
         private void AddAssemblyToView(Assembly a)
         {
-            TreeNode nd = new AssemblyTreeNode(a);
-            treeView1.Nodes.Add(nd);
-            foreach (Module md in a.GetModules())
+            if (a != null)
             {
-                LoadModule(nd, md);
+                PlugTemplateDumper.Dump(a);
+                try
+                {
+                    TreeNode nd = new AssemblyTreeNode(a);
+                    treeView1.Nodes.Add(nd);
+                    foreach (Module md in a.GetModules())
+                    {
+                        LoadModule(nd, md);
+                    }
+                    treeView1.Sort();
+                }
+                catch {}
             }
-            treeView1.Sort();
         }
 
         #region LoadModule
