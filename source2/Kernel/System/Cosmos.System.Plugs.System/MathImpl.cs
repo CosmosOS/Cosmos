@@ -305,6 +305,13 @@ namespace Cosmos.System.Plugs.System
         }
         #endregion
 
+        #region Round
+        public static double Round(double d)
+        {
+			return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
+        }
+        #endregion
+
         #region Sin
         public static double Sin(double x)
         {
