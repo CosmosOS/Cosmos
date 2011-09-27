@@ -30,7 +30,7 @@ namespace Cosmos.System.Plugs.System
         private const double atan_q0 = .89678597403663861962481162e3F;
         #endregion
 
-        public const double PI = 3.1415926535897931;
+        public const double PI = 3.1415926535897932384626433832795;
         public const double E = 2.71828182845904523536;
 
         #region Abs
@@ -95,15 +95,35 @@ namespace Cosmos.System.Plugs.System
         #endregion
 
         #region Atan2
-        public static double Atan2(double y, double x)
+        public static double Atan2(double x, double y)
         {
-            return (((x + y) == x) ? (((x == 0F) & (y == 0F)) ? 0F : ((x >= 0F) ? pio2 : (-pio2))) : ((y < 0F) ? ((x >= 0F) ? ((pio2 * 2) - atans((-x) / y)) : (((-pio2) * 2) + atans(x / y))) : ((x > 0F) ? atans(x / y) : -atans((-x) / y))));
+            if ((x + y) == x)
+            {
+                if ((x == 0F) & (y == 0F))
+                    return 0F;
+                if (x >= 0.0F)
+                    return pio2;
+                return (-pio2);
+            }
+            if (y < 0.0F)
+            {
+                if (x >= 0.0F)
+                    return ((pio2 * 2) - atans((-x) / y));
+                return (((-pio2) * 2) + atans(x / y));
+            }
+            if (x > 0.0F)
+            {
+                return (atans(x / y));
+            }
+            return (-atans((-x) / y));
+
+            //return (((x + y) == x) ? (((x == 0F) & (y == 0F)) ? 0F : ((x >= 0F) ? pio2 : (-pio2))) : ((y < 0F) ? ((x >= 0F) ? ((pio2 * 2) - atans((-x) / y)) : (((-pio2) * 2) + atans(x / y))) : ((x > 0F) ? atans(x / y) : -atans((-x) / y))));
         }
         #endregion
 
         #region Ceiling
         public static double Ceiling(double a)
-        { 
+        {
             // should be using assembler for bigger values than int or long max
             if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
                 return a;
@@ -115,6 +135,12 @@ namespace Cosmos.System.Plugs.System
         #region Cos
         public static double Cos(double x)
         {
+            // First we need to anchor it to a valid range.
+            while (x > (2 * PI))
+            {
+                x -= (2 * PI);
+            }
+
             if (x < 0)
                 x = -x;
             byte quadrand = 0;
@@ -126,24 +152,33 @@ namespace Cosmos.System.Plugs.System
             if ((x > (PI)) && (x < ((3F * PI) / 2)))
             {
                 quadrand = 2;
-                x = PI - x;
+                x = x - PI;
             }
             if ((x > ((3F * PI) / 2)))
             {
                 quadrand = 3;
                 x = (2F * PI) - x;
             }
-            const double c1 = 0.99999999999925182;
-            const double c2 = -0.49999999997024012;
-            const double c3 = 0.041666666473384543;
-            const double c4 = -0.001388888418000423;
-            const double c5 = 0.0000248010406484558;
-            const double c6 = -0.0000002752469638432;
-            const double c7 = 0.0000000019907856854;
-            double x2 = x * x; ;
-            return (((quadrand == 0) || (quadrand == 3)) ? (c1 + x2 * (c2 + x2 * (c3 + x2 * (c4 + x2 * (c5 + x2 * (c6 + c7 * x2)))))) : (-(c1 + x2 * (c2 + x2 * (c3 + x2 * (c4 + x2 * (c5 + x2 * (c6 + c7 * x2))))))));
-            //Cos(x) = Sin(90degrees - radians)
-            //return Sin((Math.PI / 2) - a);
+            const double c1 = 0.9999999999999999999999914771;
+            const double c2 = -0.4999999999999999999991637437;
+            const double c3 = 0.04166666666666666665319411988;
+            const double c4 = -0.00138888888888888880310186415;
+            const double c5 = 0.00002480158730158702330045157;
+            const double c6 = -0.000000275573192239332256421489;
+            const double c7 = 0.000000002087675698165412591559;
+            const double c8 = -0.0000000000114707451267755432394;
+            const double c9 = 0.0000000000000477945439406649917;
+            const double c10 = -0.00000000000000015612263428827781;
+            const double c11 = 0.00000000000000000039912654507924;
+            double x2 = x * x;
+            if (quadrand == 0 || quadrand == 3)
+            {
+                return (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
+            }
+            else
+            {
+                return -(c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
+            }
         }
         #endregion
 
@@ -195,7 +230,7 @@ namespace Cosmos.System.Plugs.System
 
         #region Floor
         public static double Floor(double a)
-        { 
+        {
             // should be using assembler for bigger values than int or long max
             if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
                 return a;
@@ -262,7 +297,7 @@ namespace Cosmos.System.Plugs.System
             return Log(x, 10F);
         }
         #endregion
-        
+
         #region Pow
         public static double Pow(double x, double y)
         {
@@ -308,52 +343,20 @@ namespace Cosmos.System.Plugs.System
         #region Round
         public static double Round(double d)
         {
-			return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
+            return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
         }
         #endregion
 
         #region Sin
         public static double Sin(double x)
         {
+            // First we need to anchor it to a valid range.
+            while (x > (2 * PI))
+            {
+                x -= (2 * PI);
+            }
+
             return Cos((PI / 2.0F) - x);
-            
-            //// should be using assembler instruction
-            //bool signSwitch = false;
-            //double result = 0;
-
-            ////TO radians
-            //double radians = a;// *(Math.PI / 180);
-
-            //if (radians > Math.PI)
-            //{
-            //    radians = radians - Math.PI;
-            //    signSwitch = true;
-            //}
-            //else if (a > Math.PI / 2)
-            //{
-            //    radians = radians - Math.PI;
-            //    signSwitch = true;
-            //}
-
-            ////Temp function to increase precision make more factorial calculations
-            //result = (radians) - (Math.Pow(radians, 3) / Factorial(3));
-            //result += (Math.Pow(radians, 5) / Factorial(5)) - (Math.Pow(radians, 7) / Factorial(7)) + (Math.Pow(radians, 9) / Factorial(9));
-
-            ///* USE WHEN Modulus Works
-            // * int sign = 0;
-            //for (int i = 3; i < 19; i += 2)
-            //{
-            //    if (sign % 2 == 0)
-            //        result += -Math.Pow(radians, i) / fact(i);
-            //    else
-            //        result += Math.Pow(radiansa, i) / fact(i);
-            //    sign++;
-            //}*/
-
-            //if (signSwitch)
-            //    return result * -1;
-            //else
-            //    return result;
         }
         #endregion
 
@@ -409,7 +412,68 @@ namespace Cosmos.System.Plugs.System
         #region Tan
         public static double Tan(double x)
         {
-            return (Sin(x) / Cos(x));
+            // First we need to anchor it to a valid range.
+            while (x > (2 * PI))
+            {
+                x -= (2 * PI);
+            }
+
+            byte octant = (byte)Floor(x * (1 / (PI / 4)));
+            switch (octant)
+            {
+                case 0:
+                    x = x * (4 / PI);
+                    break;
+                case 1:
+                    x = ((PI / 2) - x) * (4 / PI);
+                    break;
+                case 2:
+                    x = (x - (PI / 2)) * (4 / PI);
+                    break;
+                case 3:
+                    x = (PI - x) * (4 / PI);
+                    break;
+                case 4:
+                    x = (x - PI) * (4 / PI);
+                    break;
+                case 5:
+                    x = ((3.5 * PI) - x) * (4 / PI);
+                    break;
+                case 6:
+                    x = (x - (3.5 * PI)) * (4 / PI);
+                    break;
+                case 7:
+                    x = ((2 * PI) - x) * (4 / PI);
+                    break;
+            }
+
+
+            const double c1 =  4130240.588996024013440146267;
+            const double c2 =-  349781.8562517381616631012487;
+            const double c3 =     6170.317758142494245331944348;
+            const double c4 =-      27.94920941380194872760036319;
+            const double c5 =        0.0175143807040383602666563058;
+            const double c6 =  5258785.647179987798541780825;
+            const double c7 =- 1526650.549072940686776259893;
+            const double c8 =    54962.51616062905361152230566;
+            const double c9 =-     497.495460280917265024506937;
+            double x2 = x * x;
+            if (octant == 0 || octant == 4)
+            {
+                return ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
+            }
+            else if (octant == 1 || octant == 5)
+            {
+                return (1 / ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2)))))))));
+            }
+            else if (octant == 2 || octant == 6)
+            {
+                return (-1 / ((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2)))))))));
+            }
+            else // octant == 3 || octant == 7
+            {
+                return -((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
+            }
         }
         #endregion
 
@@ -427,15 +491,15 @@ namespace Cosmos.System.Plugs.System
         }
         #endregion
 
-        //#region Factorial (only used in Sin(), not plug )
-        //public static int Factorial(int n)
-        //{
-        //    if (n == 0)
-        //        return 1;
-        //    else
-        //        return n * Factorial(n - 1);
-        //}
-        //#endregion
+        #region Factorial (only used in Sin(), not plug )
+        public static int Factorial(int n)
+        {
+            if (n == 0)
+                return 1;
+            else
+                return n * Factorial(n - 1);
+        }
+        #endregion
 
         #region Internaly used functions
 
@@ -474,15 +538,46 @@ namespace Cosmos.System.Plugs.System
         #region atans
         private static double atans(double x)
         {
-            return ((x < sq2m1) ? atanx(x) : ((x > sq2p1) ? (pio2 - atanx(1.0F / x)) : (pio4 + atanx((x - 1.0F) / (x + 1.0F)))));
+            if (x < sq2m1)
+            {
+                return atanx(x);
+            }
+            else if (x > sq2p1)
+            {
+                return (pio2 - atanx(1.0F / x));
+            }
+            else
+            {
+                return (pio4 + atanx((x - 1.0F) / (x + 1.0F)));
+            }
         }
         #endregion
 
         #region atanx
         private static double atanx(double x)
         {
-            double ArgSquared = x * x;
-            return (((((atan_p4 * ArgSquared + atan_p3) * ArgSquared + atan_p2) * ArgSquared + atan_p1) * ArgSquared + atan_p0) / (((((ArgSquared + atan_q4) * ArgSquared + atan_q3) * ArgSquared + atan_q2) * ArgSquared + atan_q1) * ArgSquared + atan_q0) * x);
+            double argsq, value;
+
+            /* get denormalized add in following if range arg**10 is much smaller
+                than q1, so check for that case
+            */
+            if (-.01 < x && x < .01)
+                value = atan_p0 / atan_q0;
+            else
+            {
+                argsq = x * x;
+                value = ((((atan_p4 * argsq + atan_p3) * argsq + atan_p2) * argsq + atan_p1) * argsq + atan_p0);
+                value = value / (((((argsq + atan_q4) * argsq + atan_q3) * argsq + atan_q2) * argsq + atan_q1) * argsq + atan_q0);
+            }
+            return value * x;
+
+            //if (-.01 < arg && arg < .01)
+            //    value = p0 / q0;
+            //double ArgSquared = x * x;
+            //return
+            //    (((((atan_p4 * ArgSquared + atan_p3) * ArgSquared + atan_p2) * ArgSquared + atan_p1) * ArgSquared + atan_p0)
+            //    /
+            //    (((((ArgSquared + atan_q4) * ArgSquared + atan_q3) * ArgSquared + atan_q2) * ArgSquared + atan_q1) * ArgSquared + atan_q0) * x);
         }
         #endregion
 
