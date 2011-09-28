@@ -19,14 +19,14 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             case 1:
             case 2:
+				throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
             case 4:
                 {
                     if (xSource.IsFloat)
                     {
                         new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 32, DestinationIsIndirect = true };
-                        new CPUx86.x87.FloatABS();
-                        new CPUx86.x87.FloatRound();
-                        new CPUx86.x87.FloatStore { DestinationReg = Registers.ESP, Size = 32, DestinationIsIndirect = true };
+						new CPUx86.Sub { DestinationReg = Registers.ESP, SourceValue = 4 };
+						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
                     }
                     else
                     {
@@ -42,8 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
                         new CPUx86.x87.FloatABS();
-                        new CPUx86.x87.FloatRound();
-                        new CPUx86.x87.FloatStore { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+						new CPUx86.x87.IntStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
                     }
                     break;
                 }
@@ -51,7 +50,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                 throw new NotImplementedException();
 			}
-			Assembler.Stack.Push(8, typeof(UInt64));
+			Assembler.Stack.Push(Align(8, 4), typeof(Int64));
 		}
 	}
 }

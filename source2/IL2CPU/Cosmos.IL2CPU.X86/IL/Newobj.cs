@@ -98,7 +98,7 @@ namespace Cosmos.IL2CPU.X86.IL {
           aAssembler.Stack.Pop();
         }
 
-        // array length +8
+        // array length + 8
 
         bool xHasCalcSize = false;
         // try calculating size:
@@ -115,11 +115,15 @@ namespace Cosmos.IL2CPU.X86.IL {
                 && xParams[1].ParameterType == typeof(int)
                 && xParams[2].ParameterType == typeof(int)) {
             xHasCalcSize = true;
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+			new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+			new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1};
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
           }
+			else
+				throw new NotImplementedException("In NewObj is a string ctor implementation missing!");
         }
         uint xMemSize = GetStorageSize(objectType);
-        int xExtraSize = 20;
+        int xExtraSize = 12; // additional size for set values after alloc
         new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
         if (xHasCalcSize) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

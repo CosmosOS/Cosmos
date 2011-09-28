@@ -142,13 +142,8 @@ namespace Cosmos.IL2CPU.X86.IL {
         return;
 	  }
 
-#if DOTNETCOMPATIBLE
       Assembler.Stack.Push(ILOp.Align(SizeOfType(xMethodInfo.ReturnType), 4),
                               xMethodInfo.ReturnType);
-#else
-	  Assembler.Stack.Push(SizeOfType(xMethodInfo.ReturnType),
-                              xMethodInfo.ReturnType);
-#endif
     }
   }
 }

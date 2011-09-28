@@ -28,25 +28,22 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 case 1:
                 case 2:
-                    break;
-                case 4:
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+					throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
+				case 4:
+					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
                 case 8:
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-                    new CPUx86.SignExtendAX { Size = 16 };
+					new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
                 default:
                     throw new NotImplementedException( "SourceSize " + xSource + " not supported!" );
             }
-#if DOTNETCOMPATIBLE
-			Assembler.Stack.Push(4, typeof(Int16));
-#else
-			Assembler.Stack.Push(2, typeof(Int16));
-#endif
+			Assembler.Stack.Push(4, typeof(Int32));
         }
     }
 }

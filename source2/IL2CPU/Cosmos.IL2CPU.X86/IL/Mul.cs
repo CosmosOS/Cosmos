@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
 					//mov RIGHT_HIGH to eax, is useable on Full 64 multiply
 					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
-					new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
+					new CPUx86.Or { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = Simple32Multiply };
 					// Full 64 Multiply
 					

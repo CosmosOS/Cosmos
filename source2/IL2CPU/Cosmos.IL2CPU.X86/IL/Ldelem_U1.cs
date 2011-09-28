@@ -12,34 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Ldelem_Ref.Assemble( Assembler, 1 );
+            Ldelem_Ref.Assemble( Assembler, 1, false);
         }
-
-
-        // using System;
-        // using System.Collections.Generic;
-        // using System.IO;
-        // using CPU = Cosmos.Compiler.Assembler.X86;
-        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
-        // 
-        // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldelem_U1)]
-        // 	public class Ldelem_U1: Op {
-        // 
-        //         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
-        //         //{
-        //         //    Engine.RegisterType(typeof(byte));
-        //         //}
-        // 
-        //         public Ldelem_U1(ILReader aReader, MethodInformation aMethodInfo)
-        // 			: base(aReader, aMethodInfo) {
-        // 		}
-        // 		
-        // 		public override void DoAssemble() {
-        // 			Ldelem_Ref.Assemble(Assembler, 1);
-        // 		}
-        // 	}
-        // }
-
     }
 }

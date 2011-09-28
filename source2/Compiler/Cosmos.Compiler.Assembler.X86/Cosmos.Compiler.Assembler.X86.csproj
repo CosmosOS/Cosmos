@@ -77,6 +77,8 @@
     <Compile Include="SignExtendAX.cs" />
     <Compile Include="CmpXchg.cs" />
     <Compile Include="CpuId.cs" />
+    <Compile Include="SSE2\ConvertTruncateSS2SI.cs" />
+    <Compile Include="SSE2\ConvertTruncateSD2SI.cs" />
     <Compile Include="x87\FloatNegate.cs" />
     <Compile Include="XchgAndAdd.cs" />
     <Compile Include="Add.cs" />

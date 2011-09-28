@@ -11,8 +11,14 @@ namespace Cosmos.IL2CPU.X86.IL
             : base( aAsmblr )
         {
         }
-        public static void Assemble( Assembler aAssembler, uint aElementSize )
+        public static void Assemble( Assembler aAssembler, uint aElementSize,bool isSigned )
         {
+			if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
+				throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
+
+			aAssembler.Stack.Pop();
+			aAssembler.Stack.Pop();
+
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
@@ -22,55 +28,41 @@ namespace Cosmos.IL2CPU.X86.IL
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
-            uint xSizeLeft = aElementSize;
-            while( xSizeLeft > 0 )
-            {
-                if( xSizeLeft >= 4 )
-                {
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
-                    xSizeLeft -= 4;
-                }
-                else
-                {
-                    if( xSizeLeft >= 2 )
-                    {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.CX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 2 };
-                        xSizeLeft -= 2;
-                    }
-                    else
-                    {
-                        if( xSizeLeft >= 1 )
-                        {
-                            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
-                            new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
-                            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
-                            xSizeLeft -= 1;
-                        }
-                        else
-                        {
-                            throw new Exception( "Size left: " + xSizeLeft );
-                        }
-                    }
-                }
-            }
-            aAssembler.Stack.Pop();
-            aAssembler.Stack.Pop();
-#if DOTNETCOMPATIBLE
-            aAssembler.Stack.Push(ILOp.Align(aElementSize, 4), typeof(uint)); //TODO typeof type if aElementsize is other then 4
-#else
-			aAssembler.Stack.Push(aElementSize, typeof(uint));
-#endif
+
+			switch (aElementSize)
+			{
+				case 1:
+					if (isSigned)
+						new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.ECX, Size = 8, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true };
+					else
+						new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.ECX, Size = 8, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true };
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
+					break;
+				case 2:
+					if (isSigned)
+						new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.ECX, Size = 16, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true };
+					else
+						new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.ECX, Size = 16, SourceReg = CPUx86.Registers.EDX, SourceIsIndirect = true };
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
+					break;
+				case 4:
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationIsIndirect = true };
+					break;
+				case 8:
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationIsIndirect = true };
+					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true };
+					break;
+			}
+            
+			if (aElementSize <= 4)
+				aAssembler.Stack.Push(Align(aElementSize, 4), isSigned ? typeof(int) : typeof(uint));
+			else
+				aAssembler.Stack.Push(Align(aElementSize, 4), isSigned ? typeof(long) : typeof(ulong));
         }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Assemble( Assembler, 4 );
+            Assemble( Assembler, 4, false);
         }
     }
 }

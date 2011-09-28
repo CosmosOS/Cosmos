@@ -152,32 +152,50 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else if (mDebugInfo.Type == typeof(char[]).AssemblyQualifiedName)
                 {
-                    StringBuilder b = new StringBuilder();
                     xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
 
                     const uint OFFSET_LENGTH = 8;
                     const uint OFFSET_FROM_LENGTH_TO_DATA = 8;
                     uint pointer = BitConverter.ToUInt32(xData, 0);
-                    pointer += OFFSET_LENGTH;
-                    xData = mProcess.mDbgConnector.GetMemoryData(pointer, 4);
-                    int size = BitConverter.ToInt32(xData, 0);
+					if (pointer == 0)
+					{
+						propertyInfo.bstrValue = "(null)";
+					}
+					else
+					{
+						StringBuilder b = new StringBuilder();
 
-                    b.Append("Count: ");
-                    b.Append(size);
-                    b.Append("; ");
+						b.Append(String.Format("(Address 0x{0});", pointer.ToString("X").ToUpper()));
 
-                    for (int i = 0; i < size; i++)
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData((uint)(pointer + OFFSET_FROM_LENGTH_TO_DATA + i * sizeof(char)), 2);
-                        char c = BitConverter.ToChar(xData, 0);
+						pointer += OFFSET_LENGTH;
+						xData = mProcess.mDbgConnector.GetMemoryData(pointer, 4);
+						int size = BitConverter.ToInt32(xData, 0);
 
-                        b.Append('\'');
-                        b.Append(c);
-                        b.Append('\'');
-                        if (i - 1 < size)
-                            b.Append(' ');
-                    }
-                    propertyInfo.bstrValue = b.ToString();
+						b.Append("Count: ");
+						b.Append(size);
+						b.Append("; ");
+
+						for (int i = 0; i < size; i++)
+						{
+							xData = mProcess.mDbgConnector.GetMemoryData((uint)(pointer + OFFSET_FROM_LENGTH_TO_DATA + i * sizeof(char)), 2);
+							char c = BitConverter.ToChar(xData, 0);
+
+
+							b.Append('\'');
+							if (c == '\0')
+							{
+								b.Append("\\0");
+							}
+							else
+							{
+								b.Append(c);
+							}
+							b.Append('\'');
+							if (i - 1 < size)
+								b.Append(' ');
+						}
+						propertyInfo.bstrValue = b.ToString();
+					}
                 }
                 #endregion
 

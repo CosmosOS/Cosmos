@@ -29,30 +29,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
 					throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
-                case 4:
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.SignExtendAX { Size = 8 };
-                    new CPUx86.SignExtendAX { Size = 16 };
+				case 4:
+					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-
-                    break;
+					break;
                 case 8:
-                    Assembler.Stack.Pop();
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-                    new CPUx86.SignExtendAX { Size = 8 };
-                    new CPUx86.SignExtendAX { Size = 16 };
+					new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException(); 
             }
-#if DOTNETCOMPATIBLE
-            Assembler.Stack.Push(4, typeof(sbyte));
-#else
-			Assembler.Stack.Push(1, typeof(sbyte));
-#endif
+            Assembler.Stack.Push(4, typeof(int));
         }
     }
 }

@@ -15,6 +15,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var stackTop = Assembler.Stack.Pop();
+			var stackTop2 = Assembler.Stack.Peek();
+			if (stackTop.Size != stackTop2.Size)
+				throw new Exception("Different size for substract: " + aMethod.MethodBase + "!");
 
             switch( stackTop.Size )
             {
@@ -57,6 +60,5 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new NotImplementedException( "not implemented" );
             }
         }
-
     }
 }

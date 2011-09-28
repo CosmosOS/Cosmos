@@ -21,6 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 case 1:
                 case 2:
+					throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
                 case 4:
 					if (xSource.IsFloat)
 					{
