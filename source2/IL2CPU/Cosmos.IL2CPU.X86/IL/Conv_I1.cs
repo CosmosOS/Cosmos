@@ -3,46 +3,59 @@ using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	/// <summary>
-	/// Convert top Stack element to sbyte and extends it to Int32.
-	/// </summary>
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_I1 )]
+    /// <summary>
+    /// Convert top Stack element to sbyte and extends it to Int32.
+    /// </summary>
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_I1)]
     public class Conv_I1 : ILOp
     {
-        public Conv_I1( Cosmos.Compiler.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Conv_I1(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-			var xSource = Assembler.Stack.Pop();
+            var xSource = Assembler.Stack.Pop();
             if (xSource.IsFloat)
             {
-                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-                new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                if (xSource.Size == 4)
+                {
+                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
+                    new CPUx86.SSE.ConvertSS2SIAndTruncate { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                }
+                else if (xSource.Size == 8)
+                {
+                    new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
+                    new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                }
+                else
+                {
+                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->Unknown size of floating point value.");
+                }
             }
 
-            switch( xSource.Size )
+            switch (xSource.Size)
             {
                 case 1:
                 case 2:
-					throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
-				case 4:
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL };
+                    throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
+                case 4:
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL, Size = 8 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					break;
+                    break;
                 case 8:
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-					new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL };
+                    new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL, Size = 8 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                    throw new NotImplementedException(); 
+                    throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->Unknown size of variable on the top of the stack.");
             }
             Assembler.Stack.Push(4, typeof(int));
         }
