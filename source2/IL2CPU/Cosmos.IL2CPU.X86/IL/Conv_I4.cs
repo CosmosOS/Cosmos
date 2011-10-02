@@ -5,7 +5,8 @@ namespace Cosmos.IL2CPU.X86.IL
 {
 	/// <summary>
 	/// Convert top Stack element to Int32.
-	/// </summary>
+    /// </summary>
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_I)] // x86 is a 32-bit system, so this is the op-code that we should be using, for an x64 target, use Conv_I8 instead.
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_I4 )]
     public class Conv_I4 : ILOp
     {

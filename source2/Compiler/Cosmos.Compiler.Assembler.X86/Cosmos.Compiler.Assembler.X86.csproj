@@ -79,6 +79,7 @@
     <Compile Include="CpuId.cs" />
     <Compile Include="SSE2\ConvertTruncateSS2SI.cs" />
     <Compile Include="SSE2\ConvertTruncateSD2SI.cs" />
+    <Compile Include="SSE2\ConvertSD2SS.cs" />
     <Compile Include="x87\FloatNegate.cs" />
     <Compile Include="XchgAndAdd.cs" />
     <Compile Include="Add.cs" />
