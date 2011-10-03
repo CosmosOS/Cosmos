@@ -137,11 +137,32 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDebugDownPipe.SendCommand(DwMsg.Frame, aData);
     }
 
+      protected void DbgCmdPong(byte[] aData)
+      {
+          mDebugDownPipe.SendCommand(DwMsg.Pong, aData);
+      }
+
     protected void DbgCmdStack(byte[] aData) {
       mDebugDownPipe.SendCommand(DwMsg.Stack, aData);
     }
 
-    void mDebugUpPipe_DataPacketReceived(byte arg1, byte[] arg2) {
+    void mDebugUpPipe_DataPacketReceived(byte cmd, byte[] data)
+    {
+        switch (cmd)
+        {
+            case DwCmd.Noop:
+                // do nothing?
+                break;
+
+            case DwCmd.Ping:
+                mDbgConnector.Ping();
+                break;
+
+            default:
+                throw new Exception(
+                    String.Format(
+                        "Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived!", cmd));
+        }
     }
 
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
@@ -233,6 +254,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
       mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
       mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
+        mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
 
       System.Threading.Thread.Sleep(250);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
