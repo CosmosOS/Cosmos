@@ -195,31 +195,31 @@ namespace Cosmos.Core
         {
             public static string GetString(PCIDevice device)
             {
-                switch (ToHex(device.VendorID, 32))
+                switch (ToHex(device.VendorID, 16))
                 {
                     case "0x1022"://AMD
-                        switch (ToHex(device.DeviceID, 32))
+                        switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x2000":
                                 return "AMD PCnet LANCE PCI Ethernet Controller";
                         }
                         break;
                     case "0x104B"://Sony
-                        switch (ToHex(device.DeviceID, 32))
+                        switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x1040":
                                 return "Mylex BT958 SCSI Host Adaptor";
                         }
                         break;
                     case "0x1274"://Ensoniq
-                        switch (ToHex(device.DeviceID, 32))
+                        switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x1371":
                                 return "Ensoniq AudioPCI";
                         }
                         break;
                     case "0x15AD"://VMware
-                        switch (ToHex(device.DeviceID, 32))
+                        switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x0405":
                                 return "VMware NVIDIA 9500MGS";
@@ -232,7 +232,7 @@ namespace Cosmos.Core
                         }
                         break;
                     case "0x8086"://Intel
-                        switch (ToHex(device.DeviceID, 32))
+                        switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x7190":
                                 return "Intel 440BX/ZX AGPset Host Bridge";
