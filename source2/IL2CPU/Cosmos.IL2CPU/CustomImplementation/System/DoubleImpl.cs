@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
         {
             if (aThis == 0.0)
             {
-                return "0.0";
+                return "0";
             }
 
             double val = aThis;
@@ -55,12 +55,11 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
             }
             result += ((UInt64)intPart).ToString();
             int used_digits = ((UInt64)intPart).ToString().Length;
-            result += ".";
             if (fracPart == 0)
             {
-                result += "0";
                 return result;
             }
+			result += ".";
 
             if (used_digits >= 15)
             {

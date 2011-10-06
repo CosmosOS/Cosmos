@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
         {
             if (aThis == 0.0f)
             {
-                return "0.0";
+                return "0";
             }
 
             byte[] singleBytes = BitConverter.GetBytes(aThis);
@@ -52,12 +52,11 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             }
             result += ((UInt32)intPart).ToString();
             int used_digits = ((UInt32)intPart).ToString().Length;
-            result += ".";
             if (fracPart == 0)
             {
-                result += "0";
                 return result;
             }
+			result += ".";
 
             if (used_digits >= 7)
             {
