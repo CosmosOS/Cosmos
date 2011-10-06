@@ -226,34 +226,6 @@ namespace Cosmos.Core.Plugs {
                 return -1;
         }
 
-        public static string PadLeft(string aThis, int totalWidth) {
-            return PadLeft(aThis, totalWidth, ' ');
-        }
-
-        public static string PadLeft(string aThis, int totalWidth, char paddingChar) {
-            if (aThis.Length >= totalWidth)
-                return aThis;
-
-            for (int i = 0; i < totalWidth - aThis.Length; i++)
-                aThis = paddingChar.ToString() + aThis;
-
-            return aThis;
-        }
-
-        public static string PadRight(string aThis, int totalWidth) {
-            return PadRight(aThis, totalWidth, ' ');
-        }
-
-        public static string PadRight(string aThis, int totalWidth, char paddingChar) {
-            if (aThis.Length >= totalWidth)
-                return aThis;
-
-            for (int i = 0; i < totalWidth - aThis.Length; i++)
-                aThis += paddingChar.ToString();
-
-            return aThis;
-        }
-
         public static string Replace(string aThis, char oldChar, char newChar) {
             string nString = "";
             for (int i = 0; i < aThis.Length; i++) {
