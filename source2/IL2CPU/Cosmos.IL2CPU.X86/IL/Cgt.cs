@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			if( xStackItem.Size > 8 )
 			{
 				//EmitNotImplementedException( Assembler, GetServiceProvider(), "Cgt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel );
-				throw new NotImplementedException("StackSizes>8 not supported");
+				throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Cgt.cs->Error: StackSizes > 8 not supported");
 				//return;
 			}
 			Assembler.Stack.Push( new StackContents.Item( 4, typeof( bool ) ) );

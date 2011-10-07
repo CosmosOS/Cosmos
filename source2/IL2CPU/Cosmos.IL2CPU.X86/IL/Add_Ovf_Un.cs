@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xSize.Size > 8)
             {
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
-                throw new NotImplementedException("StackSize>8 not supported");
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Add_Ovf_Un.cs->Error: StackSize > 8 not supported");
             }
             else
             {

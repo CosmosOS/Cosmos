@@ -18,11 +18,15 @@ namespace Cosmos.IL2CPU.X86.IL {
 
       var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
 
-      if (xSize > 8) {
-        throw new Exception("StackSizes>8 not supported");
-      } else if (xSize <= 4) {
+      if (xSize > 8)
+      {
+        throw new Exception("Cosmos.IL2CPU.x86->IL->Ceq.cs->Error: StackSizes > 8 not supported");
+      }
+      else if (xSize <= 4) 
+      {
         Assembler.Stack.Push(new StackContents.Item(4, typeof(bool)));
-        if (xStackItem.IsFloat) {
+        if (xStackItem.IsFloat)
+        {
           new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
           new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
@@ -30,7 +34,9 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.MoveD { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.XMM1 };
           new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
           new CPUx86.Move { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-        } else {
+        }
+        else 
+        {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
           new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
           new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = Label.LastFullLabel + ".True" };
@@ -44,10 +50,13 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.Push { DestinationValue = 0 };
           new CPUx86.Jump { DestinationLabel = xNextLabel };
         }
-      } else if (xSize > 4) {
+      } 
+      else if (xSize > 4)
+      {
         Assembler.Stack.Push(new StackContents.Item(4, typeof(bool)));
 
-        if (xStackItem.IsFloat) {
+        if (xStackItem.IsFloat) 
+        {
           new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
           // esi = 1
           new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
@@ -65,7 +74,9 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
           new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 16 };
           new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
-        } else {
+        }
+        else 
+        {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
           new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -86,8 +97,11 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.Jump { DestinationLabel = xNextLabel };
         }
 
-      } else
-        throw new Exception("Case not handled!");
+      } 
+      else
+      {
+        throw new Exception("Cosmos.IL2CPU.x86->IL->Ceq.cs->Error: Case not handled!");
+      }
     }
   }
 }

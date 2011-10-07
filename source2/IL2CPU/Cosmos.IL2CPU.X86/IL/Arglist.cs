@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
 		{
-			throw new NotImplementedException("Arglist not yet implemented!");
+			throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Arglist.cs->Error: Arglist not yet implemented!");
 		}
 		
 	}

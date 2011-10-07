@@ -19,9 +19,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
 			var xSize = Math.Max( xStackContent.Size, xStackContentSecond.Size);
 			if (ILOp.Align(xStackContent.Size, 4u) != ILOp.Align(xStackContentSecond.Size, 4u))
-				throw new NotSupportedException("Operands have different size!");
+			{
+				throw new NotSupportedException("Cosmos.IL2CPU.x86->IL->And.cs->Error: Operands have different size!");
+			}
 			if( xSize > 8 )
-				throw new NotImplementedException( "StackSize>8 not supported" );
+			{
+				throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->And.cs->Error: StackSize > 8 not supported");
+			}
 
 			if( xSize > 4 )
 			{

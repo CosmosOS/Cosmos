@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xStackItem = Assembler.Stack.Pop();
             if( xStackItem.Size > 8 )
             {
-                throw new NotImplementedException("StackSizes>8 not supported");
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Clt_Un.cs->Error: StackSizes > 8 not supported");
             }
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( bool ) ) );
             string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
@@ -63,6 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackItem.IsFloat)
                 {
+                	#warning THIS NEEDS TO BE TESTED!!!
 					new Comment("TEST TODO");
                     new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };

@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xSource = Assembler.Stack.Peek();
-
+            
             Assembler.Stack.Pop();
             switch (xSource.Size)
             {

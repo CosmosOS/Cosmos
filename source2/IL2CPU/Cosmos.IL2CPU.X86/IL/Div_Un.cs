@@ -19,9 +19,10 @@ namespace Cosmos.IL2CPU.X86.IL
             {
 				// there seem to be an error in MS documentation, there is pushed an int32, but IL shows else
 				if (Assembler.Stack.Pop().Size != 8)
-					throw new Exception("Expect a size of 8 for Div!");
+					throw new Exception("Cosmos.IL2CPU.x86->IL->Div.cs->Error: Expected a size of 8 for Div!");
 				if (xStackItem.IsFloat)
-				{// TODO add 0/0 infinity/infinity X/infinity
+				{
+					// TODO add 0/0 infinity/infinity X/infinity
 					// value 1
 					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// value 2

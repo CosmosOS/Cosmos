@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      throw new NotImplementedException();
+      throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Cpobj.cs->Error: The Cpobj op-code has not yet been implemented!");
     }
 
     

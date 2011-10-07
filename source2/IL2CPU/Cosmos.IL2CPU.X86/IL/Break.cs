@@ -8,10 +8,11 @@ namespace Cosmos.IL2CPU.X86.IL
 		public Break(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
-
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      throw new Exception("TODO: Break");
-    }
+		
+		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+		{
+			throw new Exception("Cosmos.IL2CPU.x86->IL->Break.cs->Error: Break op-code has not been implemented yet!");
+		}
 
 	}
 }

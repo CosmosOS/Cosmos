@@ -10,6 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+			#warning TODO: This needs to either be implemented, or needs to throw a NotImplementedException!
       // todo: Implement correct Constrained support
         //throw new NotImplementedException("Constrained used in '" + aMethod.MethodBase.GetFullName() + "'");
     }

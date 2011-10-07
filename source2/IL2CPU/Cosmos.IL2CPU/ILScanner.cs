@@ -607,7 +607,7 @@ namespace Cosmos.IL2CPU
             // TODO: Allow whole class plugs? ie, a class that completely replaces another class
             // and is substituted on the fly? Plug scanner would direct all access to that
             // class and throw an exception if any method, field, member etc is missing.
-            foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
+            global::System.Threading.Tasks.Parallel.ForEach(AppDomain.CurrentDomain.GetAssemblies(), xAsm =>
             {
                 if (!xAsm.GlobalAssemblyCache)
                 {
@@ -659,7 +659,7 @@ namespace Cosmos.IL2CPU
                         }
                     }
                 }
-            }
+            });
         }
 
         protected void ScanMethod(MethodBase aMethod, bool aIsPlug)
@@ -877,6 +877,9 @@ namespace Cosmos.IL2CPU
             {
                 Queue(aType.BaseType, aType, "Base Type");
             }
+
+            //foreach(var intfaces in aType.GetMethods(BindingFlags.
+
             // Queue static ctors
             // We always need static ctors, else the type cannot 
             // be created.
@@ -888,10 +891,22 @@ namespace Cosmos.IL2CPU
                 }
             }
 
+            List<MethodBase> vrts = new List<MethodBase>();
+            lock (mVirtuals)
+            {
+                IEnumerable<MethodBase> vts = null;
+                vts = mVirtuals.AsParallel().Where(new Func<MethodBase, bool>(d => { return (aType.IsSubclassOf(d.DeclaringType) || (!aType.IsGenericParameter && d.DeclaringType.IsInterface)); }));
+                foreach (MethodBase b in vts)
+                {
+                    vrts.Add(b);
+                }
+                vts = null;
+            }
+
             // For each new type, we need to scan for possible new virtuals
             // in our new type if its a descendant of something in 
             // mVirtuals.
-            foreach (var xVirt in mVirtuals)
+            foreach (var xVirt in vrts)
             {
                 // See if our new type is a subclass of any virt's DeclaringTypes
                 // If so our new type might have some virtuals
@@ -921,6 +936,7 @@ namespace Cosmos.IL2CPU
                     if (aType.GetInterfaces().Contains(xVirt.DeclaringType))
                     {
                         var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
+                        
                         if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)
                         {
                             var xIdx = Array.IndexOf(xIntfMapping.InterfaceMethods, xVirt);
@@ -935,9 +951,107 @@ namespace Cosmos.IL2CPU
             }
         }
 
+        private System.Threading.Thread t1, t2, t3, t4;
+        private bool t1active, t2active, t3active, t4active;
+
         protected void ScanQueue()
         {
+            t1 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT1));
+            t2 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT2));
+            t3 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT3));
+            t4 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT4));
+            t1.Name = "Scanner Thread 1";
+            t2.Name = "Scanner Thread 2";
+            t3.Name = "Scanner Thread 3";
+            t4.Name = "Scanner Thread 4";
+            t1.Start();
+            t2.Start();
+            t3.Start();
+            t4.Start();
+            t1active = true;
+            t2active = true;
+            t3active = true;
+            t4active = true;
             while (mQueue.Count > 0)
+            {
+                if (!t1active && !t2active && !t3active && !t4active)
+                {
+                    if (mQueue.Count > 0)
+                    {
+                        t1active = true;
+                        t2active = true;
+                        t3active = true;
+                        t4active = true;
+                        t1.Start();
+                        t2.Start();
+                        t3.Start();
+                        t4.Start();
+                    }
+                    else
+                    {
+                        t1 = null;
+                        t2 = null;
+                        t3 = null;
+                        t4 = null;
+                        return;
+                    }
+                }
+                global::System.Threading.Thread.Sleep(100);
+            }
+        }
+
+        private void DequeT1(object a)
+        {
+            while (mQueue.Count > 0)
+            {
+                if (!DequeItem())
+                {
+                    t1active = false;
+                    return;
+                }
+            }
+            t1active = false;
+        }
+        private void DequeT2(object a)
+        {
+            while (mQueue.Count > 0)
+            {
+                if (!DequeItem())
+                {
+                    t2active = false;
+                    return;
+                }
+            }
+            t2active = false;
+        }
+        private void DequeT3(object a)
+        {
+            while (mQueue.Count > 0)
+            {
+                if (!DequeItem())
+                {
+                    t3active = false;
+                    return;
+                }
+            }
+            t3active = false;
+        }
+        private void DequeT4(object a)
+        {
+            while (mQueue.Count > 0)
+            {
+                if (!DequeItem())
+                {
+                    t4active = false;
+                    return;
+                }
+            }
+            t4active = false;
+        }
+
+        private bool DequeItem()
+        {
+            if (mQueue.Count > 0)
             {
                 var xItem = mQueue.Dequeue();
                 // Check for MethodBase first, they are more numerous 
@@ -958,7 +1072,9 @@ namespace Cosmos.IL2CPU
                 {
                     throw new Exception("Unknown item found in queue.");
                 }
+                return true;
             }
+            return false;
         }
 
         protected void LogMapPoint(object aSrc, string aSrcType, object aItem)

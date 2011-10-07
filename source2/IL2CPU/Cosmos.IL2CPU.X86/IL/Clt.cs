@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if( xStackItem.Size > 8 )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Clt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel );
-                throw new NotImplementedException();
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Clt.cs->Error: StackSizes > 8 not supported");
                 //return;
             }
 #if DOTNETCOMPATIBLE
