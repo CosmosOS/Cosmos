@@ -896,9 +896,12 @@ namespace Cosmos.IL2CPU
             {
                 IEnumerable<MethodBase> vts = null;
                 vts = mVirtuals.Where(new Func<MethodBase, bool>(d => { return (aType.IsSubclassOf(d.DeclaringType) || (!aType.IsGenericParameter && d.DeclaringType.IsInterface)); }));
-                foreach (MethodBase b in vts)
+                lock (vts)
                 {
-                    vrts.Add(b);
+                    foreach (MethodBase b in vts)
+                    {
+                        vrts.Add(b);
+                    }
                 }
                 vts = null;
             }
