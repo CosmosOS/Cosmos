@@ -966,42 +966,42 @@ namespace Cosmos.IL2CPU
         protected void ScanQueue()
         {
             t1 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT1));
-            t2 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT2));
-            t3 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT3));
-            t4 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT4));
+            //t2 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT2));
+            //t3 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT3));
+            //t4 = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(DequeT4));
             t1.Name = "Scanner Thread 1";
-            t2.Name = "Scanner Thread 2";
-            t3.Name = "Scanner Thread 3";
-            t4.Name = "Scanner Thread 4";
+            //t2.Name = "Scanner Thread 2";
+            //t3.Name = "Scanner Thread 3";
+            //t4.Name = "Scanner Thread 4";
             t1.Start();
-            t2.Start();
-            t3.Start();
-            t4.Start();
+            //t2.Start();
+            //t3.Start();
+            //t4.Start();
             t1active = true;
-            t2active = true;
-            t3active = true;
-            t4active = true;
+            //t2active = true;
+            //t3active = true;
+            //t4active = true;
             while (mQueue.Count > 0)
             {
-                if (!t1active && !t2active && !t3active && !t4active)
+                if (!t1active)// && !t2active && !t3active && !t4active)
                 {
                     if (mQueue.Count > 0)
                     {
                         t1active = true;
-                        t2active = true;
-                        t3active = true;
-                        t4active = true;
+                        //t2active = true;
+                        //t3active = true;
+                        //t4active = true;
                         t1.Start();
-                        t2.Start();
-                        t3.Start();
-                        t4.Start();
+                        //t2.Start();
+                        //t3.Start();
+                        //t4.Start();
                     }
                     else
                     {
                         t1 = null;
-                        t2 = null;
-                        t3 = null;
-                        t4 = null;
+                        //t2 = null;
+                        //t3 = null;
+                        //t4 = null;
                         return;
                     }
                 }
