@@ -127,15 +127,18 @@ namespace Cosmos.IL2CPU
             {
                 return;
             }
-            if (!mItems.Contains(aItem))
+            lock (mItems)
             {
-                if (mLogEnabled)
+                if (!mItems.Contains(aItem))
                 {
-                    LogMapPoint(aSrc, aSrcType, aItem);
+                    if (mLogEnabled)
+                    {
+                        LogMapPoint(aSrc, aSrcType, aItem);
+                    }
+                    mItems.Add(aItem);
+                    mItemsList.Add(aItem);
+                    mQueue.Enqueue(aItem);
                 }
-                mItems.Add(aItem);
-                mItemsList.Add(aItem);
-                mQueue.Enqueue(aItem);
             }
         }
 
