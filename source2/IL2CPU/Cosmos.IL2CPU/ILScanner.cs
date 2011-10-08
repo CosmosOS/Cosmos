@@ -183,11 +183,14 @@ namespace Cosmos.IL2CPU
                             xFields = new Dictionary<string, PlugFieldAttribute>();
                             mPlugFields.Add(xPlug.Key, xFields);
                         }
-                        if (xFields.ContainsKey(xField.FieldId))
+                        lock (xFields)
                         {
-                            throw new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
+                            if (xFields.ContainsKey(xField.FieldId))
+                            {
+                                throw new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
+                            }
+                            xFields.Add(xField.FieldId, xField);
                         }
-                        xFields.Add(xField.FieldId, xField);
                     }
                     #endregion
                 }
@@ -1584,15 +1587,18 @@ namespace Cosmos.IL2CPU
             {
                 throw new Exception("Cannot get UID of types which are not queued!");
             }
-            if (!mTypeUIDs.ContainsKey(aType))
+            lock (mTypeUIDs)
             {
-                var xId = (uint)mTypeUIDs.Count;
-                mTypeUIDs.Add(aType, xId);
-                return xId;
-            }
-            else
-            {
-                return mTypeUIDs[aType];
+                if (!mTypeUIDs.ContainsKey(aType))
+                {
+                    var xId = (uint)mTypeUIDs.Count;
+                    mTypeUIDs.Add(aType, xId);
+                    return xId;
+                }
+                else
+                {
+                    return mTypeUIDs[aType];
+                }
             }
         }
 
