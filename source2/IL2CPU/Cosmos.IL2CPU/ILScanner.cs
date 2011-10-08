@@ -895,7 +895,7 @@ namespace Cosmos.IL2CPU
             lock (mVirtuals)
             {
                 IEnumerable<MethodBase> vts = null;
-                vts = mVirtuals.AsParallel().Where(new Func<MethodBase, bool>(d => { return (aType.IsSubclassOf(d.DeclaringType) || (!aType.IsGenericParameter && d.DeclaringType.IsInterface)); }));
+                vts = mVirtuals.Where(new Func<MethodBase, bool>(d => { return (aType.IsSubclassOf(d.DeclaringType) || (!aType.IsGenericParameter && d.DeclaringType.IsInterface)); }));
                 foreach (MethodBase b in vts)
                 {
                     vrts.Add(b);
