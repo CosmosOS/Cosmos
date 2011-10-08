@@ -1554,19 +1554,25 @@ namespace Cosmos.IL2CPU
                     xParamTypes[i] = xParams[i].ParameterType;
                 }
                 var xBaseMethod = GetUltimateBaseMethod(aMethod, xParamTypes, aMethod.DeclaringType);
-                if (!mMethodUIDs.ContainsKey(xBaseMethod))
+                lock (mMethodUIDs)
                 {
-                    var xId = (uint)mMethodUIDs.Count;
-                    mMethodUIDs.Add(xBaseMethod, xId);
+                    if (!mMethodUIDs.ContainsKey(xBaseMethod))
+                    {
+                        var xId = (uint)mMethodUIDs.Count;
+                        mMethodUIDs.Add(xBaseMethod, xId);
+                    }
                 }
                 return mMethodUIDs[xBaseMethod];
             }
             else
             {
-                if (!mMethodUIDs.ContainsKey(aMethod))
+                lock (mMethodUIDs)
                 {
-                    var xId = (uint)mMethodUIDs.Count;
-                    mMethodUIDs.Add(aMethod, xId);
+                    if (!mMethodUIDs.ContainsKey(aMethod))
+                    {
+                        var xId = (uint)mMethodUIDs.Count;
+                        mMethodUIDs.Add(aMethod, xId);
+                    }
                 }
                 return mMethodUIDs[aMethod];
             }
