@@ -9,13 +9,14 @@ namespace Orvid.Graphics.FontSupport
     /// </summary>
     public class DefaultFontManager : FontManager
     {
-    	Dictionary<int, Font> Providers = new Dictionary<int, Font>();
+        
+    	List<Font> Providers = new List<Font>();
 
 
         public DefaultFontManager()
         {
-            Providers.Add(1, new bdf.BDFFont());
-            Providers.Add(2, new fnt.FntFont());
+            Providers.Add(new bdf.BDFFont());
+            //Providers.Add(2, new fnt.FntFont());
         }
 
 
@@ -36,7 +37,7 @@ namespace Orvid.Graphics.FontSupport
 
         public override Font LoadFont(int format, Stream s)
         {
-        	if (!Providers.ContainsKey(format))
+        	if (format > Providers.Count)
         	{
         		throw new Exception("Unknown format!");
         	}
@@ -51,9 +52,9 @@ namespace Orvid.Graphics.FontSupport
             get
             {
                 List<Font> all = new List<Font>();
-                foreach (KeyValuePair<int,Font> prv in Providers)
+                foreach (Font prv in Providers)
                 {
-                    all.AddRange(prv.Value.DefaultFonts);
+                    all.AddRange(prv.DefaultFonts);
                 }
                 return all.ToArray();
             }

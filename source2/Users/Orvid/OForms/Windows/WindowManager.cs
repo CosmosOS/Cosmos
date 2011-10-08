@@ -15,7 +15,7 @@ namespace OForms.Windows
         /// </summary>
         internal const int TaskBarHeight = Taskbar.TaskBarHeight;
 
-        internal static Font WindowFont = FontManager.Instance.LoadFont(1, new System.IO.MemoryStream(EmbeddedFiles.Fonts.Vera10_bdf));
+        //internal static Font WindowFont = FontManager.Instance.LoadFont(1, new System.IO.MemoryStream(EmbeddedFiles.Fonts.Vera10_bdf));
         /// <summary>
         /// The taskbar.
         /// </summary>
@@ -129,7 +129,7 @@ namespace OForms.Windows
         }
 
         /// <summary>
-        /// Adds the specified window without modifing the taskbar.
+        /// Adds the specified window without modifying the taskbar.
         /// </summary>
         /// <param name="w">The window to add.</param>
         private void InternalAddWindow(Window w)

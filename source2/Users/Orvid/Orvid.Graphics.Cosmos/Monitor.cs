@@ -12,15 +12,6 @@ namespace Orvid.Graphics
     public class Monitor
     {
         /// <summary>
-        /// This is the image that contains the background,
-        /// It is the lowest on the stack that we pull pixels from.
-        /// </summary>
-        public Image Background;
-        /// <summary>
-        /// This layer holds all of the desktop icons.
-        /// </summary>
-        public Image DesktopIcons;
-        /// <summary>
         /// This image contains the taskbar.
         /// </summary>
         public Image Taskbar;
@@ -53,6 +44,8 @@ namespace Orvid.Graphics
         /// </summary>
         public int Height;
 
+        public OForms.Windows.WindowManager WindowManager;
+
         public uint MouseX = 0;
         public uint MouseY = 0;
 
@@ -61,23 +54,23 @@ namespace Orvid.Graphics
         {
             int width = 320;
             int height = 200;
-            Background = new Image(width, height);
-            DesktopIcons = new Image(width, height);
             Taskbar = new Image(width, height);
             Mouse = new Image(width, height);
             this.curdriver = new Drivers.VGADriver();
             this.curdriver.Initialize();
             this.Width = width;
             this.Height = height;
+            WindowManager = new OForms.Windows.WindowManager(new Vec2(width, height));
 
             InitializeMouse();
 
-            Taskbar.Clear(Colors.Aqua); // Clear the screen white.
+            Taskbar.Clear(Colors.White); // Clear the screen white.
             CurrentDriver.Update(Taskbar);
         }
 
         public void Update()
         {
+            WindowManager.Draw(Taskbar);
             DrawCursor();
             //uint i = 0;
             //uint yPixBase = 0;
@@ -160,133 +153,8 @@ namespace Orvid.Graphics
 
         public Image GetEffectiveImage()
         {
-//            Image i = new Image(Width, Height);
-//            Vec2 v = new Vec2(0,0);
-//            i.DrawImage(v, Background);
-//            i.DrawImage(v, DesktopIcons);
-
-//#warning TODO: Draw the windows here.
-
-//            i.DrawImage(v, Taskbar);
-//            i.DrawImage(v, Mouse);
-
             return Taskbar;
-
         }
     }
 
-
-
-    //public class Screen
-    //{
-    //    // The arrays are in the format Y,X
-    //    public byte[][] Data;
-    //    public bool[][] Filled;
-
-    //    public Screen(int height, int width)
-    //    {
-    //        //Data = new byte[height, width];
-    //        //Filled = new bool[height, width];
-    //    }
-
-    //    public bool IsFilled(int X, int Y)
-    //    {
-    //        return Filled[Y][X];
-    //    }
-    //}
-
-    //public class LayeredScreen
-    //{
-    //    LinkedList<Screen> Screens = new LinkedList<Screen>();
-    //    int Height = 200;
-    //    int Width = 480;
-
-    //    public LayeredScreen(int height, int width)
-    //    {
-    //        this.Height = height;
-    //        this.Width = width;
-    //        Screen s = new Screen(height, width);
-    //        Screens.AddFirst(s);
-    //    }
-
-    //    public void SendToBack(Screen scrn)
-    //    {
-    //        Screens.Remove(scrn);
-    //        Screens.AddLast(scrn);
-    //    }
-
-    //    public void BringToFront(Screen scrn)
-    //    {
-    //        Screens.Remove(scrn);
-    //        Screens.AddFirst(scrn);
-    //    }
-
-    //    public byte[][] GetEffectiveScreen()
-    //    {
-    //        Screen scrn = new Screen(Height, Width);
-    //        LinkedList<Screen> ToReturn = new LinkedList<Screen>();
-    //        bool HaveAll = false;
-    //        while (!HaveAll)
-    //        {
-    //            Screen s = Screens.First.Value;
-    //            Screens.RemoveFirst();
-
-    //            for (int height = 0; height < Height; height++)
-    //            {
-    //                for (int width = 0; width < Width; width++)
-    //                {
-    //                    if (!scrn.IsFilled(width, height))
-    //                    {
-    //                        if (s.IsFilled(width, height))
-    //                        {
-    //                            byte val = s.Data[height][width];
-    //                            scrn.Data[height][width] = val;
-    //                            scrn.Filled[height][width] = true;
-    //                        }
-    //                    }
-    //                }
-    //            }
-
-    //            ToReturn.AddFirst(s);
-    //            // Check if we've run out of screens
-    //            if (Screens.Count < 1)
-    //            {
-    //                break;
-    //            }
-    //            // Otherwise we need to check if we have everything we need.
-    //            //
-    //            // TODO: Make this more efficient by only checking the lines
-    //            // we still need.
-    //            else
-    //            {
-    //                bool haveall = true;
-    //                for (int height = 0; height < Height; height++)
-    //                {
-    //                    for (int width = 0; width < Width; width++)
-    //                    {
-    //                        if (s.Filled[height][width] == false)
-    //                        {
-    //                            haveall = false;
-    //                            break;
-    //                        }
-    //                    }
-    //                    if (!haveall)
-    //                    {
-    //                        break;
-    //                    }
-    //                }
-    //                HaveAll = haveall;
-    //            }
-    //        }
-    //        // Now we need to add the screens back in.
-    //        int nmb = ToReturn.Count;
-    //        for (int i = 0; i < nmb; i++)
-    //        {
-    //            Screen scrn1 = ToReturn.First.Value;
-    //            ToReturn.RemoveFirst();
-    //            Screens.AddFirst(scrn1);
-    //        }
-    //        return scrn.Data;
-    //    }
-    //}
 }

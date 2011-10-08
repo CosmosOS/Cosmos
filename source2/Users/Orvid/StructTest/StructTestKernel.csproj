@@ -62,6 +62,10 @@
     <Compile Include="SecondaryKernel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
+      <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
+      <Name>Cosmos.System.Plugs.System</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>

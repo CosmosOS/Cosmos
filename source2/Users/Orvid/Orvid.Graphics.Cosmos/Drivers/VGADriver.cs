@@ -67,23 +67,33 @@ namespace Orvid.Graphics.Drivers
             }
         }
 
-        private uint GetForColorizer(Pixel p)
+        private byte GetForColorizer(Pixel p)
         {
-            byte r = getForPallet(p.R);
-            byte g = getForPallet(p.G);
-            byte b = getForPallet(p.B);
-            return (uint)(Math.Floor((double)(r / 42)) * Math.Floor((double)(g / 42)) * Math.Floor((double)(b / 42)));
+            byte b = unchecked((byte)(Math.Floor((double)(getForPallet(p.R) / (byte)42)) * Math.Floor((double)(getForPallet(p.G) / (byte)42)) * Math.Floor((double)(getForPallet(p.B) / (byte)42))));
+            if (b == 0)
+            {
+                return 1;
+            }
+            else if (b == 1)
+            {
+                return 0;
+            }
+            else
+            {
+                return unchecked((byte)(b + (byte)2));
+            }
         }
 
-        private uint[] Colorize(Image i)
+        private int[] Colorize(Image i)
         {
-            uint[] arr = new uint[i.Height * i.Width];
+            int[] arr = new int[i.Height * i.Width];
             int indx = 0;
             for (int y = 0; y < i.Height; y++)
             {
                 for (int x = 0; x < i.Width; x++)
                 {
                     arr[indx] = GetForColorizer(i.Data[indx]);
+                    //Console.WriteLine("Value: " + i.Data[indx].R.ToString());
                     //Console.WriteLine("Colorized value: " + GetForColorizer(i.Data[indx]).ToString());
                     indx++;
                 }
@@ -98,7 +108,7 @@ namespace Orvid.Graphics.Drivers
             // TODO: Switch to an delegate based draw mechanism,
             // it would be much faster than switch, case like statements.
 
-            uint[] data = Colorize(i);
+            int[] data = Colorize(i);
             for (uint i2 = 0; i2 < 64000 /* 320 Times 200 is 64,000 so we need to loop 64k times. */; i2++)
             {
                 mIO.VGAMemoryBlock[i2] = (byte)(data[i2] & 0xFF);

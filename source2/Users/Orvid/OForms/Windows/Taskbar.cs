@@ -294,30 +294,30 @@ namespace OForms.Windows
         {
             BoundingBox bnds = bounds - TaskbarLocation;
             //throw new Exception();
-            if (WindowManager.WindowFont.GetFontMetrics().StringWidth(w.Name) > bnds.Width - 6)
-            {
-                // Doesn't fit on the button, need to remove some characters.
-                string s = w.Name.Substring(0, w.Name.Length - 3) + "...";
-                while (WindowManager.WindowFont.GetFontMetrics().StringWidth(s) > bnds.Width - 6)
-                {
-                    if (s.Length == 3)
-                    {
-                        s = "."; // button is to small to have a name drawn.
-                        break;
-                    }
-                    else
-                    {
-                        // It's 4 to make up for the 3 extra characters we add.
-                        s = s.Substring(0, s.Length - 4) + "...";
-                    }
-                }
-                //throw new Exception();
-                Buffer.DrawString(new Vec2(bnds.Left + 2, bnds.Bottom + 2), s, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, TaskbarTextColor);
-            }
-            else // Fits on button.
-            {
-                Buffer.DrawString(new Vec2(bnds.Left + 2, bnds.Bottom + 2), w.Name, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, TaskbarTextColor);
-            }
+            //if (WindowManager.WindowFont.GetFontMetrics().StringWidth(w.Name) > bnds.Width - 6)
+            //{
+            //    // Doesn't fit on the button, need to remove some characters.
+            //    string s = w.Name.Substring(0, w.Name.Length - 3) + "...";
+            //    while (WindowManager.WindowFont.GetFontMetrics().StringWidth(s) > bnds.Width - 6)
+            //    {
+            //        if (s.Length == 3)
+            //        {
+            //            s = "."; // button is to small to have a name drawn.
+            //            break;
+            //        }
+            //        else
+            //        {
+            //            // It's 4 to make up for the 3 extra characters we add.
+            //            s = s.Substring(0, s.Length - 4) + "...";
+            //        }
+            //    }
+            //    //throw new Exception();
+            //    Buffer.DrawString(new Vec2(bnds.Left + 2, bnds.Bottom + 2), s, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, TaskbarTextColor);
+            //}
+            //else // Fits on button.
+            //{
+            //    Buffer.DrawString(new Vec2(bnds.Left + 2, bnds.Bottom + 2), w.Name, WindowManager.WindowFont, 10, Orvid.Graphics.FontSupport.FontStyle.Normal, TaskbarTextColor);
+            //}
         }
 
         /// <summary>

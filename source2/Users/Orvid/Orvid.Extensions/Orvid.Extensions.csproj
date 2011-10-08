@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{167D46D2-F0F2-4F59-BA0F-2452941E0450}</ProjectGuid>
+    <ProjectGuid>{70BC12ED-553D-4EE0-B350-D2FACF3EA90A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Orvid.Graphics.Cosmos</RootNamespace>
-    <AssemblyName>Orvid.Graphics.Cosmos</AssemblyName>
+    <RootNamespace>Orvid.Extensions</RootNamespace>
+    <AssemblyName>Orvid.Extensions</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -32,61 +32,38 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\Orvid.Extensions.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drivers\VGADriver.cs" />
-    <Compile Include="GraphicsDriver.cs" />
-    <Compile Include="GraphicsMode.cs" />
-    <Compile Include="GraphicsPlugs.cs" />
-    <Compile Include="Monitor.cs" />
+    <Compile Include="System\Half.cs" />
+    <Compile Include="System\Int128.cs" />
+    <Compile Include="System\Math.cs" />
+    <Compile Include="System\Oyster.IntX.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
-      <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
-      <Name>Cosmos.Compiler.Assembler.X86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Compiler\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler.csproj">
-      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
-      <Name>Cosmos.Compiler.Assembler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
-      <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
-      <Name>Cosmos.System</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OForms\OForms.csproj">
-      <Project>{039E2C8F-E73C-48AF-B249-FC953072D9A0}</Project>
-      <Name>OForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Orvid.Graphics\Orvid.Graphics.csproj">
-      <Project>{C9E995CF-CB65-4410-A7D2-63EBBE02AABB}</Project>
-      <Name>Orvid.Graphics</Name>
-    </ProjectReference>
+    <Compile Include="System\Quad.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -111,8 +88,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Drivers\PCI\" />
+    <Content Include="license.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
