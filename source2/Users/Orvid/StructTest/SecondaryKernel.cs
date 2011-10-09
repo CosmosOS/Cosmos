@@ -9,15 +9,19 @@ namespace StructTest
 {
     public class Kernel : Sys.Kernel
     {
+        Logger log = new Logger(2);
+
         public Kernel()
         {
             base.ClearScreen = true;
+            
         }
 
         protected override void BeforeRun()
         {
             Console.WriteLine("Hello, and welcome to the TestOS by Orvid.");
             Console.WriteLine("To see a list of supported commands, type '?'");
+            log.WriteString("This is a test message");
         }
 
 
@@ -28,10 +32,72 @@ namespace StructTest
 
         protected override void Run()
         {
-            double d = 40.23;
-            double d2 = 93.210;
-            double d3 = -412.569;
-            double d4 = 0.45912;
+            //float zero = 0;
+            //float one = 1;
+            //double a = 453.231;
+            //double b = 461.251;
+
+            //#region Variable to Variable
+            //if (zero != zero)
+            //{
+            //    Console.WriteLine("zero != zero (False)");
+            //}
+            //if (one != zero)
+            //{
+            //    Console.WriteLine("one != zero (True)");
+            //}
+            //if (zero == zero)
+            //{
+            //    Console.WriteLine("zero == zero (True)");
+            //}
+            //if (one == zero)
+            //{
+            //    Console.WriteLine("one == zero (False)");
+            //}
+            //#endregion
+
+            //#region Variable to Constant
+            //if (zero != 0)
+            //{
+            //    Console.WriteLine("zero != 0 (False)");
+            //}
+            //if (one != 0)
+            //{
+            //    Console.WriteLine("one != 0 (True)");
+            //}
+            //if (zero == 0)
+            //{
+            //    Console.WriteLine("zero == 0 (True)");
+            //}
+            //if (one == 0)
+            //{
+            //    Console.WriteLine("one == 0 (False)");
+            //}
+            //#endregion
+
+            //#region Constant to Variable
+            //if (0 != zero)
+            //{
+            //    Console.WriteLine("0 != zero (False)");
+            //}
+            //if (1 != zero)
+            //{
+            //    Console.WriteLine("1 != zero (True)");
+            //}
+            //if (0 == zero)
+            //{
+            //    Console.WriteLine("0 == zero (True)");
+            //}
+            //if (1 == zero)
+            //{
+            //    Console.WriteLine("1 == zero (False)");
+            //}
+            //#endregion
+
+            //double d = 40.23;
+            //double d2 = 93.210;
+            //double d3 = -412.569;
+            //double d4 = 0.45912;
             //Console.WriteLine("Dividing 40.23 by 40.23: " + (d / d).ToString() + " (1)");
             //Console.WriteLine("Dividing 40.23 by 93.210: " + (d / d2).ToString() + " (0.431606050852913)");
             //Console.WriteLine("Dividing 40.23 by -412.569: " + (d / d3).ToString() + " (-0.097510961802753)");
@@ -84,7 +150,7 @@ namespace StructTest
             //ushort r = 65535;
             //short r = -32768;
             //uint r = 4294967295;
-            int r = -2147483648;
+            //int r = -2147483648;
             //ulong r = 18446744073709551615;
             //long r = -9223372036854775808;
             //float r = 123.7f;
@@ -99,19 +165,19 @@ namespace StructTest
             //{
             //    Console.WriteLine("Less Than");
             //}
-            Console.WriteLine("Just one more test.");
-            Console.WriteLine("Raw Byte: " + r.ToString());
-            Console.WriteLine("Byte->Byte: " + (unchecked((byte)r)).ToString());
-            Console.WriteLine("Byte->SByte: " + (unchecked((sbyte)r)).ToString());
-            Console.WriteLine("Byte->Char: " + (unchecked((char)r)).ToString());
-            Console.WriteLine("Byte->UShort: " + (unchecked((ushort)r)).ToString());
-            Console.WriteLine("Byte->Short: " + (unchecked((short)r)).ToString());
-            Console.WriteLine("Byte->UInt: " + (unchecked((uint)r)).ToString());
-            Console.WriteLine("Byte->Int: " + (unchecked((int)r)).ToString());
-            Console.WriteLine("Byte->ULong: " + (unchecked((ulong)r)).ToString());
-            Console.WriteLine("Byte->Long: " + (unchecked((long)r)).ToString());
-            Console.WriteLine("Byte->Float: " + (unchecked((float)r)).ToString());
-            Console.WriteLine("Byte->Double: " + (unchecked((double)r)).ToString());
+            //Console.WriteLine("Just one more test.");
+            //Console.WriteLine("Raw Byte: " + r.ToString());
+            //Console.WriteLine("Byte->Byte: " + (unchecked((byte)r)).ToString());
+            //Console.WriteLine("Byte->SByte: " + (unchecked((sbyte)r)).ToString());
+            //Console.WriteLine("Byte->Char: " + (unchecked((char)r)).ToString());
+            //Console.WriteLine("Byte->UShort: " + (unchecked((ushort)r)).ToString());
+            //Console.WriteLine("Byte->Short: " + (unchecked((short)r)).ToString());
+            //Console.WriteLine("Byte->UInt: " + (unchecked((uint)r)).ToString());
+            //Console.WriteLine("Byte->Int: " + (unchecked((int)r)).ToString());
+            //Console.WriteLine("Byte->ULong: " + (unchecked((ulong)r)).ToString());
+            //Console.WriteLine("Byte->Long: " + (unchecked((long)r)).ToString());
+            //Console.WriteLine("Byte->Float: " + (unchecked((float)r)).ToString());
+            //Console.WriteLine("Byte->Double: " + (unchecked((double)r)).ToString());
             //Console.WriteLine("Byte->Decimal: " + (unchecked((decimal)r)).ToString());
             while (true)
             {
