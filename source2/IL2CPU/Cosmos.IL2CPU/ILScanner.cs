@@ -43,6 +43,13 @@ namespace Cosmos.IL2CPU
         }
     }*/
 
+    public class ScannerQueueItem
+    {
+        public object Item;
+        public object SourceItem;
+        public string QueueReason;
+    }
+
     public class ILScanner : IDisposable
     {
         protected ILReader mReader;
@@ -51,7 +58,7 @@ namespace Cosmos.IL2CPU
         protected OurHashSet<object> mItems = new OurHashSet<object>();
         protected List<object> mItemsList = new List<object>();
         // Contains items to be scanned, both types and methods
-        protected Queue<object> mQueue = new Queue<object>();
+        protected Queue<ScannerQueueItem> mQueue = new Queue<ScannerQueueItem>();
         // Virtual methods are nasty and constantly need to be rescanned for
         // overriding methods in new types, so we keep track of them separately. 
         // They are also in the main mItems and mQueue.
@@ -116,7 +123,7 @@ namespace Cosmos.IL2CPU
             mLogEnabled = true;
         }
 
-        protected void Queue(object aItem, object aSrc, string aSrcType)
+        protected void Queue(object aItem, object aSrc, string aSrcType, object sourceItem = null)
         {
             var xMemInfo = aItem as MemberInfo;
             //TODO: fix this, as each label/symbol should also contain an assembly specifier.
@@ -135,7 +142,8 @@ namespace Cosmos.IL2CPU
                 }
                 mItems.Add(aItem);
                 mItemsList.Add(aItem);
-                mQueue.Enqueue(aItem);
+
+                mQueue.Enqueue(new ScannerQueueItem() { Item = aItem, QueueReason = aSrcType, SourceItem =  aSrc + Environment.NewLine + sourceItem });
             }
         }
 
@@ -156,7 +164,7 @@ namespace Cosmos.IL2CPU
                         }
                         if (xAttrib == null)
                         {
-                            ScanMethod(xMethod, true);
+                            ScanMethod(xMethod, true, "Plug Sub Method");
                         }
                         else
                         {
@@ -166,7 +174,7 @@ namespace Cosmos.IL2CPU
                             }
                             if (xAttrib.Enabled && !xAttrib.IsMonoOnly)
                             {
-                                ScanMethod(xMethod, true);
+                                ScanMethod(xMethod, true, ".Net plug Method");
                             }
                         }
                     }
@@ -662,7 +670,7 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void ScanMethod(MethodBase aMethod, bool aIsPlug)
+        protected void ScanMethod(MethodBase aMethod, bool aIsPlug, object sourceItem)
         {
             var xParams = aMethod.GetParameters();
             var xParamTypes = new Type[xParams.Length];
@@ -804,7 +812,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (xNeedsPlug)
                 {
-                    throw new Exception("Plug needed. " + MethodInfoLabelGenerator.GenerateFullName(aMethod));
+                    throw new Exception("Plug needed. " + MethodInfoLabelGenerator.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list
@@ -823,7 +831,7 @@ namespace Cosmos.IL2CPU
                     {
                         if (xOpCode is ILOpCodes.OpMethod)
                         {
-                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, aMethod, "Call");
+                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, aMethod, "Call",sourceItem);
                         }
                         else if (xOpCode is ILOpCodes.OpType)
                         {
@@ -942,15 +950,15 @@ namespace Cosmos.IL2CPU
                 var xItem = mQueue.Dequeue();
                 // Check for MethodBase first, they are more numerous 
                 // and will reduce compares
-                if (xItem is MethodBase)
+                if (xItem.Item is MethodBase)
                 {
-                    ScanMethod((MethodBase)xItem, false);
+                    ScanMethod((MethodBase)xItem.Item, false, xItem.SourceItem);
                 }
-                else if (xItem is Type)
+                else if (xItem.Item is Type)
                 {
-                    ScanType((Type)xItem);
+                    ScanType((Type)xItem.Item);
                 }
-                else if (xItem is FieldInfo)
+                else if (xItem.Item is FieldInfo)
                 {
                     // todo: static fields need more processing?
                 }
