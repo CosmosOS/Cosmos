@@ -20,8 +20,9 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSource.Size)
             {
                 case 1:
+                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U8.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 2:
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U8.cs->The size {0:D} could not exist, because always is pushed Int32 or Int64!");
+                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U8.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
                     {
                         if (xSource.IsFloat)
