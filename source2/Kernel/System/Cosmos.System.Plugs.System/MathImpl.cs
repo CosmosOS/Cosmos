@@ -89,7 +89,6 @@ namespace Cosmos.System.Plugs.System
             else
             {
                 temp = Atan(x / temp);
-                global::System.Console.WriteLine("Atan(x / temp): " + temp.ToString() + " (0.477004391431801)");
             }
             return (sign * temp);
         }
@@ -571,18 +570,12 @@ namespace Cosmos.System.Plugs.System
             */
             if ((x > -.01) && (x < .01))
             {
-                global::System.Console.WriteLine("ERROR: This shouldn't be getting called!");
                 value = (atan_p0 / atan_q0);
             }
             else
             {
                 argsq = x * x;
-                value = ((((atan_p4 * argsq + atan_p3) * argsq + atan_p2) * argsq + atan_p1) * argsq + atan_p0);
-                value = value / (((((argsq + atan_q4) * argsq + atan_q3) * argsq + atan_q2) * argsq + atan_q1) * argsq + atan_q0);
-                global::System.Console.WriteLine("Branch 2 (x * x): " + (x * x).ToString() + " (0.101478813279645)");
-                global::System.Console.WriteLine("Branch 2 (Piece 1): " + ((((atan_p4 * argsq + atan_p3) * argsq + atan_p2) * argsq + atan_p1) * argsq + atan_p0).ToString() + " (1089.61553706437)");
-                global::System.Console.WriteLine("Branch 2 (Piece 2): " + (((((argsq + atan_q4) * argsq + atan_q3) * argsq + atan_q2) * argsq + atan_q1) * argsq + atan_q0).ToString() + " (1125.52552261533)");
-                global::System.Console.WriteLine("Branch 2 (Piece 1 / Piece 2) " + (((((atan_p4 * argsq + atan_p3) * argsq + atan_p2) * argsq + atan_p1) * argsq + atan_p0) / (((((argsq + atan_q4) * argsq + atan_q3) * argsq + atan_q2) * argsq + atan_q1) * argsq + atan_q0)).ToString() + " (0.968094916703876)");
+                value = ((((atan_p4 * argsq + atan_p3) * argsq + atan_p2) * argsq + atan_p1) * argsq + atan_p0) / (((((argsq + atan_q4) * argsq + atan_q3) * argsq + atan_q2) * argsq + atan_q1) * argsq + atan_q0);
             }
             return value * x;
 
