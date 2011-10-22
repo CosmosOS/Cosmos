@@ -8,7 +8,7 @@ namespace Cosmos.System.Filesystem.Listing {
     public readonly FileSystem FileSystem;
     public readonly string Name;
 
-    public Base(FileSystem aFileSystem, string aName) {
+    protected Base(FileSystem aFileSystem, string aName) {
       FileSystem = aFileSystem;
       Name = aName;
     }

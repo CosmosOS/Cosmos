@@ -17,11 +17,11 @@ namespace Cosmos.Core
         public readonly UInt16 Port;
 
         // all ctors are internal - Only Core ring can create it.. but hardware ring can use it.
-        public IOPortBase(UInt16 aPort)
+        protected IOPortBase(UInt16 aPort)
         {
             Port = aPort;
         }
-        public IOPortBase(UInt16 aBase, UInt16 aOffset)
+        protected IOPortBase(UInt16 aBase, UInt16 aOffset)
         {
             // C# math promotes things to integers, so we have this constructor
             // to relieve the use from having to do so many casts

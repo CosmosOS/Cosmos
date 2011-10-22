@@ -23,10 +23,10 @@ namespace Cosmos.Compiler.Assembler {
       aOutput.Write(mMnemonic);
     }
 
-    public Instruction() : this(true) {
+    protected Instruction() : this(true) {
     }
 
-    public Instruction(bool aAddToAssembler) {
+    protected Instruction(bool aAddToAssembler) {
       if (aAddToAssembler) {
         Assembler.CurrentInstance.Add(this);
       }

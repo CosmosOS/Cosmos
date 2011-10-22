@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU {
     private System.IO.TextWriter mLog;
 
     protected Assembler mAssembler;
-    public AppAssembler(Assembler assembler) {
+    protected AppAssembler(Assembler assembler) {
       mAssembler = assembler;
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();

@@ -66,7 +66,7 @@ namespace Cosmos.Compiler.Assembler {
       get { return mInstructions.Count + mDataMembers.Count; }
     }
 
-    public Assembler() {
+    protected Assembler() {
       mCurrentInstance = this;
     }
 

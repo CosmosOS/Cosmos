@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86 {
     public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
 
 
-    public AppAssembler(byte comportNumber)
+    protected AppAssembler(byte comportNumber)
       : base(new AssemblerNasm(comportNumber)) {
     }
 

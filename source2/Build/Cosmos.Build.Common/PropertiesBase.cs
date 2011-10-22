@@ -7,7 +7,7 @@ namespace Cosmos.Build.Common {
 	public abstract class PropertiesBase {
 		private Dictionary<String, String> propertiesTable;
 
-		public PropertiesBase() {
+		protected PropertiesBase() {
 			propertiesTable = new Dictionary<String, String>();
 		}
 

@@ -14,7 +14,7 @@ namespace Cosmos.Compiler.XSharp {
 
     public readonly string Name;
 
-    public Register() {
+    protected Register() {
       Name = GetType().Name.Substring(typeof(Register).Name.Length);
     }
 

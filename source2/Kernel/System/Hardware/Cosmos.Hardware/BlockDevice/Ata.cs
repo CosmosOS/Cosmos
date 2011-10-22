@@ -6,7 +6,7 @@ using System.Text;
 namespace Cosmos.Hardware.BlockDevice {
   public abstract class Ata : BlockDevice {
 
-    public Ata() {
+    protected Ata() {
       mBlockSize = 512;
     }
 
