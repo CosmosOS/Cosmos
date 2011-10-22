@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceDisplacement = i * 4, SourceIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
-            Assembler.Stack.Push( xStackContent );
+            Assembler.Stack.Push(xStackContent.Size, xStackContent.ContentType);
         }
 
     }

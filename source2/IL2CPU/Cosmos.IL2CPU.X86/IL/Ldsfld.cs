@@ -103,11 +103,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         //break;
                 }
             }
-#if DOTNETCOMPATIBLE
-            Assembler.Stack.Push( new StackContents.Item(ILOp.Align(xSize, 4), null ) );
-#else
-			 Assembler.Stack.Push( new StackContents.Item( xSize, null ) );
-#endif
+			Assembler.Stack.Push( new StackContents.Item( xSize, xField.FieldType ) );
         }
     }
 }
