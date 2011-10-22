@@ -24,18 +24,13 @@ namespace Microsoft.VisualStudio.Project
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments"), AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Field)]
 	public sealed class PropertyPageTypeConverterAttribute : Attribute
 	{
-		#region fields
-		Type converterType;
-		#endregion
+		private readonly Type converterType;
 
-		#region ctors
-		public PropertyPageTypeConverterAttribute(Type type)
+		public PropertyPageTypeConverterAttribute(Type ConverterType)
 		{
-			this.converterType = type;
+			this.converterType = ConverterType;
 		}
-		#endregion
 
-		#region properties
 		public Type ConverterType
 		{
 			get
@@ -43,24 +38,18 @@ namespace Microsoft.VisualStudio.Project
 				return this.converterType;
 			}
 		}
-		#endregion
 	}
 
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 	internal sealed class LocDisplayNameAttribute : DisplayNameAttribute
 	{
-		#region fields
-		string name;
-		#endregion
+		private readonly string name;
 
-		#region ctors
-		public LocDisplayNameAttribute(string name)
+		public LocDisplayNameAttribute(string DisplayName)
 		{
-			this.name = name;
+			this.name = DisplayName;
 		}
-		#endregion
 
-		#region properties
 		public override string DisplayName
 		{
 			get
@@ -74,6 +63,5 @@ namespace Microsoft.VisualStudio.Project
 				return result;
 			}
 		}
-		#endregion
 	}
 }

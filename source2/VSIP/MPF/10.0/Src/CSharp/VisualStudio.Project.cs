@@ -48,8 +48,8 @@ namespace Microsoft.VisualStudio.Project
 	internal sealed class SRCategoryAttribute : CategoryAttribute
 	{
 
-		public SRCategoryAttribute(string category)
-			: base(category)
+		public SRCategoryAttribute(string Category)
+			: base(Category)
 		{
 		}
 

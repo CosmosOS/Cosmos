@@ -8,19 +8,34 @@ namespace Cosmos.IL2CPU
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class OpCodeAttribute : Attribute
     {
-        public readonly ILOpCode.Code OpCode;
+		public ILOpCode.Code OpCode
+		{
+			get
+			{
+				return opCode;
+			}
+		}
+        private readonly ILOpCode.Code opCode;
 
-        public OpCodeAttribute(ILOpCode.Code aOpCode)
+        public OpCodeAttribute(ILOpCode.Code OpCode)
         {
-            OpCode = aOpCode;
+            this.opCode = OpCode;
+        }
+
+        public string Mnemonic
+        {
+            get
+            {
+                return mnemonic;
+            }
         }
 
         //OLD:
-        public readonly string Mnemonic;
+        private readonly string mnemonic;
 
-        public OpCodeAttribute(string aMnemonic)
+        public OpCodeAttribute(string Mnemonic)
         {
-            Mnemonic = aMnemonic;
+            this.mnemonic = Mnemonic;
         }
     }
 
