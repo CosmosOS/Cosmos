@@ -7,7 +7,14 @@ namespace Cosmos.IL2CPU.Plugs
 		private string mName;
 		public string Name
 		{
-			get; set;
+            get
+            {
+                return mName;
+            }
+            set
+            {
+                mName = value;
+            }
 		}
 	}
 }

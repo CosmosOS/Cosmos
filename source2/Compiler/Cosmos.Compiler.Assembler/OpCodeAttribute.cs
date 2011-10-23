@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler
 {
-    public class OpCodeAttribute: Attribute
+    public sealed class OpCodeAttribute: Attribute
     {
         public OpCodeAttribute(string mnemonic)
         {
