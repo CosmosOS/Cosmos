@@ -979,6 +979,29 @@ namespace Orvid.Graphics
         }
         #endregion
 
+        #region SubImage
+        /// <summary>
+        /// Gets a sub-image of this image,
+        /// from the specified location,
+        /// of the specified size.
+        /// </summary>
+        /// <param name="loc">The location of the image to pull.</param>
+        /// <param name="size">The size of the image to pull.</param>
+        /// <returns>The sub-image obtained.</returns>
+        public Image SubImage(Vec2 loc, Vec2 size)
+        {
+            Image i = new Image(size);
+            for (int y = loc.Y; y < (loc.Y + size.Y); y++)
+            {
+                for (int x = loc.X; x < (loc.X + size.X); x++)
+                {
+                    i.SetPixel((uint)(x - loc.X), (uint)(y - loc.Y), this.GetPixel((uint)x, (uint)y));
+                }
+            }
+            return i;
+        }
+        #endregion
+
 
         /// <summary>
         /// Get's the pixel a the specified location.
