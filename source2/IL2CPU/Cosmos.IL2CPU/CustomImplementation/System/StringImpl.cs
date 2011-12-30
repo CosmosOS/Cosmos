@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
         }
         public static string Concat(object obj0, object obj1)
         {
-            return Concat(obj0.ToString(),obj1.ToString();
+            return Concat(obj0.ToString(), obj1.ToString());
         }
         public static string Concat(object obj0, object obj1, object obj2)
         {
