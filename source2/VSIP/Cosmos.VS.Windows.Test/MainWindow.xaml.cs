@@ -13,12 +13,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Cosmos.VS.Windows.Test {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
   public partial class MainWindow : Window {
     public MainWindow() {
       InitializeComponent();
+
+      string xPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..");
+
+      byte[] xData = System.IO.File.ReadAllBytes(System.IO.Path.Combine(xPath, "SourceTest.bin"));
+      ucAssembly.Update(xData);
     }
   }
 }

@@ -45,6 +45,7 @@ namespace Cosmos.VS.Windows {
       }
 
       mCode = Encoding.ASCII.GetString(mData);
+
       // Used for creating a test file for Cosmos.VS.Windows.Test
       //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
 
