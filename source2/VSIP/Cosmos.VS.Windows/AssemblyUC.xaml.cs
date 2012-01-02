@@ -18,7 +18,7 @@ using System.Threading;
 namespace Cosmos.VS.Windows {
   public partial class AssemblyUC : UserControl {
     static public byte[] mData = new byte[0];
-    string mCode = "";
+    StringBuilder mCode = new StringBuilder();
     bool mFilter = true;
 
     public AssemblyUC() {
@@ -35,63 +35,80 @@ namespace Cosmos.VS.Windows {
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e) {
-      Clipboard.SetText(mCode);
+      Clipboard.SetText(mCode.ToString());
     }
 
     protected void Display(bool aFilter) {
+      // Used for creating a test file for Cosmos.VS.Windows.Test
+      //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+
+      mCode.Clear();
       tblkSource.Inlines.Clear();
       if (mData.Length == 0) {
         return;
       }
 
-      mCode = Encoding.ASCII.GetString(mData);
-
-      // Used for creating a test file for Cosmos.VS.Windows.Test
-      //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+      var xFont = new FontFamily("Consolas");
+      Brush xBrush;
+      string xCode = Encoding.ASCII.GetString(mData);
 
       // Should always be \r\n, but just in case we split by \n and ignore \r
-      string[] xLines = mCode.Replace("\r", "").Split('\n');
+      string[] xLines = xCode.Replace("\r", "").Split('\n');
       foreach (string xLine in xLines) {
+        xBrush = Brushes.Blue;
         string xDisplayLine = xLine;
         string xTestLine = xLine.Trim().ToUpper();
-        var xParts = xTestLine.Split(' ');
+        var xTestParts = xTestLine.Split(' ');
 
         if (aFilter) {
+          xDisplayLine = xDisplayLine.Trim();
+          var xParts = xDisplayLine.Split(' ');
+
           if (xTestLine == "INT3") {
             continue;
           } else if (xTestLine.Length == 0) {
+            // Remove all empty linesIW
             continue;
           } else {
-            if (xParts.Length > 1) {
-              if (xParts[1] == ";ASM") {
+            // Skip ASM labels
+            if (xTestParts.Length > 1) {
+              if (xTestParts[1] == ";ASM") {
                 continue;
               }
             }
           }
 
-          xDisplayLine = xDisplayLine.Trim();
-          if (xParts[0].EndsWith(":")) {
+          if (xTestParts[0].EndsWith(":")) {
             // Insert a blank line before labels, but not if its the top line
             if (tblkSource.Inlines.Count > 0) {
               tblkSource.Inlines.Add(new LineBreak());
+              mCode.AppendLine();
             }
+            // Remove the comment marker after the label
+            xDisplayLine = xParts[0];
           } else {
             xDisplayLine = "\t" + xDisplayLine;
           }
         }
 
-        var xRun = new Run(xDisplayLine.Replace("\t", "    "));
-        xRun.FontFamily = new FontFamily("Consolas");
-        if (xParts[0].EndsWith(":")) {
-          xRun.Foreground = Brushes.Black;
+        if (xTestParts[0].EndsWith(":")) {
+          xBrush = Brushes.Black;
         } else if (xTestLine.StartsWith(";")) {
-          xRun.Foreground = Brushes.Green;
-        } else {
-          xRun.Foreground = Brushes.Blue;
+          xBrush = Brushes.Green;
         }
+
+        // Even though our code is often the source of the tab, it makes
+        // more sense to do it this was because the number of space stays
+        // in one place and also lets us differntiate from natural spaces.
+        xDisplayLine = xDisplayLine.Replace("\t", "    ");
+
+        var xRun = new Run(xDisplayLine);
+        xRun.FontFamily = xFont;
+        xRun.Foreground = xBrush;
 
         tblkSource.Inlines.Add(xRun);
         tblkSource.Inlines.Add(new LineBreak());
+        mCode.AppendLine(xDisplayLine);
       }
     }
 
@@ -106,7 +123,7 @@ namespace Cosmos.VS.Windows {
     }
 
     private void asmFCopyButton_Click(object sender, RoutedEventArgs e) {
-      Clipboard.SetText(mCode);
+      Clipboard.SetText(mCode.ToString());
     }
 
     private void asmStepButton_Click(object sender, RoutedEventArgs e) {
