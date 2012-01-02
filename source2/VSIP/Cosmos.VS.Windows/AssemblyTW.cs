@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Design;
 
-namespace Cosmos.Cosmos_VS_Windows
+namespace Cosmos.VS.Windows
 {
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.

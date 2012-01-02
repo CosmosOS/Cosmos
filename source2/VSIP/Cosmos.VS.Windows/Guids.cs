@@ -2,7 +2,7 @@
 // MUST match guids.h
 using System;
 
-namespace Cosmos.Cosmos_VS_Windows
+namespace Cosmos.VS.Windows
 {
     static class GuidList
     {

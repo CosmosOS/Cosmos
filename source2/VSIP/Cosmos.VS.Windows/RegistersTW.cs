@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 
-namespace Cosmos.Cosmos_VS_Windows
+namespace Cosmos.VS.Windows
 {
     [Guid("CE2A2D0F-0F1B-4A1F-A9AC-5A5F2A5E2C25")]
     public class RegistersTW : ToolWindowPane

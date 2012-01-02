@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 
-namespace Cosmos.Cosmos_VS_Windows
+namespace Cosmos.VS.Windows
 {
     [Guid("A64D0FCC-8DCC-439A-9B16-3C43128AAD51")]
     public class StackTW : ToolWindowPane

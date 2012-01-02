@@ -15,7 +15,7 @@ using Cosmos.Debug.Consts;
 using System.Windows.Threading;
 using System.Threading;
 
-namespace Cosmos.Cosmos_VS_Windows {
+namespace Cosmos.VS.Windows {
   public partial class AssemblyUC : UserControl {
     static public byte[] mData = new byte[0];
     string mCode = "";

@@ -14,7 +14,7 @@ using Cosmos.Debug.Consts;
 using System.Windows.Threading;
 using System.Collections.Generic;
 
-namespace Cosmos.Cosmos_VS_Windows
+namespace Cosmos.VS.Windows
 {
     /// This is the class that implements the package exposed by this assembly.
     ///

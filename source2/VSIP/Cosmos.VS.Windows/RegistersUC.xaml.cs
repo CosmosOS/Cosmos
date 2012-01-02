@@ -15,7 +15,7 @@ using System.Windows.Threading;
 using System.Threading;
 using Cosmos.Debug.Consts;
 
-namespace Cosmos.Cosmos_VS_Windows
+namespace Cosmos.VS.Windows
 {
     public partial class RegistersUC : UserControl
     {

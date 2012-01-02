@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Cosmos.Cosmos_VS_Windows {
+namespace Cosmos.VS.Windows {
   public partial class StackUC : UserControl {
 
     public static byte[] mFrameData;
