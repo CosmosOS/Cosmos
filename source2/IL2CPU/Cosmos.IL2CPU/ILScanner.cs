@@ -812,7 +812,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (xNeedsPlug)
                 {
-                    throw new Exception("Plug needed. " + MethodInfoLabelGenerator.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
+                  throw new Exception("Natie code encountered, plug required. Please see http://cosmos.codeplex.com/wikipage?title=Plugs). " + MethodInfoLabelGenerator.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list
