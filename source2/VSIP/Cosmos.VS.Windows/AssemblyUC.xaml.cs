@@ -51,6 +51,7 @@ namespace Cosmos.VS.Windows {
       var xFont = new FontFamily("Consolas");
       Brush xBrush;
       string xCode = Encoding.ASCII.GetString(mData);
+      string xLabelPrefix = null;
 
       // Should always be \r\n, but just in case we split by \n and ignore \r
       string[] xLines = xCode.Replace("\r", "").Split('\n');
@@ -86,8 +87,17 @@ namespace Cosmos.VS.Windows {
             }
             // Remove the comment marker after the label
             xDisplayLine = xParts[0];
+            if (xLabelPrefix == null) {
+              var xLabelParts = xDisplayLine.Split('.');
+              xLabelPrefix = xLabelParts[0] + ".";
+            }
           } else {
             xDisplayLine = "\t" + xDisplayLine;
+          }
+
+          // Replace all and not just labels so we get jumps, calls etc
+          if (xLabelPrefix != null) {
+            xDisplayLine = xDisplayLine.Replace(xLabelPrefix, "");
           }
         }
 
@@ -99,7 +109,7 @@ namespace Cosmos.VS.Windows {
 
         // Even though our code is often the source of the tab, it makes
         // more sense to do it this was because the number of space stays
-        // in one place and also lets us differntiate from natural spaces.
+        // in one place and also lets us differentiate from natural spaces.
         xDisplayLine = xDisplayLine.Replace("\t", "    ");
 
         var xRun = new Run(xDisplayLine);
