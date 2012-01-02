@@ -42,6 +42,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Studio", "{CD3F5E45-8B24-424F-ADF1-0211712F4CB7}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.html = ReadMe.html
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
