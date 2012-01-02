@@ -49,13 +49,14 @@ namespace Cosmos.VS.Windows {
       // Used for creating a test file for Cosmos.VS.Windows.Test
       //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
 
-      string[] xLines = mCode.Split('\n');
+      // Should always be \r\n, but just in case we split by \n and ignore \r
+      string[] xLines = mCode.Replace("\r", "").Split('\n');
       foreach (string xLine in xLines) {
         string xDisplayLine = xLine;
         string xTestLine = xLine.Trim().ToUpper();
         var xParts = xTestLine.Split(' ');
 
-        if (!aFilter) {
+        if (aFilter) {
           if (xTestLine == "INT3") {
             continue;
           } else if (xTestLine.Length == 0) {
@@ -79,7 +80,8 @@ namespace Cosmos.VS.Windows {
           }
         }
 
-        var xRun = new Run(xDisplayLine);
+        var xRun = new Run(xDisplayLine.Replace("\t", "    "));
+        xRun.FontFamily = new FontFamily("Consolas");
         if (xParts[0].EndsWith(":")) {
           xRun.Foreground = Brushes.Black;
         } else if (xTestLine.StartsWith(";")) {
