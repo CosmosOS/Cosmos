@@ -68,9 +68,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ReadMe.html" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Debug.Consts</Name>
