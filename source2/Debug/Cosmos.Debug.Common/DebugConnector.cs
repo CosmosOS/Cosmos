@@ -241,7 +241,7 @@ namespace Cosmos.Debug.Common {
 
         case DsMsg.Started:
           DoDebugMsg("DC Recv: Started");
-          // Call WaitForMessage first, else it blocks becuase started triggers
+          // Call WaitForMessage first, else it blocks because DsMsg.Started triggers
           // other commands which need responses.
           WaitForMessage();
           // Guests never get the first byte sent. So we send a noop.
@@ -401,11 +401,13 @@ namespace Cosmos.Debug.Common {
     }
 
     protected void PacketTracePoint(byte[] aPacket) {
+      // Seems to need to be ebfore CmdTrace call - have to dig why by moving it breaks things
       WaitForMessage();
       CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
     }
 
     protected void PacketText(byte[] aPacket) {
+      // Seems to need to be ebfore CmdTrace call - have to dig why by moving it breaks things
       WaitForMessage();
       CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
     }
