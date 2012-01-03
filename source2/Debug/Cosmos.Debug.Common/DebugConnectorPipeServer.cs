@@ -6,29 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Cosmos.Debug.Common
-{
-	/// Used for Vmware. VMWare uses a pipe to expose guest serial ports to the host.
-    public class DebugConnectorPipeServer : DebugConnectorStream {
-    
-        public DebugConnectorPipeServer() {
-            mPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
-             , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            mPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), mPipe);
-        }
+namespace Cosmos.Debug.Common {
+  // Used for Vmware. VMWare uses a pipe to expose guest serial ports to the host.
+  public class DebugConnectorPipeServer : DebugConnectorStream {
+    private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
+    private NamedPipeServerStream mPipe;
 
-        private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
-        private NamedPipeServerStream mPipe;
-
-        public void DoWaitForConnection(IAsyncResult aResult) {
-            var xPipe = (NamedPipeServerStream)aResult.AsyncState;
-            xPipe.EndWaitForConnection(aResult);
-            mWaitConnectEvent.Set();
-            Start(xPipe);
-        }
-
-        public override void WaitConnect() {
-            mWaitConnectEvent.WaitOne();
-        }
+    public DebugConnectorPipeServer() {
+      mPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
+       , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+      mPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), mPipe);
     }
+
+    public void DoWaitForConnection(IAsyncResult aResult) {
+      var xPipe = (NamedPipeServerStream)aResult.AsyncState;
+      xPipe.EndWaitForConnection(aResult);
+      mWaitConnectEvent.Set();
+      Start(xPipe);
+    }
+
+    public override void WaitConnect() {
+      mWaitConnectEvent.WaitOne();
+    }
+  }
 }

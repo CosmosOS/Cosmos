@@ -25,7 +25,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected EngineCallback mCallback;
     public AD7Thread mThread;
     protected AD7Engine mEngine;
-    public DebugConnector mDbgConnector;
     public ReverseSourceInfos mReverseSourceMappings;
     public SourceInfos mSourceMappings;
     public uint? mCurrentAddress = null;
@@ -35,10 +34,21 @@ namespace Cosmos.Debug.VSDebugEngine {
     internal DebugInfo mDebugInfoDb;
     internal IDictionary<uint, string> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
-    private Cosmos.Debug.Common.PipeClient mDebugDownPipe;
-    private Cosmos.Debug.Common.PipeServer mDebugUpPipe;
-
     private int mProcessExitEventSent = 0;
+
+    // Connection to target environment. Usually serial but is
+    // abstracted to allow other transports (ethernet, etc)
+    public DebugConnector mDbgConnector;
+    //
+    // These are static because we need them persistent between debug
+    // sessions to avoid reconnection issues. But they are not created
+    // until the debug session is ready the first time so that we know
+    // the debug window pipes are already reayd.
+    //
+    // Pipe to communicate with Cosmos.VS.Windows
+    static private Cosmos.Debug.Common.PipeClient mDebugDownPipe = null;
+    // Pipe to receive messages from Cosmos.VS.Windows
+    static private Cosmos.Debug.Common.PipeServer mDebugUpPipe = null;
 
     protected void LaunchVMWare(bool aGDB) {
       string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
@@ -169,10 +179,13 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Load passed in values
       mDebugInfo = aDebugInfo;
 
-      mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
-      mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.UpName);
-      mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
-      mDebugUpPipe.Start();
+      if (mDebugDownPipe == null) {
+        mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
+
+        mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.UpName);
+        mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
+        mDebugUpPipe.Start();
+      }
 
       mISO = mDebugInfo["ISOFile"];
       mProjectFile = mDebugInfo["ProjectFile"];
@@ -222,13 +235,16 @@ namespace Cosmos.Debug.VSDebugEngine {
         throw new Exception("Debug data not found: SourceMappings");
       }
       mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
+
+      mDbgConnector = null;
       if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
-      } else {
+      }
+      if (mDbgConnector == null) {
         throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
       }
-      aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
+      aEngine.BPMgr.SetDebugConnector(mDbgConnector);
       mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
       mDbgConnector.CmdText += new Action<string>(DbgCmdText);
       mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
