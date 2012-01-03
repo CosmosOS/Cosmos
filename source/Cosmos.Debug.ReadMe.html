@@ -45,11 +45,13 @@
             I debated for a while if this was Kernel or Compiler. However the DebugStub must 
             remain isolated in nature, which is also why we rely on polling the serial 
             rather than IRQs. So in the end I decided since its debugging only and not part 
-            of Cosmos itself, it belongs in Compiler.</p>
+            of Cosmos itself, it is more appropriate in Compiler.</p>
     <h3>
         Comos.Debug.GDB</h3>
     <p>
-        &nbsp;</p>
+        This is the older Cosmos GDB client. It is still useful in deep scenarios but is 
+        now being overshadowed and replaced by the newer integerated assembly level 
+        debuggers.</p>
     <h3>
         Comos.Debug.HostProcess</h3>
     <p>
@@ -58,13 +60,20 @@
             controls the actual execution environment (VMWare, QEMU, etc).</p>
     <h3>
         Comos.Debug.VSDebugEngine</h3>
-	
-        <h4>
-            Notes</h4>
+    <p>
+        This provides a custom debug engine to Visual Studio to handle tracing, 
+        breakpoints, stepping, watches, etc.</p>
         <ul>
-            <li>AD7.Impl/AD7Process.cs does the lanching of the DebugHost, which then launches 
+            <li>AD7.Impl \ AD7Process.cs<ul>
+                <li>Launches DebugHost, which then launches 
                 VMWare etc</li>
-            <li>BreakpointManager.cs contains notes on breakpoints</li>
+                <li>Contains pipes for communicating to VMWare&#39;s serial port to DebugStub</li>
+                </ul>
+            </li>
+            <li>BreakpointManager.cs<ul>
+                <li>contains notes on breakpoints</li>
+                </ul>
+            </li>
         </ul>
 	
 	    <p>
