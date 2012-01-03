@@ -291,7 +291,13 @@ namespace Orvid.Graphics.Drivers
 
         public override void Update(Image i)
         {
-            throw new NotImplementedException();
+            for (ushort x = 0; x < i.Width; x++)
+            {
+                for (ushort y = 0; y < i.Height; y++)
+                {
+                    SetPixel(x, y, i.GetPixel(x, y).ToUInt());
+                }
+            }
         }
 
         public override List<GraphicsMode> GetSupportedModes()
@@ -301,7 +307,7 @@ namespace Orvid.Graphics.Drivers
 
         public override void SetMode(GraphicsMode mode)
         {
-            throw new NotImplementedException();
+            SetMode(800, 600, 32);
         }
 
         public override bool Supported()

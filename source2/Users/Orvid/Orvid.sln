@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C# Express 2010
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "OrvidTest", "OrvidTestOS\OrvidTest.Cosmos", "{02C67056-795C-4DFE-BE83-989E6A16DEE3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrvidKernel", "OrvidTestOS\OrvidKernel.csproj", "{2E14EED0-F7E9-4E7C-AA21-6E519C28457D}"
@@ -95,11 +95,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestRunner", "TestRunner", "{B03AD376-0CC6-40AB-A26A-850CA03D7AF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestRunnerKernel", "TestRunner\TestRunnerKernel.csproj", "{408DE7FA-C3A0-44A2-AA32-2F421EBE9025}"
-EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "TestRunner", "TestRunner\TestRunner.Cosmos", "{0DBE9DF9-45AB-4A3C-AC13-D0240C03012D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{408DE7FA-C3A0-44A2-AA32-2F421EBE9025} = {408DE7FA-C3A0-44A2-AA32-2F421EBE9025}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Consts", "..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
 EndProject
@@ -265,10 +260,6 @@ Global
 		{408DE7FA-C3A0-44A2-AA32-2F421EBE9025}.Debug|x86.Build.0 = Debug|x86
 		{408DE7FA-C3A0-44A2-AA32-2F421EBE9025}.Release|x86.ActiveCfg = Release|x86
 		{408DE7FA-C3A0-44A2-AA32-2F421EBE9025}.Release|x86.Build.0 = Release|x86
-		{0DBE9DF9-45AB-4A3C-AC13-D0240C03012D}.Debug|x86.ActiveCfg = Debug|x86
-		{0DBE9DF9-45AB-4A3C-AC13-D0240C03012D}.Debug|x86.Build.0 = Debug|x86
-		{0DBE9DF9-45AB-4A3C-AC13-D0240C03012D}.Release|x86.ActiveCfg = Release|x86
-		{0DBE9DF9-45AB-4A3C-AC13-D0240C03012D}.Release|x86.Build.0 = Release|x86
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|x86.ActiveCfg = Debug|x86
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|x86.Build.0 = Debug|x86
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Release|x86.ActiveCfg = Debug|Any CPU

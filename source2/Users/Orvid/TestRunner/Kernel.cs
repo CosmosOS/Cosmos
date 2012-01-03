@@ -281,7 +281,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing Byte Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing Byte Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing Byte Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -506,7 +506,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing SByte Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing SByte Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing SByte Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -731,7 +731,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing UShort Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing UShort Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing UShort Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -956,7 +956,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing Short Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing Short Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing Short Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -1181,7 +1181,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing UInt Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing UInt Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing UInt Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -1406,7 +1406,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing Int Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing Int Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing Int Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -1631,7 +1631,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing ULong Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing ULong Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing ULong Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -1856,7 +1856,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing Long Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing Long Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing Long Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -1866,7 +1866,7 @@ namespace TestRunner
                 log.WriteString("Starting Float Comparison Tests. " + CurrentTime() + "\r\n");
                 float zero = 0;
                 float one = 1;
-                
+
                 #region Variable to Variable
                 log.WriteString("Starting Float Comparison Tests (Var to Var). " + CurrentTime() + "\r\n");
                 {
@@ -2081,7 +2081,7 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing Float Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing Float Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing Float Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
@@ -2306,10 +2306,130 @@ namespace TestRunner
                 #endregion
 
                 Console.WriteLine("Finished Testing Double Comparisons. " + CurrentTime());
-                log.WriteString("Finished Testing Double Comparisons. " + CurrentTime() + "\r\n");
+                log.WriteString("Finished Testing Double Comparisons. " + CurrentTime() + "\r\n\r\n");
             }
             #endregion
 
+            #endregion
+
+            #region Test the System.Math Plug
+            {
+                // We have to compare via strings, because of the nature of doubles.
+                Console.WriteLine("Starting Tests for System.Math. " + CurrentTime());
+                log.WriteLine("Starting Tests for System.Math " + CurrentTime());
+                double d = 40.23;
+                double d2 = 93.210;
+                double d3 = -412.569;
+                double d4 = 0.45912;
+
+                if (Math.Abs(d3) == 412.569)
+                    log.WriteLine(GTN() + "Pass: System.Math.Abs(double)");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Abs(double) Got: '" + Math.Abs(d3).ToString() + "' expected '412.569'");
+
+                if (Math.Abs(-419.102f) == 419.102f)
+                    log.WriteLine(GTN() + "Pass: System.Math.Abs(float)");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Abs(float) Got: '" + Math.Abs(-419.102f).ToString() + "' expected '419.102'");
+
+                if (Math.Acos(d4).ToString() == "1.09379195562398")
+                    log.WriteLine(GTN() + "Pass: System.Math.Acos");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Acos Got: '" + Math.Acos(d4).ToString() + "' expected '1.09379195562398'");
+
+                if (Math.Asin(d4).ToString() == "0.477004371170913")
+                    log.WriteLine(GTN() + "Pass: System.Math.Asin");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Asin Got: '" + Math.Asin(d4).ToString() + "' expected '0.477004371170913'");
+
+                if (Math.Atan(d4).ToString() == "0.430412185787624")
+                    log.WriteLine(GTN() + "Pass: System.Math.Atan");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Atan Got: '" + Math.Atan(d4).ToString() + "' expected '0.430412185787624'");
+
+                if (Math.Atan2(d, d2).ToString() == "0.40745269951331")
+                    log.WriteLine(GTN() + "Pass: System.Math.Atan2");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Atan2 Got: '" + Math.Atan2(d, d2).ToString() + "' expected '0.40745269951331'");
+
+                if (Math.Ceiling(d) == 41)
+                    log.WriteLine(GTN() + "Pass: System.Math.Ceiling");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Ceiling Got: '" + Math.Ceiling(d).ToString() + "' expected '41'");
+
+                if (Math.Cos(d).ToString() == "-0.819244231260389")
+                    log.WriteLine(GTN() + "Pass: System.Math.Cos");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Cos Got: '" + Math.Cos(d).ToString() + "' expected '-0.819244231260389'");
+
+                if (Math.Cosh(d).ToString() == "1.48127949589163E+17")
+                    log.WriteLine(GTN() + "Pass: System.Math.Cosh");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Cosh Got: '" + Math.Cosh(d).ToString() + "' expected '1.48127949589163E+17'");
+
+                if (Math.Exp(d).ToString() == "2.96255899178325E+17")
+                    log.WriteLine(GTN() + "Pass: System.Math.Exp");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Exp Got: '" + Math.Exp(d).ToString() + "' expected '2.96255899178325E+17'");
+
+                if (Math.Floor(d) == 40)
+                    log.WriteLine(GTN() + "Pass: System.Math.Floor");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Floor Got: '" + Math.Floor(d).ToString() + "' expected '40'");
+
+                if (Math.Log(d).ToString() == "3.6946129859617")
+                    log.WriteLine(GTN() + "Pass: System.Math.Log(double)");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Log(double) Got: '" + Math.Log(d).ToString() + "' expected '3.6946129859617'");
+
+                if (Math.Log(d, d2).ToString() == "0.814714687928411")
+                    log.WriteLine(GTN() + "Pass: System.Math.Log(double, double)");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Log(double, double) Got: '" + Math.Log(d, d2).ToString() + "' expected '0.814714687928411'");
+
+                if (Math.Log10(d).ToString() == "1.60455003257126")
+                    log.WriteLine(GTN() + "Pass: System.Math.Log10");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Log10 Got: '" + Math.Log10(d).ToString() + "' expected '1.60455003257126'");
+
+                if (Math.Pow(d, d2).ToString() == "3.63168804144286E+149")
+                    log.WriteLine(GTN() + "Pass: System.Math.Pow");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Pow Got: '" + Math.Pow(d, d2).ToString() + "' expected '3.63168804144286E+149'");
+
+                if (Math.Round(d) == 40)
+                    log.WriteLine(GTN() + "Pass: System.Math.Round");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Round Got: '" + Math.Round(d).ToString() + "' expected '40'");
+
+                if (Math.Sinh(d).ToString() == "1.48127949589163E+17")
+                    log.WriteLine(GTN() + "Pass: System.Math.Sinh");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Sinh Got: '" + Math.Sinh(d).ToString() + "' expected '1.48127949589163E+17'");
+
+                if (Math.Sqrt(d).ToString() == "6.34271235355979")
+                    log.WriteLine(GTN() + "Pass: System.Math.Sqrt");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Sqrt Got: '" + Math.Sqrt(d).ToString() + "' expected '6.34271235355979'");
+
+                if (Math.Tan(d).ToString() == "-0.699968013575042")
+                    log.WriteLine(GTN() + "Pass: System.Math.Tan");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Tan Got: '" + Math.Tan(d).ToString() + "' expected '-0.699968013575042'");
+
+                if (Math.Tanh(d) == 1)
+                    log.WriteLine(GTN() + "Pass: System.Math.Tanh");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Tanh Got: '" + Math.Tanh(d).ToString() + "' expected '1'");
+
+                if (Math.Truncate(d) == 40)
+                    log.WriteLine(GTN() + "Pass: System.Math.Truncate");
+                else
+                    log.WriteLine(GTN() + "FAILURE: System.Math.Truncate Got: '" + Math.Truncate(d).ToString() + "' expected '40'");
+
+                Console.WriteLine("Finished Testing System.Math. " + CurrentTime());
+                log.WriteLine("Finished Testing System.Math " + CurrentTime() + "\r\n");
+            }
             #endregion
 
             log.WriteString("Testing Finished. " + CurrentTime());

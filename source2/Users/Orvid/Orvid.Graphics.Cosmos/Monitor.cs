@@ -57,7 +57,7 @@ namespace Orvid.Graphics
             Taskbar = new Image(width, height);
             Mouse = new Image(width, height);
             this.curdriver = new Drivers.VGADriver();
-            this.curdriver.Initialize();
+            //this.curdriver.Initialize();
             this.Width = width;
             this.Height = height;
             WindowManager = new OForms.Windows.WindowManager(new Vec2(width, height));

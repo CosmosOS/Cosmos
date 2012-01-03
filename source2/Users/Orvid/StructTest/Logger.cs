@@ -35,6 +35,11 @@ namespace StructTest
             iop.ModemControl.Byte = 0x0B;
         }
 
+        public void WriteLine(string s)
+        {
+            WriteString(s + "\r\n");
+        }
+
         private int IsTransmitEmpty()
         {
             return iop.LineStatus.Byte & 0x20;

@@ -172,6 +172,15 @@ namespace TestRunner
 
 
         /// <summary>
+        /// Writes the specified string to the Log, followed by EOL.
+        /// </summary>
+        /// <param name="s">The string to write.</param>
+        public void WriteLine(string s)
+        {
+            WriteString(s + "\r\n");
+        }
+
+        /// <summary>
         /// Writes the specified string to the Log.
         /// </summary>
         /// <param name="s">The string to write.</param>

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Math = Cosmos.System.Plugs.System.MathImpl;
+//using Math = Cosmos.System.Plugs.System.MathImpl;
 using System.Text;
 using Sys = Cosmos.System;
 using Orvid.Graphics;
@@ -9,7 +9,6 @@ namespace StructTest
 {
     public class Kernel : Sys.Kernel
     {
-        Logger log = new Logger(2);
 
         public Kernel()
         {
@@ -21,7 +20,6 @@ namespace StructTest
         {
             Console.WriteLine("Hello, and welcome to the TestOS by Orvid.");
             Console.WriteLine("To see a list of supported commands, type '?'");
-            log.WriteString("This is a test message");
         }
 
 
@@ -32,68 +30,7 @@ namespace StructTest
 
         protected override void Run()
         {
-            //float zero = 0;
-            //float one = 1;
-            //double a = 453.231;
-            //double b = 461.251;
-
-            //#region Variable to Variable
-            //if (zero != zero)
-            //{
-            //    Console.WriteLine("zero != zero (False)");
-            //}
-            //if (one != zero)
-            //{
-            //    Console.WriteLine("one != zero (True)");
-            //}
-            //if (zero == zero)
-            //{
-            //    Console.WriteLine("zero == zero (True)");
-            //}
-            //if (one == zero)
-            //{
-            //    Console.WriteLine("one == zero (False)");
-            //}
-            //#endregion
-
-            //#region Variable to Constant
-            //if (zero != 0)
-            //{
-            //    Console.WriteLine("zero != 0 (False)");
-            //}
-            //if (one != 0)
-            //{
-            //    Console.WriteLine("one != 0 (True)");
-            //}
-            //if (zero == 0)
-            //{
-            //    Console.WriteLine("zero == 0 (True)");
-            //}
-            //if (one == 0)
-            //{
-            //    Console.WriteLine("one == 0 (False)");
-            //}
-            //#endregion
-
-            //#region Constant to Variable
-            //if (0 != zero)
-            //{
-            //    Console.WriteLine("0 != zero (False)");
-            //}
-            //if (1 != zero)
-            //{
-            //    Console.WriteLine("1 != zero (True)");
-            //}
-            //if (0 == zero)
-            //{
-            //    Console.WriteLine("0 == zero (True)");
-            //}
-            //if (1 == zero)
-            //{
-            //    Console.WriteLine("1 == zero (False)");
-            //}
-            //#endregion
-
+            Cosmos.Core.RAM.Initialize();
             //double d = 40.23;
             //double d2 = 93.210;
             //double d3 = -412.569;
@@ -114,29 +51,6 @@ namespace StructTest
             //Console.WriteLine("Dividing 0.45912 by 93.210: " + (d4 / d2).ToString() + " (0.00492565175410364)");
             //Console.WriteLine("Dividing 0.45912 by -412.569: " + (d4 / d3).ToString() + " (-0.00111283203536863)");
             //Console.WriteLine("Dividing 0.45912 by 0.45912: " + (d4 / d4).ToString() + " (1)");
-            //Console.WriteLine("Abs (double): " + Math.Abs(d3).ToString());
-            //Console.WriteLine("Abs (float): " + Math.Abs((float)-419.102f));
-            //Console.WriteLine("Acos: " + Math.Acos(d4) + " (1.09379197907449)");
-            //Console.WriteLine("Asin: " + Math.Asin(d4));
-            //Console.WriteLine("Atan: " + Math.Atan(d4));
-            //Console.WriteLine("Atan2: " + Math.Atan2(d, d2));
-            //Console.WriteLine("Ceiling: " + Math.Ceiling(d));
-            //Console.WriteLine("Cos: " + Math.Cos(d));
-            //Console.WriteLine("Cosh: " + Math.Cosh(d));
-            //Console.WriteLine("Exp: " + Math.Exp(d));
-            //Console.WriteLine("Floor: " + Math.Floor(d));
-            //Console.WriteLine("Log (d): " + Math.Log(d));
-            //Console.WriteLine("Log (d,d): " + Math.Log(d, d2));
-            //Console.WriteLine("Log10: " + Math.Log10(d));
-            //Console.WriteLine("Pow: " + Math.Pow(d, d2));
-            //Console.WriteLine("Round: " + Math.Round(d));
-            //Console.WriteLine("Sin: " + Math.Sin(d));
-            //Console.WriteLine("Sinh: " + Math.Sinh(d));
-            //Console.WriteLine("Sqrt: " + Math.Sqrt(d));
-            //Console.WriteLine("Tan: " + Math.Tan(d));
-            //Console.WriteLine("Tanh: " + Math.Tanh(d));
-            //Console.WriteLine("Truncate: " + Math.Truncate(d));
-
 
 
             //Cosmos.Hardware.Drivers.PCI.Video.VMWareSVGAII v = new Cosmos.Hardware.Drivers.PCI.Video.VMWareSVGAII();

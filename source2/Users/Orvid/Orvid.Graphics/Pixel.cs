@@ -34,6 +34,11 @@ namespace Orvid.Graphics
             }
         }
 
+        public uint ToUInt()
+        {
+            return unchecked((uint)((R << 24) | (G << 16) | (B << 8) | (A)));
+        }
+
         //public Pixel()
         //    : this(true)
         //{

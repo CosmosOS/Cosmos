@@ -32,45 +32,10 @@
     <DebugMode>None</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
-    <VMWareFlavor>Player</VMWareFlavor>
+    <VMWareFlavor>Workstation</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Name>Cosmos.IL2CPU.Plugs</Name>
-      <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
-      <Name>Cosmos.Debug.Kernel.Plugs</Name>
-      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
-      <Name>Cosmos.System.Plugs.System</Name>
-      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
-      <Name>Cosmos.System</Name>
-      <Project>{da50b9b2-0e95-4f0d-a3c8-79fc549301b5}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
-      <Name>Cosmos.Core</Name>
-      <Project>{5ac4773c-cb4e-4cd9-8d50-02e10a07dee6}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
-      <Name>Cosmos.Hardware</Name>
-      <Project>{6a991d03-1435-4005-9809-b8bacdf3b021}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Orvid.Graphics.Cosmos\Orvid.Graphics.Cosmos.csproj">
       <Name>Orvid.Graphics.Cosmos</Name>
       <Project>{167d46d2-f0f2-4f59-ba0f-2452941e0450}</Project>
@@ -86,6 +51,20 @@
       <Project>{2e14eed0-f7e9-4e7c-aa21-6e519c28457d}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.Core.Plugs</Name>
+      <AssemblyName>Cosmos.Core.Plugs.dll</AssemblyName>
+      <HintPath>..\..\..\..\..\..\Users\Orvid\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Core.Plugs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.System.Plugs.System</Name>
+      <AssemblyName>Cosmos.System.Plugs.System.dll</AssemblyName>
+      <HintPath>..\..\..\..\..\..\Users\Orvid\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.System.Plugs.System.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
