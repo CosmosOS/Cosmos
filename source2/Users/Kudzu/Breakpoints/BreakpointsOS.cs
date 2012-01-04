@@ -15,16 +15,15 @@ namespace BreakpointsKernel {
     }
 
     protected override void Run() {
-      int i = 5;
       Test xTest;
-
       xTest = new NullableTest();
       xTest.Run();
 
       //xTest = new Int64Test();
       //xTest.Run();
 
-      //TestATA();
+      TestATA();
+      Stop();
     }
 
     protected override void BeforeRun() {
@@ -108,6 +107,7 @@ namespace BreakpointsKernel {
       Console.WriteLine("Serial No: " + xATA.SerialNo);
       Console.WriteLine("Firmware Rev: " + xATA.FirmwareRev);
       Console.WriteLine("Model No: " + xATA.ModelNo);
+      Console.WriteLine("Block Size: " + xATA.BlockSize + " bytes");
       Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
 
       Partition xPartition = null;

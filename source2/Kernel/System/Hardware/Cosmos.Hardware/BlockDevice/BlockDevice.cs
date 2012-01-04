@@ -17,7 +17,7 @@ namespace Cosmos.Hardware.BlockDevice {
     public byte[] NewBlockArray(UInt32 aBlockCount) {
       return new byte[aBlockCount * mBlockSize];
     }
-    
+
     protected UInt64 mBlockCount = 0;
     public UInt64 BlockCount {
       get { return mBlockCount; }
@@ -25,10 +25,7 @@ namespace Cosmos.Hardware.BlockDevice {
 
     protected UInt64 mBlockSize = 0;
     public UInt64 BlockSize {
-      get {
-		  var xkSize = mBlockSize;
-		  
-		  return mBlockSize; }
+      get { return mBlockSize; }
     }
 
     // Only allow reading and writing whole blocks becuase many of the hardware

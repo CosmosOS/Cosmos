@@ -123,6 +123,10 @@
       <DependentUpon>DataBytesUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Global.cs" />
+    <Compile Include="InternalTW.cs" />
+    <Compile Include="InternalUC.xaml.cs">
+      <DependentUpon>InternalUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MemoryViewUC.xaml.cs">
       <DependentUpon>MemoryViewUC.xaml</DependentUpon>
     </Compile>
@@ -182,6 +186,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DataBytesUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InternalUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
