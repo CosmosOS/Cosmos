@@ -68,8 +68,8 @@ namespace Cosmos.Debug.VSDebugEngine
         // The language for this sample is always C++
         int IDebugDocumentContext2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
-            pbstrLanguage = "C++";
-            pguidLanguage = AD7Guids.guidLanguageCpp;
+            pbstrLanguage = "CSharp";
+            pguidLanguage = AD7Guids.guidLanguageCSharp;
             return VSConstants.S_OK;
         }
 

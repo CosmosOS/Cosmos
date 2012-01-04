@@ -517,6 +517,9 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?
+        //
+        // Possibly, by dragging the execution location up
+        // or down through the source code? -Orvid
         MessageBox.Show("Step backwards is not supported.");
         mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
 
