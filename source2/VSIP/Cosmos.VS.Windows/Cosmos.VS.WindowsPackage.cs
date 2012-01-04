@@ -79,37 +79,23 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    private void ShowCosmosVSInternalToolWindow(object sender, EventArgs e) {
-      // Get the instance number 0 of this tool window. This window is single instance so this instance
-      // is actually the only one.
-      // The last flag is set to true so that if the tool window does not exists it will be created.
-      ToolWindowPane window = this.FindToolWindow(typeof(InternalTW), 0, true);
-      if ((null == window) || (null == window.Frame)) {
-        throw new NotSupportedException(Resources.CanNotCreateWindow);
+    private void ShowWindowInternal(object sender, EventArgs e) {
+      if (ShowWindow(typeof(InternalTW))) {
+        UpdateInternal();
       }
-      IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-      if (windowFrame.IsVisible() == 0) UpdateInternal();
-      Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
     }
 
-    private void ShowCosmosVSRegistersToolWindow(object sender, EventArgs e) {
-      ToolWindowPane window = this.FindToolWindow(typeof(RegistersTW), 0, true);
-      if ((null == window) || (null == window.Frame)) {
-        throw new NotSupportedException(Resources.CanNotCreateWindow);
+    private void ShowWindowRegisters(object sender, EventArgs e) {
+      if (ShowWindow(typeof(RegistersTW))) {
+        UpdateRegisters();
       }
-      IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-      if (windowFrame.IsVisible() == 0) UpdateRegisters();
-      Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
     }
 
-    private void ShowCosmosVSStackToolWindow(object sender, EventArgs e) {
-      ToolWindowPane window = this.FindToolWindow(typeof(StackTW), 0, true);
-      if ((null == window) || (null == window.Frame)) {
-        throw new NotSupportedException(Resources.CanNotCreateWindow);
+    private void ShowWindowStack(object sender, EventArgs e) {
+      if (ShowWindow(typeof(StackTW))) {
+        UpdateStack();
+        UpdateFrame();
       }
-      IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-      if (windowFrame.IsVisible() == 0) UpdateStackFrame();
-      Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
     }
 
     private bool ShowWindow(Type aWindowType) {
@@ -128,18 +114,10 @@ namespace Cosmos.VS.Windows {
     }
 
     private void ShowWindowAll(object sender, EventArgs e) {
-      if (ShowWindow(typeof(AssemblyTW))) {
-        UpdateAssembly();
-      }
-      if (ShowWindow(typeof(RegistersTW))) {
-        UpdateRegisters();
-      }
-      if (ShowWindow(typeof(StackTW))) {
-        UpdateStackFrame();
-      }
-      if (ShowWindow(typeof(InternalTW))) {
-        UpdateInternal();
-      }
+      ShowWindowAssembly(sender, e);
+      ShowWindowRegisters(sender, e);
+      ShowWindowStack(sender, e);
+      ShowWindowInternal(sender, e);
     }
 
     // Overriden Package Implementation
@@ -158,17 +136,14 @@ namespace Cosmos.VS.Windows {
         MenuCommand CosmosVSAssemblyToolWindowMenuCommand = new MenuCommand(ShowWindowAssembly, CosmosVSAssemblyToolWindowCommandID);
         mcs.AddCommand(CosmosVSAssemblyToolWindowMenuCommand);
 
-        // Create the command for the registers tool window
         CommandID CosmosVSRegistersToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosRegisters);
-        MenuCommand CosmosVSRegistersToolWindowMenuCommand = new MenuCommand(ShowCosmosVSRegistersToolWindow, CosmosVSRegistersToolWindowCommandID);
+        MenuCommand CosmosVSRegistersToolWindowMenuCommand = new MenuCommand(ShowWindowRegisters, CosmosVSRegistersToolWindowCommandID);
         mcs.AddCommand(CosmosVSRegistersToolWindowMenuCommand);
 
-        // Create the command for the stack tool window
         CommandID CosmosVSStackToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosStack);
-        MenuCommand CosmosVSStackToolWindowMenuCommand = new MenuCommand(ShowCosmosVSStackToolWindow, CosmosVSStackToolWindowCommandID);
+        MenuCommand CosmosVSStackToolWindowMenuCommand = new MenuCommand(ShowWindowStack, CosmosVSStackToolWindowCommandID);
         mcs.AddCommand(CosmosVSStackToolWindowMenuCommand);
 
-        // Create the command to show all tool windows
         CommandID CosmosVSShowAllToolWindowsCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosShowAll);
         MenuCommand CosmosVSShowAllToolWindowMenuCommand = new MenuCommand(ShowWindowAll, CosmosVSShowAllToolWindowsCommandID);
         mcs.AddCommand(CosmosVSShowAllToolWindowMenuCommand);
@@ -186,38 +161,24 @@ namespace Cosmos.VS.Windows {
           xCmd = mCommand.Dequeue();
           xMsg = mMessage.Dequeue();
         }
+
         switch (xCmd) {
           case DwMsg.Noop:
             break;
 
           case DwMsg.Stack:
-            if (StackTW.mUC != null) {
-              StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                StackTW.mUC.UpdateStack(xMsg);
-              });
-            } else {
-              StackUC.mStackData = xMsg;
-            }
+            StackUC.mStackData = xMsg;
+            UpdateStack();
             break;
 
           case DwMsg.Frame:
-            if (StackTW.mUC != null) {
-              StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                StackTW.mUC.UpdateFrame(xMsg);
-              });
-            } else {
-              StackUC.mFrameData = xMsg;
-            }
+            StackUC.mFrameData = xMsg;
+            UpdateFrame();
             break;
 
           case DwMsg.Registers:
-            if (RegistersTW.mUC != null) {
-              RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                RegistersTW.mUC.Update(xMsg);
-              });
-            } else {
-              RegistersUC.mData = xMsg;
-            }
+            RegistersUC.mData = xMsg;
+            UpdateRegisters();
             break;
 
           case DwMsg.Quit:
@@ -225,19 +186,13 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.AssemblySource:
-            if (AssemblyTW.mUC != null) {
-              AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-                AssemblyTW.mUC.Update(xMsg);
-              });
-            } else {
-              AssemblyUC.mData = xMsg;
-            }
+            AssemblyUC.mData = xMsg;
+            UpdateAssembly();
             break;
 
           case DwMsg.Pong:
             System.Windows.MessageBox.Show("Pong!");
             break;
-
         }
       }
     }
@@ -259,14 +214,18 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    private void UpdateStackFrame() {
+    private void UpdateStack() {
       if (StackTW.mUC != null) {
         if ((StackUC.mStackData != null) && (StackUC.mStackData.Length > 0)) {
           StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
             StackTW.mUC.UpdateStack(StackUC.mStackData);
           });
         }
+      }
+    }
 
+    private void UpdateFrame() {
+      if (StackTW.mUC != null) {
         if ((StackUC.mFrameData != null) && (StackUC.mFrameData.Length > 0)) {
           StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
             StackTW.mUC.UpdateFrame(StackUC.mFrameData);
