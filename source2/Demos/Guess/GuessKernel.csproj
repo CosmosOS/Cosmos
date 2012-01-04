@@ -57,8 +57,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="Cosmos.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
     <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
     <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
@@ -69,7 +67,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-
+    <ProjectReference Include="..\..\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Kernel\Common\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{04602B68-B877-4CA0-B17B-09C309732943}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -38,8 +38,6 @@
     <StartCosmosGDB>false</StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
       <Name>Cosmos.Debug.Kernel.Plugs</Name>
       <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
