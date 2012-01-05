@@ -66,17 +66,31 @@ namespace Cosmos.VS.Windows {
       mPipeDown = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.DownName);
       mPipeDown.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
       mPipeDown.Start();
-
-      Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
     }
 
-    /// This function is called when the user clicks the menu item that shows the 
-    /// tool window. See the Initialize method to see how the menu item is associated to 
-    /// this function using the OleMenuCommandService service and the MenuCommand class.
-    private void ShowWindowAssembly(object sender, EventArgs e) {
-      if (ShowWindow(typeof(AssemblyTW))) {
-        UpdateAssembly();
+    protected ToolWindowPane2 FindWindow(Type aWindowType) {
+      // Get the instance number 0 of this tool window.
+      // Our windows are single instance so this instance will be the only one.
+      // The last flag is set to true so that if the tool window does not exists it will be created.
+      var xWindow = FindToolWindow(aWindowType, 0, true);
+      if ((xWindow == null) || (xWindow.Frame == null)) {
+        throw new NotSupportedException(Resources.CanNotCreateWindow);
       }
+      return xWindow as ToolWindowPane2;
+    }
+
+    protected bool ShowWindow(Type aWindowType) {
+      var xWindow = FindWindow(aWindowType);
+      var xFrame = (IVsWindowFrame)xWindow.Frame;
+      Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
+      return xFrame.IsVisible() == 0;
+    }
+
+    // This function is called when the user clicks the menu item that shows the 
+    // tool window. See the Initialize method to see how the menu item is associated to 
+    // this function using the OleMenuCommandService service and the MenuCommand class.
+    private void ShowWindowAssembly(object sender, EventArgs e) {
+      ShowWindow(typeof(AssemblyTW));
     }
 
     private void ShowWindowInternal(object sender, EventArgs e) {
@@ -96,21 +110,6 @@ namespace Cosmos.VS.Windows {
         UpdateStack();
         UpdateFrame();
       }
-    }
-
-    private bool ShowWindow(Type aWindowType) {
-      // Get the instance number 0 of this tool window.
-      // Our windows are single instance so this instance will be the only one.
-      // The last flag is set to true so that if the tool window does not exists it will be created.
-      var xWindow = FindToolWindow(aWindowType, 0, true);
-      if ((xWindow == null) || (xWindow.Frame == null)) {
-        throw new NotSupportedException(Resources.CanNotCreateWindow);
-      }
-
-      var xFrame = (IVsWindowFrame)xWindow.Frame;
-      Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
-
-      return xFrame.IsVisible() == 0;
     }
 
     private void ShowWindowAll(object sender, EventArgs e) {
@@ -186,8 +185,7 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.AssemblySource:
-            AssemblyUC.mData = xMsg;
-            UpdateAssembly();
+            UpdateAssembly(xMsg);
             break;
 
           case DwMsg.Pong:
@@ -234,14 +232,9 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    private void UpdateAssembly() {
-      if ((AssemblyUC.mData != null) && (AssemblyUC.mData.Length > 0)) {
-        if (AssemblyTW.mUC != null) {
-          AssemblyTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-            AssemblyTW.mUC.Update(AssemblyUC.mData);
-          });
-        }
-      }
+    private void UpdateAssembly(byte[] aData) {
+      var xWindow = FindWindow(typeof(AssemblyTW));
+      xWindow.UserControl.Update(aData);
     }
 
     private void UpdateInternal() {

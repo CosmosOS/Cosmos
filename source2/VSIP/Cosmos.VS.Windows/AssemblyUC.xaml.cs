@@ -32,15 +32,13 @@ namespace Cosmos.VS.Windows {
   /// implementation of the IVsUIElementPane interface.
   //
   [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
-  public class AssemblyTW : ToolWindowPane {
-    public static AssemblyUC mUC;
-
-    public AssemblyTW() : base(null) {
-      //this.ToolBar = new CommandID(GuidList.guidAsmToolbarCmdSet, (int)PkgCmdIDList.AsmToolbar);
+  public class AssemblyTW : ToolWindowPane2 {
+    public AssemblyTW() : base() {
+      //ToolBar = new CommandID(GuidList.guidAsmToolbarCmdSet, (int)PkgCmdIDList.AsmToolbar);
       Caption = "Cosmos Assembly";
 
       // Set the image that will appear on the tab of the window frame
-      // when docked with an other window
+      // when docked with an other window.
       // The resource ID correspond to the one defined in the resx file
       // while the Index is the offset in the bitmap strip. Each image in
       // the strip being 16x16.
@@ -50,13 +48,12 @@ namespace Cosmos.VS.Windows {
       // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
       // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
       // the object returned by the Content property.
-      mUC = new AssemblyUC();
-      Content = mUC;
+      mUserControl = new AssemblyUC();
+      Content = mUserControl;
     }
   }
 
   public partial class AssemblyUC : DebuggerUC {
-    static public byte[] mData = new byte[0];
     StringBuilder mCode = new StringBuilder();
     bool mFilter = true;
 
@@ -161,7 +158,7 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    public void Update(byte[] aData) {
+    protected override void DoUpdate(byte[] aData) {
       mData = aData;
       Display(mFilter);
     }
