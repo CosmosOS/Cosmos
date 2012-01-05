@@ -55,7 +55,7 @@ namespace Cosmos.VS.Windows {
     }
   }
 
-  public partial class AssemblyUC : UserControl {
+  public partial class AssemblyUC : DebuggerUC {
     static public byte[] mData = new byte[0];
     StringBuilder mCode = new StringBuilder();
     bool mFilter = true;
