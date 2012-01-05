@@ -33,7 +33,7 @@ namespace Cosmos.VS.Windows {
   //
   [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
   public class AssemblyTW : ToolWindowPane2 {
-    public AssemblyTW() : base() {
+    public AssemblyTW() {
       //ToolBar = new CommandID(GuidList.guidAsmToolbarCmdSet, (int)PkgCmdIDList.AsmToolbar);
       Caption = "Cosmos Assembly";
 

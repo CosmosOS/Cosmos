@@ -124,7 +124,6 @@
     </Compile>
     <Compile Include="DebuggerUC.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="InternalTW.cs" />
     <Compile Include="InternalUC.xaml.cs">
       <DependentUpon>InternalUC.xaml</DependentUpon>
     </Compile>
@@ -135,7 +134,6 @@
       <DependentUpon>RegistersUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
-    <Compile Include="RegistersTW.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -105,9 +105,7 @@ namespace Cosmos.VS.Windows {
     }
 
     private void ShowWindowRegisters(object sender, EventArgs e) {
-      if (ShowWindow(typeof(RegistersTW))) {
-        UpdateRegisters();
-      }
+      ShowWindow(typeof(RegistersTW));
     }
 
     private void ShowWindowStack(object sender, EventArgs e) {
@@ -173,8 +171,7 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.Registers:
-            RegistersUC.mData = xMsg;
-            UpdateRegisters();
+            UpdateWindow(typeof(RegistersTW), xMsg);
             break;
 
           case DwMsg.Quit:
@@ -196,16 +193,6 @@ namespace Cosmos.VS.Windows {
       lock (mCommand) {
         mCommand.Enqueue(aCmd);
         mMessage.Enqueue(aMsg);
-      }
-    }
-
-    private void UpdateRegisters() {
-      if ((RegistersUC.mData != null) && (RegistersUC.mData.Length > 0)) {
-        if (RegistersTW.mUC != null) {
-          RegistersTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-            RegistersTW.mUC.Update(RegistersUC.mData);
-          });
-        }
       }
     }
 

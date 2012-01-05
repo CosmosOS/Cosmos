@@ -1,11 +1,12 @@
-﻿<UserControl x:Class="Cosmos.VS.Windows.RegistersUC"
+﻿<local:DebuggerUC x:Class="Cosmos.VS.Windows.RegistersUC"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
+             xmlns:local="clr-namespace:Cosmos.VS.Windows"
              mc:Ignorable="d" 
-             Name="CosmosRegistersUserControl"
+             x:Name="CosmosRegistersUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" xmlns:my="clr-namespace:Cosmos.VS.Windows">
     <WrapPanel>
     <StackPanel Orientation="Horizontal" Margin="5">
@@ -81,4 +82,4 @@
             </StackPanel>
       </StackPanel>
   </WrapPanel>
-</UserControl>
+</local:DebuggerUC>
