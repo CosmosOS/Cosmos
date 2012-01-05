@@ -86,6 +86,11 @@ namespace Cosmos.VS.Windows {
       return xFrame.IsVisible() == 0;
     }
 
+    protected void UpdateWindow(Type aWindowType, byte[] aData) {
+      var xWindow = FindWindow(aWindowType);
+      xWindow.UserControl.Update(aData);
+    }
+
     // This function is called when the user clicks the menu item that shows the 
     // tool window. See the Initialize method to see how the menu item is associated to 
     // this function using the OleMenuCommandService service and the MenuCommand class.
@@ -119,33 +124,25 @@ namespace Cosmos.VS.Windows {
       ShowWindowInternal(sender, e);
     }
 
-    // Overriden Package Implementation
+    protected void AddCommand(OleMenuCommandService aMcs, uint aCmdID, EventHandler aHandler) {
+      // Create the command for the assembly tool window
+      var xCmdID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)aCmdID);
+      var xMenuCmd = new MenuCommand(aHandler, xCmdID);
+      aMcs.AddCommand(xMenuCmd);
+    }
 
-    /// Initialization of the package; this method is called right after the package is sited, so this is the place
-    /// where you can put all the initilaization code that rely on services provided by VisualStudio.
+    // Initialization of the package; this method is called right after the package is sited, so this is the place
+    // where you can put all the initilaization code that rely on services provided by VisualStudio.
     protected override void Initialize() {
-      Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
       base.Initialize();
 
       // Add our command handlers for menu (commands must exist in the .vsct file)
-      OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-      if (null != mcs) {
-        // Create the command for the assembly tool window
-        CommandID CosmosVSAssemblyToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosAssembly);
-        MenuCommand CosmosVSAssemblyToolWindowMenuCommand = new MenuCommand(ShowWindowAssembly, CosmosVSAssemblyToolWindowCommandID);
-        mcs.AddCommand(CosmosVSAssemblyToolWindowMenuCommand);
-
-        CommandID CosmosVSRegistersToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosRegisters);
-        MenuCommand CosmosVSRegistersToolWindowMenuCommand = new MenuCommand(ShowWindowRegisters, CosmosVSRegistersToolWindowCommandID);
-        mcs.AddCommand(CosmosVSRegistersToolWindowMenuCommand);
-
-        CommandID CosmosVSStackToolWindowCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosStack);
-        MenuCommand CosmosVSStackToolWindowMenuCommand = new MenuCommand(ShowWindowStack, CosmosVSStackToolWindowCommandID);
-        mcs.AddCommand(CosmosVSStackToolWindowMenuCommand);
-
-        CommandID CosmosVSShowAllToolWindowsCommandID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)PkgCmdIDList.cmdidCosmosShowAll);
-        MenuCommand CosmosVSShowAllToolWindowMenuCommand = new MenuCommand(ShowWindowAll, CosmosVSShowAllToolWindowsCommandID);
-        mcs.AddCommand(CosmosVSShowAllToolWindowMenuCommand);
+      var xMcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+      if (xMcs != null) {
+        AddCommand(xMcs, PkgCmdIDList.cmdidCosmosAssembly, ShowWindowAssembly);
+        AddCommand(xMcs, PkgCmdIDList.cmdidCosmosRegisters, ShowWindowRegisters);
+        AddCommand(xMcs, PkgCmdIDList.cmdidCosmosStack, ShowWindowStack);
+        AddCommand(xMcs, PkgCmdIDList.cmdidCosmosShowAll, ShowWindowAll);
       }
     }
 
@@ -185,7 +182,7 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.AssemblySource:
-            UpdateAssembly(xMsg);
+            UpdateWindow(typeof(AssemblyTW), xMsg);
             break;
 
           case DwMsg.Pong:
@@ -230,11 +227,6 @@ namespace Cosmos.VS.Windows {
           });
         }
       }
-    }
-
-    private void UpdateAssembly(byte[] aData) {
-      var xWindow = FindWindow(typeof(AssemblyTW));
-      xWindow.UserControl.Update(aData);
     }
 
     private void UpdateInternal() {

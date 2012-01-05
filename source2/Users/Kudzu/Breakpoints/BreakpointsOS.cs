@@ -19,8 +19,8 @@ namespace BreakpointsKernel {
       xTest = new NullableTest();
       xTest.Run();
 
-      //xTest = new Int64Test();
-      //xTest.Run();
+      xTest = new Int64Test();
+      xTest.Run();
 
       TestATA();
       Stop();
