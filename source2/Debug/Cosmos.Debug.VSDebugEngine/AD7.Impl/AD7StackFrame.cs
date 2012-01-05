@@ -543,14 +543,14 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                 }
 
-                //if (m_locals != null)
+                if (m_locals != null)
                 {
-                    //foreach (VariableInformation currVariable in m_locals)
+                    foreach (DebugInfo.Local_Argument_Info currVariable in mLocalInfos)
                     {
-                        //if (String.CompareOrdinal(currVariable.m_name, pszCode) == 0)
+                        if (String.CompareOrdinal(currVariable.Name, pszCode) == 0)
                         {
-                            //ppExpr = new AD7Expression(currVariable);
-                            //return VSConstants.S_OK;
+                            ppExpr = new AD7Expression(currVariable);
+                            return VSConstants.S_OK;
                         }
                     }
                 }
