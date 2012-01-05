@@ -143,7 +143,6 @@
     <Compile Include="Cosmos.VS.WindowsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
-    <Compile Include="StackTW.cs" />
     <Compile Include="StackUC.xaml.cs">
       <DependentUpon>StackUC.xaml</DependentUpon>
     </Compile>

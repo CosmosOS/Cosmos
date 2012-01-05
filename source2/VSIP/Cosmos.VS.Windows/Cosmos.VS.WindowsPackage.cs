@@ -79,16 +79,16 @@ namespace Cosmos.VS.Windows {
       return xWindow as ToolWindowPane2;
     }
 
-    protected bool ShowWindow(Type aWindowType) {
+    protected void ShowWindow(Type aWindowType) {
       var xWindow = FindWindow(aWindowType);
       var xFrame = (IVsWindowFrame)xWindow.Frame;
       Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
-      return xFrame.IsVisible() == 0;
+      //return xFrame.IsVisible() == 0;
     }
 
     protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData) {
       var xWindow = FindWindow(aWindowType);
-      xWindow.UserControl.Update(null, aData);
+      xWindow.UserControl.Update(aTag, aData);
     }
 
     // This function is called when the user clicks the menu item that shows the 
@@ -99,9 +99,7 @@ namespace Cosmos.VS.Windows {
     }
 
     private void ShowWindowInternal(object sender, EventArgs e) {
-      if (ShowWindow(typeof(InternalTW))) {
-        UpdateInternal();
-      }
+      ShowWindow(typeof(InternalTW));
     }
 
     private void ShowWindowRegisters(object sender, EventArgs e) {
@@ -109,10 +107,7 @@ namespace Cosmos.VS.Windows {
     }
 
     private void ShowWindowStack(object sender, EventArgs e) {
-      if (ShowWindow(typeof(StackTW))) {
-        UpdateStack();
-        UpdateFrame();
-      }
+      ShowWindow(typeof(StackTW));
     }
 
     private void ShowWindowAll(object sender, EventArgs e) {
@@ -161,13 +156,11 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.Stack:
-            StackUC.mStackData = xMsg;
-            UpdateStack();
+            UpdateWindow(typeof(StackTW), "STACK", xMsg);
             break;
 
           case DwMsg.Frame:
-            StackUC.mFrameData = xMsg;
-            UpdateFrame();
+            UpdateWindow(typeof(StackTW), "FRAME", xMsg);
             break;
 
           case DwMsg.Registers:
@@ -196,27 +189,5 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    private void UpdateStack() {
-      if (StackTW.mUC != null) {
-        if ((StackUC.mStackData != null) && (StackUC.mStackData.Length > 0)) {
-          StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-            StackTW.mUC.UpdateStack(StackUC.mStackData);
-          });
-        }
-      }
-    }
-
-    private void UpdateFrame() {
-      if (StackTW.mUC != null) {
-        if ((StackUC.mFrameData != null) && (StackUC.mFrameData.Length > 0)) {
-          StackTW.mUC.Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-            StackTW.mUC.UpdateFrame(StackUC.mFrameData);
-          });
-        }
-      }
-    }
-
-    private void UpdateInternal() {
-    }
   }
 }

@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,15 +17,35 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using Cosmos.Debug.Consts;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.Windows {
-  public partial class StackUC : UserControl {
+  [Guid("A64D0FCC-8DCC-439A-9B16-3C43128AAD51")]
+  public class StackTW : ToolWindowPane2 {
+    public StackTW() {
+      Caption = "Cosmos Stack";
+      BitmapResourceID = 301;
+      BitmapIndex = 1;
 
-    public static byte[] mFrameData;
-    public static byte[] mStackData;
-
+      mUserControl = new StackUC();
+      Content = mUserControl;
+    }
+  }
+  
+  public partial class StackUC : DebuggerUC {
     public StackUC() {
       InitializeComponent();
+    }
+
+    protected override void DoUpdate(string aTag, byte[] aData) {
+      if (aTag == "STACK") {
+        UpdateStack(aData);
+      } else if (aTag == "FRAME") {
+        UpdateFrame(aData);
+      }
     }
 
     public void UpdateFrame(byte[] aData) {
