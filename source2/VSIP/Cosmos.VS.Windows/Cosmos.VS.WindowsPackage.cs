@@ -86,9 +86,9 @@ namespace Cosmos.VS.Windows {
       return xFrame.IsVisible() == 0;
     }
 
-    protected void UpdateWindow(Type aWindowType, byte[] aData) {
+    protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData) {
       var xWindow = FindWindow(aWindowType);
-      xWindow.UserControl.Update(aData);
+      xWindow.UserControl.Update(null, aData);
     }
 
     // This function is called when the user clicks the menu item that shows the 
@@ -171,7 +171,7 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.Registers:
-            UpdateWindow(typeof(RegistersTW), xMsg);
+            UpdateWindow(typeof(RegistersTW), null, xMsg);
             break;
 
           case DwMsg.Quit:
@@ -179,7 +179,7 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.AssemblySource:
-            UpdateWindow(typeof(AssemblyTW), xMsg);
+            UpdateWindow(typeof(AssemblyTW), null, xMsg);
             break;
 
           case DwMsg.Pong:

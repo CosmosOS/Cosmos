@@ -20,7 +20,7 @@ namespace Cosmos.VS.Windows.Test {
       string xPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..");
 
       byte[] xData = System.IO.File.ReadAllBytes(System.IO.Path.Combine(xPath, "SourceTest.bin"));
-      ucAssembly.Update(xData);
+      ucAssembly.Update(null, xData);
     }
   }
 }

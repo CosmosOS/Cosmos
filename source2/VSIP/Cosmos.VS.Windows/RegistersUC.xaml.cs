@@ -56,7 +56,7 @@ namespace Cosmos.VS.Windows {
       a32.Value = x32;
     }
 
-    protected override void DoUpdate(byte[] aData) {
+    protected override void DoUpdate(string aTag, byte[] aData) {
       //Push All
       //  Temp = (ESP);
       //  Push(EAX); 28

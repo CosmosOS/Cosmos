@@ -9,16 +9,16 @@ namespace Cosmos.VS.Windows {
   public class DebuggerUC : UserControl {
     protected byte[] mData = new byte[0];
 
-    public void Update(byte[] aData) {
+    public void Update(string aTag, byte[] aData) {
       mData = aData;
       Dispatcher.Invoke(DispatcherPriority.Normal, 
         (Action)delegate() {
-          DoUpdate(aData);    
+          DoUpdate(aTag, aData);    
         }
       );
     }
 
-    protected virtual void DoUpdate(byte[] aData) {
+    protected virtual void DoUpdate(string aTag, byte[] aData) {
     }
   }
 }

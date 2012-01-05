@@ -63,7 +63,7 @@ namespace Cosmos.VS.Windows {
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
       butnPing.Click += new RoutedEventHandler(butnPing_Click);
 
-      Update(mData);
+      Update(null, mData);
     }
 
     void butnPing_Click(object sender, RoutedEventArgs e) {
@@ -158,7 +158,7 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    protected override void DoUpdate(byte[] aData) {
+    protected override void DoUpdate(string aTag, byte[] aData) {
       mData = aData;
       Display(mFilter);
     }
