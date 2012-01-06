@@ -19,6 +19,8 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7Process mProcess;
         private AD7StackFrame mStackFrame;
         private DebugInfo.Local_Argument_Info mDebugInfo;
+        const uint xArrayLengthOffset = 8;
+        const uint xArrayFirstElementOffset = 16;
 
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
@@ -62,8 +64,6 @@ namespace Cosmos.Debug.VSDebugEngine
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
                 byte[] xData;
-                const uint xArrayLengthOffset = 8;
-                const uint xArrayFirstElementOffset = 16;
 
                 #region String
                 if (mDebugInfo.Type == typeof(string).AssemblyQualifiedName)

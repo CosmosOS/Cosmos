@@ -13,11 +13,15 @@ namespace Cosmos.Debug.VSDebugEngine
     // For the purposes of this sample, this means obtaining the values of locals and parameters from a stack frame.
     public class AD7Expression : IDebugExpression2
     {
-        private DebugInfo.Local_Argument_Info m_var;
+        private DebugLocalInfo m_var;
+        private AD7Process Process;
+        private AD7StackFrame StackFrame;
 
-        public AD7Expression(DebugInfo.Local_Argument_Info var)
+        public AD7Expression(DebugLocalInfo pVar, AD7Process pProcess, AD7StackFrame pStackFrame)
         {
-            //m_var = var;
+            this.m_var = pVar;
+            this.Process = pProcess;
+            this.StackFrame = pStackFrame;
         }
 
         // This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
@@ -40,7 +44,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // This method evaluates the expression synchronously.
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
-            ppResult = null;// new AD7Property(m_var);
+            ppResult = new AD7Property(m_var, Process, StackFrame);
             return VSConstants.S_OK;
         }
 

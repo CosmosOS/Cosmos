@@ -12,7 +12,7 @@ namespace Cosmos.Debug.VSDebugEngine
 {
     // Represents a logical stack frame on the thread stack. 
     // Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
-    class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2
+    public class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2
     {
         readonly AD7Engine m_engine;
         readonly AD7Thread m_thread;
@@ -531,25 +531,25 @@ namespace Cosmos.Debug.VSDebugEngine
 
             try
             {
-                //if (m_parameters != null)
+                if (m_parameters != null)
                 {
-                    //foreach (VariableInformation currVariable in m_parameters)
+                    foreach (DebugLocalInfo currVariable in m_parameters)
                     {
-                        //if (String.CompareOrdinal(currVariable.m_name, pszCode) == 0)
+                        if (String.CompareOrdinal(currVariable.Name, pszCode) == 0)
                         {
-                            //ppExpr = new AD7Expression(currVariable);
-                            //return VSConstants.S_OK;
+                            ppExpr = new AD7Expression(currVariable, mProcess, this);
+                            return VSConstants.S_OK;
                         }
                     }
                 }
 
                 if (m_locals != null)
                 {
-                    foreach (DebugInfo.Local_Argument_Info currVariable in mLocalInfos)
+                    foreach (DebugLocalInfo currVariable in m_locals)
                     {
                         if (String.CompareOrdinal(currVariable.Name, pszCode) == 0)
                         {
-                            ppExpr = new AD7Expression(currVariable);
+                            ppExpr = new AD7Expression(currVariable, mProcess, this);
                             return VSConstants.S_OK;
                         }
                     }
