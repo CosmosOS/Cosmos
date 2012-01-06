@@ -119,7 +119,7 @@ namespace Cosmos.VS.Windows {
 
     protected void AddCommand(OleMenuCommandService aMcs, uint aCmdID, EventHandler aHandler) {
       // Create the command for the assembly tool window
-      var xCmdID = new CommandID(GuidList.guidCosmos_VS_WindowsCmdSet, (int)aCmdID);
+      var xCmdID = new CommandID(GuidList.guidCosmosMenu, (int)aCmdID);
       var xMenuCmd = new MenuCommand(aHandler, xCmdID);
       aMcs.AddCommand(xMenuCmd);
     }
