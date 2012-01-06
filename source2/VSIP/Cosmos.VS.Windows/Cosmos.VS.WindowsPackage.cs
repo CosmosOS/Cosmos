@@ -83,7 +83,6 @@ namespace Cosmos.VS.Windows {
       var xWindow = FindWindow(aWindowType);
       var xFrame = (IVsWindowFrame)xWindow.Frame;
       Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
-      //return xFrame.IsVisible() == 0;
     }
 
     protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData) {
@@ -91,30 +90,27 @@ namespace Cosmos.VS.Windows {
       xWindow.UserControl.Update(aTag, aData);
     }
 
-    // This function is called when the user clicks the menu item that shows the 
-    // tool window. See the Initialize method to see how the menu item is associated to 
-    // this function using the OleMenuCommandService service and the MenuCommand class.
-    private void ShowWindowAssembly(object sender, EventArgs e) {
+    private void ShowWindowAssembly(object aCommand, EventArgs e) {
       ShowWindow(typeof(AssemblyTW));
     }
 
-    private void ShowWindowInternal(object sender, EventArgs e) {
+    private void ShowWindowInternal(object aCommand, EventArgs e) {
       ShowWindow(typeof(InternalTW));
     }
 
-    private void ShowWindowRegisters(object sender, EventArgs e) {
+    private void ShowWindowRegisters(object aCommand, EventArgs e) {
       ShowWindow(typeof(RegistersTW));
     }
 
-    private void ShowWindowStack(object sender, EventArgs e) {
+    private void ShowWindowStack(object aCommand, EventArgs e) {
       ShowWindow(typeof(StackTW));
     }
 
-    private void ShowWindowAll(object sender, EventArgs e) {
-      ShowWindowAssembly(sender, e);
-      ShowWindowRegisters(sender, e);
-      ShowWindowStack(sender, e);
-      ShowWindowInternal(sender, e);
+    private void ShowWindowAll(object aCommand, EventArgs e) {
+      ShowWindowAssembly(aCommand, e);
+      ShowWindowRegisters(aCommand, e);
+      ShowWindowStack(aCommand, e);
+      // Dont show Internal Window, most Cosmos users wont use it.
     }
 
     protected void AddCommand(OleMenuCommandService aMcs, uint aCmdID, EventHandler aHandler) {
@@ -135,6 +131,7 @@ namespace Cosmos.VS.Windows {
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosAssembly, ShowWindowAssembly);
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosRegisters, ShowWindowRegisters);
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosStack, ShowWindowStack);
+        AddCommand(xMcs, PkgCmdIDList.cmdidCosmosInternal, ShowWindowInternal);
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosShowAll, ShowWindowAll);
       }
     }

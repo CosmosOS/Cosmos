@@ -103,7 +103,7 @@
           <ButtonText>Assembly Window</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidCosmosMenu" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
+      <Button guid="guidCosmosMenu" id="cmdidCosmosRegisters" priority="0x0101" type="Button">
         <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup" />
         <Icon guid="guidImages" id="bmpRegisterIcon" />
         <Strings>
@@ -111,7 +111,7 @@
           <ButtonText>Registers Window</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidCosmosMenu" id="cmdidCosmosStack" priority="0x0100" type="Button">
+      <Button guid="guidCosmosMenu" id="cmdidCosmosStack" priority="0x0102" type="Button">
         <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup" />
         <Icon guid="guidImages" id="bmpStackIcon" />
         <Strings>
@@ -119,7 +119,14 @@
           <ButtonText>Stack Window</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidCosmosMenu" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
+      <Button guid="guidCosmosMenu" id="cmdidCosmosInternal" priority="0x0103" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup" />
+        <Strings>
+          <CommandName>cmdidCosmosInternal</CommandName>
+          <ButtonText>Internal VSIP Debug Window</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmosMenu" id="cmdidCosmosShowAll" priority="0x0104" type="Button">
         <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup" />
         <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
@@ -208,6 +215,7 @@
       <IDSymbol name="cmdidCosmosAssembly" value="0x0101" />
       <IDSymbol name="cmdidCosmosRegisters" value="0x0102" />
       <IDSymbol name="cmdidCosmosStack" value="0x0103" />
+      <IDSymbol name="cmdidCosmosInternal" value="0x0108" />
       <IDSymbol name="cmdidCosmosShowAll" value="0x0104"/>
     </GuidSymbol>
 
