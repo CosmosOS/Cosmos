@@ -25,6 +25,9 @@
 
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
+
+  <!-- http://www.adrianetilston.com/Blog/post/2009/08/20/VSX-Adding-a-top-level-menu-command.aspx -->
+  
   <Commands package="guidCosmos_VS_WindowsPkg">
     <!-- Inside this section we have different sub-sections: one for the menus, another  
     for the menu groups, one for the buttons (the actual commands), one for the combos 
@@ -35,6 +38,15 @@
     with command ids defined by other packages. -->
 
     <Menus>
+      <!-- Cosmos menu on VS main menu -->
+      <Menu guid="guidCosmosMenu" id="TopLevelMenu" priority="0x100" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>Cosmos</ButtonText>
+          <CommandName>Cosmos</CommandName>
+        </Strings>
+      </Menu>
+      
       <Menu guid="guidIDEToolbarCmdSet" id="Toolbar" type="Toolbar" >
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
@@ -42,6 +54,7 @@
           <CommandName>Cosmos Debugger Toolbar</CommandName>
         </Strings>
       </Menu>
+      
       <Menu guid="guidAsmToolbarCmdSet" id="AsmToolbar" type="ToolWindowToolbar" >
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
@@ -50,20 +63,25 @@
         </Strings>
       </Menu>
     </Menus>
+    
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
+      <Group guid="guidCosmosMenu" id="TopLevelMenuGroup" priority="0x0600">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenu"/>
+      </Group>
+
       <Group guid="guidIDEToolbarCmdSet" id="ToolbarGroup" priority="0x0000">
         <Parent guid="guidIDEToolbarCmdSet" id="Toolbar"/>
       </Group>
+      
       <Group guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup" priority="0x0000">
         <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbar"/>
       </Group>
     </Groups>
 
-    <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button 
         or combo box in a toolbar. -->
     <Buttons>
@@ -75,6 +93,49 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
               
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
+
+      <!--Cosmos Main Menu -->
+      <Button guid="guidCosmosMenu" id="cmdidMyCommand" priority="0x0100" type="Button">
+        <Parent guid="guidCosmosMenu" id="TopLevelMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <CommandName>cmdidMyCommand</CommandName>
+          <ButtonText>Sub Menu Command</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpAssemblyIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosAssembly</CommandName>
+          <ButtonText>Cosmos - Assembly</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpRegisterIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosRegisters</CommandName>
+          <ButtonText>Cosmos - Registers</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpStackIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosStack</CommandName>
+          <ButtonText>Cosmos - Stack</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="bmpAllIcon" />
+        <Strings>
+          <CommandName>cmdidCosmosShowAll</CommandName>
+          <ButtonText>Cosmos - Show All Windows</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
         <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup" />
         <Icon guid="guidImages" id="bmpAssemblyIcon" />
@@ -107,38 +168,7 @@
           <ButtonText>Cosmos - Show All Windows</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosAssembly" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpAssemblyIcon" />
-        <Strings>
-          <CommandName>cmdidCosmosAssembly</CommandName>
-          <ButtonText>Cosmos - Assembly</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpRegisterIcon" />
-        <Strings>
-          <CommandName>cmdidCosmosRegisters</CommandName>
-          <ButtonText>Cosmos - Registers</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosStack" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpStackIcon" />
-        <Strings>
-          <CommandName>cmdidCosmosStack</CommandName>
-          <ButtonText>Cosmos - Stack</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidCosmos_VS_WindowsCmdSet" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpAllIcon" />
-        <Strings>
-          <CommandName>cmdidCosmosShowAll</CommandName>
-          <ButtonText>Cosmos - Show All Windows</ButtonText>
-        </Strings>
-      </Button>
+      
       <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmFilter" priority="0x0100" type="Button">
         <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
         <Icon guid="guidImages" id="bmpAllIcon" />
@@ -179,6 +209,12 @@
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidCosmos_VS_WindowsPkg" value="{a82b45e9-2a89-43bd-925d-c7f0edd212aa}" />
+
+    <GuidSymbol name="guidCosmosMenu" value="{3247C3E4-34B8-4DB0-8748-AD62495A5222}">
+      <IDSymbol name="TopLevelMenu" value="0x0100" />
+      <IDSymbol name="TopLevelMenuGroup" value="0x0200" />
+      <IDSymbol name="cmdidMyCommand" value="0x0300" />
+    </GuidSymbol>
 
     <GuidSymbol name="guidIDEToolbarCmdSet" value="{3d4b3f35-36e7-4cea-8acc-d9601e45c0b5}">
       <IDSymbol name="Toolbar" value="0x1000" />
