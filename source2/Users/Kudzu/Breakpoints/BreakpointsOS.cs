@@ -23,6 +23,7 @@ namespace BreakpointsKernel {
       xTest.Run();
 
       TestATA();
+      Console.ReadLine();
       Stop();
     }
 
