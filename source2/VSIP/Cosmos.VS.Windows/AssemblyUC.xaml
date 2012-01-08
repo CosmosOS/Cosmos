@@ -10,20 +10,23 @@
              x:Name="CosmosAssemblyUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <DockPanel LastChildFill="True">
-        <ToolBar Height="30" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
-            <ToggleButton Content="Filter" Name="asmFilterButton" Click="asmFilterButton_Click" IsChecked="True" />
-            <Button Content="Copy" Name="asmFCopyButton" Click="asmFCopyButton_Click" />
-      <Button Content="Step" Name="asmStepButton"  Click="asmStepButton_Click" />
-      <Button Content="Ping" Name="butnPing" />
-    </ToolBar>
+        <ToolBar Height="35" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
+            <ToggleButton Content="Filter" Name="butnFilter" IsChecked="True" BorderBrush="Black" Margin="2" />
+            <Button Content="Copy" Name="butnCopy" BorderBrush="Black" Margin="2" />
+            <Rectangle Width="15" />
+            <Button Content="Step" Name="butnStep" BorderBrush="Black" Margin="2" />
+            <Rectangle Width="15" />
+            <Button Content="Ping VSIP" Name="butnPingVSIP" BorderBrush="Black" Margin="2" />
+            <Button Content="Ping DS" Name="butnPingDS" BorderBrush="Black" Margin="2" />
+        </ToolBar>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-      <TextBlock Name="tblkSource">
+            <TextBlock Name="tblkSource">
         <TextBlock.ContextMenu>
           <ContextMenu>
             <MenuItem Name="mitmCopy" Header="Copy" />
           </ContextMenu>
         </TextBlock.ContextMenu>
-      </TextBlock>
-    </ScrollViewer>
+            </TextBlock>
+        </ScrollViewer>
     </DockPanel>
 </local:DebuggerUC>

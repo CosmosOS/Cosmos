@@ -172,8 +172,8 @@ namespace Cosmos.VS.Windows {
             UpdateWindow(typeof(AssemblyTW), null, xMsg);
             break;
 
-          case DwMsg.Pong:
-            System.Windows.MessageBox.Show("Pong!");
+          case DwMsg.PongVSIP:
+            System.Windows.MessageBox.Show("Pong received from VSIP.");
             break;
         }
       }

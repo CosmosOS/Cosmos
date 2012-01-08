@@ -148,7 +148,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     protected void DbgCmdPong(byte[] aData) {
-      mDebugDownPipe.SendCommand(DwMsg.Pong, aData);
+      mDebugDownPipe.SendCommand(DwMsg.PongVSIP, aData);
     }
 
     protected void DbgCmdStack(byte[] aData) {
@@ -161,9 +161,13 @@ namespace Cosmos.Debug.VSDebugEngine {
           // do nothing?
           break;
 
-        case DwCmd.Ping:
-          mDbgConnector.Ping();
+        case DwCmd.PingVSIP:
+          mDebugDownPipe.SendCommand(DwMsg.PongVSIP, null);
           break;
+
+        //case DwCmd.Ping:
+        //  mDbgConnector.Ping();
+        //  break;
 
         default:
           throw new Exception(

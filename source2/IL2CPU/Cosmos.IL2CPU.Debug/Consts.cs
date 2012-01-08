@@ -76,13 +76,15 @@ namespace Cosmos.Debug.Consts {
     public const byte Quit = 4;
     public const byte Frame = 5;
     public const byte Stack = 6;
-    public const byte Pong = 7;
+    public const byte PongVSIP = 7;
+    public const byte PongDebugStub = 7;
   }
 
   // Commands from VS Debug Window to VS Debug Engine
   static public class DwCmd {
     public const byte Noop = 0;
-    public const byte Ping = 1;
+    public const byte PingVSIP = 1;
+    public const byte PingDebugStub = 1;
   }
 
 }
