@@ -6,7 +6,10 @@
              xmlns:local="clr-namespace:Cosmos.VS.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-            
-    </Grid>
+    <DockPanel LastChildFill="False">
+        <ToolBar Height="35" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
+            <Button Content="Ping VSIP" Name="butnPingVSIP" BorderBrush="Black" Margin="2" />
+            <Button Content="Ping DS" Name="butnPingDS" BorderBrush="Black" Margin="2" />
+        </ToolBar>
+    </DockPanel>
 </local:DebuggerUC>

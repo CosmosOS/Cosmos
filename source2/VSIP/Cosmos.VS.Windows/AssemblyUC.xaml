@@ -15,9 +15,6 @@
             <Button Content="Copy" Name="butnCopy" BorderBrush="Black" Margin="2" />
             <Rectangle Width="15" />
             <Button Content="Step" Name="butnStep" BorderBrush="Black" Margin="2" />
-            <Rectangle Width="15" />
-            <Button Content="Ping VSIP" Name="butnPingVSIP" BorderBrush="Black" Margin="2" />
-            <Button Content="Ping DS" Name="butnPingDS" BorderBrush="Black" Margin="2" />
         </ToolBar>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <TextBlock Name="tblkSource">

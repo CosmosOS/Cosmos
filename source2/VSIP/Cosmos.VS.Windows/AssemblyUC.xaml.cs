@@ -64,8 +64,6 @@ namespace Cosmos.VS.Windows {
       butnFilter.Click += new RoutedEventHandler(butnFilter_Click);
       butnCopy.Click += new RoutedEventHandler(mitmCopy_Click);
       butnStep.Click += new RoutedEventHandler(butnStep_Click);
-      butnPingVSIP.Click += new RoutedEventHandler(butnPingVSIP_Click);
-      butnPingDS.Click += new RoutedEventHandler(butnPingDS_Click);
 
       Update(null, mData);
     }
@@ -73,16 +71,9 @@ namespace Cosmos.VS.Windows {
     void butnStep_Click(object sender, RoutedEventArgs e) {
     }
 
-    void butnPingDS_Click(object sender, RoutedEventArgs e) {
-    }
-
     void butnFilter_Click(object sender, RoutedEventArgs e) {
       mFilter = !mFilter;
       Display(mFilter);
-    }
-
-    void butnPingVSIP_Click(object sender, RoutedEventArgs e) {
-      Global.mPipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
     }
 
     void mitmCopy_Click(object sender, RoutedEventArgs e) {

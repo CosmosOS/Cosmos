@@ -50,14 +50,42 @@ namespace Cosmos.Debug.VSDebugEngine {
     // Pipe to receive messages from Cosmos.VS.Windows
     static private Cosmos.Debug.Common.PipeServer mDebugUpPipe = null;
 
+    protected void DeleteFiles(string aPath, string aPattern) {
+      var xFiles = Directory.GetFiles(aPath, aPattern);
+      foreach (var xFile in xFiles) {
+        File.Delete(xFile);
+      }
+    }
+
     protected void LaunchVMWare(bool aGDB) {
       string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
       string xDebugVmx = "Debug.vmx";
 
+      // VMWare doesn't like to boot a read only VMX.
+      // We also need to make changes based on project / debug settings.
+      // Finally we do not want to create VCS checkins based on local user changes.
+      // Because of this we use Cosmos.vmx as a template and output a Debug.vmx on
+      // every run.
       using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
         try {
-          // This copy process also leaves the VMX writeable. VMWare doesnt like them read only.
-          using (var xDest = new StreamWriter(xPath + xDebugVmx)) {
+          // Delete old Debug.vmx and other files that might be left over from previous run
+          // Especially important with newer versions of VMWare player which defaults to suspend
+          // when the close button is used.
+          File.Delete(Path.Combine(xPath, xDebugVmx));
+          File.Delete(Path.Combine(xPath, Path.ChangeExtension(xDebugVmx, ".nvram")));
+          // Delete the auto snapshots that latest vmware players create as default
+          // It creates them with suffixes though, so we need to wild card find them
+          DeleteFiles(xPath, "*.vmxf");
+          DeleteFiles(xPath, "*.vmss");
+          DeleteFiles(xPath, "*.vmsd");
+          DeleteFiles(xPath, "*.vmem");
+          // Delete log files so that logged data is only from last boot
+          File.Delete(Path.Combine(xPath, "vmware.log"));
+          File.Delete(Path.Combine(xPath, "vmware-0.log"));
+          File.Delete(Path.Combine(xPath, "vmware-1.log"));
+          File.Delete(Path.Combine(xPath, "vmware-2.log"));
+          // Write out Debug.vmx
+          using (var xDest = new StreamWriter(Path.Combine(xPath, xDebugVmx))) {
             string xLine;
             while ((xLine = xSrc.ReadLine()) != null) {
               var xParts = xLine.Split('=');
@@ -70,6 +98,8 @@ namespace Cosmos.Debug.VSDebugEngine {
                   xValue = null;
                 } else if (xName == "ide1:0.fileName") {
                   xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
+                } else if (xName == "nvram") {
+                  xValue = "\"Debug.nvram\"";
                 }
 
                 if (xValue != null) {
@@ -86,8 +116,9 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
           }
         } catch (IOException e) {
-          if (e.Message.Contains(xDebugVmx))
+          if (e.Message.Contains(xDebugVmx)) {
             throw new Exception("The Vmware image " + xDebugVmx + " is still in use! Please exit current Vmware session with Cosmos and try again!", e);
+          }
           throw e;
         }
       }

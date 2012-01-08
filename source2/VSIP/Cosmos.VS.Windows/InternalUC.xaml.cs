@@ -39,6 +39,16 @@ namespace Cosmos.VS.Windows {
   public partial class InternalUC : DebuggerUC {
     public InternalUC() {
       InitializeComponent();
+
+      butnPingVSIP.Click += new RoutedEventHandler(butnPingVSIP_Click);
+      butnPingDS.Click += new RoutedEventHandler(butnPingDS_Click);
+    }
+
+    void butnPingDS_Click(object sender, RoutedEventArgs e) {
+    }
+
+    void butnPingVSIP_Click(object sender, RoutedEventArgs e) {
+      Global.mPipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
     }
   }
 }
