@@ -48,7 +48,10 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Or { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = Simple32Multiply };
 					// Full 64 Multiply
-					
+
+					// copy again, or could change EAX
+					//TODO is there an opcode that does OR without change EAX?
+					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 					// eax contains already RIGHT_HIGH
 					// multiply with LEFT_LOW
 					new CPUx86.Multiply { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 8, Size = 32 };
