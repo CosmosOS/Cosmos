@@ -92,7 +92,7 @@ namespace Cosmos.VS.Windows {
 
       var xFont = new FontFamily("Consolas");
       Brush xBrush;
-      string xCode = Encoding.ASCII.GetString(mData);
+      string xCode = Encoding.UTF8.GetString(mData);
       string xLabelPrefix = null;
 
       // Should always be \r\n, but just in case we split by \n and ignore \r

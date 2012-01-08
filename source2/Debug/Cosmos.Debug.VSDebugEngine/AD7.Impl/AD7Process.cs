@@ -57,9 +57,36 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
+    protected void CleanupVMWare(string aPath, string aVmxFile) {
+      try {
+        // Delete old Debug.vmx and other files that might be left over from previous run
+        // Especially important with newer versions of VMWare player which defaults to suspend
+        // when the close button is used.
+        File.Delete(Path.Combine(aPath, aVmxFile));
+        File.Delete(Path.Combine(aPath, Path.ChangeExtension(aVmxFile, ".nvram")));
+        // Delete the auto snapshots that latest vmware players create as default
+        // It creates them with suffixes though, so we need to wild card find them
+        DeleteFiles(aPath, "*.vmxf");
+        DeleteFiles(aPath, "*.vmss");
+        DeleteFiles(aPath, "*.vmsd");
+        DeleteFiles(aPath, "*.vmem");
+        // Delete log files so that logged data is only from last boot
+        File.Delete(Path.Combine(aPath, "vmware.log"));
+        File.Delete(Path.Combine(aPath, "vmware-0.log"));
+        File.Delete(Path.Combine(aPath, "vmware-1.log"));
+        File.Delete(Path.Combine(aPath, "vmware-2.log"));
+      } catch (Exception e) {
+        // Ignore errors, users can stop VS while VMWare is still running and files
+        // will be locked.
+      }
+    }
+
+    protected const string mDebugVmxFile = "Debug.vmx";
     protected void LaunchVMWare(bool aGDB) {
+      OutputText("Launching VMWare.");
+
       string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
-      string xDebugVmx = "Debug.vmx";
+      CleanupVMWare(xPath, mDebugVmxFile);
 
       // VMWare doesn't like to boot a read only VMX.
       // We also need to make changes based on project / debug settings.
@@ -68,24 +95,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       // every run.
       using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
         try {
-          // Delete old Debug.vmx and other files that might be left over from previous run
-          // Especially important with newer versions of VMWare player which defaults to suspend
-          // when the close button is used.
-          File.Delete(Path.Combine(xPath, xDebugVmx));
-          File.Delete(Path.Combine(xPath, Path.ChangeExtension(xDebugVmx, ".nvram")));
-          // Delete the auto snapshots that latest vmware players create as default
-          // It creates them with suffixes though, so we need to wild card find them
-          DeleteFiles(xPath, "*.vmxf");
-          DeleteFiles(xPath, "*.vmss");
-          DeleteFiles(xPath, "*.vmsd");
-          DeleteFiles(xPath, "*.vmem");
-          // Delete log files so that logged data is only from last boot
-          File.Delete(Path.Combine(xPath, "vmware.log"));
-          File.Delete(Path.Combine(xPath, "vmware-0.log"));
-          File.Delete(Path.Combine(xPath, "vmware-1.log"));
-          File.Delete(Path.Combine(xPath, "vmware-2.log"));
           // Write out Debug.vmx
-          using (var xDest = new StreamWriter(Path.Combine(xPath, xDebugVmx))) {
+          using (var xDest = new StreamWriter(Path.Combine(xPath, mDebugVmxFile))) {
             string xLine;
             while ((xLine = xSrc.ReadLine()) != null) {
               var xParts = xLine.Split('=');
@@ -116,8 +127,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             }
           }
         } catch (IOException e) {
-          if (e.Message.Contains(xDebugVmx)) {
-            throw new Exception("The Vmware image " + xDebugVmx + " is still in use! Please exit current Vmware session with Cosmos and try again!", e);
+          if (e.Message.Contains(mDebugVmxFile)) {
+            throw new Exception("The Vmware image " + mDebugVmxFile + " is still in use! Please exit current Vmware session with Cosmos and try again!", e);
           }
           throw e;
         }
@@ -145,6 +156,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Options must come beore the vmx, and cannot use shellexecute
 
       if (String.IsNullOrEmpty(xVmwarePath) || !File.Exists(xVmwarePath)) {
+        OutputText("VMWare not found.");
         MessageBox.Show("VWMare is not installed, probably going to crash now!", "Cosmos DebugEngine", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }
@@ -210,8 +222,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
       System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
       mCallback = aCallback;
-
-      // Load passed in values
       mDebugInfo = aDebugInfo;
 
       if (mDebugDownPipe == null) {
@@ -221,12 +231,17 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
         mDebugUpPipe.Start();
       }
+      // Must be after mDebugDownPipe is initialized
+      OutputClear();
+      OutputText("Debugger initialized.");
 
       mISO = mDebugInfo["ISOFile"];
+      OutputText("Using ISO file " + mISO + ".");
       mProjectFile = mDebugInfo["ProjectFile"];
       //
       var xGDBDebugStub = false;
       Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
+      OutputText("GDB " + (xGDBDebugStub ? "Enabled" : "Disabled") + ".");      
       //
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
@@ -273,6 +288,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       mDbgConnector = null;
       if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
+        OutputText("Starting serial debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
       }
       if (mDbgConnector == null) {
@@ -315,6 +331,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // Launch GDB Client
       if (xGDBDebugStub && xGDBClient) {
+        OutputText("Launching GDB client.");
         if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe)) {
           var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
           xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
@@ -497,6 +514,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public int Terminate() {
+      OutputText("Debugger terminating.");
       if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
         mProcess.Kill();
         mProcess.Exited -= mProcess_Exited;
@@ -509,6 +527,11 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDebugInfoDb = null;
         }
       }
+      
+      string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
+      CleanupVMWare(xPath, mDebugVmxFile);
+
+      OutputText("Debugger terminated.");
       return VSConstants.S_OK;
     }
 
@@ -631,7 +654,17 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
       // Send source code to the tool window
-      mDebugDownPipe.SendCommand(DwMsg.AssemblySource, Encoding.ASCII.GetBytes(xCode.ToString()));
+      mDebugDownPipe.SendCommand(DwMsg.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
+    }
+
+    //TODO: At some point this will probably need to be exposed for access
+    // outside of AD7Process
+    protected void OutputText(string aText) {
+      mDebugDownPipe.SendCommand(DwMsg.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
+    }
+
+    protected void OutputClear() {
+      mDebugDownPipe.SendCommand(DwMsg.OutputClear, null);
     }
 
   }

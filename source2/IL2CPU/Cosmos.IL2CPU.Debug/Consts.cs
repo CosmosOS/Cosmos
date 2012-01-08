@@ -77,7 +77,9 @@ namespace Cosmos.Debug.Consts {
     public const byte Frame = 5;
     public const byte Stack = 6;
     public const byte PongVSIP = 7;
-    public const byte PongDebugStub = 7;
+    public const byte PongDebugStub = 8;
+    public const byte OutputPane = 9;
+    public const byte OutputClear = 10;
   }
 
   // Commands from VS Debug Window to VS Debug Engine

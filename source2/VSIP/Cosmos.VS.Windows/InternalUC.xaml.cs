@@ -48,7 +48,7 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnPingVSIP_Click(object sender, RoutedEventArgs e) {
-      Global.mPipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
+      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
     }
   }
 }

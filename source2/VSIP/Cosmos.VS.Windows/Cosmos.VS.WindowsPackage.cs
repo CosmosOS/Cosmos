@@ -135,9 +135,11 @@ namespace Cosmos.VS.Windows {
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosShowAll, ShowWindowAll);
       }
 
+      // Create Cosmos output pane
       var xDTE = (EnvDTE80.DTE2)Package.GetGlobalService(typeof(EnvDTE.DTE));
       var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;
-      xPane.Add("Cosmos");
+      Global.OutputPane = xPane.Add("Cosmos");
+      Global.OutputPane.OutputString("Debugger windows loaded.");
     }
 
     void ProcessMessage(object sender, EventArgs e) {
@@ -178,6 +180,26 @@ namespace Cosmos.VS.Windows {
 
           case DwMsg.PongVSIP:
             System.Windows.MessageBox.Show("Pong received from VSIP.");
+            break;
+
+          case DwMsg.PongDebugStub:
+            System.Windows.MessageBox.Show("Pong received from DebugStub.");
+            break;
+
+          case DwMsg.OutputPane:
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, 
+              (Action)delegate() {
+                Global.OutputPane.OutputString(System.Text.Encoding.UTF8.GetString(xMsg));
+              }
+            );
+            break;
+
+          case DwMsg.OutputClear:
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+              (Action)delegate() {
+                Global.OutputPane.Clear();
+            }
+            );
             break;
         }
       }

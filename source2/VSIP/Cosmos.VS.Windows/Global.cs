@@ -5,10 +5,11 @@ using System.Text;
 
 namespace Cosmos.VS.Windows {
   static public class Global {
-    static public Cosmos.Debug.Common.PipeClient mPipeUp;
+    static public Cosmos.Debug.Common.PipeClient PipeUp;
+    static public EnvDTE.OutputWindowPane OutputPane;
 
     static Global() {
-      mPipeUp = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.UpName);
+      PipeUp = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.UpName);
     }
   }
 }
