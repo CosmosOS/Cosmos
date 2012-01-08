@@ -134,6 +134,10 @@ namespace Cosmos.VS.Windows {
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosInternal, ShowWindowInternal);
         AddCommand(xMcs, PkgCmdIDList.cmdidCosmosShowAll, ShowWindowAll);
       }
+
+      var xDTE = (EnvDTE80.DTE2)Package.GetGlobalService(typeof(EnvDTE.DTE));
+      var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;
+      xPane.Add("Cosmos");
     }
 
     void ProcessMessage(object sender, EventArgs e) {
