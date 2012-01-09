@@ -462,9 +462,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       throw new NotImplementedException();
     }
 
-    public int CauseBreak()
-    {
-        throw new NotImplementedException();
+    public int CauseBreak() {
+      throw new NotImplementedException();
     }
 
     public int Detach() {
