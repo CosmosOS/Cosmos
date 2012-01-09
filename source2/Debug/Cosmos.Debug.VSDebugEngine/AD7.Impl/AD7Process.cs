@@ -371,6 +371,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     protected void DbgCmdStarted() {
+      OutputText("DebugStub handshake completed.");
       DebugMsg("RmtDbg: Started");
 
       // OK, now debugger is ready. Send it a list of breakpoints that were set before

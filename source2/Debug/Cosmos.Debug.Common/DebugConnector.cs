@@ -252,6 +252,7 @@ namespace Cosmos.Debug.Common {
           // Call WaitForMessage first, else it blocks because DsMsg.Started triggers
           // other commands which need responses.
           WaitForMessage();
+
           // Guests never get the first byte sent. So we send a noop.
           // This dummy byte seems to clear out the serial channel.
           // Its never received, but if it ever is, its a noop anyways.
