@@ -26,6 +26,14 @@ namespace Cosmos.Debug.Common {
 
     //        private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
 
+    // Must be called from descendant via DoConnected
+    public Action Connected;
+    public void DoConnected() {
+      if (Connected != null) {
+        Connected();
+      }
+    }
+
     protected void DoDebugMsg(string aMsg) {
       //            mDebugWriter.WriteLine(aMsg);
       System.Diagnostics.Debug.WriteLine(aMsg);
@@ -34,7 +42,7 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public abstract bool Connected {
+    public abstract bool IsConnected {
       get;
     }
 
@@ -48,7 +56,7 @@ namespace Cosmos.Debug.Common {
       // So we just ignore any commands sent before ready, and its part of the contract
       // that the caller (Debugger) knows when the Start msg is received that it must
       // send over initializing information such as breakpoints.
-      if (Connected) {
+      if (IsConnected) {
         // This lock is used for:
         //  1) VSDebugEngine is threaded and could send commands concurrently
         //  2) Becuase in VSDebugEngine and commands from Debug.Windows can occur concurrently
@@ -131,7 +139,7 @@ namespace Cosmos.Debug.Common {
       // some execution, but more importantly stops it from 
       // logging messages to debug output for events that
       // dont happen.
-      if (!Connected) {
+      if (!IsConnected) {
         return;
       }
 
@@ -154,7 +162,7 @@ namespace Cosmos.Debug.Common {
       ////  1: x32 - offset relative to EBP
       ////  2: x32 - size of data to send
 
-      if (!Connected) {
+      if (!IsConnected) {
         return null;
       }
       if (size == 0) {
@@ -185,7 +193,7 @@ namespace Cosmos.Debug.Common {
       ////  1: x32 - offset relative to EBP
       ////  2: x32 - size of data to send
 
-      if (!Connected) {
+      if (!IsConnected) {
         return null;
       }
       var xData = new byte[8];

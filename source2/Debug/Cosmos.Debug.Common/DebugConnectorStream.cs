@@ -35,13 +35,14 @@ namespace Cosmos.Debug.Common {
       mStream.Write(aBytes, 0, aBytes.Length);
     }
 
-    public override bool Connected {
+    public override bool IsConnected {
       get { return mStream != null; }
     }
 
     // Start is not in ctor, because for servers we have to wait
     // for the callback.
     protected void Start(Stream aStream) {
+      DoConnected();
       mStream = aStream;
       Next(1, WaitForSignature);
     }

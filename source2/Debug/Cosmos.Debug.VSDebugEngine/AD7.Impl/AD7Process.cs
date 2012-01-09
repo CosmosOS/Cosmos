@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.Debugger.Interop;
-using Microsoft.VisualStudio;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.Consts;
-using Cosmos.Debug.Common;
-using Cosmos.Build.Common;
-using System.Windows.Forms;
-using System.Threading;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.Win32;
-using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.VSDebugEngine {
   public class AD7Process : IDebugProcess2 {
@@ -83,7 +82,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     protected const string mDebugVmxFile = "Debug.vmx";
     protected void LaunchVMWare(bool aGDB) {
-      OutputText("Launching VMWare.");
+      OutputText("Preparing VMWare.");
 
       string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
       CleanupVMWare(xPath, mDebugVmxFile);
@@ -219,6 +218,10 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
+    protected void DebugConnectorConnected() {
+      OutputText("Connected to DebugStub.");
+    }
+
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
       System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
       mCallback = aCallback;
@@ -233,7 +236,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       // Must be after mDebugDownPipe is initialized
       OutputClear();
-      OutputText("Debugger initialized.");
+      OutputText("Debugger process initialized.");
 
       mISO = mDebugInfo["ISOFile"];
       OutputText("Using ISO file " + mISO + ".");
@@ -290,6 +293,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
         OutputText("Starting serial debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
+        mDbgConnector.Connected = DebugConnectorConnected;
       }
       if (mDbgConnector == null) {
         throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
@@ -308,6 +312,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       System.Threading.Thread.Sleep(250);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
+      OutputText("Starting VMWare.");
       mProcess = Process.Start(mProcessStartInfo);
 
       mProcess.EnableRaisingEvents = true;
@@ -357,6 +362,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mEngine.Callback.OnProcessExit(0);
       }
     }
+
     // Shows a message in the output window of VS. Needs special treatment, 
     // because normally VS only shows msgs from debugged process, not internal
     // stuff like us.
