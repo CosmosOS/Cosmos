@@ -68,7 +68,7 @@ namespace Cosmos.VS.Package
                         if (xGuid != this.ProjectIDGuid)
                         {
                             uiThreadCallback(MSBuildResult.Successful, "Skipped");
-                            output.OutputStringThreadSafe("Project skipped, as it's not necessary for running\r\n");
+                            output.OutputStringThreadSafe("Project skipped, as it's not necessary for running\r\n\r\n");
                             return;
                         }
                     }
