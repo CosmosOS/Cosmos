@@ -480,7 +480,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
             try
             {
-                //name = EngineUtils.GetAddressDescription(null, m_threadContext.eip);
+                name = m_functionName;
                 return VSConstants.S_OK;
             }
             //catch (ComponentException e)

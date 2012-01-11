@@ -21,6 +21,7 @@ namespace Cosmos.Debug.VSDebugEngine
         private DebugInfo.Local_Argument_Info mDebugInfo;
         const uint xArrayLengthOffset = 8;
         const uint xArrayFirstElementOffset = 16;
+        private const string NULL = "null";
 
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
@@ -32,10 +33,77 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 mDebugInfo = mStackFrame.mLocalInfos[m_variableInformation.Index];
             }
+            else if (localInfo.IsArrayElement)
+            {
+                mDebugInfo = new DebugInfo.Local_Argument_Info()
+                {
+                    Type = localInfo.ArrayElementType,
+                    Name = localInfo.Name,
+                    IsArrayElement = true,
+                    Offset = localInfo.ArrayElementLocation
+                };
+            }
             else
             {
                 mDebugInfo = mStackFrame.mArgumentInfos[m_variableInformation.Index];
             }
+
+        }
+
+        public void ReadData<T>(ref DEBUG_PROPERTY_INFO propertyInfo, Func<byte[], int, T> ByteToTypeAction)
+        {
+            byte[] xData;
+            if (m_variableInformation.IsArrayElement)
+            {
+                xData = mProcess.mDbgConnector.GetMemoryData((uint)mDebugInfo.Offset, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                var xTypedIntValue = ByteToTypeAction(xData, 0);
+                propertyInfo.bstrValue = String.Format("{0}", xTypedIntValue);
+            }
+            else
+            {
+                xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                var xTypedIntValue = ByteToTypeAction(xData, 0);
+                propertyInfo.bstrValue = String.Format("{0}", xTypedIntValue);
+            }
+        }
+
+        public void ReadDataArray<T>(ref DEBUG_PROPERTY_INFO propertyInfo, string typeAsString)
+        {
+            byte[] xData;
+
+            xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+            uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
+            if (xArrayPointer == 0)
+            {
+                propertyInfo.bstrValue = NULL;
+            }
+            else
+            {
+                xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
+                uint xDataLength = BitConverter.ToUInt32(xData, 0);
+                bool xIsTooLong = xDataLength > 512;
+                if (xIsTooLong)
+                {
+                    xDataLength = 512;
+                }
+                if (xDataLength > 0)
+                {
+                    if (this.m_variableInformation.Children.Count == 0)
+                    {
+                        for (int i = 0; i < xDataLength; i++)
+                        {
+                            DebugLocalInfo inf = new DebugLocalInfo();
+                            inf.IsArrayElement = true;
+                            inf.ArrayElementType = typeof(T).AssemblyQualifiedName;
+                            inf.ArrayElementLocation = (int)(xArrayPointer + xArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
+                            inf.Name = "[" + i.ToString() + "]";
+                            this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
+                        }
+                    }
+                }
+                propertyInfo.bstrValue = String.Format(typeAsString + "[{0}] at 0x{1} ", xDataLength, xArrayPointer.ToString("X"));
+            }
+
         }
 
         // Construct a DEBUG_PROPERTY_INFO representing this local or parameter.
@@ -74,7 +142,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     uint xStrPointer = BitConverter.ToUInt32(xData, 0);
                     if (xStrPointer == 0)
                     {
-                        propertyInfo.bstrValue = "(null)";
+                        propertyInfo.bstrValue = NULL;
                     }
                     else
                     {
@@ -99,53 +167,25 @@ namespace Cosmos.Debug.VSDebugEngine
 #warning TODO: String[]
                 #endregion
 
-                #region Byte
+                // Byte
                 else if (mDebugInfo.Type == typeof(byte).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    propertyInfo.bstrValue = "0x" + xData[0].ToString("X2").ToUpper();
+                    ReadData<byte>(ref propertyInfo, new Func<byte[], int, byte>(delegate(byte[] barr, int ind) { return barr[ind]; }));
                 }
                 else if (mDebugInfo.Type == typeof(byte[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Byte[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength);
-                            bool first = true;
-                            for (int i = 0; i < xDataLength; i++)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + xData[i].ToString("X2").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
+                    ReadDataArray<byte>(ref propertyInfo, "byte");
                 }
-                #endregion
+
+                // SByte
+                else if (mDebugInfo.Type == typeof(sbyte).AssemblyQualifiedName)
+                {
+                    ReadData<sbyte>(ref propertyInfo, new Func<byte[], int, sbyte>(delegate(byte[] barr, int ind) { return unchecked((sbyte)barr[ind]); }));
+                }
+                else if (mDebugInfo.Type == typeof(sbyte[]).AssemblyQualifiedName)
+                {
+                    ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
+                }
 
                 #region Char
                 else if (mDebugInfo.Type == typeof(char).AssemblyQualifiedName)
@@ -160,7 +200,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
                     if (xArrayPointer == 0)
                     {
-                        propertyInfo.bstrValue = "(null)";
+                        propertyInfo.bstrValue = NULL;
                     }
                     else
                     {
@@ -207,469 +247,96 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 #endregion
 
-                #region Short
+                // Short
                 else if (mDebugInfo.Type == typeof(short).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedIntValue = BitConverter.ToInt16(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
+                    ReadData<short>(ref propertyInfo, new Func<byte[], int, short>(BitConverter.ToInt16));
                 }
                 else if (mDebugInfo.Type == typeof(short[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Short[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 2);
-                            bool first = true;
-                            for (int i = 0; (i / 2) < xDataLength; i += 2)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + BitConverter.ToInt16(xData, i).ToString("X").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
-
+                    ReadDataArray<short>(ref propertyInfo, "short");
                 }
-                #endregion
 
-                #region UShort
+                // UShort
                 else if (mDebugInfo.Type == typeof(ushort).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedIntValue = BitConverter.ToUInt16(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
+                    ReadData<ushort>(ref propertyInfo, new Func<byte[], int, ushort>(BitConverter.ToUInt16));
                 }
                 else if (mDebugInfo.Type == typeof(ushort[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("UShort[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 2);
-                            bool first = true;
-                            for (int i = 0; (i / 2) < xDataLength; i += 2)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + BitConverter.ToUInt16(xData, i).ToString("X").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
-
+                    ReadDataArray<ushort>(ref propertyInfo, "ushort");
                 }
-                #endregion
 
-                #region Int32
+                // Int32
                 else if (mDebugInfo.Type == typeof(int).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedIntValue = BitConverter.ToInt32(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
+                    ReadData<int>(ref propertyInfo, new Func<byte[], int, int>(BitConverter.ToInt32));
                 }
                 else if (mDebugInfo.Type == typeof(int[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Int[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 4);
-                            bool first = true;
-                            for (int i = 0; (i / 4) < xDataLength; i += 4)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + BitConverter.ToInt32(xData, i).ToString("X").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
-
+                    ReadDataArray<int>(ref propertyInfo, "int");
                 }
-                #endregion
 
-                #region UInt32
+                // UInt32
                 else if (mDebugInfo.Type == typeof(uint).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedIntValue = BitConverter.ToUInt32(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedIntValue, xTypedIntValue.ToString("X").ToUpper());
+                    ReadData<uint>(ref propertyInfo, new Func<byte[], int, uint>(BitConverter.ToUInt32));
                 }
                 else if (mDebugInfo.Type == typeof(uint[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("UInt[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 4);
-                            bool first = true;
-                            for (int i = 0; (i / 4) < xDataLength; i += 4)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + BitConverter.ToUInt32(xData, i).ToString("X").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
-
+                    ReadDataArray<uint>(ref propertyInfo, "uint");
                 }
-                #endregion
 
-                #region Long
+                // Long
                 else if (mDebugInfo.Type == typeof(long).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
-                    if (xData.Length != 8)
-                    {
-                        throw new Exception("Length should have been 8, but is " + xData.Length);
-                    }
-                    var xTypedLongValue = BitConverter.ToInt64(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedLongValue, xTypedLongValue.ToString("X").ToUpper());
+                    ReadData<long>(ref propertyInfo, new Func<byte[], int, long>(BitConverter.ToInt64));
                 }
                 else if (mDebugInfo.Type == typeof(long[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Long[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 8);
-                            bool first = true;
-                            for (int i = 0; (i / 8) < xDataLength; i += 8)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + BitConverter.ToInt64(xData, i).ToString("X").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
+                    ReadDataArray<long>(ref propertyInfo, "long");
                 }
-                #endregion
 
-                #region ULong
+                // ULong
                 else if (mDebugInfo.Type == typeof(ulong).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
-                    if (xData.Length != 8)
-                    {
-                        throw new Exception("Length should have been 8, but is " + xData.Length);
-                    }
-                    var xTypedULongValue = BitConverter.ToUInt64(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedULongValue, xTypedULongValue.ToString("X").ToUpper());
+                    ReadData<ulong>(ref propertyInfo, new Func<byte[], int, ulong>(BitConverter.ToUInt64));
                 }
                 else if (mDebugInfo.Type == typeof(ulong[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("ULong[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 8);
-                            bool first = true;
-                            for (int i = 0; (i / 8) < xDataLength; i += 8)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append("0x" + BitConverter.ToUInt64(xData, i).ToString("X").ToUpper());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
+                    ReadDataArray<ulong>(ref propertyInfo, "ulong");
                 }
-                #endregion
 
-                #region Float
+                // Float
                 else if (mDebugInfo.Type == typeof(float).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    if (xData.Length != 4)
-                    {
-                        throw new Exception("Length should have been 4, but is " + xData.Length);
-                    }
-                    var xTypedFloatValue = BitConverter.ToSingle(xData, 0);
-                    var xTypedFloatHexValue = BitConverter.ToUInt32(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedFloatValue, xTypedFloatHexValue.ToString("X").ToUpper());
+                    ReadData<float>(ref propertyInfo, new Func<byte[], int, float>(BitConverter.ToSingle));
                 }
                 else if (mDebugInfo.Type == typeof(float[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Float[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 4);
-                            bool first = true;
-                            for (int i = 0; (i / 4) < xDataLength; i += 4)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append(BitConverter.ToSingle(xData, i).ToString());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
+                    ReadDataArray<float>(ref propertyInfo, "float");
                 }
-                #endregion
 
-                #region Double
+                // Double
                 else if (mDebugInfo.Type == typeof(double).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 8);
-                    if (xData.Length != 8)
-                    {
-                        throw new Exception("Length should have been 8, but is " + xData.Length);
-                    }
-                    var xTypedDoubleValue = BitConverter.ToDouble(xData, 0);
-                    var xTypedDoubleHexValue = BitConverter.ToUInt64(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedDoubleValue, xTypedDoubleHexValue.ToString("X").ToUpper());
+                    ReadData<double>(ref propertyInfo, new Func<byte[], int, double>(BitConverter.ToDouble));
                 }
                 else if (mDebugInfo.Type == typeof(double[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Double[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString());
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 8);
-                            bool first = true;
-                            for (int i = 0; (i / 8) < xDataLength; i += 8)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append(BitConverter.ToDouble(xData, i).ToString());
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
+                    ReadDataArray<double>(ref propertyInfo, "double");
                 }
-                #endregion
 
-                #region Bool
+                // Bool
                 else if (mDebugInfo.Type == typeof(bool).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedBoolValue = BitConverter.ToBoolean(xData, 0);
-                    var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedBoolValue.ToString(), xTypedUIntValue.ToString("X").ToUpper());
+                    ReadData<bool>(ref propertyInfo, new Func<byte[], int, bool>(BitConverter.ToBoolean));
                 }
                 else if (mDebugInfo.Type == typeof(bool[]).AssemblyQualifiedName)
                 {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                    if (xArrayPointer == 0)
-                    {
-                        propertyInfo.bstrValue = "(null)";
-                    }
-                    else
-                    {
-                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                        uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                        bool xIsTooLong = xDataLength > 512;
-                        var xSB = new StringBuilder();
-                        xSB.AppendFormat("Boolean[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                        if (xIsTooLong)
-                        {
-                            xDataLength = 512;
-                        }
-                        if (xDataLength > 0)
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength);
-                            bool first = true;
-                            for (int i = 0; i < xDataLength; i++)
-                            {
-                                if (!first)
-                                    xSB.Append(", ");
-                                xSB.Append(BitConverter.ToBoolean(xData, i));
-                                first = false;
-                            }
-                        }
-                        if (xIsTooLong)
-                        {
-                            xSB.Append(", ..");
-                        }
-
-                        xSB.Append(" }");
-                        propertyInfo.bstrValue = xSB.ToString();
-                    }
+                    ReadDataArray<bool>(ref propertyInfo, "bool");
                 }
-                #endregion
+
 
                 else
                 {
@@ -685,20 +352,22 @@ namespace Cosmos.Debug.VSDebugEngine
                 // The sample does not support writing of values displayed in the debugger, so mark them all as read-only.
                 propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
 
-                //if (this.m_variableInformation.child != null)
+                if (this.m_variableInformation.Children.Count > 0)
                 {
-                    //propertyInfo.dwAttrib |= DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
+                    propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
                 }
             }
 
+            propertyInfo.pProperty = (IDebugProperty2)this;
+            propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
             // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
             // then set the pProperty field so the debugger can call back when the chilren are enumerated.
             //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
             //|| (this.m_variableInformation.child != null))
-            {
-                //propertyInfo.pProperty = (IDebugProperty2)this;
-                //propertyInfo.dwFields |= (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
-            }
+            //{
+            //    propertyInfo.pProperty = (IDebugProperty2)this;
+            //    propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
+            //}
 
             return propertyInfo;
         }
@@ -711,6 +380,16 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             ppEnum = null;
 
+            if (this.m_variableInformation.Children.Count > 0)
+            {
+                List<DEBUG_PROPERTY_INFO> infs = new List<DEBUG_PROPERTY_INFO>();
+                foreach (AD7Property dp in m_variableInformation.Children)
+                {
+                    infs.Add(dp.ConstructDebugPropertyInfo(dwFields));
+                }
+                ppEnum = new AD7PropertyEnum(infs.ToArray());
+                return VSConstants.S_OK;
+            }
             //if (this.m_variableInformation.child != null)
             //{
             //    DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[1];
