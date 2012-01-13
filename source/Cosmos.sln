@@ -173,9 +173,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{6A15C5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows.Test", "..\source2\VSIP\Cosmos.VS.Windows.Test\Cosmos.VS.Windows.Test.csproj", "{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geramy", "Geramy", "{C5ABAE1F-30BA-40B9-9A1D-F6EAC7473465}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeramysPlayground", "GeramysPlayground\GeramysPlayground.csproj", "{CC286B57-11CA-4FC1-8138-A714D5C0A64E}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GeramysPlaygroundBoot", "GeramysPlayground\GeramysPlaygroundBoot.Cosmos", "{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E} = {CC286B57-11CA-4FC1-8138-A714D5C0A64E}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 46
+		SccNumberOfProjects = 48
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -352,15 +361,23 @@ Global
 		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
 		SccProjectName43 = ../source2/Compiler/Cosmos.Compiler.DebugStub
 		SccLocalPath43 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub
-		SccWebProject44 = true
-		SccProjectUniqueName44 = ..\\Docs
-		SccProjectName44 = ../Docs
-		SccLocalPath44 = ..\\Docs
-		SccProjectEnlistmentChoice44 = 2
-		SccProjectUniqueName45 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test\\Cosmos.VS.Windows.Test.csproj
-		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = ../source2/VSIP/Cosmos.VS.Windows.Test
-		SccLocalPath45 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test
+		SccProjectUniqueName44 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test\\Cosmos.VS.Windows.Test.csproj
+		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
+		SccProjectName44 = ../source2/VSIP/Cosmos.VS.Windows.Test
+		SccLocalPath44 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test
+		SccWebProject45 = true
+		SccProjectUniqueName45 = ..\\Docs
+		SccProjectName45 = ../Docs
+		SccLocalPath45 = ..\\Docs
+		SccProjectEnlistmentChoice45 = 2
+		SccProjectUniqueName46 = GeramysPlayground\\GeramysPlayground.csproj
+		SccProjectTopLevelParentUniqueName46 = Cosmos.sln
+		SccProjectName46 = GeramysPlayground
+		SccLocalPath46 = GeramysPlayground
+		SccProjectUniqueName47 = GeramysPlayground\\GeramysPlaygroundBoot.Cosmos
+		SccProjectTopLevelParentUniqueName47 = Cosmos.sln
+		SccProjectName47 = GeramysPlayground
+		SccLocalPath47 = GeramysPlayground
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -1087,6 +1104,42 @@ Global
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}.Release|Mixed Platforms.Build.0 = Release|x86
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}.Release|x86.ActiveCfg = Release|x86
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}.Release|x86.Build.0 = Release|x86
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Bootstrap|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Bootstrap|Mixed Platforms.Build.0 = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Bootstrap|x86.Build.0 = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E}.Release|x86.Build.0 = Release|Any CPU
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Bootstrap|Any CPU.ActiveCfg = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Bootstrap|Any CPU.Build.0 = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Bootstrap|x86.ActiveCfg = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Bootstrap|x86.Build.0 = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Debug|Any CPU.Build.0 = Debug|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Debug|x86.ActiveCfg = Debug|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Debug|x86.Build.0 = Debug|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Release|Any CPU.ActiveCfg = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Release|Any CPU.Build.0 = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Release|Mixed Platforms.Build.0 = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Release|x86.ActiveCfg = Release|x86
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1122,6 +1175,7 @@ Global
 		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{2DF5F17F-4890-4856-ADFD-4DE23282C3B7} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E} = {A4478219-065D-4928-BB4D-4358CAD39A03}
+		{C5ABAE1F-30BA-40B9-9A1D-F6EAC7473465} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
@@ -1156,5 +1210,7 @@ Global
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
 		{04602B68-B877-4CA0-B17B-09C309732943} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
 		{9C96A7B5-19E5-4923-9569-DB9454E69C82} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
+		{CC286B57-11CA-4FC1-8138-A714D5C0A64E} = {C5ABAE1F-30BA-40B9-9A1D-F6EAC7473465}
+		{BD07C272-A16D-43F2-8C57-3ADC4A0AB462} = {C5ABAE1F-30BA-40B9-9A1D-F6EAC7473465}
 	EndGlobalSection
 EndGlobal
