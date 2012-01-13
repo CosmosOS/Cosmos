@@ -389,7 +389,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     private AD7ProgramNode mProgNode;
 
     // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
-    int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 process) {
+    int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 aProcess) {
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
       //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
       //System.Diagnostics.Debug.Assert(m_pollThread != null);
@@ -398,17 +398,17 @@ namespace Cosmos.Debug.VSDebugEngine {
       //System.Diagnostics.Debug.Assert(m_ad7ProgramId == Guid.Empty);
 
       try {
-        int processId = EngineUtils.GetProcessId(process);
+        int processId = EngineUtils.GetProcessId(aProcess);
 
         // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
         // which will complete the hookup with AD7
-        var xProcess = process as AD7Process;
+        var xProcess = aProcess as AD7Process;
         if (xProcess == null) {
           Trace.WriteLine("No AD7Process retrieved!");
           return VSConstants.E_INVALIDARG;
         }
         IDebugPort2 xPort;
-        EngineUtils.RequireOk(process.GetPort(out xPort));
+        EngineUtils.RequireOk(aProcess.GetPort(out xPort));
         var xDefPort = (IDebugDefaultPort2)xPort;
         IDebugPortNotify2 xNotify;
         EngineUtils.RequireOk(xDefPort.GetPortNotify(out xNotify));
