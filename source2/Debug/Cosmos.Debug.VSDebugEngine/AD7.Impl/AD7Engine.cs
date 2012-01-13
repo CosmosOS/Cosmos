@@ -441,7 +441,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     // This function is used to terminate a process that the SampleEngine launched
     // The debugger will call IDebugEngineLaunch2::CanTerminateProcess before calling this method.
-    int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 process) {
+    int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 aProcess) {
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
       //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
       //System.Diagnostics.Debug.Assert(m_pollThread != null);
@@ -449,7 +449,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       //System.Diagnostics.Debug.Assert(m_debuggedProcess != null);
 
       try {
-        int processId = EngineUtils.GetProcessId(process);
+        int processId = EngineUtils.GetProcessId(aProcess);
         //                if (processId != m_debuggedProcess.Id)
         {
           //                    return VSConstants.S_FALSE;
