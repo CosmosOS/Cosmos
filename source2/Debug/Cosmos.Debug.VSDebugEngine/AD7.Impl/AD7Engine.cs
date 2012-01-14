@@ -450,12 +450,10 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       try {
         int processId = EngineUtils.GetProcessId(aProcess);
-        //                if (processId != m_debuggedProcess.Id)
-        {
-          //                    return VSConstants.S_FALSE;
-        }
+        //                if (processId != m_debuggedProcess.Id) {
+        //                    return VSConstants.S_FALSE;
+        //}
 
-        //                m_debuggedProcess.Terminate();
         mProcess.Terminate();
         mEngineCallback.OnProcessExit(0);
         mProgram = null;
@@ -532,22 +530,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.S_OK;
     }
 
-    // Enumerates the code contexts for a given position in a source file.
-    public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-
-      throw new Exception("The method or operation is not implemented.");
-    }
-
-    // EnumCodePaths is used for the step-into specific feature -- right click on the current statment and decide which
-    // function to step into. This is not something that the SampleEngine supports.
-    public int EnumCodePaths(string hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      pathEnum = null;
-      safetyContext = null;
-      return VSConstants.E_NOTIMPL;
-    }
-
     // EnumModules is called by the debugger when it needs to enumerate the modules in the program.
     public int EnumModules(out IEnumDebugModules2 ppEnum) {
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
@@ -577,6 +559,87 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.S_OK;
     }
 
+    // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
+    public int GetENCUpdate(out object update) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      // The sample engine does not participate in managed edit & continue.
+      update = null;
+
+      return VSConstants.S_OK;
+    }
+
+    // Gets the name and identifier of the debug engine (DE) running this program.
+    public int GetEngineInfo(out string engineName, out Guid engineGuid) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      engineName = ResourceStrings.EngineName;
+      engineGuid = new Guid(AD7Engine.ID);
+
+      return VSConstants.S_OK;
+    }
+
+    // Gets the name of the program.
+    // The name returned by this method is always a friendly, user-displayable name that describes the program.
+    public int GetName(out string programName) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      // The Sample engine uses default transport and doesn't need to customize the name of the program,
+      // so return NULL.
+      programName = null;
+
+      return VSConstants.S_OK;
+    }
+
+    // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
+    // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
+    public int GetProgramId(out Guid guidProgramId) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      //System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
+
+      guidProgramId = m_ad7ProgramId;
+
+      return VSConstants.S_OK;
+    }
+
+    // This method is deprecated. Use the IDebugProcess3::Step method instead.
+    public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      mProcess.Step((enum_STEPKIND)sk);
+
+      return VSConstants.S_OK;
+    }
+
+    // ExecuteOnThread is called when the SDM wants execution to continue and have 
+    // stepping state cleared.
+    public int ExecuteOnThread(IDebugThread2 pThread) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      mProcess.Continue();
+
+      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
+      //AD7Thread thread = (AD7Thread)pThread;
+      //m_pollThread.RunOperation(new Operation(delegate{
+      //    m_debuggedProcess.Execute(thread.GetDebuggedThread());
+      //}));
+
+      return VSConstants.S_OK;
+    }
+
+    #region Unimplemented methods
+
+    // Enumerates the code contexts for a given position in a source file.
+    public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
+      throw new Exception("The method or operation is not implemented.");
+    }
+
+    // EnumCodePaths is used for the step-into specific feature -- right click on the current statment and decide which
+    // function to step into. This is not something that the SampleEngine supports.
+    public int EnumCodePaths(string hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      pathEnum = null;
+      safetyContext = null;
+      return VSConstants.E_NOTIMPL;
+    }
+
     // The properties returned by this method are specific to the program. If the program needs to return more than one property, 
     // then the IDebugProperty2 object returned by this method is a container of additional properties and calling the 
     // IDebugProperty2::EnumChildren method returns a list of all properties.
@@ -594,23 +657,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       MessageBox.Show("Disassembly");
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
       disassemblyStream = null;
+
       return VSConstants.E_NOTIMPL;
-    }
-
-    // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
-    public int GetENCUpdate(out object update) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      // The sample engine does not participate in managed edit & continue.
-      update = null;
-      return VSConstants.S_OK;
-    }
-
-    // Gets the name and identifier of the debug engine (DE) running this program.
-    public int GetEngineInfo(out string engineName, out Guid engineGuid) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      engineName = ResourceStrings.EngineName;
-      engineGuid = new Guid(AD7Engine.ID);
-      return VSConstants.S_OK;
     }
 
     // The memory bytes as represented by the IDebugMemoryBytes2 object is for the program's image in memory and not any memory 
@@ -620,68 +668,14 @@ namespace Cosmos.Debug.VSDebugEngine {
       throw new Exception("The method or operation is not implemented.");
     }
 
-    // Gets the name of the program.
-    // The name returned by this method is always a friendly, user-displayable name that describes the program.
-    public int GetName(out string programName) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      // The Sample engine uses default transport and doesn't need to customize the name of the program,
-      // so return NULL.
-      programName = null;
-      return VSConstants.S_OK;
-    }
-
-    // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
-    // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
-    public int GetProgramId(out Guid guidProgramId) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      //System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
-
-      guidProgramId = m_ad7ProgramId;
-      return VSConstants.S_OK;
-    }
-
-    // This method is deprecated. Use the IDebugProcess3::Step method instead.
-    public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      mProcess.Step((enum_STEPKIND)sk);
-
-      return VSConstants.S_OK;
-    }
-
-    // Terminates the program.
-    public int Terminate() {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      mProgram = null;
-
-      // Because the sample engine is a native debugger, it implements IDebugEngineLaunch2, and will terminate
-      // the process in IDebugEngineLaunch2.TerminateProcess
-      return VSConstants.S_OK;
-    }
-
     // Writes a dump to a file.
     public int WriteDump(enum_DUMPTYPE DUMPTYPE, string pszDumpUrl) {
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+
       // The sample debugger does not support creating or reading mini-dumps.
       return VSConstants.E_NOTIMPL;
     }
-
-    // ExecuteOnThread is called when the SDM wants execution to continue and have 
-    // stepping state cleared.
-    public int ExecuteOnThread(IDebugThread2 pThread) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      mProcess.Continue();
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-
-      //AD7Thread thread = (AD7Thread)pThread;
-
-      //m_pollThread.RunOperation(new Operation(delegate
-      //{
-      //    m_debuggedProcess.Execute(thread.GetDebuggedThread());
-      //}));
-
-      return VSConstants.S_OK;
-    }
-
+    
     // Stops all threads running in this program.
     // This method is called when this program is being debugged in a multi-program environment. When a stopping event from some other program 
     // is received, this method is called on this program. The implementation of this method should be asynchronous; 
@@ -711,6 +705,20 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       return VSConstants.S_OK;
     }
+
+
+    // Terminates the program.
+    public int Terminate() {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      mProgram = null;
+
+      // Because the sample engine is a native debugger, it implements IDebugEngineLaunch2, and will terminate
+      // the process in IDebugEngineLaunch2.TerminateProcess
+
+      return VSConstants.S_OK;
+    }
+    
+    #endregion
 
     #region Deprecated interface methods
     // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
