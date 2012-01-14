@@ -30,17 +30,13 @@ namespace Cosmos.Debug.VSDebugEngine {
   [ComVisible(true)]
   [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
   public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
-    // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
+    // Ssed to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
     EngineCallback mEngineCallback;
     internal AD7Process mProcess;
     internal IDebugProgram2 mProgram;
     // A unique identifier for the program being debugged.
     Guid m_ad7ProgramId;
     public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
-
-    // The sample debug engine is split into two parts: a managed front-end and a mixed-mode back end. DebuggedProcess is the primary
-    // object in the back-end. AD7Engine holds a reference to it.
-    //DebuggedProcess m_debuggedProcess;
 
     // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
     // api requires thread affinity to several operations.
@@ -50,33 +46,12 @@ namespace Cosmos.Debug.VSDebugEngine {
       get { return mBPMgr; }
     }
 
-    static AD7Engine() {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-    }
-
     public AD7Engine() {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
       mBPMgr = new BreakpointManager(this);
-    }
-
-    ~AD7Engine() {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
     }
 
     internal EngineCallback Callback {
       get { return mEngineCallback; }
-    }
-
-    //internal DebuggedProcess DebuggedProcess
-    //{
-    //    get { return m_debuggedProcess; }
-    //}
-
-    public string GetAddressDescription(uint ip) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      //    DebuggedModule module = m_debuggedProcess.ResolveAddress(ip);
-
-      return "";// EngineUtils.GetAddressDescription(module, ip);
     }
 
     // Attach the debug engine to a program. 
@@ -255,22 +230,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     // strings returned by the DE are properly localized. The sample engine is not localized so this is not implemented.
     int IDebugEngine2.SetLocale(ushort wLangID) {
       Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      return VSConstants.S_OK;
-    }
-
-    // A metric is a registry value used to change a debug engine's behavior or to advertise supported functionality. 
-    // This method can forward the call to the appropriate form of the Debugging SDK Helpers function, SetMetric.
-    int IDebugEngine2.SetMetric(string pszMetric, object varValue) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      // The sample engine does not need to understand any metric settings.
-      return VSConstants.S_OK;
-    }
-
-    // Sets the registry root currently in use by the DE. Different installations of Visual Studio can change where their registry information is stored
-    // This allows the debugger to tell the engine where that location is.
-    int IDebugEngine2.SetRegistryRoot(string pszRegistryRoot) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      // The sample engine does not read settings from the registry.
       return VSConstants.S_OK;
     }
 
@@ -469,27 +428,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
-    // Determines if a debug engine (DE) can detach from the program.
-    public int CanDetach() {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      // The sample engine always supports detach
-      return VSConstants.S_OK;
-    }
-
-    // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
-    // breakmode. 
-    public int CauseBreak() {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-
-      //m_pollThread.RunOperation(new Operation(delegate
-      //{
-      //    //m_debuggedProcess.Break();
-      //}));
-
-      return VSConstants.S_OK;
-    }
-
     // Continue is called from the SDM when it wants execution to continue in the debugee
     // but have stepping state remain. An example is when a tracepoint is executed, 
     // and the debugger does not want to actually enter break mode.
@@ -499,8 +437,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       AD7Thread thread = (AD7Thread)pThread;
 
-      //m_pollThread.RunOperation(new Operation(delegate
-      //{
+      //m_pollThread.RunOperation(new Operation(delegate {
       //    //m_debuggedProcess.Continue(thread.GetDebuggedThread());
       //}));
 
@@ -623,6 +560,47 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     #region Unimplemented methods
+
+    // A metric is a registry value used to change a debug engine's behavior or to advertise supported functionality. 
+    // This method can forward the call to the appropriate form of the Debugging SDK Helpers function, SetMetric.
+    int IDebugEngine2.SetMetric(string pszMetric, object varValue) {
+      // The sample engine does not need to understand any metric settings.
+      return VSConstants.S_OK;
+    }
+
+    // Sets the registry root currently in use by the DE. Different installations of Visual Studio can change where their registry information is stored
+    // This allows the debugger to tell the engine where that location is.
+    int IDebugEngine2.SetRegistryRoot(string pszRegistryRoot) {
+      // The sample engine does not read settings from the registry.
+      return VSConstants.S_OK;
+    }
+
+    public string GetAddressDescription(uint ip) {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      //    DebuggedModule module = m_debuggedProcess.ResolveAddress(ip);
+
+      return "";// EngineUtils.GetAddressDescription(module, ip);
+    }
+
+    // Determines if a debug engine (DE) can detach from the program.
+    public int CanDetach() {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      // The sample engine always supports detach
+      return VSConstants.S_OK;
+    }
+
+    // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
+    // breakmode. 
+    public int CauseBreak() {
+      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
+      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
+
+      //m_pollThread.RunOperation(new Operation(delegate {
+      //    //m_debuggedProcess.Break();
+      //}));
+
+      return VSConstants.S_OK;
+    }
 
     // Enumerates the code contexts for a given position in a source file.
     public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum) {
