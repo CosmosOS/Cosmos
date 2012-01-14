@@ -16,6 +16,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe</StartProgram>
-    <StartArguments>D:\source\Cosmos\source\Cosmos.sln</StartArguments>
+    <StartArguments>C:\Cosmos\Trunk\source\Cosmos.sln</StartArguments>
   </PropertyGroup>
 </Project>

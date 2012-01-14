@@ -10,6 +10,23 @@ namespace Cosmos.Debug.Common
 {
     public class DebugInfo : IDisposable
     {
+        /// <summary>
+        /// Please beware this field,
+        /// it may cause issues if used incorrectly.
+        /// </summary>
+        public static DebugInfo CurrentInstance { get; private set; }
+        public class Field_Info
+        {
+            public string Type { get; set; }
+            public int Offset { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class Field_Map
+        {
+            public string TypeName { get; set; }
+            public List<string> FieldNames = new List<string>();
+        }
 
         public class MLDebugSymbol
         {
@@ -35,7 +52,10 @@ namespace Cosmos.Debug.Common
 
         private FbConnection mConnection;
 
-        public DebugInfo() { }
+        public DebugInfo()
+        {
+            CurrentInstance = this;
+        }
 
         public void OpenCPDB(string aPathname)
         {
@@ -101,19 +121,35 @@ namespace Cosmos.Debug.Common
             );
 
             xExec.SqlStatements.Add(
+                "CREATE TABLE FIELD_INFO ("
+                + "    TYPE      VARCHAR(4000)     NOT NULL"
+                + " ,  OFFSET    INT               NOT NULL"
+                + " ,  NAME      VARCHAR(4000)     NOT NULL PRIMARY KEY"
+                + ");"
+                );
+
+            xExec.SqlStatements.Add(
+                "CREATE TABLE FIELD_MAPPING ("
+                + "    TYPE_NAME        VARCHAR(4000)            NOT NULL PRIMARY KEY"
+                + " ,  FIELD_COUNT      INT                      NOT NULL"
+                + " ,  FIELD_NAMES      VARCHAR(4000)[0:255]     NOT NULL"
+                + ");"
+                );
+
+            xExec.SqlStatements.Add(
                 "CREATE TABLE Label ("
-                + "  LABELNAME VARCHAR(255) NOT NULL"
-                + ", ADDRESS   BIGINT NOT NULL"
+                + "  LABELNAME VARCHAR(255)  NOT NULL"
+                + ", ADDRESS   BIGINT        NOT NULL"
                 + ");");
 
             xExec.SqlStatements.Add(
                 "CREATE TABLE LOCAL_ARGUMENT_INFO ("
-                + "  METHODLABELNAME VARCHAR(255) NOT NULL"
+                + "  METHODLABELNAME VARCHAR(255)      NOT NULL"
                 + ", ISARGUMENT      SMALLINT          NOT NULL"
-                + ", INDEXINMETHOD   INT          NOT NULL"
-                + ", OFFSET          INT          NOT NULL"
-                + ", NAME            VARCHAR(255) NOT NULL"
-                + ", TYPENAME        VARCHAR(4000) NOT NULL"
+                + ", INDEXINMETHOD   INT               NOT NULL"
+                + ", OFFSET          INT               NOT NULL"
+                + ", NAME            VARCHAR(255)      NOT NULL"
+                + ", TYPENAME        VARCHAR(4000)     NOT NULL"
                 + ");"
                 );
 
@@ -121,6 +157,174 @@ namespace Cosmos.Debug.Common
             // Batch execution closes the connection, so we have to reopen it
             mConnection.Open();
         }
+
+        private List<string> local_MappingTypeNames = new List<string>();
+        public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping)
+        {
+            using (FbTransaction transaction = mConnection.BeginTransaction())
+            {
+                IEnumerable<Field_Map> xMaps = aMapping.Where(delegate(Field_Map mp)
+                {
+                    if (local_MappingTypeNames.Contains(mp.TypeName))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        local_MappingTypeNames.Add(mp.TypeName);
+                        return true;
+                    }
+                });
+                using (var xCmd = mConnection.CreateCommand())
+                {
+                    xCmd.Transaction = transaction;
+                    xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_COUNT, FIELD_NAMES)" +
+                                       " VALUES (@TYPE_NAME, @FIELD_COUNT, @FIELD_NAMES)";
+
+                    xCmd.Parameters.Add("@TYPE_NAME", FbDbType.VarChar);
+                    xCmd.Parameters.Add("@FIELD_COUNT", FbDbType.Integer);
+                    xCmd.Parameters.Add("@FIELD_NAMES", FbDbType.Array);
+                    xCmd.Prepare();
+
+                    // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+                    foreach (var xItem in xMaps)
+                    {
+                        xCmd.Parameters[0].Value = xItem.TypeName;
+                        xCmd.Parameters[1].Value = xItem.FieldNames.Count;
+                        if (xItem.FieldNames.Count > 255)
+                        {
+                            throw new Exception("To many fields! There are '" + xItem.FieldNames.Count + "' fields.");
+                        }
+                        xCmd.Parameters[2].Value = xItem.FieldNames.ToArray();
+                        xCmd.ExecuteNonQuery();
+                    }
+                }
+                transaction.Commit();
+            }
+        }
+
+        public Field_Map GetFieldMap(string name)
+        {
+            Field_Map mp = new Field_Map();
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select TYPE_NAME, FIELD_COUNT, FIELD_NAMES from FIELD_MAPPING where(TYPE_NAME='" + name + "')";
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    if (xReader.Read())
+                    {
+                        mp.TypeName = xReader.GetString(0);
+                        int i = xReader.GetInt32(1);
+                        mp.FieldNames.AddRange(((string[])xReader.GetValue(2)).Take(i));
+                    }
+                    else
+                    {
+                        mp.TypeName = "UNKNOWN!";
+                    }
+                }
+            }
+            return mp;
+        }
+
+        public void ReadFieldMappingList(List<Field_Map> aSymbols)
+        {
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select TYPE_NAME, FIELD_COUNT, FIELD_NAMES from FIELD_MAPPING";
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    while (xReader.Read())
+                    {
+                        Field_Map mp = new Field_Map();
+                        mp.TypeName = xReader.GetString(0);
+                        int i = xReader.GetInt32(1);
+                        mp.FieldNames.AddRange(((string[])xReader.GetValue(2)).Take(i));
+                        aSymbols.Add(mp);
+                    }
+                }
+            }
+        }
+
+
+        private List<string> local_FieldInfoNames = new List<string>();
+        public void WriteFieldInfoToFile(IEnumerable<Field_Info> aFields)
+        {
+            using (FbTransaction transaction = mConnection.BeginTransaction())
+            {
+                IEnumerable<Field_Info> xFields = aFields.Where(delegate(Field_Info mp)
+                {
+                    if (local_FieldInfoNames.Contains(mp.Name))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        local_FieldInfoNames.Add(mp.Name);
+                        return true;
+                    }
+                });
+                using (var xCmd = mConnection.CreateCommand())
+                {
+                    xCmd.Transaction = transaction;
+                    xCmd.CommandText = "INSERT INTO FIELD_INFO (TYPE, OFFSET, NAME)" +
+                                       " VALUES (@TYPE, @OFFSET, @NAME)";
+
+                    xCmd.Parameters.Add("@TYPE", FbDbType.VarChar);
+                    xCmd.Parameters.Add("@OFFSET", FbDbType.Integer);
+                    xCmd.Parameters.Add("@NAME", FbDbType.VarChar);
+                    xCmd.Prepare();
+
+                    // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+                    foreach (var xItem in xFields)
+                    {
+                        xCmd.Parameters[0].Value = xItem.Type;
+                        xCmd.Parameters[1].Value = xItem.Offset;
+                        xCmd.Parameters[2].Value = xItem.Name;
+                        xCmd.ExecuteNonQuery();
+                    }
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        public Field_Info GetFieldInfo(string name)
+        {
+            Field_Info inf = new Field_Info();
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO where(NAME='" + name + "')";
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    xReader.Read();
+                    inf.Type = xReader.GetString(0);
+                    inf.Offset = xReader.GetInt32(1);
+                    inf.Name = xReader.GetString(2);
+                }
+            }
+            return inf;
+        }
+
+        public void ReadFieldInfoList(List<Field_Info> aSymbols)
+        {
+            using (var xCmd = mConnection.CreateCommand())
+            {
+                xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO";
+                using (var xReader = xCmd.ExecuteReader())
+                {
+                    while (xReader.Read())
+                    {
+                        aSymbols.Add(new Field_Info
+                        {
+                            Type = xReader.GetString(0),
+                            Offset = xReader.GetInt32(1),
+                            Name = xReader.GetString(2),
+                        });
+                    }
+                }
+            }
+        }
+
 
         public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols)
         {

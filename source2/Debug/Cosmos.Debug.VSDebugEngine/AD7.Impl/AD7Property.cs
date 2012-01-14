@@ -341,8 +341,27 @@ namespace Cosmos.Debug.VSDebugEngine
                 else
                 {
                     xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
-                    var xTypedUIntValue = BitConverter.ToUInt32(xData, 0);
-                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xTypedUIntValue, xTypedUIntValue.ToString("X").ToUpper());
+                    var xPointer = BitConverter.ToUInt32(xData, 0);
+                    if (xPointer == 0)
+                    {
+                        propertyInfo.bstrValue = NULL;
+                    }
+                    else
+                    {
+                        DebugInfo.Field_Map mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.Type);
+                        foreach (string str in mp.FieldNames)
+                        {
+                            DebugInfo.Field_Info fInf = mProcess.mDebugInfoDb.GetFieldInfo(str);
+
+                            DebugLocalInfo inf = new DebugLocalInfo();
+                            inf.IsArrayElement = true;
+                            inf.ArrayElementType = fInf.Type;
+                            inf.ArrayElementLocation = (int)(xPointer + fInf.Offset + 12);
+                            inf.Name = GetFieldName(fInf);
+                            this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
+                        }
+                        propertyInfo.bstrValue = String.Format("{0} (0x{1})", xPointer, xPointer.ToString("X").ToUpper());
+                    }
                 }
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
@@ -361,7 +380,7 @@ namespace Cosmos.Debug.VSDebugEngine
             propertyInfo.pProperty = (IDebugProperty2)this;
             propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
             // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
-            // then set the pProperty field so the debugger can call back when the chilren are enumerated.
+            // then set the pProperty field so the debugger can call back when the children are enumerated.
             //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
             //|| (this.m_variableInformation.child != null))
             //{
@@ -370,6 +389,21 @@ namespace Cosmos.Debug.VSDebugEngine
             //}
 
             return propertyInfo;
+        }
+
+        private static string GetFieldName(DebugInfo.Field_Info fInf)
+        {
+            string s = fInf.Name;
+            int i = s.LastIndexOf('.');
+            if (i > 0)
+            {
+                s = s.Substring(i + 1, s.Length - i - 1);
+                return s;
+            }
+            else
+            {
+                return s;
+            }
         }
 
         #region IDebugProperty2 Members
