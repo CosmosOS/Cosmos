@@ -102,6 +102,11 @@ namespace Cosmos.Debug.VSDebugEngine {
     
     int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint aCeltPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
       // Attach the debug engine to a program. 
+      //
+      // Attach can either be called to attach to a new process, or to complete an attach
+      // to a launched process.
+      // So could we simplify and move code from LaunchSuspended to here and maybe even 
+      // eliminate the debughost? Although I supposed DebugHost has some other uses as well.
 
       if (aCeltPrograms != 1) {
         System.Diagnostics.Debug.Fail("Cosmos Debugger only supports one debug target at a time.");
@@ -111,45 +116,20 @@ namespace Cosmos.Debug.VSDebugEngine {
       try {
         int xProcessID = EngineUtils.GetProcessId(rgpPrograms[0]);
         if (xProcessID == 0) {
-          // We only support system processes
+          // We only support system processes.
           // What other kinds of processes are there?
           return VSConstants.E_NOTIMPL;
         }
 
         EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out mProgramID));
 
-        // Attach can either be called to attach to a new process, or to complete an attach
-        // to a launched process
-        //if (m_pollThread == null)
-        //{
-        //    // We are being asked to debug a process when we currently aren't debugging anything
-        //    m_pollThread = new WorkerThread();
-
-        //    mEngineCallback = new EngineCallback(this, ad7Callback);
-
-        //    // Complete the win32 attach on the poll thread
-        //    m_pollThread.RunOperation(new Operation(delegate
-        //    {
-        //        //m_debuggedProcess = Worker.AttachToProcess(mEngineCallback, processId);
-        //    }));
-
-        //    //m_pollThread.SetDebugProcess(m_debuggedProcess);
-        //}
-        //else {
-          //if (processId != m_debuggedProcess.Id) {
-            //System.Diagnostics.Debug.Fail("Asked to attach to a process while we are debugging");
-            //return VSConstants.E_FAIL;
-          //}
-          //m_pollThread.SetDebugProcess(m_debuggedProcess);
-        //}
-
         mProgram = rgpPrograms[0];
         AD7EngineCreateEvent.Send(this);
         AD7ProgramCreateEvent.Send(this);
+        AD7ModuleLoadEvent.Send(this, mModule, true);
 
         mProcess.ResumeFromLaunch();
 
-        AD7ModuleLoadEvent.Send(this, mModule, true);
         // Dummy main thread
         // We dont support threads yet, but the debugger expects threads. 
         // So we create a dummy object to represente our only "thread".
@@ -161,10 +141,10 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.S_OK;
     }
 
-    // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
     int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 aProcess) {
+      // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
       try {
-        int processId = EngineUtils.GetProcessId(aProcess);
+        int xProcessID = EngineUtils.GetProcessId(aProcess);
 
         // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
         // which will complete the hookup with AD7
