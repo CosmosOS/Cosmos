@@ -191,7 +191,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Called by the SDM to indicate that a synchronous debug event, previously sent by the DE to the SDM,
       // was received and processed. The only event the  engine sends in this fashion is Program Destroy.
       // It responds to that event by shutting down the engine.
-      // Kudzu: I dont think we currently use this.
+      // 
+      // This is used in some cases - I set a BP here and it does get hit sometime during breakpoints
+      // being triggered for exampmmle.
       try {
         if (aEvent is AD7ProgramDestroyEvent) {
           mEngineCallback = null;
