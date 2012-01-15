@@ -100,18 +100,20 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.S_OK;
     }
     
-    int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
+    int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint aCeltPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
       // Attach the debug engine to a program. 
 
-      if (celtPrograms != 1) {
+      if (aCeltPrograms != 1) {
         System.Diagnostics.Debug.Fail("Cosmos Debugger only supports one debug target at a time.");
         throw new ArgumentException();
       }
 
       try {
-        int processId = EngineUtils.GetProcessId(rgpPrograms[0]);
-        if (processId == 0) {
-          return VSConstants.E_NOTIMPL; // We only support system processes
+        int xProcessID = EngineUtils.GetProcessId(rgpPrograms[0]);
+        if (xProcessID == 0) {
+          // We only support system processes
+          // What other kinds of processes are there?
+          return VSConstants.E_NOTIMPL;
         }
 
         EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out mProgramID));
@@ -147,21 +149,12 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         mProcess.ResumeFromLaunch();
 
-        System.Threading.ThreadPool.QueueUserWorkItem(new WaitCallback(delegate {
-          Thread.Sleep(500);
-
-          AD7ModuleLoadEvent.Send(this, mModule, true);
-
-          // Dummy main thread
-          mThread = new AD7Thread(this, mProcess);
-          AD7LoadCompleteEvent.Send(this, mThread);
-        }));
-
-        // start polling for debug events on the poll thread
-        //m_pollThread.RunOperationAsync(new Operation(delegate
-        //{
-        //    //m_debuggedProcess.ResumeEventPump();
-        //}));
+        AD7ModuleLoadEvent.Send(this, mModule, true);
+        // Dummy main thread
+        // We dont support threads yet, but the debugger expects threads. 
+        // So we create a dummy object to represente our only "thread".
+        mThread = new AD7Thread(this, mProcess);
+        AD7LoadCompleteEvent.Send(this, mThread);
       } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
