@@ -410,13 +410,13 @@ namespace Cosmos.Debug.Common {
     }
 
     protected void PacketTracePoint(byte[] aPacket) {
-      // Seems to need to be ebfore CmdTrace call - have to dig why by moving it breaks things
+      // Moving it after the cmd causes a lockup.. not sure why... need to check
       WaitForMessage();
       CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
     }
 
     protected void PacketText(byte[] aPacket) {
-      // Seems to need to be ebfore CmdTrace call - have to dig why by moving it breaks things
+      // Moving it after the cmd causes a lockup.. not sure why... need to check
       WaitForMessage();
       CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
     }

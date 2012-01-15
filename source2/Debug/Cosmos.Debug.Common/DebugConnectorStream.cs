@@ -55,17 +55,22 @@ namespace Cosmos.Debug.Common {
       base.Dispose();
     }
 
-    protected Action<byte[]> mCompleted; // Action to call after size received
+    protected Action<byte[]> mCompletedAfterSize; // Action to call after size received
     protected void SizePacket(byte[] aPacket) {
       int xSize = aPacket[0] + (aPacket[1] << 8);
-      Next(xSize, mCompleted);
+      Next(xSize, mCompletedAfterSize);
     }
 
     protected override void Next(int aPacketSize, Action<byte[]> aCompleted) {
       var xIncoming = new Incoming();
-      if (aPacketSize == -1) {
+      if (aPacketSize == 0) {
+        // Can occur with variable size packets for exampmle.
+        // Dont call read, becuase that will close the stream.
+        // So we just call the Completed directly
+        aCompleted(new byte[0]);
+      } else if (aPacketSize == -1) {
         // Variable size packet, split into two reads
-        mCompleted = aCompleted;
+        mCompletedAfterSize = aCompleted;
         aPacketSize = 2;
         xIncoming.Completed = SizePacket;
       } else {
