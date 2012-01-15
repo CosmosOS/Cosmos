@@ -59,11 +59,52 @@ namespace Cosmos.Debug.VSDebugEngine {
       get { return mEngineCallback; }
     }
 
+    #region Startup Methods
+    // During startup these methods are called in this order:
+    // -LaunchSuspended
+    // -Attach
+    // -ResumeProcess
+
+    int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo
+      , string aArgs, string aDir, string aEnv, string aOptions, enum_LAUNCH_FLAGS aLaunchFlags
+      , uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback
+      , out IDebugProcess2 aProcess) {
+      // Launches a process by means of the debug engine.
+      // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger 
+      // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program 
+      // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
+      // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
+      // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
+
+      aProcess = null;
+      try {
+        mEngineCallback = new EngineCallback(this, aAD7Callback);
+
+        var xDebugInfo = new NameValueCollection();
+        NameValueCollectionHelper.LoadFromString(xDebugInfo, aDebugInfo);
+
+        //TODO: In the future we might support command line args for kernel etc
+        //string xCmdLine = EngineUtils.BuildCommandLine(exe, args);
+        //var processLaunchInfo = new ProcessLaunchInfo(exe, xCmdLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
+
+        AD7EngineCreateEvent.Send(this);
+        var xProcess = new AD7Process(xDebugInfo, mEngineCallback, this, aPort);
+        aProcess = mProcess = xProcess;
+        mProgramID = xProcess.mID;
+        //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
+        mModule = new AD7Module();
+        mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
+      } catch (Exception e) {
+        return EngineUtils.UnexpectedException(e);
+      }
+      return VSConstants.S_OK;
+    }
+    
     int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
       // Attach the debug engine to a program. 
 
       if (celtPrograms != 1) {
-        System.Diagnostics.Debug.Fail("Cosmos Debugger only supports on debug target at a time.");
+        System.Diagnostics.Debug.Fail("Cosmos Debugger only supports one debug target at a time.");
         throw new ArgumentException();
       }
 
@@ -127,80 +168,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.S_OK;
     }
 
-    int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo, string aArgs, string aDir, string aEnv, string aOptions, enum_LAUNCH_FLAGS aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess) {
-      // Launches a process by means of the debug engine.
-      // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger 
-      // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program 
-      // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
-      // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
-      // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
-      aProcess = null;
-      try {
-        mEngineCallback = new EngineCallback(this, aAD7Callback);
-
-        var xDebugInfo = new NameValueCollection();
-        NameValueCollectionHelper.LoadFromString(xDebugInfo, aDebugInfo);
-
-        //string commandLine = EngineUtils.BuildCommandLine(exe, args);
-        //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
-        // We are being asked to debug a process when we currently aren't debugging anything
-        //m_pollThread = new WorkerThread();
-        // Complete the win32 attach on the poll thread
-        //m_pollThread.RunOperation(new Operation(delegate
-        //{
-        //   var  m_debuggedProcess = Worker.LaunchProcess(mEngineCallback, processLaunchInfo);
-        //}));
-
-        AD7EngineCreateEvent.Send(this);
-        var xProcess = new AD7Process(xDebugInfo, mEngineCallback, this, aPort);
-        aProcess = xProcess;
-        mProcess = xProcess;
-        mProgramID = xProcess.mID;
-        //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
-        mModule = new AD7Module();
-        mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
-
-        //           DebuggedModule^ module = m_moduleList->First->Value;		
-
-        //CComBSTR bstrModuleName;
-        //CComBSTR bstrSymbolPath;
-        //bstrModuleName.Attach((BSTR)(System::Runtime::InteropServices::Marshal::StringToBSTR(module->Name).ToInt32()));
-
-        //// Load symbols for the application's exe. This is the only symbol file the sample engine will load.
-        //if (m_pSymbolEngine->LoadSymbolsForModule(bstrModuleName, &bstrSymbolPath))
-        //{
-        //    module->SymbolsLoaded = true;
-        //    module->SymbolPath = gcnew String(bstrSymbolPath);
-        //}	
-
-        //m_entrypointModule = module;
-        //DebuggedThread^ thread = CreateThread(m_lastDebugEvent.dwThreadId, m_lastDebugEvent.u.CreateProcessInfo.hThread, (DWORD_PTR)m_lastDebugEvent.u.CreateProcessInfo.lpStartAddress);
-
-        //if (m_debugMethod == Launch)
-        //{
-        //    // Because of Com-re-entrancy, the engine must wait to send the fake mod-load and thread create events until after the
-        //    // launch is complete. Save these references so the call to ResumeFromLaunch can send the events.
-        //    m_entrypointModule = module;
-        //    m_entrypointThread = thread;
-
-        //    // Do not continue the create process event until after the call to ResumeFromLaunch.
-        //    fContinue = false;
-        //}
-        //else
-        //{
-        //    // This is an attach.
-        //    // Fake up a thread create event for the entrypoint module and the first thread in the process for attach
-        //m_callback->OnModuleLoad(module);
-
-        //m_callback->OnSymbolSearch(module, module->SymbolPath, module->SymbolsLoaded);
-        //    m_callback->OnThreadStart(thread);
-        //}
-        return VSConstants.S_OK;
-      } catch (Exception e) {
-        return EngineUtils.UnexpectedException(e);
-      }
-    }
-
     // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
     int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 aProcess) {
       try {
@@ -238,6 +205,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       return VSConstants.S_OK;
     }
+    #endregion
 
     #region Other implemented support methods
     int IDebugEngine2.ContinueFromSynchronousEvent(IDebugEvent2 aEvent) {
