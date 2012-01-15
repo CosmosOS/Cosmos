@@ -30,13 +30,16 @@ namespace Cosmos.Debug.VSDebugEngine {
   [ComVisible(true)]
   [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
   public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
-    // Ssed to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
-    EngineCallback mEngineCallback;
     internal AD7Process mProcess;
     internal IDebugProgram2 mProgram;
     // A unique identifier for the program being debugged.
-    Guid m_ad7ProgramId;
+    Guid mProgramID;
     public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
+    internal AD7Module mModule;
+    private AD7Thread mThread;
+    private AD7ProgramNode mProgNode;
+    public bool AfterBreak = false;
+    public IList<IDebugBoundBreakpoint2> Breakpoints = null;
 
     // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
     // api requires thread affinity to several operations.
@@ -50,24 +53,27 @@ namespace Cosmos.Debug.VSDebugEngine {
       mBPMgr = new BreakpointManager(this);
     }
 
+    // Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
+    EngineCallback mEngineCallback;
     internal EngineCallback Callback {
       get { return mEngineCallback; }
     }
 
-    // Attach the debug engine to a program. 
     int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
+      // Attach the debug engine to a program. 
+
       if (celtPrograms != 1) {
-        System.Diagnostics.Debug.Fail("SampleEngine only expects to see one program in a process");
+        System.Diagnostics.Debug.Fail("Cosmos Debugger only supports on debug target at a time.");
         throw new ArgumentException();
       }
 
       try {
         int processId = EngineUtils.GetProcessId(rgpPrograms[0]);
         if (processId == 0) {
-          return VSConstants.E_NOTIMPL; // sample engine only supports system processes
+          return VSConstants.E_NOTIMPL; // We only support system processes
         }
 
-        EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out m_ad7ProgramId));
+        EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out mProgramID));
 
         // Attach can either be called to attach to a new process, or to complete an attach
         // to a launched process
@@ -86,16 +92,14 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         //    //m_pollThread.SetDebugProcess(m_debuggedProcess);
         //}
-        //else
-        {
-          //if (processId != m_debuggedProcess.Id)
-          {
+        //else {
+          //if (processId != m_debuggedProcess.Id) {
             //System.Diagnostics.Debug.Fail("Asked to attach to a process while we are debugging");
             //return VSConstants.E_FAIL;
-          }
-
+          //}
           //m_pollThread.SetDebugProcess(m_debuggedProcess);
-        }
+        //}
+
         mProgram = rgpPrograms[0];
         AD7EngineCreateEvent.Send(this);
         AD7ProgramCreateEvent.Send(this);
@@ -117,108 +121,19 @@ namespace Cosmos.Debug.VSDebugEngine {
         //{
         //    //m_debuggedProcess.ResumeEventPump();
         //}));
-
-        return VSConstants.S_OK;
-      }
-        //catch (ComponentException e)
-        //{
-        //    return e.HResult;
-        //}
-      catch (Exception e) {
-        return EngineUtils.UnexpectedException(e);
-      }
-    }
-
-    // Requests that all programs being debugged by this DE stop execution the next time one of their threads attempts to run.
-    // This is normally called in response to the user clicking on the pause button in the debugger.
-    // When the break is complete, an AsyncBreakComplete event will be sent back to the debugger.
-    int IDebugEngine2.CauseBreak() {
-      return ((IDebugProgram2)this).CauseBreak();
-    }
-
-    // Called by the SDM to indicate that a synchronous debug event, previously sent by the DE to the SDM,
-    // was received and processed. The only event the sample engine sends in this fashion is Program Destroy.
-    // It responds to that event by shutting down the engine.
-    int IDebugEngine2.ContinueFromSynchronousEvent(IDebugEvent2 eventObject) {
-      try {
-        if (eventObject is AD7ProgramDestroyEvent) {
-          //DebuggedProcess debuggedProcess = m_debuggedProcess;
-
-          mEngineCallback = null;
-          //m_debuggedProcess = null;
-          //m_pollThread = null;
-          m_ad7ProgramId = Guid.Empty;
-          mThread = null;
-          mProgNode = null;
-        } else {
-          System.Diagnostics.Debug.Fail("Unknown synchronious event");
-        }
       } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
-
       return VSConstants.S_OK;
     }
 
-    // Creates a pending breakpoint in the engine. A pending breakpoint is contains all the information needed to bind a breakpoint to 
-    // a location in the debuggee.
-    int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
-      ppPendingBP = null;
-
-      try {
-        BPMgr.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
-      } catch (Exception e) {
-        return EngineUtils.UnexpectedException(e);
-      }
-
-      return VSConstants.S_OK;
-    }
-
-    // Informs a DE that the program specified has been atypically terminated and that the DE should 
-    // clean up all references to the program and send a program destroy event.
-    int IDebugEngine2.DestroyProgram(IDebugProgram2 pProgram) {
-      // Tell the SDM that the engine knows that the program is exiting, and that the
-      // engine will send a program destroy. We do this because the Win32 debug api will always
-      // tell us that the process exited, and otherwise we have a race condition.
-      return AD7_HRESULT.E_PROGRAM_DESTROY_PENDING;
-    }
-
-    // Gets the GUID of the DE.
-    int IDebugEngine2.GetEngineId(out Guid guidEngine) {
-      guidEngine = new Guid(ID);
-      return VSConstants.S_OK;
-    }
-
-    // Determines if a process can be terminated.
-    int IDebugEngineLaunch2.CanTerminateProcess(IDebugProcess2 process) {
-      try {
-        int processId = EngineUtils.GetProcessId(process);
-
-        //if (processId == m_debuggedProcess.Id)
-        {
-          return VSConstants.S_OK;
-        }
-        //else
-        {
-          //return VSConstants.S_FALSE;
-        }
-      }
-        //catch (ComponentException e)
-        //{
-        //    return e.HResult;
-        //}
-      catch (Exception e) {
-        return EngineUtils.UnexpectedException(e);
-      }
-    }
-
-    // Launches a process by means of the debug engine.
-    // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger 
-    // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program 
-    // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
-    // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
-    // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
     int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo, string aArgs, string aDir, string aEnv, string aOptions, enum_LAUNCH_FLAGS aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess) {
+      // Launches a process by means of the debug engine.
+      // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger 
+      // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program 
+      // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
+      // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
+      // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
       aProcess = null;
       try {
         mEngineCallback = new EngineCallback(this, aAD7Callback);
@@ -240,7 +155,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         var xProcess = new AD7Process(xDebugInfo, mEngineCallback, this, aPort);
         aProcess = xProcess;
         mProcess = xProcess;
-        m_ad7ProgramId = xProcess.mID;
+        mProgramID = xProcess.mID;
         //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
         mModule = new AD7Module();
         mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
@@ -286,10 +201,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
-    internal AD7Module mModule;
-    private AD7Thread mThread;
-    private AD7ProgramNode mProgNode;
-
     // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
     int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 aProcess) {
       try {
@@ -322,118 +233,155 @@ namespace Cosmos.Debug.VSDebugEngine {
         //{
         //m_debuggedProcess.ResumeFromLaunch();
         //}));
-
-        return VSConstants.S_OK;
-      }
-        //catch (ComponentException e)
-        //{
-        //    return e.HResult;
-        //}
-      catch (Exception e) {
+      } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
+      return VSConstants.S_OK;
     }
 
-    // This function is used to terminate a process that the SampleEngine launched
-    // The debugger will call IDebugEngineLaunch2::CanTerminateProcess before calling this method.
-    int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 aProcess) {
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-      //System.Diagnostics.Debug.Assert(m_pollThread != null);
-      //System.Diagnostics.Debug.Assert(mEngineCallback != null);
-      //System.Diagnostics.Debug.Assert(m_debuggedProcess != null);
-
+    #region Other implemented support methods
+    int IDebugEngine2.ContinueFromSynchronousEvent(IDebugEvent2 aEvent) {
+      // Called by the SDM to indicate that a synchronous debug event, previously sent by the DE to the SDM,
+      // was received and processed. The only event the  engine sends in this fashion is Program Destroy.
+      // It responds to that event by shutting down the engine.
+      // Kudzu: I dont think we currently use this.
       try {
-        int processId = EngineUtils.GetProcessId(aProcess);
-        //                if (processId != m_debuggedProcess.Id) {
-        //                    return VSConstants.S_FALSE;
-        //}
+        if (aEvent is AD7ProgramDestroyEvent) {
+          mEngineCallback = null;
+          mProgramID = Guid.Empty;
+          mThread = null;
+          mProgNode = null;
+        } else {
+          System.Diagnostics.Debug.Fail("Unknown synchronious event");
+        }
+      } catch (Exception e) {
+        return EngineUtils.UnexpectedException(e);
+      }
+      return VSConstants.S_OK;
+    }
+
+    int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
+      // Creates a pending breakpoint in the engine. A pending breakpoint is contains all the information needed to bind a breakpoint to 
+      // a location in the debuggee.
+
+      ppPendingBP = null;
+      try {
+        BPMgr.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
+      } catch (Exception e) {
+        return EngineUtils.UnexpectedException(e);
+      }
+      return VSConstants.S_OK;
+    }
+
+    int IDebugEngine2.DestroyProgram(IDebugProgram2 pProgram) {
+      // Informs a DE that the program specified has been atypically terminated and that the DE should 
+      // clean up all references to the program and send a program destroy event.
+      //
+      // Tell the SDM that the engine knows that the program is exiting, and that the
+      // engine will send a program destroy. We do this because the Win32 debug api will always
+      // tell us that the process exited, and otherwise we have a race condition.
+      return AD7_HRESULT.E_PROGRAM_DESTROY_PENDING;
+    }
+
+    int IDebugEngine2.GetEngineId(out Guid oGuidEngine) {
+      // Gets the GUID of the DebugEngine.
+      oGuidEngine = new Guid(ID);
+      return VSConstants.S_OK;
+    }
+
+    int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 aProcess) {
+      // This function is used to terminate a process that the SampleEngine launched
+      // The debugger will call IDebugEngineLaunch2::CanTerminateProcess before calling this method.
+      try {
+        // We only support one debugee, but if we support more in the future
+        // this can be use to identify which one this method applies to.
+        int xProcessID = EngineUtils.GetProcessId(aProcess);
 
         mProcess.Terminate();
         mEngineCallback.OnProcessExit(0);
         mProgram = null;
-
-        return VSConstants.S_OK;
-      }
-        //catch (ComponentException e)
-        //{
-        //    return e.HResult;
-        //}
-      catch (Exception e) {
+      } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
+      return VSConstants.S_OK;
     }
 
-    // Continue is called from the SDM when it wants execution to continue in the debugee
-    // but have stepping state remain. An example is when a tracepoint is executed, 
-    // and the debugger does not want to actually enter break mode.
-    public int Continue(IDebugThread2 pThread) {
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
+    public int Continue(IDebugThread2 aThread) {
+      // Continue is called from the SDM when it wants execution to continue in the debugee
+      // but have stepping state remain. An example is when a tracepoint is executed, 
+      // and the debugger does not want to actually enter break mode.
 
-      AD7Thread thread = (AD7Thread)pThread;
-
-      //m_pollThread.RunOperation(new Operation(delegate {
-      //    //m_debuggedProcess.Continue(thread.GetDebuggedThread());
-      //}));
-
+      var xThread = (AD7Thread)aThread;
       if (AfterBreak) {
-        Console.Write("");
-        //Callback.OnBreak(thread);
+        //Callback.OnBreak(xThread);
       }
       return VSConstants.S_OK;
     }
 
-    public bool AfterBreak = false;
-    public IList<IDebugBoundBreakpoint2> Breakpoints = null;
+    int IDebugEngine2.CauseBreak() {
+      // Requests that all programs being debugged by this DE stop execution the next time one of their threads attempts to run.
+      // This is normally called in response to the user clicking on the pause button in the debugger.
+      // When the break is complete, an AsyncBreakComplete event will be sent back to the debugger.
 
-    // Detach is called when debugging is stopped and the process was attached to (as opposed to launched)
-    // or when one of the Detach commands are executed in the UI.
+      return ((IDebugProgram2)this).CauseBreak();
+    }
+
     public int Detach() {
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
+      // Detach is called when debugging is stopped and the process was attached to (as opposed to launched)
+      // or when one of the Detach commands are executed in the UI.
 
       BPMgr.ClearBoundBreakpoints();
-
-      //m_pollThread.RunOperation(new Operation(delegate
-      //{
-      //    //m_debuggedProcess.Detach();
-      //}));
-
       return VSConstants.S_OK;
     }
 
-    // EnumModules is called by the debugger when it needs to enumerate the modules in the program.
     public int EnumModules(out IEnumDebugModules2 ppEnum) {
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
+      // EnumModules is called by the debugger when it needs to enumerate the modules in the program.
 
       ppEnum = new AD7ModuleEnum(new[] { mModule });
-
       return VSConstants.S_OK;
     }
 
-    // EnumThreads is called by the debugger when it needs to enumerate the threads in the program.
     public int EnumThreads(out IEnumDebugThreads2 ppEnum) {
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-
-      //DebuggedThread[] threads = m_debuggedProcess.GetThreads();
-
-      //AD7Thread[] threadObjects = new AD7Thread[threads.Length];
-      //for (int i = 0; i < threads.Length; i++)
-      //{
-      //    System.Diagnostics.Debug.Assert(threads[i].Client != null);
-      //    threadObjects[i] = (AD7Thread)threads[i].Client;
-      //}
+      // EnumThreads is called by the debugger when it needs to enumerate the threads in the program.
 
       ppEnum = new AD7ThreadEnum(new[] { mThread });
-
       return VSConstants.S_OK;
     }
 
-    // Gets the name and identifier of the debug engine (DE) running this program.
     public int GetEngineInfo(out string engineName, out Guid engineGuid) {
+      // Gets the name and identifier of the debug engine (DE) running this program.
+
       engineName = ResourceStrings.EngineName;
       engineGuid = new Guid(AD7Engine.ID);
 
       return VSConstants.S_OK;
     }
+
+    public int GetProgramId(out Guid aGuidProgramId) {
+      // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
+      // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
+
+      aGuidProgramId = mProgramID;
+      return VSConstants.S_OK;
+    }
+
+    public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step) {
+      // This method is deprecated. Use the IDebugProcess3::Step method instead.
+      
+      mProcess.Step((enum_STEPKIND)sk);
+      return VSConstants.S_OK;
+    }
+
+    public int ExecuteOnThread(IDebugThread2 pThread) {
+      // ExecuteOnThread is called when the SDM wants execution to continue and have 
+      // stepping state cleared.
+
+      mProcess.Continue();
+      return VSConstants.S_OK;
+    }
+    #endregion
+
+    #region Unimplemented methods
 
     // Gets the name of the program.
     // The name returned by this method is always a friendly, user-displayable name that describes the program.
@@ -441,40 +389,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       // The Sample engine uses default transport and doesn't need to customize the name of the program,
       // so return NULL.
       programName = null;
-
       return VSConstants.S_OK;
     }
-
-    // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
-    // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
-    public int GetProgramId(out Guid guidProgramId) {
-      //System.Diagnostics.Debug.Assert(m_ad7ProgramId != Guid.Empty);
-      guidProgramId = m_ad7ProgramId;
-      return VSConstants.S_OK;
-    }
-
-    // This method is deprecated. Use the IDebugProcess3::Step method instead.
-    public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step) {
-      mProcess.Step((enum_STEPKIND)sk);
-      return VSConstants.S_OK;
-    }
-
-    // ExecuteOnThread is called when the SDM wants execution to continue and have 
-    // stepping state cleared.
-    public int ExecuteOnThread(IDebugThread2 pThread) {
-      mProcess.Continue();
-
-      //System.Diagnostics.Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-      //AD7Thread thread = (AD7Thread)pThread;
-      //m_pollThread.RunOperation(new Operation(delegate{
-      //    m_debuggedProcess.Execute(thread.GetDebuggedThread());
-      //}));
-
-      return VSConstants.S_OK;
-    }
-
-    #region Unimplemented methods
-
+    
     // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
     public int GetENCUpdate(out object update) {
       // The sample engine does not participate in managed edit & continue.
@@ -618,6 +535,31 @@ namespace Cosmos.Debug.VSDebugEngine {
     // Enumerates the code contexts for a given position in a source file.
     public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum) {
       throw new Exception("The method or operation is not implemented.");
+    }
+
+    // Determines if a process can be terminated.
+    int IDebugEngineLaunch2.CanTerminateProcess(IDebugProcess2 process) {
+      return VSConstants.S_OK;
+
+      //try {
+      //  int processId = EngineUtils.GetProcessId(process);
+
+      //  //if (processId == m_debuggedProcess.Id)
+      //  {
+      //    return VSConstants.S_OK;
+      //  }
+      //  //else
+      //  {
+      //    //return VSConstants.S_FALSE;
+      //  }
+      //}
+      //  //catch (ComponentException e)
+      //  //{
+      //  //    return e.HResult;
+      //  //}
+      //catch (Exception e) {
+      //  return EngineUtils.UnexpectedException(e);
+      //}
     }
 
     #endregion
