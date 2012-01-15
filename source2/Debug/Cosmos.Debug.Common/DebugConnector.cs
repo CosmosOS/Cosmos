@@ -123,7 +123,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void SendFrame() {
-      //SendCommand(DsCmd.SendFrame);
+      SendCommand(DsCmd.SendFrame);
     }
 
     public void SendStack() {
