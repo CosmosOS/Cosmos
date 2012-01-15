@@ -62,8 +62,8 @@ namespace Cosmos.Debug.VSDebugEngine {
     #region Startup Methods
     // During startup these methods are called in this order:
     // -LaunchSuspended
-    // -Attach
     // -ResumeProcess
+    //   -Attach - Triggered by Attach
 
     int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo
       , string aArgs, string aDir, string aEnv, string aOptions, enum_LAUNCH_FLAGS aLaunchFlags
@@ -128,8 +128,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         AD7ProgramCreateEvent.Send(this);
         AD7ModuleLoadEvent.Send(this, mModule, true);
 
-        mProcess.ResumeFromLaunch();
-
         // Dummy main thread
         // We dont support threads yet, but the debugger expects threads. 
         // So we create a dummy object to represente our only "thread".
@@ -158,21 +156,29 @@ namespace Cosmos.Debug.VSDebugEngine {
         var xDefPort = (IDebugDefaultPort2)xPort;
         IDebugPortNotify2 xNotify;
         EngineUtils.RequireOk(xDefPort.GetPortNotify(out xNotify));
+
+        // This triggers Attach
         EngineUtils.RequireOk(xNotify.AddProgramNode(mProgNode));
 
-        //mProcess.ResumeFromLaunch();
-        
-        //xProcess.ResumeFromLaunch();
-        //Callback.OnModuleLoad(mModule);
-        //Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), 1);
-        //Callback.OnThreadStart(mThread);
+        Callback.OnModuleLoad(mModule);
+        Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), enum_MODULE_INFO_FLAGS.MIF_SYMBOLS_LOADED);
+        // Important! 
+        //
+        // This call triggers setting of breakpoints that exist before run.
+        // So it must be called before we resume the process.
+        // If not called VS will call it after our 3 startup events, but thats too late.
+        // This line was commented out in earlier Cosmos builds and caused problems with
+        // breakpoints and timing.
+        Callback.OnThreadStart(mThread);
+
+        // Not sure what this does exactly. It was commented out before
+        // but so was a lot of stuff we actually needed. If its uncommented it 
+        // throws:
+        //  "Operation is not valid due to the current state of the object."
         //AD7EntrypointEvent.Send(this);
 
-        // Resume the threads in the debuggee process
-        //m_pollThread.RunOperation(new Operation(delegate
-        //{
-        //m_debuggedProcess.ResumeFromLaunch();
-        //}));
+        // Now finally release our process to go after breakpoints are set
+        mProcess.ResumeFromLaunch();
       } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
