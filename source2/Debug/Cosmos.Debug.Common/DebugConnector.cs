@@ -410,13 +410,13 @@ namespace Cosmos.Debug.Common {
     }
 
     protected void PacketTracePoint(byte[] aPacket) {
-      // Moving it after the cmd causes a lockup.. not sure why... need to check
+      // WaitForMessage must be first. CmdTrace issues
+      // more commands and if we dont issue this, the pipe wont be waiting for a response.
       WaitForMessage();
       CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
     }
 
     protected void PacketText(byte[] aPacket) {
-      // Moving it after the cmd causes a lockup.. not sure why... need to check
       WaitForMessage();
       CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
     }
