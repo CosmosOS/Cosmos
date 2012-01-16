@@ -16,12 +16,26 @@ namespace BreakpointsKernel {
 
     protected override void Run() {
       Test xTest;
+
+      var xATA = new Cosmos.Hardware.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
+        , Cosmos.Hardware.BlockDevice.Ata.ControllerIdEnum.Primary
+        , Cosmos.Hardware.BlockDevice.Ata.BusPositionEnum.Master);
+      UInt64 xBlockSize = xATA.BlockSize;
+
+      xTest = new FieldInitTest();
+      xTest.Run();
+
       xTest = new NullableTest();
       xTest.Run();
 
       xTest = new Int64Test();
       xTest.Run();
 
+      Trace1();
+      TestSB(); 
+      TestStringCtor();
+      TestCompare();
+      
       TestATA();
 
       Console.WriteLine("Press enter.");
@@ -71,8 +85,6 @@ namespace BreakpointsKernel {
       } else {
         Console.WriteLine("Compare OK.");
       }
-
-      Console.ReadLine();
     }
 
     void TestStringCtor() {
@@ -89,12 +101,6 @@ namespace BreakpointsKernel {
 
     protected void TestATA() {
       //try {
-      //Trace1();
-      //TestSB(); Stop(); return;
-      //TestStringCtor();
-      //TestNullableTypes();
-      //TestCompare();
-
       Console.WriteLine();
       Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
 

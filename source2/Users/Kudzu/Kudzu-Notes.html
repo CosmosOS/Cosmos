@@ -4,19 +4,13 @@
     Kudzu
     To Do</h3>
     <ul>
-        <li>in the guess kernel, it will stop if the breakpoint is before the ReadLine() 
-            call, it won&#39;t if it&#39;s after that. 
-<Orvid> the VM will send the data, but VS won&#39;t respond.<ul>
-                <li>Threading issue with start - put a lock/wait in REsume&nbsp; and comment that 
-                    all bp calls are in main thread</li>
-                <li>set a flag after resume that means ds is listening - cant use isconnected 
-                    becauase handshake didnt occur yet</li>
-                <li>move handshake to debug connector? or make a different flag?</li>
-            </ul>
-        </li>
+        <li>Memory watches</li>
         <li>Ping DebugStub</li>
         <li>blocksize in ATA should be 512 but isnt</li>
-        <li>watches that can see fields/members</li>
+        <li>watches that can see fields/members<ul>
+            <li>of other classes besides this</li>
+            </ul>
+        </li>
         <li>ATA / FAT</li>
         <li></li>
         <li>CXDB to dataset<ul>
