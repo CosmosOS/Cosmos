@@ -42,6 +42,7 @@ namespace Cosmos.Hardware {
       // Find hardcoded ATA controllers
       InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
       InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
+
       //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum? 
       // They do show up in PCI space as well as the fixed space. 
       // Or is it always here, and was our compiler stack corruption issue?
@@ -59,11 +60,6 @@ namespace Cosmos.Hardware {
     }
 
     static public void Init() {
-      // DANGER! This is before heap? Yet somehow its working currently...
-      // Leaving it for now because Core.Init outputs to Console, but we need
-      // to change this...
-      // Heap seems to self init on demand? But even before IDT/GDT etc?
-
       InitStaticDevices();
       InitPciDevices();
     }
