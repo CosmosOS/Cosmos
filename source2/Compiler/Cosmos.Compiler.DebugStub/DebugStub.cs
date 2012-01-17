@@ -38,6 +38,27 @@ namespace Cosmos.Debug.DebugStub {
       public const byte Out = 3;
     }
 
+    public class AckCommand : CodeBlock {
+      public override void Assemble() {
+        // We acknowledge receipt of the command, not processing of it.
+        //   -Actaully the ACK is sent AFTER the command code is called - so it is an ACK that its completed.
+        // We have to do this because sometimes callers do more processing.
+        // We ACK even ones we dont process here, but do not ACK Noop.
+        // The buffers should be ok because more wont be sent till after our NACK
+        // is received.
+        // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
+        // UART buffer is 16.
+        // We may need to revisit this in the future to ack not commands, but data chunks
+        // and move them to a buffer.
+        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
+        AL = DsMsg.CmdCompleted;
+        Call<WriteALToComPort>();
+        //
+        EAX = DebugStub_CommandID.Value;
+        Call<WriteALToComPort>();
+      }
+    }
+
     public class ProcessCommand : CodeBlock {
       // Modifies: AL, DX (ReadALFromComPort)
       // Returns: AL
@@ -71,22 +92,7 @@ namespace Cosmos.Debug.DebugStub {
         CheckCmd(DsCmd.Ping, typeof(Ping));
 
         Label = ".SendACK";
-        // We acknowledge receipt of the command, not processing of it.
-        //   -Actaully the ACK is sent AFTER the command code is called - so it is an ACK that its completed.
-        // We have to do this because sometimes callers do more processing.
-        // We ACK even ones we dont process here, but do not ACK Noop.
-        // The buffers should be ok because more wont be sent till after our NACK
-        // is received.
-        // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
-        // UART buffer is 16.
-        // We may need to revisit this in the future to ack not commands, but data chunks
-        // and move them to a buffer.
-        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
-        AL = DsMsg.CmdCompleted;
-        Call<WriteALToComPort>();
-        //
-        EAX = DebugStub_CommandID.Value;
-        Call<WriteALToComPort>();
+        Call<AckCommand>();
 
         Label = ".End";
         // Restore AL for callers who check the command and do
