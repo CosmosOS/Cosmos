@@ -40,8 +40,8 @@ namespace Cosmos.Debug.DebugStub {
 
     public class AckCommand : CodeBlock {
       public override void Assemble() {
-        // We acknowledge receipt of the command, not processing of it.
-        //   -Actaully the ACK is sent AFTER the command code is called - so it is an ACK that its completed.
+        // We acknowledge receipt of the command AND the processing of it.
+        //   -In the past the ACK only acknowledged receipt.
         // We have to do this because sometimes callers do more processing.
         // We ACK even ones we dont process here, but do not ACK Noop.
         // The buffers should be ok because more wont be sent till after our NACK
@@ -70,6 +70,7 @@ namespace Cosmos.Debug.DebugStub {
         EAX.Push();
 
         // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
+        // Noop also does not send ACK.
         AL.Compare(DsCmd.Noop);
         JumpIf(Flags.Equal, ".End");
 
@@ -91,9 +92,6 @@ namespace Cosmos.Debug.DebugStub {
         CheckCmd(DsCmd.SetAsmBreak, typeof(SetAsmBreak));
         CheckCmd(DsCmd.Ping, typeof(Ping));
 
-        Label = ".SendACK";
-        Call<AckCommand>();
-
         Label = ".End";
         // Restore AL for callers who check the command and do
         // further processing, or for commands not handled by this routine.
@@ -105,7 +103,8 @@ namespace Cosmos.Debug.DebugStub {
         string xAfterLabel = NewLabel();
         JumpIf(Flags.NotEqual, xAfterLabel);
         Call(aFunction);
-        Jump(".SendACK");
+        Call<AckCommand>();
+        Jump(".End");
         Label = xAfterLabel;
       }
     }
@@ -588,6 +587,7 @@ namespace Cosmos.Debug.DebugStub {
         Jump("DebugStub_ProcessCommandBatch");
 
         Label = "DebugStub_ProcessCommandBatch_Exit";
+        Call<AckCommand>();
       }
     }
 
@@ -885,6 +885,7 @@ namespace Cosmos.Debug.DebugStub {
         Jump("DebugStub_WaitCmd");
 
         Label = "DebugStub_Break_Exit";
+        Call<AckCommand>();
         DebugStatus.Value = Status.Run;
       }
     }
