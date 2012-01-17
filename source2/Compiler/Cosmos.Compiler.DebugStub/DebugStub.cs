@@ -72,7 +72,7 @@ namespace Cosmos.Debug.DebugStub {
 
         Label = ".SendACK";
         // We acknowledge receipt of the command, not processing of it.
-        //   -Actaully the ACK is sent AFTER the command code is called - so it is an ACK that its completed
+        //   -Actaully the ACK is sent AFTER the command code is called - so it is an ACK that its completed.
         // We have to do this because sometimes callers do more processing.
         // We ACK even ones we dont process here, but do not ACK Noop.
         // The buffers should be ok because more wont be sent till after our NACK
@@ -81,7 +81,7 @@ namespace Cosmos.Debug.DebugStub {
         // UART buffer is 16.
         // We may need to revisit this in the future to ack not commands, but data chunks
         // and move them to a buffer.
-        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub)
+        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
         AL = DsMsg.CmdCompleted;
         Call<WriteALToComPort>();
         //
@@ -829,8 +829,8 @@ namespace Cosmos.Debug.DebugStub {
     }
 
     public class Break : CodeBlock {
-      // Should only be called internally by DebugStub. Has a lot of preconditions
-      // Externals should use BreakOnNextTrace instead
+      // Should only be called internally by DebugStub. Has a lot of preconditions.
+      // Externals should use BreakOnNextTrace instead.
       public override void Assemble() {
         // Reset request in case we are currently responding to one or we hit a fixed breakpoint
         // before our request could be serviced (if one existed)
@@ -842,10 +842,11 @@ namespace Cosmos.Debug.DebugStub {
 
         // Wait for a command
         Label = "DebugStub_WaitCmd";
-        // Check for common commands
+        
+        // Check for common commands first
         Call<ProcessCommand>();
 
-        // Check for commands that are only valid in break state
+        // Now check for commands that are only valid in break state
         // or commands that require special handling while in break
         // state.
 
