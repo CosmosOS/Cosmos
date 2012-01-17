@@ -179,6 +179,10 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.PongVSIP:
+            // Note: This will only work if the debugger is active,
+            // ie Cosmos is booted. This is because the receiving
+            // pipe is currently part of AD7Process which has a lifespan
+            // tied to an active debug session.
             System.Windows.MessageBox.Show("Pong received from VSIP.");
             break;
 
