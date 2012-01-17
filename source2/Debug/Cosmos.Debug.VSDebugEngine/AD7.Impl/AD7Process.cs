@@ -190,7 +190,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     protected void DbgCmdPong(byte[] aData) {
-      mDebugDownPipe.SendCommand(DwMsg.PongVSIP, aData);
+      mDebugDownPipe.SendCommand(DwMsg.PongDebugStub, aData);
     }
 
     protected void DbgCmdStack(byte[] aData) {
@@ -207,14 +207,13 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDebugDownPipe.SendCommand(DwMsg.PongVSIP, null);
           break;
 
-        //case DwCmd.Ping:
-        //  mDbgConnector.Ping();
-        //  break;
+        case DwCmd.PingDebugStub:
+          mDbgConnector.Ping();
+          break;
 
         default:
           throw new Exception(
-              String.Format(
-                  "Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived!", cmd));
+              String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived!", cmd));
       }
     }
 

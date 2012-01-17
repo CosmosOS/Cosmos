@@ -45,9 +45,15 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnPingDS_Click(object sender, RoutedEventArgs e) {
+      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingDebugStub, null);
     }
 
     void butnPingVSIP_Click(object sender, RoutedEventArgs e) {
+      MessageBox.Show("This only works if there is an active debug session, see comment in code for this event for more details.");
+      // Note: This will only work if the debugger is active,
+      // ie Cosmos is booted. This is because the receiving
+      // pipe is currently part of AD7Process which has a lifespan
+      // tied to an active debug session.
       Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
     }
   }

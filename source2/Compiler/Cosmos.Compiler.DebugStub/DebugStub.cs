@@ -72,9 +72,10 @@ namespace Cosmos.Debug.DebugStub {
 
         Label = ".SendACK";
         // We acknowledge receipt of the command, not processing of it.
-        // We have to do this because sometimes callers do more processing
+        //   -Actaully the ACK is sent AFTER the command code is called - so it is an ACK that its completed
+        // We have to do this because sometimes callers do more processing.
         // We ACK even ones we dont process here, but do not ACK Noop.
-        // The buffers should be ok becuase more wont be sent till after our NACK
+        // The buffers should be ok because more wont be sent till after our NACK
         // is received.
         // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
         // UART buffer is 16.
@@ -844,8 +845,8 @@ namespace Cosmos.Debug.DebugStub {
         // Check for common commands
         Call<ProcessCommand>();
 
-        // Now check for commands that are only valid in break state
-        // or commands that require additional handling while in break
+        // Check for commands that are only valid in break state
+        // or commands that require special handling while in break
         // state.
 
         AL.Compare(DsCmd.Continue);

@@ -96,6 +96,10 @@ namespace Cosmos.Debug.Common {
 
             SendRawData(xData);
             if (aWait) {
+              // All commands except NOOP reply back from the DebugStub
+              // with an ACK. The ACK will set the event and allow us to proceed.
+              // This wait causes this method to wait on the ACK to be receive back from
+              // DebugStub.
               mCmdWait.WaitOne();
             }
           }
@@ -144,7 +148,7 @@ namespace Cosmos.Debug.Common {
       }
 
       if (aAddress == 0) {
-        DoDebugMsg("DS Cmd: BP " + aID + " deleted");
+        DoDebugMsg("DS Cmd: BP " + aID + " deleted.");
       } else {
         DoDebugMsg("DS Cmd: BP " + aID + " @ " + aAddress.ToString("X8").ToUpper());
       }
@@ -306,7 +310,7 @@ namespace Cosmos.Debug.Common {
 
         case DsMsg.Pong:
           DoDebugMsg("DC Recv: Pong");
-          Next(1, PacketPong);
+          Next(0, PacketPong);
           break;
 
         default:
@@ -402,7 +406,7 @@ namespace Cosmos.Debug.Common {
       byte xCmdID = aPacket[0];
       DoDebugMsg("DS Msg: Cmd " + xCmdID + " Complete");
       if (mCurrCmdID != xCmdID) {
-        System.Windows.Forms.MessageBox.Show("DS Cmd Completed Mismatch. Expected " + mCurrCmdID + ", received " + xCmdID + ".");
+        System.Windows.Forms.MessageBox.Show("DebugStub CmdCompleted Mismatch. Expected " + mCurrCmdID + ", received " + xCmdID + ".");
       }
       // Release command
       mCmdWait.Set();

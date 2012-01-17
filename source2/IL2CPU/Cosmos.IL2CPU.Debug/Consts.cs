@@ -86,7 +86,7 @@ namespace Cosmos.Debug.Consts {
   static public class DwCmd {
     public const byte Noop = 0;
     public const byte PingVSIP = 1;
-    public const byte PingDebugStub = 1;
+    public const byte PingDebugStub = 2;
   }
 
 }
