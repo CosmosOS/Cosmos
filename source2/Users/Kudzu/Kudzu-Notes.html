@@ -4,10 +4,14 @@
     Kudzu
     To Do</h3>
     <ul>
-        <li>In break how to commands send the ACK? ProcessCommand is called first, and sends 
-            it for commands it does not handle.. before they are handled....</li>
-        <li>Stack and Registers window fixed width font like Assembly window</li>
-        <li>DS Ping or set a breakpoint while not in a break state will hang VS.</li>
+        <li>Asm stepping<ul>
+            <li>Historical panels</li>
+            </ul>
+        </li>
+        <li>DS Ping or set a breakpoint while not in a break state will hang VS.<ul>
+            <li>This is because its waiting on some other command to release?</li>
+            </ul>
+        </li>
         <li>Add debug VS to Cosmos menu. and remove .user files.<ul>
             <li>Hot keys?</li>
             <li>Separators?</li>
@@ -22,7 +26,6 @@
             <li>asm window - show values of EBP, etc...</li>
             </ul>
         </li>
-        <li>Ping DebugStub</li>
         <li>blocksize in ATA should be 512 but isnt</li>
         <li>watches that can see fields/members<ul>
             <li>of other classes besides this</li>

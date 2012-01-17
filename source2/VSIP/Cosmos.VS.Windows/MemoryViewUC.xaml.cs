@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 
 namespace Cosmos.VS.Windows {
   public partial class MemoryViewUC : UserControl {
+    FontFamily mFont = new FontFamily("Consolas");
+
     public MemoryViewUC() {
       InitializeComponent();
     }
@@ -44,6 +46,7 @@ namespace Cosmos.VS.Windows {
 
     public void Add(string aLabel, UInt32 aData) {
       var xLabel = new TextBlock();
+      xLabel.FontFamily = mFont;
       xLabel.Text = aLabel;
       spnlLabel.Children.Add(xLabel);
 

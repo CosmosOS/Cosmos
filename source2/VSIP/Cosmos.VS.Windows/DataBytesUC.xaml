@@ -4,5 +4,5 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
-    <TextBlock Name="tblkData" Text="0x--------"  />
+    <TextBlock FontFamily="Consolas" Name="tblkData" Text="0x--------"  />
 </UserControl>
