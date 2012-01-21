@@ -197,8 +197,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDebugDownPipe.SendCommand(DwMsg.Stack, aData);
     }
 
-    void mDebugUpPipe_DataPacketReceived(byte cmd, byte[] data) {
-      switch (cmd) {
+    void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData) {
+      switch (aCmd) {
         case DwCmd.Noop:
           // do nothing?
           break;
@@ -212,8 +212,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           break;
 
         default:
-          throw new Exception(
-              String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived!", cmd));
+          throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived!", aCmd));
       }
     }
 
@@ -282,7 +281,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(mAddressLabelMappings, mLabelAddressMappings, mDebugInfoDb);
-
       if (mSourceMappings.Count == 0) {
         throw new Exception("Debug data not found: SourceMappings");
       }
@@ -444,7 +442,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     protected void RequestFullDebugStubUpdate() {
       // We catch and resend data rather than using a second serial port because
-      // while this would work fine in a VM, it puts extra requirements on the setup
+      // while this would work fine in a VM, it would require 2 serial ports
       // when real hardware is used.
       SendAssembly();
       mDbgConnector.SendRegisters();
@@ -595,24 +593,20 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public void SendAssembly() {
       // Scan and make a list of labels that belong to this line of code
-      int xIdx = mSourceMappings.Keys.IndexOf((uint)mCurrentAddress);
-      string xFile = mSourceMappings.Values[xIdx].SourceFile;
-      int xLineNo = mSourceMappings.Values[xIdx].Line;
-      int xCol = mSourceMappings.Values[xIdx].Column;
-      //
-      var xLabels = new Dictionary<string, int>();
-      xLabels.Add(mAddressLabelMappings[(uint)mCurrentAddress] + ":", 0);
-      for (int i = xIdx; i < mSourceMappings.Values.Count; i++) {
-        var xSI = mSourceMappings.Values[i];
-        if ((xSI.SourceFile != xFile) || (xSI.Line != xLineNo) || (xSI.Column != xCol)) {
-          break;
-        }
-        string xLabel = mAddressLabelMappings[mSourceMappings.Keys[i]] + ":";
-        if (!xLabels.ContainsKey(mAddressLabelMappings[mSourceMappings.Keys[i]] + ":")) {
-          xLabels.Add(xLabel, 0);
-        }
-      }
 
+      // Create list of asm labels that belong to this line of C#.
+      var xValue = mSourceMappings[(uint)mCurrentAddress];
+      var xMappings = from x in mSourceMappings
+                   where x.Value.SourceFile == xValue.SourceFile
+                     && x.Value.Line == xValue.Line
+                     && x.Value.Column == xValue.Column
+                   select x.Key;
+      var xLabels = new List<string>();
+      foreach (uint xAddr in xMappings) {
+        xLabels.Add(mAddressLabelMappings[xAddr] + ":");
+      }
+      
+      // Extract out the relevant lines from the .asm file.
       var xCode = new StringBuilder();
       using (var xSR = new StreamReader(Path.ChangeExtension(mISO, ".asm"))) {
         // Find line in ASM that starts the code block.
@@ -625,7 +619,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
           var xParts = xLine.Trim().Split(' ');
           if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
-            if (xLabels.ContainsKey(xParts[0])) {
+            if (xLabels.Contains(xParts[0])) {
               // Found the first match, break.
               break;
             }
@@ -643,7 +637,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             } else if (xParts[1] == ";Asm") {
               // Found an ASM label.
               xCode.AppendLine(xLine);
-            } else if (xParts[1] == ";IL" && xLabels.ContainsKey(xParts[0])) {
+            } else if (xParts[1] == ";IL" && xLabels.Contains(xParts[0])) {
               // Found an exact match. Our label is in the label list
               xCode.AppendLine(xLine);
             } else {
@@ -658,6 +652,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           xLine = xSR.ReadLine();
         }
       }
+
       // Send source code to the tool window
       mDebugDownPipe.SendCommand(DwMsg.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }
