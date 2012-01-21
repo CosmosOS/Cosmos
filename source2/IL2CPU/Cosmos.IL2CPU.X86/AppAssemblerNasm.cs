@@ -171,7 +171,12 @@ namespace Cosmos.IL2CPU.X86 {
           mLoadedModules.Add(xLocation, null);
           return null;
         } else {
-          xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider() });
+			try {
+				xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider() });
+			}
+			catch (InvalidOperationException) {
+				throw new Exception("Please check that dll and pdb file is matching on location: " + xLocation);
+			}
           if (xModule.HasSymbols) {
             mLoadedModules.Add(xLocation, xModule);
           } else {
