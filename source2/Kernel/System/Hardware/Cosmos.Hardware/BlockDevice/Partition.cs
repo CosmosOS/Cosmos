@@ -12,9 +12,6 @@ namespace Cosmos.Hardware.BlockDevice {
       mHost = aHost;
       mStartingSector = aStartingSector;
       mBlockCount = aSectorCount;
-      var xSize1 = aHost.BlockSize;
-      UInt64 xSize2 = 7;
-      xSize2 = mHost.BlockSize;
       mBlockSize = aHost.BlockSize;
     }
 
