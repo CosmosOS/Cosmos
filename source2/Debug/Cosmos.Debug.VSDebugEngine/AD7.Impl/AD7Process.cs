@@ -31,7 +31,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected TargetHost mTargetHost;
     protected VMwareFlavor mVMWareFlavor = VMwareFlavor.Player;
     internal DebugInfo mDebugInfoDb;
-    internal IDictionary<uint, string> mAddressLabelMappings;
+    internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
     private int mProcessExitEventSent = 0;
 
@@ -603,7 +603,12 @@ namespace Cosmos.Debug.VSDebugEngine {
                    select x.Key;
       var xLabels = new List<string>();
       foreach (uint xAddr in xMappings) {
-        xLabels.Add(mAddressLabelMappings[xAddr] + ":");
+        var xLabelsForAddr = from x in mAddressLabelMappings
+                      where x.Key == xAddr
+                      select x.Value;
+        foreach (string xLabel in xLabelsForAddr) {
+          xLabels.Add(xLabel + ":");
+        }
       }
       
       // Extract out the relevant lines from the .asm file.

@@ -500,9 +500,9 @@ namespace Cosmos.Debug.Common
             }
         }
 
-        public void ReadLabels(out IDictionary<uint, string> oLabels, out IDictionary<string, uint> oLabelAddressMappings)
+        public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings)
         {
-            oLabels = new Dictionary<uint, string>();
+            oLabels = new List<KeyValuePair<uint, string>>();
             oLabelAddressMappings = new Dictionary<string, uint>();
             using (var xCmd = mConnection.CreateCommand())
             {
@@ -511,7 +511,7 @@ namespace Cosmos.Debug.Common
                 {
                     while (xReader.Read())
                     {
-                        oLabels.Add((uint)xReader.GetInt64(1), xReader.GetString(0));
+                        oLabels.Add(new KeyValuePair<uint, string>((uint)xReader.GetInt64(1), xReader.GetString(0)));
                         oLabelAddressMappings.Add(xReader.GetString(0), (uint)xReader.GetInt64(1));
                     }
                 }
@@ -544,7 +544,7 @@ namespace Cosmos.Debug.Common
             return mMethodId;
         }
 
-        public void WriteLabels(SortedList<uint, String> aMap)
+        public void WriteLabels(List<KeyValuePair<uint, string>> aMap)
         {
             using (var xTrans = mConnection.BeginTransaction())
             {

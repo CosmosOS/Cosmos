@@ -11,7 +11,7 @@ using System.Diagnostics;
 using FirebirdSql.Data.FirebirdClient;
 
 namespace Cosmos.Debug.Common {
-  
+
   public class SourceInfos : SortedList<uint, SourceInfo> {
     public SourceInfo GetMapping(uint aValue) {
       for (int i = Count - 1; i >= 0; i--) {
@@ -50,9 +50,9 @@ namespace Cosmos.Debug.Common {
       set;
     }
 
-    public static SortedList<uint, String> ParseMapFile(String buildPath) {
+    public static List<KeyValuePair<uint, string>> ParseMapFile(String buildPath) {
       var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
-      SortedList<uint, String> xSource = new SortedList<uint, String>();
+      var xSource = new List<KeyValuePair<uint, string>>();
       uint xIndex = 0;
       for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++) {
         if (xSourceStrings[xIndex].StartsWith("Real ")) {
@@ -72,11 +72,7 @@ namespace Cosmos.Debug.Common {
 
         if (xLineParts.Length == 3) {
           uint xAddress = UInt32.Parse(xLineParts[0], System.Globalization.NumberStyles.HexNumber);
-          if (!xSource.ContainsKey(xAddress)) {
-            xSource.Add(xAddress, xLineParts[2]);
-          } else {
-            continue;
-          }
+          xSource.Add(new KeyValuePair<uint, string>(xAddress, xLineParts[2]));
         }
       }
       return xSource;
@@ -94,7 +90,7 @@ namespace Cosmos.Debug.Common {
       return xIdx;
     }
 
-    public static SourceInfos GetSourceInfo(IDictionary<uint, string> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, DebugInfo debugInfo) {
+    public static SourceInfos GetSourceInfo(List<KeyValuePair<uint, string>> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, DebugInfo debugInfo) {
       var xSymbolsList = new List<DebugInfo.MLDebugSymbol>();
       debugInfo.ReadSymbolsList(xSymbolsList);
 
@@ -160,19 +156,24 @@ namespace Cosmos.Debug.Common {
           }
           xOldMethodToken = xSymbol.MethodToken;
         }
+
         if (xMethodSymbol != null) {
           if (aLabelAddressMappings.ContainsKey(xSymbol.LabelName)) {
             uint xAddress = aLabelAddressMappings[xSymbol.LabelName];
-            int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOffset);
-            var xSourceInfo = new SourceInfo() {
-              SourceFile = xCodeDocuments[xIdx].URL,
-              Line = xCodeLines[xIdx],
-              LineEnd = xCodeEndLines[xIdx],
-              Column = xCodeColumns[xIdx],
-              ColumnEnd = xCodeEndColumns[xIdx],
-              MethodName = xSymbol.MethodName
-            };
-            xResult.Add(xAddress, xSourceInfo);
+            // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
+            // So we just ignore duplicate addresses.
+            if (!xResult.ContainsKey(xAddress)) {
+              int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOffset);
+              var xSourceInfo = new SourceInfo() {
+                SourceFile = xCodeDocuments[xIdx].URL,
+                Line = xCodeLines[xIdx],
+                LineEnd = xCodeEndLines[xIdx],
+                Column = xCodeColumns[xIdx],
+                ColumnEnd = xCodeEndColumns[xIdx],
+                MethodName = xSymbol.MethodName
+              };
+              xResult.Add(xAddress, xSourceInfo);
+            }
           }
         }
       }

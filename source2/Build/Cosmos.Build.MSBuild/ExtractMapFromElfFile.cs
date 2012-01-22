@@ -36,28 +36,33 @@ namespace Cosmos.Build.MSBuild {
     }
 
     public override bool Execute() {
+      // Important! A given address can have more than one label.
+      // Do NOT filter by duplicate addresses as this causes serious lookup problems.
+
       string xSymbolString;
+      //TODO: This reads the file (13MB currently) into RAM...
+      // Thats not needed.. read it line by line instead. Wait till we move to direct
+      // DB only use though as we can do this at one time.
       if (!RunObjDump(out xSymbolString)) {
         return false;
       }
 
-      var xResult = new SortedList<uint, string>();
+      var xResult = new List<KeyValuePair<uint, string>>();
       var xLines = xSymbolString.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-      bool xListStarted = false;
       
       // Parse file
+      bool xListStarted = false;
       foreach (string xLine in xLines) {
-        if (!xListStarted) {
-          if (xLine != "SYMBOL TABLE:") {
-            continue;
-          } else {
-            xListStarted = true;
-            continue;
-          }
-        }
         if (String.IsNullOrEmpty(xLine)) {
           continue;
+        } else if (!xListStarted) {
+          // Find start of the data
+          if (xLine == "SYMBOL TABLE:") {
+            xListStarted = true;
+          }
+          continue;
         }
+
         uint xAddress;
         try {
           xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
@@ -65,18 +70,17 @@ namespace Cosmos.Build.MSBuild {
           Log.LogError("Error processing line '" + xLine + "'");
           throw;
         }
-        if (xResult.ContainsKey(xAddress)) {
-          continue;
-        }
+        
         string xSection = xLine.Substring(17, 5);
         if (xSection != ".text" && xSection != ".data") {
           continue;
         }
         string xLabel = xLine.Substring(32);
         if (xLabel == xSection) {
+          // Non label, skip
           continue;
         }
-        xResult.Add(xAddress, xLabel);
+        xResult.Add(new KeyValuePair<uint, string>(xAddress, xLabel));
       }
 
       using (var xDebugInfo = new DebugInfo()) {
@@ -89,32 +93,28 @@ namespace Cosmos.Build.MSBuild {
     private bool RunObjDump(out string result) {
       result = "";
       var xTempBatFile = Path.Combine(WorkingDir, "ExtractMapFromElfFileTemp.bat");
-      var xTempOutFile = Path.Combine(WorkingDir, "ExtractMapFromElfFileTemp.out");
       if (File.Exists(xTempBatFile)) {
-        Log.LogError("ExtractMapFromElfFileTemp.bat already exists!");
-        return false;
-      }
-      if (File.Exists(xTempOutFile)) {
-        Log.LogError("ExtractMapFromElfFileTemp.out already exists!");
-        return false;
-      }
-      File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" > ExtractMapFromElfFileTemp.out");
-      try {
-        try {
-          if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump")) {
-            return false;
-          }
-          result = File.ReadAllText(xTempOutFile);
-        } finally {
-          if (File.Exists(xTempOutFile)) {
-            File.Delete(xTempOutFile);
-          }
-        }
-      } finally {
+        File.Delete(xTempBatFile);
         if (File.Exists(xTempBatFile)) {
-          File.Delete(xTempBatFile);
+          Log.LogError("ExtractMapFromElfFileTemp.bat already exists!");
+          return false;
         }
       }
+
+      var xTempOutFile = Path.Combine(WorkingDir, "ExtractMapFromElfFileTemp.out");
+      if (File.Exists(xTempOutFile)) {
+        File.Delete(xTempOutFile);
+        if (File.Exists(xTempOutFile)) {
+          Log.LogError("ExtractMapFromElfFileTemp.out already exists!");
+          return false;
+        }
+      }
+
+      File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" > ExtractMapFromElfFileTemp.out");
+      if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump")) {
+        return false;
+      }
+      result = File.ReadAllText(xTempOutFile);
 
       return true;
     }
