@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Debug.Consts;
-using Cosmos.Compiler.XSharp;
+using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public class DebugStub : CodeGroup {

@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
           DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode);
         }
 
-        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp) {
+        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp) {
                        
           string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
           

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Assembler;
 
-namespace Cosmos.Compiler.XSharp {
+namespace Cosmos.Assembler.XSharp {
     public class Address {
 
         public static implicit operator Address(string aLabel) {

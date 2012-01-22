@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public static void Assemble( Assembler aAssembler, int aSize )
+        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  int aSize )
         {
             new Comment(aAssembler,  "address at: [esp + " + aSize + "]" );
             int xStorageSize = aSize;

@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.Compiler.XSharp {
+namespace Cosmos.Assembler.XSharp {
     public class Memory {
         public MemoryAction this[Address aAddress] {
             get {

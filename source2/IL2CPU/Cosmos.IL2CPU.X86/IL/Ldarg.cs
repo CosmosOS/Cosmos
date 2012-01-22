@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
           }
         }
 
-        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, ushort aParam) {
+        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam) {
           var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
           Type xArgType;
           if (aMethod.MethodBase.IsStatic) {

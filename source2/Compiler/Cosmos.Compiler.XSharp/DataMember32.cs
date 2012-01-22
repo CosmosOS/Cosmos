@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.Compiler.XSharp {
+namespace Cosmos.Assembler.XSharp {
   // This is the new type of DataMember, eventually we can eliminate much of the
   // code in DataMember (base)
   public class DataMember32 : DataMemberBase {

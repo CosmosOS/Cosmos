@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assemble(Assembler, aMethod, xMethod, xCurrentLabel, xType, xMethod.Value);
         }
 
-        public static void Assemble(Assembler aAssembler, MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
+        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
         {
             // call cctor:
             if (aMethod != null)

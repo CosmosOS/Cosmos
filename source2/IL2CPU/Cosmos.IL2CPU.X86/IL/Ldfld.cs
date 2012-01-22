@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
           return (int)(xExtraOffset + xFieldInfo.Offset);
         }
 
-        public static void DoExecute(Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
+        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
           var xStackValue = Assembler.Stack.Pop();
           var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
           var xFields = GetFieldsInfo(aDeclaringType);

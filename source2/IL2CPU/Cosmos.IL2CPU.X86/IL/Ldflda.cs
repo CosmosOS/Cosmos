@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
           DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
         }
 
-        public static void DoExecute(Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue) {
+        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue) {
 
           var xFields = GetFieldsInfo(aDeclaringType);
           var xFieldInfo = (from item in xFields

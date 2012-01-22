@@ -72,11 +72,11 @@ namespace Cosmos.IL2CPU.X86.IL {
       DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase));
     }
 
-    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
+    public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
     {
         DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition));
     }
-    public static void DoExecute(Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel) {
+    public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel) {
       //if (aTargetMethod.IsVirtual) {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
       //  return;

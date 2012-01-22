@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.XSharp {
+namespace Cosmos.Assembler.XSharp {
   public class RegisterEDX : Register32 {
     public static readonly RegisterEDX Instance = new RegisterEDX();
 

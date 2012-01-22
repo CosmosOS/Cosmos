@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public static void Assemble( Assembler aAssembler, uint aElementSize )
+        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  uint aElementSize )
         {
             
             aAssembler.Stack.Pop();

@@ -11,7 +11,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Debug.DebugStub;
-using Cosmos.Compiler.XSharp;
+using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.IL2CPU.X86 {
   // TODO: I think we need to later elminate this class
@@ -264,7 +264,7 @@ namespace Cosmos.IL2CPU.X86 {
         new Return();
       }
       // Start emitting assembly labels
-      Assembler.CurrentInstance.EmitAsmLabels = true;
+      Cosmos.Compiler.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
 
 #if !LFB_1024_8
       DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));

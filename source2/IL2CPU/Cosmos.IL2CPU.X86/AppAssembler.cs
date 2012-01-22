@@ -92,7 +92,7 @@ namespace Cosmos.IL2CPU.X86 {
       // we now need to do "newobj" on the entry point, and after that, call .Start on it
       var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
       new Label(xCurLabel);
-      IL.Newobj.Assemble(Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+      IL.Newobj.Assemble(Cosmos.Compiler.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
       xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
       new Label(xCurLabel);
       IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart");

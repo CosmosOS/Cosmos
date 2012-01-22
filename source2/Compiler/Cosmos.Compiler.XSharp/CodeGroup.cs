@@ -6,9 +6,9 @@ using System.Text;
 using Cosmos.Compiler.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
-namespace Cosmos.Compiler.XSharp {
+namespace Cosmos.Assembler.XSharp {
   public class CodeGroup {
-    protected Assembler.Assembler mAsm = Assembler.Assembler.CurrentInstance;
+    protected Cosmos.Compiler.Assembler.Assembler mAsm = Cosmos.Compiler.Assembler.Assembler.CurrentInstance;
 
     protected void SetDataMembers(object aInst) {
       var xThisType = aInst.GetType();

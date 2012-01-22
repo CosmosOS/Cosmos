@@ -17,12 +17,12 @@ namespace Cosmos.IL2CPU.X86
 {
     public abstract class ILOp : Cosmos.IL2CPU.ILOp
     {
-        protected new readonly Assembler Assembler;
+      protected new readonly Cosmos.Compiler.Assembler.Assembler Assembler;
 
         protected ILOp(Cosmos.Compiler.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
-            Assembler = (Assembler)aAsmblr;
+          Assembler = (Cosmos.Compiler.Assembler.Assembler)aAsmblr;
         }
 
         protected static void Jump_Exception(MethodInfo aMethod)
@@ -219,11 +219,11 @@ namespace Cosmos.IL2CPU.X86
                     select item.Offset + item.Size).FirstOrDefault();
         }
 
-        public static void EmitExceptionLogic(Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup)
+        public static void EmitExceptionLogic(Cosmos.Compiler.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup)
         {
             EmitExceptionLogic(aAssembler, aMethodInfo, aCurrentOpCode, aDoTest, aCleanup, ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition));
         }
-        public static void EmitExceptionLogic(Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException)
+        public static void EmitExceptionLogic(Cosmos.Compiler.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException)
         {
             string xJumpTo = null;
             if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null)

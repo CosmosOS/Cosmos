@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
             : base( aAsmblr )
         {
         }
-        public static void Assemble( Assembler aAssembler, uint aElementSize,bool isSigned )
+        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  uint aElementSize,bool isSigned )
         {
 			if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
 				throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);

@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     public Stelem_Ref(Cosmos.Compiler.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
-    public static void Assemble(Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
+    public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
       // stack - 3 == the array
       // stack - 2 == the index
       // stack - 1 == the new value
