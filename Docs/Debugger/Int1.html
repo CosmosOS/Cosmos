@@ -11,8 +11,26 @@
     <p>
         References</p>
     <ul>
-        <li><a href="http://www.yashks.com/2011/01/210/">http://www.yashks.com/2011/01/210/</a></li>
+        <li><a href="http://www.yashks.com/2011/01/210/">http://www.yashks.com/2011/01/210/</a> 
+            - <a href="Int1Notes.html">cached copy</a></li>
+        <li><a href="http://coding.derkeiler.com/Archive/Assembler/comp.lang.asm.x86/2003-12/0364.html">
+            http://coding.derkeiler.com/Archive/Assembler/comp.lang.asm.x86/2003-12/0364.html</a></li>
+        <li><a href="http://courses.engr.illinois.edu/ece390/books/labmanual/inst-ref-general.html#INST-REF-INT">
+            http://courses.engr.illinois.edu/ece390/books/labmanual/inst-ref-general.html#INST-REF-INT</a></li>
+        <li>Setting TF - <a href="http://en.wikipedia.org/wiki/Trap_flag">
+            http://en.wikipedia.org/wiki/Trap_flag</a></li>
+        <li>Debug Status Registers -
+            <a href="http://en.wikipedia.org/wiki/X86_debug_register">
+            http://en.wikipedia.org/wiki/X86_debug_register</a></li>
     </ul>
+    <p>
+        set via IRET<br />
+        executes one op then triggers<br />
+        Resets each time - Need to reset<br />
+        Store range for local method for step over<br />
+        How to determine it as a Int1? -DR6 Bit 14 (Single Step): This bit indicates 
+        that debug exception has generated since Trap Flag (TF) is set in EFLAGS 
+        register. Need to reset DR6</p>
 
 </body>
 </html>

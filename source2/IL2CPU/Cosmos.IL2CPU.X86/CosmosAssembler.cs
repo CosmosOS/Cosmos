@@ -160,8 +160,9 @@ namespace Cosmos.IL2CPU.X86 {
       DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", new byte[xIdtSize]));
       //
 	    if (mComNumber > 0) {
-		    SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
-	    }
+        SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
+        SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+      }
       //SetIdtDescriptor(1, "DebugStub_INT0"); - Change to GPF
 
       // Set IDT

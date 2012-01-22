@@ -678,45 +678,49 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    // ASM Stepping
-    //
-    // Location where INT1 has been injected
-    // 0 if no INT1 is active
-    // currently using int3, not int1... check int1
-    // int3 gives us control and prevents going into call ops... but how do we 
-    // go into call ops if we want to? step over and step in again for asm... hmm...
-    static public DataMember32 AsmBreakEIP;
-    // Old byte before INT1 was injected
-    // Only 1 byte is used
-    static public DataMember32 AsmOrigByte;
-    //
+    #region Old ASM Stepping
+    //// Old ASM Stepping
+    ////
+    //// Location where INT3 has been injected
+    //// 0 if no INT3 is active
+    //static public DataMember32 AsmBreakEIP;
+    //// Old byte before INT1 was injected
+    //// Only 1 byte is used
+    //static public DataMember32 AsmOrigByte;
+    ////
+    //public class SetAsmBreak : Inlines {
+    //  public override void Assemble() {
+    //    EDI = AsmBreakEIP.Value;
+    //    EDI.Compare(0);
+    //    // If 0, we don't need to clear an older one.
+    //    JumpIf(Flags.Equal, ".Set");
+    //    Call<ClrAsmBreak>();
+
+    //    Label = ".Set";
+    //    ReadComPortX32toStack(1);
+    //    EDI.Pop();
+    //    // Save the old byte
+    //    EAX = EDI[0];
+    //    AsmOrigByte.Value = EAX;
+    //    // Inject INT3
+    //    EDI[0] = 0xCC;
+    //    // Save EIP of the break
+    //    AsmBreakEIP.Value = EDI;
+    //  }
+    //}
+
+    //public class ClrAsmBreak : Inlines {
+    //  public override void Assemble() {
+    //    // Clear old break point
+    //    EAX = AsmOrigByte.Value;
+    //    EDI[0] = EAX;
+    //    AsmOrigByte.Value = 0;
+    //  }
+    //}
+    #endregion
+
     public class SetAsmBreak : Inlines {
       public override void Assemble() {
-        EDI = AsmBreakEIP.Value;
-        EDI.Compare(0);
-        // If 0, we don't need to clear an older one.
-        JumpIf(Flags.Equal, ".Set");
-        Call<ClrAsmBreak>();
-
-        Label = ".Set";
-        ReadComPortX32toStack(1);
-        EDI.Pop();
-        // Save the old byte
-        EAX = EDI[0];
-        AsmOrigByte.Value = EAX;
-        // Inject INT3
-        EDI[0] = 0xCC;
-        // Save EIP of the break
-        AsmBreakEIP.Value = EDI;
-      }
-    }
-
-    public class ClrAsmBreak : Inlines {
-      public override void Assemble() {
-        // Clear old break point
-        EAX = AsmOrigByte.Value;
-        EDI[0] = EAX;
-        AsmOrigByte.Value = 0;
       }
     }
 
@@ -746,6 +750,10 @@ namespace Cosmos.Debug.DebugStub {
       // Modifies: EAX, EDI, ECX
       public override void Assemble() {
         // Look for a possible matching BP
+        // TODO: This is slow on every Int3...
+        //   -Find a faster way - a list of 256 straight compares and code modifation?
+        //   -Count BPs and modify ECX since we usually dont have 256 of them?
+        //   -Move this scan earlier?
         EAX = CallerEIP.Value;
         EDI = AddressOf("DebugBPs");
         ECX = 256;
@@ -898,16 +906,16 @@ namespace Cosmos.Debug.DebugStub {
       public DataMember32 IsRunning;
 
       [XSharp(IsInteruptHandler = true)]
+      // Main entry point for the DebugStub which is executed by INT3.
       public override void Assemble() {
-        // Main entry point for the DebugStub which is executed at the 
-        // beginning of all IL ops.
+        //new Move {DestinationReg = RegistersEnum
 
         // EBP is restored by PopAll, but SendFrame uses it. Could
         // get it from the PushAll data, but this is easier.
         CallerEBP.Value = EBP;
 
         // Could also get ESP from PushAll but this is easier
-        // Another reason to do it here is that soem day we may need to use 
+        // Another reason to do it here is that some day we may need to use 
         // the stack before PushAll.
         //
         // We cant modify any registers since we havent done PushAll yet

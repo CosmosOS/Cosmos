@@ -175,6 +175,7 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Cosmos.VS.Windows.html" />
     <Content Include="Resources\Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>
