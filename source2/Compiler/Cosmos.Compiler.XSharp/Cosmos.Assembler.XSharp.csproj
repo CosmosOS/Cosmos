@@ -8,7 +8,7 @@
     <ProjectGuid>{453F2952-FD48-477F-889B-B3C6963C9850}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Compiler.XSharp</RootNamespace>
+    <RootNamespace>Cosmos.Assembler.XSharp</RootNamespace>
     <AssemblyName>Cosmos.Compiler.XSharp</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
