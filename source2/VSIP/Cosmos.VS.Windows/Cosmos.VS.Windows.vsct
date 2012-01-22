@@ -27,7 +27,6 @@
       This section uses a Guid to identify the package that provides the command defined inside it. -->
 
   <!-- http://www.adrianetilston.com/Blog/post/2009/08/20/VSX-Adding-a-top-level-menu-command.aspx -->
-  
   <Commands package="guidCosmos_VS_WindowsPkg">
     <!-- Inside this section we have different sub-sections: one for the menus, another  
     for the menu groups, one for the buttons (the actual commands), one for the combos 
@@ -164,7 +163,7 @@
         <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidCosmosShowAll</CommandName>
-          <ButtonText>Cosmos - Show All Windows</ButtonText>
+          <ButtonText>Cosmos - Show All Windows</ButtonText>                
         </Strings>
       </Button>
       
@@ -230,7 +229,7 @@
       <IDSymbol name ="cmdidAsmStep" value="0x0106" />
       <IDSymbol name ="cmdidAsmCopy" value="0x0107" />
     </GuidSymbol>
-
+                                    
     <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >
       <IDSymbol name="bmpCosmosIcon" value="1"/>
       <IDSymbol name="bmpAssemblyIcon" value="2"/>
@@ -239,4 +238,9 @@
       <IDSymbol name="bmpAllIcon" value="5"/>
     </GuidSymbol>
   </Symbols>
+
+  <KeyBindings>
+    <KeyBinding guid="guidCosmosMenu" id="cmdidCosmosShowAll"
+                mod1="CTRL ALT SHIFT" key1="G" key2="A" editor="guidVSStd97"/>
+  </KeyBindings>
 </CommandTable>
