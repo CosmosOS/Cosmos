@@ -49,19 +49,14 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         // Labels that point to a single address can happen because of exception handling exits etc.
         // Because of this given an address, we might find more than one label that matches the address.
-        // Currently, the label we are looking for will always be the last one so we choose the last one.
+        // Currently, the label we are looking for will always be the first one so we choose that one.
         // In the future this might "break", so be careful about this. In the future we may need to classify
         // labels in the output and mark them somehow.
-        string xCurrentInstructionLabelName = null;
-        var xLabelsForAddr = from x in xProcess.mAddressLabelMappings
+        var xLabelsForAddr = (from x in xProcess.mAddressLabelMappings
                              where x.Key == xProcess.mCurrentAddress.Value
-                             select x.Value;
-        foreach (string xLabel in xLabelsForAddr) {
-          xCurrentInstructionLabelName = xLabel;
-        }
-
-        if (xCurrentInstructionLabelName != null) {
-          var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xCurrentInstructionLabelName);
+                             select x.Value).ToArray();
+        if (xLabelsForAddr.Length > 0) {
+          var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xLabelsForAddr[0]);
           if (xSymbolInfo != null) {
             var xAllInfos = xProcess.mDebugInfoDb.ReadAllLocalsArgumentsInfosByMethodLabelName(xSymbolInfo.MethodName);
             mLocalInfos = (from item in xAllInfos

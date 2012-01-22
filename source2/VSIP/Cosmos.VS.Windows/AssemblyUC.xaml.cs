@@ -1,26 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Data;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using Cosmos.Debug.Consts;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.Windows {
   /// This class implements the tool window exposed by this package and hosts a user control.
@@ -69,6 +52,7 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnStep_Click(object sender, RoutedEventArgs e) {
+      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.AsmStep, null);
     }
 
     void butnFilter_Click(object sender, RoutedEventArgs e) {

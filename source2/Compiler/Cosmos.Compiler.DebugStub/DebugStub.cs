@@ -682,6 +682,9 @@ namespace Cosmos.Debug.DebugStub {
     //
     // Location where INT1 has been injected
     // 0 if no INT1 is active
+    // currently using int3, not int1... check int1
+    // int3 gives us control and prevents going into call ops... but how do we 
+    // go into call ops if we want to? step over and step in again for asm... hmm...
     static public DataMember32 AsmBreakEIP;
     // Old byte before INT1 was injected
     // Only 1 byte is used
@@ -708,19 +711,19 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class Ping : Inlines {
-      public override void Assemble() {
-        AL = DsMsg.Pong; 
-        Call<WriteALToComPort>();
-      }
-    }
-
     public class ClrAsmBreak : Inlines {
       public override void Assemble() {
         // Clear old break point
         EAX = AsmOrigByte.Value;
         EDI[0] = EAX;
         AsmOrigByte.Value = 0;
+      }
+    }
+
+    public class Ping : Inlines {
+      public override void Assemble() {
+        AL = DsMsg.Pong; 
+        Call<WriteALToComPort>();
       }
     }
 
