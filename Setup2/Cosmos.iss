@@ -29,7 +29,6 @@ AppSupportURL=http://www.goCosmos.org/
 AppUpdatesURL=http://www.goCosmos.org/
 AppVersion={#ChangeSetVersion}
 DefaultDirName={userappdata}\Cosmos User Kit
-;DefaultDirName=m:\Cosmos User Kit -- Only about 2-3 seconds faster. The GAC and other things seem to be the majority of the slowness
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
 OutputBaseFilename=CosmosUserKit
