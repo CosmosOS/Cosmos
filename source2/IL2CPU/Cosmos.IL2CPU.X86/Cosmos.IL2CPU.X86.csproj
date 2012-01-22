@@ -306,9 +306,9 @@
       <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>
       <Name>Cosmos.Debug.DebugStub</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp.csproj">
+    <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.XSharp\Cosmos.Assembler.XSharp.csproj">
       <Project>{453F2952-FD48-477F-889B-B3C6963C9850}</Project>
-      <Name>Cosmos.Compiler.XSharp</Name>
+      <Name>Cosmos.Assembler.XSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj">
       <Project>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</Project>

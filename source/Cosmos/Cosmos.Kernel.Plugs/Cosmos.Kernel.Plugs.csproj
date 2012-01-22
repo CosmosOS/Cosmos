@@ -96,9 +96,9 @@
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Compiler.Assembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.Compiler.XSharp\Cosmos.Compiler.XSharp.csproj">
+    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.Compiler.XSharp\Cosmos.Assembler.XSharp.csproj">
       <Project>{453F2952-FD48-477F-889B-B3C6963C9850}</Project>
-      <Name>Cosmos.Compiler.XSharp</Name>
+      <Name>Cosmos.Assembler.XSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source2\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
