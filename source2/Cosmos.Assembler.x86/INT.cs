@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Compiler.Assembler.X86 {
+﻿namespace Cosmos.Assembler.x86 {
     [Cosmos.Assembler.OpCode("int")]
     public class INT : InstructionWithDestination {
         public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )

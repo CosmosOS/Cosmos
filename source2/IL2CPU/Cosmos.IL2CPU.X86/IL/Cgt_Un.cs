@@ -1,8 +1,8 @@
 using System;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using CPU = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
+using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Cgt_Un )]
@@ -107,8 +107,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // 
-        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
-        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPUx86 = Cosmos.Assembler.x86;
+        // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
         // 

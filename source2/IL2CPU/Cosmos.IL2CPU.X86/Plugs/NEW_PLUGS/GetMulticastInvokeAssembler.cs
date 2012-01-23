@@ -8,7 +8,7 @@ using Cosmos.Assembler;
 using System.Reflection;
 using MethodInfo = Cosmos.IL2CPU.MethodInfo;
 
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU;
 
 namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS

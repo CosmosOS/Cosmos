@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Compiler.Assembler.X86 {
+﻿namespace Cosmos.Assembler.x86 {
     [Cosmos.Assembler.OpCode("movzx")]
 	public class MoveZeroExtend : InstructionWithDestinationAndSourceAndSize
 	{

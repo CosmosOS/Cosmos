@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler.X86 {
+namespace Cosmos.Assembler.x86 {
     public abstract class InstructionWithDestinationAndSource : InstructionWithDestination, IInstructionWithSource {
         public Cosmos.Assembler.ElementReference SourceRef {
             get;

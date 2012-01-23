@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler.X86 {
+namespace Cosmos.Assembler.x86 {
     public abstract class InstructionWithDestinationAndSourceAndSize : InstructionWithDestinationAndSource, IInstructionWithSize {
         // todo: do all instructions with two operands have a size?
         //todo should validate Instructions or use a constructor and no set properties. 

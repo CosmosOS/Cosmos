@@ -1,6 +1,6 @@
 ﻿using Cosmos.Build.Common;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
 using Microsoft.Win32;

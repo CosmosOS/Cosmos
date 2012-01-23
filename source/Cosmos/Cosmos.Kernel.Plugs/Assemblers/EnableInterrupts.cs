@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers
 {

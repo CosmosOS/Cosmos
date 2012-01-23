@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Text;
 		// using Cosmos.IL2CPU.X86;
 		// using Cosmos.IL2CPU.X86.X;
-		// using CPUx86 = Cosmos.Compiler.Assembler.X86;
+		// using CPUx86 = Cosmos.Assembler.x86;
 		// using Asm = Assembler;
 		// using System.Collections.Generic;
 		// 

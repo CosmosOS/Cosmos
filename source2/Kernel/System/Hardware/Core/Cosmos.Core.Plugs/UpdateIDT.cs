@@ -2,7 +2,7 @@
 using System.Reflection;
 using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Assembler.Assembler;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using CPUAll = Cosmos.Assembler;
 using System.Collections.Generic;
 

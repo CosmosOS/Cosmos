@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Cosmos.Assembler;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices {

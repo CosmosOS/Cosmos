@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler.X86 {
+namespace Cosmos.Assembler.x86 {
     [Cosmos.Assembler.OpCode("jcc")]
     public class ConditionalJump: JumpBase, IInstructionWithCondition {
         public ConditionalTestEnum Condition {

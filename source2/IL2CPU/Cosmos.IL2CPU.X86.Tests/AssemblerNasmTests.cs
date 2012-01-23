@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Cosmos.IL2CPU.X86;
 
-namespace Cosmos.Compiler.Assembler.X86.Tests
+namespace Cosmos.Assembler.x86.Tests
 {
     [TestFixture]
     public class AssemblerNasmTests

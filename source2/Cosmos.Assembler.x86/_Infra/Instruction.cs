@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Cosmos.Compiler.Assembler.X86 {
+namespace Cosmos.Assembler.x86 {
   // todo: cache the EncodingOption and InstructionData instances..
   public abstract class Instruction : Cosmos.Assembler.Instruction {
     

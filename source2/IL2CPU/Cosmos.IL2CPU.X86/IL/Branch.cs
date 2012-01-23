@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.X86;
-using CPU = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL

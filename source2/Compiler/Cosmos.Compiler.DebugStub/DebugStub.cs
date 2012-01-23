@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 using Cosmos.Debug.Consts;
 using Cosmos.Assembler.XSharp;
 

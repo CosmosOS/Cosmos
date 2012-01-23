@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPU = Cosmos.Assembler.x86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_R4)]

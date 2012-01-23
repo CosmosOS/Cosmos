@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Cosmos.Compiler.Assembler.X86 {
+namespace Cosmos.Assembler.x86 {
   public abstract class JumpBase : InstructionWithDestination {
     public string DestinationLabel {
       get {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 
 namespace Cosmos.Assembler.XSharp {
   // This is the new type of DataMember, eventually we can eliminate much of the

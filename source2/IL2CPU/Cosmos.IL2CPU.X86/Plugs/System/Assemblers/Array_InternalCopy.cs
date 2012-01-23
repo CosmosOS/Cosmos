@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Cosmos.IL2CPU.Plugs;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers {
   public class Array_InternalCopy: AssemblerMethod {

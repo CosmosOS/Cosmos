@@ -1,6 +1,6 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler;
 using Cosmos.Assembler;
 

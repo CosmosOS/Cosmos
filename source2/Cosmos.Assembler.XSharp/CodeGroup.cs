@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 
 namespace Cosmos.Assembler.XSharp {
   public class CodeGroup {

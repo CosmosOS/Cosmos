@@ -1,6 +1,6 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldloca)]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler.X86.X86
+namespace Cosmos.Assembler.x86.X86
 {
     [Cosmos.Assembler.OpCode("cmps")]
     public class Cmps: InstructionWithSize, IInstructionWithPrefix {

@@ -1,8 +1,8 @@
 using System;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarga )]
@@ -150,7 +150,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Linq;
         // 
         // 
-        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {

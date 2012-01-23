@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPU = Cosmos.Compiler.Assembler.X86;
+        // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
         // 

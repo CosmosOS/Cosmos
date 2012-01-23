@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CPU = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 using Cosmos.Debug.DebugStub;
 using Cosmos.Assembler.XSharp;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Cosmos.Assembler;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using System.Reflection;

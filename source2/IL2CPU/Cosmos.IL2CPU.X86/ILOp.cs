@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CPU = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.IL2CPU.IL;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
 using Cosmos.Assembler;

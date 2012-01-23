@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Compiler.Assembler.X86 {
+﻿namespace Cosmos.Assembler.x86 {
 
   // Int 0x01 and Int 0x03 have short hand op codes.
   // For Int 0x03, the short version acts differently than the long version.

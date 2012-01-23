@@ -1,8 +1,8 @@
 using System;
 // using System.Collections.Generic;
 // using System.Linq;
-using CPU = Cosmos.Compiler.Assembler.X86;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Assembler.x86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using System.Reflection;

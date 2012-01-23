@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler.X86 {
+namespace Cosmos.Assembler.x86 {
     public static class InfraExtensions {
         public static string GetDestinationAsString(this IInstructionWithDestination aThis) {
             string xDest = string.Empty;

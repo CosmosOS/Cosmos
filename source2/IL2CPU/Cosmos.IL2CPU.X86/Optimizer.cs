@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Assembler;
-using x86 = Cosmos.Compiler.Assembler.X86;
+using x86 = Cosmos.Assembler.x86;
 
 namespace Orvid
 {

@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Compiler.Assembler.X86 {
+﻿namespace Cosmos.Assembler.x86 {
     public enum ConditionalTestEnum:byte {
         Overflow = 0,
         NoOverflow = 1,

@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.X86.IL;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using NewAssembler = Cosmos.Assembler.Assembler;
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CPU = Cosmos.Compiler.Assembler.X86;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPU = Cosmos.Assembler.x86;
+using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
@@ -40,8 +40,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
-        // using CPU = Cosmos.Compiler.Assembler.X86;
-        // using CPUx86 = Cosmos.Compiler.Assembler.X86;
+        // using CPU = Cosmos.Assembler.x86;
+        // using CPUx86 = Cosmos.Assembler.x86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Localloc)]

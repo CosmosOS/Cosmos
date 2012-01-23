@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Cosmos.Compiler.Assembler.X86
+namespace Cosmos.Assembler.x86
 {
 	/// <summary>
 	/// Subtracts the source operand from the destination operand and 

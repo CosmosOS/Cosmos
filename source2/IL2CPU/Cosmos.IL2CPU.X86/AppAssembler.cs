@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Cosmos.Assembler;
-using Cosmos.Compiler.Assembler.X86;
+using Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler;
-using CPUx86 = Cosmos.Compiler.Assembler.X86;
+using CPUx86 = Cosmos.Assembler.x86;
 
 
 namespace Cosmos.IL2CPU.X86 {
@@ -45,13 +45,13 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     protected override void Call(MethodBase aMethod) {
-      new Compiler.Assembler.X86.Call {
+      new Cosmos.Assembler.x86.Call {
         DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod)
       };
     }
 
     protected override void Jump(string aLabelName) {
-      new Compiler.Assembler.X86.Jump {
+      new Cosmos.Assembler.x86.Jump {
         DestinationLabel = aLabelName
       };
     }
