@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     //[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
     public class Brtrue : ILOp
     {
-        public Brtrue( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Brtrue( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Brtrue)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Brtrue)]
         // 	public class Brtrue: Op {
         // 		public readonly string TargetLabel;
         // 		public Brtrue(ILReader aReader, MethodInformation aMethodInfo)

@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
   public class Label : Instruction {
     public static string GetFullName(MethodBase aMethod) {
       return MethodInfoLabelGenerator.GenerateLabelName(aMethod);
@@ -60,7 +60,7 @@ namespace Cosmos.Compiler.Assembler {
       get { return mName; }
     }
 
-    public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput) {
+    public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput) {
       if (IsGlobal) {
         aOutput.WriteLine("global " + QualifiedName);
       }
@@ -74,10 +74,10 @@ namespace Cosmos.Compiler.Assembler {
       return true;
     }
 
-    public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+    public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress) {
       base.UpdateAddress(aAssembler, ref aAddress);
     }
 
-    public override void WriteData(Assembler aAssembler, System.IO.Stream aOutput) { }
+    public override void WriteData(Cosmos.Assembler.Assembler aAssembler, System.IO.Stream aOutput) { }
   }
 }

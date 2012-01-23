@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using Assembler = Cosmos.Assembler.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using CPUAll = Cosmos.Compiler.Assembler;
+using CPUAll = Cosmos.Assembler;
 using System.Collections.Generic;
 
 namespace Cosmos.Core.Plugs.Assemblers {
@@ -33,7 +33,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
       // ie Int 1, 3 and GPF
       // This routine updates the IDT now that we have C# running to allow C# hooks to handle
       // the other INTs
-      var xAssembler = (Assembler)aAssembler;
+      var xAssembler = (Cosmos.Assembler.Assembler)aAssembler;
 
       // We are updating the IDT, disable interrupts
       new CPUx86.ClrInterruptFlag();

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("test")]
+    [Cosmos.Assembler.OpCode("test")]
 	public class Test: InstructionWithDestinationAndSourceAndSize {
 	}
 }

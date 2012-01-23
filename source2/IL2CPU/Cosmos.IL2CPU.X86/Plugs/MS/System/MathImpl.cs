@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.Compiler.Assembler.Assembler;
-using CPUAll = Cosmos.Compiler.Assembler;
+using Assembler = Cosmos.Assembler.Assembler;
+using CPUAll = Cosmos.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System

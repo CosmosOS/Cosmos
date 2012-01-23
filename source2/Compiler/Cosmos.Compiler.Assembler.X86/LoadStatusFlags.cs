@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("lahf")]
+    [Cosmos.Assembler.OpCode("lahf")]
     public class LoadStatusFlags : Instruction
     {
     }

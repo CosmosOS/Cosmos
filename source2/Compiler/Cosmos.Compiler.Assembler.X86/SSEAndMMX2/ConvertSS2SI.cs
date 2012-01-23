@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("cvtss2si")]
+    [Cosmos.Assembler.OpCode("cvtss2si")]
     public class ConvertSS2SI : InstructionWithDestinationAndSource
     {
     }

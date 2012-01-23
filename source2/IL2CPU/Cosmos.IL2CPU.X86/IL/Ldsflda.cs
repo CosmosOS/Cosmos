@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
 
@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldsflda )]
     public class Ldsflda : ILOp
     {
-        public Ldsflda( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldsflda( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Label(".AfterCCTorExceptionCheck");
             }
             string xDataName =DataMember.GetStaticFieldName(xField);
-            new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ) };
+            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName ) };
             Assembler.Stack.Push( new StackContents.Item(4, typeof(uint) ) );
         }
     }

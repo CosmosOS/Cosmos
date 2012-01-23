@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Or )]
     public class Or : ILOp
     {
-        public Or( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Or( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86 {
 
-  [OpCode("NOP")]
+  [Cosmos.Assembler.OpCode("NOP")]
 	public class Noop: Instruction {
 	}
 

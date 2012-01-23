@@ -2,13 +2,13 @@ using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using CPU = Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Clt_Un )]
     public class Clt_Un : ILOp
     {
-        public Clt_Un( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Clt_Un( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

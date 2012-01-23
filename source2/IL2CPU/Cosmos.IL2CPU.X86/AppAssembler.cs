@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
-using CPU = Cosmos.Compiler.Assembler;
+using CPU = Cosmos.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
 
@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Label(InitStringIDsLabel);
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
       foreach (var xDataMember in mAssembler.DataMembers) {
         if (!xDataMember.Name.StartsWith("StringLiteral")) {
           continue;
@@ -78,7 +78,7 @@ namespace Cosmos.IL2CPU.X86 {
         if (xDataMember.Name.EndsWith("__Contents")) {
           continue;
         }
-        new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+        new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       }
       new Pop { DestinationReg = Registers.EBP };
       new Return();
@@ -92,7 +92,7 @@ namespace Cosmos.IL2CPU.X86 {
       // we now need to do "newobj" on the entry point, and after that, call .Start on it
       var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
       new Label(xCurLabel);
-      IL.Newobj.Assemble(Cosmos.Compiler.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+      IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
       xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
       new Label(xCurLabel);
       IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart");

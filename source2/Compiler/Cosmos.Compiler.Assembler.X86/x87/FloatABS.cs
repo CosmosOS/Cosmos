@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fabs")]
+    [Cosmos.Assembler.OpCode("fabs")]
     public class FloatABS : Instruction
     {
     }

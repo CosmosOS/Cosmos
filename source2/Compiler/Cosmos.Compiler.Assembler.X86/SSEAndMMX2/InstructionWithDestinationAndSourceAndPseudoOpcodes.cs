@@ -12,7 +12,7 @@ namespace Cosmos.Compiler.Assembler.X86.SSE
             get;
             set;
         }
-        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             aOutput.Write(mMnemonic);
             aOutput.Write(" ");

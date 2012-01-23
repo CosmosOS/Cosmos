@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
@@ -12,7 +12,7 @@ namespace Cosmos.Assembler.XSharp {
                 var xAddrDirect = aAddress as AddressDirect;
                 if (xAddrDirect != null) {
                     if (xAddrDirect.Label != null) {
-                        return new MemoryAction(ElementReference.New(xAddrDirect.Label));
+                        return new MemoryAction(Cosmos.Assembler.ElementReference.New(xAddrDirect.Label));
                     } else {
                         if (xAddrDirect.Register != null) {
                             return new MemoryAction(xAddrDirect.Register.Value);
@@ -43,7 +43,7 @@ namespace Cosmos.Assembler.XSharp {
 
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new Mov { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new Mov { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
@@ -60,7 +60,7 @@ namespace Cosmos.Assembler.XSharp {
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
                           // Default is 32, in future save type that created the label, ie DataMemberInt vs DataMemberByte and set the size
-                            new Mov { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new Mov { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
@@ -94,7 +94,7 @@ namespace Cosmos.Assembler.XSharp {
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
                                 new Mov {
-                                    DestinationRef = ElementReference.New(xAddrDirect.Label),
+                                    DestinationRef = Cosmos.Assembler.ElementReference.New(xAddrDirect.Label),
                                     DestinationIsIndirect = true,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
@@ -136,7 +136,7 @@ namespace Cosmos.Assembler.XSharp {
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
                                 new Mov {
-                                    DestinationRef = ElementReference.New(xAddrDirect.Label),
+                                    DestinationRef = Cosmos.Assembler.ElementReference.New(xAddrDirect.Label),
                                     DestinationIsIndirect=true,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,

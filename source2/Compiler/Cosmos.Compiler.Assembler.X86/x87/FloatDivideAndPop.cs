@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fdivp")]
+    [Cosmos.Assembler.OpCode("fdivp")]
     public class FloatDivideAndPop : InstructionWithDestinationAndSource
     {
     }

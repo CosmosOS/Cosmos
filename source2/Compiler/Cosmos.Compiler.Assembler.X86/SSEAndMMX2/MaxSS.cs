@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("maxss")]
+    [Cosmos.Assembler.OpCode("maxss")]
     public class MaxSS : InstructionWithDestinationAndSource
     {
     }

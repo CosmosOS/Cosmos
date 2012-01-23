@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     public abstract class InstructionWithDestinationAndSource : InstructionWithDestination, IInstructionWithSource {
-        public ElementReference SourceRef {
+        public Cosmos.Assembler.ElementReference SourceRef {
             get;
             set;
         }
@@ -63,7 +63,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             }
         }
 
-        public override bool IsComplete( Cosmos.Compiler.Assembler.Assembler aAssembler )
+        public override bool IsComplete( Cosmos.Assembler.Assembler aAssembler )
         {
             if (SourceRef != null) {
                 ulong xAddress;
@@ -72,7 +72,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             return base.IsComplete(aAssembler);
         }
 
-        public override void UpdateAddress( Cosmos.Compiler.Assembler.Assembler aAssembler, ref ulong aAddress )
+        public override void UpdateAddress( Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress )
         {
             if (SourceRef != null) {
                 SourceValue = 0xFFFFFFFF;
@@ -80,7 +80,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             base.UpdateAddress(aAssembler, ref aAddress);
         }
 
-        public override byte[] GetData(Cosmos.Compiler.Assembler.Assembler aAssembler) {
+        public override byte[] GetData(Cosmos.Assembler.Assembler aAssembler) {
             if (SourceRef != null) {
                 ulong xAddress = 0;
                 if (!SourceRef.Resolve(aAssembler, out xAddress)) {
@@ -90,7 +90,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             }
             return base.GetData(aAssembler);
         }
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);
             String destination=this.GetDestinationAsString();

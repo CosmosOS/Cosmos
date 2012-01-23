@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Switch )]
     public class Switch : ILOp
     {
-        public Switch( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Switch( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Switch)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Switch)]
         // 	public class Switch: Op {
         // 		private string[] mLabels;
         // 		public Switch(ILReader aReader, MethodInformation aMethodInfo)

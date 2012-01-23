@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("ror")]
+    [Cosmos.Assembler.OpCode("ror")]
     public class RotateRight : InstructionWithDestinationAndSourceAndSize {
     }
 }

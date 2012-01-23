@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fisttp")]
+    [Cosmos.Assembler.OpCode("fisttp")]
     public class IntStoreWithTrunc : InstructionWithDestinationAndSize
     {
     }

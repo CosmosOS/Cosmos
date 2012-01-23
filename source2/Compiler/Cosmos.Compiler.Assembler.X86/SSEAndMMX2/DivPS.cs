@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("divps")]
+    [Cosmos.Assembler.OpCode("divps")]
     public class DivPS : InstructionWithDestinationAndSource
     {
     }

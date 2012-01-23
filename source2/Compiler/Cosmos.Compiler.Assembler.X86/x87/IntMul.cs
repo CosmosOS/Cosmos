@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fimul")]
+    [Cosmos.Assembler.OpCode("fimul")]
     public class IntMul : InstructionWithDestinationAndSize
     {
     }

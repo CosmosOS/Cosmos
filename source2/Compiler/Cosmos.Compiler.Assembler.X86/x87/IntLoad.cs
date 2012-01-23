@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fild")]
+    [Cosmos.Assembler.OpCode("fild")]
     public class IntLoad : InstructionWithDestinationAndSize
     {
     }

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Cosmos.Compiler.Assembler.X86 {
   // todo: cache the EncodingOption and InstructionData instances..
-  public abstract class Instruction : Cosmos.Compiler.Assembler.Instruction {
+  public abstract class Instruction : Cosmos.Assembler.Instruction {
     
     [Flags]
     public enum InstructionSizes {

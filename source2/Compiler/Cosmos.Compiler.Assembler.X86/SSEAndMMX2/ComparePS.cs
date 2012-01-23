@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("cmpps")]
+    [Cosmos.Assembler.OpCode("cmpps")]
     public class ComparePS : InstructionWithDestinationAndSourceAndPseudoOpcodes
     {
 	}

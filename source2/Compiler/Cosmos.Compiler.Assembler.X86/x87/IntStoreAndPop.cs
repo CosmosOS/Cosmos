@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fistp")]
+    [Cosmos.Assembler.OpCode("fistp")]
     public class IntStoreAndPop : InstructionWithDestinationAndSize
     {
    }

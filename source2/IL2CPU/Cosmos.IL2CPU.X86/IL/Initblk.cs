@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Initblk)]
 	public class Initblk: ILOp
 	{
-		public Initblk(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Initblk(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Initblk)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Initblk)]
 		// 	public class Initblk: Op {
 		// 		public Initblk(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("neg")]
+    [Cosmos.Assembler.OpCode("neg")]
 	public class Neg: InstructionWithDestinationAndSize {
 	}
 }

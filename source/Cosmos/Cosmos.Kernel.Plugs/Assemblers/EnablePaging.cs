@@ -2,7 +2,7 @@
 
 using Cosmos.IL2CPU.Plugs;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using Assembler = Cosmos.Assembler;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class ASMEnablePaging: AssemblerMethod {

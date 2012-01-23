@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.X86.IL;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using System.Reflection;
 using MethodInfo = Cosmos.IL2CPU.MethodInfo;
 
@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS
             var xMethodInfo = (MethodInfo)aMethodInfo;
             var xDelegate = typeof(Delegate);
             var xMethod = xDelegate.GetMethod("GetInvokeMethod", BindingFlags.NonPublic | BindingFlags.Instance);
-            new CPUx86.Push { DestinationRef = ElementReference.New(ILOp.GetMethodLabel(xMethod)) };
+            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(ILOp.GetMethodLabel(xMethod)) };
         }
     }
 }

@@ -3,14 +3,14 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Collections.Generic;
 using System.Reflection;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
 	public class Stloc : ILOp
 	{
-		public Stloc(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+		public Stloc(Cosmos.Assembler.Assembler aAsmblr)
 			: base(aAsmblr)
 		{
 		}

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("cdq")]
+    [Cosmos.Assembler.OpCode("cdq")]
     public class SignExtendAX : InstructionWithSize {
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             switch (Size) {
                 case 32:

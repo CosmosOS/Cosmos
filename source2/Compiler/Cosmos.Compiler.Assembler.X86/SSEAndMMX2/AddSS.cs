@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode( "addss" )]
+    [Cosmos.Assembler.OpCode( "addss" )]
     public class AddSS : InstructionWithDestinationAndSource
     {
     }

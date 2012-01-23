@@ -7,7 +7,7 @@
   // We could optimize our C# code to issue a different ouput for NASM, but there
   // are cases where the long form could be preferred. Thus instead we have 
   // chosen to follow the NASM model in our code.
-  [OpCode("Int3")]
+  [Cosmos.Assembler.OpCode("Int3")]
   public class INT3 : Instruction {
   }
 

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86
 {
-	[OpCode("shld")]
+	[Cosmos.Assembler.OpCode("shld")]
 	public class ShiftLeftDouble : InstructionWithDestinationAndSourceAndArgument
 	{
 	}

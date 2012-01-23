@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using x86 = Cosmos.Compiler.Assembler.X86;
 
 namespace Orvid

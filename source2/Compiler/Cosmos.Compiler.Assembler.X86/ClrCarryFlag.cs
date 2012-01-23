@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("clc")]
+    [Cosmos.Assembler.OpCode("clc")]
     public class ClrCarryFlag : Instruction
     {
     }

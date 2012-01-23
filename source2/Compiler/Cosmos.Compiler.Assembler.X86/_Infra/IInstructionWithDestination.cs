@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     public interface IInstructionWithDestination {
-        ElementReference DestinationRef {
+        Cosmos.Assembler.ElementReference DestinationRef {
             get;
             set;
         }

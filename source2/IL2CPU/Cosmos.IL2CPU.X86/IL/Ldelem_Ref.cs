@@ -1,17 +1,17 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelem_Ref )]
     public class Ldelem_Ref : ILOp
     {
-        public Ldelem_Ref( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldelem_Ref( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
-        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  uint aElementSize,bool isSigned )
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize,bool isSigned )
         {
 			if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
 				throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);

@@ -1,13 +1,13 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Sizeof )]
     public class Sizeof : ILOp
     {
-        public Sizeof( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Sizeof( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.Compiler;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Sizeof)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Sizeof)]
         // 	public class Sizeof: Op {
         //         private Type mType;
         // 

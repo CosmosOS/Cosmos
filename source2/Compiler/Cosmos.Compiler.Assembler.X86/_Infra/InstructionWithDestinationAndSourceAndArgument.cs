@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     public abstract class InstructionWithDestinationAndSourceAndArgument : InstructionWithDestinationAndSource, IInstructionWithArgument {
-		public ElementReference ArgumentRef
+		public Cosmos.Assembler.ElementReference ArgumentRef
 		{
             get;
             set;
@@ -68,7 +68,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             }
         }
 
-        public override bool IsComplete( Cosmos.Compiler.Assembler.Assembler aAssembler )
+        public override bool IsComplete( Cosmos.Assembler.Assembler aAssembler )
         {
             if (ArgumentRef != null) {
                 ulong xAddress;
@@ -77,7 +77,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             return base.IsComplete(aAssembler);
         }
 
-        public override void UpdateAddress( Cosmos.Compiler.Assembler.Assembler aAssembler, ref ulong aAddress )
+        public override void UpdateAddress( Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress )
         {
             if (ArgumentRef != null) {
                 ArgumentValue = 0xFFFFFFFF;
@@ -85,7 +85,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             base.UpdateAddress(aAssembler, ref aAddress);
         }
 
-        public override byte[] GetData(Cosmos.Compiler.Assembler.Assembler aAssembler) {
+        public override byte[] GetData(Cosmos.Assembler.Assembler aAssembler) {
             if (ArgumentRef != null) {
                 ulong xAddress = 0;
                 if (!ArgumentRef.Resolve(aAssembler, out xAddress)) {
@@ -95,7 +95,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             }
             return base.GetData(aAssembler);
         }
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);
             String destination=this.GetDestinationAsString();

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("in")]
+    [Cosmos.Assembler.OpCode("in")]
     public class IN : InstructionWithDestinationAndSize {
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             base.WriteText(aAssembler, aOutput);
             aOutput.Write(", DX");

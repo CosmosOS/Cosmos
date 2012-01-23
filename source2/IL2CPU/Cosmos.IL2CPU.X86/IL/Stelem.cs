@@ -7,7 +7,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem )]
     public class Stelem : ILOp
     {
-        public Stelem( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Stelem( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.Compiler;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Stelem)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stelem)]
         // 	public class Stelem: Op {
         // 		private Type mType;
         // 		private string mNextLabel;

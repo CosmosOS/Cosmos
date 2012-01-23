@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("or")]
+    [Cosmos.Assembler.OpCode("or")]
     public class Or : InstructionWithDestinationAndSourceAndSize {
     }
 }

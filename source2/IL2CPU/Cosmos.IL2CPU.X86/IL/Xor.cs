@@ -7,7 +7,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Xor )]
     public class Xor : ILOp
     {
-        public Xor( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Xor( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

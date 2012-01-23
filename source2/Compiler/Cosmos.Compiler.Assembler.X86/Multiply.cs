@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("mul")]
+    [Cosmos.Assembler.OpCode("mul")]
 	public class Multiply: InstructionWithDestinationAndSize {
 	}
 }

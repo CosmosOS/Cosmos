@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Pop )]
     public class Pop : ILOp
     {
-        public Pop( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Pop( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

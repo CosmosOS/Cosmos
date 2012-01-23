@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("xchg")]
+    [Cosmos.Assembler.OpCode("xchg")]
     public class Xchg : InstructionWithDestinationAndSourceAndSize {
     }
 }

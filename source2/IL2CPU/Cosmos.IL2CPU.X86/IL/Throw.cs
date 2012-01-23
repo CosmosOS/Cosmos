@@ -1,14 +1,14 @@
 using System;
 using CPU = Cosmos.Compiler.Assembler.X86;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Throw )]
     public class Throw : ILOp
     {
-        public Throw( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Throw( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
 #warning TODO: Implement exception
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Mov { DestinationRef = ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+            new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
             //new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Throw)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Throw)]
         // 	public class Throw: Op {
         // 		private MethodInformation mMethodInfo;
         // 		private int mCurrentILOffset;

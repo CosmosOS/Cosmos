@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fidiv")]
+    [Cosmos.Assembler.OpCode("fidiv")]
     public class IntDiv : InstructionWithDestinationAndSize
     {
     }

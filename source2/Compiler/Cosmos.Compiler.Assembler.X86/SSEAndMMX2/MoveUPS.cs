@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("movups")]
+    [Cosmos.Assembler.OpCode("movups")]
     public class MoveUPS : InstructionWithDestinationAndSource
     {
     }

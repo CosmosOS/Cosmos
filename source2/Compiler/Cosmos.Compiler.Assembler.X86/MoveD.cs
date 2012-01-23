@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("movd")]
+    [Cosmos.Assembler.OpCode("movd")]
     public class MoveD : InstructionWithDestinationAndSource
     {
     }

@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem_R8 )]
     public class Stelem_R8 : ILOp
     {
-        public Stelem_R8( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Stelem_R8( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

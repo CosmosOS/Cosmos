@@ -1,9 +1,9 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("movsx")]
+    [Cosmos.Assembler.OpCode("movsx")]
 	public class MoveSignExtend : InstructionWithDestinationAndSourceAndSize
 	{
 
-		public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+		public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
 		{
 			if (Size == 0)
 			{

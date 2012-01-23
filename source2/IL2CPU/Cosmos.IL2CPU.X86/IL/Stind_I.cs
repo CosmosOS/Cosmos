@@ -1,17 +1,17 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stind_I )]
     public class Stind_I : ILOp
     {
-        public Stind_I( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Stind_I( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
 
-        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  int aSize )
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  int aSize )
         {
             new Comment(aAssembler,  "address at: [esp + " + aSize + "]" );
             int xStorageSize = aSize;
@@ -73,7 +73,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Stind_I)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_I)]
         // 	public class Stind_I: Op {
         // 		public Stind_I(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {

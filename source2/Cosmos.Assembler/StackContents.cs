@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections;
 using System.Diagnostics.Contracts;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
 
   public class StackContents: IEnumerable<StackContents.Item> {
     #region class Item

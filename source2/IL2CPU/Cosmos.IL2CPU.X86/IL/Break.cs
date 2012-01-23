@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Break)]
 	public class Break: ILOp
 	{
-		public Break(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Break(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 		

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-	[OpCode("movsd")]
+	[Cosmos.Assembler.OpCode("movsd")]
 	public class MoveSD : InstructionWithDestinationAndSource
 	{
 	}

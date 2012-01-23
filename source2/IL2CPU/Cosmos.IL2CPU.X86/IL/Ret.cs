@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ret)]
 	public class Ret: ILOp
 	{
-		public Ret(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Ret(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

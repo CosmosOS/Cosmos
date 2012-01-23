@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler
+namespace Cosmos.Assembler
 {
     public abstract class BaseAssemblerElement
     {

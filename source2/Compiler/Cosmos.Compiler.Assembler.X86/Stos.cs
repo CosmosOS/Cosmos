@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("stos")]
+    [Cosmos.Assembler.OpCode("stos")]
     public class Stos : InstructionWithSize, IInstructionWithPrefix {
 
         public InstructionPrefixes Prefixes {
@@ -12,7 +12,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             set;
         }
 
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             if ((Prefixes & InstructionPrefixes.Repeat) != 0) {
                 aOutput.Write("rep ");

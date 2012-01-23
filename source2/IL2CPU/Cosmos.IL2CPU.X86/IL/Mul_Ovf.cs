@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Mul_Ovf)]
 	public class Mul_Ovf: ILOp
 	{
-		public Mul_Ovf(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Mul_Ovf(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Mul_Ovf)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Mul_Ovf)]
 		// 	public class Mul_Ovf: Mul {
 		//         private string mNextLabel;
 		// 	    private string mCurLabel;

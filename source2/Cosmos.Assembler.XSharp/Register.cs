@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
@@ -47,7 +47,7 @@ namespace Cosmos.Assembler.XSharp {
       new Mov { DestinationReg = GetId(), SourceReg = aRegister, Size = Registers.GetSize(GetId()) };
     }
 
-    protected void Move(ElementReference aReference) {
+    protected void Move(Cosmos.Assembler.ElementReference aReference) {
       new Mov { DestinationReg = GetId(), SourceRef = aReference, Size = Registers.GetSize(GetId()) };
     }
 

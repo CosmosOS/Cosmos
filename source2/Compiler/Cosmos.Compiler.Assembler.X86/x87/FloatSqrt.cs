@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fsqrt")]
+    [Cosmos.Assembler.OpCode("fsqrt")]
     public class FloatSqrt : Instruction
     {
     }

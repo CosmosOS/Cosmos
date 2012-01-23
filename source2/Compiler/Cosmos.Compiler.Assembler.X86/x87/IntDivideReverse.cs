@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fidivr")]
+    [Cosmos.Assembler.OpCode("fidivr")]
     public class IntDivReverse : InstructionWithDestinationAndSize
     {
     }

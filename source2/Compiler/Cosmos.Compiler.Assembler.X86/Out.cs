@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("out")]
+    [Cosmos.Assembler.OpCode("out")]
     public class Out : InstructionWithDestinationAndSize {
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);
             aOutput.Write(" DX, ");

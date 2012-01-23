@@ -6,7 +6,7 @@ using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using Cosmos.Compiler.Assembler.X86;
 
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Unbox_Any )]
     public class Unbox_Any : ILOp
     {
-        public Unbox_Any( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Unbox_Any( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
-            new CPUx86.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
+            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xTypeID ), DestinationIsIndirect = true };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
             System.Reflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
             new Call(Assembler).Execute(aMethod, new OpMethod(ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler));

@@ -11,7 +11,7 @@ using Cosmos.IL2CPU.X86;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
 // using Cosmos.IL2CPU.Compiler;
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     //         private uint mCurrentILOffset;
     //         private MethodBase mMethod;
 
-    public Call(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+    public Call(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 
@@ -72,11 +72,11 @@ namespace Cosmos.IL2CPU.X86.IL {
       DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase));
     }
 
-    public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
+    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
     {
         DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition));
     }
-    public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel) {
+    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel) {
       //if (aTargetMethod.IsVirtual) {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
       //  return;

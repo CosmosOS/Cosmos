@@ -24,7 +24,7 @@ namespace Cosmos.Assembler.X86
 
     //    #region Source options
     //    public RegistersEnum? SourceReg { get; set; }
-    //    //public ElementReference SourceRef { get; set; }
+    //    //public Cosmos.Assembler.ElementReference SourceRef { get; set; }
     //    public uint? SourceValue { get; set; }
     //    public bool SourceIsIndirect { get; set; }
     //    public int SourceDisplacement { get; set; }
@@ -32,7 +32,7 @@ namespace Cosmos.Assembler.X86
 
     //    #region Destination options
     //    public RegistersEnum? DestinationReg { get; set; }
-    //    //public ElementReference DestinationRef { get; set; }
+    //    //public Cosmos.Assembler.ElementReference DestinationRef { get; set; }
     //    public uint? DestinationValue { get; set; }
     //    public bool DestinationIsIndirect { get; set; }
     //    public int DestinationDisplacement { get; set; }

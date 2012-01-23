@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("ffree")]
+    [Cosmos.Assembler.OpCode("ffree")]
     public class FloatFree : InstructionWithDestination
     {
     }

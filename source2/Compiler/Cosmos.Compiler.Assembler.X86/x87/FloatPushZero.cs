@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.X86.x87
 {
-    [OpCode("fld0")]
+    [Cosmos.Assembler.OpCode("fld0")]
     public class FloatPushZero : Instruction
     {
     }

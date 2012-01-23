@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using System.Reflection;
 using System.Diagnostics.SymbolStore;
@@ -37,9 +37,9 @@ namespace Cosmos.IL2CPU.X86 {
         var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
         var xAsmMember = new DataMember(xName, (byte)0);
         Assembler.DataMembers.Add(xAsmMember);
-        new Compare { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+        new Compare { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
         new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
-        new Mov { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+        new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
         new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
         new Label(".BeforeQuickReturn");
         new Mov { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };

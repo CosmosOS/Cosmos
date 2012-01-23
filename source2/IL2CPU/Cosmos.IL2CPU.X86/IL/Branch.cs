@@ -2,7 +2,7 @@ using System;
 using Cosmos.IL2CPU.X86;
 using CPU = Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.Assembler.X86;
-using Label = Cosmos.Compiler.Assembler.Label;
+using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
     public class Branch : ILOp
     {
 
-        public Branch(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+        public Branch(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
         }

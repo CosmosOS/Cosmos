@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("iret")]
+    [Cosmos.Assembler.OpCode("iret")]
 	public class IRET: Instruction {
 	}
 }

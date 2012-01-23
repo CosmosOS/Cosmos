@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_Ovf_I8 )]
     public class Conv_Ovf_I8 : ILOp
     {
-        public Conv_Ovf_I8( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Conv_Ovf_I8( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

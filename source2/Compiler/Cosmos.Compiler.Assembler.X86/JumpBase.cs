@@ -14,7 +14,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
         return String.Empty;
       }
       set {
-        DestinationRef = ElementReference.New(value);
+        DestinationRef = Cosmos.Assembler.ElementReference.New(value);
       }
     }
     protected bool mNear = true;
@@ -25,7 +25,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
       }
     }
 
-    public override void WriteData(Cosmos.Compiler.Assembler.Assembler aAssembler, Stream aOutput) {
+    public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput) {
       if (mCorrectAddress) {
         if (IsRelativeJump) {
           if (DestinationValue.HasValue && !DestinationIsIndirect) {

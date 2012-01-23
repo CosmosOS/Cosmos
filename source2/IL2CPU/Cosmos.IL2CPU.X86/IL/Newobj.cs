@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Newobj)]
     public class Newobj : ILOp
     {
-        public Newobj(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+        public Newobj(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
         }
@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assemble(Assembler, aMethod, xMethod, xCurrentLabel, xType, xMethod.Value);
         }
 
-        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
         {
             // call cctor:
             if (aMethod != null)
@@ -176,7 +176,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };

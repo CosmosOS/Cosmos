@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
   public abstract class Instruction : BaseAssemblerElement {
     protected string mMnemonic;
     public string Mnemonic {
@@ -19,7 +19,7 @@ namespace Cosmos.Compiler.Assembler {
       get { return mAsmMethodIdx; }
     }
 
-    public override void WriteText(Assembler aAssembler, TextWriter aOutput) {
+    public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput) {
       aOutput.Write(mMnemonic);
     }
 
@@ -28,7 +28,7 @@ namespace Cosmos.Compiler.Assembler {
 
     protected Instruction(bool aAddToAssembler) {
       if (aAddToAssembler) {
-        Assembler.CurrentInstance.Add(this);
+        Cosmos.Assembler.Assembler.CurrentInstance.Add(this);
       }
       var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
       if (xAttribs != null && xAttribs.Length > 0) {
@@ -44,7 +44,7 @@ namespace Cosmos.Compiler.Assembler {
       }
     }
 
-    public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+    public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress) {
       base.UpdateAddress(aAssembler, ref aAddress);
     }
 
@@ -52,7 +52,7 @@ namespace Cosmos.Compiler.Assembler {
       throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
     }
 
-    public override void WriteData(Assembler aAssembler, Stream aOutput) {
+    public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput) {
       throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
     }
 

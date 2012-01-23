@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.X86
 {
-    [OpCode("cmps")]
+    [Cosmos.Assembler.OpCode("cmps")]
     public class Cmps: InstructionWithSize, IInstructionWithPrefix {
 
         public InstructionPrefixes Prefixes {
@@ -13,7 +13,7 @@ namespace Cosmos.Compiler.Assembler.X86.X86
             set;
         }
 
-        public override void WriteText(Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             if ((Prefixes & InstructionPrefixes.RepeatTillEqual) != 0)
             {

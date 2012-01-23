@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("divss")]
+    [Cosmos.Assembler.OpCode("divss")]
     public class DivSS : InstructionWithDestinationAndSource
     {
     }

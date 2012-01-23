@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("cbw")]
+    [Cosmos.Assembler.OpCode("cbw")]
     public class ConvByteToWord : Instruction
     {
     }

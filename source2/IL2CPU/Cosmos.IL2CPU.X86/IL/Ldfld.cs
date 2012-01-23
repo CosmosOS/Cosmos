@@ -5,7 +5,7 @@ using System.Linq;
 // 
 // using CPU = Cosmos.Compiler.Assembler.X86;
 // using System.Reflection;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldfld )]
     public class Ldfld : ILOp
     {
-        public Ldfld( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldfld( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
           return (int)(xExtraOffset + xFieldInfo.Offset);
         }
 
-        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
           var xStackValue = Assembler.Stack.Pop();
           var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
           var xFields = GetFieldsInfo(aDeclaringType);

@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_R8)]
 	public class Conv_R8: ILOp
 	{
-		public Conv_R8(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Conv_R8(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

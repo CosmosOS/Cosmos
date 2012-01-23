@@ -7,7 +7,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Sub )]
     public class Sub : ILOp
     {
-        public Sub( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Sub( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

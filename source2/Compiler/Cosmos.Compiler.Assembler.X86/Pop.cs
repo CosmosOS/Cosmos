@@ -2,7 +2,7 @@
 using System.Linq;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("pop")]
+    [Cosmos.Assembler.OpCode("pop")]
 	public class Pop: InstructionWithDestinationAndSize{
 	}
 

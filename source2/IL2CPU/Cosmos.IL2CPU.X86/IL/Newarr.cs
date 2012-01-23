@@ -1,7 +1,7 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using CPU = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using System.Reflection;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newarr )]
     public class Newarr : ILOp
     {
-        public Newarr( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Newarr( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( Array ) ) );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New( xTypeID ), SourceIsIndirect = true };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = ( uint )InstanceTypeEnum.Array, Size = 32 };

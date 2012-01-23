@@ -1,13 +1,13 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using CPU = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ceq)]
   public class Ceq : ILOp {
-    public Ceq(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+    public Ceq(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 

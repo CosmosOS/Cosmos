@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fxch")]
+    [Cosmos.Assembler.OpCode("fxch")]
     public class FloatXchg : InstructionWithDestination
     {
 

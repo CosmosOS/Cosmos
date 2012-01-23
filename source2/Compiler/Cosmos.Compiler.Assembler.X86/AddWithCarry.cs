@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("adc")]
+    [Cosmos.Assembler.OpCode("adc")]
 	public class AddWithCarry : InstructionWithDestinationAndSourceAndSize
 	{
 	}

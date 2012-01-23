@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fclex")]
+    [Cosmos.Assembler.OpCode("fclex")]
     public class FloatClearEx : Instruction
     {
     }

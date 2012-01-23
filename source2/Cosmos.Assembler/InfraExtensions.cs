@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
     public static class InfraExtensions {
         public static string GetAsText(this IDefine aThis) {
             return "%define " + aThis.Symbol + " 1";

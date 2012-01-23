@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("faddp")]
+    [Cosmos.Assembler.OpCode("faddp")]
     public class FloatAddAndPop : InstructionWithDestinationAndSource
     {
     }

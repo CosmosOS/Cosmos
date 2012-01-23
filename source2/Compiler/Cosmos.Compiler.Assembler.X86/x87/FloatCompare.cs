@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fcom")]
+    [Cosmos.Assembler.OpCode("fcom")]
     public class FloatCompare : InstructionWithDestinationAndSize
     {
     }

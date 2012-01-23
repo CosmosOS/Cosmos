@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldvirtftn)]
 	public class Ldvirtftn: ILOp
 	{
-		public Ldvirtftn(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Ldvirtftn(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Ldvirtftn)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldvirtftn)]
 		// 	public class Ldvirtftn: Op {
 		//         private string mNextLabel;
 		// 	    private string mCurLabel;

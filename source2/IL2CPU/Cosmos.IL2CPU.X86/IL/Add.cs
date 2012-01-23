@@ -7,7 +7,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Add )]
     public class Add : ILOp
     {
-        public Add( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Add( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

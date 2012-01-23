@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fisub")]
+    [Cosmos.Assembler.OpCode("fisub")]
     public class IntSub : InstructionWithDestinationAndSize
     {
     }

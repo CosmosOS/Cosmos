@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("popad")]
+    [Cosmos.Assembler.OpCode("popad")]
     public class Popad : Instruction {
 	}
 }

@@ -5,7 +5,7 @@ using System.Text;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Reflection;
 using System.IO;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using Cosmos.Debug.Common;

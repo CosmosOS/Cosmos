@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
   public class DataMember : BaseAssemblerElement, IComparable<DataMember> {
     public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
     public static string GetStaticFieldName(FieldInfo aField) {
@@ -96,7 +96,7 @@ namespace Cosmos.Compiler.Assembler {
       UntypedDefaultValue = aDefaultValue.Cast<object>().ToArray();
     }
 
-    public override void WriteText(Assembler aAssembler, TextWriter aOutput) {
+    public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput) {
       if (RawDefaultValue != null) {
         if (RawDefaultValue.Length == 0) {
           aOutput.Write(Name);
@@ -139,7 +139,7 @@ namespace Cosmos.Compiler.Assembler {
         aOutput.Write(Name);
         aOutput.Write(" dd ");
         Func<object, string> xGetTextForItem = delegate(object aItem) {
-                                                     var xElementRef = aItem as ElementReference;
+                                                     var xElementRef = aItem as Cosmos.Assembler.ElementReference;
                                                      if (xElementRef == null) {
                                                        return (aItem ?? 0).ToString();
                                                      } else {
@@ -175,7 +175,7 @@ namespace Cosmos.Compiler.Assembler {
       }
     }
 
-    public override void UpdateAddress(Assembler aAssembler, ref ulong xAddress) {
+    public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong xAddress) {
       if (Alignment > 0) {
         if (xAddress % Alignment != 0) {
           xAddress += Alignment - (xAddress % Alignment);
@@ -195,7 +195,7 @@ namespace Cosmos.Compiler.Assembler {
       if (UntypedDefaultValue != null &&
           UntypedDefaultValue.LongLength > 0) {
         foreach (var xReference in (from item in UntypedDefaultValue
-                                    let xRef = item as ElementReference
+                                    let xRef = item as Cosmos.Assembler.ElementReference
                                     where xRef != null
                                     select xRef)) {
           var xRef = aAssembler.TryResolveReference(xReference);
@@ -214,7 +214,7 @@ namespace Cosmos.Compiler.Assembler {
           UntypedDefaultValue.LongLength > 0) {
         var xBuff = (byte[])Array.CreateInstance(typeof(byte), UntypedDefaultValue.LongLength * 4);
         for (int i = 0; i < UntypedDefaultValue.Length; i++) {
-          var xRef = UntypedDefaultValue[i] as ElementReference;
+          var xRef = UntypedDefaultValue[i] as Cosmos.Assembler.ElementReference;
           byte[] xTemp;
           if (xRef != null) {
             var xTheRef = aAssembler.TryResolveReference(xRef);
@@ -243,12 +243,12 @@ namespace Cosmos.Compiler.Assembler {
       return RawDefaultValue;
     }
 
-    public override void WriteData(Assembler aAssembler, Stream aOutput) {
+    public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput) {
       if (UntypedDefaultValue != null &&
           UntypedDefaultValue.LongLength > 0) {
         //var xBuff = (byte[])Array.CreateInstance(typeof(byte), UntypedDefaultValue.LongLength * 4);
         for (int i = 0; i < UntypedDefaultValue.Length; i++) {
-          var xRef = UntypedDefaultValue[i] as ElementReference;
+          var xRef = UntypedDefaultValue[i] as Cosmos.Assembler.ElementReference;
           //byte[] xTemp;
           if (xRef != null) {
             var xTheRef = aAssembler.TryResolveReference(xRef);

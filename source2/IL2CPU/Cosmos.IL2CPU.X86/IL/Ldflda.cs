@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldflda )]
     public class Ldflda : ILOp
     {
-        public Ldflda( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldflda( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
           DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
         }
 
-        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue) {
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue) {
 
           var xFields = GetFieldsInfo(aDeclaringType);
           var xFieldInfo = (from item in xFields
@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.Compiler;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldflda)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldflda)]
         // 	public class Ldflda: Op {
         //         private Type mType;
         // 		private TypeInformation mTypeInfo;

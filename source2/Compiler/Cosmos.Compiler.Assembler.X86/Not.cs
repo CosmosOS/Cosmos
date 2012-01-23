@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("not")]
+    [Cosmos.Assembler.OpCode("not")]
 	public class Not: InstructionWithDestinationAndSize {
 	}
 }

@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Readonly)]
 	public class Readonly: ILOp
 	{
-		public Readonly(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Readonly(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

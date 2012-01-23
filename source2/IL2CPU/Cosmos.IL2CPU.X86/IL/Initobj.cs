@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Initobj )]
     public class Initobj : ILOp
     {
-        public Initobj( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Initobj( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.Compiler;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Initobj)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Initobj)]
         // 	public class Initobj: Op {
         // 		private uint mObjSize;
         // 

@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using CPU = Cosmos.Compiler.Assembler.X86;
@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Clt )]
     public class Clt : ILOp
     {
-        public Clt( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Clt( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -115,7 +115,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Clt)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Clt)]
         // 	public class Clt: Op {
         // 		private readonly string NextInstructionLabel;
         // 		private readonly string CurInstructionLabel;

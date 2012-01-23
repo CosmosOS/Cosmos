@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Refanyval)]
 	public class Refanyval: ILOp
 	{
-		public Refanyval(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Refanyval(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Refanyval)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Refanyval)]
 		// 	public class Refanyval: Op {
 		// 		public Refanyval(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

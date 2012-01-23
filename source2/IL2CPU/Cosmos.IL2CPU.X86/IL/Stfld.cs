@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]
   public class Stfld : ILOp {
-    public Stfld(Cosmos.Compiler.Assembler.Assembler aAsmblr) : base(aAsmblr) {
+    public Stfld(Cosmos.Assembler.Assembler aAsmblr) : base(aAsmblr) {
     }
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       DoExecute(Assembler, aMethod, xField);
     }
 
-    public static void DoExecute(Cosmos.Compiler.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC) {
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC) {
       var xType = aMethod.MethodBase.DeclaringType;
       int xExtraOffset = aNeedsGC ? 12 : 0;
 
@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       aAssembler.Stack.Pop();
     }
 
-    public static void DoExecute(Cosmos.Compiler.Assembler.Assembler aAssembler,  MethodInfo aMethod, System.Reflection.FieldInfo aField) {
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, System.Reflection.FieldInfo aField) {
       bool xNeedsGC = aField.DeclaringType.IsClass && !aField.DeclaringType.IsValueType;
 
       DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, xNeedsGC);

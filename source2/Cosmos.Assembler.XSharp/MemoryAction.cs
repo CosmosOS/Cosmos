@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
     public class MemoryAction {
         public uint? Value;
         public readonly RegistersEnum? Register;
-        public readonly ElementReference Reference;
+        public readonly Cosmos.Assembler.ElementReference Reference;
         public readonly int Displacement;
         
         public override string ToString() {
@@ -61,11 +61,11 @@ namespace Cosmos.Assembler.XSharp {
             IsIndirect = true;
         }
         // This form used for reading memory - Addresses are passed in
-        public MemoryAction(ElementReference aValue, int aDisplacement)
+        public MemoryAction(Cosmos.Assembler.ElementReference aValue, int aDisplacement)
             : this(aValue) {
             Displacement = aDisplacement;
         }
-        public MemoryAction(ElementReference aValue) {
+        public MemoryAction(Cosmos.Assembler.ElementReference aValue) {
             Reference = aValue;
         }
 

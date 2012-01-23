@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.Assembler.XSharp {
   public class DataMemberBase : DataMember {
     public DataMemberBase(string aName) : base(aName) {
     }
 
-    public ElementReference Address {
+    public Cosmos.Assembler.ElementReference Address {
       get {
-        return ElementReference.New(Name); 
+        return Cosmos.Assembler.ElementReference.New(Name); 
       }
     }
   }

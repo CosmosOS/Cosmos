@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-  [OpCode("mov")]
+  [Cosmos.Assembler.OpCode("mov")]
   public class Mov : InstructionWithDestinationAndSourceAndSize {
   }
 }

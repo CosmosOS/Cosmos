@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
   public class AddressIndirect : Address {
     public readonly RegistersEnum? Register;
-    public readonly ElementReference Reference;
+    public readonly Cosmos.Assembler.ElementReference Reference;
     public readonly uint Address;
     public readonly int Displacement;
 
     public AddressIndirect(string aLabel, Int32 aDisplacement) {
-      Reference = ElementReference.New(aLabel);
+      Reference = Cosmos.Assembler.ElementReference.New(aLabel);
       Displacement = aDisplacement;
     }
     public AddressIndirect(Register32 aBaseRegister, Int32 aDisplacement) {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("stosw")]
+    [Cosmos.Assembler.OpCode("stosw")]
 	public class StoreWordInString: Instruction {
 	}
 }

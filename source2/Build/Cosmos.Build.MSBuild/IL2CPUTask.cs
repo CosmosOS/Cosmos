@@ -1,5 +1,5 @@
 ﻿using Cosmos.Build.Common;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("inc")]
+    [Cosmos.Assembler.OpCode("inc")]
     public class INC : InstructionWithDestinationAndSize {
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("movhlps")]
+    [Cosmos.Assembler.OpCode("movhlps")]
     public class MoveHLPS : InstructionWithDestinationAndSource
     {
     }

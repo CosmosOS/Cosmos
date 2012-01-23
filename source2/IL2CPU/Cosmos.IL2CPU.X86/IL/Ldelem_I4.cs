@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelem_I4 )]
     public class Ldelem_I4 : ILOp
     {
-        public Ldelem_I4( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldelem_I4( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fstp")]
+    [Cosmos.Assembler.OpCode("fstp")]
     public class FloatStoreAndPop : InstructionWithDestinationAndSize
     {
     }

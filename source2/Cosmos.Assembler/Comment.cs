@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Cosmos.Compiler.Assembler
+namespace Cosmos.Assembler
 {
     public class Comment : Instruction
     {

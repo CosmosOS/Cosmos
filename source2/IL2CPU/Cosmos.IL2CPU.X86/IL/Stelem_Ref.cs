@@ -1,15 +1,15 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
   public class Stelem_Ref: ILOp {
-    public Stelem_Ref(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+    public Stelem_Ref(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
-    public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
+    public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
       // stack - 3 == the array
       // stack - 2 == the index
       // stack - 1 == the new value

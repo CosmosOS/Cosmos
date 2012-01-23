@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("dec")]
+    [Cosmos.Assembler.OpCode("dec")]
     public class Dec : InstructionWithDestinationAndSize {
     }
 }

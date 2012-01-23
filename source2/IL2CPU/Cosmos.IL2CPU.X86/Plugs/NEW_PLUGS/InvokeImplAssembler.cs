@@ -7,9 +7,9 @@ using Cosmos.IL2CPU.IL;
 using Cosmos.IL2CPU.Plugs;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.X86.IL;
-using CPU = Cosmos.Compiler.Assembler;
+using CPU = Cosmos.Assembler;
 using MethodBase = System.Reflection.MethodBase;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using CosmosAssembler = Cosmos.IL2CPU.X86.CosmosAssembler;
 
 namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
@@ -291,7 +291,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
 //      //new CPUx86.Move("esp", "ebp");
 
 //      //new CPUx86.Push {
-//      //  DestinationRef = ElementReference.New(LdStr.GetContentsArrayName("Events not yet implemented"))
+//      //  DestinationRef = Cosmos.Assembler.ElementReference.New(LdStr.GetContentsArrayName("Events not yet implemented"))
 //      //};
 //      //new CPUx86.Call {
 //      //  DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))

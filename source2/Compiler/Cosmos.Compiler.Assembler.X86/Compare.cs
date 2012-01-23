@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("cmp")]
+    [Cosmos.Assembler.OpCode("cmp")]
 	public class Compare: InstructionWithDestinationAndSourceAndSize {
 	}
 }

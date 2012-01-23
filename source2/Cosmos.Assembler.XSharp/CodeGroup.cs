@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
   public class CodeGroup {
-    protected Cosmos.Compiler.Assembler.Assembler mAsm = Cosmos.Compiler.Assembler.Assembler.CurrentInstance;
+    protected Cosmos.Assembler.Assembler mAsm = Cosmos.Assembler.Assembler.CurrentInstance;
 
     protected void SetDataMembers(object aInst) {
       var xThisType = aInst.GetType();

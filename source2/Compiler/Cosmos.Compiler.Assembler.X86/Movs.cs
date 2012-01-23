@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("movs")]
+    [Cosmos.Assembler.OpCode("movs")]
     public class Movs : InstructionWithSize, IInstructionWithPrefix {
         public InstructionPrefixes Prefixes {
             get;
             set;
         }
 
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             if ((Prefixes & InstructionPrefixes.Repeat) != 0) {
                 aOutput.Write("rep ");

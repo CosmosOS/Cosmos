@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("scas")]
+    [Cosmos.Assembler.OpCode("scas")]
     public class Scas: InstructionWithSize, IInstructionWithPrefix
     {
         public InstructionPrefixes Prefixes
@@ -14,7 +14,7 @@ namespace Cosmos.Compiler.Assembler.X86
             set;
         }
 
-        public override void WriteText(Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             if ((Prefixes & InstructionPrefixes.RepeatTillEqual) != 0)
             {

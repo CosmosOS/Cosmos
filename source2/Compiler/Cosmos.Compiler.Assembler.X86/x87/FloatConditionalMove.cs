@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("FCMOVcc")]
+    [Cosmos.Assembler.OpCode("FCMOVcc")]
     class FloatConditionalMove : InstructionWithDestinationAndSource
     {
         public FloatConditionalMoveTestEnum Condition
@@ -14,7 +14,7 @@ namespace Cosmos.Compiler.Assembler.X86.x87
             set;
         }
 
-        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             switch (Condition)
             {

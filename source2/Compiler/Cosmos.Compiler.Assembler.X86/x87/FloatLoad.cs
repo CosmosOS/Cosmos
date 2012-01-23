@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fld")]
+    [Cosmos.Assembler.OpCode("fld")]
     public class FloatLoad : InstructionWithDestinationAndSize
     {
     }

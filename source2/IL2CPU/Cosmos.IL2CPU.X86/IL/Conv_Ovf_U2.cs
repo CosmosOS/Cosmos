@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_U2)]
 	public class Conv_Ovf_U2: ILOp
 	{
-		public Conv_Ovf_U2(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Conv_Ovf_U2(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Conv_Ovf_U2)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Conv_Ovf_U2)]
 		// 	public class Conv_Ovf_U2: Op {
 		//         private string mNextLabel;
 		// 	    private string mCurLabel;

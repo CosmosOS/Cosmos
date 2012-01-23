@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Calli )]
     public class Calli : ILOp
     {
-        public Calli( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Calli( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPU = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Calli)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Calli)]
         // 	public class Calli: Op {
         // 		public Calli(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {

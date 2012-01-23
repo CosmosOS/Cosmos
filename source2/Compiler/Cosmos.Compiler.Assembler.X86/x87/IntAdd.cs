@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fiadd")]
+    [Cosmos.Assembler.OpCode("fiadd")]
     public class IntAdd : InstructionWithDestinationAndSize
     {
     }

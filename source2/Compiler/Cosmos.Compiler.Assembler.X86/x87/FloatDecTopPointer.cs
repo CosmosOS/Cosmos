@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fdecstp")]
+    [Cosmos.Assembler.OpCode("fdecstp")]
     public class FloatDecTopPointer : Instruction
     {
     }

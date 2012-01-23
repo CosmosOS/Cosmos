@@ -1,13 +1,13 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Label = Cosmos.Compiler.Assembler.Label;
+using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Div )]
     public class Div : ILOp
     {
-        public Div( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Div( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

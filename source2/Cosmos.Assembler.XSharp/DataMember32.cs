@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
@@ -16,14 +16,14 @@ namespace Cosmos.Assembler.XSharp {
 
     public MemoryAction Value {
       get {
-        return new MemoryAction(ElementReference.New(Name)) { IsIndirect = true, Size = 32 };
+        return new MemoryAction(Cosmos.Assembler.ElementReference.New(Name)) { IsIndirect = true, Size = 32 };
       }
       set {
         // For DataMember32 value will be null with ++ and --, this is important and purposeful.
         // ++ and -- try to set again, but for us we dont want that.
         if (value != null) {
           new Mov {
-            DestinationRef = ElementReference.New(Name),
+            DestinationRef = Cosmos.Assembler.ElementReference.New(Name),
             DestinationIsIndirect = true,
             SourceValue = value.Value.GetValueOrDefault(),
             SourceRef = value.Reference,

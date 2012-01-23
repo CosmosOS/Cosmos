@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     //[Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_U )]
     //public class Conv_U : ILOp
     //{
-    //    public Conv_U( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+    //    public Conv_U( Cosmos.Assembler.Assembler aAsmblr )
     //        : base( aAsmblr )
     //    {
     //    }

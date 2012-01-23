@@ -7,7 +7,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
 	/// <summary>
 	/// Represents the JMP opcode
 	/// </summary>
-    [OpCode("jmp")]
+    [Cosmos.Assembler.OpCode("jmp")]
 	public class Jump: JumpBase {
 	}
 }

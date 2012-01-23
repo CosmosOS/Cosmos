@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("ficom")]
+    [Cosmos.Assembler.OpCode("ficom")]
     public class IntCompare : InstructionWithDestination
     {
     }

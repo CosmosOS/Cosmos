@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86
 {
-	[OpCode("shrd")]
+	[Cosmos.Assembler.OpCode("shrd")]
 	public class ShiftRightDouble : InstructionWithDestinationAndSourceAndArgument
 	{
 	}

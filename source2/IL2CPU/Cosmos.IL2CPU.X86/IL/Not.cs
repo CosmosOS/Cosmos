@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Not )]
     public class Not : ILOp
     {
-        public Not( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Not( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

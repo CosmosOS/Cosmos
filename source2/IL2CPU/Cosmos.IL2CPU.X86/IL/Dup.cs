@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Dup )]
     public class Dup : ILOp
     {
-        public Dup( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Dup( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

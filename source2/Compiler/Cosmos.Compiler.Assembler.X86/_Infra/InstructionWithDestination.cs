@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination{
-        public ElementReference DestinationRef {
+        public Cosmos.Assembler.ElementReference DestinationRef {
             get;
             set;
         }
@@ -38,7 +38,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             set;
         }
 
-        public override bool IsComplete( Cosmos.Compiler.Assembler.Assembler aAssembler )
+        public override bool IsComplete( Cosmos.Assembler.Assembler aAssembler )
         {
             if (DestinationRef != null) {
                 ulong xAddress;
@@ -47,7 +47,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             return base.IsComplete(aAssembler);
         }
 
-        public override void UpdateAddress( Cosmos.Compiler.Assembler.Assembler aAssembler, ref ulong aAddresss )
+        public override void UpdateAddress( Cosmos.Assembler.Assembler aAssembler, ref ulong aAddresss )
         {
             if (DestinationRef != null) {
                 DestinationValue = 0xFFFFFFFF;
@@ -56,7 +56,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
         }
 
 
-        public override byte[] GetData( Cosmos.Compiler.Assembler.Assembler aAssembler )
+        public override byte[] GetData( Cosmos.Assembler.Assembler aAssembler )
         {
             if (DestinationRef != null) {
                 ulong xAddress = 0;
@@ -68,7 +68,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             return base.GetData(aAssembler);
         }
 
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);
             String destination = this.GetDestinationAsString();

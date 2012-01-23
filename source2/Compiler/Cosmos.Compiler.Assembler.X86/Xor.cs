@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("xor")]
+    [Cosmos.Assembler.OpCode("xor")]
 	public class Xor: InstructionWithDestinationAndSourceAndSize {
 	}
 }

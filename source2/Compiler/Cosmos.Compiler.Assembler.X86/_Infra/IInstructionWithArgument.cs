@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
     public interface IInstructionWithArgument {
-		ElementReference ArgumentRef
+		Cosmos.Assembler.ElementReference ArgumentRef
 		{
             get;
             set;

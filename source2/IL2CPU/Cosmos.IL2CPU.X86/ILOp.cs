@@ -10,19 +10,19 @@ using Cosmos.IL2CPU.IL;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Debug.Common;
 
 namespace Cosmos.IL2CPU.X86
 {
     public abstract class ILOp : Cosmos.IL2CPU.ILOp
     {
-      protected new readonly Cosmos.Compiler.Assembler.Assembler Assembler;
+      protected new readonly Cosmos.Assembler.Assembler Assembler;
 
-        protected ILOp(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+        protected ILOp(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
-          Assembler = (Cosmos.Compiler.Assembler.Assembler)aAsmblr;
+          Assembler = (Cosmos.Assembler.Assembler)aAsmblr;
         }
 
         protected static void Jump_Exception(MethodInfo aMethod)
@@ -78,7 +78,7 @@ namespace Cosmos.IL2CPU.X86
         {
             new CPU.Push
             {
-                DestinationRef = ElementReference.New(LdStr.GetContentsArrayName(aMessage))
+                DestinationRef = Cosmos.Assembler.ElementReference.New(LdStr.GetContentsArrayName(aMessage))
             };
             new CPU.Call
             {
@@ -219,11 +219,11 @@ namespace Cosmos.IL2CPU.X86
                     select item.Offset + item.Size).FirstOrDefault();
         }
 
-        public static void EmitExceptionLogic(Cosmos.Compiler.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup)
+        public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup)
         {
             EmitExceptionLogic(aAssembler, aMethodInfo, aCurrentOpCode, aDoTest, aCleanup, ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition));
         }
-        public static void EmitExceptionLogic(Cosmos.Compiler.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException)
+        public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException)
         {
             string xJumpTo = null;
             if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null)

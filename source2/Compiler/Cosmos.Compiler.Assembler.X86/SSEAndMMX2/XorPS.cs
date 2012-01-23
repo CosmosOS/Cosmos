@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("xorps")]
+    [Cosmos.Assembler.OpCode("xorps")]
     public class XorPS : InstructionWithDestinationAndSource
     {
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87 {
-    [OpCode("fxsave")]
+    [Cosmos.Assembler.OpCode("fxsave")]
 	public class FXSave : InstructionWithDestination {
 	}
 }

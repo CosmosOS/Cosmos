@@ -8,7 +8,7 @@ using CPU = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.X86;
 using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using Cosmos.Debug.DebugStub;
 using Cosmos.Assembler.XSharp;
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86 {
   // TODO: I think we need to later elminate this class
   // Much of it is left over from the old build stuff, and info 
   // here actually belongs else where, not in the assembler
-  public class CosmosAssembler : Cosmos.Compiler.Assembler.Assembler {
+  public class CosmosAssembler : Cosmos.Assembler.Assembler {
     //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
     protected byte mComNumber = 0;
 
@@ -109,13 +109,13 @@ namespace Cosmos.IL2CPU.X86 {
       xGdtPtr[0] = (UInt16)(xGDT.Count - 1);
       DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", xGdtPtr));
       new Mov {
-        DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"),
+        DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer"),
         DestinationIsIndirect = true,
         DestinationDisplacement = 2
         ,
-        SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
+        SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Contents")
       };
-      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer") };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer") };
       new Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment("Set data segments");
@@ -129,13 +129,13 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment("Force reload of code segment");
       new JumpToSegment { Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT" };
       new Label("Boot_FlushCsGDT");
-      new Comment(this, "END - Create GDT");
+      new Cosmos.Assembler.Comment(this, "END - Create GDT");
     }
 
     protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts) {
       int xOffset = aNo * 8;
-      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(aLabel) };
-      var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
+      new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(aLabel) };
+      var xIDT = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Contents");
       new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = Registers.AL };
       new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = Registers.AH };
       new ShiftRight { DestinationReg = Registers.EAX, SourceValue = 16 };
@@ -167,11 +167,11 @@ namespace Cosmos.IL2CPU.X86 {
 
       // Set IDT
       DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { xIdtSize, 0, 0 }));
-      new Mov { DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
+      new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer"),
         DestinationIsIndirect = true, DestinationDisplacement = 2,
-        SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
+        SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Contents")
       };
-      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer") };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer") };
       new Lidt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment(this, "END - Create IDT");
@@ -192,20 +192,20 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
       new Comment(this, "                ;- copy mb info - some stuff for you  ");
       new Comment(this, "BEGIN - Multiboot Info");
-      new Mov { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
+      new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
       new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
       new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
-      new Mov { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
       new Mov {
         DestinationReg = Registers.EAX,
         SourceReg = Registers.EBX,
         SourceIsIndirect = true
       };
-      new Mov { DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       new Mov {
         DestinationReg = Registers.ESP,
-        SourceRef = ElementReference.New("Kernel_Stack")
+        SourceRef = Cosmos.Assembler.ElementReference.New("Kernel_Stack")
       };
       new Comment(this, "END - Multiboot Info");
 
@@ -214,13 +214,13 @@ namespace Cosmos.IL2CPU.X86 {
 
 #if LFB_1024_8
             new Comment("Set graphics fields");
-            new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
+            new Move { DestinationReg = Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 72 };
-            new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 76 };
-            new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeModeInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeModeInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 80 };
-            new Move { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 
       new Comment(this, "BEGIN - SSE Init");
@@ -264,7 +264,7 @@ namespace Cosmos.IL2CPU.X86 {
         new Return();
       }
       // Start emitting assembly labels
-      Cosmos.Compiler.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
+      Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
 
 #if !LFB_1024_8
       DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
@@ -272,11 +272,11 @@ namespace Cosmos.IL2CPU.X86 {
       DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
       DataMembers.Add(new DataMember("MultibootFlags", xFlags));
       DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
-      DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
-      DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
-      DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
-      DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
-      DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
+      DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+      DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+      DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+      DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+      DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
       DataMembers.Add(new DataEndIfDefined());
       DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
       xFlags = 0x00003;
@@ -293,11 +293,11 @@ namespace Cosmos.IL2CPU.X86 {
                            xFlags));
             DataMembers.Add(new DataMember("MultibootChecksum",
                                                (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
+            DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
             // graphics fields
             DataMembers.Add(new DataMember("MultibootGraphicsMode", 0));
             DataMembers.Add(new DataMember("MultibootGraphicsWidth", 1024));

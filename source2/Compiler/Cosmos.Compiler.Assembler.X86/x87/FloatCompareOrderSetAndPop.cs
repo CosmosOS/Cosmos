@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fucomip")]
+    [Cosmos.Assembler.OpCode("fucomip")]
     public class FloatCompareOrderSetAndPop : InstructionWithDestination
     {
     }

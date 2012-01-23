@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Label = Cosmos.Compiler.Assembler.Label;
+using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Rem_Un )]
     public class Rem_Un : ILOp
     {
-        public Rem_Un( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Rem_Un( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

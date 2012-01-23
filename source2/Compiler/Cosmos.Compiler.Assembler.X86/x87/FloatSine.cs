@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fsin")]
+    [Cosmos.Assembler.OpCode("fsin")]
     public class FloatSine : Instruction
     {
     }

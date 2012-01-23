@@ -8,7 +8,7 @@ using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using System.Reflection.Emit;
 
 namespace Cosmos.IL2CPU

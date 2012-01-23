@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode( ILOpCode.Code.Neg )]
 	public class Neg : ILOp
 	{
-		public Neg( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+		public Neg( Cosmos.Assembler.Assembler aAsmblr )
 			: base( aAsmblr )
 		{
 		}

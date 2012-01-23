@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
-using Asm = Cosmos.Compiler.Assembler;
+using Asm = Cosmos.Assembler;
 using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.Kernel.Plugs {

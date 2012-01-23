@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.Assembler.X86.x87
 	/// ST(0) < ST(i): ZF, PF, CF = 001;
 	/// ST(0) = ST(i): ZF, PF, CF = 100;
 	/// </summary>
-    [OpCode("fcomi")]
+    [Cosmos.Assembler.OpCode("fcomi")]
     public class FloatCompareAndSet : InstructionWithDestination
     {
     }

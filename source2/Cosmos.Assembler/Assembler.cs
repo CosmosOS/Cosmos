@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Xml;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
 
   public abstract class Assembler {
     public virtual void Initialize() { }
@@ -88,7 +88,7 @@ namespace Cosmos.Compiler.Assembler {
       return mInstructions[aIndex];
     }
 
-    public BaseAssemblerElement TryResolveReference(ElementReference aReference) {
+    public BaseAssemblerElement TryResolveReference(Cosmos.Assembler.ElementReference aReference) {
       foreach (var xInstruction in mInstructions) {
         var xLabel = xInstruction as Label;
         if (xLabel != null) {

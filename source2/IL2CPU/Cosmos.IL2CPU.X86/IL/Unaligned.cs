@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Unaligned)]
 	public class Unaligned: ILOp
 	{
-		public Unaligned(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Unaligned(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

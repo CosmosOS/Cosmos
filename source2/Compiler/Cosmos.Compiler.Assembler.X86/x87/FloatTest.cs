@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("ftst")]
+    [Cosmos.Assembler.OpCode("ftst")]
     public class FloatTest : Instruction
     {
     }

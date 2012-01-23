@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stind_I4 )]
     public class Stind_I4 : ILOp
     {
-        public Stind_I4( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Stind_I4( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPU = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Stind_I4)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_I4)]
         // 	public class Stind_I4: Op {
         // 		public Stind_I4(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {

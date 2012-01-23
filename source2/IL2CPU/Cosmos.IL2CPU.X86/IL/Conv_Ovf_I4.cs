@@ -5,7 +5,7 @@ using Cosmos.IL2CPU.IL;
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I4)]
   public class Conv_Ovf_I4 : ILOp {
-    public Conv_Ovf_I4(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+    public Conv_Ovf_I4(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 

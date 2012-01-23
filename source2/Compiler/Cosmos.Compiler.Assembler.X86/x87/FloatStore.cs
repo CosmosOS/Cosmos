@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fst")]
+    [Cosmos.Assembler.OpCode("fst")]
     public class FloatStore : InstructionWithDestinationAndSize
     {
     }

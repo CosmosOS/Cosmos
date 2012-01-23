@@ -1,12 +1,12 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Label = Cosmos.Compiler.Assembler.Label;
+using Label = Cosmos.Assembler.Label;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I_Un)]
 	public class Conv_Ovf_I_Un: ILOp
 	{
-		public Conv_Ovf_I_Un(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+		public Conv_Ovf_I_Un(Cosmos.Assembler.Assembler aAsmblr)
 			:base(aAsmblr)
 		{
 		}
@@ -52,7 +52,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		//     [OpCode(OpCodeEnum.Conv_Ovf_I_Un)]
+		//     [Cosmos.Assembler.OpCode(OpCodeEnum.Conv_Ovf_I_Un)]
 		//     public class Conv_Ovf_I_Un : Op {
 		//         private readonly string NextInstructionLabel;
 		//         private string mNextLabel;

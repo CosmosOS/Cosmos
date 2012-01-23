@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("popfd")]
+    [Cosmos.Assembler.OpCode("popfd")]
     public class Popfd : Instruction
     {
     }

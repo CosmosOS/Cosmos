@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Endfilter)]
 	public class Endfilter: ILOp
 	{
-		public Endfilter(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Endfilter(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

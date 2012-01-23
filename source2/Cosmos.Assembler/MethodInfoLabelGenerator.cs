@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Reflection.Emit;
 
 
-namespace Cosmos.Compiler.Assembler
+namespace Cosmos.Assembler
 {
     public static class MethodInfoLabelGenerator
     {

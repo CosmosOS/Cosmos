@@ -1,14 +1,14 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Add_Ovf_Un )]
     public class Add_Ovf_Un : ILOp
     {
-		public Add_Ovf_Un(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+		public Add_Ovf_Un(Cosmos.Assembler.Assembler aAsmblr)
             : base( aAsmblr )
         {
         }

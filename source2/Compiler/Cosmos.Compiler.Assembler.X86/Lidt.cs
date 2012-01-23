@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("lidt")]
+    [Cosmos.Assembler.OpCode("lidt")]
 	public class Lidt: InstructionWithDestination {
 	}
 }

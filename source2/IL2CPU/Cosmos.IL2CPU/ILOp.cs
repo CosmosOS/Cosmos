@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
     public static IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields;
 
-    protected readonly Assembler Assembler;
-    protected ILOp(Assembler aAsmblr) {
+    protected readonly Cosmos.Assembler.Assembler Assembler;
+    protected ILOp(Cosmos.Assembler.Assembler aAsmblr) {
       Assembler = aAsmblr;
     }
 

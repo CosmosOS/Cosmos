@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("shl")]
+    [Cosmos.Assembler.OpCode("shl")]
 	public class ShiftLeft: InstructionWithDestinationAndSourceAndSize {
 	}
 }

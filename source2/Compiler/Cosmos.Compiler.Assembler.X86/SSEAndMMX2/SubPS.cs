@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("subps")]
+    [Cosmos.Assembler.OpCode("subps")]
     public class SubPS : InstructionWithDestinationAndSource
     {
     }

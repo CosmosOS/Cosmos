@@ -5,7 +5,7 @@ using CPUx86 = Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldloca)]
   public class Ldloca: ILOp {
-    public Ldloca(Cosmos.Compiler.Assembler.Assembler aAsmblr)
+    public Ldloca(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 

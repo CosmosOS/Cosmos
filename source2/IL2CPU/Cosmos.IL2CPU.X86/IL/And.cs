@@ -7,7 +7,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode( ILOpCode.Code.And )]
 	public class And : ILOp
 	{
-		public And( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+		public And( Cosmos.Assembler.Assembler aAsmblr )
 			: base( aAsmblr )
 		{
 		}

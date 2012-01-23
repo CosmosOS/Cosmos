@@ -1,14 +1,14 @@
 using System;
 using CPU = Cosmos.Compiler.Assembler.X86;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Shr )]
     public class Shr : ILOp
     {
-        public Shr( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Shr( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

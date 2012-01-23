@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fincstp")]
+    [Cosmos.Assembler.OpCode("fincstp")]
     public class FloatIncTopPointer : Instruction
     {
     }

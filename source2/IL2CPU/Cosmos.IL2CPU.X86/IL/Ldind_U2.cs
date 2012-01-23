@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldind_U2 )]
     public class Ldind_U2 : ILOp
     {
-        public Ldind_U2( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldind_U2( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Volatile)]
 	public class Volatile: ILOp
 	{
-		public Volatile(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Volatile(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

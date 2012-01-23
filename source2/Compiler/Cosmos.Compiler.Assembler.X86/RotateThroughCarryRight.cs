@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("rcr")]
+    [Cosmos.Assembler.OpCode("rcr")]
     public class RotateThroughCarryRight : InstructionWithDestinationAndSourceAndSize {
     }
 }

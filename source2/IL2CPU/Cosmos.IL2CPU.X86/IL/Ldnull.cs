@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldnull )]
     public class Ldnull : ILOp
     {
-        public Ldnull( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldnull( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldnull)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldnull)]
         // 	public class Ldnull: Op {
         // 		public Ldnull(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {

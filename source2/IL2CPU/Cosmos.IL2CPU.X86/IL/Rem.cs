@@ -1,13 +1,13 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Rem)]
 	public class Rem: ILOp
 	{
-		public Rem(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Rem(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("and")]
+    [Cosmos.Assembler.OpCode("and")]
 	public class And: InstructionWithDestinationAndSourceAndSize {
 	}
 }

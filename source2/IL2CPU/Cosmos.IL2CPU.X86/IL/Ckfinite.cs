@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ckfinite)]
 	public class Ckfinite: ILOp
 	{
-		public Ckfinite(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Ckfinite(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Ckfinite)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ckfinite)]
 		// 	public class Ckfinite: Op {
 		// 		public Ckfinite(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

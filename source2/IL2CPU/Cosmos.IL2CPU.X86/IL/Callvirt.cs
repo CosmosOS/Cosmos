@@ -4,7 +4,7 @@ using System;
 using CPU = Cosmos.Compiler.Assembler.X86;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using System.Reflection;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Callvirt )]
     public class Callvirt : ILOp
     {
-        public Callvirt( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Callvirt( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
           DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode);
         }
 
-        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp) {
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp) {
                        
           string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
           

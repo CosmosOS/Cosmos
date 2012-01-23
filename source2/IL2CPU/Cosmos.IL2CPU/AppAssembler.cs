@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.Plugs;
 
@@ -15,8 +15,8 @@ namespace Cosmos.IL2CPU {
 
     private System.IO.TextWriter mLog;
 
-    protected Assembler mAssembler;
-    protected AppAssembler(Assembler assembler) {
+    protected Cosmos.Assembler.Assembler mAssembler;
+    protected AppAssembler(Cosmos.Assembler.Assembler assembler) {
       mAssembler = assembler;
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();
@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU {
 
     public bool ShouldOptimize = false;
 
-    public Assembler Assembler {
+    public Cosmos.Assembler.Assembler Assembler {
       get { return mAssembler; }
         set { mAssembler = value; }
     }
@@ -85,7 +85,7 @@ namespace Cosmos.IL2CPU {
       } else {
         string xMethodLabelPrefix = ILOp.GetMethodLabel(aMethod.MethodBase);
         int xMethodID = DebugInfo.AddMethod(xMethodLabelPrefix);
-        Assembler.CurrentInstance.CurrentMethodID = xMethodID;
+        Cosmos.Assembler.Assembler.CurrentInstance.CurrentMethodID = xMethodID;
 
         foreach (var xOpCode in aOpCodes) {
           ushort xOpCodeVal = (ushort)xOpCode.OpCode;
@@ -171,7 +171,7 @@ namespace Cosmos.IL2CPU {
           var xAttribs = (OpCodeAttribute[])xType.GetCustomAttributes(typeof(OpCodeAttribute), false);
           foreach (var xAttrib in xAttribs) {
             var xOpCode = (ushort)xAttrib.OpCode;
-            var xCtor = xType.GetConstructor(new Type[] { typeof(Assembler) });
+            var xCtor = xType.GetConstructor(new Type[] { typeof(Cosmos.Assembler.Assembler) });
             var xILOp = (ILOp)xCtor.Invoke(new Object[] { Assembler });
             if (xOpCode <= 0xFF) {
               mILOpsLo[xOpCode] = xILOp;
@@ -201,11 +201,11 @@ namespace Cosmos.IL2CPU {
         var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
                                                                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
         string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
-        DataMember xDataMember = (from item in Assembler.CurrentInstance.DataMembers
+        DataMember xDataMember = (from item in Cosmos.Assembler.Assembler.CurrentInstance.DataMembers
                                   where item.Name == xTheName
                                   select item).FirstOrDefault();
         if (xDataMember != null) {
-          Assembler.CurrentInstance.DataMembers.Remove((from item in Assembler.CurrentInstance.DataMembers
+          Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Remove((from item in Cosmos.Assembler.Assembler.CurrentInstance.DataMembers
                                                         where item == xDataMember
                                                         select item).First());
         }
@@ -217,8 +217,8 @@ namespace Cosmos.IL2CPU {
         Array.Copy(xTemp, 0, xData, 8, 4);
         xTemp = BitConverter.GetBytes(GetVTableEntrySize());
         Array.Copy(xTemp, 0, xData, 12, 4);
-        Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-        Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Contents")));
+        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
+        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, Cosmos.Assembler.ElementReference.New(xTheName + "__Contents")));
 #if VMT_DEBUG
         using (var xVmtDebugOutput = XmlWriter.Create(@"e:\vmt_debug.xml"))
         {
@@ -310,7 +310,7 @@ namespace Cosmos.IL2CPU {
           }
           if (!xType.IsInterface) {
             Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
-            Assembler.CurrentInstance.DataMembers.Add(
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
                 new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
             Push((uint)xBaseIndex.Value);
             xData = new byte[16 + (xEmittedMethods.Count * 4)];
@@ -323,10 +323,10 @@ namespace Cosmos.IL2CPU {
             xTemp = BitConverter.GetBytes(4); // embedded array
             Array.Copy(xTemp, 0, xData, 12, 4);
             string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
-            Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
             Push(xDataName);
             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
-            Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
             Push(xDataName);
             xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
             xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
@@ -338,7 +338,7 @@ namespace Cosmos.IL2CPU {
             xTemp = BitConverter.GetBytes(2); // embedded array
             Array.Copy(xTemp, 0, xData, 12, 4);
             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
-            Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
             Push("0" + xEmittedMethods.Count.ToString("X") + "h");
             Call(xSetTypeInfoRef);
           }
@@ -408,7 +408,7 @@ namespace Cosmos.IL2CPU {
     public void ProcessField(FieldInfo aField) {
       string xFieldName = MethodInfoLabelGenerator.GetFullName(aField);
       xFieldName = DataMember.GetStaticFieldName(aField);
-      if (Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0) {
+      if (Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0) {
         var xItemList = (from item in aField.GetCustomAttributes(false)
                          where item.GetType().FullName == "ManifestResourceStreamAttribute"
                          select item).ToList();
@@ -482,7 +482,7 @@ namespace Cosmos.IL2CPU {
             }
           } catch {
           }
-          Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
+          Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
         }
       }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Cosmos.Compiler.Assembler {
+namespace Cosmos.Assembler {
   public class ElementReference {
     private static Dictionary<string, ElementReference> mLookup = new Dictionary<string, ElementReference>(StringComparer.InvariantCultureIgnoreCase);
     public static ElementReference New(string aName, int aOffset) {
@@ -54,7 +54,7 @@ namespace Cosmos.Compiler.Assembler {
     private static Dictionary<string, BaseAssemblerElement> mCache;// = new SortedList<string, BaseAssemblerElement>(StringComparer.InvariantCultureIgnoreCase);
     private static int? mThreadId = null;
 
-    private static BaseAssemblerElement DoResolve(Assembler aAssembler, string aName) {
+    private static BaseAssemblerElement DoResolve(Cosmos.Assembler.Assembler aAssembler, string aName) {
       if (!mThreadId.HasValue) {
         mThreadId = Thread.CurrentThread.ManagedThreadId;
       } else {
@@ -120,7 +120,7 @@ namespace Cosmos.Compiler.Assembler {
       }
     }
 
-    public bool Resolve(Assembler aAssembler, out ulong aAddress) {
+    public bool Resolve(Cosmos.Assembler.Assembler aAssembler, out ulong aAddress) {
       //
       if (mActualAddress != null) {
         aAddress = mActualAddress.Value;

@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using System.Reflection;
@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldsfld )]
     public class Ldsfld : ILOp
     {
-        public Ldsfld( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldsfld( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -47,21 +47,21 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     //	Pop("eax");
                     //	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-                    new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ), DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize - ( i * 4 ) ) };
+                    new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName ), DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize - ( i * 4 ) ) };
                 }
                 switch( xSize % 4 )
                 {
                     case 1:
                         {
                             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
                             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                             break;
                         }
                     case 2:
                         {
                             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
                             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                             break;
                         }
@@ -82,14 +82,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     case 1:
                         {
                             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
                             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                             break;
                         }
                     case 2:
                         {
                             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
                             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                             break;
                         }

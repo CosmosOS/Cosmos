@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("minss")]
+    [Cosmos.Assembler.OpCode("minss")]
     public class MinSS : InstructionWithDestinationAndSource
     {
     }

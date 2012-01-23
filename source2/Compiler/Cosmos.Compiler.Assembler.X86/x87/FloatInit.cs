@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("finit")]
+    [Cosmos.Assembler.OpCode("finit")]
     public class FloatInit : Instruction
     {
     }

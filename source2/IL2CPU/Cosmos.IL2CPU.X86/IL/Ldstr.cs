@@ -1,7 +1,7 @@
 using System;
-using CPU = Cosmos.Compiler.Assembler;
+using CPU = Cosmos.Assembler;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using Cosmos.Compiler.Assembler.X86;
@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
 	public class LdStr: ILOp
 	{
-		public LdStr(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public LdStr(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xOpString = aOpCode as OpString;
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment( Assembler, "String Value: " + xOpString.Value.Replace( "\r", "\\r" ).Replace( "\n", "\\n" ) );
-      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New(xDataName) };
+      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(xDataName) };
       new Push { DestinationReg = RegistersEnum.EAX };
       Assembler.Stack.Push(4, typeof(string));
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!
@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Collections.Generic;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		//     [OpCode(OpCodeEnum.Ldstr)]
+		//     [Cosmos.Assembler.OpCode(OpCodeEnum.Ldstr)]
 		//     public class LdStr : Op {
 		//         //private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		//         public readonly string LiteralStr;

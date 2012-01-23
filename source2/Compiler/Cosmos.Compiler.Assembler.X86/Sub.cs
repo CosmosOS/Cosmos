@@ -6,7 +6,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
     /// Subtracts the source operand from the destination operand and 
     /// replaces the destination operand with the result. 
     /// </summary>
-    [OpCode("sub")]
+    [Cosmos.Assembler.OpCode("sub")]
     public class Sub : InstructionWithDestinationAndSourceAndSize {
     }
 }

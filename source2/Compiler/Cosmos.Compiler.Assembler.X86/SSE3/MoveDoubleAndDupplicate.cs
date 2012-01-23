@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-	[OpCode("MOVDDUP")]
+	[Cosmos.Assembler.OpCode("MOVDDUP")]
 	public class MoveDoubleAndDupplicate : InstructionWithDestinationAndSource
 	{
 	}

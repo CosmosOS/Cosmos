@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
@@ -63,7 +63,7 @@ namespace Cosmos.Assembler.XSharp {
 
     public string Label {
       set {
-        new Cosmos.Compiler.Assembler.Label(value);
+        new Cosmos.Assembler.Label(value);
       }
     }
 
@@ -222,8 +222,8 @@ namespace Cosmos.Assembler.XSharp {
       new ClrInterruptFlag();
     }
 
-    public ElementReference AddressOf(string aDataName) {
-      return ElementReference.New(aDataName);
+    public Cosmos.Assembler.ElementReference AddressOf(string aDataName) {
+      return Cosmos.Assembler.ElementReference.New(aDataName);
     }
   }
 }

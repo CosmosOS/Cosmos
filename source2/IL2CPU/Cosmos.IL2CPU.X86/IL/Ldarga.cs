@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Compiler.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
@@ -8,7 +8,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarga )]
     public class Ldarga : ILOp
     {
-        public Ldarga( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldarga( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -154,7 +154,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldarga)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldarga)]
         // 	public class Ldarga: Op {
         // 		private int mAddress;
         //         private string mNextLabel;

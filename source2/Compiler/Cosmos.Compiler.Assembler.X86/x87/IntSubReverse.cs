@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fisubr")]
+    [Cosmos.Assembler.OpCode("fisubr")]
     public class IntSubReverse : InstructionWithDestinationAndSize
     {
     }

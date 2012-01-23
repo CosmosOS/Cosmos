@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE {
-    [OpCode("movss")]
+    [Cosmos.Assembler.OpCode("movss")]
     public class MoveSS : InstructionWithDestinationAndSource
     {
     }

@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 
@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarg )]
     public class Ldarg : ILOp
     {
-        public Ldarg( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldarg( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
           }
         }
 
-        public static void DoExecute(Cosmos.Compiler.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam) {
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam) {
           var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
           Type xArgType;
           if (aMethod.MethodBase.IsStatic) {

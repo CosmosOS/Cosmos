@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("stosd")]
+    [Cosmos.Assembler.OpCode("stosd")]
     public class StoreSD : Instruction
     {
 #warning todo: merge with stosb and stosw

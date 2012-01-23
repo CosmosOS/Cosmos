@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("jmp")]
+    [Cosmos.Assembler.OpCode("jmp")]
     public class JumpToSegment : Instruction {
-        public ElementReference DestinationRef {
+        public Cosmos.Assembler.ElementReference DestinationRef {
             get;
             set;
         }
@@ -16,7 +16,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
             set;
         }
 
-        public override void WriteText( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
                 if (DestinationRef != null) {
                     aOutput.Write("jmp ");
@@ -38,23 +38,23 @@ namespace Cosmos.Compiler.Assembler.X86 {
                 return String.Empty;
             }
             set {
-                DestinationRef = ElementReference.New(value);
+                DestinationRef = Cosmos.Assembler.ElementReference.New(value);
             }
         }
 
-        public override bool IsComplete( Cosmos.Compiler.Assembler.Assembler aAssembler )
+        public override bool IsComplete( Cosmos.Assembler.Assembler aAssembler )
         {
             ulong xAddress;
             return DestinationRef == null || DestinationRef.Resolve(aAssembler, out xAddress);
         }
 
-        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+        public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress) {
             base.UpdateAddress(aAssembler, ref aAddress);
             aAddress += 7;
         }
 
         //public override byte[] GetData(Assembler aAssembler) {
-        public override void WriteData( Cosmos.Compiler.Assembler.Assembler aAssembler, System.IO.Stream aOutput )
+        public override void WriteData( Cosmos.Assembler.Assembler aAssembler, System.IO.Stream aOutput )
         {
             aOutput.WriteByte(0xEA);
             ulong xAddress = 0;

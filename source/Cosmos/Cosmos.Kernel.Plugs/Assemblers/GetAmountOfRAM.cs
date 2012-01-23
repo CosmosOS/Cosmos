@@ -1,8 +1,8 @@
 ﻿using System;
 using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.Compiler.Assembler.Assembler;
+using Assembler = Cosmos.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using CPUAll = Cosmos.Compiler.Assembler;
+using CPUAll = Cosmos.Assembler;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class GetAmountOfRAM: AssemblerMethod {

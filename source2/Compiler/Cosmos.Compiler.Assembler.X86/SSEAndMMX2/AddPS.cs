@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.X86.SSE
 {
-    [OpCode("addps")]
+    [Cosmos.Assembler.OpCode("addps")]
     public class AddPS : InstructionWithDestinationAndSource
     {
     }

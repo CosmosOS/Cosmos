@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stobj )]
     public class Stobj : ILOp
     {
-        public Stobj( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Stobj( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }

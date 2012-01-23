@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.Compiler.Assembler.X86;
 
 namespace Cosmos.Assembler.XSharp {
@@ -34,7 +34,7 @@ namespace Cosmos.Assembler.XSharp {
       return aRegister;
     }
 
-    public static implicit operator RegisterEAX(ElementReference aReference) {
+    public static implicit operator RegisterEAX(Cosmos.Assembler.ElementReference aReference) {
       Instance.Move(aReference);
       return Instance;
     }

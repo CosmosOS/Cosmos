@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Refanytype)]
 	public class Refanytype: ILOp
 	{
-		public Refanytype(Cosmos.Compiler.Assembler.Assembler aAsmblr):base(aAsmblr)
+		public Refanytype(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Cosmos.Compiler.Assembler.X86;
 		// 
 		// namespace Cosmos.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Refanytype)]
+		// 	[Cosmos.Assembler.OpCode(OpCodeEnum.Refanytype)]
 		// 	public class Refanytype: Op {
 		// 		public Refanytype(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("push")]
+    [Cosmos.Assembler.OpCode("push")]
     public class Push : InstructionWithDestinationAndSize {
 
         public Push() {

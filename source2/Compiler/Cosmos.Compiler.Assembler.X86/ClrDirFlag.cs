@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86 {
-    [OpCode("cld")]
+    [Cosmos.Assembler.OpCode("cld")]
 	public class ClrDirFlag: Instruction {
 	}
 }

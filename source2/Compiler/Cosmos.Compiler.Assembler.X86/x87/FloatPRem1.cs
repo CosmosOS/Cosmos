@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fprem1")]
+    [Cosmos.Assembler.OpCode("fprem1")]
     public class FloatPRem1 : Instruction
     {
     }

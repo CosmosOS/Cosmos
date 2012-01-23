@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.SSE
 {
-    [OpCode("mulss")]
+    [Cosmos.Assembler.OpCode("mulss")]
     public class MulSS : InstructionWithDestinationAndSource
     {
     }

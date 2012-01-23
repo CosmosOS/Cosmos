@@ -46,7 +46,7 @@ namespace Cosmos.Compiler.Assembler.X86 {
 
         }
 
-        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             if (Size == 0)
             {

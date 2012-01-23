@@ -1,6 +1,6 @@
 ﻿using Cosmos.IL2CPU.Plugs;
-using Assembler=Cosmos.Compiler.Assembler.Assembler;
-using CPUAll = Cosmos.Compiler.Assembler;
+using Assembler=Cosmos.Assembler;
+using CPUAll = Cosmos.Assembler;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
 using Cosmos.Compiler.Assembler.X86;
 

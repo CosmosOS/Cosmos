@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 namespace Cosmos.IL2CPU.X86.IL
@@ -8,12 +8,12 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelema )]
     public class Ldelema : ILOp
     {
-        public Ldelema( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Ldelema( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
 
-        public static void Assemble(Cosmos.Compiler.Assembler.Assembler aAssembler,  uint aElementSize )
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize )
         {
             
             aAssembler.Stack.Pop();
@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.Compiler;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Ldelema)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldelema)]
         // 	public class Ldelema: Op {
         //         private Type mType;
         // 		public Ldelema(ILReader aReader, MethodInformation aMethodInfo)

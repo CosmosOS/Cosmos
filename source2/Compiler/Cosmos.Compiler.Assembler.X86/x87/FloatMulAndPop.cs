@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("fmulp")]
+    [Cosmos.Assembler.OpCode("fmulp")]
     public class FloatMulAndPop : InstructionWithDestinationAndSource
     {
     }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86.x87
 {
-    [OpCode("frndint")]
+    [Cosmos.Assembler.OpCode("frndint")]
     public class FloatRound : Instruction
     {
     }

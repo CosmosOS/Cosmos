@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.Assembler.X86
 {
-    [OpCode("cpuid")]
+    [Cosmos.Assembler.OpCode("cpuid")]
     public class CpuId : Instruction
     {
     }

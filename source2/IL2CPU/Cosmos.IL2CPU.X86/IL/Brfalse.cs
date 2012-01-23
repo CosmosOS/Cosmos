@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.X86.IL
     //[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brfalse)]
     public class Brfalse : ILOp
     {
-        public Brfalse( Cosmos.Compiler.Assembler.Assembler aAsmblr )
+        public Brfalse( Cosmos.Assembler.Assembler aAsmblr )
             : base( aAsmblr )
         {
         }
@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPUx86 = Cosmos.Compiler.Assembler.X86;
         // 
         // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[OpCode(OpCodeEnum.Brfalse)]
+        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Brfalse)]
         // 	public class Brfalse: Op {
         // 		public readonly string TargetLabel;
         // 		public readonly string CurInstructionLabel;

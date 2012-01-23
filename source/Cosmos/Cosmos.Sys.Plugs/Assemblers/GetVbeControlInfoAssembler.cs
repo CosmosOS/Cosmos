@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Compiler.Assembler.X86;
-using Cosmos.Compiler.Assembler;
+using Cosmos.Assembler;
 
 namespace Cosmos.Sys.Plugs.Assemblers
 {
@@ -12,7 +12,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
     {
         public override void AssembleNew(object aAssembler, object aMethodInfo)
         {
-            new Push { DestinationRef = ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true };
+            new Push { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true };
         }
     }
 }
