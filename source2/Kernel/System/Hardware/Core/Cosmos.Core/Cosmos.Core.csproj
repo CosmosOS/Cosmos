@@ -74,6 +74,7 @@
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="IOGroup\COM.cs" />
+    <Compile Include="IOGroup\PCSpeaker.cs" />
     <Compile Include="PCIBaseAddressBar.cs" />
     <Compile Include="PCIDeviceNormal.cs" />
     <Compile Include="PCIDeviceBridge.cs" />
