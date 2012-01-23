@@ -908,7 +908,9 @@ namespace Cosmos.Debug.DebugStub {
       [XSharp(IsInteruptHandler = true)]
       // Main entry point for the DebugStub which is executed by INT3.
       public override void Assemble() {
-        //new Move {DestinationReg = RegistersEnum
+        // Test only for now
+        // Wont work... need to use a register
+        //new MoveToDR6(0);
 
         // EBP is restored by PopAll, but SendFrame uses it. Could
         // get it from the PushAll data, but this is easier.
