@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosmos.Compiler.XSharp")]
+[assembly: AssemblyTitle("Cosmos.Assembler.XSharp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cosmos")]
-[assembly: AssemblyProduct("Cosmos.Compiler.XSharp")]
-[assembly: AssemblyCopyright("Copyright © 2010")]
+[assembly: AssemblyProduct("Cosmos.Assembler.XSharp")]
+[assembly: AssemblyCopyright("Copyright © 2008-2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
