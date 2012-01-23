@@ -83,9 +83,9 @@
     <Compile Include="TestClass.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj">
+    <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Assembler.x86.csproj">
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
-      <Name>Cosmos.Compiler.Assembler.X86</Name>
+      <Name>Cosmos.Assembler.x86</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
