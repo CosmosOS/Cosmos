@@ -102,11 +102,11 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Breakpoints", "..\source2\U
 		{3370FC04-B669-46A4-A4AA-A89540318F8D} = {3370FC04-B669-46A4-A4AA-A89540318F8D}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.XSharp", "..\source2\Compiler\Cosmos.Assembler.XSharp\Cosmos.Assembler.XSharp.csproj", "{453F2952-FD48-477F-889B-B3C6963C9850}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.XSharp", "..\source2\Cosmos.Assembler.XSharp\Cosmos.Assembler.XSharp.csproj", "{453F2952-FD48-477F-889B-B3C6963C9850}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugStub", "..\source2\Compiler\Cosmos.Compiler.DebugStub\Cosmos.Debug.DebugStub.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Compiler\Cosmos.Compiler.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Cosmos.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Assembler.X86", "..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Compiler.Assembler.X86.csproj", "{94D079E4-3C66-486A-8407-EA6EC049FF53}"
 EndProject
@@ -354,19 +354,19 @@ Global
 		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
 		SccProjectName42 = ../source2/VSIP/Cosmos.VS.Windows.Test
 		SccLocalPath42 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test
-		SccProjectUniqueName43 = ..\\source2\\Compiler\\Cosmos.Assembler.XSharp\\Cosmos.Assembler.XSharp.csproj
+		SccProjectUniqueName43 = ..\\source2\\Cosmos.Assembler.XSharp\\Cosmos.Assembler.XSharp.csproj
 		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
-		SccProjectName43 = ../source2/Compiler/Cosmos.Assembler.XSharp
-		SccLocalPath43 = ..\\source2\\Compiler\\Cosmos.Assembler.XSharp
+		SccProjectName43 = ../source2/Cosmos.Assembler.XSharp
+		SccLocalPath43 = ..\\source2\\Cosmos.Assembler.XSharp
 		SccWebProject44 = true
 		SccProjectUniqueName44 = ..\\Docs
 		SccProjectName44 = ../Docs
 		SccLocalPath44 = ..\\Docs
 		SccProjectEnlistmentChoice44 = 2
-		SccProjectUniqueName45 = ..\\source2\\Compiler\\Cosmos.Compiler.Assembler\\Cosmos.Assembler.csproj
+		SccProjectUniqueName45 = ..\\source2\\Cosmos.Assembler\\Cosmos.Assembler.csproj
 		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = ../source2/Compiler/Cosmos.Compiler.Assembler
-		SccLocalPath45 = ..\\source2\\Compiler\\Cosmos.Compiler.Assembler
+		SccProjectName45 = ../source2/Cosmos.Assembler
+		SccLocalPath45 = ..\\source2\\Cosmos.Assembler
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU

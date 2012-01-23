@@ -76,11 +76,11 @@
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
       <Name>Cosmos.Compiler.Assembler.X86</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Compiler.Assembler\Cosmos.Assembler.csproj">
+    <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Assembler.XSharp\Cosmos.Assembler.XSharp.csproj">
+    <ProjectReference Include="..\..\Cosmos.Assembler.XSharp\Cosmos.Assembler.XSharp.csproj">
       <Project>{453F2952-FD48-477F-889B-B3C6963C9850}</Project>
       <Name>Cosmos.Assembler.XSharp</Name>
     </ProjectReference>
