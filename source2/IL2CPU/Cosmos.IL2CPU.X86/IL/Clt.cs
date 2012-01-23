@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string LabelFalse = BaseLabel + "False";
             if( xStackItem.Size > 4 )
             {
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
 				// esi = 1
 				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
 				// edi = 0
@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.SSE.CompareSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0, pseudoOpcode = (byte)CPUx86.SSE.ComparePseudoOpcodes.LessThan };
                     new CPUx86.MoveD { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.XMM1 };
                     new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
-                    new CPUx86.Move { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                    new CPUx86.Mov { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 }
                 else
                 {

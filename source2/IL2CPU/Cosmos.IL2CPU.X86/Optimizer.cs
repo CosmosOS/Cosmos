@@ -55,11 +55,11 @@ namespace Orvid
                         usedLabels.Add(((x86.Push)ins).DestinationRef.Name);
                     }
                 }
-                else if (ins is x86.Move)
+                else if (ins is x86.Mov)
                 {
-                    if (((x86.Move)ins).SourceRef != null)
+                    if (((x86.Mov)ins).SourceRef != null)
                     {
-                        usedLabels.Add(((x86.Move)ins).SourceRef.Name);
+                        usedLabels.Add(((x86.Mov)ins).SourceRef.Name);
                     }
                 }
             }

@@ -39,16 +39,16 @@ namespace Cosmos.IL2CPU.X86 {
         Assembler.DataMembers.Add(xAsmMember);
         new Compare { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
         new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
-        new Move { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+        new Mov { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
         new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
         new Label(".BeforeQuickReturn");
-        new Move { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };
+        new Mov { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };
         new Return { };
         new Label(".AfterCCTorAlreadyCalledCheck");
       }
 
       new Push { DestinationReg = Registers.EBP };
-      new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       //new CPUx86.Push("0");
       //if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
       //    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
@@ -202,7 +202,7 @@ namespace Cosmos.IL2CPU.X86 {
       if (aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
         new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
       }
-      new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
+      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
       var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                             select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
       if (!aMethod.MethodBase.IsStatic) {
@@ -245,7 +245,7 @@ namespace Cosmos.IL2CPU.X86 {
         var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
         for (int i = 0; i < xReturnSize / 4; i++) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.EBP,
             DestinationIsIndirect = true,
             DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)),
@@ -356,7 +356,7 @@ namespace Cosmos.IL2CPU.X86 {
       base.MethodBegin(aMethodName);
       new Label(aMethodName);
       new Push { DestinationReg = Registers.EBP };
-      new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       xCodeOffsets = new int[0];
     }
 

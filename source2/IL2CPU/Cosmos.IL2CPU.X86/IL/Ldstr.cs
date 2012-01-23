@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xOpString = aOpCode as OpString;
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment( Assembler, "String Value: " + xOpString.Value.Replace( "\r", "\\r" ).Replace( "\n", "\\n" ) );
-      new Move { DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New(xDataName) };
+      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New(xDataName) };
       new Push { DestinationReg = RegistersEnum.EAX };
       Assembler.Stack.Push(4, typeof(string));
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!

@@ -22,7 +22,7 @@ namespace Cosmos.Assembler.XSharp {
         // For DataMember32 value will be null with ++ and --, this is important and purposeful.
         // ++ and -- try to set again, but for us we dont want that.
         if (value != null) {
-          new Move {
+          new Mov {
             DestinationRef = ElementReference.New(Name),
             DestinationIsIndirect = true,
             SourceValue = value.Value.GetValueOrDefault(),

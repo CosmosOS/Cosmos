@@ -43,14 +43,14 @@ namespace Cosmos.Assembler.XSharp {
 
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
-                            new Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
                     } else {
                         var xAddrIndirect = aAddress as AddressIndirect;
                         if (xAddrIndirect != null) {
-                                new Move { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                                new Mov { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             throw new Exception("Invalid Address type!");
                         }
@@ -60,14 +60,14 @@ namespace Cosmos.Assembler.XSharp {
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
                           // Default is 32, in future save type that created the label, ie DataMemberInt vs DataMemberByte and set the size
-                            new Move { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
-                            new Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
                     } else {
                         var xAddrIndirect = aAddress as AddressIndirect;
                         if (xAddrIndirect != null) {
-                            new Move { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new Mov { DestinationRef = xAddrIndirect.Reference, DestinationDisplacement = xAddrIndirect.Displacement, DestinationValue = xAddrIndirect.Address, DestinationReg = xAddrIndirect.Register, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             throw new Exception("Invalid Address type!");
                         }
@@ -93,7 +93,7 @@ namespace Cosmos.Assembler.XSharp {
                         var xAddrDirect = aAddress as AddressDirect;
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
-                                new Move {
+                                new Mov {
                                     DestinationRef = ElementReference.New(xAddrDirect.Label),
                                     DestinationIsIndirect = true,
                                     SourceValue = value.Value.GetValueOrDefault(),
@@ -103,7 +103,7 @@ namespace Cosmos.Assembler.XSharp {
                                     SourceIsIndirect = value.IsIndirect
                                 };
                             } else {
-                                new Move {
+                                new Mov {
                                     DestinationValue = xAddrDirect.Address,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
@@ -115,7 +115,7 @@ namespace Cosmos.Assembler.XSharp {
                         } else {
                             var xAddrIndirect = aAddress as AddressIndirect;
                             if (xAddrIndirect != null) {
-                                new Move {
+                                new Mov {
                                     DestinationRef = xAddrIndirect.Reference,
                                     DestinationDisplacement = xAddrIndirect.Displacement,
                                     DestinationValue = (xAddrIndirect.Address != 0 ? (uint?)xAddrIndirect.Address : (uint?)null),
@@ -135,7 +135,7 @@ namespace Cosmos.Assembler.XSharp {
                         var xAddrDirect = aAddress as AddressDirect;
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
-                                new Move {
+                                new Mov {
                                     DestinationRef = ElementReference.New(xAddrDirect.Label),
                                     DestinationIsIndirect=true,
                                     SourceValue = value.Value.GetValueOrDefault(),
@@ -145,7 +145,7 @@ namespace Cosmos.Assembler.XSharp {
                                     SourceIsIndirect = value.IsIndirect
                                 };
                             } else {
-                                new Move {
+                                new Mov {
                                     DestinationValue = xAddrDirect.Address,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
@@ -157,7 +157,7 @@ namespace Cosmos.Assembler.XSharp {
                         } else {
                             var xAddrIndirect = aAddress as AddressIndirect;
                             if (xAddrIndirect != null) {
-                                new Move {
+                                new Mov {
                                     DestinationRef = xAddrIndirect.Reference,
                                     DestinationDisplacement = xAddrIndirect.Displacement,
                                     DestinationValue = xAddrIndirect.Address,

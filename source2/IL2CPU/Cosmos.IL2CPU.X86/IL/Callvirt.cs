@@ -114,7 +114,7 @@ namespace Cosmos.IL2CPU.X86.IL
              * $esp + mThisOffset   This
              */
 
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationValue = aTargetMethodUID };
             new CPUx86.Call {
@@ -146,7 +146,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * $esp + mThisOffset + 4   This
                */
               // we need to see if $this is a boxed object, and if so, we need to box it
-              new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)(xThisOffset + 4) };
+              new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)(xThisOffset + 4) };
               //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( ( uint )InstanceTypeEnum.BoxedValueType ), Size = 32 };
 
               //InstanceTypeEnum.BoxedValueType == 3 =>
@@ -168,7 +168,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * 
                * ECX contains the method to call
                */
-              new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
+              new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
               /*
                * On the stack now:
                * $esp                 Params
@@ -182,7 +182,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
               //public const int FieldDataOffset = 12; // ObjectImpl says that. so..
               new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 12 };
-              new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xThisOffset, SourceReg = CPUx86.Registers.EAX};
+              new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xThisOffset, SourceReg = CPUx86.Registers.EAX};
               /*
                * On the stack now:
                * $esp                 Params

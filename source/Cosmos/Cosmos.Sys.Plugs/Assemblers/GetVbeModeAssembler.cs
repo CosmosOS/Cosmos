@@ -13,7 +13,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
         public override void AssembleNew(object aAssembler, object aMethodInfo)
         {
             new Xor { DestinationReg = Registers.EAX, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.AX, SourceRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), SourceIsIndirect = true };
+            new Mov { DestinationReg = Registers.AX, SourceRef = ElementReference.New("MultibootGraphicsRuntime_VbeMode"), SourceIsIndirect = true };
             new Push { DestinationReg = Registers.EAX };
         }
     }

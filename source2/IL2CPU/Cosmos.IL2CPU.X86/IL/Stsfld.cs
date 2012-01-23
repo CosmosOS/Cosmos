@@ -53,20 +53,20 @@ namespace Cosmos.IL2CPU.X86.IL
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationRef = ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
             }
             switch( xSize % 4 )
             {
                 case 1:
                     {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
                         break;
                     }
                 case 2:
                     {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
+                        new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
                         break;
                     }
                 case 0:

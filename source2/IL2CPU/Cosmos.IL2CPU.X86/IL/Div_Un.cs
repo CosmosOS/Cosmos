@@ -42,15 +42,15 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// divisor
 					//low
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 					//high
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
 					//dividend
 					// low
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 8 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 8 };
 					//high
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 
 					// pop both 8 byte values
 					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 16 };
@@ -97,15 +97,15 @@ namespace Cosmos.IL2CPU.X86.IL
 					new Label(LabelNoLoop);
 
 					//save high dividend
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
 					// zero EDX, so that high part is zero -> reduce overflow case
 					new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
 					// divide high part
 					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
 					// save high result
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
 					// divide low part
 					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
 					// save low result

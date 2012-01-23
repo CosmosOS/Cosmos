@@ -46,25 +46,25 @@ namespace Cosmos.Core.Plugs.Assemblers {
           continue;
         }
 
-        new CPUx86.Move {DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("__ISR_Handler_" + i.ToString("X2")) };
-        new CPUx86.Move {
+        new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("__ISR_Handler_" + i.ToString("X2")) };
+        new CPUx86.Mov {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
           DestinationIsIndirect = true, DestinationDisplacement = ((i * 8) + 0),
           SourceReg = CPUx86.Registers.AL
         };
-        new CPUx86.Move {
+        new CPUx86.Mov {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
           DestinationIsIndirect = true, DestinationDisplacement = ((i * 8) + 1),
           SourceReg = CPUx86.Registers.AH
         };
-        new CPUx86.Move {
+        new CPUx86.Mov {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
           DestinationIsIndirect = true, DestinationDisplacement = ((i * 8) + 2),
           SourceValue = 0x8,
           Size = 8
         };
 
-        new CPUx86.Move {
+        new CPUx86.Mov {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
           DestinationIsIndirect = true,
           DestinationDisplacement = ((i * 8) + 5),
@@ -72,13 +72,13 @@ namespace Cosmos.Core.Plugs.Assemblers {
           Size = 8
         };
         new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 16 };
-        new CPUx86.Move {
+        new CPUx86.Mov {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
           DestinationIsIndirect = true,
           DestinationDisplacement = ((i * 8) + 6),
           SourceReg = CPUx86.Registers.AL
         };
-        new CPUx86.Move {
+        new CPUx86.Mov {
           DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
           DestinationIsIndirect = true,
           DestinationDisplacement = ((i * 8) + 7),
@@ -92,9 +92,9 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2"));
         new CPUx86.Call { DestinationLabel = "__INTERRUPT_OCCURRED__" };
         new CPUAll.IfDefined("DEBUGSTUB");
-        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
+        new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
         new CPUAll.Else();
-        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
+        new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
         new CPUAll.EndIfDefined();
 
         if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
@@ -104,13 +104,13 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUx86.Pushad();
 
         new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP }; // preserve old stack address for passing to interrupt handler
+        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP }; // preserve old stack address for passing to interrupt handler
 
         // store floating point data
         new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
         new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 512 }; // fxsave needs 512 bytes
         new CPUx86.x87.FXSave { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true }; // save the registers
-        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESP };
+        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESP };
 
         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; // 
         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
@@ -127,7 +127,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         new CPUx86.x87.FXStore { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
-        new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX }; // this restores the stack for the FX stuff, except the pointer to the FX data
+        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX }; // this restores the stack for the FX stuff, except the pointer to the FX data
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 }; // "pop" the pointer
 
         new CPUx86.Popad();
@@ -135,9 +135,9 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
         new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
         new CPUAll.IfDefined("DEBUGSTUB");
-        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+        new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
         new CPUAll.Else();
-        new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+        new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
         new CPUAll.EndIfDefined();
         new CPUx86.IRET();
       }
@@ -145,16 +145,16 @@ namespace Cosmos.Core.Plugs.Assemblers {
       new CPUx86.Return();
       new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
       new CPUx86.Noop();
-      new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
+      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
       new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
       new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
 
       // Reenable interrupts
       new CPUx86.Sti();
       new CPUAll.IfDefined("DEBUGSTUB");
-      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+      new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("DebugStub_InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
       new CPUAll.Else();
-      new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+      new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
       new CPUAll.EndIfDefined();
       
       new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");

@@ -24,21 +24,21 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerS
     public override void AssembleNew(object aAssembler, object aMethodInfo) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };// aFieldHandle
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };// aFieldHandle
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 8 };
 			new CPUx86.Push{DestinationReg=CPUx86.Registers.EDI, DestinationIsIndirect=true};
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true };
 			new CPUx86.Multiply{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true, Size=32};
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
 
 			new Label(".StartLoop");
-			new CPUx86.Move { DestinationReg = CPUx86.Registers.DL, SourceReg = CPUx86.Registers.ESI, SourceIsIndirect = true };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.DL };
+			new CPUx86.Mov { DestinationReg = CPUx86.Registers.DL, SourceReg = CPUx86.Registers.ESI, SourceIsIndirect = true };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.DL };
 			new CPUx86.Add{DestinationReg = CPUx86.Registers.EAX, SourceValue=1};
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 1 };

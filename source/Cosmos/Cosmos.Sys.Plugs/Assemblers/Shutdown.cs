@@ -9,11 +9,11 @@ namespace Cosmos.Sys.Plugs.Assemblers{
     {
         public override void AssembleNew(object aAssembler, object aMethodInfo) {
           //ACPI Way...ONLY QEMu And Boschs
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.DX,
             SourceValue = 0xB004
           };
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.AX,
             SourceValue = 0x0 | 0x2000
           };

@@ -15,24 +15,24 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xFieldSize = Assembler.Stack.Pop().Size;
             Assembler.Stack.Pop();
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xFieldSize) };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xFieldSize) };
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
             }
             switch( xFieldSize % 4 )
             {
                 case 1:
                     {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
                         break;
                     }
                 case 2:
                     {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
                         break;
                     }
                 case 0:

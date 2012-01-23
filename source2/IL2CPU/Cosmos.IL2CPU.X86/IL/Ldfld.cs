@@ -84,31 +84,31 @@ namespace Cosmos.IL2CPU.X86.IL
 
           if( xFieldInfo.IsExternalValue && aDerefExternalField)
           {
-              new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+              new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
           }
           
           for (int i = 1; i <= (xSize / 4); i++) {
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
           }
           switch (xSize % 4) {
             case 1: {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                 break;
               }
             case 2: {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                 break;
               }
 
             case 3: //For Release
                     {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                 break;

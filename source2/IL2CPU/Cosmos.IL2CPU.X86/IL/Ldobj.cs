@@ -28,14 +28,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                     {
                         new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.BL, SourceIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.BL, SourceIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
                         break;
                     }
                 case 2:
                     {
                         new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.BX, SourceIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.BX, SourceIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
                         break;
                     }

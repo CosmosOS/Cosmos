@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 
 				// move high part in EAX
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
 				new CPUx86.Compare { DestinationReg = CPUx86.Registers.CL, SourceValue = 32, Size = 8 };
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = HighPartIsZero };
@@ -57,9 +57,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				// shift high part and move it in low part
 				new CPUx86.ShiftRight{ DestinationReg = CPUx86.Registers.EAX, Size = 32, SourceReg = CPUx86.Registers.CL };
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
 				// replace unknown high part with a zero, if <= 32
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
 				new Label(End_Shr);
 			}

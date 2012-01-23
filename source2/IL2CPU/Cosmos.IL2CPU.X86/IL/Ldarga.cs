@@ -75,8 +75,8 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xOpVar = (OpVar)aOpCode;
             var xDisplacement = Ldarga.GetArgumentDisplacement(aMethod, xOpVar.Value);
-            new Move {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
-            new Move{DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
+            new Mov {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
+            new Mov{DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
             new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
             new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
 

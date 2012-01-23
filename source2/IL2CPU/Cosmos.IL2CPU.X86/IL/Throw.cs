@@ -17,9 +17,9 @@ namespace Cosmos.IL2CPU.X86.IL
         {
 #warning TODO: Implement exception
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationRef = ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+            new CPUx86.Mov { DestinationRef = ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
             //new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
           
             Assembler.Stack.Pop();

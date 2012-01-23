@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
         public override void AssembleNew(object aAssembler, object aMethodInfo)
         {
 // $this   ebp+8
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
+            new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
             new Push { DestinationIsIndirect = true, DestinationReg = Registers.EAX, DestinationDisplacement = 8 };
         }
     }

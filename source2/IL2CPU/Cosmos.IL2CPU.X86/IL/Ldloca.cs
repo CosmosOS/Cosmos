@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       xAddress += (GetStackCountForLocal(aMethod, aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value]) - 1) * 4;
 
       // xAddress contains full size of locals, excluding the actual local
-      new CPUx86.Move {
+      new CPUx86.Mov {
         DestinationReg = CPUx86.Registers.EAX,
         SourceReg = CPUx86.Registers.EBP
       };

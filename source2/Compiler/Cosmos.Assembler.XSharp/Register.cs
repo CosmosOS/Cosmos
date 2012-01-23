@@ -36,19 +36,19 @@ namespace Cosmos.Assembler.XSharp {
     }
 
     protected void Move(uint aAddress) {
-      new Move { DestinationReg = GetId(), SourceValue = aAddress, Size = Registers.GetSize(GetId()) };
+      new Mov { DestinationReg = GetId(), SourceValue = aAddress, Size = Registers.GetSize(GetId()) };
     }
 
     protected void Move(MemoryAction aAction) {
-      new Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
+      new Mov { DestinationReg = GetId(), SourceReg = aAction.Register, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
     }
 
     protected void Move(RegistersEnum aRegister) {
-      new Move { DestinationReg = GetId(), SourceReg = aRegister, Size = Registers.GetSize(GetId()) };
+      new Mov { DestinationReg = GetId(), SourceReg = aRegister, Size = Registers.GetSize(GetId()) };
     }
 
     protected void Move(ElementReference aReference) {
-      new Move { DestinationReg = GetId(), SourceRef = aReference, Size = Registers.GetSize(GetId()) };
+      new Mov { DestinationReg = GetId(), SourceRef = aReference, Size = Registers.GetSize(GetId()) };
     }
 
     public bool isPort() {

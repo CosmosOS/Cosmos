@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string LabelFalse = BaseLabel + "False";
             if( xStackItem.Size > 4 )
             {
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
 				// esi = 1
 				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
 				// edi = 0

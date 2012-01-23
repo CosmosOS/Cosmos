@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // value
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
                 Assembler.Stack.Push( xStackItem_Value );
@@ -31,15 +31,15 @@ namespace Cosmos.IL2CPU.X86.IL
             if( xStackItem_Value.Size <= 8 )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
                 new Label( xBaseLabel + "__StartLoop" );
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xBaseLabel + "__EndLoop" };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
                 new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.Registers.CL };
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
                 new CPUx86.Jump { DestinationLabel = xBaseLabel + "__StartLoop" };

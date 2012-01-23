@@ -19,11 +19,11 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xStorageSize = 4;
             }
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xStorageSize };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xStorageSize };
             for( int i = 0; i < ( aSize / 4 ); i++ )
             {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = i * 4 };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = i * 4 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
             }
             switch( aSize % 4 )
             {
@@ -33,22 +33,22 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 case 1:
                     {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
                         break;
                     }
                 case 2:
                     {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
                         break;
                     }
                 case 3:
                     {
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ) };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ), SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ) };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ), SourceReg = CPUx86.Registers.AL };
                         break;
                     }
                 default:

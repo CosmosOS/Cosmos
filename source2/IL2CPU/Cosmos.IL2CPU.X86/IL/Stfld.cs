@@ -34,32 +34,32 @@ namespace Cosmos.IL2CPU.X86.IL {
 
       uint xRoundedSize = Align(xSize, 4);
 
-      new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
+      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.Registers.EAX };
+        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.Registers.EAX };
       }
 
       switch (xSize % 4) {
         case 1: {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AL };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AL };
             break;
           }
         case 2: {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AX };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AX };
             break;
           }
 		case 3: {
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 				// move 2 lower bytes
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AX };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.Registers.AX };
 				// shift third byte to lowest
 				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 16 };
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.Registers.AL };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.Registers.AL };
 				break;
 			}
         case 0: {

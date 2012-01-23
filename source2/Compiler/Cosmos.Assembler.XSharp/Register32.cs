@@ -23,7 +23,7 @@ namespace Cosmos.Assembler.XSharp {
         return new MemoryAction(GetId(), aOffset);
       }
       set {
-        new Move { DestinationReg = GetId(), DestinationDisplacement = aOffset, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+        new Mov { DestinationReg = GetId(), DestinationDisplacement = aOffset, DestinationIsIndirect = true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
       }
     }
 

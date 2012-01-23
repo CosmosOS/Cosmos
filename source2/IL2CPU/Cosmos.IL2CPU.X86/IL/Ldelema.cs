@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
             aAssembler.Stack.Pop();
             aAssembler.Stack.Push( 4, typeof( uint ) );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( uint )( ObjectImpl.FieldDataOffset + 4 ) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };

@@ -108,23 +108,23 @@ namespace Cosmos.IL2CPU.X86 {
       // Size of GDT Table - 1
       xGdtPtr[0] = (UInt16)(xGDT.Count - 1);
       DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", xGdtPtr));
-      new Move {
+      new Mov {
         DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"),
         DestinationIsIndirect = true,
         DestinationDisplacement = 2
         ,
         SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
       };
-      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer") };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer") };
       new Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment("Set data segments");
-      new Move { DestinationReg = Registers.EAX, SourceValue = mGdData };
-      new Move { DestinationReg = Registers.DS, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.ES, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.FS, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.GS, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.SS, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.EAX, SourceValue = mGdData };
+      new Mov { DestinationReg = Registers.DS, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.ES, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.FS, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.GS, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.SS, SourceReg = Registers.EAX };
 
       new Comment("Force reload of code segment");
       new JumpToSegment { Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT" };
@@ -134,22 +134,22 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts) {
       int xOffset = aNo * 8;
-      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(aLabel) };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(aLabel) };
       var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = Registers.AL };
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = Registers.AH };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = Registers.AL };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = Registers.AH };
       new ShiftRight { DestinationReg = Registers.EAX, SourceValue = 16 };
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = Registers.AL };
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = Registers.AH };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = Registers.AL };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = Registers.AH };
 
       // Code Segment
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 2, SourceValue = mGdCode, Size = 16 };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 2, SourceValue = mGdCode, Size = 16 };
 
       // Reserved
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 4, SourceValue = 0x00, Size = 8 };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 4, SourceValue = 0x00, Size = 8 };
 
       // Type
-      new Move { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 5, SourceValue = (byte)(aDisableInts ? 0x8E : 0x8F), Size = 8 };
+      new Mov { DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 5, SourceValue = (byte)(aDisableInts ? 0x8E : 0x8F), Size = 8 };
     }
 
     public void CreateIDT() {
@@ -167,11 +167,11 @@ namespace Cosmos.IL2CPU.X86 {
 
       // Set IDT
       DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { xIdtSize, 0, 0 }));
-      new Move { DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
+      new Mov { DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
         DestinationIsIndirect = true, DestinationDisplacement = 2,
         SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
       };
-      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer") };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer") };
       new Lidt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment(this, "END - Create IDT");
@@ -192,18 +192,18 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
       new Comment(this, "                ;- copy mb info - some stuff for you  ");
       new Comment(this, "BEGIN - Multiboot Info");
-      new Move { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
+      new Mov { DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
       new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
-      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
-      new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true };
+      new Mov { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
-      new Move {
+      new Mov {
         DestinationReg = Registers.EAX,
         SourceReg = Registers.EBX,
         SourceIsIndirect = true
       };
-      new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-      new Move {
+      new Mov { DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      new Mov {
         DestinationReg = Registers.ESP,
         SourceRef = ElementReference.New("Kernel_Stack")
       };
@@ -225,20 +225,20 @@ namespace Cosmos.IL2CPU.X86 {
 
       new Comment(this, "BEGIN - SSE Init");
       // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
       new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
-      new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
       new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
-      new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
       new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
-      new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-      new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
       new And { DestinationReg = Registers.EAX, SourceValue = 1 };
-      new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
       new Comment(this, "END - SSE Init");
 
       if (mComNumber > 0) {

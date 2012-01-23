@@ -44,29 +44,29 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
 					//mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 					new CPUx86.Or { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = Simple32Multiply };
 					// Full 64 Multiply
 
 					// copy again, or could change EAX
 					//TODO is there an opcode that does OR without change EAX?
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 					// eax contains already RIGHT_HIGH
 					// multiply with LEFT_LOW
 					new CPUx86.Multiply { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 8, Size = 32 };
 					// save result of LEFT_LOW * RIGHT_HIGH
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
 
 					//mov RIGHT_LOW to eax
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true};
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true};
 					// multiply with LEFT_HIGH
 					new CPUx86.Multiply { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, Size = 32 };
 					// add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
 					new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
 
 					//mov RIGHT_LOW to eax
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 					// multiply with LEFT_LOW
 					new CPUx86.Multiply { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 8, Size = 32 };
 					// add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
@@ -76,15 +76,15 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					new Label(Simple32Multiply);
 					//mov RIGHT_LOW to eax
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 					// multiply with LEFT_LOW
 					new CPUx86.Multiply { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 8, Size = 32 };
 
 					new Label(MoveReturnValue);
 					// move high result to left high
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDX };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDX };
 					// move low result to left low
-					new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EAX };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EAX };
 					// pop right 64 value
 					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
                 }

@@ -110,7 +110,7 @@
     <Compile Include="JumpBase.cs" />
     <Compile Include="JumpToSegment.cs" />
     <Compile Include="LoadStatusFlags.cs" />
-    <Compile Include="Move.cs" />
+    <Compile Include="Mov.cs" />
     <Compile Include="MoveCR.cs" />
     <Compile Include="MoveD.cs" />
     <Compile Include="Movs.cs" />

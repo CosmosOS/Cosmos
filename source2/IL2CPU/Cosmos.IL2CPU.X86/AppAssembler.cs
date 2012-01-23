@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     protected override void Move(string aDestLabelName, int aValue) {
-      new CPUx86.Move {
+      new CPUx86.Mov {
         DestinationRef = CPU.ElementReference.New(aDestLabelName),
         DestinationIsIndirect = true,
         SourceValue = (uint)aValue
@@ -69,8 +69,8 @@ namespace Cosmos.IL2CPU.X86 {
       // for now, we fix this at runtime.
       new Label(InitStringIDsLabel);
       new Push { DestinationReg = Registers.EBP };
-      new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-      new Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
       foreach (var xDataMember in mAssembler.DataMembers) {
         if (!xDataMember.Name.StartsWith("StringLiteral")) {
           continue;
@@ -78,14 +78,14 @@ namespace Cosmos.IL2CPU.X86 {
         if (xDataMember.Name.EndsWith("__Contents")) {
           continue;
         }
-        new Move { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+        new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       }
       new Pop { DestinationReg = Registers.EBP };
       new Return();
       #endregion
       new Label(CosmosAssembler.EntryPointName);
       new Push { DestinationReg = Registers.EBP };
-      new Move { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       new Call { DestinationLabel = InitVMTCodeLabel };
       new Call { DestinationLabel = InitStringIDsLabel };
 

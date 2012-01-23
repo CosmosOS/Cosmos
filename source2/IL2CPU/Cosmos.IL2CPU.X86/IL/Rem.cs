@@ -35,18 +35,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				// divisor
 				//low
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 				//high
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
 				// pop both 8 byte values
 				new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 16 };
 
 				//dividend
 				// low
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 8 };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 8 };
 				//high
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 
 				// set flags
 				new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
@@ -89,13 +89,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				new Label(LabelNoLoop);
 				//save high dividend
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
 				// extend that sign is in edx
 				new CPUx86.SignExtendAX { Size = 32 };
 				// divide high part
 				new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ESI };
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
 				// divide low part
 				new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
 				// save low result

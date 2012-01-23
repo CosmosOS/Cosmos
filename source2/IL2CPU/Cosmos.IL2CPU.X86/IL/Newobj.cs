@@ -125,23 +125,23 @@ namespace Cosmos.IL2CPU.X86.IL
                     if (xParams.Length == 1 && xParams[0].ParameterType == typeof(char[]))
                     {
                         xHasCalcSize = true;
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 2 };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = 2 };
                         new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     }
                     else if (xParams.Length == 3 && xParams[0].ParameterType == typeof(char[]) && xParams[1].ParameterType == typeof(int) && xParams[2].ParameterType == typeof(int))
                     {
                         xHasCalcSize = true;
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                         new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     }
                     else if (xParams.Length == 2 && xParams[0].ParameterType == typeof(char) && xParams[1].ParameterType == typeof(int))
                     {
                         xHasCalcSize = true;
-                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                         new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     }
@@ -176,10 +176,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
                 uint xSize = (uint)(((from item in xParams
                                       let xQSize = Align(SizeOfType(item.ParameterType), 4)
                                       select (int)xQSize).Take(xParams.Length).Sum()));

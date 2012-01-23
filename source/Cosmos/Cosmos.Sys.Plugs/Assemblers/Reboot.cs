@@ -12,7 +12,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
           new CPUx86.ClrInterruptFlag();
           /* Clear all keyboard buffers (output and command buffers) */
           new CPUAll.Label(".waitBuffer");
-          new CPUx86.Move {
+          new CPUx86.Mov {
             SourceValue = 0x64,
             DestinationReg = CPUx86.Registers.DX
           };
@@ -27,11 +27,11 @@ namespace Cosmos.Sys.Plugs.Assemblers
             Condition = CPUx86.ConditionalTestEnum.NotEqual,
             DestinationLabel = ".waitBuffer"
           };
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.AL,
             SourceValue = 0xD1
           };
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.DX,
             SourceValue = 0x64
           };
@@ -39,7 +39,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             DestinationReg = CPUx86.Registers.AL
           };
           new CPUAll.Label(".clearBuffer");
-          new CPUx86.Move {
+          new CPUx86.Mov {
             SourceValue = 0x64,
             DestinationReg = CPUx86.Registers.DX
           };
@@ -54,11 +54,11 @@ namespace Cosmos.Sys.Plugs.Assemblers
             Condition = CPUx86.ConditionalTestEnum.NotEqual,
             DestinationLabel = ".clearBuffer"
           };
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.AL,
             SourceValue = 0xFE
           };
-          new CPUx86.Move {
+          new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.DX,
             SourceValue = 0x60
           };
