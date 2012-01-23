@@ -108,7 +108,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugStub", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Cosmos.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.x86", "..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Assembler.x86.csproj", "{94D079E4-3C66-486A-8407-EA6EC049FF53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.x86", "..\source2\Cosmos.Assembler.X86\Cosmos.Assembler.x86.csproj", "{94D079E4-3C66-486A-8407-EA6EC049FF53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakpointsKernel", "..\source2\Users\Kudzu\Breakpoints\BreakpointsKernel.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
 EndProject
@@ -363,10 +363,10 @@ Global
 		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
 		SccProjectName44 = ../source2/Cosmos.Assembler
 		SccLocalPath44 = ..\\source2\\Cosmos.Assembler
-		SccProjectUniqueName45 = ..\\source2\\Compiler\\Cosmos.Compiler.Assembler.X86\\Cosmos.Assembler.x86.csproj
+		SccProjectUniqueName45 = ..\\source2\\Cosmos.Assembler.x86\\Cosmos.Assembler.x86.csproj
 		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = ../source2/Compiler/Cosmos.Compiler.Assembler.X86
-		SccLocalPath45 = ..\\source2\\Compiler\\Cosmos.Compiler.Assembler.X86
+		SccProjectName45 = ../source2/Cosmos.Assembler.x86
+		SccLocalPath45 = ..\\source2\\Cosmos.Assembler.x86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU

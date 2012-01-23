@@ -88,7 +88,7 @@
     <Compile Include="ThreadImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.Compiler.Assembler.X86\Cosmos.Assembler.x86.csproj">
+    <ProjectReference Include="..\..\..\source2\Cosmos.Assembler.X86\Cosmos.Assembler.x86.csproj">
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
       <Name>Cosmos.Assembler.x86</Name>
     </ProjectReference>

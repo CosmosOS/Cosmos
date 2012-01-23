@@ -8,8 +8,8 @@
     <ProjectGuid>{94D079E4-3C66-486A-8407-EA6EC049FF53}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Compiler.Assembler.X86</RootNamespace>
-    <AssemblyName>Cosmos.Compiler.Assembler.X86</AssemblyName>
+    <RootNamespace>Cosmos.Assembler.x86</RootNamespace>
+    <AssemblyName>Cosmos.Assembler.x86</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -246,7 +246,7 @@
     <Compile Include="_Infra\InstructionWithSize.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
+    <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>
     </ProjectReference>

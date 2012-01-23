@@ -8,7 +8,8 @@
     <h3>
         Cosmos.Assembler</h3>
     <p>
-        Base platform independent project for emitting machine langauge.</p>
+        Base platform independent project for emitting machine langauge. 
+        Currenly only x86 uses this but later ARM etc.</p>
     <h3>
         Cosmos.Assembler.XSharp</h3>
     <p>
@@ -21,7 +22,8 @@
         Holds ops for raw assembly. Currently does output to NASM too, but in future the 
         binary and NASM (and X# for output debugging) should be in separate assemblies 
         so the generation / output is seperated from the storage/assembly used by the 
-        compiler.</p>
+        compiler. Cant be descendant classes because we create new objects directly in 
+        code.. Maybe Cosmos.AsmGen.x86.NASM, Binary, etc... and use arrays of typeofs?</p>
     <p>
         &nbsp;</p>
 
