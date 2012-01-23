@@ -87,9 +87,9 @@
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
       <Name>Cosmos.Compiler.Assembler.X86</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler.csproj">
+    <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
-      <Name>Cosmos.Compiler.Assembler</Name>
+      <Name>Cosmos.Assembler</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Compiler\Cosmos.Compiler.DebugStub\Cosmos.Debug.DebugStub.csproj">
       <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>

@@ -245,9 +245,9 @@
     <Compile Include="_Infra\InstructionWithSize.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Assembler\Cosmos.Compiler.Assembler.csproj">
+    <ProjectReference Include="..\Cosmos.Compiler.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
-      <Name>Cosmos.Compiler.Assembler</Name>
+      <Name>Cosmos.Assembler</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
