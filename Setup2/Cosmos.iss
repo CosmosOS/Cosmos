@@ -163,7 +163,7 @@ Source: .\Build\VSIP\Cosmos.VS.Package.*; DestDir: {app}\Build\VSIP\; Flags: ign
 Source: .\Build\VSIP\Cosmos.Debug.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.Build.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.Assembler.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Compiler.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: .\Build\VSIP\Cosmos.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\Cosmos.IL2CPU.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\corapi.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
 Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
