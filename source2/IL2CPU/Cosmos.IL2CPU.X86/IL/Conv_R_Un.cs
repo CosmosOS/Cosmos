@@ -22,6 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
                 throw new NotImplementedException();
             }
+			//TODO if on stack a float it is first truncated, http://msdn.microsoft.com/en-us/library/system.reflection.emit.opcodes.conv_r_un.aspx
             if (!xValue.IsFloat)
             {
                 Assembler.Stack.Pop();
