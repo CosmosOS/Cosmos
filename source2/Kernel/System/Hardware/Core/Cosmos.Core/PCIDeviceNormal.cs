@@ -44,5 +44,10 @@ namespace Cosmos.Core
             MinGrant = ReadRegister8(0x3E);
             MaxLatency = ReadRegister8(0x3F);
         }
+
+        public void EnableDevice()
+        {
+            Command |= PCICommand.Master | PCICommand.IO | PCICommand.Memory;
+        }
     }
 }

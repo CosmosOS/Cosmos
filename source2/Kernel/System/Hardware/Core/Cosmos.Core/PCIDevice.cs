@@ -26,7 +26,7 @@ namespace Cosmos.Core
         public enum PCICommand : short
         {
             IO = 0x1,     /* Enable response in I/O space */
-            Memort = 0x2,     /* Enable response in Memory space */
+            Memory = 0x2,     /* Enable response in Memory space */
             Master = 0x4,     /* Enable bus mastering */
             Special = 0x8,     /* Enable response to special cycles */
             Invalidate = 0x10,    /* Use memory write and invalidate */
@@ -68,8 +68,10 @@ namespace Cosmos.Core
         public ushort VendorID { get; private set; }
         public ushort DeviceID { get; private set; }
 
-        public PCICommand Command { get; private set; }
-        public PCIStatus Status { get; private set; }
+        //public PCICommand Command { get; private set; }
+        //public PCIStatus Status { get; private set; }
+        public PCICommand Command { get { return (PCICommand)ReadRegister16(0x04); } set { WriteRegister16(0x04, (ushort)value); } }
+        public PCIStatus Status { get { return (PCIStatus)ReadRegister16(0x06); } set { WriteRegister16(0x06, (ushort)value); } }
 
         public byte RevisionID { get; private set; }
         public byte ProgIF { get; private set; }
@@ -86,6 +88,11 @@ namespace Cosmos.Core
 
         public bool DeviceExists { get; private set; }
 
+        /// <summary>
+        /// Has this device been claimed by a driver
+        /// </summary>
+        public bool Claimed { get; set; }
+
         public uint bus = 0;
         public uint slot = 0;
         public uint function = 0;
@@ -99,8 +106,8 @@ namespace Cosmos.Core
 
             VendorID = ReadRegister16(0x00);
             DeviceID = ReadRegister16(0x02);
-            Command = (PCICommand)ReadRegister16(0x04);
-            Status = (PCIStatus)ReadRegister16(0x06);
+            //Command = (PCICommand)ReadRegister16(0x04);
+            //Status = (PCIStatus)ReadRegister16(0x06);
 
             RevisionID = ReadRegister8(0x08);
             ProgIF = ReadRegister8(0x09);

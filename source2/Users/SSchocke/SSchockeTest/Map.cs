@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SSchockePlayground
+namespace SSchockeTest
 {
     public abstract class Map<TKey, TValue>
     {
@@ -162,17 +162,17 @@ namespace SSchockePlayground
 
         public TKey[] Keys
         {
-            get 
+            get
             {
                 TKey[] usedKeys = new TKey[count];
                 Array.Copy(keys, usedKeys, count);
 
-                return usedKeys; 
+                return usedKeys;
             }
         }
         public TValue[] Values
         {
-            get 
+            get
             {
                 TValue[] usedValues = new TValue[count];
                 Array.Copy(values, usedValues, count);

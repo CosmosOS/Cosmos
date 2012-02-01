@@ -3,9 +3,9 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{13307c67-f074-4c43-8269-7f9d66f759b2}</ProjectGuid>
+    <ProjectGuid>{4527d60e-25f4-4617-b463-7cda3c219097}</ProjectGuid>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <Name>SSchockePlaygroundBoot</Name>
+    <Name>SSchockeTestBoot</Name>
     <BinFormat>elf</BinFormat>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
@@ -21,7 +21,7 @@
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
-    <VMWareFlavor>Workstation</VMWareFlavor>
+    <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -37,26 +37,15 @@
     <StartCosmosGDB>false</StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
-      <Name>Cosmos.Debug.Kernel.Plugs</Name>
-      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
-      <Private>True</Private>
+    <ProjectReference Include=".\SSchockeTest.csproj">
+      <Name>SSchockeTest</Name>
+      <Project>{2ac69ca7-215f-4667-a046-0aa0b76c6526}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
-      <Name>Cosmos.System.Plugs.System</Name>
-      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\SSchockePlayground\SSchockePlayground.csproj">
-      <Name>SSchockePlayground</Name>
-      <Project>{4fba0f14-f23b-4f0c-82c8-da834e5d0982}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 </Project>
