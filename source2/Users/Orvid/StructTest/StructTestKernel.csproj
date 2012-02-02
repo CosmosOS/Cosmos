@@ -61,7 +61,6 @@
     <Compile Include="Logger.cs" />
     <Compile Include="MultiBoot.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="RAM.cs" />
     <Compile Include="SecondaryKernel.cs" />
   </ItemGroup>
   <ItemGroup>

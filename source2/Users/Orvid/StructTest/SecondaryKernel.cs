@@ -30,7 +30,7 @@ namespace StructTest
 
         protected override void Run()
         {
-            Cosmos.Core.RAM.Initialize();
+            //Cosmos.Core.RAM.Initialize();
             //double d = 40.23;
             //double d2 = 93.210;
             //double d3 = -412.569;
@@ -66,7 +66,7 @@ namespace StructTest
             //uint r = 4294967295;
             //int r = -2147483648;
             //ulong r = 18446744073709551615;
-            //long r = -9223372036854775808;
+            int r = -131;
             //float r = 123.7f;
             //double r = 123.7;
             //double d;
@@ -79,20 +79,20 @@ namespace StructTest
             //{
             //    Console.WriteLine("Less Than");
             //}
-            //Console.WriteLine("Just one more test.");
-            //Console.WriteLine("Raw Byte: " + r.ToString());
-            //Console.WriteLine("Byte->Byte: " + (unchecked((byte)r)).ToString());
-            //Console.WriteLine("Byte->SByte: " + (unchecked((sbyte)r)).ToString());
-            //Console.WriteLine("Byte->Char: " + (unchecked((char)r)).ToString());
-            //Console.WriteLine("Byte->UShort: " + (unchecked((ushort)r)).ToString());
-            //Console.WriteLine("Byte->Short: " + (unchecked((short)r)).ToString());
-            //Console.WriteLine("Byte->UInt: " + (unchecked((uint)r)).ToString());
-            //Console.WriteLine("Byte->Int: " + (unchecked((int)r)).ToString());
-            //Console.WriteLine("Byte->ULong: " + (unchecked((ulong)r)).ToString());
-            //Console.WriteLine("Byte->Long: " + (unchecked((long)r)).ToString());
-            //Console.WriteLine("Byte->Float: " + (unchecked((float)r)).ToString());
-            //Console.WriteLine("Byte->Double: " + (unchecked((double)r)).ToString());
-            //Console.WriteLine("Byte->Decimal: " + (unchecked((decimal)r)).ToString());
+            Console.WriteLine("Just one more test.");
+            Console.WriteLine("Raw Byte: " + r.ToString());
+            Console.WriteLine("Byte->Byte: " + (unchecked((byte)r)).ToString());
+            Console.WriteLine("Byte->SByte: " + (unchecked((sbyte)r)).ToString());
+            Console.WriteLine("Byte->Char: " + (unchecked((char)r)).ToString());
+            Console.WriteLine("Byte->UShort: " + (unchecked((ushort)r)).ToString());
+            Console.WriteLine("Byte->Short: " + (unchecked((short)r)).ToString());
+            Console.WriteLine("Byte->UInt: " + (unchecked((uint)r)).ToString());
+            Console.WriteLine("Byte->Int: " + (unchecked((int)r)).ToString());
+            Console.WriteLine("Byte->ULong: " + (unchecked((ulong)r)).ToString());
+            Console.WriteLine("Byte->Long: " + (unchecked((long)r)).ToString());
+            Console.WriteLine("Byte->Float: " + (unchecked((float)r)).ToString());
+            Console.WriteLine("Byte->Double: " + (unchecked((double)r)).ToString());
+            Console.WriteLine("Byte->Decimal: " + (unchecked((decimal)r)).ToString());
             while (true)
             {
                 //m.Update();

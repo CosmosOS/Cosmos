@@ -54,7 +54,6 @@
     <Compile Include="Drivers\VGADriver.cs" />
     <Compile Include="GraphicsDriver.cs" />
     <Compile Include="GraphicsMode.cs" />
-    <Compile Include="GraphicsPlugs.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
