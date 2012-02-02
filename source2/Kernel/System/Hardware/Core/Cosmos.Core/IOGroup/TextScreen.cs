@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Core.IOGroup {
     public class TextScreen : IOGroup {
-        public readonly MemoryBlock Memory = new MemoryBlock(0xB8000, 80 * 25 * 2 / 4);
+        public readonly MemoryBlock Memory = new MemoryBlock(0xB8000, 80 * 25 * 2);
         // These should probably move to a VGA class later, or this class should be remade into a VGA class
         public readonly IOPort MiscOutput = new IOPort(0x03C2);
         public readonly IOPort Idx1 = new IOPort(0x03C4);

@@ -59,9 +59,9 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
         public enum FIFO : uint
         {
             Min = 0,
-            Max = 1,
-            NextCmd = 2,
-            Stop = 3
+            Max = 4,
+            NextCmd = 8,
+            Stop = 12
         }
 
         private enum FIFOCommand
@@ -107,6 +107,7 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
         private Cosmos.Core.MemoryBlock FIFO_Memory;
 
         private PCIDeviceNormal device;
+        private uint depth;
 
         public VMWareSVGAII()
         {
@@ -138,6 +139,7 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
 
         protected void SetMode(ushort width, ushort height, ushort depth)
         {
+            this.depth = depth;
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
@@ -198,12 +200,12 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
 
         public void SetPixel(ushort x, ushort y, uint color)
         {
-            Video_Memory[(uint)((y * ReadRegister(Register.Width)) + x)] = color;
+            Video_Memory[(uint)((y * ReadRegister(Register.Width) * depth) + x)] = color;
         }
 
         public uint GetPixel(ushort x, ushort y)
         {
-            return Video_Memory[(uint)((y * ReadRegister(Register.Width)) + x)];
+            return Video_Memory[(uint)((y * ReadRegister(Register.Width) * depth) + x)];
         }
 
 

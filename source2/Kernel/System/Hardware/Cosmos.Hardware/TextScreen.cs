@@ -13,7 +13,7 @@ namespace Cosmos.Hardware {
     protected UInt16 mClearCellValue = 0x000F;
     protected UInt32 mClearCellValue32;
     protected UInt32 mRow2Addr;
-    protected UInt32 mScrollSize32;
+    protected UInt32 mScrollSize;
     protected UInt32 mRowSize32;
 
     protected Core.IOGroup.TextScreen IO = Core.Global.BaseIOGroups.TextScreen;
@@ -22,8 +22,8 @@ namespace Cosmos.Hardware {
     public TextScreen() {
       mRAM = IO.Memory.Bytes;
       mClearCellValue32 = (UInt32)(mClearCellValue << 16 | mClearCellValue);
-      mRow2Addr = (UInt32)(Cols * 2 / 4);
-      mScrollSize32 = (UInt32)(Cols * (Rows - 1) * 2 / 4);
+      mRow2Addr = (UInt32)(Cols * 2);
+      mScrollSize = (UInt32)(Cols * (Rows - 1) * 2);
       mRowSize32 = (UInt32)Cols * 2 / 4;
     }
 
@@ -35,8 +35,8 @@ namespace Cosmos.Hardware {
     }
 
     public void ScrollUp() {
-      IO.Memory.MoveDown(0, mRow2Addr, mScrollSize32);
-      IO.Memory.Fill(mScrollSize32, mRowSize32, mClearCellValue32);
+      IO.Memory.MoveDown(0, mRow2Addr, mScrollSize);
+      IO.Memory.Fill(mScrollSize, mRowSize32, mClearCellValue32);
     }
 
     public char this[int aX, int aY] {

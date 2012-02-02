@@ -19,8 +19,8 @@ namespace Cosmos.Core
         {
             Base = aBase;
             Size = aSize;
-            Bytes = new MemoryBlock08(aBase, aSize * 4);
-            Words = new MemoryBlock16(aBase, aSize * 2);
+            Bytes = new MemoryBlock08(aBase, aSize);
+            Words = new MemoryBlock16(aBase, aSize);
             DWords = new MemoryBlock32(aBase, aSize);
         }
 
@@ -28,49 +28,68 @@ namespace Cosmos.Core
         //TODO: Make an attribute that can be applied to methods to tell the copmiler to inline them to save
         // the overhead of a call on operations like this.
         // Need to check bounds for 16 and 32 better so offset cannot be size - 1 and then the 4 bytes write past the end
-        public unsafe UInt32 this[UInt32 aOffset]
+        public unsafe UInt32 this[UInt32 aByteOffset]
         {
             get
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt32*)(Base + aOffset * 4);
+                return *(UInt32*)(Base + aByteOffset);
             }
             set
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt32*)(Base + aOffset * 4)) = value;
+                (*(UInt32*)(Base + aByteOffset)) = value;
             }
         }
 
         public void Fill(UInt32 aData)
         {
-            Fill(0, Size, aData);
+            Fill(0, Size / 4, aData);
         }
 
-        public void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
+        public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
         {
             //TODO: before next step can at least check bounds here and do the addition just once to 
             //start the loop.
             //TODO - When asm can check count against size just one time and use a native fill asm op
-            for (UInt32 i = aStart; i < aStart + aCount; i++)
+            UInt32* xDest = (UInt32*)(this.Base + aStart);
+            for (UInt32 i = 0; i < aCount; i++)
             {
-                this[i] = aData;
+                *xDest = aData;
+                xDest++;
+            }
+        }
+        public void Fill(byte aData)
+        {
+            Fill(0, Size, aData);
+        }
+
+        public unsafe void Fill(UInt32 aStart, UInt32 aCount, byte aData)
+        {
+            //TODO: before next step can at least check bounds here and do the addition just once to 
+            //start the loop.
+            //TODO - When asm can check count against size just one time and use a native fill asm op
+            byte* xDest = (byte*)(this.Base + aStart);
+            for (UInt32 i = 0; i < aCount; i++)
+            {
+                *xDest = aData;
+                xDest++;
             }
         }
 
-        public void MoveDown(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
+        public unsafe void MoveDown(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
         {
-            UInt32 xDest = aDest;
-            UInt32 xSrc = aSrc;
-            for (int i = 1; i <= aCount; i++)
+            byte* xDest = (byte*)(this.Base + aDest);
+            byte* xSrc = (byte*)(this.Base + aSrc);
+            for (int i = 0; i < aCount; i++)
             {
-                this[xDest] = this[xSrc];
+                *xDest = *xSrc;
                 xDest++;
                 xSrc++;
             }
@@ -93,24 +112,24 @@ namespace Cosmos.Core
             Size = aSize;
         }
 
-        public unsafe byte this[UInt32 aOffset]
+        public unsafe byte this[UInt32 aByteOffset]
         {
             get
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(byte*)(Base + aOffset);
+                return *(byte*)(Base + aByteOffset);
             }
             set
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     // Also this exception gets eaten?
                     throw new Exception("Memory access violation");
                 }
-                (*(byte*)(Base + aOffset)) = value;
+                (*(byte*)(Base + aByteOffset)) = value;
             }
         }
     }
@@ -126,23 +145,23 @@ namespace Cosmos.Core
             Size = aSize;
         }
 
-        public unsafe UInt16 this[UInt32 aOffset]
+        public unsafe UInt16 this[UInt32 aByteOffset]
         {
             get
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt16*)(Base + aOffset * 2);
+                return *(UInt16*)(Base + aByteOffset);
             }
             set
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt16*)(Base + aOffset * 2)) = value;
+                (*(UInt16*)(Base + aByteOffset)) = value;
             }
         }
 
@@ -159,23 +178,23 @@ namespace Cosmos.Core
             Size = aSize;
         }
 
-        public unsafe UInt32 this[UInt32 aOffset]
+        public unsafe UInt32 this[UInt32 aByteOffset]
         {
             get
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                return *(UInt32*)(Base + aOffset);
+                return *(UInt32*)(Base + aByteOffset);
             }
             set
             {
-                if (aOffset >= Size)
+                if (aByteOffset >= Size)
                 {
                     throw new Exception("Memory access violation");
                 }
-                (*(UInt32*)(Base + aOffset)) = value;
+                (*(UInt32*)(Base + aByteOffset)) = value;
             }
         }
 
