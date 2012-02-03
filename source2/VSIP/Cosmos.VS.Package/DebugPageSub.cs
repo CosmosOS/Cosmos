@@ -31,7 +31,18 @@ namespace Cosmos.VS.Package {
                 }
             };
 
-            checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+            checkIgnoreDebugStubAttribute.CheckedChanged += delegate(Object sender, EventArgs e)
+            {
+                bool x = checkIgnoreDebugStubAttribute.Checked;
+                if (x != mProps.IgnoreDebugStubAttribute)
+                {
+                    mProps.IgnoreDebugStubAttribute = x;
+                    IsDirty = true;
+                }
+            };
+
+            checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e)
+            {
                 bool x = checkEnableGDB.Checked;
                 if (x != mProps.EnableGDB) {
                     mProps.EnableGDB = x;
@@ -66,6 +77,9 @@ namespace Cosmos.VS.Package {
 
             mProps.SetProperty("StartCosmosGDB", GetConfigProperty("StartCosmosGDB"));
             checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
+
+            mProps.SetProperty("IgnoreDebugStubAttribute", GetConfigProperty("IgnoreDebugStubAttribute"));
+            checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
 
             mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
             comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);

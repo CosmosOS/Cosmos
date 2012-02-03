@@ -134,7 +134,14 @@ namespace Cosmos.Build.MSBuild {
       set;
     }
 
-    protected bool Initialize() {
+    public bool IgnoreDebugStubAttribute
+    {
+        get;
+        set;
+    }
+
+    protected bool Initialize()
+    {
       CheckFirstTime();
       if (References != null) {
         var xSearchPaths = new List<string>(mSearchDirs);
@@ -204,6 +211,7 @@ namespace Cosmos.Build.MSBuild {
           xAsm.DebugInfo = xDebugInfo;
           xAsm.DebugMode = mDebugMode;
           xAsm.TraceAssemblies = mTraceAssemblies;
+          xAsm.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
           if (this.DebugMode.ToLower() == "none") {
             xAsm.ShouldOptimize = true;
           }

@@ -15,6 +15,12 @@ namespace Cosmos.Build.Common {
             set { SetProperty("DebugMode", value); }
         }
 
+        public bool IgnoreDebugStubAttribute
+        {
+            get { return GetProperty("IgnoreDebugStubAttribute", false); }
+            set { SetProperty("IgnoreDebugStubAttribute", value); }
+        }
+
         public Boolean EnableGDB {
             get { return GetProperty("EnableGDB", false); }
             set { SetProperty("EnableGDB", value); }

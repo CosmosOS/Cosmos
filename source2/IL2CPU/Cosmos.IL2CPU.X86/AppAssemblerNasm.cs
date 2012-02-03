@@ -427,6 +427,7 @@ namespace Cosmos.IL2CPU.X86 {
 
     public TraceAssemblies TraceAssemblies;
     public DebugMode DebugMode;
+    public bool IgnoreDebugStubAttribute;
 
     protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets) {
       // NOTE - These if statements can be optimized down - but clarity is
@@ -457,7 +458,7 @@ namespace Cosmos.IL2CPU.X86 {
       }
 
       // Check if the DebugStub has been disabled for this method
-      if (aMethod.DebugStubOff)
+      if ((!IgnoreDebugStubAttribute) && (aMethod.DebugStubOff))
       {
           return;
       }

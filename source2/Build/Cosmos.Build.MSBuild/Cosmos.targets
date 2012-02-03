@@ -31,6 +31,7 @@
 
         <IL2CPU  DebugMode="$(DebugMode)"
                  TraceAssemblies="$(TraceAssemblies)"
+                 IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
                  DebugCom="1"
                  UseNAsm="true"
                  References="@(ReferencePath)"

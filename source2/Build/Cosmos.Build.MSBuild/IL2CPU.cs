@@ -34,6 +34,12 @@ namespace Cosmos.Build.MSBuild
             set;
         }
 
+        public bool IgnoreDebugStubAttribute
+        {
+            get;
+            set;
+        }
+
         public byte DebugCom
         {
             get;
@@ -111,6 +117,7 @@ namespace Cosmos.Build.MSBuild
                 mTask.OutputFilename = OutputFilename;
                 mTask.EnableLogging = EnableLogging;
                 mTask.EmitDebugSymbols = EmitDebugSymbols;
+                mTask.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
                 return mTask.Execute();
             }
             finally

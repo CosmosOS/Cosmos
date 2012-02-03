@@ -60,6 +60,13 @@
     <Compile Include="Map.cs" />
     <Compile Include="NetworkDevice.cs" />
     <Compile Include="NetworkStack.cs" />
+    <Compile Include="TempDictionary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
