@@ -16,20 +16,22 @@ namespace Cosmos.IL2CPU
         public readonly MethodInfo PlugMethod;
         public readonly Type MethodAssembler;
         public readonly bool IsInlineAssembler = false;
+        public readonly bool DebugStubOff;
         public MethodInfo PluggedMethod;
 
-        public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, Type aMethodAssembler) : this(aMethodBase, aUID, aType, aPlugMethod)
+        public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, Type aMethodAssembler) : this(aMethodBase, aUID, aType, aPlugMethod, false)
         {
             MethodAssembler = aMethodAssembler;
         }
 
 
         public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod)
+            : this(aMethodBase, aUID, aType, aPlugMethod, false)
         {
-            MethodBase = aMethodBase;
-            UID = aUID;
-            Type = aType;
-            PlugMethod = aPlugMethod;
+            //MethodBase = aMethodBase;
+            //UID = aUID;
+            //Type = aType;
+            //PlugMethod = aPlugMethod;
         }
 
         public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, bool isInlineAssembler)
@@ -39,6 +41,13 @@ namespace Cosmos.IL2CPU
             Type = aType;
             PlugMethod = aPlugMethod;
             IsInlineAssembler = isInlineAssembler;
+
+            Object[] attribs = this.MethodBase.GetCustomAttributes(typeof(Cosmos.IL2CPU.Plugs.DebugStubAttribute), false);
+            if (attribs.Length > 0)
+            {
+                Cosmos.IL2CPU.Plugs.DebugStubAttribute attrib = attribs[0] as Cosmos.IL2CPU.Plugs.DebugStubAttribute;
+                DebugStubOff = attrib.Off;
+            }
         }
 
     }

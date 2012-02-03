@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cosmos.Common.Extensions;
 using System.Linq;
 using System.Text;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core
 {
@@ -53,6 +54,7 @@ namespace Cosmos.Core
             Fill(0, Size / 4, aData);
         }
 
+        [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
         {
             //TODO: before next step can at least check bounds here and do the addition just once to 
@@ -70,6 +72,7 @@ namespace Cosmos.Core
             Fill(0, Size, aData);
         }
 
+        [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, byte aData)
         {
             //TODO: before next step can at least check bounds here and do the addition just once to 
@@ -83,6 +86,7 @@ namespace Cosmos.Core
             }
         }
 
+        [DebugStub(Off = true)]
         public unsafe void MoveDown(UInt32 aDest, UInt32 aSrc, UInt32 aCount)
         {
             byte* xDest = (byte*)(this.Base + aDest);

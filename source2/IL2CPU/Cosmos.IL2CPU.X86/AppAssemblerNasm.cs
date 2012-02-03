@@ -456,6 +456,12 @@ namespace Cosmos.IL2CPU.X86 {
         }
       }
 
+      // Check if the DebugStub has been disabled for this method
+      if (aMethod.DebugStubOff)
+      {
+          return;
+      }
+
       // Check options for Debug Level
       // Set based on TracedAssemblies
       if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User) {
