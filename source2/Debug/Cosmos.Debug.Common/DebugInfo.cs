@@ -138,7 +138,7 @@ namespace Cosmos.Debug.Common
 
             xExec.SqlStatements.Add(
                 "CREATE TABLE Label ("
-                + "  LABELNAME VARCHAR(255)  NOT NULL"
+                + "  LABELNAME VARCHAR(4000)  NOT NULL"
                 + ", ADDRESS   BIGINT        NOT NULL"
                 + ");");
 

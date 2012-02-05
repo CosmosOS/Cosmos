@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SSchockeTest
+namespace Cosmos.System.Network
 {
-    public class TempDictionary<TValue>
+    internal class TempDictionary<TValue>
     {
         private List<UInt32> mKeys;
         private List<TValue> mValues;

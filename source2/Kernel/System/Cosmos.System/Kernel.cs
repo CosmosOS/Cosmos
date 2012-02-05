@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.Hardware;
 
 namespace Cosmos.System {
   // MtW: if the fullname (namespace + name) of this class changes, please also change IL2CPU msbuild task
@@ -36,7 +32,8 @@ namespace Cosmos.System {
 
         BeforeRun();
         while (!mStopped) {
-          Run();
+            Network.NetworkStack.Update();
+            Run();
         }
         AfterRun();
         bool xTest = 1 != 3;

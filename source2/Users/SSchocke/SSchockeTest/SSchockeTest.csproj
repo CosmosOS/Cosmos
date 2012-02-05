@@ -36,36 +36,32 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
-      <HintPath>..\..\..\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
       <HintPath>..\..\..\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Debug.Kernel.dll</HintPath>
-    </Reference>
-    <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
-      <HintPath>..\..\..\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Hardware.dll</HintPath>
-    </Reference>
-    <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
-      <HintPath>..\..\..\Kernel\System\Cosmos.System\bin\x86\Debug\Cosmos.System.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AMDPCNetII.cs" />
-    <Compile Include="BinaryHelper.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="MACAddress.cs" />
-    <Compile Include="ManagedMemoryBlock.cs" />
     <Compile Include="Map.cs" />
-    <Compile Include="NetworkDevice.cs" />
-    <Compile Include="NetworkStack.cs" />
-    <Compile Include="TempDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
+      <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
+      <Name>Cosmos.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
+      <Name>Cosmos.Hardware</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

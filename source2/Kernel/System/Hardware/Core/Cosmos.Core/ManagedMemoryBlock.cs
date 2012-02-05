@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.Core;
 
-namespace SSchockeTest
+namespace Cosmos.Core
 {
     public unsafe class ManagedMemoryBlock
     {

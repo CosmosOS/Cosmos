@@ -4,6 +4,10 @@ using System.Text;
 using Sys = Cosmos.System;
 using Cosmos.Core;
 using System.Net;
+using Cosmos.Hardware;
+using Cosmos.Hardware.Drivers.PCI.Network;
+using Cosmos.System.Network;
+using IPv4 = Cosmos.System.Network.IPv4;
 
 namespace SSchockeTest
 {
@@ -104,19 +108,66 @@ namespace SSchockeTest
         //    return x;
         //}
 
+        //internal class BaseClass
+        //{
+        //    public int baseField;
+
+        //    internal BaseClass()
+        //    {
+        //        initFields();
+        //    }
+
+        //    protected virtual void initFields()
+        //    {
+        //        baseField = 1;
+        //    }
+        //}
+        //internal class SubClass : BaseClass
+        //{
+        //    public int subField;
+
+        //    internal SubClass()
+        //        : base()
+        //    {
+        //    }
+
+        //    protected override void initFields()
+        //    {
+        //        base.initFields();
+        //        subField = 2;
+        //    }
+        //}
+        //internal class SubSubClass : SubClass
+        //{
+        //    public int subsubField;
+
+        //    internal SubSubClass()
+        //        :base()
+        //    {
+        //    }
+
+        //    protected override void initFields()
+        //    {
+        //        base.initFields();
+        //        subsubField = 3;
+        //    }
+        //}
+
         protected override void BeforeRun()
         {
             Console.WriteLine("SSchocke Test Playground");
 
-            NetworkStack.Init();
-
             Console.WriteLine("Finding network devices...");
             AMDPCNetII.FindAll();
 
-            AMDPCNetII nic = (AMDPCNetII)NetworkDevice.Devices[0];
+            NetworkDevice nic = NetworkDevice.Devices[0];
 
-            IPAddress myIP = new IPAddress(new byte[] { 192, 168, 1, 51 });
-            NetworkStack.ConfigIP(nic, myIP);
+            IPv4.Address myIP = new IPv4.Address(192, 168, 1, 51);
+            IPv4.Address mySubnet = new IPv4.Address(255, 255, 255, 0);
+            IPv4.Address myGateway = new IPv4.Address(192, 168, 1, 1);
+            IPv4.Config myConfig = new IPv4.Config(myIP, mySubnet, myGateway);
+
+            NetworkStack.ConfigIP(nic, myConfig);
             nic.Enable();
 
             Console.WriteLine("Init Done... Starting main loop");
@@ -124,6 +175,14 @@ namespace SSchockeTest
 
         protected override void Run()
         {
+            //SubSubClass instance = new SubSubClass();
+
+            //Console.WriteLine("BaseClass.field = " + instance.baseField);
+            //Console.WriteLine("SubClass.field = " + instance.subField);
+            //Console.WriteLine("SubSubClass.field = " + instance.subsubField);
+
+            //Stop();
+
             //RunSqrtTest();
             //FloatingPointTest();
             //MapTest();

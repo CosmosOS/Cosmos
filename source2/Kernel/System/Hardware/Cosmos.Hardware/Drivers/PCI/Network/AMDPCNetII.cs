@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Cosmos.Common.Extensions;
 using Cosmos.Core;
+using Cosmos.Core.Network;
+using CompilerPlugs = Cosmos.IL2CPU.Plugs;
 
-namespace SSchockeTest
+namespace Cosmos.Hardware.Drivers.PCI.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
@@ -118,8 +119,7 @@ namespace SSchockeTest
         {
             UInt32 cur_status = StatusRegister;
 
-            Console.WriteLine("AMD PCNet IRQ raised!");
-
+            //Console.WriteLine("AMD PCNet IRQ raised!");
             if ((cur_status & 0x100) != 0)
             {
                 mInitDone = true;
@@ -129,10 +129,10 @@ namespace SSchockeTest
                 if (mTransmitBuffer.Count > 0)
                 {
                     byte[] data = mTransmitBuffer.Peek();
-                    //if (SendBytes(ref data) == true)
-                    //{
-                    //    mTransmitBuffer.Dequeue();
-                    //}
+                    if (SendBytes(ref data) == true)
+                    {
+                        mTransmitBuffer.Dequeue();
+                    }
                 }
             }
             if ((cur_status & 0x400) != 0)
@@ -141,7 +141,7 @@ namespace SSchockeTest
             }
 
             StatusRegister = cur_status;
-            Global.PIC.EoiSlave();
+            Cosmos.Core.Global.PIC.EoiSlave();
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace SSchockeTest
         public static void FindAll()
         {
             Console.WriteLine("Scanning for AMD PCNetII cards...");
-            PCIDevice device = PCI.GetDevice(0x1022, 0x2000);
+            PCIDevice device = Cosmos.Core.PCI.GetDevice(0x1022, 0x2000);
             if (device != null)
             {
                 AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal)device);
@@ -229,9 +229,21 @@ namespace SSchockeTest
             return true;
         }
 
+        [CompilerPlugs.DebugStub(Off = true)]
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
-            throw new NotImplementedException();
+            byte[] data = new byte[length];
+            for (int b = 0; b < length; b++)
+            {
+                data[b] = buffer[b + offset];
+            }
+
+            if (SendBytes(ref data) == false)
+            {
+                mTransmitBuffer.Enqueue(data);
+            }
+
+            return true;
         }
 
         public override bool ReceiveBytes(byte[] buffer, int offset, int max)
@@ -241,25 +253,67 @@ namespace SSchockeTest
 
         public override byte[] ReceivePacket()
         {
-            throw new NotImplementedException();
+            if (mRecvBuffer.Count < 1)
+            {
+                return null;
+            }
+
+            byte[] data = mRecvBuffer.Dequeue();
+            return data;
         }
 
         public override int BytesAvailable()
         {
-            throw new NotImplementedException();
+            if (mRecvBuffer.Count < 1)
+            {
+                return 0;
+            }
+
+            return mRecvBuffer.Peek().Length;
         }
 
         public override bool IsSendBufferFull()
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public override bool IsReceiveBufferFull()
         {
-            throw new NotImplementedException();
+            return false;
         }
         #endregion
 
+        #region Helper Functions
+        [CompilerPlugs.DebugStub(Off = true)]
+        protected bool SendBytes(ref byte[] aData)
+        {
+            int txd = mNextTXDesc++;
+            if (mNextTXDesc >= 16)
+            {
+                mNextTXDesc = 0;
+            }
+
+            uint xOffset = (uint)(txd * 16);
+            UInt32 status = mTxDescriptor.Read32(xOffset + 4);
+            if ((status & 0x80000000) == 0)
+            {
+                for (uint b = 0; b < aData.Length; b++)
+                {
+                    mTxBuffers[txd][b] = aData[b];
+                }
+                UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
+                buffer_len = (UInt16)(~buffer_len);
+                buffer_len++;
+
+                UInt32 flags = (UInt32)(buffer_len & 0x0FFF) | 0x0300F000 | 0x80000000;
+
+                mTxDescriptor.Write32(xOffset + 4, flags);
+                return true;
+            }
+
+            return false;
+        }
+        [CompilerPlugs.DebugStub(Off = true)]
         private void ReadRawData()
         {
             uint status;
@@ -292,5 +346,6 @@ namespace SSchockeTest
                 }
             }
         }
+        #endregion
     }
 }

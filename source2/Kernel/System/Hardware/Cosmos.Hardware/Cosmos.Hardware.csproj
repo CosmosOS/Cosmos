@@ -75,12 +75,14 @@
     <Compile Include="BlockDevice\Partition.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="Drivers\PCI\Network\AMDPCNetII.cs" />
     <Compile Include="Drivers\PCI\Video\VMWareSVGAII.cs" />
     <Compile Include="Drivers\VGAScreen.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="BlockDevice\AtaPio.cs" />
     <Compile Include="Mouse.cs" />
+    <Compile Include="NetworkDevice.cs" />
     <Compile Include="PciDevice.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,6 +90,10 @@
     <Compile Include="TextScreen.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common.Extensions</Name>
@@ -112,6 +118,7 @@
     <Content Include="RTC.html" />
     <Content Include="TextScreen.html" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryHelper.cs" />
     <Compile Include="ByteConverter.cs" />
     <Compile Include="ToHexString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

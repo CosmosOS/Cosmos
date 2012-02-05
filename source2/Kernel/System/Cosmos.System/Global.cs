@@ -14,6 +14,7 @@ namespace Cosmos.System {
             Console = new Console(); 
             
             Cosmos.Hardware.Global.Init();
+            Network.NetworkStack.Init();
         }
     }
 }

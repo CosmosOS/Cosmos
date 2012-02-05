@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
+using Cosmos.Core.Network;
 
-namespace SSchockeTest
+namespace Cosmos.Hardware
 {
     public delegate void DataReceivedHandler(byte[] packetData);
 

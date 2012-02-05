@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SSchockeTest
+namespace Cosmos.Common.Extensions
 {
     /// <summary>
     /// Contains various helpermethods to make bitfiddling easier.
