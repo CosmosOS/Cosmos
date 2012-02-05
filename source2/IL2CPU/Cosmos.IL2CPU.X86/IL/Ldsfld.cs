@@ -103,7 +103,9 @@ namespace Cosmos.IL2CPU.X86.IL
                         //break;
                 }
             }
-			Assembler.Stack.Push( new StackContents.Item( xSize, xField.FieldType ) );
+			//Assembler.Stack.Push( new StackContents.Item( xSize, xField.FieldType ) );
+            Assembler.Stack.Push(ILOp.Align(SizeOfType(xField.FieldType), 4),
+                                    xField.FieldType);
         }
     }
 }

@@ -119,7 +119,9 @@ namespace Cosmos.IL2CPU.X86.IL
             default:
               throw new Exception(string.Format("Remainder size {0:D} {1:D} not supported!", xFieldInfo.FieldType.ToString(), xSize));
           }
-          Assembler.Stack.Push(new StackContents.Item(xSize, xFieldInfo.FieldType));
+          //Assembler.Stack.Push(new StackContents.Item(xSize, xFieldInfo.FieldType));
+          Assembler.Stack.Push(ILOp.Align(SizeOfType(xFieldInfo.FieldType), 4),
+                                  xFieldInfo.FieldType);
         }
     }
 }

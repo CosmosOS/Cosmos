@@ -372,7 +372,7 @@ Global
 		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
 		SccProjectName44 = ../source2/Cosmos.Assembler
 		SccLocalPath44 = ..\\source2\\Cosmos.Assembler
-		SccProjectUniqueName45 = ..\\source2\\Cosmos.Assembler.x86\\Cosmos.Assembler.x86.csproj
+		SccProjectUniqueName45 = ..\\source2\\Cosmos.Assembler.X86\\Cosmos.Assembler.x86.csproj
 		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
 		SccProjectName45 = ../source2/Cosmos.Assembler.x86
 		SccLocalPath45 = ..\\source2\\Cosmos.Assembler.x86
@@ -1110,9 +1110,7 @@ Global
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}.Release|x86.ActiveCfg = Release|x86
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}.Release|x86.Build.0 = Release|x86
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
-		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Bootstrap|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Bootstrap|Mixed Platforms.Build.0 = Release|Any CPU
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Bootstrap|x86.ActiveCfg = Release|Any CPU
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -1126,9 +1124,7 @@ Global
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5}.Release|x86.ActiveCfg = Release|Any CPU
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Bootstrap|Any CPU.ActiveCfg = Release|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
-		{4527D60E-25F4-4617-B463-7CDA3C219097}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Bootstrap|x86.ActiveCfg = Release|x86
-		{4527D60E-25F4-4617-B463-7CDA3C219097}.Bootstrap|x86.Build.0 = Release|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Debug|Mixed Platforms.Build.0 = Debug|x86
