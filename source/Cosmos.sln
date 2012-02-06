@@ -188,9 +188,11 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SSchockeTestBoot", "..\sour
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5} = {0AAD9114-6F08-4344-A282-CD6BC77595E5}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Profiler", "..\source2\IL2CPU\Cosmos.IL2CPU.Profiler\Cosmos.IL2CPU.Profiler.csproj", "{F708C866-1C9B-4579-8C28-0728ECCFC1ED}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 48
+		SccNumberOfProjects = 49
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -384,6 +386,10 @@ Global
 		SccProjectTopLevelParentUniqueName47 = Cosmos.sln
 		SccProjectName47 = ../source2/Users/SSchocke/SSchockeTest
 		SccLocalPath47 = ..\\source2\\Users\\SSchocke\\SSchockeTest
+		SccProjectUniqueName48 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
+		SccProjectTopLevelParentUniqueName48 = Cosmos.sln
+		SccProjectName48 = ../source2/IL2CPU/Cosmos.IL2CPU.Profiler
+		SccLocalPath48 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -1135,6 +1141,21 @@ Global
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Release|Mixed Platforms.Build.0 = Release|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Release|x86.ActiveCfg = Release|x86
 		{4527D60E-25F4-4617-B463-7CDA3C219097}.Release|x86.Build.0 = Release|x86
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Bootstrap|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Bootstrap|Mixed Platforms.Build.0 = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Bootstrap|x86.ActiveCfg = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1182,6 +1203,7 @@ Global
 		{52BF0A64-EBEF-420A-9F27-6C5226A4B77B} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{6882C74B-3ED2-4D76-9E7B-67B6A28808BC} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{23476FAD-3712-4A4B-90C0-CCCC9AC8D953} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
