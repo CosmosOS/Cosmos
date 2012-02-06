@@ -2,7 +2,7 @@
 
 namespace Cosmos.IL2CPU.Profiler {
   public class ILOp : Cosmos.IL2CPU.ILOp {
-    public ILOp(Cosmos.IL2CPU.Assembler aAsmblr)
+    public ILOp(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
 
