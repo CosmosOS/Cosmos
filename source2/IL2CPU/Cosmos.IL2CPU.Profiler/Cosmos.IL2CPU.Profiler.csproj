@@ -64,6 +64,10 @@
       <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
       <Name>Cosmos.Sys.Plugs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos.Assembler.X86\Cosmos.Assembler.x86.csproj">
+      <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
+      <Name>Cosmos.Assembler.x86</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>
