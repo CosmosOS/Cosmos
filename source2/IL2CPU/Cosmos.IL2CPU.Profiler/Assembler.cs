@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.Profiler {
-  public class Assembler : Cosmos.Assembler.Assembler {
+  public class Assembler : Cosmos.IL2CPU.AppAssembler {
 
     protected override void InitILOps() {
       var xILOp = new ILOp(this);
