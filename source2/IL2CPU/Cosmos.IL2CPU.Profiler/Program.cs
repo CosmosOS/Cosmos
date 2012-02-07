@@ -13,17 +13,21 @@ namespace Cosmos.IL2CPU.Profiler {
     // In the future it may profile other aspects as well.
 
     static void Main(string[] args) {
-      DoScan();
+     Program.DoScan();
     }
 
     private static void DoScan() {
       var xSW = new Stopwatch();
       xSW.Start();
-
+       
       var xAsmblr = new Assembler();
       var xScanner = new ILScanner(xAsmblr);
+      
+
       //TODO: Add plugs into the scanning equation to profile scanning them too
-      var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
+      //System.Reflection.MethodInfo[] name = typeof(SSchockeTest.Kernel).GetMethods();
+      var xEntryPoint = typeof(SSchockeTest.Kernel).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance);
+      //var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
       xScanner.Execute(xEntryPoint);
 
       xSW.Stop();
