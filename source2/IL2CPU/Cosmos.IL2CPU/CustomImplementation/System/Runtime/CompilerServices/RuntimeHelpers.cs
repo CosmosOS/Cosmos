@@ -1,16 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
+﻿using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.IL2CPU.CustomImplementation.CompilerServices {
+namespace Cosmos.IL2CPU.CustomImplementation.System.Runtime.CompilerServices {
+	[Plug(TargetName = "System.Runtime.CompilerServices.RuntimeHelpers, mscorlib", IsMicrosoftdotNETOnly=true)]
 	public class RuntimeHelpers {
-		//[MethodAlias(Name = "System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___")]
-		//[DllImport("test.dll")]
-		//public static extern void InitializeArray(Array aArray, RuntimeFieldHandle aFieldHandle);
-		public static void InitializeArrayImpl(int[] aArray, int[] aFieldHandle) {
-			for (int i = 0; i < aArray.Length; i++) {
-				aArray[i] = aFieldHandle[i];
-			}
+
+		//pluged in IL2CPU\Cosmos.IL2CPU.X86\Plugs\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs
+		//public static void InitializeArray(int[] aArray, int[] aFieldHandle) {
+		//    for (int i = 0; i < aArray.Length; i++) {
+		//        aArray[i] = aFieldHandle[i];
+		//    }
+		//}
+
+		public void ProbeForSufficientStack() {
+			// no implementation yet, before threading not needed
 		}
 	}
 }

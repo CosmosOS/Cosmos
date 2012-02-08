@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Cosmos.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
@@ -10,18 +7,13 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices {
 	[Plug(Target = typeof(RuntimeHelpers))]
 	public static class RuntimeHelpersImpl {
-//		[PlugMethod(Signature = "System_Void__System_Runtime_CompilerServices_RuntimeHelpers__cctor__")]
+
 		public static void cctor() {
-			//todo: do something
+			//TODO: do something
 		}
 
-		[PlugMethod(Assembler = typeof(InitializeArrayAssembler))]
+		[InlineAttribute(TargetPlatform = TargetPlatform.x86)]
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
-		}
-	}
-
-	public class InitializeArrayAssembler: AssemblerMethod {
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array
@@ -48,6 +40,5 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerS
 
 			new Label(".EndLoop");
 		}
-
 	}
 }

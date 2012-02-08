@@ -10,6 +10,7 @@ using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
 using Cosmos.Assembler;
 using System.Reflection.Emit;
+using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
 
 namespace Cosmos.IL2CPU
 {
@@ -45,9 +46,14 @@ namespace Cosmos.IL2CPU
 
     public class ScannerQueueItem
     {
-        public object Item;
-        public object SourceItem;
+		public _MemberInfo Item;
+        public string SourceItem;
         public string QueueReason;
+
+		public override string ToString()
+		{
+			return Item.MemberType + " " + Item.ToString();
+		}
     }
 
     public class ILScanner : IDisposable
@@ -123,7 +129,7 @@ namespace Cosmos.IL2CPU
             mLogEnabled = true;
         }
 
-        protected void Queue(object aItem, object aSrc, string aSrcType, object sourceItem = null)
+		protected void Queue(_MemberInfo aItem, object aSrc, string aSrcType, object sourceItem = null)
         {
             var xMemInfo = aItem as MemberInfo;
             //TODO: fix this, as each label/symbol should also contain an assembly specifier.
@@ -371,7 +377,7 @@ namespace Cosmos.IL2CPU
                             }
                             if (inl != null)
                             {
-                                xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null, true);
+								xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xItem), MethodInfo.TypeEnum.Plug, null, true);
 
                                 var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo/*, xPlugAssembler*/);
 
@@ -812,7 +818,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (xNeedsPlug)
                 {
-                  throw new Exception("Natie code encountered, plug required. Please see http://cosmos.codeplex.com/wikipage?title=Plugs). " + MethodInfoLabelGenerator.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
+                  throw new Exception("Native code encountered, plug required. Please see http://cosmos.codeplex.com/wikipage?title=Plugs). " + MethodInfoLabelGenerator.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list
@@ -822,6 +828,15 @@ namespace Cosmos.IL2CPU
                 // Scan the method body for more type and method refs
                 //TODO: Dont queue new items if they are plugged
                 // or do we need to queue them with a resolved ref in a new list?
+
+				InlineAttribute inl = null;
+				foreach (InlineAttribute inli in aMethod.GetCustomAttributes(typeof(InlineAttribute), false))
+				{
+					inl = inli;
+				}
+				if (inl != null)
+					return;	// cancel inline
+
                 List<ILOpCode> xOpCodes;
                 xOpCodes = mReader.ProcessMethod(aMethod);
                 if (xOpCodes != null)
@@ -1250,7 +1265,8 @@ namespace Cosmos.IL2CPU
             {
                 if (!xAttrib.Enabled)
                 {
-                    xResult = null;
+                    //xResult = null;
+					return null;
                 }
                 else if (xAttrib.IsMonoOnly)
                 {
@@ -1258,7 +1274,8 @@ namespace Cosmos.IL2CPU
                     //TODO: Two exclusive IsOnly's dont make sense
                     // refactor these as a positive rather than negative
                     // Same thing at type plug level
-                    xResult = null;
+                    //xResult = null;
+					return null;
                 }
                 //else if (xAttrib.Signature != null) {
                 //  var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xResult));
@@ -1268,7 +1285,14 @@ namespace Cosmos.IL2CPU
                 //}
             }
 
-            Queue(xResult, null, "Plug Method");
+			InlineAttribute xInlineAttrib = null;
+			foreach (InlineAttribute inli in xResult.GetCustomAttributes(typeof(InlineAttribute), false))
+			{
+				xInlineAttrib = inli;
+			}
+
+			if (xInlineAttrib == null)
+				Queue(xResult, null, "Plug Method");
             //if (xAttrib != null && xAttrib.Signature != null)
             //{
             //    var xTargetMethods = aTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);

@@ -37,7 +37,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -116,6 +115,7 @@
     <Compile Include="CustomImplementation\System\RuntimeType.cs" />
     <Compile Include="CustomImplementation\System\RuntimeType.RuntimeTypeCache.cs" />
     <Compile Include="CustomImplementation\System\RuntimeTypeHandle.cs" />
+    <Compile Include="CustomImplementation\System\Security\CodeAccessSecurityEngineImpl.cs" />
     <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
     <Compile Include="CustomImplementation\System\Runtime\InteropServices\SafeHandleImpl.cs" />
     <Compile Include="CustomImplementation\System\SByteImpl.cs" />
@@ -192,6 +192,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="CustomImplementation\System\Security\Permissions\" />
     <Folder Include="Plugs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
