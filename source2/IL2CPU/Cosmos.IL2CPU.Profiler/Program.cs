@@ -21,19 +21,33 @@ namespace Cosmos.IL2CPU.Profiler {
       xSW.Start();
        
       var xAsmblr = new Assembler();
-      var xScanner = new ILScanner(xAsmblr);
-      
+      using (var xScanner = new ILScanner(xAsmblr))
+      {
 
-      //TODO: Add plugs into the scanning equation to profile scanning them too
-      //System.Reflection.MethodInfo[] name = typeof(SSchockeTest.Kernel).GetMethods();
-      var xEntryPoint = typeof(SSchockeTest.Kernel).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance);
-      //var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
-      xScanner.Execute(xEntryPoint);
 
-      xSW.Stop();
-      Console.WriteLine("Total time : {0}", xSW.Elapsed);
-      Console.WriteLine("Method count: {0}", xScanner.MethodCount);
-      //Console.WriteLine("Instruction count: {0}", xScanner.InstructionCount);
+          //TODO: Add plugs into the scanning equation to profile scanning them too
+          //System.Reflection.MethodInfo[] name = typeof(SSchockeTest.Kernel).GetMethods();
+          Type xFoundType = typeof(SSchockeTest.Kernel);
+          var xCtor = xFoundType.GetConstructor(Type.EmptyTypes);
+          typeof(Cosmos.System.Plugs.System.System.ConsoleImpl).IsSubclassOf(typeof(object));
+          var xEntryPoint = typeof(SSchockeTest.Kernel).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance);
+          //var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
+          //EnableLogging(pathToLogFile)
+          xScanner.EnableLogging(AppDomain.CurrentDomain.BaseDirectory + "log.txt");
+          //xScanner.TempDebug += new Action<string>(xScanner_TempDebug);
+          //xScanner.
+          xScanner.Execute(xCtor);
+
+          xSW.Stop();
+          Console.WriteLine("Total time : {0}", xSW.Elapsed);
+          Console.WriteLine("Method count: {0}", xScanner.MethodCount);
+          //Console.WriteLine("Instruction count: {0}", xScanner.InstructionCount);
+      }
+    }
+
+    static void xScanner_TempDebug(string obj)
+    {
+        Console.WriteLine(obj);
     }
 
     // This is a dummy entry point for the scanner to start at.
