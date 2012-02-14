@@ -2,30 +2,39 @@
 using System.Collections.Generic;
 using System.Text;
 using Sys = Cosmos.System;
+using Cosmos.Hardware;
 
 namespace HKSplayground
 {
     public class Kernel : Sys.Kernel
     {
-        byte[] ba = {1,2,3};
-
+        Mouse m = new Mouse();
+        int x=0, y=0;
+        int z = 0;
         protected override void BeforeRun()
         {
-            Cosmos.Hardware2.PCIBus.Init();
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
+            m.Initialize();
+            Console.WriteLine("Mouse initialized");
         }
-        int i = 1;
         protected override void Run()
         {
             while (true)
             {
-                if (i == 1)
+                //Do nothing
+                if (x != m.X || y != m.Y)
                 {
-                    Cosmos.Hardware2.Network.Devices.AMDPCNetII.AMDPCNet.FindAll();
-                    i++;
-                }
-                else
-                {
+                    x = m.X;
+                    y = m.Y;
+                    if (z != Int16.MaxValue - 1)
+                    {
+                        z++;
+                    }
+                    else
+                    {
+                        z = 0;
+                    }
+                    Console.WriteLine(z);
                 }
             }
         }

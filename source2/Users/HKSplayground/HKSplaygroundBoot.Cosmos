@@ -18,7 +18,9 @@
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>false</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <IgnoreDebugStubAttribute />
+    <TraceAssemblies>All</TraceAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,12 +38,23 @@
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
-    <Reference Include="HKSplayground, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <Name>HKSplayground</Name>
-      <AssemblyName>HKSplayground.dll</AssemblyName>
-      <HintPath>bin\Debug\HKSplayground.dll</HintPath>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
+      <Name>Cosmos.Kernel.Plugs</Name>
+      <Project>{b168bedd-c6a6-4e7c-b9a5-0144286e9e42}</Project>
       <Private>True</Private>
-    </Reference>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Name>Cosmos.Kernel</Name>
+      <Project>{a1f83d9f-2d44-4264-a08b-416797123018}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\HKSplayground\HKSplayground.csproj">
+      <Name>HKSplayground (source2\Users\HKSplayground\HKSplayground)</Name>
+      <Project>{79d1c0ae-bb85-4f85-accd-8aedd8d7b395}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 </Project>
