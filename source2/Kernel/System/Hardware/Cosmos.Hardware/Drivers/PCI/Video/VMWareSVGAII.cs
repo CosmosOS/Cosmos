@@ -107,6 +107,8 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
         private Cosmos.Core.MemoryBlock FIFO_Memory;
 
         private PCIDeviceNormal device;
+		private uint height;
+		private uint width;
         private uint depth;
 
         public VMWareSVGAII()
@@ -137,9 +139,12 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
             WriteRegister(Register.ConfigDone, 1);
         }
 
-        protected void SetMode(ushort width, ushort height, ushort depth)
+        public void SetMode(ushort width, ushort height, ushort depth = 32)
         {
-            this.depth = depth;
+			// Depth is color depth in bytes.
+            this.depth = (uint)(depth / 8);
+			this.width = width;
+			this.height = height;
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
@@ -200,12 +205,12 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
 
         public void SetPixel(ushort x, ushort y, uint color)
         {
-            Video_Memory[(uint)((y * ReadRegister(Register.Width) * depth) + x)] = color;
+            Video_Memory[(uint)((y * width * depth) + x)] = color;
         }
 
         public uint GetPixel(ushort x, ushort y)
         {
-            return Video_Memory[(uint)((y * ReadRegister(Register.Width) * depth) + x)];
+            return Video_Memory[(uint)((y * width * depth) + x)];
         }
 
 
