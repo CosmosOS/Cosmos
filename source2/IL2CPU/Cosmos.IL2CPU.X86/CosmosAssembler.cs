@@ -179,6 +179,67 @@ namespace Cosmos.IL2CPU.X86 {
 
     public override void Initialize() {
       base.Initialize();
+
+#if !LFB_1024_8
+	  DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
+	  uint xFlags = 0x10003;
+	  DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
+	  DataMembers.Add(new DataMember("MultibootFlags", xFlags));
+	  DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
+	  DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+	  DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+	  DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+	  DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+	  DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
+	  DataMembers.Add(new DataEndIfDefined());
+	  DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
+	  xFlags = 0x00003;
+	  DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
+	  DataMembers.Add(new DataMember("MultibootFlags", xFlags));
+	  DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
+	  DataMembers.Add(new DataEndIfDefined());
+#else
+            DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
+            uint xFlags = 0x10007;
+            DataMembers.Add(new DataMember("MultibootSignature",
+                                   new uint[] { 0x1BADB002 }));
+            DataMembers.Add(new DataMember("MultibootFlags",
+                           xFlags));
+            DataMembers.Add(new DataMember("MultibootChecksum",
+                                               (int)(0 - (xFlags + 0x1BADB002))));
+            DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
+            // graphics fields
+            DataMembers.Add(new DataMember("MultibootGraphicsMode", 0));
+            DataMembers.Add(new DataMember("MultibootGraphicsWidth", 1024));
+            DataMembers.Add(new DataMember("MultibootGraphicsHeight", 768));
+            DataMembers.Add(new DataMember("MultibootGraphicsDepth", 8));
+            DataMembers.Add(new DataEndIfDefined());
+            DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
+            xFlags = 0x00003;
+            DataMembers.Add(new DataMember("MultibootSignature",
+                                   new uint[] { 0x1BADB002 }));
+            DataMembers.Add(new DataMember("MultibootFlags",
+                           xFlags));
+            DataMembers.Add(new DataMember("MultibootChecksum",
+                                               (int)(0 - (xFlags + 0x1BADB002))));
+            DataMembers.Add(new DataEndIfDefined());
+
+#endif
+	  // graphics info fields 
+	  DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
+	  DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
+	  DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
+	  // memory
+	  DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
+	  DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
+	  DataMembers.Add(new DataMember("Before_Kernel_Stack", new byte[0x50000]));
+	  DataMembers.Add(new DataMember("Kernel_Stack", new byte[0]));
+	  DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
+
       if (mComNumber > 0) {
         new Define("DEBUGSTUB");
       }
@@ -266,65 +327,6 @@ namespace Cosmos.IL2CPU.X86 {
       // Start emitting assembly labels
       Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
 
-#if !LFB_1024_8
-      DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
-      uint xFlags = 0x10003;
-      DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
-      DataMembers.Add(new DataMember("MultibootFlags", xFlags));
-      DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
-      DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-      DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-      DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-      DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-      DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
-      DataMembers.Add(new DataEndIfDefined());
-      DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
-      xFlags = 0x00003;
-      DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
-      DataMembers.Add(new DataMember("MultibootFlags", xFlags));
-      DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
-      DataMembers.Add(new DataEndIfDefined());
-#else
-            DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
-            uint xFlags = 0x10007;
-            DataMembers.Add(new DataMember("MultibootSignature",
-                                   new uint[] { 0x1BADB002 }));
-            DataMembers.Add(new DataMember("MultibootFlags",
-                           xFlags));
-            DataMembers.Add(new DataMember("MultibootChecksum",
-                                               (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
-            // graphics fields
-            DataMembers.Add(new DataMember("MultibootGraphicsMode", 0));
-            DataMembers.Add(new DataMember("MultibootGraphicsWidth", 1024));
-            DataMembers.Add(new DataMember("MultibootGraphicsHeight", 768));
-            DataMembers.Add(new DataMember("MultibootGraphicsDepth", 8));
-            DataMembers.Add(new DataEndIfDefined());
-            DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
-            xFlags = 0x00003;
-            DataMembers.Add(new DataMember("MultibootSignature",
-                                   new uint[] { 0x1BADB002 }));
-            DataMembers.Add(new DataMember("MultibootFlags",
-                           xFlags));
-            DataMembers.Add(new DataMember("MultibootChecksum",
-                                               (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataEndIfDefined());
-
-#endif
-      // graphics info fields 
-      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
-      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
-      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
-      // memory
-      DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
-      DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
-      DataMembers.Add(new DataMember("Before_Kernel_Stack",  new byte[0x50000]));
-      DataMembers.Add(new DataMember("Kernel_Stack", new byte[0]));
-      DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
     }
 
     protected override void OnBeforeFlush() {
