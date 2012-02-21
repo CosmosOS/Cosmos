@@ -139,56 +139,57 @@ Type: filesandordirs; Name: {code:GetCSharpExpress2010ProjectTemplatePath}\*Cosm
 
 [Files]
 ; Cecil dll, pdb
-Source: .\Resources\Dependencies\cecil\Mono.Cecil.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Resources\Dependencies\cecil\Mono.Cecil.pdb; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Resources\Dependencies\cecil\Mono.Cecil.Pdb.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Resources\Dependencies\cecil\Mono.Cecil.Pdb.pdb; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\cecil\Mono.Cecil.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\cecil\Mono.Cecil.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 ; Tools
-Source: .\Build\Tools\*.exe; DestDir: {app}\Build\Tools; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\Tools\NAsm\*.exe; DestDir: {app}\Build\Tools\NAsm; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\Tools\Cygwin\*; DestDir: {app}\Build\Tools\cygwin; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: .\Build\VMWare\*; DestDir: {app}\Build\VMWare; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
+Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
+Source: ".\Build\VMWare\*"; DestDir: "{app}\Build\VMWare"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; Kernel assemblies
-Source: .\Build\VSIP\Cosmos.Debug.Kernel.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Core.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Hardware.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.System.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Common.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\FirebirdSql.Data.FirebirdClient.*; DestDir: {app}\Kernel; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Hardware.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 ; Icon
-Source: .\source2\Cosmos.ico; DestDir: {app}; Flags: ignoreversion uninsremovereadonly
+Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; VSIP stuff
-Source: .\Build\VSIP\Cosmos.targets; DestDir: {pf32}\MSBuild\Cosmos; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.VS.Package.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Debug.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Build.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.Assembler.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.IL2CPU.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\corapi.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\raw.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\fbembed.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\icu*.dll; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\FirebirdSql.Data.FirebirdClient.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
-Source: .\Build\VSIP\Cosmos.VS.Windows.*; DestDir: {app}\Build\VSIP\; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\corapi.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\raw.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\fbembed.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\icu*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.Windows.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; wizards
-Source: .\Build\VSIP\Cosmos.VS.Wizards.*; DestDir: {code:VSNET2010_PATH}\PrivateAssemblies; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2010_PATH}\PrivateAssemblies"; Flags: ignoreversion uninsremovereadonly
 
-Source: .\Build\ISO\isolinux.*; DestDir: {app}\Build\ISO
-Source: .\Build\ISO\mboot.c32; DestDir: {app}\Build\ISO
+Source: ".\Build\ISO\isolinux.*"; DestDir: "{app}\Build\ISO"
+Source: ".\Build\ISO\mboot.c32"; DestDir: "{app}\Build\ISO"
 
 ; Templates
 ; ; Install files into VS Integrated Shell (which includes full Visual Studio)
-Source: .\Build\VSIP\CosmosProject (C#).zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
-Source: .\Build\VSIP\CosmosProject (F#).zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Fsharp2010_Installed('dummy')
-Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy')
+Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
+Source: ".\Build\VSIP\CosmosProject (F#).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Fsharp2010_Installed('dummy')
+Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy')
 ; ; Install templates into Shell
-Source: .\Build\VSIP\Cosmos.zip; DestDir: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy') or IsVBExpress2010Installed('dummy')
+Source: ".\Build\VSIP\Cosmos.zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy') or IsVBExpress2010Installed('dummy')
 ; ; Install templates into C# Express
-Source: .\Build\VSIP\CosmosKernel (C#).zip; DestDir: {code:GetCSharpExpress2010ProjectTemplatePath}; DestName: CosmosKernel (C#).zip; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy')
+Source: ".\Build\VSIP\CosmosKernel (C#).zip"; DestDir: "{code:GetCSharpExpress2010ProjectTemplatePath}"; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy')
 ; ; Install templates into VB Express
-Source: ".\Build\VSIP\CosmosKernel (VB).zip";  DestDir: {code:GetVBExpress2010ProjectTemplatePath}; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2010Installed('dummy')
+Source: ".\Build\VSIP\CosmosKernel (VB).zip"; DestDir: "{code:GetVBExpress2010ProjectTemplatePath}"; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2010Installed('dummy')
+Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey

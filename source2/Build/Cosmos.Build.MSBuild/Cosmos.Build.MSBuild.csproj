@@ -63,6 +63,9 @@
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="Mosa.Utility.IsoImage, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cb4c10f2cfcbc24d, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>

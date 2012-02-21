@@ -6,6 +6,8 @@ using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 using System.IO;
 
+using Mosa.Utility.IsoImage;
+
 namespace Cosmos.Build.MSBuild
 {
     public class MakeISO: BaseToolTask
@@ -48,11 +50,18 @@ namespace Cosmos.Build.MSBuild
             
             Log.LogMessage("xPath = '{0}'", xPath);
 
-            return ExecuteTool(
-                xPath,
-                Path.Combine(CosmosBuildDir, "Tools\\mkisofs.exe"),
-                String.Format("-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o \"{0}\" .", Path.Combine(Environment.CurrentDirectory, OutputFile)),
-                "mkisofs");
+			Options options = new Options();
+
+			options.BootLoadSize = 4;
+			options.IsoFileName = Path.Combine(Environment.CurrentDirectory, OutputFile);
+			options.BootFileName = Path.Combine(xPath, "isolinux.bin");
+			options.BootInfoTable = true;
+			options.IncludeFiles.Add(xPath);
+
+			Iso9660Generator iso = new Iso9660Generator(options);
+			iso.Generate();
+
+			return true;
         }
     }
 }
