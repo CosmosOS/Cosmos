@@ -8,7 +8,7 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
 {
     public class VMWareSVGAII
     {
-        public enum Register : byte
+        public enum Register : ushort
         {
             ID = 0,
             Enable = 1,
@@ -43,9 +43,13 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
             ScratchSize = 29,
             MemRegs = 30,
             NumDisplays = 31,
-            PitchLock = 32
-        }
+            PitchLock = 32,
 
+			/// <summary>
+			/// Indicates maximum size of FIFO Registers, which is necessary else VMware will terminate.
+			/// </summary>
+			FifoNumRegisters = 293
+        }
 
         private enum ID : uint
         {
@@ -57,7 +61,7 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
         }
 
         public enum FIFO : uint
-        {
+        {	// values are multiplied by 4 to access the array by byte index
             Min = 0,
             Max = 4,
             NextCmd = 8,
@@ -125,17 +129,17 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
             if (ReadRegister(Register.ID) != (uint)ID.V2)
                 return;
 
-            Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));            
+            Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             InitializeFIFO();
         }
 
         protected void InitializeFIFO()
         {
             FIFO_Memory = new MemoryBlock(ReadRegister(Register.MemStart), ReadRegister(Register.MemSize));
-            FIFO_Memory[(uint)FIFO.Min] = 16;
-            FIFO_Memory[(uint)FIFO.Max] = FIFO_Memory.Size;
-            FIFO_Memory[(uint)FIFO.NextCmd] = 16;
-            FIFO_Memory[(uint)FIFO.Stop] = 16;
+			FIFO_Memory[(uint)FIFO.Min] = 16;// (uint)Register.FifoNumRegisters * sizeof(uint);
+			FIFO_Memory[(uint)FIFO.Max] = FIFO_Memory.Size;
+			FIFO_Memory[(uint)FIFO.NextCmd] = FIFO_Memory[(uint)FIFO.Min];
+			FIFO_Memory[(uint)FIFO.Stop] = FIFO_Memory[(uint)FIFO.Min];
             WriteRegister(Register.ConfigDone, 1);
         }
 
@@ -186,7 +190,7 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
                 (GetFIFO(FIFO.NextCmd) + 4 == GetFIFO(FIFO.Stop)))
                 WaitForFifo();
 
-            SetFIFO((FIFO)(GetFIFO(FIFO.NextCmd) / 4), value);
+            SetFIFO((FIFO)GetFIFO(FIFO.NextCmd), value);
             SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.NextCmd) + 4);
 
             if (GetFIFO(FIFO.NextCmd) == GetFIFO(FIFO.Max))
@@ -212,7 +216,6 @@ namespace Cosmos.Hardware.Drivers.PCI.Video
         {
             return Video_Memory[(uint)((y * width * depth) + x)];
         }
-
 
         public void Clear(uint color)
         {
