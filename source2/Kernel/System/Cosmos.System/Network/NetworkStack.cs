@@ -19,6 +19,11 @@ namespace Cosmos.System.Network
         internal static void Init()
         {
             AddressMap = new TempDictionary<NetworkDevice>();
+
+            // VMT Scanner issue workaround
+            Cosmos.System.Network.IPv4.ICMPPacket.VMTInclude();
+            Cosmos.System.Network.IPv4.ICMPEchoReply.VMTInclude();
+            Cosmos.System.Network.IPv4.ICMPEchoRequest.VMTInclude();
         }
 
         /// <summary>

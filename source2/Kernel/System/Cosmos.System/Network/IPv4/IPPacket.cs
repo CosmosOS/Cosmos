@@ -58,6 +58,10 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
+        internal IPPacket()
+            : base()
+        { }
+
         internal IPPacket(byte[] rawData)
             : base(rawData)
         { }

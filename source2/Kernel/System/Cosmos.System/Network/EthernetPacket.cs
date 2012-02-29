@@ -10,6 +10,9 @@ namespace Cosmos.System.Network
         protected MACAddress destMAC;
         protected UInt16 aEtherType;
 
+        protected EthernetPacket()
+        { }
+
         protected EthernetPacket(byte[] rawData)
         {
             mRawData = rawData;

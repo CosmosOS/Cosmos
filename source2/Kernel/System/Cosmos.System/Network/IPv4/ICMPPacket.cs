@@ -12,18 +12,14 @@ namespace Cosmos.System.Network.IPv4
         internal static void ICMPHandler(byte[] packetData)
         {
             ICMPPacket icmp_packet = new ICMPPacket(packetData);
-            icmp_packet.initICMPFields();
-            //Sys.Console.WriteLine("Received " + icmp_packet.ToString());
             switch (icmp_packet.ICMP_Type)
             {
                 case 0:
                     ICMPEchoReply recvd_reply = new ICMPEchoReply(packetData);
-                    recvd_reply.initICMPEchoFields();
                     Sys.Console.WriteLine("Received ICMP Echo reply from " + recvd_reply.SourceIP.ToString());
                     break;
                 case 8:
                     ICMPEchoRequest request = new ICMPEchoRequest(packetData);
-                    request.initICMPEchoFields();
                     Sys.Console.WriteLine("Received " + request.ToString());
                     ICMPEchoReply reply = new ICMPEchoReply(request);
                     Sys.Console.WriteLine("Sending ICMP Echo reply to " + reply.DestinationIP.ToString());
@@ -32,23 +28,27 @@ namespace Cosmos.System.Network.IPv4
             }
         }
 
-        public ICMPPacket(byte[] rawData)
+        /// <summary>
+        /// Work around to make VMT scanner include the initFields method
+        /// </summary>
+        public static void VMTInclude()
+        {
+            new ICMPPacket();
+        }
+
+        internal ICMPPacket()
+            : base()
+        { }
+
+        internal ICMPPacket(byte[] rawData)
             : base(rawData)
         {
         }
 
         protected override void initFields()
         {
-            Sys.Console.WriteLine("ICMPPacket.initFields() called;");
+            //Sys.Console.WriteLine("ICMPPacket.initFields() called;");
             base.initFields();
-            icmpType = mRawData[this.dataOffset];
-            icmpCode = mRawData[this.dataOffset + 1];
-            icmpCRC = (UInt16)((mRawData[this.dataOffset + 2] << 8) | mRawData[this.dataOffset + 3]);
-        }
-
-        // TODO: Temporary until we have a fix for the VMT Scan issue
-        internal void initICMPFields()
-        {
             icmpType = mRawData[this.dataOffset];
             icmpCode = mRawData[this.dataOffset + 1];
             icmpCRC = (UInt16)((mRawData[this.dataOffset + 2] << 8) | mRawData[this.dataOffset + 3]);
@@ -117,6 +117,10 @@ namespace Cosmos.System.Network.IPv4
         protected UInt16 icmpID;
         protected UInt16 icmpSequence;
 
+        internal ICMPEchoRequest()
+            : base()
+        { }
+
         internal ICMPEchoRequest(byte[] rawData)
             : base(rawData)
         {
@@ -137,17 +141,18 @@ namespace Cosmos.System.Network.IPv4
             mRawData[this.dataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
         }
 
-        protected override void initFields()
+        /// <summary>
+        /// Work around to make VMT scanner include the initFields method
+        /// </summary>
+        public new static void VMTInclude()
         {
-            base.initFields();
-            icmpID = (UInt16)((mRawData[this.dataOffset + 4] << 8) | mRawData[this.dataOffset + 5]);
-            icmpSequence = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
+            new ICMPEchoRequest();
         }
 
-        // TODO: Temporary until we have a fix for the VMT Scan issue
-        internal void initICMPEchoFields()
+        protected override void initFields()
         {
-            base.initICMPFields();
+            //Sys.Console.WriteLine("ICMPEchoRequest.initFields() called;");
+            base.initFields();
             icmpID = (UInt16)((mRawData[this.dataOffset + 4] << 8) | mRawData[this.dataOffset + 5]);
             icmpSequence = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
         }
@@ -171,22 +176,27 @@ namespace Cosmos.System.Network.IPv4
         protected UInt16 icmpID;
         protected UInt16 icmpSequence;
 
+        internal ICMPEchoReply()
+            : base()
+        { }
+
         internal ICMPEchoReply(byte[] rawData)
             : base(rawData)
         {
         }
 
-        protected override void initFields()
+        /// <summary>
+        /// Work around to make VMT scanner include the initFields method
+        /// </summary>
+        public new static void VMTInclude()
         {
-            base.initFields();
-            icmpID = (UInt16)((mRawData[this.dataOffset + 4] << 8) | mRawData[this.dataOffset + 5]);
-            icmpSequence = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
+            new ICMPEchoReply();
         }
 
-        // TODO: Temporary until we have a fix for the VMT Scan issue
-        internal void initICMPEchoFields()
+        protected override void initFields()
         {
-            base.initICMPFields();
+            //Sys.Console.WriteLine("ICMPEchoReply.initFields() called;");
+            base.initFields();
             icmpID = (UInt16)((mRawData[this.dataOffset + 4] << 8) | mRawData[this.dataOffset + 5]);
             icmpSequence = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
         }
