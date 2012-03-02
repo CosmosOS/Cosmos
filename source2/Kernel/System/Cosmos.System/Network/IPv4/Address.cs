@@ -130,15 +130,10 @@ namespace Cosmos.System.Network.IPv4
             if (obj is Address)
             {
                 Address other = (Address)obj;
-                int i = 0;
-                i = address[0].CompareTo(other.address[0]);
-                if (i != 0) return i;
-                i = address[1].CompareTo(other.address[1]);
-                if (i != 0) return i;
-                i = address[2].CompareTo(other.address[2]);
-                if (i != 0) return i;
-                i = address[3].CompareTo(other.address[3]);
-                if (i != 0) return i;
+                if (other.hash != this.hash)
+                {
+                    return -1;
+                }
 
                 return 0;
             }

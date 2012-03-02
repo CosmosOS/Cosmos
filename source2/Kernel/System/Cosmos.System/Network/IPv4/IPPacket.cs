@@ -43,9 +43,9 @@ namespace Cosmos.System.Network.IPv4
                     //case 6:
                     //    IPv4_TCPHandler(packetData);
                     //    break;
-                    //case 17:
-                    //    IPv4_UDPHandler(packetData);
-                    //    break;
+                    case 17:
+                        UDPPacket.UDPHandler(packetData);
+                        break;
                 }
             }
         }

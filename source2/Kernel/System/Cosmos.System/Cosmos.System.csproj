@@ -87,8 +87,10 @@
     <Compile Include="Network\IPv4\ICMPPacket.cs" />
     <Compile Include="Network\IPv4\IPPacket.cs" />
     <Compile Include="Network\IPv4\OutgoingBuffer.cs" />
+    <Compile Include="Network\IPv4\UDPPacket.cs" />
     <Compile Include="Network\NetworkStack.cs" />
     <Compile Include="Network\TempDictionary.cs" />
+    <Compile Include="Network\UdpClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

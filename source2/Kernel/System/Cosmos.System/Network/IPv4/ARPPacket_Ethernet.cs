@@ -1,6 +1,7 @@
 ﻿using System;
 using Cosmos.Core.Network;
 using Cosmos.System.Network.ARP;
+using Sys = System;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -11,12 +12,17 @@ namespace Cosmos.System.Network.IPv4
         protected Address mSenderIP;
         protected Address mTargetIP;
 
+        internal ARPPacket_Ethernet()
+            : base()
+        { }
+
         internal ARPPacket_Ethernet(byte[] rawData)
             : base(rawData)
         { }
 
         protected override void initFields()
         {
+            //Sys.Console.WriteLine("ARPPacket_Ethernet.initFields() called");
             base.initFields();
             mSenderMAC = new MACAddress(mRawData, 22);
             mSenderIP = new Address(mRawData, 28);
@@ -68,6 +74,18 @@ namespace Cosmos.System.Network.IPv4
 
     internal class ARPReply_Ethernet : ARPPacket_Ethernet
     {
+        /// <summary>
+        /// Work around to make VMT scanner include the initFields method
+        /// </summary>
+        public new static void VMTInclude()
+        {
+            new ARPReply_Ethernet();
+        }
+
+        internal ARPReply_Ethernet()
+            : base()
+        { }
+
         internal ARPReply_Ethernet(byte[] rawData)
             : base(rawData)
         { }
@@ -83,6 +101,18 @@ namespace Cosmos.System.Network.IPv4
     }
     internal class ARPRequest_Ethernet : ARPPacket_Ethernet
     {
+        /// <summary>
+        /// Work around to make VMT scanner include the initFields method
+        /// </summary>
+        public new static void VMTInclude()
+        {
+            new ARPRequest_Ethernet();
+        }
+
+        internal ARPRequest_Ethernet()
+            : base()
+        { }
+
         internal ARPRequest_Ethernet(byte[] rawData)
             : base(rawData)
         { }

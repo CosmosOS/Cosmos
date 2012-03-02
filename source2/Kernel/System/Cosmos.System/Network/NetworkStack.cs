@@ -21,9 +21,14 @@ namespace Cosmos.System.Network
             AddressMap = new TempDictionary<NetworkDevice>();
 
             // VMT Scanner issue workaround
+            Cosmos.System.Network.ARP.ARPPacket.VMTInclude();
+            //Cosmos.System.Network.IPv4.ARPPacket_Ethernet.VMTInclude();
+            Cosmos.System.Network.IPv4.ARPReply_Ethernet.VMTInclude();
+            Cosmos.System.Network.IPv4.ARPRequest_Ethernet.VMTInclude();
             Cosmos.System.Network.IPv4.ICMPPacket.VMTInclude();
             Cosmos.System.Network.IPv4.ICMPEchoReply.VMTInclude();
             Cosmos.System.Network.IPv4.ICMPEchoRequest.VMTInclude();
+            Cosmos.System.Network.IPv4.UDPPacket.VMTInclude();
         }
 
         /// <summary>

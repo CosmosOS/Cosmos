@@ -27,7 +27,7 @@ namespace Cosmos.System.Network.ARP
 
                     if (NetworkStack.AddressMap.ContainsKey(arp_request.TargetIP.Hash) == true)
                     {
-                        Sys.Console.WriteLine("ARP Request Recvd from " + arp_request.SenderIP.ToString());
+                        //Sys.Console.WriteLine("ARP Request Recvd from " + arp_request.SenderIP.ToString());
                         NetworkDevice nic = NetworkStack.AddressMap[arp_request.TargetIP.Hash];
 
                         IPv4.ARPReply_Ethernet reply =
@@ -37,18 +37,32 @@ namespace Cosmos.System.Network.ARP
                     }
                 }
             }
-            //else if (arp_packet.Operation == 0x02)
-            //{
-            //    if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
-            //    {
-            //        ARP.IPv4.ARPReply_Ethernet arp_reply = new ARP.IPv4.ARPReply_Ethernet(packetData);
-            //        ARP.ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
+            else if (arp_packet.Operation == 0x02)
+            {
+                if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
+                {
+                    IPv4.ARPReply_Ethernet arp_reply = new IPv4.ARPReply_Ethernet(packetData);
+                    //Sys.Console.WriteLine("Received ARP Reply");
+                    //Sys.Console.WriteLine(arp_reply.ToString());
+                    //Sys.Console.WriteLine("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
+                    ARP.ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
 
-            //        //Sys.Console.WriteLine("ARP Reply Recvd for IP=" + arp_reply.SenderIP.ToString());
-            //        TCPIP.IPv4.OutgoingBuffer.ARPCache_Update(arp_reply);
-            //    }
-            //}
+                    IPv4.OutgoingBuffer.ARPCache_Update(arp_reply);
+                }
+            }
         }
+
+        /// <summary>
+        /// Work around to make VMT scanner include the initFields method
+        /// </summary>
+        public static void VMTInclude()
+        {
+            new ARPPacket();
+        }
+
+        internal ARPPacket()
+            : base()
+        { }
 
         internal ARPPacket(byte[] rawData)
             : base(rawData)
