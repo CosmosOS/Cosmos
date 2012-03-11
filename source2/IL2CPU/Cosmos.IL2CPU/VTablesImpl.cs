@@ -146,7 +146,5 @@ namespace Cosmos.IL2CPU {
 		public int[] MethodIndexes;
 		[FieldOffset(12)]
 		public int[] MethodAddresses;
-        [FieldOffset(16)]
-        public uint TypeInitialized;
 	}
 }

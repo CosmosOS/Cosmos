@@ -358,7 +358,7 @@ namespace Cosmos.IL2CPU {
                                                      select xParam.ParameterType).ToArray());
 
                 if (xNewMethod == null) {
-                  // get private implemenation
+                  // get private implementation
                   xNewMethod = xType.GetMethod(xMethod.Name,
                                                   (from xParam in xMethod.GetParameters()
                                                    select xParam.ParameterType).ToArray());
