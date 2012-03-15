@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-// Come form OForm 
+// This is released under the public domain.
+// Originally created by Orvid King for OForms.
 
-// The Orvid.Graphics License v1.0:
-// Copyright 2011, Orvid King
-
-// May need to be remade so it does not use this license.
 
 namespace Cosmos.Common.Extensions
 {
