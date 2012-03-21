@@ -84,6 +84,7 @@
     <Compile Include="Network\IPv4\Address.cs" />
     <Compile Include="Network\IPv4\ARPPacket_Ethernet.cs" />
     <Compile Include="Network\IPv4\Config.cs" />
+    <Compile Include="Network\IPv4\EndPoint.cs" />
     <Compile Include="Network\IPv4\ICMPPacket.cs" />
     <Compile Include="Network\IPv4\IPPacket.cs" />
     <Compile Include="Network\IPv4\OutgoingBuffer.cs" />

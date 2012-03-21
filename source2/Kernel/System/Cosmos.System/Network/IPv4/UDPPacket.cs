@@ -14,14 +14,17 @@ namespace Cosmos.System.Network.IPv4
         {
             UDPPacket udp_packet = new UDPPacket(packetData);
             Sys.Console.WriteLine("Received UDP packet from " + udp_packet.SourceIP.ToString() + ":" + udp_packet.SourcePort.ToString());
-            //if (udpClients.ContainsKey(udp_packet.DestinationPort) == true)
-            //{
+            UdpClient receiver = UdpClient.Client(udp_packet.DestinationPort);
+            if (receiver != null)
+            {
+                Sys.Console.WriteLine("UDP Packet is for registered client");
+                receiver.receiveData(udp_packet);
             //    DataReceived dlgt = udpClients[udp_packet.DestinationPort];
             //    if (dlgt != null)
             //    {
             //        dlgt(new IPv4EndPoint(udp_packet.SourceIP, udp_packet.SourcePort), udp_packet.UDP_Data);
             //    }
-            //}
+            }
         }
 
         /// <summary>
