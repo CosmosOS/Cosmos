@@ -73,7 +73,7 @@ namespace Cosmos.VS.Windows {
       Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
     }
 
-    protected override void DoUpdate(string aTag, byte[] aData) {
+    protected override void DoUpdate(string aTag) {
       string xText = Encoding.UTF8.GetString(mData);
       Log(xText, true);
     }

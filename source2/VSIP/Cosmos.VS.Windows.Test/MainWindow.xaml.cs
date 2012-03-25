@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace Cosmos.VS.Windows.Test {
   public partial class MainWindow : Window {
@@ -21,6 +22,7 @@ namespace Cosmos.VS.Windows.Test {
 
       // Uncomment code in AssemblyUC.xml.cs to genearate a new bin test file
       //  in method Display(bool aFilter)
+      // Make sure to comment back out before running this, else there will be conflicts
       byte[] xData = System.IO.File.ReadAllBytes(System.IO.Path.Combine(xPath, "SourceTest.bin"));
       ucAssembly.Update(null, xData);
     }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Collections.Generic;
 
 namespace Cosmos.VS.Windows {
   /// This class implements the tool window exposed by this package and hosts a user control.
@@ -37,8 +38,10 @@ namespace Cosmos.VS.Windows {
   }
 
   public partial class AssemblyUC : DebuggerUC {
-    StringBuilder mCode = new StringBuilder();
-    bool mFilter = true;
+    protected List<AsmLine> mLines = new List<AsmLine>();
+    // Text of code as rendered. Used for clipboard etc.
+    protected StringBuilder mCode = new StringBuilder();
+    protected bool mFilter = true;
 
     public AssemblyUC() {
       InitializeComponent();
@@ -66,7 +69,7 @@ namespace Cosmos.VS.Windows {
 
     protected void Display(bool aFilter) {
       // Used for creating a test file for Cosmos.VS.Windows.Test
-      System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+      //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
 
       mCode.Clear();
       tblkSource.Inlines.Clear();
@@ -76,15 +79,12 @@ namespace Cosmos.VS.Windows {
 
       var xFont = new FontFamily("Consolas");
       Brush xBrush;
-      string xCode = Encoding.UTF8.GetString(mData);
       string xLabelPrefix = null;
 
-      // Should always be \r\n, but just in case we split by \n and ignore \r
-      string[] xLines = xCode.Replace("\r", "").Split('\n');
-      foreach (string xLine in xLines) {
+      foreach (var xLine in mLines) {
         xBrush = Brushes.Blue;
-        string xDisplayLine = xLine;
-        string xTestLine = xLine.Trim().ToUpper();
+        string xDisplayLine = xLine.ToString();
+        string xTestLine = xDisplayLine.Trim().ToUpper();
         var xTestParts = xTestLine.Split(' ');
 
         if (aFilter) {
@@ -148,8 +148,16 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    protected override void DoUpdate(string aTag, byte[] aData) {
-      mData = aData;
+    protected override void DoUpdate(string aTag) {
+      string xCode = Encoding.UTF8.GetString(mData);
+
+      // Should always be \r\n, but just in case we split by \n and ignore \r
+      string[] xLines = xCode.Replace("\r", "").Split('\n');
+      mLines.Clear();
+      foreach (string xLine in xLines) {
+        mLines.Add(new AsmLine(xLine));
+      }
+
       Display(mFilter);
     }
 

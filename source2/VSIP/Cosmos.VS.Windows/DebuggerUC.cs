@@ -13,12 +13,12 @@ namespace Cosmos.VS.Windows {
       mData = aData;
       Dispatcher.Invoke(DispatcherPriority.Normal, 
         (Action)delegate() {
-          DoUpdate(aTag, aData);    
+          DoUpdate(aTag);    
         }
       );
     }
 
-    protected virtual void DoUpdate(string aTag, byte[] aData) {
+    protected virtual void DoUpdate(string aTag) {
     }
   }
 }

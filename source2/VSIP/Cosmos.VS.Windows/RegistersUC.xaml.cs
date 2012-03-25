@@ -56,7 +56,7 @@ namespace Cosmos.VS.Windows {
       a32.Value = x32;
     }
 
-    protected override void DoUpdate(string aTag, byte[] aData) {
+    protected override void DoUpdate(string aTag) {
       //Push All
       //  Temp = (ESP);
       //  Push(EAX); 28
@@ -73,15 +73,15 @@ namespace Cosmos.VS.Windows {
       // ESP 32
       // EIP 36
       //
-      UpdateRegisters(aData, 28, dataEAX, dataAX, dataAH, dataAL);
-      UpdateRegisters(aData, 16, dataEBX, dataBX, dataBH, dataBL);
-      UpdateRegisters(aData, 24, dataECX, dataCX, dataCH, dataCL);
-      UpdateRegisters(aData, 20, dataEDX, dataDX, dataDH, dataDL);
-      UpdateRegister32(aData, 8, dataEBP);
-      UpdateRegister32(aData, 4, dataESI);
-      UpdateRegister32(aData, 0, dataEDI);
-      UpdateRegister32(aData, 32, dataESP);
-      UpdateRegister32(aData, 36, dataEIP);
+      UpdateRegisters(mData, 28, dataEAX, dataAX, dataAH, dataAL);
+      UpdateRegisters(mData, 16, dataEBX, dataBX, dataBH, dataBL);
+      UpdateRegisters(mData, 24, dataECX, dataCX, dataCH, dataCL);
+      UpdateRegisters(mData, 20, dataEDX, dataDX, dataDH, dataDL);
+      UpdateRegister32(mData, 8, dataEBP);
+      UpdateRegister32(mData, 4, dataESI);
+      UpdateRegister32(mData, 0, dataEDI);
+      UpdateRegister32(mData, 32, dataESP);
+      UpdateRegister32(mData, 36, dataEIP);
       //TODO: Flags
     }
   }

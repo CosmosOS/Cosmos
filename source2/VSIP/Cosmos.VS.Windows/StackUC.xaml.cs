@@ -40,11 +40,11 @@ namespace Cosmos.VS.Windows {
       InitializeComponent();
     }
 
-    protected override void DoUpdate(string aTag, byte[] aData) {
+    protected override void DoUpdate(string aTag) {
       if (aTag == "STACK") {
-        UpdateStack(aData);
+        UpdateStack(mData);
       } else if (aTag == "FRAME") {
-        UpdateFrame(aData);
+        UpdateFrame(mData);
       }
     }
 

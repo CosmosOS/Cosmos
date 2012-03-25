@@ -116,6 +116,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsmLine.cs" />
     <Compile Include="AssemblyUC.xaml.cs">
       <DependentUpon>AssemblyUC.xaml</DependentUpon>
     </Compile>
