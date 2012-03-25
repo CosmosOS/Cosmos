@@ -13,6 +13,12 @@ namespace Cosmos.VS.Windows {
       return mText;
     }
 
+    protected AsmLabel mLabel;
+    public AsmLabel Label {
+      get { return mLabel; }
+      set { mLabel = value; }
+    }
+
     public AsmCode(string aText) {
       mText = aText;
     }
@@ -36,9 +42,10 @@ namespace Cosmos.VS.Windows {
       get { return mLabel; }
     }
 
-    protected string mComment;
+    protected string mComment = "";
     public string Comment {
       get { return mComment; }
+      set { mComment = value; }
     }
 
     public override string ToString() {
@@ -49,9 +56,8 @@ namespace Cosmos.VS.Windows {
       return xResult;
     }
 
-    public AsmLabel(string aLabel, string aComment) {
+    public AsmLabel(string aLabel) {
       mLabel = aLabel;
-      mComment = aComment;
     }
   }
 

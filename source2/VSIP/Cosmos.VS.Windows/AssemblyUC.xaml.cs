@@ -68,9 +68,6 @@ namespace Cosmos.VS.Windows {
     }
 
     protected void Display(bool aFilter) {
-      // Used for creating a test file for Cosmos.VS.Windows.Test
-      //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
-
       mCode.Clear();
       tblkSource.Inlines.Clear();
       if (mData.Length == 0) {
@@ -78,11 +75,11 @@ namespace Cosmos.VS.Windows {
       }
 
       var xFont = new FontFamily("Consolas");
-      Brush xBrush;
       string xLabelPrefix = null;
 
       foreach (var xLine in mLines) {
         string xDisplayLine = xLine.ToString();
+
         if (aFilter) {
           if (xLine is AsmLabel) {
             var xAsmLabel = (AsmLabel)xLine;
@@ -104,6 +101,12 @@ namespace Cosmos.VS.Windows {
               xLabelPrefix = xLabelParts[0] + ".";
             }
           } else {
+            if (xLine is AsmCode) {
+              var xCode = (AsmCode)xLine;
+              if (xCode.ToString().ToUpper() == "INT3") {
+                continue;
+              }
+            }
             xDisplayLine = "\t" + xLine.ToString();
           }
 
@@ -116,7 +119,7 @@ namespace Cosmos.VS.Windows {
         // Even though our code is often the source of the tab, it makes
         // more sense to do it this was because the number of space stays
         // in one place and also lets us differentiate from natural spaces.
-        xDisplayLine = xDisplayLine.Replace("\t", "    ");
+        xDisplayLine = xDisplayLine.Replace("\t", "  ");
 
         var xRun = new Run(xDisplayLine);
         xRun.FontFamily = xFont;
@@ -138,21 +141,24 @@ namespace Cosmos.VS.Windows {
     }
 
     protected override void DoUpdate(string aTag) {
+      // Used for creating a test file for Cosmos.VS.Windows.Test
+      if (false && mData.Length > 0) {
+        System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+      }
+      
       string xCode = Encoding.UTF8.GetString(mData);
 
+      mLines.Clear();
       // Should always be \r\n, but just in case we split by \n and ignore \r
       string[] xLines = xCode.Replace("\r", "").Split('\n');
-      mLines.Clear();
+      AsmLabel xLastAsmAsmLabel = null;
       foreach (string xLineText in xLines) {
         string xLine = xLineText.Trim();
         string xTestLine = xLine.ToUpper();
         var xParts = xLine.Split(' ');
 
-        // Skip certain items we never care about.
-        // ie remove noise
-        if (xTestLine == "INT3") {
-          continue;
-        } else if (xLine.Length == 0) {
+        // Skip certain items we never care about. ie remove noise
+        if (xLine.Length == 0) {
           // Remove all empty lines because we completely reformat output.
           // Parse below also expects some data, not empty string.
           continue;
@@ -160,16 +166,22 @@ namespace Cosmos.VS.Windows {
 
         if (xParts[0].EndsWith(":")) {
           string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
-          string xComment = "";
+          var xAsmLabel = new AsmLabel(xLabel);
           if (xParts.Length > 1) {
-            xComment = xParts[1].Substring(1).Trim();
+            xAsmLabel.Comment = xParts[1].Substring(1).Trim();
+            if (xAsmLabel.Comment.ToUpper() == "ASM") {
+              xLastAsmAsmLabel = xAsmLabel;
+            }
           }
-          mLines.Add(new AsmLabel(xLabel, xComment));
+          mLines.Add(xAsmLabel);
         } else if (xTestLine.StartsWith(";")) {
           string xComment = xLine.Trim().Substring(1).Trim();
           mLines.Add(new AsmComment(xComment));
         } else {
-          mLines.Add(new AsmCode(xLine));
+          var xAsmCode = new AsmCode(xLine);
+          xAsmCode.Label = xLastAsmAsmLabel;
+          xLastAsmAsmLabel = null;
+          mLines.Add(xAsmCode);
         }
       }
 
