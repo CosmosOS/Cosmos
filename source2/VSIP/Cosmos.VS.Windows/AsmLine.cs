@@ -18,6 +18,18 @@ namespace Cosmos.VS.Windows {
     }
   }
 
+  public class AsmComment : AsmLine {
+    protected string mComment;
+
+    public override string ToString() {
+      return "; " + mComment;
+    }
+
+    public AsmComment(string aComment) {
+      mComment = aComment;
+    }
+  }
+
   public class AsmLabel : AsmLine {
     protected string mLabel;
     public string Label {

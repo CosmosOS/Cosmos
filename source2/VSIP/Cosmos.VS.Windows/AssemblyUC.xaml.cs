@@ -83,11 +83,8 @@ namespace Cosmos.VS.Windows {
 
       foreach (var xLine in mLines) {
         string xDisplayLine = xLine.ToString();
-        string xTestLine = xDisplayLine.Trim().ToUpper();
 
         if (aFilter) {
-          xDisplayLine = xDisplayLine.Trim();
-
           if (xLine is AsmLabel) {
             var xAsmLabel = (AsmLabel)xLine;
             xDisplayLine = xAsmLabel.Label + ":";
@@ -104,11 +101,11 @@ namespace Cosmos.VS.Windows {
             }
 
             if (xLabelPrefix == null) {
-              var xLabelParts = xDisplayLine.Split('.');
+              var xLabelParts = xAsmLabel.Label.Split('.');
               xLabelPrefix = xLabelParts[0] + ".";
             }
           } else {
-            xDisplayLine = "\t" + xDisplayLine;
+            xDisplayLine = "\t" + xLine.ToString().Trim();
           }
 
           // Replace all and not just labels so we get jumps, calls etc
@@ -121,7 +118,7 @@ namespace Cosmos.VS.Windows {
         xBrush = Brushes.Blue;
         if (xLine is AsmLabel) {
           xBrush = Brushes.Black;
-        } else if (xTestLine.StartsWith(";")) {
+        } else if (xLine is AsmComment) {
           xBrush = Brushes.Green;
         }
 
@@ -167,6 +164,9 @@ namespace Cosmos.VS.Windows {
             xComment = xParts[1].Substring(1).Trim();
           }
           mLines.Add(new AsmLabel(xLabel, xComment));
+        } else if (xTestLine.StartsWith(";")) {
+          string xComment = xLine.Trim().Substring(1).Trim();
+          mLines.Add(new AsmComment(xComment));
         } else {
           mLines.Add(new AsmCode(xLine));
         }
