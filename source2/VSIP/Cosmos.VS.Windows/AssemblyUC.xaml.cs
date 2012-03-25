@@ -91,17 +91,10 @@ namespace Cosmos.VS.Windows {
           xDisplayLine = xDisplayLine.Trim();
           var xParts = xDisplayLine.Split(' ');
 
-          if (xTestLine == "INT3") {
-            continue;
-          } else if (xTestLine.Length == 0) {
-            // Remove all empty linesIW
-            continue;
-          } else {
-            // Skip ASM labels
-            if (xTestParts.Length > 1) {
-              if (xTestParts[1] == ";ASM") {
-                continue;
-              }
+          // Skip ASM labels
+          if (xTestParts.Length > 1) {
+            if (xTestParts[1] == ";ASM") {
+              continue;
             }
           }
 
@@ -155,6 +148,13 @@ namespace Cosmos.VS.Windows {
       string[] xLines = xCode.Replace("\r", "").Split('\n');
       mLines.Clear();
       foreach (string xLine in xLines) {
+        string xTestLine = xLine.Trim().ToUpper();
+        if (xTestLine == "INT3") {
+          continue;
+        } else if (xTestLine.Length == 0) {
+          // Remove all empty lines because we completely reformat output
+          continue;
+        }
         mLines.Add(new AsmLine(xLine));
       }
 
