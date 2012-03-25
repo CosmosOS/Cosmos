@@ -200,7 +200,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData) {
       switch (aCmd) {
         case DwCmd.Noop:
-          // do nothing?
+          // do nothing
           break;
 
         case DwCmd.PingVSIP:
@@ -209,6 +209,13 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         case DwCmd.PingDebugStub:
           mDbgConnector.Ping();
+          break;
+
+        case DwCmd.SetAsmBreak:
+          //mDbgConnector.Ping();
+          string xLabel = Encoding.UTF8.GetString(aData);
+          uint xAddress = mLabelAddressMappings[xLabel];
+          mDebugDownPipe.SendCommand(DwMsg.OutputPane, xAddress.ToString());
           break;
 
         default:

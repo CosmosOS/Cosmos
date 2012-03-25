@@ -140,7 +140,7 @@ namespace Cosmos.VS.Windows {
       var xDTE = (EnvDTE80.DTE2)Package.GetGlobalService(typeof(EnvDTE.DTE));
       var xPane = xDTE.ToolWindows.OutputWindow.OutputWindowPanes;
       Global.OutputPane = xPane.Add("Cosmos");
-      Global.OutputPane.OutputString("Debugger windows loaded.");
+      Global.OutputPane.OutputString("Debugger windows loaded.\r\n");
     }
 
     void ProcessMessage(object sender, EventArgs e) {

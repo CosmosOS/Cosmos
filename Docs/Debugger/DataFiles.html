@@ -5,18 +5,22 @@
     <title></title>
 </head>
 <body>
-
-    <p>
-        All files are generated in the output directory. Usually this is bin/debug or 
+    <p>All files are generated in the output directory. Usually this is bin/debug or 
         bin/release.</p>
-    <h4>
-        CMAP file</h4>
-    The CMAP file maps assembler labels to physical memory locations. These labels 
+    <h4>CMAP file</h4>
+    <p>The CMAP file maps assembler labels to physical memory locations. These labels 
     include data (internal data, static fields, string literals) and code locations 
     (method entry, points for each line of code, internal locations for exception 
-    handling).<br />
-    <br />
-    The format is address, tab, label. A small excerpt is shown below.<pre>00500000 DebugTraceMode
+    handling).</p>
+    <p><strong><em>Is CMAP used any more? Cant find any reference to it in code.</em></strong></p>
+    <p>The format is:</p>
+    <ol>
+        <li>Address</li>
+        <li>Tab</li>
+        <li>Label</li>
+    </ol>
+    <p>Example:</p>
+    <pre>00500000 DebugTraceMode
 00500004 DebugStatus
 00500008 DebugRunning </pre>
     <h4>

@@ -60,8 +60,12 @@ namespace Cosmos.VS.Windows {
                        where x is AsmCode
                        select (AsmCode)x;
       var xCodeLines = xCodeLinesQry.Where(q => q.Text.ToUpper() != "INT3").ToArray();
-      var xCodeLine = xCodeLines[1];
-      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.SetAsmBP);
+      if (xCodeLines.Length > 1) {
+        var xCodeLine = xCodeLines[1];
+        if (xCodeLine.Label != null) {
+          Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.SetAsmBreak, xCodeLine.Label.Label);
+        }
+      }
     }
 
     void butnFilter_Click(object sender, RoutedEventArgs e) {
