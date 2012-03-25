@@ -678,9 +678,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    #region Old ASM Stepping
-    //// Old ASM Stepping
-    ////
     //// Location where INT3 has been injected
     //// 0 if no INT3 is active
     //static public DataMember32 AsmBreakEIP;
@@ -717,7 +714,6 @@ namespace Cosmos.Debug.DebugStub {
     //    AsmOrigByte.Value = 0;
     //  }
     //}
-    #endregion
 
     public class SetAsmBreak : Inlines {
       public override void Assemble() {
