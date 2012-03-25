@@ -599,10 +599,19 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public void SendAssembly() {
-      // Scan and make a list of labels that belong to this line of code
+      // Because of Asm breakpoints the address we have might be in the middle of a C# line.
+      // So we find the closest address to ours that is less or equal to ours.
+      var xQry = from x in mSourceMappings
+                 where x.Key <= (uint)mCurrentAddress
+                 orderby x.Key descending
+                 select x.Value;
+      var xValue = xQry.FirstOrDefault();
+      if (xValue == null) {
+        return;
+      }
 
       // Create list of asm labels that belong to this line of C#.
-      var xValue = mSourceMappings[(uint)mCurrentAddress];
+      //var xValue = mSourceMappings[(uint)mCurrentAddress];
       var xMappings = from x in mSourceMappings
                    where x.Value.SourceFile == xValue.SourceFile
                      && x.Value.Line == xValue.Line
@@ -619,8 +628,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabels);
-
-      // Send source code to the tool window
       mDebugDownPipe.SendCommand(VsipUi.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }
 
