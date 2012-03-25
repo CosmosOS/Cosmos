@@ -15,6 +15,17 @@ namespace Cosmos.Debug.Common {
       mPipeName = aPipeName;
     }
 
+    public void SendCommand(byte aCmd) {
+      // Necessary to do it this way else C# using a literal null
+      // cant determine which of the overloads to call.
+      byte[] xData = null;
+      SendCommand(aCmd, xData);
+    }
+
+    public void SendCommand(byte aCmd, string aData) {
+      SendCommand(aCmd, Encoding.UTF8.GetBytes(aData)); 
+    }
+
     public void SendCommand(byte aCmd, byte[] aData) {
       // We need to delay creation and connect until its used, so we guarantee
       // that the server side is active and ready.

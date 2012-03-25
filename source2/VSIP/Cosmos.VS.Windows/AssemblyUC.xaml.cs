@@ -61,8 +61,7 @@ namespace Cosmos.VS.Windows {
                        select (AsmCode)x;
       var xCodeLines = xCodeLinesQry.Where(q => q.Text.ToUpper() != "INT3").ToArray();
       var xCodeLine = xCodeLines[1];
-      MessageBox.Show(xCodeLine.Label.Label);
-      //Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.AsmStep, null);
+      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.SetAsmBP);
     }
 
     void butnFilter_Click(object sender, RoutedEventArgs e) {

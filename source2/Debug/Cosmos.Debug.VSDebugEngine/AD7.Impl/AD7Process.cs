@@ -204,7 +204,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           break;
 
         case DwCmd.PingVSIP:
-          mDebugDownPipe.SendCommand(DwMsg.PongVSIP, null);
+          mDebugDownPipe.SendCommand(DwMsg.PongVSIP);
           break;
 
         case DwCmd.PingDebugStub:
@@ -669,7 +669,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     protected void OutputClear() {
-      mDebugDownPipe.SendCommand(DwMsg.OutputClear, null);
+      mDebugDownPipe.SendCommand(DwMsg.OutputClear);
     }
 
   }
