@@ -61,7 +61,7 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnPingDS_Click(object sender, RoutedEventArgs e) {
-      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingDebugStub);
+      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.UiVsip.PingDebugStub);
     }
 
     void butnPingVSIP_Click(object sender, RoutedEventArgs e) {
@@ -70,7 +70,7 @@ namespace Cosmos.VS.Windows {
       // ie Cosmos is booted. This is because the receiving
       // pipe is currently part of AD7Process which has a lifespan
       // tied to an active debug session.
-      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP);
+      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.UiVsip.PingVSIP);
     }
 
     protected override void DoUpdate(string aTag) {

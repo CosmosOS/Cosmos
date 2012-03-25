@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.Project
 
 		#region IVsSelectionEvents Members
 
-		public virtual int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
+		public virtual int OnCmdUIContextChanged(uint UiVsipUICookie, int fActive)
 		{
 			return VSConstants.E_NOTIMPL;
 		}

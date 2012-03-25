@@ -51,7 +51,7 @@ namespace Cosmos.Debug.DebugStub {
         // We may need to revisit this in the future to ack not commands, but data chunks
         // and move them to a buffer.
         // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
-        AL = DsMsg.CmdCompleted;
+        AL = DsVsip.CmdCompleted;
         Call<WriteALToComPort>();
         //
         EAX = DebugStub_CommandID.Value;
@@ -71,7 +71,7 @@ namespace Cosmos.Debug.DebugStub {
 
         // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
         // Noop also does not send ACK.
-        AL.Compare(DsCmd.Noop);
+        AL.Compare(VsipDs.Noop);
         JumpIf(Flags.Equal, ".End");
 
         // Read Command ID
@@ -80,17 +80,17 @@ namespace Cosmos.Debug.DebugStub {
 
         // Get AL back so we can compare it, but also put it back for later
         EAX = ESP[0];
-        CheckCmd(DsCmd.TraceOff, typeof(TraceOff));
-        CheckCmd(DsCmd.TraceOn, typeof(TraceOn));
-        CheckCmd(DsCmd.Break, typeof(Break));
-        CheckCmd(DsCmd.BreakOnAddress, typeof(BreakOnAddress));
-        CheckCmd(DsCmd.SendMethodContext, typeof(SendMethodContext));
-        CheckCmd(DsCmd.SendMemory, typeof(SendMemory));
-        CheckCmd(DsCmd.SendRegisters, typeof(SendRegisters));
-        CheckCmd(DsCmd.SendFrame, typeof(SendFrame));
-        CheckCmd(DsCmd.SendStack, typeof(SendStack));
-        CheckCmd(DsCmd.SetAsmBreak, typeof(SetAsmBreak));
-        CheckCmd(DsCmd.Ping, typeof(Ping));
+        CheckCmd(VsipDs.TraceOff, typeof(TraceOff));
+        CheckCmd(VsipDs.TraceOn, typeof(TraceOn));
+        CheckCmd(VsipDs.Break, typeof(Break));
+        CheckCmd(VsipDs.BreakOnAddress, typeof(BreakOnAddress));
+        CheckCmd(VsipDs.SendMethodContext, typeof(SendMethodContext));
+        CheckCmd(VsipDs.SendMemory, typeof(SendMemory));
+        CheckCmd(VsipDs.SendRegisters, typeof(SendRegisters));
+        CheckCmd(VsipDs.SendFrame, typeof(SendFrame));
+        CheckCmd(VsipDs.SendStack, typeof(SendStack));
+        CheckCmd(VsipDs.SetAsmBreak, typeof(SetAsmBreak));
+        CheckCmd(VsipDs.Ping, typeof(Ping));
 
         Label = ".End";
         // Restore AL for callers who check the command and do
@@ -208,7 +208,7 @@ namespace Cosmos.Debug.DebugStub {
       //  2: x32 - size of data to send
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
-        AL = (int)DsMsg.MethodContext;
+        AL = (int)DsVsip.MethodContext;
         Call<WriteALToComPort>();
 
         // offset relative to ebp
@@ -241,7 +241,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_1";
-        AL = (int)DsMsg.MemoryData;
+        AL = (int)DsVsip.MemoryData;
         Call<WriteALToComPort>();
 
         ReadComPortX32toStack(1);
@@ -269,11 +269,11 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         DebugStatus.Value.Compare(Status.Run);
         JumpIf(Flags.Equal, ".Normal");
-        AL = (int)DsMsg.BreakPoint;
+        AL = (int)DsVsip.BreakPoint;
         Jump(".Type");
 
         Label = ".Normal";
-        AL = (int)DsMsg.TracePoint;
+        AL = (int)DsVsip.TracePoint;
 
         Label = ".Type";
         Call<WriteALToComPort>();
@@ -290,7 +290,7 @@ namespace Cosmos.Debug.DebugStub {
       // Modifies: EAX, ECX, EDX, ESI
       public override void Assemble() {
         // Write the type
-        AL = (int)DsMsg.Message;
+        AL = (int)DsVsip.Message;
         Call<WriteALToComPort>();
 
         // Write Length
@@ -319,7 +319,7 @@ namespace Cosmos.Debug.DebugStub {
       // Modifies: EAX, ECX, EDX, ESI
       public override void Assemble() {
         // Write the type
-        AL = (int)DsMsg.Pointer;
+        AL = (int)DsVsip.Pointer;
         Call<WriteALToComPort>();
 
         // pointer value
@@ -415,7 +415,7 @@ namespace Cosmos.Debug.DebugStub {
 
         // We could use the signature as the start signal, but I prefer
         // to keep the logic separate, especially in DC.
-        AL = (int)DsMsg.Started; // Send the actual started signal
+        AL = (int)DsVsip.Started; // Send the actual started signal
         Call<WriteALToComPort>();
 
         Call<WaitForSignature>();
@@ -580,7 +580,7 @@ namespace Cosmos.Debug.DebugStub {
         Call<ProcessCommand>();
 
         // See if batch is complete
-        AL.Compare(DsCmd.BatchEnd);
+        AL.Compare(VsipDs.BatchEnd);
         JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
 
         // Loop and wait
@@ -628,7 +628,7 @@ namespace Cosmos.Debug.DebugStub {
 
     public class SendRegisters : Inlines {
       public override void Assemble() {
-        AL = (int)DsMsg.Registers; // Send the actual started signal
+        AL = (int)DsVsip.Registers; // Send the actual started signal
         Call<WriteALToComPort>();
 
         ESI = DebugPushAllPtr.Value;
@@ -642,7 +642,7 @@ namespace Cosmos.Debug.DebugStub {
 
     public class SendFrame : Inlines {
       public override void Assemble() {
-        AL = (int)DsMsg.Frame;
+        AL = (int)DsVsip.Frame;
         Call<WriteALToComPort>();
 
         int xCount = 8 * 4;
@@ -657,7 +657,7 @@ namespace Cosmos.Debug.DebugStub {
 
     public class SendStack : CodeBlock {
       public override void Assemble() {
-        AL = (int)DsMsg.Stack;
+        AL = (int)DsVsip.Stack;
         Call<WriteALToComPort>();
 
         // Send size of bytes
@@ -722,7 +722,7 @@ namespace Cosmos.Debug.DebugStub {
 
     public class Ping : Inlines {
       public override void Assemble() {
-        AL = DsMsg.Pong; 
+        AL = DsVsip.Pong; 
         Call<WriteALToComPort>();
       }
     }
@@ -863,16 +863,16 @@ namespace Cosmos.Debug.DebugStub {
         // or commands that require special handling while in break
         // state.
 
-        AL.Compare(DsCmd.Continue);
+        AL.Compare(VsipDs.Continue);
         JumpIf(Flags.Equal, "DebugStub_Break_Exit");
 
-        AL.Compare(DsCmd.StepInto);
+        AL.Compare(VsipDs.StepInto);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
         DebugBreakOnNextTrace.Value = StepTrigger.Into;
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepInto_After";
 
-        AL.Compare(DsCmd.StepOver);
+        AL.Compare(VsipDs.StepOver);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
         DebugBreakOnNextTrace.Value = StepTrigger.Over;
         EAX = CallerEBP.Value;
@@ -880,7 +880,7 @@ namespace Cosmos.Debug.DebugStub {
         Jump("DebugStub_Break_Exit");
         Label = "DebugStub_Break_StepOver_After";
 
-        AL.Compare(DsCmd.StepOut);
+        AL.Compare(VsipDs.StepOut);
         JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
         DebugBreakOnNextTrace.Value = StepTrigger.Out;
         EAX = CallerEBP.Value;

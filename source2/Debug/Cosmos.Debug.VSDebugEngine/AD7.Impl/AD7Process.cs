@@ -182,40 +182,40 @@ namespace Cosmos.Debug.VSDebugEngine {
     public string mProjectFile;
 
     protected void DbgCmdRegisters(byte[] aData) {
-      mDebugDownPipe.SendCommand(DwMsg.Registers, aData);
+      mDebugDownPipe.SendCommand(VsipUi.Registers, aData);
     }
 
     protected void DbgCmdFrame(byte[] aData) {
-      mDebugDownPipe.SendCommand(DwMsg.Frame, aData);
+      mDebugDownPipe.SendCommand(VsipUi.Frame, aData);
     }
 
     protected void DbgCmdPong(byte[] aData) {
-      mDebugDownPipe.SendCommand(DwMsg.PongDebugStub, aData);
+      mDebugDownPipe.SendCommand(VsipUi.PongDebugStub, aData);
     }
 
     protected void DbgCmdStack(byte[] aData) {
-      mDebugDownPipe.SendCommand(DwMsg.Stack, aData);
+      mDebugDownPipe.SendCommand(VsipUi.Stack, aData);
     }
 
     void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData) {
       switch (aCmd) {
-        case DwCmd.Noop:
+        case UiVsip.Noop:
           // do nothing
           break;
 
-        case DwCmd.PingVSIP:
-          mDebugDownPipe.SendCommand(DwMsg.PongVSIP);
+        case UiVsip.PingVSIP:
+          mDebugDownPipe.SendCommand(VsipUi.PongVSIP);
           break;
 
-        case DwCmd.PingDebugStub:
+        case UiVsip.PingDebugStub:
           mDbgConnector.Ping();
           break;
 
-        case DwCmd.SetAsmBreak:
+        case UiVsip.SetAsmBreak:
           //mDbgConnector.Ping();
           string xLabel = Encoding.UTF8.GetString(aData);
           uint xAddress = mLabelAddressMappings[xLabel];
-          mDebugDownPipe.SendCommand(DwMsg.OutputPane, xAddress.ToString());
+          mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
           break;
 
         default:
@@ -385,7 +385,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
         }
       }
-      mDbgConnector.SendCommand(DsCmd.BatchEnd);
+      mDbgConnector.SendCommand(VsipDs.BatchEnd);
     }
 
     void DbgCmdText(string obj) {
@@ -401,7 +401,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     void DbgCmdTrace(byte arg1, uint arg2) {
       DebugMsg("DbgCmdTrace");
       switch (arg1) {
-        case DsMsg.BreakPoint: {
+        case DsVsip.BreakPoint: {
             // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
             // Dont need to correct the address, becuase DebugStub does it for us.
             var xActualAddress = arg2;
@@ -571,18 +571,18 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     internal void Continue() { // F5
       mCurrentAddress = null;
-      mDbgConnector.SendCommand(DsCmd.Continue);
+      mDbgConnector.SendCommand(VsipDs.Continue);
     }
 
     internal void Step(enum_STEPKIND aKind) {
       if (aKind == enum_STEPKIND.STEP_INTO) { // F11
-        mDbgConnector.SendCommand(DsCmd.StepInto);
+        mDbgConnector.SendCommand(VsipDs.StepInto);
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
-        mDbgConnector.SendCommand(DsCmd.StepOver);
+        mDbgConnector.SendCommand(VsipDs.StepOver);
 
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
-        mDbgConnector.SendCommand(DsCmd.StepOut);
+        mDbgConnector.SendCommand(VsipDs.StepOut);
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?
@@ -666,17 +666,17 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       // Send source code to the tool window
-      mDebugDownPipe.SendCommand(DwMsg.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
+      mDebugDownPipe.SendCommand(VsipUi.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }
 
     //TODO: At some point this will probably need to be exposed for access
     // outside of AD7Process
     protected void OutputText(string aText) {
-      mDebugDownPipe.SendCommand(DwMsg.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
+      mDebugDownPipe.SendCommand(VsipUi.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
     }
 
     protected void OutputClear() {
-      mDebugDownPipe.SendCommand(DwMsg.OutputClear);
+      mDebugDownPipe.SendCommand(VsipUi.OutputClear);
     }
 
   }

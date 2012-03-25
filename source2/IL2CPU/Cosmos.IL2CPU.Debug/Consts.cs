@@ -9,7 +9,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Messages from Guest (Cosmos) to Host (VS)
-  static public class DsMsg {
+  static public class DsVsip {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
     public const byte Message = 2;
@@ -30,7 +30,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Messages from Host (VS) to Guest (Cosmos)
-  static public class DsCmd {
+  static public class VsipDs {
     public const byte Noop = 0;
     public const byte TraceOff = 1;
     public const byte TraceOn = 2;
@@ -40,7 +40,7 @@ namespace Cosmos.Debug.Consts {
     public const byte BreakOnAddress = 6;
     public const byte BatchBegin = 7; // Not used yet
     public const byte BatchEnd = 8; // Not used yet
-    public const byte SendMethodContext = 9; // sends data from stack, relative to EBP (in x86)
+    public const byte SendMethodContext = 9; // Sends data from stack, relative to EBP (in x86)
     public const byte SendMemory = 10;
     public const byte StepOver = 11;
     public const byte StepOut = 12;
@@ -69,7 +69,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Commands from VS Debug Engine to VS Debug Window
-  static public class DwMsg {
+  static public class VsipUi {
     public const byte Noop = 0;
     public const byte Registers = 1;
     public const byte AssemblySource = 3;
@@ -83,7 +83,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Commands from VS Debug Window to VS Debug Engine
-  static public class DwCmd {
+  static public class UiVsip {
     public const byte Noop = 0;
     public const byte PingVSIP = 1;
     public const byte PingDebugStub = 2;

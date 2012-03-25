@@ -156,38 +156,38 @@ namespace Cosmos.VS.Windows {
         }
 
         switch (xCmd) {
-          case DwMsg.Noop:
+          case VsipUi.Noop:
             break;
 
-          case DwMsg.Stack:
+          case VsipUi.Stack:
             UpdateWindow(typeof(StackTW), "STACK", xMsg);
             break;
 
-          case DwMsg.Frame:
+          case VsipUi.Frame:
             UpdateWindow(typeof(StackTW), "FRAME", xMsg);
             break;
 
-          case DwMsg.Registers:
+          case VsipUi.Registers:
             UpdateWindow(typeof(RegistersTW), null, xMsg);
             break;
 
-          case DwMsg.Quit:
+          case VsipUi.Quit:
             //Close();
             break;
 
-          case DwMsg.AssemblySource:
+          case VsipUi.AssemblySource:
             UpdateWindow(typeof(AssemblyTW), null, xMsg);
             break;
 
-          case DwMsg.PongVSIP:
+          case VsipUi.PongVSIP:
             UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
             break;
 
-          case DwMsg.PongDebugStub:
+          case VsipUi.PongDebugStub:
             UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
             break;
 
-          case DwMsg.OutputPane:
+          case VsipUi.OutputPane:
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, 
               (Action)delegate() {
                 Global.OutputPane.OutputString(System.Text.Encoding.UTF8.GetString(xMsg));
@@ -195,7 +195,7 @@ namespace Cosmos.VS.Windows {
             );
             break;
 
-          case DwMsg.OutputClear:
+          case VsipUi.OutputClear:
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
               (Action)delegate() {
                 Global.OutputPane.Clear();
