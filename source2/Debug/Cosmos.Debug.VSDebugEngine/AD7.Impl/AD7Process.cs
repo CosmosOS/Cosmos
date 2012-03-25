@@ -617,53 +617,8 @@ namespace Cosmos.Debug.VSDebugEngine {
           xLabels.Add(xLabel + ":");
         }
       }
-      
-      // Extract out the relevant lines from the .asm file.
-      var xCode = new StringBuilder();
-      using (var xSR = new StreamReader(Path.ChangeExtension(mISO, ".asm"))) {
-        // Find line in ASM that starts the code block.
-        string xLine;
-        while (true) {
-          xLine = xSR.ReadLine();
-          if (xLine == null) {
-            break;
-          }
 
-          var xParts = xLine.Trim().Split(' ');
-          if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
-            if (xLabels.Contains(xParts[0])) {
-              // Found the first match, break.
-              break;
-            }
-          }
-        }
-
-        while (xLine != null) {
-          // Extract the pertinent lines
-          var xParts = xLine.Trim().Split(' ');
-          if (xParts.Length > 0 && xParts[0].EndsWith(":")) {
-            // Its a label, lets check it
-            if (xParts.Length == 1) {
-              // Found an normal label.
-              xCode.AppendLine(xLine);
-            } else if (xParts[1] == ";Asm") {
-              // Found an ASM label.
-              xCode.AppendLine(xLine);
-            } else if (xParts[1] == ";IL" && xLabels.Contains(xParts[0])) {
-              // Found an exact match. Our label is in the label list
-              xCode.AppendLine(xLine);
-            } else {
-              // Its a label with an unrecognized comment, or its an IL label that doesn't match.
-              // We are done.
-              break;
-            }
-          } else {
-            // Not a label, just output it
-            xCode.AppendLine(xLine);
-          }
-          xLine = xSR.ReadLine();
-        }
-      }
+      var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabels);
 
       // Send source code to the tool window
       mDebugDownPipe.SendCommand(VsipUi.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
