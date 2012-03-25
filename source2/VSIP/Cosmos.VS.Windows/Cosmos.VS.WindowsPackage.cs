@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
-using System.ComponentModel.Design;
-using Microsoft.Win32;
+using System.Text;
+using System.Threading;
+using System.Windows.Threading;
+using Cosmos.Debug.Consts;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
-using System.Threading;
-using Cosmos.Debug.Consts;
-using System.Windows.Threading;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.Win32;
 
 namespace Cosmos.VS.Windows {
   /// This is the class that implements the package exposed by this assembly.
@@ -179,11 +180,11 @@ namespace Cosmos.VS.Windows {
             break;
 
           case DwMsg.PongVSIP:
-            System.Windows.MessageBox.Show("Pong received from VSIP.");
+            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
             break;
 
           case DwMsg.PongDebugStub:
-            System.Windows.MessageBox.Show("Pong received from DebugStub.");
+            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
             break;
 
           case DwMsg.OutputPane:

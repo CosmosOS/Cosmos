@@ -42,6 +42,22 @@ namespace Cosmos.VS.Windows {
 
       butnPingVSIP.Click += new RoutedEventHandler(butnPingVSIP_Click);
       butnPingDS.Click += new RoutedEventHandler(butnPingDS_Click);
+      butnClearLog.Click += new RoutedEventHandler(butnClearLog_Click);
+    }
+
+    void Log(string aMsg) {
+      Log(aMsg, false);
+    }
+
+    void Log(string aMsg, bool aLogTime) {
+      if (aLogTime) {
+        aMsg = DateTime.Now.ToString("HH:mm:ss") + ": " + aMsg;
+      }
+      lboxLog.SelectedItem = lboxLog.Items.Add(aMsg);
+    }
+
+    void butnClearLog_Click(object sender, RoutedEventArgs e) {
+      lboxLog.Items.Clear();
     }
 
     void butnPingDS_Click(object sender, RoutedEventArgs e) {
@@ -55,6 +71,11 @@ namespace Cosmos.VS.Windows {
       // pipe is currently part of AD7Process which has a lifespan
       // tied to an active debug session.
       Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.PingVSIP, null);
+    }
+
+    protected override void DoUpdate(string aTag, byte[] aData) {
+      string xText = Encoding.UTF8.GetString(mData);
+      Log(xText, true);
     }
   }
 }
