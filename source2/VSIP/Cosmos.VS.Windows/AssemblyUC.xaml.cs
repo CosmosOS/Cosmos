@@ -83,7 +83,6 @@ namespace Cosmos.VS.Windows {
 
       foreach (var xLine in mLines) {
         string xDisplayLine = xLine.ToString();
-
         if (aFilter) {
           if (xLine is AsmLabel) {
             var xAsmLabel = (AsmLabel)xLine;
@@ -105,7 +104,7 @@ namespace Cosmos.VS.Windows {
               xLabelPrefix = xLabelParts[0] + ".";
             }
           } else {
-            xDisplayLine = "\t" + xLine.ToString().Trim();
+            xDisplayLine = "\t" + xLine.ToString();
           }
 
           // Replace all and not just labels so we get jumps, calls etc
@@ -143,8 +142,9 @@ namespace Cosmos.VS.Windows {
       // Should always be \r\n, but just in case we split by \n and ignore \r
       string[] xLines = xCode.Replace("\r", "").Split('\n');
       mLines.Clear();
-      foreach (string xLine in xLines) {
-        string xTestLine = xLine.Trim().ToUpper();
+      foreach (string xLineText in xLines) {
+        string xLine = xLineText.Trim();
+        string xTestLine = xLine.ToUpper();
         var xParts = xLine.Split(' ');
 
         // Skip certain items we never care about.
@@ -158,8 +158,7 @@ namespace Cosmos.VS.Windows {
         }
 
         if (xParts[0].EndsWith(":")) {
-          string xLabel = xParts[0].Trim();
-          xLabel = xLabel.Substring(0, xLabel.Length - 1);
+          string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
           string xComment = "";
           if (xParts.Length > 1) {
             xComment = xParts[1].Substring(1).Trim();
