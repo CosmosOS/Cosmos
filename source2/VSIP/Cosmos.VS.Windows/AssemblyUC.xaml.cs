@@ -113,14 +113,6 @@ namespace Cosmos.VS.Windows {
           }
         }
 
-        // Set colour of line
-        xBrush = Brushes.Blue;
-        if (xLine is AsmLabel) {
-          xBrush = Brushes.Black;
-        } else if (xLine is AsmComment) {
-          xBrush = Brushes.Green;
-        }
-
         // Even though our code is often the source of the tab, it makes
         // more sense to do it this was because the number of space stays
         // in one place and also lets us differentiate from natural spaces.
@@ -128,10 +120,19 @@ namespace Cosmos.VS.Windows {
 
         var xRun = new Run(xDisplayLine);
         xRun.FontFamily = xFont;
-        xRun.Foreground = xBrush;
 
+        // Set colour of line
+        if (xLine is AsmLabel) {
+          xRun.Foreground = Brushes.Black;
+        } else if (xLine is AsmComment) {
+          xRun.Foreground = Brushes.Green;
+        } else {
+          xRun.Foreground = Brushes.Blue;
+        }
+        
         tblkSource.Inlines.Add(xRun);
         tblkSource.Inlines.Add(new LineBreak());
+
         mCode.AppendLine(xDisplayLine);
       }
     }
