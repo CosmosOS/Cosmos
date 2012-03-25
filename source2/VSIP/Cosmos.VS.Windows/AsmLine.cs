@@ -9,6 +9,11 @@ namespace Cosmos.VS.Windows {
 
   public class AsmCode : AsmLine {
     protected string mText;
+    public string Text {
+      get { return mText; }
+      set { mText = value; }
+    }
+
     public override string ToString() {
       return mText;
     }

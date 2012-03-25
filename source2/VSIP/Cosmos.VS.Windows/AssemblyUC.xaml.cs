@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -14,7 +15,7 @@ namespace Cosmos.VS.Windows {
   ///
   /// This class derives from the ToolWindowPane class provided from the MPF in order to use its 
   /// implementation of the IVsUIElementPane interface.
-  //
+  
   [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
   public class AssemblyTW : ToolWindowPane2 {
     public AssemblyTW() {
@@ -55,6 +56,12 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnStep_Click(object sender, RoutedEventArgs e) {
+      var xCodeLinesQry = from x in mLines
+                       where x is AsmCode
+                       select (AsmCode)x;
+      var xCodeLines = xCodeLinesQry.Where(q => q.Text.ToUpper() != "INT3").ToArray();
+      var xCodeLine = xCodeLines[1];
+      MessageBox.Show(xCodeLine.Label.Label);
       //Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.AsmStep, null);
     }
 
@@ -90,12 +97,6 @@ namespace Cosmos.VS.Windows {
               continue;
             }
 
-            // Insert a blank line before labels, but not if its the top line
-            if (tblkSource.Inlines.Count > 0) {
-              tblkSource.Inlines.Add(new LineBreak());
-              mCode.AppendLine();
-            }
-
             if (xLabelPrefix == null) {
               var xLabelParts = xAsmLabel.Label.Split('.');
               xLabelPrefix = xLabelParts[0] + ".";
@@ -107,13 +108,23 @@ namespace Cosmos.VS.Windows {
                 continue;
               }
             }
-            xDisplayLine = "\t" + xLine.ToString();
+            xDisplayLine = xLine.ToString();
           }
 
           // Replace all and not just labels so we get jumps, calls etc
           if (xLabelPrefix != null) {
             xDisplayLine = xDisplayLine.Replace(xLabelPrefix, "");
           }
+        }
+
+        if (xLine is AsmLabel) {
+          // Insert a blank line before labels, but not if its the top line
+          if (tblkSource.Inlines.Count > 0) {
+            tblkSource.Inlines.Add(new LineBreak());
+            mCode.AppendLine();
+          }
+        } else {
+          xDisplayLine = "\t" + xDisplayLine;
         }
 
         // Even though our code is often the source of the tab, it makes
