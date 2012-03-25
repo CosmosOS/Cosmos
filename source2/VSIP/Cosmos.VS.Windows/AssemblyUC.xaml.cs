@@ -82,30 +82,27 @@ namespace Cosmos.VS.Windows {
       string xLabelPrefix = null;
 
       foreach (var xLine in mLines) {
-        xBrush = Brushes.Blue;
         string xDisplayLine = xLine.ToString();
         string xTestLine = xDisplayLine.Trim().ToUpper();
-        var xTestParts = xTestLine.Split(' ');
 
         if (aFilter) {
           xDisplayLine = xDisplayLine.Trim();
-          var xParts = xDisplayLine.Split(' ');
 
-          // Skip ASM labels
-          if (xTestParts.Length > 1) {
-            if (xTestParts[1] == ";ASM") {
+          if (xLine is AsmLabel) {
+            var xAsmLabel = (AsmLabel)xLine;
+            xDisplayLine = xAsmLabel.Label + ":";
+
+            // Skip ASM labels
+            if (xAsmLabel.Comment.ToUpper() == "ASM") {
               continue;
             }
-          }
 
-          if (xTestParts[0].EndsWith(":")) {
             // Insert a blank line before labels, but not if its the top line
             if (tblkSource.Inlines.Count > 0) {
               tblkSource.Inlines.Add(new LineBreak());
               mCode.AppendLine();
             }
-            // Remove the comment marker after the label
-            xDisplayLine = xParts[0];
+
             if (xLabelPrefix == null) {
               var xLabelParts = xDisplayLine.Split('.');
               xLabelPrefix = xLabelParts[0] + ".";
@@ -120,7 +117,9 @@ namespace Cosmos.VS.Windows {
           }
         }
 
-        if (xTestParts[0].EndsWith(":")) {
+        // Set colour of line
+        xBrush = Brushes.Blue;
+        if (xLine is AsmLabel) {
           xBrush = Brushes.Black;
         } else if (xTestLine.StartsWith(";")) {
           xBrush = Brushes.Green;
@@ -149,13 +148,28 @@ namespace Cosmos.VS.Windows {
       mLines.Clear();
       foreach (string xLine in xLines) {
         string xTestLine = xLine.Trim().ToUpper();
+        var xParts = xLine.Split(' ');
+
+        // Skip certain items we never care about.
+        // ie remove noise
         if (xTestLine == "INT3") {
           continue;
-        } else if (xTestLine.Length == 0) {
-          // Remove all empty lines because we completely reformat output
+        } else if (xLine.Length == 0) {
+          // Remove all empty lines because we completely reformat output.
+          // Parse below also expects some data, not empty string.
           continue;
         }
-        mLines.Add(new AsmLine(xLine));
+
+        if (xParts[0].EndsWith(":")) {
+          string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
+          string xComment = "";
+          if (xParts.Length > 1) {
+            xComment = xParts[1].Substring(1).Trim();
+          }
+          mLines.Add(new AsmLabel(xLabel, xComment));
+        } else {
+          mLines.Add(new AsmCode(xLine));
+        }
       }
 
       Display(mFilter);

@@ -4,14 +4,42 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.VS.Windows {
-  public class AsmLine {
+  public abstract class AsmLine {
+  }
+
+  public class AsmCode : AsmLine {
     protected string mText;
     public override string ToString() {
       return mText;
     }
 
-    public AsmLine(string aText) {
+    public AsmCode(string aText) {
       mText = aText;
+    }
+  }
+
+  public class AsmLabel : AsmLine {
+    protected string mLabel;
+    public string Label {
+      get { return mLabel; }
+    }
+
+    protected string mComment;
+    public string Comment {
+      get { return mComment; }
+    }
+
+    public override string ToString() {
+      string xResult = mLabel + ":";
+      if (mLabel.Length > 0) {
+        xResult = xResult + " ;" + mComment;
+      }
+      return xResult;
+    }
+
+    public AsmLabel(string aLabel, string aComment) {
+      mLabel = aLabel;
+      mComment = aComment;
     }
   }
 
