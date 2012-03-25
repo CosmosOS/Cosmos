@@ -19,6 +19,8 @@ namespace Cosmos.VS.Windows.Test {
 
       string xPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..");
 
+      // Uncomment code in AssemblyUC.xml.cs to genearate a new bin test file
+      //  in method Display(bool aFilter)
       byte[] xData = System.IO.File.ReadAllBytes(System.IO.Path.Combine(xPath, "SourceTest.bin"));
       ucAssembly.Update(null, xData);
     }

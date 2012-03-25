@@ -52,7 +52,7 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnStep_Click(object sender, RoutedEventArgs e) {
-      Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.AsmStep, null);
+      //Global.PipeUp.SendCommand(Cosmos.Debug.Consts.DwCmd.AsmStep, null);
     }
 
     void butnFilter_Click(object sender, RoutedEventArgs e) {
@@ -66,7 +66,7 @@ namespace Cosmos.VS.Windows {
 
     protected void Display(bool aFilter) {
       // Used for creating a test file for Cosmos.VS.Windows.Test
-      //System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+      System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
 
       mCode.Clear();
       tblkSource.Inlines.Clear();

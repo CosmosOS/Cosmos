@@ -87,7 +87,7 @@ namespace Cosmos.Debug.Consts {
     public const byte Noop = 0;
     public const byte PingVSIP = 1;
     public const byte PingDebugStub = 2;
-    public const byte AsmStep = 3;
+    //public const byte AsmStep = 3;
   }
 
 }

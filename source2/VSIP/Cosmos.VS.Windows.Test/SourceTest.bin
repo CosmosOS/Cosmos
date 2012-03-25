@@ -1,0 +1,156 @@
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001: ;IL
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001.00: ;Asm
+			Int3
+			; Ldsfld
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001.01: ;Asm
+			call System_Void__Cosmos_Core_Global__cctor__
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001.02: ;Asm
+			test dword ECX, 0x2
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001.03: ;Asm
+			jne near System_Void__BreakpointsKernel_BreakpointsOS_Run__.END__OF__METHOD_EXCEPTION
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001.AfterCCTorExceptionCheck:
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0001.04: ;Asm
+			push dword [static_field__Cosmos_Core_Global_BaseIOGroups]
+			; Stack contains 1 items: (4)
+
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.0006: ;IL
+			; Ldfld
+			; Field = 'Cosmos.Core.IOGroup.ATA Cosmos.Core.BaseIOGroups.ATA1'
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0006.00: ;Asm
+			pop dword ECX
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0006.01: ;Asm
+			add dword ECX, 0x20
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0006.02: ;Asm
+			mov dword EAX, [ECX]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0006.03: ;Asm
+			push dword EAX
+			; Stack contains 1 items: (4)
+
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.000B: ;IL
+			; Ldc_I4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000B.00: ;Asm
+			push dword 0x0
+			; Stack contains 2 items: (4, 4)
+
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.000C: ;IL
+			; Ldc_I4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000C.00: ;Asm
+			push dword 0x0
+			; Stack contains 3 items: (4, 4, 4)
+
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D: ;IL
+			; Newobj
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.00: ;Asm
+			push dword 0x38
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.01: ;Asm
+			call System_UInt32__Cosmos_IL2CPU_GCImplementation_AllocNewObject_System_UInt32_
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.02: ;Asm
+			push dword [ESP]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.03: ;Asm
+			push dword [ESP]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.04: ;Asm
+			pop dword EAX
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.05: ;Asm
+			mov dword EBX, [VMT__TYPE_ID_HOLDER__Cosmos_Hardware_BlockDevice_AtaPio_ASM_IS__Cosmos_Hardware]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.06: ;Asm
+			mov dword [EAX], EBX
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.07: ;Asm
+			mov dword [EAX + 4], 0x1
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.08: ;Asm
+			mov dword [EAX + 8], 0x0
+			; Arg aIO: 4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.09: ;Asm
+			push dword [ESP + 16]
+			; Arg aControllerId: 4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.0A: ;Asm
+			push dword [ESP + 16]
+			; Arg aBusPosition: 4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.0B: ;Asm
+			push dword [ESP + 16]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.0C: ;Asm
+			call System_Void__Cosmos_Hardware_BlockDevice_AtaPio__ctor_Cosmos_Core_IOGroup_ATA__Cosmos_Hardware_BlockDevice_Ata_ControllerIdEnum__Cosmos_Hardware_BlockDevice_Ata_BusPositionEnum_
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.0D: ;Asm
+			test dword ECX, 0x2
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.0E: ;Asm
+			je near System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.NoError21305
+			; [ Newobj.PushAlignedParameterSize start count = 3 ]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.0F: ;Asm
+			add dword ESP, 0x4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.10: ;Asm
+			add dword ESP, 0x4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.11: ;Asm
+			add dword ESP, 0x4
+			; [ Newobj.PushAlignedParameterSize end ]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.12: ;Asm
+			add dword ESP, 0x4
+			; [ Newobj.Execute cleanup start count = 0 ]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.13: ;Asm
+			add dword ESP, 0xC
+			; [ Newobj.Execute cleanup end ]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.14: ;Asm
+			jmp System_Void__BreakpointsKernel_BreakpointsOS_Run__.END__OF__METHOD_EXCEPTION
+
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.NoError21305:
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.15: ;Asm
+			pop dword EAX
+			; [ Newobj.PushAlignedParameterSize start count = 3 ]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.16: ;Asm
+			add dword ESP, 0x4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.17: ;Asm
+			add dword ESP, 0x4
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.18: ;Asm
+			add dword ESP, 0x4
+			; [ Newobj.PushAlignedParameterSize end ]
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.000D.19: ;Asm
+			push dword EAX
+			; Stack contains 1 items: (4)
+
+	System_Void__BreakpointsKernel_BreakpointsOS_Run__.0012: ;IL
+			; Stloc
+			; EBPOffset = 8
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0012.00: ;Asm
+			pop dword EAX
+
+		System_Void__BreakpointsKernel_BreakpointsOS_Run__.0012.01: ;Asm
+			mov dword [EBP - 8], EAX
+			; Stack contains 0 items: ()
+

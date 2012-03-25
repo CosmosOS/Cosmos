@@ -211,10 +211,6 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDbgConnector.Ping();
           break;
 
-        case DwCmd.AsmStep:
-          //mDbgConnector.Ping();
-          break;
-
         default:
           throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
       }
