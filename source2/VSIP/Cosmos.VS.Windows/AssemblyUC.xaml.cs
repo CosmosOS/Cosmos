@@ -158,7 +158,8 @@ namespace Cosmos.VS.Windows {
         }
 
         if (xParts[0].EndsWith(":")) {
-          string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
+          string xLabel = xParts[0].Trim();
+          xLabel = xLabel.Substring(0, xLabel.Length - 1);
           string xComment = "";
           if (xParts.Length > 1) {
             xComment = xParts[1].Substring(1).Trim();
