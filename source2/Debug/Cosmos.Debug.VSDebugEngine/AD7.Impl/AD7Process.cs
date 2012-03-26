@@ -630,15 +630,19 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Get assembly source
       var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabels);
 
-      // Get label for current address
-      var xCurrentLabel = (from x in mAddressLabelMappings
-                           where x.Key == (uint)mCurrentAddress
-                           select x.Value).FirstOrDefault();
-      if (xCurrentLabel == null) {
+      // Get label for current address.
+      // A single address can have multiple labels (IL, Asm). Because of this we search
+      // for the one with the Asm tag. We dont have the tags in this debug info though,
+      // so instead if there is more than one label we use the last one which is the Asm tag.
+      var xCurrentLabelsQry = (from x in mAddressLabelMappings
+                           where (x.Key == (uint)mCurrentAddress)
+                           select x.Value);
+      var xCurrentLabels = xCurrentLabelsQry.ToArray();
+      if (xCurrentLabels.Length == 0) {
         return;
       }
       // Insert it to the first line of our data stream
-      xCode.Insert(0, xCurrentLabel + "\r\n");                      
+      xCode.Insert(0, xCurrentLabels[xCurrentLabels.Length - 1] + "\r\n");                      
 
       mDebugDownPipe.SendCommand(VsipUi.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }

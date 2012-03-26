@@ -144,8 +144,14 @@ namespace Cosmos.VS.Windows {
           xRun.Foreground = Brushes.Black;
         } else if (xLine is AsmComment) {
           xRun.Foreground = Brushes.Green;
-        } else {
+        } else if (xLine is AsmCode) {
+          var xAsmCode = (AsmCode)xLine;
+          if (xAsmCode.Label != null && xAsmCode.Label.Label == mCurrentLabel) {
+            xRun.Background = Brushes.Red;
+          }
           xRun.Foreground = Brushes.Blue;
+        } else { // Unknown type
+          xRun.Foreground = Brushes.HotPink;
         }
         
         tblkSource.Inlines.Add(xRun);
@@ -163,7 +169,7 @@ namespace Cosmos.VS.Windows {
       }
 
       // Used for creating a test file for Cosmos.VS.Windows.Test
-      if (true) {
+      if (false) {
         System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
       }
       
