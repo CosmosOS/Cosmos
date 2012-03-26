@@ -14,24 +14,6 @@ namespace Cosmos.Debug.DebugStub {
     static public DataMember32 CallerEIP;
     static public DataMember32 CallerESP;
 
-    static public class Tracing {
-      public const byte Off = 0;
-      public const byte On = 1;
-    }
-
-    // Current status of OS Debug Stub
-    static public class Status {
-      public const byte Run = 0;
-      public const byte Break = 1;
-    }
-
-    static public class StepTrigger {
-      public const byte None = 0;
-      public const byte Into = 1;
-      public const byte Over = 2;
-      public const byte Out = 3;
-    }
-
     public class AckCommand : CodeBlock {
       public override void Assemble() {
         // We acknowledge receipt of the command AND the processing of it.
@@ -162,23 +144,6 @@ namespace Cosmos.Debug.DebugStub {
 
         Label = "DebugStub_ProcessCommandBatch_Exit";
         Call<AckCommand>();
-      }
-    }
-
-    public class WaitForSignature : CodeBlock {
-      public override void Assemble() {
-        EBX = 0;
-
-        Label = "DebugStub_WaitForSignature_Read";
-        Call<ReadALFromComPort>();
-        BL = AL;
-        EBX.RotateRight(8);
-        EBX.Compare(Cosmos.Debug.Consts.Consts.SerialSignature);
-        JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read");
-
-        //TODO: Always emit and exit label and then make a Exit method which can
-        // automatically use it. I think a label might already exist.
-        Label = "DebugStub_WaitForSignature_Exit";
       }
     }
 

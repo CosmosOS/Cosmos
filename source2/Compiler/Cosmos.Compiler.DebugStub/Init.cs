@@ -33,5 +33,51 @@ namespace Cosmos.Debug.DebugStub {
         Call<Cls>();
       }
     }
+
+    public class WaitForSignature : CodeBlock {
+      public override void Assemble() {
+        EBX = 0;
+
+        Label = "DebugStub_WaitForSignature_Read";
+        Call<ReadALFromComPort>();
+        BL = AL;
+        EBX.RotateRight(8);
+        EBX.Compare(Cosmos.Debug.Consts.Consts.SerialSignature);
+        JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read");
+
+        //TODO: Always emit and exit label and then make a Exit method which can
+        // automatically use it. I think a label might already exist.
+        Label = "DebugStub_WaitForSignature_Exit";
+      }
+    }
+
+    public class WaitForDbgHandshake : Inlines {
+      public override void Assemble() {
+        // "Clear" the UART out
+        AL = 0;
+        Call<WriteALToComPort>();
+
+        // QEMU (and possibly others) send some garbage across the serial line first.
+        // Actually they send the garbage inbound, but garbage could be inbound as well so we 
+        // keep this.
+        // To work around this we send a signature. DC then discards everything before the signature.
+        // QEMU has other serial issues too, and we dont support it anymore, but this signature is a good
+        // feature so we kept it.
+        Push(Cosmos.Debug.Consts.Consts.SerialSignature);
+        ESI = ESP;
+        WriteBytesToComPort(4);
+        // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
+        EAX.Pop();
+
+        // We could use the signature as the start signal, but I prefer
+        // to keep the logic separate, especially in DC.
+        AL = (int)DsVsip.Started; // Send the actual started signal
+        Call<WriteALToComPort>();
+
+        Call<WaitForSignature>();
+        Call<ProcessCommandBatch>();
+      }
+    }
+
   }
 }
