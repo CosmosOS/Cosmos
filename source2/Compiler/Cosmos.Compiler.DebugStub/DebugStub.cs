@@ -15,22 +15,18 @@ namespace Cosmos.Debug.DebugStub {
     static public DataMember32 CallerESP;
 
     // Tracing: 0=Off, 1=On
-    static protected DataMember32 DebugTraceMode;
+    static protected DataMember32 TraceMode;
     // enum Status
     static protected DataMember32 DebugStatus;
-    // Nesting control for non steppable routines
-    static protected DataMember32 DebugSuspendLevel;
-    // Ptr to the push all data. It points to the "bottom" after a PushAll op.
+    // Pointer to the push all data. It points to the bottom after PushAll.
     // Walk up to find the 8 x 32 bit registers.
-    static protected DataMember32 DebugPushAllPtr;
-    // State of Interrupts on entry
-    static protected DataMember32 InterruptsEnabledFlag;
+    static protected DataMember32 PushAllPtr;
     // If set non 0, on next trace a break will occur
     static protected DataMember32 DebugBreakOnNextTrace;
     // For step out and over this is used to determine where the initial request was made
     // EBP is logged when the trace is started and can be used to determine 
     // what level we are "at" relative to the original step start location.
-    static protected DataMember32 DebugBreakEBP;
+    static protected DataMember32 BreakEBP;
     // Command ID of last command received
     static protected DataMember32 DebugStub_CommandID;
 
@@ -113,14 +109,21 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".AfterBreakOnAddress";
       }
 
-      // This is the secondary stub routine. After the primary has decided we should do some debug
-      // activities, this one is called.
-      public override void Assemble() {
-        CheckForBreakpoint();
+      void CheckStepF10() {
+        DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
+        JumpIf(Flags.NotEqual, ".StepOverAfter");
+        //Label = "Debug__StepOver__";
+        EAX = CallerEBP.Value;
+        EAX.Compare(BreakEBP.Value);
+        // If EBP and start EBP arent equal, dont break
+        // Dont use Equal because we also need to stop above if the user starts
+        // the step at the end of a method and next item is after a return
+        CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
+        Jump(".Normal");
+        Label = ".StepOverAfter";
+      }
 
-        // See if we are stepping
-        //
-        // F11
+      void CheckStepF11() {
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Into);
         //TODO: I think we can use a using statement to create this type of block
         // and emit asm
@@ -135,51 +138,51 @@ namespace Cosmos.Debug.DebugStub {
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump(".Normal");
         Label = ".StepIntoAfter";
+      }
 
-        // F10
-        DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
-        JumpIf(Flags.NotEqual, ".StepOverAfter");
-        //Label = "Debug__StepOver__";
-        EAX = CallerEBP.Value;
-        EAX.Compare(DebugBreakEBP.Value);
-        // If EBP and start EBP arent equal, dont break
-        // Dont use Equal because we aslo need to stop above if the user starts
-        // the step at the end of a method and next item is after a return
-        CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
-        Jump(".Normal");
-        Label = ".StepOverAfter";
-
-        // Shift-F11
+      void CheckStepShiftF11() {
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, ".StepOutAfter");
 
         EAX = CallerEBP.Value;
-        EAX.Compare(DebugBreakEBP.Value); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
+        EAX.Compare(BreakEBP.Value); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, ".Normal");
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump(".Normal");
         Label = ".StepOutAfter";
+      }
+
+      // This is the secondary stub routine. After the primary has decided we should do some debug
+      // activities, this one is called.
+      public override void Assemble() {
+        // Each of these checks a flag, and if it processes then it jumps to .Normal.
+        CheckForBreakpoint();
+        // Only one of the following can be active at a time.
+        CheckStepF11();
+        CheckStepF10();
+        CheckStepShiftF11();
 
         Label = ".Normal";
 
-        // If tracing is on, send a trace message
-        // Tracing isnt really used any more, was used
-        // by the old stand alone debugger. Might be upgraded
+        // If tracing is on, send a trace message.
+        // Tracing isnt really used any more, was used by the old stand alone debugger. Might be upgraded
         // and resused in the future.
-        DebugTraceMode.Value.Compare(Tracing.On);
+        TraceMode.Value.Compare(Tracing.On);
         CallIf(Flags.Equal, "DebugStub_SendTrace");
 
         // Is there a new incoming command? We dont want to wait for one
-        // if there isn't one already here. This is a passing check.
-        Label = ".CheckForCmd"; //TODO: ".CheckForCmd" and make it local to our class
+        // if there isn't one already here. This is a non blocking check.
+        Label = ".CheckForCmd"; 
         DX = (ushort)(mComAddr + 5u);
         AL = Port[DX];
         AL.Test(0x01);
-        // If no command waiting, break from loop
+        // If a command is waiting, process it and then check for another.
+        // If no command waiting, break from loop.
         JumpIf(Flags.Zero, ".CheckForCmd_Break");
         Call<ProcessCommand>();
         // See if there are more commands waiting
         Jump(".CheckForCmd");
+
         Label = ".CheckForCmd_Break";
       }
     }
@@ -191,7 +194,7 @@ namespace Cosmos.Debug.DebugStub {
         // Reset request in case we are currently responding to one or we hit a fixed breakpoint
         // before our request could be serviced (if one existed)
         DebugBreakOnNextTrace.Value = StepTrigger.None;
-        DebugBreakEBP.Value = 0;
+        BreakEBP.Value = 0;
         // Set break status
         DebugStatus.Value = Status.Break;
         Call<SendTrace>();
@@ -218,7 +221,7 @@ namespace Cosmos.Debug.DebugStub {
           JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
           DebugBreakOnNextTrace.Value = StepTrigger.Over;
           EAX = CallerEBP.Value;
-          DebugBreakEBP.Value = EAX;
+          BreakEBP.Value = EAX;
           Jump("DebugStub_Break_Exit");
           Label = "DebugStub_Break_StepOver_After";
 
@@ -226,7 +229,7 @@ namespace Cosmos.Debug.DebugStub {
           JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
           DebugBreakOnNextTrace.Value = StepTrigger.Out;
           EAX = CallerEBP.Value;
-          DebugBreakEBP.Value = EAX;
+          BreakEBP.Value = EAX;
           Jump("DebugStub_Break_Exit");
           Label = "DebugStub_Break_StepOut_After";
 

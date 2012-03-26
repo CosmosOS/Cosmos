@@ -11,13 +11,13 @@ namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
     public class TraceOn : CodeBlock {
       public override void Assemble() {
-        DebugTraceMode.Value = Tracing.On;
+        TraceMode.Value = Tracing.On;
       }
     }
 
     public class TraceOff : CodeBlock {
       public override void Assemble() {
-        DebugTraceMode.Value = Tracing.Off;
+        TraceMode.Value = Tracing.Off;
       }
     }
   }

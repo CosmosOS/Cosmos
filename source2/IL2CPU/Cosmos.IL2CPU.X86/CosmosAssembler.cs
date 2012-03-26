@@ -304,8 +304,6 @@ namespace Cosmos.IL2CPU.X86 {
 
       if (mComNumber > 0) {
         CodeBlock.Call<DebugStub.Init>();
-      } else {
-        DataMembers.Add(new DataMember("InterruptsEnabledFlag", new int[] { 0 }));
       }
 
       // Jump to Kernel entry point

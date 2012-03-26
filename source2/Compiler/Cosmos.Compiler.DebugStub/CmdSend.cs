@@ -14,7 +14,7 @@ namespace Cosmos.Debug.DebugStub {
         AL = (int)DsVsip.Registers; // Send the actual started signal
         Call<WriteALToComPort>();
 
-        ESI = DebugPushAllPtr.Value;
+        ESI = PushAllPtr.Value;
         WriteBytesToComPort(32);
         ESI = CallerESP.Address;
         WriteBytesToComPort(4);

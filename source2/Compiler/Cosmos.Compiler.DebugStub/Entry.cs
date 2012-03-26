@@ -58,7 +58,7 @@ namespace Cosmos.Debug.DebugStub {
         PushAll();
 
         // Save current ESP so we can look at the results of PushAll later
-        DebugPushAllPtr.Value = ESP;
+        PushAllPtr.Value = ESP;
 
         // Get current ESP and add 32. This will skip over the PushAll and point us at the call data from Int3.
         EBP = ESP;
