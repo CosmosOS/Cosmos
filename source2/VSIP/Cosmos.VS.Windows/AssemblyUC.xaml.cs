@@ -43,6 +43,7 @@ namespace Cosmos.VS.Windows {
     // Text of code as rendered. Used for clipboard etc.
     protected StringBuilder mCode = new StringBuilder();
     protected bool mFilter = true;
+    protected string mCurrentLabel;
 
     public AssemblyUC() {
       InitializeComponent();
@@ -155,19 +156,26 @@ namespace Cosmos.VS.Windows {
     }
 
     protected override void DoUpdate(string aTag) {
+      mLines.Clear();
+      if (mData.Length == 0) {
+        Display(false);
+        return;
+      }
+
       // Used for creating a test file for Cosmos.VS.Windows.Test
-      if (false && mData.Length > 0) {
+      if (true) {
         System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
       }
       
       string xCode = Encoding.UTF8.GetString(mData);
-
-      mLines.Clear();
       // Should always be \r\n, but just in case we split by \n and ignore \r
       string[] xLines = xCode.Replace("\r", "").Split('\n');
+
+      mCurrentLabel = xLines[0];
+
       AsmLabel xLastAsmAsmLabel = null;
-      foreach (string xLineText in xLines) {
-        string xLine = xLineText.Trim();
+      for (int i = 1; i < xLines.Length; i++) {
+        string xLine = xLines[i].Trim();
         string xTestLine = xLine.ToUpper();
         var xParts = xLine.Split(' ');
 

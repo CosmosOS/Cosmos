@@ -627,12 +627,23 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
 
+      // Get assembly source
       var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabels);
+
+      // Get label for current address
+      var xCurrentLabel = (from x in mAddressLabelMappings
+                           where x.Key == (uint)mCurrentAddress
+                           select x.Value).FirstOrDefault();
+      if (xCurrentLabel == null) {
+        return;
+      }
+      // Insert it to the first line of our data stream
+      xCode.Insert(0, xCurrentLabel + "\r\n");                      
+
       mDebugDownPipe.SendCommand(VsipUi.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }
 
-    //TODO: At some point this will probably need to be exposed for access
-    // outside of AD7Process
+    //TODO: At some point this will probably need to be exposed for access outside of AD7Process
     protected void OutputText(string aText) {
       mDebugDownPipe.SendCommand(VsipUi.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
     }
