@@ -51,20 +51,23 @@ namespace Cosmos.VS.Windows {
       mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
       butnFilter.Click += new RoutedEventHandler(butnFilter_Click);
       butnCopy.Click += new RoutedEventHandler(mitmCopy_Click);
-      butnStep.Click += new RoutedEventHandler(butnStep_Click);
+      butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
 
       Update(null, mData);
     }
 
-    void butnStep_Click(object sender, RoutedEventArgs e) {
+    void butnStepOver_Click(object sender, RoutedEventArgs e) {
       var xCodeLinesQry = from x in mLines
                        where x is AsmCode
                        select (AsmCode)x;
-      var xCodeLines = xCodeLinesQry.Where(q => q.Text.ToUpper() != "INT3").ToArray();
+      // Get the next code entry that is not Int3.
+      // Need to adjust to find after mCurrentLabel right now its hard coded as a test for the second item from the
+      // beginning of the method.
+      var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToArray();
       if (xCodeLines.Length > 1) {
         var xCodeLine = xCodeLines[1];
-        if (xCodeLine.Label != null) {
-          Global.PipeUp.SendCommand(Cosmos.Debug.Consts.UiVsip.SetAsmBreak, xCodeLine.Label.Label);
+        if (xCodeLine.AsmLabel != null) {
+          Global.PipeUp.SendCommand(Cosmos.Debug.Consts.UiVsip.SetAsmBreak, xCodeLine.AsmLabel.Label);
         }
       }
     }
@@ -87,7 +90,6 @@ namespace Cosmos.VS.Windows {
 
       var xFont = new FontFamily("Consolas");
       string xLabelPrefix = null;
-      bool xBreakAtNextCode = false;
       foreach (var xLine in mLines) {
         string xDisplayLine = xLine.ToString();
 
@@ -109,9 +111,6 @@ namespace Cosmos.VS.Windows {
             if (xLine is AsmCode) {
               var xAsmCode = (AsmCode)xLine;
               if (xAsmCode.IsDebugCode) {
-                if (xAsmCode.LabelMatches(mCurrentLabel)) {
-                  xBreakAtNextCode = true;
-                }
                 continue;
               }
             }
@@ -149,10 +148,9 @@ namespace Cosmos.VS.Windows {
           xRun.Foreground = Brushes.Green;
         } else if (xLine is AsmCode) {
           var xAsmCode = (AsmCode)xLine;
-          if (xBreakAtNextCode || xAsmCode.LabelMatches(mCurrentLabel)) {
+          if (xAsmCode.LabelMatches(mCurrentLabel)) {
             xRun.Foreground = Brushes.WhiteSmoke;
             xRun.Background = Brushes.DarkRed;
-            xBreakAtNextCode = false;
           } else {
             xRun.Foreground = Brushes.Blue;
           }
@@ -167,24 +165,14 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    protected override void DoUpdate(string aTag) {
-      mLines.Clear();
-      if (mData.Length == 0) {
-        Display(false);
-        return;
-      }
-
-      // Used for creating a test file for Cosmos.VS.Windows.Test
-      if (false) {
-        System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
-      }
-      
+    protected void Parse() {
       string xCode = Encoding.UTF8.GetString(mData);
       // Should always be \r\n, but just in case we split by \n and ignore \r
       string[] xLines = xCode.Replace("\r", "").Split('\n');
 
       mCurrentLabel = xLines[0];
 
+      bool xSetNextLabelToCurrent = false;
       AsmLabel xLastAsmAsmLabel = null;
       for (int i = 1; i < xLines.Length; i++) {
         string xLine = xLines[i].Trim();
@@ -198,27 +186,59 @@ namespace Cosmos.VS.Windows {
           continue;
         }
 
-        if (xParts[0].EndsWith(":")) {
+        if (xParts[0].EndsWith(":")) { // Labels
           string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
           var xAsmLabel = new AsmLabel(xLabel);
+          // See if the label has a comment/tag
           if (xParts.Length > 1) {
             xAsmLabel.Comment = xParts[1].Substring(1).Trim();
+            // If its an ASM tag, store it for future use to attach to next AsmCode
             if (xAsmLabel.Comment.ToUpper() == "ASM") {
               xLastAsmAsmLabel = xAsmLabel;
             }
           }
           mLines.Add(xAsmLabel);
-        } else if (xTestLine.StartsWith(";")) {
+
+        } else if (xTestLine.StartsWith(";")) { // Comments
           string xComment = xLine.Trim().Substring(1).Trim();
           mLines.Add(new AsmComment(xComment));
-        } else {
+
+        } else { // Codee
           var xAsmCode = new AsmCode(xLine);
-          xAsmCode.Label = xLastAsmAsmLabel;
+          xAsmCode.AsmLabel = xLastAsmAsmLabel;
           xLastAsmAsmLabel = null;
+
+          if (xSetNextLabelToCurrent) {
+            mCurrentLabel = xAsmCode.AsmLabel.Label;
+            xSetNextLabelToCurrent = false;
+          }
+
+          // If its Int3 or so, we need to set the label to the next non debug op
+          if (xAsmCode.IsDebugCode) {
+            if (xAsmCode.LabelMatches(mCurrentLabel)) {
+              xSetNextLabelToCurrent = true;
+            }
+            continue;
+          }
+          
           mLines.Add(xAsmCode);
         }
       }
+    }
 
+    protected override void DoUpdate(string aTag) {
+      mLines.Clear();
+      if (mData.Length == 0) {
+        Display(false);
+        return;
+      }
+
+      // Used for creating a test file for Cosmos.VS.Windows.Test
+      if (false) {
+        System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+      }
+
+      Parse();
       Display(mFilter);
     }
 

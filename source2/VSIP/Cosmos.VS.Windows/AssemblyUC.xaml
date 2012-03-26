@@ -14,7 +14,7 @@
             <ToggleButton Content="Filter" Name="butnFilter" IsChecked="True" BorderBrush="Black" Margin="2" />
             <Button Content="Copy" Name="butnCopy" BorderBrush="Black" Margin="2" />
             <Rectangle Width="15" />
-            <Button Content="Step" Name="butnStep" BorderBrush="Black" Margin="2" />
+            <Button Content="Step Over" Name="butnStepOver" BorderBrush="Black" Margin="2" />
         </ToolBar>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <TextBlock Name="tblkSource">

@@ -21,10 +21,10 @@ namespace Cosmos.VS.Windows {
       return mText;
     }
 
-    protected AsmLabel mLabel;
-    public AsmLabel Label {
-      get { return mLabel; }
-      set { mLabel = value; }
+    protected AsmLabel mAsmLabel;
+    public AsmLabel AsmLabel {
+      get { return mAsmLabel; }
+      set { mAsmLabel = value; }
     }
 
     protected bool mIsDebugCode;
@@ -33,7 +33,7 @@ namespace Cosmos.VS.Windows {
     }
 
     public bool LabelMatches(string aLabel) {
-      return (Label != null && Label.Label == aLabel);
+      return (AsmLabel != null && AsmLabel.Label == aLabel);
     }
 
     public AsmCode(string aText) {
