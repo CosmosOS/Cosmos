@@ -69,6 +69,7 @@
     <Compile Include="ComPort.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="DebugStub.cs" />
+    <Compile Include="Entry.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="ProcessCmds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
