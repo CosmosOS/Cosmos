@@ -76,8 +76,8 @@ namespace Cosmos.Assembler.XSharp {
     static public void Call<T>() {
       new Call { DestinationLabel = MakeLabel(typeof(T)) };
     }
-    static public void Call(Type aFunction) {
-      new Call { DestinationLabel = MakeLabel(aFunction) };
+    public void Call<T>(Flags aFlags) {
+      CallIf(aFlags, MakeLabel(typeof(T)), "");
     }
     public void Call(string aLabel) {
       new Call { DestinationLabel = aLabel };
@@ -98,7 +98,6 @@ namespace Cosmos.Assembler.XSharp {
     public void CallIf(Flags aFlags, string aLabel) {
       CallIf(aFlags, aLabel, "");
     }
-
     public void CallIf(Flags aFlags, string aLabel, string aJumpAfter) {
       // TODO: This is inefficient - lots of jumps
       // Maybe make an invert function for Flags

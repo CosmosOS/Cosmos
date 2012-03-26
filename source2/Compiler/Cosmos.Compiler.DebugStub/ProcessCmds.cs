@@ -25,7 +25,7 @@ namespace Cosmos.Debug.DebugStub {
         AL = DsVsip.CmdCompleted;
         Call<WriteALToComPort>();
         //
-        EAX = DebugStub_CommandID.Value;
+        EAX = CommandID.Value;
         Call<WriteALToComPort>();
       }
     }
@@ -47,21 +47,21 @@ namespace Cosmos.Debug.DebugStub {
 
         // Read Command ID
         Call<ReadALFromComPort>();
-        DebugStub_CommandID.Value = EAX;
+        CommandID.Value = EAX;
 
         // Get AL back so we can compare it, but also put it back for later
         EAX = ESP[0];
-        CheckCmd(VsipDs.TraceOff, typeof(TraceOff));
-        CheckCmd(VsipDs.TraceOn, typeof(TraceOn));
-        CheckCmd(VsipDs.Break, typeof(Break));
-        CheckCmd(VsipDs.BreakOnAddress, typeof(BreakOnAddress));
-        CheckCmd(VsipDs.SendMethodContext, typeof(SendMethodContext));
-        CheckCmd(VsipDs.SendMemory, typeof(SendMemory));
-        CheckCmd(VsipDs.SendRegisters, typeof(SendRegisters));
-        CheckCmd(VsipDs.SendFrame, typeof(SendFrame));
-        CheckCmd(VsipDs.SendStack, typeof(SendStack));
-        CheckCmd(VsipDs.SetAsmBreak, typeof(SetAsmBreak));
-        CheckCmd(VsipDs.Ping, typeof(Ping));
+        CheckCmd<TraceOff>(VsipDs.TraceOff);
+        CheckCmd<TraceOn>(VsipDs.TraceOn);
+        CheckCmd<Break>(VsipDs.Break);
+        CheckCmd<BreakOnAddress>(VsipDs.BreakOnAddress);
+        CheckCmd<SendMethodContext>(VsipDs.SendMethodContext);
+        CheckCmd<SendMemory>(VsipDs.SendMemory);
+        CheckCmd<SendRegisters>(VsipDs.SendRegisters);
+        CheckCmd<SendFrame>(VsipDs.SendFrame);
+        CheckCmd<SendStack>(VsipDs.SendStack);
+        CheckCmd<SetAsmBreak>(VsipDs.SetAsmBreak);
+        CheckCmd<Ping>(VsipDs.Ping);
 
         Label = ".End";
         // Restore AL for callers who check the command and do
@@ -69,11 +69,11 @@ namespace Cosmos.Debug.DebugStub {
         EAX.Pop();
       }
 
-      protected void CheckCmd(byte aCmd, Type aFunction) {
+      protected void CheckCmd<T>(byte aCmd) {
         AL.Compare(aCmd);
         string xAfterLabel = NewLabel();
         JumpIf(Flags.NotEqual, xAfterLabel);
-        Call(aFunction);
+        Call<T>();
         Call<AckCommand>();
         Jump(".End");
         Label = xAfterLabel;

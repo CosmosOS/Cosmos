@@ -28,7 +28,7 @@ namespace Cosmos.Debug.DebugStub {
     // what level we are "at" relative to the original step start location.
     static protected DataMember32 BreakEBP;
     // Command ID of last command received
-    static protected DataMember32 DebugStub_CommandID;
+    static protected DataMember32 CommandID;
 
     public class BreakOnAddress : Inlines {
       // Sets a breakpoint
@@ -118,7 +118,7 @@ namespace Cosmos.Debug.DebugStub {
         // If EBP and start EBP arent equal, dont break
         // Dont use Equal because we also need to stop above if the user starts
         // the step at the end of a method and next item is after a return
-        CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
+        Call<Break>(Flags.LessThanOrEqualTo);
         Jump(".Normal");
         Label = ".StepOverAfter";
       }
