@@ -260,23 +260,23 @@ namespace Cosmos.Debug.DebugStub {
         // This code is temporarily disabled as IRQs are not enabled right now.
         // LockOrExit()
         {
-          OldCode();
+          SaveExecuteRestore();
         }
         // Unlock();
       }
 
-      protected void OldCode() {
+      protected void SaveExecuteRestore() {
         // EBP is restored by PopAll, but SendFrame uses it. Could
         // get it from the PushAll data, but this is easier.
         CallerEBP.Value = EBP;
 
-        // Could also get ESP from PushAll but this is easier
+        // Could also get ESP from PushAll but this is easier.
         // Another reason to do it here is that some day we may need to use 
         // the stack before PushAll.
         //
         // We cant modify any registers since we havent done PushAll yet
         // Maybe we could do a sub(4) on memory direct.. 
-        // But for now we remove from ESP which the call to us produces,
+        // But for now we remove from ESP which the Int3 produces,
         // store ESP, then restore ESP so we don't cause stack corruption.
         ESP = ESP + 12; // 12 bytes for EFLAGS, CS, EIP
         CallerESP.Value = ESP;
@@ -284,16 +284,16 @@ namespace Cosmos.Debug.DebugStub {
 
         PushAll();
         {
+          // Save current ESP so we can look at the results of PushAll later
           DebugPushAllPtr.Value = ESP;
-          // We just pushed all registers to the stack so we can use them
-          // So we get the stack pointer and add 32. This skips over the
-          // registers we just pushed.
-          EBP = ESP;
-          EBP = EBP + 32; // We dont need to restore this becuase it was pushed as part of PushAll32
 
-          // Get actual EIP of caller.
+          // Get current ESP and add 32. This will skip over the PushAll and point us at the call data from Int3.
+          EBP = ESP;
+          EBP = EBP + 32;
+
+          // Caller EIP
           EAX = EBP[0];
-          // EIP is pointer to op after our call. We subtract 1 for the opcode size of Int3
+          // EIP is pointer to op after our call. Int3 is 1 byte so we subtract 1.
           // Note - when we used call it was 5 (the size of our call + address)
           // so we get the EIP as IL2CPU records it. Its also useful for when we will
           // be changing ops that call this stub.
@@ -305,8 +305,6 @@ namespace Cosmos.Debug.DebugStub {
           Call<Executing>();
         }
         PopAll(); // Restore registers
-
-        Label = "DebugStub_Return";
       }
     }
 
