@@ -183,25 +183,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class Ping : Inlines {
-      public override void Assemble() {
-        AL = DsVsip.Pong; 
-        Call<WriteALToComPort>();
-      }
-    }
-
-    public class TraceOff : CodeBlock {
-      public override void Assemble() {
-        DebugTraceMode.Value = Tracing.Off;
-      }
-    }
-
-    public class TraceOn : CodeBlock {
-      public override void Assemble() {
-        DebugTraceMode.Value = Tracing.On;
-      }
-    }
-
     public class Executing : CodeBlock {
       // This is the secondary stub routine. After the primary (main) has decided we should do some debug
       // activities, this one is called.
