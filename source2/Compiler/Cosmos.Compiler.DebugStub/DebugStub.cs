@@ -433,17 +433,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class DebugSuspend : CodeBlock {
-      public override void Assemble() {
-        DebugSuspendLevel.Value++;
-      }
-    }
-
-    public class DebugResume : CodeBlock {
-      public override void Assemble() {
-        DebugSuspendLevel.Value--;
-      }
-    }
   }
 
 }
