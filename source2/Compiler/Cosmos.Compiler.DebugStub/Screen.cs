@@ -9,12 +9,14 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
+    protected const uint VidBase = 0xB8000;
+
     public class Cls : CodeBlock {
       public override void Assemble() {
         ESI = VidBase;
         Label = "DebugStub_Cls_More";
+
         AL = 0x00;
-        // Why add 8 to ESI every time? Why not just add 8 in the first place?
         ESI[0] = AL; // Text
         ESI++;
 

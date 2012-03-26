@@ -9,8 +9,6 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    protected const uint VidBase = 0xB8000;
-
     // Caller's Registers
     static public DataMember32 CallerEBP;
     static public DataMember32 CallerEIP;
@@ -124,20 +122,6 @@ namespace Cosmos.Debug.DebugStub {
     static protected DataMember32 DebugBreakEBP;
     // Command ID of last command received
     static protected DataMember32 DebugStub_CommandID;
-
-    public DebugStub(int aComNo) {
-      mComNo = aComNo;
-      mComAddr = mComPortAddresses[mComNo - 1];
-      mComStatusAddr = (UInt16)(mComAddr + 5);
-
-      // Old method, need to convert to fields
-      mAsm.DataMembers.AddRange(new DataMember[]{
-        // Breakpoint addresses
-        new DataMember("DebugBPs", new int[256]),
-        //TODO: Move to DebugStub (new)
-        new DataMember("DebugWaitMsg", "Waiting for debugger connection...")
-      });
-    }
 
     public class BreakOnAddress : Inlines {
       // Sets a breakpoint
@@ -292,17 +276,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    // Called before Kernel runs. Inits debug stub, etc
-    public class Init : CodeBlock {
-      public override void Assemble() {
-        Call<Cls>();
-        Call<DisplayWaitMsg>();
-        Call<InitSerial>();
-        Call<WaitForDbgHandshake>();
-        Call<Cls>();
-      }
-    }
-
     public class ProcessCommandBatch : CodeBlock {
       public override void Assemble() {
         Call<ProcessCommand>();
@@ -414,13 +387,13 @@ namespace Cosmos.Debug.DebugStub {
         EDI = AsmBreakEIP.Value;
         EDI.Compare(0);
         // If 0, we don't need to clear an older one.
-        JumpIf(Flags.Equal, ".Exit");
+        JumpIf(Flags.Equal, ".Done");
         // Clear old break point and set back to original opcode / partial opcode
         EAX = AsmOrigByte.Value;
         EDI[0] = EAX;
         AsmOrigByte.Value = 0;
 
-        Label = ".Exit";
+        Label = ".Done";
       }
     }
 
