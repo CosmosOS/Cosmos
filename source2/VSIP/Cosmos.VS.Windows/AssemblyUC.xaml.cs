@@ -87,7 +87,7 @@ namespace Cosmos.VS.Windows {
 
       var xFont = new FontFamily("Consolas");
       string xLabelPrefix = null;
-
+      bool xBreakAtNextCode = false;
       foreach (var xLine in mLines) {
         string xDisplayLine = xLine.ToString();
 
@@ -107,8 +107,11 @@ namespace Cosmos.VS.Windows {
             }
           } else {
             if (xLine is AsmCode) {
-              var xCode = (AsmCode)xLine;
-              if (xCode.ToString().ToUpper() == "INT3") {
+              var xAsmCode = (AsmCode)xLine;
+              if (xAsmCode.IsDebugCode) {
+                if (xAsmCode.LabelMatches(mCurrentLabel)) {
+                  xBreakAtNextCode = true;
+                }
                 continue;
               }
             }
@@ -146,10 +149,13 @@ namespace Cosmos.VS.Windows {
           xRun.Foreground = Brushes.Green;
         } else if (xLine is AsmCode) {
           var xAsmCode = (AsmCode)xLine;
-          if (xAsmCode.Label != null && xAsmCode.Label.Label == mCurrentLabel) {
-            xRun.Background = Brushes.Red;
+          if (xBreakAtNextCode || xAsmCode.LabelMatches(mCurrentLabel)) {
+            xRun.Foreground = Brushes.WhiteSmoke;
+            xRun.Background = Brushes.DarkRed;
+            xBreakAtNextCode = false;
+          } else {
+            xRun.Foreground = Brushes.Blue;
           }
-          xRun.Foreground = Brushes.Blue;
         } else { // Unknown type
           xRun.Foreground = Brushes.HotPink;
         }

@@ -11,7 +11,10 @@ namespace Cosmos.VS.Windows {
     protected string mText;
     public string Text {
       get { return mText; }
-      set { mText = value; }
+      set { 
+        mText = value;
+        mIsDebugCode = mText.Trim().ToUpper() == "INT3";
+      }
     }
 
     public override string ToString() {
@@ -24,8 +27,18 @@ namespace Cosmos.VS.Windows {
       set { mLabel = value; }
     }
 
+    protected bool mIsDebugCode;
+    public bool IsDebugCode {
+      get { return mIsDebugCode; }
+    }
+
+    public bool LabelMatches(string aLabel) {
+      return (Label != null && Label.Label == aLabel);
+    }
+
     public AsmCode(string aText) {
-      mText = aText;
+      // Use prop setter as it has checks
+      Text = aText;
     }
   }
 
