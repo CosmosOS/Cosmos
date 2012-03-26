@@ -134,7 +134,7 @@ namespace Cosmos.Debug.DebugStub {
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepIntoAfter";
-        
+
         // F10
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
@@ -147,12 +147,12 @@ namespace Cosmos.Debug.DebugStub {
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepOverAfter";
-        
+
         // Shift-F11
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
 
-        EAX = CallerEBP.Value; 
+        EAX = CallerEBP.Value;
         EAX.Compare(DebugBreakEBP.Value); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, "DebugStub_Executing_Normal");
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
@@ -160,7 +160,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = "DebugStub_ExecutingStepOutAfter";
 
         Label = "DebugStub_Executing_Normal";
-        
+
         // If tracing is on, send a trace message
         // Tracing isnt really used any more, was used
         // by the old stand alone debugger. Might be upgraded
@@ -197,7 +197,7 @@ namespace Cosmos.Debug.DebugStub {
 
         // Wait for a command
         Label = "DebugStub_WaitCmd";
-        
+
         // Check for common commands first
         Call<ProcessCommand>();
 
@@ -240,16 +240,32 @@ namespace Cosmos.Debug.DebugStub {
     }
 
     public class TracerEntry : CodeBlock {
-      // 0 = Not in, 1 = already running
-      public DataMember32 IsRunning;
-
       [XSharp(IsInteruptHandler = true)]
-      // Main entry point for the DebugStub which is executed by INT3.
+      // Int3 entry point
       public override void Assemble() {
-        // Test only for now
-        // Wont work... need to use a register
-        //new MoveToDR6(0);
+        // We need to make sure Int3 can never run more than one instance at a time.
+        // We are not threaded yet, when we are we have to change stuff to thread vars and a lot of other stuff.
+        // Two Int3s can never be called at the same time normally, but IRQs can happen while the DebugStub is
+        // running. We also need to make sure IRQs are allowed to run during DebugStub as DebugStub can wait for
+        // a long time on commands.
+        // So we need to disable interrupts immediately and set a flag, then reenable interrupts if they were enabled
+        // when we disabled them. Later this can be replaced by some kind of critical section / lock around this code.
+        // Currently IRQs are disabled - we need to fix DS before we can reenable them and add support for critical sections / locks here.
+        // -http://www.codemaestro.com/reviews/8
+        // -http://en.wikipedia.org/wiki/Spinlock - Uses a register which is a problem for us
+        // -http://wiki.osdev.org/Spinlock
+        //   -Looks good and also allows testing intead of waiting
+        //   -Wont require us to disable / enable IRQs
 
+        // This code is temporarily disabled as IRQs are not enabled right now.
+        // LockOrExit()
+        {
+          OldCode();
+        }
+        // Unlock();
+      }
+
+      protected void OldCode() {
         // EBP is restored by PopAll, but SendFrame uses it. Could
         // get it from the PushAll data, but this is easier.
         CallerEBP.Value = EBP;
@@ -266,81 +282,29 @@ namespace Cosmos.Debug.DebugStub {
         CallerESP.Value = ESP;
         ESP = ESP - 12;
 
-        // If debug stub is in break, and then an IRQ happens, the IRQ
-        // can call DebugStub again. This causes two DebugStubs to 
-        // run which causes havoc. So we only allow one to run.
-        // We arent multi threaded yet, so this works fine.
-        // IRQ's are disabled between Compare and JumpIf so an IRQ cant
-        // happen in between them which could also cause double entry.
-        DisableInterrupts();
-        DebugSuspendLevel.Value.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_Running");
-        // DebugStub is already running, so exit.
-        // But we need to see if IRQs are disabled.
-        // If IRQ disabled, we dont reenable them after our disable
-        // in this routine.
-        InterruptsEnabledFlag.Value.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_Return");
-        EnableInterrupts();
-        Jump("DebugStub_Return");
-
-        Label = "DebugStub_Running";
-        IsRunning.Value.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_Start");
-        // If we made it this far we exit because DebugStub is already running.
-        // We need to see if IRQs were originally enabled or disabled and
-        // re-enable them if they were enabled on entry.
-        Jump("DebugStub_CheckIntAndReturn");
-
-        // All clear, mark that we are entering the debug stub
-        Label = "DebugStub_Start";
-        IsRunning.Value = 1;
-
-        // DS is now marked not to re-enter, so re-enable interrupts if
-        // they were enabled on entry
-        InterruptsEnabledFlag.Value.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_NoSTI");
-        EnableInterrupts();
-
-        // Call secondary debug stub
-        Label = "DebugStub_NoSTI";
         PushAll();
-        DebugPushAllPtr.Value = ESP;
-        // We just pushed all registers to the stack so we can use them
-        // So we get the stack pointer and add 32. This skips over the
-        // registers we just pushed.
-        EBP = ESP;
-        EBP = EBP + 32; // We dont need to restore this becuase it was pushed as part of PushAll32
+        {
+          DebugPushAllPtr.Value = ESP;
+          // We just pushed all registers to the stack so we can use them
+          // So we get the stack pointer and add 32. This skips over the
+          // registers we just pushed.
+          EBP = ESP;
+          EBP = EBP + 32; // We dont need to restore this becuase it was pushed as part of PushAll32
 
-        // Get actual EIP of caller.
-        EAX = EBP[0];
-        // EIP is pointer to op after our call. We subtract 1 for the opcode size of Int3
-        // Note - when we used call it was 5 (the size of our call + address)
-        // so we get the EIP as IL2CPU records it. Its also useful for when we will
-        // be changing ops that call this stub.
-        EAX--; 
-        // Store it for later use.
-        CallerEIP.Value = EAX;
+          // Get actual EIP of caller.
+          EAX = EBP[0];
+          // EIP is pointer to op after our call. We subtract 1 for the opcode size of Int3
+          // Note - when we used call it was 5 (the size of our call + address)
+          // so we get the EIP as IL2CPU records it. Its also useful for when we will
+          // be changing ops that call this stub.
+          EAX--;
+          // Store it for later use.
+          CallerEIP.Value = EAX;
 
-        // Call secondary stub
-        Call<Executing>();
-
-        // Restore registers
-        PopAll();
-
-        // Setting the DebugRuning flag is atomic, but in the future
-        // we might have other code as we do in the entry to check.
-        // So just to be safe, we disable interrupts while we do this.
-        DisableInterrupts();
-        // Complete, mark that DebugStub is complete
-        IsRunning.Value = 0;
-
-        Label = "DebugStub_CheckIntAndReturn";
-        // Re-enable interrupts if needed. This happens on normal exit, or call from above
-        // when there would have been a re-entry to DS.
-        InterruptsEnabledFlag.Value.Compare(0);
-        JumpIf(Flags.Equal, "DebugStub_Return");
-        EnableInterrupts();
+          // Call secondary stub
+          Call<Executing>();
+        }
+        PopAll(); // Restore registers
 
         Label = "DebugStub_Return";
       }
