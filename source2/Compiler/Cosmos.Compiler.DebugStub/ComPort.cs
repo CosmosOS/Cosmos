@@ -14,6 +14,20 @@ namespace Cosmos.Debug.DebugStub {
     static public UInt16 mComAddr;
     static public UInt16 mComStatusAddr;
 
+    public class ReadByteFromComPort : CodeBlock {
+      // Input: EDI
+      // Output: [EDI]
+      // Modified: AL, DX, EDI (+1)
+      //
+      // Reads a byte into [EDI] and does EDI + 1
+      // http://wiki.osdev.org/Serial_ports
+      public override void Assemble() {
+        Call<ReadALFromComPort>();
+        EDI[0] = AL;
+        EDI++;
+      }
+    }
+
     public abstract class Inlines : CodeBlock {
       // INLINE
       // Modifies: Stack, EDI, AL
