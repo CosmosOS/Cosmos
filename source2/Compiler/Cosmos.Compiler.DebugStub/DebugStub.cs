@@ -8,12 +8,8 @@ using Cosmos.Debug.Consts;
 using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
-  public class DebugStub : CodeGroup {
+  public partial class DebugStub : CodeGroup {
     protected const uint VidBase = 0xB8000;
-    static public int mComNo = 0;
-    static protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
-    static public UInt16 mComAddr;
-    static public UInt16 mComStatusAddr;
 
     // Caller's Registers
     static public DataMember32 CallerEBP;
@@ -141,38 +137,6 @@ namespace Cosmos.Debug.DebugStub {
         //TODO: Move to DebugStub (new)
         new DataMember("DebugWaitMsg", "Waiting for debugger connection...")
       });
-    }
-
-    public abstract class Inlines : CodeBlock {
-      // INLINE
-      // Modifies: Stack, EDI, AL
-      // TODO: Modify X# to allow inlining better by using dynamic labels otherwise
-      // repeated use of an inline will fail with conflicting labels.
-      // TODO: Allow methods to emit a start label and return automatically
-      // and mark inlines so this does not happen.
-      protected void ReadComPortX32toStack(int xCount) {
-        for (int i = 1; i <= xCount; i++) {
-          // Make room on the stack for the address
-          Push(0);
-          // ReadByteFromComPort writes to EDI, then increments
-          EDI = ESP;
-
-          // Read address to stack via EDI
-          ReadBytesFromComPort(4);
-        }
-      }
-
-      protected void ReadBytesFromComPort(int xCount) {
-        for (int i = 1; i <= xCount; i++) {
-          Call<ReadByteFromComPort>();
-        }
-      }
-
-      protected void WriteBytesToComPort(int xCount) {
-        for (int i = 1; i <= xCount; i++) {
-          Call<WriteByteToComPort>();
-        }
-      }
     }
 
     public class BreakOnAddress : Inlines {
@@ -328,62 +292,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class WriteByteToComPort : Inlines {
-      // Input: ESI
-      // Output: None
-      // Modifies: EAX, EDX
-      //
-      // Sends byte at [ESI] to com port and does esi + 1
-      //
-      // This sucks to use the stack, but x86 can only read and write ports from AL and
-      // we need to read a port before we can write out the value to another port.
-      // The overhead is a lot, but compared to the speed of the serial and the fact
-      // that we wait on the serial port anyways, its a wash.
-      //
-      // This could be changed to use interrupts, but that then complicates
-      // the code and causes interaction with other code. DebugStub should be
-      // as isolated as possible from any other code.
-      public override void Assemble() {
-        // Sucks again to use DX just for this, but x86 only supports
-        // 8 bit address for literals on ports
-        DX = mComStatusAddr;
-
-        // Wait for serial port to be ready
-        // Bit 5 (0x20) test for Transmit Holding Register to be empty.
-        Label = ".Wait";
-        AL = Port[DX];
-        AL.Test(0x20);
-        JumpIf(Flags.Zero, ".Wait");
-
-        // Set address of port
-        DX = mComAddr;
-        // Get byte to send
-        AL = ESI[0];
-        // Send the byte
-        Port[DX] = AL;
-
-        ESI++;
-      }
-    }
-
-    public class ReadALFromComPort : Inlines {
-      // Modifies: AL, DX
-      public override void Assemble() {
-        DX = mComStatusAddr;
-
-        // Wait for port to be ready
-        Label = ".Wait";
-        AL = Port[DX];
-        AL.Test(0x01);
-        JumpIf(Flags.Zero, ".Wait");
-
-        // Set address of port
-        DX = mComAddr;
-        // Read byte
-        AL = Port[DX];
-      }
-    }
-
     // Called before Kernel runs. Inits debug stub, etc
     public class Init : CodeBlock {
       public override void Assemble() {
@@ -392,186 +300,6 @@ namespace Cosmos.Debug.DebugStub {
         Call<InitSerial>();
         Call<WaitForDbgHandshake>();
         Call<Cls>();
-      }
-    }
-
-    public class WaitForDbgHandshake : Inlines {
-      public override void Assemble() {
-        // "Clear" the UART out
-        AL = 0;
-        Call<WriteALToComPort>();
-
-        // QEMU (and possibly others) send some garbage across the serial line first.
-        // Actually they send the garbage inbound, but garbage could be inbound as well so we 
-        // keep this.
-        // To work around this we send a signature. DC then discards everything before the signature.
-        // QEMU has other serial issues too, and we dont support it anymore, but this signature is a good
-        // feature so we kept it.
-        Push(Cosmos.Debug.Consts.Consts.SerialSignature);
-        ESI = ESP;
-        WriteBytesToComPort(4);
-        // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
-        EAX.Pop();
-
-        // We could use the signature as the start signal, but I prefer
-        // to keep the logic separate, especially in DC.
-        AL = (int)DsVsip.Started; // Send the actual started signal
-        Call<WriteALToComPort>();
-
-        Call<WaitForSignature>();
-        Call<ProcessCommandBatch>();
-      }
-    }
-
-    public class InitSerial : CodeBlock {
-      // SERIAL DOCS
-      //
-      // All information relating to our serial usage should be documented in 
-      // this comment.
-      //
-      // We do not use IRQs for debugstub serial. This is becuase DebugStub (DS)
-      // MUST be:
-      //  - As simple as possible
-      //  - Interact as minimal as possible wtih normal Cosmos code because
-      //    the debugstub must *always* work even if the normal code is fubarred
-      //
-      // The serial port that is used for DS should be "hidden" from Cosmos main
-      // so that Cosmos main pretends it does not exist.
-      //
-      // IRQs would create a clash/mix of code.
-      // This does make the serial code in DebugStub inefficient, but its well worth
-      // the benefits received by following these rules.
-      //
-      // Baud rate is set to 115200. Likely our code could not exceed this rate
-      // anyways the way it is written and there are compatibility issues on some
-      // hardware above this rate.
-      //
-      // We assume a minimum level of a 16550A, which should be no problem on any 
-      // common hardware today. VMWare emulates the 16550A
-      //
-      // We do not handle flow control for outbound data (DS --> DC).
-      // The DebugConnector (DC, the code in the Visual Studio side) however is threaded
-      // and easily should be able to receive data faster than we can send it.
-      // Most things are transactional with data being sent only when asked for, but 
-      // with tracing we do send a data directly.
-      //
-      // Currently there is no inbound flow control either (DC --> DS)
-      // For now we assume all commands in bound are 16 bytes or less to ensure
-      // that they fit in the FIFO. Commands in DS must wait for a command ID ACK
-      // before sending another command.
-      // See notes in ProcessCommand.
-      public override void Assemble() {
-        // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
-
-        // Disable interrupts
-        DX = (UInt16)(mComAddr + 1);
-        AL = 0;
-        Port[DX] = AL;
-
-        // Enable DLAB (set baud rate divisor)
-        DX = (UInt16)(mComAddr + 3);
-        AL = 0x80;
-        Port[DX] = AL;
-
-        // 0x01 - 0x00 - 115200
-        // 0x02 - 0x00 - 57600
-        // 0x03 - 0x00 - 38400
-        //
-        // Set divisor (lo byte)
-        DX = mComAddr;
-        AL = 0x01;
-        Port[DX] = AL;
-        // hi byte
-        DX = (UInt16)(mComAddr + 1);
-        AL = 0x00;
-        Port[DX] = AL;
-
-        // 8N1
-        DX = (UInt16)(mComAddr + 3);
-        AL = 0x03;
-        Port[DX] = AL;
-
-        // Enable FIFO, clear them
-        // Set 14-byte threshold for IRQ.
-        // We dont use IRQ, but you cant set it to 0
-        // either. IRQ is enabled/diabled separately
-        DX = (UInt16)(mComAddr + 2);
-        AL = 0xC7;
-        Port[DX] = AL;
-
-        // 0x20 AFE Automatic Flow control Enable - 16550 (VMWare uses 16550A) is most common and does not support it
-        // 0x02 RTS
-        // 0x01 DTR
-        // Send 0x03 if no AFE
-        DX = (UInt16)(mComAddr + 4);
-        AL = 0x03;
-        Port[DX] = AL;
-      }
-    }
-
-    public class DisplayWaitMsg : CodeBlock {
-      // http://wiki.osdev.org/Text_UI
-      // Later can cycle for x changes of second register:
-      // http://wiki.osdev.org/Time_And_Date
-      public override void Assemble() {
-        ESI = AddressOf("DebugWaitMsg");
-        // 10 lines down, 20 cols in
-        EDI = VidBase + (10 * 80 + 20) * 2;
-
-        // Read and copy string till 0 terminator
-        Label = ".ReadChar";
-        AL = ESI[0];
-        AL.Compare(0);
-        JumpIf(Flags.Equal, ".AfterMsg");
-        ESI++;
-        EDI[0] = AL;
-        EDI++;
-        EDI++;
-        Jump(".ReadChar");
-        //TODO: Local labels in X#
-        Label = ".AfterMsg";
-      }
-    }
-
-    public class WriteALToComPort : CodeBlock {
-      // Input: AL
-      // Output: None
-      // Modifies: EDX, ESI
-      public override void Assemble() {
-        EAX.Push();
-        ESI = ESP;
-        Call<WriteByteToComPort>();
-        // Is a local var, cant use Return(4). X# issues the return.
-        // This also allow the function to preserve EAX.
-        EAX.Pop();
-      }
-    }
-
-    public class WriteAXToComPort : Inlines {
-      // Input: AX
-      // Output: None
-      // Modifies: EDX, ESI
-      public override void Assemble() {
-        EAX.Push();
-        ESI = ESP;
-        WriteBytesToComPort(2);
-        // Is a local var, cant use Return(4). X# issues the return.
-        // This also allow the function to preserve EAX.
-        EAX.Pop();
-      }
-    }
-
-    public class WriteEAXToComPort : Inlines {
-      // Input: EAX
-      // Output: None
-      // Modifies: EDX, ESI
-      public override void Assemble() {
-        EAX.Push();
-        ESI = ESP;
-        WriteBytesToComPort(4);
-        // Is a local var, cant use Return(4). X# issues the return.
-        // This also allow the function to preserve EAX.
-        EAX.Pop();
       }
     }
 
@@ -605,24 +333,6 @@ namespace Cosmos.Debug.DebugStub {
         //TODO: Always emit and exit label and then make a Exit method which can
         // automatically use it. I think a label might already exist.
         Label = "DebugStub_WaitForSignature_Exit";
-      }
-    }
-
-    public class Cls : CodeBlock {
-      public override void Assemble() {
-        ESI = VidBase;
-        Label = "DebugStub_Cls_More";
-        AL = 0x00;
-        // Why add 8 to ESI every time? Why not just add 8 in the first place?
-        ESI[0] = AL; // Text
-        ESI++;
-
-        AL = 0x0A;
-        ESI[0] = AL; // Colour
-        ESI++;
-
-        ESI.Compare(VidBase + 25 * 80 * 2);
-        JumpIf(Flags.LessThan, "DebugStub_Cls_More");
       }
     }
 
@@ -678,45 +388,39 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    //// Location where INT3 has been injected
-    //// 0 if no INT3 is active
-    //static public DataMember32 AsmBreakEIP;
-    //// Old byte before INT1 was injected
-    //// Only 1 byte is used
-    //static public DataMember32 AsmOrigByte;
-    ////
-    //public class SetAsmBreak : Inlines {
-    //  public override void Assemble() {
-    //    EDI = AsmBreakEIP.Value;
-    //    EDI.Compare(0);
-    //    // If 0, we don't need to clear an older one.
-    //    JumpIf(Flags.Equal, ".Set");
-    //    Call<ClrAsmBreak>();
-
-    //    Label = ".Set";
-    //    ReadComPortX32toStack(1);
-    //    EDI.Pop();
-    //    // Save the old byte
-    //    EAX = EDI[0];
-    //    AsmOrigByte.Value = EAX;
-    //    // Inject INT3
-    //    EDI[0] = 0xCC;
-    //    // Save EIP of the break
-    //    AsmBreakEIP.Value = EDI;
-    //  }
-    //}
-
-    //public class ClrAsmBreak : Inlines {
-    //  public override void Assemble() {
-    //    // Clear old break point
-    //    EAX = AsmOrigByte.Value;
-    //    EDI[0] = EAX;
-    //    AsmOrigByte.Value = 0;
-    //  }
-    //}
-
+    // Location where INT3 has been injected
+    // 0 if no INT3 is active
+    static public DataMember32 AsmBreakEIP;
+    // Old byte before INT1 was injected
+    // Only 1 byte is used
+    static public DataMember32 AsmOrigByte;
+    //
     public class SetAsmBreak : Inlines {
       public override void Assemble() {
+        ReadComPortX32toStack(1);
+        EDI.Pop();
+        // Save the old byte
+        EAX = EDI[0];
+        AsmOrigByte.Value = EAX;
+        // Inject INT3
+        EDI[0] = 0xCC;
+        // Save EIP of the break
+        AsmBreakEIP.Value = EDI;
+      }
+    }
+
+    public class ClearAsmBreak : Inlines {
+      public override void Assemble() {
+        EDI = AsmBreakEIP.Value;
+        EDI.Compare(0);
+        // If 0, we don't need to clear an older one.
+        JumpIf(Flags.Equal, ".Exit");
+        // Clear old break point and set back to original opcode / partial opcode
+        EAX = AsmOrigByte.Value;
+        EDI[0] = EAX;
+        AsmOrigByte.Value = 0;
+
+        Label = ".Exit";
       }
     }
 
@@ -750,6 +454,7 @@ namespace Cosmos.Debug.DebugStub {
         //   -Find a faster way - a list of 256 straight compares and code modifation?
         //   -Count BPs and modify ECX since we usually dont have 256 of them?
         //   -Move this scan earlier?
+        //   -If there are 0 BPs, skip scan - easy and should have a good increase
         EAX = CallerEIP.Value;
         EDI = AddressOf("DebugBPs");
         ECX = 256;
@@ -763,7 +468,6 @@ namespace Cosmos.Debug.DebugStub {
         //
         // F11
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Into);
-        //Old, can delete this line: CallIf(Flags.Equal, "DebugStub_Break");
         //TODO: I think we can use a using statement to create this type of block
         // and emit asm
         // using (var xBlock = new AsmBlock()) {
@@ -773,12 +477,11 @@ namespace Cosmos.Debug.DebugStub {
         //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepIntoAfter");
         Call<Break>();
-        //TODO: Allow creating labels but issuing them later, then we can
-        // call them with early binding
+        //TODO: Allow creating labels but issuing them later, then we can call them with early binding
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepIntoAfter";
-        //
+        
         // F10
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOverAfter");
@@ -791,7 +494,7 @@ namespace Cosmos.Debug.DebugStub {
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump("DebugStub_Executing_Normal");
         Label = "DebugStub_ExecutingStepOverAfter";
-        //
+        
         // Shift-F11
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Out);
         JumpIf(Flags.NotEqual, "DebugStub_ExecutingStepOutAfter");
