@@ -685,7 +685,7 @@ namespace Cosmos.IL2CPU
             for (int i = 0; i < xParams.Length; i++)
             {
                 xParamTypes[i] = xParams[i].ParameterType;
-                Queue(xParamTypes[i], aMethod, "Parameter");
+                Queue(xParamTypes[i], MethodInfoLabelGenerator.GenerateFullName(aMethod), "Parameter");
             }
             var xIsDynamicMethod = aMethod.DeclaringType == null;
             // Queue Types directly related to method
@@ -695,12 +695,12 @@ namespace Cosmos.IL2CPU
                 if (!xIsDynamicMethod)
                 {
                     // dont queue declaring types of dynamic methods either, those dont have a declaring type
-                    Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+                    Queue(aMethod.DeclaringType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Declaring Type");
                 }
             }
             if (aMethod is System.Reflection.MethodInfo)
             {
-                Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
+                Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Return Type");
             }
 
             // Scan virtuals
@@ -757,7 +757,7 @@ namespace Cosmos.IL2CPU
                 // care of new additions.
                 if (xVirtMethod != null)
                 {
-                    Queue(xVirtMethod, aMethod, "Virtual Base");
+                    Queue(xVirtMethod, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Virtual Base");
                     mVirtuals.Add(xVirtMethod);
                     if (aMethod.Name == "ToString")
                     {
@@ -779,7 +779,7 @@ namespace Cosmos.IL2CPU
                                     // "replace" a virtual above it?
                                     if (xNewMethod.IsVirtual)
                                     {
-                                        Queue(xNewMethod, aMethod, "Virtual Downscan");
+                                        Queue(xNewMethod, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Virtual Downscan");
                                     }
                                 }
                             }
@@ -846,22 +846,22 @@ namespace Cosmos.IL2CPU
                     {
                         if (xOpCode is ILOpCodes.OpMethod)
                         {
-                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, aMethod, "Call",sourceItem);
+                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Call", sourceItem);
                         }
                         else if (xOpCode is ILOpCodes.OpType)
                         {
-                            Queue(((ILOpCodes.OpType)xOpCode).Value, aMethod, "OpCode Value");
+                            Queue(((ILOpCodes.OpType)xOpCode).Value, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
                         }
                         else if (xOpCode is ILOpCodes.OpField)
                         {
                             var xOpField = (ILOpCodes.OpField)xOpCode;
                             //TODO: Need to do this? Will we get a ILOpCodes.OpType as well?
-                            Queue(xOpField.Value.DeclaringType, aMethod, "OpCode Value");
+                            Queue(xOpField.Value.DeclaringType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
                             if (xOpField.Value.IsStatic)
                             {
                                 //TODO: Why do we add static fields, but not instance?
                                 // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                                Queue(xOpField.Value, aMethod, "OpCode Value");
+                                Queue(xOpField.Value, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
                             }
                         }
                         else if (xOpCode is ILOpCodes.OpToken)
@@ -869,16 +869,16 @@ namespace Cosmos.IL2CPU
                             var xTokenOp = (ILOpCodes.OpToken)xOpCode;
                             if (xTokenOp.ValueIsType)
                             {
-                                Queue(xTokenOp.ValueType, aMethod, "OpCode Value");
+                                Queue(xTokenOp.ValueType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
                             }
                             if (xTokenOp.ValueIsField)
                             {
-                                Queue(xTokenOp.ValueField.DeclaringType, aMethod, "OpCode Value");
+                                Queue(xTokenOp.ValueField.DeclaringType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
                                 if (xTokenOp.ValueField.IsStatic)
                                 {
                                     //TODO: Why do we add static fields, but not instance?
                                     // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                                    Queue(xTokenOp.ValueField, aMethod, "OpCode Value");
+                                    Queue(xTokenOp.ValueField, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
                                 }
                             }
                         }
