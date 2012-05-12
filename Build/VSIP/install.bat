@@ -11,11 +11,11 @@ cd /D %~dp0
 echo Compiling cosmos
 set THE_OUTPUT_PATH=%CD%
 set ProgFiles=%ProgramFiles%
-if "%PROCESSOR_ARCHITECTURE%"=="AMD64" set "ProgFiles=%ProgramFiles(x86)%
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" set ProgFiles="%ProgramFiles(x86)%"
 
 cd /D %~dp0
 cd ..\..\source
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 "/p:OutputPath=%THE_OUTPUT_PATH%"
+%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath="%THE_OUTPUT_PATH%"
 rem /t:Rebuild
 cd ..\Build\VSIP\
 
