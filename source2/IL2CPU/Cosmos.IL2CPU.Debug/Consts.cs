@@ -32,24 +32,33 @@ namespace Cosmos.Debug.Consts {
   // Messages from Host (VS) to Guest (Cosmos)
   static public class VsipDs {
     public const byte Noop = 0;
-    public const byte TraceOff = 1;
-    public const byte TraceOn = 2;
+
+    public const byte TraceOff = 1; // Dont think currently used
+    public const byte TraceOn = 2; // Dont think currently used
+    
     public const byte Break = 3;
     public const byte Continue = 4; // After a Break
-    public const byte StepInto = 5;
     public const byte BreakOnAddress = 6;
-    public const byte BatchBegin = 7; // Not used yet
-    public const byte BatchEnd = 8; // Not used yet
-    public const byte SendMethodContext = 9; // Sends data from stack, relative to EBP (in x86)
-    public const byte SendMemory = 10;
+
+    public const byte BatchBegin = 7; // Not used anymore
+    public const byte BatchEnd = 8; // Not used anymore
+
+    public const byte StepInto = 5;
     public const byte StepOver = 11;
     public const byte StepOut = 12;
+
+    public const byte SendMethodContext = 9; // Sends data from stack, relative to EBP (in x86)
+    public const byte SendMemory = 10;
     public const byte SendRegisters = 13; // Send the register values to DC
     public const byte SendFrame = 14;
     public const byte SendStack = 15;
-    public const byte SetAsmBreak = 16; // Set an assembly level break point
+
+    // Set an assembly level break point
+    // Only one can be active at a time. BreakOnAddress can have multiple.
+    public const byte SetAsmBreak = 16;
+    
     public const byte Ping = 17; 
-    //
+    
     // Make sure this is always the last entry. Used by DebugStub to verify commands.
     public const byte Max = 18;
   }

@@ -212,7 +212,6 @@ namespace Cosmos.Debug.VSDebugEngine {
           break;
 
         case UiVsip.SetAsmBreak:
-          //mDbgConnector.Ping();
           string xLabel = Encoding.UTF8.GetString(aData);
           uint xAddress = mLabelAddressMappings[xLabel];
           mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());

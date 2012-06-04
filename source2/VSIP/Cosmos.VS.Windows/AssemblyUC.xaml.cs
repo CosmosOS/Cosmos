@@ -61,7 +61,7 @@ namespace Cosmos.VS.Windows {
                        where x is AsmCode
                        select (AsmCode)x;
       // Get the next code entry that is not Int3.
-      // Need to adjust to find after mCurrentLabel right now its hard coded as a test for the second item from the
+      // TODO: Need to adjust to find after mCurrentLabel right now its hard coded as a test for the second item from the
       // beginning of the method.
       var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToArray();
       if (xCodeLines.Length > 1) {
