@@ -9,9 +9,10 @@ cd /D %~dp0
 :adminCalledFromACmdShellOrUnprivileged
 
 echo Compiling cosmos
+REM DO NOT PUT QUOTES around these.. it will put them in the var itself.
 set THE_OUTPUT_PATH=%CD%
 set ProgFiles=%ProgramFiles%
-if "%PROCESSOR_ARCHITECTURE%"=="AMD64" set ProgFiles="%ProgramFiles(x86)%"
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" set ProgFiles=%ProgramFiles(x86)%
 
 cd /D %~dp0
 cd ..\..\source
@@ -43,6 +44,7 @@ echo .
 echo .
 echo .
 
+echo Removing old Cosmos
 IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
 	ren ..\..\Setup2\Output\CosmosUserKit.exe tmp 2> nul
 	if ERRORLEVEL 1 (
@@ -53,9 +55,11 @@ IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
 	del /F ..\..\Setup2\Output\tmp
 :afterSetupDelete
 
+echo Searching for Inno
 IF NOT EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
 	echo Cannot find Inno Setup!
 	pause
+	exit
 )
 
 echo Creating setup.exe
