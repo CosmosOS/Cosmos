@@ -200,7 +200,7 @@ namespace Cosmos.Debug.DebugStub {
         Call<SendTrace>();
 
         // Wait for a command
-        Label = "DebugStub_WaitCmd";
+        Label = ".WaitCmd";
         {
           // Check for common commands first
           Call<ProcessCommand>();
@@ -209,35 +209,35 @@ namespace Cosmos.Debug.DebugStub {
           // or commands that require special handling while in break state.
 
           AL.Compare(VsipDs.Continue);
-          JumpIf(Flags.Equal, "DebugStub_Break_Exit");
+          JumpIf(Flags.Equal, ".Done");
 
           AL.Compare(VsipDs.StepInto);
-          JumpIf(Flags.NotEqual, "DebugStub_Break_StepInto_After");
+          JumpIf(Flags.NotEqual, ".StepInto_After");
           DebugBreakOnNextTrace.Value = StepTrigger.Into;
-          Jump("DebugStub_Break_Exit");
-          Label = "DebugStub_Break_StepInto_After";
+          Jump(".Done");
+          Label = ".StepInto_After";
 
           AL.Compare(VsipDs.StepOver);
-          JumpIf(Flags.NotEqual, "DebugStub_Break_StepOver_After");
+          JumpIf(Flags.NotEqual, ".StepOver_After");
           DebugBreakOnNextTrace.Value = StepTrigger.Over;
           EAX = CallerEBP.Value;
           BreakEBP.Value = EAX;
-          Jump("DebugStub_Break_Exit");
-          Label = "DebugStub_Break_StepOver_After";
+          Jump(".Done");
+          Label = ".StepOver_After";
 
           AL.Compare(VsipDs.StepOut);
-          JumpIf(Flags.NotEqual, "DebugStub_Break_StepOut_After");
+          JumpIf(Flags.NotEqual, ".StepOut_After");
           DebugBreakOnNextTrace.Value = StepTrigger.Out;
           EAX = CallerEBP.Value;
           BreakEBP.Value = EAX;
-          Jump("DebugStub_Break_Exit");
-          Label = "DebugStub_Break_StepOut_After";
+          Jump(".Done");
+          Label = ".StepOut_After";
 
           // Loop around and wait for another command
-          Jump("DebugStub_WaitCmd");
+          Jump(".WaitCmd");
         }
 
-        Label = "DebugStub_Break_Exit";
+        Label = ".Done";
         Call<AckCommand>();
         DebugStatus.Value = Status.Run;
       }
