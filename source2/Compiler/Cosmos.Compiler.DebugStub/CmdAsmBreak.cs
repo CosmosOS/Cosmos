@@ -9,13 +9,15 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
+    
     // Location where INT3 has been injected
     // 0 if no INT3 is active
     static public DataMember32 AsmBreakEIP;
+
     // Old byte before INT3 was injected.
     // Only 1 byte is used.
     static public DataMember32 AsmOrigByte;
-    //
+    
     public class SetAsmBreak : Inlines {
       public override void Assemble() {
         ReadComPortX32toStack(1);

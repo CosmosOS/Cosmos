@@ -60,7 +60,6 @@ namespace Cosmos.Debug.DebugStub {
         CheckCmd<SendRegisters>(VsipDs.SendRegisters);
         CheckCmd<SendFrame>(VsipDs.SendFrame);
         CheckCmd<SendStack>(VsipDs.SendStack);
-        CheckCmd<SetAsmBreak>(VsipDs.SetAsmBreak);
         CheckCmd<Ping>(VsipDs.Ping);
 
         Label = ".End";

@@ -214,7 +214,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         case UiVsip.SetAsmBreak:
           string xLabel = Encoding.UTF8.GetString(aData);
           uint xAddress = mLabelAddressMappings[xLabel];
-          mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
+          //mDbgConnector.SendCommand(
+          //mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
           break;
 
         default:
@@ -384,7 +385,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
         }
       }
-      mDbgConnector.SendCommand(VsipDs.BatchEnd);
+      mDbgConnector.SendCmd(VsipDs.BatchEnd);
     }
 
     void DbgCmdText(string obj) {
@@ -570,18 +571,18 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     internal void Continue() { // F5
       mCurrentAddress = null;
-      mDbgConnector.SendCommand(VsipDs.Continue);
+      mDbgConnector.SendCmd(VsipDs.Continue);
     }
 
     internal void Step(enum_STEPKIND aKind) {
       if (aKind == enum_STEPKIND.STEP_INTO) { // F11
-        mDbgConnector.SendCommand(VsipDs.StepInto);
+        mDbgConnector.SendCmd(VsipDs.StepInto);
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
-        mDbgConnector.SendCommand(VsipDs.StepOver);
+        mDbgConnector.SendCmd(VsipDs.StepOver);
 
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
-        mDbgConnector.SendCommand(VsipDs.StepOut);
+        mDbgConnector.SendCmd(VsipDs.StepOut);
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?

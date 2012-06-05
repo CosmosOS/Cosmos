@@ -55,6 +55,7 @@ namespace Cosmos.Debug.Consts {
 
     // Set an assembly level break point
     // Only one can be active at a time. BreakOnAddress can have multiple.
+    // User must call continue after.
     public const byte SetAsmBreak = 16;
     
     public const byte Ping = 17; 

@@ -46,7 +46,7 @@ namespace Cosmos.Debug.Common {
       get;
     }
 
-    protected void SendCommandData(byte aCmd, byte[] aData, bool aWait) {
+    protected void SendCmd(byte aCmd, byte[] aData, bool aWait) {
       //System.Windows.Forms.MessageBox.Show(xSB.ToString());
 
       // If not connected, we dont send anything. Things like BPs etc can be set before connected.
@@ -118,24 +118,24 @@ namespace Cosmos.Debug.Common {
     // The debugger is user driven so should not happen, but maybe could
     // happen while a previous command is waiting on a reply msg.
     protected object mSendCmdLock = new object();
-    public void SendCommand(byte aCmd) {
-      SendCommandData(aCmd, new byte[0], true);
+    public void SendCmd(byte aCmd) {
+      SendCmd(aCmd, new byte[0], true);
     }
 
     public void SendRegisters() {
-      SendCommand(VsipDs.SendRegisters);
+      SendCmd(VsipDs.SendRegisters);
     }
 
     public void SendFrame() {
-      SendCommand(VsipDs.SendFrame);
+      SendCmd(VsipDs.SendFrame);
     }
 
     public void SendStack() {
-      SendCommand(VsipDs.SendStack);
+      SendCmd(VsipDs.SendStack);
     }
 
     public void Ping() {
-      SendCommand(VsipDs.Ping);
+      SendCmd(VsipDs.Ping);
     }
 
     public void SetBreakpoint(int aID, uint aAddress) {
@@ -156,7 +156,7 @@ namespace Cosmos.Debug.Common {
       var xData = new byte[5];
       Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 0, 4);
       xData[4] = (byte)aID;
-      SendCommandData(VsipDs.BreakOnAddress, xData, true);
+      SendCmd(VsipDs.BreakOnAddress, xData, true);
     }
 
     public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1) {
@@ -181,7 +181,7 @@ namespace Cosmos.Debug.Common {
       mDataSize = (int)size;
       Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-      SendCommandData(VsipDs.SendMemory, xData, true);
+      SendCmd(VsipDs.SendMemory, xData, true);
       var xResult = mData;
       mData = null;
       if (xResult.Length != size) {
@@ -210,7 +210,7 @@ namespace Cosmos.Debug.Common {
 
       Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-      SendCommandData(VsipDs.SendMethodContext, xData, true);
+      SendCmd(VsipDs.SendMethodContext, xData, true);
       // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
       byte[] xResult;
@@ -260,7 +260,7 @@ namespace Cosmos.Debug.Common {
           // Guests never get the first byte sent. So we send a noop.
           // This dummy byte seems to clear out the serial channel.
           // Its never received, but if it ever is, its a noop anyways.
-          SendCommand(VsipDs.Noop);
+          SendCmd(VsipDs.Noop);
 
           // Send signature
           var xData = new byte[4];

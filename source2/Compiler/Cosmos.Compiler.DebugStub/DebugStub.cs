@@ -72,13 +72,14 @@ namespace Cosmos.Debug.DebugStub {
         JumpIf(Flags.NotEqual, ".AfterBreakOnAddress");
         Call<Break>();
         Jump(".Normal");
+
         Label = ".AfterBreakOnAddress";
       }
 
       void CheckStepF10() {
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, ".StepOverAfter");
-        //Label = "Debug__StepOver__";
+        
         EAX = CallerEBP.Value;
         EAX.Compare(BreakEBP.Value);
         // If EBP and start EBP arent equal, dont break
@@ -86,6 +87,7 @@ namespace Cosmos.Debug.DebugStub {
         // the step at the end of a method and next item is after a return
         Call<Break>(Flags.LessThanOrEqualTo);
         Jump(".Normal");
+
         Label = ".StepOverAfter";
       }
 
@@ -99,10 +101,12 @@ namespace Cosmos.Debug.DebugStub {
         // }
         //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, ".StepIntoAfter");
+        
         Call<Break>();
         //TODO: Allow creating labels but issuing them later, then we can call them with early binding
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump(".Normal");
+        
         Label = ".StepIntoAfter";
       }
 
@@ -113,15 +117,33 @@ namespace Cosmos.Debug.DebugStub {
         EAX = CallerEBP.Value;
         EAX.Compare(BreakEBP.Value); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, ".Normal");
+        
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump(".Normal");
+        
         Label = ".StepOutAfter";
+      }
+
+      void CheckForAsmBreak() {
+        EAX = CallerEIP.Value;
+        // AsmBreakEIP is 0 when disabled, but EIP can never be 0 so we dont need a separate check.
+        EAX.Compare(AsmBreakEIP.Value);
+        JumpIf(Flags.NotEqual, ".AsmBreakAfter");
+
+        Call<ClearAsmBreak>();
+        Call<Break>();
+        Jump(".Normal");
+
+        Label = ".AsmBreakAfter";
       }
 
       // This is the secondary stub routine. After the primary has decided we should do some debug
       // activities, this one is called.
       public override void Assemble() {
         // Each of these checks a flag, and if it processes then it jumps to .Normal.
+        //
+        // CheckForAsmBreak must coe before CheckForBreakpoint. They could exist for the same EIP.
+        CheckForAsmBreak();
         CheckForBreakpoint();
         // Only one of the following can be active at a time.
         CheckStepF11();
@@ -171,11 +193,18 @@ namespace Cosmos.Debug.DebugStub {
           // Check for common commands first
           Call<ProcessCommand>();
 
-          // Now check for commands that are only valid in break state
-          // or commands that require special handling while in break state.
+          // Now check for commands that are only valid in break state or commands that require special handling while in break state.
 
           AL.Compare(VsipDs.Continue);
           JumpIf(Flags.Equal, ".Done");
+
+          {
+            AL.Compare(VsipDs.SetAsmBreak);
+            JumpIf(Flags.NotEqual, ".SetAsmBreak_After");
+            Call<SetAsmBreak>();
+            Jump(".WaitCmd");
+            Label = ".SetAsmBreak_After";
+          }
 
           {
             AL.Compare(VsipDs.StepInto);

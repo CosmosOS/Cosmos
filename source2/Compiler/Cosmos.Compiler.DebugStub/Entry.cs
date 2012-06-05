@@ -15,7 +15,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         // We need to make sure Int3 can never run more than one instance at a time.
         // We are not threaded yet, when we are we have to change stuff to thread vars and a lot of other stuff.
-        // Two Int3s can never be called at the same time normally, but IRQs can happen while the DebugStub is
+        // Two Int3 calls currently can never happen at the same time normally, but IRQs can happen while the DebugStub is
         // running. We also need to make sure IRQs are allowed to run during DebugStub as DebugStub can wait for
         // a long time on commands.
         // So we need to disable interrupts immediately and set a flag, then reenable interrupts if they were enabled
