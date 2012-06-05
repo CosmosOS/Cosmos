@@ -214,7 +214,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         case UiVsip.SetAsmBreak:
           string xLabel = Encoding.UTF8.GetString(aData);
           uint xAddress = mLabelAddressMappings[xLabel];
-          //mDbgConnector.SendCommand(
+          mDbgConnector.SetAsmBreakpoint(xAddress);
+          mDbgConnector.Continue();
           //mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
           break;
 
@@ -571,7 +572,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     internal void Continue() { // F5
       mCurrentAddress = null;
-      mDbgConnector.SendCmd(VsipDs.Continue);
+      mDbgConnector.Continue();
     }
 
     internal void Step(enum_STEPKIND aKind) {

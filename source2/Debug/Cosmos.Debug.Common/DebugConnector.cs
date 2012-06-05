@@ -35,15 +35,24 @@ namespace Cosmos.Debug.Common {
     }
 
     protected void DoDebugMsg(string aMsg) {
-      //            mDebugWriter.WriteLine(aMsg);
-      System.Diagnostics.Debug.WriteLine(aMsg);
-      if (OnDebugMsg != null) {
-        OnDebugMsg(aMsg);
+      DoDebugMsg(aMsg, true);
+    }
+
+    protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected) {
+      if (IsConnected || aOnlyIfConnected == false) {
+        System.Diagnostics.Debug.WriteLine(aMsg);
+        if (OnDebugMsg != null) {
+          OnDebugMsg(aMsg);
+        }
       }
     }
 
     public abstract bool IsConnected {
       get;
+    }
+
+    protected void SendCmd(byte aCmd, byte[] aData) {
+      SendCmd(aCmd, aData, true);
     }
 
     protected void SendCmd(byte aCmd, byte[] aData, bool aWait) {
@@ -139,14 +148,6 @@ namespace Cosmos.Debug.Common {
     }
 
     public void SetBreakpoint(int aID, uint aAddress) {
-      // Not needed as SendCommand will do it, but it saves
-      // some execution, but more importantly stops it from 
-      // logging messages to debug output for events that
-      // dont happen.
-      if (!IsConnected) {
-        return;
-      }
-
       if (aAddress == 0) {
         DoDebugMsg("DS Cmd: BP " + aID + " deleted.");
       } else {
@@ -156,7 +157,16 @@ namespace Cosmos.Debug.Common {
       var xData = new byte[5];
       Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 0, 4);
       xData[4] = (byte)aID;
-      SendCmd(VsipDs.BreakOnAddress, xData, true);
+      SendCmd(VsipDs.BreakOnAddress, xData);
+    }
+
+    public void SetAsmBreakpoint(uint aAddress) {
+      var xData = BitConverter.GetBytes(aAddress);
+      SendCmd(VsipDs.SetAsmBreak, xData);
+    }
+
+    public void Continue() {
+      SendCmd(VsipDs.Continue);
     }
 
     public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1) {
@@ -168,12 +178,10 @@ namespace Cosmos.Debug.Common {
 
       if (!IsConnected) {
         return null;
-      }
-      if (size == 0) {
+      } else if (size == 0) {
         // no point in retrieving 0 bytes, better not request at all. also, debugstub "crashes" then
         throw new NotSupportedException("Requested memory data of size = 0");
-      }
-      if (size > 512) {
+      } else if (size > 512) {
         // for now refuse to retrieve large amounts of data:
         throw new NotSupportedException("Too large amount of data requested");
       }
@@ -181,7 +189,7 @@ namespace Cosmos.Debug.Common {
       mDataSize = (int)size;
       Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-      SendCmd(VsipDs.SendMemory, xData, true);
+      SendCmd(VsipDs.SendMemory, xData);
       var xResult = mData;
       mData = null;
       if (xResult.Length != size) {
@@ -210,7 +218,7 @@ namespace Cosmos.Debug.Common {
 
       Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-      SendCmd(VsipDs.SendMethodContext, xData, true);
+      SendCmd(VsipDs.SendMethodContext, xData);
       // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
       byte[] xResult;
