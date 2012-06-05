@@ -56,40 +56,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    // Location where INT3 has been injected
-    // 0 if no INT3 is active
-    static public DataMember32 AsmBreakEIP;
-    // Old byte before INT1 was injected
-    // Only 1 byte is used
-    static public DataMember32 AsmOrigByte;
-    //
-    public class SetAsmBreak : Inlines {
-      public override void Assemble() {
-        ReadComPortX32toStack(1);
-        EDI.Pop();
-        // Save the old byte
-        EAX = EDI[0];
-        AsmOrigByte.Value = EAX;
-        // Inject INT3
-        EDI[0] = 0xCC;
-        // Save EIP of the break
-        AsmBreakEIP.Value = EDI;
-      }
-    }
-
-    public class ClearAsmBreak : Inlines {
-      public override void Assemble() {
-        EDI = AsmBreakEIP.Value;
-        EDI.Compare(0);
-        // If 0, we don't need to clear an older one.
-        JumpIf(Flags.Equal, ".Exit");
-        // Clear old break point and set back to original opcode / partial opcode
-        EAX = AsmOrigByte.Value;
-        EDI[0] = EAX;
-        AsmOrigByte.Value = 0;
-      }
-    }
-
     public class Executing : CodeBlock {
       void CheckForBreakpoint() {
         // Look for a possible matching BP
@@ -211,27 +177,33 @@ namespace Cosmos.Debug.DebugStub {
           AL.Compare(VsipDs.Continue);
           JumpIf(Flags.Equal, ".Done");
 
-          AL.Compare(VsipDs.StepInto);
-          JumpIf(Flags.NotEqual, ".StepInto_After");
-          DebugBreakOnNextTrace.Value = StepTrigger.Into;
-          Jump(".Done");
-          Label = ".StepInto_After";
+          {
+            AL.Compare(VsipDs.StepInto);
+            JumpIf(Flags.NotEqual, ".StepInto_After");
+            DebugBreakOnNextTrace.Value = StepTrigger.Into;
+            Jump(".Done");
+            Label = ".StepInto_After";
+          }
 
-          AL.Compare(VsipDs.StepOver);
-          JumpIf(Flags.NotEqual, ".StepOver_After");
-          DebugBreakOnNextTrace.Value = StepTrigger.Over;
-          EAX = CallerEBP.Value;
-          BreakEBP.Value = EAX;
-          Jump(".Done");
-          Label = ".StepOver_After";
+          {
+            AL.Compare(VsipDs.StepOver);
+            JumpIf(Flags.NotEqual, ".StepOver_After");
+            DebugBreakOnNextTrace.Value = StepTrigger.Over;
+            EAX = CallerEBP.Value;
+            BreakEBP.Value = EAX;
+            Jump(".Done");
+            Label = ".StepOver_After";
+          }
 
-          AL.Compare(VsipDs.StepOut);
-          JumpIf(Flags.NotEqual, ".StepOut_After");
-          DebugBreakOnNextTrace.Value = StepTrigger.Out;
-          EAX = CallerEBP.Value;
-          BreakEBP.Value = EAX;
-          Jump(".Done");
-          Label = ".StepOut_After";
+          {
+            AL.Compare(VsipDs.StepOut);
+            JumpIf(Flags.NotEqual, ".StepOut_After");
+            DebugBreakOnNextTrace.Value = StepTrigger.Out;
+            EAX = CallerEBP.Value;
+            BreakEBP.Value = EAX;
+            Jump(".Done");
+            Label = ".StepOut_After";
+          }
 
           // Loop around and wait for another command
           Jump(".WaitCmd");

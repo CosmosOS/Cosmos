@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CmdAsmBreak.cs" />
     <Compile Include="CmdPing.cs" />
     <Compile Include="CmdTrace.cs" />
     <Compile Include="ComPort.cs" />
