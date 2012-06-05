@@ -7,6 +7,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>HKSplaygroundBoot</Name>
     <BinFormat>elf</BinFormat>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

@@ -121,6 +121,7 @@
     <Compile Include="DebugPageSub.Designer.cs">
       <DependentUpon>DebugPageSub.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileGenerators\XSharpGenerator.cs" />
     <Compile Include="GACDetectionUtility.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -234,9 +235,9 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\AssemblyInfo.cs">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
-	<ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
-	  <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-	</ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
     <ZipItem Include="Templates\Projects\Cosmos\CosmosProject.Cosmos">
       <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
@@ -246,27 +247,27 @@
     <ZipItem Include="Templates\Projects\Cosmos\Cosmos.vstemplate">
       <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
-	<None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
-	  <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-	</None>
-	<None Include="Templates\Projects\CosmosProject %28C#%29\Proj\Kernel.ico">
-	  <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-	</None>
-	<ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.ico">
-	  <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-	</ZipItem>
-	<ZipItem Include="Templates\Projects\CosmosProject %28F#%29\FSharpProj.vstemplate">
-	  <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-	</ZipItem>
-	<ZipItem Include="Templates\Projects\CosmosProject %28F#%29\FSharpProject.fsproj">
-	  <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-	</ZipItem>
-	<ZipItem Include="Templates\Projects\CosmosProject %28F#%29\AssemblyInfo.fs">
-	  <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-	</ZipItem>
-	<ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.fs">
-	  <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-	</ZipItem>
+    <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </None>
+    <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </None>
+    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.ico">
+      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\FSharpProj.vstemplate">
+      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\FSharpProject.fsproj">
+      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\AssemblyInfo.fs">
+      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.fs">
+      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
+    </ZipItem>
     <EmbeddedResource Include="BuildPage.resx">
       <DependentUpon>BuildPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -310,6 +311,7 @@
       <Name>Cosmos.Debug.Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

@@ -204,7 +204,7 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GeramyLovelessTestBoot", ".
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 51
+		SccNumberOfProjects = 54
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -410,6 +410,18 @@ Global
 		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
 		SccProjectName50 = ../source2/Users/GeramyLovelessTest
 		SccLocalPath50 = ..\\source2\\Users\\GeramyLovelessTest
+		SccProjectUniqueName51 = ..\\source2\\Tools\\File2ByteArray\u0020Converter\\File2ByteArray\u0020Converter.csproj
+		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
+		SccProjectName51 = ../source2/Tools/File2ByteArray\u0020Converter
+		SccLocalPath51 = ..\\source2\\Tools\\File2ByteArray\u0020Converter
+		SccProjectUniqueName52 = ..\\source2\\Users\\HKSplayground\\HKSplayground.csproj
+		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
+		SccProjectName52 = ../source2/Users/HKSplayground
+		SccLocalPath52 = ..\\source2\\Users\\HKSplayground
+		SccProjectUniqueName53 = ..\\source2\\Users\\HKSplayground\\HKSplaygroundBoot.Cosmos
+		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
+		SccProjectName53 = ../source2/Users/HKSplayground
+		SccLocalPath53 = ..\\source2\\Users\\HKSplayground
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
