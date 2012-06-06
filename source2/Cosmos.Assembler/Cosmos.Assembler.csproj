@@ -117,6 +117,7 @@
     <Compile Include="InfraExtensions.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
+    <Compile Include="LiteralAssemblerCode.cs" />
     <Compile Include="MethodAndTypeLabelsHolder.cs" />
     <Compile Include="MethodInfoLabelGenerator.cs" />
     <Compile Include="OpCodeAttribute.cs" />

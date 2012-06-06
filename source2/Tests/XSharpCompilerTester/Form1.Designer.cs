@@ -92,7 +92,7 @@
             this.textInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textInput.Size = new System.Drawing.Size(691, 153);
             this.textInput.TabIndex = 0;
-            this.textInput.Text = "# First line of X#";
+            this.textInput.Text = "# First line of X#\r\n! Literal assembler code\r\nEAX = 1";
             this.textInput.TextChanged += new System.EventHandler(this.textInput_TextChanged);
             // 
             // textOutput

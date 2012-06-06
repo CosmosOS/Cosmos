@@ -160,6 +160,7 @@ Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.XSharp.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
@@ -269,6 +270,18 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-4
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
+
+; X# file generator type
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.VS.Package
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.FileGenerators.XSharpGenerator
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.Package.dll
+
+; X# custom tool registration
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: string; ValueName: CLSID; ValueData: {{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; 
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: dword; ValueName: GeneratesDesignTimeSource; ValueData: 1
 
 ; program provider
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: none; Flags: uninsdeletekey

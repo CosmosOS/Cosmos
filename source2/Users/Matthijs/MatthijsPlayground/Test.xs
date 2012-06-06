@@ -1,11 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MatthijsPlayground
-{
-	class Test
-	{
-	}
-}
+﻿# First line of X#
+! Literal assembler code
+EAX = 1
