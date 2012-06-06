@@ -5,10 +5,11 @@ using System.Text;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Cosmos.VS.Package.FileGenerators
 {
-    public class XSharpGenerator: IVsSingleFileGenerator
+    public class XSharpGenerator : IVsSingleFileGenerator
     {
         public int DefaultExtension(out string pbstrDefaultExtension)
         {
@@ -16,7 +17,7 @@ namespace Cosmos.VS.Package.FileGenerators
             return VSConstants.S_OK;
         }
 
-        public int Generate(string wszInputFilePath, string bstrInputFileContents, string wszDefaultNamespace, IntPtr[] rgbOutputFileContents, 
+        public int Generate(string wszInputFilePath, string bstrInputFileContents, string wszDefaultNamespace, IntPtr[] rgbOutputFileContents,
             out uint pcbOutput, IVsGeneratorProgress pGenerateProgress)
         {
             var xGeneratedCode = DoGenerate(wszInputFilePath, bstrInputFileContents, wszDefaultNamespace);
@@ -38,7 +39,14 @@ namespace Cosmos.VS.Package.FileGenerators
 
         private static string DoGenerate(string inputFileName, string inputFileContents, string defaultNamespace)
         {
-            return "// generated content for: " + inputFileName;
+            using (var xInput = new StringReader(inputFileContents))
+            {
+                using (var xOut = new StringWriter())
+                {
+                    Cosmos.XSharp.Generator.Generate(xInput, inputFileName, xOut, defaultNamespace);
+                    return xOut.ToString();
+                }
+            }
         }
     }
 }
