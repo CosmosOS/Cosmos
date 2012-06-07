@@ -178,28 +178,29 @@ Source: ".\Build\VSIP\icu*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignorevers
 Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Windows.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
-; wizards
+Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+
+; Wizards
 Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2010_PATH}\PrivateAssemblies"; Flags: ignoreversion uninsremovereadonly
 
 Source: ".\Build\ISO\isolinux.*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\ISO\mboot.c32"; DestDir: "{app}\Build\ISO"
 
 ; Templates
-; ; Install files into VS Integrated Shell (which includes full Visual Studio)
+; Install files into VS Integrated Shell (which includes full Visual Studio)
 Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
 Source: ".\Build\VSIP\CosmosProject (F#).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Fsharp2010_Installed('dummy')
 Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy')
-; ; Install templates into Shell
+; Install templates into Shell
 Source: ".\Build\VSIP\Cosmos.zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy') or IsVBExpress2010Installed('dummy')
-; ; Install templates into C# Express
+; Install templates into C# Express
 Source: ".\Build\VSIP\CosmosKernel (C#).zip"; DestDir: "{code:GetCSharpExpress2010ProjectTemplatePath}"; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy')
-; ; Install templates into VB Express
+; Install templates into VB Express
 Source: ".\Build\VSIP\CosmosKernel (VB).zip"; DestDir: "{code:GetVBExpress2010ProjectTemplatePath}"; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2010Installed('dummy')
-Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
 
-; .xs Extension
+; Regiter .xs Extension
 Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
 Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
 Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Build\Tools\XSC.exe,0"
@@ -229,6 +230,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ProductVersion; ValueData: 1.0
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ProductName; ValueData: Cosmos Visual Studio Integration Package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: CompanyName; ValueData: Cosmos
+
 ; BuildPage configuration page
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.BuildPage
@@ -237,6 +239,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 ; DebugPage configuration page
+
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.DebugPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
@@ -244,6 +247,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-4
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 ; VMPage configuration page
+
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.VMPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
@@ -276,7 +280,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\AD7Metrics\Engine\{{FA1
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}\AutoSelectIncompatibleList; ValueType: string; ValueName: guidNativeOnlyEng; ValueData: {{3B476D35-A401-11D2-AAD4-00C04F990171}
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}\AutoSelectIncompatibleList; ValueType: string; ValueName: guidScriptEng; ValueData: {{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}
 
-; debug engine
+; Debug engine
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
@@ -329,7 +333,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\ToolWindows\{{a64d0fcc-
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
 Root: HKCU; SubKey: Software\Microsoft\VisualStudio\10.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
 
-; add the .cosmos file association:
+; Register .cosmos file association:
 Root: HKCR; SubKey: .Cosmos; ValueType: string; ValueName: ; ValueData: Cosmos.ProjectFile; Flags: uninsdeletevalue
 Root: HKCR; SubKey: Cosmos.ProjectFile; ValueType: string; ValueName: ; ValueData: Cosmos Project File; Flags: uninsdeletekey
 Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Cosmos.ico

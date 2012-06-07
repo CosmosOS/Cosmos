@@ -156,6 +156,7 @@
     <Compile Include="VSProjectNode.cs" />
     <Compile Include="VSProject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XSharp\SyntaxHighligther.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
