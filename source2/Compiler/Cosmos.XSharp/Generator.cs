@@ -95,7 +95,7 @@ namespace Cosmos.Compiler.XSharp {
           xParts = xParts.Where(q => string.IsNullOrWhiteSpace(q) == false).ToArray();
 
           if (xParts.Contains("=")) {
-            ProcessAssignment(aLine);
+            ProcessAssignment(xParts);
           } else {
             throw new Exception("Syntax error: '" + aLine + "'");
           }
@@ -103,25 +103,23 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
-    private void ProcessAssignment(string line) {
-      var xParts = line.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
-      if (xParts.Length != 2) {
-        throw new Exception(String.Format("Wrong Assignment line: '{0}'", line));
+    private void ProcessAssignment(string[] aParts) {
+      if (aParts.Length != 3) {
+        throw new Exception("Wrong Assignment");
       }
-      var xLeft = xParts[0].Trim();
-      var xRight = xParts[1].Trim();
-      uint xValue;
+
+      string xLeft = aParts[0];
+      string xRight = aParts[2];
 
       if (IsRegister(xLeft)) {
+        uint xValue;
         if (UInt32.TryParse(xRight, out xValue)) {
           mOutput.WriteLine("new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {1}}};", xLeft, xRight);
-
-
           return;
         }
       }
 
-      throw new Exception(String.Format("Wrong Assignment line: '{0}'", line));
+      throw new Exception("Wrong Assignment");
     }
 
     private void ProcessLiteral(string line) {
