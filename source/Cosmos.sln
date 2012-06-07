@@ -65,7 +65,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.HostProcess", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests", "..\source2\IL2CPU\Cosmos.IL2CPU.X86.Tests\Cosmos.IL2CPU.X86.Tests.csproj", "{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs", "Matthijs", "{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source2\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
@@ -179,7 +179,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{6A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows.Test", "..\source2\VSIP\Cosmos.VS.Windows.Test\Cosmos.VS.Windows.Test.csproj", "{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sschocke", "sschocke", "{4831F868-2418-4277-A91F-4F599604CB29}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sebastian Schocke", "Sebastian Schocke", "{4831F868-2418-4277-A91F-4F599604CB29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSchockeTest", "..\source2\Users\SSchocke\SSchockeTest\SSchockeTest.csproj", "{0AAD9114-6F08-4344-A282-CD6BC77595E5}"
 EndProject
@@ -190,13 +190,13 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SSchockeTestBoot", "..\sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Profiler", "..\source2\IL2CPU\Cosmos.IL2CPU.Profiler\Cosmos.IL2CPU.Profiler.csproj", "{F708C866-1C9B-4579-8C28-0728ECCFC1ED}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HKSplayground", "HKSplayground", "{9588D51E-243F-4ABA-AED2-A77DA0634209}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HKS", "HKS", "{9588D51E-243F-4ABA-AED2-A77DA0634209}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HKSplayground", "..\source2\Users\HKSplayground\HKSplayground.csproj", "{79D1C0AE-BB85-4F85-ACCD-8AEDD8D7B395}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "HKSplaygroundBoot", "..\source2\Users\HKSplayground\HKSplaygroundBoot.Cosmos", "{D048E0B1-8B2B-4A99-8376-7FC8A0656A05}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geramy Loveless's Playground", "Geramy Loveless's Playground", "{CD291145-6AD0-41CD-9986-2044F41660DE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geramy Loveless", "Geramy Loveless", "{CD291145-6AD0-41CD-9986-2044F41660DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeramyLovelessTest", "..\source2\Users\GeramyLovelessTest\GeramyLovelessTest.csproj", "{6C14B7D1-CACB-4049-A0BD-9CAC5CFCF2C2}"
 EndProject
