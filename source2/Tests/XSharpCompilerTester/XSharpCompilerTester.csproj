@@ -80,9 +80,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\Cosmos.XSharp.csproj">
+    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj">
       <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>Cosmos.XSharp</Name>
+      <Name>Cosmos.Compiler.XSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

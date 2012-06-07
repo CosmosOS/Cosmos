@@ -204,7 +204,7 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GeramyLovelessTestBoot", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharpCompilerTester", "..\source2\Tests\XSharpCompilerTester\XSharpCompilerTester.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.XSharp", "..\source2\Compiler\Cosmos.XSharp\Cosmos.XSharp.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp", "..\source2\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -430,7 +430,7 @@ Global
 		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
 		SccProjectName54 = ../source2/Tests/XSharpCompilerTester
 		SccLocalPath54 = ..\\source2\\Tests\\XSharpCompilerTester
-		SccProjectUniqueName55 = ..\\source2\\Compiler\\Cosmos.XSharp\\Cosmos.XSharp.csproj
+		SccProjectUniqueName55 = ..\\source2\\Compiler\\Cosmos.XSharp\\Cosmos.Compiler.XSharp.csproj
 		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
 		SccProjectName55 = ../source2/Compiler/Cosmos.XSharp
 		SccLocalPath55 = ..\\source2\\Compiler\\Cosmos.XSharp
