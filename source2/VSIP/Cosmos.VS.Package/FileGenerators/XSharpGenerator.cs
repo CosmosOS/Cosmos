@@ -13,7 +13,7 @@ namespace Cosmos.VS.Package.FileGenerators
     {
         public int DefaultExtension(out string pbstrDefaultExtension)
         {
-            pbstrDefaultExtension = ".xs";
+            pbstrDefaultExtension = ".cs";
             return VSConstants.S_OK;
         }
 
