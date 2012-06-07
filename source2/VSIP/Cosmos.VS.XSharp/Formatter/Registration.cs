@@ -19,4 +19,23 @@ namespace Cosmos.VS.XSharp {
       this.TextDecorations = System.Windows.TextDecorations.Underline;
     }
   }
+
+  internal static class XSharpClassificationDefinition {
+    /// Defines the "XSharp" classification type.
+    [Export(typeof(ClassificationTypeDefinition))]
+    [Name("XSharp")]
+    internal static ClassificationTypeDefinition XSharpType = null;
+  }
+
+  internal static class FileAndContentTypeDefinitions {
+    [Export]
+    [Name("XSharp")]
+    [BaseDefinition("text")]
+    internal static ContentTypeDefinition XSharpContentTypeDefinition;
+
+    [Export]
+    [FileExtension(".xs")]
+    [ContentType("XSharp")]
+    internal static FileExtensionToContentTypeDefinition XSharpFileExtensionDefinition;
+  }
 }

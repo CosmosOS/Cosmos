@@ -24,15 +24,30 @@
 <h3>
     Cosmos.VS.Package</h3>
 <p>
-    Provides support for the .Cosmos projecct type, project configuration dialogs, 
-    etc.</p>
+    MPF project.</p>
+<p>
+    Provides:</p>
+<ul>
+    <li>Support for the .Cosmos project type</li>
+    <li>Project configuration dialogs</li>
+    <li>X# custom tool generator</li>
+</ul>
 <h3>
     Cosmos.VS.Windows</h3>
 <p>
+    MPF project and VS Package.</p>
+<p>
     Provides UI for Cosmos debug windows in VS.
-      Contains windows, toolbars and menu options. Sepearate from other pacakges 
-      because of threading and hosting issues, as well as it being a different project 
-      type.</p>
+      Contains windows, toolbars and menu options. </p>
+<p>
+    Separate from other pacakges 
+      because:</p>
+<ul>
+    <li>Threading and hosting issues</li>
+    <li>It is a different project 
+      type.</li>
+    <li>Allows external testing by Cosmos.VS.Windows.Test</li>
+</ul>
 <h3>
     Cosmos.VS.Windows.Test</h3>
 <p>
@@ -40,8 +55,21 @@
 <h3>
     Cosmos.VS.Wizards</h3>
 <p>
-    Provides support for creating new Cosmos projects from within Visual Studio.</p>
+    Provides:</p>
+<ul>
+    <li>Support for creating new Cosmos projects from within Visual Studio.</li>
+</ul>
 <h3>
     Cosmos.VS.XSharp</h3>
 <p>
-    MEF based project that provides syntax coloring for X#.</p>
+    MEF project.</p>
+<p>
+    Provides:</p>
+<ul>
+    <li>Syntax coloring for X#.
+    </li>
+    <li>Code completion / intellisense (future)
+    </li>
+</ul>
+<p>
+    X# custom tool generator is in Cosmos.VS.Package.</p>

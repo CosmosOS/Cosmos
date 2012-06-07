@@ -66,10 +66,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Formatter\XSharpFormat.cs" />
-    <Compile Include="Formatter\XSharpType.cs" />
+    <Compile Include="Formatter\Registration.cs" />
     <Compile Include="Formatter\Classifier.cs" />
-    <Compile Include="Formatter\FileAndContentTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
