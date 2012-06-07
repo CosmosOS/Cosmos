@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.IO;
 
 namespace Cosmos.Compiler.XSharp
 {
     public class Generator
     {
-        //Cosmos.XSharp.Generator.Generate(xInput, inputFileName, xOut);
-        public static void Generate(TextReader input, string inputFilename, TextWriter output, string defaultNamespace)
+        public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace)
         {
             var xGenerator = new Generator();
             xGenerator.Name = Path.GetFileNameWithoutExtension(inputFilename);
@@ -44,22 +44,20 @@ namespace Cosmos.Compiler.XSharp
         private TextReader mInput;
         private TextWriter mOutput;
 
-        public void Execute(TextReader input, TextWriter output)
-        {
-            mInput = input;
-            mOutput = output;
+        public void Execute(TextReader aInput, TextWriter aOutput) {
+          mInput = aInput;
+          mOutput = aOutput;
 
-            while (input.Peek() != -1)
-            {
-                var xLine = input.ReadLine().Trim();
-                if (String.IsNullOrEmpty(xLine))
-                {
-                    continue;
-                }
-                HandleLine(xLine);
+          while (true) {
+            string xLine = aInput.ReadLine();
+            if (xLine == null) {
+              break;
             }
+
+            ProcessLine(xLine);
+          }
                                 
-            EmitFooter();
+          EmitFooter();
         }
 
         private void EmitHeader()
@@ -68,7 +66,7 @@ namespace Cosmos.Compiler.XSharp
             mOutput.WriteLine("using System.Linq;");
             mOutput.WriteLine("using Cosmos.Assembler;");
             mOutput.WriteLine("using Cosmos.Assembler.x86;");
-            mOutput.WriteLine("");
+            mOutput.WriteLine();
             mOutput.WriteLine("namespace {0}", Namespace);
             mOutput.WriteLine("{");
             mOutput.WriteLine("\tpublic class {0}: Cosmos.IL2CPU.Plugs.AssemblerMethod", Name);
@@ -85,29 +83,26 @@ namespace Cosmos.Compiler.XSharp
             mOutput.WriteLine("}");
         }
 
-        private void HandleLine(string line)
-        {
-            if (line[0] == '#')
-            {
-                HandleComment(line.Substring(1));
-                return;
+        private void ProcessLine(string aLine) {
+          aLine = aLine.Trim();
+          if (String.IsNullOrEmpty(aLine)) {
+            // Skip
+          } else if (aLine[0] == '#') {
+            ProcessComment(aLine.Substring(1));
+          } else if (aLine[0] == '!') {
+            ProcessLiteral(aLine.Substring(1));
+          } else {
+            var xParts = Regex.Split(aLine, "([)|()|(])|(=)|(.)", RegexOptions.IgnorePatternWhitespace);
+
+            if (aLine.Contains("=")) {
+              ProcessAssignment(aLine);
+            } else {
+              throw new Exception("Syntax error: '" + aLine + "'");
             }
-            if (line[0] == '!')
-            {
-                HandleLiteral(line.Substring(1));
-                return;
-            }
-            if (line.Contains("="))
-            {
-                HandleAssignment(line);
-                return;
-            }
-            // todo: error reporting?
-            throw new Exception("Line not handled: '" + line + "'!");
-            
+          }
         }
 
-        private void HandleAssignment(string line)
+        private void ProcessAssignment(string line)
         {
             var xParts = line.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
             if (xParts.Length != 2)
@@ -132,13 +127,13 @@ namespace Cosmos.Compiler.XSharp
             throw new Exception(String.Format("Wrong Assignment line: '{0}'", line));
         }
 
-        private void HandleLiteral(string line)
+        private void ProcessLiteral(string line)
         {
             EnsureHeaderWritten();
             mOutput.WriteLine("new LiteralAssemblerCode(\"{0}\");", line);
         }
 
-        private void HandleComment(string line)
+        private void ProcessComment(string line)
         {
             EnsureHeaderWritten();
             mOutput.WriteLine("new Comment(\"{0}\");", line);

@@ -31,7 +31,7 @@ namespace XSharpCompilerTester
             {
                 using (var xOut = new StringWriter())
                 {
-                  Cosmos.Compiler.XSharp.Generator.Generate(xInput, "InputFileName", xOut, "Default.Namespace");
+                  Cosmos.Compiler.XSharp.Generator.Execute(xInput, "InputFileName", xOut, "Default.Namespace");
                     textOutput.Text = xOut.ToString();
                 }
             }

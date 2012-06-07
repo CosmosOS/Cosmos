@@ -43,7 +43,7 @@ namespace Cosmos.VS.Package.FileGenerators
             {
                 using (var xOut = new StringWriter())
                 {
-                  Cosmos.Compiler.XSharp.Generator.Generate(xInput, inputFileName, xOut, defaultNamespace);
+                  Cosmos.Compiler.XSharp.Generator.Execute(xInput, inputFileName, xOut, defaultNamespace);
                     return xOut.ToString();
                 }
             }
