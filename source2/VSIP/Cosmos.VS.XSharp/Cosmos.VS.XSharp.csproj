@@ -18,6 +18,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -65,10 +66,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cosmos.VS.XSharpFormat.cs" />
-    <Compile Include="Cosmos.VS.XSharpType.cs" />
-    <Compile Include="Cosmos.VS.XSharp.cs" />
-    <Compile Include="FileAndContentTypes.cs" />
+    <Compile Include="Formatter\Cosmos.VS.XSharpFormat.cs" />
+    <Compile Include="Formatter\Cosmos.VS.XSharpType.cs" />
+    <Compile Include="Formatter\Cosmos.VS.XSharp.cs" />
+    <Compile Include="Formatter\FileAndContentTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
