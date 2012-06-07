@@ -22,7 +22,7 @@ namespace Cosmos.VS.XSharp {
     }
   }
 
-  /// Classifier that classifies all text as an instance of the OrinaryClassifierType
+  // Classifier that classifies all text as an instance of the OrinaryClassifierType
   class XSharp : IClassifier {
     IClassificationType _classificationType;
 
