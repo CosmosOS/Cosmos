@@ -144,17 +144,18 @@ namespace Cosmos.Compiler.XSharp
             mOutput.WriteLine("new Comment(\"{0}\");", line);
         }
 
-        private bool IsRegister(string word)
+        private bool IsRegister(string aWord)
         {
-            word=word.ToLower();
-            return word == "eax"
-                || word == "ebx"
-                || word == "ecx"
-                || word == "edx"
-                || word == "esp"
-                || word == "ebp"
-                || word == "esi"
-                || word == "edi";
+          aWord = aWord.ToLower();
+            return
+              aWord == "eax" || aWord == "ax" || aWord == "ah" || aWord == "al" ||
+              aWord == "ebx" || aWord == "bx" || aWord == "bh" || aWord == "bl" ||
+              aWord == "ecx" || aWord == "cx" || aWord == "ch" || aWord == "cl" ||
+              aWord == "edx" || aWord == "dx" || aWord == "dh" || aWord == "dl" || 
+              aWord == "esp" ||
+              aWord == "ebp" ||
+              aWord == "esi" ||
+              aWord == "edi";
         }
     }
 }
