@@ -52,7 +52,7 @@ AllowCancelDuringInstall=false
 ; uncomment the following two lines.
 UninstallLogMode=overwrite
 
-; we're changing file associations, so:
+; we're changing file associations, so we need to set this
 ChangesAssociations=yes
 
 #include "Code.inc"
@@ -77,7 +77,7 @@ Name: pt; MessagesFile: .\setup2\Languages\PortugueseStd-1-5.1.0.isl; InfoBefore
 Name: ru; MessagesFile: .\setup2\Languages\Russian-19-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 Name: sk; MessagesFile: .\setup2\Languages\Slovak-6-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 Name: sl; MessagesFile: .\setup2\Languages\Slovenian-3-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
-;InOffical:
+;Unofficial:
 Name: bg; MessagesFile: .\setup2\Languages\InOfficial\Bulgarian-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 Name: el; MessagesFile: .\setup2\Languages\InOfficial\Greek-4-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
 Name: is; MessagesFile: .\setup2\Languages\InOfficial\Icelandic-1-5.1.0.isl; InfoBeforeFile: .\setup2\Readme.txt
@@ -112,7 +112,7 @@ pt.BeveledLabel=Portuguese
 ru.BeveledLabel=Russian
 sk.BeveledLabel=Slovak
 sl.BeveledLabel=Slovenian
-;InOffical:
+;Unofficial:
 bg.BeveledLabel=Bulgarian
 el.BeveledLabel=Greek
 is.BeveledLabel=Icelandic
@@ -143,11 +143,14 @@ Source: ".\Resources\Dependencies\cecil\Mono.Cecil.dll"; DestDir: "{app}\Build\V
 Source: ".\Resources\Dependencies\cecil\Mono.Cecil.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+
 ; Tools
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\VMWare\*"; DestDir: "{app}\Build\VMWare"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
+Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
@@ -155,8 +158,10 @@ Source: ".\Build\VSIP\Cosmos.Hardware.*"; DestDir: "{app}\Kernel"; Flags: ignore
 Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+
 ; Icon
 Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
@@ -193,6 +198,13 @@ Source: ".\Build\VSIP\CosmosKernel (VB).zip"; DestDir: "{code:GetVBExpress2010Pr
 Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
+
+; .xs Extension
+Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
+Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Build\Tools\XSC.exe,0"
+Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\Tools\XSC.exe"" ""%1"""
+
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue
 
