@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Cosmos.XSharp
+namespace Cosmos.Compiler.XSharp
 {
     public class Generator
     {
