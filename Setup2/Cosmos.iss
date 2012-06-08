@@ -167,8 +167,7 @@ Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: 
 Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Windows.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2010_PATH}\PrivateAssemblies"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.XSharp.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Compiler.XSharp.vsix"; DestDir: "{userappdata}\Local\Microsoft\VisualStudio\10.0\Extensions"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.XSharp.vsix"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
@@ -340,6 +339,8 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName
 Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe"" ""%1"""
 
 [Run]
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
+
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
 	; /setup without nosetupvstemplates takes a LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit
