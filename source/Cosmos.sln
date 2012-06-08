@@ -206,9 +206,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharpCompilerTester", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp", "..\source2\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp.XSC", "..\source2\Compiler\Cosmos.Compiler.XSharp.XSC\Cosmos.Compiler.XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.XSharp", "..\source2\VSIP\Cosmos.VS.XSharp\Cosmos.VS.XSharp.csproj", "{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp.XSC", "..\source2\Compiler\Cosmos.Compiler.XSharp.XSC\Cosmos.Compiler.XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -426,26 +426,26 @@ Global
 		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
 		SccProjectName52 = ../source2/Compiler/Cosmos.XSharp
 		SccLocalPath52 = ..\\source2\\Compiler\\Cosmos.XSharp
-		SccProjectUniqueName53 = ..\\source2\\Compiler\\Cosmos.Compiler.XSharp.XSC\\Cosmos.Compiler.XSharp.XSC.csproj
+		SccProjectUniqueName53 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Playground.Kudzu.Breakpoints.Cosmos
 		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
-		SccProjectName53 = ../source2/Compiler/Cosmos.Compiler.XSharp.XSC
-		SccLocalPath53 = ..\\source2\\Compiler\\Cosmos.Compiler.XSharp.XSC
-		SccProjectUniqueName54 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Playground.Kudzu.Breakpoints.Cosmos
+		SccProjectName53 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath53 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName54 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Playground.Kudzu.BreakpointsKernel.csproj
 		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
 		SccProjectName54 = ../source2/Users/Kudzu/Breakpoints
 		SccLocalPath54 = ..\\source2\\Users\\Kudzu\\Breakpoints
-		SccProjectUniqueName55 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Playground.Kudzu.BreakpointsKernel.csproj
+		SccProjectUniqueName55 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground\\Playground.Matthijs.Test.csproj
 		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
-		SccProjectName55 = ../source2/Users/Kudzu/Breakpoints
-		SccLocalPath55 = ..\\source2\\Users\\Kudzu\\Breakpoints
-		SccProjectUniqueName56 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground\\Playground.Matthijs.Test.csproj
+		SccProjectName55 = ../source2/Users/Matthijs/MatthijsPlayground
+		SccLocalPath55 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground
+		SccProjectUniqueName56 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\Cosmos.VS.XSharp.csproj
 		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
-		SccProjectName56 = ../source2/Users/Matthijs/MatthijsPlayground
-		SccLocalPath56 = ..\\source2\\Users\\Matthijs\\MatthijsPlayground
-		SccProjectUniqueName57 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\Cosmos.VS.XSharp.csproj
+		SccProjectName56 = ../source2/VSIP/Cosmos.VS.XSharp
+		SccLocalPath56 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
+		SccProjectUniqueName57 = ..\\source2\\Compiler\\Cosmos.Compiler.XSharp.XSC\\Cosmos.Compiler.XSharp.XSC.csproj
 		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
-		SccProjectName57 = ../source2/VSIP/Cosmos.VS.XSharp
-		SccLocalPath57 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
+		SccProjectName57 = ../source2/Compiler/Cosmos.Compiler.XSharp.XSC
+		SccLocalPath57 = ..\\source2\\Compiler\\Cosmos.Compiler.XSharp.XSC
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Bootstrap|Any CPU = Bootstrap|Any CPU
@@ -1305,21 +1305,6 @@ Global
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A}.Release|x86.ActiveCfg = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|Any CPU.ActiveCfg = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|x86.ActiveCfg = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|x86.Build.0 = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.ActiveCfg = Debug|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.Build.0 = Debug|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.ActiveCfg = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.Build.0 = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.ActiveCfg = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.Build.0 = Release|x86
 		{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}.Bootstrap|Any CPU.ActiveCfg = Release|Any CPU
 		{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}.Bootstrap|Any CPU.Build.0 = Release|Any CPU
 		{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}.Bootstrap|Mixed Platforms.ActiveCfg = Release|Any CPU
@@ -1335,6 +1320,21 @@ Global
 		{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{49125A4E-F2DD-48C8-B19F-D9D4217FA34B}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|Any CPU.ActiveCfg = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|Mixed Platforms.ActiveCfg = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|Mixed Platforms.Build.0 = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|x86.ActiveCfg = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Bootstrap|x86.Build.0 = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.ActiveCfg = Debug|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.Build.0 = Debug|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.ActiveCfg = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.Build.0 = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.ActiveCfg = Release|x86
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
