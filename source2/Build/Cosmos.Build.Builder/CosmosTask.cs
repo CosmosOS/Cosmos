@@ -7,24 +7,24 @@ using System.IO;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
+    protected string mCosmosPath;
 
-    public void Run(string aCosmosPath) {
-      string xOutputPath = aCosmosPath + @"\Build\VSIP";
+    public CosmosTask(string aCosmosPath) {
+      mCosmosPath = aCosmosPath;
+    }
 
-      EchoOff();
+    protected override void DoRun() {
+      string xOutputPath = mCosmosPath + @"\Build\VSIP";
 
-      Echo("Compiling Cosmos");
-
-      CD(aCosmosPath + @"\source");
-      Start(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", @"Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath=" + Quoted(xOutputPath));
-      //%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath="%THE_OUTPUT_PATH%"
+      Section("Compiling Cosmos");
+      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", mCosmosPath + @"\source\Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath=" + Quoted(xOutputPath));
 
       CD(xOutputPath);
 
-      Echo("Copying files");
+      Section("Copying files");
       // Copy templates
       // .iss does some of this as well.. why some here? And why is VB disabled in .iss?
-      SrcPath = aCosmosPath + @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug";
+      SrcPath = mCosmosPath + @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug";
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");

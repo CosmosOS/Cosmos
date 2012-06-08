@@ -5,30 +5,22 @@ using System.Text;
 
 namespace Cosmos.Build.Installer {
   public class Log {
-    public Log() {
-      mEchoing = true;
+    public void WriteLine(string aText) {
+      if (LogLine != null) {
+        LogLine(aText);
+      }
     }
 
-    protected bool mEchoing;
-    public bool Echoing {
-      get { return mEchoing; }
+    public void NewSection(string aText) {
+      if (LogSection != null) {
+        LogSection(aText);
+      }
     }
 
-    public void Echo() {
-      Echo("");
-    }
+    public delegate void LogLineHandler(string aLine);
+    public event LogLineHandler LogLine;
 
-    public void Echo(string aText) {
-      // TODO
-    }
-
-    public void EchoOn() {
-      mEchoing = true;
-    }
-
-    public void EchoOff() {
-      mEchoing = false;
-    }
-
+    public delegate void LogSectionHandler(string aLine);
+    public event LogSectionHandler LogSection;
   }
 }

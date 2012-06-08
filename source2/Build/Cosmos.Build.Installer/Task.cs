@@ -6,27 +6,42 @@ using System.IO;
 using System.Diagnostics;
 
 namespace Cosmos.Build.Installer {
-  public class Task {
-    public void Start(string aEXE, string aParams) {
-      Start(aEXE, aParams, true);
+  public abstract class Task {
+    protected abstract void DoRun();
+
+    public void Run() {
+      DoRun();
     }
-    public void Start(string aExe, string aParams, bool aWait) {
+
+    public void StartConsole(string aExe, string aParams) {
       var xStart = new ProcessStartInfo();
       xStart.FileName = aExe;
       xStart.WorkingDirectory = CurrPath;
       xStart.Arguments = aParams;
       xStart.UseShellExecute = false;
+      xStart.CreateNoWindow = true;
       xStart.RedirectStandardOutput = true;
-      //xStart.RedirectStandardError = true;
       using (var xProcess = Process.Start(xStart)) {
         using (var xReader = xProcess.StandardOutput) {
-          string xRresult = xReader.ReadToEnd();
+          string xLine;
+          while (true) {
+            xLine = xReader.ReadLine();
+            if (xLine == null) {
+              break;
+            }
+            Log.WriteLine(xLine);
+          }
         }
+        xProcess.WaitForExit();
       }
     }
 
     private Log mLog = new Log();
     public Log Log { get { return mLog; } }
+
+    public void Section(string aText) {
+      Log.NewSection(aText);
+    }
 
     public string CurrPath {
       get { return Directory.GetCurrentDirectory(); }
@@ -56,20 +71,14 @@ namespace Cosmos.Build.Installer {
       Copy(aSrcPathname, Path.GetFileName(aSrcPathname));
     }
     public void Copy(string aSrcPathname, string aDestPathname) {
-      File.Copy(Path.Combine(SrcPath, aSrcPathname), Path.Combine(CurrPath, aDestPathname));
+      File.Copy(Path.Combine(SrcPath, aSrcPathname), Path.Combine(CurrPath, aDestPathname), true);
     }
 
     public void Echo() {
-      mLog.Echo("");
+      mLog.WriteLine("");
     }
     public void Echo(string aText) {
-      mLog.Echo(aText);
-    }
-    public void EchoOn() {
-      mLog.EchoOn();
-    }
-    public void EchoOff() {
-      mLog.EchoOff();
+      mLog.WriteLine(aText);
     }
   }
 }
