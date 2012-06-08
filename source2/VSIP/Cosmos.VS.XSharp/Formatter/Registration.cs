@@ -24,10 +24,8 @@ namespace Cosmos.VS.XSharp {
     /// Defines the "XSharp" classification type.
     [Export(typeof(ClassificationTypeDefinition))]
     [Name("XSharp")]
-    internal static ClassificationTypeDefinition XSharpType = null;
-  }
+    internal static ClassificationTypeDefinition XSharpType;
 
-  internal static class FileAndContentTypeDefinitions {
     [Export]
     [Name("XSharp")]
     [BaseDefinition("text")]
