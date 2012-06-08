@@ -19,12 +19,6 @@ namespace Cosmos.Build.Installer {
 
     public static readonly string ProgFiles32;
     public static readonly string ProgFiles64;
-
     public static readonly string Windows;
-
-    public static string Current {
-      get { return Directory.GetCurrentDirectory(); }
-      set { Directory.SetCurrentDirectory(value); }
-    }
   }
 }
