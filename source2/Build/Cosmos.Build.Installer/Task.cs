@@ -3,17 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace Cosmos.Build.Installer {
   public class Task {
-    public Task() {
-      CurrPath = Directory.GetCurrentDirectory();
+    public void Start(string aEXE, string aParams) {
+      Start(aEXE, aParams, true);
+    }
+    public void Start(string aExe, string aParams, bool aWait) {
+      var xStart = new ProcessStartInfo();
+      xStart.FileName = aExe;
+      xStart.WorkingDirectory = CurrPath;
+      xStart.Arguments = aParams;
+      xStart.UseShellExecute = false;
+      xStart.RedirectStandardOutput = true;
+      //xStart.RedirectStandardError = true;
+      using (var xProcess = Process.Start(xStart)) {
+        using (var xReader = xProcess.StandardOutput) {
+          string xRresult = xReader.ReadToEnd();
+        }
+      }
     }
 
     private Log mLog = new Log();
     public Log Log { get { return mLog; } }
 
-    public string CurrPath { get; set; }
+    public string CurrPath {
+      get { return Directory.GetCurrentDirectory(); }
+      set { Directory.SetCurrentDirectory(value); }
+    }
     //
     private string mSrcPath;
     public string SrcPath {
@@ -21,6 +39,10 @@ namespace Cosmos.Build.Installer {
         return string.IsNullOrWhiteSpace(mSrcPath) ? CurrPath : mSrcPath;
       }
       set { mSrcPath = value; }
+    }
+
+    public string Quoted(string aValue) {
+      return "\"" + aValue + "\"";
     }
 
     public void CD(string aPath) {

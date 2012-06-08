@@ -7,17 +7,16 @@ using System.IO;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
+
     public void Run(string aCosmosPath) {
-      if (!aCosmosPath.EndsWith(@"\")) {
-        aCosmosPath = aCosmosPath + @"\";
-      }
-      string xOutputPath = aCosmosPath + @"Build\VSIP\";
+      string xOutputPath = aCosmosPath + @"\Build\VSIP";
 
       EchoOff();
 
       Echo("Compiling Cosmos");
 
-      CD(aCosmosPath + @"source\");
+      CD(aCosmosPath + @"\source");
+      Start(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", @"Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath=" + Quoted(xOutputPath));
       //%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath="%THE_OUTPUT_PATH%"
 
       CD(xOutputPath);
@@ -25,7 +24,7 @@ namespace Cosmos.Build.Builder {
       Echo("Copying files");
       // Copy templates
       // .iss does some of this as well.. why some here? And why is VB disabled in .iss?
-      SrcPath = aCosmosPath + @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\";
+      SrcPath = aCosmosPath + @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug";
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");

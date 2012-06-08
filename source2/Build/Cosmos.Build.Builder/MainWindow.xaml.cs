@@ -19,7 +19,7 @@ namespace Cosmos.Build.Builder {
 
     public void Build() {
       var xTask = new CosmosTask();
-      xTask.Run(@"D:\source\Cosmos\");
+      xTask.Run(@"D:\source\Cosmos");
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
