@@ -168,7 +168,7 @@ Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags:
 Source: ".\Build\VSIP\Cosmos.VS.Windows.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2010_PATH}\PrivateAssemblies"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.XSharp.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Compiler.XSharp.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Compiler.XSharp.vsix"; DestDir: "{userappdata}\Local\Microsoft\VisualStudio\10.0\Extensions"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
