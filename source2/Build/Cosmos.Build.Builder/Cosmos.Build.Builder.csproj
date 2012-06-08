@@ -96,6 +96,12 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Build.Installer\Cosmos.Build.Installer.csproj">
+      <Project>{27D94586-FE88-4203-BE6A-C99013FD5018}</Project>
+      <Name>Cosmos.Build.Installer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
