@@ -8,24 +8,24 @@ using System.IO;
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
     public void Run(string aCosmosPath) {
-      string xOutputPath = Path.Combine(aCosmosPath, @"Build\VSIP\");
-      string xCodePath = Path.Combine(aCosmosPath, @"source\");
+      if (!aCosmosPath.EndsWith(@"\")) {
+        aCosmosPath = aCosmosPath + @"\";
+      }
+      string xOutputPath = aCosmosPath + @"Build\VSIP\";
 
       EchoOff();
 
       Echo("Compiling Cosmos");
 
-      //cd ..\..\source
+      CD(aCosmosPath + @"source\");
       //%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath="%THE_OUTPUT_PATH%"
-      //rem /t:Rebuild
 
-      //cd ..\Build\VSIP\
+      CD(xOutputPath);
 
       Echo("Copying files");
-      DestPath = xOutputPath;
       // Copy templates
       // .iss does some of this as well.. why some here? And why is VB disabled in .iss?
-      SrcPath = Path.Combine(xCodePath, @"..\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\");
+      SrcPath = aCosmosPath + @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug\";
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");

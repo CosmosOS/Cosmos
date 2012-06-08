@@ -7,42 +7,34 @@ using System.IO;
 namespace Cosmos.Build.Installer {
   public class Task {
     public Task() {
-      CurrentPath = Directory.GetCurrentDirectory();
+      CurrPath = Directory.GetCurrentDirectory();
     }
 
     private Log mLog = new Log();
     public Log Log { get { return mLog; } }
 
-    public string CurrentPath { get; set; }
+    public string CurrPath { get; set; }
     //
     private string mSrcPath;
     public string SrcPath {
       get {
-        return string.IsNullOrWhiteSpace(mSrcPath) ? CurrentPath : mSrcPath;
+        return string.IsNullOrWhiteSpace(mSrcPath) ? CurrPath : mSrcPath;
       }
       set { mSrcPath = value; }
-    }
-    //
-    private string mDestPath;
-    public string DestPath {
-      get {
-        return string.IsNullOrWhiteSpace(mDestPath) ? CurrentPath : mDestPath;
-      }
-      set { mDestPath = value; }
     }
 
     public void CD(string aPath) {
       ChDir(aPath);
     }
     public void ChDir(string aPath) {
-      CurrentPath = aPath;
+      CurrPath = aPath;
     }
 
     public void Copy(string aSrcPathname) {
       Copy(aSrcPathname, Path.GetFileName(aSrcPathname));
     }
     public void Copy(string aSrcPathname, string aDestPathname) {
-      File.Copy(Path.Combine(SrcPath, aSrcPathname), Path.Combine(DestPath, aDestPathname));
+      File.Copy(Path.Combine(SrcPath, aSrcPathname), Path.Combine(CurrPath, aDestPathname));
     }
 
     public void Echo() {
