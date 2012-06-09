@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Security.Permissions;
 using System.Windows.Threading;
+using System.IO;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
@@ -28,12 +29,38 @@ namespace Cosmos.Build.Builder {
     DispatcherTimer mCloseTimer;
 
     public void Build() {
-      var xTask = new CosmosTask(@"D:\source\Cosmos");
+      // TODO: Check for Inno, VS SDK SP1, other prereqs
+
+      string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
+      string xCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
+
+      var xTask = new CosmosTask(xCosmosPath);
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
       xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
       xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
       xTask.ResetHive = mApp.Args.Contains("-RESETHIVE");
-      xTask.Run();
+
+      var xThread = new System.Threading.Thread(delegate() {
+        xTask.Run();
+        ThreadDone();
+      });
+      xThread.Start();
+    }
+
+    void ThreadDone() {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        if (mApp.Args.Contains("-STAYOPEN") == false) {
+          mCloseTimer = new DispatcherTimer();
+          mCloseTimer.Interval = TimeSpan.FromSeconds(5);
+          mCloseTimer.Tick += delegate {
+            mCloseTimer.Stop();
+            if (!mPreventAutoClose) {
+              Close();
+            }
+          };
+          mCloseTimer.Start();
+        }
+      });
     }
 
     void Log_LogError() {
@@ -85,26 +112,13 @@ namespace Cosmos.Build.Builder {
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
+      Build();
     }
 
     void butnCopy_Click(object sender, RoutedEventArgs e) {
+      mPreventAutoClose = true;
       Clipboard.SetText(mClipboard.ToString());
     }
 
-    private void butnTest_Click(object sender, RoutedEventArgs e) {
-      Build();
-      if (mApp.Args.Contains("-STAYOPEN") == false) {
-        mCloseTimer = new DispatcherTimer();
-        mCloseTimer.Interval = TimeSpan.FromSeconds(5);
-        mCloseTimer.Tick += delegate {
-          mCloseTimer.Stop();
-          if (!mPreventAutoClose) {
-            Close();
-          }
-        };
-        mCloseTimer.Start();
-      }
-    }
-  
   }
 }

@@ -5,7 +5,6 @@
     <DockPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
-            <Button Name="butnTest" Click="butnTest_Click">Test</Button>
         </WrapPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Visible">
             <StackPanel Name="spnlLog" />
