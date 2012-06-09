@@ -20,11 +20,12 @@ namespace Cosmos.Build.Builder {
       mApp = (App)Application.Current;
     }
 
-    protected bool mErrorOccurred = false;
-    protected App mApp;
-    protected TextBlock mSection;
-    protected TextBlock mContent;
-    protected StringBuilder mClipboard = new StringBuilder();
+    bool mPreventAutoClose = false;
+    App mApp;
+    TextBlock mSection;
+    TextBlock mContent;
+    StringBuilder mClipboard = new StringBuilder();
+    DispatcherTimer mCloseTimer;
 
     public void Build() {
       var xTask = new CosmosTask(@"D:\source\Cosmos");
@@ -36,44 +37,51 @@ namespace Cosmos.Build.Builder {
     }
 
     void Log_LogError() {
-      mSection.Foreground = Brushes.Red;
-      mContent.Visibility = Visibility.Visible;
-      mErrorOccurred = true;
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        mSection.Foreground = Brushes.Red;
+        mContent.Visibility = Visibility.Visible;
+        mPreventAutoClose = true;
+      });
     }
 
     void Log_LogSection(string aLine) {
-      mClipboard.AppendLine();
-      mClipboard.AppendLine(new string('=', aLine.Length));
-      mClipboard.AppendLine(aLine);
-      mClipboard.AppendLine(new string('=', aLine.Length));
-      mClipboard.AppendLine();
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        mClipboard.AppendLine();
+        mClipboard.AppendLine(new string('=', aLine.Length));
+        mClipboard.AppendLine(aLine);
+        mClipboard.AppendLine(new string('=', aLine.Length));
+        mClipboard.AppendLine();
 
-      mSection = new TextBlock();
-      mSection.Text = aLine;
-      mSection.Background = Brushes.LightGray;
-      mSection.Foreground = Brushes.Green;
-      mSection.FontSize = 18;
-      mSection.FontWeight = FontWeights.Bold;
-      mSection.MouseUp += new MouseButtonEventHandler(mSection_MouseUp);
-      spnlLog.Children.Add(mSection);
+        mSection = new TextBlock();
+        mSection.Text = aLine;
+        mSection.Background = Brushes.LightGray;
+        mSection.Foreground = Brushes.Green;
+        mSection.FontSize = 18;
+        mSection.FontWeight = FontWeights.Bold;
+        mSection.MouseUp += new MouseButtonEventHandler(mSection_MouseUp);
+        spnlLog.Children.Add(mSection);
 
-      mContent = new TextBlock();
-      mContent.Visibility = Visibility.Collapsed;
-      spnlLog.Children.Add(mContent);
-      mSection.Tag = mContent;
+        mContent = new TextBlock();
+        mContent.Visibility = Visibility.Collapsed;
+        spnlLog.Children.Add(mContent);
+        mSection.Tag = mContent;
+      });
     }
 
     void mSection_MouseUp(object sender, MouseButtonEventArgs e) {
       var xSection = (TextBlock)sender;
       var xContent = (TextBlock)xSection.Tag;
       xContent.Visibility = xContent.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+      mPreventAutoClose = true;
     }
 
     void Log_LogLine(string aLine) {
-      mClipboard.AppendLine(aLine);
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        mClipboard.AppendLine(aLine);
 
-      mContent.Inlines.Add(aLine);
-      mContent.Inlines.Add(new LineBreak());
+        mContent.Inlines.Add(aLine);
+        mContent.Inlines.Add(new LineBreak());
+      });      
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
@@ -85,8 +93,16 @@ namespace Cosmos.Build.Builder {
 
     private void butnTest_Click(object sender, RoutedEventArgs e) {
       Build();
-      if (mErrorOccurred == false && mApp.Args.Contains("-STAYOPEN") == false) {
-        Close();
+      if (mApp.Args.Contains("-STAYOPEN") == false) {
+        mCloseTimer = new DispatcherTimer();
+        mCloseTimer.Interval = TimeSpan.FromSeconds(5);
+        mCloseTimer.Tick += delegate {
+          mCloseTimer.Stop();
+          if (!mPreventAutoClose) {
+            Close();
+          }
+        };
+        mCloseTimer.Start();
       }
     }
   
