@@ -8,6 +8,7 @@ using System.IO;
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
     protected string mCosmosPath;
+    public bool ResetHive { get; set; }
 
     public CosmosTask(string aCosmosPath) {
       mCosmosPath = aCosmosPath;
@@ -24,7 +25,7 @@ namespace Cosmos.Build.Builder {
       Section("Copying files");
       // Copy templates
       // .iss does some of this as well.. why some here? And why is VB disabled in .iss?
-      SrcPath = mCosmosPath + @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug";
+      SrcPath = mCosmosPath + @"\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug";
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");
@@ -32,48 +33,28 @@ namespace Cosmos.Build.Builder {
       Copy("CosmosProject (VB).zip");
       Copy("CosmosKernel (VB).zip");
 
-      Echo();
-      Echo();
-      Echo();
+      Section("Creating Setup");
+      if (!File.Exists(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe")) {
+        throw new Exception("Cannot find Inno setup.");
+      }
+      StartConsole(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe", @"/Q " + Quoted(mCosmosPath + @"\Setup2\Cosmos.iss") + " /dBuildConfiguration=Devkit");
 
-      Echo("Removing old Cosmos");
-      //IF NOT EXIST ..\..\Setup2\Output\CosmosUserKit.exe goto afterSetupDelete
-      //  ren ..\..\Setup2\Output\CosmosUserKit.exe tmp 2> nul
-      //  if ERRORLEVEL 1 (
-      //    echo Old COSMOS setup could not be removed, it is locked.
-      //    pause
-      //    exit /B 1
-      //  )
-      //  del /F ..\..\Setup2\Output\tmp
-      //:afterSetupDelete
+      Section("Running Setup");
+      //Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit.exe", @"/SILENT");
 
-      Echo("Searching for Inno");
-      //IF NOT EXIST "%ProgFiles%\Inno Setup 5\ISCC.exe" (
-      //  echo Cannot find Inno Setup!
-      //  pause
-      //  exit
-      //)
+      Section("Launching Visual Studio");
+      string xVisualStudio = Paths.ProgFiles32 + @"\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe";
+      if (!File.Exists(xVisualStudio)) {
+        throw new Exception("Cannot find Visual Studio.");
+      }
 
-      Echo("Creating setup.exe");
-      //"%ProgFiles%\Inno Setup 5\ISCC" /Q ..\..\Setup2\Cosmos.iss /dBuildConfiguration=Devkit
+      if (ResetHive) {
+        Echo("Resetting hive");
+        Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
+      }
 
-      Echo("Running setup.exe");
-      //..\..\Setup2\Output\CosmosUserKit.exe /SILENT
-
-      Echo("Install Completed.");
-
-      // Relaunch VS
-      //IF EXIST "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" (
-      //    IF "%1"=="HIVE" goto ResetHive
-      //  goto ResetHiveAfter
-      //:ResetHive
-      Echo("Resetting hive keys");
-      //  "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" /setup /rootsuffix Exp /ranu
-      //:ResetHiveAfter
       Echo("Launching Visual Studio");
-      //  echo You can close this window now.
-      //  "%ProgFiles%\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" ..\..\source\Cosmos.sln
-      //)
+      Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false);
     }
   }
 }

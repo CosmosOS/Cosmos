@@ -17,6 +17,15 @@ namespace Cosmos.Build.Installer {
       }
     }
 
+    public void SetError() {
+      if (LogError != null) {
+        LogError();
+      }
+    }
+
+    public delegate void LogErrorHandler();
+    public event LogErrorHandler LogError;
+
     public delegate void LogLineHandler(string aLine);
     public event LogLineHandler LogLine;
 

@@ -10,10 +10,19 @@ namespace Cosmos.Build.Installer {
     protected abstract void DoRun();
 
     public void Run() {
-      DoRun();
+      try {
+        DoRun();
+      } catch (Exception ex) {
+        Log.NewSection("Error");
+        Log.WriteLine(ex.Message);
+        Log.SetError();
+      }
     }
 
     public void StartConsole(string aExe, string aParams) {
+      Log.WriteLine("Starting: " + aExe);
+      Log.WriteLine("  Params: " + aParams);
+
       var xStart = new ProcessStartInfo();
       xStart.FileName = aExe;
       xStart.WorkingDirectory = CurrPath;
@@ -33,6 +42,31 @@ namespace Cosmos.Build.Installer {
           }
         }
         xProcess.WaitForExit();
+        if (xProcess.ExitCode != 0) {
+          Log.SetError();
+        }
+      }
+    }
+
+    public void Start(string aExe, string aParams) {
+      Start(aExe, aParams, true);
+    }
+    public void Start(string aExe, string aParams, bool aWait) {
+      Log.WriteLine("Starting: " + aExe);
+      Log.WriteLine("  Params: " + aParams);
+
+      var xStart = new ProcessStartInfo();
+      xStart.FileName = aExe;
+      xStart.WorkingDirectory = CurrPath;
+      xStart.Arguments = aParams;
+      xStart.UseShellExecute = false;
+      using (var xProcess = Process.Start(xStart)) {
+        if (aWait) {
+          xProcess.WaitForExit();
+          if (xProcess.ExitCode != 0) {
+            Log.SetError();
+          }
+        }
       }
     }
 
@@ -64,6 +98,7 @@ namespace Cosmos.Build.Installer {
       ChDir(aPath);
     }
     public void ChDir(string aPath) {
+      Log.WriteLine("Change Dir: " + aPath);
       CurrPath = aPath;
     }
 
@@ -71,11 +106,19 @@ namespace Cosmos.Build.Installer {
       Copy(aSrcPathname, Path.GetFileName(aSrcPathname));
     }
     public void Copy(string aSrcPathname, string aDestPathname) {
-      File.Copy(Path.Combine(SrcPath, aSrcPathname), Path.Combine(CurrPath, aDestPathname), true);
+      Log.WriteLine("Copy");
+
+      string xSrc = Path.Combine(SrcPath, aSrcPathname);
+      Log.WriteLine("  From: " + xSrc);
+
+      string xDest = Path.Combine(CurrPath, aDestPathname);
+      Log.WriteLine("  To: " + xDest);
+
+      File.Copy(xSrc, xDest, true);
     }
 
     public void Echo() {
-      mLog.WriteLine("");
+      Echo("");
     }
     public void Echo(string aText) {
       mLog.WriteLine(aText);

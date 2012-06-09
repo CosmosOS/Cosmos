@@ -1,13 +1,14 @@
 ﻿<Window x:Class="Cosmos.Build.Builder.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="389" Width="564" Loaded="Window_Loaded">
+        Title="Cosmos Kit Builder" Height="389" Width="564" Loaded="Window_Loaded" Icon="/Cosmos.Build.Builder;component/Cosmos.ico">
     <DockPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
+            <Button Name="butnTest" Click="butnTest_Click">Test</Button>
         </WrapPanel>
-        <ScrollViewer>
-            <TextBlock Name="tblkLog" Text="" TextWrapping="Wrap"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Visible">
+            <StackPanel Name="spnlLog" />
         </ScrollViewer>
     </DockPanel>
 </Window>
