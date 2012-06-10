@@ -19,7 +19,7 @@ namespace Cosmos.VS.XSharp {
     int i = 0;
     bool IScanner.ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int state) {
       tokenInfo.Type = TokenType.Unknown;
-      tokenInfo.Color = TokenColor.Text;
+      tokenInfo.Color = TokenColor.Number;
       i++;
       return i < 2;
     

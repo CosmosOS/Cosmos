@@ -34,9 +34,9 @@ namespace Cosmos.VS.XSharp {
   [ProvideLanguageServiceAttribute(typeof(XSharpLanguageService), "X#",
     106, // Resource ID of localized language name
     CodeSense = false, // IntelliSense
-    RequestStockColors = false, // Supplies custom colors
+    RequestStockColors = true, 
     EnableCommenting = false, // Commenting out code
-    EnableAsyncCompletion = false // Background parsing
+    EnableAsyncCompletion = true // Background parsing
   )]
   [ProvideLanguageExtensionAttribute(typeof(XSharpLanguageService), ".xs")]
 

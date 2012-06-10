@@ -13,6 +13,8 @@ using Microsoft.VisualStudio.OLE.Interop;
 //   http://msdn.microsoft.com/en-us/library/bb166215
 // Syntax Colorizing
 //   http://msdn.microsoft.com/en-us/library/bb165041
+// Managed Babel
+//   http://msdn.microsoft.com/en-us/library/bb165037.aspx
 
 namespace Cosmos.VS.XSharp {
   public class XSharpLanguageService : LanguageService {
