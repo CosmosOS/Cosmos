@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 
-namespace Cosmos.VS.Package.XSharp {
+namespace Cosmos.VS.XSharp {
   internal class Parser : AuthoringScope {
     public override string GetDataTipText(int line, int col, out TextSpan span) {
       span = new TextSpan();

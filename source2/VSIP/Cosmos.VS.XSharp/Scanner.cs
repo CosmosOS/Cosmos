@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 
-namespace Cosmos.VS.Package.XSharp {
+namespace Cosmos.VS.XSharp {
   internal class Scanner : IScanner {
     private IVsTextBuffer m_buffer;
     string m_source;

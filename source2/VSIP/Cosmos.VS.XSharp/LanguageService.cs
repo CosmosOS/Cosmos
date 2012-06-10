@@ -7,11 +7,15 @@ using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 
-// Walkthrough: Creating a Language Service (Managed Package Framework)
+// Walkthrough: Creating a Language Service (MPF)
 //   http://msdn.microsoft.com/en-us/library/bb165744
+// Language Service Features (MPF)
+//   http://msdn.microsoft.com/en-us/library/bb166215
+// Syntax Colorizing
+//   http://msdn.microsoft.com/en-us/library/bb165041
 
-namespace Cosmos.VS.Package.XSharp {
-  class XSharpLanguageService : LanguageService {
+namespace Cosmos.VS.XSharp {
+  public class XSharpLanguageService : LanguageService {
     public override string GetFormatFilterList() {
       throw new NotImplementedException();
     }
