@@ -21,8 +21,7 @@ namespace Cosmos.VS.XSharp {
   /// IVsPackage interface and uses the registration attributes defined in the framework to 
   /// register itself and its components with the shell.
   //
-  // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
-  // a package.
+  // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is a package.
   [PackageRegistration(UseManagedResourcesOnly = true)]
   // This attribute is used to register the informations needed to show the this package
   // in the Help/About dialog of Visual Studio.
@@ -87,8 +86,7 @@ namespace Cosmos.VS.XSharp {
 
     public int FDoIdle(uint grfidlef) {
       bool bPeriodic = (grfidlef & (uint)_OLEIDLEF.oleidlefPeriodic) != 0;
-      // Use typeof(TestLanguageService) because we need to
-      // reference the GUID for our language service.
+      // Use typeof(TestLanguageService) because we need to reference the GUID for our language service.
       LanguageService xService = GetService(typeof(XSharpLanguageService)) as LanguageService;
       if (xService != null) {
         xService.OnIdle(bPeriodic);

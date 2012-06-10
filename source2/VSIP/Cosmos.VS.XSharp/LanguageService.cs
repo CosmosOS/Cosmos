@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 namespace Cosmos.VS.XSharp {
   public class XSharpLanguageService : LanguageService {
     public override string GetFormatFilterList() {
-      throw new NotImplementedException();
+      return "X# files (*.xs)\n*.xs\n";
     }
 
     private LanguagePreferences mPreferences;
@@ -30,12 +30,15 @@ namespace Cosmos.VS.XSharp {
     }
 
     private Scanner mScanner;
-    public override IScanner GetScanner(IVsTextLines buffer) {
-      throw new NotImplementedException();
+    public override IScanner GetScanner(IVsTextLines aBuffer) {
+      if (mScanner == null) {
+        mScanner = new Scanner(aBuffer);
+      }
+      return mScanner;
     }
 
     public override string Name {
-      get { return "XSharp"; }
+      get { return "X#"; }
     }
 
     public override AuthoringScope ParseSource(ParseRequest req) {
