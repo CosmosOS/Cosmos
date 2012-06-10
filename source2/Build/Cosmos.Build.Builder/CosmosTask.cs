@@ -22,7 +22,7 @@ namespace Cosmos.Build.Builder {
       }
 
       Section("Compiling Cosmos");
-      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", mCosmosPath + @"\source\Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Bootstrap /p:Platform=x86 /p:OutputPath=" + Quoted(xOutputPath));
+      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", mCosmosPath + @"\source\Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Builder /p:Platform=Default /p:OutputPath=" + Quoted(xOutputPath));
 
       CD(xOutputPath);
 
