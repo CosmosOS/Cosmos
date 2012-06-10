@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestSettings 
+  id="85f80678-5acf-4267-a4f8-e5bf47bd5e87" 
+  name="IntegrationTests"
+  enableDefaultDataCollectors="false"
+  xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Description>This test run configuration uses the VS IDE host type in the test run.</Description>
+  <Deployment enabled="false" />
+  <Execution>
+    <Hosts>
+      <VSSDKTestHostRunConfig name="VS IDE" HiveName="10.0Exp" xmlns="http://microsoft.com/schemas/VisualStudio/SDK/Tools/IdeHostAdapter/2006/06" />
+    </Hosts>
+  </Execution>
+</TestSettings>
