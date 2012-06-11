@@ -84,30 +84,17 @@ namespace Cosmos.Compiler.XSharp {
         return;
       }
       var xParser = new Parser(aLine);
-
-      //aLine = aLine.Trim();
-      //if (String.IsNullOrEmpty(aLine)) {
-      //  // Skip
-      //} else if (aLine[0] == '#') {
-      //  ProcessComment(aLine.Substring(1));
-      //} else if (aLine[0] == '!') {
-      //  ProcessLiteral(aLine.Substring(1));
-      //} else {
-      //  if (aLine.EndsWith("++")) {
-      //    // TODO
-      //  } else if (aLine.EndsWith("--")) {
-      //    // TODO
-      //  } else {
-      //    var xParts = mRegex.Split(aLine);
-      //    xParts = xParts.Where(q => string.IsNullOrWhiteSpace(q) == false).ToArray();
-
-      //    if (xParts.Contains("=")) {
-      //      ProcessAssignment(xParts);
-      //    } else {
-      //      throw new Exception("Syntax error: '" + aLine + "'");
-      //    }
-      //  }
-      //}
+      foreach (var xToken in xParser.Tokens) {
+        if (xToken.Type == Token.TokenType.Comment) {
+          ProcessComment(xToken.Value.Substring(1));
+        } else if (xToken.Type == Token.TokenType.Literal) {
+          ProcessLiteral(xToken.Value.Substring(1));
+        } else {
+        //    if (xParts.Contains("=")) {
+        //      ProcessAssignment(xParts);
+        //    } else {
+        }
+      }
     }
 
     private void ProcessAssignment(string[] aParts) {

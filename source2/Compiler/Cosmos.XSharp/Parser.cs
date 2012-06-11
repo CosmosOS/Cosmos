@@ -25,13 +25,29 @@ namespace Cosmos.Compiler.XSharp {
         } else if (xChar1 == '!') {
           xToken.Type = Token.TokenType.Literal;
         }
-      } else if (xToken == null) {
+      } else {
         xString = mData.Substring(mStart, rPos - mStart);
 
         if (xString == "++") {
           xToken.Type = Token.TokenType.Inc;
+        } else if (xString == "--") {
+          xToken.Type = Token.TokenType.Dec;
+        } else if (xString == "[") {
+          xToken.Type = Token.TokenType.BracketLeft;
+        } else if (xString == "]") {
+          xToken.Type = Token.TokenType.BracketRight;
+        } else if (xString == "+") {
+          xToken.Type = Token.TokenType.Plus;
+        } else if (xString == "-") {
+          xToken.Type = Token.TokenType.Minus;
+        } else if (xString == "=") {
+          xToken.Type = Token.TokenType.Assignment;
         } else if (char.IsLetter(xChar1)) {
-          xToken.Type = Token.TokenType.Register;
+          xToken.Type = Token.TokenType.Text;
+        } else if (char.IsDigit(xChar1)) {
+          xToken.Type = Token.TokenType.ValueNumber;
+        } else {
+          throw new Exception("Unrecognized character.");
         }
       }
       xToken.Value = xString;
@@ -44,22 +60,31 @@ namespace Cosmos.Compiler.XSharp {
     protected void Parse() {
       char xLast = ' ';
       int i = 0;
+      bool xLastIsWhiteSpace = true;
+      bool xLastIsLetterOrDigit = false;
+      bool xLastIsOther = false;
       for (i = 0; i < mData.Length; i++) {
         char xChar = mData[i];
-        if (char.IsWhiteSpace(xChar)) {
-          if (!char.IsWhiteSpace(xLast)) {
-            NewToken(ref i);
-          }
-        } if (char.IsLetterOrDigit(xChar)) {
-          if (!char.IsLetterOrDigit(xLast)) {
-            NewToken(ref i);
-          }
+        bool xIsWhiteSpace = char.IsWhiteSpace(xChar);
+        bool xIsLetterOrDigit = char.IsLetterOrDigit(xChar);
+        bool xIsOther = !xIsWhiteSpace && !xIsLetterOrDigit;
+
+        if (xLastIsWhiteSpace) {
+          mStart = i;
         } else {
-          if (char.IsLetterOrDigit(xLast) || char.IsWhiteSpace(xLast))  {
+          if (xIsWhiteSpace) {
+            NewToken(ref i);
+          } else if (xIsLetterOrDigit && !xLastIsLetterOrDigit) {
+            NewToken(ref i);
+          } else if (xIsOther && !xLastIsOther) { 
             NewToken(ref i);
           }
         }
+
         xLast = xChar;
+        xLastIsWhiteSpace = xIsWhiteSpace;
+        xLastIsLetterOrDigit = xIsLetterOrDigit;
+        xLastIsOther = xIsOther;
       }
     }
 

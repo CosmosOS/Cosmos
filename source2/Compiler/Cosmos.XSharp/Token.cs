@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class Token {
-    public enum TokenType { Comment,  Literal, Register, Assignment, ValueNumber, BracketLeft, BracketRight, Plus, Minus, Inc, Dec}
+    public enum TokenType { Comment, Literal, Text, Assignment, ValueNumber, BracketLeft, BracketRight, Plus, Minus, Inc, Dec}
 
     public TokenType Type;
     public int SrcPosStart;
