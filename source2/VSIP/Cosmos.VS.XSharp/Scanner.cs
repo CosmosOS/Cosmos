@@ -18,22 +18,29 @@ namespace Cosmos.VS.XSharp {
     IVsTextBuffer mBuffer;
     XSC.Parser mParser;
     int mTokenIdx;
-    static Dictionary<XSC.TokenType, TokenData> mTokenMap = new Dictionary<XSC.TokenType, TokenData>();
+    static TokenData[] mTokenMap;
 
     static Scanner() {
-      mTokenMap.Add(XSC.TokenType.Label, new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier });
-      mTokenMap.Add(XSC.TokenType.Comment, new TokenData { Type = TokenType.LineComment, Color = TokenColor.Comment });
-      mTokenMap.Add(XSC.TokenType.Literal , new TokenData { Type = TokenType.Literal , Color = TokenColor.String });
-      mTokenMap.Add(XSC.TokenType.Register , new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword });
-      mTokenMap.Add(XSC.TokenType.Op , new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword });
-      mTokenMap.Add(XSC.TokenType.Assignment , new TokenData { Type = TokenType.Operator , Color = TokenColor.Text });
-      mTokenMap.Add(XSC.TokenType.ValueNumber , new TokenData { Type = TokenType.Literal , Color = TokenColor.Number });
-      mTokenMap.Add(XSC.TokenType.BracketLeft , new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text });
-      mTokenMap.Add(XSC.TokenType.BracketRight , new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text });
-      mTokenMap.Add(XSC.TokenType.Plus , new TokenData { Type = TokenType.Operator , Color = TokenColor.Text });
-      mTokenMap.Add(XSC.TokenType.Minus , new TokenData { Type = TokenType.Operator , Color = TokenColor.Text });
-      mTokenMap.Add(XSC.TokenType.Inc , new TokenData { Type = TokenType.Operator , Color = TokenColor.Text });
-      mTokenMap.Add(XSC.TokenType.Dec , new TokenData { Type = TokenType.Operator , Color = TokenColor.Text });
+      int xEnumMax = Enum.GetValues(typeof(XSC.TokenType)).Cast<int>().Max();
+      mTokenMap = new TokenData[xEnumMax];
+      foreach (var x in mTokenMap) {
+        x.Type = TokenType.Unknown;
+        x.Color = TokenColor.Text;
+      }
+
+      mTokenMap[(int)XSC.TokenType.Label] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
+      mTokenMap[(int)XSC.TokenType.Comment] = new TokenData { Type = TokenType.LineComment, Color = TokenColor.Comment };
+      mTokenMap[(int)XSC.TokenType.Literal] = new TokenData { Type = TokenType.Literal , Color = TokenColor.String };
+      mTokenMap[(int)XSC.TokenType.Register] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
+      mTokenMap[(int)XSC.TokenType.Op] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
+      mTokenMap[(int)XSC.TokenType.Assignment] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.ValueNumber] = new TokenData { Type = TokenType.Literal , Color = TokenColor.Number };
+      mTokenMap[(int)XSC.TokenType.BracketLeft] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.BracketRight] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Plus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Minus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Inc] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Dec] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
     }
 
     public Scanner(IVsTextBuffer aBuffer) {
@@ -52,14 +59,11 @@ namespace Cosmos.VS.XSharp {
       aTokenInfo.Token = (int)xToken.Type;
       aTokenInfo.StartIndex = xToken.SrcPosStart;
       aTokenInfo.EndIndex = xToken.SrcPosEnd;
-      TokenData xType;
-      if (mTokenMap.TryGetValue(xToken.Type, out xType)) {
-        aTokenInfo.Type = xType.Type;
-        aTokenInfo.Color = xType.Color;
-      } else {
-        aTokenInfo.Type = TokenType.Unknown;
-        aTokenInfo.Color = TokenColor.Text;
-      }
+
+      var xTokenData = mTokenMap[(int)xToken.Type];
+      aTokenInfo.Type = xTokenData.Type;
+      aTokenInfo.Color = xTokenData.Color;
+
       return true;
     }
 
