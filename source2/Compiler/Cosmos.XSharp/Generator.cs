@@ -16,8 +16,8 @@ namespace Cosmos.Compiler.XSharp {
     public Generator() {
       mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Literal }),
         "new LiteralAssemblerCode(\"{0}\");");
-      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
-        "new Comment(\"{0}\");");
+      //mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
+      //  "new Comment(\"{0}\");");
       mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber }),
         "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
     }
@@ -76,7 +76,10 @@ namespace Cosmos.Compiler.XSharp {
       var xTokens = xParser.Tokens;
 
       var xPattern = xTokens.Select(c => c.Type).ToArray();
-      var xCode = mPatterns[new TokenPattern(xPattern)];
+      string xCode;
+      if (!mPatterns.TryGetValue(new TokenPattern(xPattern), out xCode)) {
+        throw new Exception("Invalid token pattern in X# file.");
+      }
       mOutput.WriteLine(xCode, xTokens.Select(c => c.Value).ToArray());
     }
 
