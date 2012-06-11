@@ -74,69 +74,30 @@ namespace Cosmos.Compiler.XSharp {
       mOutput.WriteLine("}");
     }
 
-    // +-[].=
-    protected Regex mRegex = new Regex(@"(\W)");
+    // TODO change to classes with attribs, or something similar.
+    // Dont need separate classes, can assmeble straight from tokens using data and instances.
+    protected TokenType[] PatternLiteral = new TokenType[] { TokenType.Literal };
+    protected TokenType[] PatternComment = new TokenType[] { TokenType.Comment };
+    protected TokenType[] PatternRegAsnNum = new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber };
 
     protected void ProcessLine(string aLine) {
+      EnsureHeaderWritten();
+
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
         // Skip
         return;
       }
       var xParser = new Parser(aLine);
-      foreach (var xToken in xParser.Tokens) {
-        if (xToken.Type == Token.TokenType.Comment) {
-          ProcessComment(xToken.Value.Substring(1));
-        } else if (xToken.Type == Token.TokenType.Literal) {
-          ProcessLiteral(xToken.Value.Substring(1));
-        } else {
-        //    if (xParts.Contains("=")) {
-        //      ProcessAssignment(xParts);
-        //    } else {
-        }
+      var xTokens = xParser.Tokens;
+      if (xParser.PatternMatches(PatternComment)) {
+        mOutput.WriteLine("new Comment(\"{0}\");", xTokens[0].Value.Substring(1));
+      } else if (xParser.PatternMatches(PatternLiteral)) {
+        mOutput.WriteLine("new LiteralAssemblerCode(\"{0}\");", xTokens[0].Value.Substring(1));
+      } else if (xParser.PatternMatches(PatternRegAsnNum)) {
+        mOutput.WriteLine("new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {1}}};", xTokens[0].Value, xTokens[2].Value);
       }
     }
 
-    private void ProcessAssignment(string[] aParts) {
-      if (aParts.Length != 3) {
-        throw new Exception("Wrong Assignment");
-      }
-
-      string xLeft = aParts[0];
-      string xRight = aParts[2];
-
-      if (IsRegister(xLeft)) {
-        uint xValue;
-        if (UInt32.TryParse(xRight, out xValue)) {
-          mOutput.WriteLine("new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {1}}};", xLeft, xRight);
-          return;
-        }
-      }
-
-      throw new Exception("Wrong Assignment");
-    }
-
-    private void ProcessLiteral(string line) {
-      EnsureHeaderWritten();
-      mOutput.WriteLine("new LiteralAssemblerCode(\"{0}\");", line);
-    }
-
-    private void ProcessComment(string line) {
-      EnsureHeaderWritten();
-      mOutput.WriteLine("new Comment(\"{0}\");", line);
-    }
-
-    private bool IsRegister(string aWord) {
-      aWord = aWord.ToLower();
-      return
-        aWord == "eax" || aWord == "ax" || aWord == "ah" || aWord == "al" ||
-        aWord == "ebx" || aWord == "bx" || aWord == "bh" || aWord == "bl" ||
-        aWord == "ecx" || aWord == "cx" || aWord == "ch" || aWord == "cl" ||
-        aWord == "edx" || aWord == "dx" || aWord == "dh" || aWord == "dl" ||
-        aWord == "esp" ||
-        aWord == "ebp" ||
-        aWord == "esi" ||
-        aWord == "edi";
-    }
   }
 }
