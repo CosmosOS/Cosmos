@@ -17,9 +17,12 @@ namespace Cosmos.VS.XSharp {
     }
 
     int i = 0;
-    bool IScanner.ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int state) {
-      tokenInfo.Type = TokenType.Unknown;
-      tokenInfo.Color = TokenColor.Number;
+    // State argument: http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/38939d76-6f8b-473f-9ee1-fc3ae7b59cce
+    bool IScanner.ScanTokenAndProvideInfoAboutIt(TokenInfo aTokenInfo, ref int aState) {
+      aTokenInfo.StartIndex = 0;
+      aTokenInfo.EndIndex = mSource.Length;
+      aTokenInfo.Type = TokenType.Unknown;
+      aTokenInfo.Color = TokenColor.Comment;
       i++;
       return i < 2;
     
@@ -28,21 +31,22 @@ namespace Cosmos.VS.XSharp {
       if (token != null) {
         char firstChar = token[0];
         if (char.IsPunctuation(firstChar)) {
-          tokenInfo.Type = TokenType.Operator;
-          tokenInfo.Color = TokenColor.Keyword;
+          aTokenInfo.Type = TokenType.Operator;
+          aTokenInfo.Color = TokenColor.Keyword;
         } else if (char.IsNumber(firstChar)) {
-          tokenInfo.Type = TokenType.Literal;
-          tokenInfo.Color = TokenColor.Number;
+          aTokenInfo.Type = TokenType.Literal;
+          aTokenInfo.Color = TokenColor.Number;
         } else {
-          tokenInfo.Type = TokenType.Identifier;
-          tokenInfo.Color = TokenColor.Identifier;
+          aTokenInfo.Type = TokenType.Identifier;
+          aTokenInfo.Color = TokenColor.Identifier;
         }
       }
       return foundToken;
     }
 
-    void IScanner.SetSource(string source, int offset) {
-      mSource = source.Substring(offset);
+    void IScanner.SetSource(string aSource, int aOffset) {
+      i = 0;
+      mSource = aSource.Substring(aOffset);
     }
   }
 }

@@ -81,26 +81,33 @@ namespace Cosmos.Compiler.XSharp {
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
         // Skip
-      } else if (aLine[0] == '#') {
-        ProcessComment(aLine.Substring(1));
-      } else if (aLine[0] == '!') {
-        ProcessLiteral(aLine.Substring(1));
-      } else {
-        if (aLine.EndsWith("++")) {
-          // TODO
-        } else if (aLine.EndsWith("--")) {
-          // TODO
-        } else {
-          var xParts = mRegex.Split(aLine);
-          xParts = xParts.Where(q => string.IsNullOrWhiteSpace(q) == false).ToArray();
-
-          if (xParts.Contains("=")) {
-            ProcessAssignment(xParts);
-          } else {
-            throw new Exception("Syntax error: '" + aLine + "'");
-          }
-        }
+        return;
       }
+      var xParser = new Parser(aLine);
+
+      //aLine = aLine.Trim();
+      //if (String.IsNullOrEmpty(aLine)) {
+      //  // Skip
+      //} else if (aLine[0] == '#') {
+      //  ProcessComment(aLine.Substring(1));
+      //} else if (aLine[0] == '!') {
+      //  ProcessLiteral(aLine.Substring(1));
+      //} else {
+      //  if (aLine.EndsWith("++")) {
+      //    // TODO
+      //  } else if (aLine.EndsWith("--")) {
+      //    // TODO
+      //  } else {
+      //    var xParts = mRegex.Split(aLine);
+      //    xParts = xParts.Where(q => string.IsNullOrWhiteSpace(q) == false).ToArray();
+
+      //    if (xParts.Contains("=")) {
+      //      ProcessAssignment(xParts);
+      //    } else {
+      //      throw new Exception("Syntax error: '" + aLine + "'");
+      //    }
+      //  }
+      //}
     }
 
     private void ProcessAssignment(string[] aParts) {
