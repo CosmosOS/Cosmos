@@ -7,7 +7,6 @@ namespace Cosmos.Compiler.XSharp {
   public class Parser {
     int mStart = 0;
     protected string mData;
-    protected TokenType[] mPattern;
 
     protected List<Token> mTokens = new List<Token>();
     public List<Token> Tokens {
@@ -24,31 +23,13 @@ namespace Cosmos.Compiler.XSharp {
       "EDX", "EX", "DH", "DL",
     };
 
-    public bool PatternMatches(TokenType[] aPattern) {
-      // SequenceEqual is slow with arrays
-      //return mPattern.SequenceEqual(aPattern);
-      //TODO: If always 8 or less can use int64[]
-      // Could also use string arrays
-      // or maybe tree
-
-    	if (mPattern.Length == aPattern.Length) {
-	      for (int i = 0; i < aPattern.Length; i++) {
-          if (mPattern[i] != aPattern[i]) {
-		        return false;
-		      }
-	      }
-	      return true;
-	    }
-	    return false;
-    } 
-
     protected void NewToken(ref int rPos) {
       string xString = null;
       char xChar1 = mData[mStart];
       var xToken = new Token();
       if ((mTokens.Count == 0) && "#!".Contains(xChar1)) {
         rPos = mData.Length; // This will account for the dummy whitespace at the end.
-        xString = mData.Substring(mStart, rPos - mStart);
+        xString = mData.Substring(mStart + 1, rPos - mStart - 1).Trim();
         if (xChar1 == '#') {
           xToken.Type = TokenType.Comment;
         } else if (xChar1 == '!') {
@@ -127,8 +108,6 @@ namespace Cosmos.Compiler.XSharp {
         xLastIsLetterOrDigit = xIsLetterOrDigit;
         xLastIsOther = xIsOther;
       }
-
-      mPattern = mTokens.Select(c => c.Type).ToArray();
     }
 
     public Parser(string aData) {

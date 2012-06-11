@@ -7,25 +7,27 @@ using System.IO;
 
 namespace Cosmos.Compiler.XSharp {
   public class Generator {
+    protected TextReader mInput;
+    protected TextWriter mOutput;
+    protected Dictionary<TokenPattern, string> mPatterns = new Dictionary<TokenPattern, string>();
+    public string Namespace { get; set; }
+    public string Name { get; set; }
+
+    public Generator() {
+      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Literal }),
+        "new LiteralAssemblerCode(\"{0}\");");
+      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
+        "new Comment(\"{0}\");");
+      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber }),
+        "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
+    }
+
     public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace) {
       var xGenerator = new Generator();
       xGenerator.Name = Path.GetFileNameWithoutExtension(inputFilename);
       xGenerator.Namespace = defaultNamespace;
       xGenerator.Execute(input, output);
     }
-
-    public string Namespace {
-      get;
-      set;
-    }
-
-    public string Name {
-      get;
-      set;
-    }
-
-    private TextReader mInput;
-    private TextWriter mOutput;
 
     public void Execute(TextReader aInput, TextWriter aOutput) {
       mInput = aInput;
@@ -64,12 +66,6 @@ namespace Cosmos.Compiler.XSharp {
       mOutput.WriteLine("}");
     }
 
-    // TODO change to classes with attribs, or something similar.
-    // Dont need separate classes, can assmeble straight from tokens using data and instances.
-    protected TokenType[] PatternLiteral = new TokenType[] { TokenType.Literal };
-    protected TokenType[] PatternComment = new TokenType[] { TokenType.Comment };
-    protected TokenType[] PatternRegAsnNum = new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber };
-
     protected void ProcessLine(string aLine) {
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
@@ -78,13 +74,10 @@ namespace Cosmos.Compiler.XSharp {
       }
       var xParser = new Parser(aLine);
       var xTokens = xParser.Tokens;
-      if (xParser.PatternMatches(PatternComment)) {
-        mOutput.WriteLine("new Comment(\"{0}\");", xTokens[0].Value.Substring(1));
-      } else if (xParser.PatternMatches(PatternLiteral)) {
-        mOutput.WriteLine("new LiteralAssemblerCode(\"{0}\");", xTokens[0].Value.Substring(1));
-      } else if (xParser.PatternMatches(PatternRegAsnNum)) {
-        mOutput.WriteLine("new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {1}}};", xTokens[0].Value, xTokens[2].Value);
-      }
+
+      var xPattern = xTokens.Select(c => c.Type).ToArray();
+      var xCode = mPatterns[new TokenPattern(xPattern)];
+      mOutput.WriteLine(xCode, xTokens.Select(c => c.Value).ToArray());
     }
 
   }
