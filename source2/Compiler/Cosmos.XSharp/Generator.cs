@@ -16,8 +16,8 @@ namespace Cosmos.Compiler.XSharp {
     public Generator() {
       mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Literal }),
         "new LiteralAssemblerCode(\"{0}\");");
-      //mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
-      //  "new Comment(\"{0}\");");
+      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
+        "new Comment(\"{0}\");");
       mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber }),
         "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
     }
