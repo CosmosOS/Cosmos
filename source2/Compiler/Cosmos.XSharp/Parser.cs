@@ -21,7 +21,7 @@ namespace Cosmos.Compiler.XSharp {
       "EAX", "AX", "AH", "AL",
       "EBX", "BX", "BH", "BL",
       "ECX", "CX", "CH", "CL",
-      "EDX", "EX", "DH", "EL",
+      "EDX", "EX", "DH", "DL",
     };
 
     public bool PatternMatches(TokenType[] aPattern) {
@@ -29,7 +29,7 @@ namespace Cosmos.Compiler.XSharp {
       //return mPattern.SequenceEqual(aPattern);
       //TODO: If always 8 or less can use int64[]
       // Could also use string arrays
-      // or maybe btree
+      // or maybe tree
 
     	if (mPattern.Length == aPattern.Length) {
 	      for (int i = 0; i < aPattern.Length; i++) {

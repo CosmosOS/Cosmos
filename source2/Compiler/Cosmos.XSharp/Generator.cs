@@ -24,16 +24,6 @@ namespace Cosmos.Compiler.XSharp {
       set;
     }
 
-    private void EnsureHeaderWritten() {
-      if (mHeaderWritten) {
-        return;
-      }
-      mHeaderWritten = true;
-      EmitHeader();
-    }
-
-    private bool mHeaderWritten = false;
-
     private TextReader mInput;
     private TextWriter mOutput;
 
@@ -41,6 +31,7 @@ namespace Cosmos.Compiler.XSharp {
       mInput = aInput;
       mOutput = aOutput;
 
+      EmitHeader();
       while (true) {
         string xLine = aInput.ReadLine();
         if (xLine == null) {
@@ -68,7 +59,6 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     private void EmitFooter() {
-      EnsureHeaderWritten();
       mOutput.WriteLine("\t\t}");
       mOutput.WriteLine("\t}");
       mOutput.WriteLine("}");
@@ -81,8 +71,6 @@ namespace Cosmos.Compiler.XSharp {
     protected TokenType[] PatternRegAsnNum = new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber };
 
     protected void ProcessLine(string aLine) {
-      EnsureHeaderWritten();
-
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
         // Skip
