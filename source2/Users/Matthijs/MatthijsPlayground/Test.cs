@@ -9,9 +9,12 @@ namespace MatthijsPlayground
 	{
 		public override void AssembleNew(object aAssembler, object aMethodInfo)
 		{
-new Comment(" First line of X#");
-new LiteralAssemblerCode(" Literal assembler code");
+new Comment("This is a comment");
+new Comment("This next line allows emission of standard yucky Intel mnemonics");
+new LiteralAssemblerCode("Mov EAX, 1");
+new Comment("This is X# code");
 new Move{DestinationReg = RegistersEnum.EAX, SourceValue = 1};
+new Move{DestinationReg = RegistersEnum.EDX, SourceValue = 2};
 		}
 	}
 }

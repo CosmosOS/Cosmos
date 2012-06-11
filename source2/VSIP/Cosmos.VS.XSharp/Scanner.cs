@@ -10,7 +10,7 @@ using XSC = Cosmos.Compiler.XSharp;
 
 namespace Cosmos.VS.XSharp {
   internal class Scanner : IScanner {
-    class TokenData {
+    struct TokenData {
       public TokenType Type;
       public TokenColor Color;
     }
@@ -22,10 +22,10 @@ namespace Cosmos.VS.XSharp {
 
     static Scanner() {
       int xEnumMax = Enum.GetValues(typeof(XSC.TokenType)).Cast<int>().Max();
-      mTokenMap = new TokenData[xEnumMax];
-      foreach (var x in mTokenMap) {
-        x.Type = TokenType.Unknown;
-        x.Color = TokenColor.Text;
+      mTokenMap = new TokenData[xEnumMax + 1];
+      for(int i = 0; i < xEnumMax; i++) {
+        mTokenMap[i].Type = TokenType.Unknown;
+        mTokenMap[i].Color = TokenColor.Text;
       }
 
       mTokenMap[(int)XSC.TokenType.Label] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
