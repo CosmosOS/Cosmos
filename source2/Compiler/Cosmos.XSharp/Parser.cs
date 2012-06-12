@@ -46,7 +46,7 @@ namespace Cosmos.Compiler.XSharp {
             mStart = rPos;
             return;
           }
-        } if (xString == "++") {
+        } else if (xString == "++") {
           xToken.Type = TokenType.Inc;
         } else if (xString == "--") {
           xToken.Type = TokenType.Dec;
