@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class Parser {
-    int mStart = 0;
+    protected int mStart = 0;
     protected string mData;
+    protected bool mIncludeWhiteSpace;
 
     protected List<Token> mTokens = new List<Token>();
     public List<Token> Tokens {
@@ -38,7 +39,14 @@ namespace Cosmos.Compiler.XSharp {
       } else {
         xString = mData.Substring(mStart, rPos - mStart);
 
-        if (xString == "++") {
+        if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
+          if (mIncludeWhiteSpace) {
+            xToken.Type = TokenType.WhiteSpace;
+          } else {
+            mStart = rPos;
+            return;
+          }
+        } if (xString == "++") {
           xToken.Type = TokenType.Inc;
         } else if (xString == "--") {
           xToken.Type = TokenType.Dec;
@@ -68,51 +76,53 @@ namespace Cosmos.Compiler.XSharp {
         } else if (char.IsDigit(xChar1)) {
           xToken.Type = TokenType.ValueNumber;
         } else {
-          throw new Exception("Unrecognized character.");
+          throw new Exception("Unrecognized token: " + xString);
         }
       }
       xToken.Value = xString;
       xToken.SrcPosStart = mStart;
       xToken.SrcPosEnd = rPos - 1;
+      // Do near end, some logic performs returns above
       mTokens.Add(xToken);
       mStart = rPos;
     }
 
+    protected enum CharType { WhiteSpace, Identifier, Operator };
     protected void Parse() {
-      char xLast = ' ';
+      char xLastChar = ' ';
+      CharType xLastCharType = CharType.WhiteSpace;
+      char xChar;
+      CharType xCharType = CharType.WhiteSpace;
       int i = 0;
-      bool xLastIsWhiteSpace = true;
-      bool xLastIsLetterOrDigit = false;
-      bool xLastIsOther = false;
       for (i = 0; i < mData.Length; i++) {
-        char xChar = mData[i];
-        bool xIsWhiteSpace = char.IsWhiteSpace(xChar);
-        // : is for labels
-        bool xIsLetterOrDigit = char.IsLetterOrDigit(xChar) || xChar == ':';
-        bool xIsOther = !xIsWhiteSpace && !xIsLetterOrDigit;
-
-        if (xLastIsWhiteSpace) {
-          mStart = i;
+        xChar = mData[i];
+        if (char.IsWhiteSpace(xChar)) {
+          xCharType = CharType.WhiteSpace;
+        } else if (char.IsLetterOrDigit(xChar) || xChar == ':') {
+          // : is for labels
+          xCharType = CharType.Identifier;
         } else {
-          if (xIsWhiteSpace) {
-            NewToken(ref i);
-          } else if (xIsLetterOrDigit && !xLastIsLetterOrDigit) {
-            NewToken(ref i);
-          } else if (xIsOther && !xLastIsOther) { 
-            NewToken(ref i);
-          }
+          xCharType = CharType.Operator;
         }
 
-        xLast = xChar;
-        xLastIsWhiteSpace = xIsWhiteSpace;
-        xLastIsLetterOrDigit = xIsLetterOrDigit;
-        xLastIsOther = xIsOther;
+        // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.
+        // But its faster as the second short circuit rather than a separate if.
+        if (xCharType != xLastCharType && i > 0) {
+          NewToken(ref i);
+        }
+
+        xLastChar = xChar;
+        xLastCharType = xCharType;
+      }
+      // Last token
+      if (i - mStart > 0) {
+        NewToken(ref i);
       }
     }
 
-    public Parser(string aData) {
-      // We add a dummy whitespace to force the parser to trigger a NewToken for the last item.
-      mData = aData + ' ';
+    public Parser(string aData, bool aIncludeWhiteSpace) {
+      mData = aData;
+      mIncludeWhiteSpace = aIncludeWhiteSpace;
       Parse();
     }
   }

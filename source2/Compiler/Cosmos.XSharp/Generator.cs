@@ -72,7 +72,7 @@ namespace Cosmos.Compiler.XSharp {
         // Skip
         return;
       }
-      var xParser = new Parser(aLine);
+      var xParser = new Parser(aLine, false);
       var xTokens = xParser.Tokens;
 
       var xPattern = xTokens.Select(c => c.Type).ToArray();

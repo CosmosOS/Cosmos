@@ -40,7 +40,8 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.Plus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Minus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Inc] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Dec] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Dec] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
     }
 
     public Scanner(IVsTextBuffer aBuffer) {
@@ -69,7 +70,7 @@ namespace Cosmos.VS.XSharp {
 
     void IScanner.SetSource(string aSource, int aOffset) {
       mTokenIdx = 0;
-      mParser = new XSC.Parser(aSource.Substring(aOffset));
+      mParser = new XSC.Parser(aSource.Substring(aOffset), true);
     }
   }
 }
