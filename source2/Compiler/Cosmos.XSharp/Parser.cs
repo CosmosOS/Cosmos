@@ -21,7 +21,7 @@ namespace Cosmos.Compiler.XSharp {
       "EAX", "AX", "AH", "AL",
       "EBX", "BX", "BH", "BL",
       "ECX", "CX", "CH", "CL",
-      "EDX", "EX", "DH", "DL",
+      "EDX", "DX", "DH", "DL",
       "ESI", "EDI", "ESP", "EBP"
     };
 

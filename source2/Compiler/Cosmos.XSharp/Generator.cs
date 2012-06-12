@@ -20,19 +20,20 @@ namespace Cosmos.Compiler.XSharp {
         "new Comment(\"{0}\");");
 
       mPatterns.Add("REG = 123"
-        , "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
+        , "new Move{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
       mPatterns.Add("REG = REG"
-        , "new ;");
+        , "new Move{{ DestinationReg = RegistersEnum.{0}, SourceReg = {2} }};");
       mPatterns.Add("REG = REG[0]"
         , "new ;");
 
       mPatterns.Add("ABC = REG"
         , "new ;");
 
+      // TODO: Allow asm to optimize these to Inc/Dec
       mPatterns.Add("REG + 1"
-        , "new ;");
+        , "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
       mPatterns.Add("REG - 1"
-        , "new ;");
+        , "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
 
       mPatterns.Add(new TokenType[] { TokenType.OpCode },
         "new ;");
