@@ -15,6 +15,7 @@ new LiteralAssemblerCode("Mov EAX, 1");
 new Comment("This is X# code");
 new Move{DestinationReg = RegistersEnum.EAX, SourceValue = 1};
 new Move{DestinationReg = RegistersEnum.EDX, SourceValue = 2};
+new Move{DestinationReg = RegistersEnum.EDX, SourceValue = 2};
 		}
 	}
 }

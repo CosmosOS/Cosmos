@@ -6,3 +6,4 @@
 # This is X# code
 EAX = 1
 EDX = 2
+EDX = 2
