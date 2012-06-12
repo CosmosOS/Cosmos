@@ -20,14 +20,14 @@ namespace Cosmos.Compiler.XSharp {
         "new Comment(\"{0}\");");
 
       mPatterns.Add("REG = 123"
-        , "new Move{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
+        , "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
       mPatterns.Add("REG = REG"
-        , "new Move{{ DestinationReg = RegistersEnum.{0}, SourceReg = {2} }};");
+        , "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};");
       mPatterns.Add("REG = REG[0]"
-        , "new ;");
+        , "//new ;");
 
       mPatterns.Add("ABC = REG"
-        , "new ;");
+        , "//new ;");
 
       // TODO: Allow asm to optimize these to Inc/Dec
       mPatterns.Add("REG + 1"
@@ -36,7 +36,7 @@ namespace Cosmos.Compiler.XSharp {
         , "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
 
       mPatterns.Add(new TokenType[] { TokenType.OpCode },
-        "new ;");
+        "//new ;");
     }
 
     public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace) {
@@ -71,10 +71,8 @@ namespace Cosmos.Compiler.XSharp {
       mOutput.WriteLine();
       mOutput.WriteLine("namespace {0}", Namespace);
       mOutput.WriteLine("{");
-      mOutput.WriteLine("\tpublic class {0}: Cosmos.IL2CPU.Plugs.AssemblerMethod", Name);
-      mOutput.WriteLine("\t{");
-      mOutput.WriteLine("\t\tpublic override void AssembleNew(object aAssembler, object aMethodInfo)");
-      mOutput.WriteLine("\t\t{");
+      mOutput.WriteLine("\tpublic class {0} {{", Name);
+      mOutput.WriteLine("\t\tpublic void Assemble() {");
     }
 
     private void EmitFooter() {
