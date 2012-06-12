@@ -348,3 +348,7 @@ Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\B
 	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 #endif
 
+[UninstallRun]
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}"; Flags: waituntilterminated
+
+
