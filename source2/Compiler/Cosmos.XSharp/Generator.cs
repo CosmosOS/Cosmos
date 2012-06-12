@@ -9,17 +9,50 @@ namespace Cosmos.Compiler.XSharp {
   public class Generator {
     protected TextReader mInput;
     protected TextWriter mOutput;
-    protected Dictionary<TokenPattern, string> mPatterns = new Dictionary<TokenPattern, string>();
+    protected TokenPatterns mPatterns = new TokenPatterns();
     public string Namespace { get; set; }
     public string Name { get; set; }
 
     public Generator() {
-      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.LiteralAsm }),
+      // ! Mov EAX, 0
+      mPatterns.Add(new TokenType[] { TokenType.LiteralAsm },
         "new LiteralAssemblerCode(\"{0}\");");
-      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
+
+      // # This is a comment
+      mPatterns.Add(new TokenType[] { TokenType.Comment },
         "new Comment(\"{0}\");");
-      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber }),
+
+      // EAX = 0
+      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber },
         "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
+
+      // EBP = ESP
+      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.Register },
+        "new ;");
+
+      // EAX = EBP[0]
+      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.Register, TokenType.BracketLeft, TokenType.ValueNumber, TokenType.BracketRight },
+        "new ;");
+
+      // CallerEBP = EBP
+      mPatterns.Add(new TokenType[] { TokenType.AlphaNum, TokenType.Assignment, TokenType.Register },
+        "new ;");
+
+      // ESP + 12
+      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Plus, TokenType.ValueNumber },
+        "new ;");
+
+      // ESP - 12
+      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Minus, TokenType.ValueNumber },
+        "new ;");
+
+      // PopAll
+      mPatterns.Add(new TokenType[] { TokenType.OpCode },
+        "new ;");
+
+      // Sample
+      //mPatterns.Add(new TokenType[] {  },
+      //  "new ;");
     }
 
     public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace) {

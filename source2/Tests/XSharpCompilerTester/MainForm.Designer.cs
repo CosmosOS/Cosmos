@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       this.splitContainer1 = new System.Windows.Forms.SplitContainer();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.textInput = new System.Windows.Forms.TextBox();
@@ -81,8 +82,7 @@
       this.textInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
       this.textInput.Size = new System.Drawing.Size(691, 153);
       this.textInput.TabIndex = 0;
-      this.textInput.Text = "# This is a comment\r\n\r\n# This next line allows emission of standard yucky Intel m" +
-    "nemonics\r\n! Mov EAX, 1\r\n\r\n# This is X# code\r\nEAX = 1\r\nEDX = 2";
+      this.textInput.Text = resources.GetString("textInput.Text");
       this.textInput.TextChanged += new System.EventHandler(this.textInput_TextChanged);
       // 
       // groupBox2

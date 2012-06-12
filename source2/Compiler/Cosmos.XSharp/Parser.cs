@@ -67,7 +67,7 @@ namespace Cosmos.Compiler.XSharp {
             } else if (mOps.Contains(xUpper)) {
               xToken.Type = TokenType.OpCode;
             } else {
-              xToken.Type = TokenType.Unknown;
+              xToken.Type = TokenType.AlphaNum;
             }
           }
         } else if (char.IsDigit(xChar1)) {

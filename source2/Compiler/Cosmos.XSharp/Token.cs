@@ -8,7 +8,7 @@ namespace Cosmos.Compiler.XSharp {
     // Line based
     Comment, LiteralAsm, 
     //
-    Register, Label, OpCode, ValueNumber, 
+    Register, Label, OpCode, ValueNumber, AlphaNum, 
     // Symbols
     Assignment, BracketLeft, BracketRight, Plus, Minus, 
     // 
