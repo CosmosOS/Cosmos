@@ -14,45 +14,28 @@ namespace Cosmos.Compiler.XSharp {
     public string Name { get; set; }
 
     public Generator() {
-      // ! Mov EAX, 0
       mPatterns.Add(new TokenType[] { TokenType.LiteralAsm },
         "new LiteralAssemblerCode(\"{0}\");");
-
-      // # This is a comment
       mPatterns.Add(new TokenType[] { TokenType.Comment },
         "new Comment(\"{0}\");");
 
-      // EAX = 0
-      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.ValueNumber },
-        "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
+      mPatterns.Add("REG = 123"
+        , "new Move{{DestinationReg = RegistersEnum.{0}, SourceValue = {2}}};");
+      mPatterns.Add("REG = REG"
+        , "new ;");
+      mPatterns.Add("REG = REG[0]"
+        , "new ;");
 
-      // EBP = ESP
-      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.Register },
-        "new ;");
+      mPatterns.Add("ABC = REG"
+        , "new ;");
 
-      // EAX = EBP[0]
-      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Assignment, TokenType.Register, TokenType.BracketLeft, TokenType.ValueNumber, TokenType.BracketRight },
-        "new ;");
+      mPatterns.Add("REG + 1"
+        , "new ;");
+      mPatterns.Add("REG - 1"
+        , "new ;");
 
-      // CallerEBP = EBP
-      mPatterns.Add(new TokenType[] { TokenType.AlphaNum, TokenType.Assignment, TokenType.Register },
-        "new ;");
-
-      // ESP + 12
-      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Plus, TokenType.ValueNumber },
-        "new ;");
-
-      // ESP - 12
-      mPatterns.Add(new TokenType[] { TokenType.Register, TokenType.Minus, TokenType.ValueNumber },
-        "new ;");
-
-      // PopAll
       mPatterns.Add(new TokenType[] { TokenType.OpCode },
         "new ;");
-
-      // Sample
-      //mPatterns.Add(new TokenType[] {  },
-      //  "new ;");
     }
 
     public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace) {

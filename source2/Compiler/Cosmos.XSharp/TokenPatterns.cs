@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPatterns : Dictionary<TokenPattern, string> {
+    public void Add(string aTokenTypes, string aCode) {
+      Add(new TokenPattern(aTokenTypes), aCode);
+    }
+
     public void Add(TokenType[] aTokenTypes, string aCode) {
       Add(new TokenPattern(aTokenTypes), aCode);
     }

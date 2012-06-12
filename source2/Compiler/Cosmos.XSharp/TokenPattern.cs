@@ -2,17 +2,59 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPattern {
-    TokenType[] mTokenTypes;
+    protected TokenType[] mTokenTypes;
     // Since we make our contents immutable, we can cache the hash code
-    readonly int mHashCode;
+    protected int mHashCode;
+
+    public TokenPattern(string aTokenPattern) {
+      var xRegex = new Regex(@"(\W)");
+      var xParts = xRegex.Split(aTokenPattern);
+      var xTokenTypes = new List<TokenType>();
+
+      foreach (string xPart in xParts) {
+        if (string.IsNullOrWhiteSpace(xPart)) {
+          continue;
+        }
+
+        TokenType xTokenType;
+        if (string.Compare(xPart, "REG") == 0) {
+          xTokenType = TokenType.Register;
+        } else if (string.Compare(xPart, "ABC") == 0) {
+          xTokenType = TokenType.AlphaNum;
+        } else if (char.IsDigit(xPart[0])) {
+          xTokenType = TokenType.ValueNumber;
+        } else if (xPart == "=") {
+          xTokenType = TokenType.Assignment;
+        } else if (xPart == "[") {
+          xTokenType = TokenType.BracketLeft;
+        } else if (xPart == "]") {
+          xTokenType = TokenType.BracketRight;
+        } else if (xPart == "+") {
+          xTokenType = TokenType.Plus;
+        } else if (xPart == "-") {
+          xTokenType = TokenType.Minus;
+        } else {
+          throw new Exception("Unrecognized string token: " + xPart);
+        }
+        xTokenTypes.Add(xTokenType);
+      }
+
+      mTokenTypes = xTokenTypes.ToArray();
+      Init();
+    }
 
     public TokenPattern(TokenType[] aTokenTypes) {
       // We dont copy the array, so technically it is mutable but in our usage
       // constant arrays are passed in.
       mTokenTypes = aTokenTypes;
+      Init();
+    }
+
+    protected void Init() {
       mHashCode = CalcHashCode();
     }
 
