@@ -263,7 +263,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: DefaultProjectExtension; ValueData: Cosmos
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: PossibleProjectExtensions; ValueData: Cosmos
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: ProjectTemplatesDir; ValueData: {app}\build\vsip\..\Templates\Projects\CosmosProject
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: Language(VsTemplate); ValueData: CosmosProject
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: string; ValueName: Language(VsTemplate); ValueData: Cosmos
 ;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: string; ValueName: ; ValueData: Cosmos
 ;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: dword; ValueName: SortPriority; ValueData: $00000064
 ;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\NewProjectTemplates\TemplateDirs\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}\/1; ValueType: string; ValueName: TemplatesDir; ValueData: {app}\build\Templates\Projects\CosmosProject
