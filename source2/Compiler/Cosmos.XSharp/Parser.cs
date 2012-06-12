@@ -22,6 +22,7 @@ namespace Cosmos.Compiler.XSharp {
       "EBX", "BX", "BH", "BL",
       "ECX", "CX", "CH", "CL",
       "EDX", "EX", "DH", "DL",
+      "ESI", "EDI", "ESP", "EBP"
     };
 
     protected void NewToken(ref int rPos) {
@@ -46,10 +47,6 @@ namespace Cosmos.Compiler.XSharp {
             mStart = rPos;
             return;
           }
-        } else if (xString == "++") {
-          xToken.Type = TokenType.Inc;
-        } else if (xString == "--") {
-          xToken.Type = TokenType.Dec;
         } else if (xString == "[") {
           xToken.Type = TokenType.BracketLeft;
         } else if (xString == "]") {

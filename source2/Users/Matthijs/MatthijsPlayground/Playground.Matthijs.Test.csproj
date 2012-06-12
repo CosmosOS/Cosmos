@@ -42,11 +42,6 @@
   <ItemGroup>
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Test.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Test.xs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj">
@@ -73,7 +68,6 @@
   <ItemGroup>
     <None Include="Test.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Test.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

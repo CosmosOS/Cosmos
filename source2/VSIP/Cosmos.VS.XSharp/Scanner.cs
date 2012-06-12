@@ -39,8 +39,6 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.BracketRight] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Plus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Minus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Inc] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Dec] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };
     }

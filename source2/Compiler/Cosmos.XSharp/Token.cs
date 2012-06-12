@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
     //
     Register, Label, OpCode, ValueNumber, 
     // Symbols
-    Assignment, BracketLeft, BracketRight, Plus, Minus, Inc, Dec, 
+    Assignment, BracketLeft, BracketRight, Plus, Minus, 
     // 
     WhiteSpace,
     // For now used during scanning while user is typing, but in future could be user methods we have to find etc
