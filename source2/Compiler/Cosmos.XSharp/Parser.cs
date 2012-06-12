@@ -115,7 +115,7 @@ namespace Cosmos.Compiler.XSharp {
         xLastCharType = xCharType;
       }
       // Last token
-      if (i - mStart > 0) {
+      if (mStart < mData.Length) {
         NewToken(ref i);
       }
     }
