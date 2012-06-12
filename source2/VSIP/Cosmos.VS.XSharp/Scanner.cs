@@ -30,9 +30,9 @@ namespace Cosmos.VS.XSharp {
 
       mTokenMap[(int)XSC.TokenType.Label] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
       mTokenMap[(int)XSC.TokenType.Comment] = new TokenData { Type = TokenType.LineComment, Color = TokenColor.Comment };
-      mTokenMap[(int)XSC.TokenType.Literal] = new TokenData { Type = TokenType.Literal , Color = TokenColor.String };
+      mTokenMap[(int)XSC.TokenType.LiteralAsm] = new TokenData { Type = TokenType.Literal , Color = TokenColor.String };
       mTokenMap[(int)XSC.TokenType.Register] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
-      mTokenMap[(int)XSC.TokenType.Op] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
+      mTokenMap[(int)XSC.TokenType.OpCode] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
       mTokenMap[(int)XSC.TokenType.Assignment] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.ValueNumber] = new TokenData { Type = TokenType.Literal , Color = TokenColor.Number };
       mTokenMap[(int)XSC.TokenType.BracketLeft] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
@@ -42,6 +42,7 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.Inc] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Dec] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };
     }
 
     public Scanner(IVsTextBuffer aBuffer) {

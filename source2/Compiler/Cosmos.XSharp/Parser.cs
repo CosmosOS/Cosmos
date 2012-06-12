@@ -34,7 +34,7 @@ namespace Cosmos.Compiler.XSharp {
         if (xChar1 == '#') {
           xToken.Type = TokenType.Comment;
         } else if (xChar1 == '!') {
-          xToken.Type = TokenType.Literal;
+          xToken.Type = TokenType.LiteralAsm;
         }
       } else {
         xString = mData.Substring(mStart, rPos - mStart);
@@ -68,15 +68,15 @@ namespace Cosmos.Compiler.XSharp {
             if (mRegisters.Contains(xUpper)) {
               xToken.Type = TokenType.Register;
             } else if (mOps.Contains(xUpper)) {
-              xToken.Type = TokenType.Op;
+              xToken.Type = TokenType.OpCode;
             } else {
-              throw new Exception("Unrecognized text.");
+              xToken.Type = TokenType.Unknown;
             }
           }
         } else if (char.IsDigit(xChar1)) {
           xToken.Type = TokenType.ValueNumber;
         } else {
-          throw new Exception("Unrecognized token: " + xString);
+          xToken.Type = TokenType.Unknown;
         }
       }
       xToken.Value = xString;
@@ -87,7 +87,7 @@ namespace Cosmos.Compiler.XSharp {
       mStart = rPos;
     }
 
-    protected enum CharType { WhiteSpace, Identifier, Operator };
+    protected enum CharType { WhiteSpace, Identifier, Symbol };
     protected void Parse() {
       char xLastChar = ' ';
       CharType xLastCharType = CharType.WhiteSpace;
@@ -102,7 +102,7 @@ namespace Cosmos.Compiler.XSharp {
           // : is for labels
           xCharType = CharType.Identifier;
         } else {
-          xCharType = CharType.Operator;
+          xCharType = CharType.Symbol;
         }
 
         // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.

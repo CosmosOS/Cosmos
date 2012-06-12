@@ -14,7 +14,7 @@ namespace Cosmos.Compiler.XSharp {
     public string Name { get; set; }
 
     public Generator() {
-      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Literal }),
+      mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.LiteralAsm }),
         "new LiteralAssemblerCode(\"{0}\");");
       mPatterns.Add(new TokenPattern(new TokenType[] { TokenType.Comment }),
         "new Comment(\"{0}\");");
