@@ -32,11 +32,19 @@ namespace Cosmos.Compiler.XSharp {
 
       // TODO: Allow asm to optimize these to Inc/Dec
       Add("REG + 1", delegate(Token[] aTokens) {
-        return "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
+        if (aTokens[2].Value == "1") {
+          return "new Inc {{ DestinationReg = RegistersEnum.{0} }};";
+        } else {
+          return "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
+        }
       });
 
       Add("REG - 1", delegate(Token[] aTokens) {
-        return "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
+        if (aTokens[2].Value == "1") {
+          return "new Dec {{ DestinationReg = RegistersEnum.{0} }};";
+        } else {
+          return "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
+        }
       });
 
       Add(new TokenType[] { TokenType.OpCode },
@@ -44,12 +52,16 @@ namespace Cosmos.Compiler.XSharp {
       );
     }
 
-    public string GetCode(TokenType[] aPattern) {
+    public string GetCode(List<Token> aTokens) {
+      var xPattern = aTokens.Select(c => c.Type).ToArray();
+
       CodeFunc xAction;
-      if (!mList.TryGetValue(new TokenPattern(aPattern), out xAction)) {
+      if (!mList.TryGetValue(new TokenPattern(xPattern), out xAction)) {
         throw new Exception("Token pattern not found.");
       }
-      return xAction(new Token[0]);
+
+      string xResult = xAction(aTokens.ToArray());
+      return string.Format(xResult, aTokens.Select(c => c.Value).ToArray());
     }
 
     public void Add(string aPattern, CodeFunc aCode) {

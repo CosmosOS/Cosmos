@@ -62,11 +62,7 @@ namespace Cosmos.Compiler.XSharp {
         return;
       }
       var xParser = new Parser(aLine, false);
-      var xTokens = xParser.Tokens;
-
-      var xPattern = xTokens.Select(c => c.Type).ToArray();
-      string xCode = mPatterns.GetCode(xPattern);
-      mOutput.WriteLine(xCode, xTokens.Select(c => c.Value).ToArray());
+      mOutput.WriteLine(mPatterns.GetCode(xParser.Tokens));
     }
 
   }
