@@ -11,32 +11,11 @@ namespace Cosmos.Compiler.XSharp {
     protected int mHashCode;
 
     public TokenPattern(string aTokenPattern) {
-      var xRegex = new Regex(@"(\W)");
-      var xParts = xRegex.Split(aTokenPattern);
-      var xTokenTypes = new List<TokenType>();
+      // Save in comment, might be useful in future. Already had to dig it out of TFS once
+      //var xRegex = new Regex(@"(\W)");
 
-      foreach (string xPart in xParts) {
-        if (string.IsNullOrWhiteSpace(xPart)) {
-          continue;
-        }
-
-        TokenType xTokenType;
-        if (string.Compare(xPart, "REG") == 0) {
-          xTokenType = TokenType.Register;
-        } else if (string.Compare(xPart, "ABC") == 0) {
-          xTokenType = TokenType.AlphaNum;
-        } else if (char.IsDigit(xPart[0])) {
-          xTokenType = TokenType.ValueInt;
-        } else {
-          xTokenType = Token.GetTypeForSymbol(xPart);
-          if (xTokenType == TokenType.Unknown) {
-            throw new Exception("Unrecognized string token: " + xPart);
-          }
-        }
-        xTokenTypes.Add(xTokenType);
-      }
-
-      mTokenTypes = xTokenTypes.ToArray();
+      var xParser = new Parser(aTokenPattern, false);
+      mTokenTypes = xParser.Tokens.Select(c => c.Type).ToArray();
       Init();
     }
 

@@ -15,24 +15,24 @@ namespace Cosmos.Compiler.XSharp {
       Add(new TokenType[] { TokenType.Comment },
         "new Comment(\"{0}\");"
       );
-      Add("ABC:" ,
+      Add("Label:" ,
         "new Label(\"{0}\");"
       );
 
-      Add("REG = 123",
+      Add("EAX = 123",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
-      Add("REG = REG",
+      Add("EAX = EAX",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      Add("REG = [REG + 0]",
+      Add("EAX = [EAX + 0]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true, SourceDisplacement = {5}"
           + "}};"
       );
 
-      Add("ABC = REG",
+      Add("Variable = EAX",
         "new Mov {{"
          + "  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.{0})"
          + " , DestinationIsIndirect = true"
@@ -44,7 +44,7 @@ namespace Cosmos.Compiler.XSharp {
       );
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      Add("REG + 1", delegate(Token[] aTokens) {
+      Add("EAX + 1", delegate(Token[] aTokens) {
         if (aTokens[2].Value == "1") {
           return "new Inc {{ DestinationReg = RegistersEnum.{0} }};";
         } else {
@@ -52,7 +52,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      Add("REG - 1", delegate(Token[] aTokens) {
+      Add("EAX - 1", delegate(Token[] aTokens) {
         if (aTokens[2].Value == "1") {
           return "new Dec {{ DestinationReg = RegistersEnum.{0} }};";
         } else {

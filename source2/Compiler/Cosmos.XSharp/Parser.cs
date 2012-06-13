@@ -58,8 +58,22 @@ namespace Cosmos.Compiler.XSharp {
           }
         } else if (char.IsDigit(xChar1)) {
           xToken.Type = TokenType.ValueInt;
+        } else if (xString == "[") {
+          xToken.Type = TokenType.BracketLeft;
+        } else if (xString == "]") {
+          xToken.Type = TokenType.BracketRight;
+        } else if (xString == "+") {
+          xToken.Type = TokenType.Plus;
+        } else if (xString == "-") {
+          xToken.Type = TokenType.Minus;
+        } else if (xString == "=") {
+          xToken.Type = TokenType.Assignment;
+        } else if (xString == ":") {
+          xToken.Type = TokenType.Colon;
+        } else if (xString == "$") {
+          xToken.Type = TokenType.Dollar;
         } else {
-          xToken.Type = Token.GetTypeForSymbol(xString);
+          xToken.Type = TokenType.Unknown;
         }
       }
       xToken.Value = xString;

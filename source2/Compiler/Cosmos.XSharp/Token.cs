@@ -24,25 +24,5 @@ namespace Cosmos.Compiler.XSharp {
     public int SrcPosStart;
     public int SrcPosEnd;
     public string Value;
-
-    public static TokenType GetTypeForSymbol(string aSymbol) {
-      if (aSymbol == "[") {
-        return TokenType.BracketLeft;
-      } else if (aSymbol == "]") {
-        return TokenType.BracketRight;
-      } else if (aSymbol == "+") {
-        return TokenType.Plus;
-      } else if (aSymbol == "-") {
-        return TokenType.Minus;
-      } else if (aSymbol == "=") {
-        return TokenType.Assignment;
-      } else if (aSymbol == ":") {
-        return TokenType.Colon;
-      } else if (aSymbol == "$") {
-        return TokenType.Dollar;
-      } else {
-        return TokenType.Unknown;
-      }
-    }
   }
 }
