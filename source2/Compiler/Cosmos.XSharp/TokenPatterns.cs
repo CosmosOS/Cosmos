@@ -23,11 +23,21 @@ namespace Cosmos.Compiler.XSharp {
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
       Add("REG = REG[0]",
-        "//new ;"
+        "new Mov {{"
+          + " DestinationReg = RegistersEnum.{0}"
+          + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {5}"
+          + "}};"
       );
 
       Add("ABC = REG",
-        "//new ;"
+        "new Mov {{"
+         + "  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.{0}),"
+         + "   DestinationIsIndirect = true,"
+         + "   SourceValue = value.Value.GetValueOrDefault(),"
+         + "   SourceRef = value.Reference,"
+         + "   SourceReg = value.Register,"
+         + "   SourceIsIndirect = value.IsIndirect"
+         + " }};"
       );
 
       // TODO: Allow asm to optimize these to Inc/Dec
@@ -47,9 +57,16 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      Add(new TokenType[] { TokenType.OpCode },
-        "//new ;"
-      );
+      Add(new TokenType[] { TokenType.OpCode }, delegate(Token[] aTokens) {
+        string xOp = aTokens[0].Value.ToUpper();
+        if (xOp == "POPALL") {
+          return "new Popad();";
+        } else if (xOp == "PUSHALL") {
+          return "new Pushad();";
+        } else {
+          throw new Exception("Unrecognized op: " + aTokens[0].Value);
+        }
+      });
     }
 
     public string GetCode(List<Token> aTokens) {
