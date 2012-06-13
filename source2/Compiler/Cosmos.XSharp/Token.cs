@@ -8,11 +8,11 @@ namespace Cosmos.Compiler.XSharp {
     // Line based
     Comment, LiteralAsm
     //
-    , Register, OpCode, AlphaNum
+    , Register, Keyword, AlphaNum
     // Values
     , ValueInt
     // Symbols
-    , Assignment, BracketLeft, BracketRight, Plus, Minus, Colon, Dollar
+    , Assignment, BracketLeft, BracketRight, Plus, Minus, Colon, Dollar, CurlyLeft, CurlyRight
     // 
     , WhiteSpace
     // For now used during scanning while user is typing, but in future could be user methods we have to find etc

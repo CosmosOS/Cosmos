@@ -60,14 +60,24 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      Add(new TokenType[] { TokenType.OpCode }, delegate(Token[] aTokens) {
+      Add(new TokenType[] { TokenType.Keyword }, delegate(Token[] aTokens) {
         string xOp = aTokens[0].Value.ToUpper();
-        if (xOp == "POPALL") {
+        if (xOp == "CALL") {
+          return "new Call {{ DestinationLabel = {1} }};";
+        } else if (xOp == "GROUP") {
+          return "";
+        } else if (xOp == "INTERRUPTHANDLER") {
+          return "";
+        } else if (xOp == "IRET") {
+          return "new IRet();";
+        } else if (xOp == "POPALL") {
           return "new Popad();";
         } else if (xOp == "PUSHALL") {
           return "new Pushad();";
+        } else if (xOp == "PROCEDURE") {
+          return "";
         } else {
-          throw new Exception("Unrecognized op: " + aTokens[0].Value);
+          throw new Exception("Unrecognized keyword: " + aTokens[0].Value);
         }
       });
     }

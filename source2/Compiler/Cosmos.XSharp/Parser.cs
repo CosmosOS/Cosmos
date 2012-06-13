@@ -8,14 +8,19 @@ namespace Cosmos.Compiler.XSharp {
     protected int mStart = 0;
     protected string mData;
     protected bool mIncludeWhiteSpace;
+    protected bool mAllWhitespace;
 
     protected List<Token> mTokens = new List<Token>();
     public List<Token> Tokens {
       get { return mTokens; }
     }
 
-    protected static string[] mOps = new string[] { 
-      "POP", "POPALL", "PUSH", "PUSHALL"
+    protected static string[] mKeywords = new string[] { 
+      "CALL"
+      , "END"
+      , "GROUP"
+      , "IRET", "INTERRUPTHANDLER"
+      , "POPALL", "PUSHALL", "PROCEDURE"
     };
     protected static string[] mRegisters = new string[] { 
       "EAX", "AX", "AH", "AL",
@@ -29,7 +34,7 @@ namespace Cosmos.Compiler.XSharp {
       string xString = null;
       char xChar1 = mData[mStart];
       var xToken = new Token();
-      if ((mTokens.Count == 0) && "#!".Contains(xChar1)) {
+      if (mAllWhitespace && "#!".Contains(xChar1)) {
         rPos = mData.Length; // This will account for the dummy whitespace at the end.
         xString = mData.Substring(mStart + 1, rPos - mStart - 1).Trim();
         if (xChar1 == '#') {
@@ -51,8 +56,8 @@ namespace Cosmos.Compiler.XSharp {
           string xUpper = xString.ToUpper();
           if (mRegisters.Contains(xUpper)) {
             xToken.Type = TokenType.Register;
-          } else if (mOps.Contains(xUpper)) {
-            xToken.Type = TokenType.OpCode;
+          } else if (mKeywords.Contains(xUpper)) {
+            xToken.Type = TokenType.Keyword;
           } else {
             xToken.Type = TokenType.AlphaNum;
           }
@@ -62,6 +67,10 @@ namespace Cosmos.Compiler.XSharp {
           xToken.Type = TokenType.BracketLeft;
         } else if (xString == "]") {
           xToken.Type = TokenType.BracketRight;
+        } else if (xString == "{") {
+          xToken.Type = TokenType.CurlyLeft;
+        } else if (xString == "}") {
+          xToken.Type = TokenType.CurlyRight;
         } else if (xString == "+") {
           xToken.Type = TokenType.Plus;
         } else if (xString == "-") {
@@ -79,6 +88,9 @@ namespace Cosmos.Compiler.XSharp {
       xToken.Value = xString;
       xToken.SrcPosStart = mStart;
       xToken.SrcPosEnd = rPos - 1;
+      if (mAllWhitespace && xToken.Type != TokenType.WhiteSpace) {
+        mAllWhitespace = false;
+      }
       // Do near end, some logic performs returns above
       mTokens.Add(xToken);
       mStart = rPos;
@@ -119,6 +131,7 @@ namespace Cosmos.Compiler.XSharp {
     public Parser(string aData, bool aIncludeWhiteSpace) {
       mData = aData;
       mIncludeWhiteSpace = aIncludeWhiteSpace;
+      mAllWhitespace = true;
       Parse();
     }
   }

@@ -32,7 +32,7 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.LiteralAsm] = new TokenData { Type = TokenType.Literal , Color = TokenColor.String };
       
       mTokenMap[(int)XSC.TokenType.Register] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
-      mTokenMap[(int)XSC.TokenType.OpCode] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
+      mTokenMap[(int)XSC.TokenType.Keyword] = new TokenData { Type = TokenType.Keyword, Color = TokenColor.Keyword };
       mTokenMap[(int)XSC.TokenType.AlphaNum] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
 
       mTokenMap[(int)XSC.TokenType.Assignment] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
