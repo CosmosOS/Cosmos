@@ -186,10 +186,15 @@ Source: ".\Build\ISO\isolinux.*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\ISO\mboot.c32"; DestDir: "{app}\Build\ISO"
 
 ; Templates
+; Templates use the user dir and not global. Global requires devenve /setup (items) or /installvstemplates (project) which is VERY slow and kills during devkit
+
 ; Install files into VS Integrated Shell (which includes full Visual Studio)
-Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
-Source: ".\Build\VSIP\CosmosProject (F#).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Fsharp2010_Installed('dummy')
-Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy')
+Source: ".\Build\VSIP\CosmosProject (C#).zip"; DestDir: "{userdocs}\Visual Studio 2010\Templates\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
+Source: ".\Build\VSIP\CosmosProject (F#).zip"; DestDir: "{userdocs}\Visual Studio 2010\Templates\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Fsharp2010_Installed('dummy')
+Source: ".\Build\VSIP\CosmosProject (VB).zip"; DestDir: "{userdocs}\Visual Studio 2010\Templates\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: Vb2010_Installed('dummy')
+; X# File Item Template
+Source: ".\Build\VSIP\XSharpFileItem.zip"; DestDir: "{userdocs}\Visual Studio 2010\Templates\ItemTemplates\Visual C#\Cosmos"; DestName: "XSharpFileItem.zip"; Flags: ignoreversion uninsremovereadonly; Check: Csharp2010_Installed('dummy')
+
 ; Install templates into Shell
 Source: ".\Build\VSIP\Cosmos.zip"; DestDir: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2010Installed('dummy') or IsVBExpress2010Installed('dummy')
 ; Install templates into C# Express
@@ -342,7 +347,7 @@ Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\B
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
-	; /setup without nosetupvstemplates takes a LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit
+	; /setup without nosetupvstemplates takes a LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit - see new note above in X# template
 	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup /nosetupvstemplates; Flags: waituntilterminated
 #else 
 	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated

@@ -36,6 +36,7 @@ namespace Cosmos.Build.Builder {
       Copy("Cosmos.zip");
       Copy("CosmosProject (VB).zip");
       Copy("CosmosKernel (VB).zip");
+      Copy(mCosmosPath + @"\source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip");
 
       Section("Creating Setup");
       if (!File.Exists(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe")) {
