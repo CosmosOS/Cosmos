@@ -13,32 +13,6 @@ namespace Cosmos.Compiler.XSharp {
     public string Namespace { get; set; }
     public string Name { get; set; }
 
-    public Generator() {
-      mPatterns.Add(new TokenType[] { TokenType.LiteralAsm },
-        "new LiteralAssemblerCode(\"{0}\");");
-      mPatterns.Add(new TokenType[] { TokenType.Comment },
-        "new Comment(\"{0}\");");
-
-      mPatterns.Add("REG = 123"
-        , "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
-      mPatterns.Add("REG = REG"
-        , "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};");
-      mPatterns.Add("REG = REG[0]"
-        , "//new ;");
-
-      mPatterns.Add("ABC = REG"
-        , "//new ;");
-
-      // TODO: Allow asm to optimize these to Inc/Dec
-      mPatterns.Add("REG + 1"
-        , "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
-      mPatterns.Add("REG - 1"
-        , "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
-
-      mPatterns.Add(new TokenType[] { TokenType.OpCode },
-        "//new ;");
-    }
-
     public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace) {
       var xGenerator = new Generator();
       xGenerator.Name = Path.GetFileNameWithoutExtension(inputFilename);
