@@ -5,59 +5,67 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPatterns {
-    protected class CodeFunc : Func<Token[], string> { }
-    protected Dictionary<TokenPattern, Func<Token[], string>> mList = new Dictionary<TokenPattern, Func<Token[], string>>();
+    public delegate string CodeFunc(Token[] aTokens);
+    protected Dictionary<TokenPattern, CodeFunc> mList = new Dictionary<TokenPattern, CodeFunc>();
 
     public TokenPatterns() {
-      Add(new TokenType[] { TokenType.LiteralAsm }, delegate(Token[] aTokens) { 
-        return "new LiteralAssemblerCode(\"{0}\");"; 
-      });
-      Add(new TokenType[] { TokenType.Comment }, delegate(Token[] aTokens) { 
-        return "new Comment(\"{0}\");"; 
-      });
+      Add(new TokenType[] { TokenType.LiteralAsm },
+        "new LiteralAssemblerCode(\"{0}\");"
+      );
+      Add(new TokenType[] { TokenType.Comment },
+        "new Comment(\"{0}\");"
+      );
 
-      Add("REG = 123", delegate(Token[] aTokens) { 
-        return "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"; 
-      });
-      Add("REG = REG", delegate(Token[] aTokens) { 
-        return "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"; 
-      });
-      Add("REG = REG[0]", delegate(Token[] aTokens) { 
-        return "//new ;"; 
-      });
+      Add("REG = 123",
+        "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
+      );
+      Add("REG = REG",
+        "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
+      );
+      Add("REG = REG[0]",
+        "//new ;"
+      );
 
-      Add("ABC = REG", delegate(Token[] aTokens) { 
-        return "//new ;"; 
-      });
+      Add("ABC = REG",
+        "//new ;"
+      );
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      Add("REG + 1", delegate(Token[] aTokens) { 
-        return "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"; 
-      });
-      
-      Add("REG - 1", delegate(Token[] aTokens) { 
-        return "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"; 
+      Add("REG + 1", delegate(Token[] aTokens) {
+        return "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
       });
 
-      Add(new TokenType[] { TokenType.OpCode }, delegate(Token[] aTokens) {
-        return "//new ;"; 
+      Add("REG - 1", delegate(Token[] aTokens) {
+        return "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
       });
+
+      Add(new TokenType[] { TokenType.OpCode },
+        "//new ;"
+      );
     }
 
     public string GetCode(TokenType[] aPattern) {
-      Func<Token[], string> xAction;
+      CodeFunc xAction;
       if (!mList.TryGetValue(new TokenPattern(aPattern), out xAction)) {
         throw new Exception("Token pattern not found.");
       }
       return xAction(new Token[0]);
     }
 
-    public void Add(string aPattern, Func<Token[], string> aCode) {
+    public void Add(string aPattern, CodeFunc aCode) {
       mList.Add(new TokenPattern(aPattern), aCode);
     }
 
-    public void Add(TokenType[] aPattern, Func<Token[], string> aCode) {
+    public void Add(TokenType[] aPattern, CodeFunc aCode) {
       mList.Add(new TokenPattern(aPattern), aCode);
+    }
+
+    public void Add(string aPattern, string aCode) {
+      Add(aPattern, delegate(Token[] aTokens) { return aCode; });
+    }
+
+    public void Add(TokenType[] aPattern, string aCode) {
+      Add(aPattern, delegate(Token[] aTokens) { return aCode; });
     }
   }
 }
