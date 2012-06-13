@@ -15,6 +15,9 @@ namespace Cosmos.Compiler.XSharp {
       Add(new TokenType[] { TokenType.Comment },
         "new Comment(\"{0}\");"
       );
+      Add("ABC:" ,
+        "new Label(\"{0}\");"
+      );
 
       Add("REG = 123",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"

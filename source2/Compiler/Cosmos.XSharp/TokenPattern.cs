@@ -26,19 +26,12 @@ namespace Cosmos.Compiler.XSharp {
         } else if (string.Compare(xPart, "ABC") == 0) {
           xTokenType = TokenType.AlphaNum;
         } else if (char.IsDigit(xPart[0])) {
-          xTokenType = TokenType.ValueNumberInt;
-        } else if (xPart == "=") {
-          xTokenType = TokenType.Assignment;
-        } else if (xPart == "[") {
-          xTokenType = TokenType.BracketLeft;
-        } else if (xPart == "]") {
-          xTokenType = TokenType.BracketRight;
-        } else if (xPart == "+") {
-          xTokenType = TokenType.Plus;
-        } else if (xPart == "-") {
-          xTokenType = TokenType.Minus;
+          xTokenType = TokenType.ValueInt;
         } else {
-          throw new Exception("Unrecognized string token: " + xPart);
+          xTokenType = Token.GetTypeForSymbol(xPart);
+          if (xTokenType == TokenType.Unknown) {
+            throw new Exception("Unrecognized string token: " + xPart);
+          }
         }
         xTokenTypes.Add(xTokenType);
       }

@@ -47,33 +47,19 @@ namespace Cosmos.Compiler.XSharp {
             mStart = rPos;
             return;
           }
-        } else if (xString == "[") {
-          xToken.Type = TokenType.BracketLeft;
-        } else if (xString == "]") {
-          xToken.Type = TokenType.BracketRight;
-        } else if (xString == "+") {
-          xToken.Type = TokenType.Plus;
-        } else if (xString == "-") {
-          xToken.Type = TokenType.Minus;
-        } else if (xString == "=") {
-          xToken.Type = TokenType.Assignment;
         } else if (char.IsLetter(xChar1)) {
-          if (xString.EndsWith(":")) {
-            xToken.Type = TokenType.Label;
+          string xUpper = xString.ToUpper();
+          if (mRegisters.Contains(xUpper)) {
+            xToken.Type = TokenType.Register;
+          } else if (mOps.Contains(xUpper)) {
+            xToken.Type = TokenType.OpCode;
           } else {
-            string xUpper = xString.ToUpper();
-            if (mRegisters.Contains(xUpper)) {
-              xToken.Type = TokenType.Register;
-            } else if (mOps.Contains(xUpper)) {
-              xToken.Type = TokenType.OpCode;
-            } else {
-              xToken.Type = TokenType.AlphaNum;
-            }
+            xToken.Type = TokenType.AlphaNum;
           }
         } else if (char.IsDigit(xChar1)) {
-          xToken.Type = TokenType.ValueNumberInt;
+          xToken.Type = TokenType.ValueInt;
         } else {
-          xToken.Type = TokenType.Unknown;
+          xToken.Type = Token.GetTypeForSymbol(xString);
         }
       }
       xToken.Value = xString;
@@ -95,8 +81,7 @@ namespace Cosmos.Compiler.XSharp {
         xChar = mData[i];
         if (char.IsWhiteSpace(xChar)) {
           xCharType = CharType.WhiteSpace;
-        } else if (char.IsLetterOrDigit(xChar) || xChar == ':') {
-          // : is for labels
+        } else if (char.IsLetterOrDigit(xChar)) {
           xCharType = CharType.Identifier;
         } else {
           xCharType = CharType.Symbol;
