@@ -26,7 +26,7 @@ namespace Cosmos.Compiler.XSharp {
         } else if (string.Compare(xPart, "ABC") == 0) {
           xTokenType = TokenType.AlphaNum;
         } else if (char.IsDigit(xPart[0])) {
-          xTokenType = TokenType.ValueNumber;
+          xTokenType = TokenType.ValueNumberInt;
         } else if (xPart == "=") {
           xTokenType = TokenType.Assignment;
         } else if (xPart == "[") {

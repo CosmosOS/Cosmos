@@ -71,7 +71,7 @@ namespace Cosmos.Compiler.XSharp {
             }
           }
         } else if (char.IsDigit(xChar1)) {
-          xToken.Type = TokenType.ValueNumber;
+          xToken.Type = TokenType.ValueNumberInt;
         } else {
           xToken.Type = TokenType.Unknown;
         }
