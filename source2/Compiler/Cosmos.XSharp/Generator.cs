@@ -65,10 +65,7 @@ namespace Cosmos.Compiler.XSharp {
       var xTokens = xParser.Tokens;
 
       var xPattern = xTokens.Select(c => c.Type).ToArray();
-      string xCode;
-      if (!mPatterns.TryGetValue(new TokenPattern(xPattern), out xCode)) {
-        throw new Exception("Invalid token pattern in X# file.");
-      }
+      string xCode = mPatterns.GetCode(xPattern);
       mOutput.WriteLine(xCode, xTokens.Select(c => c.Value).ToArray());
     }
 

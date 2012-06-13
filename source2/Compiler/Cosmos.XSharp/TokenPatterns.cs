@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
-  public class TokenPatterns : Dictionary<TokenPattern, string> {
+  public class TokenPatterns {
+    protected Dictionary<TokenPattern, string> mList = new Dictionary<TokenPattern, string>();
+
     public TokenPatterns() {
       Add(new TokenType[] { TokenType.LiteralAsm }, "new LiteralAssemblerCode(\"{0}\");");
       Add(new TokenType[] { TokenType.Comment }, "new Comment(\"{0}\");");
@@ -22,12 +24,20 @@ namespace Cosmos.Compiler.XSharp {
       Add(new TokenType[] { TokenType.OpCode }, "//new ;");
     }
 
-    public void Add(string aTokenTypes, string aCode) {
-      Add(new TokenPattern(aTokenTypes), aCode);
+    public string GetCode(TokenType[] aPattern) {
+      string xResult;
+      if (!mList.TryGetValue(new TokenPattern(aPattern), out xResult)) {
+        throw new Exception("Token pattern not found.");
+      }
+      return xResult;
     }
 
-    public void Add(TokenType[] aTokenTypes, string aCode) {
-      Add(new TokenPattern(aTokenTypes), aCode);
+    public void Add(string aPattern, string aCode) {
+      mList.Add(new TokenPattern(aPattern), aCode);
+    }
+
+    public void Add(TokenType[] aPattern, string aCode) {
+      mList.Add(new TokenPattern(aPattern), aCode);
     }
   }
 }
