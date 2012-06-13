@@ -8,33 +8,30 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
-namespace XSharpCompilerTester
-{
-    public partial class MainForm : Form
-    {
-        public MainForm()
-        {
-            InitializeComponent();
-        }
-
-        private void textInput_TextChanged(object sender, EventArgs e)
-        {
-            timerConvert.Enabled = false;
-            timerConvert.Enabled = true;
-
-        }
-
-        private void timerConvert_Tick(object sender, EventArgs e)
-        {
-            timerConvert.Enabled = false;
-            using (var xInput = new StringReader(textInput.Text))
-            {
-                using (var xOut = new StringWriter())
-                {
-                  Cosmos.Compiler.XSharp.Generator.Execute(xInput, "InputFileName", xOut, "Default.Namespace");
-                    textOutput.Text = xOut.ToString();
-                }
-            }
-        }
+namespace XSharpCompilerTester {
+  public partial class MainForm : Form {
+    public MainForm() {
+      InitializeComponent();
+      // TODO convert to app path + relative
+      // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
+      // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
+      tboxInput.Text = File.ReadAllText(@"D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground\Test.xs");
     }
+
+    private void textInput_TextChanged(object sender, EventArgs e) {
+      timerConvert.Enabled = false;
+      timerConvert.Enabled = true;
+
+    }
+
+    private void timerConvert_Tick(object sender, EventArgs e) {
+      timerConvert.Enabled = false;
+      using (var xInput = new StringReader(tboxInput.Text)) {
+        using (var xOut = new StringWriter()) {
+          Cosmos.Compiler.XSharp.Generator.Execute(xInput, "InputFileName", xOut, "Default.Namespace");
+          textOutput.Text = xOut.ToString();
+        }
+      }
+    }
+  }
 }

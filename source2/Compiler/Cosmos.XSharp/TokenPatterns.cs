@@ -22,21 +22,21 @@ namespace Cosmos.Compiler.XSharp {
       Add("REG = REG",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      Add("REG = REG[0]",
+      Add("REG = [REG + 0]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
-          + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {5}"
+          + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true, SourceDisplacement = {5}"
           + "}};"
       );
 
       Add("ABC = REG",
         "new Mov {{"
-         + "  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.{0}),"
-         + "   DestinationIsIndirect = true,"
-         + "   SourceValue = value.Value.GetValueOrDefault(),"
-         + "   SourceRef = value.Reference,"
-         + "   SourceReg = value.Register,"
-         + "   SourceIsIndirect = value.IsIndirect"
+         + "  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.{0})"
+         + " , DestinationIsIndirect = true"
+         + " , SourceValue = value.Value.GetValueOrDefault()"
+         + " , SourceRef = value.Reference"
+         + " , SourceReg = value.Register"
+         + " , SourceIsIndirect = value.IsIndirect"
          + " }};"
       );
 

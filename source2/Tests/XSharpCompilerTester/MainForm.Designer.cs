@@ -29,10 +29,9 @@
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       this.splitContainer1 = new System.Windows.Forms.SplitContainer();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
-      this.textInput = new System.Windows.Forms.TextBox();
+      this.tboxInput = new System.Windows.Forms.TextBox();
       this.groupBox2 = new System.Windows.Forms.GroupBox();
       this.textOutput = new System.Windows.Forms.TextBox();
       this.timerConvert = new System.Windows.Forms.Timer(this.components);
@@ -64,7 +63,7 @@
       // 
       // groupBox1
       // 
-      this.groupBox1.Controls.Add(this.textInput);
+      this.groupBox1.Controls.Add(this.tboxInput);
       this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.groupBox1.Location = new System.Drawing.Point(0, 0);
       this.groupBox1.Name = "groupBox1";
@@ -73,17 +72,16 @@
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Input";
       // 
-      // textInput
+      // tboxInput
       // 
-      this.textInput.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.textInput.Location = new System.Drawing.Point(3, 16);
-      this.textInput.Multiline = true;
-      this.textInput.Name = "textInput";
-      this.textInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-      this.textInput.Size = new System.Drawing.Size(691, 153);
-      this.textInput.TabIndex = 0;
-      this.textInput.Text = resources.GetString("textInput.Text");
-      this.textInput.TextChanged += new System.EventHandler(this.textInput_TextChanged);
+      this.tboxInput.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.tboxInput.Location = new System.Drawing.Point(3, 16);
+      this.tboxInput.Multiline = true;
+      this.tboxInput.Name = "tboxInput";
+      this.tboxInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+      this.tboxInput.Size = new System.Drawing.Size(691, 153);
+      this.tboxInput.TabIndex = 0;
+      this.tboxInput.TextChanged += new System.EventHandler(this.textInput_TextChanged);
       // 
       // groupBox2
       // 
@@ -137,7 +135,7 @@
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox textInput;
+        private System.Windows.Forms.TextBox tboxInput;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox textOutput;
         private System.Windows.Forms.Timer timerConvert;
