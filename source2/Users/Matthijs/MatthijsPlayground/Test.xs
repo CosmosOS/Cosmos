@@ -30,7 +30,7 @@ EBP + 32
 EAX = EBP[0]
 
 # EIP is pointer to op after our call. Int3 is 1 byte so we subtract 1.
-# Note - when we used call it was 5 (the size of our call + address)
+# Note - when we used call it was 5 (size of our call + address)
 # so we get the EIP as IL2CPU records it. Its also useful for when we
 # wil be changing ops that call this stub.
 EAX - 1

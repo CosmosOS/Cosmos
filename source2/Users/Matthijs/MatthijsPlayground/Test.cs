@@ -31,7 +31,7 @@ new Add { DestinationReg = RegistersEnum.EBP, SourceValue = 32 };
 new Comment("Caller EIP");
 //new ;
 new Comment("EIP is pointer to op after our call. Int3 is 1 byte so we subtract 1.");
-new Comment("Note - when we used call it was 5 (the size of our call + address)");
+new Comment("Note - when we used call it was 5 (size of our call + address)");
 new Comment("so we get the EIP as IL2CPU records it. Its also useful for when we");
 new Comment("wil be changing ops that call this stub.");
 new Sub { DestinationReg = RegistersEnum.EAX, SourceValue = 1 };

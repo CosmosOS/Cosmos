@@ -144,6 +144,7 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Template\XSharpFileItem.zip" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
