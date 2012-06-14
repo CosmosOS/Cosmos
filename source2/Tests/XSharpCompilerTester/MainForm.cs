@@ -21,15 +21,19 @@ namespace XSharpCompilerTester {
     private void textInput_TextChanged(object sender, EventArgs e) {
       timerConvert.Enabled = false;
       timerConvert.Enabled = true;
-
     }
 
     private void timerConvert_Tick(object sender, EventArgs e) {
       timerConvert.Enabled = false;
       using (var xInput = new StringReader(tboxInput.Text)) {
-        using (var xOut = new StringWriter()) {
-          Cosmos.Compiler.XSharp.Generator.Execute(xInput, "InputFileName", xOut, "Default.Namespace");
-          textOutput.Text = xOut.ToString();
+        using (var xOutput = new StringWriter()) {
+
+          var xGenerator = new Cosmos.Compiler.XSharp.Generator();
+          xGenerator.Name = "InputFileName";
+          xGenerator.Namespace = "Default.Namespace";
+          xGenerator.Execute(xInput, xOutput);
+
+          textOutput.Text = xOutput.ToString();
         }
       }
     }

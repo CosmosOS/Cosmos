@@ -56,6 +56,12 @@
   <ItemGroup>
     <None Include="XSharp.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj">
+      <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
+      <Name>Cosmos.Compiler.XSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

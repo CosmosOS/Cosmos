@@ -13,13 +13,6 @@ namespace Cosmos.Compiler.XSharp {
     public string Namespace { get; set; }
     public string Name { get; set; }
 
-    public static void Execute(TextReader input, string inputFilename, TextWriter output, string defaultNamespace) {
-      var xGenerator = new Generator();
-      xGenerator.Name = Path.GetFileNameWithoutExtension(inputFilename);
-      xGenerator.Namespace = defaultNamespace;
-      xGenerator.Execute(input, output);
-    }
-
     public void Execute(TextReader aInput, TextWriter aOutput) {
       mInput = aInput;
       mOutput = aOutput;

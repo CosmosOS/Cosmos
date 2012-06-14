@@ -33,9 +33,12 @@ namespace Cosmos.VS.XSharp {
 
     private static string DoGenerate(string aInputFileName, string aInputFileContents, string aDefaultNamespace) {
       using (var xInput = new StringReader(aInputFileContents)) {
-        using (var xOut = new StringWriter()) {
-          Cosmos.Compiler.XSharp.Generator.Execute(xInput, aInputFileName, xOut, aDefaultNamespace);
-          return xOut.ToString();
+        using (var xOutput = new StringWriter()) {
+          var xGenerator = new Cosmos.Compiler.XSharp.Generator();
+          xGenerator.Name = aInputFileName;
+          xGenerator.Namespace = aDefaultNamespace;
+          xGenerator.Execute(xInput, xOutput);
+          return xOutput.ToString();
         }
       }
     }
