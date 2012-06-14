@@ -102,6 +102,13 @@ namespace Cosmos.Build.Installer {
       CurrPath = aPath;
     }
 
+    public void ResetReadOnly(string aPathname) {
+      var xAttrib = File.GetAttributes(aPathname);
+      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
+        File.SetAttributes(aPathname, xAttrib & ~FileAttributes.ReadOnly);
+      }
+    }
+
     public void Copy(string aSrcPathname) {
       Copy(aSrcPathname, Path.GetFileName(aSrcPathname));
     }
@@ -116,11 +123,9 @@ namespace Cosmos.Build.Installer {
 
       // TODO: Make overwrite a param and make this part of the logic
       // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      var xAttrib = File.GetAttributes(xDest);
-      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
-        File.SetAttributes(xDest, xAttrib & ~FileAttributes.ReadOnly);
-      }
+      ResetReadOnly(xDest);
       File.Copy(xSrc, xDest, true);
+      ResetReadOnly(xDest);
     }
 
     public void Echo() {
