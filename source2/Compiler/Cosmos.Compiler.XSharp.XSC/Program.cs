@@ -9,19 +9,16 @@ namespace Cosmos.Compiler.XSharp.XSC {
     static void Main(string[] aArgs) {
       string xSrc = aArgs[1];
       string xDest = Path.ChangeExtension(xSrc, ".cs");
+      string xNamespace = aArgs[2];
 
-      //using (var xInput = new StringReader(tboxInput.Text)) {
-      //  using (var xOut = new StringWriter()) {
-
-      //    var xGenerator = new Generator();
-      //    xGenerator.Name = Path.GetFileNameWithoutExtension(inputFilename);
-      //    xGenerator.Namespace = defaultNamespace;
-      //    xGenerator.Execute(input, output);
-          
-      //    Cosmos.Compiler.XSharp.Generator.Execute(xInput, "InputFileName", xOut, "Default.Namespace");
-      //    textOutput.Text = xOut.ToString();
-      //  }
-      //}
+      using (var xInput = new StreamReader(xSrc)) {
+        using (var xOutput = new StreamWriter(xDest)) {
+          var xGenerator = new Generator();
+          xGenerator.Name = Path.GetFileNameWithoutExtension(xSrc);
+          xGenerator.Namespace = xNamespace;
+          xGenerator.Execute(xInput, xOutput);
+        }
+      }
     }
   }
 }
