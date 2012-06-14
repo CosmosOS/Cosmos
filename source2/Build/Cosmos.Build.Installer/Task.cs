@@ -123,7 +123,9 @@ namespace Cosmos.Build.Installer {
 
       // TODO: Make overwrite a param and make this part of the logic
       // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      ResetReadOnly(xDest);
+      if (File.Exists(xDest)) {
+        ResetReadOnly(xDest);
+      }
       File.Copy(xSrc, xDest, true);
       ResetReadOnly(xDest);
     }

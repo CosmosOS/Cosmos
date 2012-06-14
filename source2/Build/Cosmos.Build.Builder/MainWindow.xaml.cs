@@ -65,6 +65,8 @@ namespace Cosmos.Build.Builder {
 
     void Log_LogError() {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        tblkCurrent.Text = "";
+
         mSection.Foreground = Brushes.Red;
         mContent.Visibility = Visibility.Visible;
         mPreventAutoClose = true;
@@ -73,6 +75,8 @@ namespace Cosmos.Build.Builder {
 
     void Log_LogSection(string aLine) {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        tblkCurrent.Text = "";
+
         mClipboard.AppendLine();
         mClipboard.AppendLine(new string('=', aLine.Length));
         mClipboard.AppendLine(aLine);
@@ -104,6 +108,7 @@ namespace Cosmos.Build.Builder {
 
     void Log_LogLine(string aLine) {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        tblkCurrent.Text = aLine;
         mClipboard.AppendLine(aLine);
 
         mContent.Inlines.Add(aLine);

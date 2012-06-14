@@ -6,6 +6,7 @@
         <WrapPanel DockPanel.Dock="Top">
             <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
         </WrapPanel>
+        <TextBlock DockPanel.Dock="Top" Name="tblkCurrent" FontSize="16" />
         <ScrollViewer HorizontalScrollBarVisibility="Visible">
             <StackPanel Name="spnlLog" />
         </ScrollViewer>
