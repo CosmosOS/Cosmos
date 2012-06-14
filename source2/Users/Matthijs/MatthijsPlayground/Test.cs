@@ -26,7 +26,7 @@ namespace MatthijsPlayground
 			new Comment("LockOrExit");
 			new Comment("EBP is restored by PopAll, but SendFrame uses it. Could");
 			new Comment("get it from the PushAll data, but this is easier.");
-			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New("CallerEBP") , SourceReg = RegistersEnum.EBP };
+			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.CallerEBP) , DestinationIsIndirect = true , SourceValue = value.Value.GetValueOrDefault() , SourceRef = value.Reference , SourceReg = value.Register , SourceIsIndirect = value.IsIndirect };
 			new Comment("Could get ESP from PushAll but this is easier.");
 			new Comment("Also allows us to use the stack before PushAll if we ever need it.");
 			new Comment("We cant modify any registers since we havent done PushAll yet");
@@ -35,11 +35,11 @@ namespace MatthijsPlayground
 			new Comment("store ESP, then restore ESP so we don't cause stack corruption.");
 			new Comment("12 bytes for EFLAGS, CS, EIP");
 			new Add { DestinationReg = RegistersEnum.ESP, SourceValue = 12 };
-			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New("CallerESP") , SourceReg = RegistersEnum.ESP };
+			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.CallerESP) , DestinationIsIndirect = true , SourceValue = value.Value.GetValueOrDefault() , SourceRef = value.Reference , SourceReg = value.Register , SourceIsIndirect = value.IsIndirect };
 			new Sub { DestinationReg = RegistersEnum.ESP, SourceValue = 12 };
 			new Pushad();
 			new Comment("Save current ESP so we can look at the results of PushAll later");
-			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New("PushAllPtr") , SourceReg = RegistersEnum.ESP };
+			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.PushAllPtr) , DestinationIsIndirect = true , SourceValue = value.Value.GetValueOrDefault() , SourceRef = value.Reference , SourceReg = value.Register , SourceIsIndirect = value.IsIndirect };
 			new Comment("Get current ESP and add 32. This will skip over the PushAll and point");
 			new Comment("us at the call data from Int3.");
 			new Mov{ DestinationReg = RegistersEnum.EBP, SourceReg = RegistersEnum.ESP };
@@ -52,12 +52,12 @@ namespace MatthijsPlayground
 			new Comment("wil be changing ops that call this stub.");
 			new Dec { DestinationReg = RegistersEnum.EAX };
 			new Comment("Store it for later use.");
-			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New("CallerEIP") , SourceReg = RegistersEnum.EAX };
-			new Call { DestinationLabel = DebugStub_"Executing" };
+			new Mov {  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.CallerEIP) , DestinationIsIndirect = true , SourceValue = value.Value.GetValueOrDefault() , SourceRef = value.Reference , SourceReg = value.Register , SourceIsIndirect = value.IsIndirect };
+			new Call { DestinationLabel = DebugStub_Executing };
 			new Popad();
 			new Comment("Temp disabled, see comment on LockOrExit above");
 			new Comment("Unlock");
-			new IRET();
+			new IRet();
 		}
 	}
 }
