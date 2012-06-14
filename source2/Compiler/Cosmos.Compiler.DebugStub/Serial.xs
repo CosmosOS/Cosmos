@@ -22,7 +22,7 @@ procedure WriteALToComPort {
 #  - Interact as minimal as possible wtih normal Cosmos code because
 #    the debugstub must *always* work even if the normal code is fubarred
 #
-# The serial port that is used for DS should be "hidden" from Cosmos main
+# The serial port that is used for DS should be 'hidden' from Cosmos main
 # so that Cosmos main pretends it does not exist.
 #
 # IRQs would create a clash/mix of code.
@@ -76,7 +76,7 @@ procedure InitSerial2 {
 	Port[DX] = AL
 	# hi byte
 	DX = ESP[4]
-	DX = (mComAddr + 1)
+	DX + 1
 	AL = $00
 	Port[DX] = AL
 

@@ -23,22 +23,24 @@
     <h3>
         Matthijs</h3>
     <ul>
-        <li>.xs is not rebuilding / creating CS on build, must manually run tool</li>
+        <li>X# msbuild action</li>
     </ul>
     <h3>
     Kudzu
     To Do</h3>
     <ul>
-        <li>X#<ul>
+        <li>Need to run custom tool manually in build - if its broken in ide, then we wont 
+            get proper cs to be used during external build<li>X#<ul>
             <li>multiple patterns on one for tokenlist - some ops will be easier this way.
+            </li>
+            <li>EAX/AX<ul>
+                <li>REG32, REG16, REG8, REG</li>
+                <li>KEYWORD (all caps only), otherwise is exact</li>
+                <li>ABC123 (all caps only), otherwise is exact</li>
+                </ul>
             </li>
             </ul>
         <ul>
-            <li>Hex Values - $FF<ul>
-                <li>Can scan for $ + AlphaNum or ValueNum and convert to ValueNum with value 0x00 
-                </li>
-                </ul>
-            </li>
             <li>Complete</li>
             <li>Code Completion</li>
         </ul>
