@@ -19,15 +19,23 @@ namespace Cosmos.Compiler.XSharp {
       Init();
     }
 
+    public TokenPattern(TokenList aTokenTypes) {
+      mTokenTypes = aTokenTypes.Select(c => c.Type).ToArray();
+      Init();
+    }
+
     public TokenPattern(TokenType[] aTokenTypes) {
-      // We dont copy the array, so technically it is mutable but in our usage
-      // constant arrays are passed in.
-      mTokenTypes = aTokenTypes;
+      mTokenTypes = (TokenType[])aTokenTypes.Clone();
       Init();
     }
 
     protected void Init() {
       mHashCode = CalcHashCode();
+    }
+
+    public bool Matches(string aPattern) {
+      var xParse = new Parser(aPattern, false);
+      return Equals(xParse.Tokens.Pattern);
     }
 
     public override bool Equals(object aObj) {

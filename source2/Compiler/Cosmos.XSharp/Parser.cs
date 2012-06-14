@@ -10,8 +10,8 @@ namespace Cosmos.Compiler.XSharp {
     protected bool mIncludeWhiteSpace;
     protected bool mAllWhitespace;
 
-    protected List<Token> mTokens = new List<Token>();
-    public List<Token> Tokens {
+    protected TokenList mTokens = new TokenList();
+    public TokenList Tokens {
       get { return mTokens; }
     }
 
@@ -81,6 +81,8 @@ namespace Cosmos.Compiler.XSharp {
           xToken.Type = TokenType.Colon;
         } else if (xString == "$") {
           xToken.Type = TokenType.Dollar;
+        } else if (xString == ".") {
+          xToken.Type = TokenType.Dot;
         } else {
           xToken.Type = TokenType.Unknown;
         }

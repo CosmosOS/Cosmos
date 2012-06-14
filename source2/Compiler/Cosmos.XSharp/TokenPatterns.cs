@@ -5,34 +5,64 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPatterns {
-    public delegate string CodeFunc(Token[] aTokens);
-    protected Dictionary<TokenPattern, CodeFunc> mList = new Dictionary<TokenPattern, CodeFunc>();
+    public delegate string CodeFunc(TokenList aTokens);
+    protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
+    protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
 
     public TokenPatterns() {
-      Add(new TokenType[] { TokenType.LiteralAsm },
+      AddPatterns();
+      AddKeywords();
+    }
+
+    protected void AddKeywords() {
+      AddKeyword("Call", delegate(TokenList aTokens) {
+        if (aTokens.Pattern.Matches("Call ABC")) {
+          return "new Call {{ DestinationLabel = {1} }};";
+        } else if (aTokens.Pattern.Matches("Call .ABC")) {
+          return "new Call {{ DestinationLabel = {1} }};";
+        }
+        throw new Exception("Unrecognized syntax for keyword: " + aTokens[0].Value);
+      });
+      AddKeyword("IRet", "new IRet();");
+      AddKeyword("PopAll", "new Popad();");
+      AddKeyword("PushAll", "new Pushad();");
+    }
+
+    protected void AddKeyword(string aKeyword, CodeFunc aCode) {
+      mKeywords.Add(aKeyword.ToUpper(), aCode);
+    }
+
+    protected void AddKeyword(string aKeyword, string aCode) {
+      AddKeyword(aKeyword, delegate(TokenList aTokens) {
+        return aCode;
+      });
+    }
+
+    protected void AddPatterns() {
+      AddPattern(new TokenType[] { TokenType.LiteralAsm },
         "new LiteralAssemblerCode(\"{0}\");"
       );
-      Add(new TokenType[] { TokenType.Comment },
+      AddPattern(new TokenType[] { TokenType.Comment },
         "new Comment(\"{0}\");"
       );
-      Add("Label:" ,
+      AddPattern("Label:" ,
         "new Label(\"{0}\");"
       );
 
-      Add("EAX = 123",
+      AddPattern("EAX = 123",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
-      Add("EAX = EAX",
+      AddPattern("EAX = EAX",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      Add("EAX = [EAX + 0]",
+      AddPattern("EAX = [EAX + 0]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true, SourceDisplacement = {5}"
           + "}};"
       );
 
-      Add("Variable = EAX",
+      AddPattern("Variable = EAX",
         "new Mov {{"
          + "  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.{0})"
          + " , DestinationIsIndirect = true"
@@ -44,7 +74,7 @@ namespace Cosmos.Compiler.XSharp {
       );
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      Add("EAX + 1", delegate(Token[] aTokens) {
+      AddPattern("EAX + 1", delegate(TokenList aTokens) {
         if (aTokens[2].Value == "1") {
           return "new Inc {{ DestinationReg = RegistersEnum.{0} }};";
         } else {
@@ -52,7 +82,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      Add("EAX - 1", delegate(Token[] aTokens) {
+      AddPattern("EAX - 1", delegate(TokenList aTokens) {
         if (aTokens[2].Value == "1") {
           return "new Dec {{ DestinationReg = RegistersEnum.{0} }};";
         } else {
@@ -60,20 +90,25 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      Add(new TokenType[] { TokenType.Keyword }, delegate(Token[] aTokens) {
+      AddPattern("}",
+        ""
+      );
+
+      AddPattern(new TokenType[] { TokenType.Keyword, TokenType.AlphaNum }, delegate(TokenList aTokens) {
         string xOp = aTokens[0].Value.ToUpper();
         if (xOp == "CALL") {
           return "new Call {{ DestinationLabel = {1} }};";
         } else if (xOp == "GROUP") {
           return "";
-        } else if (xOp == "INTERRUPTHANDLER") {
+        } else {
+          throw new Exception("Unrecognized keyword: " + aTokens[0].Value);
+        }
+      });
+
+      AddPattern(new TokenType[] { TokenType.Keyword, TokenType.AlphaNum, TokenType.CurlyLeft }, delegate(TokenList aTokens) {
+        string xOp = aTokens[0].Value.ToUpper();
+        if (xOp == "INTERRUPTHANDLER") {
           return "";
-        } else if (xOp == "IRET") {
-          return "new IRet();";
-        } else if (xOp == "POPALL") {
-          return "new Popad();";
-        } else if (xOp == "PUSHALL") {
-          return "new Pushad();";
         } else if (xOp == "PROCEDURE") {
           return "";
         } else {
@@ -82,32 +117,36 @@ namespace Cosmos.Compiler.XSharp {
       });
     }
 
-    public string GetCode(List<Token> aTokens) {
-      var xPattern = aTokens.Select(c => c.Type).ToArray();
-
-      CodeFunc xAction;
-      if (!mList.TryGetValue(new TokenPattern(xPattern), out xAction)) {
-        throw new Exception("Token pattern not found.");
+    public string GetCode(TokenList aTokens) {
+      CodeFunc xAction = null;
+      if (aTokens[0].Type == TokenType.Keyword) {
+        mKeywords.TryGetValue(aTokens[0].Value.ToUpper(), out xAction);
+      }
+      if (xAction == null) {
+        mPatterns.TryGetValue(aTokens.Pattern, out xAction);
+        if (xAction == null) {
+          throw new Exception("Token pattern not found.");
+        }
       }
 
-      string xResult = xAction(aTokens.ToArray());
+      string xResult = xAction(aTokens);
       return string.Format(xResult, aTokens.Select(c => c.Value).ToArray());
     }
 
-    public void Add(string aPattern, CodeFunc aCode) {
-      mList.Add(new TokenPattern(aPattern), aCode);
+    protected void AddPattern(string aPattern, CodeFunc aCode) {
+      mPatterns.Add(new TokenPattern(aPattern), aCode);
     }
 
-    public void Add(TokenType[] aPattern, CodeFunc aCode) {
-      mList.Add(new TokenPattern(aPattern), aCode);
+    protected void AddPattern(TokenType[] aPattern, CodeFunc aCode) {
+      mPatterns.Add(new TokenPattern(aPattern), aCode);
     }
 
-    public void Add(string aPattern, string aCode) {
-      Add(aPattern, delegate(Token[] aTokens) { return aCode; });
+    protected void AddPattern(string aPattern, string aCode) {
+      AddPattern(aPattern, delegate(TokenList aTokens) { return aCode; });
     }
 
-    public void Add(TokenType[] aPattern, string aCode) {
-      Add(aPattern, delegate(Token[] aTokens) { return aCode; });
+    protected void AddPattern(TokenType[] aPattern, string aCode) {
+      AddPattern(aPattern, delegate(TokenList aTokens) { return aCode; });
     }
   }
 }

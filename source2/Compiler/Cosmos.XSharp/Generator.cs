@@ -62,7 +62,8 @@ namespace Cosmos.Compiler.XSharp {
         return;
       }
       var xParser = new Parser(aLine, false);
-      mOutput.WriteLine(mPatterns.GetCode(xParser.Tokens));
+      string xCode =  mPatterns.GetCode(xParser.Tokens);
+      mOutput.WriteLine("\t\t\t" + xCode);
     }
 
   }
