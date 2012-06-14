@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BreakpointsKernel {
+namespace Playground.Kudzu.BreakpointsKernel {
   public class FieldInitTest : Test {
     public override void Run() {
       FieldInitBase x = new FieldInit();

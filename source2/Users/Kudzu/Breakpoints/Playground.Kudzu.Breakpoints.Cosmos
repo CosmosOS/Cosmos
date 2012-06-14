@@ -43,11 +43,6 @@
     <StartCosmosASMDBG>False</StartCosmosASMDBG>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="Breakpoints.cgdb">
-      <SubType>Content</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Compile last with NASM.bat">
       <SubType>Content</SubType>
     </None>

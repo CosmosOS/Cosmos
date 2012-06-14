@@ -8,8 +8,8 @@
     <ProjectGuid>{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BreakpointsKernel</RootNamespace>
-    <AssemblyName>BreakpointsKernel</AssemblyName>
+    <RootNamespace>Playground.Kudzu.BreakpointsKernel</RootNamespace>
+    <AssemblyName>Playground.Kudzu.BreakpointsKernel</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
@@ -28,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

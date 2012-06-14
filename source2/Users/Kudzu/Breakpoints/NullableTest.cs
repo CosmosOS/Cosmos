@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BreakpointsKernel {
+namespace Playground.Kudzu.BreakpointsKernel {
   public class NullableTest : Test {
     
     protected UInt32? mSize;

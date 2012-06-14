@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BreakpointsKernel {
+namespace Playground.Kudzu.BreakpointsKernel {
   public abstract class Test {
     
     public abstract void Run();
