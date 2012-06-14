@@ -103,6 +103,19 @@ namespace Cosmos.Compiler.XSharp {
 
     protected enum CharType { WhiteSpace, Identifier, Symbol };
     protected void Parse() {
+      ParseText();
+      Parse2();
+      mTokens = new TokenList(mTokensTemp);
+    }
+
+    // Rescan token patterns
+    protected void Parse2() {
+      for (int i = 0; i < mTokensTemp.Count; i++) {
+      }
+    }
+
+    // Initial Parse to convert text to tokens
+    protected void ParseText() {
       char xLastChar = ' ';
       CharType xLastCharType = CharType.WhiteSpace;
       char xChar;
@@ -131,13 +144,13 @@ namespace Cosmos.Compiler.XSharp {
       if (mStart < mData.Length) {
         NewToken(ref i);
       }
-      mTokens = new TokenList(mTokensTemp);
     }
 
     public Parser(string aData, bool aIncludeWhiteSpace) {
       mData = aData;
       mIncludeWhiteSpace = aIncludeWhiteSpace;
       mAllWhitespace = true;
+
       Parse();
     }
   }

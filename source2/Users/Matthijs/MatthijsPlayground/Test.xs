@@ -38,6 +38,9 @@ InterruptHandler TracerEntry {
 
 	PushAll
 
+	# Temp Test
+	EAX = $FF
+
 	# Save current ESP so we can look at the results of PushAll later
 	PushAllPtr = ESP
 
