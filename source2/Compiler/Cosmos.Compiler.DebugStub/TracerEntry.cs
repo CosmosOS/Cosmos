@@ -56,7 +56,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("Temp disabled, see comment on LockOrExit above");
 			new Comment("Unlock");
 			new Label("DebugStub_TracerEntry_Exit");
-new IRET();
+			new IRET();
 		}
 	}
 }
