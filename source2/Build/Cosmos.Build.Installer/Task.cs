@@ -114,6 +114,12 @@ namespace Cosmos.Build.Installer {
       string xDest = Path.Combine(CurrPath, aDestPathname);
       Log.WriteLine("  To: " + xDest);
 
+      // TODO: Make overwrite a param and make this part of the logic
+      // Copying files that are in TFS often they will be read only, so need to kill this file before copy
+      var xAttrib = File.GetAttributes(xDest);
+      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
+        File.SetAttributes(xDest, xAttrib & ~FileAttributes.ReadOnly);
+      }
       File.Copy(xSrc, xDest, true);
     }
 
