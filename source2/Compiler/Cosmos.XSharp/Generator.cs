@@ -63,7 +63,10 @@ namespace Cosmos.Compiler.XSharp {
       }
       var xParser = new Parser(aLine, false);
       string xCode =  mPatterns.GetCode(xParser.Tokens);
-      mOutput.WriteLine("\t\t\t" + xCode);
+      // Some keywords like Group are processe but not output
+      if (xCode != "") {
+        mOutput.WriteLine("\t\t\t" + xCode);
+      }
     }
 
   }

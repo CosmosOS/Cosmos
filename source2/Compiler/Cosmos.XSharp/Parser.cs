@@ -20,8 +20,9 @@ namespace Cosmos.Compiler.XSharp {
       "CALL"
       , "END"
       , "GROUP"
-      , "IRET", "INTERRUPTHANDLER"
+      , "INTERRUPTHANDLER"
       , "POPALL", "PUSHALL", "PROCEDURE"
+      , "RETURN", "RETURNINTERRUPT"
     };
     protected static string[] mRegisters = new string[] { 
       "EAX", "AX", "AH", "AL",

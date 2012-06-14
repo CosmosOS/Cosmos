@@ -64,6 +64,4 @@ InterruptHandler TracerEntry {
 
 	# Temp disabled, see comment on LockOrExit above
 	# Unlock
-
-#IRet
 }

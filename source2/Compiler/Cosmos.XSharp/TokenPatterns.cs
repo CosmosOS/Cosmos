@@ -8,6 +8,8 @@ namespace Cosmos.Compiler.XSharp {
     public delegate string CodeFunc(TokenList aTokens);
     protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
     protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
+    protected string mGroup;
+    protected bool mInIntHandler;
 
     public TokenPatterns() {
       AddPatterns();
@@ -17,15 +19,46 @@ namespace Cosmos.Compiler.XSharp {
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens) {
         if (aTokens.Pattern == "Call ABC") {
-          return "new Call {{ DestinationLabel = {1} }};";
+          return "new Call {{ DestinationLabel = \"{1}\" }};";
         } else if (aTokens.Pattern == "Call .ABC") {
-          return "new Call {{ DestinationLabel = {1} }};";
+          return "new Call {{ DestinationLabel = \"" + mGroup + "_{2}\" }};";
         }
-        throw new Exception("Unrecognized syntax for keyword: " + aTokens[0].Value);
+        return null;
       });
-      AddKeyword("IRet", "new IRet();");
+
+      AddKeyword("Group", delegate(TokenList aTokens) {
+        if (aTokens.Pattern == "Group ABC") {
+          mGroup = aTokens[1].Value;
+          return "";
+        }
+        return null;
+      });
+
+
+      AddKeyword("InterruptHandler", delegate(TokenList aTokens) {
+        mInIntHandler = true;
+        if (aTokens.Pattern == "InterruptHandler ABC {") {
+          return "new Label(\"{1}\");";
+        } else if (aTokens.Pattern == "InterruptHandler .ABC {") {
+          return "new Label(\"" + mGroup + "_{2}\");";
+        }
+        return null;
+      });
+
+      AddKeyword("Return", "new Ret();");
+      AddKeyword("ReturnInterrupt", "new IRET();");
       AddKeyword("PopAll", "new Popad();");
       AddKeyword("PushAll", "new Pushad();");
+
+      AddKeyword("Procedure", delegate(TokenList aTokens) {
+        mInIntHandler = false;
+        if (aTokens.Pattern == "Procedure ABC {") {
+          return "new Label(\"{1}\");";
+        } else if (aTokens.Pattern == "Procedure .ABC {") {
+          return "new Label(\"" + mGroup + "_{2}\");";
+        }
+        return null;
+      });
     }
 
     protected void AddKeyword(string aKeyword, CodeFunc aCode) {
@@ -64,12 +97,8 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("Variable = EAX",
         "new Mov {{"
-         + "  DestinationRef = Cosmos.Assembler.ElementReference.New(RegistersEnum.{0})"
-         + " , DestinationIsIndirect = true"
-         + " , SourceValue = value.Value.GetValueOrDefault()"
-         + " , SourceRef = value.Reference"
-         + " , SourceReg = value.Register"
-         + " , SourceIsIndirect = value.IsIndirect"
+         + "  DestinationRef = Cosmos.Assembler.ElementReference.New(\"{0}\")"
+         + " , SourceReg = RegistersEnum.{2}"
          + " }};"
       );
 
@@ -90,46 +119,33 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      AddPattern("}",
-        ""
-      );
-
-      AddPattern(new TokenType[] { TokenType.Keyword, TokenType.AlphaNum }, delegate(TokenList aTokens) {
-        string xOp = aTokens[0].Value.ToUpper();
-        if (xOp == "CALL") {
-          return "new Call {{ DestinationLabel = {1} }};";
-        } else if (xOp == "GROUP") {
-          return "";
+      AddPattern("}", delegate(TokenList aTokens) {
+        if (mInIntHandler) {
+          return "new IRET();";
         } else {
-          throw new Exception("Unrecognized keyword: " + aTokens[0].Value);
-        }
-      });
-
-      AddPattern(new TokenType[] { TokenType.Keyword, TokenType.AlphaNum, TokenType.CurlyLeft }, delegate(TokenList aTokens) {
-        string xOp = aTokens[0].Value.ToUpper();
-        if (xOp == "INTERRUPTHANDLER") {
-          return "";
-        } else if (xOp == "PROCEDURE") {
-          return "";
-        } else {
-          throw new Exception("Unrecognized keyword: " + aTokens[0].Value);
+          return "new Ret();";
         }
       });
     }
 
     public string GetCode(TokenList aTokens) {
       CodeFunc xAction = null;
+      string xResult = null;
       if (aTokens[0].Type == TokenType.Keyword) {
-        mKeywords.TryGetValue(aTokens[0].Value.ToUpper(), out xAction);
-      }
-      if (xAction == null) {
-        mPatterns.TryGetValue(aTokens.Pattern, out xAction);
-        if (xAction == null) {
-          throw new Exception("Token pattern not found.");
+        if (mKeywords.TryGetValue(aTokens[0].Value.ToUpper(), out xAction)) {
+          xResult = xAction(aTokens);
+          if (xResult == null) {
+            throw new Exception("Unrecognized syntax for keyword: " + aTokens[0].Value);
+          }
         }
       }
+      if (xAction == null) {
+        if (!mPatterns.TryGetValue(aTokens.Pattern, out xAction)) {
+          throw new Exception("Token pattern not found.");
+        }
+        xResult = xAction(aTokens);
+      }
 
-      string xResult = xAction(aTokens);
       return string.Format(xResult, aTokens.Select(c => c.Value).ToArray());
     }
 
