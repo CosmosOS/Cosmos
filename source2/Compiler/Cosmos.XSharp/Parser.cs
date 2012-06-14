@@ -10,7 +10,6 @@ namespace Cosmos.Compiler.XSharp {
     protected bool mIncludeWhiteSpace;
     protected bool mAllWhitespace;
 
-    protected List<Token> mTokensTemp = new List<Token>();
     protected TokenList mTokens;
     public TokenList Tokens {
       get { return mTokens; }
@@ -33,7 +32,7 @@ namespace Cosmos.Compiler.XSharp {
       "ESI", "EDI", "ESP", "EBP"
     };
 
-    protected void NewToken(ref int rPos) {
+    protected Token NewToken(ref int rPos) {
       string xString = null;
       char xChar1 = mData[mStart];
       var xToken = new Token();
@@ -49,12 +48,7 @@ namespace Cosmos.Compiler.XSharp {
         xString = mData.Substring(mStart, rPos - mStart);
 
         if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
-          if (mIncludeWhiteSpace) {
-            xToken.Type = TokenType.WhiteSpace;
-          } else {
-            mStart = rPos;
-            return;
-          }
+          xToken.Type = TokenType.WhiteSpace;
         } else if (char.IsLetter(xChar1)) {
           string xUpper = xString.ToUpper();
           if (mRegisters.Contains(xUpper)) {
@@ -96,26 +90,46 @@ namespace Cosmos.Compiler.XSharp {
       if (mAllWhitespace && xToken.Type != TokenType.WhiteSpace) {
         mAllWhitespace = false;
       }
-      // Do near end, some logic performs returns above
-      mTokensTemp.Add(xToken);
       mStart = rPos;
+      return xToken;
     }
 
     protected enum CharType { WhiteSpace, Identifier, Symbol };
     protected void Parse() {
-      ParseText();
-      Parse2();
-      mTokens = new TokenList(mTokensTemp);
+      var xTokens = ParseText();
+      xTokens = ParseTokens(xTokens);
+      mTokens = new TokenList(xTokens);
     }
 
     // Rescan token patterns
-    protected void Parse2() {
-      for (int i = 0; i < mTokensTemp.Count; i++) {
+    protected List<Token> ParseTokens(List<Token> aTokens) {
+      var xResult = new List<Token>();
+
+      for (int i = 0; i < aTokens.Count; i++) {
+        int xRemainingTokens = aTokens.Count - i;
+        var xToken = aTokens[i];
+        if (xToken.Type == TokenType.WhiteSpace && mIncludeWhiteSpace == false) {
+        } else {
+          // $FF, $02, etc
+          if (xToken.Type == TokenType.Dollar && xRemainingTokens > 1) {
+            // Dont worry about whitespace, $ FF is not valid, $FF is.
+            var xNext = aTokens[i + 1];
+            if (xNext.Type == TokenType.ValueInt || xNext.Type == TokenType.AlphaNum) {
+              i++;
+              xToken.Type = TokenType.ValueInt;
+              xToken.SrcPosEnd = xNext.SrcPosEnd;
+              xToken.Value = "0x" + xNext.Value;
+            }
+          }
+          xResult.Add(xToken);
+        }
       }
+      return xResult;
     }
 
     // Initial Parse to convert text to tokens
-    protected void ParseText() {
+    protected List<Token> ParseText() {
+      var xResult = new List<Token>();
       char xLastChar = ' ';
       CharType xLastCharType = CharType.WhiteSpace;
       char xChar;
@@ -134,16 +148,19 @@ namespace Cosmos.Compiler.XSharp {
         // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.
         // But its faster as the second short circuit rather than a separate if.
         if (xCharType != xLastCharType && i > 0) {
-          NewToken(ref i);
+          xResult.Add(NewToken(ref i));
         }
 
         xLastChar = xChar;
         xLastCharType = xCharType;
       }
+
       // Last token
       if (mStart < mData.Length) {
-        NewToken(ref i);
+        xResult.Add(NewToken(ref i));
       }
+
+      return xResult;
     }
 
     public Parser(string aData, bool aIncludeWhiteSpace) {
