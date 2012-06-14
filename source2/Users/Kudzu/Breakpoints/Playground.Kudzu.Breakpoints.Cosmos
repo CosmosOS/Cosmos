@@ -22,7 +22,7 @@
     <EnableGDB>False</EnableGDB>
     <TraceMode>
     </TraceMode>
-    <VMWareFlavor>Player</VMWareFlavor>
+    <VMWareFlavor>Workstation</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
     <TraceAssemblies>Cosmos</TraceAssemblies>
     <StartCosmosASMDBG>False</StartCosmosASMDBG>
