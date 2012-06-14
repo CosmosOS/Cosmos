@@ -88,7 +88,13 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("EAX = EAX",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      AddPattern("EAX = [EAX + 0]",
+      AddPattern("EAX = [EAX]",
+        "new Mov {{"
+          + " DestinationReg = RegistersEnum.{0}"
+          + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true"
+          + "}};"
+      );
+      AddPattern("EAX = [EAX + 1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true, SourceDisplacement = {5}"

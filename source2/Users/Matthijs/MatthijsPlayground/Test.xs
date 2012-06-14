@@ -47,7 +47,7 @@ InterruptHandler TracerEntry {
 	EBP + 32
 
 	# Caller EIP
-	EAX = [EBP + 0]
+	EAX = [EBP]
 
 	# EIP is pointer to op after our call. Int3 is 1 byte so we subtract 1.
 	# Note - when we used call it was 5 (size of our call + address)
