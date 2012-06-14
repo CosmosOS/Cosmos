@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPatterns {
-    public delegate string CodeFunc(TokenList aTokens);
+    public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
     protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
     protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
     protected string mGroup;
@@ -19,39 +19,42 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddKeywords() {
-      AddKeyword("Call", delegate(TokenList aTokens) {
+      AddKeyword("Call", delegate(TokenList aTokens, ref List<string> rCode) {
         if (aTokens.Pattern == "Call ABC") {
-          return "new Call {{ DestinationLabel = \"" + mGroup + "_{1}\" }};";
+          rCode.Add("new Call {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
+        } else {
+          rCode = null;
         }
-        return null;
       });
 
-      AddKeyword("Exit", delegate(TokenList aTokens) {
-        return "new Jump {{ DestinationLabel = \"" + mGroup + "_" + mProcedureName + "_Exit\" }};";
+      AddKeyword("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_" + mProcedureName + "_Exit\" }};");
       });
 
-      AddKeyword("Group", delegate(TokenList aTokens) {
+      AddKeyword("Group", delegate(TokenList aTokens, ref List<string> rCode) {
         if (aTokens.Pattern == "Group ABC") {
           mGroup = aTokens[1].Value;
-          return "";
+        } else {
+          rCode = null;
         }
-        return null;
       });
 
-      AddKeyword("InterruptHandler", delegate(TokenList aTokens) {
+      AddKeyword("InterruptHandler", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = true;
         if (aTokens.Pattern == "InterruptHandler ABC {") {
           mProcedureName = aTokens[1].Value;
-          return "new Label(\"" + mGroup + "_{1}\");";
+          rCode.Add("new Label(\"" + mGroup + "_{1}\");");
+        } else {
+          rCode = null;
         }
-        return null;
       });
 
-      AddKeyword("Jump", delegate(TokenList aTokens) {
+      AddKeyword("Jump", delegate(TokenList aTokens, ref List<string> rCode) {
         if (aTokens.Pattern == "Jump ABC") {
-          return "new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};";
+          rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
+        } else {
+          rCode = null;
         }
-        return null;
       });
 
       AddKeyword("Return", "new Ret();");
@@ -59,13 +62,14 @@ namespace Cosmos.Compiler.XSharp {
       AddKeyword("PopAll", "new Popad();");
       AddKeyword("PushAll", "new Pushad();");
 
-      AddKeyword("Procedure", delegate(TokenList aTokens) {
+      AddKeyword("Procedure", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
         if (aTokens.Pattern == "Procedure ABC {") {
           mProcedureName = aTokens[1].Value;
-          return "new Label(\"" + mGroup + "_{1}\");";
+          rCode.Add("new Label(\"" + mGroup + "_{1}\");");
+        } else {
+          rCode = null;
         }
-        return null;
       });
     }
 
@@ -74,8 +78,8 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddKeyword(string aKeyword, string aCode) {
-      AddKeyword(aKeyword, delegate(TokenList aTokens) {
-        return aCode;
+      AddKeyword(aKeyword, delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(aCode);
       });
     }
 
@@ -117,46 +121,46 @@ namespace Cosmos.Compiler.XSharp {
           + "}};"
       );
 
-      AddPattern("Variable = EAX", delegate(TokenList aTokens) {
-        return "new Mov {{"
+      AddPattern("Variable = EAX", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Mov {{"
          + " DestinationRef = Cosmos.Assembler.ElementReference.New(\"" + mGroup + "_{0}\"), DestinationIsIndirect = true"
          + " , SourceReg = RegistersEnum.{2}"
-         + " }};";
+         + " }};");
       });
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      AddPattern("EAX + 1", delegate(TokenList aTokens) {
+      AddPattern("EAX + 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
-          return "new Inc {{ DestinationReg = RegistersEnum.{0} }};";
+          rCode.Add("new Inc {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
-          return "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
+          rCode.Add("new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
       });
 
-      AddPattern("EAX - 1", delegate(TokenList aTokens) {
+      AddPattern("EAX - 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
-          return "new Dec {{ DestinationReg = RegistersEnum.{0} }};";
+          rCode.Add("new Dec {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
-          return "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
+          rCode.Add("new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
       });
 
-      AddPattern("}", delegate(TokenList aTokens) {
-        var xCode = "new Label(\"" + mGroup + "_" + mProcedureName + "_Exit\");\r\n";
+      AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Label(\"" + mGroup + "_" + mProcedureName + "_Exit\");");
         if (mInIntHandler) {
-          return xCode + "new IRET();";
+          rCode.Add("new IRET();");
         } else {
-          return xCode + "new Ret();";
+          rCode.Add("new Ret();");
         }
       });
     }
 
-    public string GetCode(TokenList aTokens) {
+    public List<string> GetCode(TokenList aTokens) {
       CodeFunc xAction = null;
-      string xResult = null;
+      List<string> xResult = new List<string>();
       if (aTokens[0].Type == TokenType.Keyword) {
         if (mKeywords.TryGetValue(aTokens[0].Value.ToUpper(), out xAction)) {
-          xResult = xAction(aTokens);
+          xAction(aTokens, ref xResult);
           if (xResult == null) {
             throw new Exception("Unrecognized syntax for keyword: " + aTokens[0].Value);
           }
@@ -166,10 +170,13 @@ namespace Cosmos.Compiler.XSharp {
         if (!mPatterns.TryGetValue(aTokens.Pattern, out xAction)) {
           throw new Exception("Token pattern not found.");
         }
-        xResult = xAction(aTokens);
+        xAction(aTokens, ref xResult);
       }
 
-      return string.Format(xResult, aTokens.Select(c => c.Value).ToArray());
+      for(int i = 0; i < xResult.Count; i++) {
+        xResult[i] = string.Format(xResult[i], aTokens.Select(c => c.Value).ToArray());
+      }
+      return xResult;
     }
 
     protected void AddPattern(string aPattern, CodeFunc aCode) {
@@ -181,11 +188,15 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddPattern(string aPattern, string aCode) {
-      AddPattern(aPattern, delegate(TokenList aTokens) { return aCode; });
+      AddPattern(aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(aCode);
+      });
     }
 
     protected void AddPattern(TokenType[] aPattern, string aCode) {
-      AddPattern(aPattern, delegate(TokenList aTokens) { return aCode; });
+      AddPattern(aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(aCode); 
+      });
     }
   }
 }
