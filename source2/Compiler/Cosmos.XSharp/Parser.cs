@@ -18,9 +18,10 @@ namespace Cosmos.Compiler.XSharp {
 
     protected static string[] mKeywords = new string[] { 
       "CALL"
-      , "END"
+      , "END", "EXIT"
       , "GROUP"
       , "INTERRUPTHANDLER"
+      , "JUMP"
       , "POPALL", "PUSHALL", "PROCEDURE"
       , "RETURN", "RETURNINTERRUPT"
     };

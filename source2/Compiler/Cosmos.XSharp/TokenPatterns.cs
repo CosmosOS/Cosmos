@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -9,6 +10,7 @@ namespace Cosmos.Compiler.XSharp {
     protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
     protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
     protected string mGroup;
+    protected string mProcedureName;
     protected bool mInIntHandler;
 
     public TokenPatterns() {
@@ -19,11 +21,13 @@ namespace Cosmos.Compiler.XSharp {
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens) {
         if (aTokens.Pattern == "Call ABC") {
-          return "new Call {{ DestinationLabel = \"{1}\" }};";
-        } else if (aTokens.Pattern == "Call .ABC") {
-          return "new Call {{ DestinationLabel = \"" + mGroup + "_{2}\" }};";
+          return "new Call {{ DestinationLabel = \"" + mGroup + "_{1}\" }};";
         }
         return null;
+      });
+
+      AddKeyword("Exit", delegate(TokenList aTokens) {
+        return "new Jump {{ DestinationLabel = \"" + mGroup + "_" + mProcedureName + "_Exit\" }};";
       });
 
       AddKeyword("Group", delegate(TokenList aTokens) {
@@ -34,13 +38,18 @@ namespace Cosmos.Compiler.XSharp {
         return null;
       });
 
-
       AddKeyword("InterruptHandler", delegate(TokenList aTokens) {
         mInIntHandler = true;
         if (aTokens.Pattern == "InterruptHandler ABC {") {
-          return "new Label(\"{1}\");";
-        } else if (aTokens.Pattern == "InterruptHandler .ABC {") {
-          return "new Label(\"" + mGroup + "_{2}\");";
+          mProcedureName = aTokens[1].Value;
+          return "new Label(\"" + mGroup + "_{1}\");";
+        }
+        return null;
+      });
+
+      AddKeyword("Jump", delegate(TokenList aTokens) {
+        if (aTokens.Pattern == "Jump ABC") {
+          return "new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};";
         }
         return null;
       });
@@ -53,9 +62,8 @@ namespace Cosmos.Compiler.XSharp {
       AddKeyword("Procedure", delegate(TokenList aTokens) {
         mInIntHandler = false;
         if (aTokens.Pattern == "Procedure ABC {") {
-          return "new Label(\"{1}\");";
-        } else if (aTokens.Pattern == "Procedure .ABC {") {
-          return "new Label(\"" + mGroup + "_{2}\");";
+          mProcedureName = aTokens[1].Value;
+          return "new Label(\"" + mGroup + "_{1}\");";
         }
         return null;
       });
@@ -69,6 +77,14 @@ namespace Cosmos.Compiler.XSharp {
       AddKeyword(aKeyword, delegate(TokenList aTokens) {
         return aCode;
       });
+    }
+
+    protected int IntValue(Token aToken) {
+      if (aToken.Value.StartsWith("0x")) {
+        return int.Parse(aToken.Value.Substring(2), NumberStyles.AllowHexSpecifier);
+      } else {
+        return int.Parse(aToken.Value);
+      }
     }
 
     protected void AddPatterns() {
@@ -101,16 +117,16 @@ namespace Cosmos.Compiler.XSharp {
           + "}};"
       );
 
-      AddPattern("Variable = EAX",
-        "new Mov {{"
-         + "  DestinationRef = Cosmos.Assembler.ElementReference.New(\"{0}\")"
+      AddPattern("Variable = EAX", delegate(TokenList aTokens) {
+        return "new Mov {{"
+         + " DestinationRef = Cosmos.Assembler.ElementReference.New(\"" + mGroup + "_{0}\"), DestinationIsIndirect = true"
          + " , SourceReg = RegistersEnum.{2}"
-         + " }};"
-      );
+         + " }};";
+      });
 
       // TODO: Allow asm to optimize these to Inc/Dec
       AddPattern("EAX + 1", delegate(TokenList aTokens) {
-        if (aTokens[2].Value == "1") {
+        if (IntValue(aTokens[2]) == 1) {
           return "new Inc {{ DestinationReg = RegistersEnum.{0} }};";
         } else {
           return "new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
@@ -118,7 +134,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("EAX - 1", delegate(TokenList aTokens) {
-        if (aTokens[2].Value == "1") {
+        if (IntValue(aTokens[2]) == 1) {
           return "new Dec {{ DestinationReg = RegistersEnum.{0} }};";
         } else {
           return "new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};";
@@ -126,10 +142,11 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("}", delegate(TokenList aTokens) {
+        var xCode = "new Label(\"" + mGroup + "_" + mProcedureName + "_Exit\");\r\n";
         if (mInIntHandler) {
-          return "new IRET();";
+          return xCode + "new IRET();";
         } else {
-          return "new Ret();";
+          return xCode + "new Ret();";
         }
       });
     }

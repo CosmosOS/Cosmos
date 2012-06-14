@@ -318,6 +318,7 @@ namespace Cosmos.IL2CPU.X86 {
       if (mComNumber > 0) {
         var xStub = new DebugStub(mComNumber);
         xStub.Assemble();
+        Assembler.Code.Assemble(typeof(TracerEntry).Assembly);
       } else {
         new Label("DebugStub_Step");
         new Return();

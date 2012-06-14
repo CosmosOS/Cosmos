@@ -9,7 +9,7 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class TracerEntry : CodeBlock {
+    public class TracerEntry2 : CodeBlock {
       [XSharp(IsInteruptHandler = true)]
       // Int3 entry point
       public override void Assemble() {

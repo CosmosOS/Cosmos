@@ -1,6 +1,4 @@
-﻿# From Entry.CS
-
-# We need to make sure Int3 can never run more than one instance at a time.
+﻿# We need to make sure Int3 can never run more than one instance at a time.
 # We are not threaded yet, when we are we have to change stuff to thread vars and a lot of other stuff.
 # Two Int3 calls currently can never happen at the same time normally, but IRQs can happen while the DebugStub is
 # running. We also need to make sure IRQs are allowed to run during DebugStub as DebugStub can wait for
