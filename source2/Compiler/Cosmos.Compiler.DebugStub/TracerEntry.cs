@@ -19,6 +19,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("-http:#wiki.osdev.org/Spinlock");
 			new Comment("-Looks good and also allows testing intead of waiting");
 			new Comment("-Wont require us to disable / enable IRQs");
+			new Comment("Comment");
 			new Label("DebugStub_TracerEntry");
 			new Comment("This code is temporarily disabled as IRQs are not enabled right now.");
 			new Comment("LockOrExit");

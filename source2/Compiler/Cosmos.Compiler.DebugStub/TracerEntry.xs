@@ -12,6 +12,8 @@
 #   -Looks good and also allows testing intead of waiting
 #   -Wont require us to disable / enable IRQs
 
+# Comment
+
 Group DebugStub
 
 InterruptHandler TracerEntry {
