@@ -18,17 +18,22 @@ namespace Cosmos.Compiler.XSharp {
       AddKeywords();
     }
 
+    protected string Quoted(string aString) {
+      return "\"" + aString + "\"";
+    }
+
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = aTokens[1].Value;
         if (aTokens.Pattern == "Call ABC") {
-          rCode.Add("new Call {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
+          rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
         } else {
           rCode = null;
         }
       });
 
       AddKeyword("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_" + mProcedureName + "_Exit\" }};");
+        rCode.Add("new Jump {{ DestinationLabel = " + Quoted(mGroup + "_" + mProcedureName + "_Exit") + " }};");
       });
 
       AddKeyword("Group", delegate(TokenList aTokens, ref List<string> rCode) {
