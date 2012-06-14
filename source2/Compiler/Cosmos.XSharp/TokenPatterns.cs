@@ -16,9 +16,9 @@ namespace Cosmos.Compiler.XSharp {
 
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens) {
-        if (aTokens.Pattern.Matches("Call ABC")) {
+        if (aTokens.Pattern == "Call ABC") {
           return "new Call {{ DestinationLabel = {1} }};";
-        } else if (aTokens.Pattern.Matches("Call .ABC")) {
+        } else if (aTokens.Pattern == "Call .ABC") {
           return "new Call {{ DestinationLabel = {1} }};";
         }
         throw new Exception("Unrecognized syntax for keyword: " + aTokens[0].Value);

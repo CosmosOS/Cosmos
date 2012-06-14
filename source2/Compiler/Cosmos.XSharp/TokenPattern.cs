@@ -29,13 +29,17 @@ namespace Cosmos.Compiler.XSharp {
       Init();
     }
 
-    protected void Init() {
-      mHashCode = CalcHashCode();
+    public static bool operator ==(TokenPattern a1, string a2) {
+      var xParse = new Parser(a2, false);
+      return a1.Equals(xParse.Tokens.Pattern);
+    }
+    public static bool operator !=(TokenPattern a1, string a2) {
+      var xParse = new Parser(a2, false);
+      return !a1.Equals(xParse.Tokens.Pattern);
     }
 
-    public bool Matches(string aPattern) {
-      var xParse = new Parser(aPattern, false);
-      return Equals(xParse.Tokens.Pattern);
+    protected void Init() {
+      mHashCode = CalcHashCode();
     }
 
     public override bool Equals(object aObj) {

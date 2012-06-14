@@ -10,7 +10,8 @@ namespace Cosmos.Compiler.XSharp {
     protected bool mIncludeWhiteSpace;
     protected bool mAllWhitespace;
 
-    protected TokenList mTokens = new TokenList();
+    protected List<Token> mTokensTemp = new List<Token>();
+    protected TokenList mTokens;
     public TokenList Tokens {
       get { return mTokens; }
     }
@@ -94,7 +95,7 @@ namespace Cosmos.Compiler.XSharp {
         mAllWhitespace = false;
       }
       // Do near end, some logic performs returns above
-      mTokens.Add(xToken);
+      mTokensTemp.Add(xToken);
       mStart = rPos;
     }
 
@@ -128,6 +129,7 @@ namespace Cosmos.Compiler.XSharp {
       if (mStart < mData.Length) {
         NewToken(ref i);
       }
+      mTokens = new TokenList(mTokensTemp);
     }
 
     public Parser(string aData, bool aIncludeWhiteSpace) {
