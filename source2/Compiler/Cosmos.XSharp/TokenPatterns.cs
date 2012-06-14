@@ -113,16 +113,33 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("EAX = EAX",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      AddPattern("EAX = [EAX]",
+      AddPattern("EAX = EAX[1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
-          + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true"
+          + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {4}"
           + "}};"
       );
-      AddPattern("EAX = [EAX + 1]",
+      AddPattern("EAX = EAX[-1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
-          + ", SourceReg = RegistersEnum.{3}, SourceIsIndirect = true, SourceDisplacement = {5}"
+          + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = -{4}"
+          + "}};"
+      );
+
+      AddPattern("Port[DX] = AX", 
+        // TODO: DX only for index
+        // TODO: Src reg can only be EAX, AX, AL
+        "new Out {{ DestinationReg = RegistersEnum.{5}}}"
+      );
+
+      AddPattern("+EAX",
+        "new Push {{"
+          + " SourceReg = RegistersEnum.{1}"
+          + "}};"
+      );
+      AddPattern("-EAX",
+        "new Pop {{"
+          + " SourceReg = RegistersEnum.{1}"
           + "}};"
       );
 

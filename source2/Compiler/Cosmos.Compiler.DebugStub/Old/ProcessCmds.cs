@@ -23,10 +23,10 @@ namespace Cosmos.Debug.DebugStub {
         // and move them to a buffer.
         // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
         AL = DsVsip.CmdCompleted;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
         //
         EAX = CommandID.Value;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
       }
     }
 

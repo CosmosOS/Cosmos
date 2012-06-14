@@ -12,7 +12,7 @@ namespace Cosmos.Debug.DebugStub {
     public class SendRegisters : Inlines {
       public override void Assemble() {
         AL = (int)DsVsip.Registers; // Send the actual started signal
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         ESI = PushAllPtr.Value;
         WriteBytesToComPort(32);
@@ -26,7 +26,7 @@ namespace Cosmos.Debug.DebugStub {
     public class SendFrame : Inlines {
       public override void Assemble() {
         AL = (int)DsVsip.Frame;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         int xCount = 8 * 4;
         EAX = (uint)xCount;
@@ -41,7 +41,7 @@ namespace Cosmos.Debug.DebugStub {
     public class SendStack : CodeBlock {
       public override void Assemble() {
         AL = (int)DsVsip.Stack;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         // Send size of bytes
         ESI = CallerESP.Value;
@@ -69,7 +69,7 @@ namespace Cosmos.Debug.DebugStub {
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
         AL = (int)DsVsip.MethodContext;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         // offset relative to ebp
         // size of data to send
@@ -102,7 +102,7 @@ namespace Cosmos.Debug.DebugStub {
         ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_1";
         AL = (int)DsVsip.MemoryData;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_2";
@@ -136,7 +136,7 @@ namespace Cosmos.Debug.DebugStub {
         AL = (int)DsVsip.TracePoint;
 
         Label = ".Type";
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         // Send Calling EIP.
         ESI = CallerEIP.Address;
@@ -151,7 +151,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         // Write the type
         AL = (int)DsVsip.Message;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         // Write Length
         ESI = EBP;
@@ -180,7 +180,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         // Write the type
         AL = (int)DsVsip.Pointer;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         // pointer value
         ESI = EBP[8];

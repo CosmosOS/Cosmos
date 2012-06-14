@@ -12,7 +12,7 @@ namespace Cosmos.Debug.DebugStub {
     public class Ping : Inlines {
       public override void Assemble() {
         AL = DsVsip.Pong;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
       }
     }
   }

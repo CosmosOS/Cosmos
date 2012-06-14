@@ -117,19 +117,19 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class WriteALToComPort : CodeBlock {
-      // Input: AL
-      // Output: None
-      // Modifies: EDX, ESI
-      public override void Assemble() {
-        EAX.Push();
-        ESI = ESP;
-        Call<WriteByteToComPort>();
-        // Is a local var, cant use Return(4). X# issues the return.
-        // This also allow the function to preserve EAX.
-        EAX.Pop();
-      }
-    }
+    //public class WriteALToComPort : CodeBlock {
+    //  // Input: AL
+    //  // Output: None
+    //  // Modifies: EDX, ESI
+    //  public override void Assemble() {
+    //    EAX.Push();
+    //    ESI = ESP;
+    //    Call<WriteByteToComPort>();
+    //    // Is a local var, cant use Return(4). X# issues the return.
+    //    // This also allow the function to preserve EAX.
+    //    EAX.Pop();
+    //  }
+    //}
 
     public class WriteAXToComPort : Inlines {
       // Input: AX

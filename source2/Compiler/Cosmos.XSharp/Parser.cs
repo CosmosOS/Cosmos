@@ -21,7 +21,7 @@ namespace Cosmos.Compiler.XSharp {
       , "GROUP"
       , "INTERRUPTHANDLER"
       , "JUMP"
-      , "POPALL", "PUSHALL", "PROCEDURE"
+      , "POPALL", "PUSHALL", "PROCEDURE", "PORT"
       , "RETURN", "RETURNINTERRUPT"
     };
     protected static string[] mRegisters = new string[] { 

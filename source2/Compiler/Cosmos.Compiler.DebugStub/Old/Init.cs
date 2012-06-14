@@ -55,7 +55,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         // "Clear" the UART out
         AL = 0;
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         // QEMU (and possibly others) send some garbage across the serial line first.
         // Actually they send the garbage inbound, but garbage could be inbound as well so we 
@@ -72,7 +72,7 @@ namespace Cosmos.Debug.DebugStub {
         // We could use the signature as the start signal, but I prefer
         // to keep the logic separate, especially in DC.
         AL = (int)DsVsip.Started; // Send the actual started signal
-        Call<WriteALToComPort>();
+        Call("DebugStub_WriteALToComPort");
 
         Call<WaitForSignature>();
         Call<ProcessCommandBatch>();

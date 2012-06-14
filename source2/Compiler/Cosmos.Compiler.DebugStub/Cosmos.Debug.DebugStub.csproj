@@ -75,11 +75,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Old\Screen.cs" />
     <Compile Include="Old\CmdSend.cs" />
-    <Compile Include="TracerEntry.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TracerEntry.xs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj">
@@ -101,9 +96,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+    <None Include="Serial.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+    </None>
     <None Include="TracerEntry.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>TracerEntry.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
