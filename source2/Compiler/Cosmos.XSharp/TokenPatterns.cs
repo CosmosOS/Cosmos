@@ -62,7 +62,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      AddKeyword("Return", "new Ret();");
+      AddKeyword("Return", "new Return();");
       AddKeyword("ReturnInterrupt", "new IRET();");
       AddKeyword("PopAll", "new Popad();");
       AddKeyword("PushAll", "new Pushad();");
@@ -129,17 +129,17 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("Port[DX] = AX", 
         // TODO: DX only for index
         // TODO: Src reg can only be EAX, AX, AL
-        "new Out {{ DestinationReg = RegistersEnum.{5}}}"
+        "new Out {{ DestinationReg = RegistersEnum.{5}}};"
       );
 
       AddPattern("+EAX",
         "new Push {{"
-          + " SourceReg = RegistersEnum.{1}"
+          + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
       AddPattern("-EAX",
         "new Pop {{"
-          + " SourceReg = RegistersEnum.{1}"
+          + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
 
@@ -153,7 +153,7 @@ namespace Cosmos.Compiler.XSharp {
       // TODO: Allow asm to optimize these to Inc/Dec
       AddPattern("EAX + 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
-          rCode.Add("new Inc {{ DestinationReg = RegistersEnum.{0} }};");
+          rCode.Add("new INC {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
           rCode.Add("new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
@@ -172,7 +172,7 @@ namespace Cosmos.Compiler.XSharp {
         if (mInIntHandler) {
           rCode.Add("new IRET();");
         } else {
-          rCode.Add("new Ret();");
+          rCode.Add("new Return();");
         }
       });
     }
