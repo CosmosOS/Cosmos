@@ -17,6 +17,7 @@ using System.IO;
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
     protected int mTailLineCount = 5;
+    protected int mTailCurrent = 0;
     protected List<TextBlock> mTailLines = new List<TextBlock>();
 
     public MainWindow() {
@@ -74,6 +75,7 @@ namespace Cosmos.Build.Builder {
     }
 
     void ClearTail() {
+      mTailCurrent = 0;
       foreach (var x in mTailLines) {
         x.Text = "";
       }
@@ -123,14 +125,19 @@ namespace Cosmos.Build.Builder {
     }
 
     void ScrollTail() {
-      for (int i = 0; i < mTailLines.Count - 1; i++) {
+      for (int i = 0; i < mTailLineCount - 1; i++) {
         mTailLines[i].Text = mTailLines[i + 1].Text;
       }
     }
 
     void WriteTail(string aText) {
-      ScrollTail();
-      mTailLines[mTailLines.Count - 1].Text = aText;
+      if (mTailCurrent == mTailLineCount - 1) {
+        ScrollTail();
+      }
+      mTailLines[mTailCurrent].Text = aText;
+      if (mTailCurrent < mTailLineCount - 1) {
+        mTailCurrent++;
+      }
     }
 
     void Log_LogLine(string aLine) {
