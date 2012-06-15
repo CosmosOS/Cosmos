@@ -214,9 +214,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Installer", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.XSharp", "..\source2\VSIP\Cosmos.VS.XSharp\Cosmos.VS.XSharp.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 58
+		SccNumberOfProjects = 59
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -450,6 +452,10 @@ Global
 		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
 		SccProjectName57 = ../source2/Debug/Cosmos.Debug.HostProcess
 		SccLocalPath57 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
+		SccProjectUniqueName58 = ..\\source2\\VMWareLib\\VMWareLib.csproj
+		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
+		SccProjectName58 = ../source2/VMWareLib
+		SccLocalPath58 = ..\\source2\\VMWareLib
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Builder|Any CPU = Builder|Any CPU
@@ -1384,6 +1390,23 @@ Global
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9}.Release|x86.ActiveCfg = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Builder|Any CPU.ActiveCfg = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Builder|Any CPU.Build.0 = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Builder|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Builder|Mixed Platforms.Build.0 = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Builder|x86.ActiveCfg = Release|x86
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Builder|x86.Build.0 = Release|x86
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Debug|x86.ActiveCfg = Debug|x86
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Debug|x86.Build.0 = Debug|x86
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1420,6 +1443,7 @@ Global
 		{47E8F3DC-FF3F-4CC7-8643-1807260B0B18} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{76CDB55D-55E3-4B53-AE33-12EC31430826} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{C4941654-3D7A-484B-9F5C-3D331AB8F585} = {1698DD83-72A3-44CD-B088-4320A4014A95}
 		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{2DF5F17F-4890-4856-ADFD-4DE23282C3B7} = {A4478219-065D-4928-BB4D-4358CAD39A03}
