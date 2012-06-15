@@ -7,17 +7,15 @@ using System.Text;
 namespace Cosmos.Compiler.XSharp.XSC {
   class Program {
     static void Main(string[] aArgs) {
-      string xSrc = aArgs[1];
-      string xDest = Path.ChangeExtension(xSrc, ".cs");
-      string xNamespace = aArgs[2];
+      try {
+        string xSrc = aArgs[0];
+        string xNamespace = aArgs[1];
 
-      using (var xInput = new StreamReader(xSrc)) {
-        using (var xOutput = new StreamWriter(xDest)) {
-          var xGenerator = new Generator();
-          xGenerator.Name = Path.GetFileNameWithoutExtension(xSrc);
-          xGenerator.Namespace = xNamespace;
-          xGenerator.Execute(xInput, xOutput);
-        }
+        var xGenerator = new Generator();
+        xGenerator.Execute(xNamespace, xSrc);
+      } catch (Exception ex) {
+        Console.WriteLine(ex.Message);
+        Environment.Exit(1);
       }
     }
   }

@@ -63,9 +63,16 @@ namespace Cosmos.Build.Builder {
       });
     }
 
+    void ClearTail() {
+      tblkTail1.Text = "";
+      tblkTail2.Text = "";
+      tblkTail3.Text = "";
+      tblkTail4.Text = "";
+    }
+
     void Log_LogError() {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-        tblkCurrent.Text = "";
+        ClearTail();
 
         mSection.Foreground = Brushes.Red;
         mContent.Visibility = Visibility.Visible;
@@ -75,7 +82,7 @@ namespace Cosmos.Build.Builder {
 
     void Log_LogSection(string aLine) {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-        tblkCurrent.Text = "";
+        ClearTail();
 
         mClipboard.AppendLine();
         mClipboard.AppendLine(new string('=', aLine.Length));
@@ -108,7 +115,11 @@ namespace Cosmos.Build.Builder {
 
     void Log_LogLine(string aLine) {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-        tblkCurrent.Text = aLine;
+        tblkTail1.Text = tblkTail2.Text;
+        tblkTail2.Text = tblkTail3.Text;
+        tblkTail3.Text = tblkTail4.Text;
+        tblkTail4.Text = aLine;
+
         mClipboard.AppendLine(aLine);
 
         mContent.Inlines.Add(aLine);

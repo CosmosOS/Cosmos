@@ -9,22 +9,42 @@ namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
     protected string mCosmosPath;
     public bool ResetHive { get; set; }
+    protected string mOutputPath;
 
     public CosmosTask(string aCosmosPath) {
       mCosmosPath = aCosmosPath;
     }
 
-    protected override void DoRun() {
-      string xOutputPath = mCosmosPath + @"\Build\VSIP";
+    protected void MsBuild(string aSlnFile, string aBuildCfg) {
+      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputPath));
+    }
 
-      if (!Directory.Exists(xOutputPath)) {
-        Directory.CreateDirectory(xOutputPath);
+    protected override void DoRun() {
+      mOutputPath = mCosmosPath + @"\Build\VSIP";
+      if (!Directory.Exists(mOutputPath)) {
+        Directory.CreateDirectory(mOutputPath);
+      }
+
+      Section("Compiling X# Compiler");
+      MsBuild(mCosmosPath + @"\source2\XSharp.sln", "Debug");
+
+      Section("Compiling X# Sources");
+      var xFiles = Directory.GetFiles(mCosmosPath + @"\source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
+      foreach (var xFile in xFiles) {
+        Echo("Compiling " + Path.GetFileName(xFile));
+        string xDest = Path.ChangeExtension(xFile, ".cs");
+        if (File.Exists(xDest)) {
+          ResetReadOnly(xDest);
+        }
+        // We dont ref the X# asm directly because then we could not compile it without dynamic loading.
+        // This way we can build it and call it directly.
+        StartConsole(mOutputPath + @"\xsc.exe", Quoted(xFile) + @" Cosmos.Debug.DebugStub");
       }
 
       Section("Compiling Cosmos");
-      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", mCosmosPath + @"\source\Cosmos.sln /maxcpucount /verbosity:normal /nologo /p:Configuration=Builder /p:Platform=x86 /p:OutputPath=" + Quoted(xOutputPath));
+      MsBuild(mCosmosPath + @"\source\Cosmos.sln", "Builder");
 
-      CD(xOutputPath);
+      CD(mOutputPath);
 
       Section("Copying Templates");
       // Copy templates

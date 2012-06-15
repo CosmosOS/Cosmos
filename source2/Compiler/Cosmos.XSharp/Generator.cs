@@ -10,14 +10,21 @@ namespace Cosmos.Compiler.XSharp {
     protected TextReader mInput;
     protected TextWriter mOutput;
     protected TokenPatterns mPatterns = new TokenPatterns();
-    public string Namespace { get; set; }
-    public string Name { get; set; }
 
-    public void Execute(TextReader aInput, TextWriter aOutput) {
+    public void Execute(string aNamespace, string aSrcPathname) {
+      using (var xInput = new StreamReader(aSrcPathname)) {
+        using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".cs"))) {
+          var xGenerator = new Generator();
+          xGenerator.Execute(aNamespace, Path.GetFileNameWithoutExtension(aSrcPathname), xInput, xOutput);
+        }
+      }
+    }
+
+    public void Execute(string aNamespace, string aClassname, TextReader aInput, TextWriter aOutput) {
       mInput = aInput;
       mOutput = aOutput;
 
-      EmitHeader();
+      EmitHeader(aNamespace, aClassname);
       while (true) {
         string xLine = aInput.ReadLine();
         if (xLine == null) {
@@ -30,18 +37,18 @@ namespace Cosmos.Compiler.XSharp {
       EmitFooter();
     }
 
-    private void EmitHeader() {
+    protected void EmitHeader(string aNamespace, string aClassname) {
       mOutput.WriteLine("using System;");
       mOutput.WriteLine("using System.Linq;");
       mOutput.WriteLine("using Cosmos.Assembler;");
       mOutput.WriteLine("using Cosmos.Assembler.x86;");
       mOutput.WriteLine();
-      mOutput.WriteLine("namespace {0} {{", Namespace);
-      mOutput.WriteLine("\tpublic class {0} : Cosmos.Assembler.Code {{", Name);
+      mOutput.WriteLine("namespace {0} {{", aNamespace);
+      mOutput.WriteLine("\tpublic class {0} : Cosmos.Assembler.Code {{", aClassname);
       mOutput.WriteLine("\t\tpublic override void Assemble() {");
     }
 
-    private void EmitFooter() {
+    protected void EmitFooter() {
       mOutput.WriteLine("\t\t}");
       mOutput.WriteLine("\t}");
       mOutput.WriteLine("}");
