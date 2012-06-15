@@ -96,7 +96,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "21266"
+		VWDPort = "44081"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Consts", "..\source2\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
@@ -633,8 +633,8 @@ Global
 		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Release|x86.Build.0 = Release|x86
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Builder|Mixed Platforms.ActiveCfg = Release|x86
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Builder|Mixed Platforms.Build.0 = Release|x86
-		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Builder|x86.ActiveCfg = Debug|Any CPU
-		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Builder|x86.Build.0 = Debug|Any CPU
+		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Builder|x86.ActiveCfg = Debug|x86
+		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Builder|x86.Build.0 = Debug|x86
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C}.Debug|x86.ActiveCfg = Debug|x86
