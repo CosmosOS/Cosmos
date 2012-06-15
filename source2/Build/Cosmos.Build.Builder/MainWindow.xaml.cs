@@ -16,9 +16,19 @@ using System.IO;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
+    protected int mTailLineCount = 5;
+    protected List<TextBlock> mTailLines = new List<TextBlock>();
+
     public MainWindow() {
       InitializeComponent();
       mApp = (App)Application.Current;
+
+      for (int i = 0; i < mTailLineCount; i++) {
+        var xTextBlock = new TextBlock();
+        xTextBlock.FontSize = 16;
+        mTailLines.Add(xTextBlock);
+        spnlTail.Children.Add(xTextBlock);
+      }
     }
 
     bool mPreventAutoClose = false;
@@ -64,10 +74,9 @@ namespace Cosmos.Build.Builder {
     }
 
     void ClearTail() {
-      tblkTail1.Text = "";
-      tblkTail2.Text = "";
-      tblkTail3.Text = "";
-      tblkTail4.Text = "";
+      foreach (var x in mTailLines) {
+        x.Text = "";
+      }
     }
 
     void Log_LogError() {
@@ -113,12 +122,20 @@ namespace Cosmos.Build.Builder {
       mPreventAutoClose = true;
     }
 
+    void ScrollTail() {
+      for (int i = 0; i < mTailLines.Count - 1; i++) {
+        mTailLines[i].Text = mTailLines[i + 1].Text;
+      }
+    }
+
+    void WriteTail(string aText) {
+      ScrollTail();
+      mTailLines[mTailLines.Count - 1].Text = aText;
+    }
+
     void Log_LogLine(string aLine) {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-        tblkTail1.Text = tblkTail2.Text;
-        tblkTail2.Text = tblkTail3.Text;
-        tblkTail3.Text = tblkTail4.Text;
-        tblkTail4.Text = aLine;
+        WriteTail(aLine);
 
         mClipboard.AppendLine(aLine);
 
