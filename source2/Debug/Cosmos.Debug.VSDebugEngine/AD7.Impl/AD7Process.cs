@@ -270,12 +270,13 @@ namespace Cosmos.Debug.VSDebugEngine {
         throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
       }
 
+      // Set to false for debugging, true otherwise
+      bool xNormal = true;
       mProcessStartInfo.UseShellExecute = false;
       mProcessStartInfo.RedirectStandardInput = true;
       mProcessStartInfo.RedirectStandardError = true;
-      mProcessStartInfo.RedirectStandardOutput = true;
-      // Set to false for debugging, true otherwise
-      mProcessStartInfo.CreateNoWindow = false;
+      mProcessStartInfo.RedirectStandardOutput = !xNormal;
+      mProcessStartInfo.CreateNoWindow = xNormal;
 
       string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
       if (!File.Exists(xCpdbPath)) {
