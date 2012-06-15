@@ -976,7 +976,6 @@ Global
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Builder|Mixed Platforms.ActiveCfg = Release|x86
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Builder|Mixed Platforms.Build.0 = Release|x86
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Builder|x86.ActiveCfg = Release|x86
-		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Builder|x86.Build.0 = Release|x86
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|x86.ActiveCfg = Debug|x86
