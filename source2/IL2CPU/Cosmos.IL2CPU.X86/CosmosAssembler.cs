@@ -325,7 +325,6 @@ namespace Cosmos.IL2CPU.X86 {
       }
       // Start emitting assembly labels
       Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
-
     }
 
     protected override void OnBeforeFlush() {
