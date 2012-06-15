@@ -8,8 +8,8 @@
     <ProjectGuid>{4266FA56-F6FE-4E9B-BAE3-B6910183884C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Debug.HostProcess</RootNamespace>
-    <AssemblyName>Cosmos.Debug.HostProcess</AssemblyName>
+    <RootNamespace>Cosmos.VS.HostProcess</RootNamespace>
+    <AssemblyName>Cosmos.VS.HostProcess</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>

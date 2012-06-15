@@ -7,11 +7,11 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Diagnostics;
 
-namespace Cosmos.Debug.HostProcess {
+namespace Cosmos.VS.HostProcess {
   public class Program {
     static int Main(string[] args) {
       try {
-        Console.WriteLine("Cosmos Debug Host");
+        Console.WriteLine("Cosmos VS Debug Host");
         Console.WriteLine("Waiting for start signal.");
 
         // This is here to allow this process to start, but pause till the caller tells it to continue. 

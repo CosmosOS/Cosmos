@@ -112,3 +112,36 @@
 </ul>
 <p>
     X# custom tool generator is in Cosmos.VS.Package.</p>
+    <h3>
+        Comos.VS.HostProcess</h3>
+    <p>
+            VS debugger requires a process that starts paused, and is then later started. To 
+            do this and to unify the process that is used, we use a proxy process which then 
+            controls the actual execution environment (VMWare, QEMU, etc).</p>
+    <h3>
+        Comos.Debug.VSDebugEngine</h3>
+    <p>
+        This provides a custom debug engine to Visual Studio to handle tracing, 
+        breakpoints, stepping, watches, etc.</p>
+        <ul>
+            <li>AD7.Impl \ AD7Process.cs<ul>
+                <li>Launches DebugHost, which then launches 
+                VMWare etc</li>
+                <li>Contains pipes for communicating to VMWare&#39;s serial port to DebugStub</li>
+                </ul>
+            </li>
+            <li>BreakpointManager.cs<ul>
+                <li>contains notes on breakpoints</li>
+                </ul>
+            </li>
+        </ul>
+	
+	    <p>
+            References</p>
+    <ul>
+        <li>http://archive.msdn.microsoft.com/debugenginesample/Release/ProjectReleases.aspx?ReleaseId=4149</li>
+    </ul>
+	
+	    <p>
+            &nbsp;</p>
+    

@@ -13,7 +13,7 @@ namespace Cosmos.Debug.Common {
     private NamedPipeServerStream mPipe;
 
     public DebugConnectorPipeServer() {
-      mPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
+      mPipe = new NamedPipeServerStream(@"Cosmos\Serial", PipeDirection.InOut, 1
        , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
       mPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), mPipe);
     }

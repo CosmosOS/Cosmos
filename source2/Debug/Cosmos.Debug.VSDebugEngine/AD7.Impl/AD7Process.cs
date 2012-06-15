@@ -162,19 +162,25 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     private static string GetVMWareWorkstationPath() {
       using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VMware, Inc.\VMware Workstation", false)) {
-        if (xRegKey == null) {
-          return String.Empty;
+        if (xRegKey != null) {
+          string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmware.exe");
+          if (File.Exists(xResult)) {
+            return xResult;
+          }
         }
-        return Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmware.exe");
+        return "";
       }
     }
 
     private static string GetVMWarePlayerPath() {
       using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\VMware Player", false)) {
-        if (xRegKey == null) {
-          return String.Empty;
+        if (xRegKey != null) {
+          string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmplayer.exe");
+          if (File.Exists(xResult)) {
+            return xResult;
+          }
         }
-        return Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmplayer.exe");
+        return "";
       }
     }
 
@@ -255,12 +261,14 @@ namespace Cosmos.Debug.VSDebugEngine {
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
 
-      mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Debug.HostProcess.exe"));
-      if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "VMWare")) {
+      mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
+      string xBuildTarget = mDebugInfo["BuildTarget"].ToUpper();
+      if (xBuildTarget == "VMWARE") {
         mTargetHost = TargetHost.VMWare;
-        if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Player")) {
+        string xFlavor = mDebugInfo["VMWareFlavor"].ToUpper();
+        if (xFlavor == "PLAYER") {
           mVMWareFlavor = VMwareFlavor.Player;
-        } else if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["VMWareFlavor"], "Workstation")) {
+        } else if (xFlavor == "WORKSTATION") {
           mVMWareFlavor = VMwareFlavor.Workstation;
         } else {
           throw new Exception("VMWare Flavor '" + mDebugInfo["VMWareFlavor"] + "' not implemented!");
