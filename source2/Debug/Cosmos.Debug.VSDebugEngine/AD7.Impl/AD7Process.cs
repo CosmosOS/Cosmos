@@ -81,6 +81,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     protected const string mDebugVmxFile = "Debug.vmx";
+    Host.Base mHost;
     protected void LaunchVMWare(bool aGDB) {
       OutputText("Preparing VMWare.");
 
@@ -144,6 +145,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           break;
         case VMwareFlavor.Player:
           xVmwarePath = GetVMWarePlayerPath();
+          mHost = new Host.VMWarePlayer(xPath + "Debug.vmx");
           mProcessStartInfo.Arguments = "false \"" + xVmwarePath + "\" \"" + xPath + "Debug.vmx\"";
           break;
         default:
@@ -548,6 +550,8 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDebugInfoDb = null;
         }
       }
+
+      mHost.Stop();
 
       string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
       CleanupVMWare(xPath, mDebugVmxFile);
