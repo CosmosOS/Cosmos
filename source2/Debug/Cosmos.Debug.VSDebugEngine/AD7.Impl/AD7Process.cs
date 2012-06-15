@@ -275,7 +275,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mProcessStartInfo.UseShellExecute = false;
       mProcessStartInfo.RedirectStandardInput = true;
       mProcessStartInfo.RedirectStandardError = true;
-      mProcessStartInfo.RedirectStandardOutput = !xNormal;
+      mProcessStartInfo.RedirectStandardOutput = xNormal;
       mProcessStartInfo.CreateNoWindow = xNormal;
 
       string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
