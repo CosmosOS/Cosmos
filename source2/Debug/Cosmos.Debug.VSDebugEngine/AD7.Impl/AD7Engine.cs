@@ -247,6 +247,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         int xProcessID = EngineUtils.GetProcessId(aProcess);
 
         mProcess.Terminate();
+        //VMWareStop();
+
         mEngineCallback.OnProcessExit(0);
         mProgram = null;
       } catch (Exception e) {
