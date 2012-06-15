@@ -9,6 +9,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     protected string mVmxFile;
 
     public VMWare(string aVmxFile) {
+      mVmxFile = aVmxFile;
     }
 
     public override void Stop() {
