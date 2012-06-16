@@ -97,10 +97,10 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddPatterns() {
-      AddPattern(new TokenType[] { TokenType.LiteralAsm },
+      AddPattern("! Move EAX, 0",
         "new LiteralAssemblerCode(\"{0}\");"
       );
-      AddPattern(new TokenType[] { TokenType.Comment },
+      AddPattern("# Comment",
         "new Comment(\"{0}\");"
       );
       AddPattern("Label:" ,
@@ -205,20 +205,11 @@ namespace Cosmos.Compiler.XSharp {
       mPatterns.Add(new TokenPattern(aPattern), aCode);
     }
 
-    protected void AddPattern(TokenType[] aPattern, CodeFunc aCode) {
-      mPatterns.Add(new TokenPattern(aPattern), aCode);
-    }
-
     protected void AddPattern(string aPattern, string aCode) {
       AddPattern(aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(aCode);
       });
     }
 
-    protected void AddPattern(TokenType[] aPattern, string aCode) {
-      AddPattern(aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(aCode); 
-      });
-    }
   }
 }
