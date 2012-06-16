@@ -13,7 +13,6 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
-    //protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
     protected string mGroup;
@@ -114,19 +113,19 @@ namespace Cosmos.Compiler.XSharp {
         "new Label(\"{0}\");"
       );
 
-      AddPattern("EAX = 123",
+      AddPattern("REG = 123",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
-      AddPattern("EAX = EAX",
+      AddPattern("REG = REG",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      AddPattern("EAX = EAX[1]",
+      AddPattern("REG = REG[1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {4}"
           + "}};"
       );
-      AddPattern("EAX = EAX[-1]",
+      AddPattern("REG = REG[-1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = -{4}"
@@ -139,18 +138,18 @@ namespace Cosmos.Compiler.XSharp {
         "new Out {{ DestinationReg = RegistersEnum.{5}}};"
       );
 
-      AddPattern("+EAX",
+      AddPattern("+REG",
         "new Push {{"
           + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
-      AddPattern("-EAX",
+      AddPattern("-REG",
         "new Pop {{"
           + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
 
-      AddPattern("Variable = EAX", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Variable = REG", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("new Mov {{"
          + " DestinationRef = Cosmos.Assembler.ElementReference.New(\"" + mGroup + "_{0}\"), DestinationIsIndirect = true"
          + " , SourceReg = RegistersEnum.{2}"
@@ -158,7 +157,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      AddPattern("EAX + 1", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("REG + 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
           rCode.Add("new INC {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
@@ -166,7 +165,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      AddPattern("EAX - 1", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("REG - 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
           rCode.Add("new Dec {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
@@ -223,12 +222,97 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    static protected string RegList;
+
+    protected static string ArrayToCSV(string[] aList) {
+      var xResult = new StringBuilder();
+      foreach (var x in aList) {
+        xResult.Append("," + x);
+      }
+      return xResult.Remove(0, 1).ToString();
+    }
+
+    static TokenPatterns() {
+      RegList = ArrayToCSV(Parser.Registers);
+    }
+
+    protected TokenList ParsePatterns(TokenList aTokens) {
+      var xResult = new TokenList();
+
+      // Wildcards (All caps only)
+      // -REG or ??X
+      // -REG8 or ?H,?L
+      // -REG16 or ?X
+      // -REG32 or E?X
+      //     - ? based ones are ugly and less clear
+      // -KEYWORD
+      // -ABC123
+      //
+      // Multiple Options (All caps only) - Registers only
+      // -AX/AL - Conflict if we ever use /
+      // -AX|AL - Conflict if we ever use |
+      // -AX,AL - , is unlikely to ever be used as an operator and is logical as a separator. Method calls might use, but likely better to use a space 
+      //          since we will only allow simple arguments, not compound.
+      // -REG:AX|AL - End terminator issue
+      // -REG[AX|AL] - Conflict with existing indirect access. Is indirect access always numeric? I think x86 has some register based ones too.
+      //
+      // Specific: Register, Keyword, AlphaNum
+      // -EAX
+
+      Token xNext;
+      int xCount = aTokens.Count;
+      for (int i = 0; i < xCount; i++) {
+        var xToken = aTokens[i];
+        xNext = null;
+        if (i < xCount - 2) {
+          xNext = aTokens[i + 1];
+        }
+
+        if (xToken.Type == TokenType.AlphaNum) {
+          if (xToken.Value == "REG") {
+            xToken.Type = TokenType.Register;
+            xToken.Value = RegList;
+          } else if (xToken.Value == "REG8") {
+            xToken.Type = TokenType.Register;
+            //xToken.Value = Reg8List;
+          } else if (xToken.Value == "REG16") {
+            xToken.Type = TokenType.Register;
+            //xToken.Value = Reg16List;
+          } else if (xToken.Value == "REG32") {
+            xToken.Type = TokenType.Register;
+            //xToken.Value = Reg32List;
+          } else if (xToken.Value == "KEYWORD") {
+            xToken.Type = TokenType.Keyword;
+            xToken.Value = null;
+          } else if (xToken.Value == "ABC123") {
+            xToken.Value = null;
+          }
+        } else if (xToken.Type == TokenType.Register && xNext != null && xNext.Type == TokenType.Comma) {
+          var xSB = new StringBuilder();
+          while (xToken.Type == TokenType.Register || xToken.Type == TokenType.Comma) {
+            xSB.Append(xToken.Value);
+            xToken = aTokens[++i];
+          }
+          xToken.Type = TokenType.Register;
+          xToken.Value = xSB.ToString();
+        }
+
+        xResult.Add(xToken);
+      }
+
+      return xResult;
+    }
+
     protected void AddPattern(string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false);
-      var xPattern = new Pattern();
-      xPattern.Tokens = xParser.Tokens;
-      xPattern.Hash = xParser.Tokens.GetHashCode();
-      xPattern.Code = aCode;
+      var xTokens = ParsePatterns(xParser.Tokens);
+
+      var xPattern = new Pattern() {
+        Tokens = xTokens,
+        Hash = xTokens.GetHashCode(),
+        Code = aCode
+      };
+
       mPatterns.Add(xPattern);
     }
 

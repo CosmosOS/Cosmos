@@ -15,7 +15,7 @@ namespace Cosmos.Compiler.XSharp {
       get { return mTokens; }
     }
 
-    protected static string[] mKeywords = new string[] { 
+    public static string[] mKeywords = new string[] { 
       "CALL"
       , "END", "EXIT"
       , "GROUP"
@@ -24,7 +24,7 @@ namespace Cosmos.Compiler.XSharp {
       , "POPALL", "PUSHALL", "PROCEDURE", "PORT"
       , "RETURN", "RETURNINTERRUPT"
     };
-    protected static string[] mRegisters = new string[] { 
+    public static string[] Registers = new string[] { 
       "EAX", "AX", "AH", "AL",
       "EBX", "BX", "BH", "BL",
       "ECX", "CX", "CH", "CL",
@@ -51,7 +51,7 @@ namespace Cosmos.Compiler.XSharp {
           xToken.Type = TokenType.WhiteSpace;
         } else if (char.IsLetter(xChar1)) {
           string xUpper = xString.ToUpper();
-          if (mRegisters.Contains(xUpper)) {
+          if (Registers.Contains(xUpper)) {
             xToken.Type = TokenType.Register;
           } else if (mKeywords.Contains(xUpper)) {
             xToken.Type = TokenType.Keyword;
@@ -80,6 +80,8 @@ namespace Cosmos.Compiler.XSharp {
           xToken.Type = TokenType.Dollar;
         } else if (xString == ".") {
           xToken.Type = TokenType.Dot;
+        } else if (xString == ",") {
+          xToken.Type = TokenType.Comma;
         } else {
           xToken.Type = TokenType.Unknown;
         }
