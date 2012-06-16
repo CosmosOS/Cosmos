@@ -1,4 +1,5 @@
-#define ChangeSetVersion "92560"
+; Do NOT change this next line in Dev Kit
+#define ChangeSetVersion "7"
 
 #ifndef BuildConfiguration
 	#error "No Build configuration defined!"
@@ -31,7 +32,7 @@ AppVersion={#ChangeSetVersion}
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
-OutputBaseFilename=CosmosUserKit
+OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}
 #ifdef Compress
 Compression=lzma2/ultra64
 InternalCompressLevel=ultra64

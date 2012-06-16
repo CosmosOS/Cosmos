@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Security.Permissions;
 using System.Windows.Threading;
 using System.IO;
+using Microsoft.VisualBasic;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
@@ -39,23 +40,36 @@ namespace Cosmos.Build.Builder {
     StringBuilder mClipboard = new StringBuilder();
     DispatcherTimer mCloseTimer;
 
-    public void Build() {
+    public bool Build() {
       // TODO: Check for Inno, VS SDK SP1, other prereqs
 
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       string xCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
+      bool xIsUserKit = mApp.Args.Contains("-USERKIT");
+      int xReleaseNo = 7;
 
-      var xTask = new CosmosTask(xCosmosPath, mApp.Args.Contains("-USERKIT"));
+      if (xIsUserKit) {
+        string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
+        if (string.IsNullOrEmpty(x)) {
+          return false;
+        }
+        xReleaseNo = int.Parse(x);
+      }
+
+      var xTask = new CosmosTask(xCosmosPath, xReleaseNo);
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
       xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
       xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
       xTask.ResetHive = mApp.Args.Contains("-RESETHIVE");
+      xTask.IsUserKit = xIsUserKit;
 
       var xThread = new System.Threading.Thread(delegate() {
         xTask.Run();
         ThreadDone();
       });
       xThread.Start();
+
+      return true;
     }
 
     void ThreadDone() {
@@ -152,7 +166,9 @@ namespace Cosmos.Build.Builder {
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
-      Build();
+      if (!Build()) {
+        Close();
+      }
     }
 
     void butnCopy_Click(object sender, RoutedEventArgs e) {
