@@ -54,7 +54,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenList.cs" />
-    <Compile Include="TokenPattern.cs" />
     <Compile Include="TokenPatterns.cs" />
   </ItemGroup>
   <ItemGroup>

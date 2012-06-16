@@ -128,6 +128,9 @@ namespace Cosmos.Compiler.XSharp {
 
     // Initial Parse to convert text to tokens
     protected List<Token> ParseText() {
+      // Save in comment, might be useful in future. Already had to dig it out of TFS once
+      //var xRegex = new Regex(@"(\W)");
+
       var xResult = new List<Token>();
       char xLastChar = ' ';
       CharType xLastCharType = CharType.WhiteSpace;

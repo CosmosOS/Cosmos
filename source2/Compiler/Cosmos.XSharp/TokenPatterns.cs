@@ -6,8 +6,15 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPatterns {
+    protected class Pattern {
+      public TokenList Tokens;
+      public int Hash;
+      public CodeFunc Code;
+    }
+
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
-    protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
+    //protected Dictionary<TokenPattern, CodeFunc> mPatterns = new Dictionary<TokenPattern, CodeFunc>();
+    protected List<Pattern> mPatterns = new List<Pattern>();
     protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
     protected string mGroup;
     protected string mProcedureName;
@@ -25,8 +32,7 @@ namespace Cosmos.Compiler.XSharp {
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = aTokens[1].Value;
-        var xPattern = new TokenPattern(aTokens);
-        if (xPattern == "Call ABC") {
+        if (aTokens.PatternMatches("Call ABC")) {
           rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
         } else {
           rCode = null;
@@ -38,8 +44,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddKeyword("Group", delegate(TokenList aTokens, ref List<string> rCode) {
-        var xPattern = new TokenPattern(aTokens);
-        if (xPattern == "Group ABC") {
+        if (aTokens.PatternMatches("Group ABC")) {
           mGroup = aTokens[1].Value;
         } else {
           rCode = null;
@@ -48,8 +53,7 @@ namespace Cosmos.Compiler.XSharp {
 
       AddKeyword("InterruptHandler", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = true;
-        var xPattern = new TokenPattern(aTokens);
-        if (xPattern == "InterruptHandler ABC {") {
+        if (aTokens.PatternMatches("InterruptHandler ABC {")) {
           mProcedureName = aTokens[1].Value;
           rCode.Add("new Label(\"" + mGroup + "_{1}\");");
         } else {
@@ -58,8 +62,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddKeyword("Jump", delegate(TokenList aTokens, ref List<string> rCode) {
-        var xPattern = new TokenPattern(aTokens);
-        if (xPattern == "Jump ABC") {
+        if (aTokens.PatternMatches("Jump ABC")) {
           rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
         } else {
           rCode = null;
@@ -73,8 +76,7 @@ namespace Cosmos.Compiler.XSharp {
 
       AddKeyword("Procedure", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
-        var xPattern = new TokenPattern(aTokens);
-        if (xPattern == "Procedure ABC {") {
+        if (aTokens.PatternMatches("Procedure ABC {")) {
           mProcedureName = aTokens[1].Value;
           rCode.Add("new Label(\"" + mGroup + "_{1}\");");
         } else {
@@ -194,11 +196,13 @@ namespace Cosmos.Compiler.XSharp {
         }
       }
       if (xAction == null) {
-        var xPattern = new TokenPattern(aTokens);
-        if (!mPatterns.TryGetValue(xPattern, out xAction)) {
+        int xHash = aTokens.GetPatternHashCode();
+        var xPatterns = mPatterns.Where(q => q.Hash == xHash);
+        var xPattern = xPatterns.FirstOrDefault();
+        if (xPattern == null) {
           throw new Exception("Token pattern not found.");
         }
-        xAction(aTokens, ref xResult);
+        xPattern.Code(aTokens, ref xResult); 
       }
 
       for(int i = 0; i < xResult.Count; i++) {
@@ -208,7 +212,12 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddPattern(string aPattern, CodeFunc aCode) {
-      mPatterns.Add(new TokenPattern(aPattern), aCode);
+      var xParser = new Parser(aPattern, false);
+      var xPattern = new Pattern();
+      xPattern.Tokens = xParser.Tokens;
+      xPattern.Hash = xParser.Tokens.GetHashCode();
+      xPattern.Code = aCode;
+      mPatterns.Add(xPattern);
     }
 
     protected void AddPattern(string aPattern, string aCode) {
