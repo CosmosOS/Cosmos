@@ -29,7 +29,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     public uint? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
     protected TargetHost mTargetHost;
-    protected VMwareFlavor mVMWareFlavor = VMwareFlavor.Player;
     internal DebugInfo mDebugInfoDb;
     internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
@@ -49,142 +48,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // Pipe to receive messages from Cosmos.VS.Windows
     static private Cosmos.Debug.Common.PipeServer mDebugUpPipe = null;
 
-    protected void DeleteFiles(string aPath, string aPattern) {
-      var xFiles = Directory.GetFiles(aPath, aPattern);
-      foreach (var xFile in xFiles) {
-        File.Delete(xFile);
-      }
-    }
-
-    protected void CleanupVMWare(string aPath, string aVmxFile) {
-      try {
-        // Delete old Debug.vmx and other files that might be left over from previous run
-        // Especially important with newer versions of VMWare player which defaults to suspend
-        // when the close button is used.
-        File.Delete(Path.Combine(aPath, aVmxFile));
-        File.Delete(Path.Combine(aPath, Path.ChangeExtension(aVmxFile, ".nvram")));
-        // Delete the auto snapshots that latest vmware players create as default
-        // It creates them with suffixes though, so we need to wild card find them
-        DeleteFiles(aPath, "*.vmxf");
-        DeleteFiles(aPath, "*.vmss");
-        DeleteFiles(aPath, "*.vmsd");
-        DeleteFiles(aPath, "*.vmem");
-        // Delete log files so that logged data is only from last boot
-        File.Delete(Path.Combine(aPath, "vmware.log"));
-        File.Delete(Path.Combine(aPath, "vmware-0.log"));
-        File.Delete(Path.Combine(aPath, "vmware-1.log"));
-        File.Delete(Path.Combine(aPath, "vmware-2.log"));
-      } catch (Exception e) {
-        // Ignore errors, users can stop VS while VMWare is still running and files
-        // will be locked.
-      }
-    }
-
-    protected const string mDebugVmxFile = "Debug.vmx";
     Host.Base mHost;
-    protected void LaunchVMWare(bool aGDB) {
-      OutputText("Preparing VMWare.");
-
-      string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
-      CleanupVMWare(xPath, mDebugVmxFile);
-
-      // VMWare doesn't like to boot a read only VMX.
-      // We also need to make changes based on project / debug settings.
-      // Finally we do not want to create VCS checkins based on local user changes.
-      // Because of this we use Cosmos.vmx as a template and output a Debug.vmx on
-      // every run.
-      using (var xSrc = new StreamReader(xPath + "Cosmos.vmx")) {
-        try {
-          // Write out Debug.vmx
-          using (var xDest = new StreamWriter(Path.Combine(xPath, mDebugVmxFile))) {
-            string xLine;
-            while ((xLine = xSrc.ReadLine()) != null) {
-              var xParts = xLine.Split('=');
-              if (xParts.Length == 2) {
-                string xName = xParts[0].Trim();
-                string xValue = xParts[1].Trim();
-
-                // We delete uuid entries so VMWare doenst ask the user "Did you move or copy" the file
-                if ((xName == "uuid.location") || (xName == "uuid.bios")) {
-                  xValue = null;
-                } else if (xName == "ide1:0.fileName") {
-                  xValue = "\"" + mDebugInfo["ISOFile"] + "\"";
-                } else if (xName == "nvram") {
-                  xValue = "\"Debug.nvram\"";
-                }
-
-                if (xValue != null) {
-                  xDest.WriteLine(xName + " = " + xValue);
-                }
-              }
-            }
-            if (aGDB) {
-              xDest.WriteLine();
-              xDest.WriteLine("debugStub.listen.guest32 = \"TRUE\"");
-              xDest.WriteLine("debugStub.hideBreakpoints = \"TRUE\"");
-              xDest.WriteLine("monitor.debugOnStartGuest32 = \"TRUE\"");
-              xDest.WriteLine("debugStub.listen.guest32.remote = \"TRUE\"");
-            }
-          }
-        } catch (IOException e) {
-          if (e.Message.Contains(mDebugVmxFile)) {
-            throw new Exception("The Vmware image " + mDebugVmxFile + " is still in use! Please exit current Vmware session with Cosmos and try again!", e);
-          }
-          throw e;
-        }
-      }
-
-      string xVmwarePath;
-      switch (mVMWareFlavor) {
-        case VMwareFlavor.Workstation:
-          xVmwarePath = GetVMWareWorkstationPath();
-          if (String.IsNullOrEmpty(xVmwarePath)) {
-            goto case VMwareFlavor.Player;
-          }
-          mProcessStartInfo.Arguments = "false \"" + xVmwarePath + "\" -x -q \"" + xPath + "Debug.vmx\"";
-          break;
-        case VMwareFlavor.Player:
-          xVmwarePath = GetVMWarePlayerPath();
-          mHost = new Host.VMWarePlayer(xPath + "Debug.vmx");
-          mProcessStartInfo.Arguments = "false \"" + xVmwarePath + "\" \"" + xPath + "Debug.vmx\"";
-          break;
-        default:
-          throw new NotImplementedException("VMWare flavor '" + mVMWareFlavor.ToString() + "' not implemented!");
-      }
-      //mProcessStartInfo.Arguments = "true \"" + xPath + "Debug.vmx\" -x -q";
-      // -x: Auto power on VM. Must be small x, big X means something else.
-      // -q: Close VMWare when VM is powered off.
-      // Options must come beore the vmx, and cannot use shellexecute
-
-      if (String.IsNullOrEmpty(xVmwarePath) || !File.Exists(xVmwarePath)) {
-        OutputText("VMWare not found.");
-        MessageBox.Show("VWMare is not installed, probably going to crash now!", "Cosmos DebugEngine", MessageBoxButtons.OK, MessageBoxIcon.Error);
-      }
-    }
-
-    private static string GetVMWareWorkstationPath() {
-      using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VMware, Inc.\VMware Workstation", false)) {
-        if (xRegKey != null) {
-          string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmware.exe");
-          if (File.Exists(xResult)) {
-            return xResult;
-          }
-        }
-        return "";
-      }
-    }
-
-    private static string GetVMWarePlayerPath() {
-      using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\VMware Player", false)) {
-        if (xRegKey != null) {
-          string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), "vmplayer.exe");
-          if (File.Exists(xResult)) {
-            return xResult;
-          }
-        }
-        return "";
-      }
-    }
 
     public string mISO;
     public string mProjectFile;
@@ -268,16 +132,27 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (xBuildTarget == "VMWARE") {
         mTargetHost = TargetHost.VMWare;
         string xFlavor = mDebugInfo["VMWareFlavor"].ToUpper();
-        if (xFlavor == "PLAYER") {
-          mVMWareFlavor = VMwareFlavor.Player;
-        } else if (xFlavor == "WORKSTATION") {
-          mVMWareFlavor = VMwareFlavor.Workstation;
-        } else {
-          throw new Exception("VMWare Flavor '" + mDebugInfo["VMWareFlavor"] + "' not implemented!");
+        string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
+        
+        // Try alternate if selected one is not installed
+        if (xFlavor == "PLAYER" && !Host.VMWarePlayer.IsInstalled) {
+          xFlavor = "WORKSTATION";
+        } else if (xFlavor == "WORKSTATION" && !Host.VMWareWorkstation.IsInstalled) {
+          xFlavor = "PLAYER";
         }
-        LaunchVMWare(xGDBDebugStub);
+
+        if (xFlavor == "PLAYER" && Host.VMWarePlayer.IsInstalled) {
+          mHost = new Host.VMWarePlayer(xVmxFile);
+        } else if (xFlavor == "WORKSTATION" && Host.VMWareWorkstation.IsInstalled) {
+          mHost = new Host.VMWareWorkstation(xVmxFile);
+        } else {
+          throw new Exception("VMWare Flavor '" + xFlavor + "' not implemented.");
+        }
+
+        OutputText("Preparing VMWare.");
+        mProcessStartInfo.Arguments = mHost.Start(mDebugInfo["ISOFile"], xGDBDebugStub);
       } else {
-        throw new Exception("Invalid BuildTarget value: '" + mDebugInfo["BuildTarget"] + "'!");
+        throw new Exception("Invalid BuildTarget value: '" + xBuildTarget + "'.");
       }
 
       // Set to false for debugging, true otherwise
@@ -290,7 +165,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
       if (!File.Exists(xCpdbPath)) {
-        throw new Exception("Debug data file " + xCpdbPath + " not found! Could be a omitted build process of Cosmos project so that not created.");
+        throw new Exception("Debug data file " + xCpdbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
       }
 
       mDebugInfoDb = new DebugInfo();
@@ -313,7 +188,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDbgConnector.Connected = DebugConnectorConnected;
       }
       if (mDbgConnector == null) {
-        throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'!");
+        throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'.");
       }
 
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
@@ -552,9 +427,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mHost.Stop();
-
-      string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation") + @"\";
-      CleanupVMWare(xPath, mDebugVmxFile);
 
       OutputText("Debugger terminated.");
       return VSConstants.S_OK;
