@@ -197,11 +197,23 @@ namespace Cosmos.Compiler.XSharp {
       }
       if (xAction == null) {
         int xHash = aTokens.GetPatternHashCode();
+        
+        // Get a list of matching hashes, but then we have to 
+        // search for exact pattern match because it is possible
+        // to have duplicate hashes. Hashes just provide us a quick way
+        // to reduce the search.
         var xPatterns = mPatterns.Where(q => q.Hash == xHash);
-        var xPattern = xPatterns.FirstOrDefault();
+        Pattern xPattern = null;
+        foreach (var x in xPatterns) {
+          if (x.Tokens.PatternMatches(aTokens)) {
+            xPattern = x;
+            break;
+          }
+        }
         if (xPattern == null) {
           throw new Exception("Token pattern not found.");
         }
+
         xPattern.Code(aTokens, ref xResult); 
       }
 
