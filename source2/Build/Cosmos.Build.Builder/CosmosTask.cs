@@ -10,9 +10,11 @@ namespace Cosmos.Build.Builder {
     protected string mCosmosPath;
     public bool ResetHive { get; set; }
     protected string mOutputPath;
+    protected bool mUserKit;
 
-    public CosmosTask(string aCosmosPath) {
+    public CosmosTask(string aCosmosPath, bool aUserKit) {
       mCosmosPath = aCosmosPath;
+      mUserKit = aUserKit;
     }
 
     protected void MsBuild(string aSlnFile, string aBuildCfg) {
@@ -62,24 +64,29 @@ namespace Cosmos.Build.Builder {
       if (!File.Exists(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe")) {
         throw new Exception("Cannot find Inno setup.");
       }
-      StartConsole(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe", @"/Q " + Quoted(mCosmosPath + @"\Setup2\Cosmos.iss") + " /dBuildConfiguration=Devkit");
+      string xCfg = mUserKit ? "UserKit" : "DevKit";
+      StartConsole(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe", @"/Q " + Quoted(mCosmosPath + @"\Setup2\Cosmos.iss") + " /dBuildConfiguration=" + xCfg);
 
-      Section("Running Setup");
-      Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit.exe", @"/SILENT");
+      if (!mUserKit) {
+        Section("Running Setup");
+        Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit.exe", @"/SILENT");
 
-      Section("Launching Visual Studio");
-      string xVisualStudio = Paths.ProgFiles32 + @"\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe";
-      if (!File.Exists(xVisualStudio)) {
-        throw new Exception("Cannot find Visual Studio.");
+        Section("Launching Visual Studio");
+        string xVisualStudio = Paths.ProgFiles32 + @"\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe";
+        if (!File.Exists(xVisualStudio)) {
+          throw new Exception("Cannot find Visual Studio.");
+        }
+
+        if (ResetHive) {
+          Echo("Resetting hive");
+          Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
+        }
+
+        Echo("Launching Visual Studio");
+        Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false);
       }
 
-      if (ResetHive) {
-        Echo("Resetting hive");
-        Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
-      }
-
-      Echo("Launching Visual Studio");
-      Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false);
+      Section("Build Complete!");
     }
   }
 }

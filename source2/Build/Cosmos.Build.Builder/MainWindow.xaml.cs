@@ -45,7 +45,7 @@ namespace Cosmos.Build.Builder {
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       string xCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
 
-      var xTask = new CosmosTask(xCosmosPath);
+      var xTask = new CosmosTask(xCosmosPath, mApp.Args.Contains("-USERKIT"));
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
       xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
       xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
