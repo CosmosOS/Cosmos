@@ -6,48 +6,35 @@ using System.Text.RegularExpressions;
 
 namespace Cosmos.Compiler.XSharp {
   public class TokenPattern {
-    protected TokenType[] mTokenTypes;
-    // Since we make our contents immutable, we can cache the hash code
-    protected int mHashCode;
+    protected TokenList mTokens;
 
     public TokenPattern(string aTokenPattern) {
       // Save in comment, might be useful in future. Already had to dig it out of TFS once
       //var xRegex = new Regex(@"(\W)");
 
       var xParser = new Parser(aTokenPattern, false);
-      mTokenTypes = xParser.Tokens.Select(c => c.Type).ToArray();
-      Init();
+      mTokens = xParser.Tokens;
     }
 
-    public TokenPattern(TokenList aTokenTypes) {
-      mTokenTypes = aTokenTypes.Select(c => c.Type).ToArray();
-      Init();
-    }
-
-    public TokenPattern(TokenType[] aTokenTypes) {
-      mTokenTypes = (TokenType[])aTokenTypes.Clone();
-      Init();
+    public TokenPattern(TokenList aTokens) {
+      mTokens = aTokens;
     }
 
     public static bool operator ==(TokenPattern a1, string a2) {
       var xParse = new Parser(a2, false);
-      return a1.Equals(xParse.Tokens.Pattern);
+      return a1.Equals(new TokenPattern(xParse.Tokens));
     }
     public static bool operator !=(TokenPattern a1, string a2) {
       var xParse = new Parser(a2, false);
-      return !a1.Equals(xParse.Tokens.Pattern);
-    }
-
-    protected void Init() {
-      mHashCode = CalcHashCode();
+      return !a1.Equals(new TokenPattern(xParse.Tokens));
     }
 
     public override bool Equals(object aObj) {
       if (aObj is TokenPattern) {
         var xObj = (TokenPattern)aObj;
-        if (mTokenTypes.Length == xObj.mTokenTypes.Length) {
-          for (int i = 0; i < xObj.mTokenTypes.Length; i++) {
-            if (mTokenTypes[i] != xObj.mTokenTypes[i]) {
+        if (mTokens.Count == xObj.mTokens.Count) {
+          for (int i = 0; i < xObj.mTokens.Count; i++) {
+            if (mTokens[i].Type != xObj.mTokens[i].Type) {
               return false;
             }
           }
@@ -58,23 +45,23 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     public override int GetHashCode() {
-      return mHashCode;
-    }
-
-    protected int CalcHashCode() {
       int xResult = 0;
       var xBytes = new byte[4];
-      for (int i = 0; i < mTokenTypes.Length; i = i + 4) {
+      for (int i = 0; i < mTokens.Count; i = i + 4) {
         for (int j = 0; j < 4; j++) {
-          if (j < mTokenTypes.Length) {
-            xBytes[j] = (byte)mTokenTypes[i];
+          if (j < mTokens.Count) {
+            xBytes[j] = (byte)mTokens[i].Type;
           } else {
             xBytes[j] = 0;
           }
         }
         xResult = xResult ^ BitConverter.ToInt32(xBytes, 0);
       }
+      //foreach (var x in mTokens) {
+      //  xResult = xResult ^ x.Value.GetHashCode();
+      //}
       return xResult;
     }
+
   }
 }

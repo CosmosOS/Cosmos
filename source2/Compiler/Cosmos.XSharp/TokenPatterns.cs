@@ -25,7 +25,8 @@ namespace Cosmos.Compiler.XSharp {
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = aTokens[1].Value;
-        if (aTokens.Pattern == "Call ABC") {
+        var xPattern = new TokenPattern(aTokens);
+        if (xPattern == "Call ABC") {
           rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
         } else {
           rCode = null;
@@ -37,7 +38,8 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddKeyword("Group", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (aTokens.Pattern == "Group ABC") {
+        var xPattern = new TokenPattern(aTokens);
+        if (xPattern == "Group ABC") {
           mGroup = aTokens[1].Value;
         } else {
           rCode = null;
@@ -46,7 +48,8 @@ namespace Cosmos.Compiler.XSharp {
 
       AddKeyword("InterruptHandler", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = true;
-        if (aTokens.Pattern == "InterruptHandler ABC {") {
+        var xPattern = new TokenPattern(aTokens);
+        if (xPattern == "InterruptHandler ABC {") {
           mProcedureName = aTokens[1].Value;
           rCode.Add("new Label(\"" + mGroup + "_{1}\");");
         } else {
@@ -55,7 +58,8 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddKeyword("Jump", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (aTokens.Pattern == "Jump ABC") {
+        var xPattern = new TokenPattern(aTokens);
+        if (xPattern == "Jump ABC") {
           rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
         } else {
           rCode = null;
@@ -69,7 +73,8 @@ namespace Cosmos.Compiler.XSharp {
 
       AddKeyword("Procedure", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
-        if (aTokens.Pattern == "Procedure ABC {") {
+        var xPattern = new TokenPattern(aTokens);
+        if (xPattern == "Procedure ABC {") {
           mProcedureName = aTokens[1].Value;
           rCode.Add("new Label(\"" + mGroup + "_{1}\");");
         } else {
@@ -189,7 +194,8 @@ namespace Cosmos.Compiler.XSharp {
         }
       }
       if (xAction == null) {
-        if (!mPatterns.TryGetValue(aTokens.Pattern, out xAction)) {
+        var xPattern = new TokenPattern(aTokens);
+        if (!mPatterns.TryGetValue(xPattern, out xAction)) {
           throw new Exception("Token pattern not found.");
         }
         xAction(aTokens, ref xResult);

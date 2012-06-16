@@ -97,13 +97,12 @@ namespace Cosmos.Compiler.XSharp {
     protected enum CharType { WhiteSpace, Identifier, Symbol };
     protected void Parse() {
       var xTokens = ParseText();
-      xTokens = ParseTokens(xTokens);
-      mTokens = new TokenList(xTokens);
+      mTokens = ParseTokens(xTokens);
     }
 
     // Rescan token patterns
-    protected List<Token> ParseTokens(List<Token> aTokens) {
-      var xResult = new List<Token>();
+    protected TokenList ParseTokens(List<Token> aTokens) {
+      var xResult = new TokenList();
 
       for (int i = 0; i < aTokens.Count; i++) {
         int xRemainingTokens = aTokens.Count - i;

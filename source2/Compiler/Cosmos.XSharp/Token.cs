@@ -21,8 +21,8 @@ namespace Cosmos.Compiler.XSharp {
 
   public class Token {
     public TokenType Type;
+    public string Value;
     public int SrcPosStart;
     public int SrcPosEnd;
-    public string Value;
   }
 }
