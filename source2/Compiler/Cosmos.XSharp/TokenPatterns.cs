@@ -31,7 +31,7 @@ namespace Cosmos.Compiler.XSharp {
     protected void AddKeywords() {
       AddKeyword("Call", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = aTokens[1].Value;
-        if (aTokens.PatternMatches("Call ABC123")) {
+        if (aTokens.PatternMatches("Call _ABC")) {
           rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
         } else {
           rCode = null;
@@ -43,7 +43,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddKeyword("Group", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (aTokens.PatternMatches("Group ABC123")) {
+        if (aTokens.PatternMatches("Group _ABC")) {
           mGroup = aTokens[1].Value;
         } else {
           rCode = null;
@@ -52,7 +52,7 @@ namespace Cosmos.Compiler.XSharp {
 
       AddKeyword("InterruptHandler", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = true;
-        if (aTokens.PatternMatches("InterruptHandler ABC123 {")) {
+        if (aTokens.PatternMatches("InterruptHandler _ABC {")) {
           mProcedureName = aTokens[1].Value;
           rCode.Add("new Label(\"" + mGroup + "_{1}\");");
         } else {
@@ -61,7 +61,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddKeyword("Jump", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (aTokens.PatternMatches("Jump ABC123")) {
+        if (aTokens.PatternMatches("Jump _ABC")) {
           rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
         } else {
           rCode = null;
@@ -75,7 +75,7 @@ namespace Cosmos.Compiler.XSharp {
 
       AddKeyword("Procedure", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
-        if (aTokens.PatternMatches("Procedure ABC123 {")) {
+        if (aTokens.PatternMatches("Procedure _ABC {")) {
           mProcedureName = aTokens[1].Value;
           rCode.Add("new Label(\"" + mGroup + "_{1}\");");
         } else {
@@ -109,23 +109,23 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("# Comment",
         "new Comment(\"{0}\");"
       );
-      AddPattern("ABC123:" ,
+      AddPattern("_ABC:" ,
         "new Label(\"{0}\");"
       );
 
-      AddPattern("REG = 123",
+      AddPattern("_REG = 123",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
-      AddPattern("REG = REG",
+      AddPattern("_REG = _REG",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      AddPattern("REG = REG[1]",
+      AddPattern("_REG = _REG[1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {4}"
           + "}};"
       );
-      AddPattern("REG = REG[-1]",
+      AddPattern("_REG = _REG[-1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = -{4}"
@@ -134,22 +134,22 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("Port[DX] = AX", 
         // TODO: DX only for index
-        // TODO: Src reg can only be EAX, AX, AL
+        // TODO: Src _REG can only be EAX, AX, AL
         "new Out {{ DestinationReg = RegistersEnum.{5}}};"
       );
 
-      AddPattern("+REG",
+      AddPattern("+_REG",
         "new Push {{"
           + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
-      AddPattern("-REG",
+      AddPattern("-_REG",
         "new Pop {{"
           + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
 
-      AddPattern("ABC123 = REG", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("_ABC = _REG", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("new Mov {{"
          + " DestinationRef = Cosmos.Assembler.ElementReference.New(\"" + mGroup + "_{0}\"), DestinationIsIndirect = true"
          + " , SourceReg = RegistersEnum.{2}"
@@ -157,7 +157,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      AddPattern("REG + 1", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("_REG + 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
           rCode.Add("new INC {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
@@ -165,7 +165,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      AddPattern("REG - 1", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("_REG - 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
           rCode.Add("new Dec {{ DestinationReg = RegistersEnum.{0} }};");
         } else {
@@ -226,78 +226,11 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    protected TokenList ParsePatterns(TokenList aTokens) {
-      // Wildcards (All caps only)
-      // -REG or ??X
-      // -REG8 or ?H,?L
-      // -REG16 or ?X
-      // -REG32 or E?X
-      //     - ? based ones are ugly and less clear
-      // -KEYWORD
-      // -ABC123
-      //
-      // Multiple Options (All caps only) - Registers only
-      // -AX/AL - Conflict if we ever use /
-      // -AX|AL - Conflict if we ever use |
-      // -AX,AL - , is unlikely to ever be used as an operator and is logical as a separator. Method calls might use, but likely better to use a space 
-      //          since we will only allow simple arguments, not compound.
-      // -REG:AX|AL - End terminator issue
-      // -REG[AX|AL] - Conflict with existing indirect access. Is indirect access always numeric? I think x86 has some register based ones too.
-      //
-      // Specific: Register, Keyword, AlphaNum
-      // -EAX
-      var xResult = new TokenList();
-      Token xNext;
-      int xCount = aTokens.Count;
-      for (int i = 0; i < xCount; i++) {
-        var xToken = aTokens[i];
-        xNext = null;
-        if (i + 1 < xCount) {
-          xNext = aTokens[i + 1];
-        }
-
-        if (xToken.Type == TokenType.AlphaNum) {
-          if (xToken.Value == "REG") {
-            xToken.Type = TokenType.Register;
-            xToken.Value = Parser.RegisterList;
-          } else if (xToken.Value == "REG8") {
-            xToken.Type = TokenType.Register;
-            xToken.Value = Parser.Register8List;
-          } else if (xToken.Value == "REG16") {
-            xToken.Type = TokenType.Register;
-            xToken.Value = Parser.Register16List;
-          } else if (xToken.Value == "REG32") {
-            xToken.Type = TokenType.Register;
-            xToken.Value = Parser.Register32List;
-          } else if (xToken.Value == "KEYWORD") {
-            xToken.Type = TokenType.Keyword;
-            xToken.Value = null;
-          } else if (xToken.Value == "ABC123") {
-            xToken.Value = null;
-          }
-        } else if (xToken.Type == TokenType.Register && xNext != null && xNext.Type == TokenType.Comma) {
-          var xSB = new StringBuilder();
-          while (xToken.Type == TokenType.Register || xToken.Type == TokenType.Comma) {
-            xSB.Append(xToken.Value);
-            xToken = aTokens[++i];
-          }
-          xToken.Type = TokenType.Register;
-          xToken.Value = xSB.ToString();
-        }
-
-        xResult.Add(xToken);
-      }
-
-      return xResult;
-    }
-
     protected void AddPattern(string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false, true);
-      var xTokens = ParsePatterns(xParser.Tokens);
-
       var xPattern = new Pattern() {
-        Tokens = xTokens,
-        Hash = xTokens.GetHashCode(),
+        Tokens = xParser.Tokens,
+        Hash = xParser.Tokens.GetHashCode(),
         Code = aCode
       };
 

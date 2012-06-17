@@ -16,43 +16,62 @@ namespace Cosmos.Compiler.XSharp {
       get { return mTokens; }
     }
 
-    public static string[] mKeywords = new string[] { 
+    protected static readonly char[] mComma = ",".ToCharArray();
+    public static string[] mKeywords = (
       "CALL"
-      , "END", "EXIT"
-      , "GROUP"
-      , "INTERRUPTHANDLER"
-      , "JUMP"
-      , "POPALL", "PUSHALL", "PROCEDURE", "PORT"
-      , "RETURN", "RETURNINTERRUPT"
-    };
-    public static readonly string RegisterList;
+      + ",END,EXIT"
+      + ",GROUP"
+      + ",INTERRUPTHANDLER"
+      + ",JUMP"
+      + ",POPALL,PUSHALL,PROCEDURE,PORT"
+      + ",RETURN,RETURNINTERRUPT"
+    ).Split(mComma);
+    
     public static readonly string[] Registers;
-    public static readonly string Register8List;
-    public static readonly string[] Registers8;
-    public static readonly string Register16List;
-    public static readonly string[] Registers16;
-    public static readonly string Register32List;
-    public static readonly string[] Registers32;
-    public static readonly string RegisterIdxList;
-    public static readonly string[] RegistersIdx;
+    public static readonly string[] Registers8 = "AH,AL,BH,BL,CH,CL,DH,DL".Split(mComma);
+    public static readonly string[] Registers16 = "AX,BX,CX,DX".Split(mComma);
+    public static readonly string[] Registers32 = "EAX,EBX,ECX,EDX".Split(mComma);
+    public static readonly string[] RegistersIdx = "ESI,EDI,ESP,EBP".Split(mComma);
+    public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32".Split(mComma);
 
     static Parser() {
-      // These do not work when initialized inline, despite it compiling.
-      // So they are in a static ctor instead.
-      var xComma = ",".ToCharArray();
-      Register8List = "AH,AL,BH,BL,CH,CL,DH,DL";
-      Registers8 = Register8List.Split(xComma);
-      Register16List = "AX,BX,CX,DX";
-      Registers16 = Register16List.Split(xComma);
-      Register32List = "EAX,EBX,ECX,EDX";
-      Registers32 = Register32List.Split(xComma);
-      RegisterIdxList = "ESI,EDI,ESP,EBP";
-      RegistersIdx = RegisterIdxList.Split(xComma);
-      RegisterList = Register8List + "," + Register16List + "," + Register32List + "," + RegisterIdxList;
-      Registers = RegisterList.Split(xComma);
+      var xRegisters = new List<string>();
+      xRegisters.AddRange(Registers8);
+      xRegisters.AddRange(Registers16);
+      xRegisters.AddRange(Registers32);
+      xRegisters.AddRange(RegistersIdx);
+      Registers = xRegisters.ToArray();
     }
 
     protected Token NewToken(ref int rPos) {
+      #region Pattern Notes
+      // All patterns start with _, this makes them reserved. User can use too, but at own risk of conflict.
+      //
+      // Wildcards
+      // -_REG or ??X
+      // -_REG8 or ?H,?L
+      // -_REG16 or ?X
+      // -_REG32 or E?X
+      //     - ? based ones are ugly and less clear
+      // -_Keyword
+      // -_ABC
+      //
+      //
+      // Multiple Options (All caps only) - Registers only
+      // Used to suport EAX,EBX - ie lists. But found out wasnt really needed. May add again later.
+      //
+      // -AX/AL - Conflict if we ever use /
+      // -AX|AL - Conflict if we ever use |
+      // -AX,AL - , is unlikely to ever be used as an operator and is logical as a separator. Method calls might use, but likely better to use a space 
+      //          since we will only allow simple arguments, not compound.
+      // -_REG:AX|AL - End terminator issue
+      // -_REG[AX|AL] - Conflict with existing indirect access. Is indirect access always numeric? I think x86 has some register based ones too.
+      //
+      //
+      // Specific: Register, Keyword, AlphaNum
+      // -EAX
+      #endregion
+
       string xString = null;
       char xChar1 = mData[mStart];
       var xToken = new Token();
@@ -71,14 +90,29 @@ namespace Cosmos.Compiler.XSharp {
         if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
           xToken.Type = TokenType.WhiteSpace;
 
-        } else if (char.IsLetter(xChar1)) {
+        } else if (char.IsLetter(xChar1) || xChar1 == '_') {
           string xUpper = xString.ToUpper();
-          if (Registers.Contains(xUpper)) {
-            xToken.Type = TokenType.Register;
-          } else if (mKeywords.Contains(xUpper)) {
-            xToken.Type = TokenType.Keyword;
-          } else {
-            xToken.Type = TokenType.AlphaNum;
+
+          if (mAllowPatterns) {
+            if (RegisterPatterns.Contains(xUpper)) {
+              xToken.Type = TokenType.Register;
+            } else if (xUpper == "_KEYWORD") {
+              xToken.Type = TokenType.Keyword;
+              xString = null;
+            } else if (xUpper == "_ABC") {
+              xToken.Type = TokenType.AlphaNum;
+              xString = null;
+            }
+          }
+
+          if (xToken.Type == TokenType.Unknown) {
+            if (Registers.Contains(xUpper)) {
+              xToken.Type = TokenType.Register;
+            } else if (mKeywords.Contains(xUpper)) {
+              xToken.Type = TokenType.Keyword;
+            } else {
+              xToken.Type = TokenType.AlphaNum;
+            }
           }
 
         } else if (char.IsDigit(xChar1)) {
@@ -171,7 +205,7 @@ namespace Cosmos.Compiler.XSharp {
         xChar = mData[i];
         if (char.IsWhiteSpace(xChar)) {
           xCharType = CharType.WhiteSpace;
-        } else if (char.IsLetterOrDigit(xChar)) {
+        } else if (char.IsLetterOrDigit(xChar) || xChar == '_') {
           xCharType = CharType.Identifier;
         } else {
           xCharType = CharType.Symbol;
