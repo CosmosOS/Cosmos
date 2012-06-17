@@ -60,8 +60,7 @@ namespace Cosmos.Compiler.XSharp {
         // Skip
         return;
       }
-      var xParser = new Parser(aLine, false);
-      var xCode = mPatterns.GetCode(xParser.Tokens);
+      var xCode = mPatterns.GetCode(aLine);
       foreach(var xLine in xCode) {
         mOutput.WriteLine("\t\t\t" + xLine);
       }

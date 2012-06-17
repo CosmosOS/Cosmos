@@ -25,22 +25,37 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     public bool PatternMatches(string aPattern) {
-      var xParser = new Parser(aPattern, false);
+      var xParser = new Parser(aPattern, false, true);
       return PatternMatches(xParser.Tokens);
     }
 
     public bool PatternMatches(TokenList aObj) {
       // Dont compare TokenHashCodes, they take just as long to calculate
-      // as a full comparison.
-      if (Count == aObj.Count) {
-        for (int i = 0; i < aObj.Count; i++) {
-          if (this[i].Type != aObj[i].Type) {
-            return false;
-          }
-        }
-        return true;
+      // as a full comparison. Besides this function is often called after
+      // comparing hash codes already.
+      //
+      // For mathching, we assume that only the "this" side can have wildcards or lists
+      // and that the aObj side will have only exacts. This might need to change
+      // in the future, but will complicate the code a bit. Especially if both sides
+      // could have wildcards (Doesn't even make sense at this point)
+
+      if (Count != aObj.Count) {
+        return false;
       }
-      return false;
+
+      for (int i = 0; i < aObj.Count; i++) {
+        var xThis = this[i];
+        if (xThis.Type != aObj[i].Type) {
+          return false;
+        } else if (xThis.Type == TokenType.AlphaNum || xThis.Type == TokenType.Keyword) {
+          if (xThis.Value != null && string.Compare(xThis.Value, aObj[i].Value, true) != 0) {
+            //return false;
+          }
+        } else if (xThis.Type == TokenType.Register) {
+        }
+      }
+     
+      return true;
     }
 
     // We could use values to further differntiate, however

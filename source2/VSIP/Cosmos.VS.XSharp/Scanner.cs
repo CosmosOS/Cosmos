@@ -74,7 +74,7 @@ namespace Cosmos.VS.XSharp {
 
     void IScanner.SetSource(string aSource, int aOffset) {
       mTokenIdx = 0;
-      mParser = new XSC.Parser(aSource.Substring(aOffset), true);
+      mParser = new XSC.Parser(aSource.Substring(aOffset), true, false);
     }
   }
 }

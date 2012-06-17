@@ -9,6 +9,7 @@ namespace Cosmos.Compiler.XSharp {
     protected string mData;
     protected bool mIncludeWhiteSpace;
     protected bool mAllWhitespace;
+    protected bool mAllowPatterns;
 
     protected TokenList mTokens;
     public TokenList Tokens {
@@ -55,6 +56,7 @@ namespace Cosmos.Compiler.XSharp {
       string xString = null;
       char xChar1 = mData[mStart];
       var xToken = new Token();
+
       if (mAllWhitespace && "#!".Contains(xChar1)) {
         rPos = mData.Length; // This will account for the dummy whitespace at the end.
         xString = mData.Substring(mStart + 1, rPos - mStart - 1).Trim();
@@ -68,6 +70,7 @@ namespace Cosmos.Compiler.XSharp {
 
         if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
           xToken.Type = TokenType.WhiteSpace;
+
         } else if (char.IsLetter(xChar1)) {
           string xUpper = xString.ToUpper();
           if (Registers.Contains(xUpper)) {
@@ -77,34 +80,39 @@ namespace Cosmos.Compiler.XSharp {
           } else {
             xToken.Type = TokenType.AlphaNum;
           }
+
         } else if (char.IsDigit(xChar1)) {
           xToken.Type = TokenType.ValueInt;
-        } else if (xString == "[") {
-          xToken.Type = TokenType.BracketLeft;
-        } else if (xString == "]") {
-          xToken.Type = TokenType.BracketRight;
-        } else if (xString == "{") {
-          xToken.Type = TokenType.CurlyLeft;
-        } else if (xString == "}") {
-          xToken.Type = TokenType.CurlyRight;
-        } else if (xString == "+") {
-          xToken.Type = TokenType.Plus;
-        } else if (xString == "-") {
-          xToken.Type = TokenType.Minus;
-        } else if (xString == "=") {
-          xToken.Type = TokenType.Assignment;
-        } else if (xString == ":") {
-          xToken.Type = TokenType.Colon;
-        } else if (xString == "$") {
-          xToken.Type = TokenType.Dollar;
-        } else if (xString == ".") {
-          xToken.Type = TokenType.Dot;
-        } else if (xString == ",") {
-          xToken.Type = TokenType.Comma;
+
         } else {
-          xToken.Type = TokenType.Unknown;
+          #region Symbols
+          if (xString == "[") {
+            xToken.Type = TokenType.BracketLeft;
+          } else if (xString == "]") {
+            xToken.Type = TokenType.BracketRight;
+          } else if (xString == "{") {
+            xToken.Type = TokenType.CurlyLeft;
+          } else if (xString == "}") {
+            xToken.Type = TokenType.CurlyRight;
+          } else if (xString == "+") {
+            xToken.Type = TokenType.Plus;
+          } else if (xString == "-") {
+            xToken.Type = TokenType.Minus;
+          } else if (xString == "=") {
+            xToken.Type = TokenType.Assignment;
+          } else if (xString == ":") {
+            xToken.Type = TokenType.Colon;
+          } else if (xString == "$") {
+            xToken.Type = TokenType.Dollar;
+          } else if (xString == ".") {
+            xToken.Type = TokenType.Dot;
+          } else if (xString == ",") {
+            xToken.Type = TokenType.Comma;
+          }
+          #endregion
         }
       }
+      
       xToken.Value = xString;
       xToken.SrcPosStart = mStart;
       xToken.SrcPosEnd = rPos - 1;
@@ -112,6 +120,7 @@ namespace Cosmos.Compiler.XSharp {
         mAllWhitespace = false;
       }
       mStart = rPos;
+
       return xToken;
     }
 
@@ -186,9 +195,10 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    public Parser(string aData, bool aIncludeWhiteSpace) {
+    public Parser(string aData, bool aIncludeWhiteSpace, bool aAllowPatterns) {
       mData = aData;
       mIncludeWhiteSpace = aIncludeWhiteSpace;
+      mAllowPatterns = aAllowPatterns;
       mAllWhitespace = true;
 
       Parse();
