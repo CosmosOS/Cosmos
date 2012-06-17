@@ -194,6 +194,7 @@ namespace Cosmos.Compiler.XSharp {
           }
         }
       }
+
       if (xAction == null) {
         int xHash = aTokens.GetPatternHashCode();
         
@@ -222,23 +223,7 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    static protected string RegList;
-
-    protected static string ArrayToCSV(string[] aList) {
-      var xResult = new StringBuilder();
-      foreach (var x in aList) {
-        xResult.Append("," + x);
-      }
-      return xResult.Remove(0, 1).ToString();
-    }
-
-    static TokenPatterns() {
-      RegList = ArrayToCSV(Parser.Registers);
-    }
-
     protected TokenList ParsePatterns(TokenList aTokens) {
-      var xResult = new TokenList();
-
       // Wildcards (All caps only)
       // -REG or ??X
       // -REG8 or ?H,?L
@@ -258,29 +243,29 @@ namespace Cosmos.Compiler.XSharp {
       //
       // Specific: Register, Keyword, AlphaNum
       // -EAX
-
+      var xResult = new TokenList();
       Token xNext;
       int xCount = aTokens.Count;
       for (int i = 0; i < xCount; i++) {
         var xToken = aTokens[i];
         xNext = null;
-        if (i < xCount - 2) {
+        if (i + 1 < xCount) {
           xNext = aTokens[i + 1];
         }
 
         if (xToken.Type == TokenType.AlphaNum) {
           if (xToken.Value == "REG") {
             xToken.Type = TokenType.Register;
-            xToken.Value = RegList;
+            xToken.Value = Parser.RegisterList;
           } else if (xToken.Value == "REG8") {
             xToken.Type = TokenType.Register;
-            //xToken.Value = Reg8List;
+            xToken.Value = Parser.Register8List;
           } else if (xToken.Value == "REG16") {
             xToken.Type = TokenType.Register;
-            //xToken.Value = Reg16List;
+            xToken.Value = Parser.Register16List;
           } else if (xToken.Value == "REG32") {
             xToken.Type = TokenType.Register;
-            //xToken.Value = Reg32List;
+            xToken.Value = Parser.Register32List;
           } else if (xToken.Value == "KEYWORD") {
             xToken.Type = TokenType.Keyword;
             xToken.Value = null;

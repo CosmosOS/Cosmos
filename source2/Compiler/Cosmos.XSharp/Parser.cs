@@ -24,13 +24,32 @@ namespace Cosmos.Compiler.XSharp {
       , "POPALL", "PUSHALL", "PROCEDURE", "PORT"
       , "RETURN", "RETURNINTERRUPT"
     };
-    public static string[] Registers = new string[] { 
-      "EAX", "AX", "AH", "AL",
-      "EBX", "BX", "BH", "BL",
-      "ECX", "CX", "CH", "CL",
-      "EDX", "DX", "DH", "DL",
-      "ESI", "EDI", "ESP", "EBP"
-    };
+    public static readonly string RegisterList;
+    public static readonly string[] Registers;
+    public static readonly string Register8List;
+    public static readonly string[] Registers8;
+    public static readonly string Register16List;
+    public static readonly string[] Registers16;
+    public static readonly string Register32List;
+    public static readonly string[] Registers32;
+    public static readonly string RegisterIdxList;
+    public static readonly string[] RegistersIdx;
+
+    static Parser() {
+      // These do not work when initialized inline, despite it compiling.
+      // So they are in a static ctor instead.
+      var xComma = ",".ToCharArray();
+      Register8List = "AH,AL,BH,BL,CH,CL,DH,DL";
+      Registers8 = Register8List.Split(xComma);
+      Register16List = "AX,BX,CX,DX";
+      Registers16 = Register16List.Split(xComma);
+      Register32List = "EAX,EBX,ECX,EDX";
+      Registers32 = Register32List.Split(xComma);
+      RegisterIdxList = "ESI,EDI,ESP,EBP";
+      RegistersIdx = RegisterIdxList.Split(xComma);
+      RegisterList = Register8List + "," + Register16List + "," + Register32List + "," + RegisterIdxList;
+      Registers = RegisterList.Split(xComma);
+    }
 
     protected Token NewToken(ref int rPos) {
       string xString = null;
