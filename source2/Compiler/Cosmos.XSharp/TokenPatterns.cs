@@ -64,7 +64,7 @@ namespace Cosmos.Compiler.XSharp {
           + "}};"
       );
 
-      AddPattern("Port[DX] = AX", 
+      AddPattern("Port[DX] = AL", 
         // TODO: DX only for index
         // TODO: Src _REG can only be EAX, AX, AL
         "new Out {{ DestinationReg = RegistersEnum.{5}}};"

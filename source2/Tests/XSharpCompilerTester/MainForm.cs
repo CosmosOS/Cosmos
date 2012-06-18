@@ -15,7 +15,7 @@ namespace XSharpCompilerTester {
       // TODO convert to app path + relative
       // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
       // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
-      tboxInput.Text = File.ReadAllText(@"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\TracerEntry.xs");
+      tboxInput.Text = File.ReadAllText(@"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\Serial.xs");
     }
 
     private void textInput_TextChanged(object sender, EventArgs e) {
