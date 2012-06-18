@@ -90,7 +90,7 @@ namespace Cosmos.Compiler.XSharp {
         if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
           xToken.Type = TokenType.WhiteSpace;
 
-        } else if (char.IsLetter(xChar1) || xChar1 == '_') {
+        } else if (char.IsLetter(xChar1) || xChar1 == '_' || xChar1 == '.') {
           string xUpper = xString.ToUpper();
 
           if (mAllowPatterns) {
@@ -138,8 +138,6 @@ namespace Cosmos.Compiler.XSharp {
             xToken.Type = TokenType.Colon;
           } else if (xString == "$") {
             xToken.Type = TokenType.Dollar;
-          } else if (xString == ".") {
-            xToken.Type = TokenType.Dot;
           } else if (xString == ",") {
             xToken.Type = TokenType.Comma;
           } else if (xString == "<") {
@@ -211,7 +209,10 @@ namespace Cosmos.Compiler.XSharp {
         xChar = mData[i];
         if (char.IsWhiteSpace(xChar)) {
           xCharType = CharType.WhiteSpace;
-        } else if (char.IsLetterOrDigit(xChar) || xChar == '_') {
+        } else if (char.IsLetterOrDigit(xChar) || xChar == '_' || xChar == '.') {
+          // _ and . were never likely to stand on their own. ie ESP _ 2 and ESP . 2 are never likely to be used.
+          // Having them on their own required a lot of code
+          // to treat them as a single unit where we did use them. So we treat them as AlphaNum.
           xCharType = CharType.Identifier;
         } else {
           xCharType = CharType.Symbol;

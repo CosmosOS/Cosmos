@@ -49,14 +49,18 @@ namespace Cosmos.Compiler.XSharp {
       return mGroup + "_" + mProcedureName + "_" + aLabel;
     }
 
-    protected string GetLabel(TokenList aTokens, int aIndex) {
-      if (aTokens[aIndex].Type == TokenType.AlphaNum) {
-        return ProcLabel(aIndex);
-      } else if (aTokens[aIndex + 1].Type == TokenType.Dot) {
-        return aTokens[aIndex + 2].Value;
-      } else {
-        return GroupLabel(aIndex + 1);
+    protected string GetLabel(Token aToken) {
+      if (aToken.Type != TokenType.AlphaNum) {
+        throw new Exception("Label must be AlphaNum.");
       }
+
+      string xValue = aToken.Value;
+      if (xValue.StartsWith("..")) {
+        return xValue;
+      } else if (xValue.StartsWith(".")) {
+        return GroupLabel(xValue);
+      }
+      return ProcLabel(xValue);
     }
 
     protected void AddPatterns() {
@@ -76,29 +80,29 @@ namespace Cosmos.Compiler.XSharp {
       // ..Name: - Global level. Emitted exactly as is.
       // .Name: - Group level. Group_Name
       // Name: - Procedure level. Group_ProcName_Name
-      AddPattern(new string[] { ".._ABC:", "._ABC:", "_ABC:" },
+      AddPattern(new string[] { "_ABC:" },
         delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Label(" + Quoted(GetLabel(aTokens, 0)) + ");");
+          rCode.Add("new Label(" + Quoted(GetLabel(aTokens[0])) + ");");
         }
       );
 
-      AddPattern(new string[] { "Call .._ABC", "Call ._ABC", "Call _ABC" },
+      AddPattern("Call _ABC" ,
         delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Call {{ DestinationLabel = " + Quoted(GetLabel(aTokens, 1)) + " }};");
+          rCode.Add("new Call {{ DestinationLabel = " + Quoted(GetLabel(aTokens[1])) + " }};");
         }
       );
 
-      AddPattern(new string[] { "if < goto .._ABC", "if < goto ._ABC", "if < goto _ABC" },
+      AddPattern("if < goto _ABC", 
         delegate(TokenList aTokens, ref List<string> rCode) {
-          string xLabel = GetLabel(aTokens, 3);
+          string xLabel = GetLabel(aTokens[3]);
           rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.LessThan, DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
 
-      AddPattern(new string[] { "if (_REG < 123) goto .._ABC", "if (_REG < 123) goto ._ABC", "if (_REG < 123) goto _ABC" },
+      AddPattern("if (_REG < 123) goto _ABC", 
         delegate(TokenList aTokens, ref List<string> rCode) {
           rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
-          string xLabel = GetLabel(aTokens, 7);
+          string xLabel = GetLabel(aTokens[7]);
           rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.LessThan, DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
@@ -258,6 +262,7 @@ namespace Cosmos.Compiler.XSharp {
     }
     protected void AddPattern(string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false, true);
+
       var xPattern = new Pattern() {
         Tokens = xParser.Tokens,
         Hash = xParser.Tokens.GetHashCode(),
