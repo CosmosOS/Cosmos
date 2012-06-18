@@ -11,6 +11,9 @@ namespace Cosmos.Compiler.XSharp {
     protected TextWriter mOutput;
     protected TokenPatterns mPatterns = new TokenPatterns();
 
+    public bool EmitUserComments = true;
+    public bool EmitXSharpCodeComments = true;
+
     public void Execute(string aNamespace, string aSrcPathname) {
       using (var xInput = new StreamReader(aSrcPathname)) {
         using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".cs"))) {
@@ -23,6 +26,7 @@ namespace Cosmos.Compiler.XSharp {
     public void Execute(string aNamespace, string aClassname, TextReader aInput, TextWriter aOutput) {
       mInput = aInput;
       mOutput = aOutput;
+      mPatterns.EmitUserComments = EmitUserComments;
 
       EmitHeader(aNamespace, aClassname);
       while (true) {
@@ -59,6 +63,9 @@ namespace Cosmos.Compiler.XSharp {
       if (String.IsNullOrEmpty(aLine)) {
         // Skip
         return;
+      }
+      if (EmitXSharpCodeComments) {
+        mOutput.WriteLine("\t\t\tnew Comment(\"X#: " + aLine + "\");");
       }
       var xCode = mPatterns.GetCode(aLine);
       foreach(var xLine in xCode) {

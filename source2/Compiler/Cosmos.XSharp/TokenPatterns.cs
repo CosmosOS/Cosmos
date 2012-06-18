@@ -12,6 +12,7 @@ namespace Cosmos.Compiler.XSharp {
       public CodeFunc Code;
     }
 
+    public bool EmitUserComments = true;
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected string mGroup;
@@ -62,9 +63,11 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("! Move EAX, 0",
         "new LiteralAssemblerCode(\"{0}\");"
       );
-      AddPattern("# Comment",
-        "new Comment(\"{0}\");"
-      );
+      AddPattern("# Comment", delegate(TokenList aTokens, ref List<string> rCode) {
+        if (EmitUserComments) {
+          rCode.Add("new Comment(\"{0}\");");
+        }
+      });
 
       // Labels
       // Local and proc level are used most, so designed to make their syntax shortest.
