@@ -349,6 +349,8 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName
 Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe"" ""%1"""
 
 [Run]
+; Necessary to remove then add. Adding won't overwrite (ie upgrade)
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
@@ -360,6 +362,6 @@ Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\B
 #endif
 
 [UninstallRun]
-Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}"; Flags: waituntilterminated
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 
 

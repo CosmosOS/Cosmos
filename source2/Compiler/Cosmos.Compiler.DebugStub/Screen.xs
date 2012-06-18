@@ -14,7 +14,7 @@ BeginLoop:
     AL = $0A
     ESI[0] = AL
     ESI + 1
-
+	
 	# End of Video Area
 	# VidBase + 25 * 80 * 2 = B8FA0
 	#ESI ? $B8FA0
