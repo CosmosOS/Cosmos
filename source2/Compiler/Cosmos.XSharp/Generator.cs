@@ -71,6 +71,7 @@ namespace Cosmos.Compiler.XSharp {
       foreach(var xLine in xCode) {
         mOutput.WriteLine("\t\t\t" + xLine);
       }
+      mOutput.WriteLine();
     }
 
   }
