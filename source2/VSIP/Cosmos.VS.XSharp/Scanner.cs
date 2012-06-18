@@ -45,6 +45,7 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.Dollar] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.LessThan] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.GreaterThan] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Question] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       
       mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };

@@ -11,7 +11,7 @@ namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
     protected const uint VidBase = 0xB8000;
 
-    public class Cls : CodeBlock {
+    public class Cls2 : CodeBlock {
       public override void Assemble() {
         ESI = VidBase;
         Label = "DebugStub_Cls_More";

@@ -26,11 +26,11 @@ namespace Cosmos.Debug.DebugStub {
     // Called before Kernel runs. Inits debug stub, etc
     public class Init : CodeBlock {
       public override void Assemble() {
-        Call<Cls>();
+        Call("DebugStub_Cls");
         Call<DisplayWaitMsg>();
         Call<InitSerial>();
         Call<WaitForDbgHandshake>();
-        Call<Cls>();
+        Call("DebugStub_Cls");
       }
     }
 

@@ -88,8 +88,22 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      // TODO - Combine these to code to scan
-      AddPattern("_REG < 123",
+      AddPattern(new string[] { "if < goto .._ABC", "if < goto ._ABC", "if < goto _ABC" },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          string xLabel = GetLabel(aTokens, 3);
+          rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.LessThan, DestinationLabel = " + Quoted(xLabel) + " }};");
+        }
+      );
+
+      AddPattern(new string[] { "if (_REG < 123) goto .._ABC", "if (_REG < 123) goto ._ABC", "if (_REG < 123) goto _ABC" },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
+          string xLabel = GetLabel(aTokens, 7);
+          rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.LessThan, DestinationLabel = " + Quoted(xLabel) + " }};");
+        }
+      );
+
+      AddPattern("_REG ? 123",
         "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
 

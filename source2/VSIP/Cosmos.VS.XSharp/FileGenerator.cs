@@ -32,10 +32,11 @@ namespace Cosmos.VS.XSharp {
     }
 
     private static string DoGenerate(string aInputFileName, string aInputFileContents, string aDefaultNamespace) {
+      string xClassName = Path.GetFileNameWithoutExtension(aInputFileName);
       using (var xInput = new StringReader(aInputFileContents)) {
         using (var xOutput = new StringWriter()) {
           var xGenerator = new Cosmos.Compiler.XSharp.Generator();
-          xGenerator.Execute(aDefaultNamespace, aInputFileName, xInput, xOutput);
+          xGenerator.Execute(aDefaultNamespace, xClassName, xInput, xOutput);
           return xOutput.ToString();
         }
       }

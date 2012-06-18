@@ -20,7 +20,7 @@ namespace Cosmos.Compiler.XSharp {
     public static string[] mKeywords = (
       "CALL"
       + ",END,EXIT"
-      + ",GOTO, GROUP"
+      + ",GOTO,GROUP"
       + ",IF,INTERRUPTHANDLER"
       + ",JUMP"
       + ",POPALL,PUSHALL,PROCEDURE,PORT"
@@ -146,6 +146,8 @@ namespace Cosmos.Compiler.XSharp {
             xToken.Type = TokenType.LessThan;
           } else if (xString == ">") {
             xToken.Type = TokenType.GreaterThan;
+          } else if (xString == "?") {
+            xToken.Type = TokenType.Question;
           }
           #endregion
         }

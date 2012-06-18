@@ -1,6 +1,6 @@
 ﻿Group DebugStub
 
-procedure Cls2 {
+procedure Cls {
 	# VidBase
     ESI = $B8000
     
@@ -17,7 +17,7 @@ BeginLoop:
 
 	# End of Video Area
 	# VidBase + 25 * 80 * 2 = B8FA0
-	ESI < $B8FA0
+	#ESI ? $B8FA0
 	#if < goto BeginLoop
-	# If (ESI < $B8FA0) goto .BeginLoop
+	If (ESI < $B8FA0) goto BeginLoop
 }
