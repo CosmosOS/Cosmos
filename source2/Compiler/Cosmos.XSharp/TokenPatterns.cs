@@ -133,9 +133,11 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("new Label(\"" + mGroup + "_{1}\");");
       });
 
-      AddPattern("Jump _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
-      });
+      AddPattern("Jump _ABC", 
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
+        }
+      );
 
       AddPattern("Return", "new Return();");
       AddPattern("ReturnInterrupt", "new IRET();");
@@ -152,9 +154,7 @@ namespace Cosmos.Compiler.XSharp {
     public List<string> GetCode(string aLine) {
       var xParser = new Parser(aLine, false, false);
       var xTokens = xParser.Tokens;
-      CodeFunc xAction = null;
-      List<string> xResult = new List<string>();
-
+      var xResult = new List<string>();
       int xHash = xTokens.GetPatternHashCode();
         
       // Get a list of matching hashes, but then we have to 
@@ -181,6 +181,11 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
+      foreach (var xPattern in aPatterns) {
+        AddPattern(xPattern, aCode);
+      }
+    }
     protected void AddPattern(string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false, true);
       var xPattern = new Pattern() {
@@ -191,7 +196,6 @@ namespace Cosmos.Compiler.XSharp {
 
       mPatterns.Add(xPattern);
     }
-
     protected void AddPattern(string aPattern, string aCode) {
       AddPattern(aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(aCode);
