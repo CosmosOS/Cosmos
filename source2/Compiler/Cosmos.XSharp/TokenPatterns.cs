@@ -14,84 +14,16 @@ namespace Cosmos.Compiler.XSharp {
 
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
     protected List<Pattern> mPatterns = new List<Pattern>();
-    protected Dictionary<string, CodeFunc> mKeywords = new Dictionary<string, CodeFunc>();
     protected string mGroup;
     protected string mProcedureName;
     protected bool mInIntHandler;
 
     public TokenPatterns() {
       AddPatterns();
-      AddKeywords();
     }
 
     protected string Quoted(string aString) {
       return "\"" + aString + "\"";
-    }
-
-    protected void AddKeywords() {
-      AddKeyword("Call", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = aTokens[1].Value;
-        if (aTokens.PatternMatches("Call _ABC")) {
-          rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
-        } else {
-          rCode = null;
-        }
-      });
-
-      AddKeyword("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new Jump {{ DestinationLabel = " + Quoted(mGroup + "_" + mProcedureName + "_Exit") + " }};");
-      });
-
-      AddKeyword("Group", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (aTokens.PatternMatches("Group _ABC")) {
-          mGroup = aTokens[1].Value;
-        } else {
-          rCode = null;
-        }
-      });
-
-      AddKeyword("InterruptHandler", delegate(TokenList aTokens, ref List<string> rCode) {
-        mInIntHandler = true;
-        if (aTokens.PatternMatches("InterruptHandler _ABC {")) {
-          mProcedureName = aTokens[1].Value;
-          rCode.Add("new Label(\"" + mGroup + "_{1}\");");
-        } else {
-          rCode = null;
-        }
-      });
-
-      AddKeyword("Jump", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (aTokens.PatternMatches("Jump _ABC")) {
-          rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
-        } else {
-          rCode = null;
-        }
-      });
-
-      AddKeyword("Return", "new Return();");
-      AddKeyword("ReturnInterrupt", "new IRET();");
-      AddKeyword("PopAll", "new Popad();");
-      AddKeyword("PushAll", "new Pushad();");
-
-      AddKeyword("Procedure", delegate(TokenList aTokens, ref List<string> rCode) {
-        mInIntHandler = false;
-        if (aTokens.PatternMatches("Procedure _ABC {")) {
-          mProcedureName = aTokens[1].Value;
-          rCode.Add("new Label(\"" + mGroup + "_{1}\");");
-        } else {
-          rCode = null;
-        }
-      });
-    }
-
-    protected void AddKeyword(string aKeyword, CodeFunc aCode) {
-      mKeywords.Add(aKeyword.ToUpper(), aCode);
-    }
-
-    protected void AddKeyword(string aKeyword, string aCode) {
-      AddKeyword(aKeyword, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(aCode);
-      });
     }
 
     protected int IntValue(Token aToken) {
@@ -181,6 +113,40 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new Return();");
         }
       });
+
+      AddPattern("Group _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        mGroup = aTokens[1].Value;
+      });
+
+      AddPattern("Call _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = aTokens[1].Value;
+        rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
+      });
+
+      AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Jump {{ DestinationLabel = " + Quoted(mGroup + "_" + mProcedureName + "_Exit") + " }};");
+      });
+
+      AddPattern("InterruptHandler _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+        mInIntHandler = true;
+        mProcedureName = aTokens[1].Value;
+        rCode.Add("new Label(\"" + mGroup + "_{1}\");");
+      });
+
+      AddPattern("Jump _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
+      });
+
+      AddPattern("Return", "new Return();");
+      AddPattern("ReturnInterrupt", "new IRET();");
+      AddPattern("PopAll", "new Popad();");
+      AddPattern("PushAll", "new Pushad();");
+
+      AddPattern("Procedure _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+        mInIntHandler = false;
+        mProcedureName = aTokens[1].Value;
+        rCode.Add("new Label(\"" + mGroup + "_{1}\");");
+      });
     }
 
     public List<string> GetCode(string aLine) {
@@ -189,36 +155,25 @@ namespace Cosmos.Compiler.XSharp {
       CodeFunc xAction = null;
       List<string> xResult = new List<string>();
 
-      if (xTokens[0].Type == TokenType.Keyword) {
-        if (mKeywords.TryGetValue(xTokens[0].Value.ToUpper(), out xAction)) {
-          xAction(xTokens, ref xResult);
-          if (xResult == null) {
-            throw new Exception("Unrecognized syntax for keyword: " + xTokens[0].Value);
-          }
-        }
-      }
-
-      if (xAction == null) {
-        int xHash = xTokens.GetPatternHashCode();
+      int xHash = xTokens.GetPatternHashCode();
         
-        // Get a list of matching hashes, but then we have to 
-        // search for exact pattern match because it is possible
-        // to have duplicate hashes. Hashes just provide us a quick way
-        // to reduce the search.
-        var xPatterns = mPatterns.Where(q => q.Hash == xHash);
-        Pattern xPattern = null;
-        foreach (var x in xPatterns) {
-          if (x.Tokens.PatternMatches(xTokens)) {
-            xPattern = x;
-            break;
-          }
+      // Get a list of matching hashes, but then we have to 
+      // search for exact pattern match because it is possible
+      // to have duplicate hashes. Hashes just provide us a quick way
+      // to reduce the search.
+      var xPatterns = mPatterns.Where(q => q.Hash == xHash);
+      Pattern xPattern = null;
+      foreach (var x in xPatterns) {
+        if (x.Tokens.PatternMatches(xTokens)) {
+          xPattern = x;
+          break;
         }
-        if (xPattern == null) {
-          throw new Exception("Token pattern not found.");
-        }
-
-        xPattern.Code(xTokens, ref xResult); 
       }
+      if (xPattern == null) {
+        throw new Exception("Token pattern not found.");
+      }
+
+      xPattern.Code(xTokens, ref xResult); 
 
       for(int i = 0; i < xResult.Count; i++) {
         xResult[i] = string.Format(xResult[i], xTokens.Select(c => c.Value).ToArray());
