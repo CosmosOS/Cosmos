@@ -6,7 +6,7 @@
 procedure WriteALToComPort {
 	+EAX
     ESI = ESP
-    Call WriteByteToComPort
+    Call .WriteByteToComPort
     # Is a local var, cant use Return(4). X# issues the return.
     # This also allows the function to preserve EAX.
     -EAX

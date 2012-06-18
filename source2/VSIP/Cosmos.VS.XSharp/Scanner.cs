@@ -34,15 +34,17 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.Register] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
       mTokenMap[(int)XSC.TokenType.Keyword] = new TokenData { Type = TokenType.Keyword, Color = TokenColor.Keyword };
       mTokenMap[(int)XSC.TokenType.AlphaNum] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
-
-      mTokenMap[(int)XSC.TokenType.Assignment] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.ValueInt] = new TokenData { Type = TokenType.Literal, Color = TokenColor.Number };
-      mTokenMap[(int)XSC.TokenType.BracketLeft] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
+
+      mTokenMap[(int)XSC.TokenType.Equals] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.BracketLeft] = new TokenData { Type = TokenType.Delimiter, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.BracketRight] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Plus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Minus] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Colon] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Dollar] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.LessThan] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.GreaterThan] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       
       mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };

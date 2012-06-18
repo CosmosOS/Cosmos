@@ -34,6 +34,30 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    protected string GroupLabel(int aIndex) {
+      return GroupLabel("{" + aIndex + "}");
+    }
+    protected string GroupLabel(string aLabel) {
+      return mGroup + "_" + aLabel;
+    }
+
+    protected string ProcLabel(int aIndex) {
+      return ProcLabel("{" + aIndex + "}");
+    }
+    protected string ProcLabel(string aLabel) {
+      return mGroup + "_" + mProcedureName + "_" + aLabel;
+    }
+
+    protected string GetLabel(TokenList aTokens, int aIndex) {
+      if (aTokens[aIndex].Type == TokenType.AlphaNum) {
+        return ProcLabel(aIndex);
+      } else if (aTokens[aIndex + 1].Type == TokenType.Dot) {
+        return aTokens[aIndex + 2].Value;
+      } else {
+        return GroupLabel(aIndex + 1);
+      }
+    }
+
     protected void AddPatterns() {
       AddPattern("! Move EAX, 0",
         "new LiteralAssemblerCode(\"{0}\");"
@@ -41,8 +65,23 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("# Comment",
         "new Comment(\"{0}\");"
       );
-      AddPattern("_ABC:" ,
-        "new Label(\"{0}\");"
+
+      // Labels
+      // Local and proc level are used most, so designed to make their syntax shortest.
+      // Think of the dots like a directory, . is current group, .. is above that.
+      // ..Name: - Global level. Emitted exactly as is.
+      // .Name: - Group level. Group_Name
+      // Name: - Procedure level. Group_ProcName_Name
+      AddPattern(new string[] { ".._ABC:", "._ABC:", "_ABC:" },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("new Label(" + Quoted(GetLabel(aTokens, 0)) + ");");
+        }
+      );
+
+      AddPattern(new string[] { "Call .._ABC", "Call ._ABC", "Call _ABC" },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("new Call {{ DestinationLabel = " + Quoted(GetLabel(aTokens, 1)) + " }};");
+        }
       );
 
       AddPattern("_REG = 123",
@@ -61,6 +100,13 @@ namespace Cosmos.Compiler.XSharp {
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = -{4}"
+          + "}};"
+      );
+
+      AddPattern("_REGIDX[0] = _REG",
+        "new Mov {{"
+          + " DestinationReg = RegistersEnum.{0}, DestinationIsIndirect = true, DestinationDisplacement = {2}"
+          + ", SourceReg = RegistersEnum.{5}"
           + "}};"
       );
 
@@ -118,13 +164,8 @@ namespace Cosmos.Compiler.XSharp {
         mGroup = aTokens[1].Value;
       });
 
-      AddPattern("Call _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = aTokens[1].Value;
-        rCode.Add("new Call {{ DestinationLabel = " + Quoted(mGroup + "_" + xLabel) + " }};");
-      });
-
       AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new Jump {{ DestinationLabel = " + Quoted(mGroup + "_" + mProcedureName + "_Exit") + " }};");
+        rCode.Add("new Jump {{ DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
       });
 
       AddPattern("InterruptHandler _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -156,7 +197,7 @@ namespace Cosmos.Compiler.XSharp {
       var xTokens = xParser.Tokens;
       var xResult = new List<string>();
       int xHash = xTokens.GetPatternHashCode();
-        
+
       // Get a list of matching hashes, but then we have to 
       // search for exact pattern match because it is possible
       // to have duplicate hashes. Hashes just provide us a quick way
@@ -170,7 +211,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       }
       if (xPattern == null) {
-        throw new Exception("Token pattern not found.");
+        throw new Exception("Token pattern not found: " + aLine);
       }
 
       xPattern.Code(xTokens, ref xResult); 

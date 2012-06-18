@@ -12,7 +12,7 @@ namespace Cosmos.Compiler.XSharp {
     // Values
     , ValueInt
     // Symbols
-    , Assignment, BracketLeft, BracketRight, Plus, Minus, Colon, Dollar, CurlyLeft, CurlyRight, Dot, Comma
+    , Equals, BracketLeft, BracketRight, Plus, Minus, Colon, Dollar, CurlyLeft, CurlyRight, Dot, Comma, LessThan, GreaterThan
     // 
     , WhiteSpace
     // For now used during scanning while user is typing, but in future could be user methods we have to find etc

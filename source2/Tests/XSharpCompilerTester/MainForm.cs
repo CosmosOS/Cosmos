@@ -15,25 +15,31 @@ namespace XSharpCompilerTester {
       // TODO convert to app path + relative
       // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
       // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
-      tboxInput.Text = File.ReadAllText(@"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\Serial.xs");
     }
 
-    private void textInput_TextChanged(object sender, EventArgs e) {
-      timerConvert.Enabled = false;
-      timerConvert.Enabled = true;
-    }
-
-    private void timerConvert_Tick(object sender, EventArgs e) {
-      timerConvert.Enabled = false;
-      using (var xInput = new StringReader(tboxInput.Text)) {
+    protected void Test(string aFilename) {
+      string xInputString = File.ReadAllText(@"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\" + aFilename);
+      tboxInput.Text = xInputString;
+      using (var xInput = new StringReader(xInputString)) {
         using (var xOutput = new StringWriter()) {
-
           var xGenerator = new Cosmos.Compiler.XSharp.Generator();
           xGenerator.Execute("DefaultNamespace", "InputFileName", xInput, xOutput);
 
           textOutput.Text = xOutput.ToString();
         }
       }
+    }
+
+    protected void textInput_TextChanged(object sender, EventArgs e) {
+      timerConvert.Enabled = false;
+      timerConvert.Enabled = true;
+    }
+
+    protected void timerConvert_Tick(object sender, EventArgs e) {
+      timerConvert.Enabled = false;
+      Test("TracerEntry.xs");
+      Test("Serial.xs");
+      Test("Screen.xs");
     }
   }
 }

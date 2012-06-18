@@ -20,8 +20,8 @@ namespace Cosmos.Compiler.XSharp {
     public static string[] mKeywords = (
       "CALL"
       + ",END,EXIT"
-      + ",GROUP"
-      + ",INTERRUPTHANDLER"
+      + ",GOTO, GROUP"
+      + ",IF,INTERRUPTHANDLER"
       + ",JUMP"
       + ",POPALL,PUSHALL,PROCEDURE,PORT"
       + ",RETURN,RETURNINTERRUPT"
@@ -32,7 +32,7 @@ namespace Cosmos.Compiler.XSharp {
     public static readonly string[] Registers16 = "AX,BX,CX,DX".Split(mComma);
     public static readonly string[] Registers32 = "EAX,EBX,ECX,EDX".Split(mComma);
     public static readonly string[] RegistersIdx = "ESI,EDI,ESP,EBP".Split(mComma);
-    public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32".Split(mComma);
+    public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32,_REGIDX".Split(mComma);
 
     static Parser() {
       var xRegisters = new List<string>();
@@ -133,7 +133,7 @@ namespace Cosmos.Compiler.XSharp {
           } else if (xString == "-") {
             xToken.Type = TokenType.Minus;
           } else if (xString == "=") {
-            xToken.Type = TokenType.Assignment;
+            xToken.Type = TokenType.Equals;
           } else if (xString == ":") {
             xToken.Type = TokenType.Colon;
           } else if (xString == "$") {
@@ -142,6 +142,10 @@ namespace Cosmos.Compiler.XSharp {
             xToken.Type = TokenType.Dot;
           } else if (xString == ",") {
             xToken.Type = TokenType.Comma;
+          } else if (xString == "<") {
+            xToken.Type = TokenType.LessThan;
+          } else if (xString == ">") {
+            xToken.Type = TokenType.GreaterThan;
           }
           #endregion
         }

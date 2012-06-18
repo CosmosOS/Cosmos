@@ -58,7 +58,7 @@ InterruptHandler TracerEntry {
 	# Store it for later use.
 	CallerEIP = EAX
 
-	Call Executing
+	Call .Executing
 
 	PopAll
 

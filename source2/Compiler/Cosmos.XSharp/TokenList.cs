@@ -24,6 +24,18 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    protected bool RegistersMatch(string aThisUpper, string aThatUpper, string aPattern, string[] aRegisters) {
+      // ONLY check if its our pattern. We need to return true to continue other pattern checks
+      // if not current pattern.
+      if (aThisUpper == aPattern || aThatUpper == aPattern) {
+        if (aRegisters.Contains(aThatUpper) || aRegisters.Contains(aThisUpper)) {
+          return true;
+        }
+        return false;
+      }
+      return true;
+    }
+
     public bool PatternMatches(string aPattern) {
       var xParser = new Parser(aPattern, false, true);
       return PatternMatches(xParser.Tokens);
@@ -53,30 +65,14 @@ namespace Cosmos.Compiler.XSharp {
 
           if (xThisUpper == "_REG" || xThatUpper == "_REG") {
             // true, ie continue
-
-          } else if (xThisUpper == "_REG8" && xThatUpper == "_REG8") {
-            return false;
-          } else if (xThisUpper == "_REG8" && Parser.Registers8.Contains(xThatUpper)) {
-            return false;
-          } else if (xThatUpper == "_REG8" && Parser.Registers8.Contains(xThisUpper)) {
-            return false;
-
-          } else if (xThisUpper == "_REG16" && xThatUpper == "_REG16") {
-            return false;
-          } else if (xThisUpper == "_REG16" && Parser.Registers8.Contains(xThatUpper)) {
-            return false;
-          } else if (xThatUpper == "_REG16" && Parser.Registers8.Contains(xThisUpper)) {
-            return false;
-
-          } else if (xThisUpper == "_REG32" && xThatUpper == "_REG32") {
-            return false;
-          } else if (xThisUpper == "_REG32" && Parser.Registers8.Contains(xThatUpper)) {
-            return false;
-          } else if (xThatUpper == "_REG32" && Parser.Registers8.Contains(xThisUpper)) {
-            return false;
-
-          } else if (xThisUpper != xThatUpper) {
+          } else if (RegistersMatch(xThisUpper, xThatUpper, "_REG8", Parser.Registers8)) {
+          } else if (RegistersMatch(xThisUpper, xThatUpper, "_REG16", Parser.Registers16)) {
+          } else if (RegistersMatch(xThisUpper, xThatUpper, "_REG32", Parser.Registers32)) {
+          } else if (RegistersMatch(xThisUpper, xThatUpper, "_REGIDX", Parser.RegistersIdx)) {
+          } else if (xThisUpper == xThatUpper) {
+            // This covers _REG==_REG, _REG8==_REG8, ... and DX==DX
             // Must be last, after patterns
+          } else {
             return false;
           }
         }

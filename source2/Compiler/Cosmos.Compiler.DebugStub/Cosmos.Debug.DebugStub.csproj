@@ -106,6 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+    <None Include="Screen.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+    </None>
     <None Include="Serial.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Serial.cs</LastGenOutput>
