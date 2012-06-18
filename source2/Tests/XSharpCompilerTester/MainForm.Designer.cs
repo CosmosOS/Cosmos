@@ -81,7 +81,6 @@
       this.tboxInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
       this.tboxInput.Size = new System.Drawing.Size(1212, 205);
       this.tboxInput.TabIndex = 0;
-      this.tboxInput.TextChanged += new System.EventHandler(this.textInput_TextChanged);
       // 
       // groupBox2
       // 

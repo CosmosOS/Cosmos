@@ -30,11 +30,6 @@ namespace XSharpCompilerTester {
       }
     }
 
-    protected void textInput_TextChanged(object sender, EventArgs e) {
-      timerConvert.Enabled = false;
-      timerConvert.Enabled = true;
-    }
-
     protected void timerConvert_Tick(object sender, EventArgs e) {
       timerConvert.Enabled = false;
       Test("TracerEntry.xs");

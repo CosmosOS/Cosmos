@@ -63,6 +63,7 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("! Move EAX, 0",
         "new LiteralAssemblerCode(\"{0}\");"
       );
+
       AddPattern("# Comment", delegate(TokenList aTokens, ref List<string> rCode) {
         if (EmitUserComments) {
           rCode.Add("new Comment(\"{0}\");");
@@ -87,18 +88,28 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
+      // TODO - Combine these to code to scan
+      AddPattern("_REG < 123",
+        "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
+      );
+
+      // TODO - Combine these to code to scan
+      #region _REG = ...
       AddPattern("_REG = 123",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
+      
       AddPattern("_REG = _REG",
         "new Mov{{ DestinationReg = RegistersEnum.{0}, SourceReg = RegistersEnum.{2} }};"
       );
-      AddPattern("_REG = _REG[1]",
+      
+      AddPattern("_REG = _REG32[1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
           + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {4}"
           + "}};"
       );
+      
       AddPattern("_REG = _REG[-1]",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}"
@@ -106,12 +117,13 @@ namespace Cosmos.Compiler.XSharp {
           + "}};"
       );
 
-      AddPattern("_REGIDX[0] = _REG",
+      AddPattern("_REG32[0] = _REG",
         "new Mov {{"
           + " DestinationReg = RegistersEnum.{0}, DestinationIsIndirect = true, DestinationDisplacement = {2}"
           + ", SourceReg = RegistersEnum.{5}"
           + "}};"
       );
+      #endregion
 
       AddPattern("Port[DX] = AL", 
         // TODO: DX only for index
