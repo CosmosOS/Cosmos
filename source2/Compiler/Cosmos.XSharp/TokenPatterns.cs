@@ -63,16 +63,28 @@ namespace Cosmos.Compiler.XSharp {
       return ProcLabel(xValue);
     }
 
-    protected string GetRegister(TokenList aTokens, int aIdx) {
+    protected string GetDestRegister(TokenList aTokens, int aIdx) {
+      return GetRegister("Destination", aTokens, aIdx);
+    }
+    protected string GetSrcRegister(TokenList aTokens, int aIdx) {
+      return GetRegister("Source", aTokens, aIdx);
+    }
+    protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx) {
       var xToken = aTokens[aIdx].Type;
       var xNext = TokenType.Unknown; 
       if (aIdx + 1 < aTokens.Count) {
         xNext = aTokens[aIdx + 1].Type;
       }
 
-      string xResult = "DestinationReg = RegistersEnum." + aTokens[aIdx].Value;
+      string xResult = aPrefix + "Reg = RegistersEnum." + aTokens[aIdx].Value;
       if (xNext == TokenType.BracketLeft) {
-        xResult = xResult + ", DestinationIsIndirect = true, DestinationDisplacement = " + aTokens[aIdx + 2].Value;
+        string xDisplacement;
+        if (aTokens[aIdx + 2].Type == TokenType.Minus) {
+          xDisplacement = "-" + aTokens[aIdx + 2].Value;
+        } else {
+          xDisplacement = aTokens[aIdx + 2].Value;
+        }
+        xResult = xResult + ", " + aPrefix + "IsIndirect = true, " + aPrefix + "Displacement = " + xDisplacement;
       }
       return xResult;
     }
@@ -125,10 +137,17 @@ namespace Cosmos.Compiler.XSharp {
         "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
 
-      // TODO - Combine these to code to scan
       AddPattern(new string[] { 
           "_REG = 123" 
           , "_REG = _REG"
+          , "_REG = _REG32[1]"
+          , "_REG = _REG[-1]"
+          
+          , "_REG32[1] = 123"
+          , "_REG32[1] = _REG"
+
+          , "_REG32[-1] = 123"
+          , "_REG32[-1] = _REG"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
           int xEqIdx = -1;
@@ -139,36 +158,15 @@ namespace Cosmos.Compiler.XSharp {
             }
           }
 
-          string xDestReg = GetRegister(aTokens, 0);
+          string xDestReg = GetDestRegister(aTokens, 0);
           if (aTokens[xEqIdx + 1].Type == TokenType.ValueInt) {
             rCode.Add("new Mov{{ " + xDestReg + ", SourceValue = " + aTokens[xEqIdx + 1].Value + " }};");
           } else {
-            rCode.Add("new Mov{{ " + xDestReg + ", SourceReg = RegistersEnum." + aTokens[xEqIdx + 1].Value + " }};");
+            string xSrcReg = GetSrcRegister(aTokens, xEqIdx + 1);
+            rCode.Add("new Mov{{ " + xDestReg + ", " + xSrcReg + " }};");
           }
         }
       );
-      #region _REG = ...
-      AddPattern("_REG = _REG32[1]",
-        "new Mov {{"
-          + " DestinationReg = RegistersEnum.{0}"
-          + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = {4}"
-          + "}};"
-      );
-      
-      AddPattern("_REG = _REG[-1]",
-        "new Mov {{"
-          + " DestinationReg = RegistersEnum.{0}"
-          + ", SourceReg = RegistersEnum.{2}, SourceIsIndirect = true, SourceDisplacement = -{4}"
-          + "}};"
-      );
-
-      AddPattern("_REG32[0] = _REG",
-        "new Mov {{"
-          + " DestinationReg = RegistersEnum.{0}, DestinationIsIndirect = true, DestinationDisplacement = {2}"
-          + ", SourceReg = RegistersEnum.{5}"
-          + "}};"
-      );
-      #endregion
 
       AddPattern("Port[DX] = AL", 
         // TODO: DX only for index

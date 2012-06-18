@@ -11,24 +11,6 @@ namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
     protected const uint VidBase = 0xB8000;
 
-    public class Cls2 : CodeBlock {
-      public override void Assemble() {
-        ESI = VidBase;
-        Label = "DebugStub_Cls_More";
-
-        AL = 0x00;
-        ESI[0] = AL; // Text
-        ESI++;
-
-        AL = 0x0A;
-        ESI[0] = AL; // Colour
-        ESI++;
-
-        ESI.Compare(VidBase + 25 * 80 * 2);
-        JumpIf(Flags.LessThan, "DebugStub_Cls_More");
-      }
-    }
-
     public class DisplayWaitMsg : CodeBlock {
       // http://wiki.osdev.org/Text_UI
       // Later can cycle for x changes of second register:
