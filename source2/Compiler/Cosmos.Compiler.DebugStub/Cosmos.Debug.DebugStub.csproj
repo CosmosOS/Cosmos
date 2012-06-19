@@ -73,7 +73,6 @@
     <Compile Include="Old\Init.cs" />
     <Compile Include="Old\ProcessCmds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Old\Screen.cs" />
     <Compile Include="Old\CmdSend.cs" />
     <Compile Include="Screen.cs">
       <AutoGen>True</AutoGen>

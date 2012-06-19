@@ -53,8 +53,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_Cls_Exit");
 			new Return();
 
-			new Comment("X#: procedure DisplayWaitMsg2 {");
-			new Label("DebugStub_DisplayWaitMsg2");
+			new Comment("X#: procedure DisplayWaitMsg {");
+			new Label("DebugStub_DisplayWaitMsg");
 
 			new Comment("http://wiki.osdev.org/Text_UI");
 
@@ -78,14 +78,14 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("Read and copy string till 0 terminator");
 
 			new Comment("X#: ReadChar:");
-			new Label("DebugStub_DisplayWaitMsg2_ReadChar");
+			new Label("DebugStub_DisplayWaitMsg_ReadChar");
 
 			new Comment("X#: AL = ESI[0]");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceReg = RegistersEnum.ESI, SourceIsIndirect = true, SourceDisplacement = 0 };
 
 			new Comment("X#: if (AL = 0) goto AfterMsg");
 			new Compare { DestinationReg = RegistersEnum.AL, SourceValue = 0 };
-			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_DisplayWaitMsg2_AfterMsg" };
+			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_DisplayWaitMsg_AfterMsg" };
 
 			new Comment("X#: ESI + 1");
 			new INC { DestinationReg = RegistersEnum.ESI };
@@ -97,13 +97,13 @@ namespace Cosmos.Debug.DebugStub {
 			new Add { DestinationReg = RegistersEnum.EDI, SourceValue = 2 };
 
 			new Comment("X#: Goto ReadChar");
-			new Jump { DestinationLabel = "DebugStub_DisplayWaitMsg2_ReadChar" };
+			new Jump { DestinationLabel = "DebugStub_DisplayWaitMsg_ReadChar" };
 
 			new Comment("X#: AfterMsg:");
-			new Label("DebugStub_DisplayWaitMsg2_AfterMsg");
+			new Label("DebugStub_DisplayWaitMsg_AfterMsg");
 
 			new Comment("X#: }");
-			new Label("DebugStub_DisplayWaitMsg2_Exit");
+			new Label("DebugStub_DisplayWaitMsg_Exit");
 			new Return();
 
 		}

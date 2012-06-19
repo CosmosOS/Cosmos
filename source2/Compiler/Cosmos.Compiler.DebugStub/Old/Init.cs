@@ -27,7 +27,7 @@ namespace Cosmos.Debug.DebugStub {
     public class Init : CodeBlock {
       public override void Assemble() {
         Call("DebugStub_Cls");
-        Call<DisplayWaitMsg>();
+        Call("DebugStub_DisplayWaitMsg");
         Call<InitSerial>();
         Call<WaitForDbgHandshake>();
         Call("DebugStub_Cls");

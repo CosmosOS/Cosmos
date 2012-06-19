@@ -20,7 +20,7 @@ BeginLoop:
 	If (ESI < $B8FA0) goto BeginLoop
 }
 
-procedure DisplayWaitMsg2 {
+procedure DisplayWaitMsg {
     # http://wiki.osdev.org/Text_UI
     # Later can cycle for x changes of second register:
     # http://wiki.osdev.org/Time_And_Date
