@@ -19,3 +19,26 @@ BeginLoop:
 	# VidBase + 25 * 80 * 2 = B8FA0
 	If (ESI < $B8FA0) goto BeginLoop
 }
+
+procedure DisplayWaitMsg2 {
+    # http://wiki.osdev.org/Text_UI
+    # Later can cycle for x changes of second register:
+    # http://wiki.osdev.org/Time_And_Date
+    
+	#ESI = AddressOf("DebugWaitMsg")
+
+	# VidBase
+    EDI = $B8000
+    # 10 lines down, 20 cols in (10 * 80 + 20) * 2)
+    EDI + 1640
+
+    # Read and copy string till 0 terminator
+ReadChar:
+    AL = ESI[0]
+    if (AL = 0) goto AfterMsg
+    ESI + 1
+    EDI[0] = AL
+    EDI + 2
+    Goto ReadChar
+AfterMsg:
+}

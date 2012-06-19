@@ -89,6 +89,16 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    protected string GetCondition(Token aToken) {
+      if (aToken.Type == TokenType.LessThan) {
+        return "ConditionalTestEnum.LessThan";
+      } else if (aToken.Type == TokenType.Equals) {
+        return "ConditionalTestEnum.Zero";
+      } else {
+        throw new Exception("Unrecognized symbol in conditional: " + aToken.Value);
+      }
+    }
+
     protected void AddPatterns() {
       AddPattern("! Move EAX, 0",
         "new LiteralAssemblerCode(\"{0}\");"
@@ -118,18 +128,35 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      AddPattern("if < goto _ABC", 
+      AddPattern("Goto _ABC",
         delegate(TokenList aTokens, ref List<string> rCode) {
-          string xLabel = GetLabel(aTokens[3]);
-          rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.LessThan, DestinationLabel = " + Quoted(xLabel) + " }};");
+          string xLabel = GetLabel(aTokens[1]);
+          rCode.Add("new Jump {{ DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
 
-      AddPattern("if (_REG < 123) goto _ABC", 
+      AddPattern(new string[] {
+          "if < goto _ABC", 
+          "if = goto _ABC"
+        },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          string xLabel = GetLabel(aTokens[3]);
+          var xCondition = GetCondition(aTokens[1]);
+          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
+        }
+      );
+
+      AddPattern(new string[] {
+          //0 1  2  3  4 5  6    7
+          "if (_REG < 123) goto _ABC",
+          "if (_REG = 123) goto _ABC"
+        },
         delegate(TokenList aTokens, ref List<string> rCode) {
           rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
+
           string xLabel = GetLabel(aTokens[7]);
-          rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.LessThan, DestinationLabel = " + Quoted(xLabel) + " }};");
+          var xCondition = GetCondition(aTokens[3]);
+          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
 
@@ -138,16 +165,16 @@ namespace Cosmos.Compiler.XSharp {
       );
 
       AddPattern(new string[] { 
-          "_REG = 123" 
-          , "_REG = _REG"
-          , "_REG = _REG32[1]"
-          , "_REG = _REG[-1]"
+          "_REG = 123", 
+          "_REG = _REG",
+          "_REG = _REG32[1]",
+          "_REG = _REG[-1]",
           
-          , "_REG32[1] = 123"
-          , "_REG32[1] = _REG"
+          "_REG32[1] = 123",
+          "_REG32[1] = _REG",
 
-          , "_REG32[-1] = 123"
-          , "_REG32[-1] = _REG"
+          "_REG32[-1] = 123",
+          "_REG32[-1] = _REG"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
           int xEqIdx = -1;
