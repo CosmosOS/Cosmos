@@ -25,7 +25,7 @@ procedure DisplayWaitMsg2 {
     # Later can cycle for x changes of second register:
     # http://wiki.osdev.org/Time_And_Date
     
-	#ESI = AddressOf("DebugWaitMsg")
+	ESI = @DebugWaitMsg
 
 	# VidBase
     EDI = $B8000

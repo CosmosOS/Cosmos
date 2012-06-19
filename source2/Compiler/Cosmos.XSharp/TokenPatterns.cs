@@ -106,7 +106,9 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("# Comment", delegate(TokenList aTokens, ref List<string> rCode) {
         if (EmitUserComments) {
-          rCode.Add("new Comment(\"{0}\");");
+          string xValue = aTokens[0].Value;
+          xValue = xValue.Replace("\"", "\\\""); 
+          rCode.Add("new Comment(" + Quoted(xValue) + ");");
         }
       });
 
@@ -212,9 +214,23 @@ namespace Cosmos.Compiler.XSharp {
           + "}};"
       );
 
+      AddPattern("_REG = _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Mov {{"
+         + " DestinationReg = RegistersEnum.{0}"
+         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(mGroup + aTokens[2].Value) + "), SourceIsIndirect = true"
+         + " }};");
+      });
+	    // why not [var] like registers? Because its less frequent to access th ptr
+	    // and it is like a reg.. without [] to get the value...
+      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new Mov {{"
+         + " DestinationReg = RegistersEnum.{0}"
+         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(mGroup + aTokens[3].Value) + ")"
+         + " }};");
+      });
       AddPattern("_ABC = _REG", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("new Mov {{"
-         + " DestinationRef = Cosmos.Assembler.ElementReference.New(\"" + mGroup + "_{0}\"), DestinationIsIndirect = true"
+         + " DestinationRef = Cosmos.Assembler.ElementReference.New(" + Quoted(mGroup + aTokens[0].Value) + "), DestinationIsIndirect = true"
          + " , SourceReg = RegistersEnum.{2}"
          + " }};");
       });

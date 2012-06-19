@@ -146,6 +146,8 @@ namespace Cosmos.Compiler.XSharp {
             xToken.Type = TokenType.GreaterThan;
           } else if (xString == "?") {
             xToken.Type = TokenType.Question;
+          } else if (xString == "@") {
+            xToken.Type = TokenType.At;
           }
           #endregion
         }

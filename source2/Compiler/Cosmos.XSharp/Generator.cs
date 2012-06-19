@@ -64,7 +64,7 @@ namespace Cosmos.Compiler.XSharp {
         // Skip
         return;
       }
-      if (EmitXSharpCodeComments) {
+      if (EmitXSharpCodeComments && !aLine.StartsWith("#")) {
         mOutput.WriteLine("\t\t\tnew Comment(\"X#: " + aLine + "\");");
       }
       var xCode = mPatterns.GetCode(aLine);

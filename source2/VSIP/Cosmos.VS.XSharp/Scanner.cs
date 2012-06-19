@@ -30,24 +30,30 @@ namespace Cosmos.VS.XSharp {
 
       mTokenMap[(int)XSC.TokenType.Comment] = new TokenData { Type = TokenType.LineComment, Color = TokenColor.Comment };
       mTokenMap[(int)XSC.TokenType.LiteralAsm] = new TokenData { Type = TokenType.Literal , Color = TokenColor.String };
-      
-      mTokenMap[(int)XSC.TokenType.Register] = new TokenData { Type = TokenType.Keyword , Color = TokenColor.Keyword };
-      mTokenMap[(int)XSC.TokenType.Keyword] = new TokenData { Type = TokenType.Keyword, Color = TokenColor.Keyword };
       mTokenMap[(int)XSC.TokenType.AlphaNum] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
       mTokenMap[(int)XSC.TokenType.ValueInt] = new TokenData { Type = TokenType.Literal, Color = TokenColor.Number };
 
-      mTokenMap[(int)XSC.TokenType.Equals] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.BracketLeft] = new TokenData { Type = TokenType.Delimiter, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.BracketRight] = new TokenData { Type = TokenType.Delimiter , Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Plus] = new TokenData { Type = TokenType.Operator , Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Minus] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Colon] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Dollar] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.LessThan] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.GreaterThan] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Question] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      var xKeyword = new TokenData { Type = TokenType.Keyword, Color = TokenColor.Keyword };
+      mTokenMap[(int)XSC.TokenType.Register] = xKeyword;
+      mTokenMap[(int)XSC.TokenType.Keyword] = xKeyword;
+
+      var xDelimeter = new TokenData { Type = TokenType.Delimiter, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.BracketLeft] = xDelimeter;
+      mTokenMap[(int)XSC.TokenType.BracketRight] = xDelimeter;
+
+      var xOperator = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Equals] = xOperator;
+      mTokenMap[(int)XSC.TokenType.Plus] = xOperator;
+      mTokenMap[(int)XSC.TokenType.Minus] = xOperator;
+      mTokenMap[(int)XSC.TokenType.LessThan] = xOperator;
+      mTokenMap[(int)XSC.TokenType.GreaterThan] = xOperator;
+      mTokenMap[(int)XSC.TokenType.Question] = xOperator;
+      mTokenMap[(int)XSC.TokenType.Dollar] = xOperator;
+      mTokenMap[(int)XSC.TokenType.Colon] = xOperator;
+      mTokenMap[(int)XSC.TokenType.At] = xOperator;
       
       mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
+
       mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };
     }
 
