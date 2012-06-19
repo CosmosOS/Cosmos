@@ -23,17 +23,6 @@ namespace Cosmos.Debug.DebugStub {
       });
     }
 
-    // Called before Kernel runs. Inits debug stub, etc
-    public class Init : CodeBlock {
-      public override void Assemble() {
-        Call("DebugStub_Cls");
-        Call("DebugStub_DisplayWaitMsg");
-        Call<InitSerial>();
-        Call<WaitForDbgHandshake>();
-        Call("DebugStub_Cls");
-      }
-    }
-
     public class WaitForSignature : CodeBlock {
       public override void Assemble() {
         EBX = 0;

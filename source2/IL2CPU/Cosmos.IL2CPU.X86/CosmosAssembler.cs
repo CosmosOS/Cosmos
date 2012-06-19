@@ -303,7 +303,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "END - SSE Init");
 
       if (mComNumber > 0) {
-        CodeBlock.Call<DebugStub.Init>();
+        new Call { DestinationLabel = "DebugStub_Init" };
       }
 
       // Jump to Kernel entry point
