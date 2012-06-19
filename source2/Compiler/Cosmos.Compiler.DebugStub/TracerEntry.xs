@@ -22,7 +22,7 @@ InterruptHandler TracerEntry {
 
 	# EBP is restored by PopAll, but SendFrame uses it. Could
 	# get it from the PushAll data, but this is easier.
-	CallerEBP = EBP
+	.CallerEBP = EBP
 
 	# Could get ESP from PushAll but this is easier.
 	# Also allows us to use the stack before PushAll if we ever need it.
@@ -33,13 +33,13 @@ InterruptHandler TracerEntry {
 	# store ESP, then restore ESP so we don't cause stack corruption.
 	# 12 bytes for EFLAGS, CS, EIP
 	ESP + 12
-	CallerESP = ESP
+	.CallerESP = ESP
 	ESP - 12
 
 	PushAll
 
 	# Save current ESP so we can look at the results of PushAll later
-	PushAllPtr = ESP
+	.PushAllPtr = ESP
 
 	# Get current ESP and add 32. This will skip over the PushAll and point
 	# us at the call data from Int3.
@@ -56,7 +56,7 @@ InterruptHandler TracerEntry {
 	EAX - 1
 
 	# Store it for later use.
-	CallerEIP = EAX
+	.CallerEIP = EAX
 
 	Call .Executing
 
