@@ -26,7 +26,7 @@ namespace Cosmos.Compiler.XSharp {
       + ",POPALL,PUSHALL,PROCEDURE,PORT"
       + ",RETURN,RETURNINTERRUPT"
     ).Split(mComma);
-    
+
     public static readonly string[] Registers;
     public static readonly string[] Registers8 = "AH,AL,BH,BL,CH,CL,DH,DL".Split(mComma);
     public static readonly string[] Registers16 = "AX,BX,CX,DX".Split(mComma);
@@ -43,7 +43,7 @@ namespace Cosmos.Compiler.XSharp {
       Registers = xRegisters.ToArray();
     }
 
-    protected Token NewToken(ref int rPos) {
+    protected void NewToken(TokenList aList, ref int rPos) {
       #region Pattern Notes
       // All patterns start with _, this makes them reserved. User can use too, but at own risk of conflict.
       //
@@ -90,7 +90,13 @@ namespace Cosmos.Compiler.XSharp {
         if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
           xToken.Type = TokenType.WhiteSpace;
 
-        } else if (char.IsLetter(xChar1) || xChar1 == '_' || xChar1 == '.') {
+        } else if (char.IsDigit(xChar1)) {
+          xToken.Type = TokenType.ValueInt;
+        } else if (xChar1 == '$') {
+          xToken.Type = TokenType.ValueInt;
+          xString = "0x" + xString.Substring(2);
+
+        } else if (IsAlphaNum(xChar1)) { // This must be after check for ValueInt
           string xUpper = xString.ToUpper();
 
           if (mAllowPatterns) {
@@ -115,9 +121,6 @@ namespace Cosmos.Compiler.XSharp {
             }
           }
 
-        } else if (char.IsDigit(xChar1)) {
-          xToken.Type = TokenType.ValueInt;
-
         } else {
           #region Symbols
           if (xString == "[") {
@@ -136,8 +139,6 @@ namespace Cosmos.Compiler.XSharp {
             xToken.Type = TokenType.Equals;
           } else if (xString == ":") {
             xToken.Type = TokenType.Colon;
-          } else if (xString == "$") {
-            xToken.Type = TokenType.Dollar;
           } else if (xString == ",") {
             xToken.Type = TokenType.Comma;
           } else if (xString == "<") {
@@ -152,7 +153,7 @@ namespace Cosmos.Compiler.XSharp {
           #endregion
         }
       }
-      
+
       xToken.Value = xString;
       xToken.SrcPosStart = mStart;
       xToken.SrcPosEnd = rPos - 1;
@@ -161,47 +162,26 @@ namespace Cosmos.Compiler.XSharp {
       }
       mStart = rPos;
 
-      return xToken;
+      if (mIncludeWhiteSpace || xToken.Type != TokenType.WhiteSpace) {
+        aList.Add(xToken);
+      }
     }
 
     protected enum CharType { WhiteSpace, Identifier, Symbol };
     protected void Parse() {
-      var xTokens = ParseText();
-      mTokens = ParseTokens(xTokens);
+      mTokens = ParseText();
     }
 
-    // Rescan token patterns
-    protected TokenList ParseTokens(List<Token> aTokens) {
-      var xResult = new TokenList();
-
-      for (int i = 0; i < aTokens.Count; i++) {
-        int xRemainingTokens = aTokens.Count - i;
-        var xToken = aTokens[i];
-        if (xToken.Type == TokenType.WhiteSpace && mIncludeWhiteSpace == false) {
-        } else {
-          // $FF, $02, etc
-          if (xToken.Type == TokenType.Dollar && xRemainingTokens > 1) {
-            // Dont worry about whitespace, $ FF is not valid, $FF is.
-            var xNext = aTokens[i + 1];
-            if (xNext.Type == TokenType.ValueInt || xNext.Type == TokenType.AlphaNum) {
-              i++;
-              xToken.Type = TokenType.ValueInt;
-              xToken.SrcPosEnd = xNext.SrcPosEnd;
-              xToken.Value = "0x" + xNext.Value;
-            }
-          }
-          xResult.Add(xToken);
-        }
-      }
-      return xResult;
+    protected bool IsAlphaNum(char aChar) {
+      return char.IsLetterOrDigit(aChar) || aChar == '_' || aChar == '.' || aChar == '$';
     }
 
     // Initial Parse to convert text to tokens
-    protected List<Token> ParseText() {
+    protected TokenList ParseText() {
       // Save in comment, might be useful in future. Already had to dig it out of TFS once
       //var xRegex = new Regex(@"(\W)");
 
-      var xResult = new List<Token>();
+      var xResult = new TokenList();
       char xLastChar = ' ';
       CharType xLastCharType = CharType.WhiteSpace;
       char xChar;
@@ -211,7 +191,7 @@ namespace Cosmos.Compiler.XSharp {
         xChar = mData[i];
         if (char.IsWhiteSpace(xChar)) {
           xCharType = CharType.WhiteSpace;
-        } else if (char.IsLetterOrDigit(xChar) || xChar == '_' || xChar == '.') {
+        } else if (IsAlphaNum(xChar)) {
           // _ and . were never likely to stand on their own. ie ESP _ 2 and ESP . 2 are never likely to be used.
           // Having them on their own required a lot of code
           // to treat them as a single unit where we did use them. So we treat them as AlphaNum.
@@ -223,7 +203,7 @@ namespace Cosmos.Compiler.XSharp {
         // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.
         // But its faster as the second short circuit rather than a separate if.
         if (xCharType != xLastCharType && i > 0) {
-          xResult.Add(NewToken(ref i));
+          NewToken(xResult, ref i);
         }
 
         xLastChar = xChar;
@@ -232,7 +212,7 @@ namespace Cosmos.Compiler.XSharp {
 
       // Last token
       if (mStart < mData.Length) {
-        xResult.Add(NewToken(ref i));
+        NewToken(xResult, ref i);
       }
 
       return xResult;

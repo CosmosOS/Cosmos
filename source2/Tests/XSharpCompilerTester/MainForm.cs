@@ -35,6 +35,7 @@ namespace XSharpCompilerTester {
       Test("TracerEntry.xs");
       Test("Serial.xs");
       Test("Screen.xs");
+      Test("Init.xs");
     }
   }
 }

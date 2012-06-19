@@ -203,6 +203,16 @@ namespace Cosmos.Compiler.XSharp {
         "new Out {{ DestinationReg = RegistersEnum.{5}}};"
       );
 
+      AddPattern("+123",
+        "new Push {{"
+          + " DestinationValue = {1}, Size = 32 "
+          + "}};"
+      );
+      AddPattern("+123:12",
+        "new Push {{"
+          + " DestinationValue = {1}, Size = {3} "
+          + "}};"
+      );
       AddPattern("+_REG",
         "new Push {{"
           + " DestinationReg = RegistersEnum.{1}"

@@ -48,7 +48,6 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.LessThan] = xOperator;
       mTokenMap[(int)XSC.TokenType.GreaterThan] = xOperator;
       mTokenMap[(int)XSC.TokenType.Question] = xOperator;
-      mTokenMap[(int)XSC.TokenType.Dollar] = xOperator;
       mTokenMap[(int)XSC.TokenType.Colon] = xOperator;
       mTokenMap[(int)XSC.TokenType.At] = xOperator;
       
