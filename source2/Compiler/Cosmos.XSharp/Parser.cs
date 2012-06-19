@@ -17,6 +17,7 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected static readonly char[] mComma = ",".ToCharArray();
+    protected static readonly char[] mSpace = " ".ToCharArray();
     public static string[] mKeywords = (
       "CALL"
       + ",END,EXIT"
@@ -33,6 +34,11 @@ namespace Cosmos.Compiler.XSharp {
     public static readonly string[] Registers32 = "EAX,EBX,ECX,EDX".Split(mComma);
     public static readonly string[] RegistersIdx = "ESI,EDI,ESP,EBP".Split(mComma);
     public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32,_REGIDX".Split(mComma);
+    public static readonly string[] Delimiters = ",".Split(mSpace);
+    // _.$ are AlphaNum. See comments in Parser
+    // # is comment and literal, but could be reused when not first char
+    // string[] is used instead of string because operators can be multi char, != >= etc
+    public static readonly string[] Operators = "= [ ] + - : { } < > ? @".Split(mSpace);
 
     static Parser() {
       var xRegisters = new List<string>();
@@ -121,36 +127,11 @@ namespace Cosmos.Compiler.XSharp {
             }
           }
 
-        } else {
-          #region Symbols
-          if (xString == "[") {
-            xToken.Type = TokenType.BracketLeft;
-          } else if (xString == "]") {
-            xToken.Type = TokenType.BracketRight;
-          } else if (xString == "{") {
-            xToken.Type = TokenType.CurlyLeft;
-          } else if (xString == "}") {
-            xToken.Type = TokenType.CurlyRight;
-          } else if (xString == "+") {
-            xToken.Type = TokenType.Plus;
-          } else if (xString == "-") {
-            xToken.Type = TokenType.Minus;
-          } else if (xString == "=") {
-            xToken.Type = TokenType.Equals;
-          } else if (xString == ":") {
-            xToken.Type = TokenType.Colon;
-          } else if (xString == ",") {
-            xToken.Type = TokenType.Comma;
-          } else if (xString == "<") {
-            xToken.Type = TokenType.LessThan;
-          } else if (xString == ">") {
-            xToken.Type = TokenType.GreaterThan;
-          } else if (xString == "?") {
-            xToken.Type = TokenType.Question;
-          } else if (xString == "@") {
-            xToken.Type = TokenType.At;
-          }
-          #endregion
+        } else if (Delimiters.Contains(xString)) {
+          xToken.Type = TokenType.Delimiter;
+
+        } else if (Operators.Contains(xString)) {
+          xToken.Type = TokenType.Operator;
         }
       }
 

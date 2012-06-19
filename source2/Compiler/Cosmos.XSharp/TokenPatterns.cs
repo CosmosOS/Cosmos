@@ -71,28 +71,30 @@ namespace Cosmos.Compiler.XSharp {
     }
     protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx) {
       var xToken = aTokens[aIdx].Type;
-      var xNext = TokenType.Unknown; 
+      Token xNext = null; 
       if (aIdx + 1 < aTokens.Count) {
-        xNext = aTokens[aIdx + 1].Type;
+        xNext = aTokens[aIdx + 1];
       }
 
       string xResult = aPrefix + "Reg = RegistersEnum." + aTokens[aIdx].Value;
-      if (xNext == TokenType.BracketLeft) {
-        string xDisplacement;
-        if (aTokens[aIdx + 2].Type == TokenType.Minus) {
-          xDisplacement = "-" + aTokens[aIdx + 2].Value;
-        } else {
-          xDisplacement = aTokens[aIdx + 2].Value;
+      if (xNext != null) {
+        if (xNext.Value == "[") {
+          string xDisplacement;
+          if (aTokens[aIdx + 2].Value == "-") {
+            xDisplacement = "-" + aTokens[aIdx + 2].Value;
+          } else {
+            xDisplacement = aTokens[aIdx + 2].Value;
+          }
+          xResult = xResult + ", " + aPrefix + "IsIndirect = true, " + aPrefix + "Displacement = " + xDisplacement;
         }
-        xResult = xResult + ", " + aPrefix + "IsIndirect = true, " + aPrefix + "Displacement = " + xDisplacement;
       }
       return xResult;
     }
 
     protected string GetCondition(Token aToken) {
-      if (aToken.Type == TokenType.LessThan) {
+      if (aToken.Value == "<") {
         return "ConditionalTestEnum.LessThan";
-      } else if (aToken.Type == TokenType.Equals) {
+      } else if (aToken.Value == "=") {
         return "ConditionalTestEnum.Zero";
       } else {
         throw new Exception("Unrecognized symbol in conditional: " + aToken.Value);
@@ -181,7 +183,7 @@ namespace Cosmos.Compiler.XSharp {
         delegate(TokenList aTokens, ref List<string> rCode) {
           int xEqIdx = -1;
           for (int i = 0; i < aTokens.Count; i++) {
-            if (aTokens[i].Type == TokenType.Equals) {
+            if (aTokens[i].Value == "=") {
               xEqIdx = i;
               break;
             }

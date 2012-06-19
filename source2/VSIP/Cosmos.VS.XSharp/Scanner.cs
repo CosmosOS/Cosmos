@@ -37,22 +37,9 @@ namespace Cosmos.VS.XSharp {
       mTokenMap[(int)XSC.TokenType.Register] = xKeyword;
       mTokenMap[(int)XSC.TokenType.Keyword] = xKeyword;
 
-      var xDelimeter = new TokenData { Type = TokenType.Delimiter, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.BracketLeft] = xDelimeter;
-      mTokenMap[(int)XSC.TokenType.BracketRight] = xDelimeter;
-
-      var xOperator = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
-      mTokenMap[(int)XSC.TokenType.Equals] = xOperator;
-      mTokenMap[(int)XSC.TokenType.Plus] = xOperator;
-      mTokenMap[(int)XSC.TokenType.Minus] = xOperator;
-      mTokenMap[(int)XSC.TokenType.LessThan] = xOperator;
-      mTokenMap[(int)XSC.TokenType.GreaterThan] = xOperator;
-      mTokenMap[(int)XSC.TokenType.Question] = xOperator;
-      mTokenMap[(int)XSC.TokenType.Colon] = xOperator;
-      mTokenMap[(int)XSC.TokenType.At] = xOperator;
-      
+      mTokenMap[(int)XSC.TokenType.Delimiter] = new TokenData { Type = TokenType.Delimiter, Color = TokenColor.Text };
+      mTokenMap[(int)XSC.TokenType.Operator] = new TokenData { Type = TokenType.Operator, Color = TokenColor.Text };
       mTokenMap[(int)XSC.TokenType.WhiteSpace] = new TokenData { Type = TokenType.WhiteSpace, Color = TokenColor.Text };
-
       mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };
     }
 

@@ -11,11 +11,8 @@ namespace Cosmos.Compiler.XSharp {
     , Register, Keyword, AlphaNum
     // Values
     , ValueInt
-    // Symbols
-    // _ and . are AlphaNum. See comments in Parser
-    , Equals, BracketLeft, BracketRight, Plus, Minus, Colon, CurlyLeft, CurlyRight, Comma, LessThan, GreaterThan, Question, At
     // 
-    , WhiteSpace
+    , WhiteSpace, Operator, Delimiter
     // For now used during scanning while user is typing, but in future could be user methods we have to find etc
     , Unknown
     }

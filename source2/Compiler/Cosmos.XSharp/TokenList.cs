@@ -54,7 +54,7 @@ namespace Cosmos.Compiler.XSharp {
         var xThat = aObj[i];
         if (xThis.Type != xThat.Type) {
           return false;
-        } else if (xThis.Type == TokenType.AlphaNum || xThat.Type == TokenType.Keyword) {
+        } else if (xThis.Type == TokenType.AlphaNum || xThis.Type == TokenType.Keyword || xThis.Type == TokenType.Operator || xThis.Type == TokenType.Delimiter) {
           if (xThis.Value == null || aObj[i].Value == null) {
           } else if (string.Compare(xThis.Value, xThat.Value, true) != 0) {
             return false;
