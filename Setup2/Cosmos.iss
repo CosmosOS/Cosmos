@@ -350,8 +350,8 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 
 [Run]
 ; Necessary to remove then add. Adding won't overwrite (ie upgrade)
-Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
-Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: """{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
