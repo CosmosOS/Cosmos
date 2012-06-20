@@ -349,9 +349,12 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName
 Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe"" ""%1"""
 
 [Run]
-; Necessary to remove then add. Adding won't overwrite (ie upgrade)
-Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
-Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: """{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
+; Necessary to remove then add. Adding won't overwrite (ie upgrade) unless we change the version in the manifest manually.
+; Step 2 takes a LONG time.. but its necessary because of a bug in VSIXInstaller
+; http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/645bcdb8-135f-4cdd-af95-bc1a3b36d5d1
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
+Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
