@@ -40,10 +40,22 @@ namespace Cosmos.Build.Builder {
     protected void CheckPrereqs() {
       Section("Checking Prerequisites");
       Echo("Note: This does not check all prerequisites, please see website for full list.");
+
       // We assume they have normal .NET stuff if user was able to build the builder...
+      //Visual Studio 2010
 
       // Required by VMWareLib
       CheckNet35Sp1();
+      //Visual Studio 2010 SDK SP1
+      //Inno Quick Start Pack
+      //VMWare Player (Free).
+      //or Workstation
+      //VMWare VIX API 1.11
+
+      //string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+      //using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(uninstallKey)) {
+      //  return rk.GetSubKeyNames().Contains("Microsoft .NET Framework 3.5 SP1");
+      //}
     }
 
     protected override void DoRun() {
