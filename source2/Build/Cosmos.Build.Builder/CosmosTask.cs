@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Build.Installer;
 using System.IO;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
@@ -24,12 +25,34 @@ namespace Cosmos.Build.Builder {
       StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputPath));
     }
 
+    protected void CheckNet35Sp1() {
+      bool xNet35SP1Installed = false;
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5", false)) {
+        if (xKey != null) {
+          xNet35SP1Installed = (int)xKey.GetValue("SP", 0) >= 1;
+        }
+      }
+      if (!xNet35SP1Installed) {
+        throw new Exception(".NET 3.5 SP1 not found.");
+      }
+    }
+
+    protected void CheckPrereqs() {
+      Section("Checking Prerequisites");
+      Echo("Note: This does not check all prerequisites, please see website for full list.");
+      // We assume they have normal .NET stuff if user was able to build the builder...
+
+      // Required by VMWareLib
+      CheckNet35Sp1();
+    }
+
     protected override void DoRun() {
       mOutputPath = mCosmosPath + @"\Build\VSIP";
       if (!Directory.Exists(mOutputPath)) {
         Directory.CreateDirectory(mOutputPath);
       }
 
+      CheckPrereqs();
       CompileXSharpCompiler();
       CompileXSharpSource();
       CompileCosmos();
