@@ -174,12 +174,24 @@ namespace Cosmos.Build.Builder {
 
     void CreateSetup() {
       Section("Creating Setup");
-      
-      if (!File.Exists(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe")) {
+
+      string xInnoPath;
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
+        if (xKey == null) {
+          throw new Exception("Cannot find Inno Setup.");
+        }
+        xInnoPath = (string)xKey.GetValue("InstallLocation");
+        if (string.IsNullOrWhiteSpace(xInnoPath)) {
+          throw new Exception("Cannot find Inno Setup.");
+        }
+      }
+
+      string xISCC = Path.Combine(xInnoPath, "ISCC.exe");
+      if (!File.Exists(xISCC)) {
         throw new Exception("Cannot find Inno setup.");
       }
       string xCfg = IsUserKit ? "UserKit" : "DevKit";
-      StartConsole(Paths.ProgFiles32 + @"\Inno Setup 5\ISCC.exe", @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg);
+      StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg);
 
       if (IsUserKit) {
         File.Delete(mInnoFile);
