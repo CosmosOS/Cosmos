@@ -14,6 +14,7 @@ using System.Security.Permissions;
 using System.Windows.Threading;
 using System.IO;
 using Microsoft.VisualBasic;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
@@ -31,6 +32,25 @@ namespace Cosmos.Build.Builder {
         mTailLines.Add(xTextBlock);
         spnlTail.Children.Add(xTextBlock);
       }
+
+      // GetInstallList();
+    }
+
+    protected void GetInstallList() {
+      var xSB = new StringBuilder();
+
+      string[] xKeys;
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\", false)) {
+        xKeys = xKey.GetSubKeyNames();
+      }
+      foreach (string xSubKey in xKeys) {
+        using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\" + xSubKey, false)) {
+          string xValue = (string)xKey.GetValue("ProductName");
+          xSB.AppendLine(xValue);
+        }
+      }
+
+      Clipboard.SetText(xSB.ToString());
     }
 
     bool mPreventAutoClose = false;
@@ -41,8 +61,6 @@ namespace Cosmos.Build.Builder {
     DispatcherTimer mCloseTimer;
 
     public bool Build() {
-      // TODO: Check for Inno, VS SDK SP1, other prereqs
-
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       string xCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       bool xIsUserKit = mApp.Args.Contains("-USERKIT");

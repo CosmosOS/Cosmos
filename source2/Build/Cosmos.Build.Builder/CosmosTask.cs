@@ -5,6 +5,7 @@ using System.Text;
 using Cosmos.Build.Installer;
 using System.IO;
 using Microsoft.Win32;
+using System.Windows;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
@@ -25,6 +26,33 @@ namespace Cosmos.Build.Builder {
       StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputPath));
     }
 
+    protected bool CheckForInstall(string aCheck, bool aCanThrow) {
+      return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Classes\Installer\Products\", "ProductName");
+    }
+    protected bool CheckForUninstall(string aCheck, bool aCanThrow) {
+      return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\", "DisplayName");
+    }
+    protected bool CheckForProduct(string aCheck, bool aCanThrow, string aKey, string aValueName) {
+      string xCheck = aCheck.ToUpper();
+      string[] xKeys;
+      using (var xKey = Registry.LocalMachine.OpenSubKey(aKey, false)) {
+        xKeys = xKey.GetSubKeyNames();
+      }
+      foreach (string xSubKey in xKeys) {
+        using (var xKey = Registry.LocalMachine.OpenSubKey(aKey + xSubKey, false)) {
+          string xValue = (string)xKey.GetValue(aValueName);
+          if (xValue != null && xValue.ToUpper().Contains(xCheck)) {
+            return true;
+          }
+        }
+      }
+
+      if (aCanThrow) {
+        NotFound(aCheck);
+      }
+      return false;
+    }
+
     protected void CheckNet35Sp1() {
       bool xNet35SP1Installed = false;
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5", false)) {
@@ -33,8 +61,12 @@ namespace Cosmos.Build.Builder {
         }
       }
       if (!xNet35SP1Installed) {
-        throw new Exception(".NET 3.5 SP1 not found.");
+        NotFound(".NET 3.5 SP1");
       }
+    }
+
+    protected void NotFound(string aName) {
+      throw new Exception("Prerequisite '" + aName + "' not found.");
     }
 
     protected void CheckPrereqs() {
@@ -44,18 +76,15 @@ namespace Cosmos.Build.Builder {
       // We assume they have normal .NET stuff if user was able to build the builder...
       //Visual Studio 2010
 
-      // Required by VMWareLib
-      CheckNet35Sp1();
-      //Visual Studio 2010 SDK SP1
-      //Inno Quick Start Pack
-      //VMWare Player (Free).
-      //or Workstation
-      //VMWare VIX API 1.11
-
-      //string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-      //using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(uninstallKey)) {
-      //  return rk.GetSubKeyNames().Contains("Microsoft .NET Framework 3.5 SP1");
-      //}
+      CheckNet35Sp1(); // Required by VMWareLib
+      CheckForUninstall("Inno Setup QuickStart Pack", true);
+      CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
+      if (!CheckForInstall("VMware Workstation", false)) {
+        if (!CheckForInstall("VMware Player", false)) {
+          NotFound("VMWare");
+        }
+      }
+      CheckForInstall("VMWare VIX", true);
     }
 
     protected override void DoRun() {
