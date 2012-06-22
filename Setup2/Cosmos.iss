@@ -137,8 +137,6 @@ Name: {app}; Flags: uninsalwaysuninstall
 Type: files; Name: "{code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*"
 Type: filesandordirs; Name: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"
 Type: filesandordirs; Name: "{code:GetCSharpExpress2010ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
-Type: files; Name: "{localappdata}\Microsoft\VisualStudio\10.0\Extensions\Cosmos.VS.XSharp.vsix"
-Type: filesandordirs; Name: "{localappdata}\Microsoft\VisualStudio\10.0\Extensions\Cosmos"
 
 [Files]
 ; Cecil dll, pdb
@@ -353,8 +351,9 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 [Run]
 ; http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/645bcdb8-135f-4cdd-af95-bc1a3b36d5d1
 ; VSIX upgrades are ugly, complicated by a bug in the VSIX installer with /quiet option. See above link.
-; There are serveral work arounds but all have large side effects except for one. We delete the pkg files
-; in the install before we do this, this forces an upgrade if it previously existted, or installs if it didnt prevoiusly exist.
+; Yes we have to call /u TWICE!! See above link..
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
+Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
