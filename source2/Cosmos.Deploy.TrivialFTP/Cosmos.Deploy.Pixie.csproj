@@ -8,8 +8,8 @@
     <ProjectGuid>{287A4DA7-9A8B-4F64-913F-1828DA67F16A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Deploy.TrivialFTP</RootNamespace>
-    <AssemblyName>Cosmos.Deploy.TrivialFTP</AssemblyName>
+    <RootNamespace>Cosmos.Deploy.Pixie</RootNamespace>
+    <AssemblyName>Cosmos.Deploy.Pixie</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -44,7 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BOOTP.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

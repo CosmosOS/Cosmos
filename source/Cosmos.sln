@@ -218,7 +218,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMW
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.TrivialFTP", "..\source2\Cosmos.Deploy.TrivialFTP\Cosmos.Deploy.TrivialFTP.csproj", "{287A4DA7-9A8B-4F64-913F-1828DA67F16A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\source2\Cosmos.Deploy.TrivialFTP\Cosmos.Deploy.Pixie.csproj", "{287A4DA7-9A8B-4F64-913F-1828DA67F16A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.TrivialFTP.Test", "..\source2\Cosmos.Deploy.TrivialFTP.Test\Cosmos.Deploy.TrivialFTP.Test.csproj", "{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}"
 EndProject
@@ -462,14 +462,14 @@ Global
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
 		SccProjectName58 = ../source2/VMWareLib
 		SccLocalPath58 = ..\\source2\\VMWareLib
-		SccProjectUniqueName59 = ..\\source2\\Cosmos.Deploy.TrivialFTP\\Cosmos.Deploy.TrivialFTP.csproj
+		SccProjectUniqueName59 = ..\\source2\\Cosmos.Deploy.TrivialFTP.Test\\Cosmos.Deploy.TrivialFTP.Test.csproj
 		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
-		SccProjectName59 = ../source2/Cosmos.Deploy.TrivialFTP
-		SccLocalPath59 = ..\\source2\\Cosmos.Deploy.TrivialFTP
-		SccProjectUniqueName60 = ..\\source2\\Cosmos.Deploy.TrivialFTP.Test\\Cosmos.Deploy.TrivialFTP.Test.csproj
+		SccProjectName59 = ../source2/Cosmos.Deploy.TrivialFTP.Test
+		SccLocalPath59 = ..\\source2\\Cosmos.Deploy.TrivialFTP.Test
+		SccProjectUniqueName60 = ..\\source2\\Cosmos.Deploy.TrivialFTP\\Cosmos.Deploy.Pixie.csproj
 		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
-		SccProjectName60 = ../source2/Cosmos.Deploy.TrivialFTP.Test
-		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.TrivialFTP.Test
+		SccProjectName60 = ../source2/Cosmos.Deploy.TrivialFTP
+		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.TrivialFTP
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Builder|Any CPU = Builder|Any CPU
