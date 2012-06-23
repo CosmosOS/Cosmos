@@ -26,13 +26,14 @@ namespace Cosmos.Deploy.Pixie {
       mRecvEP = new IPEndPoint(IPAddress.Any, Port);
     }
 
-    protected void Connect() {
+    protected bool Connect() {
       OpType xOp;
       var xReader = Receive(OpType.Read);
       mDataEP = new IPEndPoint(mRecvEP.Address, mRecvEP.Port);
-      
+
+      string xFilename = ReadString(xReader).Replace('/', '\\');
       // Possible path security issues, but this is currently only designed for Cosmos, not for other.
-      mPathname = Path.Combine(mPath, ReadString(xReader));
+      mPathname = Path.Combine(mPath, xFilename);
 
       string xMode = ReadString(xReader).ToLower();
       if (xMode != "octet") {
@@ -51,6 +52,10 @@ namespace Cosmos.Deploy.Pixie {
         }
       }
 
+      if (!File.Exists(mPathname)) {
+        SendErrFileNotFound();
+        return false;
+      }
 
       // OptionAck
       var xMS = new MemoryStream();
@@ -73,6 +78,7 @@ namespace Cosmos.Deploy.Pixie {
         Send(xMS.ToArray());
         WaitAck(0);
       }
+      return true;
     }
 
     protected void WriteOp(BinaryWriter aWriter, OpType aOp) {
@@ -118,7 +124,9 @@ namespace Cosmos.Deploy.Pixie {
 
     public void Execute() {
       while (true) {
-        WaitForTransfer();
+        if (Connect()) {
+          DoTransfer();
+        }
       }
     }
 
@@ -151,18 +159,6 @@ namespace Cosmos.Deploy.Pixie {
           }
           xBlockID++;
         }
-      }
-    }
-
-    protected void WaitForTransfer() {
-      Connect();
-
-      // TODO Read Option packet size for larger packet and faster speed
-
-      if (File.Exists(mPathname)) {
-        DoTransfer();
-      } else {
-        SendErrFileNotFound();
       }
     }
 
