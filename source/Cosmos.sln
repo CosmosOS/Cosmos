@@ -216,9 +216,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.XSharp", "..\sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.TrivialFTP", "Cosmos.Deploy.TrivialFTP\Cosmos.Deploy.TrivialFTP.csproj", "{287A4DA7-9A8B-4F64-913F-1828DA67F16A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.TrivialFTP.Test", "Cosmos.Deploy.TrivialFTP.Test\Cosmos.Deploy.TrivialFTP.Test.csproj", "{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 59
+		SccNumberOfProjects = 61
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -456,6 +462,14 @@ Global
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
 		SccProjectName58 = ../source2/VMWareLib
 		SccLocalPath58 = ..\\source2\\VMWareLib
+		SccProjectUniqueName59 = Cosmos.Deploy.TrivialFTP\\Cosmos.Deploy.TrivialFTP.csproj
+		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
+		SccProjectName59 = Cosmos.Deploy.TrivialFTP
+		SccLocalPath59 = Cosmos.Deploy.TrivialFTP
+		SccProjectUniqueName60 = Cosmos.Deploy.TrivialFTP.Test\\Cosmos.Deploy.TrivialFTP.Test.csproj
+		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
+		SccProjectName60 = Cosmos.Deploy.TrivialFTP.Test
+		SccLocalPath60 = Cosmos.Deploy.TrivialFTP.Test
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Builder|Any CPU = Builder|Any CPU
@@ -1407,6 +1421,36 @@ Global
 		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{76CDB55D-55E3-4B53-AE33-12EC31430826}.Release|x86.ActiveCfg = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Builder|Any CPU.ActiveCfg = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Builder|Any CPU.Build.0 = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Builder|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Builder|Mixed Platforms.Build.0 = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Builder|x86.ActiveCfg = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|x86.ActiveCfg = Release|Any CPU
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|Any CPU.ActiveCfg = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|Mixed Platforms.ActiveCfg = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|Mixed Platforms.Build.0 = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|x86.ActiveCfg = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|x86.Build.0 = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|x86.ActiveCfg = Debug|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|x86.Build.0 = Debug|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Any CPU.ActiveCfg = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Mixed Platforms.Build.0 = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|x86.ActiveCfg = Release|x86
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1428,6 +1472,7 @@ Global
 		{576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{426E77A5-80AA-48DC-97F9-037071345778} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{B521E2A2-81E4-4B2D-A471-7AB550E9551E} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
+		{FD42844B-2767-4DF4-B0AF-EA5F7CB11528} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{0462E82B-8C29-41A9-8265-9C89038ADB29} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{74A9329A-2B0B-4C0A-976C-E4FB7228D8B2} = {D95021E1-A2C9-4829-819E-ED433AF13162}
@@ -1490,5 +1535,7 @@ Global
 		{D048E0B1-8B2B-4A99-8376-7FC8A0656A05} = {9588D51E-243F-4ABA-AED2-A77DA0634209}
 		{6C14B7D1-CACB-4049-A0BD-9CAC5CFCF2C2} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{86F88A09-6801-4474-BFC8-EF09F3A9B89D} = {CD291145-6AD0-41CD-9986-2044F41660DE}
+		{287A4DA7-9A8B-4F64-913F-1828DA67F16A} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
+		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 	EndGlobalSection
 EndGlobal
