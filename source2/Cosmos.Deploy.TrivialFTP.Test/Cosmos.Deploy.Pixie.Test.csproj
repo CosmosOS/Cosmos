@@ -8,8 +8,8 @@
     <ProjectGuid>{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Deploy.TrivialFTP.Test</RootNamespace>
-    <AssemblyName>Cosmos.Deploy.TrivialFTP.Test</AssemblyName>
+    <RootNamespace>Cosmos.Deploy.Pixie.Test</RootNamespace>
+    <AssemblyName>Cosmos.Deploy.Pixie.Test</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

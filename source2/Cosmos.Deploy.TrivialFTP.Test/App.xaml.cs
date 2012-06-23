@@ -5,10 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace Cosmos.Deploy.TrivialFTP.Test {
-  /// <summary>
-  /// Interaction logic for App.xaml
-  /// </summary>
+namespace Cosmos.Deploy.Pixie.Test {
   public partial class App : Application {
   }
 }

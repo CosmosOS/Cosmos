@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Cosmos.Deploy.TrivialFTP.Test {
+namespace Cosmos.Deploy.Pixie.Test {
   /// <summary>
   /// Interaction logic for MainWindow.xaml
   /// </summary>
