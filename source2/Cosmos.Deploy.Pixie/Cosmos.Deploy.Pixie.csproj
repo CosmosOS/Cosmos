@@ -47,6 +47,8 @@
     <Compile Include="DHCP.cs" />
     <Compile Include="DhcpPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrivialFTP.cs" />
+    <Compile Include="TrivialFtpPacket.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources.html" />

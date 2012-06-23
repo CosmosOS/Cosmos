@@ -51,7 +51,7 @@ namespace Cosmos.Deploy.Pixie {
       xReader.ReadBytes(128);
 
       if (xReader.ReadUInt32() != mMagicCookie) {
-        throw new Exception("Magic cookie doesn't match.");
+        throw new Exception("[DHCP] Magic cookie doesn't match.");
       }
 
       //options     var  Optional parameters field.  See the options
@@ -89,7 +89,10 @@ namespace Cosmos.Deploy.Pixie {
       xWriter.Write(ServerAddr);
       xWriter.Write(0);
       xWriter.Write(HwAddr);
-      xWriter.Write(new byte[64]);
+
+      var xBytes1 = ASCIIEncoding.ASCII.GetBytes("none");
+      xWriter.Write(xBytes1);
+      xWriter.Write(new byte[64 - xBytes1.Length]);
 
       var xBytes = ASCIIEncoding.ASCII.GetBytes(BootFile);
       xWriter.Write(xBytes);
@@ -110,6 +113,14 @@ namespace Cosmos.Deploy.Pixie {
 
       var xResult = xStream.ToArray();
       return xResult;
+    }
+
+    public void AddTextOption(byte aID, string aText) {
+      var xBytes = Encoding.ASCII.GetBytes(aText);
+      var xBytes2 = new byte[xBytes.Length + 1];
+      xBytes2[0] = (byte)xBytes.Length;
+      xBytes.CopyTo(xBytes2, 1);
+      Options.Add(aID, xBytes2);
     }
 
     protected UInt32 mMagicCookie = 0x63538263;

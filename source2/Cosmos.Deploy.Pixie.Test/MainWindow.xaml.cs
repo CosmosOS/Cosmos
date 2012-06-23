@@ -12,10 +12,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
+using System.IO;
 
 namespace Cosmos.Deploy.Pixie.Test {
   public partial class MainWindow : Window {
-    DHCP mBOOTP;
 
     public MainWindow() {
       InitializeComponent();
@@ -23,8 +23,15 @@ namespace Cosmos.Deploy.Pixie.Test {
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
       try {
-        mBOOTP = new DHCP(42);
-        mBOOTP.Execute();
+        string xBootFile = @"D:\source\Cosmos\Build\PXE\boot\pxelinux.0";
+        var xServerIP = new byte[] { 192, 168, 42, 1 };
+
+        var xBOOTP = new DHCP(xServerIP, xBootFile);
+        xBOOTP.Execute();
+
+        var xTFTP = new TrivialFTP(xServerIP, System.IO.Path.GetDirectoryName(xBootFile));
+        xTFTP.Execute();
+
       } catch (SocketException ex) {
         MessageBox.Show(ex.SocketErrorCode.ToString());
       } catch (Exception ex) {
