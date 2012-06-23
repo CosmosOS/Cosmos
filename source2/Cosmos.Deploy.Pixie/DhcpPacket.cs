@@ -27,8 +27,7 @@ namespace Cosmos.Deploy.Pixie {
 
       //secs    2       filled in by client, seconds elapsed since client started trying to boot.
       xReader.ReadUInt16();
-      //flags   2       
-      xReader.ReadUInt16();
+      Flags = xReader.ReadUInt16();
 
       // Dont reverse IP Addresses, byte arrays end up big endian as we write them back
       ClientAddr = xReader.ReadUInt32();
@@ -83,14 +82,18 @@ namespace Cosmos.Deploy.Pixie {
       xWriter.Write((byte)0);
 
       xWriter.Write(TxID);
-      xWriter.Write(0);
+      xWriter.Write((UInt16)0);
+      xWriter.Write(Flags);
       xWriter.Write(0);
       xWriter.Write(YourAddr);
       xWriter.Write(ServerAddr);
       xWriter.Write(0);
       xWriter.Write(HwAddr);
       xWriter.Write(new byte[64]);
-      xWriter.Write(new byte[128]);
+
+      xWriter.Write(ASCIIEncoding.ASCII.GetBytes("TEST"));
+      xWriter.Write(new byte[124]);
+
       xWriter.Write(mMagicCookie);
 
       xWriter.Write((byte)53);
@@ -120,6 +123,7 @@ namespace Cosmos.Deploy.Pixie {
     public byte HwLength;
     public byte Hops;
     public UInt32 TxID;
+    public UInt16 Flags;
     public UInt32 ClientAddr;
     public UInt32 YourAddr;
     public UInt32 ServerAddr;

@@ -30,25 +30,28 @@ namespace Cosmos.Deploy.Pixie {
       xOut.YourAddr = BitConverter.ToUInt32(new byte[] { 192, 168, 42, 2 }, 0);
       xOut.ServerAddr = BitConverter.ToUInt32(new byte[] { 192, 168, 42, 1 }, 0);
       xOut.HwAddr = xIn.HwAddr;
+      xOut.Flags = xIn.Flags;
       xOut.Msg = DhcpPacket.MsgType.Offer;
       xOut.Options.Add(1, new byte[] { 255, 255, 255, 0 });
       xOut.Options.Add(51, new byte[] { 0, 0, 255, 255 });
       xOut.Options.Add(54, new byte[] { 192, 168, 42, 1 });
+      xOut.Options.Add(13, new byte[] { 4, 255 });
 
       var xOutBytes = xOut.GetBytes();
       var xBroadcastIP = new IPAddress(new byte[] { 192, 168, 42, 255 });
-      mUDP.Send(xOutBytes, xOutBytes.Length, new IPEndPoint(xBroadcastIP, 68));
+      mUDP.Send(xOutBytes, xOutBytes.Length, new IPEndPoint(IPAddress.Broadcast, 68));
 
       while (true) {
         xData = mUDP.Receive(ref xEndpoint);
         xIn = new DhcpPacket(xData);
-        if (xIn.Msg != DhcpPacket.MsgType.Discover) {
-          int i = 0;
-        }
-        if (xIn.Msg != DhcpPacket.MsgType.Request) {
-          //throw new Exception("Expected Request");
+        if (xIn.Msg == DhcpPacket.MsgType.Discover) {
+          break;
+        } else if (xIn.Msg != DhcpPacket.MsgType.Request) {
+          throw new Exception("Unexpected DHCP message.")
         }
       }
+
+
     }
 
   }
