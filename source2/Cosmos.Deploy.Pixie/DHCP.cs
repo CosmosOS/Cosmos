@@ -15,7 +15,6 @@ namespace Cosmos.Deploy.Pixie {
 
     protected byte[] mServerIP;
     protected byte[] mClientIP;
-    protected byte[] mBroadcastIP;
     protected IPEndPoint mRecvEndPoint;
 
     public DHCP(byte[] aServerIP, string aBootFile) {
@@ -24,9 +23,6 @@ namespace Cosmos.Deploy.Pixie {
 
       mClientIP = (byte[])mServerIP.Clone();
       mClientIP[3] = 2;
-      // Certain DHCP clients require specific subnet broadcast so this is safer than 255.255.255.255
-      mBroadcastIP = (byte[])mServerIP.Clone();
-      mBroadcastIP[3] = 255;
 
       mUDP = new UdpClient(new IPEndPoint(new IPAddress(mServerIP), ServerPort));
 
@@ -45,7 +41,6 @@ namespace Cosmos.Deploy.Pixie {
 
     protected void Send(DhcpPacket aPacket) {
       var xBytes = aPacket.GetBytes();
-      //mUDP.Send(xBytes, xBytes.Length, new IPEndPoint(new IPAddress(mBroadcastIP), 68));
       mUDP.Send(xBytes, xBytes.Length, new IPEndPoint(IPAddress.Broadcast, 68));
     }
 
