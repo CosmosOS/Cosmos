@@ -15,7 +15,7 @@ using System.Net.Sockets;
 
 namespace Cosmos.Deploy.Pixie.Test {
   public partial class MainWindow : Window {
-    BOOTP mBOOTP;
+    DHCP mBOOTP;
 
     public MainWindow() {
       InitializeComponent();
@@ -23,7 +23,7 @@ namespace Cosmos.Deploy.Pixie.Test {
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
       try {
-        mBOOTP = new BOOTP();
+        mBOOTP = new DHCP();
       } catch (SocketException ex) {
         MessageBox.Show(ex.SocketErrorCode.ToString());
       } catch (Exception ex) {

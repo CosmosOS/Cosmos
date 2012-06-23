@@ -44,8 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BOOTP.cs" />
-    <Compile Include="BootpPacket.cs" />
+    <Compile Include="DHCP.cs" />
+    <Compile Include="DhcpPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
