@@ -11,14 +11,25 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Net.Sockets;
 
 namespace Cosmos.Deploy.Pixie.Test {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
   public partial class MainWindow : Window {
+    BOOTP mBOOTP;
+
     public MainWindow() {
       InitializeComponent();
     }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e) {
+      try {
+        mBOOTP = new BOOTP();
+      } catch (SocketException ex) {
+        MessageBox.Show(ex.SocketErrorCode.ToString());
+      } catch (Exception ex) {
+        MessageBox.Show(ex.Message);
+      }
+    }
+
   }
 }
