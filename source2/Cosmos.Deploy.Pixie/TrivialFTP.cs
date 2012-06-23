@@ -8,14 +8,15 @@ using System.IO;
 
 namespace Cosmos.Deploy.Pixie {
   public class TrivialFTP {
-    public enum OpType { Read = 1, Write, Data, Ack, Error };
+    public enum OpType { Read = 1, Write, Data, Ack, Error, OptionAck };
     protected byte[] mServerIP;
     protected string mPath;
     protected int Port = 69;
     protected UdpClient mUDP;
     protected IPEndPoint mRecvEP;
     protected IPEndPoint mDataEP;
-    string mFilename;
+    protected string mPathname;
+    protected int mBlockSize = 512;
 
     public TrivialFTP(byte[] aServerIP, string aPath) {
       mServerIP = aServerIP;
@@ -29,12 +30,59 @@ namespace Cosmos.Deploy.Pixie {
       OpType xOp;
       var xReader = Receive(OpType.Read);
       mDataEP = new IPEndPoint(mRecvEP.Address, mRecvEP.Port);
-      mFilename = ReadString(xReader);
+      
+      // Possible path security issues, but this is currently only designed for Cosmos, not for other.
+      mPathname = Path.Combine(mPath, ReadString(xReader));
 
       string xMode = ReadString(xReader).ToLower();
       if (xMode != "octet") {
         throw new Exception("[TFTP] Expected octet.");
       }
+
+      // Read Option Extension
+      bool xTSize = false;
+      if (xReader.BaseStream.Position < xReader.BaseStream.Length) {
+        string xName = ReadString(xReader).ToLower();
+        string xValue = ReadString(xReader);
+        if (xName == "tsize") {
+          xTSize = true;
+        } else if (xName == "blksize") {
+          mBlockSize = int.Parse(xValue);
+        }
+      }
+
+
+      // OptionAck
+      var xMS = new MemoryStream();
+      var xWriter = new BinaryWriter(xMS);
+
+      WriteOp(xWriter, OpType.OptionAck);
+
+      if (xTSize) {
+        WriteString(xWriter, "tsize");
+        var xFileInfo = new FileInfo(mPathname);
+        WriteString(xWriter, xFileInfo.Length.ToString());
+      }
+      if (mBlockSize != 512) {
+        WriteString(xWriter, "blksize");
+        WriteString(xWriter, mBlockSize.ToString());
+      }
+
+      // Did we write any options?
+      if (xWriter.BaseStream.Length > 4) {
+        Send(xMS.ToArray());
+        WaitAck(0);
+      }
+    }
+
+    protected void WriteOp(BinaryWriter aWriter, OpType aOp) {
+      aWriter.Write((byte)0);
+      aWriter.Write((byte)aOp);
+    }
+
+    protected void WriteString(BinaryWriter aWriter, string aValue) {
+      aWriter.Write(Encoding.ASCII.GetBytes(aValue));
+      aWriter.Write((byte)0);
     }
 
     protected BinaryReader Receive(OpType aOp) {
@@ -78,29 +126,27 @@ namespace Cosmos.Deploy.Pixie {
       mUDP.Send(aBytes, aBytes.Length, mDataEP);
     }
 
-    protected void DoTransfer(string aPathname) {
-      int xBlockSize = 512;
-
-      using (var xFilestream = new FileStream(aPathname, FileMode.Open, FileAccess.Read)) {
+    protected void DoTransfer() {
+      using (var xFilestream = new FileStream(mPathname, FileMode.Open, FileAccess.Read)) {
         int xBlockID = 1;
         var xReader = new BinaryReader(xFilestream);
 
-        var xPacket = new byte[xBlockSize + 4];
+        var xPacket = new byte[mBlockSize + 4];
         // xPacket[0] MSB and is always 0
         xPacket[1] = (byte)OpType.Data;
         while (true) {
           xPacket[2] = (byte)(xBlockID / 256);
           xPacket[3] = (byte)(xBlockID % 256);
 
-          int xCount = xReader.Read(xPacket, 4, xBlockSize);
-          if (xCount < xBlockSize) {
+          int xCount = xReader.Read(xPacket, 4, mBlockSize);
+          if (xCount < mBlockSize) {
             xPacket = xPacket.Take(xCount + 4).ToArray();
           }
 
           Send(xPacket);
           WaitAck(xBlockID);
 
-          if (xCount < xBlockSize) {
+          if (xCount < mBlockSize) {
             break;
           }
           xBlockID++;
@@ -110,12 +156,11 @@ namespace Cosmos.Deploy.Pixie {
 
     protected void WaitForTransfer() {
       Connect();
+
       // TODO Read Option packet size for larger packet and faster speed
 
-      // Possible path security issues, but this is currently only designed for Cosmos, not for other.
-      string xPathname = Path.Combine(mPath, mFilename);
-      if (File.Exists(xPathname)) {
-        DoTransfer(xPathname);
+      if (File.Exists(mPathname)) {
+        DoTransfer();
       } else {
         SendErrFileNotFound();
       }
@@ -125,15 +170,13 @@ namespace Cosmos.Deploy.Pixie {
       var xMS = new MemoryStream();
       var xWriter = new BinaryWriter(xMS);
 
-      xWriter.Write((byte)0);
-      xWriter.Write((byte)OpType.Error);
+      WriteOp(xWriter, OpType.Error);
 
       // File not found
       xWriter.Write((byte)0);
       xWriter.Write((byte)1);
 
-      xWriter.Write(Encoding.ASCII.GetBytes("File not found."));
-      xWriter.Write((byte)0);
+      WriteString(xWriter, "File not found.");
 
       Send(xMS.ToArray());
     }
