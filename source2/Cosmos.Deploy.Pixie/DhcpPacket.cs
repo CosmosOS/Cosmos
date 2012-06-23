@@ -6,21 +6,18 @@ using System.Text;
 
 namespace Cosmos.Deploy.Pixie {
   public class DhcpPacket {
-    protected byte[] mData;
-    public enum OpType { BootRequest = 0, BootReply = 1 }
-    protected byte[] mMagicCookie = new byte[] { 99, 130, 83, 99 };
-    protected List<byte[]> mOptions = new List<byte[]>();
 
     public DhcpPacket() {
-      mData = new byte[300];
     }
 
     public DhcpPacket(byte[] aData) {
-      mData = aData;
-
-      var xReader = new BinaryReader(new MemoryStream(mData));
+      var xReader = new BinaryReader(new MemoryStream(aData));
 
       Op = (OpType)xReader.ReadByte();
+      if (Op != OpType.Request) {
+        throw new Exception("Invalid Op");
+      }
+
       HwType = xReader.ReadByte();
       HwLength = xReader.ReadByte();
       Hops = xReader.ReadByte();
@@ -54,7 +51,7 @@ namespace Cosmos.Deploy.Pixie {
       //                name in bootreply.
       xReader.ReadBytes(128);
 
-      if (xReader.ReadUInt32() != 0x63538263) {
+      if (xReader.ReadUInt32() != mMagicCookie) {
         throw new Exception("Magic cookie doesn't match.");
       }
 
@@ -69,35 +66,55 @@ namespace Cosmos.Deploy.Pixie {
         }
 
         byte xLength = xReader.ReadByte();
-        var xBytes = new byte[xLength + 2];
-        xBytes[0] = xOption;
-        xBytes[1] = xLength;
-        var xData = xReader.ReadBytes(xLength);
-        xData.CopyTo(xBytes, 2);
-
-        mOptions.Add(xBytes);
+        Options.Add(xOption, xReader.ReadBytes(xLength));
       }
-    }
 
-    protected void Write(int aIdx, byte[] aBytes) {
-      // See comments in ctor why this is commented out
-      //Array.Reverse(aBytes);
-      aBytes.CopyTo(mData, aIdx);
+      Msg = (MsgType)Options[53][0];
     }
 
     public byte[] GetBytes() {
-      mData[0] = (byte)Op;
-      mData[1] = 1;
-      mData[2] = 6;
-      Write(4, BitConverter.GetBytes(TxID));
-      Write(16, BitConverter.GetBytes(YourAddr));
-      Write(20, BitConverter.GetBytes(ServerAddr));
-      Write(28, HwAddr);
-      Write(236, mMagicCookie);
+      // See comments in ctor why we dont convert to network byte order
+      var xStream = new MemoryStream();
+      var xWriter = new BinaryWriter(xStream);
 
-      return mData;
+      xWriter.Write((byte)Op);
+      xWriter.Write((byte)1);
+      xWriter.Write((byte)6);
+      xWriter.Write((byte)0);
+
+      xWriter.Write(TxID);
+      xWriter.Write(0);
+      xWriter.Write(0);
+      xWriter.Write(YourAddr);
+      xWriter.Write(ServerAddr);
+      xWriter.Write(0);
+      xWriter.Write(HwAddr);
+      xWriter.Write(new byte[64]);
+      xWriter.Write(new byte[128]);
+      xWriter.Write(mMagicCookie);
+
+      xWriter.Write((byte)53);
+      xWriter.Write((byte)1);
+      xWriter.Write((byte)Msg);
+
+      foreach (var xOption in Options) {
+        xWriter.Write(xOption.Key);
+        xWriter.Write((byte)xOption.Value.Length);
+        xWriter.Write(xOption.Value);
+      }
+      xWriter.Write((byte)255);
+
+      var xResult = xStream.ToArray();
+      return xResult;
     }
 
+    protected UInt32 mMagicCookie = 0x63538263;
+    public Dictionary<byte, byte[]> Options = new Dictionary<byte, byte[]>();
+
+    public enum MsgType { Discover = 1, Offer, Request, Decline, Ack, Nak, Release };
+    public MsgType Msg;
+
+    public enum OpType { Request = 1, Reply }
     public OpType Op;
     public byte HwType;
     public byte HwLength;

@@ -16,22 +16,39 @@ namespace Cosmos.Deploy.Pixie {
       mUDP = new UdpClient(xBind);
 
       var xEndpoint = new IPEndPoint(IPAddress.Any, ServerPort);
+
+      // Discover
       var xData = mUDP.Receive(ref xEndpoint);
       var xIn = new DhcpPacket(xData);
+      if (xIn.Msg != DhcpPacket.MsgType.Discover) {
+        throw new Exception("Expected Discover");
+      }
 
       var xOut = new DhcpPacket();
-      xOut.Op = DhcpPacket.OpType.BootReply;
+      xOut.Op = DhcpPacket.OpType.Reply;
       xOut.TxID = xIn.TxID;
       xOut.YourAddr = BitConverter.ToUInt32(new byte[] { 192, 168, 42, 2 }, 0);
       xOut.ServerAddr = BitConverter.ToUInt32(new byte[] { 192, 168, 42, 1 }, 0);
       xOut.HwAddr = xIn.HwAddr;
+      xOut.Msg = DhcpPacket.MsgType.Offer;
+      xOut.Options.Add(1, new byte[] { 255, 255, 255, 0 });
+      xOut.Options.Add(51, new byte[] { 0, 0, 255, 255 });
+      xOut.Options.Add(54, new byte[] { 192, 168, 42, 1 });
 
       var xOutBytes = xOut.GetBytes();
       var xBroadcastIP = new IPAddress(new byte[] { 192, 168, 42, 255 });
       mUDP.Send(xOutBytes, xOutBytes.Length, new IPEndPoint(xBroadcastIP, 68));
 
-      xData = mUDP.Receive(ref xEndpoint);
-      xIn = new DhcpPacket(xData);
+      while (true) {
+        xData = mUDP.Receive(ref xEndpoint);
+        xIn = new DhcpPacket(xData);
+        if (xIn.Msg != DhcpPacket.MsgType.Discover) {
+          int i = 0;
+        }
+        if (xIn.Msg != DhcpPacket.MsgType.Request) {
+          //throw new Exception("Expected Request");
+        }
+      }
     }
 
   }
