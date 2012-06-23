@@ -23,7 +23,8 @@ namespace Cosmos.Deploy.Pixie.Test {
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
       try {
-        mBOOTP = new DHCP();
+        mBOOTP = new DHCP(42);
+        mBOOTP.Execute();
       } catch (SocketException ex) {
         MessageBox.Show(ex.SocketErrorCode.ToString());
       } catch (Exception ex) {

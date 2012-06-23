@@ -91,8 +91,9 @@ namespace Cosmos.Deploy.Pixie {
       xWriter.Write(HwAddr);
       xWriter.Write(new byte[64]);
 
-      xWriter.Write(ASCIIEncoding.ASCII.GetBytes("TEST"));
-      xWriter.Write(new byte[124]);
+      var xBytes = ASCIIEncoding.ASCII.GetBytes(BootFile);
+      xWriter.Write(xBytes);
+      xWriter.Write(new byte[128 - xBytes.Length]);
 
       xWriter.Write(mMagicCookie);
 
@@ -128,5 +129,6 @@ namespace Cosmos.Deploy.Pixie {
     public UInt32 YourAddr;
     public UInt32 ServerAddr;
     public byte[] HwAddr;
+    public string BootFile;
   }
 }
