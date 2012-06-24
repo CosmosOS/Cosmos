@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class BuildPage
+	partial class CosmosPage
 	{
 		/// <summary> 
 		/// Required designer variable.
@@ -43,9 +43,6 @@
       this.textOutputPath = new System.Windows.Forms.TextBox();
       this.labelFramework = new System.Windows.Forms.Label();
       this.tabPage2 = new System.Windows.Forms.TabPage();
-      this.tabVMWare = new System.Windows.Forms.TabPage();
-      this.label3 = new System.Windows.Forms.Label();
-      this.comboFlavor = new System.Windows.Forms.ComboBox();
       this.panel3 = new System.Windows.Forms.Panel();
       this.groupBox2 = new System.Windows.Forms.GroupBox();
       this.checkEnableGDB = new System.Windows.Forms.CheckBox();
@@ -56,16 +53,19 @@
       this.label5 = new System.Windows.Forms.Label();
       this.comboDebugMode = new System.Windows.Forms.ComboBox();
       this.comboTraceMode = new System.Windows.Forms.ComboBox();
+      this.tabVMWare = new System.Windows.Forms.TabPage();
+      this.label3 = new System.Windows.Forms.Label();
+      this.comboFlavor = new System.Windows.Forms.ComboBox();
       this.TabControl1.SuspendLayout();
       this.tabDeploy.SuspendLayout();
       this.panel1.SuspendLayout();
       this.tabCompile.SuspendLayout();
       this.panel2.SuspendLayout();
       this.tabPage2.SuspendLayout();
-      this.tabVMWare.SuspendLayout();
       this.panel3.SuspendLayout();
       this.groupBox2.SuspendLayout();
       this.groupBox1.SuspendLayout();
+      this.tabVMWare.SuspendLayout();
       this.SuspendLayout();
       // 
       // TabControl1
@@ -242,37 +242,6 @@
       this.tabPage2.Text = "Debug";
       this.tabPage2.UseVisualStyleBackColor = true;
       // 
-      // tabVMWare
-      // 
-      this.tabVMWare.Controls.Add(this.label3);
-      this.tabVMWare.Controls.Add(this.comboFlavor);
-      this.tabVMWare.Location = new System.Drawing.Point(4, 4);
-      this.tabVMWare.Name = "tabVMWare";
-      this.tabVMWare.Padding = new System.Windows.Forms.Padding(3);
-      this.tabVMWare.Size = new System.Drawing.Size(478, 215);
-      this.tabVMWare.TabIndex = 4;
-      this.tabVMWare.Text = "VMWare";
-      this.tabVMWare.UseVisualStyleBackColor = true;
-      // 
-      // label3
-      // 
-      this.label3.AutoSize = true;
-      this.label3.Location = new System.Drawing.Point(6, 12);
-      this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(94, 13);
-      this.label3.TabIndex = 18;
-      this.label3.Text = "VMWare Edition:";
-      // 
-      // comboFlavor
-      // 
-      this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.comboFlavor.FormattingEnabled = true;
-      this.comboFlavor.Location = new System.Drawing.Point(26, 37);
-      this.comboFlavor.Name = "comboFlavor";
-      this.comboFlavor.Size = new System.Drawing.Size(143, 21);
-      this.comboFlavor.Sorted = true;
-      this.comboFlavor.TabIndex = 17;
-      // 
       // panel3
       // 
       this.panel3.Controls.Add(this.groupBox2);
@@ -384,13 +353,44 @@
       this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
       this.comboTraceMode.TabIndex = 15;
       // 
-      // BuildPage
+      // tabVMWare
+      // 
+      this.tabVMWare.Controls.Add(this.label3);
+      this.tabVMWare.Controls.Add(this.comboFlavor);
+      this.tabVMWare.Location = new System.Drawing.Point(4, 4);
+      this.tabVMWare.Name = "tabVMWare";
+      this.tabVMWare.Padding = new System.Windows.Forms.Padding(3);
+      this.tabVMWare.Size = new System.Drawing.Size(478, 215);
+      this.tabVMWare.TabIndex = 4;
+      this.tabVMWare.Text = "VMWare";
+      this.tabVMWare.UseVisualStyleBackColor = true;
+      // 
+      // label3
+      // 
+      this.label3.AutoSize = true;
+      this.label3.Location = new System.Drawing.Point(6, 12);
+      this.label3.Name = "label3";
+      this.label3.Size = new System.Drawing.Size(94, 13);
+      this.label3.TabIndex = 18;
+      this.label3.Text = "VMWare Edition:";
+      // 
+      // comboFlavor
+      // 
+      this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboFlavor.FormattingEnabled = true;
+      this.comboFlavor.Location = new System.Drawing.Point(26, 37);
+      this.comboFlavor.Name = "comboFlavor";
+      this.comboFlavor.Size = new System.Drawing.Size(143, 21);
+      this.comboFlavor.Sorted = true;
+      this.comboFlavor.TabIndex = 17;
+      // 
+      // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Controls.Add(this.TabControl1);
-      this.Name = "BuildPage";
-      this.Title = "Build";
+      this.Name = "CosmosPage";
+      this.Title = "Cosmos";
       this.Controls.SetChildIndex(this.TabControl1, 0);
       this.TabControl1.ResumeLayout(false);
       this.tabDeploy.ResumeLayout(false);
@@ -400,13 +400,13 @@
       this.panel2.ResumeLayout(false);
       this.panel2.PerformLayout();
       this.tabPage2.ResumeLayout(false);
-      this.tabVMWare.ResumeLayout(false);
-      this.tabVMWare.PerformLayout();
       this.panel3.ResumeLayout(false);
       this.groupBox2.ResumeLayout(false);
       this.groupBox2.PerformLayout();
       this.groupBox1.ResumeLayout(false);
       this.groupBox1.PerformLayout();
+      this.tabVMWare.ResumeLayout(false);
+      this.tabVMWare.PerformLayout();
       this.ResumeLayout(false);
 
 		}

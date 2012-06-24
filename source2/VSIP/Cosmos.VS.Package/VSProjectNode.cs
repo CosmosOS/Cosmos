@@ -90,9 +90,7 @@ namespace Cosmos.VS.Package {
       //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
       LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
       try {
-        return new Guid[] {
-          typeof(BuildPage).GUID,
-      };
+        return new Guid[] { typeof(CosmosPage).GUID };
       } finally {
         LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
       }

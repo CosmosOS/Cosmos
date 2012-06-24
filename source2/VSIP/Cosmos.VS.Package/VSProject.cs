@@ -49,7 +49,7 @@ namespace Cosmos.VS.Package {
     //  , NewProjectRequireNewFolderVsTemplate = false)]
   
   // Property Pages
-	[ProvideObject(typeof(BuildPage), RegisterUsing = RegistrationMethod.CodeBase)]
+	[ProvideObject(typeof(CosmosPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	
   [Guid(Guids.guidProjectPkgString)]
   public sealed class VSProject : ProjectPackage, IVsInstalledProduct {

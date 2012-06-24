@@ -91,11 +91,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildPage.cs">
+    <Compile Include="CosmosPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="BuildPage.Designer.cs">
-      <DependentUpon>BuildPage.cs</DependentUpon>
+    <Compile Include="CosmosPage.Designer.cs">
+      <DependentUpon>CosmosPage.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfigurationBase.cs">
       <SubType>UserControl</SubType>
@@ -243,8 +243,8 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.fs">
       <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
     </ZipItem>
-    <EmbeddedResource Include="BuildPage.resx">
-      <DependentUpon>BuildPage.cs</DependentUpon>
+    <EmbeddedResource Include="CosmosPage.resx">
+      <DependentUpon>CosmosPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfigurationBase.resx">
       <DependentUpon>ConfigurationBase.cs</DependentUpon>

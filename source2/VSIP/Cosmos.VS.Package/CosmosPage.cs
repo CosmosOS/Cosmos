@@ -18,18 +18,18 @@ namespace Cosmos.VS.Package {
   // Magic width and height.
   // 492, 288
 
-  [Guid(Guids.BuildPage)]
-  public partial class BuildPage : ConfigurationBase {
+  [Guid(Guids.CosmosPage)]
+  public partial class CosmosPage : ConfigurationBase {
     public static TargetHost CurrentBuildTarget = TargetHost.VMWare;
     public static event EventHandler BuildTargetChanged;
 
     protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
-      if (BuildPage.BuildTargetChanged != null) {
-        BuildPage.BuildTargetChanged(sender, e);
+      if (CosmosPage.BuildTargetChanged != null) {
+        CosmosPage.BuildTargetChanged(sender, e);
       }
     }
 
-    public BuildPage() {
+    public CosmosPage() {
       InitializeComponent();
 
       textOutputPath.TextChanged += delegate(Object sender, EventArgs e) {

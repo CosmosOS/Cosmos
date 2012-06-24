@@ -241,11 +241,11 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ProductName; ValueData: Cosmos Visual Studio Integration Package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: CompanyName; ValueData: Cosmos
 
-; BuildPage configuration page
+; Project Properties Cosmos Page configuration page
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.BuildPage
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.CosmosPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.BuildPage
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.CosmosPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 
