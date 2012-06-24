@@ -130,13 +130,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
 
       string xBuildTarget = mDebugInfo["BuildTarget"].ToUpper();
-      if (xBuildTarget == "VMWARE") {
-        mBuildTarget = BuildTarget.VMWare;
-      }
-      //ISO,
-      //USB,
-      //VMWarePXE,
-      //PXE
+      var xValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
+      mBuildTarget = xValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
       if (mBuildTarget == BuildTarget.VMWare) {
         string xFlavor = mDebugInfo["VMWareFlavor"].ToUpper();
@@ -236,21 +231,25 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // Launch GDB Client
       if (xGDBDebugStub && xGDBClient) {
-        OutputText("Launching GDB client.");
-        if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe)) {
-          var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
-          xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
-          xPSInfo.UseShellExecute = false;
-          xPSInfo.RedirectStandardInput = false;
-          xPSInfo.RedirectStandardError = false;
-          xPSInfo.RedirectStandardOutput = false;
-          xPSInfo.CreateNoWindow = false;
-          Process.Start(xPSInfo);
-        } else {
-          MessageBox.Show(string.Format(
-              "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
-              Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
-        }
+        LaunchGdbClient();
+      }
+    }
+
+    protected void LaunchGdbClient() {
+      OutputText("Launching GDB client.");
+      if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe)) {
+        var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
+        xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
+        xPSInfo.UseShellExecute = false;
+        xPSInfo.RedirectStandardInput = false;
+        xPSInfo.RedirectStandardError = false;
+        xPSInfo.RedirectStandardOutput = false;
+        xPSInfo.CreateNoWindow = false;
+        Process.Start(xPSInfo);
+      } else {
+        MessageBox.Show(string.Format(
+            "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
+            Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
       }
     }
 
