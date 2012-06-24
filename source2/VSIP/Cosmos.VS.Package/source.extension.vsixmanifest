@@ -4,7 +4,7 @@
     <Name>Cosmos</Name>
     <Author>Cosmos</Author>
     <Version>1.0</Version>
-    <Description xml:space="preserve">Cosmos VSIX Project</Description>
+    <Description xml:space="preserve">Cosmos Package</Description>
     <Locale>1033</Locale>
     <Icon>..\..\Cosmos.ico</Icon>
     <SupportedProducts>
