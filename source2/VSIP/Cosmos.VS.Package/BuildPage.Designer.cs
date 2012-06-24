@@ -35,10 +35,6 @@
       this.lboxDeployTarget = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
       this.panel2 = new System.Windows.Forms.Panel();
-      this.tabPage2 = new System.Windows.Forms.TabPage();
-      this.tabVMWare = new System.Windows.Forms.TabPage();
-      this.comboFlavor = new System.Windows.Forms.ComboBox();
-      this.label3 = new System.Windows.Forms.Label();
       this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
       this.labelInternalAssembler = new System.Windows.Forms.Label();
       this.comboFramework = new System.Windows.Forms.ComboBox();
@@ -46,12 +42,30 @@
       this.label2 = new System.Windows.Forms.Label();
       this.textOutputPath = new System.Windows.Forms.TextBox();
       this.labelFramework = new System.Windows.Forms.Label();
+      this.tabPage2 = new System.Windows.Forms.TabPage();
+      this.tabVMWare = new System.Windows.Forms.TabPage();
+      this.label3 = new System.Windows.Forms.Label();
+      this.comboFlavor = new System.Windows.Forms.ComboBox();
+      this.panel3 = new System.Windows.Forms.Panel();
+      this.groupBox2 = new System.Windows.Forms.GroupBox();
+      this.checkEnableGDB = new System.Windows.Forms.CheckBox();
+      this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.checkIgnoreDebugStubAttribute = new System.Windows.Forms.CheckBox();
+      this.label4 = new System.Windows.Forms.Label();
+      this.label5 = new System.Windows.Forms.Label();
+      this.comboDebugMode = new System.Windows.Forms.ComboBox();
+      this.comboTraceMode = new System.Windows.Forms.ComboBox();
       this.TabControl1.SuspendLayout();
       this.tabDeploy.SuspendLayout();
       this.panel1.SuspendLayout();
       this.tabCompile.SuspendLayout();
       this.panel2.SuspendLayout();
+      this.tabPage2.SuspendLayout();
       this.tabVMWare.SuspendLayout();
+      this.panel3.SuspendLayout();
+      this.groupBox2.SuspendLayout();
+      this.groupBox1.SuspendLayout();
       this.SuspendLayout();
       // 
       // TabControl1
@@ -132,48 +146,6 @@
       this.panel2.Name = "panel2";
       this.panel2.Size = new System.Drawing.Size(453, 212);
       this.panel2.TabIndex = 3;
-      // 
-      // tabPage2
-      // 
-      this.tabPage2.AutoScroll = true;
-      this.tabPage2.Location = new System.Drawing.Point(4, 4);
-      this.tabPage2.Name = "tabPage2";
-      this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-      this.tabPage2.Size = new System.Drawing.Size(478, 215);
-      this.tabPage2.TabIndex = 2;
-      this.tabPage2.Text = "Debug";
-      this.tabPage2.UseVisualStyleBackColor = true;
-      // 
-      // tabVMWare
-      // 
-      this.tabVMWare.Controls.Add(this.label3);
-      this.tabVMWare.Controls.Add(this.comboFlavor);
-      this.tabVMWare.Location = new System.Drawing.Point(4, 4);
-      this.tabVMWare.Name = "tabVMWare";
-      this.tabVMWare.Padding = new System.Windows.Forms.Padding(3);
-      this.tabVMWare.Size = new System.Drawing.Size(478, 215);
-      this.tabVMWare.TabIndex = 4;
-      this.tabVMWare.Text = "VMWare";
-      this.tabVMWare.UseVisualStyleBackColor = true;
-      // 
-      // comboFlavor
-      // 
-      this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.comboFlavor.FormattingEnabled = true;
-      this.comboFlavor.Location = new System.Drawing.Point(26, 37);
-      this.comboFlavor.Name = "comboFlavor";
-      this.comboFlavor.Size = new System.Drawing.Size(143, 21);
-      this.comboFlavor.Sorted = true;
-      this.comboFlavor.TabIndex = 17;
-      // 
-      // label3
-      // 
-      this.label3.AutoSize = true;
-      this.label3.Location = new System.Drawing.Point(6, 12);
-      this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(94, 13);
-      this.label3.TabIndex = 18;
-      this.label3.Text = "VMWare Edition:";
       // 
       // checkUseInternalAssembler
       // 
@@ -258,6 +230,160 @@
       this.labelFramework.Text = "Framework:";
       this.labelFramework.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
+      // tabPage2
+      // 
+      this.tabPage2.AutoScroll = true;
+      this.tabPage2.Controls.Add(this.panel3);
+      this.tabPage2.Location = new System.Drawing.Point(4, 4);
+      this.tabPage2.Name = "tabPage2";
+      this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+      this.tabPage2.Size = new System.Drawing.Size(478, 215);
+      this.tabPage2.TabIndex = 2;
+      this.tabPage2.Text = "Debug";
+      this.tabPage2.UseVisualStyleBackColor = true;
+      // 
+      // tabVMWare
+      // 
+      this.tabVMWare.Controls.Add(this.label3);
+      this.tabVMWare.Controls.Add(this.comboFlavor);
+      this.tabVMWare.Location = new System.Drawing.Point(4, 4);
+      this.tabVMWare.Name = "tabVMWare";
+      this.tabVMWare.Padding = new System.Windows.Forms.Padding(3);
+      this.tabVMWare.Size = new System.Drawing.Size(478, 215);
+      this.tabVMWare.TabIndex = 4;
+      this.tabVMWare.Text = "VMWare";
+      this.tabVMWare.UseVisualStyleBackColor = true;
+      // 
+      // label3
+      // 
+      this.label3.AutoSize = true;
+      this.label3.Location = new System.Drawing.Point(6, 12);
+      this.label3.Name = "label3";
+      this.label3.Size = new System.Drawing.Size(94, 13);
+      this.label3.TabIndex = 18;
+      this.label3.Text = "VMWare Edition:";
+      // 
+      // comboFlavor
+      // 
+      this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboFlavor.FormattingEnabled = true;
+      this.comboFlavor.Location = new System.Drawing.Point(26, 37);
+      this.comboFlavor.Name = "comboFlavor";
+      this.comboFlavor.Size = new System.Drawing.Size(143, 21);
+      this.comboFlavor.Sorted = true;
+      this.comboFlavor.TabIndex = 17;
+      // 
+      // panel3
+      // 
+      this.panel3.Controls.Add(this.groupBox2);
+      this.panel3.Controls.Add(this.groupBox1);
+      this.panel3.Location = new System.Drawing.Point(3, 3);
+      this.panel3.Name = "panel3";
+      this.panel3.Size = new System.Drawing.Size(452, 247);
+      this.panel3.TabIndex = 2;
+      // 
+      // groupBox2
+      // 
+      this.groupBox2.Controls.Add(this.checkEnableGDB);
+      this.groupBox2.Controls.Add(this.checkStartCosmosGDB);
+      this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
+      this.groupBox2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.groupBox2.Location = new System.Drawing.Point(0, 163);
+      this.groupBox2.Name = "groupBox2";
+      this.groupBox2.Size = new System.Drawing.Size(452, 79);
+      this.groupBox2.TabIndex = 1;
+      this.groupBox2.TabStop = false;
+      this.groupBox2.Text = "Assembly";
+      // 
+      // checkEnableGDB
+      // 
+      this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.checkEnableGDB.Location = new System.Drawing.Point(21, 21);
+      this.checkEnableGDB.Name = "checkEnableGDB";
+      this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
+      this.checkEnableGDB.TabIndex = 20;
+      this.checkEnableGDB.Text = "Enable GDB Debugger";
+      this.checkEnableGDB.UseVisualStyleBackColor = true;
+      // 
+      // checkStartCosmosGDB
+      // 
+      this.checkStartCosmosGDB.AutoSize = true;
+      this.checkStartCosmosGDB.Enabled = false;
+      this.checkStartCosmosGDB.Location = new System.Drawing.Point(36, 47);
+      this.checkStartCosmosGDB.Margin = new System.Windows.Forms.Padding(25, 3, 3, 3);
+      this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
+      this.checkStartCosmosGDB.Size = new System.Drawing.Size(148, 17);
+      this.checkStartCosmosGDB.TabIndex = 22;
+      this.checkStartCosmosGDB.Text = "Use Cosmos GDB Client";
+      this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
+      // 
+      // groupBox1
+      // 
+      this.groupBox1.Controls.Add(this.checkIgnoreDebugStubAttribute);
+      this.groupBox1.Controls.Add(this.label4);
+      this.groupBox1.Controls.Add(this.label5);
+      this.groupBox1.Controls.Add(this.comboDebugMode);
+      this.groupBox1.Controls.Add(this.comboTraceMode);
+      this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
+      this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.groupBox1.Location = new System.Drawing.Point(0, 0);
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.Size = new System.Drawing.Size(452, 163);
+      this.groupBox1.TabIndex = 0;
+      this.groupBox1.TabStop = false;
+      this.groupBox1.Text = "Visual Studio";
+      // 
+      // checkIgnoreDebugStubAttribute
+      // 
+      this.checkIgnoreDebugStubAttribute.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.checkIgnoreDebugStubAttribute.Location = new System.Drawing.Point(21, 137);
+      this.checkIgnoreDebugStubAttribute.Name = "checkIgnoreDebugStubAttribute";
+      this.checkIgnoreDebugStubAttribute.Size = new System.Drawing.Size(218, 20);
+      this.checkIgnoreDebugStubAttribute.TabIndex = 23;
+      this.checkIgnoreDebugStubAttribute.Text = "Ignore DebugStub Attribute Settings";
+      this.checkIgnoreDebugStubAttribute.UseVisualStyleBackColor = true;
+      // 
+      // label4
+      // 
+      this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label4.Location = new System.Drawing.Point(18, 21);
+      this.label4.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+      this.label4.Name = "label4";
+      this.label4.Size = new System.Drawing.Size(98, 21);
+      this.label4.TabIndex = 15;
+      this.label4.Text = "Debug Level:";
+      this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // label5
+      // 
+      this.label5.AutoSize = true;
+      this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label5.Location = new System.Drawing.Point(18, 75);
+      this.label5.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+      this.label5.Name = "label5";
+      this.label5.Size = new System.Drawing.Size(50, 15);
+      this.label5.TabIndex = 18;
+      this.label5.Text = "Tracing:";
+      this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // comboDebugMode
+      // 
+      this.comboDebugMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboDebugMode.FormattingEnabled = true;
+      this.comboDebugMode.Location = new System.Drawing.Point(36, 48);
+      this.comboDebugMode.Name = "comboDebugMode";
+      this.comboDebugMode.Size = new System.Drawing.Size(221, 21);
+      this.comboDebugMode.TabIndex = 19;
+      // 
+      // comboTraceMode
+      // 
+      this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboTraceMode.FormattingEnabled = true;
+      this.comboTraceMode.Location = new System.Drawing.Point(36, 96);
+      this.comboTraceMode.Name = "comboTraceMode";
+      this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
+      this.comboTraceMode.TabIndex = 15;
+      // 
       // BuildPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -273,8 +399,14 @@
       this.tabCompile.ResumeLayout(false);
       this.panel2.ResumeLayout(false);
       this.panel2.PerformLayout();
+      this.tabPage2.ResumeLayout(false);
       this.tabVMWare.ResumeLayout(false);
       this.tabVMWare.PerformLayout();
+      this.panel3.ResumeLayout(false);
+      this.groupBox2.ResumeLayout(false);
+      this.groupBox2.PerformLayout();
+      this.groupBox1.ResumeLayout(false);
+      this.groupBox1.PerformLayout();
       this.ResumeLayout(false);
 
 		}
@@ -299,6 +431,16 @@
     private System.Windows.Forms.Label label2;
     private System.Windows.Forms.TextBox textOutputPath;
     private System.Windows.Forms.Label labelFramework;
+    private System.Windows.Forms.Panel panel3;
+    private System.Windows.Forms.GroupBox groupBox2;
+    private System.Windows.Forms.CheckBox checkEnableGDB;
+    private System.Windows.Forms.CheckBox checkStartCosmosGDB;
+    private System.Windows.Forms.GroupBox groupBox1;
+    private System.Windows.Forms.CheckBox checkIgnoreDebugStubAttribute;
+    private System.Windows.Forms.Label label4;
+    private System.Windows.Forms.Label label5;
+    private System.Windows.Forms.ComboBox comboDebugMode;
+    private System.Windows.Forms.ComboBox comboTraceMode;
 
 
 

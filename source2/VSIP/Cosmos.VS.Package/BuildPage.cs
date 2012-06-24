@@ -15,6 +15,9 @@ namespace Cosmos.VS.Package {
   // We put all items on ONE form because VS is such a nightmware to managed mulitple forms
   // and add new ones.
 
+  // Magic width and height.
+  // 492, 288
+
   [Guid(Guids.BuildPage)]
   public partial class BuildPage : ConfigurationBase {
     public static TargetHost CurrentBuildTarget = TargetHost.VMWare;
@@ -76,6 +79,50 @@ namespace Cosmos.VS.Package {
           IsDirty = true;
         }
       };
+
+      comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
+      comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var x = (Cosmos.Build.Common.DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
+        if (x != mProps.DebugMode) {
+          mProps.DebugMode = x;
+          IsDirty = true;
+        }
+      };
+
+      comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
+      comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
+        if (x != mProps.TraceAssemblies) {
+          mProps.TraceAssemblies = x;
+          IsDirty = true;
+        }
+      };
+
+      checkIgnoreDebugStubAttribute.CheckedChanged += delegate(Object sender, EventArgs e) {
+        bool x = checkIgnoreDebugStubAttribute.Checked;
+        if (x != mProps.IgnoreDebugStubAttribute) {
+          mProps.IgnoreDebugStubAttribute = x;
+          IsDirty = true;
+        }
+      };
+
+      checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+        bool x = checkEnableGDB.Checked;
+        if (x != mProps.EnableGDB) {
+          mProps.EnableGDB = x;
+          IsDirty = true;
+        }
+        checkStartCosmosGDB.Enabled = x;
+        checkStartCosmosGDB.Checked = x;
+      };
+
+      checkStartCosmosGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+        bool x = checkStartCosmosGDB.Checked;
+        if (x != mProps.StartCosmosGDB) {
+          mProps.StartCosmosGDB = x;
+          IsDirty = true;
+        }
+      };
     }
 
     protected BuildProperties mProps = new BuildProperties();
@@ -107,6 +154,21 @@ namespace Cosmos.VS.Package {
 
       mProps.SetProperty("VMWareFlavor", GetConfigProperty("VMWareFlavor"));
       comboFlavor.SelectedItem = EnumValue.Find(comboFlavor.Items, mProps.VMWareFlavor);
+
+      mProps.SetProperty("EnableGDB", GetConfigProperty("EnableGDB"));
+      checkEnableGDB.Checked = mProps.EnableGDB;
+
+      mProps.SetProperty("StartCosmosGDB", GetConfigProperty("StartCosmosGDB"));
+      checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
+
+      mProps.SetProperty("IgnoreDebugStubAttribute", GetConfigProperty("IgnoreDebugStubAttribute"));
+      checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
+
+      mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
+      comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
+
+      mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
+      comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
     }
 
     private void OutputBrowse_Click(object sender, EventArgs e) {
