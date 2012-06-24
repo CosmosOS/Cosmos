@@ -100,7 +100,7 @@ namespace Cosmos.VS.Package {
         mShowTabUSB = true;
 
       } else if (mProps.BuildTarget == BuildTarget.VMware) {
-        lablDeployText.Text = "Uses VMware to deploy and debug.";
+        lablDeployText.Text = "Use VMware to deploy and debug.";
         mShowTabDebug = true;
         mShowTabVMware = true;
         mShowTabPXE = mProps.VMwareDeploy == VMwareDeploy.PXE;
