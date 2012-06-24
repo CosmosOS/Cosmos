@@ -138,16 +138,16 @@ namespace Cosmos.Debug.VSDebugEngine {
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
         // Try alternate if selected one is not installed
-        if (xFlavor == "PLAYER" && !Host.VMWarePlayer.IsInstalled) {
+        if (xFlavor == "PLAYER" && !Host.VMwarePlayer.IsInstalled) {
           xFlavor = "WORKSTATION";
-        } else if (xFlavor == "WORKSTATION" && !Host.VMWareWorkstation.IsInstalled) {
+        } else if (xFlavor == "WORKSTATION" && !Host.VMwareWorkstation.IsInstalled) {
           xFlavor = "PLAYER";
         }
 
-        if (xFlavor == "PLAYER" && Host.VMWarePlayer.IsInstalled) {
-          mHost = new Host.VMWarePlayer(xVmxFile);
-        } else if (xFlavor == "WORKSTATION" && Host.VMWareWorkstation.IsInstalled) {
-          mHost = new Host.VMWareWorkstation(xVmxFile);
+        if (xFlavor == "PLAYER" && Host.VMwarePlayer.IsInstalled) {
+          mHost = new Host.VMwarePlayer(xVmxFile);
+        } else if (xFlavor == "WORKSTATION" && Host.VMwareWorkstation.IsInstalled) {
+          mHost = new Host.VMwareWorkstation(xVmxFile);
         } else {
           throw new Exception("VMWare Flavor '" + xFlavor + "' not implemented.");
         }
@@ -207,7 +207,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       System.Threading.Thread.Sleep(250);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
-      OutputText("Starting VMWare.");
+      OutputText("Starting OS.");
       mProcess = Process.Start(mProcessStartInfo);
 
       mProcess.EnableRaisingEvents = true;

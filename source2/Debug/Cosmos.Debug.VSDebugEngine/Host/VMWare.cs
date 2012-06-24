@@ -7,11 +7,11 @@ using Microsoft.Win32;
 using Vestris.VMWareLib;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
-  public abstract class VMWare : Base {
+  public abstract class VMware : Base {
     protected string mVmxFile;
     protected abstract void ConnectToVMWare(VMWareVirtualHost aHost);
 
-    public VMWare(string aVmxFile) {
+    public VMware(string aVmxFile) {
       mVmxFile = aVmxFile;
     }
 
@@ -48,12 +48,17 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
                 string xName = xParts[0].Trim();
                 string xValue = xParts[1].Trim();
 
-                // We delete uuid entries so VMWare doenst ask the user "Did you move or copy" the file
                 if ((xName == "uuid.location") || (xName == "uuid.bios")) {
+                  // We delete uuid entries so VMWare doesnt ask the user "Did you move or copy" the file
                   xValue = null;
+
                 } else if (xName == "ide1:0.fileName") {
+                  // Set the ISO file for booting
                   xValue = "\"" + aIsoFile + "\"";
+
                 } else if (xName == "nvram") {
+                  // Point it to an initially non-existent nvram.
+                  // This has the effect of disabling PXE so the boot is faster.
                   xValue = "\"Debug.nvram\"";
                 }
 
@@ -62,6 +67,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
                 }
               }
             }
+
             if (aGDB) {
               xDest.WriteLine();
               xDest.WriteLine("debugStub.listen.guest32 = \"TRUE\"");
@@ -72,7 +78,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
           }
         } catch (IOException ex) {
           if (ex.Message.Contains(Path.GetFileName(mVmxFile))) {
-            throw new Exception("The Vmware image " + mVmxFile + " is still in use! Please exit current Vmware session with Cosmos and try again.", ex);
+            throw new Exception("The VMware image " + mVmxFile + " is still in use! Please exit current Vmware session with Cosmos and try again.", ex);
           }
           throw ex;
         }

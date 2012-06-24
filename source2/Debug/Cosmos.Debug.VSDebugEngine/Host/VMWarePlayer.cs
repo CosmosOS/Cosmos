@@ -5,8 +5,8 @@ using System.Text;
 using Vestris.VMWareLib;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
-  public class VMWarePlayer : VMWare {
-    public VMWarePlayer(string aVmxFile) : base(aVmxFile) {
+  public class VMwarePlayer : VMware {
+    public VMwarePlayer(string aVmxFile) : base(aVmxFile) {
     }
 
     public static bool IsInstalled {

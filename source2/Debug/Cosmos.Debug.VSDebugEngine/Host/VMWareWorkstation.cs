@@ -7,8 +7,8 @@ using Microsoft.Win32;
 using Vestris.VMWareLib;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
-  public class VMWareWorkstation : VMWare {
-    public VMWareWorkstation(string aVmxFile)
+  public class VMwareWorkstation : VMware {
+    public VMwareWorkstation(string aVmxFile)
       : base(aVmxFile) {
     }
 

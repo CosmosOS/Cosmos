@@ -11,7 +11,7 @@ namespace Cosmos.VS.HostProcess {
   public class Program {
     static int Main(string[] args) {
       try {
-        Console.WriteLine("Cosmos VS Debug Host");
+        Console.WriteLine("Cosmos Visual Studio Debug Host");
         Console.WriteLine("Waiting for start signal.");
 
         // This is here to allow this process to start, but pause till the caller tells it to continue. 
