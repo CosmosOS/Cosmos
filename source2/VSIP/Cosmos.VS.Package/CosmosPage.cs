@@ -19,7 +19,7 @@ namespace Cosmos.VS.Package {
   // 492, 288
 
   [Guid(Guids.CosmosPage)]
-  public partial class CosmosPage : ConfigurationBase {
+  public partial class CosmosPage : CustomPropertyPage {
     public static BuildTarget CurrentBuildTarget = BuildTarget.VMware;
     public static event EventHandler BuildTargetChanged;
 

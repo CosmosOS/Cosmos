@@ -97,12 +97,6 @@
     <Compile Include="CosmosPage.Designer.cs">
       <DependentUpon>CosmosPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConfigurationBase.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ConfigurationBase.Designer.cs">
-      <DependentUpon>ConfigurationBase.cs</DependentUpon>
-    </Compile>
     <Compile Include="CustomPropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -245,9 +239,6 @@
     </ZipItem>
     <EmbeddedResource Include="CosmosPage.resx">
       <DependentUpon>CosmosPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ConfigurationBase.resx">
-      <DependentUpon>ConfigurationBase.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="CustomPropertyPage.resx">
       <DependentUpon>CustomPropertyPage.cs</DependentUpon>
