@@ -109,28 +109,10 @@
     <Compile Include="CustomPropertyPage.Designer.cs">
       <DependentUpon>CustomPropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="DebugPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DebugPage.Designer.cs">
-      <DependentUpon>DebugPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DebugPageSub.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DebugPageSub.Designer.cs">
-      <DependentUpon>DebugPageSub.cs</DependentUpon>
-    </Compile>
     <Compile Include="GACDetectionUtility.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogUtility.cs" />
-    <Compile Include="SubPropertyPageBase.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="SubPropertyPageBase.Designer.cs">
-      <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
-    </Compile>
     <Compile Include="TitleDivision.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -142,12 +124,6 @@
     </Compile>
     <Compile Include="UnsavedConfigChangesDialog.Designer.cs">
       <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="VMPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="VMPage.Designer.cs">
-      <DependentUpon>VMPage.cs</DependentUpon>
     </Compile>
     <Compile Include="VsConfigProvider.cs" />
     <Compile Include="VsProjectConfig.cs" />
@@ -276,24 +252,12 @@
     <EmbeddedResource Include="CustomPropertyPage.resx">
       <DependentUpon>CustomPropertyPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DebugPage.resx">
-      <DependentUpon>DebugPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DebugPageSub.resx">
-      <DependentUpon>DebugPageSub.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
-    <EmbeddedResource Include="SubPropertyPageBase.resx">
-      <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="TitleDivision.resx">
       <DependentUpon>TitleDivision.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UnsavedConfigChangesDialog.resx">
       <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VMPage.resx">
-      <DependentUpon>VMPage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

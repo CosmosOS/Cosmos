@@ -10,8 +10,6 @@ namespace Cosmos.VS.Package {
     // These GUIDs are also used in the .iss, as are the prop page names. If you change names
     // or GUIDs you need to update the .iss as well.
     public const string BuildPage = "d33a2d29-c4fd-4e12-a510-4c01a14d63e1";
-    public const string DebugPage = "39801176-289f-405f-9425-2931a2c03912";
-    public const string VMPage = "3b72bb68-7363-45a2-9eba-55c8d5f36e36";
 
     public static readonly Guid guidProjectCmdSet = new Guid(guidProjectCmdSetString);
     public static readonly Guid guidProjectFactory = new Guid(guidProjectFactoryString);
