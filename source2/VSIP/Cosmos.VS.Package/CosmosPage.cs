@@ -20,7 +20,7 @@ namespace Cosmos.VS.Package {
 
   [Guid(Guids.CosmosPage)]
   public partial class CosmosPage : ConfigurationBase {
-    public static TargetHost CurrentBuildTarget = TargetHost.VMWare;
+    public static BuildTarget CurrentBuildTarget = BuildTarget.VMWare;
     public static event EventHandler BuildTargetChanged;
 
     protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
@@ -57,11 +57,11 @@ namespace Cosmos.VS.Package {
       };
 
 
-      lboxDeployTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost), true));
-      lboxDeployTarget.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var value = (TargetHost)((EnumValue)lboxDeployTarget.SelectedItem).Value;
-        if (value != mProps.Target) {
-          mProps.Target = value;
+      lboxDeploy.Items.AddRange(EnumValue.GetEnumValues(typeof(BuildTarget), true));
+      lboxDeploy.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var value = (BuildTarget)((EnumValue)lboxDeploy.SelectedItem).Value;
+        if (value != mProps.BuildTarget) {
+          mProps.BuildTarget = value;
           IsDirty = true;
 
           //comboFlavor.Visible = value == TargetHost.VMWare;
@@ -140,10 +140,10 @@ namespace Cosmos.VS.Package {
       textOutputPath.Text = mProps.OutputPath;
 
       mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
-      lboxDeployTarget.SelectedItem = EnumValue.Find(lboxDeployTarget.Items, mProps.Target);
+      lboxDeploy.SelectedItem = EnumValue.Find(lboxDeploy.Items, mProps.BuildTarget);
       // We need to manually trigger it once, because the indexchanged event compares
       // it against the source, and they will of course be the same.
-      CurrentBuildTarget = (TargetHost)((EnumValue)lboxDeployTarget.SelectedItem).Value;
+      CurrentBuildTarget = (BuildTarget)((EnumValue)lboxDeploy.SelectedItem).Value;
       OnBuildTargetChanged(this, EventArgs.Empty);
 
       mProps.SetProperty("Framework", GetConfigProperty("Framework"));
@@ -208,11 +208,8 @@ namespace Cosmos.VS.Package {
     }
 
     private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
-      var xEnumValue = (EnumValue)lboxDeployTarget.SelectedItem;
-      var xValue = (TargetHost)xEnumValue.Value;
-      if (xValue != TargetHost.VMWare && xValue != TargetHost.ISO) {
-        MessageBox.Show("This type is temporarily unsupported.");
-      }
+      var xEnumValue = (EnumValue)lboxDeploy.SelectedItem;
+      var xValue = (BuildTarget)xEnumValue.Value;
     }
   }
 }

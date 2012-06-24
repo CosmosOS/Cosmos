@@ -6,13 +6,21 @@ using System.Text;
 namespace Cosmos.Build.Common {
   public class BuildProperties : PropertiesBase {
 
+    // Execute
+    public BuildTarget BuildTarget {
+      get { return this.GetProperty("BuildTarget", BuildTarget.VMWare); }
+      set { this.SetProperty("BuildTarget", value); }
+    }
+
+    // VMWare
+    public VMwareFlavor VMWareFlavor {
+      get { return GetProperty("VMWareFlavor", VMwareFlavor.Player); }
+      set { SetProperty("VMWareFlavor", value); }
+    }
+
     public String OutputPath {
       get { return this.GetProperty("OutputPath"); }
       set { this.SetProperty("OutputPath", value); }
-    }
-    public TargetHost Target {
-      get { return this.GetProperty("BuildTarget", TargetHost.VMWare); }
-      set { this.SetProperty("BuildTarget", value); }
     }
     public Framework Framework {
       get { return this.GetProperty("Framework", Common.Framework.MicrosoftNET); }
@@ -21,10 +29,6 @@ namespace Cosmos.Build.Common {
     public Boolean UseInternalAssembler {
       get { return this.GetProperty("UseInternalAssembler", false); }
       set { this.SetProperty("UseInternalAssembler", value); }
-    }
-    public VMwareFlavor VMWareFlavor {
-      get { return GetProperty("VMWareFlavor", VMwareFlavor.Player); }
-      set { SetProperty("VMWareFlavor", value); }
     }
 
     public TraceAssemblies TraceAssemblies {

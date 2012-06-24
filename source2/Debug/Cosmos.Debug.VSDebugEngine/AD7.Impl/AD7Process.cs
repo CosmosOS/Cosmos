@@ -28,7 +28,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public SourceInfos mSourceMappings;
     public uint? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
-    protected TargetHost mTargetHost;
+    protected BuildTarget mBuildTarget;
     internal DebugInfo mDebugInfoDb;
     internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
@@ -130,7 +130,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
       string xBuildTarget = mDebugInfo["BuildTarget"].ToUpper();
       if (xBuildTarget == "VMWARE") {
-        mTargetHost = TargetHost.VMWare;
+        mBuildTarget = BuildTarget.VMWare;
         string xFlavor = mDebugInfo["VMWareFlavor"].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         

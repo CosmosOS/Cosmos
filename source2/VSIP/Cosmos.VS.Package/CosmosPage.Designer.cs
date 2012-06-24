@@ -30,9 +30,7 @@
 		{
       this.TabControl1 = new System.Windows.Forms.TabControl();
       this.tabDeploy = new System.Windows.Forms.TabPage();
-      this.panel1 = new System.Windows.Forms.Panel();
-      this.label1 = new System.Windows.Forms.Label();
-      this.lboxDeployTarget = new System.Windows.Forms.ListBox();
+      this.lboxDeploy = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
       this.panel2 = new System.Windows.Forms.Panel();
       this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
@@ -42,7 +40,7 @@
       this.label2 = new System.Windows.Forms.Label();
       this.textOutputPath = new System.Windows.Forms.TextBox();
       this.labelFramework = new System.Windows.Forms.Label();
-      this.tabPage2 = new System.Windows.Forms.TabPage();
+      this.tabDebug = new System.Windows.Forms.TabPage();
       this.panel3 = new System.Windows.Forms.Panel();
       this.groupBox2 = new System.Windows.Forms.GroupBox();
       this.checkEnableGDB = new System.Windows.Forms.CheckBox();
@@ -56,12 +54,14 @@
       this.tabVMWare = new System.Windows.Forms.TabPage();
       this.label3 = new System.Windows.Forms.Label();
       this.comboFlavor = new System.Windows.Forms.ComboBox();
+      this.tabPXE = new System.Windows.Forms.TabPage();
+      this.tabUSB = new System.Windows.Forms.TabPage();
+      this.tabISO = new System.Windows.Forms.TabPage();
       this.TabControl1.SuspendLayout();
       this.tabDeploy.SuspendLayout();
-      this.panel1.SuspendLayout();
       this.tabCompile.SuspendLayout();
       this.panel2.SuspendLayout();
-      this.tabPage2.SuspendLayout();
+      this.tabDebug.SuspendLayout();
       this.panel3.SuspendLayout();
       this.groupBox2.SuspendLayout();
       this.groupBox1.SuspendLayout();
@@ -73,8 +73,11 @@
       this.TabControl1.Alignment = System.Windows.Forms.TabAlignment.Bottom;
       this.TabControl1.Controls.Add(this.tabDeploy);
       this.TabControl1.Controls.Add(this.tabCompile);
-      this.TabControl1.Controls.Add(this.tabPage2);
+      this.TabControl1.Controls.Add(this.tabDebug);
       this.TabControl1.Controls.Add(this.tabVMWare);
+      this.TabControl1.Controls.Add(this.tabPXE);
+      this.TabControl1.Controls.Add(this.tabUSB);
+      this.TabControl1.Controls.Add(this.tabISO);
       this.TabControl1.Location = new System.Drawing.Point(3, 44);
       this.TabControl1.Multiline = true;
       this.TabControl1.Name = "TabControl1";
@@ -84,42 +87,24 @@
       // 
       // tabDeploy
       // 
-      this.tabDeploy.AutoScroll = true;
-      this.tabDeploy.Controls.Add(this.panel1);
+      this.tabDeploy.Controls.Add(this.lboxDeploy);
       this.tabDeploy.Location = new System.Drawing.Point(4, 4);
       this.tabDeploy.Name = "tabDeploy";
       this.tabDeploy.Padding = new System.Windows.Forms.Padding(3);
       this.tabDeploy.Size = new System.Drawing.Size(478, 215);
-      this.tabDeploy.TabIndex = 3;
+      this.tabDeploy.TabIndex = 8;
       this.tabDeploy.Text = "Deploy";
       this.tabDeploy.UseVisualStyleBackColor = true;
       // 
-      // panel1
+      // lboxDeploy
       // 
-      this.panel1.Controls.Add(this.label1);
-      this.panel1.Controls.Add(this.lboxDeployTarget);
-      this.panel1.Location = new System.Drawing.Point(2, 3);
-      this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(453, 212);
-      this.panel1.TabIndex = 4;
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(16, 5);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(138, 13);
-      this.label1.TabIndex = 1;
-      this.label1.Text = "Select target deployment:";
-      // 
-      // lboxDeployTarget
-      // 
-      this.lboxDeployTarget.FormattingEnabled = true;
-      this.lboxDeployTarget.Location = new System.Drawing.Point(15, 27);
-      this.lboxDeployTarget.Name = "lboxDeployTarget";
-      this.lboxDeployTarget.Size = new System.Drawing.Size(206, 173);
-      this.lboxDeployTarget.Sorted = true;
-      this.lboxDeployTarget.TabIndex = 0;
+      this.lboxDeploy.Dock = System.Windows.Forms.DockStyle.Left;
+      this.lboxDeploy.FormattingEnabled = true;
+      this.lboxDeploy.Location = new System.Drawing.Point(3, 3);
+      this.lboxDeploy.Name = "lboxDeploy";
+      this.lboxDeploy.Size = new System.Drawing.Size(206, 209);
+      this.lboxDeploy.Sorted = true;
+      this.lboxDeploy.TabIndex = 2;
       // 
       // tabCompile
       // 
@@ -230,17 +215,17 @@
       this.labelFramework.Text = "Framework:";
       this.labelFramework.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
-      // tabPage2
+      // tabDebug
       // 
-      this.tabPage2.AutoScroll = true;
-      this.tabPage2.Controls.Add(this.panel3);
-      this.tabPage2.Location = new System.Drawing.Point(4, 4);
-      this.tabPage2.Name = "tabPage2";
-      this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-      this.tabPage2.Size = new System.Drawing.Size(478, 215);
-      this.tabPage2.TabIndex = 2;
-      this.tabPage2.Text = "Debug";
-      this.tabPage2.UseVisualStyleBackColor = true;
+      this.tabDebug.AutoScroll = true;
+      this.tabDebug.Controls.Add(this.panel3);
+      this.tabDebug.Location = new System.Drawing.Point(4, 4);
+      this.tabDebug.Name = "tabDebug";
+      this.tabDebug.Padding = new System.Windows.Forms.Padding(3);
+      this.tabDebug.Size = new System.Drawing.Size(478, 215);
+      this.tabDebug.TabIndex = 2;
+      this.tabDebug.Text = "Debug";
+      this.tabDebug.UseVisualStyleBackColor = true;
       // 
       // panel3
       // 
@@ -384,6 +369,36 @@
       this.comboFlavor.Sorted = true;
       this.comboFlavor.TabIndex = 17;
       // 
+      // tabPXE
+      // 
+      this.tabPXE.Location = new System.Drawing.Point(4, 4);
+      this.tabPXE.Name = "tabPXE";
+      this.tabPXE.Padding = new System.Windows.Forms.Padding(3);
+      this.tabPXE.Size = new System.Drawing.Size(478, 215);
+      this.tabPXE.TabIndex = 5;
+      this.tabPXE.Text = "PXE";
+      this.tabPXE.UseVisualStyleBackColor = true;
+      // 
+      // tabUSB
+      // 
+      this.tabUSB.Location = new System.Drawing.Point(4, 4);
+      this.tabUSB.Name = "tabUSB";
+      this.tabUSB.Padding = new System.Windows.Forms.Padding(3);
+      this.tabUSB.Size = new System.Drawing.Size(478, 215);
+      this.tabUSB.TabIndex = 6;
+      this.tabUSB.Text = "USB";
+      this.tabUSB.UseVisualStyleBackColor = true;
+      // 
+      // tabISO
+      // 
+      this.tabISO.Location = new System.Drawing.Point(4, 4);
+      this.tabISO.Name = "tabISO";
+      this.tabISO.Padding = new System.Windows.Forms.Padding(3);
+      this.tabISO.Size = new System.Drawing.Size(478, 215);
+      this.tabISO.TabIndex = 7;
+      this.tabISO.Text = "ISO";
+      this.tabISO.UseVisualStyleBackColor = true;
+      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -394,12 +409,10 @@
       this.Controls.SetChildIndex(this.TabControl1, 0);
       this.TabControl1.ResumeLayout(false);
       this.tabDeploy.ResumeLayout(false);
-      this.panel1.ResumeLayout(false);
-      this.panel1.PerformLayout();
       this.tabCompile.ResumeLayout(false);
       this.panel2.ResumeLayout(false);
       this.panel2.PerformLayout();
-      this.tabPage2.ResumeLayout(false);
+      this.tabDebug.ResumeLayout(false);
       this.panel3.ResumeLayout(false);
       this.groupBox2.ResumeLayout(false);
       this.groupBox2.PerformLayout();
@@ -415,14 +428,10 @@
 
     private System.Windows.Forms.TabControl TabControl1;
     private System.Windows.Forms.TabPage tabCompile;
-    private System.Windows.Forms.TabPage tabPage2;
+    private System.Windows.Forms.TabPage tabDebug;
     private System.Windows.Forms.Panel panel2;
-    private System.Windows.Forms.TabPage tabDeploy;
-    private System.Windows.Forms.Panel panel1;
     private System.Windows.Forms.TabPage tabVMWare;
     private System.Windows.Forms.ComboBox comboFlavor;
-    private System.Windows.Forms.ListBox lboxDeployTarget;
-    private System.Windows.Forms.Label label1;
     private System.Windows.Forms.Label label3;
     private System.Windows.Forms.CheckBox checkUseInternalAssembler;
     private System.Windows.Forms.Label labelInternalAssembler;
@@ -441,6 +450,11 @@
     private System.Windows.Forms.Label label5;
     private System.Windows.Forms.ComboBox comboDebugMode;
     private System.Windows.Forms.ComboBox comboTraceMode;
+    private System.Windows.Forms.TabPage tabPXE;
+    private System.Windows.Forms.TabPage tabUSB;
+    private System.Windows.Forms.TabPage tabISO;
+    private System.Windows.Forms.TabPage tabDeploy;
+    private System.Windows.Forms.ListBox lboxDeploy;
 
 
 
