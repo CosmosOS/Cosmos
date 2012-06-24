@@ -128,9 +128,17 @@ namespace Cosmos.Debug.VSDebugEngine {
       Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
+
       string xBuildTarget = mDebugInfo["BuildTarget"].ToUpper();
       if (xBuildTarget == "VMWARE") {
         mBuildTarget = BuildTarget.VMWare;
+      }
+      //ISO,
+      //USB,
+      //VMWarePXE,
+      //PXE
+
+      if (mBuildTarget == BuildTarget.VMWare) {
         string xFlavor = mDebugInfo["VMWareFlavor"].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
