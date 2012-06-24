@@ -22,7 +22,7 @@
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>VMWare</BuildTarget>
-    <VMWareFlavor>Workstation</VMWareFlavor>
+    <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
