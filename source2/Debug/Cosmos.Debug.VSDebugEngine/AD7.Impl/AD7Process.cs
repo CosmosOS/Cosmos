@@ -133,8 +133,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       var xValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
       mBuildTarget = xValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
-      if (mBuildTarget == BuildTarget.VMWare) {
-        string xFlavor = mDebugInfo["VMWareFlavor"].ToUpper();
+      if (mBuildTarget == BuildTarget.VMware) {
+        string xFlavor = mDebugInfo["VMwareEdition"].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
         // Try alternate if selected one is not installed

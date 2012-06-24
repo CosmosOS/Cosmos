@@ -20,14 +20,15 @@ namespace Cosmos.VS.Package {
 
   [Guid(Guids.CosmosPage)]
   public partial class CosmosPage : ConfigurationBase {
-    public static BuildTarget CurrentBuildTarget = BuildTarget.VMWare;
+    public static BuildTarget CurrentBuildTarget = BuildTarget.VMware;
     public static event EventHandler BuildTargetChanged;
 
     protected bool mShowTabDebug;
-    protected bool mShowTabVMWare;
+    protected bool mShowTabVMware;
     protected bool mShowTabPXE;
     protected bool mShowTabUSB;
     protected bool mShowTabISO;
+    protected bool mShowTabSlave;
 
     protected void RemoveTab(TabPage aTab) {
       if (TabControl1.TabPages.Contains(aTab)) {
@@ -37,16 +38,17 @@ namespace Cosmos.VS.Package {
 
     protected void UpdateTabs() {
       RemoveTab(tabDebug);
-      RemoveTab(tabVMWare);
+      RemoveTab(tabVMware);
       RemoveTab(tabPXE);
       RemoveTab(tabUSB);
       RemoveTab(tabISO);
+      RemoveTab(tabSlave);
 
       if (mShowTabDebug) {
         TabControl1.TabPages.Add(tabDebug);
       }
-      if (mShowTabVMWare) {
-        TabControl1.TabPages.Add(tabVMWare);
+      if (mShowTabVMware) {
+        TabControl1.TabPages.Add(tabVMware);
       }
       if (mShowTabPXE) {
         TabControl1.TabPages.Add(tabPXE);
@@ -57,6 +59,9 @@ namespace Cosmos.VS.Package {
       if (mShowTabISO) {
         TabControl1.TabPages.Add(tabISO);
       }
+      if (mShowTabSlave) {
+        TabControl1.TabPages.Add(tabSlave);
+      }
     }
 
     protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
@@ -65,30 +70,53 @@ namespace Cosmos.VS.Package {
       }
     }
 
-    protected void SetDeployment(BuildTarget aTarget) {
-      bool xBuildOnly = (aTarget == BuildTarget.ISO || aTarget == BuildTarget.USB);
+    protected void UpdateUI() {
+      mShowTabDebug = false;
+      mShowTabVMware = false;
+      mShowTabPXE = false;
+      mShowTabUSB = false;
+      mShowTabISO = false;
+      mShowTabSlave = false;
+      //
+      lablBuildOnly.Visible = false;
+      lablNonFunctional.Visible = false;
 
-      mShowTabDebug = !xBuildOnly;
-      mShowTabVMWare = (aTarget == BuildTarget.VMWare || aTarget == BuildTarget.VMWarePXE);
-      mShowTabPXE = (aTarget == BuildTarget.PXE);
-      mShowTabUSB = (aTarget == BuildTarget.USB);
-      mShowTabISO = (aTarget == BuildTarget.ISO);
+      if (mProps.BuildTarget == BuildTarget.ISO) {
+        lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD.";
+        lablBuildOnly.Visible = true;
+        lablNonFunctional.Visible = true;
+        mShowTabISO = true;
+
+      } else if (mProps.BuildTarget == BuildTarget.USB) {
+        lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
+        lablBuildOnly.Visible = true;
+        lablNonFunctional.Visible = true;
+        mShowTabUSB = true;
+
+      } else if (mProps.BuildTarget == BuildTarget.VMware) {
+        lablDeployText.Text = "Uses VMware to deploy and debug.";
+        mShowTabDebug = true;
+        mShowTabVMware = true;
+        mShowTabPXE = mProps.VMwareDeploy == VMwareDeploy.PXE;
+
+      } else if (mProps.BuildTarget == BuildTarget.PXE) {
+        lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
+        lablNonFunctional.Visible = true;
+        mShowTabDebug = true;
+        mShowTabPXE = true;
+
+      } else if (mProps.BuildTarget == BuildTarget.PxeSlave) {
+        lablDeployText.Text = "PXE but with specially attached slave computer.";
+        lablNonFunctional.Visible = true;
+        mShowTabDebug = true;
+        mShowTabPXE = true;
+        mShowTabSlave = true;
+
+      } else {
+        lablDeployText.Text = "Oops. What the frak did you click?";
+      }
 
       UpdateTabs();
-
-      lablBuildOnly.Visible = xBuildOnly;
-
-      if (aTarget == BuildTarget.ISO) {
-        lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD.";
-      } else if (aTarget == BuildTarget.USB) {
-        lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
-      } else if (aTarget == BuildTarget.VMWare) {
-        lablDeployText.Text = "Uses VMWare to deploy and debug in the standard configuration.";
-      } else if (aTarget == BuildTarget.VMWarePXE) {
-        lablDeployText.Text = "Uses VMWare and PXE. Only intended for testing PXE. VMWare (Default) should be used normally.";
-      } else if (aTarget == BuildTarget.PXE) {
-        lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
-      }
     }
 
     public CosmosPage() {
@@ -125,21 +153,33 @@ namespace Cosmos.VS.Package {
         if (value != mProps.BuildTarget) {
           mProps.BuildTarget = value;
           IsDirty = true;
-          SetDeployment(value);
+          UpdateUI();
 
           CurrentBuildTarget = value;
           OnBuildTargetChanged(this, EventArgs.Empty);
         }
       };
 
-      comboFlavor.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareFlavor), true));
-      comboFlavor.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var x = (VMwareFlavor)((EnumValue)comboFlavor.SelectedItem).Value;
-        if (x != mProps.VMWareFlavor) {
-          mProps.VMWareFlavor = x;
+      #region VMware
+      cmboVMwareEdition.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareEdition), true));
+      cmboVMwareEdition.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
+        if (x != mProps.VMwareEdition) {
+          mProps.VMwareEdition = x;
           IsDirty = true;
         }
       };
+
+      cmboVMwareDeploy.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareDeploy), true));
+      cmboVMwareDeploy.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var x = (VMwareDeploy)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
+        if (x != mProps.VMwareDeploy) {
+          mProps.VMwareDeploy = x;
+          IsDirty = true;
+          UpdateUI();
+        }
+      };
+      #endregion
 
       comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
       comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
@@ -204,7 +244,6 @@ namespace Cosmos.VS.Package {
       // We need to manually trigger it once, because the indexchanged event compares
       // it against the source, and they will of course be the same.
       CurrentBuildTarget = (BuildTarget)((EnumValue)lboxDeploy.SelectedItem).Value;
-      SetDeployment(CurrentBuildTarget);
 
       mProps.SetProperty("Framework", GetConfigProperty("Framework"));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
@@ -212,8 +251,12 @@ namespace Cosmos.VS.Package {
       mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
       checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
 
-      mProps.SetProperty("VMWareFlavor", GetConfigProperty("VMWareFlavor"));
-      comboFlavor.SelectedItem = EnumValue.Find(comboFlavor.Items, mProps.VMWareFlavor);
+      // VMware
+      mProps.SetProperty("VMwareEdition", GetConfigProperty("VMwareEdition"));
+      cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
+      //
+      mProps.SetProperty("VMwareDeploy", GetConfigProperty("VMwareDeploy"));
+      cmboVMwareDeploy.SelectedItem = EnumValue.Find(cmboVMwareDeploy.Items, mProps.VMwareDeploy);
 
       mProps.SetProperty("EnableGDB", GetConfigProperty("EnableGDB"));
       checkEnableGDB.Checked = mProps.EnableGDB;
@@ -229,6 +272,8 @@ namespace Cosmos.VS.Package {
 
       mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
       comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
+
+      UpdateUI();
     }
 
     private void OutputBrowse_Click(object sender, EventArgs e) {

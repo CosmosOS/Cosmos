@@ -30,6 +30,9 @@
 		{
       this.TabControl1 = new System.Windows.Forms.TabControl();
       this.tabDeploy = new System.Windows.Forms.TabPage();
+      this.lablNonFunctional = new System.Windows.Forms.Label();
+      this.lablDeployText = new System.Windows.Forms.Label();
+      this.lablBuildOnly = new System.Windows.Forms.Label();
       this.lboxDeploy = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
       this.panel2 = new System.Windows.Forms.Panel();
@@ -51,14 +54,15 @@
       this.label5 = new System.Windows.Forms.Label();
       this.comboDebugMode = new System.Windows.Forms.ComboBox();
       this.comboTraceMode = new System.Windows.Forms.ComboBox();
-      this.tabVMWare = new System.Windows.Forms.TabPage();
+      this.tabVMware = new System.Windows.Forms.TabPage();
+      this.cmboVMwareDeploy = new System.Windows.Forms.ComboBox();
+      this.label1 = new System.Windows.Forms.Label();
       this.label3 = new System.Windows.Forms.Label();
-      this.comboFlavor = new System.Windows.Forms.ComboBox();
+      this.cmboVMwareEdition = new System.Windows.Forms.ComboBox();
       this.tabPXE = new System.Windows.Forms.TabPage();
       this.tabUSB = new System.Windows.Forms.TabPage();
       this.tabISO = new System.Windows.Forms.TabPage();
-      this.lablBuildOnly = new System.Windows.Forms.Label();
-      this.lablDeployText = new System.Windows.Forms.Label();
+      this.tabSlave = new System.Windows.Forms.TabPage();
       this.TabControl1.SuspendLayout();
       this.tabDeploy.SuspendLayout();
       this.tabCompile.SuspendLayout();
@@ -67,7 +71,7 @@
       this.panel3.SuspendLayout();
       this.groupBox2.SuspendLayout();
       this.groupBox1.SuspendLayout();
-      this.tabVMWare.SuspendLayout();
+      this.tabVMware.SuspendLayout();
       this.SuspendLayout();
       // 
       // TabControl1
@@ -76,10 +80,11 @@
       this.TabControl1.Controls.Add(this.tabDeploy);
       this.TabControl1.Controls.Add(this.tabCompile);
       this.TabControl1.Controls.Add(this.tabDebug);
-      this.TabControl1.Controls.Add(this.tabVMWare);
+      this.TabControl1.Controls.Add(this.tabVMware);
       this.TabControl1.Controls.Add(this.tabPXE);
       this.TabControl1.Controls.Add(this.tabUSB);
       this.TabControl1.Controls.Add(this.tabISO);
+      this.TabControl1.Controls.Add(this.tabSlave);
       this.TabControl1.Location = new System.Drawing.Point(3, 44);
       this.TabControl1.Multiline = true;
       this.TabControl1.Name = "TabControl1";
@@ -89,6 +94,7 @@
       // 
       // tabDeploy
       // 
+      this.tabDeploy.Controls.Add(this.lablNonFunctional);
       this.tabDeploy.Controls.Add(this.lablDeployText);
       this.tabDeploy.Controls.Add(this.lablBuildOnly);
       this.tabDeploy.Controls.Add(this.lboxDeploy);
@@ -99,6 +105,36 @@
       this.tabDeploy.TabIndex = 8;
       this.tabDeploy.Text = "Deploy";
       this.tabDeploy.UseVisualStyleBackColor = true;
+      // 
+      // lablNonFunctional
+      // 
+      this.lablNonFunctional.AutoSize = true;
+      this.lablNonFunctional.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lablNonFunctional.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+      this.lablNonFunctional.Location = new System.Drawing.Point(226, 188);
+      this.lablNonFunctional.Name = "lablNonFunctional";
+      this.lablNonFunctional.Size = new System.Drawing.Size(206, 13);
+      this.lablNonFunctional.TabIndex = 5;
+      this.lablNonFunctional.Text = "This option is not currently functional.";
+      // 
+      // lablDeployText
+      // 
+      this.lablDeployText.Location = new System.Drawing.Point(226, 13);
+      this.lablDeployText.Name = "lablDeployText";
+      this.lablDeployText.Size = new System.Drawing.Size(226, 83);
+      this.lablDeployText.TabIndex = 4;
+      this.lablDeployText.Text = "label1";
+      // 
+      // lablBuildOnly
+      // 
+      this.lablBuildOnly.AutoSize = true;
+      this.lablBuildOnly.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lablBuildOnly.ForeColor = System.Drawing.SystemColors.HotTrack;
+      this.lablBuildOnly.Location = new System.Drawing.Point(226, 166);
+      this.lablBuildOnly.Name = "lablBuildOnly";
+      this.lablBuildOnly.Size = new System.Drawing.Size(207, 13);
+      this.lablBuildOnly.TabIndex = 3;
+      this.lablBuildOnly.Text = "You have selected a build only option.";
       // 
       // lboxDeploy
       // 
@@ -342,36 +378,57 @@
       this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
       this.comboTraceMode.TabIndex = 15;
       // 
-      // tabVMWare
+      // tabVMware
       // 
-      this.tabVMWare.Controls.Add(this.label3);
-      this.tabVMWare.Controls.Add(this.comboFlavor);
-      this.tabVMWare.Location = new System.Drawing.Point(4, 4);
-      this.tabVMWare.Name = "tabVMWare";
-      this.tabVMWare.Padding = new System.Windows.Forms.Padding(3);
-      this.tabVMWare.Size = new System.Drawing.Size(478, 215);
-      this.tabVMWare.TabIndex = 4;
-      this.tabVMWare.Text = "VMWare";
-      this.tabVMWare.UseVisualStyleBackColor = true;
+      this.tabVMware.Controls.Add(this.cmboVMwareDeploy);
+      this.tabVMware.Controls.Add(this.label1);
+      this.tabVMware.Controls.Add(this.label3);
+      this.tabVMware.Controls.Add(this.cmboVMwareEdition);
+      this.tabVMware.Location = new System.Drawing.Point(4, 4);
+      this.tabVMware.Name = "tabVMware";
+      this.tabVMware.Padding = new System.Windows.Forms.Padding(3);
+      this.tabVMware.Size = new System.Drawing.Size(478, 215);
+      this.tabVMware.TabIndex = 4;
+      this.tabVMware.Text = "VMware";
+      this.tabVMware.UseVisualStyleBackColor = true;
+      // 
+      // cmboVMwareDeploy
+      // 
+      this.cmboVMwareDeploy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmboVMwareDeploy.FormattingEnabled = true;
+      this.cmboVMwareDeploy.Location = new System.Drawing.Point(26, 101);
+      this.cmboVMwareDeploy.Name = "cmboVMwareDeploy";
+      this.cmboVMwareDeploy.Size = new System.Drawing.Size(143, 21);
+      this.cmboVMwareDeploy.Sorted = true;
+      this.cmboVMwareDeploy.TabIndex = 20;
+      // 
+      // label1
+      // 
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(6, 74);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(116, 13);
+      this.label1.TabIndex = 19;
+      this.label1.Text = "Deployment Method:";
       // 
       // label3
       // 
       this.label3.AutoSize = true;
       this.label3.Location = new System.Drawing.Point(6, 12);
       this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(94, 13);
+      this.label3.Size = new System.Drawing.Size(47, 13);
       this.label3.TabIndex = 18;
-      this.label3.Text = "VMWare Edition:";
+      this.label3.Text = "Edition:";
       // 
-      // comboFlavor
+      // cmboVMwareEdition
       // 
-      this.comboFlavor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.comboFlavor.FormattingEnabled = true;
-      this.comboFlavor.Location = new System.Drawing.Point(26, 37);
-      this.comboFlavor.Name = "comboFlavor";
-      this.comboFlavor.Size = new System.Drawing.Size(143, 21);
-      this.comboFlavor.Sorted = true;
-      this.comboFlavor.TabIndex = 17;
+      this.cmboVMwareEdition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmboVMwareEdition.FormattingEnabled = true;
+      this.cmboVMwareEdition.Location = new System.Drawing.Point(26, 37);
+      this.cmboVMwareEdition.Name = "cmboVMwareEdition";
+      this.cmboVMwareEdition.Size = new System.Drawing.Size(143, 21);
+      this.cmboVMwareEdition.Sorted = true;
+      this.cmboVMwareEdition.TabIndex = 17;
       // 
       // tabPXE
       // 
@@ -403,24 +460,15 @@
       this.tabISO.Text = "ISO";
       this.tabISO.UseVisualStyleBackColor = true;
       // 
-      // lablBuildOnly
+      // tabSlave
       // 
-      this.lablBuildOnly.AutoSize = true;
-      this.lablBuildOnly.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lablBuildOnly.ForeColor = System.Drawing.SystemColors.HotTrack;
-      this.lablBuildOnly.Location = new System.Drawing.Point(226, 166);
-      this.lablBuildOnly.Name = "lablBuildOnly";
-      this.lablBuildOnly.Size = new System.Drawing.Size(207, 13);
-      this.lablBuildOnly.TabIndex = 3;
-      this.lablBuildOnly.Text = "You have selected a build only option.";
-      // 
-      // lablDeployText
-      // 
-      this.lablDeployText.Location = new System.Drawing.Point(226, 13);
-      this.lablDeployText.Name = "lablDeployText";
-      this.lablDeployText.Size = new System.Drawing.Size(226, 83);
-      this.lablDeployText.TabIndex = 4;
-      this.lablDeployText.Text = "label1";
+      this.tabSlave.Cursor = System.Windows.Forms.Cursors.IBeam;
+      this.tabSlave.Location = new System.Drawing.Point(4, 4);
+      this.tabSlave.Name = "tabSlave";
+      this.tabSlave.Size = new System.Drawing.Size(478, 215);
+      this.tabSlave.TabIndex = 9;
+      this.tabSlave.Text = "Slave";
+      this.tabSlave.UseVisualStyleBackColor = true;
       // 
       // CosmosPage
       // 
@@ -442,8 +490,8 @@
       this.groupBox2.PerformLayout();
       this.groupBox1.ResumeLayout(false);
       this.groupBox1.PerformLayout();
-      this.tabVMWare.ResumeLayout(false);
-      this.tabVMWare.PerformLayout();
+      this.tabVMware.ResumeLayout(false);
+      this.tabVMware.PerformLayout();
       this.ResumeLayout(false);
 
 		}
@@ -454,8 +502,8 @@
     private System.Windows.Forms.TabPage tabCompile;
     private System.Windows.Forms.TabPage tabDebug;
     private System.Windows.Forms.Panel panel2;
-    private System.Windows.Forms.TabPage tabVMWare;
-    private System.Windows.Forms.ComboBox comboFlavor;
+    private System.Windows.Forms.TabPage tabVMware;
+    private System.Windows.Forms.ComboBox cmboVMwareEdition;
     private System.Windows.Forms.Label label3;
     private System.Windows.Forms.CheckBox checkUseInternalAssembler;
     private System.Windows.Forms.Label labelInternalAssembler;
@@ -481,6 +529,10 @@
     private System.Windows.Forms.ListBox lboxDeploy;
     private System.Windows.Forms.Label lablBuildOnly;
     private System.Windows.Forms.Label lablDeployText;
+    private System.Windows.Forms.ComboBox cmboVMwareDeploy;
+    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Label lablNonFunctional;
+    private System.Windows.Forms.TabPage tabSlave;
 
 
 

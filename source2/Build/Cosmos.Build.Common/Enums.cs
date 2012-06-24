@@ -12,16 +12,21 @@ namespace Cosmos.Build.Common {
     [Description("Write to USB Bootable Device")]
     USB,
 
-    [Description("VMWare (Default)")]
-    VMWare,
-    [Description("VMWare (PXE)")]
-    VMWarePXE,
+    [Description("VMware")]
+    VMware,
 
     [Description("PXE Network Boot")]
+    PXE,
+    [Description("PXE Network Boot with Slave")]
+    PxeSlave
+  }
+
+  public enum VMwareDeploy {
+    ISO,
     PXE
   }
 
-  public enum VMwareFlavor {
+  public enum VMwareEdition {
     Workstation,
     Player
   }

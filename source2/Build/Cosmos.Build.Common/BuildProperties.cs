@@ -8,14 +8,18 @@ namespace Cosmos.Build.Common {
 
     // Execute
     public BuildTarget BuildTarget {
-      get { return this.GetProperty("BuildTarget", BuildTarget.VMWare); }
+      get { return this.GetProperty("BuildTarget", BuildTarget.VMware); }
       set { this.SetProperty("BuildTarget", value); }
     }
 
-    // VMWare
-    public VMwareFlavor VMWareFlavor {
-      get { return GetProperty("VMWareFlavor", VMwareFlavor.Player); }
-      set { SetProperty("VMWareFlavor", value); }
+    // VMware
+    public VMwareEdition VMwareEdition {
+      get { return GetProperty("VMwareEdition", VMwareEdition.Player); }
+      set { SetProperty("VMwareEdition", value); }
+    }
+    public VMwareDeploy VMwareDeploy {
+      get { return GetProperty("VMwareDeploy", VMwareDeploy.ISO); }
+      set { SetProperty("VMwareDeploy", value); }
     }
 
     public String OutputPath {

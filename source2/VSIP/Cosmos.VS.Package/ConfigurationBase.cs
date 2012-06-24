@@ -87,7 +87,7 @@ namespace Cosmos.VS.Package {
             projCurrentConfig = null;
 
             ConfigurationBase.CurrentConfigurationIndex = comboConfiguration.SelectedIndex;
-            CosmosPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), BuildTarget.VMWare);
+            CosmosPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), BuildTarget.VMware);
             ConfigurationBase.OnConfigurationChanged(this, EventArgs.Empty);
 
             IgnoreDirty = true;
@@ -132,7 +132,7 @@ namespace Cosmos.VS.Package {
       comboArchitecture.SelectedIndex = 0;
 
       if ((Int32)CosmosPage.CurrentBuildTarget < 0) {
-        CosmosPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), BuildTarget.VMWare);
+        CosmosPage.CurrentBuildTarget = EnumValue.Parse(GetConfigProperty("BuildTarget"), BuildTarget.VMware);
       }
     }
 
