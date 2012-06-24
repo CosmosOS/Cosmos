@@ -24,6 +24,9 @@
     <BuildTarget>VMWare</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
+    <VMwareEdition />
+    <VMwareDeploy>ISO</VMwareDeploy>
+    <IgnoreDebugStubAttribute />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>

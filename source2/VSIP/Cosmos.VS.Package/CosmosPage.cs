@@ -37,6 +37,8 @@ namespace Cosmos.VS.Package {
     }
 
     protected void UpdateTabs() {
+      var xTab = TabControl1.SelectedTab;
+      
       RemoveTab(tabDebug);
       RemoveTab(tabVMware);
       RemoveTab(tabPXE);
@@ -61,6 +63,10 @@ namespace Cosmos.VS.Package {
       }
       if (mShowTabSlave) {
         TabControl1.TabPages.Add(tabSlave);
+      }
+
+      if (TabControl1.TabPages.Contains(xTab)) {
+        TabControl1.SelectedTab = xTab;
       }
     }
 
@@ -172,7 +178,7 @@ namespace Cosmos.VS.Package {
 
       cmboVMwareDeploy.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareDeploy), true));
       cmboVMwareDeploy.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var x = (VMwareDeploy)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
+        var x = (VMwareDeploy)((EnumValue)cmboVMwareDeploy.SelectedItem).Value;
         if (x != mProps.VMwareDeploy) {
           mProps.VMwareDeploy = x;
           IsDirty = true;
