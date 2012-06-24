@@ -12,6 +12,9 @@ using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package {
+  // We put all items on ONE form because VS is such a nightmware to managed mulitple forms
+  // and add new ones.
+
 	[Guid(Guids.BuildPage)]
 	public partial class BuildPage : ConfigurationBase{
         public static TargetHost CurrentBuildTarget = TargetHost.VMWare;
