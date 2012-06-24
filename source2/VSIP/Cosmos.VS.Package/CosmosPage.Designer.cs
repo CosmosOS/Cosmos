@@ -35,8 +35,23 @@
       this.lablBuildOnly = new System.Windows.Forms.Label();
       this.lboxDeploy = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
+      this.comboFramework = new System.Windows.Forms.ComboBox();
+      this.buttonOutputBrowse = new System.Windows.Forms.Button();
+      this.label2 = new System.Windows.Forms.Label();
+      this.textOutputPath = new System.Windows.Forms.TextBox();
+      this.labelFramework = new System.Windows.Forms.Label();
+      this.tabAssembler = new System.Windows.Forms.TabPage();
+      this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
+      this.labelInternalAssembler = new System.Windows.Forms.Label();
       this.tabDebug = new System.Windows.Forms.TabPage();
+      this.checkIgnoreDebugStubAttribute = new System.Windows.Forms.CheckBox();
+      this.label4 = new System.Windows.Forms.Label();
+      this.label5 = new System.Windows.Forms.Label();
+      this.comboDebugMode = new System.Windows.Forms.ComboBox();
+      this.comboTraceMode = new System.Windows.Forms.ComboBox();
       this.tabVMware = new System.Windows.Forms.TabPage();
+      this.checkEnableGDB = new System.Windows.Forms.CheckBox();
+      this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
       this.cmboVMwareDeploy = new System.Windows.Forms.ComboBox();
       this.label1 = new System.Windows.Forms.Label();
       this.label3 = new System.Windows.Forms.Label();
@@ -45,27 +60,12 @@
       this.tabUSB = new System.Windows.Forms.TabPage();
       this.tabISO = new System.Windows.Forms.TabPage();
       this.tabSlave = new System.Windows.Forms.TabPage();
-      this.tabAssembler = new System.Windows.Forms.TabPage();
-      this.checkUseInternalAssembler = new System.Windows.Forms.CheckBox();
-      this.labelInternalAssembler = new System.Windows.Forms.Label();
-      this.comboFramework = new System.Windows.Forms.ComboBox();
-      this.buttonOutputBrowse = new System.Windows.Forms.Button();
-      this.label2 = new System.Windows.Forms.Label();
-      this.textOutputPath = new System.Windows.Forms.TextBox();
-      this.labelFramework = new System.Windows.Forms.Label();
-      this.checkIgnoreDebugStubAttribute = new System.Windows.Forms.CheckBox();
-      this.label4 = new System.Windows.Forms.Label();
-      this.label5 = new System.Windows.Forms.Label();
-      this.comboDebugMode = new System.Windows.Forms.ComboBox();
-      this.comboTraceMode = new System.Windows.Forms.ComboBox();
-      this.checkEnableGDB = new System.Windows.Forms.CheckBox();
-      this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
       this.TabControl1.SuspendLayout();
       this.tabDeploy.SuspendLayout();
       this.tabCompile.SuspendLayout();
+      this.tabAssembler.SuspendLayout();
       this.tabDebug.SuspendLayout();
       this.tabVMware.SuspendLayout();
-      this.tabAssembler.SuspendLayout();
       this.SuspendLayout();
       // 
       // TabControl1
@@ -116,7 +116,7 @@
       // 
       this.lablDeployText.Location = new System.Drawing.Point(226, 13);
       this.lablDeployText.Name = "lablDeployText";
-      this.lablDeployText.Size = new System.Drawing.Size(226, 83);
+      this.lablDeployText.Size = new System.Drawing.Size(228, 137);
       this.lablDeployText.TabIndex = 4;
       this.lablDeployText.Text = "label1";
       // 
@@ -157,6 +157,100 @@
       this.tabCompile.Text = "Compile";
       this.tabCompile.UseVisualStyleBackColor = true;
       // 
+      // comboFramework
+      // 
+      this.comboFramework.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboFramework.Enabled = false;
+      this.comboFramework.FormattingEnabled = true;
+      this.comboFramework.Location = new System.Drawing.Point(34, 91);
+      this.comboFramework.Name = "comboFramework";
+      this.comboFramework.Size = new System.Drawing.Size(228, 21);
+      this.comboFramework.TabIndex = 22;
+      // 
+      // buttonOutputBrowse
+      // 
+      this.buttonOutputBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.buttonOutputBrowse.Location = new System.Drawing.Point(430, 41);
+      this.buttonOutputBrowse.Name = "buttonOutputBrowse";
+      this.buttonOutputBrowse.Size = new System.Drawing.Size(21, 23);
+      this.buttonOutputBrowse.TabIndex = 20;
+      this.buttonOutputBrowse.Text = "..";
+      this.buttonOutputBrowse.UseVisualStyleBackColor = true;
+      // 
+      // label2
+      // 
+      this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+      this.label2.AutoSize = true;
+      this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label2.Location = new System.Drawing.Point(18, 21);
+      this.label2.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
+      this.label2.Name = "label2";
+      this.label2.Size = new System.Drawing.Size(75, 15);
+      this.label2.TabIndex = 19;
+      this.label2.Text = "Output path:";
+      this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // textOutputPath
+      // 
+      this.textOutputPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.textOutputPath.Location = new System.Drawing.Point(34, 42);
+      this.textOutputPath.Name = "textOutputPath";
+      this.textOutputPath.Size = new System.Drawing.Size(390, 20);
+      this.textOutputPath.TabIndex = 18;
+      // 
+      // labelFramework
+      // 
+      this.labelFramework.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+      this.labelFramework.AutoSize = true;
+      this.labelFramework.Enabled = false;
+      this.labelFramework.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.labelFramework.Location = new System.Drawing.Point(18, 70);
+      this.labelFramework.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
+      this.labelFramework.Name = "labelFramework";
+      this.labelFramework.Size = new System.Drawing.Size(69, 15);
+      this.labelFramework.TabIndex = 21;
+      this.labelFramework.Text = "Framework:";
+      this.labelFramework.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // tabAssembler
+      // 
+      this.tabAssembler.Controls.Add(this.checkUseInternalAssembler);
+      this.tabAssembler.Controls.Add(this.labelInternalAssembler);
+      this.tabAssembler.Location = new System.Drawing.Point(4, 22);
+      this.tabAssembler.Name = "tabAssembler";
+      this.tabAssembler.Size = new System.Drawing.Size(627, 336);
+      this.tabAssembler.TabIndex = 10;
+      this.tabAssembler.Text = "Assembler";
+      this.tabAssembler.UseVisualStyleBackColor = true;
+      // 
+      // checkUseInternalAssembler
+      // 
+      this.checkUseInternalAssembler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+      this.checkUseInternalAssembler.AutoSize = true;
+      this.checkUseInternalAssembler.Enabled = false;
+      this.checkUseInternalAssembler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.checkUseInternalAssembler.Location = new System.Drawing.Point(18, 12);
+      this.checkUseInternalAssembler.Margin = new System.Windows.Forms.Padding(22, 12, 3, 3);
+      this.checkUseInternalAssembler.Name = "checkUseInternalAssembler";
+      this.checkUseInternalAssembler.Size = new System.Drawing.Size(146, 19);
+      this.checkUseInternalAssembler.TabIndex = 21;
+      this.checkUseInternalAssembler.Text = "Use Internal Assembler";
+      this.checkUseInternalAssembler.UseVisualStyleBackColor = true;
+      // 
+      // labelInternalAssembler
+      // 
+      this.labelInternalAssembler.Enabled = false;
+      this.labelInternalAssembler.Location = new System.Drawing.Point(40, 32);
+      this.labelInternalAssembler.Margin = new System.Windows.Forms.Padding(44, 0, 3, 0);
+      this.labelInternalAssembler.Name = "labelInternalAssembler";
+      this.labelInternalAssembler.Size = new System.Drawing.Size(224, 18);
+      this.labelInternalAssembler.TabIndex = 20;
+      this.labelInternalAssembler.Text = "Experimental. Check if you like to crash!";
+      // 
       // tabDebug
       // 
       this.tabDebug.AutoScroll = true;
@@ -173,6 +267,57 @@
       this.tabDebug.Text = "Debug";
       this.tabDebug.UseVisualStyleBackColor = true;
       // 
+      // checkIgnoreDebugStubAttribute
+      // 
+      this.checkIgnoreDebugStubAttribute.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.checkIgnoreDebugStubAttribute.Location = new System.Drawing.Point(20, 136);
+      this.checkIgnoreDebugStubAttribute.Name = "checkIgnoreDebugStubAttribute";
+      this.checkIgnoreDebugStubAttribute.Size = new System.Drawing.Size(218, 20);
+      this.checkIgnoreDebugStubAttribute.TabIndex = 28;
+      this.checkIgnoreDebugStubAttribute.Text = "Ignore DebugStub Attribute Settings";
+      this.checkIgnoreDebugStubAttribute.UseVisualStyleBackColor = true;
+      // 
+      // label4
+      // 
+      this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label4.Location = new System.Drawing.Point(17, 20);
+      this.label4.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+      this.label4.Name = "label4";
+      this.label4.Size = new System.Drawing.Size(98, 21);
+      this.label4.TabIndex = 24;
+      this.label4.Text = "Debug Level:";
+      this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // label5
+      // 
+      this.label5.AutoSize = true;
+      this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label5.Location = new System.Drawing.Point(17, 74);
+      this.label5.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+      this.label5.Name = "label5";
+      this.label5.Size = new System.Drawing.Size(50, 15);
+      this.label5.TabIndex = 26;
+      this.label5.Text = "Tracing:";
+      this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // comboDebugMode
+      // 
+      this.comboDebugMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboDebugMode.FormattingEnabled = true;
+      this.comboDebugMode.Location = new System.Drawing.Point(35, 47);
+      this.comboDebugMode.Name = "comboDebugMode";
+      this.comboDebugMode.Size = new System.Drawing.Size(221, 21);
+      this.comboDebugMode.TabIndex = 27;
+      // 
+      // comboTraceMode
+      // 
+      this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboTraceMode.FormattingEnabled = true;
+      this.comboTraceMode.Location = new System.Drawing.Point(35, 95);
+      this.comboTraceMode.Name = "comboTraceMode";
+      this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
+      this.comboTraceMode.TabIndex = 25;
+      // 
       // tabVMware
       // 
       this.tabVMware.Controls.Add(this.checkEnableGDB);
@@ -188,6 +333,28 @@
       this.tabVMware.TabIndex = 4;
       this.tabVMware.Text = "VMware";
       this.tabVMware.UseVisualStyleBackColor = true;
+      // 
+      // checkEnableGDB
+      // 
+      this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.checkEnableGDB.Location = new System.Drawing.Point(9, 144);
+      this.checkEnableGDB.Name = "checkEnableGDB";
+      this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
+      this.checkEnableGDB.TabIndex = 25;
+      this.checkEnableGDB.Text = "Enable GDB Debugger";
+      this.checkEnableGDB.UseVisualStyleBackColor = true;
+      // 
+      // checkStartCosmosGDB
+      // 
+      this.checkStartCosmosGDB.AutoSize = true;
+      this.checkStartCosmosGDB.Enabled = false;
+      this.checkStartCosmosGDB.Location = new System.Drawing.Point(24, 170);
+      this.checkStartCosmosGDB.Margin = new System.Windows.Forms.Padding(25, 3, 3, 3);
+      this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
+      this.checkStartCosmosGDB.Size = new System.Drawing.Size(140, 17);
+      this.checkStartCosmosGDB.TabIndex = 26;
+      this.checkStartCosmosGDB.Text = "Use Cosmos GDB Client";
+      this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
       // 
       // cmboVMwareDeploy
       // 
@@ -267,173 +434,6 @@
       this.tabSlave.Text = "Slave";
       this.tabSlave.UseVisualStyleBackColor = true;
       // 
-      // tabAssembler
-      // 
-      this.tabAssembler.Controls.Add(this.checkUseInternalAssembler);
-      this.tabAssembler.Controls.Add(this.labelInternalAssembler);
-      this.tabAssembler.Location = new System.Drawing.Point(4, 22);
-      this.tabAssembler.Name = "tabAssembler";
-      this.tabAssembler.Size = new System.Drawing.Size(627, 336);
-      this.tabAssembler.TabIndex = 10;
-      this.tabAssembler.Text = "Assembler";
-      this.tabAssembler.UseVisualStyleBackColor = true;
-      // 
-      // checkUseInternalAssembler
-      // 
-      this.checkUseInternalAssembler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-      this.checkUseInternalAssembler.AutoSize = true;
-      this.checkUseInternalAssembler.Enabled = false;
-      this.checkUseInternalAssembler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.checkUseInternalAssembler.Location = new System.Drawing.Point(18, 12);
-      this.checkUseInternalAssembler.Margin = new System.Windows.Forms.Padding(22, 12, 3, 3);
-      this.checkUseInternalAssembler.Name = "checkUseInternalAssembler";
-      this.checkUseInternalAssembler.Size = new System.Drawing.Size(146, 19);
-      this.checkUseInternalAssembler.TabIndex = 21;
-      this.checkUseInternalAssembler.Text = "Use Internal Assembler";
-      this.checkUseInternalAssembler.UseVisualStyleBackColor = true;
-      // 
-      // labelInternalAssembler
-      // 
-      this.labelInternalAssembler.Enabled = false;
-      this.labelInternalAssembler.Location = new System.Drawing.Point(40, 32);
-      this.labelInternalAssembler.Margin = new System.Windows.Forms.Padding(44, 0, 3, 0);
-      this.labelInternalAssembler.Name = "labelInternalAssembler";
-      this.labelInternalAssembler.Size = new System.Drawing.Size(224, 18);
-      this.labelInternalAssembler.TabIndex = 20;
-      this.labelInternalAssembler.Text = "Experimental. Check if you like to crash!";
-      // 
-      // comboFramework
-      // 
-      this.comboFramework.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.comboFramework.Enabled = false;
-      this.comboFramework.FormattingEnabled = true;
-      this.comboFramework.Location = new System.Drawing.Point(34, 91);
-      this.comboFramework.Name = "comboFramework";
-      this.comboFramework.Size = new System.Drawing.Size(228, 21);
-      this.comboFramework.TabIndex = 22;
-      // 
-      // buttonOutputBrowse
-      // 
-      this.buttonOutputBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonOutputBrowse.Location = new System.Drawing.Point(430, 41);
-      this.buttonOutputBrowse.Name = "buttonOutputBrowse";
-      this.buttonOutputBrowse.Size = new System.Drawing.Size(21, 23);
-      this.buttonOutputBrowse.TabIndex = 20;
-      this.buttonOutputBrowse.Text = "..";
-      this.buttonOutputBrowse.UseVisualStyleBackColor = true;
-      // 
-      // label2
-      // 
-      this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-      this.label2.AutoSize = true;
-      this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label2.Location = new System.Drawing.Point(18, 21);
-      this.label2.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(75, 15);
-      this.label2.TabIndex = 19;
-      this.label2.Text = "Output path:";
-      this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-      // 
-      // textOutputPath
-      // 
-      this.textOutputPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.textOutputPath.Location = new System.Drawing.Point(34, 42);
-      this.textOutputPath.Name = "textOutputPath";
-      this.textOutputPath.Size = new System.Drawing.Size(390, 20);
-      this.textOutputPath.TabIndex = 18;
-      // 
-      // labelFramework
-      // 
-      this.labelFramework.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-      this.labelFramework.AutoSize = true;
-      this.labelFramework.Enabled = false;
-      this.labelFramework.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.labelFramework.Location = new System.Drawing.Point(18, 70);
-      this.labelFramework.Margin = new System.Windows.Forms.Padding(22, 3, 0, 3);
-      this.labelFramework.Name = "labelFramework";
-      this.labelFramework.Size = new System.Drawing.Size(69, 15);
-      this.labelFramework.TabIndex = 21;
-      this.labelFramework.Text = "Framework:";
-      this.labelFramework.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-      // 
-      // checkIgnoreDebugStubAttribute
-      // 
-      this.checkIgnoreDebugStubAttribute.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.checkIgnoreDebugStubAttribute.Location = new System.Drawing.Point(20, 136);
-      this.checkIgnoreDebugStubAttribute.Name = "checkIgnoreDebugStubAttribute";
-      this.checkIgnoreDebugStubAttribute.Size = new System.Drawing.Size(218, 20);
-      this.checkIgnoreDebugStubAttribute.TabIndex = 28;
-      this.checkIgnoreDebugStubAttribute.Text = "Ignore DebugStub Attribute Settings";
-      this.checkIgnoreDebugStubAttribute.UseVisualStyleBackColor = true;
-      // 
-      // label4
-      // 
-      this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label4.Location = new System.Drawing.Point(17, 20);
-      this.label4.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-      this.label4.Name = "label4";
-      this.label4.Size = new System.Drawing.Size(98, 21);
-      this.label4.TabIndex = 24;
-      this.label4.Text = "Debug Level:";
-      this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-      // 
-      // label5
-      // 
-      this.label5.AutoSize = true;
-      this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label5.Location = new System.Drawing.Point(17, 74);
-      this.label5.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-      this.label5.Name = "label5";
-      this.label5.Size = new System.Drawing.Size(50, 15);
-      this.label5.TabIndex = 26;
-      this.label5.Text = "Tracing:";
-      this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-      // 
-      // comboDebugMode
-      // 
-      this.comboDebugMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.comboDebugMode.FormattingEnabled = true;
-      this.comboDebugMode.Location = new System.Drawing.Point(35, 47);
-      this.comboDebugMode.Name = "comboDebugMode";
-      this.comboDebugMode.Size = new System.Drawing.Size(221, 21);
-      this.comboDebugMode.TabIndex = 27;
-      // 
-      // comboTraceMode
-      // 
-      this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.comboTraceMode.FormattingEnabled = true;
-      this.comboTraceMode.Location = new System.Drawing.Point(35, 95);
-      this.comboTraceMode.Name = "comboTraceMode";
-      this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
-      this.comboTraceMode.TabIndex = 25;
-      // 
-      // checkEnableGDB
-      // 
-      this.checkEnableGDB.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.checkEnableGDB.Location = new System.Drawing.Point(9, 144);
-      this.checkEnableGDB.Name = "checkEnableGDB";
-      this.checkEnableGDB.Size = new System.Drawing.Size(218, 20);
-      this.checkEnableGDB.TabIndex = 25;
-      this.checkEnableGDB.Text = "Enable GDB Debugger";
-      this.checkEnableGDB.UseVisualStyleBackColor = true;
-      // 
-      // checkStartCosmosGDB
-      // 
-      this.checkStartCosmosGDB.AutoSize = true;
-      this.checkStartCosmosGDB.Enabled = false;
-      this.checkStartCosmosGDB.Location = new System.Drawing.Point(24, 170);
-      this.checkStartCosmosGDB.Margin = new System.Windows.Forms.Padding(25, 3, 3, 3);
-      this.checkStartCosmosGDB.Name = "checkStartCosmosGDB";
-      this.checkStartCosmosGDB.Size = new System.Drawing.Size(140, 17);
-      this.checkStartCosmosGDB.TabIndex = 26;
-      this.checkStartCosmosGDB.Text = "Use Cosmos GDB Client";
-      this.checkStartCosmosGDB.UseVisualStyleBackColor = true;
-      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -447,12 +447,12 @@
       this.tabDeploy.PerformLayout();
       this.tabCompile.ResumeLayout(false);
       this.tabCompile.PerformLayout();
+      this.tabAssembler.ResumeLayout(false);
+      this.tabAssembler.PerformLayout();
       this.tabDebug.ResumeLayout(false);
       this.tabDebug.PerformLayout();
       this.tabVMware.ResumeLayout(false);
       this.tabVMware.PerformLayout();
-      this.tabAssembler.ResumeLayout(false);
-      this.tabAssembler.PerformLayout();
       this.ResumeLayout(false);
 
 		}

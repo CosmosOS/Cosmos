@@ -10,6 +10,7 @@ using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using NameValueCollectionHelper = Cosmos.Debug.Common.NameValueCollectionHelper;
 using Cosmos.Build.Common;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Cosmos.VS.Package {
 
@@ -30,8 +31,12 @@ namespace Cosmos.VS.Package {
         var xEnumValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
         var xTarget = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
+        string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
+        string xOutputPath = Path.GetDirectoryName(xOutputAsm);
+        string xIsoPathname = Path.ChangeExtension(xOutputAsm, ".iso");
+
         if (xTarget == BuildTarget.ISO) {
-          System.Windows.Forms.MessageBox.Show("ISO is ready.");
+          Process.Start(xOutputPath);
           return VSConstants.S_OK;
         } 
         
@@ -45,16 +50,16 @@ namespace Cosmos.VS.Package {
         xInfo.bstrRemoteMachine = null; // debug locally
 
         var xValues = new NameValueCollection();
-        xValues.Add("ISOFile", Path.Combine(Path.GetDirectoryName(ProjectMgr.GetOutputAssembly(this.ConfigName)), Path.GetFileNameWithoutExtension(ProjectMgr.GetOutputAssembly(this.ConfigName)) + ".iso"));
-        xValues.Add("BinFormat", this.GetConfigurationProperty("BinFormat", false));
-        xValues.Add("EnableGDB", this.GetConfigurationProperty("EnableGDB", false));
-        xValues.Add("DebugMode", this.GetConfigurationProperty("DebugMode", false));
-        xValues.Add("TraceAssemblies", this.GetConfigurationProperty("TraceAssemblies", false));
-        xValues.Add("BuildTarget", this.GetConfigurationProperty("BuildTarget", false));
+        xValues.Add("ISOFile", xIsoPathname);
+        xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
+        xValues.Add("EnableGDB", GetConfigurationProperty("EnableGDB", false));
+        xValues.Add("DebugMode", GetConfigurationProperty("DebugMode", false));
+        xValues.Add("TraceAssemblies", GetConfigurationProperty("TraceAssemblies", false));
+        xValues.Add("BuildTarget", GetConfigurationProperty("BuildTarget", false));
         xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
-        xValues.Add("VMwareEdition", this.GetConfigurationProperty("VMwareEdition", false));
-        xValues.Add("VMwareDeploy", this.GetConfigurationProperty("VMwareDeploy", false));
-        xValues.Add("StartCosmosGDB", this.GetConfigurationProperty("StartCosmosGDB", false));
+        xValues.Add("VMwareEdition", GetConfigurationProperty("VMwareEdition", false));
+        xValues.Add("VMwareDeploy", GetConfigurationProperty("VMwareDeploy", false));
+        xValues.Add("StartCosmosGDB", GetConfigurationProperty("StartCosmosGDB", false));
 
         xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 

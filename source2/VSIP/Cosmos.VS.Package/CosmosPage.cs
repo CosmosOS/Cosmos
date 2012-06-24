@@ -88,9 +88,10 @@ namespace Cosmos.VS.Package {
       lablNonFunctional.Visible = false;
 
       if (mProps.BuildTarget == BuildTarget.ISO) {
-        lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD.";
+        lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
+         + " After running the selected project, an explorer window will open containing the ISO file."
+         + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
         lablBuildOnly.Visible = true;
-        lablNonFunctional.Visible = true;
         mShowTabISO = true;
 
       } else if (mProps.BuildTarget == BuildTarget.USB) {
