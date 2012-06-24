@@ -23,9 +23,71 @@ namespace Cosmos.VS.Package {
     public static BuildTarget CurrentBuildTarget = BuildTarget.VMWare;
     public static event EventHandler BuildTargetChanged;
 
+    protected bool mShowTabDebug;
+    protected bool mShowTabVMWare;
+    protected bool mShowTabPXE;
+    protected bool mShowTabUSB;
+    protected bool mShowTabISO;
+
+    protected void RemoveTab(TabPage aTab) {
+      if (TabControl1.TabPages.Contains(aTab)) {
+        TabControl1.TabPages.Remove(aTab);
+      }
+    }
+
+    protected void UpdateTabs() {
+      RemoveTab(tabDebug);
+      RemoveTab(tabVMWare);
+      RemoveTab(tabPXE);
+      RemoveTab(tabUSB);
+      RemoveTab(tabISO);
+
+      if (mShowTabDebug) {
+        TabControl1.TabPages.Add(tabDebug);
+      }
+      if (mShowTabVMWare) {
+        TabControl1.TabPages.Add(tabVMWare);
+      }
+      if (mShowTabPXE) {
+        TabControl1.TabPages.Add(tabPXE);
+      }
+      if (mShowTabUSB) {
+        TabControl1.TabPages.Add(tabUSB);
+      }
+      if (mShowTabISO) {
+        TabControl1.TabPages.Add(tabISO);
+      }
+    }
+
     protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
       if (CosmosPage.BuildTargetChanged != null) {
         CosmosPage.BuildTargetChanged(sender, e);
+      }
+    }
+
+    protected void SetDeployment(BuildTarget aTarget) {
+      bool xBuildOnly = (aTarget == BuildTarget.ISO || aTarget == BuildTarget.USB);
+
+      mShowTabDebug = !xBuildOnly;
+      mShowTabVMWare = (aTarget == BuildTarget.VMWare || aTarget == BuildTarget.VMWarePXE);
+      mShowTabPXE = (aTarget == BuildTarget.PXE);
+      mShowTabUSB = (aTarget == BuildTarget.USB);
+      mShowTabISO = (aTarget == BuildTarget.ISO);
+
+      UpdateTabs();
+
+      lablBuildOnly.Visible = xBuildOnly;
+
+      if (aTarget == BuildTarget.ISO) {
+        lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD.";
+      } else if (aTarget == BuildTarget.USB) {
+        lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
+      } else if (aTarget == BuildTarget.VMWare) {
+        lablDeployText.Text = "Uses VMWare to deploy and debug in the standard configuration.";
+      } else if (aTarget == BuildTarget.VMWarePXE) {
+        lablDeployText.Text = "Uses VMWare and PXE. Only intended for testing PXE. VMWare (Default) should be used normally.";
+      } else if (aTarget == BuildTarget.PXE) {
+        lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
       }
     }
 
@@ -63,8 +125,7 @@ namespace Cosmos.VS.Package {
         if (value != mProps.BuildTarget) {
           mProps.BuildTarget = value;
           IsDirty = true;
-
-          //comboFlavor.Visible = value == TargetHost.VMWare;
+          SetDeployment(value);
 
           CurrentBuildTarget = value;
           OnBuildTargetChanged(this, EventArgs.Empty);
@@ -132,7 +193,6 @@ namespace Cosmos.VS.Package {
 
     protected override void FillProperties() {
       base.FillProperties();
-
       mProps.Reset();
 
       //TODO: Why are we copying these one by one instead of automatic?
@@ -144,7 +204,7 @@ namespace Cosmos.VS.Package {
       // We need to manually trigger it once, because the indexchanged event compares
       // it against the source, and they will of course be the same.
       CurrentBuildTarget = (BuildTarget)((EnumValue)lboxDeploy.SelectedItem).Value;
-      OnBuildTargetChanged(this, EventArgs.Empty);
+      SetDeployment(CurrentBuildTarget);
 
       mProps.SetProperty("Framework", GetConfigProperty("Framework"));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);

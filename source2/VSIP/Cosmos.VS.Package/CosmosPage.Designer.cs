@@ -57,6 +57,8 @@
       this.tabPXE = new System.Windows.Forms.TabPage();
       this.tabUSB = new System.Windows.Forms.TabPage();
       this.tabISO = new System.Windows.Forms.TabPage();
+      this.lablBuildOnly = new System.Windows.Forms.Label();
+      this.lablDeployText = new System.Windows.Forms.Label();
       this.TabControl1.SuspendLayout();
       this.tabDeploy.SuspendLayout();
       this.tabCompile.SuspendLayout();
@@ -87,6 +89,8 @@
       // 
       // tabDeploy
       // 
+      this.tabDeploy.Controls.Add(this.lablDeployText);
+      this.tabDeploy.Controls.Add(this.lablBuildOnly);
       this.tabDeploy.Controls.Add(this.lboxDeploy);
       this.tabDeploy.Location = new System.Drawing.Point(4, 4);
       this.tabDeploy.Name = "tabDeploy";
@@ -399,6 +403,25 @@
       this.tabISO.Text = "ISO";
       this.tabISO.UseVisualStyleBackColor = true;
       // 
+      // lablBuildOnly
+      // 
+      this.lablBuildOnly.AutoSize = true;
+      this.lablBuildOnly.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lablBuildOnly.ForeColor = System.Drawing.SystemColors.HotTrack;
+      this.lablBuildOnly.Location = new System.Drawing.Point(226, 166);
+      this.lablBuildOnly.Name = "lablBuildOnly";
+      this.lablBuildOnly.Size = new System.Drawing.Size(207, 13);
+      this.lablBuildOnly.TabIndex = 3;
+      this.lablBuildOnly.Text = "You have selected a build only option.";
+      // 
+      // lablDeployText
+      // 
+      this.lablDeployText.Location = new System.Drawing.Point(226, 13);
+      this.lablDeployText.Name = "lablDeployText";
+      this.lablDeployText.Size = new System.Drawing.Size(226, 83);
+      this.lablDeployText.TabIndex = 4;
+      this.lablDeployText.Text = "label1";
+      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -409,6 +432,7 @@
       this.Controls.SetChildIndex(this.TabControl1, 0);
       this.TabControl1.ResumeLayout(false);
       this.tabDeploy.ResumeLayout(false);
+      this.tabDeploy.PerformLayout();
       this.tabCompile.ResumeLayout(false);
       this.panel2.ResumeLayout(false);
       this.panel2.PerformLayout();
@@ -455,6 +479,8 @@
     private System.Windows.Forms.TabPage tabISO;
     private System.Windows.Forms.TabPage tabDeploy;
     private System.Windows.Forms.ListBox lboxDeploy;
+    private System.Windows.Forms.Label lablBuildOnly;
+    private System.Windows.Forms.Label lablDeployText;
 
 
 
