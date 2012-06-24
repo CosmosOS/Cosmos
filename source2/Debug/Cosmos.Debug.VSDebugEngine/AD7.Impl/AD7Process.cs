@@ -101,9 +101,12 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
-      System.Diagnostics.Debug.WriteLine("In AD7Process..ctor");
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
+
+      string xBuildTarget = aDebugInfo["BuildTarget"].ToUpper();
+      var xEnumValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
+      mBuildTarget = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
       if (mDebugDownPipe == null) {
         mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
@@ -128,10 +131,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
-
-      string xBuildTarget = mDebugInfo["BuildTarget"].ToUpper();
-      var xValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
-      mBuildTarget = xValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
       if (mBuildTarget == BuildTarget.VMware) {
         string xFlavor = mDebugInfo["VMwareEdition"].ToUpper();
@@ -185,13 +184,13 @@ namespace Cosmos.Debug.VSDebugEngine {
       mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
 
       mDbgConnector = null;
-      if (StringComparer.InvariantCultureIgnoreCase.Equals(mDebugInfo["BuildTarget"], "vmware")) {
+      if (mBuildTarget == BuildTarget.VMware) {
         OutputText("Starting serial debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
         mDbgConnector.Connected = DebugConnectorConnected;
       }
       if (mDbgConnector == null) {
-        throw new Exception("BuildTarget value not valid: '" + mDebugInfo["BuildTarget"] + "'.");
+        throw new Exception("BuildTarget value not valid: '" + mBuildTarget.ToString() + "'.");
       }
 
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
@@ -207,7 +206,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       System.Threading.Thread.Sleep(250);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
-      OutputText("Starting OS.");
+      OutputText("Starting OS debug host.");
       mProcess = Process.Start(mProcessStartInfo);
 
       mProcess.EnableRaisingEvents = true;
@@ -221,7 +220,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
         Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
         Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
-        throw new Exception("Error while starting application");
+        throw new Exception("Error while starting OS debug host.");
       }
 
       mEngine = aEngine;

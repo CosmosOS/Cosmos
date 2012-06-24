@@ -125,7 +125,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
         File.Delete(Path.Combine(xPath, "vmware-1.log"));
         File.Delete(Path.Combine(xPath, "vmware-2.log"));
       } catch (Exception ex) {
-        // Ignore errors, users can stop VS while VMWare is still running and files will be locked.
+        // Ignore errors, users can stop VS while VMware is still running and files will be locked.
       }
     }
 
