@@ -10,5 +10,6 @@
         <ListBox Height="100" Margin="31,109,15,0" Name="lboxTarget" VerticalAlignment="Top" />
         <Label Content="Target drive:" Height="28" HorizontalAlignment="Left" Margin="12,75,0,0" Name="label2" VerticalAlignment="Top" />
         <Button Content="Refresh" Height="23" HorizontalAlignment="Left" Margin="31,230,0,0" Name="butnRefresh" VerticalAlignment="Top" Width="75" Click="butnRefresh_Click" />
+        <Label Content="*Only removable drives are listed." Height="27" Margin="0,84,15,0" Name="label3" VerticalAlignment="Top" HorizontalAlignment="Right" Width="199" FontStyle="Italic" FontSize="11" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" Foreground="Blue" />
     </Grid>
 </Window>
