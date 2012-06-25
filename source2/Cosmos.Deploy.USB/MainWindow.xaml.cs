@@ -54,7 +54,7 @@ namespace Cosmos.Deploy.USB {
 
     private void butnCreate_Click(object sender, RoutedEventArgs e) {
       if (lboxTarget.SelectedItem == null) {
-        MessageBox.Show("Please select a target drive.2", Title);
+        MessageBox.Show("Please select a target drive.", Title);
         return;
       }
 

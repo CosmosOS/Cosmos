@@ -34,17 +34,19 @@ namespace Cosmos.VS.Package {
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);
-        string xIsoPathname = Path.ChangeExtension(xOutputAsm, ".iso");
-        string xObjPathname = Path.ChangeExtension(xOutputAsm, ".obj");
+        string xIsoFile = Path.ChangeExtension(xOutputAsm, ".iso");
+        string xBinFile = Path.ChangeExtension(xOutputAsm, ".bin");
 
         if (xTarget == BuildTarget.ISO) {
           Process.Start(xOutputPath);
 
         } else if (xTarget == BuildTarget.USB) {
-          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xObjPathname + "\"");
+          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");
 
         } else if (xTarget == BuildTarget.PXE) {
-          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + Path.Combine(CosmosPaths.Build, "PXE") + "\"");
+          string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
+          File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"));
+          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
 
         } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
@@ -57,7 +59,7 @@ namespace Cosmos.VS.Package {
           xInfo.bstrRemoteMachine = null; // debug locally
 
           var xValues = new NameValueCollection();
-          xValues.Add("ISOFile", xIsoPathname);
+          xValues.Add("ISOFile", xIsoFile);
           xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
           xValues.Add("EnableGDB", GetConfigurationProperty("EnableGDB", false));
           xValues.Add("DebugMode", GetConfigurationProperty("DebugMode", false));

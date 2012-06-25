@@ -154,10 +154,13 @@ Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversio
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+;
+Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.GUI.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
