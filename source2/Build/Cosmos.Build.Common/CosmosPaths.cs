@@ -7,6 +7,7 @@ namespace Cosmos.Build.Common {
     public static readonly string CosmosKit;
     public static readonly string Build;
     public static readonly string BuildVsip;
+    public static readonly string Tools;
     public static readonly string IL2CPUTask;
     public static readonly string Kernel;
     public static readonly string GDBClientExe;
@@ -22,6 +23,7 @@ namespace Cosmos.Build.Common {
 
       Build = Path.Combine(CosmosKit, "Build");
       BuildVsip = Path.Combine(CosmosKit, "Build\\VSIP");
+      BuildVsip = Path.Combine(CosmosKit, "Build\\Tools");
       IL2CPUTask = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Build.IL2CPUTask.exe");
       Kernel = Path.Combine(CosmosKit, "Kernel");
       GDBClientExe = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Debug.GDB.exe");

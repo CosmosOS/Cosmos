@@ -222,9 +222,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie.Test", "..\source2\Cosmos.Deploy.Pixie.Test\Cosmos.Deploy.Pixie.Test.csproj", "{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "..\source2\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 61
+		SccNumberOfProjects = 62
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -470,6 +472,10 @@ Global
 		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
 		SccProjectName60 = ../source2/Cosmos.Deploy.Pixie.Test
 		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.Pixie.Test
+		SccProjectUniqueName61 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
+		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
+		SccProjectName61 = ../source2/Cosmos.Deploy.USB
+		SccLocalPath61 = ..\\source2\\Cosmos.Deploy.USB
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Builder|Any CPU = Builder|Any CPU
@@ -1451,6 +1457,21 @@ Global
 		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Mixed Platforms.Build.0 = Release|x86
 		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|x86.ActiveCfg = Release|x86
 		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|x86.Build.0 = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|Any CPU.ActiveCfg = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|Mixed Platforms.ActiveCfg = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|Mixed Platforms.Build.0 = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|x86.ActiveCfg = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|x86.Build.0 = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Debug|x86.ActiveCfg = Debug|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Debug|x86.Build.0 = Debug|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|Any CPU.ActiveCfg = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|x86.ActiveCfg = Release|x86
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1537,5 +1558,6 @@ Global
 		{86F88A09-6801-4474-BFC8-EF09F3A9B89D} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{287A4DA7-9A8B-4F64-913F-1828DA67F16A} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 	EndGlobalSection
 EndGlobal

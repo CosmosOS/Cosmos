@@ -41,7 +41,7 @@ namespace Cosmos.VS.Package {
         } else if (xTarget == BuildTarget.USB) {
           var xDrives = DriveInfo.GetDrives().Where(q => q.DriveType == DriveType.Removable).ToArray();
           string xDrive = "G";
-          UsbMaker.Generate(xDrive);
+          UsbMaker.Generate(xDrive, @"d:\source\Cosmos\source2\Demos\Guess\bin\Debug\Guess.obj");
           Process.Start(xDrive + @":\");
         } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
