@@ -17,18 +17,21 @@ namespace Cosmos.Build.Common {
       string aDrive = "G";
 
       //string xPath = BuildPath + @"C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\USB";
-      string xPath = @"D:\source\Cosmos\Build\USB";
+      string xPath =  @"C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\USB";
 
       // Why do we copy it twice???
-      RemoveFile(Path.Combine(xPath, "output.bin"));
-      //File.Copy(xBuildPath + @"output.bin", xPath + @"output.bin");
+      RemoveFile(Path.Combine(xPath, "Cosmos.bin"));
+      File.Copy(@"d:\source\Cosmos\source2\Demos\Guess\bin\Debug\Guess.obj", Path.Combine(xPath, "Cosmos.bin"));
+
       // Copy to USB device
-      RemoveFile(aDrive + @":\output.bin");
-      //File.Copy(xPath + @"output.bin", aDrive + @":\output.bin");
+      RemoveFile(aDrive + @":\Cosmos.bin");
+      File.Copy(Path.Combine(xPath, "Cosmos.bin"), aDrive + @":\Cosmos.bin");
+
       RemoveFile(aDrive + @":\mboot.c32");
-      //File.Copy(xPath + @"mboot.c32", aDrive + @":\mboot.c32");
+      File.Copy(Path.Combine(xPath, "mboot.c32"), aDrive + @":\mboot.c32");
+      
       RemoveFile(aDrive + @":\syslinux.cfg");
-      //File.Copy(xPath + @"syslinux.cfg", aDrive + @":\syslinux.cfg");
+      File.Copy(Path.Combine(xPath, "syslinux.cfg"), aDrive + @":\syslinux.cfg");
 
       // Set MBR
       //TODO: Hangs on Windows 2008 - maybe needs admin permissions? Or maybe its not compat?

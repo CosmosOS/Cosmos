@@ -18,9 +18,9 @@ namespace Cosmos.Build.Common {
       string xPath = Path.Combine(aBuildPath, @"ISO");
       RemoveFile(aIsoPathname);
       
-      // We copy and rename in the process to output.bin becaue the .cfg is currently
-      // hardcoded to output.bin.
-      string xOutputBin = Path.Combine(xPath, "output.bin");
+      // We copy and rename in the process to Cosmos.bin becaue the .cfg is currently
+      // hardcoded to Cosmos.bin.
+      string xOutputBin = Path.Combine(xPath, "Cosmos.bin");
       RemoveFile(xOutputBin);
       File.Copy(xInputPathname, xOutputBin);
 
@@ -33,7 +33,7 @@ namespace Cosmos.Build.Common {
         BootFileName = xIsoLinux,
         BootInfoTable = true
       };
-      // TODO - Use move or see if we can do this without copying first the output.bin as they will start to get larger
+      // TODO - Use move or see if we can do this without copying first the Cosmos.bin as they will start to get larger
       xOptions.IncludeFiles.Add(xPath);
 
       var xISO = new Iso9660Generator(xOptions);
