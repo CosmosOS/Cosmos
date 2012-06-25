@@ -83,6 +83,7 @@
     <Compile Include="IsoMaker.cs" />
     <Compile Include="PropertiesBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UsbMaker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

@@ -7,9 +7,9 @@ using System.Reflection;
 namespace Cosmos.Build.Common {
 
   public enum BuildTarget {
-    [Description("Create ISO Image")]
+    [Description("ISO Image")]
     ISO,
-    [Description("Write to USB Bootable Device")]
+    [Description("USB Device")]
     USB,
 
     [Description("VMware")]

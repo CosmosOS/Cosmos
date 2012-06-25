@@ -14,8 +14,9 @@ namespace Cosmos.Build.Common {
 
     static CosmosPaths() {
       using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false)) {
-        if (xReg == null)
-          throw new Exception("The Key \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Cosmos\" does not exist! Are you install Cosmos Kit?");
+        if (xReg == null) {
+          throw new Exception("The Key \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Cosmos\" not found.");
+        }
         CosmosKit = (string)xReg.GetValue(null);
       }
 

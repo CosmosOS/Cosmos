@@ -19,34 +19,6 @@ namespace Cosmos.VS.Package {
       : base(project, configuration) {
     }
 
-    protected void MoveFile(string aName) {
-
-    }
-
-    protected void MakeUSB() {
-      string aDrive = "G";
-
-      //string xPath = BuildPath + @"C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\USB";
-      string xPath = @"D:\source\Cosmos\Build\USB";
-
-      //buildFileUtils.RemoveFile(xPath + @"output.bin");
-      //File.Move(BuildPath + @"output.bin", xPath + @"output.bin");
-      //// Copy to USB device
-      //buildFileUtils.RemoveFile(aDrive + @":\output.bin");
-      //File.Copy(xPath + @"output.bin", aDrive + @":\output.bin");
-      //buildFileUtils.RemoveFile(aDrive + @":\mboot.c32");
-      //File.Copy(xPath + @"mboot.c32", aDrive + @":\mboot.c32");
-      //buildFileUtils.RemoveFile(aDrive + @":\syslinux.cfg");
-      //File.Copy(xPath + @"syslinux.cfg", aDrive + @":\syslinux.cfg");
-      
-      // Set MBR
-      //TODO: Hangs on Windows 2008 - maybe needs admin permissions? Or maybe its not compat?
-      // Runs from command line ok in Windows 2008.....
-      //Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true);
-
-      // http://www.fort-awesome.net/blog/2010/03/25/MBR_VBR_and_Raw_Disk
-    }
-
     public override int DebugLaunch(uint aLaunch) {
       try {
         // Second param is ResetCache. Must be called one time. Dunno why.
@@ -66,7 +38,7 @@ namespace Cosmos.VS.Package {
         if (xTarget == BuildTarget.ISO) {
           Process.Start(xOutputPath);
         } else if (xTarget == BuildTarget.USB) {
-          MakeUSB();
+          UsbMaker.Generate();
         } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();

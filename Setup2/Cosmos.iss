@@ -188,8 +188,8 @@ Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Build\
 
 Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
-Source: ".\Build\ISO\isolinux.*"; DestDir: "{app}\Build\ISO"
-Source: ".\Build\ISO\mboot.c32"; DestDir: "{app}\Build\ISO"
+Source: ".\Build\ISO\*.*"; DestDir: "{app}\Build\ISO"
+Source: ".\Build\USB\*.*"; DestDir: "{app}\Build\USB"
 
 ; Templates
 ; Templates use the user dir and not global. Global requires devenve /setup (items) or /installvstemplates (project) which is VERY slow and kills during devkit
