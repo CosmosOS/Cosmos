@@ -38,6 +38,7 @@ namespace Cosmos.VS.Package {
         string xBinFile = Path.ChangeExtension(xOutputAsm, ".bin");
 
         if (xTarget == BuildTarget.ISO) {
+          IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
           Process.Start(xOutputPath);
 
         } else if (xTarget == BuildTarget.USB) {
@@ -48,7 +49,10 @@ namespace Cosmos.VS.Package {
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"));
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
 
-        } else {
+        } else if (xTarget == BuildTarget.VMware) {
+          // TODO - only make ISO if not PXE
+          IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
+
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();
           xInfo.cbSize = (uint)Marshal.SizeOf(xInfo);

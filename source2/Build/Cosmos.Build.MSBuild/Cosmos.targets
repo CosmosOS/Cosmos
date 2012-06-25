@@ -72,9 +72,13 @@
 
 
     <!--todo: update cxdb to cxdbg-->
-    <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin"
+    
+    <!-- We dont build ISO in MSBuild any more because not all targets need it and it takes time.
+    But we do delete it, so we dont have out of date outputs. -->
+    <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin"
              OutputFile="$(TargetDir)$(MSBuildProjectName).iso"
-             CosmosBuildDir="$(CosmosDir)\Build" />
+             CosmosBuildDir="$(CosmosDir)\Build" /> -->
+    <Delete Files="$(TargetDir)$(MSBuildProjectName).iso" />
   </Target>
 
   <!-- compat targets -->
