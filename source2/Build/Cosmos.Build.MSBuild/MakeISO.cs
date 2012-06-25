@@ -33,31 +33,6 @@ namespace Cosmos.Build.MSBuild {
     public override bool Execute() {
       IsoMaker.Generate(CosmosBuildDir, InputFile, OutputFile);
       return true;
-      
-      //string xPath = Path.Combine(CosmosBuildDir, @"ISO\");
-      //if (File.Exists(OutputFile)) {
-      //  File.Delete(OutputFile);
-      //}
-      //if (File.Exists(Path.Combine(xPath, "output.bin"))) {
-      //  File.Delete(Path.Combine(xPath, "output.bin"));
-      //}
-
-      //File.Copy(InputFile, Path.Combine(xPath, "output.bin"));
-      //File.SetAttributes(Path.Combine(xPath, "isolinux.bin"), FileAttributes.Normal);
-
-      //Log.LogMessage("xPath = '{0}'", xPath);
-
-      //var options = new Options();
-      //options.BootLoadSize = 4;
-      //options.IsoFileName = Path.Combine(Environment.CurrentDirectory, OutputFile);
-      //options.BootFileName = Path.Combine(xPath, "isolinux.bin");
-      //options.BootInfoTable = true;
-      //options.IncludeFiles.Add(xPath);
-
-      //var xISO = new Iso9660Generator(options);
-      //xISO.Generate();
-
-      //return true;
     }
   }
 }
