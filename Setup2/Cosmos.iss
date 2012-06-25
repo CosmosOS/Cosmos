@@ -4,7 +4,8 @@
 #ifndef BuildConfiguration   
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
 ; IDE so that we don't get an undefined error.
-  #define BuildConfiguration "UserKit"
+; We default to devkit so we dont have to wait on compression.
+  #define BuildConfiguration "devkit"
 #endif
 
 #if BuildConfiguration == "Devkit"
@@ -196,7 +197,7 @@ Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
 ; USB
-Source: ".\Build\USB\*"; DestDir: "{app}\Build\USB"
+;Source: ".\Build\USB\*"; DestDir: "{app}\Build\USB"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
