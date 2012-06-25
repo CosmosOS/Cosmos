@@ -23,7 +23,7 @@ namespace Cosmos.Build.Common {
 
       Build = Path.Combine(CosmosKit, "Build");
       BuildVsip = Path.Combine(CosmosKit, "Build\\VSIP");
-      BuildVsip = Path.Combine(CosmosKit, "Build\\Tools");
+      Tools = Path.Combine(CosmosKit, "Build\\Tools");
       IL2CPUTask = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Build.IL2CPUTask.exe");
       Kernel = Path.Combine(CosmosKit, "Kernel");
       GDBClientExe = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Debug.GDB.exe");

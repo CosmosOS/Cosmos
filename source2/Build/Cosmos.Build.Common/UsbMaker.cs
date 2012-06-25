@@ -27,5 +27,6 @@ namespace Cosmos.Build.Common {
       xPSI.CreateNoWindow = true;
       Process.Start(xPSI);
     }
+
   }
 }

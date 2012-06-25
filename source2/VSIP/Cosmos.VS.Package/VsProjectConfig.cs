@@ -35,14 +35,14 @@ namespace Cosmos.VS.Package {
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);
         string xIsoPathname = Path.ChangeExtension(xOutputAsm, ".iso");
+        string xObjPathname = Path.ChangeExtension(xOutputAsm, ".obj");
 
         if (xTarget == BuildTarget.ISO) {
           Process.Start(xOutputPath);
+
         } else if (xTarget == BuildTarget.USB) {
-          var xDrives = DriveInfo.GetDrives().Where(q => q.DriveType == DriveType.Removable).ToArray();
-          string xDrive = "G";
-          UsbMaker.Generate(xDrive, @"d:\source\Cosmos\source2\Demos\Guess\bin\Debug\Guess.obj");
-          Process.Start(xDrive + @":\");
+          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xObjPathname + "\"");
+
         } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();

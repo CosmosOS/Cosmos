@@ -153,8 +153,11 @@ Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.pdb"; DestDir: "{app}\Bui
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\Build\VMWare\*"; DestDir: "{app}\Build\VMWare"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+;Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
@@ -192,6 +195,8 @@ Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Build\
 
 Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
+; VMware
+Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
 Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
