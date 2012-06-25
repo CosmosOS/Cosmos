@@ -107,7 +107,6 @@ namespace Cosmos.VS.Package {
 
       } else if (mProps.BuildTarget == BuildTarget.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
-        lablNonFunctional.Visible = true;
         mShowTabDebug = true;
         mShowTabPXE = true;
 

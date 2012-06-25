@@ -10,23 +10,49 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.IO;
 
 namespace Cosmos.Deploy.Pixie.GUI {
   public partial class MainWindow : Window {
+    protected byte[] mNicIP;
+
     public MainWindow() {
       InitializeComponent();
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
-      string xBootFile = @"C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\PXE\pxelinux.0";
-      var xServerIP = new byte[] { 192, 168, 42, 1 };
+      Title = App.Title;
 
-      var xBOOTP = new DHCP(xServerIP, xBootFile);
+      if (!Directory.Exists(App.PxePath)) {
+        MessageBox.Show("Specified path does not exist.", Title);
+        App.Current.Shutdown(-1);
+        return;
+      }
+
+      lablNIC.Content = App.IpAddress;
+      lablPath.Content = App.PxePath;
+
+      var xBytes = App.IpAddress.Split(".".ToCharArray());
+      if (xBytes.Length != 4) {
+        MessageBox.Show("Invalid IP address specified.", Title);
+        App.Current.Shutdown(-1);
+        return;
+      }
+      var mNicIP = new byte[4];
+      for (int i = 0; i < mNicIP.Length; i++) {
+        mNicIP[i] = byte.Parse(xBytes[i]);
+      }
+
+    }
+
+    protected void Start() {
+      // Need full path to boot file because it needs to get the size
+      var xBOOTP = new DHCP(mNicIP, Path.Combine(App.PxePath, "pxelinux.0"));
       xBOOTP.Execute();
 
-      var xTFTP = new TrivialFTP(xServerIP, System.IO.Path.GetDirectoryName(xBootFile));
+      var xTFTP = new TrivialFTP(mNicIP, App.PxePath);
       xTFTP.Execute();
     }
+
   }
 }

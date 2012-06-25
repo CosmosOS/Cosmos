@@ -17,6 +17,7 @@ namespace Cosmos.Deploy.Pixie {
     protected byte[] mClientIP;
     protected IPEndPoint mRecvEndPoint;
 
+    // Need full path to boot file because it needs to get the size
     public DHCP(byte[] aServerIP, string aBootFile) {
       mServerIP = aServerIP;
       mBootFile = aBootFile;

@@ -43,6 +43,9 @@ namespace Cosmos.VS.Package {
         } else if (xTarget == BuildTarget.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xObjPathname + "\"");
 
+        } else if (xTarget == BuildTarget.PXE) {
+          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + Path.Combine(CosmosPaths.Build, "PXE") + "\"");
+
         } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();

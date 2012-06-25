@@ -6,9 +6,20 @@ using System.Linq;
 using System.Windows;
 
 namespace Cosmos.Deploy.Pixie.GUI {
-  /// <summary>
-  /// Interaction logic for App.xaml
-  /// </summary>
   public partial class App : Application {
+    static public string PxePath;
+    static public string IpAddress;
+    static public string Title = "Cosmos PXE Server";
+
+    private void Application_Startup(object sender, StartupEventArgs e) {
+      if (e.Args.Length < 2) {
+        MessageBox.Show("Not enough parameters.", Title);
+        Shutdown(-1);
+      }
+
+      IpAddress = e.Args[0];
+      PxePath = e.Args[1];
+    }
+
   }
 }
