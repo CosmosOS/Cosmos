@@ -123,6 +123,10 @@ namespace Cosmos.VS.Package {
         lablDeployText.Text = "Oops. What the frak did you click?";
       }
 
+      // Nothing exists on these pages yet.
+      mShowTabUSB = false;
+      mShowTabISO = false;
+
       UpdateTabs();
     }
 
