@@ -137,6 +137,7 @@ Name: {app}; Flags: uninsalwaysuninstall
 
 [InstallDelete]
 Type: files; Name: "{code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*"
+Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"
 Type: filesandordirs; Name: "{code:GetCSharpExpress2010ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
 
@@ -193,9 +194,11 @@ Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{ap
 ; ISO
 Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
+Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
 ; USB
 Source: ".\Build\USB\*"; DestDir: "{app}\Build\USB"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
+Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
 Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
