@@ -1,4 +1,4 @@
-﻿<Application x:Class="Cosmos.Deploy.Pixie.Test.App"
+﻿<Application x:Class="Cosmos.Deploy.Pixie.GUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">

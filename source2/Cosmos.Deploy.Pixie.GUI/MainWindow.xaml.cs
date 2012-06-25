@@ -11,12 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Net.Sockets;
-using System.IO;
 
-namespace Cosmos.Deploy.Pixie.Test {
+namespace Cosmos.Deploy.Pixie.GUI {
   public partial class MainWindow : Window {
-
     public MainWindow() {
       InitializeComponent();
     }
@@ -31,6 +28,5 @@ namespace Cosmos.Deploy.Pixie.Test {
       var xTFTP = new TrivialFTP(xServerIP, System.IO.Path.GetDirectoryName(xBootFile));
       xTFTP.Execute();
     }
-
   }
 }

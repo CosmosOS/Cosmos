@@ -5,7 +5,10 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace Cosmos.Deploy.Pixie.Test {
+namespace Cosmos.Deploy.Pixie.GUI {
+  /// <summary>
+  /// Interaction logic for App.xaml
+  /// </summary>
   public partial class App : Application {
   }
 }

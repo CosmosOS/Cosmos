@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}</ProjectGuid>
+    <ProjectGuid>{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Deploy.Pixie.Test</RootNamespace>
-    <AssemblyName>Cosmos.Deploy.Pixie.Test</AssemblyName>
+    <RootNamespace>Cosmos.Deploy.Pixie.GUI</RootNamespace>
+    <AssemblyName>Cosmos.Deploy.Pixie.GUI</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -38,6 +38,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Cosmos.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -95,6 +98,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj">

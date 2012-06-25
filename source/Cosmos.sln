@@ -220,9 +220,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD4284
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\source2\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{287A4DA7-9A8B-4F64-913F-1828DA67F16A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie.Test", "..\source2\Cosmos.Deploy.Pixie.Test\Cosmos.Deploy.Pixie.Test.csproj", "{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "..\source2\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie.GUI", "..\source2\Cosmos.Deploy.Pixie.GUI\Cosmos.Deploy.Pixie.GUI.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -468,14 +468,14 @@ Global
 		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
 		SccProjectName59 = ../source2/Cosmos.Deploy.Pixie
 		SccLocalPath59 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName60 = ..\\source2\\Cosmos.Deploy.Pixie.Test\\Cosmos.Deploy.Pixie.Test.csproj
+		SccProjectUniqueName60 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
 		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
-		SccProjectName60 = ../source2/Cosmos.Deploy.Pixie.Test
-		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.Pixie.Test
-		SccProjectUniqueName61 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
+		SccProjectName60 = ../source2/Cosmos.Deploy.USB
+		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.USB
+		SccProjectUniqueName61 = ..\\source2\\Cosmos.Deploy.Pixie.GUI\\Cosmos.Deploy.Pixie.GUI.csproj
 		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
-		SccProjectName61 = ../source2/Cosmos.Deploy.USB
-		SccLocalPath61 = ..\\source2\\Cosmos.Deploy.USB
+		SccProjectName61 = ../source2/Cosmos.Deploy.Pixie.GUI
+		SccLocalPath61 = ..\\source2\\Cosmos.Deploy.Pixie.GUI
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Builder|Any CPU = Builder|Any CPU
@@ -1443,21 +1443,6 @@ Global
 		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{287A4DA7-9A8B-4F64-913F-1828DA67F16A}.Release|x86.ActiveCfg = Release|Any CPU
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|Any CPU.ActiveCfg = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|Mixed Platforms.ActiveCfg = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|Mixed Platforms.Build.0 = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|x86.ActiveCfg = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Builder|x86.Build.0 = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|x86.ActiveCfg = Debug|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Debug|x86.Build.0 = Debug|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Any CPU.ActiveCfg = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|Mixed Platforms.Build.0 = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|x86.ActiveCfg = Release|x86
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28}.Release|x86.Build.0 = Release|x86
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|Any CPU.ActiveCfg = Release|x86
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|Mixed Platforms.ActiveCfg = Release|x86
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Builder|Mixed Platforms.Build.0 = Release|x86
@@ -1473,6 +1458,21 @@ Global
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|Mixed Platforms.Build.0 = Release|x86
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|x86.ActiveCfg = Release|x86
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711}.Release|x86.Build.0 = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Builder|Any CPU.ActiveCfg = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Builder|Mixed Platforms.ActiveCfg = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Builder|Mixed Platforms.Build.0 = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Builder|x86.ActiveCfg = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Builder|x86.Build.0 = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Debug|x86.ActiveCfg = Debug|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Debug|x86.Build.0 = Debug|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Any CPU.ActiveCfg = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Mixed Platforms.Build.0 = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.ActiveCfg = Release|x86
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1558,7 +1558,7 @@ Global
 		{6C14B7D1-CACB-4049-A0BD-9CAC5CFCF2C2} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{86F88A09-6801-4474-BFC8-EF09F3A9B89D} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{287A4DA7-9A8B-4F64-913F-1828DA67F16A} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
-		{95C06A4F-8AF9-43E6-BB0E-6EC79C67DC28} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 	EndGlobalSection
 EndGlobal
