@@ -203,6 +203,7 @@ Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
 Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
+Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 
 ; Templates
 ; Templates use the user dir and not global. Global requires devenve /setup (items) or /installvstemplates (project) which is VERY slow and kills during devkit

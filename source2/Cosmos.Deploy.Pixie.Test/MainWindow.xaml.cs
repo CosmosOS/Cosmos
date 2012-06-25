@@ -22,7 +22,7 @@ namespace Cosmos.Deploy.Pixie.Test {
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
-      string xBootFile = @"D:\source\Cosmos\Build\PXE\pxelinux.0";
+      string xBootFile = @"C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\PXE\pxelinux.0";
       var xServerIP = new byte[] { 192, 168, 42, 1 };
 
       var xBOOTP = new DHCP(xServerIP, xBootFile);

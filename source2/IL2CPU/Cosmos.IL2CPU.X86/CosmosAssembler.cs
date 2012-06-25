@@ -1,5 +1,6 @@
 ﻿// uncomment the next line to enable LFB access, for now hardcoded at 1024x768x8b
 //#define LFB_1024_8
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -111,8 +112,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Mov {
         DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer"),
         DestinationIsIndirect = true,
-        DestinationDisplacement = 2
-        ,
+        DestinationDisplacement = 2,
         SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Contents")
       };
       new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer") };
@@ -154,12 +154,12 @@ namespace Cosmos.IL2CPU.X86 {
 
     public void CreateIDT() {
       new Comment(this, "BEGIN - Create IDT");
-      
+
       // Create IDT
       UInt16 xIdtSize = 8 * 256;
       DataMembers.Add(new DataMember("_NATIVE_IDT_Contents", new byte[xIdtSize]));
       //
-	    if (mComNumber > 0) {
+      if (mComNumber > 0) {
         SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
         SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
       }
@@ -167,8 +167,10 @@ namespace Cosmos.IL2CPU.X86 {
 
       // Set IDT
       DataMembers.Add(new DataMember("_NATIVE_IDT_Pointer", new UInt16[] { xIdtSize, 0, 0 }));
-      new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer"),
-        DestinationIsIndirect = true, DestinationDisplacement = 2,
+      new Mov {
+        DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer"),
+        DestinationIsIndirect = true,
+        DestinationDisplacement = 2,
         SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Contents")
       };
       new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer") };
@@ -181,23 +183,26 @@ namespace Cosmos.IL2CPU.X86 {
       base.Initialize();
 
 #if !LFB_1024_8
-	  DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
-	  uint xFlags = 0x10003;
-	  DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
-	  DataMembers.Add(new DataMember("MultibootFlags", xFlags));
-	  DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
-	  DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-	  DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-	  DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-	  DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-	  DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
-	  DataMembers.Add(new DataEndIfDefined());
-	  DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
-	  xFlags = 0x00003;
-	  DataMembers.Add(new DataMember("MultibootSignature", new uint[] { 0x1BADB002 }));
-	  DataMembers.Add(new DataMember("MultibootFlags", xFlags));
-	  DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + 0x1BADB002))));
-	  DataMembers.Add(new DataEndIfDefined());
+      uint xSig = 0x1BADB002;
+
+      DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
+      DataMembers.Add(new DataMember("MultibootSignature", new uint[] { xSig }));
+      uint xFlags = 0x10003;
+      DataMembers.Add(new DataMember("MultibootFlags", xFlags));
+      DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + xSig))));
+      DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+      DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
+      DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+      DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
+      DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
+      DataMembers.Add(new DataEndIfDefined());
+
+      DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
+      xFlags = 0x00003;
+      DataMembers.Add(new DataMember("MultibootSignature", new uint[] { xSig }));
+      DataMembers.Add(new DataMember("MultibootFlags", xFlags));
+      DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + xSig))));
+      DataMembers.Add(new DataEndIfDefined());
 #else
             DataMembers.Add(new DataIfNotDefined("ELF_COMPILATION"));
             uint xFlags = 0x10007;
@@ -229,20 +234,22 @@ namespace Cosmos.IL2CPU.X86 {
             DataMembers.Add(new DataEndIfDefined());
 
 #endif
-	  // graphics info fields 
-	  DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
-	  DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
-	  DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
-	  // memory
-	  DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
-	  DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
-	  DataMembers.Add(new DataMember("Before_Kernel_Stack", new byte[0x50000]));
-	  DataMembers.Add(new DataMember("Kernel_Stack", new byte[0]));
-	  DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
+      // graphics info fields 
+      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
+      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
+      DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));
+      // memory
+      DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
+      DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
+      DataMembers.Add(new DataMember("Before_Kernel_Stack", new byte[0x50000]));
+      DataMembers.Add(new DataMember("Kernel_Stack", new byte[0]));
+      DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
 
       if (mComNumber > 0) {
         new Define("DEBUGSTUB");
       }
+
+      // This is our first entry point. Multiboot uses this as Cosmos entry point.
       new Label("Kernel_Start") { IsGlobal = true };
 
       // CLI ASAP

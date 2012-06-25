@@ -16,6 +16,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Call .Cls");
 			new Call { DestinationLabel = "DebugStub_Cls" };
 
+			new Comment("Display message before even trying to init serial");
+
 			new Comment("X#: Call .DisplayWaitMsg");
 			new Call { DestinationLabel = "DebugStub_DisplayWaitMsg" };
 

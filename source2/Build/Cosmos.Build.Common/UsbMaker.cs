@@ -31,6 +31,7 @@ namespace Cosmos.Build.Common {
       // Syslinux modifies MBR but also writes out a hidden ldlinux.sys file.
       // Not sure how it points to the ldlinux file. Prob best to ask on syslinux list if we decide to go
       // this route.
+      // syslinux-4.05\win\syslinux.c - has source we need...
       // http://www.fort-awesome.net/blog/2010/03/25/MBR_VBR_and_Raw_Disk
       //
       string xToolsPath = @"C:\Users\Atmoic\AppData\Roaming\Cosmos User Kit\Build\Tools";
