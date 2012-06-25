@@ -14,7 +14,7 @@ using System.IO;
 
 namespace Cosmos.Deploy.Pixie.GUI {
   public partial class MainWindow : Window {
-    protected byte[] mNicIP;
+    protected byte[] mNicIP = new byte[4];
 
     public MainWindow() {
       InitializeComponent();
@@ -38,11 +38,11 @@ namespace Cosmos.Deploy.Pixie.GUI {
         App.Current.Shutdown(-1);
         return;
       }
-      var mNicIP = new byte[4];
       for (int i = 0; i < mNicIP.Length; i++) {
         mNicIP[i] = byte.Parse(xBytes[i]);
       }
 
+      Start();
     }
 
     protected void Start() {
