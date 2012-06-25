@@ -11,6 +11,7 @@ using NameValueCollectionHelper = Cosmos.Debug.Common.NameValueCollectionHelper;
 using Cosmos.Build.Common;
 using System.Linq;
 using System.Diagnostics;
+using System.IO;
 
 namespace Cosmos.VS.Package {
 
@@ -38,7 +39,10 @@ namespace Cosmos.VS.Package {
         if (xTarget == BuildTarget.ISO) {
           Process.Start(xOutputPath);
         } else if (xTarget == BuildTarget.USB) {
-          UsbMaker.Generate();
+          var xDrives = DriveInfo.GetDrives().Where(q => q.DriveType == DriveType.Removable).ToArray();
+          string xDrive = "G";
+          UsbMaker.Generate(xDrive);
+          Process.Start(xDrive + @":\");
         } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();

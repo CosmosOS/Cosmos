@@ -8,21 +8,16 @@ using Mosa.Utility.IsoImage;
 namespace Cosmos.Build.Common {
   public class IsoMaker {
 
-    static protected void RemoveFile(string aPathname) {
-      if (File.Exists(aPathname)) {
-        File.Delete(aPathname);
-      }
-    }
-
     static public void Generate(string aBuildPath, string xInputPathname, string aIsoPathname) {
       string xPath = Path.Combine(aBuildPath, @"ISO");
-      RemoveFile(aIsoPathname);
+      if (File.Exists(aIsoPathname)) {
+        File.Delete(aIsoPathname);
+      }
       
       // We copy and rename in the process to Cosmos.bin becaue the .cfg is currently
       // hardcoded to Cosmos.bin.
       string xOutputBin = Path.Combine(xPath, "Cosmos.bin");
-      RemoveFile(xOutputBin);
-      File.Copy(xInputPathname, xOutputBin);
+      File.Copy(xInputPathname, xOutputBin, true);
 
       string xIsoLinux = Path.Combine(xPath, "isolinux.bin");
       File.SetAttributes(xIsoLinux, FileAttributes.Normal);

@@ -97,7 +97,6 @@ namespace Cosmos.VS.Package {
       } else if (mProps.BuildTarget == BuildTarget.USB) {
         lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
         lablBuildOnly.Visible = true;
-        lablNonFunctional.Visible = true;
         mShowTabUSB = true;
 
       } else if (mProps.BuildTarget == BuildTarget.VMware) {
