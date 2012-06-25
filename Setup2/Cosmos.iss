@@ -1,8 +1,10 @@
 ; Do NOT change this next line in Dev Kit
 #define ChangeSetVersion "7"
 
-#ifndef BuildConfiguration
-	#error "No Build configuration defined!"
+#ifndef BuildConfiguration   
+; Currently we dont use "UserKit" but this allows us to test/compile from Inno
+; IDE so that we don't get an undefined error.
+  #define BuildConfiguration "UserKit"
 #endif
 
 #if BuildConfiguration == "Devkit"
