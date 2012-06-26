@@ -21,7 +21,7 @@
     <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
-    <BuildTarget>ISO</BuildTarget>
+    <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
     <VMwareEdition>Player</VMwareEdition>
@@ -36,7 +36,7 @@
     <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
-    <BuildTarget>ISO</BuildTarget>
+    <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
     <VMwareEdition>Player</VMwareEdition>

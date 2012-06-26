@@ -15,7 +15,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe</StartProgram>
+    <StartProgram>C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe</StartProgram>
     <StartArguments>d:\source\Cosmos\source2\Guess.sln</StartArguments>
   </PropertyGroup>
 </Project>
