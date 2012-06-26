@@ -17,12 +17,23 @@ using System.IO;
 namespace Cosmos.Deploy.Pixie.GUI {
   public partial class MainWindow : Window {
     protected byte[] mNicIP = new byte[4];
+    protected DispatcherTimer mTimer = new DispatcherTimer();
+    protected bool mWarningIssued = false;
 
     public MainWindow() {
       InitializeComponent();
+      mTimer.Interval = TimeSpan.FromSeconds(5);
+      mTimer.Tick += (object sender, EventArgs e) => {
+        if (mWarningIssued) {
+          Close();
+        } else {
+          Log("", "Last transfer request completed. Auto closing in " + mTimer.Interval.TotalSeconds + " seconds.");
+          mWarningIssued = true;
+        }
+      };
     }
 
-    private void Window_Loaded(object sender, RoutedEventArgs e) {
+    private void Window_Loaded(object sender, RoutedEventArgs e)  {
       Title = App.Title;
 
       if (!Directory.Exists(App.PxePath)) {
@@ -55,7 +66,8 @@ namespace Cosmos.Deploy.Pixie.GUI {
     }
 
     protected void Log(string aSender, string aText) {
-      lboxLog.SelectedItem = lboxLog.Items.Add("[" + aSender + "] " + aText);
+      string xPrefix = aSender == "" ? "" : "[" + aSender + "] ";
+      lboxLog.SelectedItem = lboxLog.Items.Add(xPrefix + aText);
     }
 
     protected Thread mDhcpThread;
@@ -101,6 +113,8 @@ namespace Cosmos.Deploy.Pixie.GUI {
           Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
             ClearFile();
             Log("TFTP", "Completed " + aFilename);
+            mTimer.Stop();
+            mTimer.Start();
           });
         };
 

@@ -15,6 +15,7 @@ namespace Cosmos.Deploy.Pixie.GUI {
       if (e.Args.Length < 2) {
         MessageBox.Show("Not enough parameters.", Title);
         Shutdown(-1);
+        return;
       }
 
       IpAddress = e.Args[0];
