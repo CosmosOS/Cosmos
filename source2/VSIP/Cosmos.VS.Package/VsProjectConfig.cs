@@ -46,7 +46,7 @@ namespace Cosmos.VS.Package {
 
         } else if (xTarget == BuildTarget.PXE) {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
-          File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"));
+          File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
 
         } else if (xTarget == BuildTarget.VMware) {
