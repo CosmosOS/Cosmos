@@ -45,10 +45,11 @@
              ExePath="$(NasmFile)" />
 
     <!--ELF only-->
-    <!-- 16 MiB 0x1000000 as per hpa (syslinux) is a good spot -->
+    <!-- 16 MB 0x1000000 as per hpa (syslinux) is a good spot.
+    For now just put some dummy values. 16 and 32 MB. Later size better.-->
     <Ld      CosmosBuildDir="$(CosmosDir)\Build"
              WorkingDir="$(TargetDir)"
-             Arguments="-Ttext 0x1000000 -Tdata 0x1100000 -e Kernel_Start -o '$(TargetDir)$(MSBuildProjectName).bin' '$(TargetDir)$(MSBuildProjectName).obj'"
+             Arguments="-Ttext 0x2000000 -Tdata 0x1000000 -e Kernel_Start -o '$(TargetDir)$(MSBuildProjectName).bin' '$(TargetDir)$(MSBuildProjectName).obj'"
              Condition="$(IsELF) == 'true'"/>
 
     <ExtractMapFromElfFile  InputFile="$(TargetDir)$(MSBuildProjectName).bin"
