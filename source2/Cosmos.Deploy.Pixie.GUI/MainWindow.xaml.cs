@@ -94,6 +94,7 @@ namespace Cosmos.Deploy.Pixie.GUI {
 
         mTFTP.OnFileStart += delegate(TrivialFTP aSender, string aFilename, long aSize) {
           Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+            mTimer.Stop();
             Log("TFTP", "Starting file " + aFilename);
             lablCurrentFile.Content = aFilename;
             double xMB = (double)aSize / (1024 * 1024);
@@ -113,7 +114,6 @@ namespace Cosmos.Deploy.Pixie.GUI {
           Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
             ClearFile();
             Log("TFTP", "Completed " + aFilename);
-            mTimer.Stop();
             mTimer.Start();
           });
         };
