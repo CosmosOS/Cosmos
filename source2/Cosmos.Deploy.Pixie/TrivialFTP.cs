@@ -16,8 +16,13 @@ namespace Cosmos.Deploy.Pixie {
     protected UdpClient mUDP;
     protected IPEndPoint mRecvEP;
     protected IPEndPoint mDataEP;
+    protected string mFilename;
     protected string mPathname;
     protected int mBlockSize = 512;
+
+    public void Stop() {
+      mUDP.Close();
+    }
 
     public TrivialFTP(byte[] aServerIP, string aPath) {
       mServerIP = aServerIP;
@@ -27,14 +32,20 @@ namespace Cosmos.Deploy.Pixie {
       mRecvEP = new IPEndPoint(IPAddress.Any, Port);
     }
 
+    public event Action<TrivialFTP, string, long> OnFileStart;
+    protected void DoFileStart(string aFilename, long aSize) {
+      if (OnFileStart != null) {
+        OnFileStart(this, aFilename, aSize);
+      }
+    }
     protected bool Connect() {
       OpType xOp;
       var xReader = Receive(OpType.Read);
       mDataEP = new IPEndPoint(mRecvEP.Address, mRecvEP.Port);
 
-      string xFilename = ReadString(xReader).Replace('/', '\\');
+      mFilename = ReadString(xReader).Replace('/', '\\');
       // Possible path security issues, but this is currently only designed for Cosmos, not for other.
-      mPathname = Path.Combine(mPath, xFilename);
+      mPathname = Path.Combine(mPath, mFilename);
 
       string xMode = ReadString(xReader).ToLower();
       if (xMode != "octet") {
@@ -64,9 +75,9 @@ namespace Cosmos.Deploy.Pixie {
 
       WriteOp(xWriter, OpType.OptionAck);
 
+      var xFileInfo = new FileInfo(mPathname);
       if (xTSize) {
         WriteString(xWriter, "tsize");
-        var xFileInfo = new FileInfo(mPathname);
         WriteString(xWriter, xFileInfo.Length.ToString());
       }
       if (mBlockSize != 512) {
@@ -79,6 +90,8 @@ namespace Cosmos.Deploy.Pixie {
         Send(xMS.ToArray());
         WaitAck(0);
       }
+
+      DoFileStart(mFilename, xFileInfo.Length);
       return true;
     }
 
@@ -135,6 +148,18 @@ namespace Cosmos.Deploy.Pixie {
       mUDP.Send(aBytes, aBytes.Length, mDataEP);
     }
 
+    public event Action<TrivialFTP, string, long> OnFileTransfer;
+    protected void DoFileTransfer(string aFilename, long aPosition) {
+      if (OnFileTransfer != null) {
+        OnFileTransfer(this, aFilename, aPosition);
+      }
+    }
+    public event Action<TrivialFTP, string> OnFileCompleted;
+    protected void DoFileCompleted(string aFilename) {
+      if (OnFileCompleted != null) {
+        OnFileCompleted(this, aFilename);
+      }
+    }
     protected void DoTransfer() {
       using (var xFilestream = new FileStream(mPathname, FileMode.Open, FileAccess.Read)) {
         int xBlockID = 1;
@@ -154,6 +179,7 @@ namespace Cosmos.Deploy.Pixie {
 
           Send(xPacket);
           WaitAck(xBlockID);
+          DoFileTransfer(mFilename, xReader.BaseStream.Position);
 
           if (xCount < mBlockSize) {
             break;
@@ -161,6 +187,7 @@ namespace Cosmos.Deploy.Pixie {
           xBlockID++;
         }
       }
+      DoFileCompleted(mFilename);
     }
 
     protected void SendErrFileNotFound() {

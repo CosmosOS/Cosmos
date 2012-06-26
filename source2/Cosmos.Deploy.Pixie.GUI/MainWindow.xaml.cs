@@ -10,6 +10,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Threading;
+using System.Windows.Threading;
 using System.IO;
 
 namespace Cosmos.Deploy.Pixie.GUI {
@@ -42,16 +44,76 @@ namespace Cosmos.Deploy.Pixie.GUI {
         mNicIP[i] = byte.Parse(xBytes[i]);
       }
 
+      ClearFile();
       Start();
     }
 
-    protected void Start() {
-      // Need full path to boot file because it needs to get the size
-      var xBOOTP = new DHCP(mNicIP, Path.Combine(App.PxePath, "pxelinux.0"));
-      xBOOTP.Execute();
+    void ClearFile() {
+      lablCurrentFile.Content = "";
+      lablCurrentSize.Content = "";
+      progFile.Value = 0;
+    }
 
-      var xTFTP = new TrivialFTP(mNicIP, App.PxePath);
-      xTFTP.Execute();
+    protected void Log(string aSender, string aText) {
+      lboxLog.SelectedItem = lboxLog.Items.Add("[" + aSender + "] " + aText);
+    }
+
+    protected Thread mDhcpThread;
+    protected DHCP mDHCP;
+    protected Thread mTftpThread;
+    protected TrivialFTP mTFTP;
+    protected void Start() {
+      mDhcpThread = new Thread(delegate() {
+        // Need full path to boot file because it needs to get the size
+        mDHCP = new DHCP(mNicIP, Path.Combine(App.PxePath, "pxelinux.0"));
+
+        mDHCP.OnLog += delegate(DHCP aSender, string aText) {
+          Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+            Log("DHCP", aText);
+          });
+        };
+
+        mDHCP.Execute();
+      });
+      mDhcpThread.Start();
+
+      mTftpThread = new Thread(delegate() {
+        mTFTP = new TrivialFTP(mNicIP, App.PxePath);
+
+        mTFTP.OnFileStart += delegate(TrivialFTP aSender, string aFilename, long aSize) {
+          Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+            Log("TFTP", "Starting file " + aFilename);
+            lablCurrentFile.Content = aFilename;
+            double xMB = (double)aSize / (1024 * 1024);
+            lablCurrentSize.Content = xMB.ToString("0.00") + " MB";
+            progFile.Value = 0;
+            progFile.Maximum = aSize;
+          });
+        };
+
+        mTFTP.OnFileTransfer += delegate(TrivialFTP aSender, string aFilename, long aPosition) {
+          Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+            progFile.Value = aPosition;
+          });
+        };
+
+        mTFTP.OnFileCompleted += delegate(TrivialFTP aSender, string aFilename) {
+          Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+            ClearFile();
+            Log("TFTP", "Completed " + aFilename);
+          });
+        };
+
+        mTFTP.Execute();
+      });
+      mTftpThread.Start();
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+      mDhcpThread.Abort();
+      mDHCP.Stop();
+      mTftpThread.Abort();
+      mTFTP.Stop();
     }
 
   }

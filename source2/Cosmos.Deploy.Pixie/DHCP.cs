@@ -17,6 +17,10 @@ namespace Cosmos.Deploy.Pixie {
     protected byte[] mClientIP;
     protected IPEndPoint mRecvEndPoint;
 
+    public void Stop() {
+      mUDP.Close();
+    }
+
     // Need full path to boot file because it needs to get the size
     public DHCP(byte[] aServerIP, string aBootFile) {
       mServerIP = aServerIP;
@@ -74,18 +78,30 @@ namespace Cosmos.Deploy.Pixie {
       return aDiscover;
     }
 
+    public event Action<DHCP, string> OnLog;
+    protected void DoLog(string aText) {
+      if (OnLog != null) {
+        OnLog(this, aText);
+      }
+    }
+
     public void Execute() {
       DhcpPacket xRequest;
       DhcpPacket xReply;
 
       xRequest = Receive(DhcpPacket.MsgType.Discover);
+      DoLog("Discover received.");
 
       xReply = SendOffer(xRequest);
+      string xClientIP = mClientIP[0] + "." + mClientIP[1] + "." + mClientIP[2] + "." + mClientIP[3];
+      DoLog("Offer sent: " + xClientIP);
 
       // Wait for REQUEST. We need to filter out other DISCOVER that may have been sent
       xRequest = Receive(DhcpPacket.MsgType.Request);
+      DoLog("Request received.");
 
       xReply = SendAck(xReply, xRequest);
+      DoLog("Acknowledgement sent.");
     }
 
   }
