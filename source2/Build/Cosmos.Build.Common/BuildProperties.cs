@@ -6,10 +6,22 @@ using System.Text;
 namespace Cosmos.Build.Common {
   public class BuildProperties : PropertiesBase {
 
-    // Execute
+    // Profile
     public Profile Profile {
       get { return this.GetProperty("Profile", Profile.VMware); }
       set { this.SetProperty("Profile", value); }
+    }
+
+    // Deployment
+    public Deployment Deployment {
+      get { return this.GetProperty("Deployment", Deployment.ISO); }
+      set { this.SetProperty("Deployment", value); }
+    }
+
+    // Launch
+    public Launch Launch {
+      get { return this.GetProperty("Launch", Launch.VMware); }
+      set { this.SetProperty("Launch", value); }
     }
 
     // VMware

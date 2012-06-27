@@ -116,18 +116,53 @@ namespace Cosmos.VS.Package {
     public CosmosPage() {
       InitializeComponent();
 
-      textOutputPath.TextChanged += delegate(Object sender, EventArgs e) {
-        string value = textOutputPath.Text;
-        if (!string.Equals(value, mProps.OutputPath, StringComparison.InvariantCultureIgnoreCase)) {
-          mProps.OutputPath = textOutputPath.Text;
+      # region Profile
+      lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(Profile), true));
+      lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var xValue = (Profile)((EnumValue)lboxProfile.SelectedItem).Value;
+        if (xValue != mProps.Profile) {
+          mProps.Profile = xValue;
+          IsDirty = true;
+          UpdateUI();
+        }
+      };
+      #endregion
+
+      # region Deploy
+      lboxDeployment.Items.AddRange(EnumValue.GetEnumValues(typeof(Deployment), true));
+      lboxDeployment.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var xValue = (Deployment)((EnumValue)lboxDeployment.SelectedItem).Value;
+        if (xValue != mProps.Deployment) {
+          mProps.Deployment = xValue;
           IsDirty = true;
         }
       };
+      #endregion
+
+      # region Launch
+      lboxLaunch.Items.AddRange(EnumValue.GetEnumValues(typeof(Launch), true));
+      lboxLaunch.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var xValue = (Launch)((EnumValue)lboxLaunch.SelectedItem).Value;
+        if (xValue != mProps.Launch) {
+          mProps.Launch = xValue;
+          IsDirty = true;
+        }
+      };
+      #endregion
+
       comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
       comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
         if (value != mProps.Framework) {
           mProps.Framework = value;
+          IsDirty = true;
+        }
+      };
+
+      textOutputPath.TextChanged += delegate(Object sender, EventArgs e) {
+        string value = textOutputPath.Text;
+        if (!string.Equals(value, mProps.OutputPath, StringComparison.InvariantCultureIgnoreCase)) {
+          mProps.OutputPath = textOutputPath.Text;
           IsDirty = true;
         }
       };
@@ -140,16 +175,6 @@ namespace Cosmos.VS.Package {
         }
       };
 
-
-      lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(Profile), true));
-      lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var value = (Profile)((EnumValue)lboxProfile.SelectedItem).Value;
-        if (value != mProps.Profile) {
-          mProps.Profile = value;
-          IsDirty = true;
-          UpdateUI();
-        }
-      };
 
       #region VMware
       cmboVMwareEdition.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareEdition), true));

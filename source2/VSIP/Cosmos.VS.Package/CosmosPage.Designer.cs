@@ -37,10 +37,10 @@
       this.lablDeployText = new System.Windows.Forms.Label();
       this.lablBuildOnly = new System.Windows.Forms.Label();
       this.lboxProfile = new System.Windows.Forms.ListBox();
-      this.tabDeploy = new System.Windows.Forms.TabPage();
-      this.lboxDeploy = new System.Windows.Forms.ListBox();
+      this.tabDeployment = new System.Windows.Forms.TabPage();
+      this.lboxDeployment = new System.Windows.Forms.ListBox();
       this.tabLunch = new System.Windows.Forms.TabPage();
-      this.listBox2 = new System.Windows.Forms.ListBox();
+      this.lboxLaunch = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
       this.comboFramework = new System.Windows.Forms.ComboBox();
       this.buttonOutputBrowse = new System.Windows.Forms.Button();
@@ -77,7 +77,7 @@
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
-      this.tabDeploy.SuspendLayout();
+      this.tabDeployment.SuspendLayout();
       this.tabLunch.SuspendLayout();
       this.tabCompile.SuspendLayout();
       this.tabAssembler.SuspendLayout();
@@ -120,7 +120,7 @@
       // TabControl1
       // 
       this.TabControl1.Controls.Add(this.tabProfile);
-      this.TabControl1.Controls.Add(this.tabDeploy);
+      this.TabControl1.Controls.Add(this.tabDeployment);
       this.TabControl1.Controls.Add(this.tabLunch);
       this.TabControl1.Controls.Add(this.tabCompile);
       this.TabControl1.Controls.Add(this.tabAssembler);
@@ -192,29 +192,29 @@
       this.lboxProfile.Sorted = true;
       this.lboxProfile.TabIndex = 2;
       // 
-      // tabDeploy
+      // tabDeployment
       // 
-      this.tabDeploy.Controls.Add(this.lboxDeploy);
-      this.tabDeploy.Location = new System.Drawing.Point(4, 22);
-      this.tabDeploy.Name = "tabDeploy";
-      this.tabDeploy.Size = new System.Drawing.Size(627, 293);
-      this.tabDeploy.TabIndex = 11;
-      this.tabDeploy.Text = "Deploy";
-      this.tabDeploy.UseVisualStyleBackColor = true;
+      this.tabDeployment.Controls.Add(this.lboxDeployment);
+      this.tabDeployment.Location = new System.Drawing.Point(4, 22);
+      this.tabDeployment.Name = "tabDeployment";
+      this.tabDeployment.Size = new System.Drawing.Size(627, 293);
+      this.tabDeployment.TabIndex = 11;
+      this.tabDeployment.Text = "Deployment";
+      this.tabDeployment.UseVisualStyleBackColor = true;
       // 
-      // lboxDeploy
+      // lboxDeployment
       // 
-      this.lboxDeploy.Dock = System.Windows.Forms.DockStyle.Left;
-      this.lboxDeploy.FormattingEnabled = true;
-      this.lboxDeploy.Location = new System.Drawing.Point(0, 0);
-      this.lboxDeploy.Name = "lboxDeploy";
-      this.lboxDeploy.Size = new System.Drawing.Size(206, 293);
-      this.lboxDeploy.Sorted = true;
-      this.lboxDeploy.TabIndex = 3;
+      this.lboxDeployment.Dock = System.Windows.Forms.DockStyle.Left;
+      this.lboxDeployment.FormattingEnabled = true;
+      this.lboxDeployment.Location = new System.Drawing.Point(0, 0);
+      this.lboxDeployment.Name = "lboxDeployment";
+      this.lboxDeployment.Size = new System.Drawing.Size(206, 293);
+      this.lboxDeployment.Sorted = true;
+      this.lboxDeployment.TabIndex = 3;
       // 
       // tabLunch
       // 
-      this.tabLunch.Controls.Add(this.listBox2);
+      this.tabLunch.Controls.Add(this.lboxLaunch);
       this.tabLunch.Location = new System.Drawing.Point(4, 22);
       this.tabLunch.Name = "tabLunch";
       this.tabLunch.Size = new System.Drawing.Size(627, 293);
@@ -222,15 +222,15 @@
       this.tabLunch.Text = "Launch";
       this.tabLunch.UseVisualStyleBackColor = true;
       // 
-      // listBox2
+      // lboxLaunch
       // 
-      this.listBox2.Dock = System.Windows.Forms.DockStyle.Left;
-      this.listBox2.FormattingEnabled = true;
-      this.listBox2.Location = new System.Drawing.Point(0, 0);
-      this.listBox2.Name = "listBox2";
-      this.listBox2.Size = new System.Drawing.Size(206, 336);
-      this.listBox2.Sorted = true;
-      this.listBox2.TabIndex = 3;
+      this.lboxLaunch.Dock = System.Windows.Forms.DockStyle.Left;
+      this.lboxLaunch.FormattingEnabled = true;
+      this.lboxLaunch.Location = new System.Drawing.Point(0, 0);
+      this.lboxLaunch.Name = "lboxLaunch";
+      this.lboxLaunch.Size = new System.Drawing.Size(206, 293);
+      this.lboxLaunch.Sorted = true;
+      this.lboxLaunch.TabIndex = 3;
       // 
       // tabCompile
       // 
@@ -619,7 +619,7 @@
       this.TabControl1.ResumeLayout(false);
       this.tabProfile.ResumeLayout(false);
       this.tabProfile.PerformLayout();
-      this.tabDeploy.ResumeLayout(false);
+      this.tabDeployment.ResumeLayout(false);
       this.tabLunch.ResumeLayout(false);
       this.tabCompile.ResumeLayout(false);
       this.tabCompile.PerformLayout();
@@ -649,10 +649,10 @@
     private System.Windows.Forms.Label lablDeployText;
     private System.Windows.Forms.Label lablBuildOnly;
     private System.Windows.Forms.ListBox lboxProfile;
-    private System.Windows.Forms.TabPage tabDeploy;
-    private System.Windows.Forms.ListBox lboxDeploy;
+    private System.Windows.Forms.TabPage tabDeployment;
+    private System.Windows.Forms.ListBox lboxDeployment;
     private System.Windows.Forms.TabPage tabLunch;
-    private System.Windows.Forms.ListBox listBox2;
+    private System.Windows.Forms.ListBox lboxLaunch;
     private System.Windows.Forms.TabPage tabCompile;
     private System.Windows.Forms.ComboBox comboFramework;
     private System.Windows.Forms.Button buttonOutputBrowse;

@@ -17,6 +17,26 @@ namespace Cosmos.Build.Common {
     PXE
   }
 
+  public enum Deployment {
+    [Description("ISO Image")]
+    ISO,
+    [Description("USB Device")]
+    USB,
+    [Description("PXE Network Boot")]
+    PXE
+  }
+
+  public enum Launch {
+    [Description("None or Manual")]
+    None,
+    [Description("VMware")]
+    VMware,
+    [Description("PXE Server")]
+    PXE,
+    [Description("Specially attached slave")]
+    Slave
+  }
+
   public enum VMwareEdition {
     Workstation,
     Player
