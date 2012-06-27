@@ -20,6 +20,8 @@ namespace Cosmos.VS.Package {
 
   [Guid(Guids.CosmosPage)]
   public partial class CosmosPage : CustomPropertyPage {
+    protected bool mShowTabDeployment;
+    protected bool mShowTabLaunch;
     protected bool mShowTabDebug;
     protected bool mShowTabVMware;
     protected bool mShowTabPXE;
@@ -35,8 +37,10 @@ namespace Cosmos.VS.Package {
 
     protected void UpdateTabs() {
       var xTab = TabControl1.SelectedTab;
-      
+
       RemoveTab(tabDebug);
+      RemoveTab(tabDeployment);
+      RemoveTab(tabLaunch);
       RemoveTab(tabVMware);
       RemoveTab(tabPXE);
       RemoveTab(tabUSB);
@@ -45,6 +49,12 @@ namespace Cosmos.VS.Package {
 
       if (mShowTabDebug) {
         TabControl1.TabPages.Add(tabDebug);
+      }
+      if (mShowTabDeployment) {
+        TabControl1.TabPages.Add(tabDeployment);
+      }
+      if (mShowTabLaunch) {
+        TabControl1.TabPages.Add(tabLaunch);
       }
       //
       if (mShowTabVMware) {
@@ -70,6 +80,8 @@ namespace Cosmos.VS.Package {
 
     protected void UpdateUI() {
       mShowTabDebug = true;
+      mShowTabDeployment = false;
+      mShowTabLaunch = false;
       mShowTabVMware = false;
       mShowTabPXE = false;
       mShowTabUSB = false;
@@ -83,17 +95,22 @@ namespace Cosmos.VS.Package {
       cmboCosmosPort.Enabled = true;
       cmboVisusalStudioPort.Enabled = true;
 
+      // Set visibilty and for preset set/reset values.
       if (mProps.Profile == Profile.ISO) {
         lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
          + " After running the selected project, an explorer window will open containing the ISO file."
          + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
         lablBuildOnly.Visible = true;
         mShowTabISO = true;
+        lboxDeployment.SelectedItem = Deployment.ISO;
+        lboxLaunch.SelectedItem = Launch.None;
 
       } else if (mProps.Profile == Profile.USB) {
         lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
         lablBuildOnly.Visible = true;
         mShowTabUSB = true;
+        lboxDeployment.SelectedItem = Deployment.PXE;
+        lboxLaunch.SelectedItem = Launch.PXE;
 
       } else if (mProps.Profile == Profile.VMware) {
         lablDeployText.Text = "Use VMware to deploy and debug.";
@@ -101,10 +118,14 @@ namespace Cosmos.VS.Package {
         chckEnableDebugStub.Checked = true;
         cmboCosmosPort.Enabled = false;
         cmboVisusalStudioPort.Enabled = false;
+        lboxDeployment.SelectedItem = Deployment.ISO;
+        lboxLaunch.SelectedItem = Launch.VMware;
 
       } else if (mProps.Profile == Profile.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mShowTabPXE = true;
+        lboxDeployment.SelectedItem = Deployment.PXE;
+        lboxLaunch.SelectedItem = Launch.None;
 
       } else {
         lablDeployText.Text = "Oops. What the frak did you click?";
@@ -195,6 +216,9 @@ namespace Cosmos.VS.Package {
           IsDirty = true;
         }
       };
+      chckEnableDebugStub.CheckedChanged += delegate(object aSender, EventArgs e) {
+        panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
+      };
 
       comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
       comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
@@ -241,22 +265,35 @@ namespace Cosmos.VS.Package {
       base.FillProperties();
       mProps.Reset();
 
+      #region Profile
+      mProps.SetProperty("Profile", GetConfigProperty("Profile"));
+      lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
+      #endregion
+
+      #region Deployment
+      mProps.SetProperty("Deployment", GetConfigProperty("Deployment"));
+      lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Profile);
+      #endregion
+
+      #region Launch
+      mProps.SetProperty("Launch", GetConfigProperty("Launch"));
+      lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Profile);
+      #endregion
+
+      #region VMware
+      mProps.SetProperty("VMwareEdition", GetConfigProperty("VMwareEdition"));
+      cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
+      #endregion
+
       //TODO: Why are we copying these one by one instead of automatic?
       mProps.SetProperty("OutputPath", GetConfigProperty("OutputPath"));
       textOutputPath.Text = mProps.OutputPath;
-
-      mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
-      lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
 
       mProps.SetProperty("Framework", GetConfigProperty("Framework"));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
 
       mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
       checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
-
-      // VMware
-      mProps.SetProperty("VMwareEdition", GetConfigProperty("VMwareEdition"));
-      cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
 
       mProps.SetProperty("EnableGDB", GetConfigProperty("EnableGDB"));
       checkEnableGDB.Checked = mProps.EnableGDB;
@@ -312,13 +349,5 @@ namespace Cosmos.VS.Package {
       }
     }
 
-    private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
-      var xEnumValue = (EnumValue)lboxProfile.SelectedItem;
-      var xValue = (Profile)xEnumValue.Value;
-    }
-
-    private void chckEnableDebugStub_CheckedChanged(object sender, EventArgs e) {
-      panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
-    }
   }
 }

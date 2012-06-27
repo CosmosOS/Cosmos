@@ -6,22 +6,40 @@ using System.Text;
 namespace Cosmos.Build.Common {
   public class BuildProperties : PropertiesBase {
 
+    protected String GetProfileProperty(string aName) { 
+      return GetProperty(aName, String.Empty); 
+    }
+    protected T GetProfileProperty<T>(string aName, T @default) {
+      return GetProperty(Prefix + aName, @default);
+    }
+
+    public void SetProfileProperty(string aName, object aValue) {
+      SetProperty(Prefix + aName, aValue);
+    }
+
+    protected string Prefix {
+      get {
+        return "";
+        //return Profile + "_";
+      }
+    }
+
     // Profile
     public Profile Profile {
-      get { return this.GetProperty("Profile", Profile.VMware); }
-      set { this.SetProperty("Profile", value); }
+      get { return GetProperty("Profile", Profile.VMware); }
+      set { SetProperty("Profile", value); }
     }
 
     // Deployment
     public Deployment Deployment {
-      get { return this.GetProperty("Deployment", Deployment.ISO); }
-      set { this.SetProperty("Deployment", value); }
+      get { return GetProperty("Deployment", Deployment.ISO); }
+      set { SetProperty("Deployment", value); }
     }
 
     // Launch
     public Launch Launch {
-      get { return this.GetProperty("Launch", Launch.VMware); }
-      set { this.SetProperty("Launch", value); }
+      get { return GetProperty("Launch", Launch.VMware); }
+      set { SetProperty("Launch", value); }
     }
 
     // VMware
@@ -31,16 +49,16 @@ namespace Cosmos.Build.Common {
     }
 
     public String OutputPath {
-      get { return this.GetProperty("OutputPath"); }
-      set { this.SetProperty("OutputPath", value); }
+      get { return GetProperty("OutputPath"); }
+      set { SetProperty("OutputPath", value); }
     }
     public Framework Framework {
-      get { return this.GetProperty("Framework", Common.Framework.MicrosoftNET); }
-      set { this.SetProperty("Framework", value); }
+      get { return GetProperty("Framework", Common.Framework.MicrosoftNET); }
+      set { SetProperty("Framework", value); }
     }
     public Boolean UseInternalAssembler {
-      get { return this.GetProperty("UseInternalAssembler", false); }
-      set { this.SetProperty("UseInternalAssembler", value); }
+      get { return GetProperty("UseInternalAssembler", false); }
+      set { SetProperty("UseInternalAssembler", value); }
     }
 
     public TraceAssemblies TraceAssemblies {

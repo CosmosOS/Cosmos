@@ -37,10 +37,6 @@
       this.lablDeployText = new System.Windows.Forms.Label();
       this.lablBuildOnly = new System.Windows.Forms.Label();
       this.lboxProfile = new System.Windows.Forms.ListBox();
-      this.tabDeployment = new System.Windows.Forms.TabPage();
-      this.lboxDeployment = new System.Windows.Forms.ListBox();
-      this.tabLunch = new System.Windows.Forms.TabPage();
-      this.lboxLaunch = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
       this.comboFramework = new System.Windows.Forms.ComboBox();
       this.buttonOutputBrowse = new System.Windows.Forms.Button();
@@ -62,6 +58,10 @@
       this.label5 = new System.Windows.Forms.Label();
       this.label9 = new System.Windows.Forms.Label();
       this.checkIgnoreDebugStubAttribute = new System.Windows.Forms.CheckBox();
+      this.tabDeployment = new System.Windows.Forms.TabPage();
+      this.lboxDeployment = new System.Windows.Forms.ListBox();
+      this.tabLaunch = new System.Windows.Forms.TabPage();
+      this.lboxLaunch = new System.Windows.Forms.ListBox();
       this.tabVMware = new System.Windows.Forms.TabPage();
       this.checkEnableGDB = new System.Windows.Forms.CheckBox();
       this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
@@ -77,12 +77,12 @@
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
-      this.tabDeployment.SuspendLayout();
-      this.tabLunch.SuspendLayout();
       this.tabCompile.SuspendLayout();
       this.tabAssembler.SuspendLayout();
       this.tabDebug.SuspendLayout();
       this.panlDebugSettings.SuspendLayout();
+      this.tabDeployment.SuspendLayout();
+      this.tabLaunch.SuspendLayout();
       this.tabVMware.SuspendLayout();
       this.tabPXE.SuspendLayout();
       this.tabUSB.SuspendLayout();
@@ -120,11 +120,11 @@
       // TabControl1
       // 
       this.TabControl1.Controls.Add(this.tabProfile);
-      this.TabControl1.Controls.Add(this.tabDeployment);
-      this.TabControl1.Controls.Add(this.tabLunch);
       this.TabControl1.Controls.Add(this.tabCompile);
       this.TabControl1.Controls.Add(this.tabAssembler);
       this.TabControl1.Controls.Add(this.tabDebug);
+      this.TabControl1.Controls.Add(this.tabDeployment);
+      this.TabControl1.Controls.Add(this.tabLaunch);
       this.TabControl1.Controls.Add(this.tabVMware);
       this.TabControl1.Controls.Add(this.tabPXE);
       this.TabControl1.Controls.Add(this.tabUSB);
@@ -135,7 +135,7 @@
       this.TabControl1.Multiline = true;
       this.TabControl1.Name = "TabControl1";
       this.TabControl1.SelectedIndex = 0;
-      this.TabControl1.Size = new System.Drawing.Size(635, 319);
+      this.TabControl1.Size = new System.Drawing.Size(635, 413);
       this.TabControl1.TabIndex = 4;
       // 
       // tabProfile
@@ -147,7 +147,7 @@
       this.tabProfile.Location = new System.Drawing.Point(4, 22);
       this.tabProfile.Name = "tabProfile";
       this.tabProfile.Padding = new System.Windows.Forms.Padding(3);
-      this.tabProfile.Size = new System.Drawing.Size(627, 293);
+      this.tabProfile.Size = new System.Drawing.Size(627, 387);
       this.tabProfile.TabIndex = 8;
       this.tabProfile.Text = "Profile";
       this.tabProfile.UseVisualStyleBackColor = true;
@@ -188,49 +188,9 @@
       this.lboxProfile.FormattingEnabled = true;
       this.lboxProfile.Location = new System.Drawing.Point(3, 3);
       this.lboxProfile.Name = "lboxProfile";
-      this.lboxProfile.Size = new System.Drawing.Size(206, 287);
+      this.lboxProfile.Size = new System.Drawing.Size(206, 381);
       this.lboxProfile.Sorted = true;
       this.lboxProfile.TabIndex = 2;
-      // 
-      // tabDeployment
-      // 
-      this.tabDeployment.Controls.Add(this.lboxDeployment);
-      this.tabDeployment.Location = new System.Drawing.Point(4, 22);
-      this.tabDeployment.Name = "tabDeployment";
-      this.tabDeployment.Size = new System.Drawing.Size(627, 293);
-      this.tabDeployment.TabIndex = 11;
-      this.tabDeployment.Text = "Deployment";
-      this.tabDeployment.UseVisualStyleBackColor = true;
-      // 
-      // lboxDeployment
-      // 
-      this.lboxDeployment.Dock = System.Windows.Forms.DockStyle.Left;
-      this.lboxDeployment.FormattingEnabled = true;
-      this.lboxDeployment.Location = new System.Drawing.Point(0, 0);
-      this.lboxDeployment.Name = "lboxDeployment";
-      this.lboxDeployment.Size = new System.Drawing.Size(206, 293);
-      this.lboxDeployment.Sorted = true;
-      this.lboxDeployment.TabIndex = 3;
-      // 
-      // tabLunch
-      // 
-      this.tabLunch.Controls.Add(this.lboxLaunch);
-      this.tabLunch.Location = new System.Drawing.Point(4, 22);
-      this.tabLunch.Name = "tabLunch";
-      this.tabLunch.Size = new System.Drawing.Size(627, 293);
-      this.tabLunch.TabIndex = 12;
-      this.tabLunch.Text = "Launch";
-      this.tabLunch.UseVisualStyleBackColor = true;
-      // 
-      // lboxLaunch
-      // 
-      this.lboxLaunch.Dock = System.Windows.Forms.DockStyle.Left;
-      this.lboxLaunch.FormattingEnabled = true;
-      this.lboxLaunch.Location = new System.Drawing.Point(0, 0);
-      this.lboxLaunch.Name = "lboxLaunch";
-      this.lboxLaunch.Size = new System.Drawing.Size(206, 293);
-      this.lboxLaunch.Sorted = true;
-      this.lboxLaunch.TabIndex = 3;
       // 
       // tabCompile
       // 
@@ -243,7 +203,7 @@
       this.tabCompile.Location = new System.Drawing.Point(4, 22);
       this.tabCompile.Name = "tabCompile";
       this.tabCompile.Padding = new System.Windows.Forms.Padding(3);
-      this.tabCompile.Size = new System.Drawing.Size(627, 293);
+      this.tabCompile.Size = new System.Drawing.Size(627, 387);
       this.tabCompile.TabIndex = 0;
       this.tabCompile.Text = "Compile";
       this.tabCompile.UseVisualStyleBackColor = true;
@@ -312,7 +272,7 @@
       this.tabAssembler.Controls.Add(this.labelInternalAssembler);
       this.tabAssembler.Location = new System.Drawing.Point(4, 22);
       this.tabAssembler.Name = "tabAssembler";
-      this.tabAssembler.Size = new System.Drawing.Size(627, 293);
+      this.tabAssembler.Size = new System.Drawing.Size(627, 387);
       this.tabAssembler.TabIndex = 10;
       this.tabAssembler.Text = "Assembler";
       this.tabAssembler.UseVisualStyleBackColor = true;
@@ -350,7 +310,7 @@
       this.tabDebug.Location = new System.Drawing.Point(4, 22);
       this.tabDebug.Name = "tabDebug";
       this.tabDebug.Padding = new System.Windows.Forms.Padding(3);
-      this.tabDebug.Size = new System.Drawing.Size(627, 293);
+      this.tabDebug.Size = new System.Drawing.Size(627, 387);
       this.tabDebug.TabIndex = 2;
       this.tabDebug.Text = "Debug";
       this.tabDebug.UseVisualStyleBackColor = true;
@@ -376,7 +336,6 @@
       this.panlDebugSettings.Controls.Add(this.label5);
       this.panlDebugSettings.Controls.Add(this.label9);
       this.panlDebugSettings.Controls.Add(this.checkIgnoreDebugStubAttribute);
-      this.panlDebugSettings.Enabled = false;
       this.panlDebugSettings.Location = new System.Drawing.Point(6, 51);
       this.panlDebugSettings.Name = "panlDebugSettings";
       this.panlDebugSettings.Size = new System.Drawing.Size(280, 259);
@@ -481,6 +440,46 @@
       this.checkIgnoreDebugStubAttribute.Text = "Ignore DebugStub Attribute Settings";
       this.checkIgnoreDebugStubAttribute.UseVisualStyleBackColor = true;
       // 
+      // tabDeployment
+      // 
+      this.tabDeployment.Controls.Add(this.lboxDeployment);
+      this.tabDeployment.Location = new System.Drawing.Point(4, 22);
+      this.tabDeployment.Name = "tabDeployment";
+      this.tabDeployment.Size = new System.Drawing.Size(627, 387);
+      this.tabDeployment.TabIndex = 11;
+      this.tabDeployment.Text = "Deployment";
+      this.tabDeployment.UseVisualStyleBackColor = true;
+      // 
+      // lboxDeployment
+      // 
+      this.lboxDeployment.Dock = System.Windows.Forms.DockStyle.Left;
+      this.lboxDeployment.FormattingEnabled = true;
+      this.lboxDeployment.Location = new System.Drawing.Point(0, 0);
+      this.lboxDeployment.Name = "lboxDeployment";
+      this.lboxDeployment.Size = new System.Drawing.Size(206, 293);
+      this.lboxDeployment.Sorted = true;
+      this.lboxDeployment.TabIndex = 3;
+      // 
+      // tabLaunch
+      // 
+      this.tabLaunch.Controls.Add(this.lboxLaunch);
+      this.tabLaunch.Location = new System.Drawing.Point(4, 22);
+      this.tabLaunch.Name = "tabLaunch";
+      this.tabLaunch.Size = new System.Drawing.Size(627, 387);
+      this.tabLaunch.TabIndex = 12;
+      this.tabLaunch.Text = "Launch";
+      this.tabLaunch.UseVisualStyleBackColor = true;
+      // 
+      // lboxLaunch
+      // 
+      this.lboxLaunch.Dock = System.Windows.Forms.DockStyle.Left;
+      this.lboxLaunch.FormattingEnabled = true;
+      this.lboxLaunch.Location = new System.Drawing.Point(0, 0);
+      this.lboxLaunch.Name = "lboxLaunch";
+      this.lboxLaunch.Size = new System.Drawing.Size(206, 293);
+      this.lboxLaunch.Sorted = true;
+      this.lboxLaunch.TabIndex = 3;
+      // 
       // tabVMware
       // 
       this.tabVMware.Controls.Add(this.checkEnableGDB);
@@ -490,7 +489,7 @@
       this.tabVMware.Location = new System.Drawing.Point(4, 22);
       this.tabVMware.Name = "tabVMware";
       this.tabVMware.Padding = new System.Windows.Forms.Padding(3);
-      this.tabVMware.Size = new System.Drawing.Size(627, 293);
+      this.tabVMware.Size = new System.Drawing.Size(627, 387);
       this.tabVMware.TabIndex = 4;
       this.tabVMware.Text = "VMware";
       this.tabVMware.UseVisualStyleBackColor = true;
@@ -542,7 +541,7 @@
       this.tabPXE.Location = new System.Drawing.Point(4, 22);
       this.tabPXE.Name = "tabPXE";
       this.tabPXE.Padding = new System.Windows.Forms.Padding(3);
-      this.tabPXE.Size = new System.Drawing.Size(627, 293);
+      this.tabPXE.Size = new System.Drawing.Size(627, 387);
       this.tabPXE.TabIndex = 5;
       this.tabPXE.Text = "PXE";
       this.tabPXE.UseVisualStyleBackColor = true;
@@ -562,7 +561,7 @@
       this.tabUSB.Location = new System.Drawing.Point(4, 22);
       this.tabUSB.Name = "tabUSB";
       this.tabUSB.Padding = new System.Windows.Forms.Padding(3);
-      this.tabUSB.Size = new System.Drawing.Size(627, 293);
+      this.tabUSB.Size = new System.Drawing.Size(627, 387);
       this.tabUSB.TabIndex = 6;
       this.tabUSB.Text = "USB";
       this.tabUSB.UseVisualStyleBackColor = true;
@@ -582,7 +581,7 @@
       this.tabISO.Location = new System.Drawing.Point(4, 22);
       this.tabISO.Name = "tabISO";
       this.tabISO.Padding = new System.Windows.Forms.Padding(3);
-      this.tabISO.Size = new System.Drawing.Size(627, 293);
+      this.tabISO.Size = new System.Drawing.Size(627, 387);
       this.tabISO.TabIndex = 7;
       this.tabISO.Text = "ISO";
       this.tabISO.UseVisualStyleBackColor = true;
@@ -600,7 +599,7 @@
       this.tabSlave.Cursor = System.Windows.Forms.Cursors.IBeam;
       this.tabSlave.Location = new System.Drawing.Point(4, 22);
       this.tabSlave.Name = "tabSlave";
-      this.tabSlave.Size = new System.Drawing.Size(627, 293);
+      this.tabSlave.Size = new System.Drawing.Size(627, 387);
       this.tabSlave.TabIndex = 9;
       this.tabSlave.Text = "Slave";
       this.tabSlave.UseVisualStyleBackColor = true;
@@ -612,15 +611,13 @@
       this.Controls.Add(this.TabControl1);
       this.Controls.Add(this.panel1);
       this.Name = "CosmosPage";
-      this.Size = new System.Drawing.Size(635, 362);
+      this.Size = new System.Drawing.Size(635, 456);
       this.Title = "Cosmos";
       this.panel1.ResumeLayout(false);
       this.panel1.PerformLayout();
       this.TabControl1.ResumeLayout(false);
       this.tabProfile.ResumeLayout(false);
       this.tabProfile.PerformLayout();
-      this.tabDeployment.ResumeLayout(false);
-      this.tabLunch.ResumeLayout(false);
       this.tabCompile.ResumeLayout(false);
       this.tabCompile.PerformLayout();
       this.tabAssembler.ResumeLayout(false);
@@ -629,6 +626,8 @@
       this.tabDebug.PerformLayout();
       this.panlDebugSettings.ResumeLayout(false);
       this.panlDebugSettings.PerformLayout();
+      this.tabDeployment.ResumeLayout(false);
+      this.tabLaunch.ResumeLayout(false);
       this.tabVMware.ResumeLayout(false);
       this.tabVMware.PerformLayout();
       this.tabPXE.ResumeLayout(false);
@@ -651,7 +650,7 @@
     private System.Windows.Forms.ListBox lboxProfile;
     private System.Windows.Forms.TabPage tabDeployment;
     private System.Windows.Forms.ListBox lboxDeployment;
-    private System.Windows.Forms.TabPage tabLunch;
+    private System.Windows.Forms.TabPage tabLaunch;
     private System.Windows.Forms.ListBox lboxLaunch;
     private System.Windows.Forms.TabPage tabCompile;
     private System.Windows.Forms.ComboBox comboFramework;
