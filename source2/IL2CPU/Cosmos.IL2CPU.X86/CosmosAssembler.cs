@@ -176,6 +176,19 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "END - Create IDT");
     }
 
+    public void WriteDebugVideo(string aText) {
+      UInt32 xVideo = 0xB8000;
+      for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
+        new LiteralAssemblerCode("mov byte [0x" + i.ToString("X") + "], 0");
+        new LiteralAssemblerCode("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
+      }
+
+      foreach (var xChar in aText) {
+        new LiteralAssemblerCode("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
+        xVideo = xVideo + 2;
+      }
+    }
+
     public override void Initialize() {
       base.Initialize();
 
@@ -217,6 +230,15 @@ namespace Cosmos.IL2CPU.X86 {
 
       // This is our first entry point. Multiboot uses this as Cosmos entry point.
       new Label("Kernel_Start") { IsGlobal = true };
+
+      // Displays "Cosmos" in top left. Used to make sure Cosmos is booted in case of hang.
+      // ie bootloader debugging. This must be the FIRST code, even before setup so we know
+      // we are being called properly by the bootloader and that if there are problems its
+      // somwhere in our code, not the bootloader.
+      WriteDebugVideo("Cosmos pre boot...");
+
+      // For when using Bochs, causes a break ASAP on entry after initial Cosmos display.
+      new LiteralAssemblerCode("xchg bx, bx");
 
       // CLI ASAP
       new ClrInterruptFlag();
