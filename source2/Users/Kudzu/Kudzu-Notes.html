@@ -31,11 +31,12 @@
     <ul>
         <li>Guess doesnt boot on USB or PXE</li>
         <li>.iso has a users dir in it</li>
-    </ul>
+        <li>Proj props - Disable pre boot logging</ul>
     <h3>
     Kudzu</h3>
     <ul>
-        <li>PXE<li>you switched the data and text segments, right? before text was first 
+        <li>Auto disable debug stub instead of hanging<li>PXE<li>Wait for debug - or 
+        press ESC<li>Proj props - disable debug stub<li>you switched the data and text segments, right? before text was first 
         data after, and now that&#39;s data-text? if so, we need to fix our &quot;EndOfKernel&quot; 
         code..<li>Press stop with vmwarwe 
         workstation<li>X#  <ul>

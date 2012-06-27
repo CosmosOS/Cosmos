@@ -177,15 +177,19 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     public void WriteDebugVideo(string aText) {
-      UInt32 xVideo = 0xB8000;
-      for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
-        new LiteralAssemblerCode("mov byte [0x" + i.ToString("X") + "], 0");
-        new LiteralAssemblerCode("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
-      }
+      // TODO: Add an option on the debug project properties to turn this off.
+      var xPreBootLogging = true;
+      if (xPreBootLogging) {
+        UInt32 xVideo = 0xB8000;
+        for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
+          new LiteralAssemblerCode("mov byte [0x" + i.ToString("X") + "], 0");
+          new LiteralAssemblerCode("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
+        }
 
-      foreach (var xChar in aText) {
-        new LiteralAssemblerCode("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
-        xVideo = xVideo + 2;
+        foreach (var xChar in aText) {
+          new LiteralAssemblerCode("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
+          xVideo = xVideo + 2;
+        }
       }
     }
 
@@ -235,14 +239,16 @@ namespace Cosmos.IL2CPU.X86 {
       // ie bootloader debugging. This must be the FIRST code, even before setup so we know
       // we are being called properly by the bootloader and that if there are problems its
       // somwhere in our code, not the bootloader.
-      WriteDebugVideo("Cosmos pre boot...");
+      WriteDebugVideo("Cosmos pre boot");
 
       // For when using Bochs, causes a break ASAP on entry after initial Cosmos display.
       new LiteralAssemblerCode("xchg bx, bx");
 
       // CLI ASAP
+      WriteDebugVideo("Clearing interrupts.");
       new ClrInterruptFlag();
 
+      WriteDebugVideo("Begin multiboot info.");
       new Comment(this, "MultiBoot compliant loader provides info in registers: ");
       new Comment(this, "EBX=multiboot_info ");
       new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
@@ -265,7 +271,10 @@ namespace Cosmos.IL2CPU.X86 {
       };
       new Comment(this, "END - Multiboot Info");
 
+      WriteDebugVideo("Creating GDT.");
       CreateGDT();
+
+      WriteDebugVideo("Creating IDT.");
       CreateIDT();
 
 #if LFB_1024_8
@@ -279,6 +288,7 @@ namespace Cosmos.IL2CPU.X86 {
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 
+      WriteDebugVideo("Initializing SSE.");
       new Comment(this, "BEGIN - SSE Init");
       // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
       new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
@@ -298,10 +308,12 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "END - SSE Init");
 
       if (mComNumber > 0) {
+        WriteDebugVideo("Initializing DebugStub.");
         new Call { DestinationLabel = "DebugStub_Init" };
       }
 
       // Jump to Kernel entry point
+      WriteDebugVideo("Jumping to kernel.");
       new Call { DestinationLabel = EntryPointName };
 
       new Comment(this, "Kernel done - loop till next IRQ");
