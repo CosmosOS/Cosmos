@@ -49,6 +49,7 @@ namespace Cosmos.VS.Package {
       if (mShowTabDebug) {
         TabControl1.TabPages.Add(tabDebug);
       }
+      //
       if (mShowTabVMware) {
         TabControl1.TabPages.Add(tabVMware);
       }
@@ -77,15 +78,18 @@ namespace Cosmos.VS.Package {
     }
 
     protected void UpdateUI() {
-      mShowTabDebug = false;
+      mShowTabDebug = true;
       mShowTabVMware = false;
       mShowTabPXE = false;
       mShowTabUSB = false;
       mShowTabISO = false;
       mShowTabSlave = false;
       //
+      chckEnableDebugStub.Checked = false;
       lablBuildOnly.Visible = false;
       lablNonFunctional.Visible = false;
+      cmboCosmosPort.Enabled = true;
+      cmboVisusalStudioPort.Enabled = true;
 
       if (mProps.BuildTarget == BuildTarget.ISO) {
         lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
@@ -101,21 +105,22 @@ namespace Cosmos.VS.Package {
 
       } else if (mProps.BuildTarget == BuildTarget.VMware) {
         lablDeployText.Text = "Use VMware to deploy and debug.";
-        mShowTabDebug = true;
         mShowTabVMware = true;
         mShowTabPXE = mProps.VMwareDeploy == VMwareDeploy.PXE;
+        chckEnableDebugStub.Checked = true;
+        cmboCosmosPort.Enabled = false;
+        cmboVisusalStudioPort.Enabled = false;
 
       } else if (mProps.BuildTarget == BuildTarget.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
-        mShowTabDebug = true;
         mShowTabPXE = true;
 
       } else if (mProps.BuildTarget == BuildTarget.PxeSlave) {
         lablDeployText.Text = "PXE but with specially attached slave computer.";
         lablNonFunctional.Visible = true;
-        mShowTabDebug = true;
         mShowTabPXE = true;
         mShowTabSlave = true;
+        chckEnableDebugStub.Checked = false;
 
       } else {
         lablDeployText.Text = "Oops. What the frak did you click?";
@@ -152,9 +157,9 @@ namespace Cosmos.VS.Package {
       };
 
 
-      lboxDeploy.Items.AddRange(EnumValue.GetEnumValues(typeof(BuildTarget), true));
-      lboxDeploy.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var value = (BuildTarget)((EnumValue)lboxDeploy.SelectedItem).Value;
+      lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(BuildTarget), true));
+      lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var value = (BuildTarget)((EnumValue)lboxProfile.SelectedItem).Value;
         if (value != mProps.BuildTarget) {
           mProps.BuildTarget = value;
           IsDirty = true;
@@ -245,10 +250,10 @@ namespace Cosmos.VS.Package {
       textOutputPath.Text = mProps.OutputPath;
 
       mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
-      lboxDeploy.SelectedItem = EnumValue.Find(lboxDeploy.Items, mProps.BuildTarget);
+      lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.BuildTarget);
       // We need to manually trigger it once, because the indexchanged event compares
       // it against the source, and they will of course be the same.
-      CurrentBuildTarget = (BuildTarget)((EnumValue)lboxDeploy.SelectedItem).Value;
+      CurrentBuildTarget = (BuildTarget)((EnumValue)lboxProfile.SelectedItem).Value;
 
       mProps.SetProperty("Framework", GetConfigProperty("Framework"));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
@@ -318,8 +323,12 @@ namespace Cosmos.VS.Package {
     }
 
     private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
-      var xEnumValue = (EnumValue)lboxDeploy.SelectedItem;
+      var xEnumValue = (EnumValue)lboxProfile.SelectedItem;
       var xValue = (BuildTarget)xEnumValue.Value;
+    }
+
+    private void chckEnableDebugStub_CheckedChanged(object sender, EventArgs e) {
+      panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
     }
   }
 }

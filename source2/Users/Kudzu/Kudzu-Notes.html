@@ -29,18 +29,25 @@
     <h3>
         Matthijs</h3>
     <ul>
-        <li>Guess doesnt boot on USB or PXE</li>
         <li>.iso has a users dir in it</li>
-        <li>Proj props - Disable pre boot logging</ul>
+        <li>Proj props<ul>
+            <li>Save to .user instead of project<li>Disable pre boot logging</ul>
+    </ul>
     <h3>
     Kudzu</h3>
     <ul>
-        <li>Auto disable debug stub instead of hanging<li>PXE<li>Checkpoint &quot;data&quot;<li>Wait for debug - or 
-        press ESC<li>Proj props<ul>
-            <li>Disable debug stub<li>Set Com number<li>you switched the data and text segments, right? before text was first 
+        <li>Proj props<ul>
+            <li>Disable debug stub - auto disable when tab disabled<ul>
+                <li>IL2CPUTask.cs line 205<li>Com number for debug<li>Press stop with vmwarwe 
+        workstation</ul>
+    <p>
+        &nbsp;</p>
+    <ul>
+        <ul>
+            <ul>
+                <li>you switched the data and text segments, right? before text was first 
         data after, and now that&#39;s data-text? if so, we need to fix our &quot;EndOfKernel&quot; 
-        code..<li>Press stop with vmwarwe 
-        workstation<li>X#  <ul>
+        code..<li>X#  <ul>
         <li>X#<ul>
             <li>Waitforhandshake</li>
             <li>Complete</li>
