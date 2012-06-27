@@ -85,7 +85,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("Cosmos.Debug.Consts.Consts.SerialSignature");
 
 			new Comment("X#: +$19740807");
-			new Push { DestinationValue = 0x9740807, Size = 32 };
+			new Push { DestinationValue = 0x19740807, Size = 32 };
 
 			new Comment("X#: ESI = ESP");
 			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };

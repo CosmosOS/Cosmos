@@ -96,11 +96,17 @@ namespace Cosmos.Compiler.XSharp {
         if (string.IsNullOrWhiteSpace(xString) && xString.Length > 0) {
           xToken.Type = TokenType.WhiteSpace;
 
+        } else if (xChar1 == '\'') {
+          xToken.Type = TokenType.ValueString;
+          xString = xString.Substring(1, xString.Length - 2);
+
         } else if (char.IsDigit(xChar1)) {
           xToken.Type = TokenType.ValueInt;
+
         } else if (xChar1 == '$') {
           xToken.Type = TokenType.ValueInt;
-          xString = "0x" + xString.Substring(2);
+          // Remove surrounding '
+          xString = "0x" + xString.Substring(1);
 
         } else if (IsAlphaNum(xChar1)) { // This must be after check for ValueInt
           string xUpper = xString.ToUpper();
@@ -148,7 +154,7 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
-    protected enum CharType { WhiteSpace, Identifier, Symbol };
+    protected enum CharType { WhiteSpace, Identifier, Symbol, String };
     protected void Parse() {
       mTokens = ParseText();
     }
@@ -170,7 +176,21 @@ namespace Cosmos.Compiler.XSharp {
       int i = 0;
       for (i = 0; i < mData.Length; i++) {
         xChar = mData[i];
-        if (char.IsWhiteSpace(xChar)) {
+        if (xChar == '\'') {
+          // Take data before the ' as a token.
+          NewToken(xResult, ref i);
+          // Now scan to the next '
+          for (i = i + 1; i < mData.Length; i++) {
+            if (mData[i] == '\'') {
+              break;
+            }
+          }
+          if (i == mData.Length) {
+            throw new Exception("Unterminated string.");
+          }
+          i++;
+          xCharType = CharType.String;
+        } else if (char.IsWhiteSpace(xChar)) {
           xCharType = CharType.WhiteSpace;
         } else if (IsAlphaNum(xChar)) {
           // _ and . were never likely to stand on their own. ie ESP _ 2 and ESP . 2 are never likely to be used.

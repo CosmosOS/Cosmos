@@ -306,6 +306,28 @@ namespace Cosmos.Compiler.XSharp {
         mProcedureName = aTokens[1].Value;
         rCode.Add("new Label(\"" + mGroup + "_{1}\");");
       });
+
+      AddPattern("Checkpoint ''", delegate(TokenList aTokens, ref List<string> rCode) {
+        // This method emits a lot of ASM, but thats what we want becuase
+        // at this point we need ASM as simple as possible and completely transparent.
+        // No stack changes, no register mods, no calls, no jumps, etc.
+
+        // TODO: Add an option on the debug project properties to turn this off.
+        // Also see WriteDebugVideo in CosmosAssembler.cs
+        var xPreBootLogging = true;
+        if (xPreBootLogging) {
+          UInt32 xVideo = 0xB8000;
+          for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
+            rCode.Add("new LiteralAssemblerCode(" + Quoted("mov byte [0x" + i.ToString("X") + "], 0") + ");");
+            rCode.Add("new LiteralAssemblerCode(" + Quoted("mov byte [0x" + (i + 1).ToString("X") + "], 0x02") + ");");
+          }
+
+          foreach (var xChar in aTokens[1].Value) {
+            rCode.Add("new LiteralAssemblerCode(" + Quoted("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar) + ");");
+            xVideo = xVideo + 2;
+          }
+        }
+      });
     }
 
     public List<string> GetCode(string aLine) {

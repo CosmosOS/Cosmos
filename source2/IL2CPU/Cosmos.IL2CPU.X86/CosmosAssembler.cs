@@ -176,8 +176,13 @@ namespace Cosmos.IL2CPU.X86 {
       new Comment(this, "END - Create IDT");
     }
 
-    public void WriteDebugVideo(string aText) {
+    static public void WriteDebugVideo(string aText) {
+      // This method emits a lot of ASM, but thats what we want becuase
+      // at this point we need ASM as simple as possible and completely transparent.
+      // No stack changes, no register mods, etc.
+
       // TODO: Add an option on the debug project properties to turn this off.
+      // Also see TokenPatterns.cs Checkpoint in X#
       var xPreBootLogging = true;
       if (xPreBootLogging) {
         UInt32 xVideo = 0xB8000;

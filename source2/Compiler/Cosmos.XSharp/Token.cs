@@ -10,7 +10,7 @@ namespace Cosmos.Compiler.XSharp {
     //
     , Register, Keyword, AlphaNum
     // Values
-    , ValueInt
+    , ValueInt, ValueString
     // 
     , WhiteSpace, Operator, Delimiter
     // For now used during scanning while user is typing, but in future could be user methods we have to find etc
