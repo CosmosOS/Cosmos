@@ -28,7 +28,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public SourceInfos mSourceMappings;
     public uint? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
-    protected BuildTarget mBuildTarget;
+    protected Profile mProfile;
     internal DebugInfo mDebugInfoDb;
     internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
@@ -105,8 +105,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDebugInfo = aDebugInfo;
 
       string xBuildTarget = aDebugInfo["BuildTarget"].ToUpper();
-      var xEnumValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
-      mBuildTarget = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
+      var xEnumValues = (Profile[])Enum.GetValues(typeof(Profile));
+      mProfile = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
       if (mDebugDownPipe == null) {
         mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
@@ -132,7 +132,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
 
-      if (mBuildTarget == BuildTarget.VMware) {
+      if (mProfile == Profile.VMware) {
         string xFlavor = mDebugInfo["VMwareEdition"].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
@@ -184,13 +184,13 @@ namespace Cosmos.Debug.VSDebugEngine {
       mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
 
       mDbgConnector = null;
-      if (mBuildTarget == BuildTarget.VMware) {
+      if (mProfile == Profile.VMware) {
         OutputText("Starting serial debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
         mDbgConnector.Connected = DebugConnectorConnected;
       }
       if (mDbgConnector == null) {
-        throw new Exception("BuildTarget value not valid: '" + mBuildTarget.ToString() + "'.");
+        throw new Exception("BuildTarget value not valid: '" + mProfile.ToString() + "'.");
       }
 
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);

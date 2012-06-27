@@ -6,23 +6,14 @@ using System.Reflection;
 
 namespace Cosmos.Build.Common {
 
-  public enum BuildTarget {
+  public enum Profile {
     [Description("ISO Image")]
     ISO,
     [Description("USB Device")]
     USB,
-
     [Description("VMware")]
     VMware,
-
     [Description("PXE Network Boot")]
-    PXE,
-    [Description("PXE Network Boot with Slave")]
-    PxeSlave
-  }
-
-  public enum VMwareDeploy {
-    ISO,
     PXE
   }
 

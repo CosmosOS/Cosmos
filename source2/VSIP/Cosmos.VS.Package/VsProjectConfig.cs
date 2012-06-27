@@ -29,7 +29,7 @@ namespace Cosmos.VS.Package {
         // This is the program that gest launched after build
         string xBuildTarget = GetConfigurationProperty("BuildTarget", true).ToUpper();
         //
-        var xEnumValues = (BuildTarget[])Enum.GetValues(typeof(BuildTarget));
+        var xEnumValues = (Profile[])Enum.GetValues(typeof(Profile));
         var xTarget = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
@@ -37,19 +37,19 @@ namespace Cosmos.VS.Package {
         string xIsoFile = Path.ChangeExtension(xOutputAsm, ".iso");
         string xBinFile = Path.ChangeExtension(xOutputAsm, ".bin");
 
-        if (xTarget == BuildTarget.ISO) {
+        if (xTarget == Profile.ISO) {
           IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
           Process.Start(xOutputPath);
 
-        } else if (xTarget == BuildTarget.USB) {
+        } else if (xTarget == Profile.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");
 
-        } else if (xTarget == BuildTarget.PXE) {
+        } else if (xTarget == Profile.PXE) {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
 
-        } else if (xTarget == BuildTarget.VMware) {
+        } else if (xTarget == Profile.VMware) {
           // TODO - only make ISO if not PXE
           IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
 

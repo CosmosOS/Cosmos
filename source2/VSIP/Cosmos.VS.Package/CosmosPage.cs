@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package {
-  // We put all items on ONE form because VS is such a nightmware to managed mulitple forms
+  // We put all items on ONE form because VS is such a C++ developers wet dream to manage mulitple forms
   // and add new ones.
 
   // Magic width and height.
@@ -20,9 +20,6 @@ namespace Cosmos.VS.Package {
 
   [Guid(Guids.CosmosPage)]
   public partial class CosmosPage : CustomPropertyPage {
-    public static BuildTarget CurrentBuildTarget = BuildTarget.VMware;
-    public static event EventHandler BuildTargetChanged;
-
     protected bool mShowTabDebug;
     protected bool mShowTabVMware;
     protected bool mShowTabPXE;
@@ -71,12 +68,6 @@ namespace Cosmos.VS.Package {
       }
     }
 
-    protected static void OnBuildTargetChanged(Object sender, EventArgs e) {
-      if (CosmosPage.BuildTargetChanged != null) {
-        CosmosPage.BuildTargetChanged(sender, e);
-      }
-    }
-
     protected void UpdateUI() {
       mShowTabDebug = true;
       mShowTabVMware = false;
@@ -85,42 +76,35 @@ namespace Cosmos.VS.Package {
       mShowTabISO = false;
       mShowTabSlave = false;
       //
+      lablCurrentProfile.Text = lboxProfile.SelectedItem.ToString();
       chckEnableDebugStub.Checked = false;
       lablBuildOnly.Visible = false;
       lablNonFunctional.Visible = false;
       cmboCosmosPort.Enabled = true;
       cmboVisusalStudioPort.Enabled = true;
 
-      if (mProps.BuildTarget == BuildTarget.ISO) {
+      if (mProps.Profile == Profile.ISO) {
         lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
          + " After running the selected project, an explorer window will open containing the ISO file."
          + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
         lablBuildOnly.Visible = true;
         mShowTabISO = true;
 
-      } else if (mProps.BuildTarget == BuildTarget.USB) {
+      } else if (mProps.Profile == Profile.USB) {
         lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
         lablBuildOnly.Visible = true;
         mShowTabUSB = true;
 
-      } else if (mProps.BuildTarget == BuildTarget.VMware) {
+      } else if (mProps.Profile == Profile.VMware) {
         lablDeployText.Text = "Use VMware to deploy and debug.";
         mShowTabVMware = true;
-        mShowTabPXE = mProps.VMwareDeploy == VMwareDeploy.PXE;
         chckEnableDebugStub.Checked = true;
         cmboCosmosPort.Enabled = false;
         cmboVisusalStudioPort.Enabled = false;
 
-      } else if (mProps.BuildTarget == BuildTarget.PXE) {
+      } else if (mProps.Profile == Profile.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mShowTabPXE = true;
-
-      } else if (mProps.BuildTarget == BuildTarget.PxeSlave) {
-        lablDeployText.Text = "PXE but with specially attached slave computer.";
-        lablNonFunctional.Visible = true;
-        mShowTabPXE = true;
-        mShowTabSlave = true;
-        chckEnableDebugStub.Checked = false;
 
       } else {
         lablDeployText.Text = "Oops. What the frak did you click?";
@@ -157,16 +141,13 @@ namespace Cosmos.VS.Package {
       };
 
 
-      lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(BuildTarget), true));
+      lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(Profile), true));
       lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var value = (BuildTarget)((EnumValue)lboxProfile.SelectedItem).Value;
-        if (value != mProps.BuildTarget) {
-          mProps.BuildTarget = value;
+        var value = (Profile)((EnumValue)lboxProfile.SelectedItem).Value;
+        if (value != mProps.Profile) {
+          mProps.Profile = value;
           IsDirty = true;
           UpdateUI();
-
-          CurrentBuildTarget = value;
-          OnBuildTargetChanged(this, EventArgs.Empty);
         }
       };
 
@@ -177,16 +158,6 @@ namespace Cosmos.VS.Package {
         if (x != mProps.VMwareEdition) {
           mProps.VMwareEdition = x;
           IsDirty = true;
-        }
-      };
-
-      cmboVMwareDeploy.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareDeploy), true));
-      cmboVMwareDeploy.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var x = (VMwareDeploy)((EnumValue)cmboVMwareDeploy.SelectedItem).Value;
-        if (x != mProps.VMwareDeploy) {
-          mProps.VMwareDeploy = x;
-          IsDirty = true;
-          UpdateUI();
         }
       };
       #endregion
@@ -250,10 +221,7 @@ namespace Cosmos.VS.Package {
       textOutputPath.Text = mProps.OutputPath;
 
       mProps.SetProperty("BuildTarget", GetConfigProperty("BuildTarget"));
-      lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.BuildTarget);
-      // We need to manually trigger it once, because the indexchanged event compares
-      // it against the source, and they will of course be the same.
-      CurrentBuildTarget = (BuildTarget)((EnumValue)lboxProfile.SelectedItem).Value;
+      lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
 
       mProps.SetProperty("Framework", GetConfigProperty("Framework"));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
@@ -264,9 +232,6 @@ namespace Cosmos.VS.Package {
       // VMware
       mProps.SetProperty("VMwareEdition", GetConfigProperty("VMwareEdition"));
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
-      //
-      mProps.SetProperty("VMwareDeploy", GetConfigProperty("VMwareDeploy"));
-      cmboVMwareDeploy.SelectedItem = EnumValue.Find(cmboVMwareDeploy.Items, mProps.VMwareDeploy);
 
       mProps.SetProperty("EnableGDB", GetConfigProperty("EnableGDB"));
       checkEnableGDB.Checked = mProps.EnableGDB;
@@ -324,7 +289,7 @@ namespace Cosmos.VS.Package {
 
     private void comboTarget_SelectedIndexChanged(object sender, EventArgs e) {
       var xEnumValue = (EnumValue)lboxProfile.SelectedItem;
-      var xValue = (BuildTarget)xEnumValue.Value;
+      var xValue = (Profile)xEnumValue.Value;
     }
 
     private void chckEnableDebugStub_CheckedChanged(object sender, EventArgs e) {

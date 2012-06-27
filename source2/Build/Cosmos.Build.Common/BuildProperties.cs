@@ -7,19 +7,15 @@ namespace Cosmos.Build.Common {
   public class BuildProperties : PropertiesBase {
 
     // Execute
-    public BuildTarget BuildTarget {
-      get { return this.GetProperty("BuildTarget", BuildTarget.VMware); }
-      set { this.SetProperty("BuildTarget", value); }
+    public Profile Profile {
+      get { return this.GetProperty("Profile", Profile.VMware); }
+      set { this.SetProperty("Profile", value); }
     }
 
     // VMware
     public VMwareEdition VMwareEdition {
       get { return GetProperty("VMwareEdition", VMwareEdition.Player); }
       set { SetProperty("VMwareEdition", value); }
-    }
-    public VMwareDeploy VMwareDeploy {
-      get { return GetProperty("VMwareDeploy", VMwareDeploy.ISO); }
-      set { SetProperty("VMwareDeploy", value); }
     }
 
     public String OutputPath {
