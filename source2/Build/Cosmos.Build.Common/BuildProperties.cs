@@ -6,11 +6,11 @@ using System.Text;
 namespace Cosmos.Build.Common {
   public class BuildProperties : PropertiesBase {
 
-    protected String GetProfileProperty(string aName) { 
-      return GetProperty(aName, String.Empty); 
+    protected String GetProfileProperty(string aName) {
+      return GetProperty(Prefix + aName); 
     }
-    protected T GetProfileProperty<T>(string aName, T @default) {
-      return GetProperty(Prefix + aName, @default);
+    protected T GetProfileProperty<T>(string aName, T aDefault) {
+      return GetProperty(Prefix + aName, aDefault);
     }
 
     public void SetProfileProperty(string aName, object aValue) {
@@ -32,55 +32,55 @@ namespace Cosmos.Build.Common {
 
     // Deployment
     public Deployment Deployment {
-      get { return GetProperty("Deployment", Deployment.ISO); }
-      set { SetProperty("Deployment", value); }
+      get { return GetProfileProperty("Deployment", Deployment.ISO); }
+      set { SetProfileProperty("Deployment", value); }
     }
 
     // Launch
     public Launch Launch {
-      get { return GetProperty("Launch", Launch.VMware); }
-      set { SetProperty("Launch", value); }
+      get { return GetProfileProperty("Launch", Launch.VMware); }
+      set { SetProfileProperty("Launch", value); }
     }
 
     // VMware
     public VMwareEdition VMwareEdition {
-      get { return GetProperty("VMwareEdition", VMwareEdition.Player); }
-      set { SetProperty("VMwareEdition", value); }
+      get { return GetProfileProperty("VMwareEdition", VMwareEdition.Player); }
+      set { SetProfileProperty("VMwareEdition", value); }
     }
 
     public String OutputPath {
-      get { return GetProperty("OutputPath"); }
-      set { SetProperty("OutputPath", value); }
+      get { return GetProfileProperty("OutputPath"); }
+      set { SetProfileProperty("OutputPath", value); }
     }
     public Framework Framework {
-      get { return GetProperty("Framework", Common.Framework.MicrosoftNET); }
-      set { SetProperty("Framework", value); }
+      get { return GetProfileProperty("Framework", Common.Framework.MicrosoftNET); }
+      set { SetProfileProperty("Framework", value); }
     }
     public Boolean UseInternalAssembler {
-      get { return GetProperty("UseInternalAssembler", false); }
-      set { SetProperty("UseInternalAssembler", value); }
+      get { return GetProfileProperty("UseInternalAssembler", false); }
+      set { SetProfileProperty("UseInternalAssembler", value); }
     }
 
     public TraceAssemblies TraceAssemblies {
-      get { return GetProperty("TraceAssemblies", TraceAssemblies.User); }
-      set { SetProperty("TraceAssemblies", value); }
+      get { return GetProfileProperty("TraceAssemblies", TraceAssemblies.User); }
+      set { SetProfileProperty("TraceAssemblies", value); }
     }
 
     public DebugMode DebugMode {
-      get { return GetProperty("DebugMode", DebugMode.Source); }
-      set { SetProperty("DebugMode", value); }
+      get { return GetProfileProperty("DebugMode", DebugMode.Source); }
+      set { SetProfileProperty("DebugMode", value); }
     }
     public bool IgnoreDebugStubAttribute {
-      get { return GetProperty("IgnoreDebugStubAttribute", false); }
-      set { SetProperty("IgnoreDebugStubAttribute", value); }
+      get { return GetProfileProperty("IgnoreDebugStubAttribute", false); }
+      set { SetProfileProperty("IgnoreDebugStubAttribute", value); }
     }
     public Boolean EnableGDB {
-      get { return GetProperty("EnableGDB", false); }
-      set { SetProperty("EnableGDB", value); }
+      get { return GetProfileProperty("EnableGDB", false); }
+      set { SetProfileProperty("EnableGDB", value); }
     }
     public bool StartCosmosGDB {
-      get { return GetProperty("StartCosmosGDB", false); }
-      set { SetProperty("StartCosmosGDB", value); }
+      get { return GetProfileProperty("StartCosmosGDB", false); }
+      set { SetProfileProperty("StartCosmosGDB", value); }
     }
   }
 }
