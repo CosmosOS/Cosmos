@@ -27,7 +27,7 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        string xBuildTarget = GetConfigurationProperty("BuildTarget", true).ToUpper();
+        string xBuildTarget = GetConfigurationProperty("Profile", true).ToUpper();
         //
         var xEnumValues = (Profile[])Enum.GetValues(typeof(Profile));
         var xTarget = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
@@ -68,7 +68,7 @@ namespace Cosmos.VS.Package {
           xValues.Add("EnableGDB", GetConfigurationProperty("EnableGDB", false));
           xValues.Add("DebugMode", GetConfigurationProperty("DebugMode", false));
           xValues.Add("TraceAssemblies", GetConfigurationProperty("TraceAssemblies", false));
-          xValues.Add("BuildTarget", GetConfigurationProperty("BuildTarget", false));
+          xValues.Add("Profile", GetConfigurationProperty("Profile", false));
           xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
           xValues.Add("VMwareEdition", GetConfigurationProperty("VMwareEdition", false));
           xValues.Add("VMwareDeploy", GetConfigurationProperty("VMwareDeploy", false));

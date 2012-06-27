@@ -104,7 +104,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
 
-      string xBuildTarget = aDebugInfo["BuildTarget"].ToUpper();
+      string xBuildTarget = aDebugInfo["Profile"].ToUpper();
       var xEnumValues = (Profile[])Enum.GetValues(typeof(Profile));
       mProfile = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
 

@@ -30,10 +30,6 @@
     <IgnoreDebugStubAttribute />
     <Deployment />
     <Launch />
-    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
-    <VMware_EnableGDB>False</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
-    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile />
@@ -52,10 +48,6 @@
     <IgnoreDebugStubAttribute />
     <Deployment />
     <Launch />
-    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
-    <VMware_EnableGDB>False</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
-    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
