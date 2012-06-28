@@ -273,7 +273,7 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// Defines if Project System supports Project Designer
         /// </summary>
-        private bool supportsProjectDesigner = true;
+        private bool supportsProjectDesigner;
 
         private bool showProjectInSolutionPage = true;
 

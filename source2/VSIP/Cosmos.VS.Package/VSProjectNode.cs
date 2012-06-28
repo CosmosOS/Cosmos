@@ -15,6 +15,11 @@ namespace Cosmos.VS.Package {
 
     private VSProject package;
 
+    protected override bool SupportsProjectDesigner {
+      get { return true; }
+      set { }
+    }
+
     public VSProjectNode(VSProject package) {
       LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
       try {
