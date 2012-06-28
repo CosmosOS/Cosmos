@@ -426,6 +426,7 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     public TraceAssemblies TraceAssemblies;
+    public bool DebugEnabled = false;
     public DebugMode DebugMode;
     public bool IgnoreDebugStubAttribute;
 
@@ -441,7 +442,7 @@ namespace Cosmos.IL2CPU.X86 {
         //TODO: Each IL op should exist in IL, and descendants in IL.X86.
         // Because of this we have this hack
         return;
-      } else if (DebugMode == DebugMode.None) {
+      } else if (DebugEnabled == false) {
         return;
       } else if (DebugMode == DebugMode.Source) {
         // If the current position equals one of the offsets, then we have

@@ -30,6 +30,7 @@
     </CreateProperty>
 
     <IL2CPU  DebugMode="$(DebugMode)"
+             DebugEnabled="$(DebugEnabled)"
              TraceAssemblies="$(TraceAssemblies)"
              IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
              DebugCom="1"

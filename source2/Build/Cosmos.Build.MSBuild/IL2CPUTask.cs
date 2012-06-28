@@ -162,15 +162,7 @@ namespace Cosmos.Build.MSBuild {
         }
         mSearchDirs = xSearchPaths.ToArray();
       }
-      if (String.IsNullOrEmpty(DebugMode)) {
-        mDebugMode = Cosmos.Build.Common.DebugMode.None;
-      } else {
-        if (!Enum.GetNames(typeof(DebugMode)).Contains(DebugMode, StringComparer.InvariantCultureIgnoreCase)) {
-          LogError("Invalid DebugMode specified");
-          return false;
-        }
-        mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
-      }
+      mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
       if (String.IsNullOrEmpty(TraceAssemblies)) {
         mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
       } else {
@@ -183,7 +175,8 @@ namespace Cosmos.Build.MSBuild {
       return true;
     }
 
-    protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.None;
+    public bool DebugEnabled = false;
+    protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
     protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
     protected void LogTime(string message) {
       //
@@ -202,17 +195,19 @@ namespace Cosmos.Build.MSBuild {
           return false;
         }
         var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
-        if (mDebugMode == Common.DebugMode.None) {
+        if (!DebugEnabled) {
+          // Default of 1 is in Cosmos.Targets. Need to change to use proj props
           DebugCom = 0;
         }
         var xAsm = new AppAssemblerNasm(DebugCom);
         using (var xDebugInfo = new DebugInfo()) {
           xDebugInfo.CreateCPDB(xOutputFilename + ".cpdb");
           xAsm.DebugInfo = xDebugInfo;
+          xAsm.DebugEnabled = DebugEnabled;
           xAsm.DebugMode = mDebugMode;
           xAsm.TraceAssemblies = mTraceAssemblies;
           xAsm.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
-          if (this.DebugMode.ToLower() == "none") {
+          if (DebugEnabled == false) {
             xAsm.ShouldOptimize = true;
           }
 #if OUTPUT_ELF

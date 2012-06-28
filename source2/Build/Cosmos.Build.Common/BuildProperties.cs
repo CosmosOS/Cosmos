@@ -24,6 +24,20 @@ namespace Cosmos.Build.Common {
       set { SetProperty("Launch", value); }
     }
 
+    // Debug
+    public bool DebugEnabled {
+      get { return GetProperty("DebugEnabled", true); }
+      set { SetProperty("DebugEnabled", value); }
+    }
+    public DebugMode DebugMode {
+      get { return GetProperty("DebugMode", DebugMode.Source); }
+      set { SetProperty("DebugMode", value); }
+    }
+    public bool IgnoreDebugStubAttribute {
+      get { return GetProperty("IgnoreDebugStubAttribute", false); }
+      set { SetProperty("IgnoreDebugStubAttribute", value); }
+    }
+
     // VMware
     public VMwareEdition VMwareEdition {
       get { return GetProperty("VMwareEdition", VMwareEdition.Player); }
@@ -48,14 +62,6 @@ namespace Cosmos.Build.Common {
       set { SetProperty("TraceAssemblies", value); }
     }
 
-    public DebugMode DebugMode {
-      get { return GetProperty("DebugMode", DebugMode.Source); }
-      set { SetProperty("DebugMode", value); }
-    }
-    public bool IgnoreDebugStubAttribute {
-      get { return GetProperty("IgnoreDebugStubAttribute", false); }
-      set { SetProperty("IgnoreDebugStubAttribute", value); }
-    }
     public Boolean EnableGDB {
       get { return GetProperty("EnableGDB", false); }
       set { SetProperty("EnableGDB", value); }

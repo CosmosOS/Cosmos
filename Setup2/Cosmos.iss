@@ -137,9 +137,11 @@ Name: {code:VSNET2010_PATH}\ProjectTemplates\Cosmos; Flags: uninsalwaysuninstall
 Name: {app}; Flags: uninsalwaysuninstall
 
 [InstallDelete]
-Type: files; Name: "{code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*"
 Type: filesandordirs; Name: "{app}"
+Type: files; Name: "{code:VSNET2010_PATH}\PrivateAssemblies\Cosmos.*"
 Type: filesandordirs; Name: "{code:VSNET2010_PATH}\ProjectTemplates\Cosmos"
+Type: filesandordirs; Name: "{userdocs}\Visual Studio 2010\Templates\ProjectTemplates\Cosmos"; 
+Type: filesandordirs; Name: "{userdocs}\Visual Studio 2010\Templates\ItemTemplates\Visual C#\Cosmos";
 Type: filesandordirs; Name: "{code:GetCSharpExpress2010ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2010Installed('dummy') and (not csharp2010_Installed('dummy'))
 
 [Files]
@@ -383,6 +385,7 @@ Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\B
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
 	; /setup without nosetupvstemplates takes a LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit - see new note above in X# template
+	; Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup Flags: waituntilterminated
 	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup /nosetupvstemplates; Flags: waituntilterminated
 #else 
 	Filename: {code:VSNET2010_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated

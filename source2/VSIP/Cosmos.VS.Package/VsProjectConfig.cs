@@ -27,10 +27,8 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        string xBuildTarget = GetConfigurationProperty("Profile", true).ToUpper();
-        //
-        var xEnumValues = (Profile[])Enum.GetValues(typeof(Profile));
-        var xTarget = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
+        string xProfile = GetConfigurationProperty("Profile", true);
+        var xTarget = (Profile)Enum.Parse(typeof(Profile), xProfile);
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);

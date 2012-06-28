@@ -56,7 +56,7 @@ namespace Cosmos.Build.Common {
     Warning = 0, Error = 1, Informational = 2, Performance = 3
   }
   public enum TraceAssemblies { All, Cosmos, User };
-  public enum DebugMode { None, IL, Source }
+  public enum DebugMode { IL, Source }
 
   public sealed class DescriptionAttribute : Attribute {
     public static String GetDescription(object value) {

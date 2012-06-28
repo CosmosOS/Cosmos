@@ -218,6 +218,8 @@ namespace Cosmos.VS.Package {
       };
       chckEnableDebugStub.CheckedChanged += delegate(object aSender, EventArgs e) {
         panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
+        mProps.DebugEnabled = chckEnableDebugStub.Checked;
+        IsDirty = true;
       };
 
       comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
@@ -285,6 +287,20 @@ namespace Cosmos.VS.Package {
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
       #endregion
 
+      #region Debug
+      mProps.SetProperty("DebugEnabled", GetConfigProperty("DebugEnabled"));
+      chckEnableDebugStub.Checked = mProps.DebugEnabled;
+
+      mProps.SetProperty("IgnoreDebugStubAttribute", GetConfigProperty("IgnoreDebugStubAttribute"));
+      checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
+
+      mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
+      comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
+
+      mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
+      comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
+      #endregion
+
       //TODO: Why are we copying these one by one instead of automatic?
       mProps.SetProperty("OutputPath", GetConfigProperty("OutputPath"));
       textOutputPath.Text = mProps.OutputPath;
@@ -300,15 +316,6 @@ namespace Cosmos.VS.Package {
 
       mProps.SetProperty("StartCosmosGDB", GetConfigProperty("StartCosmosGDB"));
       checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
-
-      mProps.SetProperty("IgnoreDebugStubAttribute", GetConfigProperty("IgnoreDebugStubAttribute"));
-      checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
-
-      mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
-      comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
-
-      mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
-      comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
 
       UpdateUI();
     }

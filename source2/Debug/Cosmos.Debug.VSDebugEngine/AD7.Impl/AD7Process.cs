@@ -104,9 +104,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
 
-      string xBuildTarget = aDebugInfo["Profile"].ToUpper();
-      var xEnumValues = (Profile[])Enum.GetValues(typeof(Profile));
-      mProfile = xEnumValues.Where(q => q.ToString().ToUpper() == xBuildTarget).First();
+      string xProfile = aDebugInfo["Profile"];
+      mProfile = (Profile)Enum.Parse(typeof(Profile), xProfile);
 
       if (mDebugDownPipe == null) {
         mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
@@ -154,7 +153,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         OutputText("Preparing VMWare.");
         mProcessStartInfo.Arguments = mHost.Start(mDebugInfo["ISOFile"], xGDBDebugStub);
       } else {
-        throw new Exception("Invalid BuildTarget value: '" + xBuildTarget + "'.");
+        throw new Exception("Invalid Profile value: '" + xProfile + "'.");
       }
 
       // Set to false for debugging, true otherwise
@@ -190,7 +189,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDbgConnector.Connected = DebugConnectorConnected;
       }
       if (mDbgConnector == null) {
-        throw new Exception("BuildTarget value not valid: '" + mProfile.ToString() + "'.");
+        throw new Exception("Profile value not valid: '" + mProfile.ToString() + "'.");
       }
 
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
