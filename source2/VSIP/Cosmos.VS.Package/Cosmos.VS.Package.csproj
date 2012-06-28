@@ -207,14 +207,12 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\Cosmos\CosmosProject.Cosmos">
-      <RootPath>Templates\Projects\Cosmos</RootPath>
-    </ZipItem>
     <ZipItem Include="Templates\Projects\Cosmos\Kernel.ico">
       <RootPath>Templates\Projects\Cosmos</RootPath>
     </ZipItem>
     <ZipItem Include="Templates\Projects\Cosmos\Cosmos.vstemplate">
       <RootPath>Templates\Projects\Cosmos</RootPath>
+      <SubType>Designer</SubType>
     </ZipItem>
     <None Include="Templates\Projects\CosmosProject %28C#%29\Proj\CosmosProj.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
