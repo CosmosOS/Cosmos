@@ -279,53 +279,53 @@ namespace Cosmos.VS.Package {
       mProps.Reset();
 
       #region Profile
-      mProps.SetProperty("Profile", GetConfigProperty("Profile"));
+      mProps.SetProperty(BuildProperties.ProfileString, GetConfigProperty(BuildProperties.ProfileString));
       lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
       #endregion
 
       #region Deployment
-      mProps.SetProperty("Deployment", GetConfigProperty("Deployment"));
+      mProps.SetProperty(BuildProperties.DeploymentString, GetConfigProperty(BuildProperties.DeploymentString));
       lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Profile);
       #endregion
 
       #region Launch
-      mProps.SetProperty("Launch", GetConfigProperty("Launch"));
+      mProps.SetProperty(BuildProperties.LaunchString, GetConfigProperty(BuildProperties.LaunchString));
       lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Profile);
       #endregion
 
       #region VMware
-      mProps.SetProperty("VMwareEdition", GetConfigProperty("VMwareEdition"));
+      mProps.SetProperty(BuildProperties.VMwareEditionString, GetConfigProperty(BuildProperties.VMwareEditionString));
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
       #endregion
 
       #region Debug
-      mProps.SetProperty("DebugEnabled", GetConfigProperty("DebugEnabled"));
+      mProps.SetProperty(BuildProperties.DebugEnabledString, GetConfigProperty(BuildProperties.DebugEnabledString));
       chckEnableDebugStub.Checked = mProps.DebugEnabled;
 
-      mProps.SetProperty("IgnoreDebugStubAttribute", GetConfigProperty("IgnoreDebugStubAttribute"));
+      mProps.SetProperty(BuildProperties.IgnoreDebugStubAttributeString, GetConfigProperty(BuildProperties.IgnoreDebugStubAttributeString));
       checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
 
-      mProps.SetProperty("DebugMode", GetConfigProperty("DebugMode"));
+      mProps.SetProperty(BuildProperties.DebugModeString, GetConfigProperty(BuildProperties.DebugModeString));
       comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
 
-      mProps.SetProperty("TraceMode", GetConfigProperty("TraceMode"));
+      mProps.SetProperty(BuildProperties.TraceAssembliesString, GetConfigProperty(BuildProperties.TraceAssembliesString));
       comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
       #endregion
 
       //TODO: Why are we copying these one by one instead of automatic?
-      mProps.SetProperty("OutputPath", GetConfigProperty("OutputPath"));
+      mProps.SetProperty(BuildProperties.OutputPathString, GetConfigProperty(BuildProperties.OutputPathString));
       textOutputPath.Text = mProps.OutputPath;
 
-      mProps.SetProperty("Framework", GetConfigProperty("Framework"));
+      mProps.SetProperty(BuildProperties.FrameworkString, GetConfigProperty(BuildProperties.FrameworkString));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
 
-      mProps.SetProperty("UseInternalAssembler", GetConfigProperty("UseInternalAssembler"));
+      mProps.SetProperty(BuildProperties.UseInternalAssemblerString, GetConfigProperty(BuildProperties.UseInternalAssemblerString));
       checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
 
-      mProps.SetProperty("EnableGDB", GetConfigProperty("EnableGDB"));
+      mProps.SetProperty(BuildProperties.EnableGDBString, GetConfigProperty(BuildProperties.EnableGDBString));
       checkEnableGDB.Checked = mProps.EnableGDB;
 
-      mProps.SetProperty("StartCosmosGDB", GetConfigProperty("StartCosmosGDB"));
+      mProps.SetProperty(BuildProperties.StartCosmosGDBString, GetConfigProperty(BuildProperties.StartCosmosGDBString));
       checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
 
       UpdateUI();
