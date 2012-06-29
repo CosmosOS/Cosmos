@@ -42,6 +42,10 @@ namespace Cosmos.Deploy.USB {
         decimal xSize = x.TotalSize / (1000 * 1000 * 1000);
         lboxTarget.Items.Add(x.Name + "   " + xSize.ToString("0.0") + " GiB   " + x.DriveFormat + "   [" + x.VolumeLabel + "]");
       }
+
+      if (lboxTarget.Items.Count == 1) {
+        lboxTarget.SelectedIndex = 0;
+      }
     }
 
     private void butnRefresh_Click(object sender, RoutedEventArgs e) {
