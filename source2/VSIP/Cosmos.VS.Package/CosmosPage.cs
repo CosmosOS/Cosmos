@@ -41,6 +41,8 @@ namespace Cosmos.VS.Package {
     protected bool mShowTabISO;
     protected bool mShowTabSlave;
 
+    protected List<string> mPropNames = new List<string>();
+
     protected void RemoveTab(TabPage aTab) {
       if (TabControl1.TabPages.Contains(aTab)) {
         TabControl1.TabPages.Remove(aTab);
@@ -149,11 +151,24 @@ namespace Cosmos.VS.Package {
     public CosmosPage() {
       InitializeComponent();
 
+      foreach (var xField in typeof(BuildProperties).GetFields()) {
+        // IsLiteral determines if its value is written at 
+        //   compile time and not changeable
+        // IsInitOnly determine if the field can be set 
+        //   in the body of the constructor
+        // for C# a field which is readonly keyword would have both true 
+        //   but a const field would have only IsLiteral equal to true
+        if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
+          mPropNames.Add((string)xField.GetValue(mProps));
+        }
+      }
+
       # region Profile
       lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(Profile), true));
       lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var xValue = (Profile)((EnumValue)lboxProfile.SelectedItem).Value;
         if (xValue != mProps.Profile) {
+          SaveProfile(mProps.Profile.ToString());
           mProps.Profile = xValue;
           IsDirty = true;
           UpdateUI();
@@ -275,44 +290,39 @@ namespace Cosmos.VS.Package {
       get { return mProps; }
     }
 
+    protected void SaveProfile(string aName) {
+      foreach (var xName in mPropNames) {
+        if (xName != BuildProperties.ProfileString) {
+          mProps.SetProperty(aName + "_" + xName, GetConfigProperty(xName));
+        }
+      }
+    }
+
     protected override void FillProperties() {
       base.FillProperties();
       mProps.Reset();
-      foreach (var xField in typeof(BuildProperties).GetFields(BindingFlags.Public)) {
-        // IsLiteral determines if its value is written at 
-        //   compile time and not changeable
-        // IsInitOnly determine if the field can be set 
-        //   in the body of the constructor
-        // for C# a field which is readonly keyword would have both true 
-        //   but a const field would have only IsLiteral equal to true
-        if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
-          string xName = (string)xField.GetValue(this);
-          mProps.SetProperty(xName, GetConfigProperty(xName));
-        }
+      // Initialize defaults?
+      foreach (var xName in mPropNames) {
+        mProps.SetProperty(xName, GetConfigProperty(xName));
       }
 
-      #region Profile
+      // Profile
       lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
-      #endregion
 
-      #region Deployment      mProps.SetProperty(BuildProperties.DeploymentString, GetConfigProperty(BuildProperties.DeploymentString));
+      // Deployment   
       lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Profile);
-      #endregion
 
-      #region Launch
+      // Launch
       lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Profile);
-      #endregion
 
-      #region VMware
+      // VMware
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
-      #endregion
 
-      #region Debug
+      // Debug
       chckEnableDebugStub.Checked = mProps.DebugEnabled;
       checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
       comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
       comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
-      #endregion
 
       textOutputPath.Text = mProps.OutputPath;
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);

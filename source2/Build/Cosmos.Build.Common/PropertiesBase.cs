@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Cosmos.Build.Common {
   public abstract class PropertiesBase {
-    protected Dictionary<String, String> mPropTable = new Dictionary<String, String>();
+    protected Dictionary<string, string> mPropTable = new Dictionary<string, string>();
 
-    public Dictionary<String, String> GetProperties() {
-      Dictionary<string, string> clonedTable = new Dictionary<String, String>();
+    public Dictionary<string, string> GetProperties() {
+      Dictionary<string, string> clonedTable = new Dictionary<string, string>();
 
       foreach (KeyValuePair<string, string> pair in mPropTable) { 
         clonedTable.Add(pair.Key, pair.Value); 
@@ -21,29 +21,30 @@ namespace Cosmos.Build.Common {
       mPropTable.Clear();
     }
 
-    public void SetProperty(String name, String value) {
+    public void SetProperty(string name, string value) {
       if (mPropTable.ContainsKey(name) == false) { mPropTable.Add(name, value); } else { mPropTable[name] = value; }
     }
 
-    public void SetProperty(String name, Object value) {
+    public void SetProperty(string name, Object value) {
       SetProperty(name, value.ToString());
     }
 
-    protected String GetProperty(String name) {
-      return GetProperty(name, String.Empty);
+    public string GetProperty(string name) {
+      return GetProperty(name, string.Empty);
     }
 
-    protected T GetProperty<T>(String name, T @default) {
+    public T GetProperty<T>(string name, T @default) {
       T value = @default;
       if (mPropTable.ContainsKey(name) == true) {
-        String stringValue = mPropTable[name];
+        string stringValue = mPropTable[name];
         Type valueType = typeof(T);
-        String valueTypeName = valueType.Name;
+        string valueTypeName = valueType.Name;
 
         if (valueType.IsEnum == true) {
           value = EnumValue.Parse(stringValue, @default);
         } else {
-          if (valueTypeName == "String") {
+          // TODO Check on types directly instead of string literal
+          if (valueType == typeof(string)) {
             value = (T)((Object)stringValue);
           } else if ((valueTypeName == "Int16") || (valueTypeName == "Short")) {
             Int16 newValue;

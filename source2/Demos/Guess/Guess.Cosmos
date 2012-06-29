@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>PXE</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -30,10 +30,35 @@
     <IgnoreDebugStubAttribute />
     <Deployment />
     <Launch />
-    <DebugEnabled>False</DebugEnabled>
+    <DebugEnabled>True</DebugEnabled>
+    <TraceAssemblies />
+    <PXE_Deployment />
+    <PXE_Launch />
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
+    <PXE_DebugMode>Source</PXE_DebugMode>
+    <PXE_IgnoreDebugStubAttribute />
+    <PXE_VMwareEdition>Player</PXE_VMwareEdition>
+    <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
+    <PXE_Framework>MicrosoftNET</PXE_Framework>
+    <PXE_UseInternalAssembler>False</PXE_UseInternalAssembler>
+    <PXE_TraceAssemblies />
+    <PXE_EnableGDB>False</PXE_EnableGDB>
+    <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
+    <USB_Deployment />
+    <USB_Launch />
+    <USB_DebugEnabled>False</USB_DebugEnabled>
+    <USB_DebugMode>Source</USB_DebugMode>
+    <USB_IgnoreDebugStubAttribute />
+    <USB_VMwareEdition>Player</USB_VMwareEdition>
+    <USB_OutputPath>bin\Debug\</USB_OutputPath>
+    <USB_Framework>MicrosoftNET</USB_Framework>
+    <USB_UseInternalAssembler>False</USB_UseInternalAssembler>
+    <USB_TraceAssemblies />
+    <USB_EnableGDB>False</USB_EnableGDB>
+    <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>PXE</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -49,7 +74,32 @@
     <IgnoreDebugStubAttribute />
     <Deployment />
     <Launch />
-    <DebugEnabled>False</DebugEnabled>
+    <DebugEnabled>True</DebugEnabled>
+    <TraceAssemblies />
+    <PXE_Deployment />
+    <PXE_Launch />
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
+    <PXE_DebugMode>Source</PXE_DebugMode>
+    <PXE_IgnoreDebugStubAttribute />
+    <PXE_VMwareEdition>Player</PXE_VMwareEdition>
+    <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
+    <PXE_Framework>MicrosoftNET</PXE_Framework>
+    <PXE_UseInternalAssembler>False</PXE_UseInternalAssembler>
+    <PXE_TraceAssemblies />
+    <PXE_EnableGDB>False</PXE_EnableGDB>
+    <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
+    <USB_Deployment />
+    <USB_Launch />
+    <USB_DebugEnabled>False</USB_DebugEnabled>
+    <USB_DebugMode>Source</USB_DebugMode>
+    <USB_IgnoreDebugStubAttribute />
+    <USB_VMwareEdition>Player</USB_VMwareEdition>
+    <USB_OutputPath>bin\Debug\</USB_OutputPath>
+    <USB_Framework>MicrosoftNET</USB_Framework>
+    <USB_UseInternalAssembler>False</USB_UseInternalAssembler>
+    <USB_TraceAssemblies />
+    <USB_EnableGDB>False</USB_EnableGDB>
+    <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
