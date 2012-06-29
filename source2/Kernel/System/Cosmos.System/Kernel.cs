@@ -31,10 +31,12 @@ namespace Cosmos.System {
         }
 
         BeforeRun();
+
         while (!mStopped) {
-            Network.NetworkStack.Update();
-            Run();
+          Network.NetworkStack.Update();
+          Run();
         }
+
         AfterRun();
         bool xTest = 1 != 3;
         while (xTest) {

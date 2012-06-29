@@ -87,6 +87,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       new Call { DestinationLabel = InitVMTCodeLabel };
+      CosmosAssembler.WriteDebugVideo("Initializing string IDs.");
       new Call { DestinationLabel = InitStringIDsLabel };
 
       // we now need to do "newobj" on the entry point, and after that, call .Start on it
