@@ -7,6 +7,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Reflection;
 using Cosmos.Build.Common;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
@@ -277,55 +278,46 @@ namespace Cosmos.VS.Package {
     protected override void FillProperties() {
       base.FillProperties();
       mProps.Reset();
+      foreach (var xField in typeof(BuildProperties).GetFields(BindingFlags.Public)) {
+        // IsLiteral determines if its value is written at 
+        //   compile time and not changeable
+        // IsInitOnly determine if the field can be set 
+        //   in the body of the constructor
+        // for C# a field which is readonly keyword would have both true 
+        //   but a const field would have only IsLiteral equal to true
+        if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
+          string xName = (string)xField.GetValue(this);
+          mProps.SetProperty(xName, GetConfigProperty(xName));
+        }
+      }
 
       #region Profile
-      mProps.SetProperty(BuildProperties.ProfileString, GetConfigProperty(BuildProperties.ProfileString));
       lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
       #endregion
 
-      #region Deployment
-      mProps.SetProperty(BuildProperties.DeploymentString, GetConfigProperty(BuildProperties.DeploymentString));
+      #region Deployment      mProps.SetProperty(BuildProperties.DeploymentString, GetConfigProperty(BuildProperties.DeploymentString));
       lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Profile);
       #endregion
 
       #region Launch
-      mProps.SetProperty(BuildProperties.LaunchString, GetConfigProperty(BuildProperties.LaunchString));
       lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Profile);
       #endregion
 
       #region VMware
-      mProps.SetProperty(BuildProperties.VMwareEditionString, GetConfigProperty(BuildProperties.VMwareEditionString));
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
       #endregion
 
       #region Debug
-      mProps.SetProperty(BuildProperties.DebugEnabledString, GetConfigProperty(BuildProperties.DebugEnabledString));
       chckEnableDebugStub.Checked = mProps.DebugEnabled;
-
-      mProps.SetProperty(BuildProperties.IgnoreDebugStubAttributeString, GetConfigProperty(BuildProperties.IgnoreDebugStubAttributeString));
       checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
-
-      mProps.SetProperty(BuildProperties.DebugModeString, GetConfigProperty(BuildProperties.DebugModeString));
       comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
-
-      mProps.SetProperty(BuildProperties.TraceAssembliesString, GetConfigProperty(BuildProperties.TraceAssembliesString));
       comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
       #endregion
 
-      //TODO: Why are we copying these one by one instead of automatic?
-      mProps.SetProperty(BuildProperties.OutputPathString, GetConfigProperty(BuildProperties.OutputPathString));
       textOutputPath.Text = mProps.OutputPath;
-
-      mProps.SetProperty(BuildProperties.FrameworkString, GetConfigProperty(BuildProperties.FrameworkString));
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
-
-      mProps.SetProperty(BuildProperties.UseInternalAssemblerString, GetConfigProperty(BuildProperties.UseInternalAssemblerString));
       checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
-
-      mProps.SetProperty(BuildProperties.EnableGDBString, GetConfigProperty(BuildProperties.EnableGDBString));
       checkEnableGDB.Checked = mProps.EnableGDB;
-
-      mProps.SetProperty(BuildProperties.StartCosmosGDBString, GetConfigProperty(BuildProperties.StartCosmosGDBString));
       checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
 
       UpdateUI();
