@@ -27,7 +27,7 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        string xProfile = GetConfigurationProperty("Profile", true);
+        string xProfile = GetConfigurationProperty(BuildProperties.ProfileString, true);
         var xTarget = (Profile)Enum.Parse(typeof(Profile), xProfile);
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
@@ -63,14 +63,14 @@ namespace Cosmos.VS.Package {
           var xValues = new NameValueCollection();
           xValues.Add("ISOFile", xIsoFile);
           xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
-          xValues.Add("EnableGDB", GetConfigurationProperty("EnableGDB", false));
-          xValues.Add("DebugMode", GetConfigurationProperty("DebugMode", false));
-          xValues.Add("TraceAssemblies", GetConfigurationProperty("TraceAssemblies", false));
-          xValues.Add("Profile", GetConfigurationProperty("Profile", false));
+          xValues.Add(BuildProperties.EnableGDBString, GetConfigurationProperty(BuildProperties.EnableGDBString, false));
+          xValues.Add(BuildProperties.DebugModeString, GetConfigurationProperty(BuildProperties.DebugModeString, false));
+          xValues.Add(BuildProperties.TraceAssembliesString, GetConfigurationProperty(BuildProperties.TraceAssembliesString, false));
+          xValues.Add(BuildProperties.ProfileString, GetConfigurationProperty(BuildProperties.ProfileString, false));
           xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
-          xValues.Add("VMwareEdition", GetConfigurationProperty("VMwareEdition", false));
-          xValues.Add("VMwareDeploy", GetConfigurationProperty("VMwareDeploy", false));
-          xValues.Add("StartCosmosGDB", GetConfigurationProperty("StartCosmosGDB", false));
+          xValues.Add(BuildProperties.VMwareEditionString, GetConfigurationProperty(BuildProperties.VMwareEditionString, false));
+          xValues.Add(BuildProperties.VMwareEditionString, GetConfigurationProperty(BuildProperties.VMwareEditionString, false));
+          xValues.Add(BuildProperties.StartCosmosGDBString, GetConfigurationProperty(BuildProperties.StartCosmosGDBString, false));
 
           xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 

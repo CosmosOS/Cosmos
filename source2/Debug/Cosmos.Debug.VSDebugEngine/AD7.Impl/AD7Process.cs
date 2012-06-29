@@ -104,7 +104,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
 
-      string xProfile = aDebugInfo["Profile"];
+      string xProfile = aDebugInfo[BuildProperties.ProfileString];
       mProfile = (Profile)Enum.Parse(typeof(Profile), xProfile);
 
       if (mDebugDownPipe == null) {
@@ -123,16 +123,16 @@ namespace Cosmos.Debug.VSDebugEngine {
       mProjectFile = mDebugInfo["ProjectFile"];
       //
       var xGDBDebugStub = false;
-      Boolean.TryParse(mDebugInfo["EnableGDB"], out xGDBDebugStub);
+      Boolean.TryParse(mDebugInfo[BuildProperties.EnableGDBString], out xGDBDebugStub);
       OutputText("GDB " + (xGDBDebugStub ? "Enabled" : "Disabled") + ".");
       //
       var xGDBClient = false;
-      Boolean.TryParse(mDebugInfo["StartCosmosGDB"], out xGDBClient);
+      Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
 
       if (mProfile == Profile.VMware) {
-        string xFlavor = mDebugInfo["VMwareEdition"].ToUpper();
+        string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
         // Try alternate if selected one is not installed
