@@ -75,30 +75,31 @@ namespace Cosmos.VS.Package {
     private static ImageList imageList;
 
     protected override ConfigProvider CreateConfigProvider() {
-      LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
-      try {
-        return new VsConfigProvider(this);
-      } finally {
-        LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.CreateConfigProvider()");
-      }
+      return new VsConfigProvider(this);
     }
+
+    // See comments in CosmosPage.cs about this.
+    //protected override Guid[] GetConfigurationDependentPropertyPages() {
+    //  return new Guid[] { 
+    //    typeof(CosmosPage).GUID 
+    // };
+    //}
 
     protected override Guid[] GetConfigurationIndependentPropertyPages() {
       // Default C# property pages
       // Unfortunately just adding them to the list does not work.
       // It causes AV's, but its specific to each page
-      // loading and getting confused under a different project type
+      // loading and getting confused under a different project type.
+      // Maybe they need to be added as Dependent instead of Independent pages?
+      // Adding them as dependent ones is better, but at least build events is added, but is disabled.
+      //
       //5E9A8AC2-4F34-4521-858F-4C248BA31532 - Application
       //43E38D2E-43B8-4204-8225-9357316137A4 - Services
       //031911C8-6148-4E25-B1B1-44BCA9A0C45C - Reference Paths
       //F8D6553F-F752-4DBF-ACB6-F291B744A792 - Signing
       //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
-      LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
-      try {
-        return new Guid[] { typeof(CosmosPage).GUID };
-      } finally {
-        LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.GetConfigurationIndependentPropertyPages()");
-      }
+      
+      return new Guid[] { typeof(CosmosPage).GUID };
     }
 
     static VSProjectNode() {

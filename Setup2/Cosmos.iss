@@ -266,6 +266,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: CompanyName; ValueData: Cosmos
 
 ; Project Properties Cosmos Page configuration page
+; If we use the vsinstaller - do we still need these?
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.CosmosPage
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL

@@ -12,11 +12,22 @@ using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package {
-  // We put all items on ONE form because VS is such a C++ developers wet dream to manage mulitple forms
+  // We put all items on ONE form because VS is such a C++ developers wet dream to manage mulitple pages
   // and add new ones.
 
-  // Magic width and height.
-  // 492, 288
+  // We use our own profiles instead of Project Configrations because:
+  // -Couldnt find a proper way to tell VS there are no configuration independent pages. The MPF way (as well as 
+  //  0 sized array) both don't work.
+  // -When we assign our own project configuration types and the solution configurations refer to now non existent 
+  //  project configurations, there are errors.
+  //
+  // BOTH of the above probably could be solved with some digging. BUT in the end we learned that project configs
+  // really wont do what we want. For the user to change the active config for a *single* project they would need
+  // to change it manually in the solution config, or maintain on solution config for every project config type. 
+  // Maintaining so many solution configs is not only impractical but causes a whole bunch of other issues.
+  //
+  // So instead we keep our own list of profiles, and when the user selects them we write out a copy of its values
+  // to the active configuration (all since we are not configuration dependent) for MSBuild and other code to use.
 
   [Guid(Guids.CosmosPage)]
   public partial class CosmosPage : CustomPropertyPage {
