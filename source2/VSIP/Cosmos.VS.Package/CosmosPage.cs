@@ -42,6 +42,8 @@ namespace Cosmos.VS.Package {
       }
     }
 
+    protected bool mShowTabDeployment;
+    protected bool mShowTabLaunch;
     protected bool mShowTabVMware;
     protected bool mShowTabPXE;
     protected bool mShowTabUSB;
@@ -57,14 +59,20 @@ namespace Cosmos.VS.Package {
     protected void UpdateTabs() {
       var xTab = TabControl1.SelectedTab;
 
-      RemoveTab(tabDebug);
       RemoveTab(tabDeployment);
+      RemoveTab(tabLaunch);
       RemoveTab(tabVMware);
       RemoveTab(tabPXE);
       RemoveTab(tabUSB);
       RemoveTab(tabISO);
       RemoveTab(tabSlave);
 
+      if (mShowTabDeployment) {
+        TabControl1.TabPages.Add(tabDeployment);
+      }
+      if (mShowTabLaunch) {
+        TabControl1.TabPages.Add(tabLaunch);
+      }
       if (mShowTabVMware) {
         TabControl1.TabPages.Add(tabVMware);
       }
@@ -95,13 +103,8 @@ namespace Cosmos.VS.Package {
       //
       lablCurrentProfile.Text = lboxProfile.SelectedItem.ToString();
       chckEnableDebugStub.Checked = false;
-      lablBuildOnly.Visible = false;
       cmboCosmosPort.Enabled = true;
       cmboVisusalStudioPort.Enabled = true;
-
-      lablPreset.Visible = (mProps.Profile != ProfileType.Custom);
-      lboxDeployment.Enabled = !lablPreset.Visible;
-      lboxLaunch.Enabled = !lablPreset.Visible;
 
       // Set visibilty and for preset set/reset values.
       if (mProps.Profile == ProfileType.ISO) {
@@ -111,14 +114,14 @@ namespace Cosmos.VS.Package {
         lablBuildOnly.Visible = true;
         mShowTabISO = true;
         mProps.Deployment = Deployment.ISO;
-        lboxLaunch.SelectedItem = Launch.None;
+        mProps.Launch = Launch.None;
 
       } else if (mProps.Profile == ProfileType.USB) {
         lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
         lablBuildOnly.Visible = true;
         mShowTabUSB = true;
         mProps.Deployment = Deployment.USB;
-        lboxLaunch.SelectedItem = Launch.PXE;
+        mProps.Launch = Launch.PXE;
 
       } else if (mProps.Profile == ProfileType.VMware) {
         lablDeployText.Text = "Use VMware to deploy and debug.";
@@ -127,19 +130,25 @@ namespace Cosmos.VS.Package {
         cmboCosmosPort.Enabled = false;
         cmboVisusalStudioPort.Enabled = false;
         mProps.Deployment = Deployment.ISO;
-        lboxLaunch.SelectedItem = Launch.VMware;
+        mProps.Launch = Launch.VMware;
 
       } else if (mProps.Profile == ProfileType.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mShowTabPXE = true;
         mProps.Deployment = Deployment.PXE;
-        lboxLaunch.SelectedItem = Launch.None;
+        mProps.Launch = Launch.None;
 
       } else {
         lablDeployText.Text = "Oops. What the frak did you click?";
       }
 
       lboxDeployment.SelectedItem = mProps.Deployment;
+      lboxLaunch.SelectedItem = mProps.Launch;
+      lablBuildOnly.Visible = mProps.Launch == Launch.None;
+
+      lablPreset.Visible = (mProps.Profile != ProfileType.Custom);
+      mShowTabDeployment = !lablPreset.Visible;
+      mShowTabLaunch = !lablPreset.Visible;
 
       UpdateTabs();
     }

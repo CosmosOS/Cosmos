@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>ISO</Profile>
+    <Profile>USB</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -28,13 +28,13 @@
     <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
-    <Deployment />
-    <Launch />
-    <DebugEnabled>True</DebugEnabled>
+    <Deployment>USB</Deployment>
+    <Launch>PXE</Launch>
+    <DebugEnabled>False</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment />
     <PXE_Launch />
-    <PXE_DebugEnabled>False</PXE_DebugEnabled>
+    <PXE_DebugEnabled>True</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
@@ -70,7 +70,7 @@
     <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
     <ISO_Deployment />
     <ISO_Launch />
-    <ISO_DebugEnabled>False</ISO_DebugEnabled>
+    <ISO_DebugEnabled>True</ISO_DebugEnabled>
     <ISO_DebugMode>Source</ISO_DebugMode>
     <ISO_IgnoreDebugStubAttribute />
     <ISO_VMwareEdition>Player</ISO_VMwareEdition>
@@ -82,7 +82,7 @@
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>ISO</Profile>
+    <Profile>USB</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -96,13 +96,13 @@
     <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
-    <Deployment />
-    <Launch />
-    <DebugEnabled>True</DebugEnabled>
+    <Deployment>USB</Deployment>
+    <Launch>PXE</Launch>
+    <DebugEnabled>False</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment />
     <PXE_Launch />
-    <PXE_DebugEnabled>False</PXE_DebugEnabled>
+    <PXE_DebugEnabled>True</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
@@ -138,7 +138,7 @@
     <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
     <ISO_Deployment />
     <ISO_Launch />
-    <ISO_DebugEnabled>False</ISO_DebugEnabled>
+    <ISO_DebugEnabled>True</ISO_DebugEnabled>
     <ISO_DebugMode>Source</ISO_DebugMode>
     <ISO_IgnoreDebugStubAttribute />
     <ISO_VMwareEdition>Player</ISO_VMwareEdition>
