@@ -28,10 +28,21 @@ namespace Cosmos.Build.Common {
       }
     }
 
+    // Profile
     public const string ProfileString = "Profile";
     public string Profile {
       get { return GetProperty(ProfileString, "VMware"); }
       set { SetProperty(ProfileString, value); }
+    }
+    public const string NameString = "Name";
+    public string Name {
+      get { return GetProperty(NameString, ""); }
+      set { SetProperty(NameString, value); }
+    }
+    public const string DescriptionString = "Description";
+    public string Description {
+      get { return GetProperty(DescriptionString, ""); }
+      set { SetProperty(DescriptionString, value); }
     }
 
     // Deployment

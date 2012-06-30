@@ -128,8 +128,8 @@ namespace Cosmos.VS.Package {
       }
     }
 
-    public virtual String GetConfigProperty(String name) {
-      return ProjectConfigs[0].GetConfigurationProperty(name, true);
+    public virtual String GetConfigProperty(string aName) {
+      return ProjectConfigs[0].GetConfigurationProperty(aName, true);
     }
 
     protected virtual void Initialize() {

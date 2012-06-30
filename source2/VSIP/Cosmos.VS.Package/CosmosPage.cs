@@ -35,7 +35,6 @@ namespace Cosmos.VS.Package {
     protected class ProfileItem {
       public string Prefix;
       public string Name;
-      public string Description;
       public bool IsPreset;
 
       public override string ToString() {
@@ -123,7 +122,7 @@ namespace Cosmos.VS.Package {
       var xProfile = (ProfileItem)lboxProfile.SelectedItem;
 
       lablCurrentProfile.Text = xProfile.ToString();
-      lablDeployText.Text = xProfile.Description;
+      lablDeployText.Text = mProps.Description;
       lboxDeployment.SelectedItem = mProps.Deployment;
       lboxLaunch.SelectedItem = mProps.Launch;
       lablBuildOnly.Visible = mProps.Launch == Launch.None;
@@ -142,71 +141,43 @@ namespace Cosmos.VS.Package {
       UpdateTabs();
     }
 
+    protected int FillProfile(string aPrefix, string aName) {
+      var xProfile = new ProfileItem {
+        Prefix = aPrefix,
+        Name = aName,
+        IsPreset = true
+      };
+      return lboxProfile.Items.Add(xProfile);
+    }
+
+    protected int FillProfile(int aID) {
+      var xProfile = new ProfileItem {
+        Prefix = "User" + aID.ToString("000"),
+        IsPreset = false
+      };
+      xProfile.Name = mProps.GetProperty(xProfile.Prefix + "_Name");
+      return lboxProfile.Items.Add(xProfile);
+    }
+
     protected void FillProfiles() {
-      ProfileItem xProfile;
+      FillProfile("ISO", "ISO Image");
+      FillProfile("USB", "USB Bootable Drive");
+      FillProfile("PXE", "PXE Network Boot");
+      FillProfile("VMware", "VMware");
 
-      xProfile = new ProfileItem {
-        Prefix = "ISO",
-        Name = "ISO Image",
-        IsPreset = true,
-        Description = "Creates a bootable ISO image which can be burned to a DVD."
-         + " After running the selected project, an explorer window will open containing the ISO file."
-         + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system."
-      };
-      lboxProfile.Items.Add(xProfile);
-
-      xProfile = new ProfileItem {
-        Prefix = "USB",
-        Name = "USB Device",
-        IsPreset = true,
-        Description = "Makes a USB device such as a flash drive or external hard disk bootable."
-      };
-      lboxProfile.Items.Add(xProfile);
-
-      xProfile = new ProfileItem {
-        Prefix = "VMware",
-        Name = "VMware",
-        IsPreset = true,
-        Description = "Use VMware Player or Workstation to deploy and debug."
-      };
-      lboxProfile.Items.Add(xProfile);
-
-      xProfile = new ProfileItem {
-        Prefix = "PXE",
-        Name = "PXE Network Boot",
-        IsPreset = true,
-        Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable."
-      };
-      lboxProfile.Items.Add(xProfile);
+      for (int i = 1; i < 100; i++) {
+        if (mProps.GetProperty("User" + i.ToString("000") + "_Name") != "") {
+          FillProfile(i);
+        }
+      }
     }
 
     public CosmosPage() {
       InitializeComponent();
 
       # region Profile
-      butnProfileClone.Click += delegate(Object sender, EventArgs e) {
-        var xItem = (ProfileItem)lboxProfile.SelectedItem;
-        if (xItem == null) {
-          // This should be impossible, but we check for it anwyays.
-          return;
-        }
-      };
-      butnProfileDelete.Click += delegate(Object sender, EventArgs e) {
-        var xItem = (ProfileItem)lboxProfile.SelectedItem;
-
-        if (xItem == null) {
-          // This should be impossible, but we check for it anwyays.
-
-        } else if (xItem.IsPreset) {
-          MessageBox.Show("Preset profiles cannot be deleted.");
-
-        } else if (MessageBox.Show("", "Delete profile '" + xItem.Name + "'?", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-          // Select a new profile first, so the selectchange logic wont barf
-          lboxProfile.SelectedIndex = 0;
-          lboxProfile.Items.Remove(xItem);
-          mProps.DeleteProfile(xItem.Prefix);
-        }
-      };
+      butnProfileClone.Click += new EventHandler(butnProfileClone_Click);
+      butnProfileDelete.Click += new EventHandler(butnProfileDelete_Click);
 
       FillProfiles();
       lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
@@ -330,6 +301,47 @@ namespace Cosmos.VS.Package {
       };
     }
 
+    void butnProfileDelete_Click(object sender, EventArgs e) {
+      var xItem = (ProfileItem)lboxProfile.SelectedItem;
+
+      if (xItem == null) {
+        // This should be impossible, but we check for it anwyays.
+
+      } else if (xItem.IsPreset) {
+        MessageBox.Show("Preset profiles cannot be deleted.");
+
+      } else if (MessageBox.Show("", "Delete profile '" + xItem.Name + "'?", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+        // Select a new profile first, so the selectchange logic wont barf
+        lboxProfile.SelectedIndex = 0;
+        lboxProfile.Items.Remove(xItem);
+        mProps.DeleteProfile(xItem.Prefix);
+      }
+    }
+
+    void butnProfileClone_Click(object sender, EventArgs e) {
+      var xItem = (ProfileItem)lboxProfile.SelectedItem;
+      if (xItem == null) {
+        // This should be impossible, but we check for it anwyays.
+        return;
+      }
+
+      int xID;
+      string xPrefix = null;
+      for (xID = 1; xID < 100; xID++) {
+        xPrefix = "User" + xID.ToString("000");
+        if (mProps.GetProperty(xPrefix + "_Name") == "") {
+          break;
+        }
+      }
+      if (xID == 100) {
+        MessageBox.Show("No more profile space is available.");
+        return;
+      }
+
+      SaveProfile(xPrefix);
+      lboxProfile.SelectedIndex = FillProfile(xID);
+    }
+
     protected BuildProperties mProps = new BuildProperties();
     public override PropertiesBase Properties {
       get { return mProps; }
@@ -337,29 +349,35 @@ namespace Cosmos.VS.Package {
 
     protected void SaveProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
-        mProps.SetProperty(aName + "_" + xName, GetConfigProperty(xName));
+        mProps.SetProperty(aName + "_" + xName, mProps.GetProperty(xName));
       }
     }
 
     protected void LoadProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
-        mProps.SetProperty(xName, GetConfigProperty(aName + "_" + xName));
+        mProps.SetProperty(xName, mProps.GetProperty(aName + "_" + xName));
       }
 
       // Reforce fixed settings for presets on each load.
       if (mProps.Profile == "ISO") {
+        mProps.Description = "Creates a bootable ISO image which can be burned to a DVD."
+         + " After running the selected project, an explorer window will open containing the ISO file."
+         + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.None;
 
       } else if (mProps.Profile == "USB") {
+        mProps.Description = "Makes a USB device such as a flash drive or external hard disk bootable.";
         mProps.Deployment = Deployment.USB;
         mProps.Launch = Launch.PXE;
 
       } else if (mProps.Profile == "VMware") {
+        mProps.Description = "Use VMware Player or Workstation to deploy and debug.";
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.VMware;
 
       } else if (mProps.Profile == "PXE") {
+        mProps.Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mProps.Deployment = Deployment.PXE;
         mProps.Launch = Launch.None;
       }
