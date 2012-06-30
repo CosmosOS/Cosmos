@@ -120,6 +120,11 @@
       <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="VsConfigProvider.cs" />
+    <Compile Include="VSPackage.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+    </Compile>
     <Compile Include="VsProjectConfig.cs" />
     <Compile Include="VSProjectFactory.cs" />
     <Compile Include="VSProjectNode.cs" />
@@ -129,6 +134,8 @@
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VSPackage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

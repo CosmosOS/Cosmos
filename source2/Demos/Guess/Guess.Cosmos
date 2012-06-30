@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>VMware</Profile>
+    <Profile>ISO</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -56,9 +56,33 @@
     <USB_TraceAssemblies />
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
+    <VMware_Deployment />
+    <VMware_Launch />
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_IgnoreDebugStubAttribute />
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_Framework>MicrosoftNET</VMware_Framework>
+    <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
+    <VMware_TraceAssemblies />
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+    <ISO_Deployment />
+    <ISO_Launch />
+    <ISO_DebugEnabled>False</ISO_DebugEnabled>
+    <ISO_DebugMode>Source</ISO_DebugMode>
+    <ISO_IgnoreDebugStubAttribute />
+    <ISO_VMwareEdition>Player</ISO_VMwareEdition>
+    <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
+    <ISO_Framework>MicrosoftNET</ISO_Framework>
+    <ISO_UseInternalAssembler>False</ISO_UseInternalAssembler>
+    <ISO_TraceAssemblies />
+    <ISO_EnableGDB>False</ISO_EnableGDB>
+    <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>VMware</Profile>
+    <Profile>ISO</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -100,6 +124,30 @@
     <USB_TraceAssemblies />
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
+    <VMware_Deployment />
+    <VMware_Launch />
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_IgnoreDebugStubAttribute />
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_Framework>MicrosoftNET</VMware_Framework>
+    <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
+    <VMware_TraceAssemblies />
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+    <ISO_Deployment />
+    <ISO_Launch />
+    <ISO_DebugEnabled>False</ISO_DebugEnabled>
+    <ISO_DebugMode>Source</ISO_DebugMode>
+    <ISO_IgnoreDebugStubAttribute />
+    <ISO_VMwareEdition>Player</ISO_VMwareEdition>
+    <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
+    <ISO_Framework>MicrosoftNET</ISO_Framework>
+    <ISO_UseInternalAssembler>False</ISO_UseInternalAssembler>
+    <ISO_TraceAssemblies />
+    <ISO_EnableGDB>False</ISO_EnableGDB>
+    <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">

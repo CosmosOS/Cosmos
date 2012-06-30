@@ -10,8 +10,8 @@ namespace Cosmos.Build.Common {
     public Dictionary<string, string> GetProperties() {
       Dictionary<string, string> clonedTable = new Dictionary<string, string>();
 
-      foreach (KeyValuePair<string, string> pair in mPropTable) { 
-        clonedTable.Add(pair.Key, pair.Value); 
+      foreach (KeyValuePair<string, string> pair in mPropTable) {
+        clonedTable.Add(pair.Key, pair.Value);
       }
 
       return clonedTable;
@@ -22,7 +22,11 @@ namespace Cosmos.Build.Common {
     }
 
     public void SetProperty(string name, string value) {
-      if (mPropTable.ContainsKey(name) == false) { mPropTable.Add(name, value); } else { mPropTable[name] = value; }
+      if (mPropTable.ContainsKey(name) == false) { 
+        mPropTable.Add(name, value); 
+      } else { 
+        mPropTable[name] = value; 
+      }
     }
 
     public void SetProperty(string name, Object value) {

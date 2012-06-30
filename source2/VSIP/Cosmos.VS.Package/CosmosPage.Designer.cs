@@ -28,15 +28,20 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CosmosPage));
       this.panel1 = new System.Windows.Forms.Panel();
       this.lablCurrentProfile = new System.Windows.Forms.Label();
       this.label11 = new System.Windows.Forms.Label();
       this.TabControl1 = new System.Windows.Forms.TabControl();
       this.tabProfile = new System.Windows.Forms.TabPage();
+      this.panel2 = new System.Windows.Forms.Panel();
+      this.lboxProfile = new System.Windows.Forms.ListBox();
+      this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+      this.butnProfileClone = new System.Windows.Forms.ToolStripButton();
+      this.butnProfileDelete = new System.Windows.Forms.ToolStripButton();
       this.lablNonFunctional = new System.Windows.Forms.Label();
       this.lablDeployText = new System.Windows.Forms.Label();
       this.lablBuildOnly = new System.Windows.Forms.Label();
-      this.lboxProfile = new System.Windows.Forms.ListBox();
       this.tabCompile = new System.Windows.Forms.TabPage();
       this.comboFramework = new System.Windows.Forms.ComboBox();
       this.buttonOutputBrowse = new System.Windows.Forms.Button();
@@ -77,6 +82,8 @@
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
+      this.panel2.SuspendLayout();
+      this.toolStrip1.SuspendLayout();
       this.tabCompile.SuspendLayout();
       this.tabAssembler.SuspendLayout();
       this.tabDebug.SuspendLayout();
@@ -140,10 +147,10 @@
       // 
       // tabProfile
       // 
+      this.tabProfile.Controls.Add(this.panel2);
       this.tabProfile.Controls.Add(this.lablNonFunctional);
       this.tabProfile.Controls.Add(this.lablDeployText);
       this.tabProfile.Controls.Add(this.lablBuildOnly);
-      this.tabProfile.Controls.Add(this.lboxProfile);
       this.tabProfile.Location = new System.Drawing.Point(4, 22);
       this.tabProfile.Name = "tabProfile";
       this.tabProfile.Padding = new System.Windows.Forms.Padding(3);
@@ -151,6 +158,57 @@
       this.tabProfile.TabIndex = 8;
       this.tabProfile.Text = "Profile";
       this.tabProfile.UseVisualStyleBackColor = true;
+      // 
+      // panel2
+      // 
+      this.panel2.Controls.Add(this.lboxProfile);
+      this.panel2.Controls.Add(this.toolStrip1);
+      this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
+      this.panel2.Location = new System.Drawing.Point(3, 3);
+      this.panel2.Name = "panel2";
+      this.panel2.Size = new System.Drawing.Size(200, 381);
+      this.panel2.TabIndex = 6;
+      // 
+      // lboxProfile
+      // 
+      this.lboxProfile.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.lboxProfile.FormattingEnabled = true;
+      this.lboxProfile.Location = new System.Drawing.Point(0, 25);
+      this.lboxProfile.Name = "lboxProfile";
+      this.lboxProfile.Size = new System.Drawing.Size(200, 356);
+      this.lboxProfile.Sorted = true;
+      this.lboxProfile.TabIndex = 4;
+      // 
+      // toolStrip1
+      // 
+      this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.butnProfileClone,
+            this.butnProfileDelete});
+      this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+      this.toolStrip1.Name = "toolStrip1";
+      this.toolStrip1.Size = new System.Drawing.Size(200, 25);
+      this.toolStrip1.TabIndex = 3;
+      this.toolStrip1.Text = "toolStrip1";
+      // 
+      // butnProfileClone
+      // 
+      this.butnProfileClone.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+      this.butnProfileClone.Image = ((System.Drawing.Image)(resources.GetObject("butnProfileClone.Image")));
+      this.butnProfileClone.ImageTransparentColor = System.Drawing.Color.Magenta;
+      this.butnProfileClone.Name = "butnProfileClone";
+      this.butnProfileClone.Size = new System.Drawing.Size(23, 22);
+      this.butnProfileClone.Text = "Clone";
+      this.butnProfileClone.ToolTipText = "Create a new profile from an existing one.";
+      // 
+      // butnProfileDelete
+      // 
+      this.butnProfileDelete.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+      this.butnProfileDelete.Image = ((System.Drawing.Image)(resources.GetObject("butnProfileDelete.Image")));
+      this.butnProfileDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+      this.butnProfileDelete.Name = "butnProfileDelete";
+      this.butnProfileDelete.Size = new System.Drawing.Size(23, 22);
+      this.butnProfileDelete.Text = "Delete";
+      this.butnProfileDelete.ToolTipText = "Delete selected profile";
       // 
       // lablNonFunctional
       // 
@@ -181,16 +239,6 @@
       this.lablBuildOnly.Size = new System.Drawing.Size(207, 13);
       this.lablBuildOnly.TabIndex = 3;
       this.lablBuildOnly.Text = "You have selected a build only option.";
-      // 
-      // lboxProfile
-      // 
-      this.lboxProfile.Dock = System.Windows.Forms.DockStyle.Left;
-      this.lboxProfile.FormattingEnabled = true;
-      this.lboxProfile.Location = new System.Drawing.Point(3, 3);
-      this.lboxProfile.Name = "lboxProfile";
-      this.lboxProfile.Size = new System.Drawing.Size(206, 381);
-      this.lboxProfile.Sorted = true;
-      this.lboxProfile.TabIndex = 2;
       // 
       // tabCompile
       // 
@@ -456,7 +504,7 @@
       this.lboxDeployment.FormattingEnabled = true;
       this.lboxDeployment.Location = new System.Drawing.Point(0, 0);
       this.lboxDeployment.Name = "lboxDeployment";
-      this.lboxDeployment.Size = new System.Drawing.Size(206, 293);
+      this.lboxDeployment.Size = new System.Drawing.Size(206, 387);
       this.lboxDeployment.Sorted = true;
       this.lboxDeployment.TabIndex = 3;
       // 
@@ -476,7 +524,7 @@
       this.lboxLaunch.FormattingEnabled = true;
       this.lboxLaunch.Location = new System.Drawing.Point(0, 0);
       this.lboxLaunch.Name = "lboxLaunch";
-      this.lboxLaunch.Size = new System.Drawing.Size(206, 293);
+      this.lboxLaunch.Size = new System.Drawing.Size(206, 387);
       this.lboxLaunch.Sorted = true;
       this.lboxLaunch.TabIndex = 3;
       // 
@@ -618,6 +666,10 @@
       this.TabControl1.ResumeLayout(false);
       this.tabProfile.ResumeLayout(false);
       this.tabProfile.PerformLayout();
+      this.panel2.ResumeLayout(false);
+      this.panel2.PerformLayout();
+      this.toolStrip1.ResumeLayout(false);
+      this.toolStrip1.PerformLayout();
       this.tabCompile.ResumeLayout(false);
       this.tabCompile.PerformLayout();
       this.tabAssembler.ResumeLayout(false);
@@ -647,7 +699,6 @@
     private System.Windows.Forms.Label lablNonFunctional;
     private System.Windows.Forms.Label lablDeployText;
     private System.Windows.Forms.Label lablBuildOnly;
-    private System.Windows.Forms.ListBox lboxProfile;
     private System.Windows.Forms.TabPage tabDeployment;
     private System.Windows.Forms.ListBox lboxDeployment;
     private System.Windows.Forms.TabPage tabLaunch;
@@ -685,6 +736,11 @@
     private System.Windows.Forms.TabPage tabISO;
     private System.Windows.Forms.Label label8;
     private System.Windows.Forms.TabPage tabSlave;
+    private System.Windows.Forms.Panel panel2;
+    private System.Windows.Forms.ToolStrip toolStrip1;
+    private System.Windows.Forms.ListBox lboxProfile;
+    private System.Windows.Forms.ToolStripButton butnProfileClone;
+    private System.Windows.Forms.ToolStripButton butnProfileDelete;
 
 
 

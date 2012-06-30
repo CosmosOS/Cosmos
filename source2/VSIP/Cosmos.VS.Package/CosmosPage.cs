@@ -32,6 +32,16 @@ namespace Cosmos.VS.Package {
 
   [Guid(Guids.CosmosPage)]
   public partial class CosmosPage : CustomPropertyPage {
+    protected class ProfileItem {
+      public string Prefix;
+      public string Description;
+      public ProfileType Type;
+
+      public override string ToString() {
+        return Description;
+      }
+    }
+
     protected bool mShowTabDeployment;
     protected bool mShowTabLaunch;
     protected bool mShowTabDebug;
@@ -110,7 +120,7 @@ namespace Cosmos.VS.Package {
       cmboVisusalStudioPort.Enabled = true;
 
       // Set visibilty and for preset set/reset values.
-      if (mProps.Profile == Profile.ISO) {
+      if (mProps.Profile == ProfileType.ISO) {
         lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
          + " After running the selected project, an explorer window will open containing the ISO file."
          + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
@@ -119,14 +129,14 @@ namespace Cosmos.VS.Package {
         lboxDeployment.SelectedItem = Deployment.ISO;
         lboxLaunch.SelectedItem = Launch.None;
 
-      } else if (mProps.Profile == Profile.USB) {
+      } else if (mProps.Profile == ProfileType.USB) {
         lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
         lablBuildOnly.Visible = true;
         mShowTabUSB = true;
         lboxDeployment.SelectedItem = Deployment.PXE;
         lboxLaunch.SelectedItem = Launch.PXE;
 
-      } else if (mProps.Profile == Profile.VMware) {
+      } else if (mProps.Profile == ProfileType.VMware) {
         lablDeployText.Text = "Use VMware to deploy and debug.";
         mShowTabVMware = true;
         chckEnableDebugStub.Checked = true;
@@ -135,7 +145,7 @@ namespace Cosmos.VS.Package {
         lboxDeployment.SelectedItem = Deployment.ISO;
         lboxLaunch.SelectedItem = Launch.VMware;
 
-      } else if (mProps.Profile == Profile.PXE) {
+      } else if (mProps.Profile == ProfileType.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mShowTabPXE = true;
         lboxDeployment.SelectedItem = Deployment.PXE;
@@ -164,12 +174,22 @@ namespace Cosmos.VS.Package {
       }
 
       # region Profile
-      lboxProfile.Items.AddRange(EnumValue.GetEnumValues(typeof(Profile), true));
+      foreach (ProfileType xProfile in Enum.GetValues(typeof(ProfileType))) {
+        if (xProfile != ProfileType.Custom) {
+          var xItem = new ProfileItem { 
+            Prefix = xProfile.ToString(),
+            Description = Cosmos.Build.Common.DescriptionAttribute.GetDescription(xProfile),
+            Type = xProfile
+          };
+          lboxProfile.Items.Add(xItem);
+        }
+      }
       lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var xValue = (Profile)((EnumValue)lboxProfile.SelectedItem).Value;
-        if (xValue != mProps.Profile) {
+        var xProfile = (ProfileItem)lboxProfile.SelectedItem;
+        if (xProfile.Type != mProps.Profile) {
           SaveProfile(mProps.Profile.ToString());
-          mProps.Profile = xValue;
+          LoadProfile(xProfile.Prefix);
+          mProps.Profile = xProfile.Type;
           IsDirty = true;
           UpdateUI();
         }
@@ -298,6 +318,14 @@ namespace Cosmos.VS.Package {
       }
     }
 
+    protected void LoadProfile(string aName) {
+      foreach (var xName in mPropNames) {
+        if (xName != BuildProperties.ProfileString) {
+          mProps.SetProperty(xName, GetConfigProperty(aName + "_" + xName));
+        }
+      }
+    }
+
     protected override void FillProperties() {
       base.FillProperties();
       mProps.Reset();
@@ -307,7 +335,12 @@ namespace Cosmos.VS.Package {
       }
 
       // Profile
-      lboxProfile.SelectedItem = EnumValue.Find(lboxProfile.Items, mProps.Profile);
+      foreach (ProfileItem xItem in lboxProfile.Items) {
+        if (xItem.Type == mProps.Profile) {
+          lboxProfile.SelectedItem = xItem;
+          break;
+        }
+      }
 
       // Deployment   
       lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Profile);

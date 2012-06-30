@@ -8,8 +8,8 @@ namespace Cosmos.Build.Common {
 
     // Profile
     public const string ProfileString = "Profile";
-    public Profile Profile {
-      get { return GetProperty(ProfileString, Profile.VMware); }
+    public ProfileType Profile {
+      get { return GetProperty(ProfileString, ProfileType.VMware); }
       set { SetProperty(ProfileString, value); }
     }
 
@@ -53,7 +53,7 @@ namespace Cosmos.Build.Common {
 
     public const string OutputPathString = "OutputPath";
     public String OutputPath {
-      get { return GetProperty(OutputPathString); }
+      get { return GetProperty(OutputPathString, @"bin\debug"); }
       set { SetProperty(OutputPathString, value); }
     }
     public const string FrameworkString = "Framework";
