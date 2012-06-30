@@ -48,8 +48,6 @@ namespace Cosmos.VS.Package {
     protected bool mShowTabISO;
     protected bool mShowTabSlave;
 
-    protected List<string> mPropNames = new List<string>();
-
     protected void RemoveTab(TabPage aTab) {
       if (TabControl1.TabPages.Contains(aTab)) {
         TabControl1.TabPages.Remove(aTab);
@@ -148,18 +146,6 @@ namespace Cosmos.VS.Package {
 
     public CosmosPage() {
       InitializeComponent();
-
-      foreach (var xField in typeof(BuildProperties).GetFields()) {
-        // IsLiteral determines if its value is written at 
-        //   compile time and not changeable
-        // IsInitOnly determine if the field can be set 
-        //   in the body of the constructor
-        // for C# a field which is readonly keyword would have both true 
-        //   but a const field would have only IsLiteral equal to true
-        if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
-          mPropNames.Add((string)xField.GetValue(mProps));
-        }
-      }
 
       # region Profile
       foreach (ProfileType xProfile in Enum.GetValues(typeof(ProfileType))) {
@@ -299,7 +285,7 @@ namespace Cosmos.VS.Package {
     }
 
     protected void SaveProfile(string aName) {
-      foreach (var xName in mPropNames) {
+      foreach (var xName in BuildProperties.PropNames) {
         if (xName != BuildProperties.ProfileString) {
           mProps.SetProperty(aName + "_" + xName, GetConfigProperty(xName));
         }
@@ -307,7 +293,7 @@ namespace Cosmos.VS.Package {
     }
 
     protected void LoadProfile(string aName) {
-      foreach (var xName in mPropNames) {
+      foreach (var xName in BuildProperties.PropNames) {
         if (xName != BuildProperties.ProfileString) {
           mProps.SetProperty(xName, GetConfigProperty(aName + "_" + xName));
         }
@@ -318,7 +304,7 @@ namespace Cosmos.VS.Package {
       base.FillProperties();
       mProps.Reset();
       // Initialize defaults?
-      foreach (var xName in mPropNames) {
+      foreach (var xName in BuildProperties.PropNames) {
         mProps.SetProperty(xName, GetConfigProperty(xName));
       }
 

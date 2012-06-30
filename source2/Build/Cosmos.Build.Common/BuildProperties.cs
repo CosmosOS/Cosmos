@@ -5,6 +5,19 @@ using System.Text;
 
 namespace Cosmos.Build.Common {
   public class BuildProperties : PropertiesBase {
+    static public List<string> PropNames = new List<string>();
+
+    static BuildProperties() {
+      foreach (var xField in typeof(BuildProperties).GetFields()) {
+        // IsLiteral determines if its value is written at compile time and not changeable.
+        // Consts are static even if we dont use static keyword.
+        // IsInitOnly determine if the field can be set in the body of the constructor
+        // for C# a field which is readonly keyword would have both true but a const field would have only IsLiteral equal to true
+        if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
+          PropNames.Add((string)xField.GetValue(null));
+        }
+      }
+    }
 
     // Profile
     public const string ProfileString = "Profile";
