@@ -166,19 +166,19 @@ namespace Cosmos.VS.Package {
       };
       butnProfileDelete.Click += delegate(Object sender, EventArgs e) {
         var xItem = (ProfileItem)lboxProfile.SelectedItem;
+
         if (xItem == null) {
           // This should be impossible, but we check for it anwyays.
-          return;
+
         } else if (xItem.Type != ProfileType2.Custom) {
           MessageBox.Show("Preset profiles cannot be deleted.");
-        } else if (MessageBox.Show("", "Delete profile '" + xItem.Description + "'?", MessageBoxButtons.YesNo) == DialogResult.No) {
-          return;
-        }
 
-        // Select a new profile first, so the selectchange logic wont barf
-        lboxProfile.SelectedIndex = 0;
-        lboxProfile.Items.Remove(xItem);
-        mProps.DeleteProfile(xItem.Prefix);
+        } else if (MessageBox.Show("", "Delete profile '" + xItem.Description + "'?", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+          // Select a new profile first, so the selectchange logic wont barf
+          lboxProfile.SelectedIndex = 0;
+          lboxProfile.Items.Remove(xItem);
+          mProps.DeleteProfile(xItem.Prefix);
+        }
       };
       foreach (ProfileType2 xProfile in Enum.GetValues(typeof(ProfileType2))) {
         if (xProfile != ProfileType2.Custom) {

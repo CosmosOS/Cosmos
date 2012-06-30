@@ -38,7 +38,6 @@ namespace Cosmos.VS.Package {
 
         if (xDeployment == Deployment.ISO) {
           IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
-          Process.Start(xOutputPath);
 
         } else if (xDeployment == Deployment.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");

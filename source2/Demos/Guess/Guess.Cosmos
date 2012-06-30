@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>USB</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -28,13 +28,13 @@
     <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
-    <Deployment>USB</Deployment>
-    <Launch>PXE</Launch>
-    <DebugEnabled>False</DebugEnabled>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
+    <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies />
-    <PXE_Deployment />
-    <PXE_Launch />
-    <PXE_DebugEnabled>True</PXE_DebugEnabled>
+    <PXE_Deployment>USB</PXE_Deployment>
+    <PXE_Launch>PXE</PXE_Launch>
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
@@ -44,8 +44,8 @@
     <PXE_TraceAssemblies />
     <PXE_EnableGDB>False</PXE_EnableGDB>
     <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
-    <USB_Deployment />
-    <USB_Launch />
+    <USB_Deployment>USB</USB_Deployment>
+    <USB_Launch>PXE</USB_Launch>
     <USB_DebugEnabled>False</USB_DebugEnabled>
     <USB_DebugMode>Source</USB_DebugMode>
     <USB_IgnoreDebugStubAttribute />
@@ -56,8 +56,8 @@
     <USB_TraceAssemblies />
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
-    <VMware_Deployment />
-    <VMware_Launch />
+    <VMware_Deployment>USB</VMware_Deployment>
+    <VMware_Launch>PXE</VMware_Launch>
     <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
@@ -68,9 +68,9 @@
     <VMware_TraceAssemblies />
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
-    <ISO_Deployment />
-    <ISO_Launch />
-    <ISO_DebugEnabled>True</ISO_DebugEnabled>
+    <ISO_Deployment>USB</ISO_Deployment>
+    <ISO_Launch>PXE</ISO_Launch>
+    <ISO_DebugEnabled>False</ISO_DebugEnabled>
     <ISO_DebugMode>Source</ISO_DebugMode>
     <ISO_IgnoreDebugStubAttribute />
     <ISO_VMwareEdition>Player</ISO_VMwareEdition>
@@ -82,7 +82,7 @@
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>USB</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -96,13 +96,13 @@
     <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
-    <Deployment>USB</Deployment>
-    <Launch>PXE</Launch>
-    <DebugEnabled>False</DebugEnabled>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
+    <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies />
-    <PXE_Deployment />
-    <PXE_Launch />
-    <PXE_DebugEnabled>True</PXE_DebugEnabled>
+    <PXE_Deployment>USB</PXE_Deployment>
+    <PXE_Launch>PXE</PXE_Launch>
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
@@ -112,8 +112,8 @@
     <PXE_TraceAssemblies />
     <PXE_EnableGDB>False</PXE_EnableGDB>
     <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
-    <USB_Deployment />
-    <USB_Launch />
+    <USB_Deployment>USB</USB_Deployment>
+    <USB_Launch>PXE</USB_Launch>
     <USB_DebugEnabled>False</USB_DebugEnabled>
     <USB_DebugMode>Source</USB_DebugMode>
     <USB_IgnoreDebugStubAttribute />
@@ -124,8 +124,8 @@
     <USB_TraceAssemblies />
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
-    <VMware_Deployment />
-    <VMware_Launch />
+    <VMware_Deployment>USB</VMware_Deployment>
+    <VMware_Launch>PXE</VMware_Launch>
     <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
@@ -136,9 +136,9 @@
     <VMware_TraceAssemblies />
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
-    <ISO_Deployment />
-    <ISO_Launch />
-    <ISO_DebugEnabled>True</ISO_DebugEnabled>
+    <ISO_Deployment>USB</ISO_Deployment>
+    <ISO_Launch>PXE</ISO_Launch>
+    <ISO_DebugEnabled>False</ISO_DebugEnabled>
     <ISO_DebugMode>Source</ISO_DebugMode>
     <ISO_IgnoreDebugStubAttribute />
     <ISO_VMwareEdition>Player</ISO_VMwareEdition>
