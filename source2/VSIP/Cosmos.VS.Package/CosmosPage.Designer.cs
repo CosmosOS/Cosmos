@@ -34,12 +34,12 @@
       this.label11 = new System.Windows.Forms.Label();
       this.TabControl1 = new System.Windows.Forms.TabControl();
       this.tabProfile = new System.Windows.Forms.TabPage();
+      this.lablPreset = new System.Windows.Forms.Label();
       this.panel2 = new System.Windows.Forms.Panel();
       this.lboxProfile = new System.Windows.Forms.ListBox();
       this.toolStrip1 = new System.Windows.Forms.ToolStrip();
       this.butnProfileClone = new System.Windows.Forms.ToolStripButton();
       this.butnProfileDelete = new System.Windows.Forms.ToolStripButton();
-      this.lablNonFunctional = new System.Windows.Forms.Label();
       this.lablDeployText = new System.Windows.Forms.Label();
       this.lablBuildOnly = new System.Windows.Forms.Label();
       this.tabCompile = new System.Windows.Forms.TabPage();
@@ -147,8 +147,8 @@
       // 
       // tabProfile
       // 
+      this.tabProfile.Controls.Add(this.lablPreset);
       this.tabProfile.Controls.Add(this.panel2);
-      this.tabProfile.Controls.Add(this.lablNonFunctional);
       this.tabProfile.Controls.Add(this.lablDeployText);
       this.tabProfile.Controls.Add(this.lablBuildOnly);
       this.tabProfile.Location = new System.Drawing.Point(4, 22);
@@ -158,6 +158,17 @@
       this.tabProfile.TabIndex = 8;
       this.tabProfile.Text = "Profile";
       this.tabProfile.UseVisualStyleBackColor = true;
+      // 
+      // lablPreset
+      // 
+      this.lablPreset.AutoSize = true;
+      this.lablPreset.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lablPreset.ForeColor = System.Drawing.SystemColors.HotTrack;
+      this.lablPreset.Location = new System.Drawing.Point(217, 17);
+      this.lablPreset.Name = "lablPreset";
+      this.lablPreset.Size = new System.Drawing.Size(247, 13);
+      this.lablPreset.TabIndex = 7;
+      this.lablPreset.Text = "** This is a preset. Some options are restricted.";
       // 
       // panel2
       // 
@@ -210,20 +221,9 @@
       this.butnProfileDelete.Text = "Delete";
       this.butnProfileDelete.ToolTipText = "Delete selected profile";
       // 
-      // lablNonFunctional
-      // 
-      this.lablNonFunctional.AutoSize = true;
-      this.lablNonFunctional.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lablNonFunctional.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-      this.lablNonFunctional.Location = new System.Drawing.Point(226, 188);
-      this.lablNonFunctional.Name = "lablNonFunctional";
-      this.lablNonFunctional.Size = new System.Drawing.Size(206, 13);
-      this.lablNonFunctional.TabIndex = 5;
-      this.lablNonFunctional.Text = "This option is not currently functional.";
-      // 
       // lablDeployText
       // 
-      this.lablDeployText.Location = new System.Drawing.Point(226, 13);
+      this.lablDeployText.Location = new System.Drawing.Point(217, 44);
       this.lablDeployText.Name = "lablDeployText";
       this.lablDeployText.Size = new System.Drawing.Size(228, 137);
       this.lablDeployText.TabIndex = 4;
@@ -234,11 +234,11 @@
       this.lablBuildOnly.AutoSize = true;
       this.lablBuildOnly.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lablBuildOnly.ForeColor = System.Drawing.SystemColors.HotTrack;
-      this.lablBuildOnly.Location = new System.Drawing.Point(226, 166);
+      this.lablBuildOnly.Location = new System.Drawing.Point(217, 4);
       this.lablBuildOnly.Name = "lablBuildOnly";
-      this.lablBuildOnly.Size = new System.Drawing.Size(207, 13);
+      this.lablBuildOnly.Size = new System.Drawing.Size(310, 13);
       this.lablBuildOnly.TabIndex = 3;
-      this.lablBuildOnly.Text = "You have selected a build only option.";
+      this.lablBuildOnly.Text = "** This is a build only option. No process will be launched.";
       // 
       // tabCompile
       // 
@@ -696,7 +696,6 @@
     private System.Windows.Forms.Label label11;
     private System.Windows.Forms.TabControl TabControl1;
     private System.Windows.Forms.TabPage tabProfile;
-    private System.Windows.Forms.Label lablNonFunctional;
     private System.Windows.Forms.Label lablDeployText;
     private System.Windows.Forms.Label lablBuildOnly;
     private System.Windows.Forms.TabPage tabDeployment;
@@ -741,6 +740,7 @@
     private System.Windows.Forms.ListBox lboxProfile;
     private System.Windows.Forms.ToolStripButton butnProfileClone;
     private System.Windows.Forms.ToolStripButton butnProfileDelete;
+    private System.Windows.Forms.Label lablPreset;
 
 
 
