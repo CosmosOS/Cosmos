@@ -34,11 +34,12 @@ namespace Cosmos.VS.Package {
   public partial class CosmosPage : CustomPropertyPage {
     protected class ProfileItem {
       public string Prefix;
+      public string Name;
       public string Description;
-      public ProfileType2 Type;
+      public bool IsPreset;
 
       public override string ToString() {
-        return Description;
+        return Name;
       }
     }
 
@@ -95,36 +96,23 @@ namespace Cosmos.VS.Package {
     }
 
     protected void UpdateUI() {
-      mShowTabVMware = false;
-      mShowTabPXE = false;
-      mShowTabUSB = false;
-      mShowTabISO = false;
-      mShowTabSlave = false;
-      //
-      lablCurrentProfile.Text = lboxProfile.SelectedItem.ToString();
+      var xProfile = (ProfileItem)lboxProfile.SelectedItem;
+
       chckEnableDebugStub.Checked = false;
       cmboCosmosPort.Enabled = true;
       cmboVisusalStudioPort.Enabled = true;
 
       // Set visibilty and for preset set/reset values.
-      if (mProps.Profile == ProfileType2.ISO) {
-        lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
-         + " After running the selected project, an explorer window will open containing the ISO file."
-         + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
-        lablBuildOnly.Visible = true;
-        mShowTabISO = true;
+      if (mProps.Profile == "ISO") {
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.None;
 
-      } else if (mProps.Profile == ProfileType2.USB) {
-        lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
-        lablBuildOnly.Visible = true;
+      } else if (mProps.Profile == "USB") {
         mShowTabUSB = true;
         mProps.Deployment = Deployment.USB;
         mProps.Launch = Launch.PXE;
 
-      } else if (mProps.Profile == ProfileType2.VMware) {
-        lablDeployText.Text = "Use VMware to deploy and debug.";
+      } else if (mProps.Profile == "VMware") {
         mShowTabVMware = true;
         chckEnableDebugStub.Checked = true;
         cmboCosmosPort.Enabled = false;
@@ -132,9 +120,7 @@ namespace Cosmos.VS.Package {
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.VMware;
 
-      } else if (mProps.Profile == ProfileType2.PXE) {
-        lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
-        mShowTabPXE = true;
+      } else if (mProps.Profile == "PXE") {
         mProps.Deployment = Deployment.PXE;
         mProps.Launch = Launch.None;
 
@@ -142,15 +128,62 @@ namespace Cosmos.VS.Package {
         lablDeployText.Text = "Oops. What the frak did you click?";
       }
 
+      lablCurrentProfile.Text = xProfile.ToString();
+      lablDeployText.Text = xProfile.Description;
       lboxDeployment.SelectedItem = mProps.Deployment;
       lboxLaunch.SelectedItem = mProps.Launch;
       lablBuildOnly.Visible = mProps.Launch == Launch.None;
 
-      lablPreset.Visible = (mProps.Profile != ProfileType2.Custom);
+      lablPreset.Visible = xProfile.IsPreset;
       mShowTabDeployment = !lablPreset.Visible;
       mShowTabLaunch = !lablPreset.Visible;
+      
+      mShowTabISO = mProps.Deployment == Deployment.ISO;
+      mShowTabUSB = mProps.Deployment == Deployment.USB;
+
+      mShowTabVMware = mProps.Launch == Launch.VMware;
+      mShowTabSlave = mProps.Launch == Launch.Slave;
+      mShowTabPXE = mProps.Launch == Launch.PXE;
 
       UpdateTabs();
+    }
+
+    protected void FillProfiles() {
+      ProfileItem xProfile;
+
+      xProfile = new ProfileItem {
+        Prefix = "ISO",
+        Name = "ISO Image",
+        IsPreset = true,
+        Description = "Creates a bootable ISO image which can be burned to a DVD."
+         + " After running the selected project, an explorer window will open containing the ISO file."
+         + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system."
+      };
+      lboxProfile.Items.Add(xProfile);
+
+      xProfile = new ProfileItem {
+        Prefix = "USB",
+        Name = "USB Device",
+        IsPreset = true,
+        Description = "Makes a USB device such as a flash drive or external hard disk bootable."
+      };
+      lboxProfile.Items.Add(xProfile);
+
+      xProfile = new ProfileItem {
+        Prefix = "VMware",
+        Name = "VMware",
+        IsPreset = true,
+        Description = "Use VMware Player or Workstation to deploy and debug."
+      };
+      lboxProfile.Items.Add(xProfile);
+
+      xProfile = new ProfileItem {
+        Prefix = "PXE",
+        Name = "PXE Network Boot",
+        IsPreset = true,
+        Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable."
+      };
+      lboxProfile.Items.Add(xProfile);
     }
 
     public CosmosPage() {
@@ -170,32 +203,24 @@ namespace Cosmos.VS.Package {
         if (xItem == null) {
           // This should be impossible, but we check for it anwyays.
 
-        } else if (xItem.Type != ProfileType2.Custom) {
+        } else if (xItem.IsPreset) {
           MessageBox.Show("Preset profiles cannot be deleted.");
 
-        } else if (MessageBox.Show("", "Delete profile '" + xItem.Description + "'?", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+        } else if (MessageBox.Show("", "Delete profile '" + xItem.Name + "'?", MessageBoxButtons.YesNo) == DialogResult.Yes) {
           // Select a new profile first, so the selectchange logic wont barf
           lboxProfile.SelectedIndex = 0;
           lboxProfile.Items.Remove(xItem);
           mProps.DeleteProfile(xItem.Prefix);
         }
       };
-      foreach (ProfileType2 xProfile in Enum.GetValues(typeof(ProfileType2))) {
-        if (xProfile != ProfileType2.Custom) {
-          var xItem = new ProfileItem { 
-            Prefix = xProfile.ToString(),
-            Description = Cosmos.Build.Common.DescriptionAttribute.GetDescription(xProfile),
-            Type = xProfile
-          };
-          lboxProfile.Items.Add(xItem);
-        }
-      }
+
+      FillProfiles();
       lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var xProfile = (ProfileItem)lboxProfile.SelectedItem;
-        if (xProfile.Type != mProps.Profile) {
+        if (xProfile.Prefix != mProps.Profile) {
           SaveProfile(mProps.Profile.ToString());
           LoadProfile(xProfile.Prefix);
-          mProps.Profile = xProfile.Type;
+          mProps.Profile = xProfile.Prefix;
           IsDirty = true;
           UpdateUI();
         }
@@ -339,17 +364,17 @@ namespace Cosmos.VS.Package {
 
       // Profile
       foreach (ProfileItem xItem in lboxProfile.Items) {
-        if (xItem.Type == mProps.Profile) {
+        if (xItem.Prefix == mProps.Profile) {
           lboxProfile.SelectedItem = xItem;
           break;
         }
       }
 
       // Deployment   
-      lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Profile);
+      lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Deployment);
 
       // Launch
-      lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Profile);
+      lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Launch);
 
       // VMware
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);

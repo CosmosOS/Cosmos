@@ -28,10 +28,9 @@ namespace Cosmos.Build.Common {
       }
     }
 
-    // Profile
     public const string ProfileString = "Profile";
-    public ProfileType2 Profile {
-      get { return GetProperty(ProfileString, ProfileType2.VMware); }
+    public string Profile {
+      get { return GetProperty(ProfileString, "VMware"); }
       set { SetProperty(ProfileString, value); }
     }
 
