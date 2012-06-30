@@ -95,38 +95,32 @@ namespace Cosmos.VS.Package {
       }
     }
 
-    protected void UpdateUI() {
-      var xProfile = (ProfileItem)lboxProfile.SelectedItem;
-
+    protected void UpdatePresetsUI() {
       chckEnableDebugStub.Checked = false;
       cmboCosmosPort.Enabled = true;
       cmboVisusalStudioPort.Enabled = true;
 
-      // Set visibilty and for preset set/reset values.
       if (mProps.Profile == "ISO") {
-        mProps.Deployment = Deployment.ISO;
-        mProps.Launch = Launch.None;
 
       } else if (mProps.Profile == "USB") {
         mShowTabUSB = true;
-        mProps.Deployment = Deployment.USB;
-        mProps.Launch = Launch.PXE;
 
       } else if (mProps.Profile == "VMware") {
         mShowTabVMware = true;
         chckEnableDebugStub.Checked = true;
         cmboCosmosPort.Enabled = false;
         cmboVisusalStudioPort.Enabled = false;
-        mProps.Deployment = Deployment.ISO;
-        mProps.Launch = Launch.VMware;
 
       } else if (mProps.Profile == "PXE") {
-        mProps.Deployment = Deployment.PXE;
-        mProps.Launch = Launch.None;
 
       } else {
         lablDeployText.Text = "Oops. What the frak did you click?";
       }
+    }
+
+    protected void UpdateUI() {
+      UpdatePresetsUI();
+      var xProfile = (ProfileItem)lboxProfile.SelectedItem;
 
       lablCurrentProfile.Text = xProfile.ToString();
       lablDeployText.Text = xProfile.Description;
@@ -350,6 +344,24 @@ namespace Cosmos.VS.Package {
     protected void LoadProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
         mProps.SetProperty(xName, GetConfigProperty(aName + "_" + xName));
+      }
+
+      // Reforce fixed settings for presets on each load.
+      if (mProps.Profile == "ISO") {
+        mProps.Deployment = Deployment.ISO;
+        mProps.Launch = Launch.None;
+
+      } else if (mProps.Profile == "USB") {
+        mProps.Deployment = Deployment.USB;
+        mProps.Launch = Launch.PXE;
+
+      } else if (mProps.Profile == "VMware") {
+        mProps.Deployment = Deployment.ISO;
+        mProps.Launch = Launch.VMware;
+
+      } else if (mProps.Profile == "PXE") {
+        mProps.Deployment = Deployment.PXE;
+        mProps.Launch = Launch.None;
       }
     }
 
