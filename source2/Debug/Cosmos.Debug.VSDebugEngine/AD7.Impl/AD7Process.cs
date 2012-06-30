@@ -28,7 +28,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public SourceInfos mSourceMappings;
     public uint? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
-    protected ProfileType mProfile;
+    protected Launch mLaunch;
     internal DebugInfo mDebugInfoDb;
     internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
@@ -104,8 +104,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
 
-      string xProfile = aDebugInfo[BuildProperties.ProfileString];
-      mProfile = (ProfileType)Enum.Parse(typeof(ProfileType), xProfile);
+      mLaunch = (Launch)Enum.Parse(typeof(Launch), aDebugInfo[BuildProperties.LaunchString]);
 
       if (mDebugDownPipe == null) {
         mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
@@ -131,7 +130,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
 
-      if (mProfile == ProfileType.VMware) {
+      if (mLaunch == Launch.VMware) {
         string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
@@ -153,7 +152,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         OutputText("Preparing VMWare.");
         mProcessStartInfo.Arguments = mHost.Start(mDebugInfo["ISOFile"], xGDBDebugStub);
       } else {
-        throw new Exception("Invalid Profile value: '" + xProfile + "'.");
+        throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
 
       // Set to false for debugging, true otherwise
@@ -183,13 +182,10 @@ namespace Cosmos.Debug.VSDebugEngine {
       mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
 
       mDbgConnector = null;
-      if (mProfile == ProfileType.VMware) {
+      if (mLaunch == Launch.VMware) {
         OutputText("Starting serial debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
         mDbgConnector.Connected = DebugConnectorConnected;
-      }
-      if (mDbgConnector == null) {
-        throw new Exception("Profile value not valid: '" + mProfile.ToString() + "'.");
       }
 
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);

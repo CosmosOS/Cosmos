@@ -35,7 +35,7 @@ namespace Cosmos.VS.Package {
     protected class ProfileItem {
       public string Prefix;
       public string Description;
-      public ProfileType Type;
+      public ProfileType2 Type;
 
       public override string ToString() {
         return Description;
@@ -107,7 +107,7 @@ namespace Cosmos.VS.Package {
       cmboVisusalStudioPort.Enabled = true;
 
       // Set visibilty and for preset set/reset values.
-      if (mProps.Profile == ProfileType.ISO) {
+      if (mProps.Profile == ProfileType2.ISO) {
         lablDeployText.Text = "Creates a bootable ISO image which can be burned to a DVD."
          + " After running the selected project, an explorer window will open containing the ISO file."
          + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
@@ -116,14 +116,14 @@ namespace Cosmos.VS.Package {
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.None;
 
-      } else if (mProps.Profile == ProfileType.USB) {
+      } else if (mProps.Profile == ProfileType2.USB) {
         lablDeployText.Text = "Makes a USB device such as a flash drive or external hard disk bootable.";
         lablBuildOnly.Visible = true;
         mShowTabUSB = true;
         mProps.Deployment = Deployment.USB;
         mProps.Launch = Launch.PXE;
 
-      } else if (mProps.Profile == ProfileType.VMware) {
+      } else if (mProps.Profile == ProfileType2.VMware) {
         lablDeployText.Text = "Use VMware to deploy and debug.";
         mShowTabVMware = true;
         chckEnableDebugStub.Checked = true;
@@ -132,7 +132,7 @@ namespace Cosmos.VS.Package {
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.VMware;
 
-      } else if (mProps.Profile == ProfileType.PXE) {
+      } else if (mProps.Profile == ProfileType2.PXE) {
         lablDeployText.Text = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mShowTabPXE = true;
         mProps.Deployment = Deployment.PXE;
@@ -146,7 +146,7 @@ namespace Cosmos.VS.Package {
       lboxLaunch.SelectedItem = mProps.Launch;
       lablBuildOnly.Visible = mProps.Launch == Launch.None;
 
-      lablPreset.Visible = (mProps.Profile != ProfileType.Custom);
+      lablPreset.Visible = (mProps.Profile != ProfileType2.Custom);
       mShowTabDeployment = !lablPreset.Visible;
       mShowTabLaunch = !lablPreset.Visible;
 
@@ -169,9 +169,9 @@ namespace Cosmos.VS.Package {
         if (xItem == null) {
           // This should be impossible, but we check for it anwyays.
           return;
-        } else if (xItem.Type != ProfileType.Custom) {
+        } else if (xItem.Type != ProfileType2.Custom) {
           MessageBox.Show("Preset profiles cannot be deleted.");
-        } else if (MessageBox.Show("", "Delete " + xItem.Description + "?", MessageBoxButtons.YesNo) == DialogResult.No) {
+        } else if (MessageBox.Show("", "Delete profile '" + xItem.Description + "'?", MessageBoxButtons.YesNo) == DialogResult.No) {
           return;
         }
 
@@ -180,8 +180,8 @@ namespace Cosmos.VS.Package {
         lboxProfile.Items.Remove(xItem);
         mProps.DeleteProfile(xItem.Prefix);
       };
-      foreach (ProfileType xProfile in Enum.GetValues(typeof(ProfileType))) {
-        if (xProfile != ProfileType.Custom) {
+      foreach (ProfileType2 xProfile in Enum.GetValues(typeof(ProfileType2))) {
+        if (xProfile != ProfileType2.Custom) {
           var xItem = new ProfileItem { 
             Prefix = xProfile.ToString(),
             Description = Cosmos.Build.Common.DescriptionAttribute.GetDescription(xProfile),

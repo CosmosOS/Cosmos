@@ -27,29 +27,47 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        string xProfile = GetConfigurationProperty(BuildProperties.ProfileString, true);
-        var xTarget = (ProfileType)Enum.Parse(typeof(ProfileType), xProfile);
+        var xDeployment = (Deployment)Enum.Parse(typeof(Deployment), GetConfigurationProperty(BuildProperties.DeploymentString, true));
+        //
+        var xLaunch = (Launch)Enum.Parse(typeof(Launch), GetConfigurationProperty(BuildProperties.LaunchString, false));
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);
         string xIsoFile = Path.ChangeExtension(xOutputAsm, ".iso");
         string xBinFile = Path.ChangeExtension(xOutputAsm, ".bin");
 
-        if (xTarget == ProfileType.ISO) {
+        if (xDeployment == Deployment.ISO) {
           IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
           Process.Start(xOutputPath);
 
-        } else if (xTarget == ProfileType.USB) {
+        } else if (xDeployment == Deployment.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");
 
-        } else if (xTarget == ProfileType.PXE) {
+        } else if (xDeployment == Deployment.PXE) {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
-          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
 
-        } else if (xTarget == ProfileType.VMware) {
-          // TODO - only make ISO if not PXE
-          IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
+        } else {
+          throw new Exception("Unknown deployment type.");
+        }
+
+        if (xLaunch == Launch.None) {
+          if (xDeployment == Deployment.ISO) {
+            Process.Start(xOutputPath);
+          } else if (xDeployment == Deployment.PXE) {
+            string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
+          }
+
+        } else if (xLaunch == Launch.Slave) {
+
+        } else if (xLaunch == Launch.PXE) {
+          if (xDeployment == Deployment.PXE) {
+            string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
+            Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
+          }
+
+        } else if (xLaunch == Launch.VMware) {
+          //TODO - Handle PXE
 
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();
@@ -61,15 +79,14 @@ namespace Cosmos.VS.Package {
           xInfo.bstrRemoteMachine = null; // debug locally
 
           var xValues = new NameValueCollection();
+          xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
           xValues.Add("ISOFile", xIsoFile);
           xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
-          xValues.Add(BuildProperties.EnableGDBString, GetConfigurationProperty(BuildProperties.EnableGDBString, false));
+          xValues.Add(BuildProperties.LaunchString, GetConfigurationProperty(BuildProperties.LaunchString, false));
           xValues.Add(BuildProperties.DebugModeString, GetConfigurationProperty(BuildProperties.DebugModeString, false));
           xValues.Add(BuildProperties.TraceAssembliesString, GetConfigurationProperty(BuildProperties.TraceAssembliesString, false));
-          xValues.Add(BuildProperties.ProfileString, GetConfigurationProperty(BuildProperties.ProfileString, false));
-          xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
           xValues.Add(BuildProperties.VMwareEditionString, GetConfigurationProperty(BuildProperties.VMwareEditionString, false));
-          xValues.Add(BuildProperties.VMwareEditionString, GetConfigurationProperty(BuildProperties.VMwareEditionString, false));
+          xValues.Add(BuildProperties.EnableGDBString, GetConfigurationProperty(BuildProperties.EnableGDBString, false));
           xValues.Add(BuildProperties.StartCosmosGDBString, GetConfigurationProperty(BuildProperties.StartCosmosGDBString, false));
 
           xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
@@ -79,6 +96,9 @@ namespace Cosmos.VS.Package {
           xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
 
           VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
+
+        } else {
+          throw new Exception("Unknown launch type.");
         }
       } catch (Exception ex) {
         return Marshal.GetHRForException(ex);

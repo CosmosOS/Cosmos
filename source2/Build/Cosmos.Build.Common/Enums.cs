@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Cosmos.Build.Common {
 
-  public enum ProfileType {
+  public enum ProfileType2 {
     Custom,
     [Description("ISO Image")]
     ISO,
