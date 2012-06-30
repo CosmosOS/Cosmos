@@ -14,8 +14,17 @@ namespace Cosmos.Build.Common {
         // IsInitOnly determine if the field can be set in the body of the constructor
         // for C# a field which is readonly keyword would have both true but a const field would have only IsLiteral equal to true
         if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
-          PropNames.Add((string)xField.GetValue(null));
+          string xName = (string)xField.GetValue(null);
+          if (xName != BuildProperties.ProfileString) {
+            PropNames.Add(xName);
+          }
         }
+      }
+    }
+
+    public void DeleteProfile(string aPrefix) {
+      foreach (var xName in BuildProperties.PropNames) {
+        mPropTable.Remove(aPrefix + "_" + xName);
       }
     }
 

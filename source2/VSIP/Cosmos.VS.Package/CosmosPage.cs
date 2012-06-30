@@ -157,6 +157,29 @@ namespace Cosmos.VS.Package {
       InitializeComponent();
 
       # region Profile
+      butnProfileClone.Click += delegate(Object sender, EventArgs e) {
+        var xItem = (ProfileItem)lboxProfile.SelectedItem;
+        if (xItem == null) {
+          // This should be impossible, but we check for it anwyays.
+          return;
+        }
+      };
+      butnProfileDelete.Click += delegate(Object sender, EventArgs e) {
+        var xItem = (ProfileItem)lboxProfile.SelectedItem;
+        if (xItem == null) {
+          // This should be impossible, but we check for it anwyays.
+          return;
+        } else if (xItem.Type != ProfileType.Custom) {
+          MessageBox.Show("Preset profiles cannot be deleted.");
+        } else if (MessageBox.Show("", "Delete " + xItem.Description + "?", MessageBoxButtons.YesNo) == DialogResult.No) {
+          return;
+        }
+
+        // Select a new profile first, so the selectchange logic wont barf
+        lboxProfile.SelectedIndex = 0;
+        lboxProfile.Items.Remove(xItem);
+        mProps.DeleteProfile(xItem.Prefix);
+      };
       foreach (ProfileType xProfile in Enum.GetValues(typeof(ProfileType))) {
         if (xProfile != ProfileType.Custom) {
           var xItem = new ProfileItem { 
@@ -295,17 +318,13 @@ namespace Cosmos.VS.Package {
 
     protected void SaveProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
-        if (xName != BuildProperties.ProfileString) {
-          mProps.SetProperty(aName + "_" + xName, GetConfigProperty(xName));
-        }
+        mProps.SetProperty(aName + "_" + xName, GetConfigProperty(xName));
       }
     }
 
     protected void LoadProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
-        if (xName != BuildProperties.ProfileString) {
-          mProps.SetProperty(xName, GetConfigProperty(aName + "_" + xName));
-        }
+        mProps.SetProperty(xName, GetConfigProperty(aName + "_" + xName));
       }
     }
 
@@ -313,6 +332,7 @@ namespace Cosmos.VS.Package {
       base.FillProperties();
       mProps.Reset();
       // Initialize defaults?
+      mProps.SetProperty(BuildProperties.ProfileString, GetConfigProperty(BuildProperties.ProfileString));
       foreach (var xName in BuildProperties.PropNames) {
         mProps.SetProperty(xName, GetConfigProperty(xName));
       }
