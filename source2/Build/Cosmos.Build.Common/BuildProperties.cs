@@ -60,7 +60,7 @@ namespace Cosmos.Build.Common {
       } else if (aName == "PXE") {
         Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         Deployment = Deployment.PXE;
-        Launch = Launch.PXE;
+        Launch = Launch.None;
       }
     }
 

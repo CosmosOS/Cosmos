@@ -44,7 +44,9 @@ namespace Cosmos.VS.Package {
 
         } else if (xDeployment == Deployment.PXE) {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
+          string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
+          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), xPxeIntf + " \"" + xPxePath + "\"");
 
         } else {
           throw new Exception("Unknown deployment type.");
@@ -53,15 +55,6 @@ namespace Cosmos.VS.Package {
         if (xLaunch == Launch.None) {
           if (xDeployment == Deployment.ISO) {
             Process.Start(xOutputPath);
-          } else if (xDeployment == Deployment.PXE) {
-            string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
-          }
-
-        } else if (xLaunch == Launch.PXE) {
-          if (xDeployment == Deployment.PXE) {
-            string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
-            string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
-            Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), xPxeIntf + " \"" + xPxePath + "\"");
           }
 
         } else if (xLaunch == Launch.VMware) {

@@ -74,14 +74,15 @@
       this.label3 = new System.Windows.Forms.Label();
       this.cmboVMwareEdition = new System.Windows.Forms.ComboBox();
       this.tabPXE = new System.Windows.Forms.TabPage();
+      this.textPxeInterface = new System.Windows.Forms.TextBox();
+      this.label1 = new System.Windows.Forms.Label();
       this.tabUSB = new System.Windows.Forms.TabPage();
       this.label7 = new System.Windows.Forms.Label();
       this.tabISO = new System.Windows.Forms.TabPage();
       this.label8 = new System.Windows.Forms.Label();
-      this.label1 = new System.Windows.Forms.Label();
-      this.textPxeInterface = new System.Windows.Forms.TextBox();
-      this.label6 = new System.Windows.Forms.Label();
+      this.tabSlave = new System.Windows.Forms.TabPage();
       this.cmboSlavePort = new System.Windows.Forms.ComboBox();
+      this.label6 = new System.Windows.Forms.Label();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -97,6 +98,7 @@
       this.tabPXE.SuspendLayout();
       this.tabUSB.SuspendLayout();
       this.tabISO.SuspendLayout();
+      this.tabSlave.SuspendLayout();
       this.SuspendLayout();
       // 
       // panel1
@@ -139,6 +141,7 @@
       this.TabControl1.Controls.Add(this.tabPXE);
       this.TabControl1.Controls.Add(this.tabUSB);
       this.TabControl1.Controls.Add(this.tabISO);
+      this.TabControl1.Controls.Add(this.tabSlave);
       this.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.TabControl1.Location = new System.Drawing.Point(0, 43);
       this.TabControl1.Multiline = true;
@@ -600,8 +603,6 @@
       // 
       // tabPXE
       // 
-      this.tabPXE.Controls.Add(this.cmboSlavePort);
-      this.tabPXE.Controls.Add(this.label6);
       this.tabPXE.Controls.Add(this.textPxeInterface);
       this.tabPXE.Controls.Add(this.label1);
       this.tabPXE.Location = new System.Drawing.Point(4, 22);
@@ -611,6 +612,22 @@
       this.tabPXE.TabIndex = 5;
       this.tabPXE.Text = "PXE";
       this.tabPXE.UseVisualStyleBackColor = true;
+      // 
+      // textPxeInterface
+      // 
+      this.textPxeInterface.Location = new System.Drawing.Point(28, 32);
+      this.textPxeInterface.Name = "textPxeInterface";
+      this.textPxeInterface.Size = new System.Drawing.Size(146, 20);
+      this.textPxeInterface.TabIndex = 1;
+      // 
+      // label1
+      // 
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(13, 16);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(52, 13);
+      this.label1.TabIndex = 0;
+      this.label1.Text = "Interface:";
       // 
       // tabUSB
       // 
@@ -651,30 +668,17 @@
       this.label8.TabIndex = 1;
       this.label8.Text = "There are currently no ISO options.";
       // 
-      // label1
+      // tabSlave
       // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(13, 16);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(52, 13);
-      this.label1.TabIndex = 0;
-      this.label1.Text = "Interface:";
-      // 
-      // textPxeInterface
-      // 
-      this.textPxeInterface.Location = new System.Drawing.Point(28, 32);
-      this.textPxeInterface.Name = "textPxeInterface";
-      this.textPxeInterface.Size = new System.Drawing.Size(146, 20);
-      this.textPxeInterface.TabIndex = 1;
-      // 
-      // label6
-      // 
-      this.label6.AutoSize = true;
-      this.label6.Location = new System.Drawing.Point(13, 73);
-      this.label6.Name = "label6";
-      this.label6.Size = new System.Drawing.Size(59, 13);
-      this.label6.TabIndex = 2;
-      this.label6.Text = "Slave Port:";
+      this.tabSlave.Controls.Add(this.cmboSlavePort);
+      this.tabSlave.Controls.Add(this.label6);
+      this.tabSlave.Location = new System.Drawing.Point(4, 22);
+      this.tabSlave.Name = "tabSlave";
+      this.tabSlave.Padding = new System.Windows.Forms.Padding(3);
+      this.tabSlave.Size = new System.Drawing.Size(627, 387);
+      this.tabSlave.TabIndex = 13;
+      this.tabSlave.Text = "Slave";
+      this.tabSlave.UseVisualStyleBackColor = true;
       // 
       // cmboSlavePort
       // 
@@ -686,11 +690,20 @@
             "Serial Com2",
             "Serial Com3",
             "Serial Com4"});
-      this.cmboSlavePort.Location = new System.Drawing.Point(28, 89);
+      this.cmboSlavePort.Location = new System.Drawing.Point(30, 31);
       this.cmboSlavePort.Name = "cmboSlavePort";
       this.cmboSlavePort.Size = new System.Drawing.Size(146, 21);
       this.cmboSlavePort.Sorted = true;
-      this.cmboSlavePort.TabIndex = 33;
+      this.cmboSlavePort.TabIndex = 35;
+      // 
+      // label6
+      // 
+      this.label6.AutoSize = true;
+      this.label6.Location = new System.Drawing.Point(15, 15);
+      this.label6.Name = "label6";
+      this.label6.Size = new System.Drawing.Size(59, 13);
+      this.label6.TabIndex = 34;
+      this.label6.Text = "Slave Port:";
       // 
       // CosmosPage
       // 
@@ -726,6 +739,8 @@
       this.tabPXE.PerformLayout();
       this.tabUSB.ResumeLayout(false);
       this.tabISO.ResumeLayout(false);
+      this.tabSlave.ResumeLayout(false);
+      this.tabSlave.PerformLayout();
       this.ResumeLayout(false);
 
 		}
@@ -781,10 +796,11 @@
     private System.Windows.Forms.ToolStripButton butnProfileDelete;
     private System.Windows.Forms.Label lablPreset;
     private System.Windows.Forms.ToolStripButton butnProfileRename;
-    private System.Windows.Forms.ComboBox cmboSlavePort;
-    private System.Windows.Forms.Label label6;
     private System.Windows.Forms.TextBox textPxeInterface;
     private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.TabPage tabSlave;
+    private System.Windows.Forms.ComboBox cmboSlavePort;
+    private System.Windows.Forms.Label label6;
 
 
 

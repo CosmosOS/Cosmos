@@ -29,11 +29,11 @@
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
     <Deployment>PXE</Deployment>
-    <Launch>PXE</Launch>
+    <Launch>Slave</Launch>
     <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
-    <PXE_Launch>PXE</PXE_Launch>
+    <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
@@ -88,12 +88,12 @@
     <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
     <PXE_Name>PXE with Slave (Kudzu)</PXE_Name>
     <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
-    <VMware_Name />
+    <VMware_Name>Guess</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
     <User001_Deployment>PXE</User001_Deployment>
-    <User001_Launch>PXE</User001_Launch>
+    <User001_Launch>Slave</User001_Launch>
     <User001_DebugEnabled>True</User001_DebugEnabled>
     <User001_DebugMode>Source</User001_DebugMode>
     <User001_IgnoreDebugStubAttribute />
@@ -110,6 +110,16 @@
     <User001_SlavePort>Serial: COM3</User001_SlavePort>
     <ISO_PxeInterface>192.168.43.1</ISO_PxeInterface>
     <ISO_SlavePort>Serial: COM3</ISO_SlavePort>
+    <PXE_PxeInterface>192.168.43.1</PXE_PxeInterface>
+    <PXE_SlavePort>Serial: COM3</PXE_SlavePort>
+    <USB_PxeInterface>192.168.43.1</USB_PxeInterface>
+    <USB_SlavePort>Serial: COM3</USB_SlavePort>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
+    <VMware_PxeInterface>192.168.43.1</VMware_PxeInterface>
+    <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
+    <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
+    <User001_VisualStudioDebugPort>Pipe: Cosmos\Serial</User001_VisualStudioDebugPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>User001</Profile>
@@ -127,11 +137,11 @@
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
     <Deployment>PXE</Deployment>
-    <Launch>PXE</Launch>
+    <Launch>Slave</Launch>
     <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
-    <PXE_Launch>PXE</PXE_Launch>
+    <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
@@ -186,12 +196,12 @@
     <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
     <PXE_Name>PXE with Slave (Kudzu)</PXE_Name>
     <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
-    <VMware_Name />
+    <VMware_Name>Guess</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
     <User001_Deployment>PXE</User001_Deployment>
-    <User001_Launch>PXE</User001_Launch>
+    <User001_Launch>Slave</User001_Launch>
     <User001_DebugEnabled>True</User001_DebugEnabled>
     <User001_DebugMode>Source</User001_DebugMode>
     <User001_IgnoreDebugStubAttribute />
@@ -204,9 +214,8 @@
     <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
     <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
     <User001_CosmosDebugPort>Serial: COM1</User001_CosmosDebugPort>
-    <User001_VisualStudioDebugPort />
-    <VisualStudioDebugPort>
-    </VisualStudioDebugPort>
+    <User001_VisualStudioDebugPort>Pipe: Cosmos\Serial</User001_VisualStudioDebugPort>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
     <VMware_CosmosDebugPort />
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <ISO_CosmosDebugPort />
@@ -214,13 +223,19 @@
     <PXE_CosmosDebugPort />
     <PXE_VisualStudioDebugPort />
     <USB_CosmosDebugPort />
-    <USB_VisualStudioDebugPort />
+    <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
     <PxeInterface>192.168.43.1</PxeInterface>
     <SlavePort>Serial: COM3</SlavePort>
     <User001_PxeInterface>192.168.43.1</User001_PxeInterface>
     <User001_SlavePort>Serial: COM3</User001_SlavePort>
     <ISO_PxeInterface>192.168.43.1</ISO_PxeInterface>
     <ISO_SlavePort>Serial: COM3</ISO_SlavePort>
+    <PXE_PxeInterface>192.168.43.1</PXE_PxeInterface>
+    <PXE_SlavePort>Serial: COM3</PXE_SlavePort>
+    <USB_PxeInterface>192.168.43.1</USB_PxeInterface>
+    <USB_SlavePort>Serial: COM3</USB_SlavePort>
+    <VMware_PxeInterface>192.168.43.1</VMware_PxeInterface>
+    <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">

@@ -16,12 +16,14 @@ namespace Cosmos.Build.Common {
   }
 
   public enum Launch {
-    [Description("None or Manual")]
+    [Description("None")]
     None,
+    [Description("Manual")]
+    Manual,
     [Description("VMware")]
     VMware,
-    [Description("PXE Server")]
-    PXE
+    [Description("Attached Slave (CanaKit)")]
+    Slave
   }
 
   public enum VMwareEdition {

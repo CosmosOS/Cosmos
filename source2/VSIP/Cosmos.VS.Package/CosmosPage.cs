@@ -54,6 +54,7 @@ namespace Cosmos.VS.Package {
     protected bool mShowTabPXE;
     protected bool mShowTabUSB;
     protected bool mShowTabISO;
+    protected bool mShowTabSlave;
 
     public override void ApplyChanges() {
       // Save now, because when we reload this form it will
@@ -79,18 +80,14 @@ namespace Cosmos.VS.Package {
       RemoveTab(tabPXE);
       RemoveTab(tabUSB);
       RemoveTab(tabISO);
+      RemoveTab(tabSlave);
 
       if (mShowTabDebug) {
         TabControl1.TabPages.Add(tabDebug);
       }
+
       if (mShowTabDeployment) {
         TabControl1.TabPages.Add(tabDeployment);
-      }
-      if (mShowTabLaunch) {
-        TabControl1.TabPages.Add(tabLaunch);
-      }
-      if (mShowTabVMware) {
-        TabControl1.TabPages.Add(tabVMware);
       }
       if (mShowTabPXE) {
         TabControl1.TabPages.Add(tabPXE);
@@ -100,6 +97,16 @@ namespace Cosmos.VS.Package {
       }
       if (mShowTabISO) {
         TabControl1.TabPages.Add(tabISO);
+      }
+
+      if (mShowTabLaunch) {
+        TabControl1.TabPages.Add(tabLaunch);
+      }
+      if (mShowTabVMware) {
+        TabControl1.TabPages.Add(tabVMware);
+      }
+      if (mShowTabSlave) {
+        TabControl1.TabPages.Add(tabSlave);
       }
 
       if (TabControl1.TabPages.Contains(xTab)) {
@@ -168,6 +175,9 @@ namespace Cosmos.VS.Package {
 
       #region PXE
       textPxeInterface.Text = mProps.PxeInterface;
+      #endregion
+
+      #region Slave
       cmboSlavePort.SelectedIndex = cmboSlavePort.Items.IndexOf(mProps.SlavePort);
       #endregion
 
@@ -179,10 +189,14 @@ namespace Cosmos.VS.Package {
 
       mShowTabDeployment = !xProfile.IsPreset;
       mShowTabLaunch = !xProfile.IsPreset;
+      //
       mShowTabISO = mProps.Deployment == Deployment.ISO;
       mShowTabUSB = mProps.Deployment == Deployment.USB;
+      mShowTabPXE = mProps.Deployment == Deployment.PXE;
+      //
       mShowTabVMware = mProps.Launch == Launch.VMware;
-      mShowTabPXE = mProps.Launch == Launch.PXE;
+      mShowTabSlave = mProps.Launch == Launch.Slave;
+      //
       UpdateTabs();
     }
 
