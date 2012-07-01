@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosmos.Debug.HostProcess")]
+[assembly: AssemblyTitle("Cosmos.Launch.VMware")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cosmos")]
-[assembly: AssemblyProduct("Cosmos.Debug.HostProcess")]
-[assembly: AssemblyCopyright("Copyright © 2010")]
+[assembly: AssemblyProduct("Cosmos.Launch.VMware")]
+[assembly: AssemblyCopyright("Copyright © 2010-2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

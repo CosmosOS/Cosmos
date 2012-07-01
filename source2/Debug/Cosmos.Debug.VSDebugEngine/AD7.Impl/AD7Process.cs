@@ -128,7 +128,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
 
-      mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
+      mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Launch.VMware.exe"));
 
       if (mLaunch == LaunchType.VMware) {
         string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
