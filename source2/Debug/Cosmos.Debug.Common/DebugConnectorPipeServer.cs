@@ -12,8 +12,8 @@ namespace Cosmos.Debug.Common {
     private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
     private NamedPipeServerStream mPipe;
 
-    public DebugConnectorPipeServer() {
-      mPipe = new NamedPipeServerStream(@"Cosmos\Serial", PipeDirection.InOut, 1
+    public DebugConnectorPipeServer(string aName) {
+      mPipe = new NamedPipeServerStream(aName, PipeDirection.InOut, 1
        , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
       mPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), mPipe);
     }
@@ -25,8 +25,5 @@ namespace Cosmos.Debug.Common {
       Start(xPipe);
     }
 
-    public override void WaitConnect() {
-      mWaitConnectEvent.WaitOne();
-    }
   }
 }

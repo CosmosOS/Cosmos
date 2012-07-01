@@ -7,9 +7,17 @@ using Cosmos.Build.Common;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
   public class Slave : Base {
+    string mPort;
 
     public Slave(NameValueCollection aParams)
       : base(aParams) {
+      var xPort = mParams[BuildProperties.SlavePortString];
+      if (xPort == "None") {
+        throw new Exception("No slave port is set.");
+      }
+
+      var xParts = xPort.Split(' ');
+      mPort = xParts[1];
     }
 
     public override string GetHostProcessExe() {
@@ -17,13 +25,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     }
 
     public override string Start(bool aGDB) {
-      var xPort = mParams[BuildProperties.SlavePortString];
-      if (xPort == "None") {
-        throw new Exception("No slave port is set.");
-      }
-
-      var xParts = xPort.Split(' ');
-      return mParams[xParts[1]];
+      return mPort;
     }
 
     public override void Stop() {

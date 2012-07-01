@@ -67,25 +67,11 @@ namespace Cosmos.Launch.Slave {
       }
     }
 
-    StringBuilder mInputLine = new StringBuilder();
-    string CheckInputLine() {
-      while (Console.KeyAvailable) {
-        var xKey = Console.ReadKey(true);
-        if (xKey.Key == ConsoleKey.Enter) {
-          string xResult = mInputLine.ToString();
-          mInputLine.Clear();
-          return xResult;
-        } else {
-          mInputLine.Append(xKey.KeyChar);
-        }
-      }
-      return null;
-    }
-
     protected override int Run() {
+      Console.WriteLine("Opening " + mPortName);
       mPort = new SerialPort(mPortName);
       mPort.Open(); try {
-        Console.WriteLine("Initializing");
+        Console.WriteLine("Initializing Canakit UK1104");
         Send("");
         // Set to digital input
         Send("CH1.SETMODE(2)");
@@ -108,7 +94,7 @@ namespace Cosmos.Launch.Slave {
           Thread.Sleep(250);
           string xLine = CheckInputLine();
           if (xLine == null) {
-          } else if (xLine == "off") {
+          } else if (string.Equals(xLine, "off", StringComparison.InvariantCultureIgnoreCase)) {
             Console.WriteLine("Powering off.");
             TogglePowerSwitch();
             WaitPowerState(false);

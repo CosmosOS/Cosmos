@@ -15,6 +15,27 @@ namespace Cosmos.Launch.Common {
       mArgs = aArgs;
     }
 
+    protected StringBuilder mInputLine = new StringBuilder();
+    protected string CheckInputLine() {
+      while (true) {
+        // Don't use Console read methods directly, most (ReadKey, etc) have issues with redirected input.
+        int xCharInt = Console.In.Read();
+        if (xCharInt == -1) {
+          break;
+        }
+
+        var xChar = (char)xCharInt;
+        if (xChar == '\r') {
+          string xResult = mInputLine.ToString();
+          mInputLine.Clear();
+          return xResult;
+        } else {
+          mInputLine.Append(xChar);
+        }
+      }
+      return null;
+    }
+
     public int Go(string aEdition) {
       try {
         Console.WriteLine("Cosmos Visual Studio Debug Host for " + aEdition);

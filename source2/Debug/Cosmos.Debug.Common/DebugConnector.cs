@@ -21,7 +21,6 @@ namespace Cosmos.Debug.Common {
     public Action<byte[]> CmdPong;
 
     protected byte mCurrentMsgType;
-    public abstract void WaitConnect();
     protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
     //        private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };

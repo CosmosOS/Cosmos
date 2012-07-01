@@ -101,14 +101,44 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     ProcessStartInfo CreateHostProcessInfo(string aExe) {
-      bool xShowHost = mDebugInfo["ShowLaunchHost"] == "true";
+      bool xShowHost = mDebugInfo[BuildProperties.ShowLaunchConsoleString].ToLower() == "true";
       var xResult = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), aExe));
       xResult.UseShellExecute = false;
       xResult.RedirectStandardInput = true;
-      xResult.RedirectStandardError = true;
+      xResult.RedirectStandardError = !xShowHost;
       xResult.RedirectStandardOutput = !xShowHost;
       xResult.CreateNoWindow = !xShowHost;
       return xResult;
+    }
+
+    void CreateDebugConnector() {
+      mDbgConnector = null;
+
+      string xPort = mDebugInfo[BuildProperties.VisualStudioDebugPortString];
+      var xParts = xPort.Split(' ');
+      string xPortType = xParts[0].ToLower();
+      string xPortParam = xParts[1].ToLower();
+
+      OutputText("Starting debug connector.");
+      if (xPortType == "pipe:") {
+        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
+      } else if (xPortType == "serial:") {
+        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorSerial(xPortParam);
+      }
+
+      if (mDbgConnector == null) {
+        throw new Exception("No debug connector found.");
+      }
+      mDbgConnector.Connected = DebugConnectorConnected;
+      mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
+      mDbgConnector.CmdText += new Action<string>(DbgCmdText);
+      mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
+      mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
+      mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
+      mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
+      mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
+      mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
+      mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
     }
 
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
@@ -188,25 +218,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
 
-      mDbgConnector = null;
-      if (mLaunch == LaunchType.VMware) {
-        OutputText("Starting pipe debug listener.");
-        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
-        mDbgConnector.Connected = DebugConnectorConnected;
-      }
-
-      if (mDbgConnector != null) {
-        aEngine.BPMgr.SetDebugConnector(mDbgConnector);
-        mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
-        mDbgConnector.CmdText += new Action<string>(DbgCmdText);
-        mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
-        mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
-        mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
-        mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
-        mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
-        mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
-        mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
-      }
+      CreateDebugConnector();
+      aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
       System.Threading.Thread.Sleep(250);
 
@@ -457,8 +470,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       Trace.WriteLine(String.Format("Process Exit Code: {0}", mProcess.ExitCode));
       //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
       //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
-      mDbgConnector.Dispose();
-      mDbgConnector = null;
+
+      if (mDbgConnector != null) {
+        mDbgConnector.Dispose();
+        mDbgConnector = null;
+      }
       if (mDebugInfoDb != null) {
         mDebugInfoDb.Dispose();
         mDebugInfoDb = null;
