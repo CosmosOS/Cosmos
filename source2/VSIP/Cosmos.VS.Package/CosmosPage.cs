@@ -11,6 +11,7 @@ using System.Reflection;
 using Cosmos.Build.Common;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
+using Microsoft.VisualBasic;
 
 namespace Cosmos.VS.Package {
   // We put all items on ONE form because VS is such a C++ developers wet dream to manage mulitple pages
@@ -42,13 +43,14 @@ namespace Cosmos.VS.Package {
       }
     }
 
+    protected ProfilePresets mPresets = new ProfilePresets();
+
     protected bool mShowTabDeployment;
     protected bool mShowTabLaunch;
     protected bool mShowTabVMware;
     protected bool mShowTabPXE;
     protected bool mShowTabUSB;
     protected bool mShowTabISO;
-    protected bool mShowTabSlave;
 
     protected void RemoveTab(TabPage aTab) {
       if (TabControl1.TabPages.Contains(aTab)) {
@@ -65,7 +67,6 @@ namespace Cosmos.VS.Package {
       RemoveTab(tabPXE);
       RemoveTab(tabUSB);
       RemoveTab(tabISO);
-      RemoveTab(tabSlave);
 
       if (mShowTabDeployment) {
         TabControl1.TabPages.Add(tabDeployment);
@@ -84,9 +85,6 @@ namespace Cosmos.VS.Package {
       }
       if (mShowTabISO) {
         TabControl1.TabPages.Add(tabISO);
-      }
-      if (mShowTabSlave) {
-        TabControl1.TabPages.Add(tabSlave);
       }
 
       if (TabControl1.TabPages.Contains(xTab)) {
@@ -120,8 +118,11 @@ namespace Cosmos.VS.Package {
     protected void UpdateUI() {
       UpdatePresetsUI();
       var xProfile = (ProfileItem)lboxProfile.SelectedItem;
+      if (xProfile == null) {
+        return;
+      }
 
-      lablCurrentProfile.Text = xProfile.ToString();
+      lablCurrentProfile.Text = xProfile.Name;
       lablDeployText.Text = mProps.Description;
       lboxDeployment.SelectedItem = mProps.Deployment;
       lboxLaunch.SelectedItem = mProps.Launch;
@@ -130,12 +131,11 @@ namespace Cosmos.VS.Package {
       lablPreset.Visible = xProfile.IsPreset;
       mShowTabDeployment = !lablPreset.Visible;
       mShowTabLaunch = !lablPreset.Visible;
-      
+
       mShowTabISO = mProps.Deployment == Deployment.ISO;
       mShowTabUSB = mProps.Deployment == Deployment.USB;
 
       mShowTabVMware = mProps.Launch == Launch.VMware;
-      mShowTabSlave = mProps.Launch == Launch.Slave;
       mShowTabPXE = mProps.Launch == Launch.PXE;
 
       UpdateTabs();
@@ -160,13 +160,14 @@ namespace Cosmos.VS.Package {
     }
 
     protected void FillProfiles() {
-      FillProfile("ISO", "ISO Image");
-      FillProfile("USB", "USB Bootable Drive");
-      FillProfile("PXE", "PXE Network Boot");
-      FillProfile("VMware", "VMware");
+      lboxProfile.Items.Clear();
+
+      foreach (var xPreset in mPresets) {
+        FillProfile(xPreset.Key, xPreset.Value);
+      }
 
       for (int i = 1; i < 100; i++) {
-        if (mProps.GetProperty("User" + i.ToString("000") + "_Name") != "") {
+        if (!string.IsNullOrEmpty(mProps.GetProperty("User" + i.ToString("000") + "_Name"))) {
           FillProfile(i);
         }
       }
@@ -178,14 +179,17 @@ namespace Cosmos.VS.Package {
       # region Profile
       butnProfileClone.Click += new EventHandler(butnProfileClone_Click);
       butnProfileDelete.Click += new EventHandler(butnProfileDelete_Click);
+      butnProfileRename.Click += new EventHandler(butnProfileRename_Click);
 
-      FillProfiles();
       lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var xProfile = (ProfileItem)lboxProfile.SelectedItem;
         if (xProfile.Prefix != mProps.Profile) {
-          SaveProfile(mProps.Profile.ToString());
+          // Save existing profile
+          SaveProfile(mProps.Profile);
+          // Load newly selected profile
           LoadProfile(xProfile.Prefix);
           mProps.Profile = xProfile.Prefix;
+
           IsDirty = true;
           UpdateUI();
         }
@@ -301,6 +305,27 @@ namespace Cosmos.VS.Package {
       };
     }
 
+    void butnProfileRename_Click(object sender, EventArgs e) {
+      var xItem = (ProfileItem)lboxProfile.SelectedItem;
+
+      if (xItem == null) {
+        // This should be impossible, but we check for it anwyays.
+
+      } else if (xItem.IsPreset) {
+        MessageBox.Show("Preset profiles cannot be renamed.");
+
+      } else {
+        string xName = Interaction.InputBox("Profile Name", "Rename Profile", mProps.Name);
+        if (xName != "") {
+          IsDirty = true;
+          mProps.Name = xName;
+          xItem.Name = xName;
+          typeof(ListBox).InvokeMember("RefreshItems", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod
+            , null, lboxProfile, new object[] { });
+        }
+      }
+    }
+
     void butnProfileDelete_Click(object sender, EventArgs e) {
       var xItem = (ProfileItem)lboxProfile.SelectedItem;
 
@@ -310,7 +335,8 @@ namespace Cosmos.VS.Package {
       } else if (xItem.IsPreset) {
         MessageBox.Show("Preset profiles cannot be deleted.");
 
-      } else if (MessageBox.Show("", "Delete profile '" + xItem.Name + "'?", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+      } else if (MessageBox.Show("Delete profile '" + xItem.Name + "'?", "", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+        IsDirty = true;
         // Select a new profile first, so the selectchange logic wont barf
         lboxProfile.SelectedIndex = 0;
         lboxProfile.Items.Remove(xItem);
@@ -338,6 +364,9 @@ namespace Cosmos.VS.Package {
         return;
       }
 
+      IsDirty = true;
+      mProps.Name = xItem.Prefix + " User " + xID.ToString("000");
+      mProps.Description = "";
       SaveProfile(xPrefix);
       lboxProfile.SelectedIndex = FillProfile(xID);
     }
@@ -359,38 +388,63 @@ namespace Cosmos.VS.Package {
       }
 
       // Reforce fixed settings for presets on each load.
-      if (mProps.Profile == "ISO") {
+      if (aName == "ISO") {
         mProps.Description = "Creates a bootable ISO image which can be burned to a DVD."
          + " After running the selected project, an explorer window will open containing the ISO file."
          + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.None;
 
-      } else if (mProps.Profile == "USB") {
+      } else if (aName == "USB") {
         mProps.Description = "Makes a USB device such as a flash drive or external hard disk bootable.";
         mProps.Deployment = Deployment.USB;
-        mProps.Launch = Launch.PXE;
+        mProps.Launch = Launch.None;
 
-      } else if (mProps.Profile == "VMware") {
+      } else if (aName == "VMware") {
         mProps.Description = "Use VMware Player or Workstation to deploy and debug.";
         mProps.Deployment = Deployment.ISO;
         mProps.Launch = Launch.VMware;
 
-      } else if (mProps.Profile == "PXE") {
+      } else if (aName == "PXE") {
         mProps.Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         mProps.Deployment = Deployment.PXE;
-        mProps.Launch = Launch.None;
+        mProps.Launch = Launch.PXE;
+      }
+    }
+
+    protected void LoadProfileProps(string aPrefix) {
+      string xPrefix = aPrefix + (aPrefix == "" ? "" : "_");
+      foreach (var xName in BuildProperties.PropNames) {
+        mProps.SetProperty(xPrefix + xName, ProjectConfigs[0].GetConfigurationProperty(xPrefix + xName, false));
+      }
+    }
+
+    protected void LoadProps() {
+      // Load mProps from project config file.
+      // The reason for loading into mProps seems to be so we can track changes, and cancel if necessary.
+      mProps.Reset();
+
+      // Reset cache only on first one
+      // Get selected profile
+      mProps.SetProperty(BuildProperties.ProfileString, ProjectConfigs[0].GetConfigurationProperty(BuildProperties.ProfileString, true));
+
+      // Load selected profile props
+      LoadProfileProps("");
+      foreach (var xPreset in mPresets) {
+        LoadProfileProps(xPreset.Key);
+      }
+      for (int i = 1; i < 100; i++) {
+        string xPrefix = "User" + i.ToString("000");
+        if (ProjectConfigs[0].GetConfigurationProperty(xPrefix + "_Name", false) != "") {
+          LoadProfileProps(xPrefix);
+        }
       }
     }
 
     protected override void FillProperties() {
       base.FillProperties();
-      mProps.Reset();
-      // Initialize defaults?
-      mProps.SetProperty(BuildProperties.ProfileString, GetConfigProperty(BuildProperties.ProfileString));
-      foreach (var xName in BuildProperties.PropNames) {
-        mProps.SetProperty(xName, GetConfigProperty(xName));
-      }
+      LoadProps();
+      FillProfiles();
 
       // Profile
       foreach (ProfileItem xItem in lboxProfile.Items) {

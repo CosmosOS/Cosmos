@@ -57,8 +57,6 @@ namespace Cosmos.VS.Package {
             string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
           }
 
-        } else if (xLaunch == Launch.Slave) {
-
         } else if (xLaunch == Launch.PXE) {
           if (xDeployment == Deployment.PXE) {
             string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");

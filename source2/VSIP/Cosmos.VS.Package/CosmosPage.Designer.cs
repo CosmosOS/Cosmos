@@ -79,6 +79,7 @@
       this.tabISO = new System.Windows.Forms.TabPage();
       this.label8 = new System.Windows.Forms.Label();
       this.tabSlave = new System.Windows.Forms.TabPage();
+      this.butnProfileRename = new System.Windows.Forms.ToolStripButton();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -194,7 +195,8 @@
       // 
       this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.butnProfileClone,
-            this.butnProfileDelete});
+            this.butnProfileDelete,
+            this.butnProfileRename});
       this.toolStrip1.Location = new System.Drawing.Point(0, 0);
       this.toolStrip1.Name = "toolStrip1";
       this.toolStrip1.Size = new System.Drawing.Size(200, 25);
@@ -652,6 +654,16 @@
       this.tabSlave.Text = "Slave";
       this.tabSlave.UseVisualStyleBackColor = true;
       // 
+      // butnProfileRename
+      // 
+      this.butnProfileRename.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+      this.butnProfileRename.Image = ((System.Drawing.Image)(resources.GetObject("butnProfileRename.Image")));
+      this.butnProfileRename.ImageTransparentColor = System.Drawing.Color.Magenta;
+      this.butnProfileRename.Name = "butnProfileRename";
+      this.butnProfileRename.Size = new System.Drawing.Size(23, 22);
+      this.butnProfileRename.Text = "Rename";
+      this.butnProfileRename.ToolTipText = "Rename selected profile.";
+      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -741,6 +753,7 @@
     private System.Windows.Forms.ToolStripButton butnProfileClone;
     private System.Windows.Forms.ToolStripButton butnProfileDelete;
     private System.Windows.Forms.Label lablPreset;
+    private System.Windows.Forms.ToolStripButton butnProfileRename;
 
 
 

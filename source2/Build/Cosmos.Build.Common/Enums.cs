@@ -21,9 +21,7 @@ namespace Cosmos.Build.Common {
     [Description("VMware")]
     VMware,
     [Description("PXE Server")]
-    PXE,
-    [Description("Specially attached slave")]
-    Slave
+    PXE
   }
 
   public enum VMwareEdition {
