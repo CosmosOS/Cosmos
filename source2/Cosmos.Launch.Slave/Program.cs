@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Cosmos.Launch.Slave {
   class Program {
-    static void Main(string[] args) {
+    static int Main(string[] aArgs) {
+      var xHost = new DebugHost(aArgs);
+      return xHost.Go("Attached Slave");
     }
   }
 }

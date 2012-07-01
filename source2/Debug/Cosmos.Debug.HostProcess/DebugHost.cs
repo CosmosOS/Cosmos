@@ -9,8 +9,7 @@ using System.Diagnostics;
 
 namespace Cosmos.Launch.VMware {
   public class DebugHost : Cosmos.Launch.Common.DebugHost {
-    public DebugHost(string[] aArgs)
-      : base(aArgs) {
+    public DebugHost(string[] aArgs) : base(aArgs, 3) {
     }
 
     protected override int Run() {

@@ -5,8 +5,7 @@ using System.Text;
 
 namespace Cosmos.Launch.Manual {
   public class DebugHost : Cosmos.Launch.Common.DebugHost {
-    public DebugHost(string[] aArgs)
-      : base(aArgs) {
+    public DebugHost(string[] aArgs) : base(aArgs, 0) {
     }
 
     protected override int Run() {

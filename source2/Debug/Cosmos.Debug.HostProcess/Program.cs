@@ -11,7 +11,7 @@ namespace Cosmos.Launch.VMware {
   public class Program {
     static int Main(string[] aArgs) {
       var xHost = new DebugHost(aArgs);
-      return xHost.Go();
+      return xHost.Go("VMware");
     }
   }
 }
