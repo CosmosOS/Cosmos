@@ -22,6 +22,42 @@ namespace Cosmos.Build.Common {
       }
     }
 
+    public void SaveProfile(string aName) {
+      foreach (var xName in BuildProperties.PropNames) {
+        SetProperty(aName + "_" + xName, GetProperty(xName));
+      }
+    }
+
+    public void LoadProfile(string aName) {
+      foreach (var xName in BuildProperties.PropNames) {
+        SetProperty(xName, GetProperty(aName + "_" + xName));
+      }
+
+      // Reforce fixed settings for presets on each load.
+      if (aName == "ISO") {
+        Description = "Creates a bootable ISO image which can be burned to a DVD."
+         + " After running the selected project, an explorer window will open containing the ISO file."
+         + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
+        Deployment = Deployment.ISO;
+        Launch = Launch.None;
+
+      } else if (aName == "USB") {
+        Description = "Makes a USB device such as a flash drive or external hard disk bootable.";
+        Deployment = Deployment.USB;
+        Launch = Launch.None;
+
+      } else if (aName == "VMware") {
+        Description = "Use VMware Player or Workstation to deploy and debug.";
+        Deployment = Deployment.ISO;
+        Launch = Launch.VMware;
+
+      } else if (aName == "PXE") {
+        Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
+        Deployment = Deployment.PXE;
+        Launch = Launch.PXE;
+      }
+    }
+
     public void DeleteProfile(string aPrefix) {
       foreach (var xName in BuildProperties.PropNames) {
         mPropTable.Remove(aPrefix + "_" + xName);
@@ -74,6 +110,16 @@ namespace Cosmos.Build.Common {
     public bool IgnoreDebugStubAttribute {
       get { return GetProperty(IgnoreDebugStubAttributeString, false); }
       set { SetProperty(IgnoreDebugStubAttributeString, value); }
+    }
+    public const string CosmosDebugPortString = "CosmosDebugPort";
+    public string CosmosDebugPort {
+      get { return GetProperty(CosmosDebugPortString, "Serial: COM1"); }
+      set { SetProperty(CosmosDebugPortString, value); }
+    }
+    public const string VisualStudioDebugPortString = "VisualStudioDebugPort";
+    public string VisualStudioDebugPort {
+      get { return GetProperty(VisualStudioDebugPortString, "Serial: COM1"); }
+      set { SetProperty(VisualStudioDebugPortString, value); }
     }
 
     // VMware

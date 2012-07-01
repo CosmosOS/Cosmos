@@ -40,6 +40,7 @@
       this.toolStrip1 = new System.Windows.Forms.ToolStrip();
       this.butnProfileClone = new System.Windows.Forms.ToolStripButton();
       this.butnProfileDelete = new System.Windows.Forms.ToolStripButton();
+      this.butnProfileRename = new System.Windows.Forms.ToolStripButton();
       this.lablDeployText = new System.Windows.Forms.Label();
       this.lablBuildOnly = new System.Windows.Forms.Label();
       this.tabCompile = new System.Windows.Forms.TabPage();
@@ -55,9 +56,9 @@
       this.chckEnableDebugStub = new System.Windows.Forms.CheckBox();
       this.panlDebugSettings = new System.Windows.Forms.Panel();
       this.label4 = new System.Windows.Forms.Label();
-      this.cmboVisusalStudioPort = new System.Windows.Forms.ComboBox();
+      this.cmboVisualStudioDebugPort = new System.Windows.Forms.ComboBox();
       this.comboTraceMode = new System.Windows.Forms.ComboBox();
-      this.cmboCosmosPort = new System.Windows.Forms.ComboBox();
+      this.cmboCosmosDebugPort = new System.Windows.Forms.ComboBox();
       this.comboDebugMode = new System.Windows.Forms.ComboBox();
       this.label10 = new System.Windows.Forms.Label();
       this.label5 = new System.Windows.Forms.Label();
@@ -79,7 +80,6 @@
       this.tabISO = new System.Windows.Forms.TabPage();
       this.label8 = new System.Windows.Forms.Label();
       this.tabSlave = new System.Windows.Forms.TabPage();
-      this.butnProfileRename = new System.Windows.Forms.ToolStripButton();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -222,6 +222,16 @@
       this.butnProfileDelete.Size = new System.Drawing.Size(23, 22);
       this.butnProfileDelete.Text = "Delete";
       this.butnProfileDelete.ToolTipText = "Delete selected profile";
+      // 
+      // butnProfileRename
+      // 
+      this.butnProfileRename.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+      this.butnProfileRename.Image = ((System.Drawing.Image)(resources.GetObject("butnProfileRename.Image")));
+      this.butnProfileRename.ImageTransparentColor = System.Drawing.Color.Magenta;
+      this.butnProfileRename.Name = "butnProfileRename";
+      this.butnProfileRename.Size = new System.Drawing.Size(23, 22);
+      this.butnProfileRename.Text = "Rename";
+      this.butnProfileRename.ToolTipText = "Rename selected profile.";
       // 
       // lablDeployText
       // 
@@ -378,9 +388,9 @@
       // panlDebugSettings
       // 
       this.panlDebugSettings.Controls.Add(this.label4);
-      this.panlDebugSettings.Controls.Add(this.cmboVisusalStudioPort);
+      this.panlDebugSettings.Controls.Add(this.cmboVisualStudioDebugPort);
       this.panlDebugSettings.Controls.Add(this.comboTraceMode);
-      this.panlDebugSettings.Controls.Add(this.cmboCosmosPort);
+      this.panlDebugSettings.Controls.Add(this.cmboCosmosDebugPort);
       this.panlDebugSettings.Controls.Add(this.comboDebugMode);
       this.panlDebugSettings.Controls.Add(this.label10);
       this.panlDebugSettings.Controls.Add(this.label5);
@@ -402,20 +412,21 @@
       this.label4.Text = "Debug Level:";
       this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
-      // cmboVisusalStudioPort
+      // cmboVisualStudioDebugPort
       // 
-      this.cmboVisusalStudioPort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.cmboVisusalStudioPort.FormattingEnabled = true;
-      this.cmboVisusalStudioPort.Items.AddRange(new object[] {
+      this.cmboVisualStudioDebugPort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmboVisualStudioDebugPort.FormattingEnabled = true;
+      this.cmboVisualStudioDebugPort.Items.AddRange(new object[] {
+            "Ethernet (not supported yet)",
             "Serial Com1",
             "Serial Com2",
             "Serial Com3",
-            "Serial Com4",
-            "Ethernet (not supported yet)"});
-      this.cmboVisusalStudioPort.Location = new System.Drawing.Point(23, 226);
-      this.cmboVisusalStudioPort.Name = "cmboVisusalStudioPort";
-      this.cmboVisusalStudioPort.Size = new System.Drawing.Size(163, 21);
-      this.cmboVisusalStudioPort.TabIndex = 32;
+            "Serial Com4"});
+      this.cmboVisualStudioDebugPort.Location = new System.Drawing.Point(23, 226);
+      this.cmboVisualStudioDebugPort.Name = "cmboVisualStudioDebugPort";
+      this.cmboVisualStudioDebugPort.Size = new System.Drawing.Size(221, 21);
+      this.cmboVisualStudioDebugPort.Sorted = true;
+      this.cmboVisualStudioDebugPort.TabIndex = 32;
       // 
       // comboTraceMode
       // 
@@ -426,20 +437,21 @@
       this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
       this.comboTraceMode.TabIndex = 25;
       // 
-      // cmboCosmosPort
+      // cmboCosmosDebugPort
       // 
-      this.cmboCosmosPort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.cmboCosmosPort.FormattingEnabled = true;
-      this.cmboCosmosPort.Items.AddRange(new object[] {
+      this.cmboCosmosDebugPort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmboCosmosDebugPort.FormattingEnabled = true;
+      this.cmboCosmosDebugPort.Items.AddRange(new object[] {
+            "Ethernet (not supported yet)",
             "Serial Com1",
             "Serial Com2",
             "Serial Com3",
-            "Serial Com4",
-            "Ethernet (not supported yet)"});
-      this.cmboCosmosPort.Location = new System.Drawing.Point(23, 178);
-      this.cmboCosmosPort.Name = "cmboCosmosPort";
-      this.cmboCosmosPort.Size = new System.Drawing.Size(163, 21);
-      this.cmboCosmosPort.TabIndex = 31;
+            "Serial Com4"});
+      this.cmboCosmosDebugPort.Location = new System.Drawing.Point(23, 178);
+      this.cmboCosmosDebugPort.Name = "cmboCosmosDebugPort";
+      this.cmboCosmosDebugPort.Size = new System.Drawing.Size(221, 21);
+      this.cmboCosmosDebugPort.Sorted = true;
+      this.cmboCosmosDebugPort.TabIndex = 31;
       // 
       // comboDebugMode
       // 
@@ -654,16 +666,6 @@
       this.tabSlave.Text = "Slave";
       this.tabSlave.UseVisualStyleBackColor = true;
       // 
-      // butnProfileRename
-      // 
-      this.butnProfileRename.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-      this.butnProfileRename.Image = ((System.Drawing.Image)(resources.GetObject("butnProfileRename.Image")));
-      this.butnProfileRename.ImageTransparentColor = System.Drawing.Color.Magenta;
-      this.butnProfileRename.Name = "butnProfileRename";
-      this.butnProfileRename.Size = new System.Drawing.Size(23, 22);
-      this.butnProfileRename.Text = "Rename";
-      this.butnProfileRename.ToolTipText = "Rename selected profile.";
-      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -727,9 +729,9 @@
     private System.Windows.Forms.CheckBox chckEnableDebugStub;
     private System.Windows.Forms.Panel panlDebugSettings;
     private System.Windows.Forms.Label label4;
-    private System.Windows.Forms.ComboBox cmboVisusalStudioPort;
+    private System.Windows.Forms.ComboBox cmboVisualStudioDebugPort;
     private System.Windows.Forms.ComboBox comboTraceMode;
-    private System.Windows.Forms.ComboBox cmboCosmosPort;
+    private System.Windows.Forms.ComboBox cmboCosmosDebugPort;
     private System.Windows.Forms.ComboBox comboDebugMode;
     private System.Windows.Forms.Label label10;
     private System.Windows.Forms.Label label5;

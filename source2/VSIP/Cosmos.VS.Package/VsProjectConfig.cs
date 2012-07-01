@@ -79,12 +79,9 @@ namespace Cosmos.VS.Package {
           xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
           xValues.Add("ISOFile", xIsoFile);
           xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
-          xValues.Add(BuildProperties.LaunchString, GetConfigurationProperty(BuildProperties.LaunchString, false));
-          xValues.Add(BuildProperties.DebugModeString, GetConfigurationProperty(BuildProperties.DebugModeString, false));
-          xValues.Add(BuildProperties.TraceAssembliesString, GetConfigurationProperty(BuildProperties.TraceAssembliesString, false));
-          xValues.Add(BuildProperties.VMwareEditionString, GetConfigurationProperty(BuildProperties.VMwareEditionString, false));
-          xValues.Add(BuildProperties.EnableGDBString, GetConfigurationProperty(BuildProperties.EnableGDBString, false));
-          xValues.Add(BuildProperties.StartCosmosGDBString, GetConfigurationProperty(BuildProperties.StartCosmosGDBString, false));
+          foreach (var xName in BuildProperties.PropNames) {
+            xValues.Add(xName, GetConfigurationProperty(xName, false));
+          }
 
           xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
