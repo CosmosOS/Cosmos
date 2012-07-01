@@ -34,7 +34,7 @@
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>PXE</PXE_Launch>
-    <PXE_DebugEnabled>True</PXE_DebugEnabled>
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
@@ -81,18 +81,17 @@
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
     <Name>PXE with Slave (Kudzu)</Name>
-    <Description>
-    </Description>
+    <Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
     <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
-    <PXE_Name />
+    <PXE_Name>PXE with Slave (Kudzu)</PXE_Name>
     <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
     <VMware_Name />
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
-    <User001_Description />
+    <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
     <User001_Deployment>PXE</User001_Deployment>
     <User001_Launch>PXE</User001_Launch>
     <User001_DebugEnabled>True</User001_DebugEnabled>
@@ -105,6 +104,12 @@
     <User001_TraceAssemblies />
     <User001_EnableGDB>False</User001_EnableGDB>
     <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
+    <PxeInterface>192.168.43.1</PxeInterface>
+    <SlavePort>Serial: COM3</SlavePort>
+    <User001_PxeInterface>192.168.43.1</User001_PxeInterface>
+    <User001_SlavePort>Serial: COM3</User001_SlavePort>
+    <ISO_PxeInterface>192.168.43.1</ISO_PxeInterface>
+    <ISO_SlavePort>Serial: COM3</ISO_SlavePort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>User001</Profile>
@@ -127,7 +132,7 @@
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>PXE</PXE_Launch>
-    <PXE_DebugEnabled>True</PXE_DebugEnabled>
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
     <PXE_IgnoreDebugStubAttribute />
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
@@ -174,18 +179,17 @@
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
     <Name>PXE with Slave (Kudzu)</Name>
-    <Description>
-    </Description>
+    <Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
     <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
-    <PXE_Name />
+    <PXE_Name>PXE with Slave (Kudzu)</PXE_Name>
     <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
     <VMware_Name />
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
-    <User001_Description />
+    <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
     <User001_Deployment>PXE</User001_Deployment>
     <User001_Launch>PXE</User001_Launch>
     <User001_DebugEnabled>True</User001_DebugEnabled>
@@ -211,6 +215,12 @@
     <PXE_VisualStudioDebugPort />
     <USB_CosmosDebugPort />
     <USB_VisualStudioDebugPort />
+    <PxeInterface>192.168.43.1</PxeInterface>
+    <SlavePort>Serial: COM3</SlavePort>
+    <User001_PxeInterface>192.168.43.1</User001_PxeInterface>
+    <User001_SlavePort>Serial: COM3</User001_SlavePort>
+    <ISO_PxeInterface>192.168.43.1</ISO_PxeInterface>
+    <ISO_SlavePort>Serial: COM3</ISO_SlavePort>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">

@@ -24,13 +24,19 @@ namespace Cosmos.Build.Common {
 
     public void SaveProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
-        SetProperty(aName + "_" + xName, GetProperty(xName));
+        string xValue = GetProperty(xName);
+        if (!string.IsNullOrWhiteSpace(xValue)) {
+          SetProperty(aName + "_" + xName, xValue);
+        }
       }
     }
 
     public void LoadProfile(string aName) {
       foreach (var xName in BuildProperties.PropNames) {
-        SetProperty(xName, GetProperty(aName + "_" + xName));
+        string xValue = GetProperty(aName + "_" + xName);
+        if (!string.IsNullOrWhiteSpace(xValue)) {
+          SetProperty(xName, xValue);
+        }
       }
 
       // Reforce fixed settings for presets on each load.
@@ -120,6 +126,18 @@ namespace Cosmos.Build.Common {
     public string VisualStudioDebugPort {
       get { return GetProperty(VisualStudioDebugPortString, "Serial: COM1"); }
       set { SetProperty(VisualStudioDebugPortString, value); }
+    }
+
+    // PXE
+    public const string PxeInterfaceString = "PxeInterface";
+    public string PxeInterface {
+      get { return GetProperty(PxeInterfaceString, "192.168.42.1"); }
+      set { SetProperty(PxeInterfaceString, value); }
+    }
+    public const string SlavePortString = "SlavePort";
+    public string SlavePort {
+      get { return GetProperty(SlavePortString, "None"); }
+      set { SetProperty(SlavePortString, value); }
     }
 
     // VMware

@@ -166,6 +166,11 @@ namespace Cosmos.VS.Package {
       // Locked to COM1 for now.
       cmboCosmosDebugPort.SelectedIndex = 0;
 
+      #region PXE
+      textPxeInterface.Text = mProps.PxeInterface;
+      cmboSlavePort.SelectedIndex = cmboSlavePort.Items.IndexOf(mProps.SlavePort);
+      #endregion
+
       checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
       comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
       comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
@@ -256,6 +261,7 @@ namespace Cosmos.VS.Package {
       };
       #endregion
 
+      #region Compile
       comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
         if (value != mProps.Framework) {
@@ -271,7 +277,9 @@ namespace Cosmos.VS.Package {
           IsDirty = true;
         }
       };
+      #endregion
 
+      #region Assembler
       checkUseInternalAssembler.CheckedChanged += delegate(Object sender, EventArgs e) {
         bool value = checkUseInternalAssembler.Checked;
         if (value != mProps.UseInternalAssembler) {
@@ -279,6 +287,7 @@ namespace Cosmos.VS.Package {
           IsDirty = true;
         }
       };
+      #endregion
 
 
       #region VMware
@@ -286,6 +295,24 @@ namespace Cosmos.VS.Package {
         var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
         if (x != mProps.VMwareEdition) {
           mProps.VMwareEdition = x;
+          IsDirty = true;
+        }
+      };
+      #endregion
+
+      #region PXE
+      textPxeInterface.TextChanged += delegate(Object sender, EventArgs e) {
+        var x = textPxeInterface.Text.Trim();
+        if (x != mProps.PxeInterface) {
+          mProps.PxeInterface = x;
+          IsDirty = true;
+        }
+      };
+
+      cmboSlavePort.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        var x = (string)cmboSlavePort.SelectedItem;
+        if (x != mProps.SlavePort) {
+          mProps.SlavePort = x;
           IsDirty = true;
         }
       };
@@ -487,16 +514,27 @@ namespace Cosmos.VS.Package {
       cmboCosmosDebugPort.Items.Add("Serial: COM1");
 
       cmboVisualStudioDebugPort.Items.Clear();
-      foreach (string xPort in SerialPort.GetPortNames()) {
-        cmboVisualStudioDebugPort.Items.Add("Serial: " + xPort);
-      }
+      FillComPorts(cmboVisualStudioDebugPort.Items);
       mVMwareDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
 
       comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
       comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
       #endregion
 
+      #region PXE
+      cmboSlavePort.Items.Clear();
+      cmboSlavePort.Items.Add("None");
+      FillComPorts(cmboSlavePort.Items);
+      #endregion
+
       UpdateUI();
+    }
+
+    protected void FillComPorts(System.Collections.IList aList) {
+      //TODO http://stackoverflow.com/questions/2937585/how-to-open-a-serial-port-by-friendly-name
+      foreach (string xPort in SerialPort.GetPortNames()) {
+        aList.Add("Serial: " + xPort);
+      }
     }
 
     private void OutputBrowse_Click(object sender, EventArgs e) {

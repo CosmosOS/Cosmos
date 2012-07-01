@@ -74,11 +74,14 @@
       this.label3 = new System.Windows.Forms.Label();
       this.cmboVMwareEdition = new System.Windows.Forms.ComboBox();
       this.tabPXE = new System.Windows.Forms.TabPage();
-      this.label6 = new System.Windows.Forms.Label();
       this.tabUSB = new System.Windows.Forms.TabPage();
       this.label7 = new System.Windows.Forms.Label();
       this.tabISO = new System.Windows.Forms.TabPage();
       this.label8 = new System.Windows.Forms.Label();
+      this.label1 = new System.Windows.Forms.Label();
+      this.textPxeInterface = new System.Windows.Forms.TextBox();
+      this.label6 = new System.Windows.Forms.Label();
+      this.cmboSlavePort = new System.Windows.Forms.ComboBox();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -597,7 +600,10 @@
       // 
       // tabPXE
       // 
+      this.tabPXE.Controls.Add(this.cmboSlavePort);
       this.tabPXE.Controls.Add(this.label6);
+      this.tabPXE.Controls.Add(this.textPxeInterface);
+      this.tabPXE.Controls.Add(this.label1);
       this.tabPXE.Location = new System.Drawing.Point(4, 22);
       this.tabPXE.Name = "tabPXE";
       this.tabPXE.Padding = new System.Windows.Forms.Padding(3);
@@ -605,15 +611,6 @@
       this.tabPXE.TabIndex = 5;
       this.tabPXE.Text = "PXE";
       this.tabPXE.UseVisualStyleBackColor = true;
-      // 
-      // label6
-      // 
-      this.label6.Location = new System.Drawing.Point(23, 22);
-      this.label6.Name = "label6";
-      this.label6.Size = new System.Drawing.Size(375, 102);
-      this.label6.TabIndex = 0;
-      this.label6.Text = "Currently PXE is locked to 192.168.42.1 to avoid configuration conflicts among Co" +
-    "smos developers. For now please use this configuation.";
       // 
       // tabUSB
       // 
@@ -654,6 +651,47 @@
       this.label8.TabIndex = 1;
       this.label8.Text = "There are currently no ISO options.";
       // 
+      // label1
+      // 
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(13, 16);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(52, 13);
+      this.label1.TabIndex = 0;
+      this.label1.Text = "Interface:";
+      // 
+      // textPxeInterface
+      // 
+      this.textPxeInterface.Location = new System.Drawing.Point(28, 32);
+      this.textPxeInterface.Name = "textPxeInterface";
+      this.textPxeInterface.Size = new System.Drawing.Size(146, 20);
+      this.textPxeInterface.TabIndex = 1;
+      // 
+      // label6
+      // 
+      this.label6.AutoSize = true;
+      this.label6.Location = new System.Drawing.Point(13, 73);
+      this.label6.Name = "label6";
+      this.label6.Size = new System.Drawing.Size(59, 13);
+      this.label6.TabIndex = 2;
+      this.label6.Text = "Slave Port:";
+      // 
+      // cmboSlavePort
+      // 
+      this.cmboSlavePort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmboSlavePort.FormattingEnabled = true;
+      this.cmboSlavePort.Items.AddRange(new object[] {
+            "Ethernet (not supported yet)",
+            "Serial Com1",
+            "Serial Com2",
+            "Serial Com3",
+            "Serial Com4"});
+      this.cmboSlavePort.Location = new System.Drawing.Point(28, 89);
+      this.cmboSlavePort.Name = "cmboSlavePort";
+      this.cmboSlavePort.Size = new System.Drawing.Size(146, 21);
+      this.cmboSlavePort.Sorted = true;
+      this.cmboSlavePort.TabIndex = 33;
+      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -685,6 +723,7 @@
       this.tabVMware.ResumeLayout(false);
       this.tabVMware.PerformLayout();
       this.tabPXE.ResumeLayout(false);
+      this.tabPXE.PerformLayout();
       this.tabUSB.ResumeLayout(false);
       this.tabISO.ResumeLayout(false);
       this.ResumeLayout(false);
@@ -731,7 +770,6 @@
     private System.Windows.Forms.Label label3;
     private System.Windows.Forms.ComboBox cmboVMwareEdition;
     private System.Windows.Forms.TabPage tabPXE;
-    private System.Windows.Forms.Label label6;
     private System.Windows.Forms.TabPage tabUSB;
     private System.Windows.Forms.Label label7;
     private System.Windows.Forms.TabPage tabISO;
@@ -743,6 +781,10 @@
     private System.Windows.Forms.ToolStripButton butnProfileDelete;
     private System.Windows.Forms.Label lablPreset;
     private System.Windows.Forms.ToolStripButton butnProfileRename;
+    private System.Windows.Forms.ComboBox cmboSlavePort;
+    private System.Windows.Forms.Label label6;
+    private System.Windows.Forms.TextBox textPxeInterface;
+    private System.Windows.Forms.Label label1;
 
 
 
