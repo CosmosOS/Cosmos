@@ -67,6 +67,7 @@
       this.tabDeployment = new System.Windows.Forms.TabPage();
       this.lboxDeployment = new System.Windows.Forms.ListBox();
       this.tabLaunch = new System.Windows.Forms.TabPage();
+      this.chckShowLaunchConsole = new System.Windows.Forms.CheckBox();
       this.lboxLaunch = new System.Windows.Forms.ListBox();
       this.tabVMware = new System.Windows.Forms.TabPage();
       this.checkEnableGDB = new System.Windows.Forms.CheckBox();
@@ -83,7 +84,6 @@
       this.tabSlave = new System.Windows.Forms.TabPage();
       this.cmboSlavePort = new System.Windows.Forms.ComboBox();
       this.label6 = new System.Windows.Forms.Label();
-      this.chckShowLaunchConsole = new System.Windows.Forms.CheckBox();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -538,6 +538,16 @@
       this.tabLaunch.Text = "Launch";
       this.tabLaunch.UseVisualStyleBackColor = true;
       // 
+      // chckShowLaunchConsole
+      // 
+      this.chckShowLaunchConsole.AutoSize = true;
+      this.chckShowLaunchConsole.Location = new System.Drawing.Point(230, 18);
+      this.chckShowLaunchConsole.Name = "chckShowLaunchConsole";
+      this.chckShowLaunchConsole.Size = new System.Drawing.Size(158, 17);
+      this.chckShowLaunchConsole.TabIndex = 35;
+      this.chckShowLaunchConsole.Text = "Show Launch Host Process";
+      this.chckShowLaunchConsole.UseVisualStyleBackColor = true;
+      // 
       // lboxLaunch
       // 
       this.lboxLaunch.Dock = System.Windows.Forms.DockStyle.Left;
@@ -706,16 +716,6 @@
       this.label6.Size = new System.Drawing.Size(59, 13);
       this.label6.TabIndex = 34;
       this.label6.Text = "Slave Port:";
-      // 
-      // chckShowLaunchConsole
-      // 
-      this.chckShowLaunchConsole.AutoSize = true;
-      this.chckShowLaunchConsole.Location = new System.Drawing.Point(230, 18);
-      this.chckShowLaunchConsole.Name = "chckShowLaunchConsole";
-      this.chckShowLaunchConsole.Size = new System.Drawing.Size(154, 17);
-      this.chckShowLaunchConsole.TabIndex = 35;
-      this.chckShowLaunchConsole.Text = "Enable Remote Debugging";
-      this.chckShowLaunchConsole.UseVisualStyleBackColor = true;
       // 
       // CosmosPage
       // 
