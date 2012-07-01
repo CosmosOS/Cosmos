@@ -80,7 +80,7 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>PXE Kudzu</Name>
+    <Name>PXE with Slave (Kudzu)</Name>
     <Description>
     </Description>
     <ISO_Name>User 001</ISO_Name>
@@ -91,7 +91,7 @@
     <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
     <VMware_Name />
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
-    <User001_Name>PXE Kudzu</User001_Name>
+    <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description />
     <User001_Deployment>PXE</User001_Deployment>
     <User001_Launch>PXE</User001_Launch>
@@ -1477,6 +1477,13 @@
     <User099_TraceAssemblies />
     <User099_EnableGDB />
     <User099_StartCosmosGDB />
+    <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
+    <User001_CosmosDebugPort>Serial: COM1</User001_CosmosDebugPort>
+    <User001_VisualStudioDebugPort />
+    <VisualStudioDebugPort>
+    </VisualStudioDebugPort>
+    <VMware_CosmosDebugPort />
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>User001</Profile>
@@ -1545,7 +1552,7 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>PXE Kudzu</Name>
+    <Name>PXE with Slave (Kudzu)</Name>
     <Description>
     </Description>
     <ISO_Name>User 001</ISO_Name>
@@ -1556,7 +1563,7 @@
     <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
     <VMware_Name />
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
-    <User001_Name>PXE Kudzu</User001_Name>
+    <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description />
     <User001_Deployment>PXE</User001_Deployment>
     <User001_Launch>PXE</User001_Launch>
@@ -2942,6 +2949,13 @@
     <User099_TraceAssemblies />
     <User099_EnableGDB />
     <User099_StartCosmosGDB />
+    <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
+    <User001_CosmosDebugPort>Serial: COM1</User001_CosmosDebugPort>
+    <User001_VisualStudioDebugPort />
+    <VisualStudioDebugPort>
+    </VisualStudioDebugPort>
+    <VMware_CosmosDebugPort />
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
