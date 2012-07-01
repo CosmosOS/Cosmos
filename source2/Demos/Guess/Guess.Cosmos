@@ -114,14 +114,15 @@
     <PXE_SlavePort>Serial: COM3</PXE_SlavePort>
     <USB_PxeInterface>192.168.43.1</USB_PxeInterface>
     <USB_SlavePort>Serial: COM3</USB_SlavePort>
-    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <VisualStudioDebugPort>Serial: COM1</VisualStudioDebugPort>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_PxeInterface>192.168.43.1</VMware_PxeInterface>
     <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
     <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
-    <User001_VisualStudioDebugPort>Pipe: Cosmos\Serial</User001_VisualStudioDebugPort>
+    <User001_VisualStudioDebugPort>Serial: COM1</User001_VisualStudioDebugPort>
     <ShowLaunchConsole>True</ShowLaunchConsole>
     <User001_ShowLaunchConsole>True</User001_ShowLaunchConsole>
+    <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>User001</Profile>
@@ -216,8 +217,8 @@
     <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
     <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
     <User001_CosmosDebugPort>Serial: COM1</User001_CosmosDebugPort>
-    <User001_VisualStudioDebugPort>Pipe: Cosmos\Serial</User001_VisualStudioDebugPort>
-    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <User001_VisualStudioDebugPort>Serial: COM1</User001_VisualStudioDebugPort>
+    <VisualStudioDebugPort>Serial: COM1</VisualStudioDebugPort>
     <VMware_CosmosDebugPort />
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <ISO_CosmosDebugPort />
@@ -240,6 +241,7 @@
     <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
     <ShowLaunchConsole>True</ShowLaunchConsole>
     <User001_ShowLaunchConsole>True</User001_ShowLaunchConsole>
+    <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">

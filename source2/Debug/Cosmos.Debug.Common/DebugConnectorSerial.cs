@@ -9,16 +9,14 @@ namespace Cosmos.Debug.Common {
     private SerialPort mPort;
 
     public DebugConnectorSerial(string aPort) {
-      // TODO: MtW - Make COM port configurable
-      //        mPort = new SerialPort("COM" + aPort, 9600, Parity.None, 8, StopBits.One);
-      //        mPort.Handshake = Handshake.None;
-      //        mPort.Open();
-      //        Start(mPort.BaseStream);
+      mPort = new SerialPort(aPort);
+      mPort.BaudRate = 115200;
+      mPort.Parity = Parity.None;
+      mPort.DataBits = 8;
+      mPort.StopBits = StopBits.One;
+      mPort.Open();
+      Start(mPort.BaseStream);
     }
 
-    //    public override void WaitConnect() {    
-    //        //TODO: Serial we cant detect connection, but we can wait for first byte...
-    //        throw new NotImplementedException();
-    //    }
   }
 }

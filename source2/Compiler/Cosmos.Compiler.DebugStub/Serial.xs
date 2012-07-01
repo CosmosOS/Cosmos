@@ -66,9 +66,9 @@ procedure InitSerial2 {
 	AL = $80
 	Port[DX] = AL
 
-	# 0x01 - 0x00 - 115200
-	# 0x02 - 0x00 - 57600
-	# 0x03 - 0x00 - 38400
+	# 0x01, 0x00 - 115200
+	# 0x02, 0x00 - 57600
+	# 0x03, 0x00 - 38400
 	#
 	# Set divisor (lo byte)
 	DX = ESP[4]
