@@ -13,24 +13,59 @@ using System.Windows.Navigation;
 using System.Threading;
 using System.Windows.Threading;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Cosmos.Deploy.Pixie.GUI {
   public partial class MainWindow : Window {
     protected byte[] mNicIP = new byte[4];
-    protected DispatcherTimer mTimer = new DispatcherTimer();
+    protected DispatcherTimer mCloseTimer = new DispatcherTimer();
+    protected DispatcherTimer mOnlineTimer = new DispatcherTimer();
     protected bool mWarningIssued = false;
 
     public MainWindow() {
       InitializeComponent();
-      mTimer.Interval = TimeSpan.FromSeconds(5);
-      mTimer.Tick += (object sender, EventArgs e) => {
+
+      lablWaiting.Visibility = Visibility.Hidden;
+
+      mCloseTimer.Interval = TimeSpan.FromSeconds(5);
+      mCloseTimer.Tick += (object sender, EventArgs e) => {
         if (mWarningIssued) {
           Close();
         } else {
-          Log("", "Last transfer request completed. Auto closing in " + mTimer.Interval.TotalSeconds + " seconds.");
+          Log("", "Last transfer request completed. Auto closing in " + mCloseTimer.Interval.TotalSeconds + " seconds.");
           mWarningIssued = true;
         }
       };
+
+      mOnlineTimer.Interval = TimeSpan.FromSeconds(1);
+      mOnlineTimer.Tick += new EventHandler(mOnlineTimer_Tick);
+    }
+    
+    // This code is necessary for cross over cables. NIC will appear offline till sense appears,
+    // which wont happen till we turn the machine on.
+    void mOnlineTimer_Tick(object sender, EventArgs e) {
+      mOnlineTimer.Stop();
+      
+      UdpClient xUDP = null;
+      try {
+        xUDP = new UdpClient(new IPEndPoint(new IPAddress(mNicIP), 67));
+      } catch (SocketException ex) {
+        if (ex.ErrorCode != 10049) {
+          throw;
+        }
+        if (lablWaiting.Visibility == Visibility.Hidden) {
+          lablWaiting.Visibility = Visibility.Visible;
+          Log("NIC", "Interface unavailable. Waiting.");
+        }
+        mOnlineTimer.Start();
+        return;
+      }
+
+      lablWaiting.Visibility = Visibility.Hidden;
+      Log("NIC", "Interface active.");
+      xUDP.Close();
+      Start();
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)  {
@@ -56,7 +91,9 @@ namespace Cosmos.Deploy.Pixie.GUI {
       }
 
       ClearFile();
-      Start();
+
+      Log("NIC", "Checking for interface.");
+      mOnlineTimer.Start();
     }
 
     void ClearFile() {
@@ -75,6 +112,7 @@ namespace Cosmos.Deploy.Pixie.GUI {
     protected Thread mTftpThread;
     protected TrivialFTP mTFTP;
     protected void Start() {
+      Log("DHCP", "Starting");
       mDhcpThread = new Thread(delegate() {
         // Need full path to boot file because it needs to get the size
         mDHCP = new DHCP(mNicIP, Path.Combine(App.PxePath, "pxelinux.0"));
@@ -89,12 +127,13 @@ namespace Cosmos.Deploy.Pixie.GUI {
       });
       mDhcpThread.Start();
 
+      Log("TFTP", "Starting");
       mTftpThread = new Thread(delegate() {
         mTFTP = new TrivialFTP(mNicIP, App.PxePath);
 
         mTFTP.OnFileStart += delegate(TrivialFTP aSender, string aFilename, long aSize) {
           Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-            mTimer.Stop();
+            mCloseTimer.Stop();
             Log("TFTP", "Starting file " + aFilename);
             lablCurrentFile.Content = aFilename;
             double xMB = (double)aSize / (1024 * 1024);
@@ -114,7 +153,7 @@ namespace Cosmos.Deploy.Pixie.GUI {
           Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
             ClearFile();
             Log("TFTP", "Completed " + aFilename);
-            mTimer.Start();
+            mCloseTimer.Start();
           });
         };
 
@@ -124,10 +163,14 @@ namespace Cosmos.Deploy.Pixie.GUI {
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-      mDhcpThread.Abort();
-      mDHCP.Stop();
-      mTftpThread.Abort();
-      mTFTP.Stop();
+      if (mDhcpThread != null) {
+        mDhcpThread.Abort();
+        mDHCP.Stop();
+      }
+      if (mTftpThread != null) {
+        mTftpThread.Abort();
+        mTFTP.Stop();
+      }
     }
 
   }

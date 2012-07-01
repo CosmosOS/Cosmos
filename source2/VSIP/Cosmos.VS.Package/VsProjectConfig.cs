@@ -60,7 +60,8 @@ namespace Cosmos.VS.Package {
         } else if (xLaunch == Launch.PXE) {
           if (xDeployment == Deployment.PXE) {
             string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
-            Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), "192.168.42.1 \"" + xPxePath + "\"");
+            string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
+            Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), xPxeIntf + " \"" + xPxePath + "\"");
           }
 
         } else if (xLaunch == Launch.VMware) {
