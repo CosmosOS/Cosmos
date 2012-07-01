@@ -129,6 +129,8 @@
     <Compile Include="Engine.Impl\OperationThread.cs" />
     <Compile Include="AD7.Impl\AD7Engine.cs" />
     <Compile Include="Engine.Impl\EngineCallback.cs" />
+    <Compile Include="Host\Manual.cs" />
+    <Compile Include="Host\Slave.cs" />
     <Compile Include="Host\VMware.cs" />
     <Compile Include="Host\VMwarePlayer.cs" />
     <Compile Include="Host\VMwareWorkstation.cs" />

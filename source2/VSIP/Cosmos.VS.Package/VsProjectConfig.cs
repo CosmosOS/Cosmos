@@ -57,9 +57,7 @@ namespace Cosmos.VS.Package {
             Process.Start(xOutputPath);
           }
 
-        } else if (xLaunch == LaunchType.VMware) {
-          //TODO - Handle PXE
-
+        } else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();
           xInfo.cbSize = (uint)Marshal.SizeOf(xInfo);
@@ -84,9 +82,6 @@ namespace Cosmos.VS.Package {
           xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
 
           VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
-
-        } else {
-          throw new Exception("Unknown launch type.");
         }
       } catch (Exception ex) {
         return Marshal.GetHRForException(ex);

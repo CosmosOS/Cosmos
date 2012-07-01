@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Vestris.VMWareLib;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
   public class VMwarePlayer : VMware {
-    public VMwarePlayer(string aVmxFile) : base(aVmxFile) {
+    public VMwarePlayer(NameValueCollection aParams, string aVmxFile)
+      : base(aParams, aVmxFile) {
     }
 
     public static bool IsInstalled {

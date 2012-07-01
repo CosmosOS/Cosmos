@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -8,8 +9,8 @@ using Vestris.VMWareLib;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
   public class VMwareWorkstation : VMware {
-    public VMwareWorkstation(string aVmxFile)
-      : base(aVmxFile) {
+    public VMwareWorkstation(NameValueCollection aParams, string aVmxFile)
+      : base(aParams, aVmxFile) {
     }
 
     public static bool IsInstalled {

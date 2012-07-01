@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,12 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     protected string mVmxFile;
     protected abstract void ConnectToVMWare(VMWareVirtualHost aHost);
 
-    public VMware(string aVmxFile) {
+    public VMware(NameValueCollection aParams, string aVmxFile) : base(aParams) {
       mVmxFile = aVmxFile;
+    }
+
+    public override string GetHostProcessExe() {
+      return "Cosmos.Launch.VMware.exe";
     }
 
     protected static string GetPathname(string aKey, string aEXE) {
@@ -29,7 +34,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
 
     protected abstract string GetParams();
 
-    public override string Start(string aIsoFile, bool aGDB) {
+    public override string Start(bool aGDB) {
       string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\");
       Cleanup();
 
@@ -54,7 +59,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
 
                 } else if (xName == "ide1:0.fileName") {
                   // Set the ISO file for booting
-                  xValue = "\"" + aIsoFile + "\"";
+                  xValue = "\"" + mParams["ISOFile"] + "\"";
 
                 } else if (xName == "nvram") {
                   // Point it to an initially non-existent nvram.

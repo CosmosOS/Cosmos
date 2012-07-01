@@ -139,12 +139,12 @@ namespace Cosmos.Debug.VSDebugEngine {
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
 
-      mProcessStartInfo = CreateHostProcessInfo("Cosmos.Launch.VMware.exe");
-
+      string xHostArgs = "";
       if (mLaunch == LaunchType.VMware) {
+        OutputText("Preparing VMWare.");
         string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
-        
+
         // Try alternate if selected one is not installed
         if (xFlavor == "PLAYER" && !Host.VMwarePlayer.IsInstalled) {
           xFlavor = "WORKSTATION";
@@ -153,15 +153,19 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
 
         if (xFlavor == "PLAYER" && Host.VMwarePlayer.IsInstalled) {
-          mHost = new Host.VMwarePlayer(xVmxFile);
+          mHost = new Host.VMwarePlayer(mDebugInfo, xVmxFile);
         } else if (xFlavor == "WORKSTATION" && Host.VMwareWorkstation.IsInstalled) {
-          mHost = new Host.VMwareWorkstation(xVmxFile);
+          mHost = new Host.VMwareWorkstation(mDebugInfo, xVmxFile);
         } else {
           throw new Exception("VMWare Flavor '" + xFlavor + "' not implemented.");
         }
 
-        OutputText("Preparing VMWare.");
-        mProcessStartInfo.Arguments = mHost.Start(mDebugInfo["ISOFile"], xGDBDebugStub);
+      } else if (mLaunch == LaunchType.Slave) {
+        mHost = new Host.Slave(mDebugInfo);
+
+      } else if (mLaunch == LaunchType.Manual) {
+        mHost = new Host.Manual(mDebugInfo);
+
       } else {
         throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
@@ -186,25 +190,30 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       mDbgConnector = null;
       if (mLaunch == LaunchType.VMware) {
-        OutputText("Starting serial debug listener.");
+        OutputText("Starting pipe debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
         mDbgConnector.Connected = DebugConnectorConnected;
       }
 
-      aEngine.BPMgr.SetDebugConnector(mDbgConnector);
-      mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
-      mDbgConnector.CmdText += new Action<string>(DbgCmdText);
-      mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
-      mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
-      mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
-      mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
-      mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
-      mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
-      mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
+      if (mDbgConnector != null) {
+        aEngine.BPMgr.SetDebugConnector(mDbgConnector);
+        mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
+        mDbgConnector.CmdText += new Action<string>(DbgCmdText);
+        mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
+        mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
+        mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
+        mDbgConnector.CmdRegisters += new Action<byte[]>(DbgCmdRegisters);
+        mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
+        mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
+        mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
+      }
 
       System.Threading.Thread.Sleep(250);
+
+      OutputText("Starting launch debug host.");
+      mProcessStartInfo = CreateHostProcessInfo(mHost.GetHostProcessExe());
+      mProcessStartInfo.Arguments = mHost.Start(xGDBDebugStub);
       System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
-      OutputText("Starting OS debug host.");
       mProcess = Process.Start(mProcessStartInfo);
 
       mProcess.EnableRaisingEvents = true;
@@ -226,7 +235,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback.OnThreadStart(mThread);
       mPort = aPort;
 
-      // Launch GDB Client
       if (xGDBDebugStub && xGDBClient) {
         LaunchGdbClient();
       }
