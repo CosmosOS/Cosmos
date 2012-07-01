@@ -83,6 +83,7 @@
       this.tabSlave = new System.Windows.Forms.TabPage();
       this.cmboSlavePort = new System.Windows.Forms.ComboBox();
       this.label6 = new System.Windows.Forms.Label();
+      this.chckShowLaunchConsole = new System.Windows.Forms.CheckBox();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -528,6 +529,7 @@
       // 
       // tabLaunch
       // 
+      this.tabLaunch.Controls.Add(this.chckShowLaunchConsole);
       this.tabLaunch.Controls.Add(this.lboxLaunch);
       this.tabLaunch.Location = new System.Drawing.Point(4, 22);
       this.tabLaunch.Name = "tabLaunch";
@@ -705,6 +707,16 @@
       this.label6.TabIndex = 34;
       this.label6.Text = "Slave Port:";
       // 
+      // chckShowLaunchConsole
+      // 
+      this.chckShowLaunchConsole.AutoSize = true;
+      this.chckShowLaunchConsole.Location = new System.Drawing.Point(230, 18);
+      this.chckShowLaunchConsole.Name = "chckShowLaunchConsole";
+      this.chckShowLaunchConsole.Size = new System.Drawing.Size(154, 17);
+      this.chckShowLaunchConsole.TabIndex = 35;
+      this.chckShowLaunchConsole.Text = "Enable Remote Debugging";
+      this.chckShowLaunchConsole.UseVisualStyleBackColor = true;
+      // 
       // CosmosPage
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -733,6 +745,7 @@
       this.panlDebugSettings.PerformLayout();
       this.tabDeployment.ResumeLayout(false);
       this.tabLaunch.ResumeLayout(false);
+      this.tabLaunch.PerformLayout();
       this.tabVMware.ResumeLayout(false);
       this.tabVMware.PerformLayout();
       this.tabPXE.ResumeLayout(false);
@@ -801,6 +814,7 @@
     private System.Windows.Forms.TabPage tabSlave;
     private System.Windows.Forms.ComboBox cmboSlavePort;
     private System.Windows.Forms.Label label6;
+    private System.Windows.Forms.CheckBox chckShowLaunchConsole;
 
 
 

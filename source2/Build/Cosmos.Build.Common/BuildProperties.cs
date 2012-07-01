@@ -100,6 +100,11 @@ namespace Cosmos.Build.Common {
       get { return GetProperty(LaunchString, LaunchType.VMware); }
       set { SetProperty(LaunchString, value); }
     }
+    public const string ShowLaunchConsoleString = "ShowLaunchConsole";
+    public bool ShowLaunchConsole {
+      get { return GetProperty(ShowLaunchConsoleString, false); }
+      set { SetProperty(ShowLaunchConsoleString, value); }
+    }
 
     // Debug
     public const string DebugEnabledString = "DebugEnabled";

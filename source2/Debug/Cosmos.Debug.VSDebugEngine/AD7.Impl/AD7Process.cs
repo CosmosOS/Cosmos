@@ -100,6 +100,17 @@ namespace Cosmos.Debug.VSDebugEngine {
       OutputText("Connected to DebugStub.");
     }
 
+    ProcessStartInfo CreateHostProcessInfo(string aExe) {
+      bool xShowHost = mDebugInfo["ShowLaunchHost"] == "true";
+      var xResult = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), aExe));
+      xResult.UseShellExecute = false;
+      xResult.RedirectStandardInput = true;
+      xResult.RedirectStandardError = true;
+      xResult.RedirectStandardOutput = !xShowHost;
+      xResult.CreateNoWindow = !xShowHost;
+      return xResult;
+    }
+
     internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort) {
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
@@ -128,7 +139,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
 
-      mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.Launch.VMware.exe"));
+      mProcessStartInfo = CreateHostProcessInfo("Cosmos.Launch.VMware.exe");
 
       if (mLaunch == LaunchType.VMware) {
         string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
@@ -154,14 +165,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       } else {
         throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
-
-      // Set to false for debugging, true otherwise
-      bool xNormal = true;
-      mProcessStartInfo.UseShellExecute = false;
-      mProcessStartInfo.RedirectStandardInput = true;
-      mProcessStartInfo.RedirectStandardError = true;
-      mProcessStartInfo.RedirectStandardOutput = xNormal;
-      mProcessStartInfo.CreateNoWindow = xNormal;
 
       string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
       if (!File.Exists(xCpdbPath)) {
