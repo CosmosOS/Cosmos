@@ -79,7 +79,6 @@
       this.label7 = new System.Windows.Forms.Label();
       this.tabISO = new System.Windows.Forms.TabPage();
       this.label8 = new System.Windows.Forms.Label();
-      this.tabSlave = new System.Windows.Forms.TabPage();
       this.panel1.SuspendLayout();
       this.TabControl1.SuspendLayout();
       this.tabProfile.SuspendLayout();
@@ -137,7 +136,6 @@
       this.TabControl1.Controls.Add(this.tabPXE);
       this.TabControl1.Controls.Add(this.tabUSB);
       this.TabControl1.Controls.Add(this.tabISO);
-      this.TabControl1.Controls.Add(this.tabSlave);
       this.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.TabControl1.Location = new System.Drawing.Point(0, 43);
       this.TabControl1.Multiline = true;
@@ -634,8 +632,8 @@
       this.label7.Name = "label7";
       this.label7.Size = new System.Drawing.Size(375, 102);
       this.label7.TabIndex = 1;
-      this.label7.Text = "There are no current USB options. The target drive will be asked when you run the" +
-    " project.";
+      this.label7.Text = "There are no current USB options. The target drive will be requested when you run" +
+    " the project.";
       // 
       // tabISO
       // 
@@ -655,16 +653,6 @@
       this.label8.Size = new System.Drawing.Size(375, 102);
       this.label8.TabIndex = 1;
       this.label8.Text = "There are currently no ISO options.";
-      // 
-      // tabSlave
-      // 
-      this.tabSlave.Cursor = System.Windows.Forms.Cursors.IBeam;
-      this.tabSlave.Location = new System.Drawing.Point(4, 22);
-      this.tabSlave.Name = "tabSlave";
-      this.tabSlave.Size = new System.Drawing.Size(627, 387);
-      this.tabSlave.TabIndex = 9;
-      this.tabSlave.Text = "Slave";
-      this.tabSlave.UseVisualStyleBackColor = true;
       // 
       // CosmosPage
       // 
@@ -748,7 +736,6 @@
     private System.Windows.Forms.Label label7;
     private System.Windows.Forms.TabPage tabISO;
     private System.Windows.Forms.Label label8;
-    private System.Windows.Forms.TabPage tabSlave;
     private System.Windows.Forms.Panel panel2;
     private System.Windows.Forms.ToolStrip toolStrip1;
     private System.Windows.Forms.ListBox lboxProfile;

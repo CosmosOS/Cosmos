@@ -47,6 +47,7 @@ namespace Cosmos.VS.Package {
     protected ProfilePresets mPresets = new ProfilePresets();
     protected int mVMwareDebugPipe;
 
+    protected bool mShowTabDebug;
     protected bool mShowTabDeployment;
     protected bool mShowTabLaunch;
     protected bool mShowTabVMware;
@@ -71,6 +72,7 @@ namespace Cosmos.VS.Package {
     protected void UpdateTabs() {
       var xTab = TabControl1.SelectedTab;
 
+      RemoveTab(tabDebug);
       RemoveTab(tabDeployment);
       RemoveTab(tabLaunch);
       RemoveTab(tabVMware);
@@ -78,6 +80,9 @@ namespace Cosmos.VS.Package {
       RemoveTab(tabUSB);
       RemoveTab(tabISO);
 
+      if (mShowTabDebug) {
+        TabControl1.TabPages.Add(tabDebug);
+      }
       if (mShowTabDeployment) {
         TabControl1.TabPages.Add(tabDeployment);
       }
@@ -99,21 +104,21 @@ namespace Cosmos.VS.Package {
 
       if (TabControl1.TabPages.Contains(xTab)) {
         TabControl1.SelectedTab = xTab;
+      } else {
+        TabControl1.SelectedTab = tabProfile;
       }
     }
 
     protected void UpdatePresetsUI() {
-      chckEnableDebugStub.Enabled = true;
+      mShowTabDebug = true;
       cmboCosmosDebugPort.Enabled = true;
       cmboVisualStudioDebugPort.Enabled = true;
 
       if (mProps.Profile == "ISO") {
-        chckEnableDebugStub.Enabled = false;
-        chckEnableDebugStub.Checked = false;
+        mShowTabDebug = false;
 
       } else if (mProps.Profile == "USB") {
-        chckEnableDebugStub.Enabled = false;
-        chckEnableDebugStub.Checked = false;
+        mShowTabDebug = false;
         mShowTabUSB = true;
 
       } else if (mProps.Profile == "VMware") {
@@ -136,22 +141,43 @@ namespace Cosmos.VS.Package {
         return;
       }
 
+      if (mShowTabDebug == false) {
+        chckEnableDebugStub.Checked = false;
+      }
+
       lablCurrentProfile.Text = xProfile.Name;
       lablDeployText.Text = mProps.Description;
       lboxDeployment.SelectedItem = mProps.Deployment;
       lboxLaunch.SelectedItem = mProps.Launch;
       lablBuildOnly.Visible = mProps.Launch == Launch.None;
 
-      lablPreset.Visible = xProfile.IsPreset;
-      mShowTabDeployment = !lablPreset.Visible;
-      mShowTabLaunch = !lablPreset.Visible;
+      lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Deployment);
+      lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Launch);
+      cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
+      chckEnableDebugStub.Checked = mProps.DebugEnabled;
+      panlDebugSettings.Enabled = mProps.DebugEnabled;
+      cmboCosmosDebugPort.SelectedIndex = cmboCosmosDebugPort.Items.IndexOf(mProps.CosmosDebugPort);
+      cmboVisualStudioDebugPort.SelectedIndex = cmboVisualStudioDebugPort.Items.IndexOf(mProps.VisualStudioDebugPort);
+      textOutputPath.Text = mProps.OutputPath;
+      comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
+      checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
+      checkEnableGDB.Checked = mProps.EnableGDB;
+      checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
+      // Locked to COM1 for now.
+      cmboCosmosDebugPort.SelectedIndex = 0;
 
+      checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
+      comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
+      comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
+
+      lablPreset.Visible = xProfile.IsPreset;
+
+      mShowTabDeployment = !xProfile.IsPreset;
+      mShowTabLaunch = !xProfile.IsPreset;
       mShowTabISO = mProps.Deployment == Deployment.ISO;
       mShowTabUSB = mProps.Deployment == Deployment.USB;
-
       mShowTabVMware = mProps.Launch == Launch.VMware;
       mShowTabPXE = mProps.Launch == Launch.PXE;
-
       UpdateTabs();
     }
 
@@ -211,7 +237,6 @@ namespace Cosmos.VS.Package {
       #endregion
 
       # region Deploy
-      lboxDeployment.Items.AddRange(EnumValue.GetEnumValues(typeof(Deployment), true));
       lboxDeployment.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var xValue = (Deployment)((EnumValue)lboxDeployment.SelectedItem).Value;
         if (xValue != mProps.Deployment) {
@@ -222,7 +247,6 @@ namespace Cosmos.VS.Package {
       #endregion
 
       # region Launch
-      lboxLaunch.Items.AddRange(EnumValue.GetEnumValues(typeof(Launch), true));
       lboxLaunch.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var xValue = (Launch)((EnumValue)lboxLaunch.SelectedItem).Value;
         if (xValue != mProps.Launch) {
@@ -232,7 +256,6 @@ namespace Cosmos.VS.Package {
       };
       #endregion
 
-      comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
       comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
         if (value != mProps.Framework) {
@@ -259,7 +282,6 @@ namespace Cosmos.VS.Package {
 
 
       #region VMware
-      cmboVMwareEdition.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareEdition), true));
       cmboVMwareEdition.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
         if (x != mProps.VMwareEdition) {
@@ -270,7 +292,6 @@ namespace Cosmos.VS.Package {
       #endregion
 
       #region Debug
-      comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
       comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var x = (Cosmos.Build.Common.DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
         if (x != mProps.DebugMode) {
@@ -285,7 +306,6 @@ namespace Cosmos.VS.Package {
         IsDirty = true;
       };
 
-      comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
       comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
         var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
         if (x != mProps.TraceAssemblies) {
@@ -436,7 +456,7 @@ namespace Cosmos.VS.Package {
       }
       for (int i = 1; i < 100; i++) {
         string xPrefix = "User" + i.ToString("000");
-        if (ProjectConfigs[0].GetConfigurationProperty(xPrefix + "_Name", false) != "") {
+        if (!string.IsNullOrWhiteSpace(ProjectConfigs[0].GetConfigurationProperty(xPrefix + "_Name", false))) {
           LoadProfileProps(xPrefix);
         }
       }
@@ -446,7 +466,6 @@ namespace Cosmos.VS.Package {
       base.FillProperties();
       LoadProps();
 
-      // Profile
       FillProfiles();
       foreach (ProfileItem xItem in lboxProfile.Items) {
         if (xItem.Prefix == mProps.Profile) {
@@ -455,39 +474,27 @@ namespace Cosmos.VS.Package {
         }
       }
 
-      // Deployment   
-      lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Deployment);
+      lboxDeployment.Items.AddRange(EnumValue.GetEnumValues(typeof(Deployment), true));
+      comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
+      lboxLaunch.Items.AddRange(EnumValue.GetEnumValues(typeof(Launch), true));
 
-      // Launch
-      lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Launch);
-
-      // VMware
-      cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
+      #region VMware
+      cmboVMwareEdition.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareEdition), true));
+      #endregion
 
       #region Debug
-      chckEnableDebugStub.Checked = mProps.DebugEnabled;
-      checkIgnoreDebugStubAttribute.Checked = mProps.IgnoreDebugStubAttribute;
-      comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
-      comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
-
-      // Locked to COM1 for now.
       cmboCosmosDebugPort.Items.Clear();
-      cmboCosmosDebugPort.SelectedIndex = cmboCosmosDebugPort.Items.Add("Serial: COM1");
-      cmboCosmosDebugPort.SelectedIndex = cmboCosmosDebugPort.Items.IndexOf(mProps.CosmosDebugPort);
+      cmboCosmosDebugPort.Items.Add("Serial: COM1");
 
       cmboVisualStudioDebugPort.Items.Clear();
       foreach (string xPort in SerialPort.GetPortNames()) {
         cmboVisualStudioDebugPort.Items.Add("Serial: " + xPort);
       }
       mVMwareDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
-      cmboVisualStudioDebugPort.SelectedIndex = cmboVisualStudioDebugPort.Items.IndexOf(mProps.VisualStudioDebugPort);
-      #endregion
 
-      textOutputPath.Text = mProps.OutputPath;
-      comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
-      checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
-      checkEnableGDB.Checked = mProps.EnableGDB;
-      checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
+      comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
+      comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
+      #endregion
 
       UpdateUI();
     }
