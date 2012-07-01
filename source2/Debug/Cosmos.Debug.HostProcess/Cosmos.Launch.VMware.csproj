@@ -8,8 +8,8 @@
     <ProjectGuid>{4266FA56-F6FE-4E9B-BAE3-B6910183884C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.VS.HostProcess</RootNamespace>
-    <AssemblyName>Cosmos.VS.HostProcess</AssemblyName>
+    <RootNamespace>Cosmos.Launch.VMware</RootNamespace>
+    <AssemblyName>Cosmos.Launch.VMware</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -72,13 +72,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Cosmos.Launch.Common\Cosmos.Launch.Common.csproj">
+      <Project>{BB67AB57-1296-4DDF-B052-757CC72DCFC2}</Project>
+      <Name>Cosmos.Launch.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

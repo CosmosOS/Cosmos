@@ -44,23 +44,23 @@ namespace Cosmos.Build.Common {
         Description = "Creates a bootable ISO image which can be burned to a DVD."
          + " After running the selected project, an explorer window will open containing the ISO file."
          + " The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.";
-        Deployment = Deployment.ISO;
-        Launch = Launch.None;
+        Deployment = DeploymentType.ISO;
+        Launch = LaunchType.None;
 
       } else if (aName == "USB") {
         Description = "Makes a USB device such as a flash drive or external hard disk bootable.";
-        Deployment = Deployment.USB;
-        Launch = Launch.None;
+        Deployment = DeploymentType.USB;
+        Launch = LaunchType.None;
 
       } else if (aName == "VMware") {
         Description = "Use VMware Player or Workstation to deploy and debug.";
-        Deployment = Deployment.ISO;
-        Launch = Launch.VMware;
+        Deployment = DeploymentType.ISO;
+        Launch = LaunchType.VMware;
 
       } else if (aName == "PXE") {
         Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
-        Deployment = Deployment.PXE;
-        Launch = Launch.None;
+        Deployment = DeploymentType.PXE;
+        Launch = LaunchType.None;
       }
     }
 
@@ -89,15 +89,15 @@ namespace Cosmos.Build.Common {
 
     // Deployment
     public const string DeploymentString = "Deployment";
-    public Deployment Deployment {
-      get { return GetProperty(DeploymentString, Deployment.ISO); }
+    public DeploymentType Deployment {
+      get { return GetProperty(DeploymentString, DeploymentType.ISO); }
       set { SetProperty(DeploymentString, value); }
     }
 
     // Launch
     public const string LaunchString = "Launch";
-    public Launch Launch {
-      get { return GetProperty(LaunchString, Launch.VMware); }
+    public LaunchType Launch {
+      get { return GetProperty(LaunchString, LaunchType.VMware); }
       set { SetProperty(LaunchString, value); }
     }
 

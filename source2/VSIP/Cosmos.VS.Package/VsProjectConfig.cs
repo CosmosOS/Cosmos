@@ -27,22 +27,22 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        var xDeployment = (Deployment)Enum.Parse(typeof(Deployment), GetConfigurationProperty(BuildProperties.DeploymentString, true));
+        var xDeployment = (DeploymentType)Enum.Parse(typeof(DeploymentType), GetConfigurationProperty(BuildProperties.DeploymentString, true));
         //
-        var xLaunch = (Launch)Enum.Parse(typeof(Launch), GetConfigurationProperty(BuildProperties.LaunchString, false));
+        var xLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), GetConfigurationProperty(BuildProperties.LaunchString, false));
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);
         string xIsoFile = Path.ChangeExtension(xOutputAsm, ".iso");
         string xBinFile = Path.ChangeExtension(xOutputAsm, ".bin");
 
-        if (xDeployment == Deployment.ISO) {
+        if (xDeployment == DeploymentType.ISO) {
           IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
 
-        } else if (xDeployment == Deployment.USB) {
+        } else if (xDeployment == DeploymentType.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");
 
-        } else if (xDeployment == Deployment.PXE) {
+        } else if (xDeployment == DeploymentType.PXE) {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
           string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
@@ -52,12 +52,12 @@ namespace Cosmos.VS.Package {
           throw new Exception("Unknown deployment type.");
         }
 
-        if (xLaunch == Launch.None) {
-          if (xDeployment == Deployment.ISO) {
+        if (xLaunch == LaunchType.None) {
+          if (xDeployment == DeploymentType.ISO) {
             Process.Start(xOutputPath);
           }
 
-        } else if (xLaunch == Launch.VMware) {
+        } else if (xLaunch == LaunchType.VMware) {
           //TODO - Handle PXE
 
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx

@@ -28,7 +28,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public SourceInfos mSourceMappings;
     public uint? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
-    protected Launch mLaunch;
+    protected LaunchType mLaunch;
     internal DebugInfo mDebugInfoDb;
     internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
     internal IDictionary<string, uint> mLabelAddressMappings;
@@ -104,7 +104,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback = aCallback;
       mDebugInfo = aDebugInfo;
 
-      mLaunch = (Launch)Enum.Parse(typeof(Launch), aDebugInfo[BuildProperties.LaunchString]);
+      mLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), aDebugInfo[BuildProperties.LaunchString]);
 
       if (mDebugDownPipe == null) {
         mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
@@ -130,7 +130,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       mProcessStartInfo = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.HostProcess.exe"));
 
-      if (mLaunch == Launch.VMware) {
+      if (mLaunch == LaunchType.VMware) {
         string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
         string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
         
@@ -182,7 +182,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
 
       mDbgConnector = null;
-      if (mLaunch == Launch.VMware) {
+      if (mLaunch == LaunchType.VMware) {
         OutputText("Starting serial debug listener.");
         mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer();
         mDbgConnector.Connected = DebugConnectorConnected;

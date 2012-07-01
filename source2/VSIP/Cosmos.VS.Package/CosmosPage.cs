@@ -156,7 +156,7 @@ namespace Cosmos.VS.Package {
       lablDeployText.Text = mProps.Description;
       lboxDeployment.SelectedItem = mProps.Deployment;
       lboxLaunch.SelectedItem = mProps.Launch;
-      lablBuildOnly.Visible = mProps.Launch == Launch.None;
+      lablBuildOnly.Visible = mProps.Launch == LaunchType.None;
 
       lboxDeployment.SelectedItem = EnumValue.Find(lboxDeployment.Items, mProps.Deployment);
       lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Launch);
@@ -190,12 +190,12 @@ namespace Cosmos.VS.Package {
       mShowTabDeployment = !xProfile.IsPreset;
       mShowTabLaunch = !xProfile.IsPreset;
       //
-      mShowTabISO = mProps.Deployment == Deployment.ISO;
-      mShowTabUSB = mProps.Deployment == Deployment.USB;
-      mShowTabPXE = mProps.Deployment == Deployment.PXE;
+      mShowTabISO = mProps.Deployment == DeploymentType.ISO;
+      mShowTabUSB = mProps.Deployment == DeploymentType.USB;
+      mShowTabPXE = mProps.Deployment == DeploymentType.PXE;
       //
-      mShowTabVMware = mProps.Launch == Launch.VMware;
-      mShowTabSlave = mProps.Launch == Launch.Slave;
+      mShowTabVMware = mProps.Launch == LaunchType.VMware;
+      mShowTabSlave = mProps.Launch == LaunchType.Slave;
       //
       UpdateTabs();
     }
@@ -257,7 +257,7 @@ namespace Cosmos.VS.Package {
 
       # region Deploy
       lboxDeployment.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var xValue = (Deployment)((EnumValue)lboxDeployment.SelectedItem).Value;
+        var xValue = (DeploymentType)((EnumValue)lboxDeployment.SelectedItem).Value;
         if (xValue != mProps.Deployment) {
           mProps.Deployment = xValue;
           IsDirty = true;
@@ -267,7 +267,7 @@ namespace Cosmos.VS.Package {
 
       # region Launch
       lboxLaunch.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
-        var xValue = (Launch)((EnumValue)lboxLaunch.SelectedItem).Value;
+        var xValue = (LaunchType)((EnumValue)lboxLaunch.SelectedItem).Value;
         if (xValue != mProps.Launch) {
           mProps.Launch = xValue;
           IsDirty = true;
@@ -515,9 +515,9 @@ namespace Cosmos.VS.Package {
         }
       }
 
-      lboxDeployment.Items.AddRange(EnumValue.GetEnumValues(typeof(Deployment), true));
+      lboxDeployment.Items.AddRange(EnumValue.GetEnumValues(typeof(DeploymentType), true));
       comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
-      lboxLaunch.Items.AddRange(EnumValue.GetEnumValues(typeof(Launch), true));
+      lboxLaunch.Items.AddRange(EnumValue.GetEnumValues(typeof(LaunchType), true));
 
       #region VMware
       cmboVMwareEdition.Items.AddRange(EnumValue.GetEnumValues(typeof(VMwareEdition), true));

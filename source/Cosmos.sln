@@ -63,7 +63,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.HostProcess", "..\source2\Debug\Cosmos.Debug.HostProcess\Cosmos.VS.HostProcess.csproj", "{4266FA56-F6FE-4E9B-BAE3-B6910183884C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Launch.VMware", "..\source2\Debug\Cosmos.Debug.HostProcess\Cosmos.Launch.VMware.csproj", "{4266FA56-F6FE-4E9B-BAE3-B6910183884C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86.Tests", "..\source2\IL2CPU\Cosmos.IL2CPU.X86.Tests\Cosmos.IL2CPU.X86.Tests.csproj", "{52BF0A64-EBEF-420A-9F27-6C5226A4B77B}"
 EndProject
@@ -222,11 +222,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "..\sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie.GUI", "..\source2\Cosmos.Deploy.Pixie.GUI\Cosmos.Deploy.Pixie.GUI.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host Process", "Host Process", "{37C932A7-5958-4262-8A47-73042CC7B503}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Launch", "Launch", "{37C932A7-5958-4262-8A47-73042CC7B503}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Launch.Common", "Cosmos.Launch.Common\Cosmos.Launch.Common.csproj", "{BB67AB57-1296-4DDF-B052-757CC72DCFC2}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 62
+		SccNumberOfProjects = 63
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -456,26 +458,30 @@ Global
 		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
 		SccProjectName56 = ../source2/Tests/XSharpCompilerTester
 		SccLocalPath56 = ..\\source2\\Tests\\XSharpCompilerTester
-		SccProjectUniqueName57 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess\\Cosmos.VS.HostProcess.csproj
+		SccProjectUniqueName57 = ..\\source2\\VMWareLib\\VMWareLib.csproj
 		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
-		SccProjectName57 = ../source2/Debug/Cosmos.Debug.HostProcess
-		SccLocalPath57 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
-		SccProjectUniqueName58 = ..\\source2\\VMWareLib\\VMWareLib.csproj
+		SccProjectName57 = ../source2/VMWareLib
+		SccLocalPath57 = ..\\source2\\VMWareLib
+		SccProjectUniqueName58 = ..\\source2\\Cosmos.Deploy.Pixie\\Cosmos.Deploy.Pixie.csproj
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
-		SccProjectName58 = ../source2/VMWareLib
-		SccLocalPath58 = ..\\source2\\VMWareLib
-		SccProjectUniqueName59 = ..\\source2\\Cosmos.Deploy.Pixie\\Cosmos.Deploy.Pixie.csproj
+		SccProjectName58 = ../source2/Cosmos.Deploy.Pixie
+		SccLocalPath58 = ..\\source2\\Cosmos.Deploy.Pixie
+		SccProjectUniqueName59 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
 		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
-		SccProjectName59 = ../source2/Cosmos.Deploy.Pixie
-		SccLocalPath59 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName60 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
+		SccProjectName59 = ../source2/Cosmos.Deploy.USB
+		SccLocalPath59 = ..\\source2\\Cosmos.Deploy.USB
+		SccProjectUniqueName60 = ..\\source2\\Cosmos.Deploy.Pixie.GUI\\Cosmos.Deploy.Pixie.GUI.csproj
 		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
-		SccProjectName60 = ../source2/Cosmos.Deploy.USB
-		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.USB
-		SccProjectUniqueName61 = ..\\source2\\Cosmos.Deploy.Pixie.GUI\\Cosmos.Deploy.Pixie.GUI.csproj
+		SccProjectName60 = ../source2/Cosmos.Deploy.Pixie.GUI
+		SccLocalPath60 = ..\\source2\\Cosmos.Deploy.Pixie.GUI
+		SccProjectUniqueName61 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess\\Cosmos.Launch.VMware.csproj
 		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
-		SccProjectName61 = ../source2/Cosmos.Deploy.Pixie.GUI
-		SccLocalPath61 = ..\\source2\\Cosmos.Deploy.Pixie.GUI
+		SccProjectName61 = ../source2/Debug/Cosmos.Debug.HostProcess
+		SccLocalPath61 = ..\\source2\\Debug\\Cosmos.Debug.HostProcess
+		SccProjectUniqueName62 = Cosmos.Launch.Common\\Cosmos.Launch.Common.csproj
+		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
+		SccProjectName62 = Cosmos.Launch.Common
+		SccLocalPath62 = Cosmos.Launch.Common
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Builder|Any CPU = Builder|Any CPU
@@ -1474,6 +1480,23 @@ Global
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Mixed Platforms.Build.0 = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.ActiveCfg = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.Build.0 = Release|x86
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Builder|Any CPU.ActiveCfg = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Builder|Any CPU.Build.0 = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Builder|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Builder|Mixed Platforms.Build.0 = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Builder|x86.ActiveCfg = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Builder|x86.Build.0 = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Debug|x86.Build.0 = Debug|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1551,5 +1574,6 @@ Global
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{4266FA56-F6FE-4E9B-BAE3-B6910183884C} = {37C932A7-5958-4262-8A47-73042CC7B503}
+		{BB67AB57-1296-4DDF-B052-757CC72DCFC2} = {37C932A7-5958-4262-8A47-73042CC7B503}
 	EndGlobalSection
 EndGlobal

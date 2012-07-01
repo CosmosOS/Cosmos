@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Cosmos.Build.Common {
 
-  public enum Deployment {
+  public enum DeploymentType {
     [Description("ISO Image")]
     ISO,
     [Description("USB Device")]
@@ -15,7 +15,7 @@ namespace Cosmos.Build.Common {
     PXE
   }
 
-  public enum Launch {
+  public enum LaunchType {
     [Description("None")]
     None,
     [Description("Manual")]
