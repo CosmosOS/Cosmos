@@ -35,13 +35,17 @@ namespace Cosmos.Hardware {
     // a hard drive is connected or not and if so what type.
     static internal void InitStaticDevices() {
       //TextScreen = new TextScreen();
+      Global.Dbg.Send("CLS");
       TextScreen.Clear();
 
+      Global.Dbg.Send("Keyboard");
       Keyboard = new Keyboard();
 
       // Find hardcoded ATA controllers
-      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
-      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
+      Global.Dbg.Send("ATA Master");
+      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
+      Global.Dbg.Send("ATA Slave");
+      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
 
       //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum? 
       // They do show up in PCI space as well as the fixed space. 
@@ -60,7 +64,9 @@ namespace Cosmos.Hardware {
     }
 
     static public void Init() {
+      Global.Dbg.Send("Static Devices");
       InitStaticDevices();
+      Global.Dbg.Send("PCI Devices");
       InitPciDevices();
     }
 

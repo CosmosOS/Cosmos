@@ -46,6 +46,12 @@ namespace Cosmos.Debug.Common {
       }
     }
 
+    protected bool mSigReceived = false;
+    public bool SigReceived {
+      get { return mSigReceived; }
+    }
+
+    // Is stream alive? Other side may not be responsive yet, use SigReceived instead for this instead
     public abstract bool IsConnected {
       get;
     }
@@ -57,14 +63,14 @@ namespace Cosmos.Debug.Common {
     protected void SendCmd(byte aCmd, byte[] aData, bool aWait) {
       //System.Windows.Forms.MessageBox.Show(xSB.ToString());
 
-      // If not connected, we dont send anything. Things like BPs etc can be set before connected.
+      // If no sig received yet, we dont send anything. Things like BPs etc can be set before connected.
       // The debugger must resend these after the start command hits.
       // We dont queue them, as it would end up with a lot of overlapping ops, ie set and then remove.
       // We also dont check connected at caller, becuase its a lot of extra code.
       // So we just ignore any commands sent before ready, and its part of the contract
       // that the caller (Debugger) knows when the Start msg is received that it must
       // send over initializing information such as breakpoints.
-      if (IsConnected) {
+      if (SigReceived) {
         // This lock is used for:
         //  1) VSDebugEngine is threaded and could send commands concurrently
         //  2) Becuase in VSDebugEngine and commands from Debug.Windows can occur concurrently
@@ -352,6 +358,7 @@ namespace Cosmos.Debug.Common {
       DoDebugMsg("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
       if (xSig == Cosmos.Debug.Consts.Consts.SerialSignature) {
         // Sig found, wait for messages
+        mSigReceived = true;
         WaitForMessage();
       } else {
         // Sig not found, keep looking

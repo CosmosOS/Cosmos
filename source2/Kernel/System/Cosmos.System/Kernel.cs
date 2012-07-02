@@ -22,16 +22,22 @@ namespace Cosmos.System {
         }
         mStarted = true;
 
+        Global.Dbg.Send("HW Bootstrap Init");
         Hardware.Bootstrap.Init();
+
+        Global.Dbg.Send("Global Init");
         Global.Init();
 
         // Provide the user with a clear screen if they requested it
         if (ClearScreen) {
+          Global.Dbg.Send("Cls");
           Global.Console.Clear();
         }
 
+        Global.Dbg.Send("Before Run");
         BeforeRun();
 
+        Global.Dbg.Send("Run");
         while (!mStopped) {
           Network.NetworkStack.Update();
           Run();

@@ -58,7 +58,7 @@
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
     <VMware_VMwareEdition>Player</VMware_VMwareEdition>
@@ -120,9 +120,10 @@
     <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
     <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
     <User001_VisualStudioDebugPort>Serial: COM1</User001_VisualStudioDebugPort>
-    <ShowLaunchConsole>True</ShowLaunchConsole>
-    <User001_ShowLaunchConsole>True</User001_ShowLaunchConsole>
+    <ShowLaunchConsole>False</ShowLaunchConsole>
+    <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
     <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
+    <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>User001</Profile>
@@ -169,7 +170,7 @@
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
     <VMware_VMwareEdition>Player</VMware_VMwareEdition>
@@ -239,9 +240,10 @@
     <USB_SlavePort>Serial: COM3</USB_SlavePort>
     <VMware_PxeInterface>192.168.43.1</VMware_PxeInterface>
     <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
-    <ShowLaunchConsole>True</ShowLaunchConsole>
-    <User001_ShowLaunchConsole>True</User001_ShowLaunchConsole>
+    <ShowLaunchConsole>False</ShowLaunchConsole>
+    <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
     <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
+    <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">

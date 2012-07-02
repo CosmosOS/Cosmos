@@ -46,6 +46,9 @@ namespace Cosmos.Debug.DebugStub {
         AL = 0;
         Call("DebugStub_WriteALToComPort");
 
+        // Real hardware emits some junk on boot. My test hardware emits 2 x 0x00. Might be
+        // BIOS diganostics.
+        //
         // QEMU (and possibly others) send some garbage across the serial line first.
         // Actually they send the garbage inbound, but garbage could be inbound as well so we 
         // keep this.
