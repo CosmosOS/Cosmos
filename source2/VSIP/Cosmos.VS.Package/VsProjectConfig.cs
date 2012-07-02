@@ -46,7 +46,7 @@ namespace Cosmos.VS.Package {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
           string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
-          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.GUI.exe"), xPxeIntf + " \"" + xPxePath + "\"");
+          Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.exe"), xPxeIntf + " \"" + xPxePath + "\"");
 
         } else {
           throw new Exception("Unknown deployment type.");
