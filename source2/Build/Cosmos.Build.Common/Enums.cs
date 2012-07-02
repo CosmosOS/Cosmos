@@ -18,8 +18,6 @@ namespace Cosmos.Build.Common {
   public enum LaunchType {
     [Description("None")]
     None,
-    [Description("Manual")]
-    Manual,
     [Description("VMware")]
     VMware,
     [Description("Attached Slave (CanaKit)")]
