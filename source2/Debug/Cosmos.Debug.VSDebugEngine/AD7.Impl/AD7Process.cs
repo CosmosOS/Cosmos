@@ -193,9 +193,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       } else if (mLaunch == LaunchType.Slave) {
         mHost = new Host.Slave(mDebugInfo);
 
-      } else if (mLaunch == LaunchType.Manual) {
-        mHost = new Host.Manual(mDebugInfo);
-
       } else {
         throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
