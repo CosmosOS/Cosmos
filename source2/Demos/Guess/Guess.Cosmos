@@ -58,7 +58,7 @@
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>False</VMware_DebugEnabled>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
     <VMware_VMwareEdition>Player</VMware_VMwareEdition>
@@ -170,7 +170,7 @@
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>False</VMware_DebugEnabled>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
     <VMware_VMwareEdition>Player</VMware_VMwareEdition>
