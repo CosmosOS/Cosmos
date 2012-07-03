@@ -11,6 +11,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
   public class Slave : Base {
     string mPortName;
     SerialPort mPort;
+    Thread mPowerStateThread;
 
     public Slave(NameValueCollection aParams, bool aUseGDB)
       : base(aParams, aUseGDB) {
@@ -87,9 +88,27 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       TogglePowerSwitch();
       // Give PC some time to turn on, else we will detect it as off right away.
       WaitPowerState(true);
+
+      if (OnShutDown != null) {
+        mPowerStateThread = new Thread(delegate() {
+          while (true) {
+            Thread.Sleep(1000);
+            if (!IsOn()) {
+              OnShutDown(this, EventArgs.Empty);
+              break;
+            }
+          }
+        });
+        mPowerStateThread.Start();
+      }
     }
 
     public override void Stop() {
+      if (mPowerStateThread != null) {
+        mPowerStateThread.Abort();
+        mPowerStateThread.Join();
+      }
+
       if (IsOn()) {
         TogglePowerSwitch();
         WaitPowerState(false);

@@ -164,6 +164,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       } else {
         throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
+      mHost.OnShutDown += HostShutdown;
 
       string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
       if (!File.Exists(xCpdbPath)) {
@@ -397,15 +398,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       OutputText("Debugger terminating.");
       if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
         mProcess.Kill();
-        mProcess.Exited -= mProcess_Exited;
-        if (mDbgConnector != null) {
-          mDbgConnector.Dispose();
-          mDbgConnector = null;
-        }
-        if (mDebugInfoDb != null) {
-          mDebugInfoDb.Dispose();
-          mDebugInfoDb = null;
-        }
+        ShutDown();
       }
 
       mHost.Stop();
@@ -418,10 +411,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mHost.Start();
     }
 
-    void mProcess_Exited(object sender, EventArgs e) {
-      //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
-      //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
-
+    void ShutDown() {
       if (mDbgConnector != null) {
         mDbgConnector.Dispose();
         mDbgConnector = null;
@@ -430,8 +420,21 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDebugInfoDb.Dispose();
         mDebugInfoDb = null;
       }
+    }
+
+    void HostShutdown(object sender, EventArgs e) {
+      //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
+      //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
+
+      // Kill off dummy process
+      mProcess.Kill();
+
+      ShutDown();
+
+      // We dont use process info any more, but have to call this to tell
+      // VS to stop debugging.
       if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
-        mCallback.OnProcessExit((uint)mProcess.ExitCode);
+        mCallback.OnProcessExit(0);
       }
     }
 
