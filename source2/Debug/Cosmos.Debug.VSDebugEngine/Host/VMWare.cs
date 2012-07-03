@@ -50,10 +50,6 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       }
     }
 
-    public override string GetHostProcessExe() {
-      return "Cosmos.Launch.VMware.exe";
-    }
-
     protected string GetPathname(string aKey, string aEXE) {
       using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\" + aKey, false)) {
         if (xRegKey != null) {
@@ -66,14 +62,80 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       }
     }
 
-    protected string GetParams() {
+    public override void Start() {
+      Cleanup();
+      CreateDebugVmx();
+
+      // Target exe or file
+      mProcess = new Process();
+      var xPSI = mProcess.StartInfo;
       if (mEdition == VMwareEdition.Player) {
-        return "\"" + mPlayerPath + "\" \"" + mVmxPath + "\"";
+        xPSI.FileName = mPlayerPath;
+      } else {
+        xPSI.FileName = mWorkstationPath;
+      }
+      var xArgSB = new StringBuilder();
+
+      string xVmxPath = "\"" + mVmxPath + "\"";
+      if (mEdition == VMwareEdition.Player) {
+        xPSI.Arguments = xVmxPath;
       } else {
         // -x: Auto power on VM. Must be small x, big X means something else.
         // -q: Close VMWare when VM is powered off.
         // Options must come beore the vmx, and cannot use shellexecute
-        return "\"" + mWorkstationPath + "\" -x -q \"" + mVmxPath + "\"";
+        xPSI.Arguments = "-x -q " + xVmxPath;
+      }
+      xPSI.RedirectStandardError = false;
+      xPSI.RedirectStandardOutput = false;
+      xPSI.UseShellExecute = false;
+      mProcess.EnableRaisingEvents = true;
+      mProcess.Exited += delegate(Object aSender, EventArgs e) {
+        if (OnShutDown != null) {
+          OnShutDown(aSender, e);
+        }
+      };
+      mProcess.Start();
+    }
+
+    public override void Stop() {
+      using (var xHost = new VMWareVirtualHost()) {
+        ConnectToVMWare(xHost);
+        using (var xMachine = xHost.Open(mVmxPath)) {
+          xMachine.PowerOff();
+        }
+        xHost.Close();
+      }
+      Cleanup();
+    }
+
+    protected void DeleteFiles(string aPath, string aPattern) {
+      var xFiles = Directory.GetFiles(aPath, aPattern);
+      foreach (var xFile in xFiles) {
+        File.Delete(xFile);
+      }
+    }
+
+    protected void Cleanup() {
+      try {
+        string xPath = Path.GetDirectoryName(mVmxPath);
+        // Delete old Debug.vmx and other files that might be left over from previous run.
+        // Especially important with newer versions of VMWare player which defaults to suspend
+        // when the close button is used.
+        File.Delete(mVmxPath);
+        File.Delete(Path.ChangeExtension(mVmxPath, ".nvram"));
+        // Delete the auto snapshots that latest vmware players create as default.
+        // It creates them with suffixes though, so we need to wild card find them.
+        DeleteFiles(xPath, "*.vmxf");
+        DeleteFiles(xPath, "*.vmss");
+        DeleteFiles(xPath, "*.vmsd");
+        DeleteFiles(xPath, "*.vmem");
+        // Delete log files so that logged data is only from last boot
+        File.Delete(Path.Combine(xPath, "vmware.log"));
+        File.Delete(Path.Combine(xPath, "vmware-0.log"));
+        File.Delete(Path.Combine(xPath, "vmware-1.log"));
+        File.Delete(Path.Combine(xPath, "vmware-2.log"));
+      } catch (Exception) {
+        // Ignore errors, users can stop VS while VMware is still running and files will be locked.
       }
     }
 
@@ -129,83 +191,6 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
         }
       }
     }
-
-    public override void Start() {
-      Cleanup();
-      CreateDebugVmx();
-
-      // Target exe or file
-      mProcess = new Process();
-      var xPSI = mProcess.StartInfo;
-      if (mEdition == VMwareEdition.Player) {
-        xPSI.FileName = mPlayerPath;
-      } else {
-        xPSI.FileName = mWorkstationPath;
-      }
-      var xArgSB = new StringBuilder();
-
-      string xVmxPath = "\"" + mVmxPath + "\"";
-      if (mEdition == VMwareEdition.Player) {
-        xPSI.Arguments = xVmxPath;
-      } else {
-        // -x: Auto power on VM. Must be small x, big X means something else.
-        // -q: Close VMWare when VM is powered off.
-        // Options must come beore the vmx, and cannot use shellexecute
-        xPSI.Arguments = "-x -q " + xVmxPath;
-      }
-      xPSI.RedirectStandardError = false;
-      xPSI.RedirectStandardOutput = false;
-      xPSI.UseShellExecute = false;
-      mProcess.Start();
-    }
-
-    public override string StartOld() {
-      Cleanup();
-      CreateDebugVmx();
-      return "false " + GetParams();
-    }
-
-    public override void Stop() {
-      using (var xHost = new VMWareVirtualHost()) {
-        ConnectToVMWare(xHost);
-        using (var xMachine = xHost.Open(mVmxPath)) {
-          xMachine.PowerOff();
-        }
-        xHost.Close();
-      }
-      Cleanup();
-    }
-
-    protected void DeleteFiles(string aPath, string aPattern) {
-      var xFiles = Directory.GetFiles(aPath, aPattern);
-      foreach (var xFile in xFiles) {
-        File.Delete(xFile);
-      }
-    }
-
-    protected void Cleanup() {
-      try {
-        string xPath = Path.GetDirectoryName(mVmxPath);
-        // Delete old Debug.vmx and other files that might be left over from previous run.
-        // Especially important with newer versions of VMWare player which defaults to suspend
-        // when the close button is used.
-        File.Delete(mVmxPath);
-        File.Delete(Path.ChangeExtension(mVmxPath, ".nvram"));
-        // Delete the auto snapshots that latest vmware players create as default.
-        // It creates them with suffixes though, so we need to wild card find them.
-        DeleteFiles(xPath, "*.vmxf");
-        DeleteFiles(xPath, "*.vmss");
-        DeleteFiles(xPath, "*.vmsd");
-        DeleteFiles(xPath, "*.vmem");
-        // Delete log files so that logged data is only from last boot
-        File.Delete(Path.Combine(xPath, "vmware.log"));
-        File.Delete(Path.Combine(xPath, "vmware-0.log"));
-        File.Delete(Path.Combine(xPath, "vmware-1.log"));
-        File.Delete(Path.Combine(xPath, "vmware-2.log"));
-      } catch (Exception) {
-        // Ignore errors, users can stop VS while VMware is still running and files will be locked.
-      }
-    }
-
+  
   }
 }

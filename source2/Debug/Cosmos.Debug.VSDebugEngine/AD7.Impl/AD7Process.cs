@@ -18,7 +18,6 @@ using Microsoft.Win32;
 
 namespace Cosmos.Debug.VSDebugEngine {
   public class AD7Process : IDebugProcess2 {
-    bool mNewLauncher = true;
     public Guid mID = Guid.NewGuid();
     protected Process mProcess;
     protected EngineCallback mCallback;
@@ -187,44 +186,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       CreateDebugConnector();
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
-      if (mNewLauncher) {
-        mProcess = new Process();
-        var xPSI = mProcess.StartInfo;
-        xPSI.FileName = Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.DummyHost.exe");
-        xPSI.UseShellExecute = false;
-        xPSI.RedirectStandardInput = true;
-        xPSI.RedirectStandardError = true;
-        xPSI.RedirectStandardOutput = true;
-        xPSI.CreateNoWindow = true;
-        mProcess.Start();
-      } else {
-        OutputText("Starting launch debug host.");
-        System.Threading.Thread.Sleep(250);
-        bool xShowHost = mDebugInfo[BuildProperties.ShowLaunchConsoleString].ToLower() == "true";
-        var xPSI = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), mHost.GetHostProcessExe()));
-        xPSI.UseShellExecute = false;
-        xPSI.RedirectStandardInput = true;
-        xPSI.RedirectStandardError = !xShowHost;
-        xPSI.RedirectStandardOutput = !xShowHost;
-        xPSI.CreateNoWindow = !xShowHost;
-        xPSI.Arguments = mHost.StartOld();
-
-        mProcess = Process.Start(xPSI);
-
-        mProcess.EnableRaisingEvents = true;
-        mProcess.Exited += new EventHandler(mProcess_Exited);
-
-        // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
-        // if so, why not hook before start? 
-        // MtW: we do this for the potential situation where it might exit before the Exited event is hooked. Iirc i had this situation before..
-        System.Threading.Thread.Sleep(250);
-        if (mProcess.HasExited) {
-          Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
-          Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-          Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
-          throw new Exception("Error while starting OS debug host.");
-        }
-      }
+      StartDummyHost();
 
       mEngine = aEngine;
       mThread = new AD7Thread(aEngine, this);
@@ -234,6 +196,18 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (xUseGDB && xGDBClient) {
         LaunchGdbClient();
       }
+    }
+
+    protected void StartDummyHost() {
+      mProcess = new Process();
+      var xPSI = mProcess.StartInfo;
+      xPSI.FileName = Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.DummyHost.exe");
+      xPSI.UseShellExecute = false;
+      xPSI.RedirectStandardInput = true;
+      xPSI.RedirectStandardError = true;
+      xPSI.RedirectStandardOutput = true;
+      xPSI.CreateNoWindow = true;
+      mProcess.Start();
     }
 
     protected void LaunchGdbClient() {
@@ -441,20 +415,10 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     internal void ResumeFromLaunch() {
-      // This unpauses our debug host
-      // We do this because VS requires a start, and then a resume after. So we have debughost which is a stub
-      // that allows VS to "see" that. Here we resume it.
-      if (mNewLauncher) {
-        mHost.Start();
-      } else {
-        mProcess.StandardInput.WriteLine();
-      }
+      mHost.Start();
     }
 
     void mProcess_Exited(object sender, EventArgs e) {
-      Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
-      Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-      Trace.WriteLine(String.Format("Process Exit Code: {0}", mProcess.ExitCode));
       //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
       //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
 

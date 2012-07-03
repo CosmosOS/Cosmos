@@ -9,14 +9,14 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     protected NameValueCollection mParams;
     protected bool mUseGDB;
 
+    public EventHandler OnShutDown;
+
     public Base(NameValueCollection aParams, bool aUseGDB) {
       mParams = aParams;
       mUseGDB = aUseGDB;
     }
 
-    public abstract string StartOld();
     public abstract void Start();
     public abstract void Stop();
-    public abstract string GetHostProcessExe();
   }
 }

@@ -150,10 +150,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Launch.Common\Cosmos.Launch.Common.csproj">
-      <Project>{BB67AB57-1296-4DDF-B052-757CC72DCFC2}</Project>
-      <Name>Cosmos.Launch.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
