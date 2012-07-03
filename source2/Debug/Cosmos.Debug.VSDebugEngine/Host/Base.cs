@@ -7,12 +7,15 @@ using System.Text;
 namespace Cosmos.Debug.VSDebugEngine.Host {
   public abstract class Base {
     protected NameValueCollection mParams;
+    protected bool mUseGDB;
 
-    public Base(NameValueCollection aParams) {
+    public Base(NameValueCollection aParams, bool aUseGDB) {
       mParams = aParams;
+      mUseGDB = aUseGDB;
     }
 
-    public abstract string Start(bool aGDB);
+    public abstract string StartOld();
+    public abstract void Start();
     public abstract void Stop();
     public abstract string GetHostProcessExe();
   }

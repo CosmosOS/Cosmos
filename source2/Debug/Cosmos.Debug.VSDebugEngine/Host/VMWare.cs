@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,13 +13,14 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
   public class VMware : Base {
     protected VMwareEdition mEdition;
     protected string mDir;
-    protected string mVmxFile;
-    string mWorkstationPath;
-    string mPlayerPath;
+    protected string mVmxPath;
+    protected Process mProcess;
+    protected string mWorkstationPath;
+    protected string mPlayerPath;
 
-    public VMware(NameValueCollection aParams) : base(aParams) {
+    public VMware(NameValueCollection aParams, bool aUseGDB) : base(aParams, aUseGDB) {
       mDir = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\");
-      mVmxFile = Path.Combine(mDir, @"Debug.vmx");
+      mVmxPath = Path.Combine(mDir, @"Debug.vmx");
 
       mWorkstationPath = GetPathname("VMware Workstation", "vmware.exe");
       mPlayerPath = GetPathname("VMware Player", "vmplayer.exe");
@@ -66,18 +68,16 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
 
     protected string GetParams() {
       if (mEdition == VMwareEdition.Player) {
-        return "\"" + mPlayerPath + "\" \"" + mVmxFile + "\"";
+        return "\"" + mPlayerPath + "\" \"" + mVmxPath + "\"";
       } else {
         // -x: Auto power on VM. Must be small x, big X means something else.
         // -q: Close VMWare when VM is powered off.
         // Options must come beore the vmx, and cannot use shellexecute
-        return "\"" + mWorkstationPath + "\" -x -q \"" + mVmxFile + "\"";
+        return "\"" + mWorkstationPath + "\" -x -q \"" + mVmxPath + "\"";
       }
     }
 
-    public override string Start(bool aGDB) {
-      Cleanup();
-
+    protected void CreateDebugVmx() {
       // VMWare doesn't like to boot a read only VMX.
       // We also need to make changes based on project / debug settings.
       // Finally we do not want to create VCS checkins based on local user changes.
@@ -85,7 +85,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       using (var xSrc = new StreamReader(Path.Combine(mDir, "Cosmos.vmx"))) {
         try {
           // Write out Debug.vmx
-          using (var xDest = new StreamWriter(mVmxFile)) {
+          using (var xDest = new StreamWriter(mVmxPath)) {
             string xLine;
             while ((xLine = xSrc.ReadLine()) != null) {
               var xParts = xLine.Split('=');
@@ -113,7 +113,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
               }
             }
 
-            if (aGDB) {
+            if (mUseGDB) {
               xDest.WriteLine();
               xDest.WriteLine("debugStub.listen.guest32 = \"TRUE\"");
               xDest.WriteLine("debugStub.hideBreakpoints = \"TRUE\"");
@@ -128,14 +128,47 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
           throw ex;
         }
       }
+    }
 
+    public override void Start() {
+      Cleanup();
+      CreateDebugVmx();
+
+      // Target exe or file
+      mProcess = new Process();
+      var xPSI = mProcess.StartInfo;
+      if (mEdition == VMwareEdition.Player) {
+        xPSI.FileName = mPlayerPath;
+      } else {
+        xPSI.FileName = mWorkstationPath;
+      }
+      var xArgSB = new StringBuilder();
+
+      string xVmxPath = "\"" + mVmxPath + "\"";
+      if (mEdition == VMwareEdition.Player) {
+        xPSI.Arguments = xVmxPath;
+      } else {
+        // -x: Auto power on VM. Must be small x, big X means something else.
+        // -q: Close VMWare when VM is powered off.
+        // Options must come beore the vmx, and cannot use shellexecute
+        xPSI.Arguments = "-x -q " + xVmxPath;
+      }
+      xPSI.RedirectStandardError = false;
+      xPSI.RedirectStandardOutput = false;
+      xPSI.UseShellExecute = false;
+      mProcess.Start();
+    }
+
+    public override string StartOld() {
+      Cleanup();
+      CreateDebugVmx();
       return "false " + GetParams();
     }
 
     public override void Stop() {
       using (var xHost = new VMWareVirtualHost()) {
         ConnectToVMWare(xHost);
-        using (var xMachine = xHost.Open(mVmxFile)) {
+        using (var xMachine = xHost.Open(mVmxPath)) {
           xMachine.PowerOff();
         }
         xHost.Close();
@@ -152,12 +185,12 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
 
     protected void Cleanup() {
       try {
-        string xPath = Path.GetDirectoryName(mVmxFile);
+        string xPath = Path.GetDirectoryName(mVmxPath);
         // Delete old Debug.vmx and other files that might be left over from previous run.
         // Especially important with newer versions of VMWare player which defaults to suspend
         // when the close button is used.
-        File.Delete(mVmxFile);
-        File.Delete(Path.ChangeExtension(mVmxFile, ".nvram"));
+        File.Delete(mVmxPath);
+        File.Delete(Path.ChangeExtension(mVmxPath, ".nvram"));
         // Delete the auto snapshots that latest vmware players create as default.
         // It creates them with suffixes though, so we need to wild card find them.
         DeleteFiles(xPath, "*.vmxf");

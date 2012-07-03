@@ -18,9 +18,9 @@ using Microsoft.Win32;
 
 namespace Cosmos.Debug.VSDebugEngine {
   public class AD7Process : IDebugProcess2 {
+    bool mNewLauncher = true;
     public Guid mID = Guid.NewGuid();
     protected Process mProcess;
-    protected ProcessStartInfo mProcessStartInfo;
     protected EngineCallback mCallback;
     public AD7Thread mThread;
     protected AD7Engine mEngine;
@@ -100,17 +100,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       OutputText("Connected to DebugStub.");
     }
 
-    ProcessStartInfo CreateHostProcessInfo(string aExe) {
-      bool xShowHost = mDebugInfo[BuildProperties.ShowLaunchConsoleString].ToLower() == "true";
-      var xResult = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), aExe));
-      xResult.UseShellExecute = false;
-      xResult.RedirectStandardInput = true;
-      xResult.RedirectStandardError = !xShowHost;
-      xResult.RedirectStandardOutput = !xShowHost;
-      xResult.CreateNoWindow = !xShowHost;
-      return xResult;
-    }
-
     void CreateDebugConnector() {
       mDbgConnector = null;
 
@@ -162,18 +151,17 @@ namespace Cosmos.Debug.VSDebugEngine {
       OutputText("Using ISO file " + mISO + ".");
       mProjectFile = mDebugInfo["ProjectFile"];
       //
-      var xGDBDebugStub = false;
-      Boolean.TryParse(mDebugInfo[BuildProperties.EnableGDBString], out xGDBDebugStub);
-      OutputText("GDB " + (xGDBDebugStub ? "Enabled" : "Disabled") + ".");
+      bool xUseGDB = string.Equals(mDebugInfo[BuildProperties.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
+      OutputText("GDB " + (xUseGDB ? "Enabled" : "Disabled") + ".");
       //
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
 
       string xHostArgs = "";
       if (mLaunch == LaunchType.VMware) {
-        mHost = new Host.VMware(mDebugInfo);
+        mHost = new Host.VMware(mDebugInfo, xUseGDB);
       } else if (mLaunch == LaunchType.Slave) {
-        mHost = new Host.Slave(mDebugInfo);
+        mHost = new Host.Slave(mDebugInfo, xUseGDB);
       } else {
         throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
@@ -199,26 +187,43 @@ namespace Cosmos.Debug.VSDebugEngine {
       CreateDebugConnector();
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
-      System.Threading.Thread.Sleep(250);
+      if (mNewLauncher) {
+        mProcess = new Process();
+        var xPSI = mProcess.StartInfo;
+        xPSI.FileName = Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.DummyHost.exe");
+        xPSI.UseShellExecute = false;
+        xPSI.RedirectStandardInput = true;
+        xPSI.RedirectStandardError = true;
+        xPSI.RedirectStandardOutput = true;
+        xPSI.CreateNoWindow = true;
+        mProcess.Start();
+      } else {
+        OutputText("Starting launch debug host.");
+        System.Threading.Thread.Sleep(250);
+        bool xShowHost = mDebugInfo[BuildProperties.ShowLaunchConsoleString].ToLower() == "true";
+        var xPSI = new ProcessStartInfo(Path.Combine(PathUtilities.GetVSIPDir(), mHost.GetHostProcessExe()));
+        xPSI.UseShellExecute = false;
+        xPSI.RedirectStandardInput = true;
+        xPSI.RedirectStandardError = !xShowHost;
+        xPSI.RedirectStandardOutput = !xShowHost;
+        xPSI.CreateNoWindow = !xShowHost;
+        xPSI.Arguments = mHost.StartOld();
 
-      OutputText("Starting launch debug host.");
-      mProcessStartInfo = CreateHostProcessInfo(mHost.GetHostProcessExe());
-      mProcessStartInfo.Arguments = mHost.Start(xGDBDebugStub);
-      System.Diagnostics.Debug.WriteLine(String.Format("Launching process: \"{0}\" {1}", mProcessStartInfo.FileName, mProcessStartInfo.Arguments).Trim());
-      mProcess = Process.Start(mProcessStartInfo);
+        mProcess = Process.Start(xPSI);
 
-      mProcess.EnableRaisingEvents = true;
-      mProcess.Exited += new EventHandler(mProcess_Exited);
+        mProcess.EnableRaisingEvents = true;
+        mProcess.Exited += new EventHandler(mProcess_Exited);
 
-      // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
-      // if so, why not hook before start? 
-      // MtW: we do this for the potential situation where it might exit before the Exited event is hooked. Iirc i had this situation before..
-      System.Threading.Thread.Sleep(250);
-      if (mProcess.HasExited) {
-        Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
-        Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
-        Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
-        throw new Exception("Error while starting OS debug host.");
+        // Sleep 250 and see if it exited too quickly. Why do we do this? We have .Exited hooked. Is this in case it happens between start and hook?
+        // if so, why not hook before start? 
+        // MtW: we do this for the potential situation where it might exit before the Exited event is hooked. Iirc i had this situation before..
+        System.Threading.Thread.Sleep(250);
+        if (mProcess.HasExited) {
+          Trace.WriteLine("Error while running: " + mProcess.StandardError.ReadToEnd());
+          Trace.WriteLine(mProcess.StandardOutput.ReadToEnd());
+          Trace.WriteLine("ExitCode: " + mProcess.ExitCode);
+          throw new Exception("Error while starting OS debug host.");
+        }
       }
 
       mEngine = aEngine;
@@ -226,7 +231,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mCallback.OnThreadStart(mThread);
       mPort = aPort;
 
-      if (xGDBDebugStub && xGDBClient) {
+      if (xUseGDB && xGDBClient) {
         LaunchGdbClient();
       }
     }
@@ -439,7 +444,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       // This unpauses our debug host
       // We do this because VS requires a start, and then a resume after. So we have debughost which is a stub
       // that allows VS to "see" that. Here we resume it.
-      mProcess.StandardInput.WriteLine();
+      if (mNewLauncher) {
+        mHost.Start();
+      } else {
+        mProcess.StandardInput.WriteLine();
+      }
     }
 
     void mProcess_Exited(object sender, EventArgs e) {

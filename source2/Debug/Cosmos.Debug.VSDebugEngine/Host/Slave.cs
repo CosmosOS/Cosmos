@@ -9,8 +9,8 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
   public class Slave : Base {
     string mPort;
 
-    public Slave(NameValueCollection aParams)
-      : base(aParams) {
+    public Slave(NameValueCollection aParams, bool aUseGDB)
+      : base(aParams, aUseGDB) {
       var xPort = mParams[BuildProperties.SlavePortString];
       if (xPort == "None") {
         throw new Exception("No slave port is set.");
@@ -24,7 +24,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       return "Cosmos.Launch.Slave.exe";
     }
 
-    public override string Start(bool aGDB) {
+    public override void Start() {
+    }
+
+    public override string StartOld() {
       return mPort;
     }
 
