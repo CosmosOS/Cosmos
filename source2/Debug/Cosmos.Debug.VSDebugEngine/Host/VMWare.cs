@@ -6,21 +6,53 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32;
 using Vestris.VMWareLib;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
-  public abstract class VMware : Base {
+  public class VMware : Base {
+    protected VMwareEdition mEdition;
+    protected string mDir;
     protected string mVmxFile;
-    protected abstract void ConnectToVMWare(VMWareVirtualHost aHost);
+    string mWorkstationPath;
+    string mPlayerPath;
 
-    public VMware(NameValueCollection aParams, string aVmxFile) : base(aParams) {
-      mVmxFile = aVmxFile;
+    public VMware(NameValueCollection aParams) : base(aParams) {
+      mDir = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\");
+      mVmxFile = Path.Combine(mDir, @"Debug.vmx");
+
+      mWorkstationPath = GetPathname("VMware Workstation", "vmware.exe");
+      mPlayerPath = GetPathname("VMware Player", "vmplayer.exe");
+      if (mWorkstationPath == null && mPlayerPath == null) {
+        throw new Exception("VMware not found.");
+      }
+
+      string xFlavor = aParams[BuildProperties.VMwareEditionString].ToUpper();
+      mEdition = VMwareEdition.Player;
+      if (xFlavor == "WORKSTATION") {
+        mEdition = VMwareEdition.Workstation;
+      }
+
+      // Try alternate if selected one is not installed
+      if (mEdition == VMwareEdition.Player && mPlayerPath == null) {
+        mEdition = VMwareEdition.Workstation;
+      } else if (mEdition == VMwareEdition.Workstation && mWorkstationPath == null) {
+        mEdition = VMwareEdition.Player;
+      }
+    }
+
+    protected void ConnectToVMWare(VMWareVirtualHost aHost) {
+      if (mEdition == VMwareEdition.Player) {
+        aHost.ConnectToVMWareWorkstation();
+      } else {
+        aHost.ConnectToVMWarePlayer();
+      }
     }
 
     public override string GetHostProcessExe() {
       return "Cosmos.Launch.VMware.exe";
     }
 
-    protected static string GetPathname(string aKey, string aEXE) {
+    protected string GetPathname(string aKey, string aEXE) {
       using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\VMware, Inc.\" + aKey, false)) {
         if (xRegKey != null) {
           string xResult = Path.Combine(((string)xRegKey.GetValue("InstallPath")), aEXE);
@@ -32,17 +64,25 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       }
     }
 
-    protected abstract string GetParams();
+    protected string GetParams() {
+      if (mEdition == VMwareEdition.Player) {
+        return "\"" + mPlayerPath + "\" \"" + mVmxFile + "\"";
+      } else {
+        // -x: Auto power on VM. Must be small x, big X means something else.
+        // -q: Close VMWare when VM is powered off.
+        // Options must come beore the vmx, and cannot use shellexecute
+        return "\"" + mWorkstationPath + "\" -x -q \"" + mVmxFile + "\"";
+      }
+    }
 
     public override string Start(bool aGDB) {
-      string xPath = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\");
       Cleanup();
 
       // VMWare doesn't like to boot a read only VMX.
       // We also need to make changes based on project / debug settings.
       // Finally we do not want to create VCS checkins based on local user changes.
       // Because of this we use Cosmos.vmx as a template and output a Debug.vmx on every run.
-      using (var xSrc = new StreamReader(Path.Combine(xPath, "Cosmos.vmx"))) {
+      using (var xSrc = new StreamReader(Path.Combine(mDir, "Cosmos.vmx"))) {
         try {
           // Write out Debug.vmx
           using (var xDest = new StreamWriter(mVmxFile)) {
@@ -82,8 +122,8 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
             }
           }
         } catch (IOException ex) {
-          if (ex.Message.Contains(Path.GetFileName(mVmxFile))) {
-            throw new Exception("The VMware image " + mVmxFile + " is still in use! Please exit current Vmware session with Cosmos and try again.", ex);
+          if (ex.Message.Contains(Path.GetFileName(mDir))) {
+            throw new Exception("The VMware image " + mDir + " is still in use. Please exit current Vmware session with Cosmos and try again.", ex);
           }
           throw ex;
         }
@@ -129,7 +169,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
         File.Delete(Path.Combine(xPath, "vmware-0.log"));
         File.Delete(Path.Combine(xPath, "vmware-1.log"));
         File.Delete(Path.Combine(xPath, "vmware-2.log"));
-      } catch (Exception ex) {
+      } catch (Exception) {
         // Ignore errors, users can stop VS while VMware is still running and files will be locked.
       }
     }

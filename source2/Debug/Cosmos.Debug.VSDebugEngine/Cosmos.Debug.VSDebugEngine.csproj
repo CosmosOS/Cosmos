@@ -131,8 +131,6 @@
     <Compile Include="Engine.Impl\EngineCallback.cs" />
     <Compile Include="Host\Slave.cs" />
     <Compile Include="Host\VMware.cs" />
-    <Compile Include="Host\VMwarePlayer.cs" />
-    <Compile Include="Host\VMwareWorkstation.cs" />
     <Compile Include="PathUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine.Impl\EngineUtils.cs" />

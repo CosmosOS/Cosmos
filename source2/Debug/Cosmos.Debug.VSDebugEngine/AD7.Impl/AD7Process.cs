@@ -171,28 +171,9 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       string xHostArgs = "";
       if (mLaunch == LaunchType.VMware) {
-        OutputText("Preparing VMWare.");
-        string xFlavor = mDebugInfo[BuildProperties.VMwareEditionString].ToUpper();
-        string xVmxFile = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\Debug.vmx");
-
-        // Try alternate if selected one is not installed
-        if (xFlavor == "PLAYER" && !Host.VMwarePlayer.IsInstalled) {
-          xFlavor = "WORKSTATION";
-        } else if (xFlavor == "WORKSTATION" && !Host.VMwareWorkstation.IsInstalled) {
-          xFlavor = "PLAYER";
-        }
-
-        if (xFlavor == "PLAYER" && Host.VMwarePlayer.IsInstalled) {
-          mHost = new Host.VMwarePlayer(mDebugInfo, xVmxFile);
-        } else if (xFlavor == "WORKSTATION" && Host.VMwareWorkstation.IsInstalled) {
-          mHost = new Host.VMwareWorkstation(mDebugInfo, xVmxFile);
-        } else {
-          throw new Exception("VMWare Flavor '" + xFlavor + "' not implemented.");
-        }
-
+        mHost = new Host.VMware(mDebugInfo);
       } else if (mLaunch == LaunchType.Slave) {
         mHost = new Host.Slave(mDebugInfo);
-
       } else {
         throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
