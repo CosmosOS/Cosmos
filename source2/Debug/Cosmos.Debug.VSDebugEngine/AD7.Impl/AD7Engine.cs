@@ -30,8 +30,9 @@ namespace Cosmos.Debug.VSDebugEngine {
   [ComVisible(true)]
   [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
   public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
-    internal AD7Process mProcess;
     internal IDebugProgram2 mProgram;
+    // We only support one process, so we just keep a ref to it and save a lot of accounting.
+    internal AD7Process mProcess;
     // A unique identifier for the program being debugged.
     Guid mProgramID;
     public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
@@ -68,7 +69,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aDebugInfo
       , string aArgs, string aDir, string aEnv, string aOptions, enum_LAUNCH_FLAGS aLaunchFlags
       , uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback
-      , out IDebugProcess2 aProcess) {
+      , out IDebugProcess2 oProcess) {
       // Launches a process by means of the debug engine.
       // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger 
       // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program 
@@ -76,7 +77,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
       // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
 
-      aProcess = null;
+      oProcess = null;
       try {
         mEngineCallback = new EngineCallback(this, aAD7Callback);
 
@@ -88,12 +89,12 @@ namespace Cosmos.Debug.VSDebugEngine {
         //var processLaunchInfo = new ProcessLaunchInfo(exe, xCmdLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
 
         AD7EngineCreateEvent.Send(this);
-        var xProcess = new AD7Process(xDebugInfo, mEngineCallback, this, aPort);
-        aProcess = mProcess = xProcess;
-        mProgramID = xProcess.mID;
+        oProcess = mProcess = new AD7Process(xDebugInfo, mEngineCallback, this, aPort);
+        // We only support one process, so just use its ID for the program ID
+        mProgramID = mProcess.ID;
         //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
         mModule = new AD7Module();
-        mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(xProcess));
+        mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(mProcess));
       } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
@@ -148,7 +149,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         // which will complete the hookup with AD7
         var xProcess = aProcess as AD7Process;
         if (xProcess == null) {
-          Trace.WriteLine("No AD7Process retrieved!");
           return VSConstants.E_INVALIDARG;
         }
         IDebugPort2 xPort;
@@ -193,7 +193,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // It responds to that event by shutting down the engine.
       // 
       // This is used in some cases - I set a BP here and it does get hit sometime during breakpoints
-      // being triggered for exampmmle.
+      // being triggered for example.
       try {
         if (aEvent is AD7ProgramDestroyEvent) {
           mEngineCallback = null;

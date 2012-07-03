@@ -18,7 +18,7 @@ using Microsoft.Win32;
 
 namespace Cosmos.Debug.VSDebugEngine {
   public class AD7Process : IDebugProcess2 {
-    public Guid mID = Guid.NewGuid();
+    public Guid ID = Guid.NewGuid();
     protected Process mProcess;
     protected EngineCallback mCallback;
     public AD7Thread mThread;
@@ -368,7 +368,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
       pProcessId[0].dwProcessId = (uint)mProcess.Id;
       pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
       return VSConstants.S_OK;
@@ -385,8 +384,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public int GetProcessId(out Guid pguidProcessId) {
-      Trace.WriteLine(new StackTrace(false).GetFrame(0).GetMethod().GetFullName());
-      pguidProcessId = mID;
+      pguidProcessId = ID;
       return VSConstants.S_OK;
     }
 

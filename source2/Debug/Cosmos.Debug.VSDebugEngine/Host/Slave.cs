@@ -94,6 +94,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
           while (true) {
             Thread.Sleep(1000);
             if (!IsOn()) {
+              mPort.Close();
               OnShutDown(this, EventArgs.Empty);
               break;
             }
