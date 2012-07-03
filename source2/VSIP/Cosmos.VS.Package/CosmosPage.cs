@@ -158,7 +158,6 @@ namespace Cosmos.VS.Package {
       
       // Launch
       lboxLaunch.SelectedItem = mProps.Launch;
-      chckShowLaunchConsole.Checked = mProps.ShowLaunchConsole;
 
       lablBuildOnly.Visible = mProps.Launch == LaunchType.None;
 
@@ -189,9 +188,6 @@ namespace Cosmos.VS.Package {
       comboDebugMode.SelectedItem = EnumValue.Find(comboDebugMode.Items, mProps.DebugMode);
       comboTraceMode.SelectedItem = EnumValue.Find(comboTraceMode.Items, mProps.TraceAssemblies);
 
-      if (xProfile.IsPreset) {
-        chckShowLaunchConsole.Checked = false;
-      }
       lablPreset.Visible = xProfile.IsPreset;
 
       mShowTabDeployment = !xProfile.IsPreset;
@@ -277,14 +273,6 @@ namespace Cosmos.VS.Package {
         var xValue = (LaunchType)((EnumValue)lboxLaunch.SelectedItem).Value;
         if (xValue != mProps.Launch) {
           mProps.Launch = xValue;
-          IsDirty = true;
-        }
-      };
-
-      chckShowLaunchConsole.CheckedChanged += delegate(Object sender, EventArgs e) {
-        var xValue = chckShowLaunchConsole.Checked;
-        if (xValue != mProps.ShowLaunchConsole) {
-          mProps.ShowLaunchConsole = xValue;
           IsDirty = true;
         }
       };

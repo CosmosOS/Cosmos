@@ -67,7 +67,6 @@
       this.tabDeployment = new System.Windows.Forms.TabPage();
       this.lboxDeployment = new System.Windows.Forms.ListBox();
       this.tabLaunch = new System.Windows.Forms.TabPage();
-      this.chckShowLaunchConsole = new System.Windows.Forms.CheckBox();
       this.lboxLaunch = new System.Windows.Forms.ListBox();
       this.tabVMware = new System.Windows.Forms.TabPage();
       this.checkEnableGDB = new System.Windows.Forms.CheckBox();
@@ -529,7 +528,6 @@
       // 
       // tabLaunch
       // 
-      this.tabLaunch.Controls.Add(this.chckShowLaunchConsole);
       this.tabLaunch.Controls.Add(this.lboxLaunch);
       this.tabLaunch.Location = new System.Drawing.Point(4, 22);
       this.tabLaunch.Name = "tabLaunch";
@@ -537,16 +535,6 @@
       this.tabLaunch.TabIndex = 12;
       this.tabLaunch.Text = "Launch";
       this.tabLaunch.UseVisualStyleBackColor = true;
-      // 
-      // chckShowLaunchConsole
-      // 
-      this.chckShowLaunchConsole.AutoSize = true;
-      this.chckShowLaunchConsole.Location = new System.Drawing.Point(230, 18);
-      this.chckShowLaunchConsole.Name = "chckShowLaunchConsole";
-      this.chckShowLaunchConsole.Size = new System.Drawing.Size(158, 17);
-      this.chckShowLaunchConsole.TabIndex = 35;
-      this.chckShowLaunchConsole.Text = "Show Launch Host Process";
-      this.chckShowLaunchConsole.UseVisualStyleBackColor = true;
       // 
       // lboxLaunch
       // 
@@ -745,7 +733,6 @@
       this.panlDebugSettings.PerformLayout();
       this.tabDeployment.ResumeLayout(false);
       this.tabLaunch.ResumeLayout(false);
-      this.tabLaunch.PerformLayout();
       this.tabVMware.ResumeLayout(false);
       this.tabVMware.PerformLayout();
       this.tabPXE.ResumeLayout(false);
@@ -814,7 +801,6 @@
     private System.Windows.Forms.TabPage tabSlave;
     private System.Windows.Forms.ComboBox cmboSlavePort;
     private System.Windows.Forms.Label label6;
-    private System.Windows.Forms.CheckBox chckShowLaunchConsole;
 
 
 

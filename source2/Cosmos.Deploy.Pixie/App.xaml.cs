@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace Cosmos.Deploy.Pixie.GUI {
+namespace Cosmos.Deploy.Pixie {
   public partial class App : Application {
     static public string PxePath;
     static public string IpAddress;

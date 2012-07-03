@@ -16,7 +16,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Cosmos.Deploy.Pixie.GUI {
+namespace Cosmos.Deploy.Pixie {
   public partial class MainWindow : Window {
     protected byte[] mNicIP = new byte[4];
     protected DispatcherTimer mCloseTimer = new DispatcherTimer();
