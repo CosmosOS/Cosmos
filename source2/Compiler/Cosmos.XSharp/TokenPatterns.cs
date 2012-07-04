@@ -94,8 +94,16 @@ namespace Cosmos.Compiler.XSharp {
     protected string GetCondition(Token aToken) {
       if (aToken.Value == "<") {
         return "ConditionalTestEnum.LessThan";
+      } else if (aToken.Value == ">") {
+        return "ConditionalTestEnum.GreaterThan";
       } else if (aToken.Value == "=") {
         return "ConditionalTestEnum.Zero";
+      } else if (aToken.Value == "!=") {
+        return "ConditionalTestEnum.NotZero";
+      } else if (aToken.Value == "<=") {
+        return "ConditionalTestEnum.BelowOrEqual";
+      } else if (aToken.Value == ">=") {
+        return "ConditionalTestEnum.AboveOrEqual";
       } else {
         throw new Exception("Unrecognized symbol in conditional: " + aToken.Value);
       }
@@ -141,7 +149,11 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern(new string[] {
           "if < goto _ABC", 
-          "if = goto _ABC"
+          "if > goto _ABC", 
+          "if = goto _ABC",
+          "if != goto _ABC",
+          "if <= goto _ABC", 
+          "if >= goto _ABC" 
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
           string xLabel = GetLabel(aTokens[3]);
@@ -153,19 +165,37 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern(new string[] {
           //0 1  2  3  4 5  6    7
           "if (_REG < 123) goto _ABC",
-          "if (_REG = 123) goto _ABC"
+          "if (_REG > 123) goto _ABC",
+          "if (_REG = 123) goto _ABC",
+          "if (_REG != 123) goto _ABC",
+          "if (_REG <= 123) goto _ABC",
+          "if (_REG >= 123) goto _ABC"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
           rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
 
-          string xLabel = GetLabel(aTokens[7]);
           var xCondition = GetCondition(aTokens[3]);
+          string xLabel = GetLabel(aTokens[7]);
           rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
 
       AddPattern("_REG ? 123",
         "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
+      );
+
+      // ~ "infinite" shift because it loops
+      AddPattern("_REG ~> 123",
+        "new LiteralAssemblerCode(\"ROR {0}, {2}\");"
+      );
+      AddPattern("_REG <~ 123",
+        "new LiteralAssemblerCode(\"ROL {0}, {2}\");"
+      );
+      AddPattern("_REG >> 123",
+        "new LiteralAssemblerCode(\"SHR {0}, {2}\");"
+      );
+      AddPattern("_REG << 123",
+        "new LiteralAssemblerCode(\"SHL {0}, {2}\");"
       );
 
       AddPattern(new string[] { 

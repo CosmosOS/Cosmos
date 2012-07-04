@@ -23,22 +23,5 @@ namespace Cosmos.Debug.DebugStub {
       });
     }
 
-    public class WaitForSignature : CodeBlock {
-      public override void Assemble() {
-        EBX = 0;
-
-        Label = "DebugStub_WaitForSignature_Read";
-        Call<ReadALFromComPort>();
-        BL = AL;
-        EBX.RotateRight(8);
-        EBX.Compare(Cosmos.Debug.Consts.Consts.SerialSignature);
-        JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read");
-
-        //TODO: Always emit and exit label and then make a Exit method which can
-        // automatically use it. I think a label might already exist.
-        Label = "DebugStub_WaitForSignature_Exit";
-      }
-    }
-
   }
 }
