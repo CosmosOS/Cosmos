@@ -27,7 +27,7 @@ Read:
 # To work around this we send a signature. DC then discards everything before the signature.
 # QEMU has other serial issues too, and we dont support it anymore, but this signature is a good
 # feature so we kept it.
-procedure WaitForDbgHandshakeNew {
+procedure WaitForDbgHandshake {
     # "Clear" the UART out
     AL = 0
     Call .WriteALToComPort

@@ -71,8 +71,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("feature so we kept it.");
 
-			new Comment("X#: procedure WaitForDbgHandshakeNew {");
-			new Label("DebugStub_WaitForDbgHandshakeNew");
+			new Comment("X#: procedure WaitForDbgHandshake {");
+			new Label("DebugStub_WaitForDbgHandshake");
 
 			new Comment("\"Clear\" the UART out");
 
@@ -130,7 +130,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Call { DestinationLabel = "DebugStub_ProcessCommandBatch" };
 
 			new Comment("X#: }");
-			new Label("DebugStub_WaitForDbgHandshakeNew_Exit");
+			new Label("DebugStub_WaitForDbgHandshake_Exit");
 			new Return();
 
 		}
