@@ -115,13 +115,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       try {
-        int xProcessID = EngineUtils.GetProcessId(rgpPrograms[0]);
-        if (xProcessID == 0) {
-          // We only support system processes.
-          // What other kinds of processes are there?
-          return VSConstants.E_NOTIMPL;
-        }
-
         EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out mProgramID));
 
         mProgram = rgpPrograms[0];
@@ -143,8 +136,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 aProcess) {
       // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
       try {
-        int xProcessID = EngineUtils.GetProcessId(aProcess);
-
         // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
         // which will complete the hookup with AD7
         var xProcess = aProcess as AD7Process;
@@ -242,10 +233,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       // This function is used to terminate a process that the SampleEngine launched
       // The debugger will call IDebugEngineLaunch2::CanTerminateProcess before calling this method.
       try {
-        // We only support one debugee, but if we support more in the future
-        // this can be use to identify which one this method applies to.
-        int xProcessID = EngineUtils.GetProcessId(aProcess);
-
         mProcess.Terminate();
 
         mEngineCallback.OnProcessExit(0);

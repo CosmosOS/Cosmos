@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>User001</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -28,8 +28,8 @@
     <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
-    <Deployment>PXE</Deployment>
-    <Launch>Slave</Launch>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
     <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
@@ -80,8 +80,8 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>PXE with Slave (Kudzu)</Name>
-    <Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</Description>
+    <Name>Guess</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
@@ -114,7 +114,7 @@
     <PXE_SlavePort>Serial: COM3</PXE_SlavePort>
     <USB_PxeInterface>192.168.43.1</USB_PxeInterface>
     <USB_SlavePort>Serial: COM3</USB_SlavePort>
-    <VisualStudioDebugPort>Serial: COM1</VisualStudioDebugPort>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_PxeInterface>192.168.43.1</VMware_PxeInterface>
     <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
@@ -126,7 +126,7 @@
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>User001</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -140,8 +140,8 @@
     <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
-    <Deployment>PXE</Deployment>
-    <Launch>Slave</Launch>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
     <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
@@ -192,8 +192,8 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>PXE with Slave (Kudzu)</Name>
-    <Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</Description>
+    <Name>Guess</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
@@ -219,7 +219,7 @@
     <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
     <User001_CosmosDebugPort>Serial: COM1</User001_CosmosDebugPort>
     <User001_VisualStudioDebugPort>Serial: COM1</User001_VisualStudioDebugPort>
-    <VisualStudioDebugPort>Serial: COM1</VisualStudioDebugPort>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
     <VMware_CosmosDebugPort />
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <ISO_CosmosDebugPort />
