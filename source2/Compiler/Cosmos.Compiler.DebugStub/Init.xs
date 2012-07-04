@@ -10,15 +10,13 @@ procedure Init {
     Call .Cls
 }
 
-procedure WaitForSignatureNew {
+procedure WaitForSignature {
     EBX = 0
-
 Read:
     Call .ReadALFromComPort
     BL = AL
-    #EBX.RotateRight(8)
-    #EBX.Compare(Cosmos.Debug.Consts.Consts.SerialSignature)
-    #JumpIf(Flags.NotEqual, "DebugStub_WaitForSignature_Read")
+    EBX ~> 8
+    if (EBX != $19740807) goto Read
 }
 
 # QEMU (and possibly others) send some garbage across the serial line first.
