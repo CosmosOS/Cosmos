@@ -19,7 +19,6 @@ using Microsoft.Win32;
 namespace Cosmos.Debug.VSDebugEngine {
   public class AD7Process : IDebugProcess2 {
     public Guid ID = Guid.NewGuid();
-    protected Process mProcess;
     protected EngineCallback mCallback;
     public AD7Thread mThread;
     protected AD7Engine mEngine;
@@ -187,8 +186,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       CreateDebugConnector();
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
 
-      StartDummyHost();
-
       mEngine = aEngine;
       mThread = new AD7Thread(aEngine, this);
       mCallback.OnThreadStart(mThread);
@@ -197,18 +194,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (xUseGDB && xGDBClient) {
         LaunchGdbClient();
       }
-    }
-
-    protected void StartDummyHost() {
-      mProcess = new Process();
-      var xPSI = mProcess.StartInfo;
-      xPSI.FileName = Path.Combine(PathUtilities.GetVSIPDir(), "Cosmos.VS.DummyHost.exe");
-      xPSI.UseShellExecute = false;
-      xPSI.RedirectStandardInput = true;
-      xPSI.RedirectStandardError = true;
-      xPSI.RedirectStandardOutput = true;
-      xPSI.CreateNoWindow = true;
-      mProcess.Start();
     }
 
     protected void LaunchGdbClient() {
@@ -410,11 +395,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     void ShutDown() {
-      if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
-        // Kill off dummy process
-        mProcess.Kill();
-        mProcess = null;
-      }
       if (mDbgConnector != null) {
         mDbgConnector.Dispose();
         mDbgConnector = null;
