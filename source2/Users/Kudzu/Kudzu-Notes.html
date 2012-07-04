@@ -44,53 +44,45 @@
                                     <li>X# Complete</li>
                                     <li>return errors 
         when comport cant open<li>OutputDebug Catcher with filters, categories, timestamps<li>Press stop while on bp with worktation</li>
-        <li>Press stop while vmware player is running</ul>
-    <p>
-        &nbsp;</p>
-    <p>
-        &nbsp;</p>
-    <ul>
-        <li>you switched the data and text segments, right? before text was first 
+        <li>Press stop while vmware player is running<li>you switched the data and text segments, right? before text was first 
         data after, and now that&#39;s data-text? if so, we need to fix our &quot;EndOfKernel&quot; 
         code..<li>X#  
-                            Code Completion<ul>
-            <li>Asm stepping<ul>
-                                    <li>Historical panels</li>
-                                    </ul>
-                                </li>
-                                <li>Convert cxdb to sql compact and edm<ul>
-                                    <li><a href="http://www.microsoft.com/download/en/details.aspx?id=17876">http://www.microsoft.com/download/en/details.aspx?id=17876</a></li>
-                                    </ul>
-                                </li>
-                                <li>Increase speed of DebugStub / lower impact</li>
-                                <li>DS Ping or set a breakpoint while not in a break state will hang VS.<ul>
-                                    <li>This is because its waiting on some other command to release?</li>
-                                    </ul>
-                                </li>
-                                <li>Watches<ul>
-                                    <li>Memory watches</li>
-                                    <li>this:28 - show its size</li>
-                                    <li>watches - show EBP+-</li>
-                                    <li>frame - show var names</li>
-                                    <li>asm window - show values of EBP, etc...</li>
-                                    </ul>
-                                </li>
-                                <li>watches that can see fields/members<ul>
-                                    <li>of other classes besides this</li>
-                                    </ul>
-                                </li>
-                                <li>ATA / FAT</li>
-                                <li>ring restrictions on console etc.. by class, or explict inclusion</li>
-                                <li>PIT/RTC<ul>
-                                    <li>And sleep, needed for ATA</li>
-                                    </ul>
-                                </li>
-                                <li>tohex plug based on string input of X8 etc</li>
-                                <li>Bootstrap - clean up more</li>
-                                <li>networking</li>
-                                <li>gc</li>
-                                <li>USB</li>
-        </ul>
+                            Code Completion<li>Asm stepping<ul>
+            <li>Historical panels</li>
+            </ul>
+        </li>
+        <li>Convert cxdb to sql compact and edm<ul>
+            <li><a href="http://www.microsoft.com/download/en/details.aspx?id=17876">http://www.microsoft.com/download/en/details.aspx?id=17876</a></li>
+            </ul>
+        </li>
+        <li>Increase speed of DebugStub / lower impact</li>
+        <li>DS Ping or set a breakpoint while not in a break state will hang VS.<ul>
+            <li>This is because its waiting on some other command to release?</li>
+            </ul>
+        </li>
+        <li>Watches<ul>
+            <li>Memory watches</li>
+            <li>this:28 - show its size</li>
+            <li>watches - show EBP+-</li>
+            <li>frame - show var names</li>
+            <li>asm window - show values of EBP, etc...</li>
+            </ul>
+        </li>
+        <li>watches that can see fields/members<ul>
+            <li>of other classes besides this</li>
+            </ul>
+        </li>
+        <li>ATA / FAT</li>
+        <li>ring restrictions on console etc.. by class, or explict inclusion</li>
+        <li>PIT/RTC<ul>
+            <li>And sleep, needed for ATA</li>
+            </ul>
+        </li>
+        <li>tohex plug based on string input of X8 etc</li>
+        <li>Bootstrap - clean up more</li>
+        <li>networking</li>
+        <li>gc</li>
+        <li>USB</li>
         <p>
         scanner issue: <a href="http://groups.yahoo.com/group/Cosmos-Dev/message/4789">http://groups.yahoo.com/group/Cosmos-Dev/message/4789</a><br />debugstub.SkipMethod<br />SkipClass<br />speedup debug stub on no trigger<br />compiler dynamic load<br />unsafe arrays but controllled
                             </p>
@@ -114,7 +106,8 @@
         <ul>
             <li>Throw exception on null ref...</li>
             <li>Plugs - warn if plugging something that doesnt exists... caused the x08 bug?</li>
-            <li>Write out .asm line number to the cxdb file so I can use it in cgdb</li>
+        </ul>
+        <ul>
             <li>(joint with Kudzu) - Move all critical plugs out of old asms and remove building 
         of old asms.<ul>
                     <li>And the plugs also from CustomImplementations in IL2CPU?</li>
@@ -122,8 +115,8 @@
             </li>
             <li>Exceptions dont work. Try int.parse(&quot;asdf&quot;). It runs but when the exception is 
         hit we get garbage back instead. (ie exceptions through plug proxy dont work)</li>
-            <li>We are still stuck on install.bat.. I made a change in Cosmos.Hardware.. but it 
-        didnt take effect until I ran install.bat..</li>
+        </ul>
+        <ul>
             <li>IL2CPU.AlwaysCompile attribute and get rid of IDT.Dummy</li>
             <li>int j = Array.IndexOf(Digits, s[i]);<ul>
                 <li>When Digits is a char array, we get a plug needed error.</li>
@@ -151,18 +144,11 @@
             load the plugs etc so we can just rebuild and run and even trace them without 
                 rerunnig the bat for each change</li>
         </li>
-            <li>2010 support<ul>
-                <li>http://blogs.msdn.com/b/jacdavis/archive/2010/04/05/vs-2010-version-of-debugenginesample-is-now-available.aspx</li>
-                <li>Trivalik worked on some already</li>
-                </ul>
-            </li>
+        </ul>
+        <ul>
             <li>Ring attributes and enforcement<ul>
                 <li>Also allow restriction of assembly references</li>
                 <li>Only allow core to be /unsafe, no others</li>
-                </ul>
-            </li>
-            <li>Ask on forums: How to debug the vsdebug pkg?<ul>
-                <li>http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/6a9a307a-19fa-4c06-8728-303c1f4dd0bc/</li>
                 </ul>
             </li>
         </ul>
@@ -170,8 +156,6 @@
     Even later</h3>
         <ul>
             <li>localloc - int.parse needs plug for now because of this.</li>
-            <li>use INT3 for BP? Will save 3 bytes per call.. which is a lot...</li>
-            <li>Gradual X# upgrades (Kudzu)</li>
             <li>Filesystem</li>
             <li>Memory Manager<ul>
                 <li>http://www.osdever.net/tutorials/view/memory-management-1</li>
@@ -189,8 +173,6 @@
         <ul>
             <li>USB</li>
         </ul>
-        <h3>
-    Notes</h3>
         <h3>
         Assembly Plug Example</h3>
         <h4>
