@@ -367,14 +367,17 @@ namespace Cosmos.Debug.VSDebugEngine {
       throw new NotImplementedException();
     }
 
+    public readonly Guid PhysID = Guid.NewGuid();
     public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId) {
-      pProcessId[0].dwProcessId = (uint)mProcess.Id;
-      pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+      // http://blogs.msdn.com/b/jacdavis/archive/2008/05/01/what-to-do-if-your-debug-engine-doesn-t-create-real-processes.aspx
+      // http://social.msdn.microsoft.com/Forums/en/vsx/thread/fe809686-e5f9-439d-9e52-00017e12300f
+      pProcessId[0].guidProcessId = PhysID;
+      pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+
       return VSConstants.S_OK;
     }
 
     private IDebugPort2 mPort = null;
-
     public int GetPort(out IDebugPort2 ppPort) {
       if (mPort == null) {
         throw new Exception("Error");
@@ -394,11 +397,8 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public int Terminate() {
       OutputText("Debugger terminating.");
-      if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
-        mProcess.Kill();
-        ShutDown();
-      }
-
+      
+      ShutDown();
       mHost.Stop();
 
       OutputText("Debugger terminated.");
@@ -410,6 +410,11 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     void ShutDown() {
+      if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
+        // Kill off dummy process
+        mProcess.Kill();
+        mProcess = null;
+      }
       if (mDbgConnector != null) {
         mDbgConnector.Dispose();
         mDbgConnector = null;
@@ -423,9 +428,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     void HostShutdown(object sender, EventArgs e) {
       //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
       //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
-
-      // Kill off dummy process
-      mProcess.Kill();
 
       ShutDown();
 

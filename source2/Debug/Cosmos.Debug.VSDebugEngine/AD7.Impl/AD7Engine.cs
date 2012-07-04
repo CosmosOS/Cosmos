@@ -94,7 +94,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mProgramID = mProcess.ID;
         //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
         mModule = new AD7Module();
-        mProgNode = new AD7ProgramNode(EngineUtils.GetProcessId(mProcess));
+        mProgNode = new AD7ProgramNode(mProcess.PhysID);
       } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
