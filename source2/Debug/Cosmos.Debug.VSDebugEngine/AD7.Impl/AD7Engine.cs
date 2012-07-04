@@ -412,7 +412,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // An IDE might display the additional program properties through a generic property browser user interface.
     // The sample engine does not support this
     public int GetDebugProperty(out IDebugProperty2 ppProperty) {
-      throw new Exception("The method or operation is not implemented.");
+      throw new NotImplementedException();
     }
 
     // The debugger calls this when it needs to obtain the IDebugDisassemblyStream2 for a particular code-context.
@@ -471,7 +471,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     // Enumerates the code contexts for a given position in a source file.
     public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum) {
-      throw new Exception("The method or operation is not implemented.");
+      throw new NotImplementedException();
     }
 
     // Determines if a process can be terminated.
