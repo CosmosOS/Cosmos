@@ -155,7 +155,7 @@ namespace Cosmos.Build.Builder {
     void CompileCosmos() {
       Section("Compiling Cosmos");
 
-      MsBuild(mCosmosPath + @"\source\Cosmos.sln", "Builder");
+      MsBuild(mCosmosPath + @"\source\Build.sln", "Debug");
     }
 
     void CopyTemplates() {
