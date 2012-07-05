@@ -64,14 +64,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
-      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
-      <Name>Cosmos.Kernel.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
-      <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
-      <Name>Cosmos.Sys.Plugs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Cosmos.Assembler.X86\Cosmos.Assembler.x86.csproj">
       <Project>{94D079E4-3C66-486A-8407-EA6EC049FF53}</Project>
       <Name>Cosmos.Assembler.x86</Name>
@@ -99,10 +91,6 @@
     <ProjectReference Include="..\..\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
       <Project>{D9A87AAD-FCC9-4517-B31D-E904DAD00784}</Project>
       <Name>Cosmos.Core.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Users\SSchocke\SSchockeTest\SSchockeTest.csproj">
-      <Project>{0AAD9114-6F08-4344-A282-CD6BC77595E5}</Project>
-      <Name>SSchockeTest</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
       <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
