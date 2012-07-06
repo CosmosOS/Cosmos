@@ -45,7 +45,8 @@ namespace Cosmos.Build.Installer {
         xProcess.WaitForExit();
         if (xProcess.ExitCode != 0) {
           Log.SetError();
-          throw new Exception("Console returned exit code. (" + xProcess.ExitCode + ")\r\n" + xProcess.StandardError.ReadToEnd());
+          Log.WriteLine(xProcess.StandardError.ReadToEnd());
+          throw new Exception("Console returned exit code. (" + xProcess.ExitCode + ")");
         }
       }
     }
