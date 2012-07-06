@@ -30,6 +30,7 @@ namespace Cosmos.Build.Installer {
       xStart.UseShellExecute = false;
       xStart.CreateNoWindow = true;
       xStart.RedirectStandardOutput = true;
+      xStart.RedirectStandardError = true;
       using (var xProcess = Process.Start(xStart)) {
         using (var xReader = xProcess.StandardOutput) {
           string xLine;
@@ -44,7 +45,7 @@ namespace Cosmos.Build.Installer {
         xProcess.WaitForExit();
         if (xProcess.ExitCode != 0) {
           Log.SetError();
-          throw new Exception("Console returned exit code.");
+          throw new Exception("Console returned exit code. (" + xProcess.ExitCode + ")\r\n" + xProcess.StandardError.ReadToEnd());
         }
       }
     }
