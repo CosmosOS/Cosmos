@@ -159,55 +159,5 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class InitSerial2 : CodeBlock {
-      public override void Assemble() {
-        // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
-
-        // Disable interrupts
-        DX = (UInt16)(mComAddr + 1);
-        AL = 0;
-        Port[DX] = AL;
-
-        // Enable DLAB (set baud rate divisor)
-        DX = (UInt16)(mComAddr + 3);
-        AL = 0x80;
-        Port[DX] = AL;
-
-        // 0x01 - 0x00 - 115200
-        // 0x02 - 0x00 - 57600
-        // 0x03 - 0x00 - 38400
-        //
-        // Set divisor (lo byte)
-        DX = mComAddr;
-        AL = 0x01;
-        Port[DX] = AL;
-        // hi byte
-        DX = (UInt16)(mComAddr + 1);
-        AL = 0x00;
-        Port[DX] = AL;
-
-        // 8N1
-        DX = (UInt16)(mComAddr + 3);
-        AL = 0x03;
-        Port[DX] = AL;
-
-        // Enable FIFO, clear them
-        // Set 14-byte threshold for IRQ.
-        // We dont use IRQ, but you cant set it to 0
-        // either. IRQ is enabled/diabled separately
-        DX = (UInt16)(mComAddr + 2);
-        AL = 0xC7;
-        Port[DX] = AL;
-
-        // 0x20 AFE Automatic Flow control Enable - 16550 (VMWare uses 16550A) is most common and does not support it
-        // 0x02 RTS
-        // 0x01 DTR
-        // Send 0x03 if no AFE
-        DX = (UInt16)(mComAddr + 4);
-        AL = 0x03;
-        Port[DX] = AL;
-      }
-    }
-  
   }
 }
