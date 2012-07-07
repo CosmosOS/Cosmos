@@ -32,6 +32,13 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Call .DisplayWaitMsg");
 			new Call { DestinationLabel = "DebugStub_DisplayWaitMsg" };
 
+			new Comment("mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;");
+
+			new Comment("Currently hardcoded to COM1.");
+
+			new Comment("X#: DX = $03F8");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceValue = 0x03F8 };
+
 			new Comment("X#: Call .InitSerial");
 			new Call { DestinationLabel = "DebugStub_InitSerial" };
 
