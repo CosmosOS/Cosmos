@@ -1,7 +1,8 @@
 ﻿Group DebugStub
 
-# Todo: Change to a group level var
+# Todo: Change these to a group level var
 var ..DebugBPs int[256]
+var ..DebugWaitMsg 'Waiting for debugger connection...'
 
 # Called before Kernel runs. Inits debug stub, etc
 procedure Init {

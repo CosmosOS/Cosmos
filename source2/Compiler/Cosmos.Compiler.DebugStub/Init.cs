@@ -11,10 +11,13 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
-			new Comment("Todo: Change to a group level var");
+			new Comment("Todo: Change these to a group level var");
 
 			new Comment("X#: var ..DebugBPs int[256]");
 			mAssembler.DataMembers.Add(new DataMember("DebugBPs", new int[256]));
+
+			new Comment("X#: var ..DebugWaitMsg 'Waiting for debugger connection...'");
+			mAssembler.DataMembers.Add(new DataMember("DebugWaitMsg", "Waiting for debugger connection..."));
 
 			new Comment("Called before Kernel runs. Inits debug stub, etc");
 
