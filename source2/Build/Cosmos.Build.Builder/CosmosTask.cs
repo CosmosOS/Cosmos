@@ -88,7 +88,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected override void DoRun() {
-      mOutputPath = mCosmosPath + @"\Build\VSIP";
+      mOutputPath = Path.Combine(mCosmosPath, @"Build\VSIP");
       if (!Directory.Exists(mOutputPath)) {
         Directory.CreateDirectory(mOutputPath);
       }
@@ -133,13 +133,13 @@ namespace Cosmos.Build.Builder {
     void CompileXSharpCompiler() {
       Section("Compiling X# Compiler");
 
-      MsBuild(mCosmosPath + @"\source2\XSharp.sln", "Debug");
+      MsBuild(mCosmosPath + @"source2\XSharp.sln", "Debug");
     }
 
     void CompileXSharpSource() {
       Section("Compiling X# Sources");
       
-      var xFiles = Directory.GetFiles(mCosmosPath + @"\source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
+      var xFiles = Directory.GetFiles(mCosmosPath + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
       foreach (var xFile in xFiles) {
         Echo("Compiling " + Path.GetFileName(xFile));
         string xDest = Path.ChangeExtension(xFile, ".cs");
@@ -162,14 +162,14 @@ namespace Cosmos.Build.Builder {
       Section("Copying Templates");
 
       CD(mOutputPath);
-      SrcPath = mCosmosPath + @"\source2\VSIP\Cosmos.VS.Package\obj\x86\Debug";
+      SrcPath = Path.Combine(mCosmosPath, @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug");
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");
       Copy("Cosmos.zip");
       Copy("CosmosProject (VB).zip");
       Copy("CosmosKernel (VB).zip");
-      Copy(mCosmosPath + @"\source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip");
+      Copy(mCosmosPath + @"source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip");
     }
 
     void CreateSetup() {
