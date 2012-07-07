@@ -159,7 +159,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class InitSerial : CodeBlock {
+    public class InitSerial2 : CodeBlock {
       public override void Assemble() {
         // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
 

@@ -118,15 +118,17 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Todo ebp frame ptr auto etc");
 
-			new Comment("Input - Address on stack as x32");
+			new Comment("Inputs");
 
-			new Comment("X#: procedure InitSerial2 {");
-			new Label("DebugStub_InitSerial2");
+			new Comment("-DX - Serial Port Address");
+
+			new Comment("X#: procedure InitSerial {");
+			new Label("DebugStub_InitSerial");
 
 			new Comment("Disable interrupts");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: BX = DX");
+			new Mov{ DestinationReg = RegistersEnum.BX, SourceReg = RegistersEnum.DX };
 
 			new Comment("X#: DX + 1");
 			new INC { DestinationReg = RegistersEnum.DX };
@@ -139,8 +141,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Enable DLAB (set baud rate divisor)");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: DX = BX");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.BX };
 
 			new Comment("X#: DX + 3");
 			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 3 };
@@ -161,8 +163,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Set divisor (lo byte)");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: DX = BX");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.BX };
 
 			new Comment("X#: AL = $01");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 0x01 };
@@ -172,8 +174,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("hi byte");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: DX = BX");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.BX };
 
 			new Comment("X#: DX + 1");
 			new INC { DestinationReg = RegistersEnum.DX };
@@ -186,8 +188,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("8N1");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: DX = BX");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.BX };
 
 			new Comment("X#: DX + 3");
 			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 3 };
@@ -206,8 +208,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("either. IRQ is enabled/diabled separately");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: DX = BX");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.BX };
 
 			new Comment("X#: DX + 2");
 			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 2 };
@@ -226,8 +228,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Send 0x03 if no AFE");
 
-			new Comment("X#: DX = ESP[4]");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+			new Comment("X#: DX = BX");
+			new Mov{ DestinationReg = RegistersEnum.DX, SourceReg = RegistersEnum.BX };
 
 			new Comment("X#: DX + 4");
 			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 4 };
@@ -239,7 +241,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Out { DestinationReg = RegistersEnum.AL};
 
 			new Comment("X#: }");
-			new Label("DebugStub_InitSerial2_Exit");
+			new Label("DebugStub_InitSerial_Exit");
 			new Return();
 
 		}

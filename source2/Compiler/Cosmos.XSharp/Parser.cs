@@ -86,6 +86,9 @@ namespace Cosmos.Compiler.XSharp {
       if (mAllWhitespace && "#!".Contains(xChar1)) {
         rPos = mData.Length; // This will account for the dummy whitespace at the end.
         xString = mData.Substring(mStart + 1, rPos - mStart - 1).Trim();
+        // So ToString/Format wont generate error
+        xString = xString.Replace("{", "{{");
+        xString = xString.Replace("}", "}}");
         if (xChar1 == '#') {
           xToken.Type = TokenType.Comment;
         } else if (xChar1 == '!') {

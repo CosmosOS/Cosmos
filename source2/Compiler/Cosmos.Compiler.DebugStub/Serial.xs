@@ -52,16 +52,17 @@ procedure WriteALToComPort {
 
 # Todo Auto params
 # Todo ebp frame ptr auto etc
-# Input - Address on stack as x32
-procedure InitSerial2 {
+# Inputs
+#  -DX - Serial Port Address
+procedure InitSerial {
 	# Disable interrupts
-	DX = ESP[4]
+	BX = DX
 	DX + 1
 	AL = 0
 	Port[DX] = AL
 
 	# Enable DLAB (set baud rate divisor)
-	DX = ESP[4]
+	DX = BX
 	DX + 3
 	AL = $80
 	Port[DX] = AL
@@ -71,17 +72,17 @@ procedure InitSerial2 {
 	# 0x03, 0x00 - 38400
 	#
 	# Set divisor (lo byte)
-	DX = ESP[4]
+	DX = BX
 	AL = $01
 	Port[DX] = AL
 	# hi byte
-	DX = ESP[4]
+	DX = BX
 	DX + 1
 	AL = $00
 	Port[DX] = AL
 
 	# 8N1
-	DX = ESP[4]
+	DX = BX
 	DX + 3
 	AL = $03
 	Port[DX] = AL
@@ -90,7 +91,7 @@ procedure InitSerial2 {
 	# Set 14-byte threshold for IRQ.
 	# We dont use IRQ, but you cant set it to 0
 	# either. IRQ is enabled/diabled separately
-	DX = ESP[4]
+	DX = BX
 	DX + 2
 	AL = $C7
 	Port[DX] = AL
@@ -99,7 +100,7 @@ procedure InitSerial2 {
 	# 0x02 RTS
 	# 0x01 DTR
 	# Send 0x03 if no AFE
-	DX = ESP[4]
+	DX = BX
 	DX + 4
 	AL = $03
 	Port[DX] = AL
