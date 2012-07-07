@@ -17,7 +17,7 @@ namespace Cosmos.Debug.DebugStub {
       // Old method, need to convert to fields
       mAsm.DataMembers.AddRange(new DataMember[]{
         // Breakpoint addresses
-        new DataMember("DebugBPs", new int[256]),
+        //new DataMember("DebugBPs", new int[256]),
         //TODO: Move to DebugStub (new)
         new DataMember("DebugWaitMsg", "Waiting for debugger connection...")
       });

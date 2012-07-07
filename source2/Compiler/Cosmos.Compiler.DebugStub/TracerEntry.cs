@@ -5,6 +5,9 @@ using Cosmos.Assembler.x86;
 
 namespace Cosmos.Debug.DebugStub {
 	public class TracerEntry : Cosmos.Assembler.Code {
+
+		public TracerEntry(Assembler.Assembler aAssembler) : base(aAssembler) {}
+
 		public override void Assemble() {
 			new Comment("We need to make sure Int3 can never run more than one instance at a time.");
 

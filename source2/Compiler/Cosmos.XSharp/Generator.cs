@@ -47,8 +47,11 @@ namespace Cosmos.Compiler.XSharp {
       mOutput.WriteLine("using Cosmos.Assembler;");
       mOutput.WriteLine("using Cosmos.Assembler.x86;");
       mOutput.WriteLine();
-      mOutput.WriteLine("namespace {0} {{", aNamespace);
-      mOutput.WriteLine("\tpublic class {0} : Cosmos.Assembler.Code {{", aClassname);
+      mOutput.WriteLine("namespace " + aNamespace + " {");
+      mOutput.WriteLine("\tpublic class " + aClassname + " : Cosmos.Assembler.Code {");
+      mOutput.WriteLine();
+      mOutput.WriteLine("\t\tpublic " + aClassname + "(Assembler.Assembler aAssembler) : base(aAssembler) {}");
+      mOutput.WriteLine();
       mOutput.WriteLine("\t\tpublic override void Assemble() {");
     }
 

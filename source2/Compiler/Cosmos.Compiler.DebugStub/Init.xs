@@ -1,5 +1,8 @@
 ﻿Group DebugStub
 
+# Todo: Change to a group level var
+var ..DebugBPs int[256]
+
 # Called before Kernel runs. Inits debug stub, etc
 procedure Init {
     Call .Cls

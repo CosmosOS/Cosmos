@@ -147,6 +147,25 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
+      AddPattern("var _ABC 'Text'",
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          string xLabel = GetLabel(aTokens[1]);
+          rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", \"" + aTokens[2].Value + "\"));");
+        }
+      );
+      AddPattern("var _ABC 123",
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          string xLabel = GetLabel(aTokens[1]);
+          rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", \"" + aTokens[2].Value + "\"));");
+        }
+      );
+      AddPattern("var _ABC _ABC[123]",
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          string xLabel = GetLabel(aTokens[1]);
+          rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
+        }
+      );
+
       AddPattern(new string[] {
           "if < goto _ABC", 
           "if > goto _ABC", 
@@ -337,7 +356,7 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("new Label(\"" + mGroup + "_{1}\");");
       });
 
-      AddPattern("Checkpoint ''", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
         // This method emits a lot of ASM, but thats what we want becuase
         // at this point we need ASM as simple as possible and completely transparent.
         // No stack changes, no register mods, no calls, no jumps, etc.

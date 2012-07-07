@@ -5,8 +5,16 @@ using Cosmos.Assembler.x86;
 
 namespace Cosmos.Debug.DebugStub {
 	public class Init : Cosmos.Assembler.Code {
+
+		public Init(Assembler.Assembler aAssembler) : base(aAssembler) {}
+
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
+
+			new Comment("Todo: Change to a group level var");
+
+			new Comment("X#: var ..DebugBPs int[256]");
+			mAssembler.DataMembers.Add(new DataMember("DebugBPs", new int[256]));
 
 			new Comment("Called before Kernel runs. Inits debug stub, etc");
 

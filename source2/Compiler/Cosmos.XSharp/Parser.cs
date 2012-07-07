@@ -26,6 +26,7 @@ namespace Cosmos.Compiler.XSharp {
       + ",JUMP"
       + ",POPALL,PUSHALL,PROCEDURE,PORT"
       + ",RETURN,RETURNINTERRUPT"
+      + ",VAR"
     ).Split(mComma);
 
     public static readonly string[] Registers;

@@ -5,6 +5,9 @@ using Cosmos.Assembler.x86;
 
 namespace Cosmos.Debug.DebugStub {
 	public class Screen : Cosmos.Assembler.Code {
+
+		public Screen(Assembler.Assembler aAssembler) : base(aAssembler) {}
+
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
