@@ -112,7 +112,6 @@
     <None Include="Cosmos.snk" />
     <None Include="Init.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Init.cs</LastGenOutput>
     </None>
     <None Include="Screen.xs">
       <Generator>CosmosXSharpGenerator</Generator>
