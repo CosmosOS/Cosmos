@@ -16,7 +16,7 @@ namespace Cosmos.Compiler.XSharp {
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected string mGroup;
-    protected string mProcedureName;
+    protected string mProcedureName = null;
     protected bool mInIntHandler;
 
     public TokenPatterns() {
@@ -55,12 +55,20 @@ namespace Cosmos.Compiler.XSharp {
       }
 
       string xValue = aToken.Value;
-      if (xValue.StartsWith("..")) {
-        return xValue.Substring(2);
-      } else if (xValue.StartsWith(".")) {
-        return GroupLabel(xValue.Substring(1));
+
+      if (mProcedureName == null) {
+        if (xValue.StartsWith(".")) {
+          return xValue.Substring(1);
+        } 
+        return GroupLabel(xValue);
+      } else {
+        if (xValue.StartsWith("..")) {
+          return xValue.Substring(2);
+        } else if (xValue.StartsWith(".")) {
+          return GroupLabel(xValue.Substring(1));
+        }
+        return ProcLabel(xValue);
       }
-      return ProcLabel(xValue);
     }
 
     protected string GetDestRegister(TokenList aTokens, int aIdx) {
@@ -399,6 +407,7 @@ namespace Cosmos.Compiler.XSharp {
         } else {
           rCode.Add("new Return();");
         }
+        mProcedureName = null;
       });
 
       AddPattern("Group _ABC", delegate(TokenList aTokens, ref List<string> rCode) {

@@ -2,7 +2,7 @@
 
 # mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
 # Currently hardcoded to COM1.
-var .ComAddr = $03F8
+var ComAddr = $03F8
 
 # All information relating to our serial usage should be documented in this comment.
 # http://wiki.osdev.org/Serial_ports
