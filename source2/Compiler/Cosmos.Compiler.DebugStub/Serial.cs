@@ -422,6 +422,38 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_ComWrite8_Exit");
 			new Return();
 
+			new Comment("X#: procedure ComWrite16 {");
+			new Label("DebugStub_ComWrite16");
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComWrite16_Exit");
+			new Return();
+
+			new Comment("X#: procedure ComWrite32 {");
+			new Label("DebugStub_ComWrite32");
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComWrite32_Exit");
+			new Return();
+
 		}
 	}
 }

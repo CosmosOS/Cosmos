@@ -183,3 +183,13 @@ Wait:
 
 	ESI++
 }
+procedure ComWrite16 {
+	Call .ComWrite8
+	Call .ComWrite8
+}
+procedure ComWrite32 {
+	Call .ComWrite8
+	Call .ComWrite8
+	Call .ComWrite8
+	Call .ComWrite8
+}
