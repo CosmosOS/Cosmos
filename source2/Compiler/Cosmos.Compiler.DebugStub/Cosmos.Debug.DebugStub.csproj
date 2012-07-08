@@ -84,12 +84,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CmdSend.xs</DependentUpon>
     </Compile>
+    <Compile Include="DebugStub.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DebugStub.xs</DependentUpon>
+    </Compile>
     <Compile Include="Init.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Init.xs</DependentUpon>
     </Compile>
-    <Compile Include="Old\CmdAsmBreak.cs" />
     <Compile Include="Old\Consts.cs" />
     <Compile Include="Old\DebugStub.cs" />
     <Compile Include="Old\ProcessCmds.cs" />
@@ -147,6 +151,10 @@
       <LastGenOutput>CmdSend.cs</LastGenOutput>
     </None>
     <None Include="Cosmos.snk" />
+    <None Include="DebugStub.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>DebugStub.cs</LastGenOutput>
+    </None>
     <None Include="Init.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Init.cs</LastGenOutput>

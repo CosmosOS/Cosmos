@@ -127,10 +127,10 @@ namespace Cosmos.Debug.DebugStub {
       void CheckForAsmBreak() {
         EAX = CallerEIP.Value;
         // AsmBreakEIP is 0 when disabled, but EIP can never be 0 so we dont need a separate check.
-        EAX.Compare(AsmBreakEIP.Value);
+        Call("DebugStub_HackCompareAsmBreakEIP");
         JumpIf(Flags.NotEqual, ".AsmBreakAfter");
 
-        Call<ClearAsmBreak>();
+        Call("DebugStub_ClearAsmBreak");
         Call<Break>();
         Jump(".Normal");
 
@@ -201,7 +201,7 @@ namespace Cosmos.Debug.DebugStub {
           {
             AL.Compare(VsipDs.SetAsmBreak);
             JumpIf(Flags.NotEqual, ".SetAsmBreak_After");
-            Call<SetAsmBreak>();
+            Call("DebugStub_SetAsmBreak");
             Jump(".WaitCmd");
             Label = ".SetAsmBreak_After";
           }

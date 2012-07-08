@@ -36,7 +36,9 @@ namespace XSharpCompilerTester {
       Test("Serial.xs");
       Test("Screen.xs");
       Test("Init.xs");
-      Test("Commands.xs");
+      Test("CmdMisc.xs");
+      Test("CmdAsmBreak.xs");
+      Test("DebugStub.xs");
     }
   }
 }

@@ -147,16 +147,22 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      AddPattern("var _ABC = 'Text'",
+      AddPattern("var _ABC",
         delegate(TokenList aTokens, ref List<string> rCode) {
           string xLabel = GetLabel(aTokens[1]);
-          rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", \"" + aTokens[3].Value + "\"));");
+          rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", 0));");
         }
       );
       AddPattern("var _ABC = 123",
         delegate(TokenList aTokens, ref List<string> rCode) {
           string xLabel = GetLabel(aTokens[1]);
           rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", " + aTokens[3].Value + "));");
+        }
+      );
+      AddPattern("var _ABC = 'Text'",
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          string xLabel = GetLabel(aTokens[1]);
+          rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", \"" + aTokens[3].Value + "\"));");
         }
       );
       AddPattern("var _ABC _ABC[123]",
@@ -181,10 +187,27 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
+      AddPattern(new string[] {
+          "if 0 Exit", 
+          "if < Exit", 
+          "if > Exit", 
+          "if = Exit",
+          "if != Exit",
+          "if <= Exit", 
+          "if >= Exit" 
+        },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          var xCondition = GetCondition(aTokens[1]);
+          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
+        }
+      );
       // Must test separate since !0 is two tokens
       AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = GetLabel(aTokens[4]);
         rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.NotZero, DestinationLabel = " + Quoted(xLabel) + " }};");
+      });
+      AddPattern("if !0 Exit", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.NotZero, DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
       });
 
       AddPattern(new string[] {
@@ -204,10 +227,30 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
+      AddPattern(new string[] {
+          //0 1  2  3  4 5  6    
+          "if (_REG < 123) Exit",
+          "if (_REG > 123) Exit",
+          "if (_REG = 123) Exit",
+          "if (_REG != 123) Exit",
+          "if (_REG <= 123) Exit",
+          "if (_REG >= 123) Exit"
+        },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
 
-      AddPattern("_REG ? 123",
+          var xCondition = GetCondition(aTokens[3]);
+          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
+        }
+      );
+
+      AddPattern("_REG ?= 123",
         "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
+      AddPattern("_REG ?= _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = GetLabel(aTokens[2]);
+        rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{0}, SourceIsIndirect = true, SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ") }};");
+      });
 
       AddPattern("_REG ?& 123",
         "new Test {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
