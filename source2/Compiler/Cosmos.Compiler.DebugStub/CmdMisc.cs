@@ -4,9 +4,9 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 
 namespace Cosmos.Debug.DebugStub {
-	public class Commands : Cosmos.Assembler.Code {
+	public class CmdMisc : Cosmos.Assembler.Code {
 
-		public Commands(Assembler.Assembler aAssembler) : base(aAssembler) {}
+		public CmdMisc(Assembler.Assembler aAssembler) : base(aAssembler) {}
 
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
@@ -31,7 +31,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Tracing.On");
 
-			new Comment(".TraceMode = 1");
+			new Comment("X#: .TraceMode = 1");
+			new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("DebugStub_TraceMode"), DestinationIsIndirect = true , SourceValue = 1 };
 
 			new Comment("X#: }");
 			new Label("DebugStub_TraceOn_Exit");
@@ -42,7 +43,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Tracing.Off");
 
-			new Comment(".TraceMode = 0");
+			new Comment("X#: .TraceMode = 0");
+			new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("DebugStub_TraceMode"), DestinationIsIndirect = true , SourceValue = 0 };
 
 			new Comment("X#: }");
 			new Label("DebugStub_TraceOff_Exit");

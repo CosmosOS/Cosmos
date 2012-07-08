@@ -64,10 +64,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands.cs">
+    <Compile Include="CmdAsmBreak.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Commands.xs</DependentUpon>
+      <DependentUpon>CmdAsmBreak.xs</DependentUpon>
+    </Compile>
+    <Compile Include="CmdMisc.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdMisc.xs</DependentUpon>
+    </Compile>
+    <Compile Include="CmdProcess.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdProcess.xs</DependentUpon>
+    </Compile>
+    <Compile Include="CmdSend.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdSend.xs</DependentUpon>
     </Compile>
     <Compile Include="Init.cs">
       <AutoGen>True</AutoGen>
@@ -115,9 +130,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Commands.xs">
+    <None Include="CmdAsmBreak.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Commands.cs</LastGenOutput>
+      <LastGenOutput>CmdAsmBreak.cs</LastGenOutput>
+    </None>
+    <None Include="CmdMisc.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>CmdMisc.cs</LastGenOutput>
+    </None>
+    <None Include="CmdProcess.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>CmdProcess.cs</LastGenOutput>
+    </None>
+    <None Include="CmdSend.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>CmdSend.cs</LastGenOutput>
     </None>
     <None Include="Cosmos.snk" />
     <None Include="Init.xs">
