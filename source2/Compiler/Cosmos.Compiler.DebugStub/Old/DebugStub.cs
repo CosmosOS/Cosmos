@@ -160,8 +160,8 @@ namespace Cosmos.Debug.DebugStub {
 
         // Is there a new incoming command? We dont want to wait for one
         // if there isn't one already here. This is a non blocking check.
-        Label = ".CheckForCmd"; 
-        DX = (ushort)(mComAddr + 5u);
+        Label = ".CheckForCmd";
+        DX = (ushort)(0x3F8 + 5u);
         AL = Port[DX];
         AL.Test(0x01);
         // If a command is waiting, process it and then check for another.

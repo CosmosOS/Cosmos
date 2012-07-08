@@ -75,7 +75,6 @@
     <Compile Include="Old\ComPort.cs" />
     <Compile Include="Old\Consts.cs" />
     <Compile Include="Old\DebugStub.cs" />
-    <Compile Include="Old\Init.cs" />
     <Compile Include="Old\ProcessCmds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Old\CmdSend.cs" />

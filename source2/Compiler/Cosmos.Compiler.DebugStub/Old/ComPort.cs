@@ -9,10 +9,6 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    static public int mComNo = 0;
-    static protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
-    static public UInt16 mComAddr;
-    static public UInt16 mComStatusAddr;
 
     public abstract class Inlines : CodeBlock {
       // INLINE
