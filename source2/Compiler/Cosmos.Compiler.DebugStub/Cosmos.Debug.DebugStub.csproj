@@ -72,7 +72,6 @@
     <Compile Include="Old\CmdAsmBreak.cs" />
     <Compile Include="Old\CmdPing.cs" />
     <Compile Include="Old\CmdTrace.cs" />
-    <Compile Include="Old\ComPort.cs" />
     <Compile Include="Old\Consts.cs" />
     <Compile Include="Old\DebugStub.cs" />
     <Compile Include="Old\ProcessCmds.cs" />

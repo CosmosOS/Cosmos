@@ -30,7 +30,7 @@ namespace Cosmos.Debug.DebugStub {
     // Command ID of last command received
     static protected DataMember32 CommandID;
 
-    public class BreakOnAddress : Inlines {
+    public class BreakOnAddress : CodeBlock {
       // Sets a breakpoint
       // Serial Params:
       //   1: x32 - EIP to break on, or 0 to disable breakpoint.

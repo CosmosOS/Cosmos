@@ -17,8 +17,8 @@ namespace Cosmos.Debug.DebugStub {
     // Old byte before INT3 was injected.
     // Only 1 byte is used.
     static public DataMember32 AsmOrigByte;
-    
-    public class SetAsmBreak : Inlines {
+
+    public class SetAsmBreak : CodeBlock {
       public override void Assemble() {
         Call("DebugStub_ComReadEAX");
         EDI = EAX;
@@ -32,7 +32,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class ClearAsmBreak : Inlines {
+    public class ClearAsmBreak : CodeBlock {
       public override void Assemble() {
         EDI = AsmBreakEIP.Value;
         EDI.Compare(0);

@@ -9,7 +9,7 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class Ping : Inlines {
+    public class Ping : CodeBlock {
       public override void Assemble() {
         AL = DsVsip.Pong;
         Call("DebugStub_ComWriteAL");

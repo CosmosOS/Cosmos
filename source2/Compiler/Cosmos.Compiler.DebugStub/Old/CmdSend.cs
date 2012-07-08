@@ -9,7 +9,7 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class SendRegisters : Inlines {
+    public class SendRegisters : CodeBlock {
       public override void Assemble() {
         AL = (int)DsVsip.Registers; // Send the actual started signal
         Call("DebugStub_ComWriteAL");
@@ -24,7 +24,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendFrame : Inlines {
+    public class SendFrame : CodeBlock {
       public override void Assemble() {
         AL = (int)DsVsip.Frame;
         Call("DebugStub_ComWriteAL");
@@ -62,7 +62,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendMethodContext : Inlines {
+    public class SendMethodContext : CodeBlock {
       // sends a stack value
       // Serial Params:
       //  1: x32 - offset relative to EBP
@@ -93,7 +93,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendMemory : Inlines {
+    public class SendMemory : CodeBlock {
       // sends a stack value
       // Serial Params:
       //  1: x32 - offset relative to EBP
@@ -122,7 +122,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendTrace : Inlines {
+    public class SendTrace : CodeBlock {
       // Modifies: EAX, ESI
       public override void Assemble() {
         DebugStatus.Value.Compare(Status.Run);
@@ -142,7 +142,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendText : Inlines {
+    public class SendText : CodeBlock {
       // Input: Stack
       // Output: None
       // Modifies: EAX, ECX, EDX, ESI
@@ -171,7 +171,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendPtr : Inlines {
+    public class SendPtr : CodeBlock {
       // Input: Stack
       // Output: None
       // Modifies: EAX, ECX, EDX, ESI
