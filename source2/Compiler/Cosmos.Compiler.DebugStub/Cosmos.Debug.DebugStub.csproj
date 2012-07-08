@@ -64,6 +64,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Init.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Init.xs</DependentUpon>
+    </Compile>
     <Compile Include="Old\CmdAsmBreak.cs" />
     <Compile Include="Old\CmdPing.cs" />
     <Compile Include="Old\CmdTrace.cs" />
@@ -78,6 +83,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Screen.xs</DependentUpon>
+    </Compile>
+    <Compile Include="Serial.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Serial.xs</DependentUpon>
     </Compile>
     <Compile Include="TracerEntry.cs">
       <AutoGen>True</AutoGen>
@@ -115,6 +125,7 @@
     </None>
     <None Include="Serial.xs">
       <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>Serial.cs</LastGenOutput>
     </None>
     <None Include="TracerEntry.xs">
       <Generator>CosmosXSharpGenerator</Generator>

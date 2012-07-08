@@ -1,6 +1,6 @@
 ﻿Group DebugStub
 
-var ComAddr = 
+var ComAddr = $03F8
 
 # Input: AL
 # Output: None
