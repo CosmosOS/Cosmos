@@ -8,12 +8,12 @@ BeginLoop:
 	# Text
     AL = $00
     ESI[0] = AL
-    ESI + 1
+    ESI++
 
 	# Colour
     AL = $0A
     ESI[0] = AL
-    ESI + 1
+    ESI++
 	
 	# End of Video Area
 	# VidBase + 25 * 80 * 2 = B8FA0
@@ -36,7 +36,7 @@ procedure DisplayWaitMsg {
 ReadChar:
     AL = ESI[0]
     if (AL = 0) goto AfterMsg
-    ESI + 1
+    ESI++
     EDI[0] = AL
     EDI + 2
     Goto ReadChar

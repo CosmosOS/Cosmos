@@ -53,7 +53,7 @@ InterruptHandler TracerEntry {
 	# Note - when we used call it was 5 (size of our call + address)
 	# so we get the EIP as IL2CPU records it. Its also useful for when we
 	# wil be changing ops that call this stub.
-	EAX - 1
+	EAX--
 
 	# Store it for later use.
 	.CallerEIP = EAX
