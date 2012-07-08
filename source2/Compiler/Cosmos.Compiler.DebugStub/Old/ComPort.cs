@@ -26,13 +26,7 @@ namespace Cosmos.Debug.DebugStub {
           EDI = ESP;
 
           // Read address to stack via EDI
-          ReadBytesFromComPort(4);
-        }
-      }
-
-      protected void ReadBytesFromComPort(int xCount) {
-        for (int i = 1; i <= xCount; i++) {
-          Call("DebugStub_ReadByteFromComPort");
+          Call("DebugStub_ComRead32");
         }
       }
 

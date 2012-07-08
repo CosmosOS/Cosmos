@@ -130,10 +130,21 @@ Wait:
 # Modified: AL, DX, EDI (+1)
 #
 # Reads a byte into [EDI] and does EDI + 1
-procedure ReadByteFromComPort  {
+procedure ComRead8  {
     Call .ReadALFromComPort
     EDI[0] = AL
     EDI + 1
+}
+
+procedure ComRead16 {
+	Call .ComRead8
+	Call .ComRead8
+}
+procedure ComRead32 {
+	Call .ComRead8
+	Call .ComRead8
+	Call .ComRead8
+	Call .ComRead8
 }
 
 procedure WriteByteToComPort {

@@ -295,8 +295,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Reads a byte into [EDI] and does EDI + 1");
 
-			new Comment("X#: procedure ReadByteFromComPort  {");
-			new Label("DebugStub_ReadByteFromComPort");
+			new Comment("X#: procedure ComRead8  {");
+			new Label("DebugStub_ComRead8");
 
 			new Comment("X#: Call .ReadALFromComPort");
 			new Call { DestinationLabel = "DebugStub_ReadALFromComPort" };
@@ -308,7 +308,39 @@ namespace Cosmos.Debug.DebugStub {
 			new INC { DestinationReg = RegistersEnum.EDI };
 
 			new Comment("X#: }");
-			new Label("DebugStub_ReadByteFromComPort_Exit");
+			new Label("DebugStub_ComRead8_Exit");
+			new Return();
+
+			new Comment("X#: procedure ComRead16 {");
+			new Label("DebugStub_ComRead16");
+
+			new Comment("X#: Call .ComRead8");
+			new Call { DestinationLabel = "DebugStub_ComRead8" };
+
+			new Comment("X#: Call .ComRead8");
+			new Call { DestinationLabel = "DebugStub_ComRead8" };
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComRead16_Exit");
+			new Return();
+
+			new Comment("X#: procedure ComRead32 {");
+			new Label("DebugStub_ComRead32");
+
+			new Comment("X#: Call .ComRead8");
+			new Call { DestinationLabel = "DebugStub_ComRead8" };
+
+			new Comment("X#: Call .ComRead8");
+			new Call { DestinationLabel = "DebugStub_ComRead8" };
+
+			new Comment("X#: Call .ComRead8");
+			new Call { DestinationLabel = "DebugStub_ComRead8" };
+
+			new Comment("X#: Call .ComRead8");
+			new Call { DestinationLabel = "DebugStub_ComRead8" };
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComRead32_Exit");
 			new Return();
 
 			new Comment("X#: procedure WriteByteToComPort {");
