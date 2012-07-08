@@ -321,6 +321,9 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
       });
+      AddPattern("_REG++", 
+        "new INC {{ DestinationReg = RegistersEnum.{0} }};"
+      );
 
       AddPattern("_REG - 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
@@ -329,6 +332,9 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
       });
+      AddPattern("_REG--",
+        "new Dec {{ DestinationReg = RegistersEnum.{0} }};"
+      );
 
       AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("new Label(\"" + mGroup + "_" + mProcedureName + "_Exit\");");
