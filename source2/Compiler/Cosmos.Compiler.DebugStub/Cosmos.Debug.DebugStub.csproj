@@ -64,13 +64,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Commands.xs</DependentUpon>
+    </Compile>
     <Compile Include="Init.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Init.xs</DependentUpon>
     </Compile>
     <Compile Include="Old\CmdAsmBreak.cs" />
-    <Compile Include="Old\CmdPing.cs" />
     <Compile Include="Old\CmdTrace.cs" />
     <Compile Include="Old\Consts.cs" />
     <Compile Include="Old\DebugStub.cs" />
@@ -112,6 +116,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Commands.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>Commands.cs</LastGenOutput>
+    </None>
     <None Include="Cosmos.snk" />
     <None Include="Init.xs">
       <Generator>CosmosXSharpGenerator</Generator>
