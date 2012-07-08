@@ -109,6 +109,17 @@ procedure InitSerial {
 	Port[DX] = AL
 }
 
+# Input: EDI
+# Output: [EDI]
+# Modified: AL, DX, EDI (+1)
+#
+# Reads a byte into [EDI] and does EDI + 1
+procedure ReadByteFromComPort  {
+    Call .ReadALFromComPort
+    EDI[0] = AL
+    EDI + 1
+}
+
 procedure WriteByteToComPort {
 	# Input: ESI
 	# Output: None
