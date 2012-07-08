@@ -10,6 +10,9 @@ namespace Cosmos.Build.Builder {
     public static bool IsUserKit;
     public static bool ResetHive;
     public static bool StayOpen;
+    public static bool UseTask;
+    public static bool InstallTask;
+    public static bool IgnoreVS;
 
     protected override void OnStartup(StartupEventArgs e) {
       var xArgs = new string[e.Args.Length];
@@ -19,6 +22,9 @@ namespace Cosmos.Build.Builder {
       IsUserKit = xArgs.Contains("-USERKIT");
       ResetHive = xArgs.Contains("-RESETHIVE");
       StayOpen = xArgs.Contains("-STAYOPEN");
+      UseTask = !xArgs.Contains("-NOTASK");
+      InstallTask = xArgs.Contains("-INSTALLTASK");
+      IgnoreVS = xArgs.Contains("-IGNOREVS");
       base.OnStartup(e);
     }
   }

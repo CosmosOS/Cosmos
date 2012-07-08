@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Cosmos.Build.Installer {
   public abstract class Task {
@@ -17,6 +18,27 @@ namespace Cosmos.Build.Installer {
         Log.WriteLine(ex.Message);
         Log.SetError();
       }
+    }
+
+    public bool IsRunning(string aName) {
+      var xList = Process.GetProcessesByName(aName);
+      return xList.Length > 0;
+    }
+
+    public void WaitForExit(string aName) {
+      WaitForExit(aName, null);
+    }
+    public bool WaitForExit(string aName, int? aMilliSec) {
+      while (IsRunning(aName)) {
+        if (aMilliSec.HasValue && aMilliSec <= 0) {
+          return true;
+        }
+        Thread.Sleep(200);
+        if (aMilliSec.HasValue) {
+          aMilliSec = aMilliSec - 200;
+        }
+      }
+      return false;
     }
 
     public void StartConsole(string aExe, string aParams) {
@@ -52,18 +74,20 @@ namespace Cosmos.Build.Installer {
     }
 
     public void Start(string aExe, string aParams) {
-      Start(aExe, aParams, true);
+      Start(aExe, aParams, true, true);
     }
-    public void Start(string aExe, string aParams, bool aWait) {
+    public void Start(string aExe, string aParams, bool aWait, bool aShowWindow) {
       Log.WriteLine("Starting: " + aExe);
       Log.WriteLine("  Params: " + aParams);
 
-      var xStart = new ProcessStartInfo();
-      xStart.FileName = aExe;
-      xStart.WorkingDirectory = CurrPath;
-      xStart.Arguments = aParams;
-      xStart.UseShellExecute = false;
-      using (var xProcess = Process.Start(xStart)) {
+      using (var xProcess = new Process()) {
+        var xPSI = xProcess.StartInfo;
+        xPSI.FileName = aExe;
+        xPSI.WorkingDirectory = CurrPath;
+        xPSI.Arguments = aParams;
+        xPSI.UseShellExecute = false;
+        xPSI.CreateNoWindow = !aShowWindow;
+        xProcess.Start();
         if (aWait) {
           xProcess.WaitForExit();
           if (xProcess.ExitCode != 0) {

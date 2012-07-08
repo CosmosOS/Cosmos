@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -15,12 +16,16 @@ using System.Windows.Threading;
 using System.IO;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
+using TaskScheduler;
+using System.Reflection;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
     protected int mTailLineCount = 5;
     protected int mTailCurrent = 0;
     protected List<TextBlock> mTailLines = new List<TextBlock>();
+    protected string mCosmosPath;
+    protected int mReleaseNo = 7;
 
     public MainWindow() {
       InitializeComponent();
@@ -60,25 +65,75 @@ namespace Cosmos.Build.Builder {
     StringBuilder mClipboard = new StringBuilder();
     DispatcherTimer mCloseTimer;
 
-    public bool Build() {
-      string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
-      string xCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
-      int xReleaseNo = 7;
+    void InstallScheduledTask() {
+      ITaskService xService = new TaskScheduler.TaskScheduler();
+      xService.Connect();
 
+      ITaskDefinition xTaskDef = xService.NewTask(0);
+      xTaskDef.RegistrationInfo.Description = "Cosmos DevKit UAC Bypass";
+      xTaskDef.RegistrationInfo.Author = "Cosmos Group";
+      xTaskDef.Settings.Compatibility = _TASK_COMPATIBILITY.TASK_COMPATIBILITY_V2_1;
+      xTaskDef.Principal.RunLevel = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
+
+      IActionCollection xActions = xTaskDef.Actions;
+      IAction xAction = xActions.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
+      IExecAction xExecAction = xAction as IExecAction;
+      xExecAction.Path = Path.Combine(mCosmosPath + @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe");
+      xExecAction.Arguments = @"/SILENT";
+
+      ITaskFolder xFolder = xService.GetFolder(@"\");
+      // 6 as argument means this task can be created or updated ["CreateOrUpdate" flag]
+      // if Name id empty or null, System will create a task with name as GUID
+      xFolder.RegisterTaskDefinition("CosmosSetup", xTaskDef, 6, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
+    }
+
+    // http://yoursandmyideas.wordpress.com/2012/01/07/task-scheduler-in-c-net/
+    bool ScheduledTaskIsInstalled() {
+      ITaskService xService = new TaskScheduler.TaskScheduler();
+      xService.Connect();
+
+      var xTasks = new List<IRegisteredTask>();
+      ITaskFolder xFolder = xService.GetFolder(@"\");
+      foreach (IRegisteredTask xTask in xFolder.GetTasks(0)) {
+        if (string.Equals(xTask.Name, "CosmosSetup")) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    void InstallTaskAsAdmin() {
+      // Restart with UAC and just install scheduled task
+      using (var xProcess = new Process()) {
+        var xPSI = xProcess.StartInfo;
+        xPSI.UseShellExecute = true;
+        xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase;
+        xPSI.Arguments = "-InstallTask";
+        xPSI.Verb = "runas";
+        xProcess.Start();
+        xProcess.WaitForExit();
+      }
+    }
+
+    public bool Build() {
       if (App.IsUserKit) {
         string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
         if (string.IsNullOrEmpty(x)) {
           return false;
         }
-        xReleaseNo = int.Parse(x);
+        mReleaseNo = int.Parse(x);
+      } else {
+        if (App.UseTask) {
+          if (!ScheduledTaskIsInstalled()) {
+            InstallTaskAsAdmin();
+          }
+        }
       }
 
-      var xTask = new CosmosTask(xCosmosPath, xReleaseNo);
+      var xTask = new CosmosTask(mCosmosPath, mReleaseNo);
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
       xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
       xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
-      xTask.ResetHive = App.ResetHive;
-      xTask.IsUserKit = App.IsUserKit;
 
       var xThread = new System.Threading.Thread(delegate() {
         xTask.Run();
@@ -183,7 +238,12 @@ namespace Cosmos.Build.Builder {
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
-      if (!Build()) {
+      string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
+      mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
+      if (App.InstallTask) {
+        InstallScheduledTask();
+        Close();
+      } else if (!Build()) {
         Close();
       }
     }

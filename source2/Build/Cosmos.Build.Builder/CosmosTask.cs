@@ -6,14 +6,11 @@ using Cosmos.Build.Installer;
 using System.IO;
 using Microsoft.Win32;
 using System.Windows;
-using TaskScheduler;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
     protected string mCosmosPath;
-    public bool ResetHive { get; set; }
     protected string mOutputPath;
-    public bool IsUserKit { get; set; }
     protected int mReleaseNo;
     protected string mInnoFile;
 
@@ -34,6 +31,7 @@ namespace Cosmos.Build.Builder {
       return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\", "DisplayName");
     }
     protected bool CheckForProduct(string aCheck, bool aCanThrow, string aKey, string aValueName) {
+      Echo("Looking for " + aCheck);
       string xCheck = aCheck.ToUpper();
       string[] xKeys;
       using (var xKey = Registry.LocalMachine.OpenSubKey(aKey, false)) {
@@ -55,6 +53,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckNet35Sp1() {
+      Echo("Looking for .NET 3.5 SP1");
       bool xNet35SP1Installed = false;
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5", false)) {
         if (xKey != null) {
@@ -63,6 +62,20 @@ namespace Cosmos.Build.Builder {
       }
       if (!xNet35SP1Installed) {
         NotFound(".NET 3.5 SP1");
+      }
+    }
+
+    protected void CheckIsVsRunning() {
+      if (App.IgnoreVS) {
+        return;
+      }
+
+      Echo("Checking if Visual Studio is running.");
+
+      // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
+      // So we wait a few seconds first.
+      if (WaitForExit("devenv", 3000)) {
+        throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
       }
     }
 
@@ -77,6 +90,7 @@ namespace Cosmos.Build.Builder {
       // We assume they have normal .NET stuff if user was able to build the builder...
       //Visual Studio 2010
 
+      CheckIsVsRunning();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckForUninstall("Inno Setup QuickStart Pack", true);
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
@@ -94,19 +108,16 @@ namespace Cosmos.Build.Builder {
         Directory.CreateDirectory(mOutputPath);
       }
 
-      CheckScheduledTask();
-      return;
-
       CheckPrereqs();
       CompileXSharpCompiler();
       CompileXSharpSource();
       CompileCosmos();
       CopyTemplates();
-      if (IsUserKit) {
+      if (App.IsUserKit) {
         CreateUserKitScript();
       }
       CreateSetup();
-      if (!IsUserKit) {
+      if (!App.IsUserKit) {
         RunSetup();
         LaunchVS();
       }
@@ -194,10 +205,10 @@ namespace Cosmos.Build.Builder {
       if (!File.Exists(xISCC)) {
         throw new Exception("Cannot find Inno setup.");
       }
-      string xCfg = IsUserKit ? "UserKit" : "DevKit";
+      string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
       StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg);
 
-      if (IsUserKit) {
+      if (App.IsUserKit) {
         File.Delete(mInnoFile);
       }
     }
@@ -210,37 +221,25 @@ namespace Cosmos.Build.Builder {
         throw new Exception("Cannot find Visual Studio.");
       }
 
-      if (ResetHive) {
+      if (App.ResetHive) {
         Echo("Resetting hive");
         Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
       }
 
       Echo("Launching Visual Studio");
-      Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false);
-    }
-
-    bool mTaskIsInstalled = false;
-    void CheckScheduledTask() {
-      ITaskService xService = new TaskScheduler.TaskScheduler();
-      xService.Connect();
-      var xTasks = new List<IRegisteredTask>();
-      ITaskFolder xFolder = xService.GetFolder(@"\");
-      foreach (IRegisteredTask xTask in xFolder.GetTasks(0)) {
-        if (string.Equals(xTask.Name, "CosmosSetup")) {
-          mTaskIsInstalled = true;
-          break;
-        }
-      }
+      Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false, true);
     }
 
     void RunSetup() {
       Section("Running Setup");
 
-      // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
-      // the dev kit a lot.
-      CheckScheduledTask();
-      if (mTaskIsInstalled) {
-        Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"));
+      if (App.UseTask) {
+        // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
+        // the dev kit a lot.
+        Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
+
+        // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
+        WaitForExit("CosmosUserKit-" + mReleaseNo);
       } else {
         Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
       }
