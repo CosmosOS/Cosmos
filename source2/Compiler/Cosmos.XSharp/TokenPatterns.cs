@@ -265,7 +265,7 @@ namespace Cosmos.Compiler.XSharp {
           "AX = Port[DX]", 
           "EAX = Port[DX]"
         },
-        "new In {{ DestinationReg = RegistersEnum.{0}}};"
+        "new IN {{ DestinationReg = RegistersEnum.{0}}};"
       );
 
       AddPattern("+123",
