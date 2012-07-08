@@ -41,6 +41,10 @@ namespace Cosmos.Assembler.XSharp {
             return Instance;
         }
 
+        public static implicit operator RegisterEDI(RegisterEAX aValue) {
+          Instance.Move(aValue);
+          return Instance;
+        }
         public static implicit operator RegisterEDI(RegisterESP aValue) {
             Instance.Move(aValue.GetId());
             return Instance;
