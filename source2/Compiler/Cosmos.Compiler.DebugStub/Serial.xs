@@ -121,7 +121,7 @@ Wait:
 procedure ComRead8  {
     Call .ComReadAL
     EDI[0] = AL
-    EDI++
+    EDI + 1
 }
 procedure ComRead16 {
 	Call .ComRead8
@@ -181,15 +181,5 @@ Wait:
 	# Send the byte
 	Port[DX] = AL
 
-	ESI++
-}
-procedure ComWrite16 {
-	Call .ComWrite8
-	Call .ComWrite8
-}
-procedure ComWrite32 {
-	Call .ComWrite8
-	Call .ComWrite8
-	Call .ComWrite8
-	Call .ComWrite8
+	ESI + 1
 }

@@ -44,7 +44,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call("DebugStub_ComWrite16");
+        WriteBytesToComPort(2);
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();
@@ -58,7 +58,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         EAX.Push();
         ESI = ESP;
-        Call("DebugStub_ComWrite32");
+        WriteBytesToComPort(4);
         // Is a local var, cant use Return(4). X# issues the return.
         // This also allow the function to preserve EAX.
         EAX.Pop();

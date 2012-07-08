@@ -17,9 +17,9 @@ namespace Cosmos.Debug.DebugStub {
         ESI = PushAllPtr.Value;
         WriteBytesToComPort(32);
         ESI = CallerESP.Address;
-        Call("DebugStub_ComWrite32");
+        WriteBytesToComPort(4);
         ESI = CallerEIP.Address;
-        Call("DebugStub_ComWrite32");
+        WriteBytesToComPort(4);
       }
     }
 
@@ -140,7 +140,7 @@ namespace Cosmos.Debug.DebugStub {
 
         // Send Calling EIP.
         ESI = CallerEIP.Address;
-        Call("DebugStub_ComWrite32");
+        WriteBytesToComPort(4);
       }
     }
 
@@ -157,7 +157,7 @@ namespace Cosmos.Debug.DebugStub {
         ESI = EBP;
         ESI = ESI + 12;
         ECX = ESI[0];
-        Call("DebugStub_ComWrite16");
+        WriteBytesToComPort(2);
 
         // Address of string
         ESI = EBP[8];
@@ -184,7 +184,7 @@ namespace Cosmos.Debug.DebugStub {
 
         // pointer value
         ESI = EBP[8];
-        Call("DebugStub_ComWrite32");
+        WriteBytesToComPort(4);
       }
     }
   }
