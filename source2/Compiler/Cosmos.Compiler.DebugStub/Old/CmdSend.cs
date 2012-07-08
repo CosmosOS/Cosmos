@@ -56,7 +56,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".SendByte";
         ESI.Compare(CallerEBP.Value);
         JumpIf(Flags.Equal, ".Exit");
-        Call<WriteByteToComPort>();
+        Call("DebugStub_WriteByteToComPort");
         Jump(".SendByte");
       }
     }
@@ -85,7 +85,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".SendByte";
         ECX.Compare(0);
         JumpIf(Flags.Equal, ".AfterSendByte");
-        Call<WriteByteToComPort>();
+        Call("DebugStub_WriteByteToComPort");
         ECX--;
         Jump(".SendByte");
         Label = ".AfterSendByte";
@@ -116,7 +116,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = "DebugStub_SendMemory_SendByte";
         new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
         JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte");
-        Call<WriteByteToComPort>();
+        Call("DebugStub_WriteByteToComPort");
         ECX--;
         Jump("DebugStub_SendMemory_SendByte");
 
@@ -164,7 +164,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".WriteChar";
         ECX.Compare(0);
         JumpIf(Flags.Equal, ".Exit");
-        Call<WriteByteToComPort>();
+        Call("DebugStub_WriteByteToComPort");
         ECX--;
         // We are storing as 16 bits, but for now I will transmit 8 bits
         // So we inc again to skip the 0

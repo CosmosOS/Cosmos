@@ -84,11 +84,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Screen.xs</DependentUpon>
     </Compile>
-    <Compile Include="Serial.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Serial.xs</DependentUpon>
-    </Compile>
     <Compile Include="TracerEntry.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

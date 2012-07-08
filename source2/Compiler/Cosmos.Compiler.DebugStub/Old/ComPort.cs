@@ -61,7 +61,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class WriteByteToComPort : CodeBlock {
+    public class WriteByteToComPort2 : CodeBlock {
       // Input: ESI
       // Output: None
       // Modifies: EAX, EDX

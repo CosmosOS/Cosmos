@@ -96,7 +96,7 @@ namespace Cosmos.Compiler.XSharp {
         return "ConditionalTestEnum.LessThan";
       } else if (aToken.Value == ">") {
         return "ConditionalTestEnum.GreaterThan";
-      } else if (aToken.Value == "=") {
+      } else if (aToken.Value == "=" || aToken.Value == "0") {
         return "ConditionalTestEnum.Zero";
       } else if (aToken.Value == "!=") {
         return "ConditionalTestEnum.NotZero";
@@ -167,6 +167,7 @@ namespace Cosmos.Compiler.XSharp {
       );
 
       AddPattern(new string[] {
+          "if 0 goto _ABC", 
           "if < goto _ABC", 
           "if > goto _ABC", 
           "if = goto _ABC",
@@ -201,6 +202,10 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("_REG ? 123",
         "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
+      );
+
+      AddPattern("_REG ?& 123",
+        "new Test {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
       );
 
       // ~ "infinite" shift because it loops
@@ -248,10 +253,19 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      AddPattern("Port[DX] = AL", 
-        // TODO: DX only for index
-        // TODO: Src _REG can only be EAX, AX, AL
+      AddPattern(new string[] { 
+          "Port[DX] = AL", 
+          "Port[DX] = AX", 
+          "Port[DX] = EAX"
+        },
         "new Out {{ DestinationReg = RegistersEnum.{5}}};"
+      );
+      AddPattern(new string[] { 
+          "AL = Port[DX]", 
+          "AX = Port[DX]", 
+          "EAX = Port[DX]"
+        },
+        "new In {{ DestinationReg = RegistersEnum.{0}}};"
       );
 
       AddPattern("+123",
@@ -424,6 +438,11 @@ namespace Cosmos.Compiler.XSharp {
       };
 
       mPatterns.Add(xPattern);
+    }
+    protected void AddPattern(string[] aPatterns, string aCode) {
+      AddPattern(aPatterns, delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(aCode);
+      });
     }
     protected void AddPattern(string aPattern, string aCode) {
       AddPattern(aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
