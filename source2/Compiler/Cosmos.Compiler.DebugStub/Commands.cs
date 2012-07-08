@@ -26,6 +26,28 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_Ping_Exit");
 			new Return();
 
+			new Comment("X#: procedure TraceOn {");
+			new Label("DebugStub_TraceOn");
+
+			new Comment("Tracing.On");
+
+			new Comment(".TraceMode = 1");
+
+			new Comment("X#: }");
+			new Label("DebugStub_TraceOn_Exit");
+			new Return();
+
+			new Comment("X#: procedure TraceOff {");
+			new Label("DebugStub_TraceOff");
+
+			new Comment("Tracing.Off");
+
+			new Comment(".TraceMode = 0");
+
+			new Comment("X#: }");
+			new Label("DebugStub_TraceOff_Exit");
+			new Return();
+
 		}
 	}
 }
