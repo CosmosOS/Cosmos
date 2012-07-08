@@ -37,7 +37,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class WriteAXToComPort : Inlines {
+    public class ComWriteAX : Inlines {
       // Input: AX
       // Output: None
       // Modifies: EDX, ESI
@@ -51,7 +51,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class WriteEAXToComPort : Inlines {
+    public class ComWriteEAX : Inlines {
       // Input: EAX
       // Output: None
       // Modifies: EDX, ESI
