@@ -37,7 +37,6 @@ namespace Cosmos.Debug.DebugStub {
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
         // BP Address
-        //ReadComPortX32toStack(1);
         Call("DebugStub_ComReadEAX");
         ECX = EAX;
 

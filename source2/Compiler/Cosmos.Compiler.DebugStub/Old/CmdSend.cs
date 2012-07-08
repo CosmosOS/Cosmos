@@ -74,9 +74,9 @@ namespace Cosmos.Debug.DebugStub {
 
         // offset relative to ebp
         // size of data to send
-        ReadComPortX32toStack(2);
-        ECX.Pop();
-        EAX.Pop();
+        Call("DebugStub_ComReadEAX");
+        ECX = EAX;
+        Call("DebugStub_ComReadEAX");
 
         // now ECX contains size of data (count)
         // EAX contains relative to EBP
@@ -100,20 +100,17 @@ namespace Cosmos.Debug.DebugStub {
       //  2: x32 - size of data to send
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
-        ReadComPortX32toStack(1);
-        Label = "DebugStub_SendMemory_1";
+        Call("DebugStub_ComReadEAX");
+        ECX = EAX;
         AL = (int)DsVsip.MemoryData;
         Call("DebugStub_ComWriteAL");
 
-        ReadComPortX32toStack(1);
-        Label = "DebugStub_SendMemory_2";
-        ECX.Pop();
-        ESI.Pop();
+        Call("DebugStub_ComReadEAX");
+        ESI = EAX;
 
         // now ECX contains size of data (count)
         // ESI contains address
 
-        Label = "DebugStub_SendMemory_3";
         Label = "DebugStub_SendMemory_SendByte";
         new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
         JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte");

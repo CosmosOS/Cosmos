@@ -20,8 +20,8 @@ namespace Cosmos.Debug.DebugStub {
     
     public class SetAsmBreak : Inlines {
       public override void Assemble() {
-        ReadComPortX32toStack(1);
-        EDI.Pop();
+        Call("DebugStub_ComReadEAX");
+        EDI = EAX;
         // Save the old byte
         EAX = EDI[0];
         AsmOrigByte.Value = EAX;
