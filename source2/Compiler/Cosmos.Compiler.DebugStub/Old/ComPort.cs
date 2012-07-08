@@ -29,12 +29,6 @@ namespace Cosmos.Debug.DebugStub {
           Call("DebugStub_ComRead32");
         }
       }
-
-      protected void WriteBytesToComPort(int xCount) {
-        for (int i = 1; i <= xCount; i++) {
-          Call("DebugStub_ComWrite8");
-        }
-      }
     }
 
     public class ComWriteAX : Inlines {

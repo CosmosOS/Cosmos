@@ -15,7 +15,8 @@ namespace Cosmos.Debug.DebugStub {
         Call("DebugStub_ComWriteAL");
 
         ESI = PushAllPtr.Value;
-        WriteBytesToComPort(32);
+        ECX = 32;
+        Call("DebugStub_ComWriteX");
         ESI = CallerESP.Address;
         Call("DebugStub_ComWrite32");
         ESI = CallerEIP.Address;
@@ -28,13 +29,13 @@ namespace Cosmos.Debug.DebugStub {
         AL = (int)DsVsip.Frame;
         Call("DebugStub_ComWriteAL");
 
-        int xCount = 8 * 4;
-        EAX = (uint)xCount;
+        EAX = 32;
         Call<ComWriteAX>();
 
         ESI = CallerEBP.Value;
         ESI.Add(8); // Dont transmit EIP or old EBP
-        WriteBytesToComPort(xCount);
+        ECX = 32;
+        Call("DebugStub_ComWriteX");
       }
     }
 
