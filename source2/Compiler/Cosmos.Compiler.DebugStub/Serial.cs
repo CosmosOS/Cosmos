@@ -230,8 +230,6 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: DX + 5");
 			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 5 };
 
-			new Comment("Wait for port to be ready");
-
 			new Comment("X#: Wait:");
 			new Label("DebugStub_ComReadAL_Wait");
 
@@ -247,13 +245,42 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: DX = .ComAddr");
 			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
 
-			new Comment("Read byte");
-
 			new Comment("X#: AL = Port[DX]");
 			new IN { DestinationReg = RegistersEnum.AL};
 
 			new Comment("X#: }");
 			new Label("DebugStub_ComReadAL_Exit");
+			new Return();
+
+			new Comment("X#: procedure ComReadEAX {");
+			new Label("DebugStub_ComReadEAX");
+
+			new Comment("X#: Call .ComReadAL");
+			new Call { DestinationLabel = "DebugStub_ComReadAL" };
+
+			new Comment("X#: EAX >~ 8");
+			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+
+			new Comment("X#: Call .ComReadAL");
+			new Call { DestinationLabel = "DebugStub_ComReadAL" };
+
+			new Comment("X#: EAX >~ 8");
+			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+
+			new Comment("X#: Call .ComReadAL");
+			new Call { DestinationLabel = "DebugStub_ComReadAL" };
+
+			new Comment("X#: EAX >~ 8");
+			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+
+			new Comment("X#: Call .ComReadAL");
+			new Call { DestinationLabel = "DebugStub_ComReadAL" };
+
+			new Comment("X#: EAX >~ 8");
+			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComReadEAX_Exit");
 			new Return();
 
 			new Comment("Input: EDI");

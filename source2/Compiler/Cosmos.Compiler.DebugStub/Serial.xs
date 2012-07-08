@@ -101,16 +101,23 @@ procedure InitSerial {
 procedure ComReadAL {
 	DX = .ComAddr
 	DX + 5
-
-    # Wait for port to be ready
 Wait:
     AL = Port[DX]
     AL ?& $01
     if 0 goto Wait
 
 	DX = .ComAddr
-    # Read byte
     AL = Port[DX]
+}
+procedure ComReadEAX {
+	Call .ComReadAL
+	EAX >~ 8
+	Call .ComReadAL
+	EAX >~ 8
+	Call .ComReadAL
+	EAX >~ 8
+	Call .ComReadAL
+	EAX >~ 8
 }
 
 # Input: EDI
@@ -156,7 +163,6 @@ procedure ComWriteAX {
     # This also allow the function to preserve EAX.
     -EAX
 }
-
 procedure ComWriteEAX {
     # Input: EAX
     # Output: None
