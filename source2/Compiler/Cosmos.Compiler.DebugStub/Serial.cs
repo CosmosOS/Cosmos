@@ -415,7 +415,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Port[DX] = AL");
 			new Out { DestinationReg = RegistersEnum.AL};
 
-			new Comment("X#: ESI + 1");
+			new Comment("X#: ESI++");
 			new INC { DestinationReg = RegistersEnum.ESI };
 
 			new Comment("X#: }");

@@ -30,7 +30,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: ESI[0] = AL");
 			new Mov{ DestinationReg = RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0, SourceReg = RegistersEnum.AL };
 
-			new Comment("X#: ESI + 1");
+			new Comment("X#: ESI++");
 			new INC { DestinationReg = RegistersEnum.ESI };
 
 			new Comment("Colour");
@@ -41,7 +41,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: ESI[0] = AL");
 			new Mov{ DestinationReg = RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0, SourceReg = RegistersEnum.AL };
 
-			new Comment("X#: ESI + 1");
+			new Comment("X#: ESI++");
 			new INC { DestinationReg = RegistersEnum.ESI };
 
 			new Comment("End of Video Area");
@@ -90,7 +90,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Compare { DestinationReg = RegistersEnum.AL, SourceValue = 0 };
 			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_DisplayWaitMsg_AfterMsg" };
 
-			new Comment("X#: ESI + 1");
+			new Comment("X#: ESI++");
 			new INC { DestinationReg = RegistersEnum.ESI };
 
 			new Comment("X#: EDI[0] = AL");

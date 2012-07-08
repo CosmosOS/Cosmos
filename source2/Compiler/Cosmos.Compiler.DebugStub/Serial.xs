@@ -181,5 +181,5 @@ Wait:
 	# Send the byte
 	Port[DX] = AL
 
-	ESI + 1
+	ESI++
 }

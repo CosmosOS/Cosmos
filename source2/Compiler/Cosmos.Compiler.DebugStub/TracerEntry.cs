@@ -107,7 +107,7 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("wil be changing ops that call this stub.");
 
-			new Comment("X#: EAX - 1");
+			new Comment("X#: EAX--");
 			new Dec { DestinationReg = RegistersEnum.EAX };
 
 			new Comment("Store it for later use.");
