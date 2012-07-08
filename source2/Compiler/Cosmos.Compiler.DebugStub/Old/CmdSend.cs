@@ -30,7 +30,7 @@ namespace Cosmos.Debug.DebugStub {
         Call("DebugStub_ComWriteAL");
 
         EAX = 32;
-        Call<ComWriteAX>();
+        Call("DebugStub_ComWriteAX");
 
         ESI = CallerEBP.Value;
         ESI.Add(8); // Dont transmit EIP or old EBP
@@ -48,7 +48,7 @@ namespace Cosmos.Debug.DebugStub {
         ESI = CallerESP.Value;
         EAX = CallerEBP.Value;
         EAX.Sub(ESI);
-        Call<ComWriteAX>();
+        Call("DebugStub_ComWriteAX");
 
         // Send actual bytes
         //

@@ -343,6 +343,64 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_ComWriteAL_Exit");
 			new Return();
 
+			new Comment("X#: procedure ComWriteAX {");
+			new Label("DebugStub_ComWriteAX");
+
+			new Comment("Input: AX");
+
+			new Comment("Output: None");
+
+			new Comment("Modifies: EDX, ESI");
+
+			new Comment("X#: +EAX");
+			new Push { DestinationReg = RegistersEnum.EAX};
+
+			new Comment("X#: ESI = ESP");
+			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
+
+			new Comment("X#: Call .ComWrite16");
+			new Call { DestinationLabel = "DebugStub_ComWrite16" };
+
+			new Comment("Is a local var, cant use Return(4). X# issues the return.");
+
+			new Comment("This also allow the function to preserve EAX.");
+
+			new Comment("X#: -EAX");
+			new Pop { DestinationReg = RegistersEnum.EAX};
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComWriteAX_Exit");
+			new Return();
+
+			new Comment("X#: procedure ComWriteEAX {");
+			new Label("DebugStub_ComWriteEAX");
+
+			new Comment("Input: EAX");
+
+			new Comment("Output: None");
+
+			new Comment("Modifies: EDX, ESI");
+
+			new Comment("X#: +EAX");
+			new Push { DestinationReg = RegistersEnum.EAX};
+
+			new Comment("X#: ESI = ESP");
+			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
+
+			new Comment("X#: Call .ComWrite32");
+			new Call { DestinationLabel = "DebugStub_ComWrite32" };
+
+			new Comment("Is a local var, cant use Return(4). X# issues the return.");
+
+			new Comment("This also allow the function to preserve EAX.");
+
+			new Comment("X#: -EAX");
+			new Pop { DestinationReg = RegistersEnum.EAX};
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComWriteEAX_Exit");
+			new Return();
+
 			new Comment("X#: procedure ComWrite8 {");
 			new Label("DebugStub_ComWrite8");
 

@@ -145,6 +145,29 @@ procedure ComWriteAL {
     # This also allows the function to preserve EAX.
     -EAX
 }
+procedure ComWriteAX {
+    # Input: AX
+    # Output: None
+    # Modifies: EDX, ESI
+    +EAX
+    ESI = ESP
+    Call .ComWrite16
+    # Is a local var, cant use Return(4). X# issues the return.
+    # This also allow the function to preserve EAX.
+    -EAX
+}
+
+procedure ComWriteEAX {
+    # Input: EAX
+    # Output: None
+    # Modifies: EDX, ESI
+    +EAX
+    ESI = ESP
+    Call .ComWrite32
+    # Is a local var, cant use Return(4). X# issues the return.
+    # This also allow the function to preserve EAX.
+    -EAX
+}
 
 procedure ComWrite8 {
 	# Input: ESI

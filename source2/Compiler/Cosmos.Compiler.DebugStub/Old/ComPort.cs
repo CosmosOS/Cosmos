@@ -31,33 +31,5 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class ComWriteAX : Inlines {
-      // Input: AX
-      // Output: None
-      // Modifies: EDX, ESI
-      public override void Assemble() {
-        EAX.Push();
-        ESI = ESP;
-        Call("DebugStub_ComWrite16");
-        // Is a local var, cant use Return(4). X# issues the return.
-        // This also allow the function to preserve EAX.
-        EAX.Pop();
-      }
-    }
-
-    public class ComWriteEAX : Inlines {
-      // Input: EAX
-      // Output: None
-      // Modifies: EDX, ESI
-      public override void Assemble() {
-        EAX.Push();
-        ESI = ESP;
-        Call("DebugStub_ComWrite32");
-        // Is a local var, cant use Return(4). X# issues the return.
-        // This also allow the function to preserve EAX.
-        EAX.Pop();
-      }
-    }
-
   }
 }
