@@ -11,6 +11,10 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
+			new Comment("mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;");
+
+			new Comment("Currently hardcoded to COM1.");
+
 			new Comment("X#: var .ComAddr = $03F8");
 			mAssembler.DataMembers.Add(new DataMember("DebugStub_ComAddr", 0x03F8));
 
@@ -44,6 +48,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Return();
 
 			new Comment("All information relating to our serial usage should be documented in this comment.");
+
+			new Comment("http://wiki.osdev.org/Serial_ports");
 
 			new Comment("");
 
@@ -120,12 +126,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure InitSerial {");
 			new Label("DebugStub_InitSerial");
 
-			new Comment("mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;");
-
-			new Comment("Currently hardcoded to COM1.");
-
-			new Comment("X#: DX = $03F8");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceValue = 0x03F8 };
+			new Comment("X#: DX = .ComAddr");
+			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
 
 			new Comment("Disable interrupts");
 
@@ -281,8 +283,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("8 bit address for literals on ports");
 
-			new Comment("X#: DX = $03F8");
-			new Mov{ DestinationReg = RegistersEnum.DX, SourceValue = 0x03F8 };
+			new Comment("X#: DX = .ComAddr");
+			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
 
 			new Comment("X#: DX + 5");
 			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 5 };
@@ -295,7 +297,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_WriteByteToComPort_Wait");
 
 			new Comment("X#: AL = Port[DX]");
-			new In { DestinationReg = RegistersEnum.AL};
+			new IN { DestinationReg = RegistersEnum.AL};
 
 			new Comment("X#: AL ?& $20");
 			new Test { DestinationReg = RegistersEnum.AL, SourceValue = 0x20 };

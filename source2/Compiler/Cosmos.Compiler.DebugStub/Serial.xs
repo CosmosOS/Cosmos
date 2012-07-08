@@ -1,5 +1,7 @@
 ﻿Group DebugStub
 
+# mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
+# Currently hardcoded to COM1.
 var .ComAddr = $03F8
 
 # Input: AL
@@ -15,6 +17,7 @@ procedure WriteALToComPort {
 }
 
 # All information relating to our serial usage should be documented in this comment.
+# http://wiki.osdev.org/Serial_ports
 #
 # We do not use IRQs for debugstub serial. This is becuase DebugStub (DS)
 # MUST be:
@@ -53,9 +56,7 @@ procedure WriteALToComPort {
 # Todo Auto params
 # Todo ebp frame ptr auto etc
 procedure InitSerial {
-	# mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
-	# Currently hardcoded to COM1.
-	DX = $03F8
+	DX = .ComAddr
 
 	# Disable interrupts
 	BX = DX
@@ -126,7 +127,7 @@ procedure WriteByteToComPort {
 
 	# Sucks again to use DX just for this, but x86 only supports
 	# 8 bit address for literals on ports
-	DX = $03F8
+	DX = .ComAddr
 	DX + 5
 
 	# Wait for serial port to be ready

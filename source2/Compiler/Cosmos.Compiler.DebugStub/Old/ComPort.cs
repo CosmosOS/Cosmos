@@ -20,7 +20,6 @@ namespace Cosmos.Debug.DebugStub {
       // Modified: AL, DX, EDI (+1)
       //
       // Reads a byte into [EDI] and does EDI + 1
-      // http://wiki.osdev.org/Serial_ports
       public override void Assemble() {
         Call<ReadALFromComPort>();
         EDI[0] = AL;
@@ -58,44 +57,6 @@ namespace Cosmos.Debug.DebugStub {
         for (int i = 1; i <= xCount; i++) {
           Call("DebugStub_WriteByteToComPort");
         }
-      }
-    }
-
-    public class WriteByteToComPort2 : CodeBlock {
-      // Input: ESI
-      // Output: None
-      // Modifies: EAX, EDX
-      //
-      // Sends byte at [ESI] to com port and does esi + 1
-      //
-      // This sucks to use the stack, but x86 can only read and write ports from AL and
-      // we need to read a port before we can write out the value to another port.
-      // The overhead is a lot, but compared to the speed of the serial and the fact
-      // that we wait on the serial port anyways, its a wash.
-      //
-      // This could be changed to use interrupts, but that then complicates
-      // the code and causes interaction with other code. DebugStub should be
-      // as isolated as possible from any other code.
-      public override void Assemble() {
-        // Sucks again to use DX just for this, but x86 only supports
-        // 8 bit address for literals on ports
-        DX = mComStatusAddr;
-
-        // Wait for serial port to be ready
-        // Bit 5 (0x20) test for Transmit Holding Register to be empty.
-        Label = ".Wait";
-        AL = Port[DX];
-        AL.Test(0x20);
-        JumpIf(Flags.Zero, ".Wait");
-
-        // Set address of port
-        DX = mComAddr;
-        // Get byte to send
-        AL = ESI[0];
-        // Send the byte
-        Port[DX] = AL;
-
-        ESI++;
       }
     }
 
