@@ -34,7 +34,7 @@ namespace Cosmos.Debug.DebugStub {
       // Modifies: AL, DX (ReadALFromComPort)
       // Returns: AL
       public override void Assemble() {
-        Call<ReadALFromComPort>();
+        Call("DebugStub_ReadALFromComPort");
         // Some callers expect AL to be returned, so we preserve it
         // in case any commands modify AL.
         // We push EAX to keep stack aligned. 
@@ -46,7 +46,7 @@ namespace Cosmos.Debug.DebugStub {
         JumpIf(Flags.Equal, ".End");
 
         // Read Command ID
-        Call<ReadALFromComPort>();
+        Call("DebugStub_ReadALFromComPort");
         CommandID.Value = EAX;
 
         // Get AL back so we can compare it, but also put it back for later

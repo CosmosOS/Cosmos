@@ -109,6 +109,22 @@ procedure InitSerial {
 	Port[DX] = AL
 }
 
+# Modifies: AL, DX
+procedure ReadALFromComPort {
+	DX = .ComAddr
+	DX + 5
+
+    # Wait for port to be ready
+Wait:
+    AL = Port[DX]
+    AL ?& $01
+    if 0 goto Wait
+
+	DX = .ComAddr
+    # Read byte
+    AL = Port[DX]
+}
+
 # Input: EDI
 # Output: [EDI]
 # Modified: AL, DX, EDI (+1)

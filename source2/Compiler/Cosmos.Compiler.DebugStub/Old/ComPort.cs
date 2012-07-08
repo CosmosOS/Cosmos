@@ -47,24 +47,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class ReadALFromComPort : Inlines {
-      // Modifies: AL, DX
-      public override void Assemble() {
-        DX = mComStatusAddr;
-
-        // Wait for port to be ready
-        Label = ".Wait";
-        AL = Port[DX];
-        AL.Test(0x01);
-        JumpIf(Flags.Zero, ".Wait");
-
-        // Set address of port
-        DX = mComAddr;
-        // Read byte
-        AL = Port[DX];
-      }
-    }
-
     public class WriteAXToComPort : Inlines {
       // Input: AX
       // Output: None

@@ -248,6 +248,43 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_InitSerial_Exit");
 			new Return();
 
+			new Comment("Modifies: AL, DX");
+
+			new Comment("X#: procedure ReadALFromComPort {");
+			new Label("DebugStub_ReadALFromComPort");
+
+			new Comment("X#: DX = .ComAddr");
+			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
+
+			new Comment("X#: DX + 5");
+			new Add { DestinationReg = RegistersEnum.DX, SourceValue = 5 };
+
+			new Comment("Wait for port to be ready");
+
+			new Comment("X#: Wait:");
+			new Label("DebugStub_ReadALFromComPort_Wait");
+
+			new Comment("X#: AL = Port[DX]");
+			new IN { DestinationReg = RegistersEnum.AL};
+
+			new Comment("X#: AL ?& $01");
+			new Test { DestinationReg = RegistersEnum.AL, SourceValue = 0x01 };
+
+			new Comment("X#: if 0 goto Wait");
+			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_ReadALFromComPort_Wait" };
+
+			new Comment("X#: DX = .ComAddr");
+			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
+
+			new Comment("Read byte");
+
+			new Comment("X#: AL = Port[DX]");
+			new IN { DestinationReg = RegistersEnum.AL};
+
+			new Comment("X#: }");
+			new Label("DebugStub_ReadALFromComPort_Exit");
+			new Return();
+
 			new Comment("Input: EDI");
 
 			new Comment("Output: [EDI]");
