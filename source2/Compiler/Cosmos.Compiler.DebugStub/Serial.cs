@@ -454,6 +454,25 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_ComWrite32_Exit");
 			new Return();
 
+			new Comment("X#: procedure ComWriteX {");
+			new Label("DebugStub_ComWriteX");
+
+			new Comment("X#: More:");
+			new Label("DebugStub_ComWriteX_More");
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("X#: ECX--");
+			new Dec { DestinationReg = RegistersEnum.ECX };
+
+			new Comment("X#: if !0 goto More");
+			new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = "DebugStub_ComWriteX_More" };
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComWriteX_Exit");
+			new Return();
+
 		}
 	}
 }

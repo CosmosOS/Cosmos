@@ -193,3 +193,9 @@ procedure ComWrite32 {
 	Call .ComWrite8
 	Call .ComWrite8
 }
+procedure ComWriteX {
+More:
+	Call .ComWrite8
+	ECX--
+	if !0 goto More
+}

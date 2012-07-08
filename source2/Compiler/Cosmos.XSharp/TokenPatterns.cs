@@ -181,6 +181,11 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
+      // Must test separate since !0 is two tokens
+      AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = GetLabel(aTokens[4]);
+        rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.NotZero, DestinationLabel = " + Quoted(xLabel) + " }};");
+      });
 
       AddPattern(new string[] {
           //0 1  2  3  4 5  6    7
