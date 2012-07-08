@@ -115,7 +115,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: .CallerEIP = EAX");
 			new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true , SourceReg = RegistersEnum.EAX };
 
-			new Comment("X#: Call .Executing");
+			new Comment("X#: Executing()");
 			new Call { DestinationLabel = "DebugStub_Executing" };
 
 			new Comment("X#: PopAll");

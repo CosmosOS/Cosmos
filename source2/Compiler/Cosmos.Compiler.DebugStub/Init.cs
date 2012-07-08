@@ -24,21 +24,21 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure Init {");
 			new Label("DebugStub_Init");
 
-			new Comment("X#: Call .Cls");
+			new Comment("X#: Cls()");
 			new Call { DestinationLabel = "DebugStub_Cls" };
 
 			new Comment("Display message before even trying to init serial");
 
-			new Comment("X#: Call .DisplayWaitMsg");
+			new Comment("X#: DisplayWaitMsg()");
 			new Call { DestinationLabel = "DebugStub_DisplayWaitMsg" };
 
-			new Comment("X#: Call .InitSerial");
+			new Comment("X#: InitSerial()");
 			new Call { DestinationLabel = "DebugStub_InitSerial" };
 
-			new Comment("X#: Call .WaitForDbgHandshake");
+			new Comment("X#: WaitForDbgHandshake()");
 			new Call { DestinationLabel = "DebugStub_WaitForDbgHandshake" };
 
-			new Comment("X#: Call .Cls");
+			new Comment("X#: Cls()");
 			new Call { DestinationLabel = "DebugStub_Cls" };
 
 			new Comment("X#: }");
@@ -54,7 +54,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Read:");
 			new Label("DebugStub_WaitForSignature_Read");
 
-			new Comment("X#: Call .ComReadAL");
+			new Comment("X#: ComReadAL()");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: BL = AL");
@@ -91,7 +91,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: AL = 0");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 0 };
 
-			new Comment("X#: Call .ComWriteAL");
+			new Comment("X#: ComWriteAL()");
 			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
 
 			new Comment("Cosmos.Debug.Consts.Consts.SerialSignature");
@@ -104,16 +104,16 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("TODO pass a count register");
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
 			new Comment("Restore ESP, we actually dont care about EAX or the value on the stack anymore.");
@@ -132,13 +132,13 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: AL = 6");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 6 };
 
-			new Comment("X#: Call .ComWriteAL");
+			new Comment("X#: ComWriteAL()");
 			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
 
-			new Comment("X#: Call .WaitForSignature");
+			new Comment("X#: WaitForSignature()");
 			new Call { DestinationLabel = "DebugStub_WaitForSignature" };
 
-			new Comment("X#: Call .ProcessCommandBatch");
+			new Comment("X#: ProcessCommandBatch()");
 			new Call { DestinationLabel = "DebugStub_ProcessCommandBatch" };
 
 			new Comment("X#: }");

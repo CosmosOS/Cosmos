@@ -496,6 +496,28 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    public List<string> GetNonPatternCode(TokenList aTokens) {
+      List<string> xCode = new List<string>();
+      var xResult = new List<string>();
+      // () could be handled by pattern, but best to keep in one place for future
+      if (aTokens.Count == 2 && aTokens[0].Type == TokenType.AlphaNum && aTokens[1].Value == "()") {
+        xCode.Add("Call ." + aTokens[0].Value);
+      }
+
+      foreach (var x in xCode) {
+        var xLines = GetPatternCode(x);
+        if (xLines == null) {
+          return null;
+        }
+        xResult.AddRange(xLines);
+      }
+
+      if (xResult.Count == 0) {
+        return null;
+      }
+      return xResult;
+    }
+
     public List<string> GetCode(string aLine) {
       var xParser = new Parser(aLine, false, false);
       var xTokens = xParser.Tokens;
@@ -503,7 +525,8 @@ namespace Cosmos.Compiler.XSharp {
       if (xResult != null) {
         return xResult;
       }
-      return null;
+
+      return GetNonPatternCode(xTokens);
     }
 
     protected void AddPattern(string[] aPatterns, CodeFunc aCode) {

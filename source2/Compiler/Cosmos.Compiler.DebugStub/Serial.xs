@@ -110,13 +110,13 @@ Wait:
     AL = Port[DX]
 }
 procedure ComReadEAX {
-	Call .ComReadAL
+	ComReadAL()
 	EAX ~> 8
-	Call .ComReadAL
+	ComReadAL()
 	EAX ~> 8
-	Call .ComReadAL
+	ComReadAL()
 	EAX ~> 8
-	Call .ComReadAL
+	ComReadAL()
 	EAX ~> 8
 }
 
@@ -126,19 +126,19 @@ procedure ComReadEAX {
 #
 # Reads a byte into [EDI] and does EDI + 1
 procedure ComRead8  {
-    Call .ComReadAL
+    ComReadAL()
     EDI[0] = AL
     EDI + 1
 }
 procedure ComRead16 {
-	Call .ComRead8
-	Call .ComRead8
+	ComRead8()
+	ComRead8()
 }
 procedure ComRead32 {
-	Call .ComRead8
-	Call .ComRead8
-	Call .ComRead8
-	Call .ComRead8
+	ComRead8()
+	ComRead8()
+	ComRead8()
+	ComRead8()
 }
 
 # Input: AL
@@ -147,7 +147,7 @@ procedure ComRead32 {
 procedure ComWriteAL {
 	+EAX
     ESI = ESP
-    Call .ComWrite8
+    ComWrite8()
     # Is a local var, cant use Return(4). X# issues the return.
     # This also allows the function to preserve EAX.
     -EAX
@@ -158,7 +158,7 @@ procedure ComWriteAX {
     # Modifies: EDX, ESI
     +EAX
     ESI = ESP
-    Call .ComWrite16
+    ComWrite16()
     # Is a local var, cant use Return(4). X# issues the return.
     # This also allow the function to preserve EAX.
     -EAX
@@ -169,7 +169,7 @@ procedure ComWriteEAX {
     # Modifies: EDX, ESI
     +EAX
     ESI = ESP
-    Call .ComWrite32
+    ComWrite32()
     # Is a local var, cant use Return(4). X# issues the return.
     # This also allow the function to preserve EAX.
     -EAX
@@ -213,18 +213,18 @@ Wait:
 	ESI++
 }
 procedure ComWrite16 {
-	Call .ComWrite8
-	Call .ComWrite8
+	ComWrite8()
+	ComWrite8()
 }
 procedure ComWrite32 {
-	Call .ComWrite8
-	Call .ComWrite8
-	Call .ComWrite8
-	Call .ComWrite8
+	ComWrite8()
+	ComWrite8()
+	ComWrite8()
+	ComWrite8()
 }
 procedure ComWriteX {
 More:
-	Call .ComWrite8
+	ComWrite8()
 	ECX--
 	if !0 goto More
 }

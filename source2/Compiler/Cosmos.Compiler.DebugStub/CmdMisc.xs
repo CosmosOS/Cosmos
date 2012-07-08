@@ -3,7 +3,7 @@
 procedure Ping {
     # DsVsip.Pong
     AL = 13
-    Call .ComWriteAL
+    ComWriteAL()
 }
 
 procedure TraceOn {

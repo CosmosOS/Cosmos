@@ -15,7 +15,7 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Currently hardcoded to COM1.");
 
-			new Comment("X#: var .ComAddr = $03F8");
+			new Comment("X#: var ComAddr = $03F8");
 			mAssembler.DataMembers.Add(new DataMember("DebugStub_ComAddr", 0x03F8));
 
 			new Comment("All information relating to our serial usage should be documented in this comment.");
@@ -255,25 +255,25 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComReadEAX {");
 			new Label("DebugStub_ComReadEAX");
 
-			new Comment("X#: Call .ComReadAL");
+			new Comment("X#: ComReadAL()");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: EAX ~> 8");
 			new LiteralAssemblerCode("ROR EAX, 8");
 
-			new Comment("X#: Call .ComReadAL");
+			new Comment("X#: ComReadAL()");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: EAX ~> 8");
 			new LiteralAssemblerCode("ROR EAX, 8");
 
-			new Comment("X#: Call .ComReadAL");
+			new Comment("X#: ComReadAL()");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: EAX ~> 8");
 			new LiteralAssemblerCode("ROR EAX, 8");
 
-			new Comment("X#: Call .ComReadAL");
+			new Comment("X#: ComReadAL()");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: EAX ~> 8");
@@ -296,7 +296,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComRead8  {");
 			new Label("DebugStub_ComRead8");
 
-			new Comment("X#: Call .ComReadAL");
+			new Comment("X#: ComReadAL()");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: EDI[0] = AL");
@@ -312,10 +312,10 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComRead16 {");
 			new Label("DebugStub_ComRead16");
 
-			new Comment("X#: Call .ComRead8");
+			new Comment("X#: ComRead8()");
 			new Call { DestinationLabel = "DebugStub_ComRead8" };
 
-			new Comment("X#: Call .ComRead8");
+			new Comment("X#: ComRead8()");
 			new Call { DestinationLabel = "DebugStub_ComRead8" };
 
 			new Comment("X#: }");
@@ -325,16 +325,16 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComRead32 {");
 			new Label("DebugStub_ComRead32");
 
-			new Comment("X#: Call .ComRead8");
+			new Comment("X#: ComRead8()");
 			new Call { DestinationLabel = "DebugStub_ComRead8" };
 
-			new Comment("X#: Call .ComRead8");
+			new Comment("X#: ComRead8()");
 			new Call { DestinationLabel = "DebugStub_ComRead8" };
 
-			new Comment("X#: Call .ComRead8");
+			new Comment("X#: ComRead8()");
 			new Call { DestinationLabel = "DebugStub_ComRead8" };
 
-			new Comment("X#: Call .ComRead8");
+			new Comment("X#: ComRead8()");
 			new Call { DestinationLabel = "DebugStub_ComRead8" };
 
 			new Comment("X#: }");
@@ -356,7 +356,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: ESI = ESP");
 			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
 			new Comment("Is a local var, cant use Return(4). X# issues the return.");
@@ -385,7 +385,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: ESI = ESP");
 			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
 
-			new Comment("X#: Call .ComWrite16");
+			new Comment("X#: ComWrite16()");
 			new Call { DestinationLabel = "DebugStub_ComWrite16" };
 
 			new Comment("Is a local var, cant use Return(4). X# issues the return.");
@@ -414,7 +414,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: ESI = ESP");
 			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
 
-			new Comment("X#: Call .ComWrite32");
+			new Comment("X#: ComWrite32()");
 			new Call { DestinationLabel = "DebugStub_ComWrite32" };
 
 			new Comment("Is a local var, cant use Return(4). X# issues the return.");
@@ -510,10 +510,10 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComWrite16 {");
 			new Label("DebugStub_ComWrite16");
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
 			new Comment("X#: }");
@@ -523,16 +523,16 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComWrite32 {");
 			new Label("DebugStub_ComWrite32");
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
 			new Comment("X#: }");
@@ -545,7 +545,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: More:");
 			new Label("DebugStub_ComWriteX_More");
 
-			new Comment("X#: Call .ComWrite8");
+			new Comment("X#: ComWrite8()");
 			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
 			new Comment("X#: ECX--");

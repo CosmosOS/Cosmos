@@ -86,9 +86,9 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: AL = ESI[0]");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceReg = RegistersEnum.ESI, SourceIsIndirect = true, SourceDisplacement = 0 };
 
-			new Comment("X#: if (AL = 0) goto AfterMsg");
+			new Comment("X#: if (AL = 0) exit");
 			new Compare { DestinationReg = RegistersEnum.AL, SourceValue = 0 };
-			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_DisplayWaitMsg_AfterMsg" };
+			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_DisplayWaitMsg_Exit" };
 
 			new Comment("X#: ESI++");
 			new INC { DestinationReg = RegistersEnum.ESI };
@@ -101,9 +101,6 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("X#: Goto ReadChar");
 			new Jump { DestinationLabel = "DebugStub_DisplayWaitMsg_ReadChar" };
-
-			new Comment("X#: AfterMsg:");
-			new Label("DebugStub_DisplayWaitMsg_AfterMsg");
 
 			new Comment("X#: }");
 			new Label("DebugStub_DisplayWaitMsg_Exit");

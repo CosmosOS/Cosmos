@@ -6,18 +6,18 @@ var .DebugWaitMsg = 'Waiting for debugger connection...'
 
 # Called before Kernel runs. Inits debug stub, etc
 procedure Init {
-    Call .Cls
+    Cls()
 	# Display message before even trying to init serial
-    Call .DisplayWaitMsg
-    Call .InitSerial
-    Call .WaitForDbgHandshake
-    Call .Cls
+    DisplayWaitMsg()
+    InitSerial()
+    WaitForDbgHandshake()
+    Cls()
 }
 
 procedure WaitForSignature {
     EBX = 0
 Read:
-    Call .ComReadAL
+    ComReadAL()
     BL = AL
     EBX ~> 8
     if (EBX != $19740807) goto Read
@@ -32,17 +32,17 @@ Read:
 procedure WaitForDbgHandshake {
     # "Clear" the UART out
     AL = 0
-    Call .ComWriteAL
+    ComWriteAL()
 
     # Cosmos.Debug.Consts.Consts.SerialSignature
 	+$19740807
     ESI = ESP
 
     # TODO pass a count register
-    Call .ComWrite8
-    Call .ComWrite8
-    Call .ComWrite8
-    Call .ComWrite8
+    ComWrite8()
+    ComWrite8()
+    ComWrite8()
+    ComWrite8()
 
     # Restore ESP, we actually dont care about EAX or the value on the stack anymore.
     -EAX
@@ -53,9 +53,9 @@ procedure WaitForDbgHandshake {
 	# Send the actual started signal
 	# DsVsip.Started = 6
     AL = 6
-    Call .ComWriteAL
+    ComWriteAL()
 
-    Call .WaitForSignature
-    Call .ProcessCommandBatch
+    WaitForSignature()
+    ProcessCommandBatch()
 }
 

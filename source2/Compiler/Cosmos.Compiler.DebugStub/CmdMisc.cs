@@ -19,7 +19,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: AL = 13");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 13 };
 
-			new Comment("X#: Call .ComWriteAL");
+			new Comment("X#: ComWriteAL()");
 			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
 
 			new Comment("X#: }");

@@ -9,7 +9,7 @@ var AsmBreakEIP
 var AsmOrigByte
 
 procedure SetAsmBreak {
-    Call .ComReadEAX
+    ComReadEAX()
     EDI = EAX
     # Save the old byte
     EAX = EDI[0]

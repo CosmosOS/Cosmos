@@ -35,10 +35,9 @@ procedure DisplayWaitMsg {
     # Read and copy string till 0 terminator
 ReadChar:
     AL = ESI[0]
-    if (AL = 0) goto AfterMsg
+    if (AL = 0) exit
     ESI++
     EDI[0] = AL
     EDI + 2
     Goto ReadChar
-AfterMsg:
 }
