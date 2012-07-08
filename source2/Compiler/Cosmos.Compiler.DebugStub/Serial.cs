@@ -11,8 +11,8 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
-			new Comment("X#: var ComAddr = $03F8");
-			mAssembler.DataMembers.Add(new DataMember("DebugStub__ComAddr", "="));
+			new Comment("X#: var .ComAddr = $03F8");
+			mAssembler.DataMembers.Add(new DataMember("DebugStub_ComAddr", 0x03F8));
 
 			new Comment("Input: AL");
 

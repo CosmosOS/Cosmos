@@ -56,12 +56,12 @@ namespace Cosmos.Debug.DebugStub {
 
       protected void WriteBytesToComPort(int xCount) {
         for (int i = 1; i <= xCount; i++) {
-          Call<WriteByteToComPort>();
+          Call("DebugStub_WriteByteToComPort");
         }
       }
     }
 
-    public class WriteByteToComPort : Inlines {
+    public class WriteByteToComPort : CodeBlock {
       // Input: ESI
       // Output: None
       // Modifies: EAX, EDX
@@ -116,20 +116,6 @@ namespace Cosmos.Debug.DebugStub {
         AL = Port[DX];
       }
     }
-
-    //public class WriteALToComPort : CodeBlock {
-    //  // Input: AL
-    //  // Output: None
-    //  // Modifies: EDX, ESI
-    //  public override void Assemble() {
-    //    EAX.Push();
-    //    ESI = ESP;
-    //    Call<WriteByteToComPort>();
-    //    // Is a local var, cant use Return(4). X# issues the return.
-    //    // This also allow the function to preserve EAX.
-    //    EAX.Pop();
-    //  }
-    //}
 
     public class WriteAXToComPort : Inlines {
       // Input: AX
