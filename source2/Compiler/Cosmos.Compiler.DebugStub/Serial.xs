@@ -181,7 +181,7 @@ Wait:
 	# Send the byte
 	Port[DX] = AL
 
-	ESI + 1
+	ESI++
 }
 procedure ComWrite16 {
 	Call .ComWrite8
