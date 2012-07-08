@@ -125,6 +125,17 @@
   <ItemGroup>
     <Resource Include="Cosmos.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="TaskScheduler">
+      <Guid>{E34CB9F1-C7F7-424C-BE29-027DCC09363A}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -63,10 +63,9 @@ namespace Cosmos.Build.Builder {
     public bool Build() {
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       string xCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
-      bool xIsUserKit = mApp.Args.Contains("-USERKIT");
       int xReleaseNo = 7;
 
-      if (xIsUserKit) {
+      if (App.IsUserKit) {
         string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
         if (string.IsNullOrEmpty(x)) {
           return false;
@@ -78,8 +77,8 @@ namespace Cosmos.Build.Builder {
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
       xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
       xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
-      xTask.ResetHive = mApp.Args.Contains("-RESETHIVE");
-      xTask.IsUserKit = xIsUserKit;
+      xTask.ResetHive = App.ResetHive;
+      xTask.IsUserKit = App.IsUserKit;
 
       var xThread = new System.Threading.Thread(delegate() {
         xTask.Run();
@@ -92,7 +91,7 @@ namespace Cosmos.Build.Builder {
 
     void ThreadDone() {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
-        if (mApp.Args.Contains("-STAYOPEN") == false) {
+        if (App.StayOpen == false) {
           mCloseTimer = new DispatcherTimer();
           mCloseTimer.Interval = TimeSpan.FromSeconds(5);
           mCloseTimer.Tick += delegate {

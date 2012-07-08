@@ -6,6 +6,7 @@ using Cosmos.Build.Installer;
 using System.IO;
 using Microsoft.Win32;
 using System.Windows;
+using TaskScheduler;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
@@ -92,6 +93,9 @@ namespace Cosmos.Build.Builder {
       if (!Directory.Exists(mOutputPath)) {
         Directory.CreateDirectory(mOutputPath);
       }
+
+      CheckScheduledTask();
+      return;
 
       CheckPrereqs();
       CompileXSharpCompiler();
@@ -215,10 +219,31 @@ namespace Cosmos.Build.Builder {
       Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false);
     }
 
+    bool mTaskIsInstalled = false;
+    void CheckScheduledTask() {
+      ITaskService xService = new TaskScheduler.TaskScheduler();
+      xService.Connect();
+      var xTasks = new List<IRegisteredTask>();
+      ITaskFolder xFolder = xService.GetFolder(@"\");
+      foreach (IRegisteredTask xTask in xFolder.GetTasks(0)) {
+        if (string.Equals(xTask.Name, "CosmosSetup")) {
+          mTaskIsInstalled = true;
+          break;
+        }
+      }
+    }
+
     void RunSetup() {
       Section("Running Setup");
-     
-      Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
+
+      // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
+      // the dev kit a lot.
+      CheckScheduledTask();
+      if (mTaskIsInstalled) {
+        Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"));
+      } else {
+        Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
+      }
     }
 
     void Done() {
