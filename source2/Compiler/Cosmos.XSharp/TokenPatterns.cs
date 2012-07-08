@@ -478,22 +478,32 @@ namespace Cosmos.Compiler.XSharp {
       return null;
     }
 
-    public List<string> GetCode(string aLine) {
+    public List<string> GetPatternCode(string aLine) {
       var xParser = new Parser(aLine, false, false);
-      var xTokens = xParser.Tokens;
-
-      var xPattern = FindMatch(xTokens);
+      return GetPatternCode(xParser.Tokens);
+    }
+    public List<string> GetPatternCode(TokenList aTokens) {
+      var xResult = new List<string>();
+      var xPattern = FindMatch(aTokens);
       if (xPattern == null) {
         return null;
       }
 
-      var xResult = new List<string>();
-      xPattern.Code(xTokens, ref xResult); 
-
-      for(int i = 0; i < xResult.Count; i++) {
-        xResult[i] = string.Format(xResult[i], xTokens.Select(c => c.Value).ToArray());
+      xPattern.Code(aTokens, ref xResult);
+      for (int i = 0; i < xResult.Count; i++) {
+        xResult[i] = string.Format(xResult[i], aTokens.Select(c => c.Value).ToArray());
       }
       return xResult;
+    }
+
+    public List<string> GetCode(string aLine) {
+      var xParser = new Parser(aLine, false, false);
+      var xTokens = xParser.Tokens;
+      var xResult = GetPatternCode(xTokens);
+      if (xResult != null) {
+        return xResult;
+      }
+      return null;
     }
 
     protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
