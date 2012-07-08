@@ -70,10 +70,15 @@ namespace Cosmos.Compiler.XSharp {
       if (EmitXSharpCodeComments && !aLine.StartsWith("#")) {
         mOutput.WriteLine("\t\t\tnew Comment(\"X#: " + aLine + "\");");
       }
+
       var xCode = mPatterns.GetCode(aLine);
-      foreach(var xLine in xCode) {
+      if (xCode == null) {
+        throw new Exception("Parsing error: " + aLine);
+      }
+      foreach (var xLine in xCode) {
         mOutput.WriteLine("\t\t\t" + xLine);
       }
+
       mOutput.WriteLine();
     }
 
