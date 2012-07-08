@@ -310,11 +310,19 @@ namespace Cosmos.Compiler.XSharp {
          + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ")"
          + " }};");
       });
+
       AddPattern("_ABC = _REG", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = GetLabel(aTokens[0]);
         rCode.Add("new Mov {{"
          + " DestinationRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), DestinationIsIndirect = true"
          + " , SourceReg = RegistersEnum.{2}"
+         + " }};");
+      });
+      AddPattern("_ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = GetLabel(aTokens[0]);
+        rCode.Add("new Mov {{"
+         + " DestinationRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), DestinationIsIndirect = true"
+         + " , SourceValue = {2}"
          + " }};");
       });
 

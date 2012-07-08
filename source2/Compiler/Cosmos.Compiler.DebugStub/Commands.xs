@@ -8,10 +8,10 @@ procedure Ping {
 
 procedure TraceOn {
     # Tracing.On
-    #.TraceMode = 1
+    .TraceMode = 1
 }
 
 procedure TraceOff {
     # Tracing.Off
-    #.TraceMode = 0
+    .TraceMode = 0
 }

@@ -51,16 +51,16 @@ namespace Cosmos.Debug.DebugStub {
 
         // Get AL back so we can compare it, but also put it back for later
         EAX = ESP[0];
-        CheckCmd<TraceOff>(VsipDs.TraceOff);
-        CheckCmd<TraceOn>(VsipDs.TraceOn);
-        CheckCmd<Break>(VsipDs.Break);
-        CheckCmd<BreakOnAddress>(VsipDs.BreakOnAddress);
-        CheckCmd<SendMethodContext>(VsipDs.SendMethodContext);
-        CheckCmd<SendMemory>(VsipDs.SendMemory);
-        CheckCmd<SendRegisters>(VsipDs.SendRegisters);
-        CheckCmd<SendFrame>(VsipDs.SendFrame);
-        CheckCmd<SendStack>(VsipDs.SendStack);
-        CheckCmd<Ping>(VsipDs.Ping);
+        CheckCmd("TraceOff", VsipDs.TraceOff);
+        CheckCmd("TraceOn", VsipDs.TraceOn);
+        CheckCmd("Break", VsipDs.Break);
+        CheckCmd("BreakOnAddress", VsipDs.BreakOnAddress);
+        CheckCmd("SendMethodContext", VsipDs.SendMethodContext);
+        CheckCmd("SendMemory", VsipDs.SendMemory);
+        CheckCmd("SendRegisters", VsipDs.SendRegisters);
+        CheckCmd("SendFrame", VsipDs.SendFrame);
+        CheckCmd("SendStack", VsipDs.SendStack);
+        CheckCmd("Ping", VsipDs.Ping);
 
         Label = ".End";
         // Restore AL for callers who check the command and do
@@ -68,11 +68,11 @@ namespace Cosmos.Debug.DebugStub {
         EAX.Pop();
       }
 
-      protected void CheckCmd<T>(byte aCmd) {
+      protected void CheckCmd(string aLabel, byte aCmd) {
         AL.Compare(aCmd);
         string xAfterLabel = NewLabel();
         JumpIf(Flags.NotEqual, xAfterLabel);
-        Call<T>();
+        Call("DebugStub_" + aLabel);
         Call<AckCommand>();
         Jump(".End");
         Label = xAfterLabel;
