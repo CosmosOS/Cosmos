@@ -16,14 +16,14 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("0 if no INT3 is active.");
 
 			new Comment("X#: var AsmBreakEIP");
-			mAssembler.DataMembers.Add(new DataMember("DebugStub__AsmBreakEIP", 0));
+			mAssembler.DataMembers.Add(new DataMember("DebugStub_AsmBreakEIP", 0));
 
 			new Comment("Old byte before INT3 was injected.");
 
 			new Comment("Only 1 byte is used.");
 
 			new Comment("X#: var AsmOrigByte");
-			mAssembler.DataMembers.Add(new DataMember("DebugStub__AsmOrigByte", 0));
+			mAssembler.DataMembers.Add(new DataMember("DebugStub_AsmOrigByte", 0));
 
 			new Comment("X#: procedure SetAsmBreak {");
 			new Label("DebugStub_SetAsmBreak");
@@ -70,8 +70,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Clear old break point and set back to original opcode / partial opcode");
 
-			new Comment("X#: EAX = AsmOrigByte");
-			new Mov { DestinationReg = RegistersEnum.EAX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ClearAsmBreak_AsmOrigByte"), SourceIsIndirect = true };
+			new Comment("X#: EAX = .AsmOrigByte");
+			new Mov { DestinationReg = RegistersEnum.EAX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_AsmOrigByte"), SourceIsIndirect = true };
 
 			new Comment("X#: EDI[0] = EAX");
 			new Mov{ DestinationReg = RegistersEnum.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0, SourceReg = RegistersEnum.EAX };

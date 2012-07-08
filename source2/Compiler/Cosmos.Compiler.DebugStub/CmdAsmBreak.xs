@@ -26,7 +26,7 @@ procedure ClearAsmBreak {
     If (EDI = 0) exit
     
 	# Clear old break point and set back to original opcode / partial opcode
-    EAX = AsmOrigByte
+    EAX = .AsmOrigByte
     EDI[0] = EAX
     .AsmOrigByte = 0
 }
