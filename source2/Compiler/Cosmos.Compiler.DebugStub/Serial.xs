@@ -1,5 +1,7 @@
 ﻿Group DebugStub
 
+var ComAddr = 
+
 # Input: AL
 # Output: None
 # Modifies: EDX, ESI
@@ -12,8 +14,6 @@ procedure WriteALToComPort {
     -EAX
 }
 
-# SERIAL DOCS
-#
 # All information relating to our serial usage should be documented in this comment.
 #
 # We do not use IRQs for debugstub serial. This is becuase DebugStub (DS)
@@ -52,9 +52,11 @@ procedure WriteALToComPort {
 
 # Todo Auto params
 # Todo ebp frame ptr auto etc
-# Inputs
-#  -DX - Serial Port Address
 procedure InitSerial {
+	# mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
+	# Currently hardcoded to COM1.
+	DX = $03F8
+
 	# Disable interrupts
 	BX = DX
 	DX + 1

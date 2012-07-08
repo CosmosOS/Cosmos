@@ -147,13 +147,13 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      AddPattern("var _ABC 'Text'",
+      AddPattern("var _ABC = 'Text'",
         delegate(TokenList aTokens, ref List<string> rCode) {
           string xLabel = GetLabel(aTokens[1]);
           rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", \"" + aTokens[2].Value + "\"));");
         }
       );
-      AddPattern("var _ABC 123",
+      AddPattern("var _ABC = 123",
         delegate(TokenList aTokens, ref List<string> rCode) {
           string xLabel = GetLabel(aTokens[1]);
           rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(xLabel) + ", \"" + aTokens[2].Value + "\"));");

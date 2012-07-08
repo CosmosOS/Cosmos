@@ -2,19 +2,14 @@
 
 # Todo: Change these to a group level var
 var ..DebugBPs int[256]
-var ..DebugWaitMsg 'Waiting for debugger connection...'
+var ..DebugWaitMsg = 'Waiting for debugger connection...'
 
 # Called before Kernel runs. Inits debug stub, etc
 procedure Init {
     Call .Cls
 	# Display message before even trying to init serial
     Call .DisplayWaitMsg
-
-	# mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
-	# Currently hardcoded to COM1.
-	DX = $03F8
     Call .InitSerial
-
     Call .WaitForDbgHandshake
     Call .Cls
 }
