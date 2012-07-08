@@ -32,7 +32,7 @@ namespace Cosmos.Debug.DebugStub {
 
       protected void WriteBytesToComPort(int xCount) {
         for (int i = 1; i <= xCount; i++) {
-          Call("DebugStub_WriteByteToComPort");
+          Call("DebugStub_ComWrite8");
         }
       }
     }

@@ -23,18 +23,18 @@ namespace Cosmos.Debug.DebugStub {
         // and move them to a buffer.
         // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
         AL = DsVsip.CmdCompleted;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
         //
         EAX = CommandID.Value;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
       }
     }
 
     public class ProcessCommand : CodeBlock {
-      // Modifies: AL, DX (ReadALFromComPort)
+      // Modifies: AL, DX (ComReadAL)
       // Returns: AL
       public override void Assemble() {
-        Call("DebugStub_ReadALFromComPort");
+        Call("DebugStub_ComReadAL");
         // Some callers expect AL to be returned, so we preserve it
         // in case any commands modify AL.
         // We push EAX to keep stack aligned. 
@@ -46,7 +46,7 @@ namespace Cosmos.Debug.DebugStub {
         JumpIf(Flags.Equal, ".End");
 
         // Read Command ID
-        Call("DebugStub_ReadALFromComPort");
+        Call("DebugStub_ComReadAL");
         CommandID.Value = EAX;
 
         // Get AL back so we can compare it, but also put it back for later

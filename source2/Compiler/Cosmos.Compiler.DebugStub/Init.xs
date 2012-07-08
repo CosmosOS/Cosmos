@@ -17,7 +17,7 @@ procedure Init {
 procedure WaitForSignature {
     EBX = 0
 Read:
-    Call .ReadALFromComPort
+    Call .ComReadAL
     BL = AL
     EBX ~> 8
     if (EBX != $19740807) goto Read
@@ -32,17 +32,17 @@ Read:
 procedure WaitForDbgHandshake {
     # "Clear" the UART out
     AL = 0
-    Call .WriteALToComPort
+    Call .ComWriteAL
 
     # Cosmos.Debug.Consts.Consts.SerialSignature
 	+$19740807
     ESI = ESP
 
     # TODO pass a count register
-    Call .WriteByteToComPort
-    Call .WriteByteToComPort
-    Call .WriteByteToComPort
-    Call .WriteByteToComPort
+    Call .ComWrite8
+    Call .ComWrite8
+    Call .ComWrite8
+    Call .ComWrite8
 
     # Restore ESP, we actually dont care about EAX or the value on the stack anymore.
     -EAX
@@ -53,7 +53,7 @@ procedure WaitForDbgHandshake {
 	# Send the actual started signal
 	# DsVsip.Started = 6
     AL = 6
-    Call .WriteALToComPort
+    Call .ComWriteAL
 
     Call .WaitForSignature
     Call .ProcessCommandBatch

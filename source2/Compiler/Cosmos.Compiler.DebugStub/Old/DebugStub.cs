@@ -44,7 +44,7 @@ namespace Cosmos.Debug.DebugStub {
         // BP ID Number is sent after BP Address, becuase
         // reading BP address uses AL (EAX).
         EAX = 0;
-        Call("DebugStub_ReadALFromComPort");
+        Call("DebugStub_ComReadAL");
 
         // Calculate location in table
         // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet

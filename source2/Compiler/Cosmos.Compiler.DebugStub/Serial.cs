@@ -18,35 +18,6 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: var .ComAddr = $03F8");
 			mAssembler.DataMembers.Add(new DataMember("DebugStub_ComAddr", 0x03F8));
 
-			new Comment("Input: AL");
-
-			new Comment("Output: None");
-
-			new Comment("Modifies: EDX, ESI");
-
-			new Comment("X#: procedure WriteALToComPort {");
-			new Label("DebugStub_WriteALToComPort");
-
-			new Comment("X#: +EAX");
-			new Push { DestinationReg = RegistersEnum.EAX};
-
-			new Comment("X#: ESI = ESP");
-			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
-
-			new Comment("X#: Call .WriteByteToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteByteToComPort" };
-
-			new Comment("Is a local var, cant use Return(4). X# issues the return.");
-
-			new Comment("This also allows the function to preserve EAX.");
-
-			new Comment("X#: -EAX");
-			new Pop { DestinationReg = RegistersEnum.EAX};
-
-			new Comment("X#: }");
-			new Label("DebugStub_WriteALToComPort_Exit");
-			new Return();
-
 			new Comment("All information relating to our serial usage should be documented in this comment.");
 
 			new Comment("http://wiki.osdev.org/Serial_ports");
@@ -250,8 +221,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("Modifies: AL, DX");
 
-			new Comment("X#: procedure ReadALFromComPort {");
-			new Label("DebugStub_ReadALFromComPort");
+			new Comment("X#: procedure ComReadAL {");
+			new Label("DebugStub_ComReadAL");
 
 			new Comment("X#: DX = .ComAddr");
 			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
@@ -262,7 +233,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("Wait for port to be ready");
 
 			new Comment("X#: Wait:");
-			new Label("DebugStub_ReadALFromComPort_Wait");
+			new Label("DebugStub_ComReadAL_Wait");
 
 			new Comment("X#: AL = Port[DX]");
 			new IN { DestinationReg = RegistersEnum.AL};
@@ -271,7 +242,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Test { DestinationReg = RegistersEnum.AL, SourceValue = 0x01 };
 
 			new Comment("X#: if 0 goto Wait");
-			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_ReadALFromComPort_Wait" };
+			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_ComReadAL_Wait" };
 
 			new Comment("X#: DX = .ComAddr");
 			new Mov { DestinationReg = RegistersEnum.DX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_ComAddr"), SourceIsIndirect = true };
@@ -282,7 +253,7 @@ namespace Cosmos.Debug.DebugStub {
 			new IN { DestinationReg = RegistersEnum.AL};
 
 			new Comment("X#: }");
-			new Label("DebugStub_ReadALFromComPort_Exit");
+			new Label("DebugStub_ComReadAL_Exit");
 			new Return();
 
 			new Comment("Input: EDI");
@@ -298,8 +269,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: procedure ComRead8  {");
 			new Label("DebugStub_ComRead8");
 
-			new Comment("X#: Call .ReadALFromComPort");
-			new Call { DestinationLabel = "DebugStub_ReadALFromComPort" };
+			new Comment("X#: Call .ComReadAL");
+			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: EDI[0] = AL");
 			new Mov{ DestinationReg = RegistersEnum.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0, SourceReg = RegistersEnum.AL };
@@ -343,8 +314,37 @@ namespace Cosmos.Debug.DebugStub {
 			new Label("DebugStub_ComRead32_Exit");
 			new Return();
 
-			new Comment("X#: procedure WriteByteToComPort {");
-			new Label("DebugStub_WriteByteToComPort");
+			new Comment("Input: AL");
+
+			new Comment("Output: None");
+
+			new Comment("Modifies: EDX, ESI");
+
+			new Comment("X#: procedure ComWriteAL {");
+			new Label("DebugStub_ComWriteAL");
+
+			new Comment("X#: +EAX");
+			new Push { DestinationReg = RegistersEnum.EAX};
+
+			new Comment("X#: ESI = ESP");
+			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
+
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+
+			new Comment("Is a local var, cant use Return(4). X# issues the return.");
+
+			new Comment("This also allows the function to preserve EAX.");
+
+			new Comment("X#: -EAX");
+			new Pop { DestinationReg = RegistersEnum.EAX};
+
+			new Comment("X#: }");
+			new Label("DebugStub_ComWriteAL_Exit");
+			new Return();
+
+			new Comment("X#: procedure ComWrite8 {");
+			new Label("DebugStub_ComWrite8");
 
 			new Comment("Input: ESI");
 
@@ -389,7 +389,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("Bit 5 (0x20) test for Transmit Holding Register to be empty.");
 
 			new Comment("X#: Wait:");
-			new Label("DebugStub_WriteByteToComPort_Wait");
+			new Label("DebugStub_ComWrite8_Wait");
 
 			new Comment("X#: AL = Port[DX]");
 			new IN { DestinationReg = RegistersEnum.AL};
@@ -398,7 +398,7 @@ namespace Cosmos.Debug.DebugStub {
 			new Test { DestinationReg = RegistersEnum.AL, SourceValue = 0x20 };
 
 			new Comment("X#: if 0 goto Wait");
-			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_WriteByteToComPort_Wait" };
+			new ConditionalJump { Condition = ConditionalTestEnum.Zero, DestinationLabel = "DebugStub_ComWrite8_Wait" };
 
 			new Comment("Set address of port");
 
@@ -419,7 +419,7 @@ namespace Cosmos.Debug.DebugStub {
 			new INC { DestinationReg = RegistersEnum.ESI };
 
 			new Comment("X#: }");
-			new Label("DebugStub_WriteByteToComPort_Exit");
+			new Label("DebugStub_ComWrite8_Exit");
 			new Return();
 
 		}

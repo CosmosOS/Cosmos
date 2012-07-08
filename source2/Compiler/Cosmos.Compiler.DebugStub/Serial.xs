@@ -4,18 +4,6 @@
 # Currently hardcoded to COM1.
 var .ComAddr = $03F8
 
-# Input: AL
-# Output: None
-# Modifies: EDX, ESI
-procedure WriteALToComPort {
-	+EAX
-    ESI = ESP
-    Call .WriteByteToComPort
-    # Is a local var, cant use Return(4). X# issues the return.
-    # This also allows the function to preserve EAX.
-    -EAX
-}
-
 # All information relating to our serial usage should be documented in this comment.
 # http://wiki.osdev.org/Serial_ports
 #
@@ -110,7 +98,7 @@ procedure InitSerial {
 }
 
 # Modifies: AL, DX
-procedure ReadALFromComPort {
+procedure ComReadAL {
 	DX = .ComAddr
 	DX + 5
 
@@ -131,11 +119,10 @@ Wait:
 #
 # Reads a byte into [EDI] and does EDI + 1
 procedure ComRead8  {
-    Call .ReadALFromComPort
+    Call .ComReadAL
     EDI[0] = AL
     EDI + 1
 }
-
 procedure ComRead16 {
 	Call .ComRead8
 	Call .ComRead8
@@ -147,7 +134,19 @@ procedure ComRead32 {
 	Call .ComRead8
 }
 
-procedure WriteByteToComPort {
+# Input: AL
+# Output: None
+# Modifies: EDX, ESI
+procedure ComWriteAL {
+	+EAX
+    ESI = ESP
+    Call .ComWrite8
+    # Is a local var, cant use Return(4). X# issues the return.
+    # This also allows the function to preserve EAX.
+    -EAX
+}
+
+procedure ComWrite8 {
 	# Input: ESI
 	# Output: None
 	# Modifies: EAX, EDX

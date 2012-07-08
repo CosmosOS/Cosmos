@@ -12,7 +12,7 @@ namespace Cosmos.Debug.DebugStub {
     public class SendRegisters : Inlines {
       public override void Assemble() {
         AL = (int)DsVsip.Registers; // Send the actual started signal
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         ESI = PushAllPtr.Value;
         WriteBytesToComPort(32);
@@ -26,7 +26,7 @@ namespace Cosmos.Debug.DebugStub {
     public class SendFrame : Inlines {
       public override void Assemble() {
         AL = (int)DsVsip.Frame;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         int xCount = 8 * 4;
         EAX = (uint)xCount;
@@ -41,7 +41,7 @@ namespace Cosmos.Debug.DebugStub {
     public class SendStack : CodeBlock {
       public override void Assemble() {
         AL = (int)DsVsip.Stack;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         // Send size of bytes
         ESI = CallerESP.Value;
@@ -56,7 +56,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".SendByte";
         ESI.Compare(CallerEBP.Value);
         JumpIf(Flags.Equal, ".Exit");
-        Call("DebugStub_WriteByteToComPort");
+        Call("DebugStub_ComWrite8");
         Jump(".SendByte");
       }
     }
@@ -69,7 +69,7 @@ namespace Cosmos.Debug.DebugStub {
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
         AL = (int)DsVsip.MethodContext;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         // offset relative to ebp
         // size of data to send
@@ -85,7 +85,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".SendByte";
         ECX.Compare(0);
         JumpIf(Flags.Equal, ".AfterSendByte");
-        Call("DebugStub_WriteByteToComPort");
+        Call("DebugStub_ComWrite8");
         ECX--;
         Jump(".SendByte");
         Label = ".AfterSendByte";
@@ -102,7 +102,7 @@ namespace Cosmos.Debug.DebugStub {
         ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_1";
         AL = (int)DsVsip.MemoryData;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         ReadComPortX32toStack(1);
         Label = "DebugStub_SendMemory_2";
@@ -116,7 +116,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = "DebugStub_SendMemory_SendByte";
         new Compare { DestinationReg = Registers.ECX, SourceValue = 0 };
         JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte");
-        Call("DebugStub_WriteByteToComPort");
+        Call("DebugStub_ComWrite8");
         ECX--;
         Jump("DebugStub_SendMemory_SendByte");
 
@@ -136,7 +136,7 @@ namespace Cosmos.Debug.DebugStub {
         AL = (int)DsVsip.TracePoint;
 
         Label = ".Type";
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         // Send Calling EIP.
         ESI = CallerEIP.Address;
@@ -151,7 +151,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         // Write the type
         AL = (int)DsVsip.Message;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         // Write Length
         ESI = EBP;
@@ -164,7 +164,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".WriteChar";
         ECX.Compare(0);
         JumpIf(Flags.Equal, ".Exit");
-        Call("DebugStub_WriteByteToComPort");
+        Call("DebugStub_ComWrite8");
         ECX--;
         // We are storing as 16 bits, but for now I will transmit 8 bits
         // So we inc again to skip the 0
@@ -180,7 +180,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         // Write the type
         AL = (int)DsVsip.Pointer;
-        Call("DebugStub_WriteALToComPort");
+        Call("DebugStub_ComWriteAL");
 
         // pointer value
         ESI = EBP[8];

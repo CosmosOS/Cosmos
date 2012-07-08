@@ -17,7 +17,7 @@ namespace Cosmos.Debug.DebugStub {
 			mAssembler.DataMembers.Add(new DataMember("DebugBPs", new int[256]));
 
 			new Comment("X#: var ..DebugWaitMsg = 'Waiting for debugger connection...'");
-			mAssembler.DataMembers.Add(new DataMember("DebugWaitMsg", "="));
+			mAssembler.DataMembers.Add(new DataMember("DebugWaitMsg", "Waiting for debugger connection..."));
 
 			new Comment("Called before Kernel runs. Inits debug stub, etc");
 
@@ -54,8 +54,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Read:");
 			new Label("DebugStub_WaitForSignature_Read");
 
-			new Comment("X#: Call .ReadALFromComPort");
-			new Call { DestinationLabel = "DebugStub_ReadALFromComPort" };
+			new Comment("X#: Call .ComReadAL");
+			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
 			new Comment("X#: BL = AL");
 			new Mov{ DestinationReg = RegistersEnum.BL, SourceReg = RegistersEnum.AL };
@@ -91,8 +91,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: AL = 0");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 0 };
 
-			new Comment("X#: Call .WriteALToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteALToComPort" };
+			new Comment("X#: Call .ComWriteAL");
+			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
 
 			new Comment("Cosmos.Debug.Consts.Consts.SerialSignature");
 
@@ -104,17 +104,17 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("TODO pass a count register");
 
-			new Comment("X#: Call .WriteByteToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteByteToComPort" };
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .WriteByteToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteByteToComPort" };
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .WriteByteToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteByteToComPort" };
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
-			new Comment("X#: Call .WriteByteToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteByteToComPort" };
+			new Comment("X#: Call .ComWrite8");
+			new Call { DestinationLabel = "DebugStub_ComWrite8" };
 
 			new Comment("Restore ESP, we actually dont care about EAX or the value on the stack anymore.");
 
@@ -132,8 +132,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: AL = 6");
 			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 6 };
 
-			new Comment("X#: Call .WriteALToComPort");
-			new Call { DestinationLabel = "DebugStub_WriteALToComPort" };
+			new Comment("X#: Call .ComWriteAL");
+			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
 
 			new Comment("X#: Call .WaitForSignature");
 			new Call { DestinationLabel = "DebugStub_WaitForSignature" };
