@@ -39,7 +39,7 @@ namespace Cosmos.Compiler.XSharp {
     // _.$ are AlphaNum. See comments in Parser
     // # is comment and literal, but could be reused when not first char
     // string[] is used instead of string because operators can be multi char, != >= etc
-    public static readonly string[] Operators = "= != >= <= [ ] + - : { } < > ? @ ~> ~< >> << ++ --".Split(mSpace);
+    public static readonly string[] Operators = "= != >= <= [ ] + - : { } < > ? ?& @ ~> <~ >> << ++ --".Split(mSpace);
 
     static Parser() {
       var xRegisters = new List<string>();

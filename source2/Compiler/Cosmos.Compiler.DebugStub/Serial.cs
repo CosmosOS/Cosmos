@@ -258,26 +258,26 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Call .ComReadAL");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
-			new Comment("X#: EAX >~ 8");
-			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+			new Comment("X#: EAX ~> 8");
+			new LiteralAssemblerCode("ROR EAX, 8");
 
 			new Comment("X#: Call .ComReadAL");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
-			new Comment("X#: EAX >~ 8");
-			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+			new Comment("X#: EAX ~> 8");
+			new LiteralAssemblerCode("ROR EAX, 8");
 
 			new Comment("X#: Call .ComReadAL");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
-			new Comment("X#: EAX >~ 8");
-			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+			new Comment("X#: EAX ~> 8");
+			new LiteralAssemblerCode("ROR EAX, 8");
 
 			new Comment("X#: Call .ComReadAL");
 			new Call { DestinationLabel = "DebugStub_ComReadAL" };
 
-			new Comment("X#: EAX >~ 8");
-			new Test { DestinationReg = RegistersEnum.EAX, SourceValue = 8 };
+			new Comment("X#: EAX ~> 8");
+			new LiteralAssemblerCode("ROR EAX, 8");
 
 			new Comment("X#: }");
 			new Label("DebugStub_ComReadEAX_Exit");

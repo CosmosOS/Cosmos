@@ -111,13 +111,13 @@ Wait:
 }
 procedure ComReadEAX {
 	Call .ComReadAL
-	EAX >~ 8
+	EAX ~> 8
 	Call .ComReadAL
-	EAX >~ 8
+	EAX ~> 8
 	Call .ComReadAL
-	EAX >~ 8
+	EAX ~> 8
 	Call .ComReadAL
-	EAX >~ 8
+	EAX ~> 8
 }
 
 # Input: EDI
