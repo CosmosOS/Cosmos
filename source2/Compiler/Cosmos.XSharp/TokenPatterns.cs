@@ -7,10 +7,16 @@ using System.Text;
 namespace Cosmos.Compiler.XSharp {
   public class TokenPatterns {
     protected class Pattern {
-      public TokenList Tokens;
-      public int Hash;
-      public CodeFunc Code;
-      public bool OldCodeType;
+      public readonly TokenList Tokens;
+      public readonly int Hash;
+      public readonly CodeFunc Code;
+      public bool RawAsm;
+
+      public Pattern(TokenList aTokens, CodeFunc aCode) {
+        Tokens = aTokens;
+        Hash = aTokens.GetHashCode();
+        Code = aCode;
+      }
     }
 
     public bool EmitUserComments = true;
@@ -154,16 +160,16 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add(GroupLabel("Const_" + aTokens[1]) + " equ " + aTokens[3]);
       });
 
-      AddPattern(true, "var _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern(false, "var _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", 0));");
       });
-      AddPattern(true, "var _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern(false, "var _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", " + aTokens[3].Value + "));");
       });
-      AddPattern(true, "var _ABC = 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern(false, "var _ABC = 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", \"" + aTokens[3].Value + "\"));");
       });
-      AddPattern(true, "var _ABC _ABC[123]", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern(false, "var _ABC _ABC[123]", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
       });
 
@@ -438,7 +444,7 @@ namespace Cosmos.Compiler.XSharp {
       for (int i = 0; i < xResult.Count; i++) {
         xResult[i] = string.Format(xResult[i], aTokens.Select(c => c.Value).ToArray());
       }
-      if (xPattern.OldCodeType == false) {
+      if (xPattern.RawAsm) {
         for (int i = 0; i < xResult.Count; i++) {
           xResult[i] = "new LiteralAssemblerCode(\"" + xResult[i] + "\");";
         }
@@ -480,43 +486,37 @@ namespace Cosmos.Compiler.XSharp {
       return GetNonPatternCode(xTokens);
     }
 
-    protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
-      AddPattern(false, aPatterns, aCode);
-    }
-    protected void AddPattern(bool aOldCodeType, string[] aPatterns, CodeFunc aCode) {
-      foreach (var xPattern in aPatterns) {
-        AddPattern(aOldCodeType, xPattern, aCode);
-      }
+    protected void AddPattern(string aPattern, string aCode) {
+      AddPattern(true, aPattern, aCode);
     }
     protected void AddPattern(string aPattern, CodeFunc aCode) {
-      AddPattern(false, aPattern, aCode);
+      AddPattern(true, aPattern, aCode);
     }
-    protected void AddPattern(bool aOldCodeType, string aPattern, CodeFunc aCode) {
+    protected void AddPattern(string[] aPatterns, string aCode) {
+      AddPattern(true, aPatterns, aCode);
+    }
+    protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
+      AddPattern(true, aPatterns, aCode);
+    }
+
+    protected void AddPattern(bool aRawAsm, string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false, true);
-
-      var xPattern = new Pattern() {
-        Tokens = xParser.Tokens,
-        Hash = xParser.Tokens.GetHashCode(),
-        Code = aCode,
-        OldCodeType = aOldCodeType
-      };
-
+      var xPattern = new Pattern(xParser.Tokens, aCode);
+      xPattern.RawAsm = aRawAsm;
       mPatterns.Add(xPattern);
     }
-
-    protected void AddPattern(string[] aPatterns, string aCode) {
-      AddPattern(false, aPatterns, aCode);
+    protected void AddPattern(bool aRawAsm, string[] aPatterns, CodeFunc aCode) {
+      foreach (var xPattern in aPatterns) {
+        AddPattern(aRawAsm, xPattern, aCode);
+      }
     }
-    protected void AddPattern(bool aOldCodeType, string[] aPatterns, string aCode) {
-      AddPattern(aOldCodeType, aPatterns, delegate(TokenList aTokens, ref List<string> rCode) {
+    protected void AddPattern(bool aRawAsm, string aPattern, string aCode) {
+      AddPattern(aRawAsm, aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(aCode);
       });
     }
-    protected void AddPattern(string aPattern, string aCode) {
-      AddPattern(false, aPattern, aCode);
-    }
-    protected void AddPattern(bool aOldCodeType, string aPattern, string aCode) {
-      AddPattern(aOldCodeType, aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
+    protected void AddPattern(bool aRawAsm, string[] aPatterns, string aCode) {
+      AddPattern(aRawAsm, aPatterns, delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(aCode);
       });
     }
