@@ -66,16 +66,19 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckIsVsRunning() {
+      int xSeconds = 5;
       if (App.IgnoreVS) {
         return;
       }
 
       Echo("Checking if Visual Studio is running.");
-
-      // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
-      // So we wait a few seconds first.
-      if (WaitForExit("devenv", 5000)) {
-        throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
+      if (IsRunning("devenv")) {
+        Echo("Waiting " + xSeconds + " to see if Visual Studio exits.");
+        // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
+        // So we wait a few seconds first.
+        if (WaitForExit("devenv", xSeconds * 1000)) {
+          throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
+        }
       }
     }
 
