@@ -8,24 +8,6 @@ using System.IO;
 namespace Cosmos.Assembler {
   public class DataMember : BaseAssemblerElement, IComparable<DataMember> {
     public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
-    public static string GetStaticFieldName(FieldInfo aField) {
-      return FilterStringForIncorrectChars("static_field__" + MethodInfoLabelGenerator.GetFullName(aField.DeclaringType) + "." + aField.Name);
-    }
-
-    public static string FilterStringForIncorrectChars(string aName) {
-      string xTempResult = aName;
-      foreach (char c in IllegalIdentifierChars) {
-        xTempResult = xTempResult.Replace(c, '_');
-      }
-      return String.Intern(xTempResult);
-    }
-
-    public DataMember(string aName, Stream aData) {
-      Name = aName;
-      RawDefaultValue = new byte[aData.Length];
-      aData.Read(RawDefaultValue, 0, RawDefaultValue.Length);
-    }
-
     public string Name { get; private set; }
     public bool IsComment { get; set; }
     public byte[] RawDefaultValue { get; set; }
@@ -36,11 +18,6 @@ namespace Cosmos.Assembler {
       Name = aName;
     }
 
-    public DataMember(string aName, params object[] aDefaultValue) {
-      Name = aName;
-      UntypedDefaultValue = aDefaultValue;
-    }
-
     public DataMember(string aName, string aValue) {
       Name = aName;
       var xBytes = ASCIIEncoding.ASCII.GetBytes(aValue);
@@ -48,6 +25,11 @@ namespace Cosmos.Assembler {
       xBytes.CopyTo(xBytes2, 0);
       xBytes2[xBytes2.Length - 1] = 0;
       RawDefaultValue = xBytes2;
+    }
+
+    public DataMember(string aName, params object[] aDefaultValue) {
+      Name = aName;
+      UntypedDefaultValue = aDefaultValue;
     }
 
     public DataMember(string aName, byte[] aDefaultValue) {
@@ -94,6 +76,24 @@ namespace Cosmos.Assembler {
       //                RawDefaultValue, i * 4, 4);
       //}
       UntypedDefaultValue = aDefaultValue.Cast<object>().ToArray();
+    }
+
+    public DataMember(string aName, Stream aData) {
+      Name = aName;
+      RawDefaultValue = new byte[aData.Length];
+      aData.Read(RawDefaultValue, 0, RawDefaultValue.Length);
+    }
+
+    public static string GetStaticFieldName(FieldInfo aField) {
+      return FilterStringForIncorrectChars("static_field__" + MethodInfoLabelGenerator.GetFullName(aField.DeclaringType) + "." + aField.Name);
+    }
+
+    public static string FilterStringForIncorrectChars(string aName) {
+      string xTempResult = aName;
+      foreach (char c in IllegalIdentifierChars) {
+        xTempResult = xTempResult.Replace(c, '_');
+      }
+      return String.Intern(xTempResult);
     }
 
     public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput) {

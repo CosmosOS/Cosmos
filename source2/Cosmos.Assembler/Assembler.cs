@@ -45,14 +45,13 @@ namespace Cosmos.Assembler {
       get { return mAsmIlIdx; }
     }
 
-    protected internal List<Instruction> mInstructions = new List<Instruction>();
-    private List<DataMember> mDataMembers = new List<DataMember>();
-
+    protected List<DataMember> mDataMembers = new List<DataMember>();
     public List<DataMember> DataMembers {
       get { return mDataMembers; }
         set { mDataMembers = value; }
     }
 
+    protected internal List<Instruction> mInstructions = new List<Instruction>();
     public List<Instruction> Instructions {
       get { return mInstructions; }
         set { mInstructions = value; }
