@@ -16,8 +16,9 @@ procedure AckCommand {
     # The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
 
 	# DsVsip.CmdCompleted
-	# mov AL, DebugStub_DsVsip_CmdCompleted
-    AL = 9
+	# ! mov AL, DebugStub_DsVsip_CmdCompleted
+	AL = .DsVsip_CmdCompleted
+    #AL = 9
     ComWriteAL()
     
     EAX = .CommandID
@@ -33,5 +34,5 @@ Begin:
 	# VsipDs.BatchEnd
 	if (AL != 8) goto Begin
 
-    Call("DebugStub_AckCommand")
+    AckCommand()
 }
