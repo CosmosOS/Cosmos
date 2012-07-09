@@ -11,6 +11,8 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
+			new Comment("test when emitted after usage too");
+
 			new Comment("X#: ! DebugStub_DsVsip_CmdCompleted equ 9");
 			new LiteralAssemblerCode("DebugStub_DsVsip_CmdCompleted equ 9");
 
@@ -43,8 +45,7 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("! mov AL, DebugStub_DsVsip_CmdCompleted");
 
-			new Comment("X#: AL = .DsVsip_CmdCompleted");
-			new Mov { DestinationReg = RegistersEnum.AL , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_DsVsip_CmdCompleted"), SourceIsIndirect = true };
+			new Comment("AL = .DsVsip_CmdCompleted");
 
 			new Comment("AL = 9");
 

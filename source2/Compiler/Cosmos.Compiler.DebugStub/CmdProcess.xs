@@ -1,5 +1,6 @@
 ﻿Group DebugStub
 
+# test when emitted after usage too
 ! DebugStub_DsVsip_CmdCompleted equ 9
 
 procedure AckCommand {
@@ -17,7 +18,7 @@ procedure AckCommand {
 
 	# DsVsip.CmdCompleted
 	# ! mov AL, DebugStub_DsVsip_CmdCompleted
-	AL = .DsVsip_CmdCompleted
+	#AL = .DsVsip_CmdCompleted
     #AL = 9
     ComWriteAL()
     
