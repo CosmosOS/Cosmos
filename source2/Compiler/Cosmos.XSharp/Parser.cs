@@ -19,7 +19,10 @@ namespace Cosmos.Compiler.XSharp {
     protected static readonly char[] mComma = ",".ToCharArray();
     protected static readonly char[] mSpace = " ".ToCharArray();
     public static string[] mKeywords = (
-      "CALL,CONST"
+      "AS"
+      + ",BYTE"
+      + ",CALL,CONST"
+      + ",DWORD"
       + ",END,EXIT"
       + ",GOTO,GROUP"
       + ",IF,INTERRUPTHANDLER"
@@ -27,6 +30,7 @@ namespace Cosmos.Compiler.XSharp {
       + ",POPALL,PUSHALL,PROCEDURE,PORT"
       + ",RETURN,RETURNINTERRUPT"
       + ",VAR"
+      + ",WORD"
     ).Split(mComma);
 
     public static readonly string[] Registers;

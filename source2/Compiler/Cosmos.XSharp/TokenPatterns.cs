@@ -60,7 +60,7 @@ namespace Cosmos.Compiler.XSharp {
       if (mProcedureName == null) {
         if (xValue.StartsWith(".")) {
           return xValue.Substring(1);
-        } 
+        }
         return GroupLabel(xValue);
       } else {
         if (xValue.StartsWith("..")) {
@@ -80,7 +80,7 @@ namespace Cosmos.Compiler.XSharp {
     }
     protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx) {
       var xToken = aTokens[aIdx].Type;
-      Token xNext = null; 
+      Token xNext = null;
       if (aIdx + 1 < aTokens.Count) {
         xNext = aTokens[aIdx + 1];
       }
@@ -124,7 +124,7 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("# Comment", delegate(TokenList aTokens, ref List<string> rCode) {
         if (EmitUserComments) {
           string xValue = aTokens[0].Value;
-          xValue = xValue.Replace("\"", "\\\""); 
+          xValue = xValue.Replace("\"", "\\\"");
           rCode.Add("; " + xValue);
         }
       });
@@ -232,16 +232,22 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      AddPattern(true, "_REG ?= 123",
-        "new Compare {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
-      );
-      AddPattern(true, "_REG ?= _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[2]);
-        rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{0}, SourceIsIndirect = true, SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ") }};");
+      AddPattern("_REG ?= 123", "Cmp {0}, {2}");
+      AddPattern("_REG ?= _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Cmp {0}, " + GetLabel(aTokens[2]));
+      });
+      AddPattern("_REG ?= #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Cmp {0}, " + GroupLabel("Const_" + aTokens[3]));
       });
 
       AddPattern("_REG ?& 123", "Test {0}, {2}");
-      // ~ "infinite" shift because it loops
+      AddPattern("_REG ?& _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Test {0}, " + GetLabel(aTokens[2]));
+      });
+      AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Test {0}, " + GroupLabel("Const_" + aTokens[3]));
+      });
+
       AddPattern("_REG ~> 123", "ROR {0}, {2}");
       AddPattern("_REG <~ 123", "ROL {0}, {2}");
       AddPattern("_REG >> 123", "SHR {0}, {2}");
@@ -251,7 +257,7 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern(new string[] {
           "_REG32[1] = 123",
           "_REGIDX[1] = 123"
-        }, 
+        },
           "Mov dword [{0} + {2}], {5}"
       );
       AddPattern(new string[] {
@@ -260,7 +266,7 @@ namespace Cosmos.Compiler.XSharp {
         },
           "Mov dword [{0} - {2}], {5}"
       );
-      
+
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("Mov {0}, " + GroupLabel("Const_" + aTokens[3]));
       });
@@ -268,7 +274,7 @@ namespace Cosmos.Compiler.XSharp {
           "_REG32[1] = 123",
           "_REGIDX[1] = 123"
         }, delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("Mov dword [{0} + {2}], " + GroupLabel("Const_" + aTokens[5]));
+        rCode.Add("Mov dword [{0} + {2}], " + GroupLabel("Const_" + aTokens[5]));
       });
       AddPattern(new string[] {
           "_REG32[-1] = 123",
@@ -277,35 +283,39 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("Mov dword [{0} - {2}], " + GroupLabel("Const_" + aTokens[5]));
       });
 
-      AddPattern(true, new string[] { 
-          "_REG = _REG",
-          "_REG = _REG32[1]",
-          "_REG = _REG[-1]",
-          "_REG32[1] = _REG",
-          "_REG32[-1] = _REG"
-        },
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          int xEqIdx = aTokens.IndexOf("=");
-          string xDestReg = GetDestRegister(aTokens, 0);
-          string xSrcReg = GetSrcRegister(aTokens, xEqIdx + 1);
-          rCode.Add("new Mov{{ " + xDestReg + ", " + xSrcReg + " }};");
-        }
+      AddPattern("_REG = _REG", "Mov {0}, {2}");
+      AddPattern(new string[] {
+        "_REG32[1] = _REG", 
+        "_REGIDX[1] = _REG"},
+        //
+        "Mov [{0} + {2}], {5}"
       );
-      AddPattern(true, "_REG = _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[2]);
-        rCode.Add("new Mov {{"
-         + " DestinationReg = RegistersEnum.{0}"
-         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), SourceIsIndirect = true"
-         + " }};");
+      AddPattern(new string[] {
+        "_REG32[-1] = _REG", 
+        "_REGIDX[-1] = _REG"},
+        //
+        "Mov [{0} - {3}], {6}"
+      );
+      AddPattern(new string[] { 
+        "_REG = _REG32[1]",
+        "_REG = _REGIDX[1]"},
+        //
+        "Mov {0}, [{2} + {4}]"
+      );
+      AddPattern(new string[] { 
+        "_REG = _REG32[-1]",
+        "_REG = _REGIDX[-1]"},
+        //
+        "Mov {0}, [{2} - {5}]"
+      );
+
+      AddPattern("_REG = _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Mov {0}, [" + GetLabel(aTokens[2]) + "]");
       });
       // why not [var] like registers? Because its less frequent to access th ptr
       // and it is like a reg.. without [] to get the value...
-      AddPattern(true, "_REG = @_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[3]);
-        rCode.Add("new Mov {{"
-         + " DestinationReg = RegistersEnum.{0}"
-         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ")"
-         + " }};");
+      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Mov {0}, " + GetLabel(aTokens[3]));
       });
 
       AddPattern(new string[] { 
@@ -316,36 +326,36 @@ namespace Cosmos.Compiler.XSharp {
         "Out DX, {5}"
       );
       AddPattern(new string[] { 
-          "AL = Port[DX]", 
-          "AX = Port[DX]", 
-          "EAX = Port[DX]"
-        },
+        "AL = Port[DX]", 
+        "AX = Port[DX]", 
+        "EAX = Port[DX]"},
+        //
         "In {0}, DX"
       );
 
       AddPattern("+123", "Push dword {1}");
-      AddPattern(true, "+123:12",
-        "new Push {{"
-          + " DestinationValue = {1}, Size = {3} "
-          + "}};"
-      );
+      AddPattern(new string[] {
+        "+123 as byte",
+        "+123 as word",
+        "+123 as dword"},
+        "Push {3} {1}");
       AddPattern("+_REG", "Push {1}");
       AddPattern("-_REG", "Pop {1}");
 
-      AddPattern(true, "_ABC = _REG", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[0]);
-        rCode.Add("new Mov {{"
-         + " DestinationRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), DestinationIsIndirect = true"
-         + " , SourceReg = RegistersEnum.{2}"
-         + " }};");
+      AddPattern("_ABC = _REG",
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("Mov [" + GetLabel(aTokens[0]) + "], {2}");
+        });
+      AddPattern("_ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Mov dword [" + GetLabel(aTokens[0]) + "], {2}");
       });
-      AddPattern(true, "_ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[0]);
-        rCode.Add("new Mov {{"
-         + " DestinationRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), DestinationIsIndirect = true"
-         + " , SourceValue = {2}"
-         + " }};");
-      });
+      AddPattern(new string[] {
+        "_ABC = 123 as byte",
+        "_ABC = 123 as word",
+        "_ABC = 123 as dword"},
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("Mov {4} [" + GetLabel(aTokens[0]) + "], {2}");
+        });
 
       // TODO: Allow asm to optimize these to Inc/Dec
       AddPattern("_REG + 1", "Add {0}, {2}");
