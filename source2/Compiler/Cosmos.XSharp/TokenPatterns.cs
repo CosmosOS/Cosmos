@@ -100,19 +100,22 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    protected string GetCondition(Token aToken) {
+    protected string GetJump(Token aToken) {
       if (aToken.Value == "<") {
-        return "ConditionalTestEnum.LessThan";
+        return "JB";  // unsigned
       } else if (aToken.Value == ">") {
-        return "ConditionalTestEnum.GreaterThan";
-      } else if (aToken.Value == "=" || aToken.Value == "0") {
-        return "ConditionalTestEnum.Zero";
+        return "JA";  // unsigned
+      } else if (aToken.Value == "=") {
+        return "JE";
+      } else if (aToken.Value == "0") {
+        // Same as JE, but implies intent in .asm better
+        return "JZ"; 
       } else if (aToken.Value == "!=") {
-        return "ConditionalTestEnum.NotZero";
+        return "JNE";
       } else if (aToken.Value == "<=") {
-        return "ConditionalTestEnum.BelowOrEqual";
+        return "JBE"; // unsigned
       } else if (aToken.Value == ">=") {
-        return "ConditionalTestEnum.AboveOrEqual";
+        return "JAE"; // unsigned
       } else {
         throw new Exception("Unrecognized symbol in conditional: " + aToken.Value);
       }
@@ -164,75 +167,51 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
       });
 
-      AddPattern(true, new string[] {
-          "if 0 goto _ABC", 
-          "if < goto _ABC", 
-          "if > goto _ABC", 
-          "if = goto _ABC",
-          "if != goto _ABC",
-          "if <= goto _ABC", 
-          "if >= goto _ABC" 
+      AddPattern(new string[] {
+          "if 0 goto _ABC", "if 0 Exit", 
+          "if < goto _ABC", "if < Exit", 
+          "if > goto _ABC", "if > Exit", 
+          "if = goto _ABC", "if = Exit", 
+          "if != goto _ABC", "if != Exit", 
+          "if <= goto _ABC", "if <= Exit", 
+          "if >= goto _ABC" , "if >= Exit"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
-          string xLabel = GetLabel(aTokens[3]);
-          var xCondition = GetCondition(aTokens[1]);
-          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
-        }
-      );
-      AddPattern(true, new string[] {
-          "if 0 Exit", 
-          "if < Exit", 
-          "if > Exit", 
-          "if = Exit",
-          "if != Exit",
-          "if <= Exit", 
-          "if >= Exit" 
-        },
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          var xCondition = GetCondition(aTokens[1]);
-          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
+          string xLabel;
+          if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
+            xLabel = ProcLabel("Exit");
+          } else {
+            xLabel = GetLabel(aTokens[3]);
+          }
+          rCode.Add(GetJump(aTokens[1]) + " " + xLabel);
         }
       );
       // Must test separate since !0 is two tokens
-      AddPattern(true, "if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[4]);
-        rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.NotZero, DestinationLabel = " + Quoted(xLabel) + " }};");
+      AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("JNZ " + GetLabel(aTokens[4]));
       });
-      AddPattern(true, "if !0 Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new ConditionalJump {{ Condition = ConditionalTestEnum.NotZero, DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
+      AddPattern("if !0 Exit", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("JNZ " + ProcLabel("Exit"));
       });
 
-      AddPattern(true, new string[] {
+      AddPattern(new string[] {
           //0  1   2  3  4     5  
-          "if _REG < 123 goto _ABC",
-          "if _REG > 123 goto _ABC",
-          "if _REG = 123 goto _ABC",
-          "if _REG != 123 goto _ABC",
-          "if _REG <= 123 goto _ABC",
-          "if _REG >= 123 goto _ABC"
+          "if _REG < 123 goto _ABC", "if _REG < 123 exit",
+          "if _REG > 123 goto _ABC", "if _REG > 123 exit",
+          "if _REG = 123 goto _ABC", "if _REG = 123 exit",
+          "if _REG != 123 goto _ABC", "if _REG != 123 exit",
+          "if _REG <= 123 goto _ABC", "if _REG <= 123 exit",
+          "if _REG >= 123 goto _ABC", "if _REG >= 123 exit"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{1}, SourceValue = {3} }};");
-
-          var xCondition = GetCondition(aTokens[2]);
-          string xLabel = GetLabel(aTokens[5]);
-          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
-        }
-      );
-      AddPattern(true, new string[] {
-          //0  1   2  3   4     
-          "if _REG < 123 Exit",
-          "if _REG > 123 Exit",
-          "if _REG = 123 Exit",
-          "if _REG != 123 Exit",
-          "if _REG <= 123 Exit",
-          "if _REG >= 123 Exit"
-        },
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{1}, SourceValue = {3} }};");
-
-          var xCondition = GetCondition(aTokens[2]);
-          rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
+          rCode.Add("Cmp {1}, {3}");
+          string xLabel;
+          if (string.Equals(aTokens[4].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
+            xLabel = ProcLabel("Exit");
+          } else {
+            xLabel = GetLabel(aTokens[5]);
+          }
+          rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
         }
       );
 
