@@ -20,7 +20,7 @@ Read:
     ComReadAL()
     BL = AL
     EBX ~> 8
-    if (EBX != $19740807) goto Read
+    if EBX != $19740807 goto Read
 }
 
 # QEMU (and possibly others) send some garbage across the serial line first.

@@ -23,7 +23,7 @@ procedure SetAsmBreak {
 procedure ClearAsmBreak {
     EDI = .AsmBreakEIP
     # If 0, we don't need to clear an older one.
-    If (EDI = 0) exit
+    if EDI = 0 exit
     
 	# Clear old break point and set back to original opcode / partial opcode
     EAX = .AsmOrigByte

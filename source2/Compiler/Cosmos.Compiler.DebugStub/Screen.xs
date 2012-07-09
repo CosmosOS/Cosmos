@@ -17,7 +17,7 @@ BeginLoop:
 	
 	# End of Video Area
 	# VidBase + 25 * 80 * 2 = B8FA0
-	If (ESI < $B8FA0) goto BeginLoop
+	If ESI < $B8FA0 goto BeginLoop
 }
 
 procedure DisplayWaitMsg {
@@ -35,7 +35,7 @@ procedure DisplayWaitMsg {
     # Read and copy string till 0 terminator
 ReadChar:
     AL = ESI[0]
-    if (AL = 0) exit
+    if AL = 0 exit
     ESI++
     EDI[0] = AL
     EDI + 2

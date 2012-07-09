@@ -84,15 +84,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CmdSend.xs</DependentUpon>
     </Compile>
-    <Compile Include="Main.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Main.xs</DependentUpon>
-    </Compile>
     <Compile Include="Init.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Init.xs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Main.xs</DependentUpon>
     </Compile>
     <Compile Include="Old\Consts.cs" />
     <Compile Include="Old\DebugStub.cs" />

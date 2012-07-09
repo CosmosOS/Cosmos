@@ -219,35 +219,35 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern(new string[] {
-          //0 1  2  3  4 5  6    7
-          "if (_REG < 123) goto _ABC",
-          "if (_REG > 123) goto _ABC",
-          "if (_REG = 123) goto _ABC",
-          "if (_REG != 123) goto _ABC",
-          "if (_REG <= 123) goto _ABC",
-          "if (_REG >= 123) goto _ABC"
+          //0  1   2  3  4     5  
+          "if _REG < 123 goto _ABC",
+          "if _REG > 123 goto _ABC",
+          "if _REG = 123 goto _ABC",
+          "if _REG != 123 goto _ABC",
+          "if _REG <= 123 goto _ABC",
+          "if _REG >= 123 goto _ABC"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
+          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{1}, SourceValue = {3} }};");
 
-          var xCondition = GetCondition(aTokens[3]);
-          string xLabel = GetLabel(aTokens[7]);
+          var xCondition = GetCondition(aTokens[2]);
+          string xLabel = GetLabel(aTokens[5]);
           rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(xLabel) + " }};");
         }
       );
       AddPattern(new string[] {
-          //0 1  2  3  4 5  6    
-          "if (_REG < 123) Exit",
-          "if (_REG > 123) Exit",
-          "if (_REG = 123) Exit",
-          "if (_REG != 123) Exit",
-          "if (_REG <= 123) Exit",
-          "if (_REG >= 123) Exit"
+          //0  1   2  3   4     
+          "if _REG < 123 Exit",
+          "if _REG > 123 Exit",
+          "if _REG = 123 Exit",
+          "if _REG != 123 Exit",
+          "if _REG <= 123 Exit",
+          "if _REG >= 123 Exit"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{2}, SourceValue = {4} }};");
+          rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{1}, SourceValue = {3} }};");
 
-          var xCondition = GetCondition(aTokens[3]);
+          var xCondition = GetCondition(aTokens[2]);
           rCode.Add("new ConditionalJump {{ Condition = " + xCondition + ", DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
         }
       );

@@ -74,7 +74,7 @@ namespace Cosmos.Build.Builder {
 
       // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
       // So we wait a few seconds first.
-      if (WaitForExit("devenv", 3000)) {
+      if (WaitForExit("devenv", 5000)) {
         throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
       }
     }
