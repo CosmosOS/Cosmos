@@ -81,6 +81,15 @@ namespace Cosmos.Compiler.XSharp {
       return true;
     }
 
+    public int IndexOf(string aValue) {
+      for (int i = 0; i < Count; i++) {
+        if (this[i].Value == aValue) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
     // We could use values to further differntiate, however
     // with types alone it still provides a decent and fash hash.
     public override int GetHashCode() {

@@ -280,34 +280,60 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern(new string[] { 
           "_REG = 123", 
+          "_REG32[1] = 123",
+          "_REG32[-1] = 123",
+        },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          int xEqIdx = aTokens.IndexOf("=");
+          string xDestReg = GetDestRegister(aTokens, 0);
+          rCode.Add("new Mov{{ " + xDestReg + ", SourceValue = " + aTokens[xEqIdx + 1].Value + " }};");
+        }
+      );
+      AddPattern(new string[] { 
+          "_REG = #_ABC", 
+          "_REG32[1] = #_ABC",
+          "_REG32[-1] = #_ABC",
+        },
+        delegate(TokenList aTokens, ref List<string> rCode) {
+          int xEqIdx = aTokens.IndexOf("=");
+          string xDestReg = GetDestRegister(aTokens, 0);
+          string xLabel = GroupLabel("Const_" + aTokens[xEqIdx + 2].Value);
+          rCode.Add("new Mov {{"
+           + xDestReg
+           + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ")"
+           + " }};");
+        }
+      );
+      AddPattern(new string[] { 
           "_REG = _REG",
           "_REG = _REG32[1]",
           "_REG = _REG[-1]",
-          
-          "_REG32[1] = 123",
           "_REG32[1] = _REG",
-
-          "_REG32[-1] = 123",
           "_REG32[-1] = _REG"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
-          int xEqIdx = -1;
-          for (int i = 0; i < aTokens.Count; i++) {
-            if (aTokens[i].Value == "=") {
-              xEqIdx = i;
-              break;
-            }
-          }
-
+          int xEqIdx = aTokens.IndexOf("=");
           string xDestReg = GetDestRegister(aTokens, 0);
-          if (aTokens[xEqIdx + 1].Type == TokenType.ValueInt) {
-            rCode.Add("new Mov{{ " + xDestReg + ", SourceValue = " + aTokens[xEqIdx + 1].Value + " }};");
-          } else {
-            string xSrcReg = GetSrcRegister(aTokens, xEqIdx + 1);
-            rCode.Add("new Mov{{ " + xDestReg + ", " + xSrcReg + " }};");
-          }
+          string xSrcReg = GetSrcRegister(aTokens, xEqIdx + 1);
+          rCode.Add("new Mov{{ " + xDestReg + ", " + xSrcReg + " }};");
         }
       );
+      AddPattern("_REG = _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = GetLabel(aTokens[2]);
+        rCode.Add("new Mov {{"
+         + " DestinationReg = RegistersEnum.{0}"
+         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), SourceIsIndirect = true"
+         + " }};");
+      });
+      // why not [var] like registers? Because its less frequent to access th ptr
+      // and it is like a reg.. without [] to get the value...
+      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        string xLabel = GetLabel(aTokens[3]);
+        rCode.Add("new Mov {{"
+         + " DestinationReg = RegistersEnum.{0}"
+         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ")"
+         + " }};");
+      });
 
       AddPattern(new string[] { 
           "Port[DX] = AL", 
@@ -344,23 +370,6 @@ namespace Cosmos.Compiler.XSharp {
           + " DestinationReg = RegistersEnum.{1}"
           + "}};"
       );
-
-      AddPattern("_REG = _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[2]);
-        rCode.Add("new Mov {{"
-         + " DestinationReg = RegistersEnum.{0}"
-         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + "), SourceIsIndirect = true"
-         + " }};");
-      });
-	    // why not [var] like registers? Because its less frequent to access th ptr
-	    // and it is like a reg.. without [] to get the value...
-      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        string xLabel = GetLabel(aTokens[3]);
-        rCode.Add("new Mov {{"
-         + " DestinationReg = RegistersEnum.{0}"
-         + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ")"
-         + " }};");
-      });
 
       AddPattern("_ABC = _REG", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = GetLabel(aTokens[0]);

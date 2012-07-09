@@ -1,7 +1,7 @@
 ﻿Group DebugStub
 
 # test when emitted after usage too
-! DebugStub_DsVsip_CmdCompleted equ 9
+! DebugStub_Const_DsVsip_CmdCompleted equ 9
 
 procedure AckCommand {
     # We acknowledge receipt of the command AND the processing of it.
@@ -17,7 +17,7 @@ procedure AckCommand {
     # The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
 
 	# DsVsip.CmdCompleted
-	AL = @.DsVsip_CmdCompleted
+	AL = #DsVsip_CmdCompleted
     #AL = 9
     ComWriteAL()
     
