@@ -22,5 +22,9 @@ namespace Cosmos.Compiler.XSharp {
     public string Value;
     public int SrcPosStart;
     public int SrcPosEnd;
+
+    public override string ToString() {
+      return Value;
+    }
   }
 }

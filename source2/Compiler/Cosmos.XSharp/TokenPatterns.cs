@@ -247,25 +247,36 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG >> 123", "SHR {0}, {2}");
       AddPattern("_REG << 123", "SHL {0}, {2}");
 
-      AddPattern("_REG = 123", "Mov dword {0}, {2}");
-      AddPattern("_REG[1] = 123", "Mov dword [{0} + {2}], {5}");
-      AddPattern("_REG[-1] = 123", "Mov dword [{0} - {2}], {5}");
-      //
-      AddPattern(true, new string[] { 
-          "_REG = #_ABC", 
-          "_REG32[1] = #_ABC",
-          "_REG32[-1] = #_ABC",
-        },
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          int xEqIdx = aTokens.IndexOf("=");
-          string xDestReg = GetDestRegister(aTokens, 0);
-          string xLabel = GroupLabel("Const_" + aTokens[xEqIdx + 2].Value);
-          rCode.Add("new Mov {{"
-           + xDestReg
-           + " , SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ")"
-           + " }};");
-        }
+      AddPattern("_REG = 123", "Mov {0}, {2}");
+      AddPattern(new string[] {
+          "_REG32[1] = 123",
+          "_REGIDX[1] = 123"
+        }, 
+          "Mov dword [{0} + {2}], {5}"
       );
+      AddPattern(new string[] {
+          "_REG32[-1] = 123",
+          "_REGIDX[-1] = 123"
+        },
+          "Mov dword [{0} - {2}], {5}"
+      );
+      
+      AddPattern("_REG = #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Mov {0}, " + GroupLabel("Const_" + aTokens[3]));
+      });
+      AddPattern(new string[] {
+          "_REG32[1] = 123",
+          "_REGIDX[1] = 123"
+        }, delegate(TokenList aTokens, ref List<string> rCode) {
+          rCode.Add("Mov dword [{0} + {2}], " + GroupLabel("Const_" + aTokens[5]));
+      });
+      AddPattern(new string[] {
+          "_REG32[-1] = 123",
+          "_REGIDX[-1] = 123"
+        }, delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Mov dword [{0} - {2}], " + GroupLabel("Const_" + aTokens[5]));
+      });
+
       AddPattern(true, new string[] { 
           "_REG = _REG",
           "_REG = _REG32[1]",
@@ -318,16 +329,8 @@ namespace Cosmos.Compiler.XSharp {
           + " DestinationValue = {1}, Size = {3} "
           + "}};"
       );
-      AddPattern(true, "+_REG",
-        "new Push {{"
-          + " DestinationReg = RegistersEnum.{1}"
-          + "}};"
-      );
-      AddPattern(true, "-_REG",
-        "new Pop {{"
-          + " DestinationReg = RegistersEnum.{1}"
-          + "}};"
-      );
+      AddPattern("+_REG", "Push {1}");
+      AddPattern("-_REG", "Pop {1}");
 
       AddPattern(true, "_ABC = _REG", delegate(TokenList aTokens, ref List<string> rCode) {
         string xLabel = GetLabel(aTokens[0]);
@@ -345,66 +348,51 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      AddPattern(true, "_REG + 1", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (IntValue(aTokens[2]) == 1) {
-          rCode.Add("new INC {{ DestinationReg = RegistersEnum.{0} }};");
-        } else {
-          rCode.Add("new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
-        }
-      });
+      AddPattern("_REG + 1", "Add {0}, {2}");
+      AddPattern("_REG - 1", "Sub {0}, {2}");
       AddPattern("_REG++", "Inc {0}");
-
-      AddPattern(true, "_REG - 1", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (IntValue(aTokens[2]) == 1) {
-          rCode.Add("new Dec {{ DestinationReg = RegistersEnum.{0} }};");
-        } else {
-          rCode.Add("new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
-        }
-      });
       AddPattern("_REG--", "Dec {0}");
 
-      AddPattern(true, "}", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new Label(\"" + mGroup + "_" + mProcedureName + "_Exit\");");
+      AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(mGroup + "_" + mProcedureName + "_Exit:");
         if (mInIntHandler) {
-          rCode.Add("new IRET();");
+          rCode.Add("IRet");
         } else {
-          rCode.Add("new Return();");
+          rCode.Add("Ret");
         }
         mProcedureName = null;
       });
 
-      AddPattern(true, "Group _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Group _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         mGroup = aTokens[1].Value;
       });
 
-      AddPattern(true, "Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("new Jump {{ DestinationLabel = " + Quoted(ProcLabel("Exit")) + " }};");
+      AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Jp " + ProcLabel("Exit"));
       });
 
-      AddPattern(true, "InterruptHandler _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("InterruptHandler _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = true;
         mProcedureName = aTokens[1].Value;
-        rCode.Add("new Label(\"" + mGroup + "_{1}\");");
+        rCode.Add(mGroup + "_{1}:");
       });
 
-      AddPattern(true, "Jump _ABC", 
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("new Jump {{ DestinationLabel = \"" + mGroup + "_{1}\" }};");
-        }
-      );
+      AddPattern("Jump _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add("Jp " + GetLabel(aTokens[1]));
+      });
 
       AddPattern("Return", "Ret");
       AddPattern("ReturnInterrupt", "IRet");
       AddPattern("PopAll", "Popad");
       AddPattern("PushAll", "Pushad");
 
-      AddPattern(true, "Procedure _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Procedure _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
         mProcedureName = aTokens[1].Value;
-        rCode.Add("new Label(\"" + mGroup + "_{1}\");");
+        rCode.Add(mGroup + "_{1}:");
       });
 
-      AddPattern(true, "Checkpoint 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
         // This method emits a lot of ASM, but thats what we want becuase
         // at this point we need ASM as simple as possible and completely transparent.
         // No stack changes, no register mods, no calls, no jumps, etc.
@@ -415,12 +403,12 @@ namespace Cosmos.Compiler.XSharp {
         if (xPreBootLogging) {
           UInt32 xVideo = 0xB8000;
           for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
-            rCode.Add("new LiteralAssemblerCode(" + Quoted("mov byte [0x" + i.ToString("X") + "], 0") + ");");
-            rCode.Add("new LiteralAssemblerCode(" + Quoted("mov byte [0x" + (i + 1).ToString("X") + "], 0x02") + ");");
+            rCode.Add("mov byte [0x" + i.ToString("X") + "], 0");
+            rCode.Add("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
           }
 
           foreach (var xChar in aTokens[1].Value) {
-            rCode.Add("new LiteralAssemblerCode(" + Quoted("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar) + ");");
+            rCode.Add("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
             xVideo = xVideo + 2;
           }
         }
