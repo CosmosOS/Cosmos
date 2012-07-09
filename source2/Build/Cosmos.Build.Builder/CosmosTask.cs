@@ -73,7 +73,7 @@ namespace Cosmos.Build.Builder {
 
       Echo("Checking if Visual Studio is running.");
       if (IsRunning("devenv")) {
-        Echo("Waiting " + xSeconds + " to see if Visual Studio exits.");
+        Echo("Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
         // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
         // So we wait a few seconds first.
         if (WaitForExit("devenv", xSeconds * 1000)) {
