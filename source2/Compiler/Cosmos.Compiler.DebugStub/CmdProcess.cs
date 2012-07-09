@@ -11,6 +11,60 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
+			new Comment("X#: const Vs2Ds_Noop = 0");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_Noop equ 0");
+
+			new Comment("X#: const Vs2Ds_TraceOff = 1");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_TraceOff equ 1");
+
+			new Comment("X#: const Vs2Ds_TraceOn = 2");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_TraceOn equ 2");
+
+			new Comment("X#: const Vs2Ds_Break = 3");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_Break equ 3");
+
+			new Comment("X#: const Vs2Ds_Continue = 4");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_Continue equ 4");
+
+			new Comment("X#: const Vs2Ds_BreakOnAddress = 6");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_BreakOnAddress equ 6");
+
+			new Comment("X#: const Vs2Ds_BatchBegin = 7");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_BatchBegin equ 7");
+
+			new Comment("X#: const Vs2Ds_BatchEnd = 8");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_BatchEnd equ 8");
+
+			new Comment("X#: const Vs2Ds_StepInto = 5");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_StepInto equ 5");
+
+			new Comment("X#: const Vs2Ds_StepOver = 11");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_StepOver equ 11");
+
+			new Comment("X#: const Vs2Ds_StepOut = 12");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_StepOut equ 12");
+
+			new Comment("X#: const Vs2Ds_SendMethodContext = 9");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_SendMethodContext equ 9");
+
+			new Comment("X#: const Vs2Ds_SendMemory = 10");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_SendMemory equ 10");
+
+			new Comment("X#: const Vs2Ds_SendRegisters = 13");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_SendRegisters equ 13");
+
+			new Comment("X#: const Vs2Ds_SendFrame = 14");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_SendFrame equ 14");
+
+			new Comment("X#: const Vs2Ds_SendStack = 15");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_SendStack equ 15");
+
+			new Comment("X#: const Vs2Ds_Ping = 17");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_Ping equ 17");
+
+			new Comment("X#: const Vs2Ds_Max = 18");
+			new LiteralAssemblerCode("DebugStub_Const_Vs2Ds_Max equ 18");
+
 			new Comment("X#: const Ds2Vs_Noop = 0");
 			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Noop equ 0");
 

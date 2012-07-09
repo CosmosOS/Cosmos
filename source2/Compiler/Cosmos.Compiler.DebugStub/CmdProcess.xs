@@ -1,5 +1,24 @@
 ﻿Group DebugStub
 
+const Vs2Ds_Noop = 0
+const Vs2Ds_TraceOff = 1
+const Vs2Ds_TraceOn = 2
+const Vs2Ds_Break = 3
+const Vs2Ds_Continue = 4
+const Vs2Ds_BreakOnAddress = 6
+const Vs2Ds_BatchBegin = 7
+const Vs2Ds_BatchEnd = 8
+const Vs2Ds_StepInto = 5
+const Vs2Ds_StepOver = 11
+const Vs2Ds_StepOut = 12
+const Vs2Ds_SendMethodContext = 9
+const Vs2Ds_SendMemory = 10
+const Vs2Ds_SendRegisters = 13
+const Vs2Ds_SendFrame = 14
+const Vs2Ds_SendStack = 15
+const Vs2Ds_Ping = 17 
+const Vs2Ds_Max = 18
+
 const Ds2Vs_Noop = 0
 const Ds2Vs_TracePoint = 1
 const Ds2Vs_Message = 2
