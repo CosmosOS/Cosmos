@@ -424,12 +424,12 @@ namespace Cosmos.Compiler.XSharp {
       return GetPatternCode(xParser.Tokens);
     }
     public List<string> GetPatternCode(TokenList aTokens) {
-      var xResult = new List<string>();
       var xPattern = FindMatch(aTokens);
       if (xPattern == null) {
         return null;
       }
 
+      var xResult = new List<string>();
       xPattern.Code(aTokens, ref xResult);
       // Apply {0} etc into string
       for (int i = 0; i < xResult.Count; i++) {
