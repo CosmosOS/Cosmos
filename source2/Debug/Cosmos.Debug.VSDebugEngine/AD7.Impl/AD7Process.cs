@@ -383,7 +383,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     public int Terminate() {
       OutputText("Debugger terminating.");
       
-      ShutDown();
       mHost.Stop();
 
       OutputText("Debugger terminated.");
@@ -394,7 +393,16 @@ namespace Cosmos.Debug.VSDebugEngine {
       mHost.Start();
     }
 
-    void ShutDown() {
+    void HostShutdown(object sender, EventArgs e) {
+      //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
+      //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
+
+      // We dont use process info any more, but have to call this to tell
+      // VS to stop debugging.
+      if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
+        mCallback.OnProcessExit(0);
+      }
+
       if (mDbgConnector != null) {
         mDbgConnector.Dispose();
         mDbgConnector = null;
@@ -402,19 +410,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (mDebugInfoDb != null) {
         mDebugInfoDb.Dispose();
         mDebugInfoDb = null;
-      }
-    }
-
-    void HostShutdown(object sender, EventArgs e) {
-      //AD7ThreadDestroyEvent.Send(mEngine, mThread, (uint)mProcess.ExitCode);
-      //mCallback.OnProgramDestroy((uint)mProcess.ExitCode);
-
-      ShutDown();
-
-      // We dont use process info any more, but have to call this to tell
-      // VS to stop debugging.
-      if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0) {
-        mCallback.OnProcessExit(0);
       }
     }
 
