@@ -119,9 +119,7 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddPatterns() {
-      AddPattern(true, "! Move EAX, 0",
-        "new LiteralAssemblerCode(\"{0}\");"
-      );
+      AddPattern("! Move EAX, 0", "{0}");
 
       AddPattern(true, "# Comment", delegate(TokenList aTokens, ref List<string> rCode) {
         if (EmitUserComments) {
@@ -261,23 +259,13 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("new Compare {{ DestinationReg = RegistersEnum.{0}, SourceIsIndirect = true, SourceRef = Cosmos.Assembler.ElementReference.New(" + Quoted(xLabel) + ") }};");
       });
 
-      AddPattern(true, "_REG ?& 123",
-        "new Test {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};"
-      );
+      AddPattern("_REG ?& 123", "Test {0}, {2}");
 
       // ~ "infinite" shift because it loops
-      AddPattern(true, "_REG ~> 123",
-        "new LiteralAssemblerCode(\"ROR {0}, {2}\");"
-      );
-      AddPattern(true, "_REG <~ 123",
-        "new LiteralAssemblerCode(\"ROL {0}, {2}\");"
-      );
-      AddPattern(true, "_REG >> 123",
-        "new LiteralAssemblerCode(\"SHR {0}, {2}\");"
-      );
-      AddPattern(true, "_REG << 123",
-        "new LiteralAssemblerCode(\"SHL {0}, {2}\");"
-      );
+      AddPattern("_REG ~> 123", "ROR {0}, {2}");
+      AddPattern("_REG <~ 123", "ROL {0}, {2}");
+      AddPattern("_REG >> 123", "SHR {0}, {2}");
+      AddPattern("_REG << 123", "SHL {0}, {2}");
 
       AddPattern(true, new string[] { 
           "_REG = 123", 
@@ -336,26 +324,22 @@ namespace Cosmos.Compiler.XSharp {
          + " }};");
       });
 
-      AddPattern(true, new string[] { 
+      AddPattern(new string[] { 
           "Port[DX] = AL", 
           "Port[DX] = AX", 
           "Port[DX] = EAX"
         },
-        "new Out {{ DestinationReg = RegistersEnum.{5}}};"
+        "Out DX, {5}"
       );
-      AddPattern(true, new string[] { 
+      AddPattern(new string[] { 
           "AL = Port[DX]", 
           "AX = Port[DX]", 
           "EAX = Port[DX]"
         },
-        "new IN {{ DestinationReg = RegistersEnum.{0}}};"
+        "In {0}, DX"
       );
 
-      AddPattern(true, "+123",
-        "new Push {{"
-          + " DestinationValue = {1}, Size = 32 "
-          + "}};"
-      );
+      AddPattern("+123", "Push dword {1}");
       AddPattern(true, "+123:12",
         "new Push {{"
           + " DestinationValue = {1}, Size = {3} "
@@ -395,9 +379,7 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new Add {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
       });
-      AddPattern(true, "_REG++", 
-        "new INC {{ DestinationReg = RegistersEnum.{0} }};"
-      );
+      AddPattern("_REG++", "Inc {0}");
 
       AddPattern(true, "_REG - 1", delegate(TokenList aTokens, ref List<string> rCode) {
         if (IntValue(aTokens[2]) == 1) {
@@ -406,9 +388,7 @@ namespace Cosmos.Compiler.XSharp {
           rCode.Add("new Sub {{ DestinationReg = RegistersEnum.{0}, SourceValue = {2} }};");
         }
       });
-      AddPattern(true, "_REG--",
-        "new Dec {{ DestinationReg = RegistersEnum.{0} }};"
-      );
+      AddPattern("_REG--", "Dec {0}");
 
       AddPattern(true, "}", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("new Label(\"" + mGroup + "_" + mProcedureName + "_Exit\");");
@@ -440,10 +420,10 @@ namespace Cosmos.Compiler.XSharp {
         }
       );
 
-      AddPattern(true, "Return", "new Return();");
-      AddPattern(true, "ReturnInterrupt", "new IRET();");
-      AddPattern(true, "PopAll", "new Popad();");
-      AddPattern(true, "PushAll", "new Pushad();");
+      AddPattern("Return", "Ret");
+      AddPattern("ReturnInterrupt", "IRet");
+      AddPattern("PopAll", "Popad");
+      AddPattern("PushAll", "Pushad");
 
       AddPattern(true, "Procedure _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
@@ -500,9 +480,16 @@ namespace Cosmos.Compiler.XSharp {
       }
 
       xPattern.Code(aTokens, ref xResult);
+      // Apply {0} etc into string
       for (int i = 0; i < xResult.Count; i++) {
         xResult[i] = string.Format(xResult[i], aTokens.Select(c => c.Value).ToArray());
       }
+      if (xPattern.OldCodeType == false) {
+        for (int i = 0; i < xResult.Count; i++) {
+          xResult[i] = "new LiteralAssemblerCode(\"" + xResult[i] + "\");";
+        }
+      }
+
       return xResult;
     }
 
@@ -556,10 +543,16 @@ namespace Cosmos.Compiler.XSharp {
 
       mPatterns.Add(xPattern);
     }
+    protected void AddPattern(string[] aPatterns, string aCode) {
+      AddPattern(false, aPatterns, aCode);
+    }
     protected void AddPattern(bool aOldCodeType, string[] aPatterns, string aCode) {
       AddPattern(aOldCodeType, aPatterns, delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(aCode);
       });
+    }
+    protected void AddPattern(string aPattern, string aCode) {
+      AddPattern(false, aPattern, aCode);
     }
     protected void AddPattern(bool aOldCodeType, string aPattern, string aCode) {
       AddPattern(aOldCodeType, aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
