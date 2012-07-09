@@ -87,13 +87,14 @@ namespace Cosmos.Compiler.XSharp {
       char xChar1 = mData[mStart];
       var xToken = new Token();
 
-      if (mAllWhitespace && "#!".Contains(xChar1)) {
+      if (mAllWhitespace && "/!".Contains(xChar1)) {
         rPos = mData.Length; // This will account for the dummy whitespace at the end.
         xString = mData.Substring(mStart + 1, rPos - mStart - 1).Trim();
         // So ToString/Format wont generate error
         xString = xString.Replace("{", "{{");
         xString = xString.Replace("}", "}}");
-        if (xChar1 == '#') {
+        if (xChar1 == '/' && xString.Substring(0, 1) == @"/") {
+          xString = xString.Substring(1);
           xToken.Type = TokenType.Comment;
         } else if (xChar1 == '!') {
           xToken.Type = TokenType.LiteralAsm;
@@ -163,16 +164,13 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected enum CharType { WhiteSpace, Identifier, Symbol, String };
-    protected void Parse() {
-      mTokens = ParseText();
-    }
 
     protected bool IsAlphaNum(char aChar) {
       return char.IsLetterOrDigit(aChar) || aChar == '_' || aChar == '.' || aChar == '$';
     }
 
     // Initial Parse to convert text to tokens
-    protected TokenList ParseText() {
+    protected TokenList Parse() {
       // Save in comment, might be useful in future. Already had to dig it out of TFS once
       //var xRegex = new Regex(@"(\W)");
 
@@ -233,7 +231,7 @@ namespace Cosmos.Compiler.XSharp {
       mAllowPatterns = aAllowPatterns;
       mAllWhitespace = true;
 
-      Parse();
+      mTokens = Parse();
       if (mTokens.Count(q => q.Type == TokenType.Unknown) > 0) {
         throw new Exception("Unknown tokens found.");
       }

@@ -120,8 +120,8 @@ namespace Cosmos.Compiler.XSharp {
 
     protected void AddPatterns() {
       AddPattern("! Move EAX, 0", "{0}");
-
-      AddPattern("# Comment", delegate(TokenList aTokens, ref List<string> rCode) {
+      
+      AddPattern("// Comment", delegate(TokenList aTokens, ref List<string> rCode) {
         if (EmitUserComments) {
           string xValue = aTokens[0].Value;
           xValue = xValue.Replace("\"", "\\\"");
