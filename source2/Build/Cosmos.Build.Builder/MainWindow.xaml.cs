@@ -244,10 +244,6 @@ namespace Cosmos.Build.Builder {
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
-      if (App.RunMinimized) {
-        WindowState = WindowState.Minimized;
-      }
-
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       if (App.InstallTask) {

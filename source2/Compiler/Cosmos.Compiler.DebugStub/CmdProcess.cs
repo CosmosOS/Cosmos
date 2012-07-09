@@ -41,8 +41,6 @@ namespace Cosmos.Debug.DebugStub {
 
 			new Comment("The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).");
 
-			new Comment("DsVsip.CmdCompleted");
-
 			new Comment("X#: AL = #DsVsip_CmdCompleted");
 			new Mov {DestinationReg = RegistersEnum.AL , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_Const_DsVsip_CmdCompleted") };
 

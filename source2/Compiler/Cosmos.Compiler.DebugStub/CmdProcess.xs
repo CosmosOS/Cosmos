@@ -16,7 +16,6 @@ procedure AckCommand {
     # and move them to a buffer.
     # The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
 
-	# DsVsip.CmdCompleted
 	AL = #DsVsip_CmdCompleted
     #AL = 9
     ComWriteAL()
