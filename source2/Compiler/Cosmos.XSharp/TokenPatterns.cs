@@ -435,7 +435,7 @@ namespace Cosmos.Compiler.XSharp {
       xPattern.Code(aTokens, ref xResult);
       // Apply {0} etc into string
       for (int i = 0; i < xResult.Count; i++) {
-        xResult[i] = string.Format(xResult[i], aTokens.Select(c => c.Value).ToArray());
+        xResult[i] = string.Format(xResult[i], aTokens.ToArray());
       }
       if (xPattern.RawAsm) {
         AsmToCSharp(xResult);
