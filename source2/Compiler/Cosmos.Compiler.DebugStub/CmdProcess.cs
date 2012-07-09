@@ -11,79 +11,77 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
-			new Comment("test when emitted after usage too");
+			new LiteralAssemblerCode("; test when emitted after usage too");
 
 			new Comment("X#: ! DebugStub_Const_DsVsip_CmdCompleted equ 9");
 			new LiteralAssemblerCode("DebugStub_Const_DsVsip_CmdCompleted equ 9");
 
 			new Comment("X#: procedure AckCommand {");
-			new Label("DebugStub_AckCommand");
+			new LiteralAssemblerCode("DebugStub_AckCommand:");
 
-			new Comment("We acknowledge receipt of the command AND the processing of it.");
+			new LiteralAssemblerCode("; We acknowledge receipt of the command AND the processing of it.");
 
-			new Comment("-In the past the ACK only acknowledged receipt.");
+			new LiteralAssemblerCode("; -In the past the ACK only acknowledged receipt.");
 
-			new Comment("We have to do this because sometimes callers do more processing.");
+			new LiteralAssemblerCode("; We have to do this because sometimes callers do more processing.");
 
-			new Comment("We ACK even ones we dont process here, but do not ACK Noop.");
+			new LiteralAssemblerCode("; We ACK even ones we dont process here, but do not ACK Noop.");
 
-			new Comment("The buffers should be ok because more wont be sent till after our NACK");
+			new LiteralAssemblerCode("; The buffers should be ok because more wont be sent till after our NACK");
 
-			new Comment("is received.");
+			new LiteralAssemblerCode("; is received.");
 
-			new Comment("Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7.");
+			new LiteralAssemblerCode("; Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7.");
 
-			new Comment("UART buffer is 16.");
+			new LiteralAssemblerCode("; UART buffer is 16.");
 
-			new Comment("We may need to revisit this in the future to ack not commands, but data chunks");
+			new LiteralAssemblerCode("; We may need to revisit this in the future to ack not commands, but data chunks");
 
-			new Comment("and move them to a buffer.");
+			new LiteralAssemblerCode("; and move them to a buffer.");
 
-			new Comment("The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).");
+			new LiteralAssemblerCode("; The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).");
 
 			new Comment("X#: AL = #DsVsip_CmdCompleted");
-			new Mov {DestinationReg = RegistersEnum.AL , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_Const_DsVsip_CmdCompleted") };
-
-			new Comment("AL = 9");
+			new LiteralAssemblerCode("Mov AL, DebugStub_Const_DsVsip_CmdCompleted");
 
 			new Comment("X#: ComWriteAL()");
-			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
+			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 
 			new Comment("X#: EAX = .CommandID");
-			new Mov { DestinationReg = RegistersEnum.EAX , SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_CommandID"), SourceIsIndirect = true };
+			new LiteralAssemblerCode("Mov EAX, [DebugStub_CommandID]");
 
 			new Comment("X#: ComWriteAL()");
-			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
+			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 
 			new Comment("X#: }");
-			new Label("DebugStub_AckCommand_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_AckCommand_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 			new Comment("X#: procedure ProcessCommandBatch {");
-			new Label("DebugStub_ProcessCommandBatch");
+			new LiteralAssemblerCode("DebugStub_ProcessCommandBatch:");
 
 			new Comment("X#: Begin:");
-			new Label("DebugStub_ProcessCommandBatch_Begin");
+			new LiteralAssemblerCode("DebugStub_ProcessCommandBatch_Begin:");
 
 			new Comment("X#: ProcessCommand()");
-			new Call { DestinationLabel = "DebugStub_ProcessCommand" };
+			new LiteralAssemblerCode("Call DebugStub_ProcessCommand");
 
-			new Comment("See if batch is complete");
+			new LiteralAssemblerCode("; See if batch is complete");
 
-			new Comment("Loop and wait");
+			new LiteralAssemblerCode("; Loop and wait");
 
-			new Comment("VsipDs.BatchEnd");
+			new LiteralAssemblerCode("; VsipDs.BatchEnd");
 
 			new Comment("X#: if AL != 8 goto Begin");
 			new Compare { DestinationReg = RegistersEnum.AL, SourceValue = 8 };
 			new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = "DebugStub_ProcessCommandBatch_Begin" };
 
 			new Comment("X#: AckCommand()");
-			new Call { DestinationLabel = "DebugStub_AckCommand" };
+			new LiteralAssemblerCode("Call DebugStub_AckCommand");
 
 			new Comment("X#: }");
-			new Label("DebugStub_ProcessCommandBatch_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_ProcessCommandBatch_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 		}
 	}

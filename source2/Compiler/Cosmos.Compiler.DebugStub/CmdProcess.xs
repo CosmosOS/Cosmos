@@ -17,7 +17,6 @@ procedure AckCommand {
     # The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
 
 	AL = #DsVsip_CmdCompleted
-    #AL = 9
     ComWriteAL()
     
     EAX = .CommandID
