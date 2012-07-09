@@ -419,10 +419,12 @@ namespace Cosmos.Compiler.XSharp {
       return null;
     }
 
-    public List<string> GetPatternCode(string aLine) {
-      var xParser = new Parser(aLine, false, false);
-      return GetPatternCode(xParser.Tokens);
+    void AsmToCSharp(List<string> aLines) {
+      for (int i = 0; i < aLines.Count; i++) {
+        aLines[i] = "new LiteralAssemblerCode(\"" + aLines[i] + "\");";
+      }
     }
+
     public List<string> GetPatternCode(TokenList aTokens) {
       var xPattern = FindMatch(aTokens);
       if (xPattern == null) {
@@ -436,33 +438,27 @@ namespace Cosmos.Compiler.XSharp {
         xResult[i] = string.Format(xResult[i], aTokens.Select(c => c.Value).ToArray());
       }
       if (xPattern.RawAsm) {
-        for (int i = 0; i < xResult.Count; i++) {
-          xResult[i] = "new LiteralAssemblerCode(\"" + xResult[i] + "\");";
-        }
+        AsmToCSharp(xResult);
       }
 
       return xResult;
     }
 
     public List<string> GetNonPatternCode(TokenList aTokens) {
-      List<string> xCode = new List<string>();
       var xResult = new List<string>();
-      // () could be handled by pattern, but best to keep in one place for future
+
+      // Find match and emit X#
       if (aTokens.Count == 2 && aTokens[0].Type == TokenType.AlphaNum && aTokens[1].Value == "()") {
-        xCode.Add("Call ." + aTokens[0].Value);
+        // () could be handled by pattern, but best to keep in one place for future
+        xResult.Add("Call " + GroupLabel(aTokens[0].Value));
       }
 
-      foreach (var x in xCode) {
-        var xLines = GetPatternCode(x);
-        if (xLines == null) {
-          return null;
-        }
-        xResult.AddRange(xLines);
-      }
-
+      // No matches
       if (xResult.Count == 0) {
         return null;
       }
+
+      AsmToCSharp(xResult);
       return xResult;
     }
 
