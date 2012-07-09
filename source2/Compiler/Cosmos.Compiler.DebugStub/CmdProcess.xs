@@ -1,7 +1,19 @@
 ﻿Group DebugStub
 
-# test when emitted after usage too
-! DebugStub_Const_DsVsip_CmdCompleted equ 9
+const DsVsip_Noop = 0
+const DsVsip_TracePoint = 1
+const DsVsip_Message = 2
+const DsVsip_BreakPoint = 3
+const DsVsip_Error = 4
+const DsVsip_Pointer = 5
+const DsVsip_Started = 6
+const DsVsip_MethodContext = 7
+const DsVsip_MemoryData = 8
+const DsVsip_CmdCompleted = 9
+const DsVsip_Registers = 10
+const DsVsip_Frame = 11
+const DsVsip_Stack = 12
+const DsVsip_Pong = 13
 
 procedure AckCommand {
     # We acknowledge receipt of the command AND the processing of it.

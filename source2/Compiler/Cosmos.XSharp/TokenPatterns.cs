@@ -147,6 +147,10 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("Jp " + GetLabel(aTokens[1]));
       });
 
+      AddPattern("const _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(GroupLabel("Const_" + aTokens[1]) + " equ " + aTokens[3]);
+      });
+
       AddPattern(true, "var _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", 0));");
       });

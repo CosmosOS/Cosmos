@@ -11,10 +11,47 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
-			new LiteralAssemblerCode("; test when emitted after usage too");
+			new Comment("X#: const DsVsip_Noop = 0");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Noop equ 0");
 
-			new Comment("X#: ! DebugStub_Const_DsVsip_CmdCompleted equ 9");
+			new Comment("X#: const DsVsip_TracePoint = 1");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_TracePoint equ 1");
+
+			new Comment("X#: const DsVsip_Message = 2");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Message equ 2");
+
+			new Comment("X#: const DsVsip_BreakPoint = 3");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_BreakPoint equ 3");
+
+			new Comment("X#: const DsVsip_Error = 4");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Error equ 4");
+
+			new Comment("X#: const DsVsip_Pointer = 5");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Pointer equ 5");
+
+			new Comment("X#: const DsVsip_Started = 6");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Started equ 6");
+
+			new Comment("X#: const DsVsip_MethodContext = 7");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_MethodContext equ 7");
+
+			new Comment("X#: const DsVsip_MemoryData = 8");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_MemoryData equ 8");
+
+			new Comment("X#: const DsVsip_CmdCompleted = 9");
 			new LiteralAssemblerCode("DebugStub_Const_DsVsip_CmdCompleted equ 9");
+
+			new Comment("X#: const DsVsip_Registers = 10");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Registers equ 10");
+
+			new Comment("X#: const DsVsip_Frame = 11");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Frame equ 11");
+
+			new Comment("X#: const DsVsip_Stack = 12");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Stack equ 12");
+
+			new Comment("X#: const DsVsip_Pong = 13");
+			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Pong equ 13");
 
 			new Comment("X#: procedure AckCommand {");
 			new LiteralAssemblerCode("DebugStub_AckCommand:");
