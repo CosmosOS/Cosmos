@@ -13,6 +13,7 @@ namespace Cosmos.Build.Builder {
     public static bool UseTask;
     public static bool InstallTask;
     public static bool IgnoreVS;
+    public static bool RunMinimized;
 
     protected override void OnStartup(StartupEventArgs e) {
       var xArgs = new string[e.Args.Length];
@@ -24,6 +25,8 @@ namespace Cosmos.Build.Builder {
       StayOpen = xArgs.Contains("-STAYOPEN");
       UseTask = !xArgs.Contains("-NOTASK");
       InstallTask = xArgs.Contains("-INSTALLTASK");
+      RunMinimized = xArgs.Contains("-RUNMINIMIZED");
+      // For use during dev of Builder only.
       IgnoreVS = xArgs.Contains("-IGNOREVS");
       base.OnStartup(e);
     }

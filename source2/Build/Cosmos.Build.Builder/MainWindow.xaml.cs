@@ -151,7 +151,11 @@ namespace Cosmos.Build.Builder {
           mCloseTimer.Interval = TimeSpan.FromSeconds(5);
           mCloseTimer.Tick += delegate {
             mCloseTimer.Stop();
-            if (!mPreventAutoClose) {
+            if (mPreventAutoClose) {
+              if (WindowState == WindowState.Minimized) {
+                WindowState = WindowState.Normal;
+              }
+            } else {
               Close();
             }
           };
@@ -179,6 +183,8 @@ namespace Cosmos.Build.Builder {
 
     void Log_LogSection(string aLine) {
       Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate() {
+        Title = aLine;
+
         ClearTail();
 
         mClipboard.AppendLine();
@@ -238,6 +244,10 @@ namespace Cosmos.Build.Builder {
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
+      if (App.RunMinimized) {
+        WindowState = WindowState.Minimized;
+      }
+
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       if (App.InstallTask) {
