@@ -239,7 +239,7 @@ namespace Cosmos.Debug.DebugStub {
         }
 
         Label = ".Done";
-        Call<AckCommand>();
+        Call("DebugStub_AckCommand");
         DebugStatus.Value = Status.Run;
       }
     }

@@ -9,27 +9,6 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class AckCommand : CodeBlock {
-      public override void Assemble() {
-        // We acknowledge receipt of the command AND the processing of it.
-        //   -In the past the ACK only acknowledged receipt.
-        // We have to do this because sometimes callers do more processing.
-        // We ACK even ones we dont process here, but do not ACK Noop.
-        // The buffers should be ok because more wont be sent till after our NACK
-        // is received.
-        // Right now our max cmd size is 2 (Cmd + Cmd ID) + 5 (Data) = 7. 
-        // UART buffer is 16.
-        // We may need to revisit this in the future to ack not commands, but data chunks
-        // and move them to a buffer.
-        // The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
-        AL = DsVsip.CmdCompleted;
-        Call("DebugStub_ComWriteAL");
-        //
-        EAX = CommandID.Value;
-        Call("DebugStub_ComWriteAL");
-      }
-    }
-
     public class ProcessCommand : CodeBlock {
       // Modifies: AL, DX (ComReadAL)
       // Returns: AL
@@ -73,26 +52,11 @@ namespace Cosmos.Debug.DebugStub {
         string xAfterLabel = NewLabel();
         JumpIf(Flags.NotEqual, xAfterLabel);
         Call("DebugStub_" + aLabel);
-        Call<AckCommand>();
+        Call("DebugStub_AckCommand");
         Jump(".End");
         Label = xAfterLabel;
       }
     }
 
-    public class ProcessCommandBatch : CodeBlock {
-      public override void Assemble() {
-        Call<ProcessCommand>();
-
-        // See if batch is complete
-        AL.Compare(VsipDs.BatchEnd);
-        JumpIf(Flags.Equal, "DebugStub_ProcessCommandBatch_Exit");
-
-        // Loop and wait
-        Jump("DebugStub_ProcessCommandBatch");
-
-        Label = "DebugStub_ProcessCommandBatch_Exit";
-        Call<AckCommand>();
-      }
-    }
   }
 }

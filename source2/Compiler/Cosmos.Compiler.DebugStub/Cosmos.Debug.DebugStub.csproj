@@ -74,11 +74,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CmdMisc.xs</DependentUpon>
     </Compile>
-    <Compile Include="CmdProcess.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CmdProcess.xs</DependentUpon>
-    </Compile>
     <Compile Include="CmdSend.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -144,7 +139,6 @@
     </None>
     <None Include="CmdProcess.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>CmdProcess.cs</LastGenOutput>
     </None>
     <None Include="CmdSend.xs">
       <Generator>CosmosXSharpGenerator</Generator>
