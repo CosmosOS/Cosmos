@@ -11,47 +11,47 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
-			new Comment("X#: const DsVsip_Noop = 0");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Noop equ 0");
+			new Comment("X#: const Ds2Vs_Noop = 0");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Noop equ 0");
 
-			new Comment("X#: const DsVsip_TracePoint = 1");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_TracePoint equ 1");
+			new Comment("X#: const Ds2Vs_TracePoint = 1");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_TracePoint equ 1");
 
-			new Comment("X#: const DsVsip_Message = 2");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Message equ 2");
+			new Comment("X#: const Ds2Vs_Message = 2");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Message equ 2");
 
-			new Comment("X#: const DsVsip_BreakPoint = 3");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_BreakPoint equ 3");
+			new Comment("X#: const Ds2Vs_BreakPoint = 3");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_BreakPoint equ 3");
 
-			new Comment("X#: const DsVsip_Error = 4");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Error equ 4");
+			new Comment("X#: const Ds2Vs_Error = 4");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Error equ 4");
 
-			new Comment("X#: const DsVsip_Pointer = 5");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Pointer equ 5");
+			new Comment("X#: const Ds2Vs_Pointer = 5");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Pointer equ 5");
 
-			new Comment("X#: const DsVsip_Started = 6");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Started equ 6");
+			new Comment("X#: const Ds2Vs_Started = 6");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Started equ 6");
 
-			new Comment("X#: const DsVsip_MethodContext = 7");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_MethodContext equ 7");
+			new Comment("X#: const Ds2Vs_MethodContext = 7");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_MethodContext equ 7");
 
-			new Comment("X#: const DsVsip_MemoryData = 8");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_MemoryData equ 8");
+			new Comment("X#: const Ds2Vs_MemoryData = 8");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_MemoryData equ 8");
 
-			new Comment("X#: const DsVsip_CmdCompleted = 9");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_CmdCompleted equ 9");
+			new Comment("X#: const Ds2Vs_CmdCompleted = 9");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_CmdCompleted equ 9");
 
-			new Comment("X#: const DsVsip_Registers = 10");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Registers equ 10");
+			new Comment("X#: const Ds2Vs_Registers = 10");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Registers equ 10");
 
-			new Comment("X#: const DsVsip_Frame = 11");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Frame equ 11");
+			new Comment("X#: const Ds2Vs_Frame = 11");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Frame equ 11");
 
-			new Comment("X#: const DsVsip_Stack = 12");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Stack equ 12");
+			new Comment("X#: const Ds2Vs_Stack = 12");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Stack equ 12");
 
-			new Comment("X#: const DsVsip_Pong = 13");
-			new LiteralAssemblerCode("DebugStub_Const_DsVsip_Pong equ 13");
+			new Comment("X#: const Ds2Vs_Pong = 13");
+			new LiteralAssemblerCode("DebugStub_Const_Ds2Vs_Pong equ 13");
 
 			new Comment("X#: procedure AckCommand {");
 			new LiteralAssemblerCode("DebugStub_AckCommand:");
@@ -78,8 +78,8 @@ namespace Cosmos.Debug.DebugStub {
 
 			new LiteralAssemblerCode("; The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).");
 
-			new Comment("X#: AL = #DsVsip_CmdCompleted");
-			new LiteralAssemblerCode("Mov AL, DebugStub_Const_DsVsip_CmdCompleted");
+			new Comment("X#: AL = #Ds2Vs_CmdCompleted");
+			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_CmdCompleted");
 
 			new Comment("X#: ComWriteAL()");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
@@ -107,7 +107,7 @@ namespace Cosmos.Debug.DebugStub {
 
 			new LiteralAssemblerCode("; Loop and wait");
 
-			new LiteralAssemblerCode("; VsipDs.BatchEnd");
+			new LiteralAssemblerCode("; Vs2Ds.BatchEnd");
 
 			new Comment("X#: if AL != 8 goto Begin");
 			new Compare { DestinationReg = RegistersEnum.AL, SourceValue = 8 };

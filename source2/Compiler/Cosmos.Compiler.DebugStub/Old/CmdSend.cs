@@ -11,7 +11,7 @@ namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
     public class SendRegisters : CodeBlock {
       public override void Assemble() {
-        AL = (int)DsVsip.Registers; // Send the actual started signal
+        AL = (int)Ds2Vs.Registers; // Send the actual started signal
         Call("DebugStub_ComWriteAL");
 
         ESI = PushAllPtr.Value;
@@ -26,7 +26,7 @@ namespace Cosmos.Debug.DebugStub {
 
     public class SendFrame : CodeBlock {
       public override void Assemble() {
-        AL = (int)DsVsip.Frame;
+        AL = (int)Ds2Vs.Frame;
         Call("DebugStub_ComWriteAL");
 
         EAX = 32;
@@ -41,7 +41,7 @@ namespace Cosmos.Debug.DebugStub {
 
     public class SendStack : CodeBlock {
       public override void Assemble() {
-        AL = (int)DsVsip.Stack;
+        AL = (int)Ds2Vs.Stack;
         Call("DebugStub_ComWriteAL");
 
         // Send size of bytes
@@ -69,7 +69,7 @@ namespace Cosmos.Debug.DebugStub {
       //  2: x32 - size of data to send
       [XSharp(PreserveStack = true)]
       public override void Assemble() {
-        AL = (int)DsVsip.MethodContext;
+        AL = (int)Ds2Vs.MethodContext;
         Call("DebugStub_ComWriteAL");
 
         // offset relative to ebp
@@ -102,7 +102,7 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         Call("DebugStub_ComReadEAX");
         ECX = EAX;
-        AL = (int)DsVsip.MemoryData;
+        AL = (int)Ds2Vs.MemoryData;
         Call("DebugStub_ComWriteAL");
 
         Call("DebugStub_ComReadEAX");
@@ -127,11 +127,11 @@ namespace Cosmos.Debug.DebugStub {
       public override void Assemble() {
         DebugStatus.Value.Compare(Status.Run);
         JumpIf(Flags.Equal, ".Normal");
-        AL = (int)DsVsip.BreakPoint;
+        AL = (int)Ds2Vs.BreakPoint;
         Jump(".Type");
 
         Label = ".Normal";
-        AL = (int)DsVsip.TracePoint;
+        AL = (int)Ds2Vs.TracePoint;
 
         Label = ".Type";
         Call("DebugStub_ComWriteAL");
@@ -148,7 +148,7 @@ namespace Cosmos.Debug.DebugStub {
       // Modifies: EAX, ECX, EDX, ESI
       public override void Assemble() {
         // Write the type
-        AL = (int)DsVsip.Message;
+        AL = (int)Ds2Vs.Message;
         Call("DebugStub_ComWriteAL");
 
         // Write Length
@@ -177,7 +177,7 @@ namespace Cosmos.Debug.DebugStub {
       // Modifies: EAX, ECX, EDX, ESI
       public override void Assemble() {
         // Write the type
-        AL = (int)DsVsip.Pointer;
+        AL = (int)Ds2Vs.Pointer;
         Call("DebugStub_ComWriteAL");
 
         // pointer value

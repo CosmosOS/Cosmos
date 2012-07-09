@@ -241,7 +241,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           mDbgConnector.SetBreakpoint(xBBP.RemoteID, xBBP.mAddress);
         }
       }
-      mDbgConnector.SendCmd(VsipDs.BatchEnd);
+      mDbgConnector.SendCmd(Vs2Ds.BatchEnd);
     }
 
     void DbgCmdText(string obj) {
@@ -257,7 +257,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     void DbgCmdTrace(byte arg1, uint arg2) {
       DebugMsg("DbgCmdTrace");
       switch (arg1) {
-        case DsVsip.BreakPoint: {
+        case Ds2Vs.BreakPoint: {
             // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
             // Dont need to correct the address, becuase DebugStub does it for us.
             var xActualAddress = arg2;
@@ -420,13 +420,13 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     internal void Step(enum_STEPKIND aKind) {
       if (aKind == enum_STEPKIND.STEP_INTO) { // F11
-        mDbgConnector.SendCmd(VsipDs.StepInto);
+        mDbgConnector.SendCmd(Vs2Ds.StepInto);
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
-        mDbgConnector.SendCmd(VsipDs.StepOver);
+        mDbgConnector.SendCmd(Vs2Ds.StepOver);
 
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
-        mDbgConnector.SendCmd(VsipDs.StepOut);
+        mDbgConnector.SendCmd(Vs2Ds.StepOut);
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {
         // STEP_BACKWARDS - Supported at all by VS?

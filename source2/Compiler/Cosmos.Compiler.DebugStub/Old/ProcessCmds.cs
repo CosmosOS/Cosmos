@@ -21,7 +21,7 @@ namespace Cosmos.Debug.DebugStub {
 
         // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
         // Noop also does not send ACK.
-        AL.Compare(VsipDs.Noop);
+        AL.Compare(Vs2Ds.Noop);
         JumpIf(Flags.Equal, ".End");
 
         // Read Command ID
@@ -30,16 +30,16 @@ namespace Cosmos.Debug.DebugStub {
 
         // Get AL back so we can compare it, but also put it back for later
         EAX = ESP[0];
-        CheckCmd("TraceOff", VsipDs.TraceOff);
-        CheckCmd("TraceOn", VsipDs.TraceOn);
-        CheckCmd("Break", VsipDs.Break);
-        CheckCmd("BreakOnAddress", VsipDs.BreakOnAddress);
-        CheckCmd("SendMethodContext", VsipDs.SendMethodContext);
-        CheckCmd("SendMemory", VsipDs.SendMemory);
-        CheckCmd("SendRegisters", VsipDs.SendRegisters);
-        CheckCmd("SendFrame", VsipDs.SendFrame);
-        CheckCmd("SendStack", VsipDs.SendStack);
-        CheckCmd("Ping", VsipDs.Ping);
+        CheckCmd("TraceOff", Vs2Ds.TraceOff);
+        CheckCmd("TraceOn", Vs2Ds.TraceOn);
+        CheckCmd("Break", Vs2Ds.Break);
+        CheckCmd("BreakOnAddress", Vs2Ds.BreakOnAddress);
+        CheckCmd("SendMethodContext", Vs2Ds.SendMethodContext);
+        CheckCmd("SendMemory", Vs2Ds.SendMemory);
+        CheckCmd("SendRegisters", Vs2Ds.SendRegisters);
+        CheckCmd("SendFrame", Vs2Ds.SendFrame);
+        CheckCmd("SendStack", Vs2Ds.SendStack);
+        CheckCmd("Ping", Vs2Ds.Ping);
 
         Label = ".End";
         // Restore AL for callers who check the command and do

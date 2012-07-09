@@ -1,7 +1,7 @@
 ﻿Group DebugStub
 
 procedure Ping {
-    # DsVsip.Pong
+    # Ds2Vs.Pong
     AL = 13
     ComWriteAL()
 }

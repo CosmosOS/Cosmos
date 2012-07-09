@@ -82,13 +82,13 @@ namespace Cosmos.Debug.Common {
           //System.Windows.Forms.MessageBox.Show(xSB.ToString());
           DoDebugMsg("DC Send: " + aCmd.ToString());
 
-          if (aCmd == VsipDs.Noop) {
+          if (aCmd == Vs2Ds.Noop) {
             // Noops dont have any data.
             // This is becuase Noops are used to clear out the 
             // channel and are often not received. Sending noop + data
             // usually causes the data to be interpreted as a command
             // as its often the first byte received.
-            SendRawData(new byte[1] { VsipDs.Noop });
+            SendRawData(new byte[1] { Vs2Ds.Noop });
           } else {
             var xData = new byte[aData.Length + 2];
             // See comments about flow control in the DebugStub class
@@ -137,19 +137,19 @@ namespace Cosmos.Debug.Common {
     }
 
     public void SendRegisters() {
-      SendCmd(VsipDs.SendRegisters);
+      SendCmd(Vs2Ds.SendRegisters);
     }
 
     public void SendFrame() {
-      SendCmd(VsipDs.SendFrame);
+      SendCmd(Vs2Ds.SendFrame);
     }
 
     public void SendStack() {
-      SendCmd(VsipDs.SendStack);
+      SendCmd(Vs2Ds.SendStack);
     }
 
     public void Ping() {
-      SendCmd(VsipDs.Ping);
+      SendCmd(Vs2Ds.Ping);
     }
 
     public void SetBreakpoint(int aID, uint aAddress) {
@@ -162,16 +162,16 @@ namespace Cosmos.Debug.Common {
       var xData = new byte[5];
       Array.Copy(BitConverter.GetBytes(aAddress), 0, xData, 0, 4);
       xData[4] = (byte)aID;
-      SendCmd(VsipDs.BreakOnAddress, xData);
+      SendCmd(Vs2Ds.BreakOnAddress, xData);
     }
 
     public void SetAsmBreakpoint(uint aAddress) {
       var xData = BitConverter.GetBytes(aAddress);
-      SendCmd(VsipDs.SetAsmBreak, xData);
+      SendCmd(Vs2Ds.SetAsmBreak, xData);
     }
 
     public void Continue() {
-      SendCmd(VsipDs.Continue);
+      SendCmd(Vs2Ds.Continue);
     }
 
     public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1) {
@@ -194,7 +194,7 @@ namespace Cosmos.Debug.Common {
       mDataSize = (int)size;
       Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-      SendCmd(VsipDs.SendMemory, xData);
+      SendCmd(Vs2Ds.SendMemory, xData);
       var xResult = mData;
       mData = null;
       if (xResult.Length != size) {
@@ -223,7 +223,7 @@ namespace Cosmos.Debug.Common {
 
       Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
-      SendCmd(VsipDs.SendMethodContext, xData);
+      SendCmd(Vs2Ds.SendMethodContext, xData);
       // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
       byte[] xResult;
@@ -253,27 +253,27 @@ namespace Cosmos.Debug.Common {
       mCurrentMsgType = aPacket[0];
       // Could change to an array, but really not much benefit
       switch (mCurrentMsgType) {
-        case DsVsip.TracePoint:
-        case DsVsip.BreakPoint:
+        case Ds2Vs.TracePoint:
+        case Ds2Vs.BreakPoint:
           DoDebugMsg("DC Recv: TracePoint / BreakPoint");
           Next(4, PacketTracePoint);
           break;
 
-        case DsVsip.Message:
+        case Ds2Vs.Message:
           DoDebugMsg("DC Recv: Message");
           Next(2, PacketTextSize);
           break;
 
-        case DsVsip.Started:
+        case Ds2Vs.Started:
           DoDebugMsg("DC Recv: Started");
-          // Call WaitForMessage first, else it blocks because DsVsip.Started triggers
+          // Call WaitForMessage first, else it blocks because Ds2Vs.Started triggers
           // other commands which need responses.
           WaitForMessage();
 
           // Guests never get the first byte sent. So we send a noop.
           // This dummy byte seems to clear out the serial channel.
           // Its never received, but if it ever is, its a noop anyways.
-          SendCmd(VsipDs.Noop);
+          SendCmd(Vs2Ds.Noop);
 
           // Send signature
           var xData = new byte[4];
@@ -283,7 +283,7 @@ namespace Cosmos.Debug.Common {
           CmdStarted();
           break;
 
-        case DsVsip.Noop:
+        case Ds2Vs.Noop:
           DoDebugMsg("DC Recv: Noop");
           // MtW: When implementing Serial support for debugging on real hardware, it appears
           //      that when booting a machine, in the bios it emits zero's to the serial port.
@@ -291,37 +291,37 @@ namespace Cosmos.Debug.Common {
           WaitForMessage();
           break;
 
-        case DsVsip.CmdCompleted:
+        case Ds2Vs.CmdCompleted:
           DoDebugMsg("DC Recv: CmdCompleted");
           Next(1, PacketCmdCompleted);
           break;
 
-        case DsVsip.MethodContext:
+        case Ds2Vs.MethodContext:
           DoDebugMsg("DC Recv: MethodContext");
           Next(mDataSize, PacketMethodContext);
           break;
 
-        case DsVsip.MemoryData:
+        case Ds2Vs.MemoryData:
           DoDebugMsg("DC Recv: MemoryData");
           Next(mDataSize, PacketMemoryData);
           break;
 
-        case DsVsip.Registers:
+        case Ds2Vs.Registers:
           DoDebugMsg("DC Recv: Registers");
           Next(40, PacketRegisters);
           break;
 
-        case DsVsip.Frame:
+        case Ds2Vs.Frame:
           DoDebugMsg("DC Recv: Frame");
           Next(-1, PacketFrame);
           break;
 
-        case DsVsip.Stack:
+        case Ds2Vs.Stack:
           DoDebugMsg("DC Recv: Stack");
           Next(-1, PacketStack);
           break;
 
-        case DsVsip.Pong:
+        case Ds2Vs.Pong:
           DoDebugMsg("DC Recv: Pong");
           Next(0, PacketPong);
           break;

@@ -11,7 +11,7 @@ namespace Cosmos.Debug.DebugStub {
 		public override void Assemble() {
 			new Comment("X#: Group DebugStub");
 
-			new Comment("Todo: Change these to a group level var");
+			new LiteralAssemblerCode("; Todo: Change these to a group level var");
 
 			new Comment("X#: var .DebugBPs int[256]");
 			mAssembler.DataMembers.Add(new DataMember("DebugBPs", new int[256]));
@@ -19,46 +19,46 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: var .DebugWaitMsg = 'Waiting for debugger connection...'");
 			mAssembler.DataMembers.Add(new DataMember("DebugWaitMsg", "Waiting for debugger connection..."));
 
-			new Comment("Called before Kernel runs. Inits debug stub, etc");
+			new LiteralAssemblerCode("; Called before Kernel runs. Inits debug stub, etc");
 
 			new Comment("X#: procedure Init {");
-			new Label("DebugStub_Init");
+			new LiteralAssemblerCode("DebugStub_Init:");
 
 			new Comment("X#: Cls()");
-			new Call { DestinationLabel = "DebugStub_Cls" };
+			new LiteralAssemblerCode("Call DebugStub_Cls");
 
-			new Comment("Display message before even trying to init serial");
+			new LiteralAssemblerCode("; Display message before even trying to init serial");
 
 			new Comment("X#: DisplayWaitMsg()");
-			new Call { DestinationLabel = "DebugStub_DisplayWaitMsg" };
+			new LiteralAssemblerCode("Call DebugStub_DisplayWaitMsg");
 
 			new Comment("X#: InitSerial()");
-			new Call { DestinationLabel = "DebugStub_InitSerial" };
+			new LiteralAssemblerCode("Call DebugStub_InitSerial");
 
 			new Comment("X#: WaitForDbgHandshake()");
-			new Call { DestinationLabel = "DebugStub_WaitForDbgHandshake" };
+			new LiteralAssemblerCode("Call DebugStub_WaitForDbgHandshake");
 
 			new Comment("X#: Cls()");
-			new Call { DestinationLabel = "DebugStub_Cls" };
+			new LiteralAssemblerCode("Call DebugStub_Cls");
 
 			new Comment("X#: }");
-			new Label("DebugStub_Init_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_Init_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 			new Comment("X#: procedure WaitForSignature {");
-			new Label("DebugStub_WaitForSignature");
+			new LiteralAssemblerCode("DebugStub_WaitForSignature:");
 
 			new Comment("X#: EBX = 0");
-			new Mov{ DestinationReg = RegistersEnum.EBX, SourceValue = 0 };
+			new LiteralAssemblerCode("Mov EBX, 0");
 
 			new Comment("X#: Read:");
-			new Label("DebugStub_WaitForSignature_Read");
+			new LiteralAssemblerCode("DebugStub_WaitForSignature_Read:");
 
 			new Comment("X#: ComReadAL()");
-			new Call { DestinationLabel = "DebugStub_ComReadAL" };
+			new LiteralAssemblerCode("Call DebugStub_ComReadAL");
 
 			new Comment("X#: BL = AL");
-			new Mov{ DestinationReg = RegistersEnum.BL, SourceReg = RegistersEnum.AL };
+			new LiteralAssemblerCode("Mov BL, AL");
 
 			new Comment("X#: EBX ~> 8");
 			new LiteralAssemblerCode("ROR EBX, 8");
@@ -68,82 +68,82 @@ namespace Cosmos.Debug.DebugStub {
 			new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = "DebugStub_WaitForSignature_Read" };
 
 			new Comment("X#: }");
-			new Label("DebugStub_WaitForSignature_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_WaitForSignature_Exit:");
+			new LiteralAssemblerCode("Ret");
 
-			new Comment("QEMU (and possibly others) send some garbage across the serial line first.");
+			new LiteralAssemblerCode("; QEMU (and possibly others) send some garbage across the serial line first.");
 
-			new Comment("Actually they send the garbage inbound, but garbage could be inbound as well so we");
+			new LiteralAssemblerCode("; Actually they send the garbage inbound, but garbage could be inbound as well so we");
 
-			new Comment("keep this.");
+			new LiteralAssemblerCode("; keep this.");
 
-			new Comment("To work around this we send a signature. DC then discards everything before the signature.");
+			new LiteralAssemblerCode("; To work around this we send a signature. DC then discards everything before the signature.");
 
-			new Comment("QEMU has other serial issues too, and we dont support it anymore, but this signature is a good");
+			new LiteralAssemblerCode("; QEMU has other serial issues too, and we dont support it anymore, but this signature is a good");
 
-			new Comment("feature so we kept it.");
+			new LiteralAssemblerCode("; feature so we kept it.");
 
 			new Comment("X#: procedure WaitForDbgHandshake {");
-			new Label("DebugStub_WaitForDbgHandshake");
+			new LiteralAssemblerCode("DebugStub_WaitForDbgHandshake:");
 
-			new Comment("\"Clear\" the UART out");
+			new LiteralAssemblerCode("; \"Clear\" the UART out");
 
 			new Comment("X#: AL = 0");
-			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 0 };
+			new LiteralAssemblerCode("Mov AL, 0");
 
 			new Comment("X#: ComWriteAL()");
-			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
+			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 
-			new Comment("Cosmos.Debug.Consts.Consts.SerialSignature");
+			new LiteralAssemblerCode("; Cosmos.Debug.Consts.Consts.SerialSignature");
 
 			new Comment("X#: +$19740807");
-			new Push { DestinationValue = 0x19740807, Size = 32 };
+			new LiteralAssemblerCode("Push dword 0x19740807");
 
 			new Comment("X#: ESI = ESP");
-			new Mov{ DestinationReg = RegistersEnum.ESI, SourceReg = RegistersEnum.ESP };
+			new LiteralAssemblerCode("Mov ESI, ESP");
 
-			new Comment("TODO pass a count register");
-
-			new Comment("X#: ComWrite8()");
-			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+			new LiteralAssemblerCode("; TODO pass a count register");
 
 			new Comment("X#: ComWrite8()");
-			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
 
 			new Comment("X#: ComWrite8()");
-			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
 
 			new Comment("X#: ComWrite8()");
-			new Call { DestinationLabel = "DebugStub_ComWrite8" };
+			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
 
-			new Comment("Restore ESP, we actually dont care about EAX or the value on the stack anymore.");
+			new Comment("X#: ComWrite8()");
+			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
+
+			new LiteralAssemblerCode("; Restore ESP, we actually dont care about EAX or the value on the stack anymore.");
 
 			new Comment("X#: -EAX");
-			new Pop { DestinationReg = RegistersEnum.EAX};
+			new LiteralAssemblerCode("Pop EAX");
 
-			new Comment("We could use the signature as the start signal, but I prefer");
+			new LiteralAssemblerCode("; We could use the signature as the start signal, but I prefer");
 
-			new Comment("to keep the logic separate, especially in DC.");
+			new LiteralAssemblerCode("; to keep the logic separate, especially in DC.");
 
-			new Comment("Send the actual started signal");
+			new LiteralAssemblerCode("; Send the actual started signal");
 
-			new Comment("DsVsip.Started = 6");
+			new LiteralAssemblerCode("; Ds2Vs.Started = 6");
 
 			new Comment("X#: AL = 6");
-			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 6 };
+			new LiteralAssemblerCode("Mov AL, 6");
 
 			new Comment("X#: ComWriteAL()");
-			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
+			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 
 			new Comment("X#: WaitForSignature()");
-			new Call { DestinationLabel = "DebugStub_WaitForSignature" };
+			new LiteralAssemblerCode("Call DebugStub_WaitForSignature");
 
 			new Comment("X#: ProcessCommandBatch()");
-			new Call { DestinationLabel = "DebugStub_ProcessCommandBatch" };
+			new LiteralAssemblerCode("Call DebugStub_ProcessCommandBatch");
 
 			new Comment("X#: }");
-			new Label("DebugStub_WaitForDbgHandshake_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_WaitForDbgHandshake_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 		}
 	}

@@ -12,43 +12,43 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: Group DebugStub");
 
 			new Comment("X#: procedure Ping {");
-			new Label("DebugStub_Ping");
+			new LiteralAssemblerCode("DebugStub_Ping:");
 
-			new Comment("DsVsip.Pong");
+			new LiteralAssemblerCode("; Ds2Vs.Pong");
 
 			new Comment("X#: AL = 13");
-			new Mov{ DestinationReg = RegistersEnum.AL, SourceValue = 13 };
+			new LiteralAssemblerCode("Mov AL, 13");
 
 			new Comment("X#: ComWriteAL()");
-			new Call { DestinationLabel = "DebugStub_ComWriteAL" };
+			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 
 			new Comment("X#: }");
-			new Label("DebugStub_Ping_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_Ping_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 			new Comment("X#: procedure TraceOn {");
-			new Label("DebugStub_TraceOn");
+			new LiteralAssemblerCode("DebugStub_TraceOn:");
 
-			new Comment("Tracing.On");
+			new LiteralAssemblerCode("; Tracing.On");
 
 			new Comment("X#: .TraceMode = 1");
-			new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("DebugStub_TraceMode"), DestinationIsIndirect = true , SourceValue = 1 };
+			new LiteralAssemblerCode("Mov dword [DebugStub_TraceMode], 1");
 
 			new Comment("X#: }");
-			new Label("DebugStub_TraceOn_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_TraceOn_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 			new Comment("X#: procedure TraceOff {");
-			new Label("DebugStub_TraceOff");
+			new LiteralAssemblerCode("DebugStub_TraceOff:");
 
-			new Comment("Tracing.Off");
+			new LiteralAssemblerCode("; Tracing.Off");
 
 			new Comment("X#: .TraceMode = 0");
-			new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("DebugStub_TraceMode"), DestinationIsIndirect = true , SourceValue = 0 };
+			new LiteralAssemblerCode("Mov dword [DebugStub_TraceMode], 0");
 
 			new Comment("X#: }");
-			new Label("DebugStub_TraceOff_Exit");
-			new Return();
+			new LiteralAssemblerCode("DebugStub_TraceOff_Exit:");
+			new LiteralAssemblerCode("Ret");
 
 		}
 	}

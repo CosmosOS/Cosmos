@@ -195,11 +195,11 @@ namespace Cosmos.Debug.DebugStub {
 
           // Now check for commands that are only valid in break state or commands that require special handling while in break state.
 
-          AL.Compare(VsipDs.Continue);
+          AL.Compare(Vs2Ds.Continue);
           JumpIf(Flags.Equal, ".Done");
 
           {
-            AL.Compare(VsipDs.SetAsmBreak);
+            AL.Compare(Vs2Ds.SetAsmBreak);
             JumpIf(Flags.NotEqual, ".SetAsmBreak_After");
             Call("DebugStub_SetAsmBreak");
             Jump(".WaitCmd");
@@ -207,7 +207,7 @@ namespace Cosmos.Debug.DebugStub {
           }
 
           {
-            AL.Compare(VsipDs.StepInto);
+            AL.Compare(Vs2Ds.StepInto);
             JumpIf(Flags.NotEqual, ".StepInto_After");
             DebugBreakOnNextTrace.Value = StepTrigger.Into;
             Jump(".Done");
@@ -215,7 +215,7 @@ namespace Cosmos.Debug.DebugStub {
           }
 
           {
-            AL.Compare(VsipDs.StepOver);
+            AL.Compare(Vs2Ds.StepOver);
             JumpIf(Flags.NotEqual, ".StepOver_After");
             DebugBreakOnNextTrace.Value = StepTrigger.Over;
             EAX = CallerEBP.Value;
@@ -225,7 +225,7 @@ namespace Cosmos.Debug.DebugStub {
           }
 
           {
-            AL.Compare(VsipDs.StepOut);
+            AL.Compare(Vs2Ds.StepOut);
             JumpIf(Flags.NotEqual, ".StepOut_After");
             DebugBreakOnNextTrace.Value = StepTrigger.Out;
             EAX = CallerEBP.Value;

@@ -51,7 +51,7 @@ procedure WaitForDbgHandshake {
     # to keep the logic separate, especially in DC.
 
 	# Send the actual started signal
-	# DsVsip.Started = 6
+	# Ds2Vs.Started = 6
     AL = 6
     ComWriteAL()
 

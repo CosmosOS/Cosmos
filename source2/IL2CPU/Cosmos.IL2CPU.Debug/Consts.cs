@@ -9,7 +9,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Messages from Guest (Cosmos) to Host (VS)
-  static public class DsVsip {
+  static public class Ds2Vs {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
     public const byte Message = 2;
@@ -30,7 +30,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Messages from Host (VS) to Guest (Cosmos)
-  static public class VsipDs {
+  static public class Vs2Ds {
     public const byte Noop = 0;
 
     public const byte TraceOff = 1; // Dont think currently used

@@ -1,19 +1,19 @@
 ﻿Group DebugStub
 
-const DsVsip_Noop = 0
-const DsVsip_TracePoint = 1
-const DsVsip_Message = 2
-const DsVsip_BreakPoint = 3
-const DsVsip_Error = 4
-const DsVsip_Pointer = 5
-const DsVsip_Started = 6
-const DsVsip_MethodContext = 7
-const DsVsip_MemoryData = 8
-const DsVsip_CmdCompleted = 9
-const DsVsip_Registers = 10
-const DsVsip_Frame = 11
-const DsVsip_Stack = 12
-const DsVsip_Pong = 13
+const Ds2Vs_Noop = 0
+const Ds2Vs_TracePoint = 1
+const Ds2Vs_Message = 2
+const Ds2Vs_BreakPoint = 3
+const Ds2Vs_Error = 4
+const Ds2Vs_Pointer = 5
+const Ds2Vs_Started = 6
+const Ds2Vs_MethodContext = 7
+const Ds2Vs_MemoryData = 8
+const Ds2Vs_CmdCompleted = 9
+const Ds2Vs_Registers = 10
+const Ds2Vs_Frame = 11
+const Ds2Vs_Stack = 12
+const Ds2Vs_Pong = 13
 
 procedure AckCommand {
     # We acknowledge receipt of the command AND the processing of it.
@@ -28,7 +28,7 @@ procedure AckCommand {
     # and move them to a buffer.
     # The buffer problem exists only to inbound data, not outbound data (relative to DebugStub).
 
-	AL = #DsVsip_CmdCompleted
+	AL = #Ds2Vs_CmdCompleted
     ComWriteAL()
     
     EAX = .CommandID
@@ -41,7 +41,7 @@ Begin:
 
     # See if batch is complete
     # Loop and wait
-	# VsipDs.BatchEnd
+	# Vs2Ds.BatchEnd
 	if AL != 8 goto Begin
 
     AckCommand()
