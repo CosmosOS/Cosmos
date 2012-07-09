@@ -42,27 +42,18 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
-    protected string GroupLabel(int aIdx) {
-      return GroupLabel("{" + aIdx + "}");
-    }
     protected string GroupLabel(string aLabel) {
       return mGroup + "_" + aLabel;
-    }
-
-    protected string ProcLabel(int aIdx) {
-      return ProcLabel("{" + aIdx + "}");
     }
     protected string ProcLabel(string aLabel) {
       return mGroup + "_" + mProcedureName + "_" + aLabel;
     }
-
     protected string GetLabel(Token aToken) {
       if (aToken.Type != TokenType.AlphaNum) {
         throw new Exception("Label must be AlphaNum.");
       }
 
       string xValue = aToken.Value;
-
       if (mProcedureName == null) {
         if (xValue.StartsWith(".")) {
           return xValue.Substring(1);
@@ -516,9 +507,9 @@ namespace Cosmos.Compiler.XSharp {
       });
     }
     protected void AddPattern(bool aRawAsm, string[] aPatterns, string aCode) {
-      AddPattern(aRawAsm, aPatterns, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(aCode);
-      });
+      foreach (var xPattern in aPatterns) {
+        AddPattern(aRawAsm, xPattern, aCode);
+      }
     }
 
   }
