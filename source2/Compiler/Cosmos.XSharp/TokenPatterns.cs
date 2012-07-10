@@ -451,10 +451,8 @@ namespace Cosmos.Compiler.XSharp {
       if (aTokens.Count == 2 && aTokens[0].Type == TokenType.AlphaNum && aTokens[1].Value == "()") {
         // () could be handled by pattern, but best to keep in one place for future
         xResult.Add("Call " + GroupLabel(aTokens[0].Value));
-      }
-
-      // No matches
-      if (xResult.Count == 0) {
+      } else {
+        // No matches
         return null;
       }
 
