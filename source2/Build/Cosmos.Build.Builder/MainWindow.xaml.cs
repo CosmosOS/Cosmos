@@ -244,6 +244,8 @@ namespace Cosmos.Build.Builder {
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
+        Left = Properties.Settings.Default.Location.X;
+        Top = Properties.Settings.Default.Location.Y;
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       if (App.InstallTask) {
@@ -257,6 +259,12 @@ namespace Cosmos.Build.Builder {
     void butnCopy_Click(object sender, RoutedEventArgs e) {
       mPreventAutoClose = true;
       Clipboard.SetText(mClipboard.ToString());
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        Properties.Settings.Default.Location = new System.Drawing.Point((int)Left, (int)Top);
+        Properties.Settings.Default.Save();
     }
 
   }
