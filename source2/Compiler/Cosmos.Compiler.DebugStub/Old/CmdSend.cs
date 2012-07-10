@@ -9,21 +9,6 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class SendRegisters : CodeBlock {
-      public override void Assemble() {
-        AL = (int)Ds2Vs.Registers; // Send the actual started signal
-        Call("DebugStub_ComWriteAL");
-
-        ESI = PushAllPtr.Value;
-        ECX = 32;
-        Call("DebugStub_ComWriteX");
-        ESI = CallerESP.Address;
-        Call("DebugStub_ComWrite32");
-        ESI = CallerEIP.Address;
-        Call("DebugStub_ComWrite32");
-      }
-    }
-
     public class SendFrame : CodeBlock {
       public override void Assemble() {
         AL = (int)Ds2Vs.Frame;
