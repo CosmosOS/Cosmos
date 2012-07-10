@@ -195,12 +195,12 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern(new string[] {
           //0  1   2  3  4     5  
-          "if _REG < 123 goto _ABC", "if _REG < 123 exit",
-          "if _REG > 123 goto _ABC", "if _REG > 123 exit",
-          "if _REG = 123 goto _ABC", "if _REG = 123 exit",
-          "if _REG != 123 goto _ABC", "if _REG != 123 exit",
-          "if _REG <= 123 goto _ABC", "if _REG <= 123 exit",
-          "if _REG >= 123 goto _ABC", "if _REG >= 123 exit"
+          "if _REG < 123 goto _ABC", "if _REG < 123 exit", "if _REG < _REG goto _ABC", "if _REG < _REG exit",
+          "if _REG > 123 goto _ABC", "if _REG > 123 exit", "if _REG > _REG goto _ABC", "if _REG > _REG exit",
+          "if _REG = 123 goto _ABC", "if _REG = 123 exit", "if _REG = _REG goto _ABC", "if _REG = _REG exit",
+          "if _REG != 123 goto _ABC", "if _REG != 123 exit", "if _REG != _REG goto _ABC", "if _REG != _REG exit",
+          "if _REG <= 123 goto _ABC", "if _REG <= 123 exit", "if _REG <= _REG goto _ABC", "if _REG <= _REG exit",
+          "if _REG >= 123 goto _ABC", "if _REG >= 123 exit", "if _REG >= _REG goto _ABC", "if _REG >= _REG exit"
         },
         delegate(TokenList aTokens, ref List<string> rCode) {
           rCode.Add("Cmp {1}, {3}");
@@ -340,8 +340,14 @@ namespace Cosmos.Compiler.XSharp {
         });
 
       // TODO: Allow asm to optimize these to Inc/Dec
-      AddPattern("_REG + 1", "Add {0}, {2}");
-      AddPattern("_REG - 1", "Sub {0}, {2}");
+      AddPattern(new string[] {
+        "_REG + 1",
+        "_REG + _REG"
+      }, "Add {0}, {2}");
+      AddPattern(new string[] {
+        "_REG - 1",
+        "_REG - _REG"
+      }, "Sub {0}, {2}");
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
 

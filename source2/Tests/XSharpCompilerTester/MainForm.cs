@@ -40,6 +40,7 @@ namespace XSharpCompilerTester {
       Test("CmdAsmBreak.xs");
       Test("Main.xs");
       Test("CmdProcess.xs");
+      Test("CmdSend.xs");
     }
   }
 }
