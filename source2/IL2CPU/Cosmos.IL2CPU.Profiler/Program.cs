@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Cosmos.System;
+using Console = System.Console;
 
 namespace Cosmos.IL2CPU.Profiler {
   class Program {
@@ -27,10 +29,10 @@ namespace Cosmos.IL2CPU.Profiler {
 
           //TODO: Add plugs into the scanning equation to profile scanning them too
           //System.Reflection.MethodInfo[] name = typeof(SSchockeTest.Kernel).GetMethods();
-          Type xFoundType = typeof(SSchockeTest.Kernel);
+          Type xFoundType = typeof(Kernel);
           var xCtor = xFoundType.GetConstructor(Type.EmptyTypes);
           typeof(Cosmos.System.Plugs.System.System.ConsoleImpl).IsSubclassOf(typeof(object));
-          var xEntryPoint = typeof(SSchockeTest.Kernel).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance);
+          var xEntryPoint = typeof(Kernel).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance);
           //var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
           //EnableLogging(pathToLogFile)
           xScanner.EnableLogging(AppDomain.CurrentDomain.BaseDirectory + "log.txt");
