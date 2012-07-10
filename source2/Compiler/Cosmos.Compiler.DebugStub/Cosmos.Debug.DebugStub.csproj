@@ -84,6 +84,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CmdSend.xs</DependentUpon>
     </Compile>
+    <Compile Include="Consts.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Consts.xs</DependentUpon>
+    </Compile>
     <Compile Include="Init.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -149,6 +154,10 @@
     <None Include="CmdSend.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>CmdSend.cs</LastGenOutput>
+    </None>
+    <None Include="Consts.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>Consts.cs</LastGenOutput>
     </None>
     <None Include="Cosmos.snk" />
     <None Include="Main.xs">
