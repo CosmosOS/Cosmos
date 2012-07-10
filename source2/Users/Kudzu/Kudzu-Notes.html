@@ -3,7 +3,13 @@
 <body>
 <h3>Public - Easy</h3>
     <ul>
-        <li>Builder - Save/load window position</li>
+        <li>Builder - Save/load window position<ul>
+            <li>but also keep mind builder may or may not be minimized on start by the shortcut 
+                properties - if minimized it hsould not load/save, but should do so if the user 
+                restores the window or the window restores itself (such as it does when an error 
+                occurs)</li>
+            </ul>
+        </li>
         <li>Integrate VIX so users dont have to download<ul>
             <li><a href="http://blogs.vmware.com/vix/2010/05/redistibutable-vix-api-client-libraries.html" 
                     target="_blank">
@@ -24,7 +30,10 @@
         </li>
         <li>Dynamic load/unload IL2CPU and other parts so we dont need to exit and run 
             builder every time for changes</li>
-        <li>X# msbuild action</li>
+        <li>X# msbuild action<ul>
+            <li>http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx</li>
+            </ul>
+        </li>
         <li><a href="http://www.tellingmachine.com/post/Too-much-VMWare-can-cause-Unable-to-connect-to-host-Error-The-specified-version-was-not-found.aspx">http://www.tellingmachine.com/post/Too-much-VMWare-can-cause-Unable-to-connect-to-host-Error-The-specified-version-was-not-found.aspx</a><ul>
             <li>Check in builder? Modify for users?</li>
             <li>there are TWO of these text files if the user has VIX installed, I had to modify 

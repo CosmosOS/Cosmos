@@ -35,9 +35,14 @@ namespace Cosmos.VS.XSharp {
       string xClassName = Path.GetFileNameWithoutExtension(aInputFileName);
       using (var xInput = new StringReader(aInputFileContents)) {
         using (var xOutput = new StringWriter()) {
-          var xGenerator = new Cosmos.Compiler.XSharp.Generator();
-          xGenerator.Execute(aDefaultNamespace, xClassName, xInput, xOutput);
-          return xOutput.ToString();
+          try {
+            var xGenerator = new Cosmos.Compiler.XSharp.Generator();
+            xGenerator.Execute(aDefaultNamespace, xClassName, xInput, xOutput);
+            return xOutput.ToString();
+          } catch (Exception ex) {
+            return xOutput.ToString() + "\r\n"
+              + ex.Message + "\r\n";
+          }
         }
       }
     }
