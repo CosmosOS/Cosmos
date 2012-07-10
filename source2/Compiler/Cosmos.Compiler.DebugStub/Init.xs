@@ -38,11 +38,7 @@ procedure WaitForDbgHandshake {
 	+$19740807
     ESI = ESP
 
-    // TODO pass a count register
-    ComWrite8()
-    ComWrite8()
-    ComWrite8()
-    ComWrite8()
+    ComWrite32()
 
     // Restore ESP, we actually dont care about EAX or the value on the stack anymore.
     -EAX

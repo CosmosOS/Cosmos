@@ -110,14 +110,10 @@ Wait:
     AL = Port[DX]
 }
 procedure ComReadEAX {
-	ComReadAL()
-	EAX ~> 8
-	ComReadAL()
-	EAX ~> 8
-	ComReadAL()
-	EAX ~> 8
-	ComReadAL()
-	EAX ~> 8
+	repeat 4 times {
+		ComReadAL()
+		EAX ~> 8
+	}
 }
 
 // Input: EDI
@@ -131,14 +127,14 @@ procedure ComRead8  {
     EDI + 1
 }
 procedure ComRead16 {
-	ComRead8()
-	ComRead8()
+	repeat 2 times {
+		ComRead8()
+	}
 }
 procedure ComRead32 {
-	ComRead8()
-	ComRead8()
-	ComRead8()
-	ComRead8()
+	repeat 4 times {
+		ComRead8()
+	}
 }
 
 // Input: AL

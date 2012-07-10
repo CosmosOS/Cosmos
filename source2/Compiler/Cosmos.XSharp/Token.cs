@@ -26,5 +26,9 @@ namespace Cosmos.Compiler.XSharp {
     public override string ToString() {
       return Value;
     }
+
+    public bool Matches(string aText) {
+      return string.Equals(Value, aText, StringComparison.InvariantCultureIgnoreCase);
+    }
   }
 }

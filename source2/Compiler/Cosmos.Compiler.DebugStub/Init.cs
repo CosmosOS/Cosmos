@@ -64,8 +64,8 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("ROR EBX, 8");
 
 			new Comment("X#: if EBX != $19740807 goto Read");
-			new Compare { DestinationReg = RegistersEnum.EBX, SourceValue = 0x19740807 };
-			new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = "DebugStub_WaitForSignature_Read" };
+			new LiteralAssemblerCode("Cmp EBX, 0x19740807");
+			new LiteralAssemblerCode("JNE DebugStub_WaitForSignature_Read");
 
 			new Comment("X#: }");
 			new LiteralAssemblerCode("DebugStub_WaitForSignature_Exit:");
@@ -102,19 +102,8 @@ namespace Cosmos.Debug.DebugStub {
 			new Comment("X#: ESI = ESP");
 			new LiteralAssemblerCode("Mov ESI, ESP");
 
-			new LiteralAssemblerCode(";  TODO pass a count register");
-
-			new Comment("X#: ComWrite8()");
-			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
-
-			new Comment("X#: ComWrite8()");
-			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
-
-			new Comment("X#: ComWrite8()");
-			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
-
-			new Comment("X#: ComWrite8()");
-			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
+			new Comment("X#: ComWrite32()");
+			new LiteralAssemblerCode("Call DebugStub_ComWrite32");
 
 			new LiteralAssemblerCode(";  Restore ESP, we actually dont care about EAX or the value on the stack anymore.");
 

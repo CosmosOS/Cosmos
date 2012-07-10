@@ -28,7 +28,8 @@ namespace Cosmos.Compiler.XSharp {
       + ",IF,INTERRUPTHANDLER"
       + ",JUMP"
       + ",POPALL,PUSHALL,PROCEDURE,PORT"
-      + ",RETURN,RETURNINTERRUPT"
+      + ",RETURN,RETURNINTERRUPT,REPEAT"
+      + ",TIMES"
       + ",VAR"
       + ",WORD"
     ).Split(mComma);

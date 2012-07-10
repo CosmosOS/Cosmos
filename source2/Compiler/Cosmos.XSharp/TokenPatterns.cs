@@ -25,6 +25,8 @@ namespace Cosmos.Compiler.XSharp {
     protected string mGroup;
     protected string mProcedureName = null;
     protected bool mInIntHandler;
+    protected TokenList mBlockStarter = null;
+    protected List<string> mBlock = null;
 
     public TokenPatterns() {
       AddPatterns();
@@ -106,7 +108,7 @@ namespace Cosmos.Compiler.XSharp {
         return "JE";
       } else if (aToken.Value == "0") {
         // Same as JE, but implies intent in .asm better
-        return "JZ"; 
+        return "JZ";
       } else if (aToken.Value == "!=") {
         return "JNE";
       } else if (aToken.Value == "<=") {
@@ -120,7 +122,7 @@ namespace Cosmos.Compiler.XSharp {
 
     protected void AddPatterns() {
       AddPattern("! Move EAX, 0", "{0}");
-      
+
       AddPattern("// Comment", delegate(TokenList aTokens, ref List<string> rCode) {
         if (EmitUserComments) {
           string xValue = aTokens[0].Value;
@@ -344,13 +346,26 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG--", "Dec {0}");
 
       AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(mGroup + "_" + mProcedureName + "_Exit:");
-        if (mInIntHandler) {
-          rCode.Add("IRet");
+        if (mBlock == null) {
+          rCode.Add(mGroup + "_" + mProcedureName + "_Exit:");
+          if (mInIntHandler) {
+            rCode.Add("IRet");
+          } else {
+            rCode.Add("Ret");
+          }
+          mProcedureName = null;
         } else {
-          rCode.Add("Ret");
+          if (mBlockStarter.PatternMatches("repeat 4 times {")) {
+            int xCount = int.Parse(mBlockStarter[1].Value);
+            for (int i = 1; i <= xCount; i++) {
+              rCode.AddRange(mBlock);
+            }
+            mBlockStarter = null;
+            mBlock = null;
+          } else {
+            throw new Exception("Unknown block starter.");
+          }
         }
-        mProcedureName = null;
       });
 
       AddPattern("Group _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -359,6 +374,11 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("Jp " + ProcLabel("Exit"));
+      });
+
+      AddPattern("Repeat 4 times {", delegate(TokenList aTokens, ref List<string> rCode) {
+        mBlockStarter = aTokens;
+        mBlock = new List<string>();
       });
 
       AddPattern("InterruptHandler _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -420,6 +440,11 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     void AsmToCSharp(List<string> aLines) {
+      // Don't reformat if we are in a block because then this will occur twice
+      if (mBlock != null) {
+        return;
+      }
+
       for (int i = 0; i < aLines.Count; i++) {
         aLines[i] = "new LiteralAssemblerCode(\"" + aLines[i] + "\");";
       }
@@ -433,10 +458,14 @@ namespace Cosmos.Compiler.XSharp {
 
       var xResult = new List<string>();
       xPattern.Code(aTokens, ref xResult);
+      
       // Apply {0} etc into string
+      // This happens twice for block code, but its ok because the first pass
+      // strips out all tags.
       for (int i = 0; i < xResult.Count; i++) {
         xResult[i] = string.Format(xResult[i], aTokens.ToArray());
       }
+
       if (xPattern.RawAsm) {
         AsmToCSharp(xResult);
       }
@@ -445,12 +474,22 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     public List<string> GetNonPatternCode(TokenList aTokens) {
+      if (aTokens.Count == 0) {
+        return null;
+      }
+
+      var xFirst = aTokens[0];
+      var xLast = aTokens[aTokens.Count - 1];
       var xResult = new List<string>();
 
       // Find match and emit X#
-      if (aTokens.Count == 2 && aTokens[0].Type == TokenType.AlphaNum && aTokens[1].Value == "()") {
+      if (aTokens.Count == 2
+        && xFirst.Type == TokenType.AlphaNum
+        && xLast.Matches("()")
+        ) {
         // () could be handled by pattern, but best to keep in one place for future
         xResult.Add("Call " + GroupLabel(aTokens[0].Value));
+
       } else {
         // No matches
         return null;
@@ -464,11 +503,15 @@ namespace Cosmos.Compiler.XSharp {
       var xParser = new Parser(aLine, false, false);
       var xTokens = xParser.Tokens;
       var xResult = GetPatternCode(xTokens);
-      if (xResult != null) {
-        return xResult;
+      if (xResult == null) {
+        xResult = GetNonPatternCode(xTokens);
       }
 
-      return GetNonPatternCode(xTokens);
+      if (mBlock != null) {
+        mBlock.AddRange(xResult);
+        xResult.Clear();
+      }
+      return xResult;
     }
 
     protected void AddPattern(string aPattern, string aCode) {
