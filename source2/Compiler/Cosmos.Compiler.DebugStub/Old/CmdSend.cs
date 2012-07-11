@@ -9,44 +9,6 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class SendFrameOld : CodeBlock {
-      public override void Assemble() {
-        AL = (int)Ds2Vs.Frame;
-        Call("DebugStub_ComWriteAL");
-
-        EAX = 32;
-        Call("DebugStub_ComWriteAX");
-
-        ESI = CallerEBP.Value;
-        ESI.Add(8); // Dont transmit EIP or old EBP
-        ECX = 32;
-        Call("DebugStub_ComWriteX");
-      }
-    }
-
-    public class SendStackOld : CodeBlock {
-      public override void Assemble() {
-        AL = (int)Ds2Vs.Stack;
-        Call("DebugStub_ComWriteAL");
-
-        // Send size of bytes
-        ESI = CallerESP.Value;
-        EAX = CallerEBP.Value;
-        EAX.Sub(ESI);
-        Call("DebugStub_ComWriteAX");
-
-        // Send actual bytes
-        //
-        // Need to reload ESI, WriteAXToCompPort modifies it
-        ESI = CallerESP.Value;
-        Label = ".SendByte";
-        ESI.Compare(CallerEBP.Value);
-        JumpIf(Flags.Equal, ".Exit");
-        Call("DebugStub_ComWrite8");
-        Jump(".SendByte");
-      }
-    }
-
     public class SendMethodContext : CodeBlock {
       // sends a stack value
       // Serial Params:
@@ -104,21 +66,6 @@ namespace Cosmos.Debug.DebugStub {
         Jump("DebugStub_SendMemory_SendByte");
 
         Label = "DebugStub_SendMemory_After_SendByte";
-      }
-    }
-
-    public class SendPtr : CodeBlock {
-      // Input: Stack
-      // Output: None
-      // Modifies: EAX, ECX, EDX, ESI
-      public override void Assemble() {
-        // Write the type
-        AL = (int)Ds2Vs.Pointer;
-        Call("DebugStub_ComWriteAL");
-
-        // pointer value
-        ESI = EBP[8];
-        Call("DebugStub_ComWrite32");
       }
     }
   }

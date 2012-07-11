@@ -154,7 +154,7 @@ WriteChar:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-procedure SendPtr2 {
+procedure SendPtr {
     // Write the type
     AL = #Ds2Vs_Pointer
     ComWriteAL()

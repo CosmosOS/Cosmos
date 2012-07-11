@@ -110,12 +110,12 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Jmp DebugStub_SendText_WriteChar");
 			new LiteralAssemblerCode("DebugStub_SendText_Exit:");
 			new LiteralAssemblerCode("Ret");
-			new LiteralAssemblerCode("DebugStub_SendPtr2:");
+			new LiteralAssemblerCode("DebugStub_SendPtr:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_Pointer");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 			new LiteralAssemblerCode("Mov ESI, [EBP + 8]");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite32");
-			new LiteralAssemblerCode("DebugStub_SendPtr2_Exit:");
+			new LiteralAssemblerCode("DebugStub_SendPtr_Exit:");
 			new LiteralAssemblerCode("Ret");
 		}
 	}
