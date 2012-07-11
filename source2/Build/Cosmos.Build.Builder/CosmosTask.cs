@@ -248,6 +248,7 @@ namespace Cosmos.Build.Builder {
         if (WaitForStart("devenv", xSeconds * 1000)) {
           throw new Exception("Setup did not start.");
         }
+        Echo("Setup is running.");
 
         // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
         Echo("Waiting for Setup to complete.");
