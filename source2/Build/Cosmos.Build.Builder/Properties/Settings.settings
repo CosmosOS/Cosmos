@@ -5,5 +5,8 @@
     <Setting Name="Location" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">0, 0</Value>
     </Setting>
+    <Setting Name="Size" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">700, 500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

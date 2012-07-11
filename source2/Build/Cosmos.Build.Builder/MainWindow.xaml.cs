@@ -243,9 +243,9 @@ namespace Cosmos.Build.Builder {
       });
     }
 
+    protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e) {
-      Left = Properties.Settings.Default.Location.X;
-      Top = Properties.Settings.Default.Location.Y;
+      mLoaded = true;
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       if (App.InstallTask) {
@@ -261,14 +261,29 @@ namespace Cosmos.Build.Builder {
       Clipboard.SetText(mClipboard.ToString());
     }
 
-    private void Window_Closed(object sender, EventArgs e) {
+    void LoadPosition() {
+      Left = Properties.Settings.Default.Location.X;
+      Top = Properties.Settings.Default.Location.Y;
+      Width = Properties.Settings.Default.Size.Width;
+      Height = Properties.Settings.Default.Size.Height;
+    }
+
+    protected void SavePosition() {
       Properties.Settings.Default.Location = new System.Drawing.Point((int)Left, (int)Top);
+      Properties.Settings.Default.Size = new System.Drawing.Size((int)Width, (int)Height);
       Properties.Settings.Default.Save();
     }
 
+    private void Window_Closed(object sender, EventArgs e) {
+      SavePosition();
+    }
+
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e) {
-      // User had unminimized window, or maximized it, or otherwise manually intervened.
-      if (WindowState != System.Windows.WindowState.Minimized) {
+      // User had non minimized window, or maximized it, or otherwise manually intervened.
+      // Even if starting minimized, this event gets called with Normal before load.
+      // This is why we have mLoaded.
+      if (mLoaded && WindowState != System.Windows.WindowState.Minimized) {
+        LoadPosition();
         mPreventAutoClose = true;
       }
     }
