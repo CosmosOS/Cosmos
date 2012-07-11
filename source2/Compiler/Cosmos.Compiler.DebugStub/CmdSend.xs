@@ -16,7 +16,7 @@ procedure SendRegisters {
     ComWrite32()
 }
 
-procedure SendFrame2 {
+procedure SendFrame {
     AL = #Ds2Vs_Frame
     ComWriteAL()
 
@@ -30,7 +30,7 @@ procedure SendFrame2 {
     ComWriteX()
 }
 
-procedure SendStack2 {
+procedure SendStack {
     AL = #Ds2Vs_Stack
     ComWriteAL()
 
@@ -46,7 +46,7 @@ procedure SendStack2 {
     ESI = .CallerESP
 	//TODO While
 SendByte:
-    if ESI = CallerEBP exit
+    if ESI = .CallerEBP exit
     ComWrite8()
     goto SendByte
 }
@@ -69,7 +69,7 @@ procedure SendMethodContext2 {
 
     // now ECX contains size of data (count)
     // EAX contains relative to EBP
-    ESI = CallerEBP
+    ESI = .CallerEBP
     ESI + EAX
 
     // TODO While
@@ -108,14 +108,14 @@ AfterSendByte:
 }
 
 // Modifies: EAX, ESI
-procedure SendTrace2 {
+procedure SendTrace {
 	if .DebugStatus = #Status_Run goto Normal
 
     AL = #Ds2Vs_BreakPoint
     goto Type
 
 Normal:
-    AL = Ds2Vs_TracePoint
+    AL = #Ds2Vs_TracePoint
 
 Type:
     ComWriteAL()
@@ -125,7 +125,7 @@ Type:
     ComWrite32()
 }
 
-procedure SendText2 {
+procedure SendText {
     // Input: Stack
     // Output: None
     // Modifies: EAX, ECX, EDX, ESI
@@ -154,7 +154,7 @@ WriteChar:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-procedure SendPtr2 {
+procedure SendPtr {
     // Write the type
     AL = #Ds2Vs_Pointer
     ComWriteAL()

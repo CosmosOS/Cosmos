@@ -208,7 +208,8 @@ namespace Cosmos.Compiler.XSharp {
 
             string xLeft = aTokens[1].Value;
             if (aTokens[1].Type == TokenType.AlphaNum) {
-              xLeft = "[" + GetLabel(aTokens[1]) + "]";
+              // Hardcoded to dword for now
+              xLeft = "dword [" + GetLabel(aTokens[1]) + "]";
             }
 
             string xRight = aTokens[3].Value;

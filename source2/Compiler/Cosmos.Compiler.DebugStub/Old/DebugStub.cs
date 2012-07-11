@@ -185,7 +185,7 @@ namespace Cosmos.Debug.DebugStub {
         BreakEBP.Value = 0;
         // Set break status
         DebugStatus.Value = Status.Break;
-        Call<SendTrace>();
+        Call("DebugStub_SendTrace");
 
         // Wait for a command
         Label = ".WaitCmd";
