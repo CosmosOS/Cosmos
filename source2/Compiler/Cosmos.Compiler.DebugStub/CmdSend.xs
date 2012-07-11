@@ -51,12 +51,13 @@ SendByte:
     goto SendByte
 }
 
+// sends a stack value
+// Serial Params:
+//  1: x32 - offset relative to EBP
+//  2: x32 - size of data to send
 function SendMethodContext2 {
-    // sends a stack value
-    // Serial Params:
-    //  1: x32 - offset relative to EBP
-    //  2: x32 - size of data to send
 //    [XSharp(PreserveStack = true)]
+	+All
 
     AL = #Ds2Vs_MethodContext
     ComWriteAL()

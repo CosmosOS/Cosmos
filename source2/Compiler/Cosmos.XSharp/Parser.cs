@@ -19,7 +19,7 @@ namespace Cosmos.Compiler.XSharp {
     protected static readonly char[] mComma = ",".ToCharArray();
     protected static readonly char[] mSpace = " ".ToCharArray();
     public static string[] mKeywords = (
-      "AS"
+      "As,All"
       + ",BYTE"
       + ",CALL,CONST"
       + ",DWORD"

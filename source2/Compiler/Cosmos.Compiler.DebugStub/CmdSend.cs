@@ -48,6 +48,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("DebugStub_SendStack_Exit:");
 			new LiteralAssemblerCode("Ret");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2:");
+			new LiteralAssemblerCode("Pushad");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_MethodContext");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 			new LiteralAssemblerCode("Call DebugStub_ComReadEAX");

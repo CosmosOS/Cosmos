@@ -20,6 +20,7 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected string mFuncName = null;
+    protected bool mFuncExitFound = false;
 
     public bool EmitUserComments = true;
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
@@ -73,6 +74,23 @@ namespace Cosmos.Compiler.XSharp {
         }
         return FuncLabel(xValue);
       }
+    }
+
+    protected void StartFunc(string aName) {
+      mFuncName = aName;
+      mFuncExitFound = false;
+    }
+
+    protected void EndFunc(ref List<string> rCode) {
+      if (!mFuncExitFound) {
+        rCode.Add(mGroup + "_" + mFuncName + "_Exit:");
+      }
+      if (mInIntHandler) {
+        rCode.Add("IRet");
+      } else {
+        rCode.Add("Ret");
+      }
+      mFuncName = null;
     }
 
     protected string GetDestRegister(TokenList aTokens, int aIdx) {
@@ -145,6 +163,9 @@ namespace Cosmos.Compiler.XSharp {
       // Name: - Function level. Group_ProcName_Name
       AddPattern("_ABC:", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(GetLabel(aTokens[0]) + ":");
+        if (string.Equals(aTokens[0].Value, "Exit", StringComparison.InvariantCultureIgnoreCase)) {
+          mFuncExitFound = true;
+        }
       });
 
       AddPattern("Call _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -384,13 +405,7 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
         if (mBlock == null) {
-          rCode.Add(mGroup + "_" + mFuncName + "_Exit:");
-          if (mInIntHandler) {
-            rCode.Add("IRet");
-          } else {
-            rCode.Add("Ret");
-          }
-          mFuncName = null;
+          EndFunc(ref rCode);
         } else {
           if (mBlockStarter.PatternMatches("repeat 4 times {")) {
             int xCount = int.Parse(mBlockStarter[1].Value);
@@ -419,8 +434,8 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+        StartFunc(aTokens[1].Value);
         mInIntHandler = true;
-        mFuncName = aTokens[1].Value;
         rCode.Add(mGroup + "_{1}:");
       });
 
@@ -430,8 +445,8 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("PushAll", "Pushad");
 
       AddPattern("Function _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+        StartFunc(aTokens[1].Value);
         mInIntHandler = false;
-        mFuncName = aTokens[1].Value;
         rCode.Add(mGroup + "_{1}:");
       });
 
