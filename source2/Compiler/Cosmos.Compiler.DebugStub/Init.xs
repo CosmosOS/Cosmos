@@ -20,7 +20,7 @@ Read:
     ComReadAL()
     BL = AL
     EBX ~> 8
-    if EBX != $19740807 goto Read
+    if EBX != #Signature goto Read
 }
 
 // QEMU (and possibly others) send some garbage across the serial line first.
@@ -35,7 +35,7 @@ procedure WaitForDbgHandshake {
     ComWriteAL()
 
     // Cosmos.Debug.Consts.Consts.SerialSignature
-	+$19740807
+	+#Signature
     ESI = ESP
 
     ComWrite32()

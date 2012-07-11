@@ -1,5 +1,7 @@
 ﻿Group DebugStub
 
+const Signature = $19740807
+
 const Tracing_Off = 0
 const Tracing_On = 1
 

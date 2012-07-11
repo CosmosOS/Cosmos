@@ -337,9 +337,22 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern(new string[] {
         "+123 as byte",
         "+123 as word",
-        "+123 as dword"},
-        "Push {3} {1}");
+        "+123 as dword"
+      }, "Push {3} {1}");
       AddPattern("+_REG", "Push {1}");
+      AddPattern(new string[] {
+        //0  1  2   3
+        "+#_ABC",
+        "+#_ABC as byte",
+        "+#_ABC as word",
+        "+#_ABC as dword"
+        }, delegate(TokenList aTokens, ref List<string> rCode) {
+          string xSize = "dword ";
+          if (aTokens.Count > 2) {
+            xSize = aTokens[3].Value + " ";
+          }
+          rCode.Add("Push " + xSize + ConstLabel(aTokens[1]));
+      });
       AddPattern("-_REG", "Pop {1}");
 
       AddPattern("_ABC = _REG",
