@@ -171,64 +171,60 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
       });
 
-      foreach (var x in "< > = != <= >= 0".Split(xSpace)) {
-        AddPattern(new string[] {
-          "if " + x + " goto _ABC",
-          "if " + x + " Exit", 
-        }, delegate(TokenList aTokens, ref List<string> rCode) {
-          string xLabel;
-          if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
-            xLabel = ProcLabel("Exit");
-          } else {
-            xLabel = GetLabel(aTokens[3]);
-          }
-          rCode.Add(GetJump(aTokens[1]) + " " + xLabel);
-        });
-      }
       // Must test separate since !0 is two tokens
       AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("JNZ " + GetLabel(aTokens[4]));
       });
-      AddPattern("if !0 Exit", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("if !0 return", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("JNZ " + ProcLabel("Exit"));
       });
+      foreach (var xComparison in "< > = != <= >= 0".Split(xSpace)) {
+        foreach (var xTail in "goto _ABC|return".Split("|".ToCharArray())) {
+          if (xComparison != "0") {
+            AddPattern(new string[] {
+              //0  1           2            3        4
+              "if _REG " + xComparison + " 123 " + xTail,
+              "if _REG " + xComparison + " _REG " + xTail, 
+              "if _REG " + xComparison + " _ABC " + xTail, 
+              //                           3  4        5
+              "if _REG " + xComparison + " #_ABC " + xTail, 
+              "if _ABC " + xComparison + " #_ABC " + xTail, 
+            }, delegate(TokenList aTokens, ref List<string> rCode) {
+              int xTailIdx = 4;
 
-      foreach (var xComparison in "< > = != <= >=".Split(xSpace)) {
-        foreach (var xTail in "goto _ABC|exit".Split("|".ToCharArray())) {
-          AddPattern(new string[] {
-            //0  1           2            3        4
-            "if _REG " + xComparison + " 123 " + xTail,
-            "if _REG " + xComparison + " _REG " + xTail, 
-            "if _REG " + xComparison + " _ABC " + xTail, 
-            //                           3  4        5
-            "if _REG " + xComparison + " #_ABC " + xTail, 
-            "if _ABC " + xComparison + " #_ABC " + xTail, 
-          }, delegate(TokenList aTokens, ref List<string> rCode) {
-            int xTailIdx = 4;
+              string xLeft = aTokens[1].Value;
+              if (aTokens[1].Type == TokenType.AlphaNum) {
+                // Hardcoded to dword for now
+                xLeft = "dword [" + GetLabel(aTokens[1]) + "]";
+              }
 
-            string xLeft = aTokens[1].Value;
-            if (aTokens[1].Type == TokenType.AlphaNum) {
-              // Hardcoded to dword for now
-              xLeft = "dword [" + GetLabel(aTokens[1]) + "]";
-            }
+              string xRight = aTokens[3].Value;
+              if (aTokens[3].Type == TokenType.AlphaNum) {
+                xRight = "[" + GetLabel(aTokens[3]) + "]";
+              } else if (aTokens[3].Value == "#") {
+                xRight = ConstLabel(aTokens[4]);
+                xTailIdx = 5;
+              }
+              rCode.Add("Cmp " + xLeft + ", " + xRight);
 
-            string xRight = aTokens[3].Value;
-            if (aTokens[3].Type == TokenType.AlphaNum) {
-              xRight = "[" + GetLabel(aTokens[3]) + "]";
-            } else if (aTokens[3].Value == "#") {
-              xRight = ConstLabel(aTokens[4]);
-              xTailIdx = 5;
-            }
-            rCode.Add("Cmp " + xLeft + ", " + xRight);
+              string xLabel;
+              if (aTokens[xTailIdx].Matches("return")) {
+                xLabel = ProcLabel("Exit");
+              } else {
+                xLabel = GetLabel(aTokens[xTailIdx + 1]);
+              }
 
+              rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
+            });
+          }
+          AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, ref List<string> rCode) {
             string xLabel;
-            if (aTokens[xTailIdx].Matches("exit")) {
+            if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
               xLabel = ProcLabel("Exit");
             } else {
-              xLabel = GetLabel(aTokens[xTailIdx + 1]);
+              xLabel = GetLabel(aTokens[3]);
             }
-
-            rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
+            rCode.Add(GetJump(aTokens[1]) + " " + xLabel);
           });
         }
       }

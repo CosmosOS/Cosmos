@@ -46,7 +46,7 @@ procedure SendStack {
     ESI = .CallerESP
 	//TODO While
 SendByte:
-    if ESI = .CallerEBP exit
+    if ESI = .CallerEBP return
     ComWrite8()
     goto SendByte
 }
@@ -142,7 +142,7 @@ procedure SendText {
     // Address of string
     ESI = EBP[8]
 WriteChar:
-    if ECX = 0 exit
+    if ECX = 0 return
     ComWrite8()
     ECX--
     // We are storing as 16 bits, but for now I will transmit 8 bits
