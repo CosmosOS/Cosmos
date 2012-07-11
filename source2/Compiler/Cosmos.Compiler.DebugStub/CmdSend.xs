@@ -108,7 +108,7 @@ AfterSendByte:
 }
 
 // Modifies: EAX, ESI
-procedure SendTrace2 {
+procedure SendTrace {
 	if .DebugStatus = #Status_Run goto Normal
 
     AL = #Ds2Vs_BreakPoint

@@ -107,7 +107,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendTrace : CodeBlock {
+    public class SendTraceOld : CodeBlock {
       // Modifies: EAX, ESI
       public override void Assemble() {
         DebugStatus.Value.Compare(Status.Run);

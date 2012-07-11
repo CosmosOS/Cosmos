@@ -151,7 +151,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("Goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Jp " + GetLabel(aTokens[1]));
+        rCode.Add("Jmp " + GetLabel(aTokens[1]));
       });
 
       AddPattern("const _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -411,7 +411,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Jp " + ProcLabel("Exit"));
+        rCode.Add("Jmp " + ProcLabel("Exit"));
       });
 
       AddPattern("Repeat 4 times {", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -423,10 +423,6 @@ namespace Cosmos.Compiler.XSharp {
         mInIntHandler = true;
         mProcedureName = aTokens[1].Value;
         rCode.Add(mGroup + "_{1}:");
-      });
-
-      AddPattern("Jump _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Jp " + GetLabel(aTokens[1]));
       });
 
       AddPattern("Return", "Ret");
