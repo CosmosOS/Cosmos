@@ -1,6 +1,6 @@
 ﻿Group DebugStub
 
-procedure SendRegisters {
+function SendRegisters {
 	// Send the actual started signal
     AL = #Ds2Vs_Registers 
 	ComWriteAL()
@@ -16,7 +16,7 @@ procedure SendRegisters {
     ComWrite32()
 }
 
-procedure SendFrame {
+function SendFrame {
     AL = #Ds2Vs_Frame
     ComWriteAL()
 
@@ -30,7 +30,7 @@ procedure SendFrame {
     ComWriteX()
 }
 
-procedure SendStack {
+function SendStack {
     AL = #Ds2Vs_Stack
     ComWriteAL()
 
@@ -51,7 +51,7 @@ SendByte:
     goto SendByte
 }
 
-procedure SendMethodContext2 {
+function SendMethodContext2 {
     // sends a stack value
     // Serial Params:
     //  1: x32 - offset relative to EBP
@@ -85,7 +85,7 @@ AfterSendByte:
 // saveregs
 // frame
 // +All
-procedure SendMemory2 {
+function SendMemory2 {
     // sends a stack value
     // Serial Params:
     //  1: x32 - offset relative to EBP
@@ -99,7 +99,7 @@ procedure SendMemory2 {
     ComReadEAX()
     ESI = EAX
 
-// TODO - Make this a method and use it in above procedure too
+// TODO - Make this a method and use it in above function too
     // now ECX contains size of data (count)
     // ESI contains address
 SendByte:
@@ -111,7 +111,7 @@ AfterSendByte:
 }
 
 // Modifies: EAX, ESI
-procedure SendTrace {
+function SendTrace {
 	if .DebugStatus = #Status_Run goto Normal
 
     AL = #Ds2Vs_BreakPoint
@@ -128,7 +128,7 @@ Type:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-procedure SendText {
+function SendText {
 	// Write the type
     AL = #Ds2Vs_Message
     ComWriteAL()
@@ -154,7 +154,7 @@ WriteChar:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-procedure SendPtr {
+function SendPtr {
     // Write the type
     AL = #Ds2Vs_Pointer
     ComWriteAL()

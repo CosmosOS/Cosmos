@@ -8,7 +8,7 @@ var AsmBreakEIP
 // Only 1 byte is used.
 var AsmOrigByte
 
-procedure SetAsmBreak {
+function SetAsmBreak {
     ComReadEAX()
     EDI = EAX
     // Save the old byte
@@ -20,7 +20,7 @@ procedure SetAsmBreak {
     .AsmBreakEIP = EDI
 }
 
-procedure ClearAsmBreak {
+function ClearAsmBreak {
     EDI = .AsmBreakEIP
     // If 0, we don't need to clear an older one.
     if EDI = 0 return

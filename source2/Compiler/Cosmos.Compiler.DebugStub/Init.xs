@@ -5,7 +5,7 @@ var .DebugBPs int[256]
 var .DebugWaitMsg = 'Waiting for debugger connection...'
 
 // Called before Kernel runs. Inits debug stub, etc
-procedure Init {
+function Init {
     Cls()
 	// Display message before even trying to init serial
     DisplayWaitMsg()
@@ -14,7 +14,7 @@ procedure Init {
     Cls()
 }
 
-procedure WaitForSignature {
+function WaitForSignature {
     EBX = 0
 Read:
     ComReadAL()
@@ -29,7 +29,7 @@ Read:
 // To work around this we send a signature. DC then discards everything before the signature.
 // QEMU has other serial issues too, and we dont support it anymore, but this signature is a good
 // feature so we kept it.
-procedure WaitForDbgHandshake {
+function WaitForDbgHandshake {
     // "Clear" the UART out
     AL = 0
     ComWriteAL()

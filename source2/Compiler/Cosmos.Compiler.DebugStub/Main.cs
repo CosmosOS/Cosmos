@@ -9,18 +9,10 @@ namespace Cosmos.Debug.DebugStub {
 		public Main(Assembler.Assembler aAssembler) : base(aAssembler) {}
 
 		public override void Assemble() {
-			new Comment("X#: Group DebugStub");
-
-			new Comment("X#: procedure HackCompareAsmBreakEIP {");
-			new Label("DebugStub_HackCompareAsmBreakEIP");
-
-			new Comment("X#: EAX ?= .AsmBreakEIP");
-			new Compare { DestinationReg = RegistersEnum.EAX, SourceIsIndirect = true, SourceRef = Cosmos.Assembler.ElementReference.New("DebugStub_AsmBreakEIP") };
-
-			new Comment("X#: }");
-			new Label("DebugStub_HackCompareAsmBreakEIP_Exit");
-			new Return();
-
+			new LiteralAssemblerCode("DebugStub_HackCompareAsmBreakEIP:");
+			new LiteralAssemblerCode("Cmp EAX, DebugStub_AsmBreakEIP");
+			new LiteralAssemblerCode("DebugStub_HackCompareAsmBreakEIP_Exit:");
+			new LiteralAssemblerCode("Ret");
 		}
 	}
 }

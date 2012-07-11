@@ -1,17 +1,17 @@
 ﻿Group DebugStub
 
-procedure Ping {
+function Ping {
     // Ds2Vs.Pong
     AL = 13
     ComWriteAL()
 }
 
-procedure TraceOn {
+function TraceOn {
     // Tracing.On
     .TraceMode = 1
 }
 
-procedure TraceOff {
+function TraceOff {
     // Tracing.Off
     .TraceMode = 0
 }

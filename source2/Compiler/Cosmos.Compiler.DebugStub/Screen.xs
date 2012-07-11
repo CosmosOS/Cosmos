@@ -1,6 +1,6 @@
 ﻿Group DebugStub
 
-procedure Cls {
+function Cls {
 	// VidBase
     ESI = $B8000
     
@@ -20,7 +20,7 @@ BeginLoop:
 	If ESI < $B8FA0 goto BeginLoop
 }
 
-procedure DisplayWaitMsg {
+function DisplayWaitMsg {
     // http://wiki.osdev.org/Text_UI
     // Later can cycle for x changes of second register:
     // http://wiki.osdev.org/Time_And_Date

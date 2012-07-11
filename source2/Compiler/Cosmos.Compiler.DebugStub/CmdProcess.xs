@@ -1,6 +1,6 @@
 ﻿Group DebugStub
 
-procedure AckCommand {
+function AckCommand {
     // We acknowledge receipt of the command AND the processing of it.
     //   -In the past the ACK only acknowledged receipt.
     // We have to do this because sometimes callers do more processing.
@@ -20,7 +20,7 @@ procedure AckCommand {
     ComWriteAL()
 }
 
-procedure ProcessCommandBatch {
+function ProcessCommandBatch {
 Begin:
     ProcessCommand()
 

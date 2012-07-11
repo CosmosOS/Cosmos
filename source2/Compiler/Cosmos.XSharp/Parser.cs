@@ -23,16 +23,17 @@ namespace Cosmos.Compiler.XSharp {
       + ",BYTE"
       + ",CALL,CONST"
       + ",DWORD"
-      + ",END,EXIT"
+      + ",end,exit"
+      + ",function"
       + ",GOTO,GROUP"
-      + ",IF,INTERRUPTHANDLER"
+      + ",IF,INTERRUPT"
       + ",JUMP"
-      + ",POPALL,PUSHALL,PROCEDURE,PORT"
+      + ",POPALL,PUSHALL,PORT"
       + ",RETURN,RETURNINTERRUPT,REPEAT"
       + ",TIMES"
       + ",VAR"
       + ",WORD"
-    ).Split(mComma);
+    ).ToUpper().Split(mComma);
 
     public static readonly string[] Registers;
     public static readonly string[] Registers8 = "AH,AL,BH,BL,CH,CL,DH,DL".Split(mComma);

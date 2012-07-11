@@ -19,11 +19,12 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    protected string mFuncName = null;
+
     public bool EmitUserComments = true;
     public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected string mGroup;
-    protected string mProcedureName = null;
     protected bool mInIntHandler;
     protected TokenList mBlockStarter = null;
     protected List<string> mBlock = null;
@@ -50,8 +51,8 @@ namespace Cosmos.Compiler.XSharp {
     protected string GroupLabel(string aLabel) {
       return mGroup + "_" + aLabel;
     }
-    protected string ProcLabel(string aLabel) {
-      return mGroup + "_" + mProcedureName + "_" + aLabel;
+    protected string FuncLabel(string aLabel) {
+      return mGroup + "_" + mFuncName + "_" + aLabel;
     }
     protected string GetLabel(Token aToken) {
       if (aToken.Type != TokenType.AlphaNum) {
@@ -59,7 +60,7 @@ namespace Cosmos.Compiler.XSharp {
       }
 
       string xValue = aToken.Value;
-      if (mProcedureName == null) {
+      if (mFuncName == null) {
         if (xValue.StartsWith(".")) {
           return xValue.Substring(1);
         }
@@ -70,7 +71,7 @@ namespace Cosmos.Compiler.XSharp {
         } else if (xValue.StartsWith(".")) {
           return GroupLabel(xValue.Substring(1));
         }
-        return ProcLabel(xValue);
+        return FuncLabel(xValue);
       }
     }
 
@@ -141,7 +142,7 @@ namespace Cosmos.Compiler.XSharp {
       // Think of the dots like a directory, . is current group, .. is above that.
       // ..Name: - Global level. Emitted exactly as is.
       // .Name: - Group level. Group_Name
-      // Name: - Procedure level. Group_ProcName_Name
+      // Name: - Function level. Group_ProcName_Name
       AddPattern("_ABC:", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(GetLabel(aTokens[0]) + ":");
       });
@@ -176,7 +177,7 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("JNZ " + GetLabel(aTokens[4]));
       });
       AddPattern("if !0 return", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("JNZ " + ProcLabel("Exit"));
+        rCode.Add("JNZ " + FuncLabel("Exit"));
       });
       foreach (var xComparison in "< > = != <= >= 0".Split(xSpace)) {
         foreach (var xTail in "goto _ABC|return".Split("|".ToCharArray())) {
@@ -209,7 +210,7 @@ namespace Cosmos.Compiler.XSharp {
 
               string xLabel;
               if (aTokens[xTailIdx].Matches("return")) {
-                xLabel = ProcLabel("Exit");
+                xLabel = FuncLabel("Exit");
               } else {
                 xLabel = GetLabel(aTokens[xTailIdx + 1]);
               }
@@ -220,7 +221,7 @@ namespace Cosmos.Compiler.XSharp {
           AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, ref List<string> rCode) {
             string xLabel;
             if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
-              xLabel = ProcLabel("Exit");
+              xLabel = FuncLabel("Exit");
             } else {
               xLabel = GetLabel(aTokens[3]);
             }
@@ -383,13 +384,13 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
         if (mBlock == null) {
-          rCode.Add(mGroup + "_" + mProcedureName + "_Exit:");
+          rCode.Add(mGroup + "_" + mFuncName + "_Exit:");
           if (mInIntHandler) {
             rCode.Add("IRet");
           } else {
             rCode.Add("Ret");
           }
-          mProcedureName = null;
+          mFuncName = null;
         } else {
           if (mBlockStarter.PatternMatches("repeat 4 times {")) {
             int xCount = int.Parse(mBlockStarter[1].Value);
@@ -409,7 +410,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Jmp " + ProcLabel("Exit"));
+        rCode.Add("Jmp " + FuncLabel("Exit"));
       });
 
       AddPattern("Repeat 4 times {", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -417,9 +418,9 @@ namespace Cosmos.Compiler.XSharp {
         mBlock = new List<string>();
       });
 
-      AddPattern("InterruptHandler _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = true;
-        mProcedureName = aTokens[1].Value;
+        mFuncName = aTokens[1].Value;
         rCode.Add(mGroup + "_{1}:");
       });
 
@@ -428,9 +429,9 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("PopAll", "Popad");
       AddPattern("PushAll", "Pushad");
 
-      AddPattern("Procedure _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Function _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
         mInIntHandler = false;
-        mProcedureName = aTokens[1].Value;
+        mFuncName = aTokens[1].Value;
         rCode.Add(mGroup + "_{1}:");
       });
 

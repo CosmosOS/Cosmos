@@ -14,7 +14,7 @@
 
 Group DebugStub
 
-InterruptHandler TracerEntry {
+Interrupt TracerEntry {
 	// This code is temporarily disabled as IRQs are not enabled right now.
 	// LockOrExit
 

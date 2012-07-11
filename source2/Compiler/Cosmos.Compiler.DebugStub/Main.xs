@@ -1,5 +1,5 @@
 ﻿Group DebugStub
 
-procedure HackCompareAsmBreakEIP {
+function HackCompareAsmBreakEIP {
 	EAX ?= .AsmBreakEIP
 }

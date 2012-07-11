@@ -43,7 +43,7 @@ var ComAddr = $03F8
 
 // Todo Auto params
 // Todo ebp frame ptr auto etc
-procedure InitSerial {
+function InitSerial {
 	DX = .ComAddr
 
 	// Disable interrupts
@@ -98,7 +98,7 @@ procedure InitSerial {
 }
 
 // Modifies: AL, DX
-procedure ComReadAL {
+function ComReadAL {
 	DX = .ComAddr
 	DX + 5
 Wait:
@@ -109,7 +109,7 @@ Wait:
 	DX = .ComAddr
     AL = Port[DX]
 }
-procedure ComReadEAX {
+function ComReadEAX {
 	repeat 4 times {
 		ComReadAL()
 		EAX ~> 8
@@ -121,17 +121,17 @@ procedure ComReadEAX {
 // Modified: AL, DX, EDI (+1)
 //
 // Reads a byte into [EDI] and does EDI + 1
-procedure ComRead8  {
+function ComRead8  {
     ComReadAL()
     EDI[0] = AL
     EDI + 1
 }
-procedure ComRead16 {
+function ComRead16 {
 	repeat 2 times {
 		ComRead8()
 	}
 }
-procedure ComRead32 {
+function ComRead32 {
 	repeat 4 times {
 		ComRead8()
 	}
@@ -140,7 +140,7 @@ procedure ComRead32 {
 // Input: AL
 // Output: None
 // Modifies: EDX, ESI
-procedure ComWriteAL {
+function ComWriteAL {
 	+EAX
     ESI = ESP
     ComWrite8()
@@ -148,7 +148,7 @@ procedure ComWriteAL {
     // This also allows the function to preserve EAX.
     -EAX
 }
-procedure ComWriteAX {
+function ComWriteAX {
     // Input: AX
     // Output: None
     // Modifies: EDX, ESI
@@ -159,7 +159,7 @@ procedure ComWriteAX {
     // This also allow the function to preserve EAX.
     -EAX
 }
-procedure ComWriteEAX {
+function ComWriteEAX {
     // Input: EAX
     // Output: None
     // Modifies: EDX, ESI
@@ -171,7 +171,7 @@ procedure ComWriteEAX {
     -EAX
 }
 
-procedure ComWrite8 {
+function ComWrite8 {
 	// Input: ESI
 	// Output: None
 	// Modifies: EAX, EDX
@@ -208,17 +208,17 @@ Wait:
 
 	ESI++
 }
-procedure ComWrite16 {
+function ComWrite16 {
 	ComWrite8()
 	ComWrite8()
 }
-procedure ComWrite32 {
+function ComWrite32 {
 	ComWrite8()
 	ComWrite8()
 	ComWrite8()
 	ComWrite8()
 }
-procedure ComWriteX {
+function ComWriteX {
 More:
 	ComWrite8()
 	ECX--
