@@ -9,7 +9,7 @@ using Cosmos.Assembler.XSharp;
 
 namespace Cosmos.Debug.DebugStub {
   public partial class DebugStub : CodeGroup {
-    public class SendFrame : CodeBlock {
+    public class SendFrameOld : CodeBlock {
       public override void Assemble() {
         AL = (int)Ds2Vs.Frame;
         Call("DebugStub_ComWriteAL");
@@ -24,7 +24,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendStack : CodeBlock {
+    public class SendStackOld : CodeBlock {
       public override void Assemble() {
         AL = (int)Ds2Vs.Stack;
         Call("DebugStub_ComWriteAL");

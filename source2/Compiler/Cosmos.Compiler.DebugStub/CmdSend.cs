@@ -21,7 +21,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Call DebugStub_ComWrite32");
 			new LiteralAssemblerCode("DebugStub_SendRegisters_Exit:");
 			new LiteralAssemblerCode("Ret");
-			new LiteralAssemblerCode("DebugStub_SendFrame2:");
+			new LiteralAssemblerCode("DebugStub_SendFrame:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_Frame");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 			new LiteralAssemblerCode("Mov EAX, 32");
@@ -30,9 +30,9 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Add ESI, 8");
 			new LiteralAssemblerCode("Mov ECX, 32");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteX");
-			new LiteralAssemblerCode("DebugStub_SendFrame2_Exit:");
+			new LiteralAssemblerCode("DebugStub_SendFrame_Exit:");
 			new LiteralAssemblerCode("Ret");
-			new LiteralAssemblerCode("DebugStub_SendStack2:");
+			new LiteralAssemblerCode("DebugStub_SendStack:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_Stack");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 			new LiteralAssemblerCode("Mov ESI, [DebugStub_CallerESP]");
@@ -40,12 +40,12 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Sub EAX, ESI");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAX");
 			new LiteralAssemblerCode("Mov ESI, [DebugStub_CallerESP]");
-			new LiteralAssemblerCode("DebugStub_SendStack2_SendByte:");
+			new LiteralAssemblerCode("DebugStub_SendStack_SendByte:");
 			new LiteralAssemblerCode("Cmp ESI, [DebugStub_CallerEBP]");
-			new LiteralAssemblerCode("JE DebugStub_SendStack2_Exit");
+			new LiteralAssemblerCode("JE DebugStub_SendStack_Exit");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
-			new LiteralAssemblerCode("Jmp DebugStub_SendStack2_SendByte");
-			new LiteralAssemblerCode("DebugStub_SendStack2_Exit:");
+			new LiteralAssemblerCode("Jmp DebugStub_SendStack_SendByte");
+			new LiteralAssemblerCode("DebugStub_SendStack_Exit:");
 			new LiteralAssemblerCode("Ret");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_MethodContext");

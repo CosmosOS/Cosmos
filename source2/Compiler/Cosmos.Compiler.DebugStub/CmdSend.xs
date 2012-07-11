@@ -16,7 +16,7 @@ procedure SendRegisters {
     ComWrite32()
 }
 
-procedure SendFrame2 {
+procedure SendFrame {
     AL = #Ds2Vs_Frame
     ComWriteAL()
 
@@ -30,7 +30,7 @@ procedure SendFrame2 {
     ComWriteX()
 }
 
-procedure SendStack2 {
+procedure SendStack {
     AL = #Ds2Vs_Stack
     ComWriteAL()
 
