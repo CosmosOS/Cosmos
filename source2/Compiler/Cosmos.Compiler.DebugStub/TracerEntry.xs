@@ -34,7 +34,7 @@ Interrupt TracerEntry {
 	.CallerESP = ESP
 	ESP - 12
 
-	PushAll
+	+All
 
 	// Save current ESP so we can look at the results of PushAll later
 	.PushAllPtr = ESP
@@ -58,7 +58,7 @@ Interrupt TracerEntry {
 
 	Executing()
 
-	PopAll
+	-All
 
 	// Temp disabled, see comment on LockOrExit above
 	// Unlock

@@ -56,7 +56,7 @@ namespace Cosmos.Compiler.XSharp {
       return mGroup + "_" + mFuncName + "_" + aLabel;
     }
     protected string GetLabel(Token aToken) {
-      if (aToken.Type != TokenType.AlphaNum) {
+      if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("Exit")) {
         throw new Exception("Label must be AlphaNum.");
       }
 
@@ -161,11 +161,12 @@ namespace Cosmos.Compiler.XSharp {
       // ..Name: - Global level. Emitted exactly as is.
       // .Name: - Group level. Group_Name
       // Name: - Function level. Group_ProcName_Name
+      AddPattern("Exit:", delegate(TokenList aTokens, ref List<string> rCode) {
+        rCode.Add(GetLabel(aTokens[0]) + ":");
+        mFuncExitFound = true;
+      });
       AddPattern("_ABC:", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add(GetLabel(aTokens[0]) + ":");
-        if (string.Equals(aTokens[0].Value, "Exit", StringComparison.InvariantCultureIgnoreCase)) {
-          mFuncExitFound = true;
-        }
       });
 
       AddPattern("Call _ABC", delegate(TokenList aTokens, ref List<string> rCode) {

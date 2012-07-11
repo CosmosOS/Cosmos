@@ -80,18 +80,23 @@ SendByte:
     ECX--
     goto SendByte
 AfterSendByte:
+
+Exit:
+	-All
 }
 
 // none
 // saveregs
 // frame
-// +All
+//
+// sends a stack value
+// Serial Params:
+//  1: x32 - offset relative to EBP
+//  2: x32 - size of data to send
 function SendMemory2 {
-    // sends a stack value
-    // Serial Params:
-    //  1: x32 - offset relative to EBP
-    //  2: x32 - size of data to send
 //    [XSharp(PreserveStack = true)]
+	+All
+
     ComReadEAX()
     ECX = EAX
     AL = #Ds2Vs_MemoryData
@@ -109,6 +114,9 @@ SendByte:
     ECX--
     goto SendByte
 AfterSendByte:
+
+Exit:
+	-All
 }
 
 // Modifies: EAX, ESI

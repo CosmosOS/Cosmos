@@ -64,8 +64,10 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Jmp DebugStub_SendMethodContext2_SendByte");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2_AfterSendByte:");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2_Exit:");
+			new LiteralAssemblerCode("Popad");
 			new LiteralAssemblerCode("Ret");
 			new LiteralAssemblerCode("DebugStub_SendMemory2:");
+			new LiteralAssemblerCode("Pushad");
 			new LiteralAssemblerCode("Call DebugStub_ComReadEAX");
 			new LiteralAssemblerCode("Mov ECX, EAX");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_MemoryData");
@@ -80,6 +82,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Jmp DebugStub_SendMemory2_SendByte");
 			new LiteralAssemblerCode("DebugStub_SendMemory2_AfterSendByte:");
 			new LiteralAssemblerCode("DebugStub_SendMemory2_Exit:");
+			new LiteralAssemblerCode("Popad");
 			new LiteralAssemblerCode("Ret");
 			new LiteralAssemblerCode("DebugStub_SendTrace:");
 			new LiteralAssemblerCode("Cmp dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run");
