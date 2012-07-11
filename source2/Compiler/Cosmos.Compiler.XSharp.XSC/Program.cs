@@ -11,7 +11,7 @@ namespace Cosmos.Compiler.XSharp.XSC {
         string xSrc = aArgs[0];
         string xNamespace = aArgs[1];
 
-        var xGenerator = new Generator();
+        var xGenerator = new CSharpGenerator();
         xGenerator.Execute(xNamespace, xSrc);
       } catch (Exception ex) {
         Console.WriteLine(ex.Message);

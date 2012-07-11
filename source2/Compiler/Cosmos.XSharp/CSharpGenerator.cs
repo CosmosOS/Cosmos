@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 
 namespace Cosmos.Compiler.XSharp {
-  public class Generator {
+  public class CSharpGenerator {
     protected TextReader mInput;
     protected TextWriter mOutput;
     protected TokenPatterns mPatterns = new TokenPatterns();
@@ -20,7 +20,7 @@ namespace Cosmos.Compiler.XSharp {
       mPathname = Path.GetFileName(aSrcPathname);
       using (var xInput = new StreamReader(aSrcPathname)) {
         using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".cs"))) {
-          var xGenerator = new Generator();
+          var xGenerator = new CSharpGenerator();
           xGenerator.Execute(aNamespace, Path.GetFileNameWithoutExtension(aSrcPathname), xInput, xOutput);
         }
       }

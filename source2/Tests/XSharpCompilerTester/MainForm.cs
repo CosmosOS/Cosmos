@@ -22,7 +22,7 @@ namespace XSharpCompilerTester {
       tboxInput.Text = xInputString;
       using (var xInput = new StringReader(xInputString)) {
         using (var xOutput = new StringWriter()) {
-          var xGenerator = new Cosmos.Compiler.XSharp.Generator();
+          var xGenerator = new Cosmos.Compiler.XSharp.CSharpGenerator();
           xGenerator.Execute("DefaultNamespace", "InputFileName", xInput, xOutput);
 
           textOutput.Text = xOutput.ToString();

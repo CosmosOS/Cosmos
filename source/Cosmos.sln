@@ -218,11 +218,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "..\source2\XSharp.Nasm\XSharp.Nasm.csproj", "{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 60
+		SccNumberOfProjects = 59
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -460,10 +458,6 @@ Global
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
 		SccProjectName58 = ../source2/Cosmos.Deploy.Pixie
 		SccLocalPath58 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName59 = ..\\source2\\XSharp.Nasm\\XSharp.Nasm.csproj
-		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
-		SccProjectName59 = ../source2/XSharp.Nasm
-		SccLocalPath59 = ..\\source2\\XSharp.Nasm
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1120,16 +1114,6 @@ Global
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Mixed Platforms.Build.0 = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.ActiveCfg = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.Build.0 = Release|x86
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1204,6 +1188,5 @@ Global
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{2A59517C-356E-4B55-B155-50335BF482FB} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{7B8499A7-0A8D-44FC-8181-9666CC198025} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
-		{3E045DC7-BE2A-4AEF-AD37-EBBF37CC66CA} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 	EndGlobalSection
 EndGlobal
