@@ -44,19 +44,23 @@
     <h3>
     Kudzu</h3>
     <ul>
-                                    <li>PreserveRegisters</li>
-                                    <li>look for todo in cmdsend.xs</li>
-                                    <li>AL = ComRead8()</li>
                                     <li>Stop debugging<ul>
                                         <li>EngineUtils.cs - line 74</li>
                                         </ul>
                                     </li>
                                     <li>Complete X# Port<ul>
+                                    <li>Exit:</li>
+                                        <li>PreserveRegisters</li>
+                                    <li>look for todo in cmdsend.xs</li>
+                                    <li>AL = ComRead8()</li>
+                                    <li>ComWrite(AL)</li>
+                                        </ul>
+                                    </li>
+                                    <ul>
                                         <li>X# ProcessCmds.CS, ProcessCmdBatch - #TODO Make this a do while loop. Test 
                                             elsewhere though, this method is not used currently.</li>
                                         <li>Remove old X# translator</li>
-                                        </ul>
-                                    </li>
+                                    </ul>
                                     <li>Simplify assembler - methods and straight to text/bin. Current system is overly 
                                         complicated<ul>
                                             <li>Also skip c# step - compile straight to .asm from X#</ul>

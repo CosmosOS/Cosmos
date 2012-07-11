@@ -81,6 +81,10 @@ SendByte:
 AfterSendByte:
 }
 
+// none
+// saveregs
+// frame
+// +All
 procedure SendMemory2 {
     // sends a stack value
     // Serial Params:
@@ -98,7 +102,6 @@ procedure SendMemory2 {
 // TODO - Make this a method and use it in above procedure too
     // now ECX contains size of data (count)
     // ESI contains address
-
 SendByte:
 	if ECX = 0 goto AfterSendByte
     ComWrite8()
@@ -113,13 +116,10 @@ procedure SendTrace {
 
     AL = #Ds2Vs_BreakPoint
     goto Type
-
 Normal:
     AL = #Ds2Vs_TracePoint
-
 Type:
     ComWriteAL()
-
     // Send Calling EIP.
     ESI = @.CallerEIP
     ComWrite32()

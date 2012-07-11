@@ -354,6 +354,8 @@ namespace Cosmos.Compiler.XSharp {
           }
           rCode.Add("Push " + xSize + ConstLabel(aTokens[1]));
       });
+      AddPattern("+All", "Pushad");
+      AddPattern("-All", "Popad");
       AddPattern("-_REG", "Pop {1}");
 
       AddPattern("_ABC = _REG",
