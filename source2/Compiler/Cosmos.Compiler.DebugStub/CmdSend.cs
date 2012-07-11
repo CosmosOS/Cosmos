@@ -44,7 +44,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Cmp ESI, [DebugStub_CallerEBP]");
 			new LiteralAssemblerCode("JE DebugStub_SendStack2_Exit");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
-			new LiteralAssemblerCode("Jp DebugStub_SendStack2_SendByte");
+			new LiteralAssemblerCode("Jmp DebugStub_SendStack2_SendByte");
 			new LiteralAssemblerCode("DebugStub_SendStack2_Exit:");
 			new LiteralAssemblerCode("Ret");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2:");
@@ -60,7 +60,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("JE DebugStub_SendMethodContext2_AfterSendByte");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
 			new LiteralAssemblerCode("Dec ECX");
-			new LiteralAssemblerCode("Jp DebugStub_SendMethodContext2_SendByte");
+			new LiteralAssemblerCode("Jmp DebugStub_SendMethodContext2_SendByte");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2_AfterSendByte:");
 			new LiteralAssemblerCode("DebugStub_SendMethodContext2_Exit:");
 			new LiteralAssemblerCode("Ret");
@@ -76,7 +76,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("JE DebugStub_SendMemory2_AfterSendByte");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
 			new LiteralAssemblerCode("Dec ECX");
-			new LiteralAssemblerCode("Jp DebugStub_SendMemory2_SendByte");
+			new LiteralAssemblerCode("Jmp DebugStub_SendMemory2_SendByte");
 			new LiteralAssemblerCode("DebugStub_SendMemory2_AfterSendByte:");
 			new LiteralAssemblerCode("DebugStub_SendMemory2_Exit:");
 			new LiteralAssemblerCode("Ret");
@@ -84,7 +84,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Cmp dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run");
 			new LiteralAssemblerCode("JE DebugStub_SendTrace_Normal");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_BreakPoint");
-			new LiteralAssemblerCode("Jp DebugStub_SendTrace_Type");
+			new LiteralAssemblerCode("Jmp DebugStub_SendTrace_Type");
 			new LiteralAssemblerCode("DebugStub_SendTrace_Normal:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_TracePoint");
 			new LiteralAssemblerCode("DebugStub_SendTrace_Type:");
@@ -93,7 +93,7 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Call DebugStub_ComWrite32");
 			new LiteralAssemblerCode("DebugStub_SendTrace_Exit:");
 			new LiteralAssemblerCode("Ret");
-			new LiteralAssemblerCode("DebugStub_SendText2:");
+			new LiteralAssemblerCode("DebugStub_SendText:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_Message");
 			new LiteralAssemblerCode("Call DebugStub_ComWriteAL");
 			new LiteralAssemblerCode("Mov ESI, EBP");
@@ -101,14 +101,14 @@ namespace Cosmos.Debug.DebugStub {
 			new LiteralAssemblerCode("Mov ECX, [ESI + 0]");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite16");
 			new LiteralAssemblerCode("Mov ESI, [EBP + 8]");
-			new LiteralAssemblerCode("DebugStub_SendText2_WriteChar:");
+			new LiteralAssemblerCode("DebugStub_SendText_WriteChar:");
 			new LiteralAssemblerCode("Cmp ECX, 0");
-			new LiteralAssemblerCode("JE DebugStub_SendText2_Exit");
+			new LiteralAssemblerCode("JE DebugStub_SendText_Exit");
 			new LiteralAssemblerCode("Call DebugStub_ComWrite8");
 			new LiteralAssemblerCode("Dec ECX");
 			new LiteralAssemblerCode("Inc ESI");
-			new LiteralAssemblerCode("Jp DebugStub_SendText2_WriteChar");
-			new LiteralAssemblerCode("DebugStub_SendText2_Exit:");
+			new LiteralAssemblerCode("Jmp DebugStub_SendText_WriteChar");
+			new LiteralAssemblerCode("DebugStub_SendText_Exit:");
 			new LiteralAssemblerCode("Ret");
 			new LiteralAssemblerCode("DebugStub_SendPtr2:");
 			new LiteralAssemblerCode("Mov AL, DebugStub_Const_Ds2Vs_Pointer");

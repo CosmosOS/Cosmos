@@ -107,27 +107,7 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendTraceOld : CodeBlock {
-      // Modifies: EAX, ESI
-      public override void Assemble() {
-        DebugStatus.Value.Compare(Status.Run);
-        JumpIf(Flags.Equal, ".Normal");
-        AL = (int)Ds2Vs.BreakPoint;
-        Jump(".Type");
-
-        Label = ".Normal";
-        AL = (int)Ds2Vs.TracePoint;
-
-        Label = ".Type";
-        Call("DebugStub_ComWriteAL");
-
-        // Send Calling EIP.
-        ESI = CallerEIP.Address;
-        Call("DebugStub_ComWrite32");
-      }
-    }
-
-    public class SendText : CodeBlock {
+    public class SendTextOld : CodeBlock {
       // Input: Stack
       // Output: None
       // Modifies: EAX, ECX, EDX, ESI

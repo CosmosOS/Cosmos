@@ -128,7 +128,7 @@ Type:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-procedure SendText2 {
+procedure SendText {
 	// Write the type
     AL = #Ds2Vs_Message
     ComWriteAL()
