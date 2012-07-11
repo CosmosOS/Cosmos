@@ -107,35 +107,6 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class SendTextOld : CodeBlock {
-      // Input: Stack
-      // Output: None
-      // Modifies: EAX, ECX, EDX, ESI
-      public override void Assemble() {
-        // Write the type
-        AL = (int)Ds2Vs.Message;
-        Call("DebugStub_ComWriteAL");
-
-        // Write Length
-        ESI = EBP;
-        ESI = ESI + 12;
-        ECX = ESI[0];
-        Call("DebugStub_ComWrite16");
-
-        // Address of string
-        ESI = EBP[8];
-        Label = ".WriteChar";
-        ECX.Compare(0);
-        JumpIf(Flags.Equal, ".Exit");
-        Call("DebugStub_ComWrite8");
-        ECX--;
-        // We are storing as 16 bits, but for now I will transmit 8 bits
-        // So we inc again to skip the 0
-        ESI++;
-        Jump(".WriteChar");
-      }
-    }
-
     public class SendPtr : CodeBlock {
       // Input: Stack
       // Output: None
