@@ -6,25 +6,20 @@ function Cls {
 	// VidBase
     ESI = #VidBase
     
-BeginLoop:
-	// Text
-    ESI[0] = $00
-    ESI++
-
-	// Colour
-    ESI[0] = $0A
-    ESI++
-	
 	// End of Video Area
 	// VidBase + 25 * 80 * 2 = B8FA0
-	If ESI < $B8FA0 goto BeginLoop
+	while ESI < $B8FA0 {
+		// Text
+		ESI[0] = $00
+		ESI++
+
+		// Colour
+		ESI[0] = $0A
+		ESI++
+	}
 }
 
 function DisplayWaitMsg {
-    // http://wiki.osdev.org/Text_UI
-    // Later can cycle for x changes of second register:
-    // http://wiki.osdev.org/Time_And_Date
-    
 	ESI = @..DebugWaitMsg
 
     EDI = #VidBase
