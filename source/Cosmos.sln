@@ -166,9 +166,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{
 		Cosmos.Assembler.html = Cosmos.Assembler.html
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{6A15C540-8278-4B9C-B890-FA57FB6AE6A6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{6A15C540-8278-4B9C-B890-FA57FB6AE6A6}"
 	ProjectSection(SolutionItems) = preProject
-		Cosmos.Compiler.html = Cosmos.Compiler.html
+		Cosmos.IL2CPU.html = Cosmos.IL2CPU.html
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows.Test", "..\source2\VSIP\Cosmos.VS.Windows.Test\Cosmos.VS.Windows.Test.csproj", "{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}"
