@@ -28,7 +28,7 @@ namespace Cosmos.Compiler.XSharp {
       + ",GOTO,GROUP"
       + ",IF,INTERRUPT"
       + ",JUMP"
-      + ",POPALL,PUSHALL,PORT"
+      + ",PORT"
       + ",RETURN,RETURNINTERRUPT,REPEAT"
       + ",TIMES"
       + ",VAR"

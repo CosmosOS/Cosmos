@@ -441,8 +441,6 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("Return", "Ret");
       AddPattern("ReturnInterrupt", "IRet");
-      AddPattern("PopAll", "Popad");
-      AddPattern("PushAll", "Pushad");
 
       AddPattern("Function _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
         StartFunc(aTokens[1].Value);
