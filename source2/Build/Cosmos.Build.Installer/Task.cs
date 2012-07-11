@@ -25,11 +25,20 @@ namespace Cosmos.Build.Installer {
       return xList.Length > 0;
     }
 
+    public void WaitForStart(string aName) {
+      WaitForStart(aName, null);
+    }
+    public bool WaitForStart(string aName, int? aMilliSec) {
+      return WaitForState(aName, aMilliSec, true);
+    }
     public void WaitForExit(string aName) {
       WaitForExit(aName, null);
     }
     public bool WaitForExit(string aName, int? aMilliSec) {
-      while (IsRunning(aName)) {
+      return WaitForState(aName, aMilliSec, false);
+    }
+    public bool WaitForState(string aName, int? aMilliSec, bool aIsRunning) {
+      while (IsRunning(aName) != aIsRunning) {
         if (aMilliSec.HasValue && aMilliSec <= 0) {
           return true;
         }

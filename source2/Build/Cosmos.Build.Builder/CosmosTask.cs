@@ -241,7 +241,16 @@ namespace Cosmos.Build.Builder {
         // the dev kit a lot.
         Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
 
+        // Must check for start before stop, else on slow machines we exit quickly because Exit is found before
+        // it starts.
+        int xSeconds = 5;
+        Echo("Waiting " + xSeconds + " seconds for Setup to start.");
+        if (WaitForStart("devenv", xSeconds * 1000)) {
+          throw new Exception("Setup did not start.");
+        }
+
         // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
+        Echo("Waiting for Setup to complete.");
         WaitForExit("CosmosUserKit-" + mReleaseNo);
       } else {
         Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
