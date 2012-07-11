@@ -44,6 +44,9 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    protected string ConstLabel(Token aToken) {
+      return GroupLabel("Const_" + aToken);
+    }
     protected string GroupLabel(string aLabel) {
       return mGroup + "_" + aLabel;
     }
@@ -121,6 +124,8 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected void AddPatterns() {
+      var xSpace = " ".ToCharArray();
+
       AddPattern("! Move EAX, 0", "{0}");
 
       AddPattern("// Comment", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -150,7 +155,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("const _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(GroupLabel("Const_" + aTokens[1]) + " equ " + aTokens[3]);
+        rCode.Add(ConstLabel(aTokens[1]) + " equ " + aTokens[3]);
       });
 
       AddPattern(false, "var _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -166,16 +171,11 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
       });
 
-      AddPattern(new string[] {
-          "if 0 goto _ABC", "if 0 Exit", 
-          "if < goto _ABC", "if < Exit", 
-          "if > goto _ABC", "if > Exit", 
-          "if = goto _ABC", "if = Exit", 
-          "if != goto _ABC", "if != Exit", 
-          "if <= goto _ABC", "if <= Exit", 
-          "if >= goto _ABC" , "if >= Exit"
-        },
-        delegate(TokenList aTokens, ref List<string> rCode) {
+      foreach (var x in "< > = != <= >= 0".Split(xSpace)) {
+        AddPattern(new string[] {
+          "if " + x + " goto _ABC",
+          "if " + x + " Exit", 
+        }, delegate(TokenList aTokens, ref List<string> rCode) {
           string xLabel;
           if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
             xLabel = ProcLabel("Exit");
@@ -183,8 +183,8 @@ namespace Cosmos.Compiler.XSharp {
             xLabel = GetLabel(aTokens[3]);
           }
           rCode.Add(GetJump(aTokens[1]) + " " + xLabel);
-        }
-      );
+        });
+      }
       // Must test separate since !0 is two tokens
       AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("JNZ " + GetLabel(aTokens[4]));
@@ -193,33 +193,51 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("JNZ " + ProcLabel("Exit"));
       });
 
-      AddPattern(new string[] {
-          //0  1   2  3  4     5  
-          "if _REG < 123 goto _ABC", "if _REG < 123 exit", "if _REG < _REG goto _ABC", "if _REG < _REG exit",
-          "if _REG > 123 goto _ABC", "if _REG > 123 exit", "if _REG > _REG goto _ABC", "if _REG > _REG exit",
-          "if _REG = 123 goto _ABC", "if _REG = 123 exit", "if _REG = _REG goto _ABC", "if _REG = _REG exit",
-          "if _REG != 123 goto _ABC", "if _REG != 123 exit", "if _REG != _REG goto _ABC", "if _REG != _REG exit",
-          "if _REG <= 123 goto _ABC", "if _REG <= 123 exit", "if _REG <= _REG goto _ABC", "if _REG <= _REG exit",
-          "if _REG >= 123 goto _ABC", "if _REG >= 123 exit", "if _REG >= _REG goto _ABC", "if _REG >= _REG exit"
-        },
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("Cmp {1}, {3}");
-          string xLabel;
-          if (string.Equals(aTokens[4].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
-            xLabel = ProcLabel("Exit");
-          } else {
-            xLabel = GetLabel(aTokens[5]);
-          }
-          rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
+      foreach (var xComparison in "< > = != <= >=".Split(xSpace)) {
+        foreach (var xTail in "goto _ABC|exit".Split("|".ToCharArray())) {
+          AddPattern(new string[] {
+            //0  1           2            3        4
+            "if _REG " + xComparison + " 123 " + xTail,
+            "if _REG " + xComparison + " _REG " + xTail, 
+            "if _REG " + xComparison + " _ABC " + xTail, 
+            //                           3  4        5
+            "if _REG " + xComparison + " #_ABC " + xTail, 
+            "if _ABC " + xComparison + " #_ABC " + xTail, 
+          }, delegate(TokenList aTokens, ref List<string> rCode) {
+            int xTailIdx = 4;
+
+            string xLeft = aTokens[1].Value;
+            if (aTokens[1].Type == TokenType.AlphaNum) {
+              xLeft = "[" + GetLabel(aTokens[1]) + "]";
+            }
+
+            string xRight = aTokens[3].Value;
+            if (aTokens[3].Type == TokenType.AlphaNum) {
+              xRight = "[" + GetLabel(aTokens[3]) + "]";
+            } else if (aTokens[3].Value == "#") {
+              xRight = ConstLabel(aTokens[4]);
+              xTailIdx = 5;
+            }
+            rCode.Add("Cmp " + xLeft + ", " + xRight);
+
+            string xLabel;
+            if (aTokens[xTailIdx].Matches("exit")) {
+              xLabel = ProcLabel("Exit");
+            } else {
+              xLabel = GetLabel(aTokens[xTailIdx + 1]);
+            }
+
+            rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
+          });
         }
-      );
+      }
 
       AddPattern("_REG ?= 123", "Cmp {0}, {2}");
       AddPattern("_REG ?= _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("Cmp {0}, " + GetLabel(aTokens[2]));
       });
       AddPattern("_REG ?= #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Cmp {0}, " + GroupLabel("Const_" + aTokens[3]));
+        rCode.Add("Cmp {0}, " + ConstLabel(aTokens[3]));
       });
 
       AddPattern("_REG ?& 123", "Test {0}, {2}");
@@ -227,7 +245,7 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("Test {0}, " + GetLabel(aTokens[2]));
       });
       AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Test {0}, " + GroupLabel("Const_" + aTokens[3]));
+        rCode.Add("Test {0}, " + ConstLabel(aTokens[3]));
       });
 
       AddPattern("_REG ~> 123", "ROR {0}, {2}");
@@ -250,19 +268,19 @@ namespace Cosmos.Compiler.XSharp {
       );
 
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov {0}, " + GroupLabel("Const_" + aTokens[3]));
+        rCode.Add("Mov {0}, " + ConstLabel(aTokens[3]));
       });
       AddPattern(new string[] {
           "_REG32[1] = 123",
           "_REGIDX[1] = 123"
         }, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov dword [{0} + {2}], " + GroupLabel("Const_" + aTokens[5]));
+        rCode.Add("Mov dword [{0} + {2}], " + ConstLabel(aTokens[5]));
       });
       AddPattern(new string[] {
           "_REG32[-1] = 123",
           "_REGIDX[-1] = 123"
         }, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov dword [{0} - {2}], " + GroupLabel("Const_" + aTokens[5]));
+        rCode.Add("Mov dword [{0} - {2}], " + ConstLabel(aTokens[5]));
       });
 
       AddPattern("_REG = _REG", "Mov {0}, {2}");

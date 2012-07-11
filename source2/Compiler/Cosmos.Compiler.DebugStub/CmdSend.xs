@@ -44,124 +44,122 @@ procedure SendStack2 {
     //
     // Need to reload ESI, WriteAXToCompPort modifies it
     ESI = .CallerESP
+	//TODO While
 SendByte:
-//    if ESI = CallerEBP exit
+    if ESI = CallerEBP exit
     ComWrite8()
     goto SendByte
 }
 
 procedure SendMethodContext2 {
-//    // sends a stack value
-//    // Serial Params:
-//    //  1: x32 - offset relative to EBP
-//    //  2: x32 - size of data to send
+    // sends a stack value
+    // Serial Params:
+    //  1: x32 - offset relative to EBP
+    //  2: x32 - size of data to send
 //    [XSharp(PreserveStack = true)]
-//    AL = Ds2Vs_MethodContext
+
+    AL = #Ds2Vs_MethodContext
     ComWriteAL()
-//
-//    // offset relative to ebp
-//    // size of data to send
-//    Call("DebugStub_ComReadEAX()
-//    ECX = EAX
-//    Call("DebugStub_ComReadEAX()
-//
-//    // now ECX contains size of data (count)
-//    // EAX contains relative to EBP
-//    ESI = CallerEBP.Value
-//    ESI.Add(EAX) //TODO: ESI = ESI + EAX
-//
-//    Label = ".SendByte"
-//    ECX.Compare(0)
-//    JumpIf(Flags.Equal, ".AfterSendByte")
+
+    // offset relative to ebp
+    // size of data to send
+    ComReadEAX()
+    ECX = EAX
+    ComReadEAX()
+
+    // now ECX contains size of data (count)
+    // EAX contains relative to EBP
+    ESI = CallerEBP
+    ESI + EAX
+
+    // TODO While
+SendByte:
+	if ECX = 0 goto AfterSendByte
     ComWrite8()
-//    ECX--
-//    Jump(".SendByte")
-//    Label = ".AfterSendByte"
+    ECX--
+    goto SendByte
+AfterSendByte:
 }
 
 procedure SendMemory2 {
-//    // sends a stack value
-//    // Serial Params:
-//    //  1: x32 - offset relative to EBP
-//    //  2: x32 - size of data to send
+    // sends a stack value
+    // Serial Params:
+    //  1: x32 - offset relative to EBP
+    //  2: x32 - size of data to send
 //    [XSharp(PreserveStack = true)]
-//    procedure
-//    Call("DebugStub_ComReadEAX()
-//    ECX = EAX
-//    AL = Ds2Vs_MemoryData
+    ComReadEAX()
+    ECX = EAX
+    AL = #Ds2Vs_MemoryData
     ComWriteAL()
-//
-//    Call("DebugStub_ComReadEAX()
-//    ESI = EAX
-//
-//    // now ECX contains size of data (count)
-//    // ESI contains address
-//
-//    Label = "DebugStub_SendMemory_SendByte"
-//    new Compare { DestinationReg = Registers.ECX, SourceValue = 0 }
-//    JumpIf(Flags.Equal, "DebugStub_SendMemory_After_SendByte")
+
+    ComReadEAX()
+    ESI = EAX
+
+// TODO - Make this a method and use it in above procedure too
+    // now ECX contains size of data (count)
+    // ESI contains address
+
+SendByte:
+	if ECX = 0 goto AfterSendByte
     ComWrite8()
-//    ECX--
-//    Jump("DebugStub_SendMemory_SendByte")
-//
-//    Label = "DebugStub_SendMemory_After_SendByte"
-//    }
+    ECX--
+    goto SendByte
+AfterSendByte:
 }
 
+// Modifies: EAX, ESI
 procedure SendTrace2 {
-//    // Modifies: EAX, ESI
-//    DebugStatus.Value.Compare(Status.Run)
-//    JumpIf(Flags.Equal, ".Normal")
-//    AL = Ds2Vs_BreakPoint
-//    Jump(".Type")
-//
-//    Label = ".Normal"
-//    AL = Ds2Vs_TracePoint
-//
-//    Label = ".Type"
+	if .DebugStatus = #Status_Run goto Normal
+
+    AL = #Ds2Vs_BreakPoint
+    goto Type
+
+Normal:
+    AL = Ds2Vs_TracePoint
+
+Type:
     ComWriteAL()
-//
-//    // Send Calling EIP.
-//    ESI = CallerEIP.Address
-//    DebugStub_ComWrite32()
+
+    // Send Calling EIP.
+    ESI = .CallerEIP
+    ComWrite32()
 }
 
 procedure SendText2 {
-//    // Input: Stack
-//    // Output: None
-//    // Modifies: EAX, ECX, EDX, ESI
-//    // Write the type
-//    AL = Ds2Vs_Message
+    // Input: Stack
+    // Output: None
+    // Modifies: EAX, ECX, EDX, ESI
+    // Write the type
+    AL = #Ds2Vs_Message
     ComWriteAL()
-//
-//    // Write Length
-//    ESI = EBP
-//    ESI = ESI + 12
-//    ECX = ESI[0]
+
+    // Write Length
+    ESI = EBP
+    ESI + 12
+    ECX = ESI[0]
     ComWrite16()
-//
-//    // Address of string
-//    ESI = EBP[8]
-//    Label = ".WriteChar"
-//    ECX.Compare(0)
-//    JumpIf(Flags.Equal, ".Exit")
+
+    // Address of string
+    ESI = EBP[8]
+WriteChar:
+    if ECX = 0 exit
     ComWrite8()
-//    ECX--
-//    // We are storing as 16 bits, but for now I will transmit 8 bits
-//    // So we inc again to skip the 0
-//    ESI++
-//    Jump(".WriteChar")
+    ECX--
+    // We are storing as 16 bits, but for now I will transmit 8 bits
+    // So we inc again to skip the 0
+    ESI++
+    goto WriteChar
 }
 
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
 procedure SendPtr2 {
-//    // Input: Stack
-//    // Output: None
-//    // Modifies: EAX, ECX, EDX, ESI
-//    // Write the type
-//    AL = Ds2Vs_Pointer
+    // Write the type
+    AL = #Ds2Vs_Pointer
     ComWriteAL()
-//
-//    // pointer value
-//    ESI = EBP[8]
-//    DebugStub_ComWrite32()
+
+    // pointer value
+    ESI = EBP[8]
+    ComWrite32()
 }
