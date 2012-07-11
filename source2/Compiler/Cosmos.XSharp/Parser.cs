@@ -30,9 +30,9 @@ namespace Cosmos.Compiler.XSharp {
       + ",JUMP"
       + ",PORT"
       + ",RETURN,RETURNINTERRUPT,REPEAT"
-      + ",TIMES"
-      + ",VAR"
-      + ",WORD"
+      + ",times"
+      + ",var"
+      + ",word,while"
     ).ToUpper().Split(mComma);
 
     public static readonly string[] Registers;

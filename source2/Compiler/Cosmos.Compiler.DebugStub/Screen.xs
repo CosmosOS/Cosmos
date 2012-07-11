@@ -1,18 +1,18 @@
 ﻿Group DebugStub
 
+const VidBase = $B8000
+
 function Cls {
 	// VidBase
-    ESI = $B8000
+    ESI = #VidBase
     
 BeginLoop:
 	// Text
-    AL = $00
-    ESI[0] = AL
+    ESI[0] = $00
     ESI++
 
 	// Colour
-    AL = $0A
-    ESI[0] = AL
+    ESI[0] = $0A
     ESI++
 	
 	// End of Video Area
@@ -27,17 +27,17 @@ function DisplayWaitMsg {
     
 	ESI = @..DebugWaitMsg
 
-	// VidBase
-    EDI = $B8000
+    EDI = #VidBase
     // 10 lines down, 20 cols in (10 * 80 + 20) * 2)
     EDI + 1640
 
     // Read and copy string till 0 terminator
-ReadChar:
-    AL = ESI[0]
-    if AL = 0 return
-    ESI++
-    EDI[0] = AL
-    EDI + 2
-    Goto ReadChar
+	AL = 1
+    while AL != 0 {
+    //while ESI[0] != 0 {
+		AL = ESI[0]
+		EDI[0] = AL
+		ESI++
+		EDI + 2
+	}
 }

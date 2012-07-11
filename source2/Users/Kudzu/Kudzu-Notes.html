@@ -42,11 +42,18 @@
                                         </ul>
                                     </li>
                                     <li>Complete X# Port<ul>
-                                        <li>PreserveRegisters</li>
-                                    <li>look for todo in cmdsend.xs</li>
-                                    <li>AL = ComRead8()</li>
-                                    <li>ComWrite(AL)</li>
+                                    <li>Screen.XS<ul>
+                                        <li>Loop in top</li>
+                                        <li>//while ESI[0] != 0 { </li>
                                         </ul>
+                                        </li>
+                                        <li>Builder restores</li>
+                                        </ul>
+                                    <ul>
+                                        <li>PreserveRegisters</li>
+                                        <li>AL = ComRead8()</li>
+                                        <li>ComWrite(AL)</li>
+                                    </ul>
                                     </li>
                                     <ul>
                                         <li>X# ProcessCmds.CS, ProcessCmdBatch - #TODO Make this a do while loop. Test 

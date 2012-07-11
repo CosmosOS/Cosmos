@@ -27,10 +27,25 @@ namespace Cosmos.Compiler.XSharp {
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected string mGroup;
     protected bool mInIntHandler;
+    protected string[] mCompareOps;
+    protected List<string> mCompares = new List<string>();
+
     protected TokenList mBlockStarter = null;
     protected List<string> mBlock = null;
+    protected int mBlockLabel = 0;
 
     public TokenPatterns() {
+      mCompareOps = "< > = != <= >= 0".Split(" ".ToCharArray());
+      foreach (var xComparison in mCompareOps) {
+        if (xComparison != "0") {
+          mCompares.Add("_REG " + xComparison + " 123");
+          mCompares.Add("_REG " + xComparison + " _REG");
+          mCompares.Add("_REG " + xComparison + " _ABC");
+          mCompares.Add("_REG " + xComparison + " #_ABC");
+          mCompares.Add("_ABC " + xComparison + " #_ABC");
+        }
+      }
+
       AddPatterns();
     }
 
@@ -54,6 +69,9 @@ namespace Cosmos.Compiler.XSharp {
     }
     protected string FuncLabel(string aLabel) {
       return mGroup + "_" + mFuncName + "_" + aLabel;
+    }
+    protected string BlockLabel(string aLabel) {
+      return FuncLabel("Block" + mBlockLabel + aLabel);
     }
     protected string GetLabel(Token aToken) {
       if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("Exit")) {
@@ -79,6 +97,14 @@ namespace Cosmos.Compiler.XSharp {
     protected void StartFunc(string aName) {
       mFuncName = aName;
       mFuncExitFound = false;
+    }
+
+    protected void StartBlock(TokenList aTokens, bool aIsCollector) {
+      mBlockStarter = aTokens;
+      if (aIsCollector) {
+        mBlock = new List<string>();
+      }
+      mBlockLabel++;
     }
 
     protected void EndFunc(ref List<string> rCode) {
@@ -121,30 +147,73 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    protected string GetCompare(TokenList aTokens, int aStart) {
+      string xLeft = aTokens[1].Value;
+      if (aTokens[1].Type == TokenType.AlphaNum) {
+        // Hardcoded to dword for now
+        xLeft = "dword [" + GetLabel(aTokens[1]) + "]";
+      }
+
+      string xRight = aTokens[3].Value;
+      if (aTokens[3].Type == TokenType.AlphaNum) {
+        xRight = "[" + GetLabel(aTokens[3]) + "]";
+      } else if (aTokens[3].Value == "#") {
+        xRight = ConstLabel(aTokens[4]);
+      }
+      return "Cmp " + xLeft + ", " + xRight;
+    }
+
     protected string GetJump(Token aToken) {
-      if (aToken.Value == "<") {
+      return GetJump(aToken, false);
+    }
+    protected string GetJump(Token aToken, bool aInvert) {
+      string xOp = aToken.Value;
+
+      if (aInvert) {
+        if (xOp == "<") {
+          xOp = ">=";
+        } else if (xOp == ">") {
+          xOp = "<=";
+        } else if (xOp == "=") {
+          xOp = "!=";
+        } else if (xOp == "0") {
+          // Same as JE, but implies intent in .asm better
+          xOp = "!0";
+        } else if (xOp == "!=") {
+          xOp = "=";
+        } else if (xOp == "<=") {
+          xOp = ">";
+        } else if (xOp == ">=") {
+          xOp = "<";
+        } else {
+          throw new Exception("Unrecognized symbol in conditional: " + xOp);
+        }
+      }
+
+      if (xOp == "<") {
         return "JB";  // unsigned
-      } else if (aToken.Value == ">") {
+      } else if (xOp == ">") {
         return "JA";  // unsigned
-      } else if (aToken.Value == "=") {
+      } else if (xOp == "=") {
         return "JE";
-      } else if (aToken.Value == "0") {
+      } else if (xOp == "0") {
         // Same as JE, but implies intent in .asm better
         return "JZ";
-      } else if (aToken.Value == "!=") {
+      } else if (xOp == "!=") {
         return "JNE";
-      } else if (aToken.Value == "<=") {
+      } else if (xOp == "!0") {
+        // Same as JNE, but implies intent in .asm better
+        return "JNZ";
+      } else if (xOp == "<=") {
         return "JBE"; // unsigned
-      } else if (aToken.Value == ">=") {
+      } else if (xOp == ">=") {
         return "JAE"; // unsigned
       } else {
-        throw new Exception("Unrecognized symbol in conditional: " + aToken.Value);
+        throw new Exception("Unrecognized symbol in conditional: " + xOp);
       }
     }
 
     protected void AddPatterns() {
-      var xSpace = " ".ToCharArray();
-
       AddPattern("! Move EAX, 0", "{0}");
 
       AddPattern("// Comment", delegate(TokenList aTokens, ref List<string> rCode) {
@@ -194,6 +263,16 @@ namespace Cosmos.Compiler.XSharp {
         rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
       });
 
+      foreach (var xCompare in mCompares) {
+        //          0         1  2   3     4
+        AddPattern("while " + xCompare + " {", delegate(TokenList aTokens, ref List<string> rCode) {
+          StartBlock(aTokens, false);
+          rCode.Add(BlockLabel("Begin") + ":");
+          rCode.Add(GetCompare(aTokens, 1));
+          rCode.Add(GetJump(aTokens[2], true) + " " + BlockLabel("End"));
+        });
+      }
+
       // Must test separate since !0 is two tokens
       AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("JNZ " + GetLabel(aTokens[4]));
@@ -201,45 +280,8 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("if !0 return", delegate(TokenList aTokens, ref List<string> rCode) {
         rCode.Add("JNZ " + FuncLabel("Exit"));
       });
-      foreach (var xComparison in "< > = != <= >= 0".Split(xSpace)) {
-        foreach (var xTail in "goto _ABC|return".Split("|".ToCharArray())) {
-          if (xComparison != "0") {
-            AddPattern(new string[] {
-              //0  1           2            3        4
-              "if _REG " + xComparison + " 123 " + xTail,
-              "if _REG " + xComparison + " _REG " + xTail, 
-              "if _REG " + xComparison + " _ABC " + xTail, 
-              //                           3  4        5
-              "if _REG " + xComparison + " #_ABC " + xTail, 
-              "if _ABC " + xComparison + " #_ABC " + xTail, 
-            }, delegate(TokenList aTokens, ref List<string> rCode) {
-              int xTailIdx = 4;
-
-              string xLeft = aTokens[1].Value;
-              if (aTokens[1].Type == TokenType.AlphaNum) {
-                // Hardcoded to dword for now
-                xLeft = "dword [" + GetLabel(aTokens[1]) + "]";
-              }
-
-              string xRight = aTokens[3].Value;
-              if (aTokens[3].Type == TokenType.AlphaNum) {
-                xRight = "[" + GetLabel(aTokens[3]) + "]";
-              } else if (aTokens[3].Value == "#") {
-                xRight = ConstLabel(aTokens[4]);
-                xTailIdx = 5;
-              }
-              rCode.Add("Cmp " + xLeft + ", " + xRight);
-
-              string xLabel;
-              if (aTokens[xTailIdx].Matches("return")) {
-                xLabel = FuncLabel("Exit");
-              } else {
-                xLabel = GetLabel(aTokens[xTailIdx + 1]);
-              }
-
-              rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
-            });
-          }
+      foreach (var xTail in "goto _ABC|return".Split("|".ToCharArray())) {
+        foreach (var xComparison in mCompareOps) {
           AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, ref List<string> rCode) {
             string xLabel;
             if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
@@ -248,6 +290,22 @@ namespace Cosmos.Compiler.XSharp {
               xLabel = GetLabel(aTokens[3]);
             }
             rCode.Add(GetJump(aTokens[1]) + " " + xLabel);
+          });
+        }
+        foreach (var xCompare in mCompares) {
+          //          0      1  2   3          4
+          AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, ref List<string> rCode) {
+            int xTailIdx = aTokens[3].Value == "#" ? 5 : 4;
+            rCode.Add(GetCompare(aTokens, 1));
+
+            string xLabel;
+            if (aTokens[xTailIdx].Matches("return")) {
+              xLabel = FuncLabel("Exit");
+            } else {
+              xLabel = GetLabel(aTokens[xTailIdx + 1]);
+            }
+
+            rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
           });
         }
       }
@@ -405,19 +463,27 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG--", "Dec {0}");
 
       AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
-        if (mBlock == null) {
+        // Use mBlockStarter, not mBlock because not all blocks use mBlock to collect
+        // (repeat does for example, but while does not)
+        if (mBlockStarter == null) {
           EndFunc(ref rCode);
         } else {
-          if (mBlockStarter.PatternMatches("repeat 4 times {")) {
+          if (mBlockStarter[0].Matches("repeat")) {
             int xCount = int.Parse(mBlockStarter[1].Value);
             for (int i = 1; i <= xCount; i++) {
               rCode.AddRange(mBlock);
             }
-            mBlockStarter = null;
-            mBlock = null;
+
+          } else if (mBlockStarter[0].Matches("while")) {
+            rCode.Add("jmp " + BlockLabel("Begin"));
+            rCode.Add(BlockLabel("End") + ":");
+
           } else {
             throw new Exception("Unknown block starter.");
           }
+          
+          mBlockStarter = null;
+          mBlock = null;
         }
       });
 
@@ -430,8 +496,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("Repeat 4 times {", delegate(TokenList aTokens, ref List<string> rCode) {
-        mBlockStarter = aTokens;
-        mBlock = new List<string>();
+        StartBlock(aTokens, true);
       });
 
       AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {

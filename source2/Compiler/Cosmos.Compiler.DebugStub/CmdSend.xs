@@ -44,11 +44,9 @@ function SendStack {
     //
     // Need to reload ESI, WriteAXToCompPort modifies it
     ESI = .CallerESP
-	//TODO While
-SendByte:
-    if ESI = .CallerEBP return
-    ComWrite8()
-    goto SendByte
+    while ESI != .CallerEBP {
+		ComWrite8()
+	}
 }
 
 // sends a stack value
@@ -72,13 +70,10 @@ function SendMethodContext {
     ESI = .CallerEBP
     ESI + EAX
 
-    // TODO While
-SendByte:
-	if ECX = 0 goto AfterSendByte
-    ComWrite8()
-    ECX--
-    goto SendByte
-AfterSendByte:
+	while ECX != 0 {
+		ComWrite8()
+		ECX--
+	}
 
 Exit:
 	-All
@@ -103,15 +98,12 @@ function SendMemory {
     ComReadEAX()
     ESI = EAX
 
-// TODO - Make this a method and use it in above function too
     // now ECX contains size of data (count)
     // ESI contains address
-SendByte:
-	if ECX = 0 goto AfterSendByte
-    ComWrite8()
-    ECX--
-    goto SendByte
-AfterSendByte:
+	while ECX != 0 {
+		ComWrite8()
+		ECX--
+	}
 
 Exit:
 	-All
