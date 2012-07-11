@@ -83,8 +83,8 @@ namespace Cosmos.Compiler.XSharp {
         if (mPathname != "") {
           xMsg.Append("File " + mPathname + ", ");
         }
-        xMsg.Append(", Line " + mLineNo);
-        xMsg.Append(", Parsing error: " + aLine);
+        xMsg.Append("Line " + mLineNo + ", ");
+        xMsg.Append("Parsing error: " + aLine);
         throw new Exception(xMsg.ToString());
       }
       foreach (var xLine in xCode) {
