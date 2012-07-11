@@ -62,7 +62,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assembler\" />
     <Folder Include="Nasm\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
