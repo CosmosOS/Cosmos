@@ -90,6 +90,7 @@ namespace Cosmos.Debug.Common {
             // as its often the first byte received.
             SendRawData(new byte[1] { Vs2Ds.Noop });
           } else {
+            // +2 - Leave room for Cmd and CmdID
             var xData = new byte[aData.Length + 2];
             // See comments about flow control in the DebugStub class
             // to see why we limit to 16.

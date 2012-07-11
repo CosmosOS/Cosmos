@@ -16,7 +16,7 @@ procedure SendRegisters {
     ComWrite32()
 }
 
-procedure SendFrame {
+procedure SendFrame2 {
     AL = #Ds2Vs_Frame
     ComWriteAL()
 
@@ -30,7 +30,7 @@ procedure SendFrame {
     ComWriteX()
 }
 
-procedure SendStack {
+procedure SendStack2 {
     AL = #Ds2Vs_Stack
     ComWriteAL()
 
@@ -108,7 +108,7 @@ AfterSendByte:
 }
 
 // Modifies: EAX, ESI
-procedure SendTrace {
+procedure SendTrace2 {
 	if .DebugStatus = #Status_Run goto Normal
 
     AL = #Ds2Vs_BreakPoint
@@ -121,15 +121,15 @@ Type:
     ComWriteAL()
 
     // Send Calling EIP.
-    ESI = .CallerEIP
+    ESI = @.CallerEIP
     ComWrite32()
 }
 
-procedure SendText {
-    // Input: Stack
-    // Output: None
-    // Modifies: EAX, ECX, EDX, ESI
-    // Write the type
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+procedure SendText2 {
+	// Write the type
     AL = #Ds2Vs_Message
     ComWriteAL()
 
@@ -154,7 +154,7 @@ WriteChar:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-procedure SendPtr {
+procedure SendPtr2 {
     // Write the type
     AL = #Ds2Vs_Pointer
     ComWriteAL()

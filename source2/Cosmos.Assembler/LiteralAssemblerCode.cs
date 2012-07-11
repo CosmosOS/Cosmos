@@ -20,7 +20,7 @@ namespace Cosmos.Assembler
 
         public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
         {
-            aOutput.WriteLine(Code);
+            aOutput.Write(Code);
         }
     }
 }

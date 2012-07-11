@@ -92,7 +92,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "21199"
+		VWDPort = "18115"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Consts", "..\source2\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"

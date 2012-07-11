@@ -185,11 +185,7 @@ namespace Cosmos.Assembler {
         if (xOp is Label) {
           var xLabel = (Label)xOp;
           aOutput.WriteLine();
-          if (xLabel.Name[0] == '.') {
-            prefix = "\t\t";
-          } else {
-            prefix = "\t";
-          }
+          prefix = "\t\t";
           aOutput.Write(prefix);
           xLabel.WriteText(this, aOutput);
           aOutput.WriteLine();

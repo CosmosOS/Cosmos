@@ -40,8 +40,8 @@ namespace Cosmos.Debug.Consts {
     public const byte Continue = 4; // After a Break
     public const byte BreakOnAddress = 6;
 
-    public const byte BatchBegin = 7; // Not used anymore?
-    public const byte BatchEnd = 8; // Not used anymore?
+    public const byte BatchBegin = 7; 
+    public const byte BatchEnd = 8; 
 
     public const byte StepInto = 5;
     public const byte StepOver = 11;

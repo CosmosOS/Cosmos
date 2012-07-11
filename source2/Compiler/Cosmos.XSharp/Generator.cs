@@ -11,8 +11,8 @@ namespace Cosmos.Compiler.XSharp {
     protected TextWriter mOutput;
     protected TokenPatterns mPatterns = new TokenPatterns();
 
-    public bool EmitUserComments = true;
-    public bool EmitXSharpCodeComments = true;
+    public bool EmitUserComments = false;
+    public bool EmitXSharpCodeComments = false;
     protected int mLineNo = 0;
     protected string mPathname = "";
 
