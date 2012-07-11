@@ -240,12 +240,12 @@ namespace Cosmos.Build.Builder {
 
         mContent.Inlines.Add(aLine);
         mContent.Inlines.Add(new LineBreak());
-      });      
+      });
     }
 
     void Window_Loaded(object sender, RoutedEventArgs e) {
-        Left = Properties.Settings.Default.Location.X;
-        Top = Properties.Settings.Default.Location.Y;
+      Left = Properties.Settings.Default.Location.X;
+      Top = Properties.Settings.Default.Location.Y;
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       if (App.InstallTask) {
@@ -261,10 +261,16 @@ namespace Cosmos.Build.Builder {
       Clipboard.SetText(mClipboard.ToString());
     }
 
-    private void Window_Closed(object sender, EventArgs e)
-    {
-        Properties.Settings.Default.Location = new System.Drawing.Point((int)Left, (int)Top);
-        Properties.Settings.Default.Save();
+    private void Window_Closed(object sender, EventArgs e) {
+      Properties.Settings.Default.Location = new System.Drawing.Point((int)Left, (int)Top);
+      Properties.Settings.Default.Save();
+    }
+
+    private void Window_SizeChanged(object sender, SizeChangedEventArgs e) {
+      // User had unminimized window, or maximized it, or otherwise manually intervened.
+      if (WindowState != System.Windows.WindowState.Minimized) {
+        mPreventAutoClose = true;
+      }
     }
 
   }
