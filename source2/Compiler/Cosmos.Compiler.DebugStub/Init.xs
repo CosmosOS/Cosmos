@@ -45,10 +45,9 @@ procedure WaitForDbgHandshake {
 
     // We could use the signature as the start signal, but I prefer
     // to keep the logic separate, especially in DC.
-
+	//
 	// Send the actual started signal
-	// Ds2Vs.Started = 6
-    AL = 6
+    AL = #Ds2Vs_Started
     ComWriteAL()
 
     WaitForSignature()
