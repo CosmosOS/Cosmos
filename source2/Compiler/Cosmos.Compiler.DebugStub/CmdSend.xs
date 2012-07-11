@@ -55,8 +55,7 @@ SendByte:
 // Serial Params:
 //  1: x32 - offset relative to EBP
 //  2: x32 - size of data to send
-function SendMethodContext2 {
-//    [XSharp(PreserveStack = true)]
+function SendMethodContext {
 	+All
 
     AL = #Ds2Vs_MethodContext
@@ -93,8 +92,7 @@ Exit:
 // Serial Params:
 //  1: x32 - offset relative to EBP
 //  2: x32 - size of data to send
-function SendMemory2 {
-//    [XSharp(PreserveStack = true)]
+function SendMemory {
 	+All
 
     ComReadEAX()
