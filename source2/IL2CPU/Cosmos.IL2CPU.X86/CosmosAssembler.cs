@@ -345,9 +345,7 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void OnBeforeFlush() {
       base.OnBeforeFlush();
-      DataMembers.AddRange(new DataMember[]{
-                    new DataMember("_end_data",
-                                   new byte[0])});
+      DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0])});
       new Label("_end_code");
     }
 
