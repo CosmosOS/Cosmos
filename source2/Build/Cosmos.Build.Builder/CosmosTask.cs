@@ -151,7 +151,7 @@ namespace Cosmos.Build.Builder {
     void CompileXSharpCompiler() {
       Section("Compiling X# Compiler");
 
-      MsBuild(mCosmosPath + @"source2\XSharp.sln", "Debug");
+      MsBuild(Path.Combine(mCosmosPath, @"XSharp\source\XSharp.sln"), "Debug");
     }
 
     void CompileXSharpSource() {
