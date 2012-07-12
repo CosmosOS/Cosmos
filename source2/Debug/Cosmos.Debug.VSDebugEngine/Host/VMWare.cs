@@ -19,7 +19,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     protected string mPlayerPath;
 
     public VMware(NameValueCollection aParams, bool aUseGDB) : base(aParams, aUseGDB) {
-      mDir = Path.Combine(PathUtilities.GetBuildDir(), @"VMWare\Workstation\");
+      mDir = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\");
       mVmxPath = Path.Combine(mDir, @"Debug.vmx");
 
       mWorkstationPath = GetPathname("VMware Workstation", "vmware.exe");

@@ -242,12 +242,18 @@ Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: "
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue
 
-; AssemblyFolder
-Root: HKLM; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: uninsdeletevalue
+; Old keys
+Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: deletevalue
+Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: deletevalue; Check: IsWin64
 
+; User Kit Folder
+Root: HKLM; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletevalue
 Root: HKLM64; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey; Check: IsWin64
-Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: uninsdeletevalue; Check: IsWin64
+Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletevalue; Check: IsWin64
+
+; Easter Egg
+Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "World Domination" ; ValueData: "true"; Flags: uninsdeletevalue
 
 ; VSIP package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: none; Flags: uninsdeletekey
@@ -273,23 +279,9 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 
-; DebugPage configuration page
+; Old configuration pages
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: none; Flags: deletekey
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: none; Flags: uninsdeletekey
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.DebugPage
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.DebugPage
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{39801176-289f-405f-9425-2931a2c03912}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
-
-; VMPage configuration page
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: none; Flags: deletekey
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: none; Flags: uninsdeletekey
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.VMPage
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.VMPage
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
-;Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\CLSID\{{3b72bb68-7363-45a2-9eba-55c8d5f36e36}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 
 ; project type factory
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\10.0\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4}; ValueType: none; Flags: uninsdeletekey

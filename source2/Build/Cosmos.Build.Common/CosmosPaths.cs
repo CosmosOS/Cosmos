@@ -4,9 +4,9 @@ using Path = System.IO.Path;
 
 namespace Cosmos.Build.Common {
   public static class CosmosPaths {
-    public static readonly string CosmosKit;
+    public static readonly string UserKit;
     public static readonly string Build;
-    public static readonly string BuildVsip;
+    public static readonly string Vsip;
     public static readonly string Tools;
     public static readonly string IL2CPUTask;
     public static readonly string Kernel;
@@ -16,18 +16,18 @@ namespace Cosmos.Build.Common {
     static CosmosPaths() {
       using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false)) {
         if (xReg == null) {
-          throw new Exception("The Key \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Cosmos\" not found.");
+          throw new Exception("The Key \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Cosmos\" was not found.");
         }
-        CosmosKit = (string)xReg.GetValue(null);
+        UserKit = (string)xReg.GetValue("UserKit");
       }
 
-      Build = Path.Combine(CosmosKit, "Build");
-      BuildVsip = Path.Combine(CosmosKit, "Build\\VSIP");
-      Tools = Path.Combine(CosmosKit, "Build\\Tools");
-      IL2CPUTask = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Build.IL2CPUTask.exe");
-      Kernel = Path.Combine(CosmosKit, "Kernel");
-      GDBClientExe = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.Debug.GDB.exe");
-      DBGClientExe = Path.Combine(CosmosKit, "Build\\VSIP\\Cosmos.VS.Debug.exe");
+      Build = Path.Combine(UserKit, "Build");
+      Vsip = Path.Combine(UserKit, "Build\\VSIP");
+      Tools = Path.Combine(UserKit, "Build\\Tools");
+      IL2CPUTask = Path.Combine(UserKit, "Build\\VSIP\\Cosmos.Build.IL2CPUTask.exe");
+      Kernel = Path.Combine(UserKit, "Kernel");
+      GDBClientExe = Path.Combine(UserKit, "Build\\VSIP\\Cosmos.Debug.GDB.exe");
+      DBGClientExe = Path.Combine(UserKit, "Build\\VSIP\\Cosmos.VS.Debug.exe");
     }
   }
 }
