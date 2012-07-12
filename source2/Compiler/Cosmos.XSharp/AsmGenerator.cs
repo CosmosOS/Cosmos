@@ -18,7 +18,7 @@ namespace Cosmos.Compiler.XSharp {
       mPathname = Path.GetFileName(aSrcPathname);
       using (var xInput = new StreamReader(aSrcPathname)) {
         using (var xOutputCode = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm"))) {
-          using (var xOutputData = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asmd"))) {
+          using (var xOutputData = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asmdata"))) {
             Execute(xInput, xOutputData, xOutputCode);
           }
         }

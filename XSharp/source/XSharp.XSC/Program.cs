@@ -21,6 +21,17 @@ namespace XSharp.XSC {
           } else {
             xGenerator.Execute(xNamespace, xSrc);
           }
+        } else {
+          string xSrc = aArgs[0];
+
+          var xGenerator = new AsmGenerator();
+          if (Directory.Exists(xSrc)) {
+            foreach (var xFile in Directory.GetFiles(xSrc, "*.xs")) {
+              xGenerator.Execute(xFile);
+            }
+          } else {
+            xGenerator.Execute(xSrc);
+          }
         }
       } catch (Exception ex) {
         Console.WriteLine(ex.Message);
