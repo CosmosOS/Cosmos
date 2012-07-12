@@ -35,7 +35,7 @@ namespace XSharp.Test {
           using (var xOutputData = new StringWriter()) {
             try {
               var xGenerator = new Cosmos.Compiler.XSharp.AsmGenerator();
-              xGenerator.Execute(xInput, xOutputData, xOutputCode);
+              xGenerator.Generate(xInput, xOutputData, xOutputCode);
 
               xTbox.Text = xOutputData.ToString() + "\r\n"
                 + xOutputCode.ToString();

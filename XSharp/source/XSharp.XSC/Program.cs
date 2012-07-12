@@ -25,12 +25,14 @@ namespace XSharp.XSC {
           string xSrc = aArgs[0];
 
           var xGenerator = new AsmGenerator();
+          string[] xFiles;
           if (Directory.Exists(xSrc)) {
-            foreach (var xFile in Directory.GetFiles(xSrc, "*.xs")) {
-              xGenerator.Execute(xFile);
-            }
+            xFiles = Directory.GetFiles(xSrc, "*.xs");
           } else {
-            xGenerator.Execute(xSrc);
+            xFiles = new string[] { xSrc };
+          }
+          foreach (var xFile in xFiles) {
+            xGenerator.GenerateToFiles(xFile);
           }
         }
       } catch (Exception ex) {

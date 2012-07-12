@@ -14,18 +14,18 @@ namespace Cosmos.Compiler.XSharp {
     protected int mLineNo = 0;
     protected string mPathname = "";
 
-    public void Execute(string aSrcPathname) {
+    public void GenerateToFiles(string aSrcPathname) {
       mPathname = Path.GetFileName(aSrcPathname);
       using (var xInput = new StreamReader(aSrcPathname)) {
         using (var xOutputCode = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm"))) {
           using (var xOutputData = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asmdata"))) {
-            Execute(xInput, xOutputData, xOutputCode);
+            Generate(xInput, xOutputData, xOutputCode);
           }
         }
       }
     }
 
-    public void Execute(TextReader aInput, TextWriter aOutputData, TextWriter aOutputCode) {
+    public void Generate(TextReader aInput, TextWriter aOutputData, TextWriter aOutputCode) {
       mPatterns.EmitUserComments = EmitUserComments;
       // Right now we just collect in RAM, but later we should flush to separate files
       // or something and merge after.
