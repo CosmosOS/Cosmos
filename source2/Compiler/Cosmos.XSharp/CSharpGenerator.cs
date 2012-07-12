@@ -31,6 +31,7 @@ namespace Cosmos.Compiler.XSharp {
       mInput = aInput;
       mOutput = aOutput;
       mPatterns.EmitUserComments = EmitUserComments;
+      var xAsm = new Nasm.Assembler();
 
       mLineNo = 0;
       EmitHeader(aNamespace, aClassname);
@@ -41,7 +42,15 @@ namespace Cosmos.Compiler.XSharp {
           break;
         }
 
-        ProcessLine(xLine);
+        var xAsm2 = ProcessLine(xLine);
+        xAsm.Data.AddRange(xAsm2.Data);
+        xAsm.Code.AddRange(xAsm2.Code);
+      }
+      foreach (var xLine in xAsm.Data) {
+        mOutput.WriteLine("\t\t\tmAssembler.DataMembers.Add(new DataMember() { RawAsm = \"" + xLine.Replace("\"", "\\\"") + "\" });");
+      }
+      foreach (var xLine in xAsm.Code) {
+        mOutput.WriteLine("\t\t\tnew LiteralAssemblerCode(\"" + xLine + "\");");
       }
 
       EmitFooter();
@@ -67,19 +76,23 @@ namespace Cosmos.Compiler.XSharp {
       mOutput.WriteLine("}");
     }
 
-    protected void ProcessLine(string aLine) {
+    protected Nasm.Assembler ProcessLine(string aLine) {
+      Nasm.Assembler xAsm;
+
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
-        mOutput.WriteLine();
-        return;
+        xAsm = new Nasm.Assembler();
+        xAsm += "";
+        return xAsm;
       }
+
       if (EmitXSharpCodeComments && !aLine.StartsWith("//")) {
         string xLine = aLine.Replace("\"", "\\\"");
         mOutput.WriteLine("\t\t\tnew Comment(\"X#: " + xLine + "\");");
       }
 
-      var xCode = mPatterns.GetCode(aLine);
-      if (xCode == null) {
+      xAsm = mPatterns.GetCode(aLine);
+      if (xAsm == null) {
         var xMsg = new StringBuilder();
         if (mPathname != "") {
           xMsg.Append("File " + mPathname + ", ");
@@ -88,9 +101,7 @@ namespace Cosmos.Compiler.XSharp {
         xMsg.Append("Parsing error: " + aLine);
         throw new Exception(xMsg.ToString());
       }
-      foreach (var xLine in xCode) {
-        mOutput.WriteLine("\t\t\t" + xLine);
-      }
+      return xAsm;
     }
 
   }

@@ -13,6 +13,12 @@ namespace Cosmos.Assembler {
     public byte[] RawDefaultValue { get; set; }
     public uint Alignment { get; set; }
     protected object[] UntypedDefaultValue;
+    public string RawAsm = null;
+
+    // Hack for not to emit raw data. See RawAsm
+    public DataMember() {
+      Name = "Dummy";
+    }
 
     protected DataMember(string aName) {
       Name = aName;
@@ -97,6 +103,11 @@ namespace Cosmos.Assembler {
     }
 
     public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput) {
+      if (RawAsm != null) {
+        aOutput.WriteLine(RawAsm);
+        return;
+      }
+
       if (RawDefaultValue != null) {
         if (RawDefaultValue.Length == 0) {
           aOutput.Write(Name);
@@ -192,6 +203,9 @@ namespace Cosmos.Assembler {
     }
 
     public override bool IsComplete(Assembler aAssembler) {
+      if (RawAsm != null) {
+        return true;
+      }
       if (UntypedDefaultValue != null &&
           UntypedDefaultValue.LongLength > 0) {
         foreach (var xReference in (from item in UntypedDefaultValue

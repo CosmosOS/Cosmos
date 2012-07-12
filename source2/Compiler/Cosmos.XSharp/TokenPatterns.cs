@@ -10,7 +10,6 @@ namespace Cosmos.Compiler.XSharp {
       public readonly TokenList Tokens;
       public readonly int Hash;
       public readonly CodeFunc Code;
-      public bool RawAsm;
 
       public Pattern(TokenList aTokens, CodeFunc aCode) {
         Tokens = aTokens;
@@ -19,14 +18,11 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
-    // Temp hack
-    public bool RawAsm = false;
-
     protected string mFuncName = null;
     protected bool mFuncExitFound = false;
 
     public bool EmitUserComments = true;
-    public delegate void CodeFunc(TokenList aTokens, ref List<string> rCode);
+    public delegate void CodeFunc(TokenList aTokens, Nasm.Assembler aAsm);
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected string mGroup;
     protected bool mInIntHandler;
@@ -110,14 +106,14 @@ namespace Cosmos.Compiler.XSharp {
       mBlockLabel++;
     }
 
-    protected void EndFunc(ref List<string> rCode) {
+    protected void EndFunc(Nasm.Assembler aAsm) {
       if (!mFuncExitFound) {
-        rCode.Add(mGroup + "_" + mFuncName + "_Exit:");
+        aAsm += mGroup + "_" + mFuncName + "_Exit:";
       }
       if (mInIntHandler) {
-        rCode.Add("IRet");
+        aAsm += "IRet";
       } else {
-        rCode.Add("Ret");
+        aAsm += "Ret";
       }
       mFuncName = null;
     }
@@ -219,11 +215,11 @@ namespace Cosmos.Compiler.XSharp {
     protected void AddPatterns() {
       AddPattern("! Move EAX, 0", "{0}");
 
-      AddPattern("// Comment", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("// Comment", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         if (EmitUserComments) {
           string xValue = aTokens[0].Value;
           xValue = xValue.Replace("\"", "\\\"");
-          rCode.Add("; " + xValue);
+          aAsm += "; " + xValue;
         }
       });
 
@@ -233,73 +229,87 @@ namespace Cosmos.Compiler.XSharp {
       // ..Name: - Global level. Emitted exactly as is.
       // .Name: - Group level. Group_Name
       // Name: - Function level. Group_ProcName_Name
-      AddPattern("Exit:", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(GetLabel(aTokens[0]) + ":");
+      AddPattern("Exit:", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += GetLabel(aTokens[0]) + ":";
         mFuncExitFound = true;
       });
-      AddPattern("_ABC:", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(GetLabel(aTokens[0]) + ":");
+      AddPattern("_ABC:", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += GetLabel(aTokens[0]) + ":";
       });
 
-      AddPattern("Call _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Call " + GetLabel(aTokens[1]));
+      AddPattern("Call _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Call " + GetLabel(aTokens[1]);
       });
 
-      AddPattern("Goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Jmp " + GetLabel(aTokens[1]));
+      AddPattern("Goto _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Jmp " + GetLabel(aTokens[1]);
       });
 
-      AddPattern("const _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(ConstLabel(aTokens[1]) + " equ " + aTokens[3]);
+      AddPattern("const _ABC = 123", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += ConstLabel(aTokens[1]) + " equ " + aTokens[3];
       });
 
-      AddPattern(false, "var _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", 0));");
+      AddPattern("var _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " dd 0");
       });
-      AddPattern(false, "var _ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", " + aTokens[3].Value + "));");
+      AddPattern("var _ABC = 123", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " dd " + aTokens[3].Value);
       });
-      AddPattern(false, "var _ABC = 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", \"" + aTokens[3].Value + "\"));");
+      AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " db \"" + aTokens[3].Value + "\"");
       });
-      AddPattern(false, "var _ABC _ABC[123]", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("mAssembler.DataMembers.Add(new DataMember(" + Quoted(GetLabel(aTokens[1])) + ", new " + aTokens[2].Value + "[" + aTokens[4].Value + "]));");
+      AddPattern(new string[] {
+        "var _ABC byte[123]",
+        "var _ABC word[123]",
+        "var _ABC dword[123]"
+      }, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        string xSize;
+        if (aTokens[2].Matches("byte")) {
+          xSize = "db";
+        } else if (aTokens[2].Matches("word")) {
+          xSize = "dw";
+        } else if (aTokens[2].Matches("dword")) {
+          xSize = "dd";
+        } else {
+          throw new Exception("Unknown size specified");
+        }
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " TIMES " + aTokens[4].Value + " " + xSize + " 0");
       });
 
       foreach (var xCompare in mCompares) {
         //          0         1  2   3     4
-        AddPattern("while " + xCompare + " {", delegate(TokenList aTokens, ref List<string> rCode) {
+        AddPattern("while " + xCompare + " {", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
           StartBlock(aTokens, false);
-          rCode.Add(BlockLabel("Begin") + ":");
-          rCode.Add(GetCompare(aTokens, 1));
-          rCode.Add(GetJump(aTokens[2], true) + " " + BlockLabel("End"));
+          aAsm += BlockLabel("Begin") + ":";
+          aAsm += GetCompare(aTokens, 1);
+          aAsm += GetJump(aTokens[2], true) + " " + BlockLabel("End");
         });
       }
 
       // Must test separate since !0 is two tokens
-      AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("JNZ " + GetLabel(aTokens[4]));
+      AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "JNZ " + GetLabel(aTokens[4]);
       });
-      AddPattern("if !0 return", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("JNZ " + FuncLabel("Exit"));
+      AddPattern("if !0 return", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "JNZ " + FuncLabel("Exit");
       });
       foreach (var xTail in "goto _ABC|return".Split("|".ToCharArray())) {
         foreach (var xComparison in mCompareOps) {
-          AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, ref List<string> rCode) {
+          AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
             string xLabel;
             if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
               xLabel = FuncLabel("Exit");
             } else {
               xLabel = GetLabel(aTokens[3]);
             }
-            rCode.Add(GetJump(aTokens[1]) + " " + xLabel);
+            aAsm += GetJump(aTokens[1]) + " " + xLabel;
           });
         }
         foreach (var xCompare in mCompares) {
           //          0      1  2   3          4
-          AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, ref List<string> rCode) {
+          AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
             int xTailIdx = aTokens[3].Value == "#" ? 5 : 4;
-            rCode.Add(GetCompare(aTokens, 1));
+            aAsm += GetCompare(aTokens, 1);
 
             string xLabel;
             if (aTokens[xTailIdx].Matches("return")) {
@@ -308,25 +318,25 @@ namespace Cosmos.Compiler.XSharp {
               xLabel = GetLabel(aTokens[xTailIdx + 1]);
             }
 
-            rCode.Add(GetJump(aTokens[2]) + " " + xLabel);
+            aAsm += GetJump(aTokens[2]) + " " + xLabel;
           });
         }
       }
 
       AddPattern("_REG ?= 123", "Cmp {0}, {2}");
-      AddPattern("_REG ?= _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Cmp {0}, " + GetLabel(aTokens[2]));
+      AddPattern("_REG ?= _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Cmp {0}, " + GetLabel(aTokens[2]);
       });
-      AddPattern("_REG ?= #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Cmp {0}, " + ConstLabel(aTokens[3]));
+      AddPattern("_REG ?= #_ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Cmp {0}, " + ConstLabel(aTokens[3]);
       });
 
       AddPattern("_REG ?& 123", "Test {0}, {2}");
-      AddPattern("_REG ?& _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Test {0}, " + GetLabel(aTokens[2]));
+      AddPattern("_REG ?& _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Test {0}, " + GetLabel(aTokens[2]);
       });
-      AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Test {0}, " + ConstLabel(aTokens[3]));
+      AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Test {0}, " + ConstLabel(aTokens[3]);
       });
 
       AddPattern("_REG ~> 123", "ROR {0}, {2}");
@@ -348,20 +358,20 @@ namespace Cosmos.Compiler.XSharp {
           "Mov dword [{0} - {2}], {5}"
       );
 
-      AddPattern("_REG = #_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov {0}, " + ConstLabel(aTokens[3]));
+      AddPattern("_REG = #_ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Mov {0}, " + ConstLabel(aTokens[3]);
       });
       AddPattern(new string[] {
           "_REG32[1] = 123",
           "_REGIDX[1] = 123"
-        }, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov dword [{0} + {2}], " + ConstLabel(aTokens[5]));
+        }, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Mov dword [{0} + {2}], " + ConstLabel(aTokens[5]);
       });
       AddPattern(new string[] {
           "_REG32[-1] = 123",
           "_REGIDX[-1] = 123"
-        }, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov dword [{0} - {2}], " + ConstLabel(aTokens[5]));
+        }, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Mov dword [{0} - {2}], " + ConstLabel(aTokens[5]);
       });
 
       AddPattern("_REG = _REG", "Mov {0}, {2}");
@@ -390,13 +400,13 @@ namespace Cosmos.Compiler.XSharp {
         "Mov {0}, [{2} - {5}]"
       );
 
-      AddPattern("_REG = _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov {0}, [" + GetLabel(aTokens[2]) + "]");
+      AddPattern("_REG = _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Mov {0}, [" + GetLabel(aTokens[2]) + "]";
       });
       // why not [var] like registers? Because its less frequent to access th ptr
       // and it is like a reg.. without [] to get the value...
-      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov {0}, " + GetLabel(aTokens[3]));
+      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Mov {0}, " + GetLabel(aTokens[3]);
       });
 
       AddPattern(new string[] { 
@@ -427,30 +437,30 @@ namespace Cosmos.Compiler.XSharp {
         "+#_ABC as byte",
         "+#_ABC as word",
         "+#_ABC as dword"
-        }, delegate(TokenList aTokens, ref List<string> rCode) {
+        }, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
           string xSize = "dword ";
           if (aTokens.Count > 2) {
             xSize = aTokens[3].Value + " ";
           }
-          rCode.Add("Push " + xSize + ConstLabel(aTokens[1]));
+          aAsm += "Push " + xSize + ConstLabel(aTokens[1]);
       });
       AddPattern("+All", "Pushad");
       AddPattern("-All", "Popad");
       AddPattern("-_REG", "Pop {1}");
 
       AddPattern("_ABC = _REG",
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("Mov [" + GetLabel(aTokens[0]) + "], {2}");
+        delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+          aAsm += "Mov [" + GetLabel(aTokens[0]) + "], {2}";
         });
-      AddPattern("_ABC = 123", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Mov dword [" + GetLabel(aTokens[0]) + "], {2}");
+      AddPattern("_ABC = 123", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Mov dword [" + GetLabel(aTokens[0]) + "], {2}";
       });
       AddPattern(new string[] {
         "_ABC = 123 as byte",
         "_ABC = 123 as word",
         "_ABC = 123 as dword"},
-        delegate(TokenList aTokens, ref List<string> rCode) {
-          rCode.Add("Mov {4} [" + GetLabel(aTokens[0]) + "], {2}");
+        delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+          aAsm += "Mov {4} [" + GetLabel(aTokens[0]) + "], {2}";
         });
 
       // TODO: Allow asm to optimize these to Inc/Dec
@@ -465,21 +475,21 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
 
-      AddPattern("}", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("}", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         // Use mBlockStarter, not mBlock because not all blocks use mBlock to collect
         // (repeat does for example, but while does not)
         if (mBlockStarter == null) {
-          EndFunc(ref rCode);
+          EndFunc(aAsm);
         } else {
           if (mBlockStarter[0].Matches("repeat")) {
             int xCount = int.Parse(mBlockStarter[1].Value);
             for (int i = 1; i <= xCount; i++) {
-              rCode.AddRange(mBlock);
+              aAsm.Code.AddRange(mBlock);
             }
 
           } else if (mBlockStarter[0].Matches("while")) {
-            rCode.Add("jmp " + BlockLabel("Begin"));
-            rCode.Add(BlockLabel("End") + ":");
+            aAsm += "jmp " + BlockLabel("Begin");
+            aAsm += BlockLabel("End") + ":";
 
           } else {
             throw new Exception("Unknown block starter.");
@@ -490,34 +500,34 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      AddPattern("Group _ABC", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Group _ABC", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         mGroup = aTokens[1].Value;
       });
 
-      AddPattern("Exit", delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add("Jmp " + FuncLabel("Exit"));
+      AddPattern("Exit", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += "Jmp " + FuncLabel("Exit");
       });
 
-      AddPattern("Repeat 4 times {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Repeat 4 times {", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         StartBlock(aTokens, true);
       });
 
-      AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         StartFunc(aTokens[1].Value);
         mInIntHandler = true;
-        rCode.Add(mGroup + "_{1}:");
+        aAsm += mGroup + "_{1}:";
       });
 
       AddPattern("Return", "Ret");
       AddPattern("ReturnInterrupt", "IRet");
 
-      AddPattern("Function _ABC {", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Function _ABC {", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         StartFunc(aTokens[1].Value);
         mInIntHandler = false;
-        rCode.Add(mGroup + "_{1}:");
+        aAsm += mGroup + "_{1}:";
       });
 
-      AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens, ref List<string> rCode) {
+      AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens, Nasm.Assembler aAsm) {
         // This method emits a lot of ASM, but thats what we want becuase
         // at this point we need ASM as simple as possible and completely transparent.
         // No stack changes, no register mods, no calls, no jumps, etc.
@@ -528,12 +538,12 @@ namespace Cosmos.Compiler.XSharp {
         if (xPreBootLogging) {
           UInt32 xVideo = 0xB8000;
           for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
-            rCode.Add("mov byte [0x" + i.ToString("X") + "], 0");
-            rCode.Add("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
+            aAsm += "mov byte [0x" + i.ToString("X") + "], 0";
+            aAsm += "mov byte [0x" + (i + 1).ToString("X") + "], 0x02";
           }
 
           foreach (var xChar in aTokens[1].Value) {
-            rCode.Add("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
+            aAsm += "mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar;
             xVideo = xVideo + 2;
           }
         }
@@ -554,52 +564,33 @@ namespace Cosmos.Compiler.XSharp {
       return null;
     }
 
-    protected void AsmToCSharp(List<string> aLines) {
-      if (RawAsm) {
-        return;
-      }
-
-      // Don't reformat if we are in a block because then this will occur twice
-      if (mBlock != null) {
-        return;
-      }
-
-      for (int i = 0; i < aLines.Count; i++) {
-        aLines[i] = "new LiteralAssemblerCode(\"" + aLines[i] + "\");";
-      }
-    }
-
-    public List<string> GetPatternCode(TokenList aTokens) {
+    public Nasm.Assembler GetPatternCode(TokenList aTokens) {
       var xPattern = FindMatch(aTokens);
       if (xPattern == null) {
         return null;
       }
 
-      var xResult = new List<string>();
-      xPattern.Code(aTokens, ref xResult);
+      var xResult = new Nasm.Assembler();
+      xPattern.Code(aTokens, xResult);
       
       // Apply {0} etc into string
       // This happens twice for block code, but its ok because the first pass
       // strips out all tags.
-      for (int i = 0; i < xResult.Count; i++) {
-        xResult[i] = string.Format(xResult[i], aTokens.ToArray());
-      }
-
-      if (xPattern.RawAsm) {
-        AsmToCSharp(xResult);
+      for (int i = 0; i < xResult.Code.Count; i++) {
+        xResult.Code[i] = string.Format(xResult.Code[i], aTokens.ToArray());
       }
 
       return xResult;
     }
 
-    public List<string> GetNonPatternCode(TokenList aTokens) {
+    public Nasm.Assembler GetNonPatternCode(TokenList aTokens) {
       if (aTokens.Count == 0) {
         return null;
       }
 
       var xFirst = aTokens[0];
       var xLast = aTokens[aTokens.Count - 1];
-      var xResult = new List<string>();
+      var xResult = new Nasm.Assembler();
 
       // Find match and emit X#
       if (aTokens.Count == 2
@@ -607,18 +598,17 @@ namespace Cosmos.Compiler.XSharp {
         && xLast.Matches("()")
         ) {
         // () could be handled by pattern, but best to keep in one place for future
-        xResult.Add("Call " + GroupLabel(aTokens[0].Value));
+        xResult += "Call " + GroupLabel(aTokens[0].Value);
 
       } else {
         // No matches
         return null;
       }
 
-      AsmToCSharp(xResult);
       return xResult;
     }
 
-    public List<string> GetCode(string aLine) {
+    public Nasm.Assembler GetCode(string aLine) {
       var xParser = new Parser(aLine, false, false);
       var xTokens = xParser.Tokens;
       var xResult = GetPatternCode(xTokens);
@@ -627,44 +617,30 @@ namespace Cosmos.Compiler.XSharp {
       }
 
       if (mBlock != null) {
-        mBlock.AddRange(xResult);
-        xResult.Clear();
+        mBlock.AddRange(xResult.Code);
+        xResult.Code.Clear();
       }
       return xResult;
     }
 
-    protected void AddPattern(string aPattern, string aCode) {
-      AddPattern(true, aPattern, aCode);
-    }
     protected void AddPattern(string aPattern, CodeFunc aCode) {
-      AddPattern(true, aPattern, aCode);
-    }
-    protected void AddPattern(string[] aPatterns, string aCode) {
-      AddPattern(true, aPatterns, aCode);
-    }
-    protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
-      AddPattern(true, aPatterns, aCode);
-    }
-
-    protected void AddPattern(bool aRawAsm, string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false, true);
       var xPattern = new Pattern(xParser.Tokens, aCode);
-      xPattern.RawAsm = aRawAsm;
       mPatterns.Add(xPattern);
     }
-    protected void AddPattern(bool aRawAsm, string[] aPatterns, CodeFunc aCode) {
+    protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
       foreach (var xPattern in aPatterns) {
-        AddPattern(aRawAsm, xPattern, aCode);
+        AddPattern(xPattern, aCode);
       }
     }
-    protected void AddPattern(bool aRawAsm, string aPattern, string aCode) {
-      AddPattern(aRawAsm, aPattern, delegate(TokenList aTokens, ref List<string> rCode) {
-        rCode.Add(aCode);
+    protected void AddPattern(string aPattern, string aCode) {
+      AddPattern(aPattern, delegate(TokenList aTokens, Nasm.Assembler aAsm) {
+        aAsm += aCode;
       });
     }
-    protected void AddPattern(bool aRawAsm, string[] aPatterns, string aCode) {
+    protected void AddPattern(string[] aPatterns, string aCode) {
       foreach (var xPattern in aPatterns) {
-        AddPattern(aRawAsm, xPattern, aCode);
+        AddPattern(xPattern, aCode);
       }
     }
 

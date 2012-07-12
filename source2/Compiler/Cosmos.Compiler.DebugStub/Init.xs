@@ -1,7 +1,7 @@
 ﻿Group DebugStub
 
 // Todo: Change these to a group level var
-var .DebugBPs int[256]
+var .DebugBPs dword[256]
 var .DebugWaitMsg = 'Waiting for debugger connection...'
 
 // Called before Kernel runs. Inits debug stub, etc

@@ -7,17 +7,11 @@ using System.IO;
 
 namespace Cosmos.Compiler.XSharp {
   public class AsmGenerator {
-    protected TextReader mInput;
-    protected TextWriter mOutput;
     protected TokenPatterns mPatterns = new TokenPatterns();
 
     public bool EmitUserComments = false;
     protected int mLineNo = 0;
     protected string mPathname = "";
-
-    public AsmGenerator() {
-      mPatterns.RawAsm = true;
-    }
 
     public void Execute(string aSrcPathname) {
       mPathname = Path.GetFileName(aSrcPathname);
@@ -29,9 +23,10 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     public void Execute(TextReader aInput, TextWriter aOutput) {
-      mInput = aInput;
-      mOutput = aOutput;
       mPatterns.EmitUserComments = EmitUserComments;
+      // Right now we just collect in RAM, but later we should flush to separate files
+      // or something and merge after.
+      var xAsm = new Nasm.Assembler();
 
       mLineNo = 0;
       while (true) {
@@ -41,19 +36,33 @@ namespace Cosmos.Compiler.XSharp {
           break;
         }
 
-        ProcessLine(xLine);
+        var xAsm2 = ProcessLine(xLine);
+        xAsm.Data.AddRange(xAsm2.Data);
+        xAsm.Code.AddRange(xAsm2.Code);
+      }
+
+      foreach (var x in xAsm.Data) {
+        aOutput.WriteLine(x);
+      }
+      foreach (var x in xAsm.Code) {
+        aOutput.WriteLine(x);
       }
     }
 
-    protected void ProcessLine(string aLine) {
+    protected Nasm.Assembler ProcessLine(string aLine) {
+      Nasm.Assembler xAsm;
+
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
-        mOutput.WriteLine();
-        return;
+        xAsm = new Nasm.Assembler();
+        xAsm += "";
+        return xAsm;
       }
 
-      var xCode = mPatterns.GetCode(aLine);
-      if (xCode == null) {
+      // Curretly we use a new assembler for every line.
+      // If we dont it could create a really large in memory object.
+      xAsm = mPatterns.GetCode(aLine);
+      if (xAsm == null) {
         var xMsg = new StringBuilder();
         if (mPathname != "") {
           xMsg.Append("File " + mPathname + ", ");
@@ -62,9 +71,7 @@ namespace Cosmos.Compiler.XSharp {
         xMsg.Append("Parsing error: " + aLine);
         throw new Exception(xMsg.ToString());
       }
-      foreach (var xLine in xCode) {
-        mOutput.WriteLine(xLine);
-      }
+      return xAsm;
     }
   }
 }
