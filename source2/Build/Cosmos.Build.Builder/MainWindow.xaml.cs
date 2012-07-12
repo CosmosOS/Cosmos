@@ -245,6 +245,7 @@ namespace Cosmos.Build.Builder {
 
     protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e) {
+        LoadPosition();
       mLoaded = true;
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
@@ -282,7 +283,7 @@ namespace Cosmos.Build.Builder {
       if (mLoaded && !mSizeLoaded && WindowState != System.Windows.WindowState.Minimized) {
         // Only do it once, else when user sizes window we keep overriding them.
         mSizeLoaded = true;
-        LoadPosition();
+        //LoadPosition();
         mPreventAutoClose = true;
       }
     }
