@@ -20,6 +20,10 @@ namespace Cosmos.Build.Installer {
       }
     }
 
+    public bool AmRunning32Bit() {
+      return IntPtr.Size == 4;
+    }
+
     public bool IsRunning(string aName) {
       var xList = Process.GetProcessesByName(aName);
       return xList.Length > 0;

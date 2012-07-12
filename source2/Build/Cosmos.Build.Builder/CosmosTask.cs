@@ -20,6 +20,30 @@ namespace Cosmos.Build.Builder {
       mInnoFile = mCosmosPath + @"\Setup2\Cosmos.iss";
     }
 
+    protected override void DoRun() {
+      mOutputPath = Path.Combine(mCosmosPath, @"Build\VSIP");
+      if (!Directory.Exists(mOutputPath)) {
+        Directory.CreateDirectory(mOutputPath);
+      }
+
+      CheckPrereqs();
+      CompileXSharpCompiler();
+      CompileXSharpSource();
+      CompileCosmos();
+      CopyTemplates();
+      if (App.IsUserKit) {
+        CreateUserKitScript();
+      }
+      CreateSetup();
+      if (!App.IsUserKit) {
+        RunSetup();
+        WriteDevKit();
+        LaunchVS();
+      }
+
+      Done();
+    }
+    
     protected void MsBuild(string aSlnFile, string aBuildCfg) {
       StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputPath));
     }
@@ -73,7 +97,8 @@ namespace Cosmos.Build.Builder {
 
       Echo("Checking if Visual Studio is running.");
       if (IsRunning("devenv")) {
-        Echo("Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
+        Echo("--Visual Studio is running.");
+        Echo("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
         // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
         // So we wait a few seconds first.
         if (WaitForExit("devenv", xSeconds * 1000)) {
@@ -90,6 +115,11 @@ namespace Cosmos.Build.Builder {
       Section("Checking Prerequisites");
       Echo("Note: This does not check all prerequisites, please see website for full list.");
 
+      Echo("Checking for x86 run.");
+      if (!AmRunning32Bit()) {
+        throw new Exception("Builder must run as x86");
+      }
+
       // We assume they have normal .NET stuff if user was able to build the builder...
       //Visual Studio 2010
 
@@ -105,27 +135,18 @@ namespace Cosmos.Build.Builder {
       CheckForInstall("VMWare VIX", true);
     }
 
-    protected override void DoRun() {
-      mOutputPath = Path.Combine(mCosmosPath, @"Build\VSIP");
-      if (!Directory.Exists(mOutputPath)) {
-        Directory.CreateDirectory(mOutputPath);
-      }
+    void WriteDevKit() {
+      Section("Writing Dev Kit to Registry");
 
-      CheckPrereqs();
-      CompileXSharpCompiler();
-      CompileXSharpSource();
-      CompileCosmos();
-      CopyTemplates();
-      if (App.IsUserKit) {
-        CreateUserKitScript();
+      // Inno deletes this from registry, so we must add this after. 
+      // We let Inno delete it, so if user runs it by itself they get
+      // only UserKit, and no DevKit settings.
+      // HKCU instead of HKLM because builder does not run as admin.
+      //
+      // HKCU is not redirected.
+      using (var xKey = Registry.CurrentUser.CreateSubKey("Software\\Cosmos")) {
+        xKey.SetValue("DevKit", mCosmosPath);
       }
-      CreateSetup();
-      if (!App.IsUserKit) {
-        RunSetup();
-        LaunchVS();
-      }
-
-      Done();
     }
 
     void CreateUserKitScript() {

@@ -243,14 +243,17 @@ Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersE
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue
 
 ; Old keys
-Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: deletevalue
-Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: ; ValueData: {app}; Flags: deletevalue; Check: IsWin64
+Root: HKLM; SubKey: Software\Cosmos; ValueType: none; Flags: deletevalue;
+Root: HKLM64; SubKey: Software\Cosmos; ValueType: none; Flags: deletekey; Check: IsWin64
 
 ; User Kit Folder
 Root: HKLM; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletevalue
-Root: HKLM64; SubKey: Software\Cosmos; ValueType: none; Flags: uninsdeletekey; Check: IsWin64
-Root: HKLM64; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletevalue; Check: IsWin64
+
+; Dev Kit Folder - Set by builder only, but we delete it here. See comments in builder.
+; HKCU because Builder doesnt run as admin
+; Note HKCU is not part of registry redirection
+Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletevalue;
 
 ; Easter Egg
 Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "World Domination" ; ValueData: "true"; Flags: uninsdeletevalue
