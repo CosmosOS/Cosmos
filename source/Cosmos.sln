@@ -214,9 +214,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.XSC", "..\XSharp\source\XSC\XSharp.XSC\XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Test", "..\XSharp\source\XSharp.Test\XSharp.Test.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Test", "..\XSharp\source\XSharp.Test\XSharp.Test\XSharp.Test.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.XSC", "..\XSharp\source\XSharp.XSC\XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -450,14 +450,14 @@ Global
 		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
 		SccProjectName56 = ../source2/Cosmos.Deploy.Pixie
 		SccLocalPath56 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName57 = ..\\XSharp\\source\\XSC\\XSharp.XSC\\XSharp.XSC.csproj
+		SccProjectUniqueName57 = ..\\XSharp\\source\\XSharp.Test\\XSharp.Test.csproj
 		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
-		SccProjectName57 = ../XSharp/source/XSC/XSharp.XSC
-		SccLocalPath57 = ..\\XSharp\\source\\XSC\\XSharp.XSC
-		SccProjectUniqueName58 = ..\\XSharp\\source\\XSharp.Test\\XSharp.Test\\XSharp.Test.csproj
+		SccProjectName57 = ../XSharp/source/XSharp.Test
+		SccLocalPath57 = ..\\XSharp\\source\\XSharp.Test
+		SccProjectUniqueName58 = ..\\XSharp\\source\\XSharp.XSC\\XSharp.XSC.csproj
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
-		SccProjectName58 = ../XSharp/source/XSharp.Test/XSharp.Test
-		SccLocalPath58 = ..\\XSharp\\source\\XSharp.Test\\XSharp.Test
+		SccProjectName58 = ../XSharp/source/XSharp.XSC
+		SccLocalPath58 = ..\\XSharp\\source\\XSharp.XSC
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1094,16 +1094,6 @@ Global
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Mixed Platforms.Build.0 = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.ActiveCfg = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.Build.0 = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.ActiveCfg = Release|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -1114,6 +1104,16 @@ Global
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1184,8 +1184,8 @@ Global
 		{86F88A09-6801-4474-BFC8-EF09F3A9B89D} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
-		{7B8499A7-0A8D-44FC-8181-9666CC198025} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{2A59517C-356E-4B55-B155-50335BF482FB} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
+		{7B8499A7-0A8D-44FC-8181-9666CC198025} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 	EndGlobalSection
