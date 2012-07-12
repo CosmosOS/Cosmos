@@ -198,8 +198,8 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     protected void LaunchGdbClient() {
       OutputText("Launching GDB client.");
-      if (File.Exists(Cosmos.Build.Common.CosmosPaths.GDBClientExe)) {
-        var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GDBClientExe);
+      if (File.Exists(Cosmos.Build.Common.CosmosPaths.GdbClientExe)) {
+        var xPSInfo = new ProcessStartInfo(Cosmos.Build.Common.CosmosPaths.GdbClientExe);
         xPSInfo.Arguments = "\"" + Path.ChangeExtension(mProjectFile, ".cgdb") + "\"" + @" /Connect";
         xPSInfo.UseShellExecute = false;
         xPSInfo.RedirectStandardInput = false;
@@ -210,7 +210,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       } else {
         MessageBox.Show(string.Format(
             "The GDB-Client could not be found at \"{0}\". Please deactivate it under \"Properties/Debug/Enable GDB\"",
-            Cosmos.Build.Common.CosmosPaths.GDBClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+            Cosmos.Build.Common.CosmosPaths.GdbClientExe), "GDB-Client", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
       }
     }
 

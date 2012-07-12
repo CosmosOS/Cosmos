@@ -328,9 +328,12 @@ namespace Cosmos.IL2CPU.X86 {
       new Jump { DestinationLabel = ".loop" };
 
       if (mComNumber > 0) {
+        // Compile old X#
         var xStub = new DebugStub();
         xStub.Assemble();
 
+        // New X#
+        // TODO Kill this class too after we dont need it.
         Assembler.Code.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, typeof(TracerEntry).Assembly);
       } else {
         new Label("DebugStub_Step");
