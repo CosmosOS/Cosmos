@@ -157,6 +157,8 @@ namespace Cosmos.Build.Builder {
     void CompileXSharpSource() {
       Section("Compiling X# Sources");
       
+      // XSC can do all files in path, but we do it on our own currently for better status updates.
+      // When we get xsproj files we can build directly.
       var xFiles = Directory.GetFiles(mCosmosPath + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
       foreach (var xFile in xFiles) {
         Echo("Compiling " + Path.GetFileName(xFile));
