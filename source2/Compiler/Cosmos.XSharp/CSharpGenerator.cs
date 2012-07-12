@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using System.IO;
 
 namespace Cosmos.Compiler.XSharp {
+  // This is a separate class from AsmGenerator and no common base because it is
+  // temporary and will go away soon.
   public class CSharpGenerator {
     protected TextReader mInput;
     protected TextWriter mOutput;
@@ -20,8 +22,7 @@ namespace Cosmos.Compiler.XSharp {
       mPathname = Path.GetFileName(aSrcPathname);
       using (var xInput = new StreamReader(aSrcPathname)) {
         using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".cs"))) {
-          var xGenerator = new CSharpGenerator();
-          xGenerator.Execute(aNamespace, Path.GetFileNameWithoutExtension(aSrcPathname), xInput, xOutput);
+          Execute(aNamespace, Path.GetFileNameWithoutExtension(aSrcPathname), xInput, xOutput);
         }
       }
     }
@@ -69,7 +70,7 @@ namespace Cosmos.Compiler.XSharp {
     protected void ProcessLine(string aLine) {
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
-        // Skip
+        mOutput.WriteLine();
         return;
       }
       if (EmitXSharpCodeComments && !aLine.StartsWith("//")) {

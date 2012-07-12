@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using System.IO;
 
 namespace Cosmos.VS.XSharp {
-
   // This is the custom tool used to compile .XS files to .CS files in VS
   public class FileGenerator : IVsSingleFileGenerator {
     public int DefaultExtension(out string aDefaultExt) {

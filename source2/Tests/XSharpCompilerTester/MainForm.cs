@@ -10,37 +10,47 @@ using System.IO;
 
 namespace XSharpCompilerTester {
   public partial class MainForm : Form {
+    // TODO convert to app path + relative
+    // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
+    // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
+    protected string mPath = @"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\";
+
     public MainForm() {
       InitializeComponent();
-      // TODO convert to app path + relative
-      // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
-      // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
     }
 
     protected void Test(string aFilename) {
-      string xInputString = File.ReadAllText(@"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\" + aFilename);
-      tboxInput.Text = xInputString;
-      using (var xInput = new StringReader(xInputString)) {
-        using (var xOutput = new StringWriter()) {
-          var xGenerator = new Cosmos.Compiler.XSharp.CSharpGenerator();
-          xGenerator.Execute("DefaultNamespace", "InputFileName", xInput, xOutput);
+      tabsMain.TabPages.Add(Path.GetFileNameWithoutExtension(aFilename));
+      var xTab = tabsMain.TabPages[tabsMain.TabPages.Count - 1];
 
-          textOutput.Text = xOutput.ToString();
+      var xTbox = new TextBox();
+      xTab.Controls.Add(xTbox);
+      xTbox.Dock = DockStyle.Fill;
+      xTbox.Multiline = true;
+      xTbox.Font = new Font("Consolas", 12);
+      xTbox.ScrollBars = ScrollBars.Both;
+
+      using (var xInput = new StreamReader(aFilename)) {
+        using (var xOutput = new StringWriter()) {
+          try {
+            var xGenerator = new Cosmos.Compiler.XSharp.AsmGenerator();
+            xGenerator.Execute(xInput, xOutput);
+
+            xTbox.Text = xOutput.ToString();
+          } catch (Exception ex) {
+            xTab.Text = "* " + xTab.Text;
+            xTbox.Text = xOutput.ToString() + "\r\n"
+              + ex.Message + "\r\n";
+          }
         }
       }
     }
 
-    protected void timerConvert_Tick(object sender, EventArgs e) {
-      timerConvert.Enabled = false;
-      Test("TracerEntry.xs");
-      Test("Serial.xs");
-      Test("Screen.xs");
-      Test("Init.xs");
-      Test("CmdMisc.xs");
-      Test("CmdAsmBreak.xs");
-      Test("Main.xs");
-      Test("CmdProcess.xs");
-      Test("CmdSend.xs");
+    private void MainForm_Load(object sender, EventArgs e) {
+      var xFiles = Directory.GetFiles(mPath, "*.xs");
+      foreach (var xFile in xFiles) {
+        Test(xFile);
+      }
     }
   }
 }

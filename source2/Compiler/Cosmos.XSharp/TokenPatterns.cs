@@ -19,6 +19,9 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    // Temp hack
+    public bool RawAsm = false;
+
     protected string mFuncName = null;
     protected bool mFuncExitFound = false;
 
@@ -551,7 +554,11 @@ namespace Cosmos.Compiler.XSharp {
       return null;
     }
 
-    void AsmToCSharp(List<string> aLines) {
+    protected void AsmToCSharp(List<string> aLines) {
+      if (RawAsm) {
+        return;
+      }
+
       // Don't reformat if we are in a block because then this will occur twice
       if (mBlock != null) {
         return;
