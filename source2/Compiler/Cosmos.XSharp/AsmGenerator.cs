@@ -14,6 +14,26 @@ namespace Cosmos.Compiler.XSharp {
     protected int mLineNo = 0;
     protected string mPathname = "";
 
+    public Assembler Generate(string aSrcPathname) {
+      mPatterns.EmitUserComments = EmitUserComments;
+      mLineNo = 0;
+      var xResult = new Assembler();
+      using (var xInput = new StreamReader(aSrcPathname)) {
+        while (true) {
+          mLineNo++;
+          string xLine = xInput.ReadLine();
+          if (xLine == null) {
+            break;
+          }
+
+          var xAsm = ProcessLine(xLine);
+          xResult.Data.AddRange(xAsm.Data);
+          xResult.Code.AddRange(xAsm.Code);
+        }
+      }
+      return xResult;
+    }
+
     public void GenerateToFiles(string aSrcPathname) {
       mPathname = Path.GetFileName(aSrcPathname);
       using (var xInput = new StreamReader(aSrcPathname)) {
@@ -27,10 +47,6 @@ namespace Cosmos.Compiler.XSharp {
 
     public void Generate(TextReader aInput, TextWriter aOutputData, TextWriter aOutputCode) {
       mPatterns.EmitUserComments = EmitUserComments;
-      // Right now we just collect in RAM, but later we should flush to separate files
-      // or something and merge after.
-      var xAsm = new Assembler();
-
       mLineNo = 0;
       while (true) {
         mLineNo++;
@@ -39,10 +55,7 @@ namespace Cosmos.Compiler.XSharp {
           break;
         }
 
-        var xAsm2 = ProcessLine(xLine);
-        xAsm.Data.AddRange(xAsm2.Data);
-        xAsm.Code.AddRange(xAsm2.Code);
-
+        var xAsm = ProcessLine(xLine);
         foreach (var x in xAsm.Data) {
           aOutputData.WriteLine(x);
         }
