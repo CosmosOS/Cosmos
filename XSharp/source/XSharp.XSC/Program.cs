@@ -14,7 +14,13 @@ namespace XSharp.XSC {
           string xNamespace = aArgs[2];
 
           var xGenerator = new CSharpGenerator();
-          xGenerator.Execute(xNamespace, xSrc);
+          if (Directory.Exists(xSrc)) {
+            foreach (var xFile in Directory.GetFiles(xSrc, "*.xs")) {
+              xGenerator.Execute(xNamespace, xFile);
+            }
+          } else {
+            xGenerator.Execute(xNamespace, xSrc);
+          }
         }
       } catch (Exception ex) {
         Console.WriteLine(ex.Message);
