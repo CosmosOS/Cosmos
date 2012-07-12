@@ -17,13 +17,15 @@ namespace Cosmos.Compiler.XSharp {
     public void Execute(string aSrcPathname) {
       mPathname = Path.GetFileName(aSrcPathname);
       using (var xInput = new StreamReader(aSrcPathname)) {
-        using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm"))) {
-          Execute(xInput, xOutput);
+        using (var xOutputCode = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm"))) {
+          using (var xOutputData = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asmd"))) {
+            Execute(xInput, xOutputData, xOutputCode);
+          }
         }
       }
     }
 
-    public void Execute(TextReader aInput, TextWriter aOutput) {
+    public void Execute(TextReader aInput, TextWriter aOutputData, TextWriter aOutputCode) {
       mPatterns.EmitUserComments = EmitUserComments;
       // Right now we just collect in RAM, but later we should flush to separate files
       // or something and merge after.
@@ -40,13 +42,13 @@ namespace Cosmos.Compiler.XSharp {
         var xAsm2 = ProcessLine(xLine);
         xAsm.Data.AddRange(xAsm2.Data);
         xAsm.Code.AddRange(xAsm2.Code);
-      }
 
-      foreach (var x in xAsm.Data) {
-        aOutput.WriteLine(x);
-      }
-      foreach (var x in xAsm.Code) {
-        aOutput.WriteLine(x);
+        foreach (var x in xAsm.Data) {
+          aOutputData.WriteLine(x);
+        }
+        foreach (var x in xAsm.Code) {
+          aOutputCode.WriteLine(x);
+        }
       }
     }
 

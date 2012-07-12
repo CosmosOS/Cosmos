@@ -31,16 +31,20 @@ namespace XSharp.Test {
       xTbox.ScrollBars = ScrollBars.Both;
 
       using (var xInput = new StreamReader(aFilename)) {
-        using (var xOutput = new StringWriter()) {
-          try {
-            var xGenerator = new Cosmos.Compiler.XSharp.AsmGenerator();
-            xGenerator.Execute(xInput, xOutput);
+        using (var xOutputCode = new StringWriter()) {
+          using (var xOutputData = new StringWriter()) {
+            try {
+              var xGenerator = new Cosmos.Compiler.XSharp.AsmGenerator();
+              xGenerator.Execute(xInput, xOutputData, xOutputCode);
 
-            xTbox.Text = xOutput.ToString();
-          } catch (Exception ex) {
-            xTab.Text = "* " + xTab.Text;
-            xTbox.Text = xOutput.ToString() + "\r\n"
-              + ex.Message + "\r\n";
+              xTbox.Text = xOutputData.ToString() + "\r\n"
+                + xOutputCode.ToString();
+            } catch (Exception ex) {
+              xTab.Text = "* " + xTab.Text;
+              xTbox.Text = xOutputData.ToString() + "\r\n"
+                + xOutputCode.ToString() + "\r\n"
+                + ex.Message + "\r\n";
+            }
           }
         }
       }

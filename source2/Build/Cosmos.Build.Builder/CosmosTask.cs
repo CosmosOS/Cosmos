@@ -166,7 +166,7 @@ namespace Cosmos.Build.Builder {
         }
         // We dont ref the X# asm directly because then we could not compile it without dynamic loading.
         // This way we can build it and call it directly.
-        StartConsole(mOutputPath + @"\xsc.exe", Quoted(xFile) + @" Cosmos.Debug.DebugStub");
+        StartConsole(mOutputPath + @"\xsc.exe", "-CSharp " + Quoted(xFile) + @" Cosmos.Debug.DebugStub");
       }
     }
 
