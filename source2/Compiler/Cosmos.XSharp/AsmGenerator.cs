@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
+using XSharp.Nasm;
 
 namespace Cosmos.Compiler.XSharp {
   public class AsmGenerator {
@@ -26,7 +27,7 @@ namespace Cosmos.Compiler.XSharp {
       mPatterns.EmitUserComments = EmitUserComments;
       // Right now we just collect in RAM, but later we should flush to separate files
       // or something and merge after.
-      var xAsm = new Nasm.Assembler();
+      var xAsm = new Assembler();
 
       mLineNo = 0;
       while (true) {
@@ -49,12 +50,12 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
-    protected Nasm.Assembler ProcessLine(string aLine) {
-      Nasm.Assembler xAsm;
+    protected Assembler ProcessLine(string aLine) {
+      Assembler xAsm;
 
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
-        xAsm = new Nasm.Assembler();
+        xAsm = new Assembler();
         xAsm += "";
         return xAsm;
       }

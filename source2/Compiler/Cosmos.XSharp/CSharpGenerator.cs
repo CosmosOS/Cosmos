@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
+using XSharp.Nasm;
 
 namespace Cosmos.Compiler.XSharp {
   // This is a separate class from AsmGenerator and no common base because it is
@@ -31,7 +32,7 @@ namespace Cosmos.Compiler.XSharp {
       mInput = aInput;
       mOutput = aOutput;
       mPatterns.EmitUserComments = EmitUserComments;
-      var xAsm = new Nasm.Assembler();
+      var xAsm = new Assembler();
 
       mLineNo = 0;
       EmitHeader(aNamespace, aClassname);
@@ -76,12 +77,12 @@ namespace Cosmos.Compiler.XSharp {
       mOutput.WriteLine("}");
     }
 
-    protected Nasm.Assembler ProcessLine(string aLine) {
-      Nasm.Assembler xAsm;
+    protected Assembler ProcessLine(string aLine) {
+      Assembler xAsm;
 
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine)) {
-        xAsm = new Nasm.Assembler();
+        xAsm = new Assembler();
         xAsm += "";
         return xAsm;
       }
