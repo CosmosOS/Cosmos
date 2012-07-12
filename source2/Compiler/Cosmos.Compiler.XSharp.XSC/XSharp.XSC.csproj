@@ -8,7 +8,7 @@
     <ProjectGuid>{7B8499A7-0A8D-44FC-8181-9666CC198025}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Compiler.XSharp.XSC</RootNamespace>
+    <RootNamespace>XSharp.XSC</RootNamespace>
     <AssemblyName>XSC</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>

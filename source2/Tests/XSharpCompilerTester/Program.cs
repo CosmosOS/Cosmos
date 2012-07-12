@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace XSharpCompilerTester {
+namespace XSharp.Test {
   static class Program {
     [STAThread]
     static void Main() {

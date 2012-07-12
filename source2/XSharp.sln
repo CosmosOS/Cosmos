@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp", "Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp.Test", "Tests\XSharpCompilerTester\Cosmos.Compiler.XSharp.Test.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Test", "Tests\XSharpCompilerTester\XSharp.Test.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp.XSC", "Compiler\Cosmos.Compiler.XSharp.XSC\Cosmos.Compiler.XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.XSC", "Compiler\Cosmos.Compiler.XSharp.XSC\XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.XSharp", "VSIP\Cosmos.VS.XSharp\Cosmos.VS.XSharp.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
 EndProject
@@ -18,15 +18,15 @@ Global
 		SccProjectUniqueName1 = Compiler\\Cosmos.XSharp\\Cosmos.Compiler.XSharp.csproj
 		SccProjectName1 = Compiler/Cosmos.XSharp
 		SccLocalPath1 = Compiler\\Cosmos.XSharp
-		SccProjectUniqueName2 = Tests\\XSharpCompilerTester\\Cosmos.Compiler.XSharp.Test.csproj
-		SccProjectName2 = Tests/XSharpCompilerTester
-		SccLocalPath2 = Tests\\XSharpCompilerTester
-		SccProjectUniqueName3 = Compiler\\Cosmos.Compiler.XSharp.XSC\\Cosmos.Compiler.XSharp.XSC.csproj
+		SccProjectUniqueName2 = VSIP\\Cosmos.VS.XSharp\\Cosmos.VS.XSharp.csproj
+		SccProjectName2 = VSIP/Cosmos.VS.XSharp
+		SccLocalPath2 = VSIP\\Cosmos.VS.XSharp
+		SccProjectUniqueName3 = Compiler\\Cosmos.Compiler.XSharp.XSC\\XSharp.XSC.csproj
 		SccProjectName3 = Compiler/Cosmos.Compiler.XSharp.XSC
 		SccLocalPath3 = Compiler\\Cosmos.Compiler.XSharp.XSC
-		SccProjectUniqueName4 = VSIP\\Cosmos.VS.XSharp\\Cosmos.VS.XSharp.csproj
-		SccProjectName4 = VSIP/Cosmos.VS.XSharp
-		SccLocalPath4 = VSIP\\Cosmos.VS.XSharp
+		SccProjectUniqueName4 = Tests\\XSharpCompilerTester\\XSharp.Test.csproj
+		SccProjectName4 = Tests/XSharpCompilerTester
+		SccLocalPath4 = Tests\\XSharpCompilerTester
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

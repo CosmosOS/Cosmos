@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
-namespace XSharpCompilerTester {
+namespace XSharp.Test {
   public partial class MainForm : Form {
     // TODO convert to app path + relative
     // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug

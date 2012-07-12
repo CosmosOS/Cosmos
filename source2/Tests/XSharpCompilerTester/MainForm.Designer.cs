@@ -1,4 +1,4 @@
-﻿namespace XSharpCompilerTester
+﻿namespace XSharp.Test
 {
     partial class MainForm
     {

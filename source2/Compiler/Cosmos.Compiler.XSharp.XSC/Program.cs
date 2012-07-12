@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Cosmos.Compiler.XSharp;
 
-namespace Cosmos.Compiler.XSharp.XSC {
+namespace XSharp.XSC {
   class Program {
     static void Main(string[] aArgs) {
       try {
