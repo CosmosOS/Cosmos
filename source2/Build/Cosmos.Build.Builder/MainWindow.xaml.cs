@@ -274,18 +274,21 @@ namespace Cosmos.Build.Builder {
       Properties.Settings.Default.Save();
     }
 
-    private void Window_Closed(object sender, EventArgs e) {
-      SavePosition();
-    }
-
+    protected bool mSizeLoaded = false;
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e) {
       // User had non minimized window, or maximized it, or otherwise manually intervened.
       // Even if starting minimized, this event gets called with Normal before load.
       // This is why we have mLoaded.
-      if (mLoaded && WindowState != System.Windows.WindowState.Minimized) {
+      if (mLoaded && !mSizeLoaded && WindowState != System.Windows.WindowState.Minimized) {
+        // Only do it once, else when user sizes window we keep overriding them.
+        mSizeLoaded = true;
         LoadPosition();
         mPreventAutoClose = true;
       }
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+      SavePosition();
     }
 
   }
