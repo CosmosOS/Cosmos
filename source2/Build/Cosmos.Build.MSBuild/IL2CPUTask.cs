@@ -16,6 +16,7 @@ using System.Text;
 using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild {
+  // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
   // Class is separated from MSBuild task so we can call it from debugging and standalone applications.
   public class IL2CPUTask {
 
