@@ -10,6 +10,8 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Debug.DebugStub;
 using Cosmos.Assembler.XSharp;
+using XSharp.Nasm;
+using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.IL2CPU.X86 {
   // TODO: I think we need to later elminate this class
@@ -334,7 +336,20 @@ namespace Cosmos.IL2CPU.X86 {
 
         // New X#
         // TODO Kill this class too after we dont need it.
-        Assembler.Code.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, typeof(TracerEntry).Assembly);
+        if (true) {
+          Assembler.Code.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, typeof(TracerEntry).Assembly);
+        } else {
+          var xGen = new AsmGenerator();
+          foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs")) {
+            var xAsm = xGen.Generate(xFile);
+            foreach (var xData in xAsm.Data) {
+              Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember() { RawAsm = xData });
+            }
+            foreach (var xCode in xAsm.Code) {
+              new LiteralAssemblerCode(xCode);
+            }
+          }
+        }
       } else {
         new Label("DebugStub_Step");
         new Return();

@@ -6,7 +6,6 @@
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
     <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
-
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
   </PropertyGroup>
 
@@ -18,7 +17,6 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
 
   <Target Name="CoreCompile">
-
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!"
            Condition="$(Compile) != ''"/>
 
