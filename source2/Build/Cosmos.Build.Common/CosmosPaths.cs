@@ -14,6 +14,9 @@ namespace Cosmos.Build.Common {
     public static readonly string DevKit = null;
     public static readonly string DebugStubSrc;
 
+    static string CheckPath(string aPath1, string aPath2) {
+      return CheckPath(Path.Combine(aPath1, aPath2));
+    }
     static string CheckPath(string aPath) {
       if (Directory.Exists(aPath) || File.Exists(aPath)) {
         return aPath;
@@ -28,16 +31,17 @@ namespace Cosmos.Build.Common {
         }
         UserKit = (string)xReg.GetValue("UserKit");
       }
-      Build = CheckPath(Path.Combine(UserKit, @"Build"));
-      Vsip = CheckPath(Path.Combine(UserKit, @"Build\VSIP"));
-      Tools = CheckPath(Path.Combine(UserKit, @"Build\Tools"));
-      Kernel = CheckPath(Path.Combine(UserKit, @"Kernel"));
-      GdbClientExe = CheckPath(Path.Combine(UserKit, @"Build\VSIP\Cosmos.Debug.GDB.exe"));
+      Build = CheckPath(UserKit, @"Build");
+      Vsip = CheckPath(UserKit, @"Build\VSIP");
+      Tools = CheckPath(UserKit, @"Build\Tools");
+      Kernel = CheckPath(UserKit, @"Kernel");
+      GdbClientExe = CheckPath(UserKit, @"Build\VSIP\Cosmos.Debug.GDB.exe");
+      DebugStubSrc = CheckPath(UserKit, @"XSharp\DebugStub");
 
       using (var xReg = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos", false)) {
         if (xReg != null) {
           DevKit = (string)xReg.GetValue("DevKit");
-          DebugStubSrc = CheckPath(Path.Combine(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub"));
+          DebugStubSrc = CheckPath(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub");
         }
       }
     }

@@ -38,15 +38,15 @@
     <h3>
     Kudzu</h3>
     <ul>
+                                    <li>you switched the data and text segments, right? before text was first data 
+                                        after, and now that&#39;s data-text? if so, we need to fix our &quot;EndOfKernel&quot; code.</li>
                                     <li>Stop debugging<ul>
                                         <li>EngineUtils.cs - line 74</li>
                                         </ul>
                                     </li>
                                     <li>Complete X# Port<ul>
-                                    <li>DebugStubSrc for UserKit</li>
+                                        <li>Screen.XS - //while ESI[0] != 0 {</li>
                                         <li>use includes for compiling nasm</li>
-                                        <li>Screen.XS - //while ESI[0] != 0 { 
-                                        </li>
                                         </ul>
                                     <ul>
                                         <li>PreserveRegisters</li>
@@ -66,10 +66,7 @@
                                         complicated<ul>
                                             <li>Also skip c# step - compile straight to .asm from X#</ul>
                                     <li>return errors 
-        when comport cant open<li>OutputDebug Catcher with filters, categories, timestamps<li>Press stop while on bp with worktation</li>
-                                    <li>Press stop while vmware player is running<li>you switched the data and text segments, right? before text was first 
-        data after, and now that&#39;s data-text? if so, we need to fix our &quot;EndOfKernel&quot; 
-        code..<li>X#  
+        when comport cant open<li>OutputDebug Catcher with filters, categories, timestamps<li>X#  
                             Code Completion<li>Asm stepping<ul>
                                         <li>Historical panels</li>
                                         </ul>
