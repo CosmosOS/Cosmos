@@ -167,7 +167,7 @@ namespace Cosmos.Debug.DebugStub {
         // If a command is waiting, process it and then check for another.
         // If no command waiting, break from loop.
         JumpIf(Flags.Zero, ".CheckForCmd_Break");
-        Call<ProcessCommand>();
+        Call("DebugStub_ProcessCommand");
         // See if there are more commands waiting
         Jump(".CheckForCmd");
 
@@ -191,7 +191,7 @@ namespace Cosmos.Debug.DebugStub {
         Label = ".WaitCmd";
         {
           // Check for common commands first
-          Call<ProcessCommand>();
+          Call("DebugStub_ProcessCommand");
 
           // Now check for commands that are only valid in break state or commands that require special handling while in break state.
 

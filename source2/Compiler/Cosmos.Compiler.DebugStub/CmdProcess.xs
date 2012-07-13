@@ -2,7 +2,7 @@
 
 // Modifies: AL, DX (ComReadAL)
 // Returns: AL
-function ProcessCommand2 {
+function ProcessCommandNew {
     ComReadAL()
     // Some callers expect AL to be returned, so we preserve it
     // in case any commands modify AL.
@@ -25,16 +25,42 @@ function ProcessCommand2 {
 		TraceOff()
 		return
 	}
-    //CheckCmd("TraceOff", Vs2Ds.TraceOff)
-    //CheckCmd("TraceOn", Vs2Ds.TraceOn)
-    //CheckCmd("Break", Vs2Ds.Break)
-    //CheckCmd("BreakOnAddress", Vs2Ds.BreakOnAddress)
-    //CheckCmd("SendMethodContext", Vs2Ds.SendMethodContext)
-    //CheckCmd("SendMemory", Vs2Ds.SendMemory)
-    //CheckCmd("SendRegisters", Vs2Ds.SendRegisters)
-    //CheckCmd("SendFrame", Vs2Ds.SendFrame)
-    //CheckCmd("SendStack", Vs2Ds.SendStack)
-    //CheckCmd("Ping", Vs2Ds.Ping)
+	if EAX = #Vs2Ds_TraceOn {
+		TraceOn()
+		return
+	}
+	if EAX = #Vs2Ds_Break {
+		Break()
+		return
+	}
+	if EAX = #Vs2Ds_BreakOnAddress {
+		BreakOnAddress()
+		return
+	}
+	if EAX = #Vs2Ds_SendMethodContext {
+		SendMethodContext()
+		return
+	}
+	if EAX = #Vs2Ds_SendMemory {
+		SendMemory()
+		return
+	}
+	if EAX = #Vs2Ds_SendRegisters {
+		SendRegisters()
+		return
+	}
+	if EAX = #Vs2Ds_SendFrame {
+		SendFrame()
+		return
+	}
+	if EAX = #Vs2Ds_SendStack {
+		SendStack()
+		return
+	}
+	if EAX = #Vs2Ds_Ping {
+		Ping()
+		return
+	}
 
 Exit:
     // Restore AL for callers who check the command and do
@@ -42,16 +68,6 @@ Exit:
     -EAX
 }
 
-function CheckCmd2 {
-//  AL.Compare(aCmd)
-//  string xAfterLabel = NewLabel()
-//  JumpIf(Flags.NotEqual, xAfterLabel)
-//  Call("DebugStub_" + aLabel)
-//  Call("DebugStub_AckCommand")
-//  Jump(".End")
-//  Label = xAfterLabel
-}
-	  
 function AckCommand {
     // We acknowledge receipt of the command AND the processing of it.
     //   -In the past the ACK only acknowledged receipt.
