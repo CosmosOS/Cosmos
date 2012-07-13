@@ -15,6 +15,7 @@
             (x86)\MSBuild\Cosmos\Cosmos.targets 41 6 Guess (Demos\Guess\Guess)
             <ul>
                 <li>Change it to display the actual nasm error</li>
+                <li>Also display nasm warnings when no error.</li>
             </ul>
         </li>
         <li>Move selected project profile to .user file.</li>
@@ -51,9 +52,10 @@
                                     </li>
                                     <li>Complete X# Port<ul>
                                         <li>DebugWaitMsg db &quot;Waiting for debugger connection...&quot; = 0 at end</li>
-                                        <li>Cmp dword AL, 8</li>
-                                        <li>use includes for compiling nasm</li>
                                         </ul>
+                                    <ul>
+                                        <li>use includes for compiling nasm</li>
+                                    </ul>
                                     <ul>
                                         <li>PreserveRegisters</li>
                                         <li>AL = ComRead8()</li>

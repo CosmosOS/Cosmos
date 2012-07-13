@@ -207,7 +207,7 @@ namespace Cosmos.Compiler.XSharp {
       string xRight = GetRef(aTokens, ref rStart, out xRightSizeKnown);
       
       return "Cmp " 
-        + (xLeftSizeKnown && xRightSizeKnown ? "" : "dword ")
+        + (xLeftSizeKnown || xRightSizeKnown ? "" : "dword ")
         + xLeft + ", " + xRight;
     }
 
