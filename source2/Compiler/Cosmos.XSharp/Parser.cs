@@ -36,11 +36,12 @@ namespace Cosmos.Compiler.XSharp {
     ).ToUpper().Split(mComma);
 
     public static readonly string[] Registers;
+    public static readonly string[] RegistersAddr;
     public static readonly string[] Registers8 = "AH,AL,BH,BL,CH,CL,DH,DL".Split(mComma);
     public static readonly string[] Registers16 = "AX,BX,CX,DX".Split(mComma);
     public static readonly string[] Registers32 = "EAX,EBX,ECX,EDX".Split(mComma);
     public static readonly string[] RegistersIdx = "ESI,EDI,ESP,EBP".Split(mComma);
-    public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32,_REGIDX".Split(mComma);
+    public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32,_REGIDX._REGADDR".Split(mComma);
     public static readonly string[] Delimiters = ",".Split(mSpace);
     // _.$ are AlphaNum. See comments in Parser
     // # is comment and literal, but could be reused when not first char
@@ -54,6 +55,11 @@ namespace Cosmos.Compiler.XSharp {
       xRegisters.AddRange(Registers32);
       xRegisters.AddRange(RegistersIdx);
       Registers = xRegisters.ToArray();
+
+      var xRegistersAddr = new List<string>();
+      xRegistersAddr.AddRange(Registers32);
+      xRegistersAddr.AddRange(RegistersIdx);
+      RegistersAddr = xRegistersAddr.ToArray();
     }
 
     protected void NewToken(TokenList aList, ref int rPos) {
