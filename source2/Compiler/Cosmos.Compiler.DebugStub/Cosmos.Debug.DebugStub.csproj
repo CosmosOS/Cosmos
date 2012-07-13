@@ -64,60 +64,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CmdAsmBreak.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CmdAsmBreak.xs</DependentUpon>
-    </Compile>
-    <Compile Include="CmdMisc.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CmdMisc.xs</DependentUpon>
-    </Compile>
-    <Compile Include="CmdProcess.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CmdProcess.xs</DependentUpon>
-    </Compile>
-    <Compile Include="CmdSend.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CmdSend.xs</DependentUpon>
-    </Compile>
-    <Compile Include="Consts.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Consts.xs</DependentUpon>
-    </Compile>
-    <Compile Include="Init.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Init.xs</DependentUpon>
-    </Compile>
-    <Compile Include="Main.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Main.xs</DependentUpon>
-    </Compile>
     <Compile Include="Old\Consts.cs" />
     <Compile Include="Old\DebugStub.cs" />
     <Compile Include="Old\ProcessCmds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Screen.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Screen.xs</DependentUpon>
-    </Compile>
-    <Compile Include="Serial.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Serial.xs</DependentUpon>
-    </Compile>
-    <Compile Include="TracerEntry.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TracerEntry.xs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.Consts.csproj">
@@ -140,45 +90,97 @@
   <ItemGroup>
     <None Include="CmdAsmBreak.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>CmdAsmBreak.cs</LastGenOutput>
+      <LastGenOutput>CmdAsmBreak.asm</LastGenOutput>
     </None>
     <None Include="CmdMisc.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>CmdMisc.cs</LastGenOutput>
+      <LastGenOutput>CmdMisc.asm</LastGenOutput>
     </None>
     <None Include="CmdProcess.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>CmdProcess.cs</LastGenOutput>
+      <LastGenOutput>CmdProcess.asm</LastGenOutput>
     </None>
     <None Include="CmdSend.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>CmdSend.cs</LastGenOutput>
+      <LastGenOutput>CmdSend.asm</LastGenOutput>
     </None>
     <None Include="Consts.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Consts.cs</LastGenOutput>
+      <LastGenOutput>Consts.asm</LastGenOutput>
     </None>
     <None Include="Cosmos.snk" />
     <None Include="Main.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Main.cs</LastGenOutput>
+      <LastGenOutput>Main.asm</LastGenOutput>
     </None>
     <None Include="Init.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Init.cs</LastGenOutput>
+      <LastGenOutput>Init.asm</LastGenOutput>
     </None>
     <None Include="Screen.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Screen.cs</LastGenOutput>
+      <LastGenOutput>Screen.asm</LastGenOutput>
     </None>
     <None Include="Serial.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Serial.cs</LastGenOutput>
+      <LastGenOutput>Serial.asm</LastGenOutput>
     </None>
     <None Include="TracerEntry.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>TracerEntry.cs</LastGenOutput>
+      <LastGenOutput>TracerEntry.asm</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CmdAsmBreak.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdAsmBreak.xs</DependentUpon>
+    </Content>
+    <Content Include="CmdMisc.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdMisc.xs</DependentUpon>
+    </Content>
+    <Content Include="CmdProcess.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdProcess.xs</DependentUpon>
+    </Content>
+    <Content Include="CmdSend.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CmdSend.xs</DependentUpon>
+    </Content>
+    <Content Include="Consts.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Consts.xs</DependentUpon>
+    </Content>
+    <Content Include="Init.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Init.xs</DependentUpon>
+    </Content>
+    <Content Include="Main.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Main.xs</DependentUpon>
+    </Content>
+    <Content Include="Screen.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Screen.xs</DependentUpon>
+    </Content>
+    <Content Include="Serial.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Serial.xs</DependentUpon>
+    </Content>
+    <Content Include="TracerEntry.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TracerEntry.xs</DependentUpon>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

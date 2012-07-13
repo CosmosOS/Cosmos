@@ -336,7 +336,7 @@ namespace Cosmos.IL2CPU.X86 {
 
         // New X#
         // TODO Kill this class too after we dont need it.
-        if (true) {
+        if (false) {
           Assembler.Code.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, typeof(TracerEntry).Assembly);
         } else {
           var xGen = new AsmGenerator();
