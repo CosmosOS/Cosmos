@@ -44,14 +44,13 @@ namespace Cosmos.Build.Builder {
     protected void GetInstallList() {
       var xSB = new StringBuilder();
 
-      string[] xKeys;
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\", false)) {
-        xKeys = xKey.GetSubKeyNames();
-      }
-      foreach (string xSubKey in xKeys) {
-        using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\" + xSubKey, false)) {
-          string xValue = (string)xKey.GetValue("ProductName");
-          xSB.AppendLine(xValue);
+        var xSubKeyNames = xKey.GetSubKeyNames();
+        foreach (string xSubKeyName in xSubKeyNames) {
+          using (var xSubKey = xKey.OpenSubKey(xSubKeyName, false)) {
+            string xValue = (string)xSubKey.GetValue("ProductName");
+            xSB.AppendLine(xValue);
+          }
         }
       }
 
