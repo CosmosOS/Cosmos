@@ -144,7 +144,7 @@ namespace Cosmos.Build.Builder {
       // HKCU instead of HKLM because builder does not run as admin.
       //
       // HKCU is not redirected.
-      using (var xKey = Registry.CurrentUser.CreateSubKey("Software\\Cosmos")) {
+      using (var xKey = Registry.CurrentUser.CreateSubKey(@"Software\Cosmos")) {
         xKey.SetValue("DevKit", mCosmosPath);
       }
     }

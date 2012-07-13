@@ -10,7 +10,6 @@ namespace Cosmos.Build.Common {
     public static readonly string Tools;
     public static readonly string Kernel;
     public static readonly string GdbClientExe;
-    public static readonly string DbgClientExe;
     //
     public static readonly string DevKit = null;
     public static readonly string DebugStubSrc;
@@ -34,12 +33,11 @@ namespace Cosmos.Build.Common {
       Tools = CheckPath(Path.Combine(UserKit, @"Build\Tools"));
       Kernel = CheckPath(Path.Combine(UserKit, @"Kernel"));
       GdbClientExe = CheckPath(Path.Combine(UserKit, @"Build\VSIP\Cosmos.Debug.GDB.exe"));
-      DbgClientExe = CheckPath(Path.Combine(UserKit, @"Build\VSIP\Cosmos.VS.Debug.exe"));
 
       using (var xReg = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos", false)) {
         if (xReg != null) {
           DevKit = (string)xReg.GetValue("DevKit");
-          DebugStubSrc = CheckPath(Path.Combine(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub\"));
+          DebugStubSrc = CheckPath(Path.Combine(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub"));
         }
       }
     }
