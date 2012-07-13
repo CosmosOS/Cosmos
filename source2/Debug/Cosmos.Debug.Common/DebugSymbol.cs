@@ -70,11 +70,7 @@ namespace Cosmos.Debug.Common
             // by changing the current dir right before the first load (create or open).
             // We set it back after.
             string xCurrDir = Directory.GetCurrentDirectory();
-            using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Cosmos", false))
-            {
-                string xCosmosDir = (string)xKey.GetValue("");
-                Directory.SetCurrentDirectory(Path.Combine(xCosmosDir, @"Build\VSIP"));
-            }
+            Directory.SetCurrentDirectory(Cosmos.Build.Common.CosmosPaths.Vsip);
 
             if (aCreate)
             {

@@ -56,11 +56,8 @@ namespace Cosmos.Build.MSBuild {
       var xSearchDirs = new List<string>();
       xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
 
-      using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false)) {
-        var xPath = (string)xReg.GetValue(null);
-        xSearchDirs.Add(xPath);
-        xSearchDirs.Add(Path.Combine(xPath, "Kernel"));
-      }
+      xSearchDirs.Add(CosmosPaths.UserKit);
+      xSearchDirs.Add(CosmosPaths.Kernel);
       mSearchDirs = xSearchDirs.ToArray();
 
       AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);

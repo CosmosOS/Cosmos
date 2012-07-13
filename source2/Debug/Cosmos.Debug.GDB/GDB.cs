@@ -179,13 +179,7 @@ namespace Cosmos.Debug.GDB {
 
 		static GDB()
 		{
-			using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos", false))
-			{
-				if(xReg == null)
-					throw new Exception("The Key \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Cosmos\" does not exist! Have you installed Cosmos Kit?");
-				var xPathToInstalled = (string)xReg.GetValue(null);
-				mGDBExePath = Path.Combine(xPathToInstalled, @"Build\Tools\gdb.exe");
-			}
+       mGDBExePath = Path.Combine(Cosmos.Build.Common.CosmosPaths.Tools, "gdb.exe");
 		}
 
 		public GDB(Action<Response> aOnResponse, Action<bool> aOnRunStateChange)

@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4">
 
   <PropertyGroup>
-    <CosmosDir Condition="$(CosmosDir) == ''">$(Registry:HKEY_LOCAL_MACHINE\Software\Cosmos)</CosmosDir>
+    <CosmosDir Condition="$(CosmosDir) == ''">$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
     <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
