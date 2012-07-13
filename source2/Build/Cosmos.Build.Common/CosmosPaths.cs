@@ -8,7 +8,6 @@ namespace Cosmos.Build.Common {
     public static readonly string Build;
     public static readonly string Vsip;
     public static readonly string Tools;
-    public static readonly string IL2CPUTask;
     public static readonly string Kernel;
     public static readonly string GdbClientExe;
     public static readonly string DbgClientExe;
@@ -33,7 +32,6 @@ namespace Cosmos.Build.Common {
       Build = CheckPath(Path.Combine(UserKit, @"Build"));
       Vsip = CheckPath(Path.Combine(UserKit, @"Build\VSIP"));
       Tools = CheckPath(Path.Combine(UserKit, @"Build\Tools"));
-      IL2CPUTask = CheckPath(Path.Combine(UserKit, @"Build\VSIP\Cosmos.Build.IL2CPUTask.exe"));
       Kernel = CheckPath(Path.Combine(UserKit, @"Kernel"));
       GdbClientExe = CheckPath(Path.Combine(UserKit, @"Build\VSIP\Cosmos.Debug.GDB.exe"));
       DbgClientExe = CheckPath(Path.Combine(UserKit, @"Build\VSIP\Cosmos.VS.Debug.exe"));
