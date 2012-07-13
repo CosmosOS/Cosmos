@@ -150,10 +150,6 @@
     <None Include="Key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Docs\Goals.html" />
-    <Content Include="Docs\index.html" />
-    <Content Include="Docs\Old.html" />
-    <Content Include="Docs\ToDo.html" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
