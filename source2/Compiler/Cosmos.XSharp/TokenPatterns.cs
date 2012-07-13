@@ -36,25 +36,29 @@ namespace Cosmos.Compiler.XSharp {
 
     public TokenPatterns() {
       mCompareOps = "< > = != <= >= 0".Split(" ".ToCharArray());
-      foreach (var xComparison in mCompareOps) {
-        if (xComparison != "0") {
-          mCompares.Add("_REG " + xComparison + " 123");
-          mCompares.Add("_REG " + xComparison + " _REG");
-          mCompares.Add("_REG " + xComparison + " _REGADDR[1]");
-          mCompares.Add("_REG " + xComparison + " _REGADDR[-1]");
-          mCompares.Add("_REG " + xComparison + " _ABC");
-          mCompares.Add("_REG " + xComparison + " #_ABC");
-          //
-          mCompares.Add("_REGADDR[1] " + xComparison + " 123");
-          mCompares.Add("_REGADDR[-1] " + xComparison + " 123");
-          mCompares.Add("_REGADDR[1] " + xComparison + " _REG");
-          mCompares.Add("_REGADDR[-1] " + xComparison + " _REG");
-          mCompares.Add("_REGADDR[1] " + xComparison + " #_ABC");
-          mCompares.Add("_REGADDR[-1] " + xComparison + " #_ABC");
-          //
-          mCompares.Add("_ABC " + xComparison + " 123");
-          mCompares.Add("_ABC " + xComparison + " _REG");
-          mCompares.Add("_ABC " + xComparison + " #_ABC");
+      var xSizes = "byte , word , dword ".Split(",".ToCharArray()).ToList();
+      xSizes.Add("");
+      foreach (var xSize in xSizes) {
+        foreach (var xComparison in mCompareOps) {
+          if (xComparison != "0") {
+            mCompares.Add(xSize + "_REG " + xComparison + " 123");
+            mCompares.Add(xSize + "_REG " + xComparison + " _REG");
+            mCompares.Add(xSize + "_REG " + xComparison + " _REGADDR[1]");
+            mCompares.Add(xSize + "_REG " + xComparison + " _REGADDR[-1]");
+            mCompares.Add(xSize + "_REG " + xComparison + " _ABC");
+            mCompares.Add(xSize + "_REG " + xComparison + " #_ABC");
+            //
+            mCompares.Add(xSize + "_REGADDR[1] " + xComparison + " 123");
+            mCompares.Add(xSize + "_REGADDR[-1] " + xComparison + " 123");
+            mCompares.Add(xSize + "_REGADDR[1] " + xComparison + " _REG");
+            mCompares.Add(xSize + "_REGADDR[-1] " + xComparison + " _REG");
+            mCompares.Add(xSize + "_REGADDR[1] " + xComparison + " #_ABC");
+            mCompares.Add(xSize + "_REGADDR[-1] " + xComparison + " #_ABC");
+            //
+            mCompares.Add(xSize + "_ABC " + xComparison + " 123");
+            mCompares.Add(xSize + "_ABC " + xComparison + " _REG");
+            mCompares.Add(xSize + "_ABC " + xComparison + " #_ABC");
+          }
         }
       }
 
@@ -86,7 +90,7 @@ namespace Cosmos.Compiler.XSharp {
       return FuncLabel("Block" + mBlockLabel + aLabel);
     }
     protected string GetLabel(Token aToken) {
-      if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("Exit")) {
+      if (aToken.Type != TokenType.AlphaNum) {
         throw new Exception("Label must be AlphaNum.");
       }
 
@@ -159,8 +163,7 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    protected string GetRef(TokenList aTokens, ref int rIdx, out bool oSizeIsKnown) {
-      oSizeIsKnown = false;
+    protected string GetRef(TokenList aTokens, ref int rIdx) {
       var xToken1 = aTokens[rIdx];
       Token xToken2 = null;
       if (rIdx + 1 < aTokens.Count) {
@@ -175,7 +178,6 @@ namespace Cosmos.Compiler.XSharp {
           rIdx += 4;
           return "[" + xToken1 + " + " + aTokens[rIdx - 2] + "]";
         }
-        oSizeIsKnown = true;
         rIdx += 1;
         return xToken1.ToString();
 
@@ -197,18 +199,20 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected string GetCompare(TokenList aTokens, ref int rStart, out Token aComparison) {
-      bool xLeftSizeKnown;
-      string xLeft = GetRef(aTokens, ref rStart, out xLeftSizeKnown);
+      string xSize = "";
+      if (aTokens[rStart].Type == TokenType.Keyword) {
+        xSize = aTokens[rStart] + " ";
+        rStart++;
+      }
+
+      string xLeft = GetRef(aTokens, ref rStart);
 
       aComparison = aTokens[rStart];
       rStart++;
 
-      bool xRightSizeKnown;
-      string xRight = GetRef(aTokens, ref rStart, out xRightSizeKnown);
-      
-      return "Cmp " 
-        + (xLeftSizeKnown || xRightSizeKnown ? "" : "dword ")
-        + xLeft + ", " + xRight;
+      string xRight = GetRef(aTokens, ref rStart);
+
+      return "Cmp " + xSize + xLeft + ", " + xRight;
     }
 
     protected string GetJump(Token aToken) {
@@ -306,7 +310,7 @@ namespace Cosmos.Compiler.XSharp {
       });
       AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
         // , 0 adds null term to our strings.
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " db \"" + aTokens[3].Value + "\", 0");
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " db \"" + aTokens[3].Value + "\"");
       });
       AddPattern(new string[] {
         "var _ABC byte[123]",

@@ -1,5 +1,41 @@
 ﻿Group DebugStub
 
+// Modifies: AL, DX (ComReadAL)
+// Returns: AL
+function ProcessCommand2 {
+    ComReadAL()
+    // Some callers expect AL to be returned, so we preserve it
+    // in case any commands modify AL.
+    // We push EAX to keep stack aligned. 
+    +EAX
+
+    // Noop has no data at all (see notes in client DebugConnector), so skip Command ID
+    // Noop also does not send ACK.
+	if AL = #Vs2Ds_Noop return
+
+    // Read Command ID
+    ComReadAL()
+    .CommandID = EAX
+
+    // Get AL back so we can compare it, but also put it back for later
+    EAX = ESP[0]
+    //CheckCmd("TraceOff", Vs2Ds.TraceOff)
+    //CheckCmd("TraceOn", Vs2Ds.TraceOn)
+    //CheckCmd("Break", Vs2Ds.Break)
+    //CheckCmd("BreakOnAddress", Vs2Ds.BreakOnAddress)
+    //CheckCmd("SendMethodContext", Vs2Ds.SendMethodContext)
+    //CheckCmd("SendMemory", Vs2Ds.SendMemory)
+    //CheckCmd("SendRegisters", Vs2Ds.SendRegisters)
+    //CheckCmd("SendFrame", Vs2Ds.SendFrame)
+    //CheckCmd("SendStack", Vs2Ds.SendStack)
+    //CheckCmd("Ping", Vs2Ds.Ping)
+
+Exit:
+    // Restore AL for callers who check the command and do
+    // further processing, or for commands not handled by this routine.
+    -EAX
+}
+
 function AckCommand {
     // We acknowledge receipt of the command AND the processing of it.
     //   -In the past the ACK only acknowledged receipt.

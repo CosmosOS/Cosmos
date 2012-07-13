@@ -51,6 +51,9 @@ namespace XSharp.Test {
     }
 
     private void MainForm_Load(object sender, EventArgs e) {
+      // For testing
+      //Test(Path.Combine(mPath, "CmdProcess.xs"));
+
       var xFiles = Directory.GetFiles(mPath, "*.xs");
       foreach (var xFile in xFiles) {
         Test(xFile);

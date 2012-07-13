@@ -111,7 +111,7 @@ Exit:
 
 // Modifies: EAX, ESI
 function SendTrace {
-	if .DebugStatus = #Status_Run goto Normal
+	if dword .DebugStatus = #Status_Run goto Normal
 
     AL = #Ds2Vs_BreakPoint
     goto Type
