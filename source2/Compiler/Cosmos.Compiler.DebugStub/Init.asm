@@ -1,6 +1,4 @@
 DebugBPs TIMES 256 dd 0
-DebugWaitMsg db "Waiting for debugger connection..."
-Null dd 0
 
 
 
@@ -19,7 +17,7 @@ DebugStub_WaitForSignature_Read:
 Call DebugStub_ComReadAL
 Mov BL, AL
 ROR EBX, 8
-Cmp EBX, DebugStub_Const_Signature
+Cmp dword EBX, DebugStub_Const_Signature
 JNE DebugStub_WaitForSignature_Read
 DebugStub_WaitForSignature_Exit:
 Ret

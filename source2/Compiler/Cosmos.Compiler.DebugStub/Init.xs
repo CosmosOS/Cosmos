@@ -2,8 +2,6 @@
 
 // Todo: Change these to a group level var
 var .DebugBPs dword[256]
-var .DebugWaitMsg = 'Waiting for debugger connection...'
-var .Null = 0
 
 // Called before Kernel runs. Inits debug stub, etc
 function Init {

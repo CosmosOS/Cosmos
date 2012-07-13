@@ -1,3 +1,4 @@
+DebugWaitMsg db "Waiting for debugger connection..."
 
 
 DebugStub_Const_VidBase equ 0xB8000

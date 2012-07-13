@@ -1,9 +1,9 @@
 ﻿Group DebugStub
 
 const VidBase = $B8000
+var .DebugWaitMsg = 'Waiting for debugger connection...'
 
 function Cls {
-	// VidBase
     ESI = #VidBase
     
 	// End of Video Area
