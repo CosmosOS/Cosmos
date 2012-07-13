@@ -336,18 +336,14 @@ namespace Cosmos.IL2CPU.X86 {
 
         // New X#
         // TODO Kill this class too after we dont need it.
-        if (false) {
-          Assembler.Code.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, typeof(TracerEntry).Assembly);
-        } else {
-          var xGen = new AsmGenerator();
-          foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs")) {
-            var xAsm = xGen.Generate(xFile);
-            foreach (var xData in xAsm.Data) {
-              Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember() { RawAsm = xData });
-            }
-            foreach (var xCode in xAsm.Code) {
-              new LiteralAssemblerCode(xCode);
-            }
+        var xGen = new AsmGenerator();
+        foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs")) {
+          var xAsm = xGen.Generate(xFile);
+          foreach (var xData in xAsm.Data) {
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember() { RawAsm = xData });
+          }
+          foreach (var xCode in xAsm.Code) {
+            new LiteralAssemblerCode(xCode);
           }
         }
       } else {

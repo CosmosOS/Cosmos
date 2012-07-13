@@ -121,7 +121,6 @@
     <Compile Include="MethodAndTypeLabelsHolder.cs" />
     <Compile Include="MethodInfoLabelGenerator.cs" />
     <Compile Include="OpCodeAttribute.cs" />
-    <Compile Include="Code.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StackContents.cs" />
     <Compile Include="TypeComparer.cs" />
