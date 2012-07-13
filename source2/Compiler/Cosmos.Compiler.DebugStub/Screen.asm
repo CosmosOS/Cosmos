@@ -6,7 +6,7 @@ DebugStub_Cls:
 Mov ESI, DebugStub_Const_VidBase
 
 DebugStub_Cls_Block1Begin:
-Cmp ESI, 0xB8FA0
+Cmp dword ESI, 0xB8FA0
 JAE DebugStub_Cls_Block1End
 Mov dword [ESI + 0], 0x00
 Inc ESI
@@ -24,9 +24,8 @@ Mov ESI, DebugWaitMsg
 Mov EDI, DebugStub_Const_VidBase
 Add EDI, 1640
 
-Mov AL, 1
 DebugStub_DisplayWaitMsg_Block2Begin:
-Cmp AL, 0
+Cmp dword [ESI + 0], 0
 JE DebugStub_DisplayWaitMsg_Block2End
 Mov AL, [ESI + 0]
 Mov [EDI + 0], AL

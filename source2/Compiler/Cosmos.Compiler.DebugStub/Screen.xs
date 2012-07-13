@@ -27,9 +27,7 @@ function DisplayWaitMsg {
     EDI + 1640
 
     // Read and copy string till 0 terminator
-	AL = 1
-    while AL != 0 {
-    //while ESI[0] != 0 {
+    while ESI[0] != 0 {
 		AL = ESI[0]
 		EDI[0] = AL
 		ESI++

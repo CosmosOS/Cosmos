@@ -159,7 +159,8 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    protected string GetRef(TokenList aTokens, ref int rIdx) {
+    protected string GetRef(TokenList aTokens, ref int rIdx, out bool oSizeIsKnown) {
+      oSizeIsKnown = false;
       var xToken1 = aTokens[rIdx];
       Token xToken2 = null;
       if (rIdx + 1 < aTokens.Count) {
@@ -174,6 +175,7 @@ namespace Cosmos.Compiler.XSharp {
           rIdx += 4;
           return "[" + xToken1 + " + " + aTokens[rIdx - 2] + "]";
         }
+        oSizeIsKnown = true;
         rIdx += 1;
         return xToken1.ToString();
 
@@ -195,18 +197,18 @@ namespace Cosmos.Compiler.XSharp {
     }
 
     protected string GetCompare(TokenList aTokens, ref int rStart, out Token aComparison) {
-      string xLeft = GetRef(aTokens, ref rStart);
-      if (aTokens[1].Type == TokenType.AlphaNum) {
-        // Hardcoded to dword for now
-        xLeft = "dword " + xLeft;
-      }
+      bool xLeftSizeKnown;
+      string xLeft = GetRef(aTokens, ref rStart, out xLeftSizeKnown);
 
       aComparison = aTokens[rStart];
       rStart++;
 
-      string xRight = GetRef(aTokens, ref rStart);
+      bool xRightSizeKnown;
+      string xRight = GetRef(aTokens, ref rStart, out xRightSizeKnown);
       
-      return "Cmp " + xLeft + ", " + xRight;
+      return "Cmp " 
+        + (xLeftSizeKnown && xRightSizeKnown ? "" : "dword ")
+        + xLeft + ", " + xRight;
     }
 
     protected string GetJump(Token aToken) {

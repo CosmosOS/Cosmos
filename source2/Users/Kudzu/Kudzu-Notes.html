@@ -11,6 +11,12 @@
                 http://blogs.vmware.com/vix/2010/05/redistibutable-vix-api-client-libraries.html</a></li>
             </ul>
         </li>
+        <li>Error 28 Error occurred while invoking NAsm. C:\Program Files 
+            (x86)\MSBuild\Cosmos\Cosmos.targets 41 6 Guess (Demos\Guess\Guess)
+            <ul>
+                <li>Change it to display the actual nasm error</li>
+            </ul>
+        </li>
         <li>Move selected project profile to .user file.</li>
         <li>.iso has a users dir in it</li>
     </ul>
@@ -39,14 +45,11 @@
     <h3>
     Kudzu</h3>
     <ul>
-                                    <li>you switched the data and text segments, right? before text was first data 
-                                        after, and now that&#39;s data-text? if so, we need to fix our &quot;EndOfKernel&quot; code.</li>
                                     <li>Stop debugging<ul>
                                         <li>EngineUtils.cs - line 74</li>
                                         </ul>
                                     </li>
                                     <li>Complete X# Port<ul>
-                                        <li>Screen.XS - //while ESI[0] != 0 {</li>
                                         <li>DebugWaitMsg db &quot;Waiting for debugger connection...&quot; = 0 at end</li>
                                         <li>use includes for compiling nasm</li>
                                         </ul>
