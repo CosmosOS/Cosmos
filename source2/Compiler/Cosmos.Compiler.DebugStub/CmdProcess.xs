@@ -14,11 +14,17 @@ function ProcessCommand2 {
 	if AL = #Vs2Ds_Noop return
 
     // Read Command ID
+	EAX = 0
     ComReadAL()
     .CommandID = EAX
 
-    // Get AL back so we can compare it, but also put it back for later
+    // Get AL back so we can compare it, but also leave it for later
     EAX = ESP[0]
+
+	if EAX = #Vs2Ds_TraceOff {
+		TraceOff()
+		return
+	}
     //CheckCmd("TraceOff", Vs2Ds.TraceOff)
     //CheckCmd("TraceOn", Vs2Ds.TraceOn)
     //CheckCmd("Break", Vs2Ds.Break)
@@ -32,10 +38,20 @@ function ProcessCommand2 {
 
 Exit:
     // Restore AL for callers who check the command and do
-    // further processing, or for commands not handled by this routine.
+    // further processing, or for commands not handled by this function.
     -EAX
 }
 
+function CheckCmd2 {
+//  AL.Compare(aCmd)
+//  string xAfterLabel = NewLabel()
+//  JumpIf(Flags.NotEqual, xAfterLabel)
+//  Call("DebugStub_" + aLabel)
+//  Call("DebugStub_AckCommand")
+//  Jump(".End")
+//  Label = xAfterLabel
+}
+	  
 function AckCommand {
     // We acknowledge receipt of the command AND the processing of it.
     //   -In the past the ACK only acknowledged receipt.

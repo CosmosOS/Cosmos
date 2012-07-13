@@ -351,11 +351,11 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("if !0 return", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "JNZ " + FuncLabel("Exit");
       });
-      foreach (var xTail in "goto _ABC|return".Split("|".ToCharArray())) {
+      foreach (var xTail in "goto _ABC|return|{".Split("|".ToCharArray())) {
         foreach (var xComparison in mCompareOps) {
           AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
             string xLabel;
-            if (string.Equals(aTokens[2].Value, "exit", StringComparison.InvariantCultureIgnoreCase)) {
+            if (string.Equals(aTokens[2].Value, "return", StringComparison.InvariantCultureIgnoreCase)) {
               xLabel = FuncLabel("Exit");
             } else {
               xLabel = GetLabel(aTokens[3]);
@@ -366,20 +366,24 @@ namespace Cosmos.Compiler.XSharp {
         foreach (var xCompare in mCompares) {
           //          0      1  2   3          4
           AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
-            int xTailIdx = aTokens[3].Value == "#" ? 5 : 4;
-
             int xIdx = 1;
             Token xComparison;
             aAsm += GetCompare(aTokens, ref xIdx, out xComparison);
 
             string xLabel;
-            if (aTokens.Last().Matches("return")) {
-              xLabel = FuncLabel("Exit");
+            var xLast = aTokens.Last();
+            if (xLast.Value == "{") {
+              StartBlock(aTokens, false);
+              aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
             } else {
-              xLabel = GetLabel(aTokens.Last());
-            }
+              if (xLast.Matches("return")) {
+                xLabel = FuncLabel("Exit");
+              } else {
+                xLabel = GetLabel(xLast);
+              }
 
-            aAsm += GetJump(xComparison) + " " + xLabel;
+              aAsm += GetJump(xComparison) + " " + xLabel;
+            } 
           });
         }
       }
@@ -500,20 +504,25 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
 
+      // End block
       AddPattern("}", delegate(TokenList aTokens, Assembler aAsm) {
         // Use mBlockStarter, not mBlock because not all blocks use mBlock to collect
         // (repeat does for example, but while does not)
         if (mBlockStarter == null) {
           EndFunc(aAsm);
         } else {
-          if (mBlockStarter[0].Matches("repeat")) {
+          var xToken1 = mBlockStarter[0];
+          if (xToken1.Matches("repeat")) {
             int xCount = int.Parse(mBlockStarter[1].Value);
             for (int i = 1; i <= xCount; i++) {
               aAsm.Code.AddRange(mBlock);
             }
 
-          } else if (mBlockStarter[0].Matches("while")) {
+          } else if (xToken1.Matches("while")) {
             aAsm += "jmp " + BlockLabel("Begin");
+            aAsm += BlockLabel("End") + ":";
+
+          } else if (xToken1.Matches("if")) {
             aAsm += BlockLabel("End") + ":";
 
           } else {
@@ -529,7 +538,7 @@ namespace Cosmos.Compiler.XSharp {
         mGroup = aTokens[1].Value;
       });
 
-      AddPattern("Exit", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("Return", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Jmp " + FuncLabel("Exit");
       });
 
@@ -543,8 +552,10 @@ namespace Cosmos.Compiler.XSharp {
         aAsm += mGroup + "_{1}:";
       });
 
-      AddPattern("Return", "Ret");
-      AddPattern("ReturnInterrupt", "IRet");
+      // This needs to be different from return.
+      // return jumps to exit, ret does raw x86 ret
+      AddPattern("Ret", "Ret");
+      AddPattern("IRet", "IRet");
 
       AddPattern("Function _ABC {", delegate(TokenList aTokens, Assembler aAsm) {
         StartFunc(aTokens[1].Value);
