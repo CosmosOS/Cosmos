@@ -40,8 +40,20 @@ namespace Cosmos.Compiler.XSharp {
         if (xComparison != "0") {
           mCompares.Add("_REG " + xComparison + " 123");
           mCompares.Add("_REG " + xComparison + " _REG");
+          mCompares.Add("_REG " + xComparison + " _REGADDR[1]");
+          mCompares.Add("_REG " + xComparison + " _REGADDR[-1]");
           mCompares.Add("_REG " + xComparison + " _ABC");
           mCompares.Add("_REG " + xComparison + " #_ABC");
+          //
+          mCompares.Add("_REGADDR[1] " + xComparison + " 123");
+          mCompares.Add("_REGADDR[-1] " + xComparison + " 123");
+          mCompares.Add("_REGADDR[1] " + xComparison + " _REG");
+          mCompares.Add("_REGADDR[-1] " + xComparison + " _REG");
+          mCompares.Add("_REGADDR[1] " + xComparison + " #_ABC");
+          mCompares.Add("_REGADDR[-1] " + xComparison + " #_ABC");
+          //
+          mCompares.Add("_ABC " + xComparison + " 123");
+          mCompares.Add("_ABC " + xComparison + " _REG");
           mCompares.Add("_ABC " + xComparison + " #_ABC");
         }
       }
@@ -147,19 +159,53 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    protected string GetCompare(TokenList aTokens, int aStart) {
-      string xLeft = aTokens[1].Value;
+    protected string GetRef(TokenList aTokens, ref int rIdx) {
+      var xToken1 = aTokens[rIdx];
+      Token xToken2 = null;
+      if (rIdx + 1 < aTokens.Count) {
+        xToken2 = aTokens[rIdx + 1];
+      }
+      if (xToken1.Type == TokenType.Register) {
+        if (xToken2 != null && xToken2.Value == "[") {
+          if (aTokens[rIdx + 2].Value == "-") {
+            rIdx += 5;
+            return "[" + xToken1 + " - " + aTokens[rIdx - 2] + "]";
+          }
+          rIdx += 4;
+          return "[" + xToken1 + " + " + aTokens[rIdx - 2] + "]";
+        }
+        rIdx += 1;
+        return xToken1.ToString();
+
+      } else if (xToken1.Type == TokenType.AlphaNum) {
+        rIdx += 1;
+        return "[" + GetLabel(xToken1) + "]";
+
+      } else if (xToken1.Type == TokenType.ValueInt) {
+        rIdx += 1;
+        return xToken1.ToString();
+
+      } else if (xToken1.Value == "#") {
+        rIdx += 2;
+        return ConstLabel(xToken2);
+
+      } else {
+        throw new Exception("Cannot determine reference");
+      }
+    }
+
+    protected string GetCompare(TokenList aTokens, ref int rStart, out Token aComparison) {
+      string xLeft = GetRef(aTokens, ref rStart);
       if (aTokens[1].Type == TokenType.AlphaNum) {
         // Hardcoded to dword for now
-        xLeft = "dword [" + GetLabel(aTokens[1]) + "]";
+        xLeft = "dword " + xLeft;
       }
 
-      string xRight = aTokens[3].Value;
-      if (aTokens[3].Type == TokenType.AlphaNum) {
-        xRight = "[" + GetLabel(aTokens[3]) + "]";
-      } else if (aTokens[3].Value == "#") {
-        xRight = ConstLabel(aTokens[4]);
-      }
+      aComparison = aTokens[rStart];
+      rStart++;
+
+      string xRight = GetRef(aTokens, ref rStart);
+      
       return "Cmp " + xLeft + ", " + xRight;
     }
 
@@ -282,8 +328,12 @@ namespace Cosmos.Compiler.XSharp {
         AddPattern("while " + xCompare + " {", delegate(TokenList aTokens, Assembler aAsm) {
           StartBlock(aTokens, false);
           aAsm += BlockLabel("Begin") + ":";
-          aAsm += GetCompare(aTokens, 1);
-          aAsm += GetJump(aTokens[2], true) + " " + BlockLabel("End");
+
+          int xIdx = 1;
+          Token xComparison;
+          aAsm += GetCompare(aTokens, ref xIdx, out xComparison);
+
+          aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
         });
       }
 
@@ -310,16 +360,19 @@ namespace Cosmos.Compiler.XSharp {
           //          0      1  2   3          4
           AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
             int xTailIdx = aTokens[3].Value == "#" ? 5 : 4;
-            aAsm += GetCompare(aTokens, 1);
+
+            int xIdx = 1;
+            Token xComparison;
+            aAsm += GetCompare(aTokens, ref xIdx, out xComparison);
 
             string xLabel;
-            if (aTokens[xTailIdx].Matches("return")) {
+            if (aTokens.Last().Matches("return")) {
               xLabel = FuncLabel("Exit");
             } else {
-              xLabel = GetLabel(aTokens[xTailIdx + 1]);
+              xLabel = GetLabel(aTokens.Last());
             }
 
-            aAsm += GetJump(aTokens[2]) + " " + xLabel;
+            aAsm += GetJump(xComparison) + " " + xLabel;
           });
         }
       }
@@ -346,56 +399,24 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG << 123", "SHL {0}, {2}");
 
       AddPattern("_REG = 123", "Mov {0}, {2}");
-      AddPattern(new string[] {
-          "_REG32[1] = 123",
-          "_REGIDX[1] = 123"
-        }, "Mov dword [{0} + {2}], {5}");
-      AddPattern(new string[] {
-          "_REG32[-1] = 123",
-          "_REGIDX[-1] = 123"
-        }, "Mov dword [{0} - {2}], {5}");
+      AddPattern("_REGADDR[1] = 123", "Mov dword [{0} + {2}], {5}");
+      AddPattern("_REGADDR[-1] = 123", "Mov dword [{0} - {2}], {5}");
 
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Mov {0}, " + ConstLabel(aTokens[3]);
       });
-      AddPattern(new string[] {
-          "_REG32[1] = 123",
-          "_REGIDX[1] = 123"
-        }, delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("_REGADDR[1] = 123", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Mov("dword", "[{0} + {2}]", ConstLabel(aTokens[5]));
       });
-      AddPattern(new string[] {
-          "_REG32[-1] = 123",
-          "_REGIDX[-1] = 123"
-        }, delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("_REGADDR[-1] = 123", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Mov("dword", "[{0} - {2}]", ConstLabel(aTokens[5]));
       });
 
       AddPattern("_REG = _REG", "Mov {0}, {2}");
-      AddPattern(new string[] {
-        "_REG32[1] = _REG", 
-        "_REGIDX[1] = _REG"},
-        //
-        "Mov [{0} + {2}], {5}"
-      );
-      AddPattern(new string[] {
-        "_REG32[-1] = _REG", 
-        "_REGIDX[-1] = _REG"},
-        //
-        "Mov [{0} - {3}], {6}"
-      );
-      AddPattern(new string[] { 
-        "_REG = _REG32[1]",
-        "_REG = _REGIDX[1]"},
-        //
-        "Mov {0}, [{2} + {4}]"
-      );
-      AddPattern(new string[] { 
-        "_REG = _REG32[-1]",
-        "_REG = _REGIDX[-1]"},
-        //
-        "Mov {0}, [{2} - {5}]"
-      );
+      AddPattern("_REGADDR[1] = _REG",  "Mov [{0} + {2}], {5}");
+      AddPattern("_REGADDR[-1] = _REG", "Mov [{0} - {3}], {6}");
+      AddPattern("_REG = _REGADDR[1]", "Mov {0}, [{2} + {4}]");
+      AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {5}]");
 
       AddPattern("_REG = _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Mov {0}, [" + GetLabel(aTokens[2]) + "]";

@@ -7,13 +7,32 @@ using System.Text;
 namespace Cosmos.Compiler.XSharp {
   public class TokenList : List<Token> {
 
+    public Token this[int aIdx] {
+      get {
+        if (aIdx < 0) {
+          aIdx = Count + aIdx;
+        }
+        return base[aIdx];
+      }
+      set {
+        if (aIdx < 0) {
+          aIdx = Count + aIdx;
+        }
+        base[aIdx] = value;
+      }
+    }
+
+    public Token Last() {
+      return base[Count - 1];
+    }
+
     public int GetPatternHashCode() {
       int xResult = 0;
       var xBytes = new byte[4];
       for (int i = 0; i < Count; i = i + 4) {
         for (int j = 0; j < 4; j++) {
           if (j < Count) {
-            xBytes[j] = (byte)this[i].Type;
+            xBytes[j] = (byte)base[i].Type;
           } else {
             xBytes[j] = 0;
           }
@@ -69,6 +88,7 @@ namespace Cosmos.Compiler.XSharp {
           } else if (RegistersMatch(xThisUpper, xThatUpper, "_REG16", Parser.Registers16)) {
           } else if (RegistersMatch(xThisUpper, xThatUpper, "_REG32", Parser.Registers32)) {
           } else if (RegistersMatch(xThisUpper, xThatUpper, "_REGIDX", Parser.RegistersIdx)) {
+          } else if (RegistersMatch(xThisUpper, xThatUpper, "_REGADDR", Parser.RegistersAddr)) {
           } else if (xThisUpper == xThatUpper) {
             // This covers _REG==_REG, _REG8==_REG8, ... and DX==DX
             // Must be last, after patterns
