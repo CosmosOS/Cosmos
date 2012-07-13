@@ -51,7 +51,12 @@
                                         </ul>
                                     </li>
                                     <li>Complete X# Port<ul>
-                                        <li>DebugWaitMsg db &quot;Waiting for debugger connection...&quot; = 0 at end</li>
+                                        <li>X# ProcessCmds.CS, ProcessCmdBatch - #TODO Make this a do while loop. Test 
+                                            elsewhere though, this method is not used currently.<ul>
+                                                <li>if eax = 4 { }</li>
+                                            </ul>
+                                        </li>
+                                        <li>Remove old X# translator</li>
                                         </ul>
                                     <ul>
                                         <li>use includes for compiling nasm</li>
@@ -62,14 +67,6 @@
                                         <li>ComWrite(AL)</li>
                                     </ul>
                                     </li>
-                                    <ul>
-                                        <li>X# ProcessCmds.CS, ProcessCmdBatch - #TODO Make this a do while loop. Test 
-                                            elsewhere though, this method is not used currently.<ul>
-                                                <li>if eax = 4 { }</li>
-                                            </ul>
-                                        </li>
-                                        <li>Remove old X# translator</li>
-                                    </ul>
                                     <li>Simplify assembler - methods and straight to text/bin. Current system is overly 
                                         complicated<ul>
                                             <li>Also skip c# step - compile straight to .asm from X#</ul>
