@@ -16,51 +16,61 @@ Mov EAX, [ESP + 0]
 Cmp EAX, DebugStub_Const_Vs2Ds_TraceOff
 JNE DebugStub_ProcessCommandNew_Block1End
 Call DebugStub_TraceOff
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block1End:
 Cmp EAX, DebugStub_Const_Vs2Ds_TraceOn
 JNE DebugStub_ProcessCommandNew_Block2End
 Call DebugStub_TraceOn
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block2End:
 Cmp EAX, DebugStub_Const_Vs2Ds_Break
 JNE DebugStub_ProcessCommandNew_Block3End
 Call DebugStub_Break
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block3End:
 Cmp EAX, DebugStub_Const_Vs2Ds_BreakOnAddress
 JNE DebugStub_ProcessCommandNew_Block4End
 Call DebugStub_BreakOnAddress
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block4End:
 Cmp EAX, DebugStub_Const_Vs2Ds_SendMethodContext
 JNE DebugStub_ProcessCommandNew_Block5End
 Call DebugStub_SendMethodContext
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block5End:
 Cmp EAX, DebugStub_Const_Vs2Ds_SendMemory
 JNE DebugStub_ProcessCommandNew_Block6End
 Call DebugStub_SendMemory
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block6End:
 Cmp EAX, DebugStub_Const_Vs2Ds_SendRegisters
 JNE DebugStub_ProcessCommandNew_Block7End
 Call DebugStub_SendRegisters
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block7End:
 Cmp EAX, DebugStub_Const_Vs2Ds_SendFrame
 JNE DebugStub_ProcessCommandNew_Block8End
 Call DebugStub_SendFrame
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block8End:
 Cmp EAX, DebugStub_Const_Vs2Ds_SendStack
 JNE DebugStub_ProcessCommandNew_Block9End
 Call DebugStub_SendStack
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block9End:
 Cmp EAX, DebugStub_Const_Vs2Ds_Ping
 JNE DebugStub_ProcessCommandNew_Block10End
 Call DebugStub_Ping
+Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommandNew_Exit
 DebugStub_ProcessCommandNew_Block10End:
 

@@ -23,42 +23,52 @@ function ProcessCommandNew {
 
 	if EAX = #Vs2Ds_TraceOff {
 		TraceOff()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_TraceOn {
 		TraceOn()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_Break {
 		Break()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_BreakOnAddress {
 		BreakOnAddress()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_SendMethodContext {
 		SendMethodContext()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_SendMemory {
 		SendMemory()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_SendRegisters {
 		SendRegisters()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_SendFrame {
 		SendFrame()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_SendStack {
 		SendStack()
+		AckCommand()
 		return
 	}
 	if EAX = #Vs2Ds_Ping {
 		Ping()
+		AckCommand()
 		return
 	}
 
