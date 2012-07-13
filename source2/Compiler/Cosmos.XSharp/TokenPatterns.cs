@@ -310,7 +310,7 @@ namespace Cosmos.Compiler.XSharp {
       });
       AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
         // , 0 adds null term to our strings.
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " db \"" + aTokens[3].Value + "\"");
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " db \"" + aTokens[3].Value + "\", 0");
       });
       AddPattern(new string[] {
         "var _ABC byte[123]",
