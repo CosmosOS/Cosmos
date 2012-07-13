@@ -1,5 +1,6 @@
 DebugBPs TIMES 256 dd 0
 DebugWaitMsg db "Waiting for debugger connection..."
+Null dd 0
 
 
 
