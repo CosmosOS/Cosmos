@@ -108,6 +108,10 @@
       <LastGenOutput>Consts.asm</LastGenOutput>
     </None>
     <None Include="Cosmos.snk" />
+    <None Include="DebugStub.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>DebugStub.asm</LastGenOutput>
+    </None>
     <None Include="Main.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Main.asm</LastGenOutput>
@@ -154,6 +158,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Consts.xs</DependentUpon>
+    </Content>
+    <Content Include="DebugStub.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DebugStub.xs</DependentUpon>
     </Content>
     <Content Include="Init.asm">
       <AutoGen>True</AutoGen>

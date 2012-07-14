@@ -79,7 +79,7 @@ namespace Cosmos.Debug.DebugStub {
       void CheckStepF10() {
         DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over);
         JumpIf(Flags.NotEqual, ".StepOverAfter");
-        
+
         EAX = CallerEBP.Value;
         EAX.Compare(BreakEBP.Value);
         // If EBP and start EBP arent equal, dont break
@@ -101,12 +101,12 @@ namespace Cosmos.Debug.DebugStub {
         // }
         //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, ".StepIntoAfter");
-        
+
         Call<Break>();
         //TODO: Allow creating labels but issuing them later, then we can call them with early binding
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump(".Normal");
-        
+
         Label = ".StepIntoAfter";
       }
 
@@ -117,10 +117,10 @@ namespace Cosmos.Debug.DebugStub {
         EAX = CallerEBP.Value;
         EAX.Compare(BreakEBP.Value); // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
         JumpIf(Flags.Equal, ".Normal");
-        
+
         CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break");
         Jump(".Normal");
-        
+
         Label = ".StepOutAfter";
       }
 
