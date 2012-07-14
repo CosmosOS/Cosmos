@@ -2,7 +2,7 @@
 
 // Modifies: AL, DX (ComReadAL)
 // Returns: AL
-function ProcessCommandNew {
+function ProcessCommand {
     ComReadAL()
     // Some callers expect AL to be returned, so we preserve it
     // in case any commands modify AL.
@@ -21,52 +21,52 @@ function ProcessCommandNew {
     // Get AL back so we can compare it, but also leave it for later
     EAX = ESP[0]
 
-	if EAX = #Vs2Ds_TraceOff {
+	if AL = #Vs2Ds_TraceOff {
 		TraceOff()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_TraceOn {
+	if AL = #Vs2Ds_TraceOn {
 		TraceOn()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_Break {
+	if AL = #Vs2Ds_Break {
 		Break()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_BreakOnAddress {
+	if AL = #Vs2Ds_BreakOnAddress {
 		BreakOnAddress()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_SendMethodContext {
+	if AL = #Vs2Ds_SendMethodContext {
 		SendMethodContext()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_SendMemory {
+	if AL = #Vs2Ds_SendMemory {
 		SendMemory()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_SendRegisters {
+	if AL = #Vs2Ds_SendRegisters {
 		SendRegisters()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_SendFrame {
+	if AL = #Vs2Ds_SendFrame {
 		SendFrame()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_SendStack {
+	if AL = #Vs2Ds_SendStack {
 		SendStack()
 		AckCommand()
 		return
 	}
-	if EAX = #Vs2Ds_Ping {
+	if AL = #Vs2Ds_Ping {
 		Ping()
 		AckCommand()
 		return
