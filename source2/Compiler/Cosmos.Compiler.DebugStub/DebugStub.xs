@@ -5,49 +5,84 @@
 //static public DataMember32 CallerEIP
 //static public DataMember32 CallerESP
 
-//// Tracing: 0=Off, 1=On
+// Tracing: 0=Off, 1=On
 //static protected DataMember32 TraceMode
-//// enum Status
+// enum Status
 //static protected DataMember32 DebugStatus
-//// Pointer to the push all data. It points to the bottom after PushAll.
-//// Walk up to find the 8 x 32 bit registers.
+// Pointer to the push all data. It points to the bottom after PushAll.
+// Walk up to find the 8 x 32 bit registers.
 //static protected DataMember32 PushAllPtr
-//// If set non 0, on next trace a break will occur
+// If set non 0, on next trace a break will occur
 //static protected DataMember32 DebugBreakOnNextTrace
-//// For step out and over this is used to determine where the initial request was made
-//// EBP is logged when the trace is started and can be used to determine 
-//// what level we are "at" relative to the original step start location.
+// For step out and over this is used to determine where the initial request was made
+// EBP is logged when the trace is started and can be used to determine 
+// what level we are "at" relative to the original step start location.
 //static protected DataMember32 BreakEBP
-//// Command ID of last command received
+// Command ID of last command received
 //static protected DataMember32 CommandID
 
-//public class BreakOnAddress : CodeBlock {
-//  // Sets a breakpoint
-//  // Serial Params:
-//  //   1: x32 - EIP to break on, or 0 to disable breakpoint.
-//  [XSharp(PreserveStack = true)]
-//  public override void Assemble() {
-//    // BP Address
-//    Call("DebugStub_ComReadEAX")
-//    ECX = EAX
+// Sets a breakpoint
+// Serial Params:
+//   1: x32 - EIP to break on, or 0 to disable breakpoint.
+function BreakOnAddress2 {
+	+All
+    // BP Address
+    ComReadEAX()
+    ECX = EAX
 
-//    // BP ID Number
-//    // BP ID Number is sent after BP Address, becuase
-//    // reading BP address uses AL (EAX).
-//    EAX = 0
-//    Call("DebugStub_ComReadAL")
+    // BP ID Number
+    // BP ID Number is sent after BP Address, becuase
+    // reading BP address uses AL (EAX).
+    EAX = 0
+    ComReadAL()
 
-//    // Calculate location in table
-//    // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
-//    EBX = AddressOf("DebugBPs")
-//    EAX = EAX << 2
-//    EBX.Add(EAX)
+    // Calculate location in table
+    // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
+    //EBX = @.DebugBPs
+    EAX << 2
+    EBX + EAX
 
-//    EBX[0] = ECX
-//  }
-//}
+    EBX[0] = ECX
+Exit:
+	-All
+}
 
-//public class Executing : CodeBlock {
+function Executing2 {
+	// This is the secondary stub routine. After the primary has decided we should do some debug
+	// activities, this one is called.
+	// Each of these checks a flag, and if it processes then it jumps to .Normal.
+    // CheckForAsmBreak must coe before CheckForBreakpoint. They could exist for the same EIP.
+//    CheckForAsmBreak()
+//    CheckForBreakpoint()
+//    // Only one of the following can be active at a time.
+//    CheckStepF11()
+//    CheckStepF10()
+//    CheckStepShiftF11()
+
+Normal:
+
+    // If tracing is on, send a trace message.
+    // Tracing isnt really used any more, was used by the old stand alone debugger. Might be upgraded
+    // and resused in the future.
+	//if .TraceMode = #Tracing_On {
+		SendTrace()
+	//}
+
+    // Is there a new incoming command? We dont want to wait for one
+    // if there isn't one already here. This is a non blocking check.
+CheckForCmd:
+//    DX = (ushort)(0x3F8 + 5u)
+    AL = Port[DX]
+    AL ?& 1
+    // If a command is waiting, process it and then check for another.
+    // If no command waiting, break from loop.
+	//if !0 {
+		ProcessCommand()
+		// See if there are more commands waiting
+		goto CheckForCmd
+	//}
+}
+
 //  void CheckForBreakpoint() {
 //    // Look for a possible matching BP
 //    // TODO: This is slow on every Int3...
@@ -128,45 +163,8 @@
 //    Label = ".AsmBreakAfter"
 //  }
 
-//  // This is the secondary stub routine. After the primary has decided we should do some debug
-//  // activities, this one is called.
-//  public override void Assemble() {
-//    // Each of these checks a flag, and if it processes then it jumps to .Normal.
-//    //
-//    // CheckForAsmBreak must coe before CheckForBreakpoint. They could exist for the same EIP.
-//    CheckForAsmBreak()
-//    CheckForBreakpoint()
-//    // Only one of the following can be active at a time.
-//    CheckStepF11()
-//    CheckStepF10()
-//    CheckStepShiftF11()
 
-//    Label = ".Normal"
-
-//    // If tracing is on, send a trace message.
-//    // Tracing isnt really used any more, was used by the old stand alone debugger. Might be upgraded
-//    // and resused in the future.
-//    TraceMode.Value.Compare(Tracing.On)
-//    CallIf(Flags.Equal, "DebugStub_SendTrace")
-
-//    // Is there a new incoming command? We dont want to wait for one
-//    // if there isn't one already here. This is a non blocking check.
-//    Label = ".CheckForCmd"
-//    DX = (ushort)(0x3F8 + 5u)
-//    AL = Port[DX]
-//    AL.Test(0x01)
-//    // If a command is waiting, process it and then check for another.
-//    // If no command waiting, break from loop.
-//    JumpIf(Flags.Zero, ".CheckForCmd_Break")
-//    Call("DebugStub_ProcessCommand")
-//    // See if there are more commands waiting
-//    Jump(".CheckForCmd")
-
-//    Label = ".CheckForCmd_Break"
-//  }
-//}
-
-//public class Break : CodeBlock {
+//function Break {
 //  // Should only be called internally by DebugStub. Has a lot of preconditions.
 //  // Externals should use BreakOnNextTrace instead.
 //  public override void Assemble() {
