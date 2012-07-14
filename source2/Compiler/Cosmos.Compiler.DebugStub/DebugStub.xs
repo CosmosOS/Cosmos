@@ -24,7 +24,7 @@
 // Sets a breakpoint
 // Serial Params:
 //   1: x32 - EIP to break on, or 0 to disable breakpoint.
-function BreakOnAddress2 {
+function BreakOnAddress {
 	+All
     // BP Address
     ComReadEAX()

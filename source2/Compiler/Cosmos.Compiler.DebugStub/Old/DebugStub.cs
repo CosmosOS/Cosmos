@@ -30,32 +30,6 @@ namespace Cosmos.Debug.DebugStub {
     // Command ID of last command received
     static protected DataMember32 CommandID;
 
-    public class BreakOnAddress : CodeBlock {
-      // Sets a breakpoint
-      // Serial Params:
-      //   1: x32 - EIP to break on, or 0 to disable breakpoint.
-      [XSharp(PreserveStack = true)]
-      public override void Assemble() {
-        // BP Address
-        Call("DebugStub_ComReadEAX");
-        ECX = EAX;
-
-        // BP ID Number
-        // BP ID Number is sent after BP Address, becuase
-        // reading BP address uses AL (EAX).
-        EAX = 0;
-        Call("DebugStub_ComReadAL");
-
-        // Calculate location in table
-        // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
-        EBX = AddressOf("DebugBPs");
-        EAX = EAX << 2;
-        EBX.Add(EAX);
-
-        EBX[0] = ECX;
-      }
-    }
-
     public class Executing : CodeBlock {
       void CheckForBreakpoint() {
         // Look for a possible matching BP

@@ -2,7 +2,7 @@
 
 
 
-DebugStub_BreakOnAddress2:
+DebugStub_BreakOnAddress:
 Pushad
 Call DebugStub_ComReadEAX
 Mov ECX, EAX
@@ -15,7 +15,7 @@ SHL EAX, 2
 Add EBX, EAX
 
 Mov [EBX + 0], ECX
-DebugStub_BreakOnAddress2_Exit:
+DebugStub_BreakOnAddress_Exit:
 Popad
 Ret
 
