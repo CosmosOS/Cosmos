@@ -23,6 +23,7 @@ namespace Cosmos.Compiler.XSharp {
       + ",BYTE"
       + ",CALL,CONST"
       + ",DWORD"
+      + ",exit"
       + ",function"
       + ",GOTO,GROUP"
       + ",IF,INTERRUPT,iret"

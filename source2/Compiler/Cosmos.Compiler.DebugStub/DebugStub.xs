@@ -37,8 +37,8 @@ function BreakOnAddress2 {
     ComReadAL()
 
     // Calculate location in table
-    // Mov [EBX + EAX * 4], ECX would be better, but our asm doesn't handle this yet
-    //EBX = @.DebugBPs
+    // Mov [EBX + EAX * 4], ECX would be better, but our X# doesn't handle this yet
+    EBX = @..DebugBPs
     EAX << 2
     EBX + EAX
 

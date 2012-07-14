@@ -10,6 +10,7 @@ Mov ECX, EAX
 Mov EAX, 0
 Call DebugStub_ComReadAL
 
+Mov EBX, DebugBPs
 SHL EAX, 2
 Add EBX, EAX
 

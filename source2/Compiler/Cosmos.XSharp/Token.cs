@@ -27,6 +27,11 @@ namespace Cosmos.Compiler.XSharp {
       return Value;
     }
 
+
+    static public implicit operator string(Token aToken) {
+      return aToken.Value;
+    }
+
     public bool Matches(string aText) {
       return string.Equals(Value, aText, StringComparison.InvariantCultureIgnoreCase);
     }

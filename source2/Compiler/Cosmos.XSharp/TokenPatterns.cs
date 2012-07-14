@@ -90,7 +90,7 @@ namespace Cosmos.Compiler.XSharp {
       return FuncLabel("Block" + mBlockLabel + aLabel);
     }
     protected string GetLabel(Token aToken) {
-      if (aToken.Type != TokenType.AlphaNum) {
+      if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("exit")) {
         throw new Exception("Label must be AlphaNum.");
       }
 
@@ -179,7 +179,7 @@ namespace Cosmos.Compiler.XSharp {
           return "[" + xToken1 + " + " + aTokens[rIdx - 2] + "]";
         }
         rIdx += 1;
-        return xToken1.ToString();
+        return xToken1;
 
       } else if (xToken1.Type == TokenType.AlphaNum) {
         rIdx += 1;
@@ -187,7 +187,7 @@ namespace Cosmos.Compiler.XSharp {
 
       } else if (xToken1.Type == TokenType.ValueInt) {
         rIdx += 1;
-        return xToken1.ToString();
+        return xToken1;
 
       } else if (xToken1.Value == "#") {
         rIdx += 2;
@@ -430,12 +430,12 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {5}]");
 
       AddPattern("_REG = _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Mov {0}, [" + GetLabel(aTokens[2]) + "]";
+        aAsm.Mov(aTokens[0], "[" + GetLabel(aTokens[2]) + "]");
       });
-      // why not [var] like registers? Because its less frequent to access th ptr
+      // why not [var] like registers? Because its less frequent to access the ptr
       // and it is like a reg.. without [] to get the value...
       AddPattern("_REG = @_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Mov {0}, " + GetLabel(aTokens[3]);
+        aAsm.Mov(aTokens[0], GetLabel(aTokens[3]));
       });
 
       AddPattern(new string[] { 
