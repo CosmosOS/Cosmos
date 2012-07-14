@@ -1,25 +1,25 @@
 ﻿Group DebugStub
 
 // Caller's Registers
-//static public DataMember32 CallerEBP
-//static public DataMember32 CallerEIP
-//static public DataMember32 CallerESP
+//var CallerEBP
+//var CallerEIP
+//var CallerESP
 
 // Tracing: 0=Off, 1=On
-//static protected DataMember32 TraceMode
+//var TraceMode
 // enum Status
-//static protected DataMember32 DebugStatus
+//var DebugStatus
 // Pointer to the push all data. It points to the bottom after PushAll.
 // Walk up to find the 8 x 32 bit registers.
-//static protected DataMember32 PushAllPtr
+//var PushAllPtr
 // If set non 0, on next trace a break will occur
-//static protected DataMember32 DebugBreakOnNextTrace
+//var DebugBreakOnNextTrace
 // For step out and over this is used to determine where the initial request was made
 // EBP is logged when the trace is started and can be used to determine 
 // what level we are "at" relative to the original step start location.
-//static protected DataMember32 BreakEBP
+//var BreakEBP
 // Command ID of last command received
-//static protected DataMember32 CommandID
+//var CommandID
 
 // Sets a breakpoint
 // Serial Params:
