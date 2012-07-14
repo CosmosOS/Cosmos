@@ -21,42 +21,15 @@ Ret
 
 DebugStub_Executing2:
 
-DebugStub_Executing2_Normal:
 
+DebugStub_Executing2_Normal:
+Cmp dword [DebugStub_TraceMode], DebugStub_Const_Tracing_On
+JNE DebugStub_Executing2_Block1End
 Call DebugStub_SendTrace
+DebugStub_Executing2_Block1End:
 
 DebugStub_Executing2_CheckForCmd:
 In AL, DX
 Test AL, 1
-Call DebugStub_ProcessCommand
-Jmp DebugStub_Executing2_CheckForCmd
-DebugStub_Executing2_Exit:
-Ret
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Line 79, Parsing error: if !0 {

@@ -17,11 +17,14 @@ namespace XSharp.Nasm {
       Mov("", aDst, aSrc);
     }
     public void Mov(string aSize, string aDst, string aSrc) {
-      string xSize = "";
-      if (aSize != "") {
-        xSize = aSize + " ";
-      }
-      Code.Add("Mov " + xSize + aDst + ", " + aSrc);
+      Code.Add("Mov " + (aSize + " ").Trim() + aDst + ", " + aSrc);
+    }
+
+    public void Cmp(string aDst, string aSrc) {
+      Cmp("", aDst, aSrc);
+    }
+    public void Cmp(string aSize, string aDst, string aSrc) {
+      Code.Add("Cmp " + (aSize + " ").Trim() + aDst + ", " + aSrc);
     }
   }
 }

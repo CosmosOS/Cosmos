@@ -35,12 +35,13 @@ namespace Cosmos.Compiler.XSharp {
     protected int mBlockLabel = 0;
 
     public TokenPatterns() {
-      mCompareOps = "< > = != <= >= 0".Split(" ".ToCharArray());
+      mCompareOps = "< > = != <= >= 0 !0".Split(" ".ToCharArray());
       var xSizes = "byte , word , dword ".Split(",".ToCharArray()).ToList();
       xSizes.Add("");
       foreach (var xSize in xSizes) {
         foreach (var xComparison in mCompareOps) {
-          if (xComparison != "0") {
+          // Skip 0 and !0
+          if (!xComparison.Contains("0")) {
             mCompares.Add(xSize + "_REG " + xComparison + " 123");
             mCompares.Add(xSize + "_REG " + xComparison + " _REG");
             mCompares.Add(xSize + "_REG " + xComparison + " _REGADDR[1]");
@@ -94,7 +95,7 @@ namespace Cosmos.Compiler.XSharp {
         throw new Exception("Label must be AlphaNum.");
       }
 
-      string xValue = aToken.Value;
+      string xValue = aToken;
       if (mFuncName == null) {
         if (xValue.StartsWith(".")) {
           return xValue.Substring(1);
@@ -198,10 +199,10 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
-    protected string GetCompare(TokenList aTokens, ref int rStart, out Token aComparison) {
+    protected void DoCompare(Assembler aAsm, TokenList aTokens, ref int rStart, out Token aComparison) {
       string xSize = "";
       if (aTokens[rStart].Type == TokenType.Keyword) {
-        xSize = aTokens[rStart] + " ";
+        xSize = aTokens[rStart];
         rStart++;
       }
 
@@ -212,56 +213,74 @@ namespace Cosmos.Compiler.XSharp {
 
       string xRight = GetRef(aTokens, ref rStart);
 
-      return "Cmp " + xSize + xLeft + ", " + xRight;
+      aAsm.Cmp(xSize, xLeft, xRight);
     }
 
-    protected string GetJump(Token aToken) {
-      return GetJump(aToken, false);
+    protected string GetJump(string aComparison) {
+      return GetJump(aComparison, false);
     }
-    protected string GetJump(Token aToken, bool aInvert) {
-      string xOp = aToken.Value;
-
+    protected string GetJump(string aComparison, bool aInvert) {
       if (aInvert) {
-        if (xOp == "<") {
-          xOp = ">=";
-        } else if (xOp == ">") {
-          xOp = "<=";
-        } else if (xOp == "=") {
-          xOp = "!=";
-        } else if (xOp == "0") {
+        if (aComparison == "<") {
+          aComparison = ">=";
+        } else if (aComparison == ">") {
+          aComparison = "<=";
+        } else if (aComparison == "=") {
+          aComparison = "!=";
+        } else if (aComparison == "0") {
           // Same as JE, but implies intent in .asm better
-          xOp = "!0";
-        } else if (xOp == "!=") {
-          xOp = "=";
-        } else if (xOp == "<=") {
-          xOp = ">";
-        } else if (xOp == ">=") {
-          xOp = "<";
+          aComparison = "!0";
+        } else if (aComparison == "!0") {
+          // Same as JE, but implies intent in .asm better
+          aComparison = "0";
+        } else if (aComparison == "!=") {
+          aComparison = "=";
+        } else if (aComparison == "<=") {
+          aComparison = ">";
+        } else if (aComparison == ">=") {
+          aComparison = "<";
         } else {
-          throw new Exception("Unrecognized symbol in conditional: " + xOp);
+          throw new Exception("Unrecognized symbol in conditional: " + aComparison);
         }
       }
 
-      if (xOp == "<") {
+      if (aComparison == "<") {
         return "JB";  // unsigned
-      } else if (xOp == ">") {
+      } else if (aComparison == ">") {
         return "JA";  // unsigned
-      } else if (xOp == "=") {
+      } else if (aComparison == "=") {
         return "JE";
-      } else if (xOp == "0") {
+      } else if (aComparison == "0") {
         // Same as JE, but implies intent in .asm better
         return "JZ";
-      } else if (xOp == "!=") {
+      } else if (aComparison == "!=") {
         return "JNE";
-      } else if (xOp == "!0") {
+      } else if (aComparison == "!0") {
         // Same as JNE, but implies intent in .asm better
         return "JNZ";
-      } else if (xOp == "<=") {
+      } else if (aComparison == "<=") {
         return "JBE"; // unsigned
-      } else if (xOp == ">=") {
+      } else if (aComparison == ">=") {
         return "JAE"; // unsigned
       } else {
-        throw new Exception("Unrecognized symbol in conditional: " + xOp);
+        throw new Exception("Unrecognized symbol in conditional: " + aComparison);
+      }
+    }
+
+    protected void HandleIf(Assembler aAsm, TokenList aTokens, string xComparison) {
+      string xLabel;
+      var xLast = aTokens.Last();
+      if (xLast.Value == "{") {
+        StartBlock(aTokens, false);
+        aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
+      } else {
+        if (xLast.Matches("return")) {
+          xLabel = FuncLabel("Exit");
+        } else {
+          xLabel = GetLabel(xLast);
+        }
+
+        aAsm += GetJump(xComparison) + " " + xLabel;
       }
     }
 
@@ -338,52 +357,35 @@ namespace Cosmos.Compiler.XSharp {
 
           int xIdx = 1;
           Token xComparison;
-          aAsm += GetCompare(aTokens, ref xIdx, out xComparison);
+          DoCompare(aAsm, aTokens, ref xIdx, out xComparison);
 
           aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
         });
       }
 
-      // Must test separate since !0 is two tokens
-      AddPattern("if !0 goto _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "JNZ " + GetLabel(aTokens[4]);
-      });
-      AddPattern("if !0 return", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "JNZ " + FuncLabel("Exit");
-      });
       foreach (var xTail in "goto _ABC|return|{".Split("|".ToCharArray())) {
+        // if 0 exit, etc
         foreach (var xComparison in mCompareOps) {
           AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
-            string xLabel;
-            if (string.Equals(aTokens[2].Value, "return", StringComparison.InvariantCultureIgnoreCase)) {
-              xLabel = FuncLabel("Exit");
-            } else {
-              xLabel = GetLabel(aTokens[3]);
+            string xOp = aTokens[1];
+            // !0 is 2 tokens
+            if (aTokens[2] == "0") {
+              xOp = "!0";
             }
-            aAsm += GetJump(aTokens[1]) + " " + xLabel;
+
+            HandleIf(aAsm, aTokens, xComparison);
           });
         }
+
+        // if reg = x exit, etc
         foreach (var xCompare in mCompares) {
           //          0      1  2   3          4
           AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
             int xIdx = 1;
             Token xComparison;
-            aAsm += GetCompare(aTokens, ref xIdx, out xComparison);
+            DoCompare(aAsm, aTokens, ref xIdx, out xComparison);
 
-            string xLabel;
-            var xLast = aTokens.Last();
-            if (xLast.Value == "{") {
-              StartBlock(aTokens, false);
-              aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
-            } else {
-              if (xLast.Matches("return")) {
-                xLabel = FuncLabel("Exit");
-              } else {
-                xLabel = GetLabel(xLast);
-              }
-
-              aAsm += GetJump(xComparison) + " " + xLabel;
-            } 
+            HandleIf(aAsm, aTokens, xComparison);
           });
         }
       }

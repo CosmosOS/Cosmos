@@ -7,43 +7,10 @@
 <body>
 
     <p>
-        Call/JumpIf(EAX == 0x04, ....)</p>
-    <p>
-        Can do reg = reg + 4 - define the + overload as a type that can then be 
-        reimplicitly converted to a register, or whatever type goes inside Memory[x]</p>
-    <p>
-        Make it so X# doesnt require the 32 and that it checks register size Memory[EBX, 
-        32] = ECX; </p>
-    <p>
-        Register.cs - public void Push() { // TODO: This emits Push dword which 
-        generates warnings about dword being ignored new Push { DestinationReg = GetId() 
-        }; } |<br />
-        AL.Push does not work at all.</p>
-    <p>
-        EAX = Memory[&quot;lable&quot;] does same as addressof.. you have to specify size... size 
-        should be infreered and never use teh value of the label</p>
-    <p>
-        Memory[EAX, 8] = 0x0A; // Does not work....</p>
-    <p>
-        <b>Routines</b></p>
-    <p>
-        Globals</p>
-    <p>
-        Locals</p>
-    <p>
-        Name referencing other routines</p>
-    <p>
-        avoid il rewriting =could really do some neat things, but would really comlicate 
-        things.</p>
-    <p>
-        CosmosAssembler.cs - 2 spots<br />
-        X# used here too:
-        Debugger.cs - public class DebuggerAsm : CodeBlock</p>
-    
-    <p>
-        Replace codeblock class with dynamic options to get method in C# 4.0?</p>
-    <p>
-        &nbsp;</p>
+        if dword .TraceMode = #Tracing_On {
+        <br />
+        Change this so dword is figured out by X# because of type declaration of 
+        TraceMode</p>
     
 </body>
 </html>

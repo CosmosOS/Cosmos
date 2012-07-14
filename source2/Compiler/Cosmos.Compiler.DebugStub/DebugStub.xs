@@ -51,7 +51,8 @@ function Executing2 {
 	// This is the secondary stub routine. After the primary has decided we should do some debug
 	// activities, this one is called.
 	// Each of these checks a flag, and if it processes then it jumps to .Normal.
-    // CheckForAsmBreak must coe before CheckForBreakpoint. They could exist for the same EIP.
+
+    // CheckForAsmBreak must come before CheckForBreakpoint. They could exist for the same EIP.
 //    CheckForAsmBreak()
 //    CheckForBreakpoint()
 //    // Only one of the following can be active at a time.
@@ -60,13 +61,12 @@ function Executing2 {
 //    CheckStepShiftF11()
 
 Normal:
-
     // If tracing is on, send a trace message.
     // Tracing isnt really used any more, was used by the old stand alone debugger. Might be upgraded
     // and resused in the future.
-	//if .TraceMode = #Tracing_On {
+	if dword .TraceMode = #Tracing_On {
 		SendTrace()
-	//}
+	}
 
     // Is there a new incoming command? We dont want to wait for one
     // if there isn't one already here. This is a non blocking check.
@@ -76,11 +76,11 @@ CheckForCmd:
     AL ?& 1
     // If a command is waiting, process it and then check for another.
     // If no command waiting, break from loop.
-	//if !0 {
+	if !0 {
 		ProcessCommand()
 		// See if there are more commands waiting
 		goto CheckForCmd
-	//}
+	}
 }
 
 //  void CheckForBreakpoint() {
