@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 // Todo: Change these to a group level var
 var .DebugBPs dword[256]

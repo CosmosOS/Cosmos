@@ -12,7 +12,7 @@
 //   -Looks good and also allows testing intead of waiting
 //   -Wont require us to disable / enable IRQs
 
-Group DebugStub
+namespace DebugStub
 
 Interrupt TracerEntry {
 	// This code is temporarily disabled as IRQs are not enabled right now.

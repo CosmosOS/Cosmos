@@ -560,7 +560,7 @@ namespace Cosmos.Compiler.XSharp {
         }
       });
 
-      AddPattern("Group _ABC", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("namespace _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         mGroup = aTokens[1].Value;
       });
 

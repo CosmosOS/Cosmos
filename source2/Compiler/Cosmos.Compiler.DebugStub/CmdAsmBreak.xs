@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 // Location where INT3 has been injected.
 // 0 if no INT3 is active.

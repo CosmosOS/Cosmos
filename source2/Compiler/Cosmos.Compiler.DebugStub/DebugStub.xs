@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 // Caller's Registers
 //var CallerEBP

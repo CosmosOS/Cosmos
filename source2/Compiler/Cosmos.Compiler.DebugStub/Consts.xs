@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 const Signature = $19740807
 

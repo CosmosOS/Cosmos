@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 const VidBase = $B8000
 var .DebugWaitMsg = 'Waiting for debugger connection...'

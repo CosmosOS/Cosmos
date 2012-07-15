@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 function Ping {
     // Ds2Vs.Pong

@@ -1,4 +1,4 @@
-﻿Group DebugStub
+﻿namespace DebugStub
 
 function SendRegisters {
 	// Send the actual started signal
