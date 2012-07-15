@@ -23,6 +23,10 @@ namespace Cosmos.Compiler.XSharp {
     protected class Blocks : List<Block> {
       protected int mCurrentLabelID = 0;
 
+      public void Reset() {
+        mCurrentLabelID = 0;
+      }
+
       public Block Current() {
         return base[Count - 1];
       }
@@ -114,7 +118,7 @@ namespace Cosmos.Compiler.XSharp {
       return mGroup + "_" + mFuncName + "_" + aLabel;
     }
     protected string BlockLabel(string aLabel) {
-      return FuncLabel("Block" + mBlocks.Current().LabelID + aLabel);
+      return FuncLabel("Block" + mBlocks.Current().LabelID + "_" + aLabel);
     }
     protected string GetLabel(Token aToken) {
       if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("exit")) {
@@ -140,6 +144,7 @@ namespace Cosmos.Compiler.XSharp {
     protected void StartFunc(string aName) {
       mFuncName = aName;
       mFuncExitFound = false;
+      mBlocks.Reset();
     }
 
     protected void EndFunc(Assembler aAsm) {

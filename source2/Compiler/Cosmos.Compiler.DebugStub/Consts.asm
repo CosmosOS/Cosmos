@@ -29,6 +29,7 @@ DebugStub_Const_Vs2Ds_SendMemory equ 10
 DebugStub_Const_Vs2Ds_SendRegisters equ 13
 DebugStub_Const_Vs2Ds_SendFrame equ 14
 DebugStub_Const_Vs2Ds_SendStack equ 15
+DebugStub_Const_Vs2Ds_SetAsmBreak equ 16
 DebugStub_Const_Vs2Ds_Ping equ 17
 DebugStub_Const_Vs2Ds_Max equ 18
 

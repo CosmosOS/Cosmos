@@ -30,6 +30,10 @@ const Vs2Ds_SendMemory = 10
 const Vs2Ds_SendRegisters = 13
 const Vs2Ds_SendFrame = 14
 const Vs2Ds_SendStack = 15
+// Set an assembly level break point
+// Only one can be active at a time. BreakOnAddress can have multiple.
+// User must call continue after.
+const Vs2Ds_SetAsmBreak = 16
 const Vs2Ds_Ping = 17 
 const Vs2Ds_Max = 18
 

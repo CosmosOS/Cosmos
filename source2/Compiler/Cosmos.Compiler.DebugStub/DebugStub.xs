@@ -21,6 +21,10 @@
 // Command ID of last command received
 //var CommandID
 
+function HackCompareAsmBreakEIP {
+	EAX ?= .AsmBreakEIP
+}
+
 // Sets a breakpoint
 // Serial Params:
 //   1: x32 - EIP to break on, or 0 to disable breakpoint.
@@ -82,13 +86,13 @@ function Executing2 {
 
     // Only one of the following can be active at a time (F10, F11, ShiftF11)
 	// Check Step F11
-    if .DebugBreakOnNextTrace = #StepTrigger_Into {
+    if dword .DebugBreakOnNextTrace = #StepTrigger_Into {
 		Break()
 		goto Normal
 	}
 	
 	// Check Step F10
-    if .DebugBreakOnNextTrace = #StepTrigger_Over {
+    if dword .DebugBreakOnNextTrace = #StepTrigger_Over {
 	    EAX = .CallerEBP
 		// If EBP and start EBP arent equal, dont break
 		// Dont use Equal because we also need to stop above if the user starts
@@ -100,7 +104,7 @@ function Executing2 {
 	}
 
 	// Check Step Shift-F11
-    if .DebugBreakOnNextTrace = #StepTrigger_Out {
+    if dword .DebugBreakOnNextTrace = #StepTrigger_Out {
 	    EAX = .CallerEBP
 		if EAX = .BreakEBP goto Normal
 		if < {
