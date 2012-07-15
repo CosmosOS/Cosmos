@@ -53,12 +53,61 @@ function Executing2 {
 	// Each of these checks a flag, and if it processes then it jumps to .Normal.
 
     // CheckForAsmBreak must come before CheckForBreakpoint. They could exist for the same EIP.
-//    CheckForAsmBreak()
-//    CheckForBreakpoint()
-//    // Only one of the following can be active at a time.
-//    CheckStepF11()
-//    CheckStepF10()
-//    CheckStepShiftF11()
+	// Check for asm break
+    EAX = .CallerEIP
+    // AsmBreakEIP is 0 when disabled, but EIP can never be 0 so we dont need a separate check.
+	if EAX = .AsmBreakEIP {
+	   ClearAsmBreak()
+       Break()
+	   goto Normal
+	}
+
+
+	// Check for breakpoint
+    // Look for a possible matching BP
+    // TODO: This is slow on every Int3...
+    //   -Find a faster way - a list of 256 straight compares and code modifation?
+    //   -Count BPs and modify ECX since we usually dont have 256 of them?
+    //   -Move this scan earlier - Have to set a global flag when anything (StepTriggers, etc below) is going on at all
+    //     A selective disable of the DS
+    //   -If there are 0 BPs, skip scan - easy and should have a good increase
+    EAX = .CallerEIP
+    EDI = @..DebugBPs
+    ECX = 256
+	! repne scasd
+	if = {
+		Break()
+		goto Normal
+	}
+
+    // Only one of the following can be active at a time (F10, F11, ShiftF11)
+	// Check Step F11
+    if .DebugBreakOnNextTrace = #StepTrigger_Into {
+		Break()
+		goto Normal
+	}
+	
+	// Check Step F10
+    if .DebugBreakOnNextTrace = #StepTrigger_Over {
+	    EAX = .CallerEBP
+		// If EBP and start EBP arent equal, dont break
+		// Dont use Equal because we also need to stop above if the user starts
+		// the step at the end of a method and next item is after a return
+		if EAX <= .BreakEBP {
+			Break()
+		}
+		goto Normal
+	}
+
+	// Check Step Shift-F11
+    if .DebugBreakOnNextTrace = #StepTrigger_Out {
+	    EAX = .CallerEBP
+		if EAX = .BreakEBP goto Normal
+		if < {
+			Break()
+		}
+		goto Normal
+	}
 
 Normal:
     // If tracing is on, send a trace message.
@@ -71,7 +120,8 @@ Normal:
     // Is there a new incoming command? We dont want to wait for one
     // if there isn't one already here. This is a non blocking check.
 CheckForCmd:
-//    DX = (ushort)(0x3F8 + 5u)
+	DX = .ComAddr
+	DX + 5
     AL = Port[DX]
     AL ?& 1
     // If a command is waiting, process it and then check for another.
@@ -83,100 +133,18 @@ CheckForCmd:
 	}
 }
 
-//  void CheckForBreakpoint() {
-//    // Look for a possible matching BP
-//    // TODO: This is slow on every Int3...
-//    //   -Find a faster way - a list of 256 straight compares and code modifation?
-//    //   -Count BPs and modify ECX since we usually dont have 256 of them?
-//    //   -Move this scan earlier - Have to set a global flag when anything (StepTriggers, etc below) is going on at all
-//    //     A selective disable of the DS
-//    //   -If there are 0 BPs, skip scan - easy and should have a good increase
-//    EAX = CallerEIP.Value
-//    EDI = AddressOf("DebugBPs")
-//    ECX = 256
-//    new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 }
-//    JumpIf(Flags.NotEqual, ".AfterBreakOnAddress")
-//    Call<Break>()
-//    Jump(".Normal")
-
-//    Label = ".AfterBreakOnAddress"
-//  }
-
-//  void CheckStepF10() {
-//    DebugBreakOnNextTrace.Value.Compare(StepTrigger.Over)
-//    JumpIf(Flags.NotEqual, ".StepOverAfter")
-        
-//    EAX = CallerEBP.Value
-//    EAX.Compare(BreakEBP.Value)
-//    // If EBP and start EBP arent equal, dont break
-//    // Dont use Equal because we also need to stop above if the user starts
-//    // the step at the end of a method and next item is after a return
-//    Call<Break>(Flags.LessThanOrEqualTo)
-//    Jump(".Normal")
-
-//    Label = ".StepOverAfter"
-//  }
-
-//  void CheckStepF11() {
-//    DebugBreakOnNextTrace.Value.Compare(StepTrigger.Into)
-//    //TODO: I think we can use a using statement to create this type of block
-//    // and emit asm
-//    // using (var xBlock = new AsmBlock()) {
-//    //   JumpIf(something, xBlock.End/Begin)
-//    //   also can do xBlock.Break()
-//    // }
-//    //TODO: If statements can probably be done with anonymous delegates...
-//    JumpIf(Flags.NotEqual, ".StepIntoAfter")
-        
-//    Call<Break>()
-//    //TODO: Allow creating labels but issuing them later, then we can call them with early binding
-//    //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
-//    Jump(".Normal")
-        
-//    Label = ".StepIntoAfter"
-//  }
-
-//  void CheckStepShiftF11() {
-//    DebugBreakOnNextTrace.Value.Compare(StepTrigger.Out)
-//    JumpIf(Flags.NotEqual, ".StepOutAfter")
-
-//    EAX = CallerEBP.Value
-//    EAX.Compare(BreakEBP.Value) // TODO: X# JumpIf(EAX == Memory[...... or better yet if(EAX==Memory..., new Delegate { Jump.... Jump should be handled specially so we dont jump around jumps... TODO: Also allow Compare(EAX, 0), in fact force this new syntax
-//    JumpIf(Flags.Equal, ".Normal")
-        
-//    CallIf(Flags.LessThanOrEqualTo, "DebugStub_Break")
-//    Jump(".Normal")
-        
-//    Label = ".StepOutAfter"
-//  }
-
-//  void CheckForAsmBreak() {
-//    EAX = CallerEIP.Value
-//    // AsmBreakEIP is 0 when disabled, but EIP can never be 0 so we dont need a separate check.
-//    Call("DebugStub_HackCompareAsmBreakEIP")
-//    JumpIf(Flags.NotEqual, ".AsmBreakAfter")
-
-//    Call("DebugStub_ClearAsmBreak")
-//    Call<Break>()
-//    Jump(".Normal")
-
-//    Label = ".AsmBreakAfter"
-//  }
-
-
-//function Break {
-//  // Should only be called internally by DebugStub. Has a lot of preconditions.
-//  // Externals should use BreakOnNextTrace instead.
-//  public override void Assemble() {
-//    // Reset request in case we are currently responding to one or we hit a fixed breakpoint
-//    // before our request could be serviced (if one existed)
+function Break2 {
+    // Should only be called internally by DebugStub. Has a lot of preconditions.
+    // Externals should use BreakOnNextTrace instead.
+    // Reset request in case we are currently responding to one or we hit a fixed breakpoint
+    // before our request could be serviced (if one existed)
 //    DebugBreakOnNextTrace.Value = StepTrigger.None
 //    BreakEBP.Value = 0
-//    // Set break status
+    // Set break status
 //    DebugStatus.Value = Status.Break
 //    Call("DebugStub_SendTrace")
 
-//    // Wait for a command
+    // Wait for a command
 //    Label = ".WaitCmd"
 //    {
 //      // Check for common commands first
@@ -230,6 +198,5 @@ CheckForCmd:
 //    Label = ".Done"
 //    Call("DebugStub_AckCommand")
 //    DebugStatus.Value = Status.Run
-//  }
-//}
+}
 

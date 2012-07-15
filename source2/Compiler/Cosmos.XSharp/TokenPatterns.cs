@@ -19,6 +19,36 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    protected Blocks mBlocks = new Blocks();
+    protected class Blocks : List<Block> {
+      protected int mCurrentLabelID = 0;
+
+      public Block Current() {
+        return base[Count - 1];
+      }
+
+      public void Start(TokenList aTokens, bool aIsCollector) {
+        var xBlock = new Block();
+        mCurrentLabelID++;
+        xBlock.LabelID = mCurrentLabelID;
+        xBlock.StartTokens = aTokens;
+        if (aIsCollector || (Count > 0 && Current().Contents != null)) {
+          xBlock.Contents = new List<string>();
+        }
+        // Last because we use Current() above
+        Add(xBlock);
+      }
+
+      public void End() {
+        RemoveAt(Count - 1);
+      }
+    }
+    protected class Block {
+      public TokenList StartTokens;
+      public List<string> Contents;
+      public int LabelID;
+    }
+
     protected string mFuncName = null;
     protected bool mFuncExitFound = false;
 
@@ -29,10 +59,6 @@ namespace Cosmos.Compiler.XSharp {
     protected bool mInIntHandler;
     protected string[] mCompareOps;
     protected List<string> mCompares = new List<string>();
-
-    protected TokenList mBlockStarter = null;
-    protected List<string> mBlock = null;
-    protected int mBlockLabel = 0;
 
     public TokenPatterns() {
       mCompareOps = "< > = != <= >= 0 !0".Split(" ".ToCharArray());
@@ -88,7 +114,7 @@ namespace Cosmos.Compiler.XSharp {
       return mGroup + "_" + mFuncName + "_" + aLabel;
     }
     protected string BlockLabel(string aLabel) {
-      return FuncLabel("Block" + mBlockLabel + aLabel);
+      return FuncLabel("Block" + mBlocks.Current().LabelID + aLabel);
     }
     protected string GetLabel(Token aToken) {
       if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("exit")) {
@@ -114,14 +140,6 @@ namespace Cosmos.Compiler.XSharp {
     protected void StartFunc(string aName) {
       mFuncName = aName;
       mFuncExitFound = false;
-    }
-
-    protected void StartBlock(TokenList aTokens, bool aIsCollector) {
-      mBlockStarter = aTokens;
-      if (aIsCollector) {
-        mBlock = new List<string>();
-      }
-      mBlockLabel++;
     }
 
     protected void EndFunc(Assembler aAsm) {
@@ -271,7 +289,7 @@ namespace Cosmos.Compiler.XSharp {
       string xLabel;
       var xLast = aTokens.Last();
       if (xLast.Value == "{") {
-        StartBlock(aTokens, false);
+        mBlocks.Start(aTokens, false);
         aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
       } else {
         if (xLast.Matches("return")) {
@@ -352,7 +370,7 @@ namespace Cosmos.Compiler.XSharp {
       foreach (var xCompare in mCompares) {
         //          0         1  2   3     4
         AddPattern("while " + xCompare + " {", delegate(TokenList aTokens, Assembler aAsm) {
-          StartBlock(aTokens, false);
+          mBlocks.Start(aTokens, false);
           aAsm += BlockLabel("Begin") + ":";
 
           int xIdx = 1;
@@ -508,16 +526,15 @@ namespace Cosmos.Compiler.XSharp {
 
       // End block
       AddPattern("}", delegate(TokenList aTokens, Assembler aAsm) {
-        // Use mBlockStarter, not mBlock because not all blocks use mBlock to collect
-        // (repeat does for example, but while does not)
-        if (mBlockStarter == null) {
+        if (mBlocks.Count == 0) {
           EndFunc(aAsm);
         } else {
-          var xToken1 = mBlockStarter[0];
+          var xBlock = mBlocks.Current();
+          var xToken1 = xBlock.StartTokens[0];
           if (xToken1.Matches("repeat")) {
-            int xCount = int.Parse(mBlockStarter[1].Value);
+            int xCount = int.Parse(xBlock.StartTokens[1]);
             for (int i = 1; i <= xCount; i++) {
-              aAsm.Code.AddRange(mBlock);
+              aAsm.Code.AddRange(xBlock.Contents);
             }
 
           } else if (xToken1.Matches("while")) {
@@ -530,9 +547,7 @@ namespace Cosmos.Compiler.XSharp {
           } else {
             throw new Exception("Unknown block starter.");
           }
-          
-          mBlockStarter = null;
-          mBlock = null;
+          mBlocks.End();
         }
       });
 
@@ -545,7 +560,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("Repeat 4 times {", delegate(TokenList aTokens, Assembler aAsm) {
-        StartBlock(aTokens, true);
+        mBlocks.Start(aTokens, true);
       });
 
       AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, Assembler aAsm) {
@@ -654,8 +669,8 @@ namespace Cosmos.Compiler.XSharp {
         xResult = GetNonPatternCode(xTokens);
       }
 
-      if (mBlock != null) {
-        mBlock.AddRange(xResult.Code);
+      if (mBlocks.Count > 0 && mBlocks.Current().Contents != null) {
+        mBlocks.Current().Contents.AddRange(xResult.Code);
         xResult.Code.Clear();
       }
       return xResult;

@@ -112,10 +112,6 @@
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>DebugStub.asm</LastGenOutput>
     </None>
-    <None Include="Main.xs">
-      <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>Main.asm</LastGenOutput>
-    </None>
     <None Include="Init.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Init.asm</LastGenOutput>
@@ -168,11 +164,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Init.xs</DependentUpon>
-    </Content>
-    <Content Include="Main.asm">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Main.xs</DependentUpon>
     </Content>
     <Content Include="Screen.asm">
       <AutoGen>True</AutoGen>

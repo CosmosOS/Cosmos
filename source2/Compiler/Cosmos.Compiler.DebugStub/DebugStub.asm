@@ -21,15 +21,19 @@ Ret
 
 DebugStub_Executing2:
 
-
-DebugStub_Executing2_Normal:
-Cmp dword [DebugStub_TraceMode], DebugStub_Const_Tracing_On
+Mov EAX, [DebugStub_CallerEIP]
+Cmp EAX, [DebugStub_AsmBreakEIP]
 JNE DebugStub_Executing2_Block1End
-Call DebugStub_SendTrace
+Call DebugStub_ClearAsmBreak
+Call DebugStub_Break
+Jmp DebugStub_Executing2_Normal
 DebugStub_Executing2_Block1End:
 
-DebugStub_Executing2_CheckForCmd:
-In AL, DX
-Test AL, 1
 
-Line 79, Parsing error: if !0 {
+Mov EAX, [DebugStub_CallerEIP]
+Mov EDI, DebugBPs
+Mov ECX, 256
+repne scasd
+
+Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
