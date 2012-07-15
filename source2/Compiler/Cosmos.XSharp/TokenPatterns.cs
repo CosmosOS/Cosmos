@@ -59,10 +59,17 @@ namespace Cosmos.Compiler.XSharp {
     public bool EmitUserComments = true;
     public delegate void CodeFunc(TokenList aTokens, Assembler aAsm);
     protected List<Pattern> mPatterns = new List<Pattern>();
-    protected string mGroup;
     protected bool mInIntHandler;
     protected string[] mCompareOps;
     protected List<string> mCompares = new List<string>();
+
+    protected string mNamespace = null;
+    protected string GetNamespace() {
+      if (mNamespace == null) {
+        throw new Exception("A namespace has not been defined.");
+      }
+      return mNamespace;
+    }
 
     public TokenPatterns() {
       mCompareOps = "< > = != <= >= 0 !0".Split(" ".ToCharArray());
@@ -112,10 +119,10 @@ namespace Cosmos.Compiler.XSharp {
       return GroupLabel("Const_" + aToken);
     }
     protected string GroupLabel(string aLabel) {
-      return mGroup + "_" + aLabel;
+      return GetNamespace() + "_" + aLabel;
     }
     protected string FuncLabel(string aLabel) {
-      return mGroup + "_" + mFuncName + "_" + aLabel;
+      return GetNamespace() + "_" + mFuncName + "_" + aLabel;
     }
     protected string BlockLabel(string aLabel) {
       return FuncLabel("Block" + mBlocks.Current().LabelID + "_" + aLabel);
@@ -149,7 +156,7 @@ namespace Cosmos.Compiler.XSharp {
 
     protected void EndFunc(Assembler aAsm) {
       if (!mFuncExitFound) {
-        aAsm += mGroup + "_" + mFuncName + "_Exit:";
+        aAsm += GetNamespace() + "_" + mFuncName + "_Exit:";
       }
       if (mInIntHandler) {
         aAsm += "IRet";
@@ -561,7 +568,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("namespace _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        mGroup = aTokens[1].Value;
+        mNamespace = aTokens[1].Value;
       });
 
       AddPattern("Return", delegate(TokenList aTokens, Assembler aAsm) {
@@ -575,7 +582,7 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, Assembler aAsm) {
         StartFunc(aTokens[1].Value);
         mInIntHandler = true;
-        aAsm += mGroup + "_{1}:";
+        aAsm += GetNamespace() + "_{1}:";
       });
 
       // This needs to be different from return.
@@ -586,7 +593,7 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("Function _ABC {", delegate(TokenList aTokens, Assembler aAsm) {
         StartFunc(aTokens[1].Value);
         mInIntHandler = false;
-        aAsm += mGroup + "_{1}:";
+        aAsm += GetNamespace() + "_{1}:";
       });
 
       AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
