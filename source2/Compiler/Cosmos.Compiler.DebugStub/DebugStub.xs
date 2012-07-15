@@ -138,65 +138,50 @@ function Break2 {
     // Externals should use BreakOnNextTrace instead.
     // Reset request in case we are currently responding to one or we hit a fixed breakpoint
     // before our request could be serviced (if one existed)
-//    DebugBreakOnNextTrace.Value = StepTrigger.None
-//    BreakEBP.Value = 0
+    .DebugBreakOnNextTrace = #StepTrigger_None
+    .BreakEBP = 0
     // Set break status
-//    DebugStatus.Value = Status.Break
-//    Call("DebugStub_SendTrace")
+    .DebugStatus = #Status_Break
+    SendTrace()
 
     // Wait for a command
-//    Label = ".WaitCmd"
-//    {
-//      // Check for common commands first
-//      Call("DebugStub_ProcessCommand")
+WaitCmd:
+    // Check for common commands first
+    ProcessCommand()
 
-//      // Now check for commands that are only valid in break state or commands that require special handling while in break state.
+    // Now check for commands that are only valid in break state or commands that require special handling while in break state.
 
-//      AL.Compare(Vs2Ds.Continue)
-//      JumpIf(Flags.Equal, ".Done")
+    if AL = #Vs2Ds_Continue goto Done
 
-//      {
-//        AL.Compare(Vs2Ds.SetAsmBreak)
-//        JumpIf(Flags.NotEqual, ".SetAsmBreak_After")
-//        Call("DebugStub_SetAsmBreak")
-//        Jump(".WaitCmd")
-//        Label = ".SetAsmBreak_After"
-//      }
+    if AL = #Vs2Ds_SetAsmBreak {
+        SetAsmBreak()
+	    goto WaitCmd
+	}
 
-//      {
-//        AL.Compare(Vs2Ds.StepInto)
-//        JumpIf(Flags.NotEqual, ".StepInto_After")
-//        DebugBreakOnNextTrace.Value = StepTrigger.Into
-//        Jump(".Done")
-//        Label = ".StepInto_After"
-//      }
+    if AL = #Vs2Ds_StepInto {
+        .DebugBreakOnNextTrace = #StepTrigger_Into
+	    goto Done
+	}
 
-//      {
-//        AL.Compare(Vs2Ds.StepOver)
-//        JumpIf(Flags.NotEqual, ".StepOver_After")
-//        DebugBreakOnNextTrace.Value = StepTrigger.Over
-//        EAX = CallerEBP.Value
-//        BreakEBP.Value = EAX
-//        Jump(".Done")
-//        Label = ".StepOver_After"
-//      }
+    if AL = #Vs2Ds_StepOver {
+        .DebugBreakOnNextTrace = #StepTrigger_Over
+        EAX = .CallerEBP
+        .BreakEBP = EAX
+	    goto Done
+	}
 
-//      {
-//        AL.Compare(Vs2Ds.StepOut)
-//        JumpIf(Flags.NotEqual, ".StepOut_After")
-//        DebugBreakOnNextTrace.Value = StepTrigger.Out
-//        EAX = CallerEBP.Value
-//        BreakEBP.Value = EAX
-//        Jump(".Done")
-//        Label = ".StepOut_After"
-//      }
+    if AL = #Vs2Ds_StepOut {
+        .DebugBreakOnNextTrace = #StepTrigger_Out
+        EAX = .CallerEBP
+        .BreakEBP = EAX
+	    goto Done
+	}
 
-//      // Loop around and wait for another command
-//      Jump(".WaitCmd")
-//    }
+    // Loop around and wait for another command
+    goto WaitCmd
 
-//    Label = ".Done"
-//    Call("DebugStub_AckCommand")
-//    DebugStatus.Value = Status.Run
+Done:
+    AckCommand()
+    .DebugStatus = #Status_Run
 }
 

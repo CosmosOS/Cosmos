@@ -499,10 +499,14 @@ namespace Cosmos.Compiler.XSharp {
 
       AddPattern("_ABC = _REG",
         delegate(TokenList aTokens, Assembler aAsm) {
-          aAsm += "Mov [" + GetLabel(aTokens[0]) + "], {2}";
+          aAsm.Mov("[" + GetLabel(aTokens[0]) + "]", aTokens[2]);
+        });
+      AddPattern("_ABC = #_ABC",
+        delegate(TokenList aTokens, Assembler aAsm) {
+          aAsm.Mov("dword", "[" + GetLabel(aTokens[0]) + "]", ConstLabel(aTokens[3]));
         });
       AddPattern("_ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Mov dword [" + GetLabel(aTokens[0]) + "], {2}";
+        aAsm.Mov("dword", "[" + GetLabel(aTokens[0]) + "]", aTokens[2]);
       });
       AddPattern(new string[] {
         "_ABC = 123 as byte",
