@@ -265,7 +265,8 @@ namespace Cosmos.Build.Builder {
 
         // Must check for start before stop, else on slow machines we exit quickly because Exit is found before
         // it starts.
-        int xSeconds = 5;
+        // Some slow user PCs take around 5 seconds to start up the task...
+        int xSeconds = 10;
         Echo("Waiting " + xSeconds + " seconds for Setup to start.");
         if (WaitForStart("CosmosUserKit-" + mReleaseNo, xSeconds * 1000)) {
           throw new Exception("Setup did not start.");
