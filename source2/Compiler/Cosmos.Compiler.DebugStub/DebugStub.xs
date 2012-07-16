@@ -21,10 +21,6 @@ var BreakEBP
 // Command ID of last command received
 var CommandID
 
-function HackCompareAsmBreakEIP {
-	EAX ?= .AsmBreakEIP
-}
-
 // Sets a breakpoint
 // Serial Params:
 //   1: x32 - EIP to break on, or 0 to disable breakpoint.

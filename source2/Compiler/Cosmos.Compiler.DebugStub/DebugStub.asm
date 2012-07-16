@@ -11,11 +11,6 @@ DebugStub_CommandID dd 0
 
 
 
-DebugStub_HackCompareAsmBreakEIP:
-Cmp EAX, DebugStub_AsmBreakEIP
-DebugStub_HackCompareAsmBreakEIP_Exit:
-Ret
-
 DebugStub_BreakOnAddress:
 Pushad
 Call DebugStub_ComReadEAX
