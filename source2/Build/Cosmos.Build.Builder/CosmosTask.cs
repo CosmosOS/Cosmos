@@ -22,7 +22,11 @@ namespace Cosmos.Build.Builder {
 
     protected override void DoRun() {
       mOutputPath = Path.Combine(mCosmosPath, @"Build\VSIP");
-      if (!Directory.Exists(mOutputPath)) {
+      if (Directory.Exists(mOutputPath)) {
+        // Make sure no files are left, else things can be not be rebuilt and when adding
+        // new items this can cause issues.
+        Directory.Delete(mOutputPath, true);
+      } else {
         Directory.CreateDirectory(mOutputPath);
       }
 
