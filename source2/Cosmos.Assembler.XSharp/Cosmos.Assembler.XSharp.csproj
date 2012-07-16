@@ -69,7 +69,6 @@
     <Compile Include="Address.cs" />
     <Compile Include="AddressDirect.cs" />
     <Compile Include="AddressIndirect.cs" />
-    <Compile Include="CodeGroup.cs" />
     <Compile Include="DataMemberBase.cs" />
     <Compile Include="DataMember32.cs" />
     <Compile Include="Memory.cs" />
