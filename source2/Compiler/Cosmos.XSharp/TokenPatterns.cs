@@ -399,11 +399,11 @@ namespace Cosmos.Compiler.XSharp {
           AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
             string xOp = aTokens[1];
             // !0 is 2 tokens
-            if (aTokens[2] == "0") {
+            if (aTokens[1] + aTokens[2] == "!0") {
               xOp = "!0";
             }
 
-            HandleIf(aAsm, aTokens, xComparison);
+            HandleIf(aAsm, aTokens, xOp);
           });
         }
 
