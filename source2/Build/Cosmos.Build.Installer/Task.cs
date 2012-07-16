@@ -43,12 +43,12 @@ namespace Cosmos.Build.Installer {
     }
     public bool WaitForState(string aName, int? aMilliSec, bool aIsRunning) {
       while (IsRunning(aName) != aIsRunning) {
-        if (aMilliSec.HasValue && aMilliSec <= 0) {
-          return true;
-        }
         Thread.Sleep(200);
         if (aMilliSec.HasValue) {
           aMilliSec = aMilliSec - 200;
+          if (aMilliSec <= 0) {
+            return true;
+          }
         }
       }
       return false;
