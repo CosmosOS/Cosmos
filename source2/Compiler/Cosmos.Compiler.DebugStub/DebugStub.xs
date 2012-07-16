@@ -5,7 +5,7 @@
 //var CallerEIP
 //var CallerESP
 
-// Tracing: 0=Off, 1=On
+// Tracing: 0=Off, 1=On 
 //var TraceMode
 // enum Status
 //var DebugStatus

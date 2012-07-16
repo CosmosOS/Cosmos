@@ -15,11 +15,11 @@ function Init {
 
 function WaitForSignature {
     EBX = 0
-Read:
-    ComReadAL()
-    BL = AL
-    EBX ~> 8
-    if EBX != #Signature goto Read
+	while EBX != #Signature {
+		ComReadAL()
+		BL = AL
+		EBX ~> 8
+	}
 }
 
 // QEMU (and possibly others) send some garbage across the serial line first.
