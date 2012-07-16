@@ -9,33 +9,22 @@
     <h3>
     Kudzu</h3>
     <ul>
-                                    <li>Stop debugging<ul>
-                                        <li>EngineUtils.cs - line 74</li>
-                                        </ul>
-                                    </li>
-                                    <li>Complete X# Port<ul>
-                                        <li>Remove old X# CodeGroup</li>
-                                        <li>Remove old X# translator</li>
-                                        </ul>
-                                    <ul>
+                                    <li>Asm stepping</li>
+                                    <li>ATA / FAT</li>
+                                    <li>X#<ul>
                                         <li>use includes for compiling nasm</li>
-                                    </ul>
-                                    <ul>
-                                        <li>PreserveRegisters</li>
-                                        <li>AL = ComRead8()</li>
-                                        <li>ComWrite(AL)</li>
-                                    </ul>
+                                        </ul>
+                                        <ul>
+                                            <li>AL = ComRead8()</li>
+                                            <li>ComWrite(AL)</li>
+                                            <li>Code completion</li>
+                                        </ul>
                                     </li>
                                     <li>Plugs<ul>
                                         <li>Allow plug attrib to specify asm name and link to X# directly.</ul>
-                                    <li>Simplify assembler - methods and straight to text/bin. Current system is overly 
-                                        complicated<ul>
-                                            <li>Also skip c# step - compile straight to .asm from X#</ul>
-                                    <li>return errors 
-        when comport cant open<li>OutputDebug Catcher with filters, categories, timestamps<li>X#  
-                            Code Completion<li>Asm stepping<ul>
-                                        <li>Historical panels</li>
-                                        </ul>
+                                    <li>OutputDebug Catcher with filters, categories, timestamps<li>Asm stepping<ul>
+                                    <li>Historical panels</li>
+                                    </ul>
                                     </li>
                                     <li>Convert cxdb to sql compact and edm<ul>
                                         <li><a href="http://www.microsoft.com/download/en/details.aspx?id=17876">http://www.microsoft.com/download/en/details.aspx?id=17876</a></li>
@@ -58,7 +47,6 @@
                                         <li>of other classes besides this</li>
                                         </ul>
                                     </li>
-                                    <li>ATA / FAT</li>
                                     <li>ring restrictions on console etc.. by class, or explict inclusion</li>
                                     <li>PIT/RTC<ul>
                                         <li>And sleep, needed for ATA</li>
