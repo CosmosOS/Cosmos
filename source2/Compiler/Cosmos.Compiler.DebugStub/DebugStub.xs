@@ -51,7 +51,7 @@ Exit:
 	-All
 }
 
-function Executing2 {
+function Executing {
 	// This is the secondary stub routine. After the primary has decided we should do some debug
 	// activities, this one is called.
 	// Each of these checks a flag, and if it processes then it jumps to .Normal.
