@@ -39,7 +39,7 @@ Mov EAX, [DebugStub_CallerEIP]
 Mov EDI, DebugBPs
 Mov ECX, 256
 repne scasd
-JZ DebugStub_Executing2_Block2_End
+JNE DebugStub_Executing2_Block2_End
 Call DebugStub_Break
 Jmp DebugStub_Executing2_Normal
 DebugStub_Executing2_Block2_End:
@@ -65,7 +65,7 @@ JNE DebugStub_Executing2_Block6_End
 Mov EAX, [DebugStub_CallerEBP]
 Cmp EAX, [DebugStub_BreakEBP]
 JE DebugStub_Executing2_Normal
-JZ DebugStub_Executing2_Block7_End
+JAE DebugStub_Executing2_Block7_End
 Call DebugStub_Break
 DebugStub_Executing2_Block7_End:
 Jmp DebugStub_Executing2_Normal
@@ -89,53 +89,53 @@ DebugStub_Executing2_Block9_End:
 DebugStub_Executing2_Exit:
 Ret
 
-DebugStub_Break2:
+DebugStub_Break:
 Mov dword[DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_None
 Mov dword[DebugStub_BreakEBP], 0
 Mov dword[DebugStub_DebugStatus], DebugStub_Const_Status_Break
 Call DebugStub_SendTrace
 
-DebugStub_Break2_WaitCmd:
+DebugStub_Break_WaitCmd:
 Call DebugStub_ProcessCommand
 
 
 Cmp AL, DebugStub_Const_Vs2Ds_Continue
-JE DebugStub_Break2_Done
+JE DebugStub_Break_Done
 
 Cmp AL, DebugStub_Const_Vs2Ds_SetAsmBreak
-JNE DebugStub_Break2_Block1_End
+JNE DebugStub_Break_Block1_End
 Call DebugStub_SetAsmBreak
-Jmp DebugStub_Break2_WaitCmd
-DebugStub_Break2_Block1_End:
+Jmp DebugStub_Break_WaitCmd
+DebugStub_Break_Block1_End:
 
 Cmp AL, DebugStub_Const_Vs2Ds_StepInto
-JNE DebugStub_Break2_Block2_End
+JNE DebugStub_Break_Block2_End
 Mov dword[DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Into
-Jmp DebugStub_Break2_Done
-DebugStub_Break2_Block2_End:
+Jmp DebugStub_Break_Done
+DebugStub_Break_Block2_End:
 
 Cmp AL, DebugStub_Const_Vs2Ds_StepOver
-JNE DebugStub_Break2_Block3_End
+JNE DebugStub_Break_Block3_End
 Mov dword[DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Over
 Mov EAX, [DebugStub_CallerEBP]
 Mov [DebugStub_BreakEBP], EAX
-Jmp DebugStub_Break2_Done
-DebugStub_Break2_Block3_End:
+Jmp DebugStub_Break_Done
+DebugStub_Break_Block3_End:
 
 Cmp AL, DebugStub_Const_Vs2Ds_StepOut
-JNE DebugStub_Break2_Block4_End
+JNE DebugStub_Break_Block4_End
 Mov dword[DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Out
 Mov EAX, [DebugStub_CallerEBP]
 Mov [DebugStub_BreakEBP], EAX
-Jmp DebugStub_Break2_Done
-DebugStub_Break2_Block4_End:
+Jmp DebugStub_Break_Done
+DebugStub_Break_Block4_End:
 
-Jmp DebugStub_Break2_WaitCmd
+Jmp DebugStub_Break_WaitCmd
 
-DebugStub_Break2_Done:
+DebugStub_Break_Done:
 Call DebugStub_AckCommand
 Mov dword[DebugStub_DebugStatus], DebugStub_Const_Status_Run
-DebugStub_Break2_Exit:
+DebugStub_Break_Exit:
 Ret
 
 

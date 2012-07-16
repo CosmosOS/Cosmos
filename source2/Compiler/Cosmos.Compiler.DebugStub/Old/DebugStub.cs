@@ -44,7 +44,7 @@ namespace Cosmos.Debug.DebugStub {
         ECX = 256;
         new Scas { Prefixes = InstructionPrefixes.RepeatTillEqual, Size = 32 };
         JumpIf(Flags.NotEqual, ".AfterBreakOnAddress");
-        Call<Break>();
+        Call("DebugStub_Break");
         Jump(".Normal");
 
         Label = ".AfterBreakOnAddress";
@@ -59,7 +59,7 @@ namespace Cosmos.Debug.DebugStub {
         // If EBP and start EBP arent equal, dont break
         // Dont use Equal because we also need to stop above if the user starts
         // the step at the end of a method and next item is after a return
-        Call<Break>(Flags.LessThanOrEqualTo);
+        Call("DebugStub_Break");
         Jump(".Normal");
 
         Label = ".StepOverAfter";
@@ -76,7 +76,7 @@ namespace Cosmos.Debug.DebugStub {
         //TODO: If statements can probably be done with anonymous delegates...
         JumpIf(Flags.NotEqual, ".StepIntoAfter");
 
-        Call<Break>();
+        Call("DebugStub_Break");
         //TODO: Allow creating labels but issuing them later, then we can call them with early binding
         //TODO: End - can be exit label for each method, allowing Jump(Begin/End) etc... Also make a label type and allwo Jump overload to the label itself. Or better yet, End.Jump()
         Jump(".Normal");
@@ -105,7 +105,7 @@ namespace Cosmos.Debug.DebugStub {
         JumpIf(Flags.NotEqual, ".AsmBreakAfter");
 
         Call("DebugStub_ClearAsmBreak");
-        Call<Break>();
+        Call("DebugStub_Break");
         Jump(".Normal");
 
         Label = ".AsmBreakAfter";
@@ -149,73 +149,5 @@ namespace Cosmos.Debug.DebugStub {
       }
     }
 
-    public class Break : CodeBlock {
-      // Should only be called internally by DebugStub. Has a lot of preconditions.
-      // Externals should use BreakOnNextTrace instead.
-      public override void Assemble() {
-        // Reset request in case we are currently responding to one or we hit a fixed breakpoint
-        // before our request could be serviced (if one existed)
-        DebugBreakOnNextTrace.Value = StepTrigger.None;
-        BreakEBP.Value = 0;
-        // Set break status
-        DebugStatus.Value = Status.Break;
-        Call("DebugStub_SendTrace");
-
-        // Wait for a command
-        Label = ".WaitCmd";
-        {
-          // Check for common commands first
-          Call("DebugStub_ProcessCommand");
-
-          // Now check for commands that are only valid in break state or commands that require special handling while in break state.
-
-          AL.Compare(Vs2Ds.Continue);
-          JumpIf(Flags.Equal, ".Done");
-
-          {
-            AL.Compare(Vs2Ds.SetAsmBreak);
-            JumpIf(Flags.NotEqual, ".SetAsmBreak_After");
-            Call("DebugStub_SetAsmBreak");
-            Jump(".WaitCmd");
-            Label = ".SetAsmBreak_After";
-          }
-
-          {
-            AL.Compare(Vs2Ds.StepInto);
-            JumpIf(Flags.NotEqual, ".StepInto_After");
-            DebugBreakOnNextTrace.Value = StepTrigger.Into;
-            Jump(".Done");
-            Label = ".StepInto_After";
-          }
-
-          {
-            AL.Compare(Vs2Ds.StepOver);
-            JumpIf(Flags.NotEqual, ".StepOver_After");
-            DebugBreakOnNextTrace.Value = StepTrigger.Over;
-            EAX = CallerEBP.Value;
-            BreakEBP.Value = EAX;
-            Jump(".Done");
-            Label = ".StepOver_After";
-          }
-
-          {
-            AL.Compare(Vs2Ds.StepOut);
-            JumpIf(Flags.NotEqual, ".StepOut_After");
-            DebugBreakOnNextTrace.Value = StepTrigger.Out;
-            EAX = CallerEBP.Value;
-            BreakEBP.Value = EAX;
-            Jump(".Done");
-            Label = ".StepOut_After";
-          }
-
-          // Loop around and wait for another command
-          Jump(".WaitCmd");
-        }
-
-        Label = ".Done";
-        Call("DebugStub_AckCommand");
-        DebugStatus.Value = Status.Run;
-      }
-    }
   }
 }

@@ -137,7 +137,7 @@ CheckForCmd:
 	}
 }
 
-function Break2 {
+function Break {
     // Should only be called internally by DebugStub. Has a lot of preconditions.
     // Externals should use BreakOnNextTrace instead.
     // Reset request in case we are currently responding to one or we hit a fixed breakpoint
