@@ -267,11 +267,12 @@ namespace Cosmos.Build.Builder {
         // it starts.
         // Some slow user PCs take around 5 seconds to start up the task...
         int xSeconds = 10;
+        var xTimed = DateTime.Now;
         Echo("Waiting " + xSeconds + " seconds for Setup to start.");
         if (WaitForStart("CosmosUserKit-" + mReleaseNo, xSeconds * 1000)) {
           throw new Exception("Setup did not start.");
         }
-        Echo("Setup is running.");
+        Echo("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
 
         // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
         Echo("Waiting for Setup to complete.");
