@@ -52,36 +52,36 @@ namespace Cosmos.Debug.VSDebugEngine {
     public string mProjectFile;
 
     protected void DbgCmdRegisters(byte[] aData) {
-      mDebugDownPipe.SendCommand(VsipUi.Registers, aData);
+      mDebugDownPipe.SendCommand(Debugger2Windows.Registers, aData);
     }
 
     protected void DbgCmdFrame(byte[] aData) {
-      mDebugDownPipe.SendCommand(VsipUi.Frame, aData);
+      mDebugDownPipe.SendCommand(Debugger2Windows.Frame, aData);
     }
 
     protected void DbgCmdPong(byte[] aData) {
-      mDebugDownPipe.SendCommand(VsipUi.PongDebugStub, aData);
+      mDebugDownPipe.SendCommand(Debugger2Windows.PongDebugStub, aData);
     }
 
     protected void DbgCmdStack(byte[] aData) {
-      mDebugDownPipe.SendCommand(VsipUi.Stack, aData);
+      mDebugDownPipe.SendCommand(Debugger2Windows.Stack, aData);
     }
 
     void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData) {
       switch (aCmd) {
-        case UiVsip.Noop:
+        case Windows2Debugger.Noop:
           // do nothing
           break;
 
-        case UiVsip.PingVSIP:
-          mDebugDownPipe.SendCommand(VsipUi.PongVSIP);
+        case Windows2Debugger.PingVSIP:
+          mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
           break;
 
-        case UiVsip.PingDebugStub:
+        case Windows2Debugger.PingDebugStub:
           mDbgConnector.Ping();
           break;
 
-        case UiVsip.SetAsmBreak:
+        case Windows2Debugger.SetAsmBreak:
           string xLabel = Encoding.UTF8.GetString(aData);
           uint xAddress = mLabelAddressMappings[xLabel];
           mDbgConnector.SetAsmBreakpoint(xAddress);
@@ -488,16 +488,16 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Insert it to the first line of our data stream
       xCode.Insert(0, xCurrentLabels[xCurrentLabels.Length - 1] + "\r\n");                      
 
-      mDebugDownPipe.SendCommand(VsipUi.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
+      mDebugDownPipe.SendCommand(Debugger2Windows.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }
 
     //TODO: At some point this will probably need to be exposed for access outside of AD7Process
     protected void OutputText(string aText) {
-      mDebugDownPipe.SendCommand(VsipUi.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
+      mDebugDownPipe.SendCommand(Debugger2Windows.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
     }
 
     protected void OutputClear() {
-      mDebugDownPipe.SendCommand(VsipUi.OutputClear);
+      mDebugDownPipe.SendCommand(Debugger2Windows.OutputClear);
     }
 
   }

@@ -67,7 +67,7 @@ namespace Cosmos.VS.Windows {
       if (xCodeLines.Length > 1) {
         var xCodeLine = xCodeLines[1];
         if (xCodeLine.AsmLabel != null) {
-          Global.PipeUp.SendCommand(Cosmos.Debug.Consts.UiVsip.SetAsmBreak, xCodeLine.AsmLabel.Label);
+          Global.PipeUp.SendCommand(Cosmos.Debug.Consts.Windows2Debugger.SetAsmBreak, xCodeLine.AsmLabel.Label);
         }
       }
     }

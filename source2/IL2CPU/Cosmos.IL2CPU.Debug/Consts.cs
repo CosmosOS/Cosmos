@@ -79,7 +79,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Commands from VS Debug Engine to VS Debug Window
-  static public class VsipUi {
+  static public class Debugger2Windows {
     public const byte Noop = 0;
     public const byte Registers = 1;
     public const byte AssemblySource = 3;
@@ -93,7 +93,7 @@ namespace Cosmos.Debug.Consts {
   }
 
   // Commands from VS Debug Window to VS Debug Engine
-  static public class UiVsip {
+  static public class Windows2Debugger {
     public const byte Noop = 0;
     public const byte PingVSIP = 1;
     public const byte PingDebugStub = 2;
