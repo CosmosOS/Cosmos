@@ -8,7 +8,6 @@ using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Cosmos.Assembler.XSharp;
 using XSharp.Nasm;
 using Cosmos.Compiler.XSharp;
 
