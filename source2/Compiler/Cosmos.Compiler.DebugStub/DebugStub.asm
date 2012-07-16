@@ -24,7 +24,7 @@ Mov ECX, EAX
 Mov EAX, 0
 Call DebugStub_ComReadAL
 
-Mov EBX, DebugBPs
+Mov EBX, DebugStub_DebugBPs
 SHL EAX, 2
 Add EBX, EAX
 
@@ -45,7 +45,7 @@ DebugStub_Executing_Block1_End:
 
 
 Mov EAX, [DebugStub_CallerEIP]
-Mov EDI, DebugBPs
+Mov EDI, DebugStub_DebugBPs
 Mov ECX, 256
 repne scasd
 JNE DebugStub_Executing_Block2_End

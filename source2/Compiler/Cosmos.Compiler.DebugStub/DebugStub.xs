@@ -42,7 +42,7 @@ function BreakOnAddress {
 
     // Calculate location in table
     // Mov [EBX + EAX * 4], ECX would be better, but our X# doesn't handle this yet
-    EBX = @..DebugBPs
+    EBX = @.DebugBPs
     EAX << 2
     EBX + EAX
 
@@ -76,7 +76,7 @@ function Executing {
     //     A selective disable of the DS
     //   -If there are 0 BPs, skip scan - easy and should have a good increase
     EAX = .CallerEIP
-    EDI = @..DebugBPs
+    EDI = @.DebugBPs
     ECX = 256
 	! repne scasd
 	if = {

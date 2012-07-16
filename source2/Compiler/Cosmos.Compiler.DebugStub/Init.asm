@@ -1,4 +1,4 @@
-DebugBPs TIMES 256 dd 0
+DebugStub_DebugBPs TIMES 256 dd 0
 
 
 
