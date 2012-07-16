@@ -267,7 +267,7 @@ namespace Cosmos.Build.Builder {
         // it starts.
         int xSeconds = 5;
         Echo("Waiting " + xSeconds + " seconds for Setup to start.");
-        if (WaitForStart("devenv", xSeconds * 1000)) {
+        if (WaitForStart("CosmosUserKit-" + mReleaseNo, xSeconds * 1000)) {
           throw new Exception("Setup did not start.");
         }
         Echo("Setup is running.");
