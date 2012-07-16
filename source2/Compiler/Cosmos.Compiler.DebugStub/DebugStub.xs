@@ -1,25 +1,25 @@
 ﻿namespace DebugStub
 
 // Caller's Registers
-//var CallerEBP
-//var CallerEIP
-//var CallerESP
+var CallerEBP
+var CallerEIP
+var CallerESP
 
 // Tracing: 0=Off, 1=On 
-//var TraceMode
+var TraceMode
 // enum Status
-//var DebugStatus
+var DebugStatus
 // Pointer to the push all data. It points to the bottom after PushAll.
 // Walk up to find the 8 x 32 bit registers.
-//var PushAllPtr
+var PushAllPtr
 // If set non 0, on next trace a break will occur
-//var DebugBreakOnNextTrace
+var DebugBreakOnNextTrace
 // For step out and over this is used to determine where the initial request was made
 // EBP is logged when the trace is started and can be used to determine 
 // what level we are "at" relative to the original step start location.
-//var BreakEBP
+var BreakEBP
 // Command ID of last command received
-//var CommandID
+var CommandID
 
 function HackCompareAsmBreakEIP {
 	EAX ?= .AsmBreakEIP

@@ -1,3 +1,12 @@
+DebugStub_CallerEBP dd 0
+DebugStub_CallerEIP dd 0
+DebugStub_CallerESP dd 0
+DebugStub_TraceMode dd 0
+DebugStub_DebugStatus dd 0
+DebugStub_PushAllPtr dd 0
+DebugStub_DebugBreakOnNextTrace dd 0
+DebugStub_BreakEBP dd 0
+DebugStub_CommandID dd 0
 
 
 

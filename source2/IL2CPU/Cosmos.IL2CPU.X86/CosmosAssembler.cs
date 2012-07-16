@@ -8,7 +8,6 @@ using System.Reflection;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Cosmos.Debug.DebugStub;
 using Cosmos.Assembler.XSharp;
 using XSharp.Nasm;
 using Cosmos.Compiler.XSharp;
@@ -330,12 +329,6 @@ namespace Cosmos.IL2CPU.X86 {
       new Jump { DestinationLabel = ".loop" };
 
       if (mComNumber > 0) {
-        // Compile old X#
-        var xStub = new DebugStub();
-        xStub.Assemble();
-
-        // New X#
-        // TODO Kill this class too after we dont need it.
         var xGen = new AsmGenerator();
         foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs")) {
           var xAsm = xGen.Generate(xFile);
