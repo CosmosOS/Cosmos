@@ -67,7 +67,11 @@ namespace Cosmos.Build.Builder {
     }
     
     protected void MsBuild(string aSlnFile, string aBuildCfg) {
-      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputDir));
+      string xMsBuild = Path.Combine(Paths.Windows, @"Microsoft.NET\Framework\v4.0.30319\msbuild.exe");
+      string xParams = Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputDir);
+      // Clean then build: http://adrianfoyn.wordpress.com/2011/03/30/wrestling-with-msbuild-the-bane-of-trebuild/
+      StartConsole(xMsBuild, "/t:Clean " + xParams);
+      StartConsole(xMsBuild, "/t:Build " + xParams);
     }
 
     protected bool CheckForInstall(string aCheck, bool aCanThrow) {
@@ -111,6 +115,15 @@ namespace Cosmos.Build.Builder {
       }
     }
 
+    protected void CheckIfBuilderRunning() {
+      Echo("Checking if Builder is already running.");
+      var xList = Process.GetProcessesByName("Cosmos.Build.Builder");
+      // Check > 1 so we exclude ourself.
+      if (xList.Length > 1) {
+        throw new Exception("Another instance of builder is running.");
+      }
+    }
+
     protected void CheckIsVsRunning() {
       int xSeconds = 5;
       if (App.IgnoreVS) {
@@ -146,6 +159,8 @@ namespace Cosmos.Build.Builder {
       //Visual Studio 2010
 
       CheckIsVsRunning();
+      CheckIfBuilderRunning();
+
       CheckVs2010Sp1();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckForInno();
@@ -250,7 +265,7 @@ namespace Cosmos.Build.Builder {
     void CompileCosmos() {
       Section("Compiling Cosmos");
 
-      MsBuild(mCosmosDir + @"\source\Build.sln", "Debug");
+      MsBuild(Path.Combine(mCosmosDir, @"source\Build.sln"), "Debug");
     }
 
     void CopyTemplates() {
