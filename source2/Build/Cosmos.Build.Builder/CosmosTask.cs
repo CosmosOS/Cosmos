@@ -129,6 +129,7 @@ namespace Cosmos.Build.Builder {
 
       CheckIsVsRunning();
       CheckVs2010Sp1();
+      CheckVs2010SDK();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckForUninstall("Inno Setup QuickStart Pack", true);
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
@@ -149,6 +150,16 @@ namespace Cosmos.Build.Builder {
         var xInfo = FileVersionInfo.GetVersionInfo(Path.Combine(xDir, "devenv.exe"));
         if (xInfo.ProductPrivatePart < 1) {
           throw new Exception("Visual Studio 2010 **SP1** not detected.");
+        }
+      }
+    }
+
+    void CheckVs2010SDK() {
+      Echo("Checking for Visual Studio 2010 SDK SP1");
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\VSIP\10.0")) {
+        // This tell us if SDK is installed, but not if its SP1. But if CheckVs2010Sp1() passed, then it should be SP1.
+        if (xKey.GetValue("InstallDir") == null) {
+          throw new Exception("Visual Studio 2010 SDK not detected.");
         }
       }
     }
