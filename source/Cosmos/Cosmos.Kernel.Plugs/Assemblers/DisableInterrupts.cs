@@ -7,7 +7,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class DisableInterrupts: AssemblerMethod {
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       new CPUx86.ClrInterruptFlag();
     }
   }

@@ -28,12 +28,11 @@ namespace Cosmos.Core.Plugs.Assemblers {
         , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
     }
 
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       // IDT is already initialized but just for base hooks, and asm only.
       // ie Int 1, 3 and GPF
       // This routine updates the IDT now that we have C# running to allow C# hooks to handle
       // the other INTs
-      var xAssembler = (Cosmos.Assembler.Assembler)aAssembler;
 
       // We are updating the IDT, disable interrupts
       new CPUx86.ClrInterruptFlag();

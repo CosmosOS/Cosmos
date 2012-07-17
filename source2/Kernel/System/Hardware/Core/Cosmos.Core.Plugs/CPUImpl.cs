@@ -14,7 +14,7 @@ namespace Cosmos.Core.Plugs {
         }
 
         public class GetAmountOfRAMAsm : AssemblerMethod {
-            public override void AssembleNew(object aAssembler, object aMethodInfo) {
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1024 };
@@ -28,7 +28,7 @@ namespace Cosmos.Core.Plugs {
         public static uint GetAmountOfRAM() { return 0; }
 
         public class GetEndOfKernelAsm : AssemblerMethod {
-            public override void AssembleNew(object aAssembler, object aMethodInfo) {
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
                 new CPUx86.Push { DestinationRef = CPUAll.ElementReference.New("_end_code") };
             }
         }
@@ -39,7 +39,7 @@ namespace Cosmos.Core.Plugs {
         }
 
         public class ZeroFillAsm : AssemblerMethod {
-            public override void AssembleNew(object aAssembler, object aMethodInfo) {
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
                 new CPUx86.ClrDirFlag();
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
@@ -61,7 +61,7 @@ namespace Cosmos.Core.Plugs {
         public static void ZeroFill(CPU aThis, uint aStartAddress, uint aLength) { }
 
         public class InitFloatAsm : AssemblerMethod {
-            public override void AssembleNew(object aAssembler, object aMethodInfo) {
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
                 new CPUx86.x87.FloatInit();
             }
         }
@@ -70,7 +70,7 @@ namespace Cosmos.Core.Plugs {
         public static void InitFloat(CPU aThis) { }
 
         public class HaltAsm : AssemblerMethod {
-            public override void AssembleNew(object aAssembler, object aMethodInfo) {
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
                 new CPUx86.Halt();
             }
         }

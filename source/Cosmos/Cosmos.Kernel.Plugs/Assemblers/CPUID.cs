@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     //; Arguments:
     //; 	(none)
     //; 	ReturnSize: 4
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
         /*new CPUx86.Pushfd();
         new CPUx86.Pop("eax");
         new CPUx86.Move("ecx", "eax");
@@ -53,7 +53,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     //; 	(3) 4	4	ebp + 0Ch (Type = System.UInt32&)
     //; 	(4) 0	4	ebp + 08h (Type = System.UInt32)
     //; 	ReturnSize: 0
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       new CPUx86.ClrInterruptFlag();
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
       new CPUx86.CpuId();

@@ -8,7 +8,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
 {
     public class Reboot : AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo) {
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
           new CPUx86.ClrInterruptFlag();
           /* Clear all keyboard buffers (output and command buffers) */
           new CPUAll.Label(".waitBuffer");

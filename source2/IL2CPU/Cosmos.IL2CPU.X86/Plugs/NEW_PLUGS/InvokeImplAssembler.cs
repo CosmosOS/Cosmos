@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
       return 0;
     }
 
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       var xAssembler = (CosmosAssembler)aAssembler;
       var xMethodInfo = (Cosmos.IL2CPU.MethodInfo)aMethodInfo;
       var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
@@ -124,7 +124,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
     }
 
     #region OLD attempt
-    //    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    //    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
 //      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.BX, SourceReg = CPUx86.Registers.BX, Size = 16 };
 //      new CPUx86.Noop();
 //      var xAssembler = (CosmosAssembler)aAssembler;

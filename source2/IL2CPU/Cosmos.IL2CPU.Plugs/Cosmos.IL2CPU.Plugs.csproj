@@ -80,6 +80,12 @@
   <ItemGroup>
     <Content Include="ReadMe.html" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
+      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
+      <Name>Cosmos.Assembler</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

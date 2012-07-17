@@ -15,7 +15,7 @@ namespace Cosmos.Core.Plugs
         #region Write8
         private class Write8Assembler : AssemblerMethod
         {
-            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 //TODO: This is a lot of work to write to a single port.
                 // We need to have some kind of inline ASM option that can
@@ -32,7 +32,7 @@ namespace Cosmos.Core.Plugs
         #region Write16
         private class Write16Assembler : AssemblerMethod
         {
-            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
@@ -46,7 +46,7 @@ namespace Cosmos.Core.Plugs
         #region Write32
         private class Write32Assembler : AssemblerMethod
         {
-            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
@@ -60,7 +60,7 @@ namespace Cosmos.Core.Plugs
         #region Read8
         private class Read8Assembler : AssemblerMethod
         {
-            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
                 //TODO: Do we need to clear rest of EAX first?
@@ -77,7 +77,7 @@ namespace Cosmos.Core.Plugs
         #region Read16
         private class Read16Assembler : AssemblerMethod
         {
-            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
@@ -92,7 +92,7 @@ namespace Cosmos.Core.Plugs
         #region Read32
         private class Read32Assembler : AssemblerMethod
         {
-            public override void AssembleNew(object aAssembler, object aMethodInfo)
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
                 new CPUx86.IN { DestinationReg = CPUx86.Registers.EAX };

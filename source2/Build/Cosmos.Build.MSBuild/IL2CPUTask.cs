@@ -55,7 +55,6 @@ namespace Cosmos.Build.MSBuild {
     protected static void CheckFirstTime() {
       var xSearchDirs = new List<string>();
       xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
-
       xSearchDirs.Add(CosmosPaths.UserKit);
       xSearchDirs.Add(CosmosPaths.Kernel);
       mSearchDirs = xSearchDirs.ToArray();
@@ -132,14 +131,12 @@ namespace Cosmos.Build.MSBuild {
       set;
     }
 
-    public bool IgnoreDebugStubAttribute
-    {
-        get;
-        set;
+    public bool IgnoreDebugStubAttribute {
+      get;
+      set;
     }
 
-    protected bool Initialize()
-    {
+    protected bool Initialize() {
       CheckFirstTime();
       if (References != null) {
         var xSearchPaths = new List<string>(mSearchDirs);
@@ -148,7 +145,13 @@ namespace Cosmos.Build.MSBuild {
             var xName = xRef.GetMetadata("FullPath");
             var xDir = Path.GetDirectoryName(xName);
             if (!xSearchPaths.Contains(xDir)) {
-              xSearchPaths.Insert(0, xDir);
+              // This seems to be to try to load plugs on demand from their own dirs, but 
+              // it often just causes load conflicts, and weird errors like "implemnation not found" 
+              // for a method, even when both the output user kit dir and local bin dir have up to date
+              // and same assemblies. 
+              // So its removed for now and we should find a better way to dynamically load plugs in 
+              // future.
+              //xSearchPaths.Insert(0, xDir);
             }
             if (xName.Length > 0) {
               if (File.Exists(xName))
@@ -180,6 +183,7 @@ namespace Cosmos.Build.MSBuild {
       //
     }
     public bool Execute() {
+      //System.Diagnostics.Debugger.Launch();
       try {
         LogMessage("Executing IL2CPU on assembly");
         if (!Initialize()) {

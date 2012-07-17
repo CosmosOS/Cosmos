@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers {
      *			 int length,				ebp + 0xC
      *			 bool reliable);			ebp + 0x8
      */
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x1C };
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceValue = 12, Size = 32 }; // pointer is at the element size
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

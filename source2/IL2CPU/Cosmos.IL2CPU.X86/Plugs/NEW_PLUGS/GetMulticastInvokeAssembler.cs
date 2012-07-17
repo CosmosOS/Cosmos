@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS
 {
     public class GetMulticastInvokeAssembler: AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo)
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
             var xAsm = (Assembler)aAssembler;
             var xMethodInfo = (MethodInfo)aMethodInfo;

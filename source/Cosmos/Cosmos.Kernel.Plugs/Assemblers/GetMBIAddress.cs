@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers
 {
     public class GetMBIAddress: AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo)
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
             new Push { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect=true };
         }

@@ -11,7 +11,7 @@ using NewAssembler = Cosmos.Assembler.Assembler;
 
 namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
   public class CtorImplAssembler: AssemblerMethod {
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       // method signature: $this, object @object, IntPtr method
       var xMethodInfo = (MethodInfo)aMethodInfo;
       var xAssembler = (NewAssembler)aAssembler;

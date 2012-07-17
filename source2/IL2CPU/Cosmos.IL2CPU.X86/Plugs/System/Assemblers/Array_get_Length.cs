@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 {
     public class Array_get_Length: AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo)
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
 // $this   ebp+8
             new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };

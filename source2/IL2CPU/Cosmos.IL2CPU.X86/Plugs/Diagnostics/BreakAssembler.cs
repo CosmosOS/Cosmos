@@ -7,7 +7,7 @@ using Cosmos.Assembler;
 
 namespace Cosmos.IL2CPU.X86.PlugsLinqTest.CustomImplementations.System.Diagnostics {
 	public class BreakAssembler: AssemblerMethod {
-    public override void AssembleNew(object aAssembler, object aMethodInfo) {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
     }
 	}
 }

@@ -10,7 +10,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
 {
     public class GetVbeModeAssembler: AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo)
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
             new Xor { DestinationReg = Registers.EAX, SourceReg = Registers.EAX };
             new Mov { DestinationReg = Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), SourceIsIndirect = true };

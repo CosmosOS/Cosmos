@@ -7,7 +7,7 @@ using Cosmos.Assembler.x86;
 namespace Cosmos.Sys.Plugs.Assemblers{
     public class ShutDown : AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo) {
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
           //ACPI Way...ONLY QEMu And Boschs
           new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.DX,

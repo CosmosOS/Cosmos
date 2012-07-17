@@ -10,7 +10,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
 {
     public class GetVbeControlInfoAssembler: AssemblerMethod
     {
-        public override void AssembleNew(object aAssembler, object aMethodInfo)
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
             new Push { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true };
         }
