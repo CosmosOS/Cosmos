@@ -23,10 +23,7 @@ namespace Cosmos.IL2CPU.Profiler {
       xSW.Start();
        
       var xAsmblr = new Assembler();
-      using (var xScanner = new ILScanner(xAsmblr))
-      {
-
-
+      using (var xScanner = new ILScanner(xAsmblr)) {
           //TODO: Add plugs into the scanning equation to profile scanning them too
           //System.Reflection.MethodInfo[] name = typeof(SSchockeTest.Kernel).GetMethods();
           Type xFoundType = typeof(Kernel);
