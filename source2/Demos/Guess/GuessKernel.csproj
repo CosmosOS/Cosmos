@@ -71,10 +71,6 @@
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Kernel\Common\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{04602B68-B877-4CA0-B17B-09C309732943}</Project>
-      <Name>Cosmos.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

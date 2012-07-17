@@ -80,10 +80,6 @@
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\Common\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{04602B68-B877-4CA0-B17B-09C309732943}</Project>
-      <Name>Cosmos.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
       <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
       <Name>Cosmos.System</Name>
