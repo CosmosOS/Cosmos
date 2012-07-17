@@ -109,6 +109,7 @@ JE DebugStub_Break_Done
 Cmp AL, DebugStub_Const_Vs2Ds_SetAsmBreak
 JNE DebugStub_Break_Block1_End
 Call DebugStub_SetAsmBreak
+Call DebugStub_AckCommand
 Jmp DebugStub_Break_WaitCmd
 DebugStub_Break_Block1_End:
 

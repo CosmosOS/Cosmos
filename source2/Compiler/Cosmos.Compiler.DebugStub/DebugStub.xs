@@ -155,6 +155,7 @@ WaitCmd:
 
     if AL = #Vs2Ds_SetAsmBreak {
         SetAsmBreak()
+	    AckCommand()
 	    goto WaitCmd
 	}
 
