@@ -14,6 +14,7 @@ namespace Cosmos.Build.Builder {
     protected string mOutputPath;
     protected int mReleaseNo;
     protected string mInnoFile;
+    protected string mInnoPath;
 
     public CosmosTask(string aCosmosPath, int aReleaseNo) {
       mCosmosPath = aCosmosPath;
@@ -131,7 +132,7 @@ namespace Cosmos.Build.Builder {
       CheckVs2010Sp1();
       CheckVs2010SDK();
       CheckNet35Sp1(); // Required by VMWareLib
-      CheckForUninstall("Inno Setup QuickStart Pack", true);
+      CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
       if (!CheckForInstall("VMware Workstation", false)) {
         if (!CheckForInstall("VMware Player", false)) {
@@ -139,6 +140,24 @@ namespace Cosmos.Build.Builder {
         }
       }
       CheckForInstall("VMWare VIX", true);
+    }
+
+    void CheckForInno() {
+      Echo("Checking for Inno Setup");
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
+        if (xKey == null) {
+          throw new Exception("Cannot find Inno Setup.");
+        }
+        mInnoPath = (string)xKey.GetValue("InstallLocation");
+        if (string.IsNullOrWhiteSpace(mInnoPath)) {
+          throw new Exception("Cannot find Inno Setup.");
+        }
+      }
+
+      Echo("Checking for Inno Preprocessor");
+      if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll"))) {
+        throw new Exception("Inno Preprocessor not detected.");
+      }
     }
 
     void CheckVs2010Sp1() {
@@ -245,18 +264,7 @@ namespace Cosmos.Build.Builder {
     void CreateSetup() {
       Section("Creating Setup");
 
-      string xInnoPath;
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
-        if (xKey == null) {
-          throw new Exception("Cannot find Inno Setup.");
-        }
-        xInnoPath = (string)xKey.GetValue("InstallLocation");
-        if (string.IsNullOrWhiteSpace(xInnoPath)) {
-          throw new Exception("Cannot find Inno Setup.");
-        }
-      }
-
-      string xISCC = Path.Combine(xInnoPath, "ISCC.exe");
+      string xISCC = Path.Combine(mInnoPath, "ISCC.exe");
       if (!File.Exists(xISCC)) {
         throw new Exception("Cannot find Inno setup.");
       }
