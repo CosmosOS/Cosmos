@@ -29,19 +29,13 @@ namespace Cosmos.Build.Installer {
       return xList.Length > 0;
     }
 
-    public void WaitForStart(string aName) {
-      WaitForStart(aName, null);
+    public bool WaitForStart(string aName, int? aMilliSec = null) {
+      return WaitForState(aName, true, aMilliSec);
     }
-    public bool WaitForStart(string aName, int? aMilliSec) {
-      return WaitForState(aName, aMilliSec, true);
+    public bool WaitForExit(string aName, int? aMilliSec = null) {
+      return WaitForState(aName, false, aMilliSec);
     }
-    public void WaitForExit(string aName) {
-      WaitForExit(aName, null);
-    }
-    public bool WaitForExit(string aName, int? aMilliSec) {
-      return WaitForState(aName, aMilliSec, false);
-    }
-    public bool WaitForState(string aName, int? aMilliSec, bool aIsRunning) {
+    public bool WaitForState(string aName, bool aIsRunning, int? aMilliSec) {
       while (IsRunning(aName) != aIsRunning) {
         Thread.Sleep(200);
         if (aMilliSec.HasValue) {
@@ -86,10 +80,7 @@ namespace Cosmos.Build.Installer {
       }
     }
 
-    public void Start(string aExe, string aParams) {
-      Start(aExe, aParams, true, true);
-    }
-    public void Start(string aExe, string aParams, bool aWait, bool aShowWindow) {
+    public void Start(string aExe, string aParams, bool aWait = true, bool aShowWindow = true) {
       Log.WriteLine("Starting: " + aExe);
       Log.WriteLine("  Params: " + aParams);
 
