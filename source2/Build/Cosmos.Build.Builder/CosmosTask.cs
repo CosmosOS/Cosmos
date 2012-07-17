@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Cosmos.Build.Installer;
@@ -127,6 +128,7 @@ namespace Cosmos.Build.Builder {
       //Visual Studio 2010
 
       CheckIsVsRunning();
+      CheckVs2010Sp1();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckForUninstall("Inno Setup QuickStart Pack", true);
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
@@ -136,6 +138,19 @@ namespace Cosmos.Build.Builder {
         }
       }
       CheckForInstall("VMWare VIX", true);
+    }
+
+    void CheckVs2010Sp1() {
+      // If user got this far, we know they have VS 2010. But we need to make sure
+      // that its SP1.
+      Echo("Checking for Visual Studio 2010 SP1");
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0")) {
+        string xDir = (string)xKey.GetValue("InstallDir");
+        var xInfo = FileVersionInfo.GetVersionInfo(Path.Combine(xDir, "devenv.exe"));
+        if (xInfo.ProductPrivatePart < 1) {
+          throw new Exception("Visual Studio 2010 **SP1** not detected.");
+        }
+      }
     }
 
     void WriteDevKit() {
