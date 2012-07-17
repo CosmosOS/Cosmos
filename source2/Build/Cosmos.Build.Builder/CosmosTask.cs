@@ -10,29 +10,46 @@ using System.Windows;
 
 namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
-    protected string mCosmosPath;
-    protected string mOutputPath;
+    protected string mCosmosDir;
+    protected string mOutputDir;
+    protected string mAppDataDir;
     protected int mReleaseNo;
     protected string mInnoFile;
     protected string mInnoPath;
 
-    public CosmosTask(string aCosmosPath, int aReleaseNo) {
-      mCosmosPath = aCosmosPath;
+    public CosmosTask(string aCosmosDir, int aReleaseNo) {
+      mCosmosDir = aCosmosDir;
+      mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
       mReleaseNo = aReleaseNo;
-      mInnoFile = mCosmosPath + @"\Setup2\Cosmos.iss";
+      mInnoFile = mCosmosDir + @"\Setup2\Cosmos.iss";
+    }
+
+    void Cleanup() {
+      Section("Cleaning up");
+      if (Directory.Exists(mOutputDir)) {
+        // Make sure no files are left, else things can be not be rebuilt and when adding
+        // new items this can cause issues.
+        Echo("Deleting build output directory.");
+        Echo("  " + mOutputDir);
+        Directory.Delete(mOutputDir, true);
+      } else {
+        Echo("Creating build output directory.");
+        Echo("  " + mOutputDir);
+        Directory.CreateDirectory(mOutputDir);
+      }
+
+      if (Directory.Exists(mAppDataDir)) {
+        Echo("Deleting user kit directory.");
+        Echo("  " + mAppDataDir);
+        Directory.Delete(mAppDataDir, true);
+      }
     }
 
     protected override void DoRun() {
-      mOutputPath = Path.Combine(mCosmosPath, @"Build\VSIP");
-      if (Directory.Exists(mOutputPath)) {
-        // Make sure no files are left, else things can be not be rebuilt and when adding
-        // new items this can cause issues.
-        Directory.Delete(mOutputPath, true);
-      } else {
-        Directory.CreateDirectory(mOutputPath);
-      }
+      mOutputDir = Path.Combine(mCosmosDir, @"Build\VSIP");
 
       CheckPrereqs();
+      Cleanup();
       
       CompileCosmos();
       CopyTemplates();
@@ -50,7 +67,7 @@ namespace Cosmos.Build.Builder {
     }
     
     protected void MsBuild(string aSlnFile, string aBuildCfg) {
-      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputPath));
+      StartConsole(Paths.Windows + @"\Microsoft.NET\Framework\v4.0.30319\msbuild.exe", Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputDir));
     }
 
     protected bool CheckForInstall(string aCheck, bool aCanThrow) {
@@ -193,7 +210,7 @@ namespace Cosmos.Build.Builder {
       //
       // HKCU is not redirected.
       using (var xKey = Registry.CurrentUser.CreateSubKey(@"Software\Cosmos")) {
-        xKey.SetValue("DevKit", mCosmosPath);
+        xKey.SetValue("DevKit", mCosmosDir);
       }
     }
 
@@ -220,7 +237,7 @@ namespace Cosmos.Build.Builder {
     void CompileXSharpCompiler() {
       Section("Compiling X# Compiler");
 
-      MsBuild(Path.Combine(mCosmosPath, @"XSharp\source\XSharp.sln"), "Debug");
+      MsBuild(Path.Combine(mCosmosDir, @"XSharp\source\XSharp.sln"), "Debug");
     }
 
     void CompileXSharpSource() {
@@ -228,7 +245,7 @@ namespace Cosmos.Build.Builder {
       
       // XSC can do all files in path, but we do it on our own currently for better status updates.
       // When we get xsproj files we can build directly.
-      var xFiles = Directory.GetFiles(mCosmosPath + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
+      var xFiles = Directory.GetFiles(mCosmosDir + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
       foreach (var xFile in xFiles) {
         Echo("Compiling " + Path.GetFileName(xFile));
         string xDest = Path.ChangeExtension(xFile, ".cs");
@@ -237,28 +254,28 @@ namespace Cosmos.Build.Builder {
         }
         // We dont ref the X# asm directly because then we could not compile it without dynamic loading.
         // This way we can build it and call it directly.
-        StartConsole(mOutputPath + @"\xsc.exe", Quoted(xFile) + @" Cosmos.Debug.DebugStub");
+        StartConsole(mOutputDir + @"\xsc.exe", Quoted(xFile) + @" Cosmos.Debug.DebugStub");
       }
     }
 
     void CompileCosmos() {
       Section("Compiling Cosmos");
 
-      MsBuild(mCosmosPath + @"\source\Build.sln", "Debug");
+      MsBuild(mCosmosDir + @"\source\Build.sln", "Debug");
     }
 
     void CopyTemplates() {
       Section("Copying Templates");
 
-      CD(mOutputPath);
-      SrcPath = Path.Combine(mCosmosPath, @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug");
+      CD(mOutputDir);
+      SrcPath = Path.Combine(mCosmosDir, @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug");
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");
       Copy("Cosmos.zip");
       Copy("CosmosProject (VB).zip");
       Copy("CosmosKernel (VB).zip");
-      Copy(mCosmosPath + @"source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip");
+      Copy(mCosmosDir + @"source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip");
     }
 
     void CreateSetup() {
@@ -290,7 +307,7 @@ namespace Cosmos.Build.Builder {
       }
 
       Echo("Launching Visual Studio");
-      Start(xVisualStudio, mCosmosPath + @"\source\Cosmos.sln", false, true);
+      Start(xVisualStudio, mCosmosDir + @"\source\Cosmos.sln", false, true);
     }
 
     void RunSetup() {
@@ -316,7 +333,7 @@ namespace Cosmos.Build.Builder {
         Echo("Waiting for Setup to complete.");
         WaitForExit("CosmosUserKit-" + mReleaseNo);
       } else {
-        Start(mCosmosPath + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
+        Start(mCosmosDir + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
       }
     }
 
