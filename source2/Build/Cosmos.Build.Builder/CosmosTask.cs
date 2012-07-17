@@ -77,7 +77,7 @@ namespace Cosmos.Build.Builder {
       return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\", "DisplayName");
     }
     protected bool CheckForProduct(string aCheck, bool aCanThrow, string aKey, string aValueName) {
-      Echo("Looking for " + aCheck);
+      Echo("Checking for " + aCheck);
       string xCheck = aCheck.ToUpper();
       string[] xKeys;
       using (var xKey = Registry.LocalMachine.OpenSubKey(aKey, false)) {
@@ -99,7 +99,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckNet35Sp1() {
-      Echo("Looking for .NET 3.5 SP1");
+      Echo("Checking for .NET 3.5 SP1");
       bool xNet35SP1Installed = false;
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5", false)) {
         if (xKey != null) {
@@ -147,7 +147,6 @@ namespace Cosmos.Build.Builder {
 
       CheckIsVsRunning();
       CheckVs2010Sp1();
-      CheckVs2010SDK();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
@@ -186,16 +185,6 @@ namespace Cosmos.Build.Builder {
         var xInfo = FileVersionInfo.GetVersionInfo(Path.Combine(xDir, "devenv.exe"));
         if (xInfo.ProductPrivatePart < 1) {
           throw new Exception("Visual Studio 2010 **SP1** not detected.");
-        }
-      }
-    }
-
-    void CheckVs2010SDK() {
-      Echo("Checking for Visual Studio 2010 SDK SP1");
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\VSIP\10.0")) {
-        // This tell us if SDK is installed, but not if its SP1. But if CheckVs2010Sp1() passed, then it should be SP1.
-        if (xKey.GetValue("InstallDir") == null) {
-          throw new Exception("Visual Studio 2010 SDK not detected.");
         }
       }
     }
