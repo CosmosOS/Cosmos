@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug.Consts;
+using Cosmos.Debug.Common;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -278,7 +278,7 @@ namespace Cosmos.Debug.Common {
 
           // Send signature
           var xData = new byte[4];
-          Array.Copy(BitConverter.GetBytes(Cosmos.Debug.Consts.Consts.SerialSignature), 0, xData, 0, 4);
+          Array.Copy(BitConverter.GetBytes(Cosmos.Debug.Common.Consts.SerialSignature), 0, xData, 0, 4);
           SendRawData(xData);
 
           CmdStarted();
@@ -357,7 +357,7 @@ namespace Cosmos.Debug.Common {
       mSigCheck[3] = aPacket[0];
       var xSig = GetUInt32(mSigCheck, 0);
       DoDebugMsg("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
-      if (xSig == Cosmos.Debug.Consts.Consts.SerialSignature) {
+      if (xSig == Consts.SerialSignature) {
         // Sig found, wait for messages
         mSigReceived = true;
         WaitForMessage();

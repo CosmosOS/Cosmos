@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
-using Cosmos.Debug.Consts;
+using Cosmos.Debug.Common;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.IO;

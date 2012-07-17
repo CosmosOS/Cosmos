@@ -11,7 +11,6 @@ using System.Threading;
 using System.Windows.Forms;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
-using Cosmos.Debug.Consts;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.Win32;
@@ -135,9 +134,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       mLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), aDebugInfo[BuildProperties.LaunchString]);
 
       if (mDebugDownPipe == null) {
-        mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.DownName);
+        mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Pipes.DownName);
 
-        mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.UpName);
+        mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Pipes.UpName);
         mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
         mDebugUpPipe.Start();
       }

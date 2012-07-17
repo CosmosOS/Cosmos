@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.VS.Windows {
   static public class Global {
@@ -9,7 +10,7 @@ namespace Cosmos.VS.Windows {
     static public EnvDTE.OutputWindowPane OutputPane;
 
     static Global() {
-      PipeUp = new Cosmos.Debug.Common.PipeClient(Cosmos.Debug.Consts.Pipes.UpName);
+      PipeUp = new Cosmos.Debug.Common.PipeClient(Pipes.UpName);
     }
   }
 }

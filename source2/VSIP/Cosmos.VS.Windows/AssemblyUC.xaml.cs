@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Collections.Generic;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.VS.Windows {
   /// This class implements the tool window exposed by this package and hosts a user control.
@@ -67,7 +68,7 @@ namespace Cosmos.VS.Windows {
       if (xCodeLines.Length > 1) {
         var xCodeLine = xCodeLines[1];
         if (xCodeLine.AsmLabel != null) {
-          Global.PipeUp.SendCommand(Cosmos.Debug.Consts.Windows2Debugger.SetAsmBreak, xCodeLine.AsmLabel.Label);
+          Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, xCodeLine.AsmLabel.Label);
         }
       }
     }

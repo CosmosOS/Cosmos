@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Threading;
-using Cosmos.Debug.Consts;
+using Cosmos.Debug.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -64,7 +64,7 @@ namespace Cosmos.VS.Windows {
       mTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProcessMessage);
       mTimer.Start();
 
-      mPipeDown = new Cosmos.Debug.Common.PipeServer(Cosmos.Debug.Consts.Pipes.DownName);
+      mPipeDown = new Cosmos.Debug.Common.PipeServer(Pipes.DownName);
       mPipeDown.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
       mPipeDown.Start();
     }

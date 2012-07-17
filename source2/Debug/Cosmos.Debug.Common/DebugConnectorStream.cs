@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug.Consts;
 
 namespace Cosmos.Debug.Common {
   public abstract class DebugConnectorStream : DebugConnector {
