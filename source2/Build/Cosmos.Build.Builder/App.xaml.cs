@@ -13,8 +13,11 @@ namespace Cosmos.Build.Builder {
     public static bool UseTask;
     public static bool InstallTask;
     public static bool IgnoreVS;
+    public static bool HasParams = false;
 
     protected override void OnStartup(StartupEventArgs e) {
+      HasParams = e.Args.Length > 0;
+
       var xArgs = new string[e.Args.Length];
       for (int i = 0; i < xArgs.Length; i++) {
         xArgs[i] = e.Args[i].ToUpper();

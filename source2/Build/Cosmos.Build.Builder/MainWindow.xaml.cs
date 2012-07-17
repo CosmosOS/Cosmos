@@ -255,8 +255,15 @@ namespace Cosmos.Build.Builder {
 
     protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e) {
+      if (!App.HasParams) {
+        MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.");
+        Close();
+        return;
+      }
+
       LoadPosition();
       mLoaded = true;
+
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
       mSetupPath = Path.Combine(mCosmosDir, @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe");
