@@ -24,7 +24,8 @@ namespace Cosmos.Build.Builder {
     protected int mTailLineCount = 5;
     protected int mTailCurrent = 0;
     protected List<TextBlock> mTailLines = new List<TextBlock>();
-    protected string mCosmosPath;
+    protected string mCosmosDir;
+    protected string mSetupPath;
     protected int mReleaseNo = 7;
 
     public MainWindow() {
@@ -77,7 +78,7 @@ namespace Cosmos.Build.Builder {
       IActionCollection xActions = xTaskDef.Actions;
       IAction xAction = xActions.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
       IExecAction xExecAction = xAction as IExecAction;
-      xExecAction.Path = Path.Combine(mCosmosPath + @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe");
+      xExecAction.Path = mSetupPath;
       xExecAction.Arguments = @"/SILENT";
 
       ITaskFolder xFolder = xService.GetFolder(@"\");
@@ -95,6 +96,16 @@ namespace Cosmos.Build.Builder {
       ITaskFolder xFolder = xService.GetFolder(@"\");
       foreach (IRegisteredTask xTask in xFolder.GetTasks(0)) {
         if (string.Equals(xTask.Name, "CosmosSetup")) {
+          // Wanted to make code to see if user moves setup after task is created
+          // but it didnt work....
+          //IAction xAction = xTask.Definition.Actions[0];
+          //if (xAction is IExecAction) {
+          //  IExecAction xAction2 = xAction as IExecAction;
+          //  if (xAction2.Path == null) {
+          //  }
+          //} else {
+          //  throw new Exception("Task is of unkonwn type.");
+          //}
           return true;
         }
       }
@@ -129,7 +140,7 @@ namespace Cosmos.Build.Builder {
         }
       }
 
-      var xTask = new CosmosTask(mCosmosPath, mReleaseNo);
+      var xTask = new CosmosTask(mCosmosDir, mReleaseNo);
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
       xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
       xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
@@ -244,10 +255,11 @@ namespace Cosmos.Build.Builder {
 
     protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e) {
-        LoadPosition();
+      LoadPosition();
       mLoaded = true;
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
-      mCosmosPath = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
+      mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
+      mSetupPath = Path.Combine(mCosmosDir, @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe");
       if (App.InstallTask) {
         InstallScheduledTask();
         Close();
