@@ -38,7 +38,6 @@ Call DebugStub_Break
 Jmp DebugStub_Executing_Normal
 DebugStub_Executing_Block1_End:
 
-
 Mov EAX, [DebugStub_CallerEIP]
 Mov EDI, DebugStub_DebugBPs
 Mov ECX, 256

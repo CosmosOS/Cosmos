@@ -111,14 +111,12 @@ Exit:
 
 // Modifies: EAX, ESI
 function SendTrace {
-	if dword .DebugStatus = #Status_Run goto Normal
-
     AL = #Ds2Vs_BreakPoint
-    goto Type
-Normal:
-    AL = #Ds2Vs_TracePoint
-Type:
+	if dword .DebugStatus = #Status_Run {
+	    AL = #Ds2Vs_TracePoint
+	}
     ComWriteAL()
+
     // Send Calling EIP.
     ESI = @.CallerEIP
     ComWrite32()

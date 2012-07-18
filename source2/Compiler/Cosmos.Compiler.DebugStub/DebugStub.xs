@@ -62,7 +62,6 @@ function Executing {
 	   goto Normal
 	}
 
-
 	// Check for breakpoint
     // Look for a possible matching BP
     // TODO: This is slow on every Int3...
