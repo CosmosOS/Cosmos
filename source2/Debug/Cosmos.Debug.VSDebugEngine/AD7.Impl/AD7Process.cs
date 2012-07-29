@@ -27,8 +27,8 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected readonly NameValueCollection mDebugInfo;
     protected LaunchType mLaunch;
     internal DebugInfo mDebugInfoDb;
-    internal List<KeyValuePair<uint, string>> mAddressLabelMappings;
-    internal IDictionary<string, uint> mLabelAddressMappings;
+    internal List<KeyValuePair<UInt32, string>> mAddressLabelMappings;
+    internal IDictionary<string, UInt32> mLabelAddressMappings;
     private int mProcessExitEventSent = 0;
 
     // Connection to target environment. Usually serial but is
@@ -82,7 +82,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         case Windows2Debugger.SetAsmBreak:
           string xLabel = Encoding.UTF8.GetString(aData);
-          uint xAddress = mLabelAddressMappings[xLabel];
+          UInt32 xAddress = mLabelAddressMappings[xLabel];
           mDbgConnector.SetAsmBreakpoint(xAddress);
           mDbgConnector.Continue();
           //mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
