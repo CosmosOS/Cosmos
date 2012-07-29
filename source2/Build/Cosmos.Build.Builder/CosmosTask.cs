@@ -195,7 +195,10 @@ namespace Cosmos.Build.Builder {
       // If user got this far, we know they have VS 2010. But we need to make sure
       // that its SP1.
       Echo("Checking for Visual Studio 2010 SP1");
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0")) {
+      string key = @"SOFTWARE\Microsoft\VisualStudio\10.0";
+      if (Environment.Is64BitOperatingSystem)
+          key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0";
+      using (var xKey = Registry.LocalMachine.OpenSubKey(key)) {
         string xDir = (string)xKey.GetValue("InstallDir");
         var xInfo = FileVersionInfo.GetVersionInfo(Path.Combine(xDir, "devenv.exe"));
         if (xInfo.ProductPrivatePart < 1) {
