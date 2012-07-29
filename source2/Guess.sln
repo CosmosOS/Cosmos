@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs.System", "Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common", "Kernel\Common\Cosmos.Common\Cosmos.Common.csproj", "{04602B68-B877-4CA0-B17B-09C309732943}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cosmos", "Cosmos", "{95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}"
@@ -29,31 +27,28 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "Kernel\Sys
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 13
+		SccNumberOfProjects = 12
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
-		SccProjectUniqueName0 = Demos\\Guess\\Guess.Cosmos
-		SccProjectName0 = Demos/Guess
-		SccLocalPath0 = Demos\\Guess
-		SccProjectUniqueName1 = Demos\\Guess\\GuessKernel.csproj
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Demos\\Guess\\Guess.Cosmos
 		SccProjectName1 = Demos/Guess
 		SccLocalPath1 = Demos\\Guess
-		SccProjectUniqueName2 = Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
-		SccProjectTopLevelParentUniqueName2 = Guess.sln
-		SccProjectName2 = Kernel/System/Hardware/Core/Cosmos.Core.Plugs
-		SccLocalPath2 = Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
-		SccProjectUniqueName3 = Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
+		SccProjectUniqueName2 = Demos\\Guess\\GuessKernel.csproj
+		SccProjectName2 = Demos/Guess
+		SccLocalPath2 = Demos\\Guess
+		SccProjectUniqueName3 = Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
 		SccProjectTopLevelParentUniqueName3 = Guess.sln
-		SccProjectName3 = Kernel/Debug/Cosmos.Debug.Kernel.Plugs
-		SccLocalPath3 = Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
-		SccProjectUniqueName4 = Kernel\\System\\Cosmos.System.Plugs.System\\Cosmos.System.Plugs.System.csproj
+		SccProjectName3 = Kernel/System/Hardware/Core/Cosmos.Core.Plugs
+		SccLocalPath3 = Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
+		SccProjectUniqueName4 = Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
 		SccProjectTopLevelParentUniqueName4 = Guess.sln
-		SccProjectName4 = Kernel/System/Cosmos.System.Plugs.System
-		SccLocalPath4 = Kernel\\System\\Cosmos.System.Plugs.System
-		SccProjectUniqueName5 = Kernel\\Common\\Cosmos.Common\\Cosmos.Common.csproj
+		SccProjectName4 = Kernel/Debug/Cosmos.Debug.Kernel.Plugs
+		SccLocalPath4 = Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
+		SccProjectUniqueName5 = Kernel\\System\\Cosmos.System.Plugs.System\\Cosmos.System.Plugs.System.csproj
 		SccProjectTopLevelParentUniqueName5 = Guess.sln
-		SccProjectName5 = Kernel/Common/Cosmos.Common
-		SccLocalPath5 = Kernel\\Common\\Cosmos.Common
+		SccProjectName5 = Kernel/System/Cosmos.System.Plugs.System
+		SccLocalPath5 = Kernel\\System\\Cosmos.System.Plugs.System
 		SccProjectUniqueName6 = Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
 		SccProjectTopLevelParentUniqueName6 = Guess.sln
 		SccProjectName6 = Kernel/Common/Cosmos.Common.Extensions
@@ -78,7 +73,6 @@ Global
 		SccProjectTopLevelParentUniqueName11 = Guess.sln
 		SccProjectName11 = Kernel/System/Cosmos.System
 		SccLocalPath11 = Kernel\\System\\Cosmos.System
-		SccLocalPath12 = .
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,14 +133,6 @@ Global
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409}.Release|Itanium.ActiveCfg = Release|x86
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409}.Release|x86.ActiveCfg = Release|x86
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409}.Release|x86.Build.0 = Release|x86
-		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|Itanium.ActiveCfg = Debug|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Release|Itanium.ActiveCfg = Release|Any CPU
-		{04602B68-B877-4CA0-B17B-09C309732943}.Release|x86.ActiveCfg = Release|Any CPU
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}.Debug|Itanium.ActiveCfg = Debug|x86
@@ -212,11 +198,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{04602B68-B877-4CA0-B17B-09C309732943} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
-		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
-		{D9A87AAD-FCC9-4517-B31D-E904DAD00784} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
 		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
+		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
+		{D9A87AAD-FCC9-4517-B31D-E904DAD00784} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
 		{61607F1E-58F9-41CF-972F-128384F3E115} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
 		{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}
