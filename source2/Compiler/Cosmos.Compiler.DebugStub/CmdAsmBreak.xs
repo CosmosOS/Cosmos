@@ -11,7 +11,7 @@ var AsmOrigByte
 function SetAsmBreak {
     ComReadEAX()
     EDI = EAX
-    // Save the old byte
+    // Save the old byte (as dword for now)
     EAX = EDI[0]
     .AsmOrigByte = EAX
     // Inject INT3

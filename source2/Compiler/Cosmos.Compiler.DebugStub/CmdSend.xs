@@ -112,6 +112,8 @@ Exit:
 // Modifies: EAX, ESI
 function SendTrace {
     AL = #Ds2Vs_BreakPoint
+	// If we are running, its a tracepoint, not a breakpoint.
+	// In future, maybe separate these into 2 methods
 	if dword .DebugStatus = #Status_Run {
 	    AL = #Ds2Vs_TracePoint
 	}
