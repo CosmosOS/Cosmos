@@ -10,7 +10,8 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.Common {
   public abstract class DebugConnector : IDisposable {
     public Action<Exception> ConnectionLost;
-    public Action<byte, UInt32> CmdTrace;
+    public Action<UInt32> CmdTrace;
+    public Action<UInt32> CmdBreak;
     public Action<byte[]> CmdMethodContext;
     public Action<string> CmdText;
     public Action CmdStarted;
@@ -255,9 +256,13 @@ namespace Cosmos.Debug.Common {
       // Could change to an array, but really not much benefit
       switch (mCurrentMsgType) {
         case Ds2Vs.TracePoint:
-        case Ds2Vs.BreakPoint:
-          DoDebugMsg("DC Recv: TracePoint / BreakPoint");
+          DoDebugMsg("DC Recv: TracePoint");
           Next(4, PacketTracePoint);
+          break;
+
+        case Ds2Vs.BreakPoint:
+          DoDebugMsg("DC Recv: BreakPoint");
+          Next(4, PacketBreakPoint);
           break;
 
         case Ds2Vs.Message:
@@ -432,7 +437,12 @@ namespace Cosmos.Debug.Common {
       // WaitForMessage must be first. CmdTrace issues
       // more commands and if we dont issue this, the pipe wont be waiting for a response.
       WaitForMessage();
-      CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
+      CmdTrace(GetUInt32(aPacket, 0));
+    }
+
+    protected void PacketBreakPoint(byte[] aPacket) {
+      WaitForMessage();
+      CmdBreak(GetUInt32(aPacket, 0));
     }
 
     protected void PacketText(byte[] aPacket) {

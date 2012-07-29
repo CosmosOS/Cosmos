@@ -116,7 +116,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         throw new Exception("No debug connector found.");
       }
       mDbgConnector.Connected = DebugConnectorConnected;
-      mDbgConnector.CmdTrace += new Action<byte, uint>(DbgCmdTrace);
+      mDbgConnector.CmdBreak += new Action<UInt32>(DbgCmdBreak);
+      mDbgConnector.CmdTrace += new Action<UInt32>(DbgCmdTrace);
       mDbgConnector.CmdText += new Action<string>(DbgCmdText);
       mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
       mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
@@ -253,52 +254,46 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
-    void DbgCmdTrace(byte arg1, uint arg2) {
-      DebugMsg("DbgCmdTrace");
-      switch (arg1) {
-        case Ds2Vs.BreakPoint: {
-            // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
-            // Dont need to correct the address, becuase DebugStub does it for us.
-            var xActualAddress = arg2;
-            DebugMsg("BP hit @ " + xActualAddress.ToString("X8").ToUpper());
+    void DbgCmdTrace(UInt32 aAddress) {
+      DebugMsg("TraceReceived: " + aAddress);
+    }
 
-            var xActionPoints = new List<object>();
-            var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
+    void DbgCmdBreak(UInt32 aAddress) {
+      DebugMsg("DbgCmdBreak " + aAddress);
 
-            // Search the BPs and find the ones that match our address
-            foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
-              foreach (var xBBP in xBP.mBoundBPs) {
-                if (xBBP.mAddress == xActualAddress) {
-                  xBoundBreakpoints.Add(xBBP);
-                }
-              }
-            }
+      // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
+      // Dont need to correct the address, becuase DebugStub does it for us.
+      DebugMsg("BP hit @ " + aAddress.ToString("X8").ToUpper());
 
-            mCurrentAddress = xActualAddress;
-            // if no matching breakpoint, its either a stepping operation, or a code based break
-            if (xBoundBreakpoints.Count == 0) {
-              // Is it a result of stepping operation?
-              if (mEngine.AfterBreak) {
-                RequestFullDebugStubUpdate();
-                mCallback.OnStepComplete();
-              } else {
-                RequestFullDebugStubUpdate();
-                // Code based break. Tell VS to break.
-                mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
-              }
-            } else {
-              // Found a bound breakpoint
-              RequestFullDebugStubUpdate();
-              mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
-              mEngine.AfterBreak = true;
-            }
-            break;
+      var xActionPoints = new List<object>();
+      var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
+
+      // Search the BPs and find the ones that match our address
+      foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
+        foreach (var xBBP in xBP.mBoundBPs) {
+          if (xBBP.mAddress == aAddress) {
+            xBoundBreakpoints.Add(xBBP);
           }
+        }
+      }
 
-        default: {
-            DebugMsg("TraceReceived: " + arg1);
-            break;
-          }
+      mCurrentAddress = aAddress;
+      // if no matching breakpoint, its either a stepping operation, or a code based break
+      if (xBoundBreakpoints.Count == 0) {
+        // Is it a result of stepping operation?
+        if (mEngine.AfterBreak) {
+          RequestFullDebugStubUpdate();
+          mCallback.OnStepComplete();
+        } else {
+          RequestFullDebugStubUpdate();
+          // Code based break. Tell VS to break.
+          mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
+        }
+      } else {
+        // Found a bound breakpoint
+        RequestFullDebugStubUpdate();
+        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
+        mEngine.AfterBreak = true;
       }
     }
 
