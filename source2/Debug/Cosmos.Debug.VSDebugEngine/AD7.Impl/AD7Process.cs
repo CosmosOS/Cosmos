@@ -261,14 +261,14 @@ namespace Cosmos.Debug.VSDebugEngine {
     void DbgCmdBreak(UInt32 aAddress) {
       DebugMsg("DbgCmdBreak " + aAddress);
 
-      // When doing a CALL, the return address is pushed, but that's the address of the next instruction, after CALL. call is 5 bytes (for now?)
-      // Dont need to correct the address, becuase DebugStub does it for us.
-      DebugMsg("BP hit @ " + aAddress.ToString("X8").ToUpper());
+      // aAddress will be actaul address. Call and other methods push return to (after op), but DS
+      // corrects for us and sends us actual op address.
+      DebugMsg("Breaking @" + aAddress.ToString("X8").ToUpper());
 
       var xActionPoints = new List<object>();
       var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
 
-      // Search the BPs and find the ones that match our address
+      // Search the BPs and find ones that match our address.
       foreach (var xBP in mEngine.BPMgr.mPendingBPs) {
         foreach (var xBBP in xBP.mBoundBPs) {
           if (xBBP.mAddress == aAddress) {
@@ -278,21 +278,25 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mCurrentAddress = aAddress;
-      // if no matching breakpoint, its either a stepping operation, or a code based break
       if (xBoundBreakpoints.Count == 0) {
-        // Is it a result of stepping operation?
+        // if no matching breakpoints are found then its one of the following:
+        //   - Stepping operation
+        //   - Code based break
+        //   - Asm stepping
         if (mEngine.AfterBreak) {
+          // Source stepping operation
           RequestFullDebugStubUpdate();
           mCallback.OnStepComplete();
         } else {
+          // Code based or Asm break
           RequestFullDebugStubUpdate();
           // Code based break. Tell VS to break.
-          mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
+          mCallback.OnBreakpoint(mThread, new List<IDebugBoundBreakpoint2>());
         }
       } else {
         // Found a bound breakpoint
         RequestFullDebugStubUpdate();
-        mCallback.OnBreakpoint(mThread, new ReadOnlyCollection<IDebugBoundBreakpoint2>(xBoundBreakpoints));
+        mCallback.OnBreakpoint(mThread, xBoundBreakpoints.AsReadOnly());
         mEngine.AfterBreak = true;
       }
     }
