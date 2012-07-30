@@ -61,15 +61,19 @@ namespace Cosmos.VS.Windows {
       var xCodeLinesQry = from x in mLines
                        where x is AsmCode
                        select (AsmCode)x;
-      // Get the next code entry that is not Int3.
-      // TODO: Need to adjust to find after mCurrentLabel right now its hard coded as a test for the second item from the
-      // beginning of the method.
-      var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToArray();
-      if (xCodeLines.Length > 1) {
-        var xCodeLine = xCodeLines[1];
-        if (xCodeLine.AsmLabel != null) {
-          Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, xCodeLine.AsmLabel.Label);
+      // Remove Int3 calls.
+      var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode);
+      AsmLabel xLabel = null;
+      foreach (var xLine in xCodeLines) {
+        if (xLine.LabelMatches(mCurrentLabel)) {
+          xLabel = xLine.AsmLabel;
+          break;
         }
+      }
+      if (xLabel == null) {
+        MessageBox.Show("Cannot step from here.");
+      } else {
+        Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, xLabel.Label);
       }
     }
 
