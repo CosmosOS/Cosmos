@@ -10,11 +10,17 @@
              x:Name="CosmosAssemblyUserControl"
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
     <DockPanel LastChildFill="True">
-        <ToolBar Height="35" Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
-            <ToggleButton Content="Filter" Name="butnFilter" IsChecked="True" BorderBrush="Black" Margin="2" />
-            <Button Content="Copy" Name="butnCopy" BorderBrush="Black" Margin="2" />
-            <Rectangle Width="15" />
-            <Button Content="Asm Step Over" Name="butnStepOver" BorderBrush="Black" Margin="2" />
+        <ToolBar Name="toolBar1" DockPanel.Dock="Top" HorizontalAlignment="Left">
+            <ToggleButton Name="butnFilter" IsChecked="True" BorderBrush="Black" Margin="1" ToolTip="Filter" Width="24" Height="24">
+                <Image Source="/Cosmos.VS.Windows;component/Images/filter-small.png" />
+            </ToggleButton>
+            <Button ToolTip="Copy" Name="butnCopy" BorderBrush="Black" Margin="1" Width="24" Height="24">
+                <Image Source="/Cosmos.VS.Windows;component/Images/Copy_Icon_2.jpg" />
+            </Button>
+            <Rectangle Width="8" />
+            <Button ToolTip="Step Over" Name="butnStepOver" BorderBrush="Black" Margin="1" Width="24" Height="24">
+                <Image Source="/Cosmos.VS.Windows;component/Images/StepOver.png" />
+            </Button>
         </ToolBar>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <TextBlock Name="tblkSource">

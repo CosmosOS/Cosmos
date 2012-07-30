@@ -177,6 +177,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Cosmos.VS.Windows.html" />
+    <Resource Include="Images\filter-small.png" />
+    <Resource Include="Images\Copy_Icon_2.jpg" />
+    <Resource Include="Images\StepOver.png" />
     <Content Include="Resources\Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>
