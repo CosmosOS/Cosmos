@@ -18,11 +18,10 @@ Interrupt TracerEntry {
 	// This code is temporarily disabled as IRQs are not enabled right now.
 	// LockOrExit
 
-	.CallerEBP = EBP
-
 	+All
 	// Save current ESP so we can look at the results of PushAll later
 	.PushAllPtr = ESP
+	.CallerEBP = EBP
 
 	// Get current ESP and add 32. This will skip over the PushAll and point
 	// us at the call data from Int3.

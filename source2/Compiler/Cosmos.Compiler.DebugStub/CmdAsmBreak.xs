@@ -9,6 +9,8 @@ var AsmBreakEIP
 var AsmOrigByte
 
 function SetAsmBreak {
+	ClearAsmBreak()
+
     ComReadEAX()
     EDI = EAX
     // Save EIP of the break
@@ -19,7 +21,9 @@ function SetAsmBreak {
     .AsmOrigByte = AX
 
     // Inject INT3
-    EDI[0] = $CC
+	// Do in 2 steps to force a byte move to RAM (till X# can do byte in one step)
+	AX = $CC
+    EDI[0] = AX
 }
 
 function ClearAsmBreak {
@@ -30,6 +34,7 @@ function ClearAsmBreak {
 	// Clear old break point and set back to original opcode / partial opcode
     AX = .AsmOrigByte
     EDI[0] = AX
-    .AsmOrigByte = 0
+
+    .AsmBreakEIP = 0
 }
 

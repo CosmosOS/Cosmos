@@ -3,10 +3,9 @@
 
 DebugStub_TracerEntry:
 
-Mov [DebugStub_CallerEBP], EBP
-
 Pushad
 Mov [DebugStub_PushAllPtr], ESP
+Mov [DebugStub_CallerEBP], EBP
 
 Mov EBP, ESP
 Add EBP, 32
