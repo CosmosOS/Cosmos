@@ -62,11 +62,12 @@ namespace Cosmos.VS.Windows {
                        where x is AsmCode
                        select (AsmCode)x;
       // Remove Int3 calls.
-      var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode);
+      var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToArray();
       AsmLabel xLabel = null;
-      foreach (var xLine in xCodeLines) {
-        if (xLine.LabelMatches(mCurrentLabel)) {
-          xLabel = xLine.AsmLabel;
+      // We check against Length - 1 because when we find it, we go one more.
+      for (int i = 0; i < xCodeLines.Length - 1; i++) {
+        if (xCodeLines[i].LabelMatches(mCurrentLabel)) {
+          xLabel = xCodeLines[i + 1].AsmLabel;
           break;
         }
       }
