@@ -8,8 +8,8 @@ DebugStub_SetAsmBreak:
 Call DebugStub_ClearAsmBreak
 
 Call DebugStub_ComReadEAX
+Mov [DebugStub_AsmBreakEIP], EAX
 Mov EDI, EAX
-Mov [DebugStub_AsmBreakEIP], EDI
 
 Mov AL, [EDI + 0]
 Mov [DebugStub_AsmOrigByte], AL

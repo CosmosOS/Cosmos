@@ -12,9 +12,9 @@ function SetAsmBreak {
 	ClearAsmBreak()
 
     ComReadEAX()
-    EDI = EAX
     // Save EIP of the break
-    .AsmBreakEIP = EDI
+    .AsmBreakEIP = EAX
+    EDI = EAX
 
     // Save the old byte
     AL = EDI[0]
