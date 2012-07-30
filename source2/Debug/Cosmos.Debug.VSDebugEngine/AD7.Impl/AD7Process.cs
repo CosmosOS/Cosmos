@@ -283,21 +283,19 @@ namespace Cosmos.Debug.VSDebugEngine {
         //   - Stepping operation
         //   - Code based break
         //   - Asm stepping
-        if (mEngine.AfterBreak) {
-          // Source stepping operation
-          RequestFullDebugStubUpdate();
+
+        if (mStepping) {
           mCallback.OnStepComplete();
+          mStepping = false;
         } else {
-          // Code based or Asm break
-          RequestFullDebugStubUpdate();
-          // Code based break. Tell VS to break.
           mCallback.OnBreakpoint(mThread, new List<IDebugBoundBreakpoint2>());
         }
+
+        RequestFullDebugStubUpdate();
       } else {
         // Found a bound breakpoint
         RequestFullDebugStubUpdate();
         mCallback.OnBreakpoint(mThread, xBoundBreakpoints.AsReadOnly());
-        mEngine.AfterBreak = true;
       }
     }
 
@@ -416,14 +414,18 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDbgConnector.Continue();
     }
 
+    bool mStepping = false;
     internal void Step(enum_STEPKIND aKind) {
       if (aKind == enum_STEPKIND.STEP_INTO) { // F11
+        mStepping = true;
         mDbgConnector.SendCmd(Vs2Ds.StepInto);
 
       } else if (aKind == enum_STEPKIND.STEP_OVER) { // F10
+        mStepping = true;
         mDbgConnector.SendCmd(Vs2Ds.StepOver);
 
       } else if (aKind == enum_STEPKIND.STEP_OUT) { // Shift-F11
+        mStepping = true;
         mDbgConnector.SendCmd(Vs2Ds.StepOut);
 
       } else if (aKind == enum_STEPKIND.STEP_BACKWARDS) {

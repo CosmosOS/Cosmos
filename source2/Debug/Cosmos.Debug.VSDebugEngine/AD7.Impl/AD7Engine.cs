@@ -39,7 +39,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     internal AD7Module mModule;
     private AD7Thread mThread;
     private AD7ProgramNode mProgNode;
-    public bool AfterBreak = false;
     public IList<IDebugBoundBreakpoint2> Breakpoints = null;
 
     // This object facilitates calling from this thread into the worker thread of the engine. This is necessary because the Win32 debugging
@@ -244,14 +243,16 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public int Continue(IDebugThread2 aThread) {
+      // We don't appear to use or support this currently.
+
       // Continue is called from the SDM when it wants execution to continue in the debugee
       // but have stepping state remain. An example is when a tracepoint is executed, 
       // and the debugger does not want to actually enter break mode.
 
       var xThread = (AD7Thread)aThread;
-      if (AfterBreak) {
+      //if (AfterBreak) {
         //Callback.OnBreak(xThread);
-      }
+      //}
       return VSConstants.S_OK;
     }
 
