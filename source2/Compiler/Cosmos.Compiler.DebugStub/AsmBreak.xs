@@ -9,6 +9,13 @@ var AsmBreakEIP
 var AsmOrigByte
 
 function DoAsmBreak {
+	// Since our Int3 is temp, we need to adjust return EIP to return to it, not after it.
+	ESI = .CallerESP
+	EAX = .AsmBreakEIP
+	ESI[-12] = EAX
+
+	ClearAsmBreak()
+    Break()
 }
 
 function SetAsmBreak {

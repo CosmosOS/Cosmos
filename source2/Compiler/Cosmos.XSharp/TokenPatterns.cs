@@ -448,16 +448,16 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Mov {0}, " + ConstLabel(aTokens[3]);
       });
-      AddPattern("_REGADDR[1] = 123", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("_REGADDR[1] = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Mov("dword", "[{0} + {2}]", ConstLabel(aTokens[5]));
       });
-      AddPattern("_REGADDR[-1] = 123", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("_REGADDR[-1] = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Mov("dword", "[{0} - {2}]", ConstLabel(aTokens[5]));
       });
 
       AddPattern("_REG = _REG", "Mov {0}, {2}");
       AddPattern("_REGADDR[1] = _REG",  "Mov [{0} + {2}], {5}");
-      AddPattern("_REGADDR[-1] = _REG", "Mov [{0} - {3}], {6}");
+      AddPattern("_REGADDR[-1] = _REG", "Mov [{0} - {2}], {5}");
       AddPattern("_REG = _REGADDR[1]", "Mov {0}, [{2} + {4}]");
       AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {5}]");
 

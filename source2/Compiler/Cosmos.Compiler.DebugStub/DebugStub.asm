@@ -33,8 +33,7 @@ DebugStub_Executing:
 Mov EAX, [DebugStub_CallerEIP]
 Cmp EAX, [DebugStub_AsmBreakEIP]
 JNE DebugStub_Executing_Block1_End
-Call DebugStub_ClearAsmBreak
-Call DebugStub_Break
+Call DebugStub_DoAsmBreak
 Jmp DebugStub_Executing_Normal
 DebugStub_Executing_Block1_End:
 

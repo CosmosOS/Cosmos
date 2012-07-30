@@ -57,9 +57,8 @@ function Executing {
     EAX = .CallerEIP
     // AsmBreakEIP is 0 when disabled, but EIP can never be 0 so we dont need a separate check.
 	if EAX = .AsmBreakEIP {
-	   ClearAsmBreak()
-       Break()
-	   goto Normal
+		DoAsmBreak()
+  		goto Normal
 	}
 
 	// Check for breakpoint
