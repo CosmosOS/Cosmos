@@ -29,22 +29,29 @@ namespace Cosmos.Debug.Common {
     public void SendCommand(byte aCmd, byte[] aData) {
       // We need to delay creation and connect until its used, so we guarantee
       // that the server side is active and ready.
-      if (mPipe == null) {
-        mPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);
-        try {
-          // For now we assume its there or not from the first call.
-          // If we don't find the server, we disable it to avoid causing lag.
-          // TODO: In future - try this instead:
-          // String[] listOfPipes = System.IO.Directory.GetFiles(@"\.\pipe\");
-          // or maybe not - what we have seems to work just fine...
 
-          mPipe.Connect(500);
-        } catch (TimeoutException ex) {
-          mPipe.Close();
-          mPipe = null;
-          return;
+      // Because we have a timeout in connect this can happen more than once
+      // concurrently if the user is quick. I had this issue several times during
+      // testing. To avoid this, we block with a lock.
+      lock (this) {
+        if (mPipe == null) {
+          var xPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);
+          try {
+            // For now we assume its there or not from the first call.
+            // If we don't find the server, we disable it to avoid causing lag.
+            // TODO: In future - try this instead:
+            // String[] listOfPipes = System.IO.Directory.GetFiles(@"\.\pipe\");
+            // or maybe not - what we have seems to work just fine...
+
+            mPipe.Connect(500);
+          } catch (TimeoutException ex) {
+            mPipe.Close();
+            return;
+          }
+          mWriter = new StreamWriter(mPipe);
+          // Only set mPipe if we are truly ready. Other code can check it.
+          mPipe = xPipe;
         }
-        mWriter = new StreamWriter(mPipe);
       }
 
       mPipe.WriteByte(aCmd);
