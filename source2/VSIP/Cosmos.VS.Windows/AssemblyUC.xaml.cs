@@ -171,9 +171,10 @@ namespace Cosmos.VS.Windows {
       // Should always be \r\n, but just in case we split by \n and ignore \r
       string[] xLines = xCode.Replace("\r", "").Split('\n');
 
+      // First line of packet is not code, but the current label and inserted by caller.
       mCurrentLabel = xLines[0];
-
       bool xSetNextLabelToCurrent = false;
+
       AsmLabel xLastAsmAsmLabel = null;
       for (int i = 1; i < xLines.Length; i++) {
         string xLine = xLines[i].Trim();
@@ -187,7 +188,7 @@ namespace Cosmos.VS.Windows {
           continue;
         }
 
-        if (xParts[0].EndsWith(":")) { // Labels
+        if (xParts[0].EndsWith(":")) { // Label
           string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
           var xAsmLabel = new AsmLabel(xLabel);
           // See if the label has a comment/tag
@@ -200,11 +201,11 @@ namespace Cosmos.VS.Windows {
           }
           mLines.Add(xAsmLabel);
 
-        } else if (xTestLine.StartsWith(";")) { // Comments
+        } else if (xTestLine.StartsWith(";")) { // Comment
           string xComment = xLine.Trim().Substring(1).Trim();
           mLines.Add(new AsmComment(xComment));
 
-        } else { // Codee
+        } else { // Code
           var xAsmCode = new AsmCode(xLine);
           xAsmCode.AsmLabel = xLastAsmAsmLabel;
           xLastAsmAsmLabel = null;
@@ -214,7 +215,7 @@ namespace Cosmos.VS.Windows {
             xSetNextLabelToCurrent = false;
           }
 
-          // If its Int3 or so, we need to set the label to the next non debug op
+          // If its Int3 or so, we need to set the current label to the next non debug op.
           if (xAsmCode.IsDebugCode) {
             if (xAsmCode.LabelMatches(mCurrentLabel)) {
               xSetNextLabelToCurrent = true;
@@ -231,16 +232,15 @@ namespace Cosmos.VS.Windows {
       mLines.Clear();
       if (mData.Length == 0) {
         Display(false);
-        return;
-      }
+      } else {
+        // Used for creating a test file for Cosmos.VS.Windows.Test
+        if (false) {
+          System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+        }
 
-      // Used for creating a test file for Cosmos.VS.Windows.Test
-      if (false) {
-        System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+        Parse();
+        Display(mFilter);
       }
-
-      Parse();
-      Display(mFilter);
     }
 
   }
