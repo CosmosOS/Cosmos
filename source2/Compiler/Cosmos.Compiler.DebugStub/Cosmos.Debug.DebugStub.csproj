@@ -77,9 +77,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CmdAsmBreak.xs">
+    <None Include="AsmBreak.xs">
       <Generator>CosmosXSharpGenerator</Generator>
-      <LastGenOutput>CmdAsmBreak.asm</LastGenOutput>
+      <LastGenOutput>AsmBreak.asm</LastGenOutput>
     </None>
     <None Include="CmdMisc.xs">
       <Generator>CosmosXSharpGenerator</Generator>
@@ -120,10 +120,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CmdAsmBreak.asm">
+    <Content Include="AsmBreak.asm">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>CmdAsmBreak.xs</DependentUpon>
+      <DependentUpon>AsmBreak.xs</DependentUpon>
     </Content>
     <Content Include="CmdMisc.asm">
       <AutoGen>True</AutoGen>

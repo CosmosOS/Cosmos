@@ -4,6 +4,10 @@ DebugStub_AsmOrigByte dd 0
 
 
 
+DebugStub_DoAsmBreak:
+DebugStub_DoAsmBreak_Exit:
+Ret
+
 DebugStub_SetAsmBreak:
 Call DebugStub_ClearAsmBreak
 

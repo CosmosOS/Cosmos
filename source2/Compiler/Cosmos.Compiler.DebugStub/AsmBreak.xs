@@ -8,6 +8,9 @@ var AsmBreakEIP
 // Only 1 byte is used.
 var AsmOrigByte
 
+function DoAsmBreak {
+}
+
 function SetAsmBreak {
 	ClearAsmBreak()
 
