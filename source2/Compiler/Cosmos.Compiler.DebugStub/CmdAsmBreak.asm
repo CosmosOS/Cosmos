@@ -11,26 +11,21 @@ Call DebugStub_ComReadEAX
 Mov EDI, EAX
 Mov [DebugStub_AsmBreakEIP], EDI
 
-Mov AX, [EDI + 0]
-Mov [DebugStub_AsmOrigByte], AX
+Mov AL, [EDI + 0]
+Mov [DebugStub_AsmOrigByte], AL
 
-Mov AX, 0xCC
-Mov [EDI + 0], AX
+Mov AL, 0xCC
+Mov [EDI + 0], AL
 DebugStub_SetAsmBreak_Exit:
 Ret
-
-
-
-
-
 
 DebugStub_ClearAsmBreak:
 Mov EDI, [DebugStub_AsmBreakEIP]
 Cmp EDI, 0
 JE DebugStub_ClearAsmBreak_Exit
 
-Mov AX, [DebugStub_AsmOrigByte]
-Mov [EDI + 0], AX
+Mov AL, [DebugStub_AsmOrigByte]
+Mov [EDI + 0], AL
 
 Mov dword [DebugStub_AsmBreakEIP], 0
 DebugStub_ClearAsmBreak_Exit:

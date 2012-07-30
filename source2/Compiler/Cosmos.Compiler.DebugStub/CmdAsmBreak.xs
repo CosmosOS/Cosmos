@@ -17,13 +17,13 @@ function SetAsmBreak {
     .AsmBreakEIP = EDI
 
     // Save the old byte
-    AX = EDI[0]
-    .AsmOrigByte = AX
+    AL = EDI[0]
+    .AsmOrigByte = AL
 
     // Inject INT3
 	// Do in 2 steps to force a byte move to RAM (till X# can do byte in one step)
-	AX = $CC
-    EDI[0] = AX
+	AL = $CC
+    EDI[0] = AL
 }
 
 function ClearAsmBreak {
@@ -32,8 +32,8 @@ function ClearAsmBreak {
     if EDI = 0 return
     
 	// Clear old break point and set back to original opcode / partial opcode
-    AX = .AsmOrigByte
-    EDI[0] = AX
+    AL = .AsmOrigByte
+    EDI[0] = AL
 
     .AsmBreakEIP = 0
 }
