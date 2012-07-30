@@ -80,29 +80,31 @@ function Executing {
 	}
 
     // Only one of the following can be active at a time (F10, F11, ShiftF11)
-	// Check Step F11
+
+	// F11 - Must check first
+	// If F11, stop on next C# line that executes.
     if dword .DebugBreakOnNextTrace = #StepTrigger_Into {
 		Break()
 		goto Normal
 	}
+
+	// .CallerEBP is the stack on method entry.
+	EAX = .CallerEBP
 	
-	// Check Step F10
+	// F10
     if dword .DebugBreakOnNextTrace = #StepTrigger_Over {
-	    EAX = .CallerEBP
-		// If EBP and start EBP arent equal, dont break
-		// Dont use Equal because we also need to stop above if the user starts
-		// the step at the end of a method and next item is after a return
-		if EAX <= .BreakEBP {
+		// If EAX = .BreakEBP then we are in same method.
+		// If EAX > .BreakEBP then our method has returned and we are in the caller.
+		if EAX >= .BreakEBP {
 			Break()
 		}
 		goto Normal
 	}
 
-	// Check Step Shift-F11
+	// Shift-F11
     if dword .DebugBreakOnNextTrace = #StepTrigger_Out {
-	    EAX = .CallerEBP
-		if EAX = .BreakEBP goto Normal
-		if < {
+		// If EAX > .BreakEBP then our method has returned and we are in the caller.
+		if EAX > .BreakEBP {
 			Break()
 		}
 		goto Normal
@@ -161,6 +163,8 @@ WaitCmd:
 
     if AL = #Vs2Ds_StepInto {
         .DebugBreakOnNextTrace = #StepTrigger_Into
+		// Not used, but set for consistency
+        .BreakEBP = EAX
 	    goto Done
 	}
 
