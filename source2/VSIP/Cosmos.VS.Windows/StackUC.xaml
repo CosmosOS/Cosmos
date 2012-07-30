@@ -10,6 +10,6 @@
              Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" xmlns:my="clr-namespace:Cosmos.VS.Windows">
     <WrapPanel>
         <my:MemoryViewUC Margin="5,0,0,0" x:Name="memvEBP" Title="Arguments" />
-        <my:MemoryViewUC Margin="5,0,0,0" x:Name="memvESP" Title="Stack" />
+        <my:MemoryViewUC Margin="15,0,0,0" x:Name="memvESP" Title="Stack" />
     </WrapPanel>
 </local:DebuggerUC>

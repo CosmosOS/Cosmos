@@ -65,7 +65,7 @@ namespace Cosmos.VS.Windows {
       int xCount = xValues.Count;
       memvESP.Clear();
       for (int i = 0; i < xCount; i++) {
-        memvESP.Add("[EBP - " + ((xCount - i) * 4) + "] [ESP + " + (i * 4) + "]", xValues[i]);
+        memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
       }
     }
   }
