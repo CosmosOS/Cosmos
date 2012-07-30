@@ -290,13 +290,11 @@ namespace Cosmos.Debug.VSDebugEngine {
         } else {
           mCallback.OnBreakpoint(mThread, new List<IDebugBoundBreakpoint2>());
         }
-
-        RequestFullDebugStubUpdate();
       } else {
         // Found a bound breakpoint
-        RequestFullDebugStubUpdate();
         mCallback.OnBreakpoint(mThread, xBoundBreakpoints.AsReadOnly());
       }
+      RequestFullDebugStubUpdate();
     }
 
     protected void RequestFullDebugStubUpdate() {
