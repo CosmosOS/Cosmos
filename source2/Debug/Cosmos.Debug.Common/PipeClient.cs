@@ -43,12 +43,12 @@ namespace Cosmos.Debug.Common {
             // String[] listOfPipes = System.IO.Directory.GetFiles(@"\.\pipe\");
             // or maybe not - what we have seems to work just fine...
 
-            mPipe.Connect(500);
+            xPipe.Connect(500);
           } catch (TimeoutException ex) {
-            mPipe.Close();
+            xPipe.Close();
             return;
           }
-          mWriter = new StreamWriter(mPipe);
+          mWriter = new StreamWriter(xPipe);
           // Only set mPipe if we are truly ready. Other code can check it.
           mPipe = xPipe;
         }
