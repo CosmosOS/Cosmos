@@ -57,92 +57,166 @@ namespace Cosmos.Debug.Common {
     }
 
     private void OpenCPDB(string aPathname, bool aCreate) {
-      var xCSB = new FbConnectionStringBuilder();
-      xCSB.ServerType = FbServerType.Embedded;
-      xCSB.Database = aPathname;
-      xCSB.UserID = "sysdba";
-      xCSB.Password = "masterkey";
-      xCSB.Pooling = false;
+      if (UseSQL) {
+        var xCSB = new FbConnectionStringBuilder();
+        xCSB.DataSource = aPathname;
 
-      // Ugh - The curr dir is the actual .cosmos dir. But we dont want to
-      // copy the FB Embedded DLLs everywhere, and we don't want them in system
-      // or path as they might conflict with other apps.
-      // However the FB .NET provider doesnt let us set the path, so we hack it
-      // by changing the current dir right before the first load (create or open).
-      // We set it back after.
-      string xCurrDir = Directory.GetCurrentDirectory();
-      Directory.SetCurrentDirectory(Cosmos.Build.Common.CosmosPaths.Build);
+        if (aCreate) {
+          File.Delete(aPathname);
+          var xEngine = new SqlCeEngine(xCSB.ToString());
+          xEngine.CreateDatabase();
+        }
 
-      if (aCreate) {
-        File.Delete(aPathname);
-        FbConnection.CreateDatabase(xCSB.ToString(), 16384, false, true); // Specifying false to forcedwrites will improve database speed.
+        mConnection = new SqlCeConnection(xCSB.ToString());
+        mConnection.Open();
+      } else {
+        var xCSB = new FbConnectionStringBuilder();
+        xCSB.ServerType = FbServerType.Embedded;
+        xCSB.Database = aPathname;
+        xCSB.UserID = "sysdba";
+        xCSB.Password = "masterkey";
+        xCSB.Pooling = false;
+
+        // Ugh - The curr dir is the actual .cosmos dir. But we dont want to
+        // copy the FB Embedded DLLs everywhere, and we don't want them in system
+        // or path as they might conflict with other apps.
+        // However the FB .NET provider doesnt let us set the path, so we hack it
+        // by changing the current dir right before the first load (create or open).
+        // We set it back after.
+        string xCurrDir = Directory.GetCurrentDirectory();
+        Directory.SetCurrentDirectory(Cosmos.Build.Common.CosmosPaths.Build);
+
+        if (aCreate) {
+          File.Delete(aPathname);
+          FbConnection.CreateDatabase(xCSB.ToString(), 16384, false, true); // Specifying false to forcedwrites will improve database speed.
+        }
+
+        mConnection = new FbConnection(xCSB.ToString());
+        mConnection.Open();
+
+        // Set the current directory back to the original
+        Directory.SetCurrentDirectory(xCurrDir);
       }
+    }
 
-      mConnection = new FbConnection(xCSB.ToString());
-      mConnection.Open();
-
-      // Set the current directory back to the original
-      Directory.SetCurrentDirectory(xCurrDir);
+    protected void ExecSQL(string aSQL) {
+      using (var xCmd = mConnection.CreateCommand()) {
+        xCmd.CommandText = aSQL;
+        xCmd.ExecuteNonQuery();
+      }
     }
 
     public void CreateCPDB(string aPathname) {
       OpenCPDB(aPathname, true);
-      var xExec = new FbBatchExecution((FbConnection)mConnection);
+      if (UseSQL) {
+        ExecSQL(
+            "CREATE TABLE Method ("
+            + "    MethodId      INT            NOT NULL PRIMARY KEY"
+            + "  , LabelPrefix   VARCHAR(255)   NOT NULL"
+            + ");");
+        ExecSQL(
+            "CREATE TABLE MLSYMBOL ("
+            + "   LABELNAME   VARCHAR(255)  NOT NULL"
+            + " , STACKDIFF   INT           NOT NULL"
+            + " , ILASMFILE   VARCHAR(255)  NOT NULL"
+            + " , TYPETOKEN   INT           NOT NULL"
+            + " , METHODTOKEN INT           NOT NULL"
+            + " , ILOFFSET    INT           NOT NULL"
+            + " , METHODNAME  VARCHAR(255)  NOT NULL"
+            + ");"
+        );
 
-      xExec.SqlStatements.Add(
-          "CREATE TABLE Method ("
-          + "    MethodId      INT            NOT NULL PRIMARY KEY"
-          + "  , LabelPrefix   VARCHAR(255)   NOT NULL"
-          + ");");
+        ExecSQL(
+            "CREATE TABLE FIELD_INFO ("
+            + "    TYPE      VARCHAR(4000)     NOT NULL"
+            + " ,  OFFSET    INT               NOT NULL"
+            + " ,  NAME      VARCHAR(4000)     NOT NULL PRIMARY KEY"
+            + ");"
+            );
 
-      xExec.SqlStatements.Add(
-          "CREATE TABLE MLSYMBOL ("
-          + "   LABELNAME   VARCHAR(255)  NOT NULL"
-          + " , STACKDIFF   INT           NOT NULL"
-          + " , ILASMFILE   VARCHAR(255)  NOT NULL"
-          + " , TYPETOKEN   INT           NOT NULL"
-          + " , METHODTOKEN INT           NOT NULL"
-          + " , ILOFFSET    INT           NOT NULL"
-          + " , METHODNAME  VARCHAR(255)  NOT NULL"
-          + ");"
-      );
+        ExecSQL(
+            "CREATE TABLE FIELD_MAPPING ("
+            + "    TYPE_NAME        VARCHAR(4000)            NOT NULL PRIMARY KEY"
+            + " ,  FIELD_COUNT      INT                      NOT NULL"
+            + " ,  FIELD_NAMES      VARCHAR(4000)[0:255]     NOT NULL"
+            + ");"
+            );
 
-      xExec.SqlStatements.Add(
-          "CREATE TABLE FIELD_INFO ("
-          + "    TYPE      VARCHAR(4000)     NOT NULL"
-          + " ,  OFFSET    INT               NOT NULL"
-          + " ,  NAME      VARCHAR(4000)     NOT NULL PRIMARY KEY"
-          + ");"
-          );
+        ExecSQL(
+            "CREATE TABLE Label ("
+            + "  LABELNAME VARCHAR(4000)  NOT NULL"
+            + ", ADDRESS   BIGINT        NOT NULL"
+            + ");");
 
-      xExec.SqlStatements.Add(
-          "CREATE TABLE FIELD_MAPPING ("
-          + "    TYPE_NAME        VARCHAR(4000)            NOT NULL PRIMARY KEY"
-          + " ,  FIELD_COUNT      INT                      NOT NULL"
-          + " ,  FIELD_NAMES      VARCHAR(4000)[0:255]     NOT NULL"
-          + ");"
-          );
+        ExecSQL(
+            "CREATE TABLE LOCAL_ARGUMENT_INFO ("
+            + "  METHODLABELNAME VARCHAR(255)      NOT NULL"
+            + ", ISARGUMENT      SMALLINT          NOT NULL"
+            + ", INDEXINMETHOD   INT               NOT NULL"
+            + ", OFFSET          INT               NOT NULL"
+            + ", NAME            VARCHAR(255)      NOT NULL"
+            + ", TYPENAME        VARCHAR(4000)     NOT NULL"
+            + ");"
+            );
+      } else {
+        var xExec = new FbBatchExecution((FbConnection)mConnection);
 
-      xExec.SqlStatements.Add(
-          "CREATE TABLE Label ("
-          + "  LABELNAME VARCHAR(4000)  NOT NULL"
-          + ", ADDRESS   BIGINT        NOT NULL"
-          + ");");
+        xExec.SqlStatements.Add(
+            "CREATE TABLE Method ("
+            + "    MethodId      INT            NOT NULL PRIMARY KEY"
+            + "  , LabelPrefix   VARCHAR(255)   NOT NULL"
+            + ");");
 
-      xExec.SqlStatements.Add(
-          "CREATE TABLE LOCAL_ARGUMENT_INFO ("
-          + "  METHODLABELNAME VARCHAR(255)      NOT NULL"
-          + ", ISARGUMENT      SMALLINT          NOT NULL"
-          + ", INDEXINMETHOD   INT               NOT NULL"
-          + ", OFFSET          INT               NOT NULL"
-          + ", NAME            VARCHAR(255)      NOT NULL"
-          + ", TYPENAME        VARCHAR(4000)     NOT NULL"
-          + ");"
-          );
+        xExec.SqlStatements.Add(
+            "CREATE TABLE MLSYMBOL ("
+            + "   LABELNAME   VARCHAR(255)  NOT NULL"
+            + " , STACKDIFF   INT           NOT NULL"
+            + " , ILASMFILE   VARCHAR(255)  NOT NULL"
+            + " , TYPETOKEN   INT           NOT NULL"
+            + " , METHODTOKEN INT           NOT NULL"
+            + " , ILOFFSET    INT           NOT NULL"
+            + " , METHODNAME  VARCHAR(255)  NOT NULL"
+            + ");"
+        );
 
-      xExec.Execute();
-      // Batch execution closes the connection, so we have to reopen it
-      mConnection.Open();
+        xExec.SqlStatements.Add(
+            "CREATE TABLE FIELD_INFO ("
+            + "    TYPE      VARCHAR(4000)     NOT NULL"
+            + " ,  OFFSET    INT               NOT NULL"
+            + " ,  NAME      VARCHAR(4000)     NOT NULL PRIMARY KEY"
+            + ");"
+            );
+
+        xExec.SqlStatements.Add(
+            "CREATE TABLE FIELD_MAPPING ("
+            + "    TYPE_NAME        VARCHAR(4000)            NOT NULL PRIMARY KEY"
+            + " ,  FIELD_COUNT      INT                      NOT NULL"
+            + " ,  FIELD_NAMES      VARCHAR(4000)[0:255]     NOT NULL"
+            + ");"
+            );
+
+        xExec.SqlStatements.Add(
+            "CREATE TABLE Label ("
+            + "  LABELNAME VARCHAR(4000)  NOT NULL"
+            + ", ADDRESS   BIGINT        NOT NULL"
+            + ");");
+
+        xExec.SqlStatements.Add(
+            "CREATE TABLE LOCAL_ARGUMENT_INFO ("
+            + "  METHODLABELNAME VARCHAR(255)      NOT NULL"
+            + ", ISARGUMENT      SMALLINT          NOT NULL"
+            + ", INDEXINMETHOD   INT               NOT NULL"
+            + ", OFFSET          INT               NOT NULL"
+            + ", NAME            VARCHAR(255)      NOT NULL"
+            + ", TYPENAME        VARCHAR(4000)     NOT NULL"
+            + ");"
+            );
+
+        xExec.Execute();
+
+        // Batch execution closes the connection, so we have to reopen it
+        mConnection.Open();
+      } 
     }
 
     private List<string> local_MappingTypeNames = new List<string>();
