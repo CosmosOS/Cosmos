@@ -136,9 +136,8 @@ namespace Cosmos.Debug.Common {
 
         ExecSQL(
             "CREATE TABLE FIELD_MAPPING ("
-            + "    TYPE_NAME        VARCHAR(4000)            NOT NULL PRIMARY KEY"
-            + " ,  FIELD_COUNT      INT                      NOT NULL"
-            + " ,  FIELD_NAMES      VARCHAR(4000)[0:255]     NOT NULL"
+            + "    TYPE_NAME       VARCHAR(4000)    NOT NULL"
+            + " ,  FIELD_NAME      VARCHAR(4000)    NOT NULL"
             + ");"
             );
 
@@ -221,37 +220,54 @@ namespace Cosmos.Debug.Common {
 
     private List<string> local_MappingTypeNames = new List<string>();
     public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping) {
-      using (FbTransaction transaction = ((FbConnection)mConnection).BeginTransaction()) {
-        IEnumerable<Field_Map> xMaps = aMapping.Where(delegate(Field_Map mp) {
-          if (local_MappingTypeNames.Contains(mp.TypeName)) {
-            return false;
-          } else {
-            local_MappingTypeNames.Add(mp.TypeName);
-            return true;
-          }
-        });
-        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-          xCmd.Transaction = transaction;
+      IEnumerable<Field_Map> xMaps = aMapping.Where(delegate(Field_Map mp) {
+        if (local_MappingTypeNames.Contains(mp.TypeName)) {
+          return false;
+        } else {
+          local_MappingTypeNames.Add(mp.TypeName);
+          return true;
+        }
+      });
+
+      if (UseSQL) {
+        using (var xCmd = mConnection.CreateCommand()) {
           xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_COUNT, FIELD_NAMES)" +
-                             " VALUES (@TYPE_NAME, @FIELD_COUNT, @FIELD_NAMES)";
-
-          xCmd.Parameters.Add("@TYPE_NAME", FbDbType.VarChar);
-          xCmd.Parameters.Add("@FIELD_COUNT", FbDbType.Integer);
-          xCmd.Parameters.Add("@FIELD_NAMES", FbDbType.Array);
+                               " VALUES (@TYPE_NAME, @FIELD_COUNT, @FIELD_NAMES)";
           xCmd.Prepare();
-
           // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
           foreach (var xItem in xMaps) {
             xCmd.Parameters[0].Value = xItem.TypeName;
-            xCmd.Parameters[1].Value = xItem.FieldNames.Count;
-            if (xItem.FieldNames.Count > 255) {
-              throw new Exception("To many fields! There are '" + xItem.FieldNames.Count + "' fields.");
+            foreach (var xFieldName in xItem.FieldNames) {
+              xCmd.Parameters[2].Value = xItem.FieldNames.ToArray();
+              xCmd.ExecuteNonQuery();
             }
-            xCmd.Parameters[2].Value = xItem.FieldNames.ToArray();
-            xCmd.ExecuteNonQuery();
           }
         }
-        transaction.Commit();
+      } else {
+        using (var transaction = ((FbConnection)mConnection).BeginTransaction()) {
+          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
+            xCmd.Transaction = transaction;
+            xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_COUNT, FIELD_NAMES)" +
+                               " VALUES (@TYPE_NAME, @FIELD_COUNT, @FIELD_NAMES)";
+
+            xCmd.Parameters.Add("@TYPE_NAME", FbDbType.VarChar);
+            xCmd.Parameters.Add("@FIELD_COUNT", FbDbType.Integer);
+            xCmd.Parameters.Add("@FIELD_NAMES", FbDbType.Array);
+            xCmd.Prepare();
+
+            // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+            foreach (var xItem in xMaps) {
+              xCmd.Parameters[0].Value = xItem.TypeName;
+              xCmd.Parameters[1].Value = xItem.FieldNames.Count;
+              if (xItem.FieldNames.Count > 255) {
+                throw new Exception("Too many fields! There are '" + xItem.FieldNames.Count + "' fields.");
+              }
+              xCmd.Parameters[2].Value = xItem.FieldNames.ToArray();
+              xCmd.ExecuteNonQuery();
+            }
+            transaction.Commit();
+          }
+        }
       }
     }
 
