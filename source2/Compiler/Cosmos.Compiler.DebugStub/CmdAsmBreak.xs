@@ -11,13 +11,15 @@ var AsmOrigByte
 function SetAsmBreak {
     ComReadEAX()
     EDI = EAX
-    // Save the old byte (as dword for now)
-    EAX = EDI[0]
-    .AsmOrigByte = EAX
-    // Inject INT3
-    EDI[0] = $CC
     // Save EIP of the break
     .AsmBreakEIP = EDI
+
+    // Save the old byte
+    AX = EDI[0]
+    .AsmOrigByte = AX
+
+    // Inject INT3
+    EDI[0] = $CC
 }
 
 function ClearAsmBreak {
@@ -26,8 +28,8 @@ function ClearAsmBreak {
     if EDI = 0 return
     
 	// Clear old break point and set back to original opcode / partial opcode
-    EAX = .AsmOrigByte
-    EDI[0] = EAX
+    AX = .AsmOrigByte
+    EDI[0] = AX
     .AsmOrigByte = 0
 }
 
