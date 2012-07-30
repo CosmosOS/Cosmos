@@ -58,23 +58,25 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnStepOver_Click(object sender, RoutedEventArgs e) {
+      // Disable until step is done to prevent user concurrently clicking
+      butnStepOver.IsEnabled = false;
+      Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, mStepToLabel.Label);
+    }
+
+    protected AsmLabel mStepToLabel = null;
+    protected void FindStepToLabel() {
+      mStepToLabel = null;
       var xCodeLinesQry = from x in mLines
                        where x is AsmCode
                        select (AsmCode)x;
       // Remove Int3 calls.
       var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToArray();
-      AsmLabel xLabel = null;
       // We check against Length - 1 because when we find it, we go one more.
       for (int i = 0; i < xCodeLines.Length - 1; i++) {
         if (xCodeLines[i].LabelMatches(mCurrentLabel)) {
-          xLabel = xCodeLines[i + 1].AsmLabel;
+          mStepToLabel = xCodeLines[i + 1].AsmLabel;
           break;
         }
-      }
-      if (xLabel == null) {
-        MessageBox.Show("Cannot step from here.");
-      } else {
-        Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, xLabel.Label);
       }
     }
 
@@ -244,6 +246,8 @@ namespace Cosmos.VS.Windows {
         }
 
         Parse();
+        FindStepToLabel();
+        butnStepOver.IsEnabled = mStepToLabel != null;
         Display(mFilter);
       }
     }
