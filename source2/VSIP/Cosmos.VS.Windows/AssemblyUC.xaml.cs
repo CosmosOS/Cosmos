@@ -89,6 +89,7 @@ namespace Cosmos.VS.Windows {
       Clipboard.SetText(mCode.ToString());
     }
 
+    protected Run mSelectedCodeRun = null;
     protected void Display(bool aFilter) {
       mCode.Clear();
       tblkSource.Inlines.Clear();
@@ -162,6 +163,22 @@ namespace Cosmos.VS.Windows {
           } else {
             xRun.Foreground = Brushes.Blue;
           }
+
+          xRun.MouseUp += delegate(object aSender, System.Windows.Input.MouseButtonEventArgs aArgs) {
+            // Reset colours for previously selected item.
+            if (mSelectedCodeRun != null) {
+              mSelectedCodeRun.Foreground = Brushes.Blue;
+              mSelectedCodeRun.Background = null;
+              mSelectedCodeRun = null;
+            }
+
+            // Highlight new selection, if not the current break.
+            if (xRun.Background != Brushes.DarkRed) {
+              mSelectedCodeRun = xRun;
+              xRun.Foreground = Brushes.WhiteSmoke;
+              xRun.Background = Brushes.Blue;
+            }
+          };
         } else { // Unknown type
           xRun.Foreground = Brushes.HotPink;
         }
