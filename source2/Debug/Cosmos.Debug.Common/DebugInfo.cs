@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Data;
+using System.Data.Common;
+using System.Data.SqlServerCe;
 using Microsoft.Win32;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
-    /// Please beware this field, it may cause issues if used incorrectly.
+    protected const bool UseSQL = false;
+
+    // Please beware this field, it may cause issues if used incorrectly.
     public static DebugInfo CurrentInstance { get; private set; }
     public class Field_Info {
       public string Type { get; set; }
@@ -41,7 +46,7 @@ namespace Cosmos.Debug.Common {
       public string Type { get; set; }
     }
 
-    private FbConnection mConnection;
+    protected DbConnection mConnection;
 
     public DebugInfo() {
       CurrentInstance = this;
@@ -82,7 +87,7 @@ namespace Cosmos.Debug.Common {
 
     public void CreateCPDB(string aPathname) {
       OpenCPDB(aPathname, true);
-      var xExec = new FbBatchExecution(mConnection);
+      var xExec = new FbBatchExecution((FbConnection)mConnection);
 
       xExec.SqlStatements.Add(
           "CREATE TABLE Method ("
@@ -142,7 +147,7 @@ namespace Cosmos.Debug.Common {
 
     private List<string> local_MappingTypeNames = new List<string>();
     public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping) {
-      using (FbTransaction transaction = mConnection.BeginTransaction()) {
+      using (FbTransaction transaction = ((FbConnection)mConnection).BeginTransaction()) {
         IEnumerable<Field_Map> xMaps = aMapping.Where(delegate(Field_Map mp) {
           if (local_MappingTypeNames.Contains(mp.TypeName)) {
             return false;
@@ -151,7 +156,7 @@ namespace Cosmos.Debug.Common {
             return true;
           }
         });
-        using (var xCmd = mConnection.CreateCommand()) {
+        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
           xCmd.Transaction = transaction;
           xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_COUNT, FIELD_NAMES)" +
                              " VALUES (@TYPE_NAME, @FIELD_COUNT, @FIELD_NAMES)";
@@ -178,7 +183,7 @@ namespace Cosmos.Debug.Common {
 
     public Field_Map GetFieldMap(string name) {
       Field_Map mp = new Field_Map();
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select TYPE_NAME, FIELD_COUNT, FIELD_NAMES from FIELD_MAPPING where(TYPE_NAME='" + name + "')";
         using (var xReader = xCmd.ExecuteReader()) {
           if (xReader.Read()) {
@@ -194,7 +199,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadFieldMappingList(List<Field_Map> aSymbols) {
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select TYPE_NAME, FIELD_COUNT, FIELD_NAMES from FIELD_MAPPING";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
@@ -211,7 +216,7 @@ namespace Cosmos.Debug.Common {
 
     private List<string> local_FieldInfoNames = new List<string>();
     public void WriteFieldInfoToFile(IEnumerable<Field_Info> aFields) {
-      using (FbTransaction transaction = mConnection.BeginTransaction()) {
+      using (FbTransaction transaction = ((FbConnection)mConnection).BeginTransaction()) {
         IEnumerable<Field_Info> xFields = aFields.Where(delegate(Field_Info mp) {
           if (local_FieldInfoNames.Contains(mp.Name)) {
             return false;
@@ -220,7 +225,7 @@ namespace Cosmos.Debug.Common {
             return true;
           }
         });
-        using (var xCmd = mConnection.CreateCommand()) {
+        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
           xCmd.Transaction = transaction;
           xCmd.CommandText = "INSERT INTO FIELD_INFO (TYPE, OFFSET, NAME)" +
                              " VALUES (@TYPE, @OFFSET, @NAME)";
@@ -245,7 +250,7 @@ namespace Cosmos.Debug.Common {
 
     public Field_Info GetFieldInfo(string name) {
       Field_Info inf = new Field_Info();
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO where NAME='" + name + "'";
         using (var xReader = xCmd.ExecuteReader()) {
           xReader.Read();
@@ -258,7 +263,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadFieldInfoList(List<Field_Info> aSymbols) {
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
@@ -274,8 +279,8 @@ namespace Cosmos.Debug.Common {
 
 
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
-      using (FbTransaction transaction = mConnection.BeginTransaction()) {
-        using (var xCmd = mConnection.CreateCommand()) {
+      using (FbTransaction transaction = ((FbConnection)mConnection).BeginTransaction()) {
+        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
           xCmd.Transaction = transaction;
           xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
                        " VALUES (@LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
@@ -307,7 +312,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadSymbolsList(List<MLDebugSymbol> aSymbols) {
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
@@ -326,7 +331,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public MLDebugSymbol ReadSymbolByLabelName(string labelName) {
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL"
             + " WHERE LABELNAME = @LABELNAME";
         xCmd.Parameters.Add("@LABELNAME", labelName);
@@ -350,8 +355,8 @@ namespace Cosmos.Debug.Common {
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
     public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
-      using (var xTrans = mConnection.BeginTransaction()) {
-        using (var xCmd = mConnection.CreateCommand()) {
+      using (var xTrans = ((FbConnection)mConnection).BeginTransaction()) {
+        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
           xCmd.Transaction = xTrans;
           xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
           xCmd.Parameters.Add("@METHODLABELNAME", FbDbType.VarChar);
@@ -376,7 +381,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfos() {
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO";
         using (var xReader = xCmd.ExecuteReader()) {
           var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
@@ -396,7 +401,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfosByMethodLabelName(string methodLabelName) {
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO"
             + " WHERE METHODLABELNAME = @METHODLABELNAME";
         xCmd.Parameters.Add("@METHODLABELNAME", methodLabelName);
@@ -420,7 +425,7 @@ namespace Cosmos.Debug.Common {
     public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
       oLabels = new List<KeyValuePair<uint, string>>();
       oLabelAddressMappings = new Dictionary<string, uint>();
-      using (var xCmd = mConnection.CreateCommand()) {
+      using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
         xCmd.CommandText = "select LABELNAME, ADDRESS from Label";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
@@ -435,8 +440,8 @@ namespace Cosmos.Debug.Common {
     protected int mMethodId = 0;
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
-      using (var xTrans = mConnection.BeginTransaction()) {
-        using (var xCmd = mConnection.CreateCommand()) {
+      using (var xTrans = ((FbConnection)mConnection).BeginTransaction()) {
+        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
           xCmd.Transaction = xTrans;
           xCmd.CommandText = "INSERT INTO Method (MethodId, LabelPrefix) values (@MethodId, @LabelPrefix)";
 
@@ -455,8 +460,8 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
-      using (var xTrans = mConnection.BeginTransaction()) {
-        using (var xCmd = mConnection.CreateCommand()) {
+      using (var xTrans = ((FbConnection)mConnection).BeginTransaction()) {
+        using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
           xCmd.Transaction = xTrans;
           xCmd.CommandText = "insert into Label (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
           xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);

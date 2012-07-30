@@ -453,7 +453,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       // Create list of asm labels that belong to this line of C#.
-      //var xValue = mSourceMappings[(uint)mCurrentAddress];
       var xMappings = from x in mSourceMappings
                    where x.Value.SourceFile == xValue.SourceFile
                      && x.Value.Line == xValue.Line
