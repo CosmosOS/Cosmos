@@ -27,11 +27,11 @@ namespace Cosmos.IL2CPU.X86 {
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
       if (aMethod.PluggedMethod != null) {
-        new Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
+        new Cosmos.Assembler.Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
       } else {
-        new Label(aMethod.MethodBase);
+        new Cosmos.Assembler.Label(aMethod.MethodBase);
       }
-      var xMethodLabel = Label.LastFullLabel;
+      var xMethodLabel = Cosmos.Assembler.Label.LastFullLabel;
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
         new Comment("This is a static constructor. see if it has been called already, and if so, return.");
         var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
@@ -41,10 +41,10 @@ namespace Cosmos.IL2CPU.X86 {
         new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
         new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
         new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
-        new Label(".BeforeQuickReturn");
+        new Cosmos.Assembler.Label(".BeforeQuickReturn");
         new Mov { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };
         new Return { };
-        new Label(".AfterCCTorAlreadyCalledCheck");
+        new Cosmos.Assembler.Label(".AfterCCTorAlreadyCalledCheck");
       }
 
       new Push { DestinationReg = Registers.EBP };
@@ -200,7 +200,7 @@ namespace Cosmos.IL2CPU.X86 {
         xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
       }
       if (aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
-        new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
+        new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
       }
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
       var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
@@ -260,7 +260,7 @@ namespace Cosmos.IL2CPU.X86 {
         }
         // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
       }
-      new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException);
+      new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException);
       //for (int i = 0; i < aLocAllocItemCount; i++) {
       //  new CPUx86.Call { DestinationLabel = aHeapFreeLabel };
       //}
@@ -325,7 +325,7 @@ namespace Cosmos.IL2CPU.X86 {
       //new CPUx86.Halt();
       // TODO: not nice coding, still a test
       //new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
-      new Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
+      new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
       if (xRetSize < 0) {
@@ -354,7 +354,7 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodBegin(string aMethodName) {
       base.MethodBegin(aMethodName);
-      new Label(aMethodName);
+      new Cosmos.Assembler.Label(aMethodName);
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       xCodeOffsets = new int[0];
@@ -362,7 +362,7 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodEnd(string aMethodName) {
       base.MethodEnd(aMethodName);
-      new Label("_END_OF_" + aMethodName);
+      new Cosmos.Assembler.Label("_END_OF_" + aMethodName);
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       new CPUx86.Return();
     }
@@ -392,7 +392,7 @@ namespace Cosmos.IL2CPU.X86 {
       base.BeforeOp(aMethod, aOpCode);
       string xLabel = TmpPosLabel(aMethod, aOpCode);
       Assembler.CurrentIlLabel = xLabel;
-      new Label(xLabel, "IL");
+      new Cosmos.Assembler.Label(xLabel, "IL");
       
       if (mSymbols != null) {
         var xMLSymbol = new DebugInfo.MLDebugSymbol();
