@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using Microsoft.Win32;
 
 namespace Cosmos.Debug.Common {
@@ -43,7 +43,7 @@ namespace Cosmos.Debug.Common {
       public string Type { get; set; }
     }
 
-    protected DbConnection mConnection;
+    protected SqlConnection mConnection;
 
     public DebugInfo() {
       CurrentInstance = this;
@@ -59,11 +59,11 @@ namespace Cosmos.Debug.Common {
 
       if (aCreate) {
         File.Delete(aPathname);
-        var xEngine = new SqlCeEngine(xCSB.ToString());
+        var xEngine = new SqlEngine(xCSB.ToString());
         xEngine.CreateDatabase();
       }
 
-      mConnection = new SqlCeConnection(xCSB.ToString());
+      mConnection = new SqlConnection(xCSB.ToString());
       mConnection.Open();
     }
 
