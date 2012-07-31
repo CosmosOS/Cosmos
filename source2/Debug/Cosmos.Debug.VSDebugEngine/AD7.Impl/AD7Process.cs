@@ -165,7 +165,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       mHost.OnShutDown += HostShutdown;
 
-      string xCpdbPath = Path.ChangeExtension(mISO, "cpdb");
+      string xCpdbPath = Path.ChangeExtension(mISO, "sdf");
       if (!File.Exists(xCpdbPath)) {
         throw new Exception("Debug data file " + xCpdbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
       }
