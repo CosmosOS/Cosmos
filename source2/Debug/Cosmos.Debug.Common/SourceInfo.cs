@@ -8,7 +8,6 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Diagnostics;
-using FirebirdSql.Data.FirebirdClient;
 
 namespace Cosmos.Debug.Common {
 

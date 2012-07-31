@@ -6,12 +6,9 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using Microsoft.Win32;
-using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.Data.Isql;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
-    protected const bool UseSQL = true;
 
     // Please beware this field, it may cause issues if used incorrectly.
     public static DebugInfo CurrentInstance { get; private set; }
@@ -52,53 +49,22 @@ namespace Cosmos.Debug.Common {
       CurrentInstance = this;
     }
 
-    public void OpenCPDB(string aPathname) {
-      OpenCPDB(aPathname, false);
+    public void OpenDB(string aPathname) {
+      OpenDB(aPathname, false);
     }
 
-    private void OpenCPDB(string aPathname, bool aCreate) {
-      if (UseSQL) {
-        aPathname = Path.ChangeExtension(aPathname, ".sdf");
+    private void OpenDB(string aPathname, bool aCreate) {
+      var xCSB = new DbConnectionStringBuilder();
+      xCSB["DataSource"] = aPathname;
 
-        var xCSB = new FbConnectionStringBuilder();
-        xCSB.DataSource = aPathname;
-
-        if (aCreate) {
-          File.Delete(aPathname);
-          var xEngine = new SqlCeEngine(xCSB.ToString());
-          xEngine.CreateDatabase();
-        }
-
-        mConnection = new SqlCeConnection(xCSB.ToString());
-        mConnection.Open();
-      } else {
-        var xCSB = new FbConnectionStringBuilder();
-        xCSB.ServerType = FbServerType.Embedded;
-        xCSB.Database = aPathname;
-        xCSB.UserID = "sysdba";
-        xCSB.Password = "masterkey";
-        xCSB.Pooling = false;
-
-        // Ugh - The curr dir is the actual .cosmos dir. But we dont want to
-        // copy the FB Embedded DLLs everywhere, and we don't want them in system
-        // or path as they might conflict with other apps.
-        // However the FB .NET provider doesnt let us set the path, so we hack it
-        // by changing the current dir right before the first load (create or open).
-        // We set it back after.
-        string xCurrDir = Directory.GetCurrentDirectory();
-        Directory.SetCurrentDirectory(Cosmos.Build.Common.CosmosPaths.Build);
-
-        if (aCreate) {
-          File.Delete(aPathname);
-          FbConnection.CreateDatabase(xCSB.ToString(), 16384, false, true); // Specifying false to forcedwrites will improve database speed.
-        }
-
-        mConnection = new FbConnection(xCSB.ToString());
-        mConnection.Open();
-
-        // Set the current directory back to the original
-        Directory.SetCurrentDirectory(xCurrDir);
+      if (aCreate) {
+        File.Delete(aPathname);
+        var xEngine = new SqlCeEngine(xCSB.ToString());
+        xEngine.CreateDatabase();
       }
+
+      mConnection = new SqlCeConnection(xCSB.ToString());
+      mConnection.Open();
     }
 
     protected void ExecSQL(string aSQL) {
@@ -109,115 +75,55 @@ namespace Cosmos.Debug.Common {
     }
 
     public void CreateCPDB(string aPathname) {
-      OpenCPDB(aPathname, true);
-      if (UseSQL) {
-        ExecSQL(
-            "CREATE TABLE Method ("
-            + "    MethodId      INT            NOT NULL PRIMARY KEY"
-            + "  , LabelPrefix   NVARCHAR(255)   NOT NULL"
-            + ");");
-        ExecSQL(
-            "CREATE TABLE MLSYMBOL ("
-            + "   LABELNAME   NVARCHAR(255)  NOT NULL"
-            + " , STACKDIFF   INT           NOT NULL"
-            + " , ILASMFILE   NVARCHAR(255)  NOT NULL"
-            + " , TYPETOKEN   INT           NOT NULL"
-            + " , METHODTOKEN INT           NOT NULL"
-            + " , ILOFFSET    INT           NOT NULL"
-            + " , METHODNAME  NVARCHAR(255)  NOT NULL"
-            + ");"
-        );
+      OpenDB(aPathname, true);
+      ExecSQL(
+          "CREATE TABLE Method ("
+          + "    MethodId      INT            NOT NULL PRIMARY KEY"
+          + "  , LabelPrefix   NVARCHAR(255)   NOT NULL"
+          + ");");
+      ExecSQL(
+          "CREATE TABLE MLSYMBOL ("
+          + "   LABELNAME   NVARCHAR(255)  NOT NULL"
+          + " , STACKDIFF   INT           NOT NULL"
+          + " , ILASMFILE   NVARCHAR(255)  NOT NULL"
+          + " , TYPETOKEN   INT           NOT NULL"
+          + " , METHODTOKEN INT           NOT NULL"
+          + " , ILOFFSET    INT           NOT NULL"
+          + " , METHODNAME  NVARCHAR(255)  NOT NULL"
+          + ");"
+      );
 
-        ExecSQL(
-            "CREATE TABLE FIELD_INFO ("
-            + "    TYPE      NVARCHAR(4000)     NOT NULL"
-            + " ,  OFFSET    INT               NOT NULL"
-            + " ,  NAME      NVARCHAR(4000)     NOT NULL PRIMARY KEY"
-            + ");"
-            );
+      ExecSQL(
+          "CREATE TABLE FIELD_INFO ("
+          + "    TYPE      NVARCHAR(4000)     NOT NULL"
+          + " ,  OFFSET    INT               NOT NULL"
+          + " ,  NAME      NVARCHAR(4000)     NOT NULL PRIMARY KEY"
+          + ");"
+          );
 
-        ExecSQL(
-            "CREATE TABLE FIELD_MAPPING ("
-            + "    TYPE_NAME       NVARCHAR(4000)    NOT NULL"
-            + " ,  FIELD_NAME      NVARCHAR(4000)    NOT NULL"
-            + ");"
-            );
+      ExecSQL(
+          "CREATE TABLE FIELD_MAPPING ("
+          + "    TYPE_NAME       NVARCHAR(4000)    NOT NULL"
+          + " ,  FIELD_NAME      NVARCHAR(4000)    NOT NULL"
+          + ");"
+          );
 
-        ExecSQL(
-            "CREATE TABLE Label ("
-            + "  LABELNAME NVARCHAR(4000)  NOT NULL"
-            + ", ADDRESS   BIGINT        NOT NULL"
-            + ");");
+      ExecSQL(
+          "CREATE TABLE Label ("
+          + "  LABELNAME NVARCHAR(4000)  NOT NULL"
+          + ", ADDRESS   BIGINT        NOT NULL"
+          + ");");
 
-        ExecSQL(
-            "CREATE TABLE LOCAL_ARGUMENT_INFO ("
-            + "  METHODLABELNAME NVARCHAR(255)      NOT NULL"
-            + ", ISARGUMENT      SMALLINT          NOT NULL"
-            + ", INDEXINMETHOD   INT               NOT NULL"
-            + ", OFFSET          INT               NOT NULL"
-            + ", NAME            NVARCHAR(255)      NOT NULL"
-            + ", TYPENAME        NVARCHAR(4000)     NOT NULL"
-            + ");"
-            );
-      } else {
-        var xExec = new FbBatchExecution((FbConnection)mConnection);
-
-        xExec.SqlStatements.Add(
-            "CREATE TABLE Method ("
-            + "    MethodId      INT            NOT NULL PRIMARY KEY"
-            + "  , LabelPrefix   VARCHAR(255)   NOT NULL"
-            + ");");
-
-        xExec.SqlStatements.Add(
-            "CREATE TABLE MLSYMBOL ("
-            + "   LABELNAME   VARCHAR(255)  NOT NULL"
-            + " , STACKDIFF   INT           NOT NULL"
-            + " , ILASMFILE   VARCHAR(255)  NOT NULL"
-            + " , TYPETOKEN   INT           NOT NULL"
-            + " , METHODTOKEN INT           NOT NULL"
-            + " , ILOFFSET    INT           NOT NULL"
-            + " , METHODNAME  VARCHAR(255)  NOT NULL"
-            + ");"
-        );
-
-        xExec.SqlStatements.Add(
-            "CREATE TABLE FIELD_INFO ("
-            + "    TYPE      VARCHAR(4000)     NOT NULL"
-            + " ,  OFFSET    INT               NOT NULL"
-            + " ,  NAME      VARCHAR(4000)     NOT NULL PRIMARY KEY"
-            + ");"
-            );
-
-        xExec.SqlStatements.Add(
-            "CREATE TABLE FIELD_MAPPING ("
-            + "    TYPE_NAME        VARCHAR(4000)            NOT NULL PRIMARY KEY"
-            + " ,  FIELD_COUNT      INT                      NOT NULL"
-            + " ,  FIELD_NAMES      VARCHAR(4000)[0:255]     NOT NULL"
-            + ");"
-            );
-
-        xExec.SqlStatements.Add(
-            "CREATE TABLE Label ("
-            + "  LABELNAME VARCHAR(4000)  NOT NULL"
-            + ", ADDRESS   BIGINT        NOT NULL"
-            + ");");
-
-        xExec.SqlStatements.Add(
-            "CREATE TABLE LOCAL_ARGUMENT_INFO ("
-            + "  METHODLABELNAME VARCHAR(255)      NOT NULL"
-            + ", ISARGUMENT      SMALLINT          NOT NULL"
-            + ", INDEXINMETHOD   INT               NOT NULL"
-            + ", OFFSET          INT               NOT NULL"
-            + ", NAME            VARCHAR(255)      NOT NULL"
-            + ", TYPENAME        VARCHAR(4000)     NOT NULL"
-            + ");"
-            );
-
-        xExec.Execute();
-
-        // Batch execution closes the connection, so we have to reopen it
-        mConnection.Open();
-      }
+      ExecSQL(
+          "CREATE TABLE LOCAL_ARGUMENT_INFO ("
+          + "  METHODLABELNAME NVARCHAR(255)      NOT NULL"
+          + ", ISARGUMENT      SMALLINT          NOT NULL"
+          + ", INDEXINMETHOD   INT               NOT NULL"
+          + ", OFFSET          INT               NOT NULL"
+          + ", NAME            NVARCHAR(255)      NOT NULL"
+          + ", TYPENAME        NVARCHAR(4000)     NOT NULL"
+          + ");"
+          );
     }
 
     private List<string> local_MappingTypeNames = new List<string>();
@@ -231,45 +137,18 @@ namespace Cosmos.Debug.Common {
         }
       });
 
-      if (UseSQL) {
-        using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
-          xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_NAME)" +
-                               " VALUES (@TYPE_NAME, @FIELD_NAME)";
-          xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-          foreach (var xItem in xMaps) {
-            xCmd.Parameters[0].Value = xItem.TypeName;
-            foreach (var xFieldName in xItem.FieldNames) {
-              xCmd.Parameters[1].Value = xFieldName;
-              xCmd.ExecuteNonQuery();
-            }
+      using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
+        xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_NAME)" +
+                             " VALUES (@TYPE_NAME, @FIELD_NAME)";
+        xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
+        // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+        foreach (var xItem in xMaps) {
+          xCmd.Parameters[0].Value = xItem.TypeName;
+          foreach (var xFieldName in xItem.FieldNames) {
+            xCmd.Parameters[1].Value = xFieldName;
+            xCmd.ExecuteNonQuery();
           }
-        }
-      } else {
-        using (var transaction = ((FbConnection)mConnection).BeginTransaction()) {
-          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-            xCmd.Transaction = transaction;
-            xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_COUNT, FIELD_NAMES)" +
-                               " VALUES (@TYPE_NAME, @FIELD_COUNT, @FIELD_NAMES)";
-
-            xCmd.Parameters.Add("@TYPE_NAME", FbDbType.VarChar);
-            xCmd.Parameters.Add("@FIELD_COUNT", FbDbType.Integer);
-            xCmd.Parameters.Add("@FIELD_NAMES", FbDbType.Array);
-            xCmd.Prepare();
-
-            // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-            foreach (var xItem in xMaps) {
-              xCmd.Parameters[0].Value = xItem.TypeName;
-              xCmd.Parameters[1].Value = xItem.FieldNames.Count;
-              if (xItem.FieldNames.Count > 255) {
-                throw new Exception("Too many fields! There are '" + xItem.FieldNames.Count + "' fields.");
-              }
-              xCmd.Parameters[2].Value = xItem.FieldNames.ToArray();
-              xCmd.ExecuteNonQuery();
-            }
-          }
-          transaction.Commit();
         }
       }
     }
@@ -277,24 +156,11 @@ namespace Cosmos.Debug.Common {
     public Field_Map GetFieldMap(string name) {
       var mp = new Field_Map();
       using (var xCmd = mConnection.CreateCommand()) {
-        if (UseSQL) {
-          xCmd.CommandText = "select TYPE_NAME, FIELD_NAME from FIELD_MAPPING where(TYPE_NAME='" + name + "')";
-          using (var xReader = xCmd.ExecuteReader()) {
-            mp.TypeName = name;
-            while (xReader.Read()) {
-              mp.FieldNames.Add(xReader.GetString(1));
-            }
-          }
-        } else {
-          xCmd.CommandText = "select TYPE_NAME, FIELD_COUNT, FIELD_NAMES from FIELD_MAPPING where(TYPE_NAME='" + name + "')";
-          using (var xReader = xCmd.ExecuteReader()) {
-            if (xReader.Read()) {
-              mp.TypeName = xReader.GetString(0);
-              int i = xReader.GetInt32(1);
-              mp.FieldNames.AddRange(((string[])xReader.GetValue(2)).Take(i));
-            } else {
-              mp.TypeName = "UNKNOWN!";
-            }
+        xCmd.CommandText = "select TYPE_NAME, FIELD_NAME from FIELD_MAPPING where(TYPE_NAME='" + name + "')";
+        using (var xReader = xCmd.ExecuteReader()) {
+          mp.TypeName = name;
+          while (xReader.Read()) {
+            mp.FieldNames.Add(xReader.GetString(1));
           }
         }
       }
@@ -303,34 +169,21 @@ namespace Cosmos.Debug.Common {
 
     public void ReadFieldMappingList(List<Field_Map> aSymbols) {
       using (var xCmd = mConnection.CreateCommand()) {
-        if (UseSQL) {
-          xCmd.CommandText = "select TYPE_NAME, FIELD_NAME from FIELD_MAPPING order by TYPE_NAME";
-          using (var xReader = xCmd.ExecuteReader()) {
-            var mp = new Field_Map();
-            while (xReader.Read()) {
-              string xTypeName = xReader.GetString(0);
-              if (xTypeName != mp.TypeName) {
-                if (mp.FieldNames.Count > 0) {
-                  aSymbols.Add(mp);
-                }
-                mp = new Field_Map();
-                mp.TypeName = xTypeName;
+        xCmd.CommandText = "select TYPE_NAME, FIELD_NAME from FIELD_MAPPING order by TYPE_NAME";
+        using (var xReader = xCmd.ExecuteReader()) {
+          var mp = new Field_Map();
+          while (xReader.Read()) {
+            string xTypeName = xReader.GetString(0);
+            if (xTypeName != mp.TypeName) {
+              if (mp.FieldNames.Count > 0) {
+                aSymbols.Add(mp);
               }
-              mp.FieldNames.Add(xReader.GetString(1));
+              mp = new Field_Map();
+              mp.TypeName = xTypeName;
             }
-            aSymbols.Add(mp);
+            mp.FieldNames.Add(xReader.GetString(1));
           }
-        } else {
-          xCmd.CommandText = "select TYPE_NAME, FIELD_COUNT, FIELD_NAMES from FIELD_MAPPING";
-          using (var xReader = xCmd.ExecuteReader()) {
-            while (xReader.Read()) {
-              var mp = new Field_Map();
-              mp.TypeName = xReader.GetString(0);
-              int i = xReader.GetInt32(1);
-              mp.FieldNames.AddRange(((string[])xReader.GetValue(2)).Take(i));
-              aSymbols.Add(mp);
-            }
-          }
+          aSymbols.Add(mp);
         }
       }
     }
@@ -346,42 +199,18 @@ namespace Cosmos.Debug.Common {
         }
       });
 
-      if (UseSQL) {
-        using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
-          xCmd.CommandText = "INSERT INTO FIELD_INFO (TYPE, OFFSET, NAME)" +
-                             " VALUES (@TYPE, @OFFSET, @NAME)";
-          xCmd.Parameters.Add("@TYPE", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
-          xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-          foreach (var xItem in xFields) {
-            xCmd.Parameters[0].Value = xItem.Type;
-            xCmd.Parameters[1].Value = xItem.Offset;
-            xCmd.Parameters[2].Value = xItem.Name;
-            xCmd.ExecuteNonQuery();
-          }
-        }
-      } else {
-        using (FbTransaction transaction = ((FbConnection)mConnection).BeginTransaction()) {
-          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-            xCmd.Transaction = transaction;
-            xCmd.CommandText = "INSERT INTO FIELD_INFO (TYPE, OFFSET, NAME)" +
-                               " VALUES (@TYPE, @OFFSET, @NAME)";
-
-            xCmd.Parameters.Add("@TYPE", FbDbType.VarChar);
-            xCmd.Parameters.Add("@OFFSET", FbDbType.Integer);
-            xCmd.Parameters.Add("@NAME", FbDbType.VarChar);
-            xCmd.Prepare();
-
-            // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-            foreach (var xItem in xFields) {
-              xCmd.Parameters[0].Value = xItem.Type;
-              xCmd.Parameters[1].Value = xItem.Offset;
-              xCmd.Parameters[2].Value = xItem.Name;
-              xCmd.ExecuteNonQuery();
-            }
-          }
-          transaction.Commit();
+      using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
+        xCmd.CommandText = "INSERT INTO FIELD_INFO (TYPE, OFFSET, NAME)" +
+                           " VALUES (@TYPE, @OFFSET, @NAME)";
+        xCmd.Parameters.Add("@TYPE", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
+        xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
+        // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+        foreach (var xItem in xFields) {
+          xCmd.Parameters[0].Value = xItem.Type;
+          xCmd.Parameters[1].Value = xItem.Offset;
+          xCmd.Parameters[2].Value = xItem.Name;
+          xCmd.ExecuteNonQuery();
         }
       }
     }
@@ -416,59 +245,26 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
-      if (UseSQL) {
-        using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
-          xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                       " VALUES (@LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
-          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
-          xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
-          xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
-          xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
-          xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-          foreach (var xItem in aSymbols) {
-            xCmd.Parameters[0].Value = xItem.LabelName;
-            xCmd.Parameters[1].Value = xItem.StackDifference;
-            xCmd.Parameters[2].Value = xItem.AssemblyFile;
-            xCmd.Parameters[3].Value = xItem.TypeToken;
-            xCmd.Parameters[4].Value = xItem.MethodToken;
-            xCmd.Parameters[5].Value = xItem.ILOffset;
-            xCmd.Parameters[6].Value = xItem.MethodName;
-            xCmd.ExecuteNonQuery();
-          }
-        }
-      } else {
-        using (FbTransaction transaction = ((FbConnection)mConnection).BeginTransaction()) {
-          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-            xCmd.Transaction = transaction;
-            xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                         " VALUES (@LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
-
-            xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
-            xCmd.Parameters.Add("@STACKDIFF", FbDbType.Integer);
-            xCmd.Parameters.Add("@ILASMFILE", FbDbType.VarChar);
-            xCmd.Parameters.Add("@TYPETOKEN", FbDbType.Integer);
-            xCmd.Parameters.Add("@METHODTOKEN", FbDbType.Integer);
-            xCmd.Parameters.Add("@ILOFFSET", FbDbType.Integer);
-            xCmd.Parameters.Add("@METHODNAME", FbDbType.VarChar);
-            xCmd.Prepare();
-
-            // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-            foreach (var xItem in aSymbols) {
-              xCmd.Parameters[0].Value = xItem.LabelName;
-              xCmd.Parameters[1].Value = xItem.StackDifference;
-              xCmd.Parameters[2].Value = xItem.AssemblyFile;
-              xCmd.Parameters[3].Value = xItem.TypeToken;
-              xCmd.Parameters[4].Value = xItem.MethodToken;
-              xCmd.Parameters[5].Value = xItem.ILOffset;
-              xCmd.Parameters[6].Value = xItem.MethodName;
-              xCmd.ExecuteNonQuery();
-            }
-          }
-
-          transaction.Commit();
+      using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
+        xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                     " VALUES (@LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
+        xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
+        xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
+        xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
+        xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
+        xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
+        // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
+        foreach (var xItem in aSymbols) {
+          xCmd.Parameters[0].Value = xItem.LabelName;
+          xCmd.Parameters[1].Value = xItem.StackDifference;
+          xCmd.Parameters[2].Value = xItem.AssemblyFile;
+          xCmd.Parameters[3].Value = xItem.TypeToken;
+          xCmd.Parameters[4].Value = xItem.MethodToken;
+          xCmd.Parameters[5].Value = xItem.ILOffset;
+          xCmd.Parameters[6].Value = xItem.MethodName;
+          xCmd.ExecuteNonQuery();
         }
       }
     }
@@ -516,48 +312,22 @@ namespace Cosmos.Debug.Common {
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
     public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
-      if (UseSQL) {
-        using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
-          xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
-          xCmd.Parameters.Add("@METHODLABELNAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@ISARGUMENT", SqlDbType.SmallInt);
-          xCmd.Parameters.Add("@INDEXINMETHOD", SqlDbType.Int);
-          xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
-          xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@TYPENAME", SqlDbType.NVarChar);
-          foreach (var xInfo in infos) {
-            xCmd.Parameters[0].Value = xInfo.MethodLabelName;
-            xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
-            xCmd.Parameters[2].Value = xInfo.Index;
-            xCmd.Parameters[3].Value = xInfo.Offset;
-            xCmd.Parameters[4].Value = xInfo.Name;
-            xCmd.Parameters[5].Value = xInfo.Type;
-            xCmd.ExecuteNonQuery();
-          }
-        }
-      } else {
-        using (var xTrans = ((FbConnection)mConnection).BeginTransaction()) {
-          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-            xCmd.Transaction = xTrans;
-            xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
-            xCmd.Parameters.Add("@METHODLABELNAME", FbDbType.VarChar);
-            xCmd.Parameters.Add("@ISARGUMENT", FbDbType.SmallInt);
-            xCmd.Parameters.Add("@INDEXINMETHOD", FbDbType.Integer);
-            xCmd.Parameters.Add("@OFFSET", FbDbType.Integer);
-            xCmd.Parameters.Add("@NAME", FbDbType.VarChar);
-            xCmd.Parameters.Add("@TYPENAME", FbDbType.VarChar);
-            xCmd.Prepare();
-            foreach (var xInfo in infos) {
-              xCmd.Parameters[0].Value = xInfo.MethodLabelName;
-              xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
-              xCmd.Parameters[2].Value = xInfo.Index;
-              xCmd.Parameters[3].Value = xInfo.Offset;
-              xCmd.Parameters[4].Value = xInfo.Name;
-              xCmd.Parameters[5].Value = xInfo.Type;
-              xCmd.ExecuteNonQuery();
-            }
-            xTrans.Commit();
-          }
+      using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
+        xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
+        xCmd.Parameters.Add("@METHODLABELNAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@ISARGUMENT", SqlDbType.SmallInt);
+        xCmd.Parameters.Add("@INDEXINMETHOD", SqlDbType.Int);
+        xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
+        xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@TYPENAME", SqlDbType.NVarChar);
+        foreach (var xInfo in infos) {
+          xCmd.Parameters[0].Value = xInfo.MethodLabelName;
+          xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
+          xCmd.Parameters[2].Value = xInfo.Index;
+          xCmd.Parameters[3].Value = xInfo.Offset;
+          xCmd.Parameters[4].Value = xInfo.Name;
+          xCmd.Parameters[5].Value = xInfo.Type;
+          xCmd.ExecuteNonQuery();
         }
       }
     }
@@ -622,62 +392,25 @@ namespace Cosmos.Debug.Common {
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
 
-      if (UseSQL) {
-        using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
-          xCmd.CommandText = "INSERT INTO Method (MethodId, LabelPrefix) values (@MethodId, @LabelPrefix)";
-          xCmd.Parameters.AddWithValue("@MethodId", mMethodId);
-          xCmd.Parameters.AddWithValue("@LabelPrefix", aLabelPrefix);
-          xCmd.ExecuteNonQuery();
-        }
-      } else {
-        using (var xTrans = ((FbConnection)mConnection).BeginTransaction()) {
-          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-            xCmd.Transaction = xTrans;
-            xCmd.CommandText = "INSERT INTO Method (MethodId, LabelPrefix) values (@MethodId, @LabelPrefix)";
-
-            xCmd.Parameters.Add("@MethodId", FbDbType.Integer);
-            xCmd.Parameters.Add("@LabelPrefix", FbDbType.VarChar);
-            xCmd.Prepare();
-
-            xCmd.Parameters[0].Value = mMethodId;
-            xCmd.Parameters[1].Value = aLabelPrefix;
-            xCmd.ExecuteNonQuery();
-
-            xTrans.Commit();
-          }
-        }
+      using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
+        xCmd.CommandText = "INSERT INTO Method (MethodId, LabelPrefix) values (@MethodId, @LabelPrefix)";
+        xCmd.Parameters.AddWithValue("@MethodId", mMethodId);
+        xCmd.Parameters.AddWithValue("@LabelPrefix", aLabelPrefix);
+        xCmd.ExecuteNonQuery();
       }
 
       return mMethodId;
     }
 
     public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
-      if (UseSQL) {
-        using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
-          xCmd.CommandText = "insert into Label (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
-          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
-          foreach (var xItem in aMap) {
-            xCmd.Parameters[0].Value = xItem.Value;
-            xCmd.Parameters[1].Value = xItem.Key;
-            xCmd.ExecuteNonQuery();
-          }
-        }
-      } else {
-        using (var xTrans = ((FbConnection)mConnection).BeginTransaction()) {
-          using (var xCmd = ((FbConnection)mConnection).CreateCommand()) {
-            xCmd.Transaction = xTrans;
-            xCmd.CommandText = "insert into Label (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
-            xCmd.Parameters.Add("@LABELNAME", FbDbType.VarChar);
-            xCmd.Parameters.Add("@ADDRESS", FbDbType.BigInt);
-            xCmd.Prepare();
-            foreach (var xItem in aMap) {
-              xCmd.Parameters[0].Value = xItem.Value;
-              xCmd.Parameters[1].Value = xItem.Key;
-              xCmd.ExecuteNonQuery();
-            }
-            xTrans.Commit();
-          }
+      using (var xCmd = (SqlCeCommand)mConnection.CreateCommand()) {
+        xCmd.CommandText = "insert into Label (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
+        xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
+        foreach (var xItem in aMap) {
+          xCmd.Parameters[0].Value = xItem.Value;
+          xCmd.Parameters[1].Value = xItem.Key;
+          xCmd.ExecuteNonQuery();
         }
       }
     }

@@ -165,13 +165,13 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       mHost.OnShutDown += HostShutdown;
 
-      string xCpdbPath = Path.ChangeExtension(mISO, "sdf");
-      if (!File.Exists(xCpdbPath)) {
-        throw new Exception("Debug data file " + xCpdbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
+      string xDbPath = Path.ChangeExtension(mISO, "sdf");
+      if (!File.Exists(xDbPath)) {
+        throw new Exception("Debug data file " + xDbPath + " not found. Could be a omitted build process of Cosmos project so that not created.");
       }
 
       mDebugInfoDb = new DebugInfo();
-      mDebugInfoDb.OpenCPDB(xCpdbPath);
+      mDebugInfoDb.OpenDB(xDbPath);
       mDebugInfoDb.ReadLabels(out mAddressLabelMappings, out mLabelAddressMappings);
       if (mAddressLabelMappings.Count == 0) {
         throw new Exception("Debug data not found: LabelByAddressMapping");

@@ -19,7 +19,7 @@ namespace Cosmos.Build.MSBuild {
         return false;
       }
       using (var xDebugInfo = new DebugInfo()) {
-        xDebugInfo.OpenCPDB(DebugInfoFile);
+        xDebugInfo.OpenDB(DebugInfoFile);
         xDebugInfo.WriteLabels(xSourceInfos);
       }
       return true;
