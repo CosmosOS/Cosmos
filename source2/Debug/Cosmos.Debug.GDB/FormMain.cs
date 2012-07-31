@@ -241,7 +241,7 @@ namespace Cosmos.Debug.GDB {
 				// path of asm, obj and cgdb
 				using(var xDialog = new OpenFileDialog())
 				{
-					xDialog.Filter = "Symbols (*.asm;*.obj;*.cpdb)|*.asm;*.obj;*.cpdb";
+					xDialog.Filter = "Symbols (*.asm;*.obj;*.mdf)|*.asm;*.obj;*.mdf";
 					xDialog.ShowHelp = true;
 					xDialog.HelpRequest += new EventHandler(xDialog_HelpRequest);
 
@@ -275,7 +275,7 @@ namespace Cosmos.Debug.GDB {
 
 		void xDialog_HelpRequest(object sender, EventArgs e)
 		{
-			MessageBox.Show("Select a folder which contain files of type asm, obj and cpdb with same name.", "Help", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+			MessageBox.Show("Select a folder which contain files of type asm, obj and mdf with same name.", "Help", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
 		}
 
 		private void OnRunStateChanged(bool stopped)

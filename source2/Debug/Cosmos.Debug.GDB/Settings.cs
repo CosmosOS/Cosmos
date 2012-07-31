@@ -88,7 +88,7 @@ namespace Cosmos.Debug.GDB {
 
 				if (false == File.Exists(Path.Combine(mOutputPath, mObjFile))
 					|| false == File.Exists(Path.Combine(mOutputPath, mAsmFile))
-					|| false == File.Exists(Path.Combine(mOutputPath, Path.GetFileNameWithoutExtension(Filename) + ".cpdb")))
+					|| false == File.Exists(Path.Combine(mOutputPath, Path.GetFileNameWithoutExtension(Filename) + ".mdf")))
 				{
 					mOutputPath = null;
 					return false;

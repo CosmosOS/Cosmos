@@ -203,7 +203,7 @@ namespace Cosmos.Build.MSBuild {
         }
         var xAsm = new AppAssemblerNasm(DebugCom);
         using (var xDebugInfo = new DebugInfo()) {
-          xDebugInfo.CreateCPDB(xOutputFilename + ".cpdb");
+          xDebugInfo.CreateDB(xOutputFilename + ".mdf");
           xAsm.DebugInfo = xDebugInfo;
           xAsm.DebugEnabled = DebugEnabled;
           xAsm.DebugMode = mDebugMode;
