@@ -88,7 +88,7 @@ namespace Cosmos.Build.Builder {
         xKeys = xKey.GetSubKeyNames();
       }
       foreach (string xSubKey in xKeys) {
-        using (var xKey = Registry.LocalMachine.OpenSubKey(aKey + xSubKey, false)) {
+        using (var xKey = Registry.LocalMachine.OpenSubKey(aKey + xSubKey)) {
           string xValue = (string)xKey.GetValue(aValueName);
           if (xValue != null && xValue.ToUpper().Contains(xCheck)) {
             return true;
@@ -105,13 +105,26 @@ namespace Cosmos.Build.Builder {
     protected void CheckNet35Sp1() {
       Echo("Checking for .NET 3.5 SP1");
       bool xNet35SP1Installed = false;
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5", false)) {
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5")) {
         if (xKey != null) {
           xNet35SP1Installed = (int)xKey.GetValue("SP", 0) >= 1;
         }
       }
       if (!xNet35SP1Installed) {
         NotFound(".NET 3.5 SP1");
+      }
+    }
+
+    protected void CheckNet402() {
+      Echo("Checking for .NET 4.02");
+      bool xNet402Installed = false;
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs")) {
+        if (xKey != null) {
+          xNet402Installed = xKey.OpenSubKey(".NETFramework,Version=v4.0.2") != null;
+        }
+      }
+      if (!xNet402Installed) {
+        NotFound(".NET 4.02 Full Install (not client)");
       }
     }
 
@@ -163,6 +176,7 @@ namespace Cosmos.Build.Builder {
 
       CheckVs2010Sp1();
       CheckNet35Sp1(); // Required by VMWareLib
+      CheckNet402();
       CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
       if (!CheckForInstall("VMware Workstation", false)) {
