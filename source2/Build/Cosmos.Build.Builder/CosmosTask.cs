@@ -116,9 +116,9 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckNet402() {
-      Echo("Checking for .NET 4.02");
-      if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework,Version=v4.0.2") == null) {
-        NotFound(".NET 4.02 Full Install (not client)");
+      Echo("Checking for .NET 4.03");
+      if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework,Version=v4.0.3") == null) {
+        NotFound(".NET 4.03 Full Install (not client)");
       }
     }
 
