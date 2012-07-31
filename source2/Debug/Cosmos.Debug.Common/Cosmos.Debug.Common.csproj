@@ -103,6 +103,11 @@
     <Compile Include="DebugConnectorStream.cs" />
     <Compile Include="DebugConnectorTCPServer.cs" />
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="DebugModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DebugModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="NameValueCollectionHelper.cs" />
     <Compile Include="ObjDump.cs" />
     <Compile Include="PipeClient.cs" />
@@ -112,7 +117,12 @@
     <Compile Include="SourceInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.Config" />
     <None Include="Cosmos.snk" />
+    <EntityDeploy Include="DebugModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DebugModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
@@ -151,8 +161,13 @@
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Empty.mdf">
+    <Content Include="DebugModel.edmx.sql" />
+    <Content Include="Guess.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Guess_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>Guess.mdf</DependentUpon>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
