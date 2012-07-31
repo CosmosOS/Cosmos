@@ -104,27 +104,29 @@ namespace Cosmos.Build.Builder {
 
     protected void CheckNet35Sp1() {
       Echo("Checking for .NET 3.5 SP1");
-      bool xNet35SP1Installed = false;
+      bool xInstalled = false;
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5")) {
         if (xKey != null) {
-          xNet35SP1Installed = (int)xKey.GetValue("SP", 0) >= 1;
+          xInstalled = (int)xKey.GetValue("SP", 0) >= 1;
         }
       }
-      if (!xNet35SP1Installed) {
+      if (!xInstalled) {
         NotFound(".NET 3.5 SP1");
       }
     }
 
     protected void CheckNet402() {
       Echo("Checking for .NET 4.02");
-      bool xNet402Installed = false;
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs")) {
-        if (xKey != null) {
-          xNet402Installed = xKey.OpenSubKey(".NETFramework,Version=v4.0.2") != null;
-        }
-      }
-      if (!xNet402Installed) {
+      if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework,Version=v4.0.2") == null) {
         NotFound(".NET 4.02 Full Install (not client)");
+      }
+    }
+
+    protected void CheckLocalDb2012() {
+      Echo("SQL Server Express 2012 LocalDB");
+      // Can also check file version and presence of this file: C:\WINDOWS\system32\sqlncli.dll
+      if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server Local DB\Installed Versions\11.0") == null) {
+        NotFound("SQL Server Express 2012 LocalDB");
       }
     }
 
@@ -177,6 +179,7 @@ namespace Cosmos.Build.Builder {
       CheckVs2010Sp1();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckNet402();
+      CheckLocalDb2012();
       CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
       if (!CheckForInstall("VMware Workstation", false)) {
