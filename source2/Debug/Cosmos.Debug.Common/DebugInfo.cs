@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Data;
+using System.Data.EntityClient;
 using System.Data.SqlClient;
 using System.Data.Common;
+using System.Reflection;
 using Microsoft.Win32;
 
 namespace Cosmos.Debug.Common {
@@ -44,6 +46,7 @@ namespace Cosmos.Debug.Common {
     }
 
     protected SqlConnection mConnection;
+    protected Entities mEntities;
 
     public DebugInfo() {
       CurrentInstance = this;
@@ -56,7 +59,7 @@ namespace Cosmos.Debug.Common {
     private void OpenDB(string aPathname, bool aCreate) {
       string xDbName = Path.GetFileNameWithoutExtension(aPathname);
       // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
-      string xConnStr = @"Data Source=(LocalDB)\v11.0;Integrated Security=True;";
+      string xConnStr = @"Data Source=(LocalDB)\v11.0;Integrated Security=True;MultipleActiveResultSets=True;";
 
       if (aCreate) {
         using (var xConn = new SqlConnection(xConnStr)) {
@@ -90,6 +93,13 @@ namespace Cosmos.Debug.Common {
 
       xConnStr += "AttachDbFilename=" + aPathname + ";";
       mConnection = new SqlConnection(xConnStr);
+
+      var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
+        new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
+      var xEntConn = new EntityConnection(xWorkspace, mConnection);
+      mEntities = new Entities(xEntConn);
+
+      // Must do after Entity connection is created
       mConnection.Open();
     }
 
