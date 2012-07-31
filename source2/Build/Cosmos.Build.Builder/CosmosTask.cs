@@ -123,7 +123,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckLocalDb2012() {
-      Echo("SQL Server Express 2012 LocalDB");
+      Echo("Checking for SQL Server Express 2012 LocalDB");
       // Can also check file version and presence of this file: C:\WINDOWS\system32\sqlncli.dll
       if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server Local DB\Installed Versions\11.0") == null) {
         NotFound("SQL Server Express 2012 LocalDB");
