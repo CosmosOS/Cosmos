@@ -83,8 +83,7 @@ namespace Cosmos.Build.MSBuild {
         xResult.Add(new KeyValuePair<uint, string>(xAddress, xLabel));
       }
 
-      using (var xDebugInfo = new DebugInfo()) {
-        xDebugInfo.OpenDB(DebugInfoFile);
+      using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
         xDebugInfo.WriteLabels(xResult);
       }
       return true;

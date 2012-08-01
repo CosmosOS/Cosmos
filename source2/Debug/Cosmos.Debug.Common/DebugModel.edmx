@@ -15,36 +15,32 @@
   </EntityContainer>
   <EntityType Name="FIELD_INFO">
     <Key>
-      <PropertyRef Name="NAME" />
+      <PropertyRef Name="ID" />
     </Key>
     <Property Name="TYPE" Type="nvarchar" Nullable="false" MaxLength="4000" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="FIELD_MAPPING">
     <Key>
-      <PropertyRef Name="TYPE_NAME" />
-      <PropertyRef Name="FIELD_NAME" />
+      <PropertyRef Name="ID" />
     </Key>
     <Property Name="TYPE_NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
     <Property Name="FIELD_NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="Labels">
     <Key>
-      <PropertyRef Name="LABELNAME" />
-      <PropertyRef Name="ADDRESS" />
+      <PropertyRef Name="ID" />
     </Key>
     <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
     <Property Name="ADDRESS" Type="bigint" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="LOCAL_ARGUMENT_INFO">
     <Key>
-      <PropertyRef Name="METHODLABELNAME" />
-      <PropertyRef Name="ISARGUMENT" />
-      <PropertyRef Name="INDEXINMETHOD" />
-      <PropertyRef Name="OFFSET" />
-      <PropertyRef Name="NAME" />
-      <PropertyRef Name="TYPENAME" />
+      <PropertyRef Name="ID" />
     </Key>
     <Property Name="METHODLABELNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="ISARGUMENT" Type="smallint" Nullable="false" />
@@ -52,23 +48,19 @@
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="Methods">
     <Key>
-      <PropertyRef Name="MethodId" />
+      <PropertyRef Name="ID" />
     </Key>
     <Property Name="MethodId" Type="int" Nullable="false" />
     <Property Name="LabelPrefix" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="MLSYMBOLs">
     <Key>
-      <PropertyRef Name="LABELNAME" />
-      <PropertyRef Name="STACKDIFF" />
-      <PropertyRef Name="ILASMFILE" />
-      <PropertyRef Name="TYPETOKEN" />
-      <PropertyRef Name="METHODTOKEN" />
-      <PropertyRef Name="ILOFFSET" />
-      <PropertyRef Name="METHODNAME" />
+      <PropertyRef Name="ID" />
     </Key>
     <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="STACKDIFF" Type="int" Nullable="false" />
@@ -77,6 +69,7 @@
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="ILOFFSET" Type="int" Nullable="false" />
     <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -92,36 +85,32 @@
         </EntityContainer>
         <EntityType Name="FIELD_INFO">
           <Key>
-            <PropertyRef Name="NAME" />
+            <PropertyRef Name="ID" />
           </Key>
           <Property Name="TYPE" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
         </EntityType>
         <EntityType Name="FIELD_MAPPING">
           <Key>
-            <PropertyRef Name="TYPE_NAME" />
-            <PropertyRef Name="FIELD_NAME" />
+            <PropertyRef Name="ID" />
           </Key>
           <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
           <Property Name="FIELD_NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
         </EntityType>
         <EntityType Name="Label">
           <Key>
-            <PropertyRef Name="LABELNAME" />
-            <PropertyRef Name="ADDRESS" />
+            <PropertyRef Name="ID" />
           </Key>
           <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
           <Property Name="ADDRESS" Type="Int64" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
         </EntityType>
         <EntityType Name="LOCAL_ARGUMENT_INFO">
           <Key>
-            <PropertyRef Name="METHODLABELNAME" />
-            <PropertyRef Name="ISARGUMENT" />
-            <PropertyRef Name="INDEXINMETHOD" />
-            <PropertyRef Name="OFFSET" />
-            <PropertyRef Name="NAME" />
-            <PropertyRef Name="TYPENAME" />
+            <PropertyRef Name="ID" />
           </Key>
           <Property Name="METHODLABELNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
           <Property Name="ISARGUMENT" Type="Int16" Nullable="false" />
@@ -129,23 +118,19 @@
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
           <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
         </EntityType>
         <EntityType Name="Method">
           <Key>
-            <PropertyRef Name="MethodId" />
+            <PropertyRef Name="ID" />
           </Key>
           <Property Name="MethodId" Type="Int32" Nullable="false" />
           <Property Name="LabelPrefix" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
         </EntityType>
         <EntityType Name="MLSYMBOL">
           <Key>
-            <PropertyRef Name="LABELNAME" />
-            <PropertyRef Name="STACKDIFF" />
-            <PropertyRef Name="ILASMFILE" />
-            <PropertyRef Name="TYPETOKEN" />
-            <PropertyRef Name="METHODTOKEN" />
-            <PropertyRef Name="ILOFFSET" />
-            <PropertyRef Name="METHODNAME" />
+            <PropertyRef Name="ID" />
           </Key>
           <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
           <Property Name="STACKDIFF" Type="Int32" Nullable="false" />
@@ -154,6 +139,7 @@
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="ILOFFSET" Type="Int32" Nullable="false" />
           <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -164,15 +150,17 @@
     <EntitySetMapping Name="FIELD_INFO">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.FIELD_INFO)">
         <MappingFragment StoreEntitySet="FIELD_INFO">
-          <ScalarProperty Name="NAME" ColumnName="NAME" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="TYPE" ColumnName="TYPE" />
           <ScalarProperty Name="OFFSET" ColumnName="OFFSET" />
+          <ScalarProperty Name="NAME" ColumnName="NAME" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="FIELD_MAPPING">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.FIELD_MAPPING)">
         <MappingFragment StoreEntitySet="FIELD_MAPPING">
+          <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="TYPE_NAME" ColumnName="TYPE_NAME" />
           <ScalarProperty Name="FIELD_NAME" ColumnName="FIELD_NAME" />
         </MappingFragment>
@@ -181,6 +169,7 @@
     <EntitySetMapping Name="Labels">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.Label)">
         <MappingFragment StoreEntitySet="Labels">
+          <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="LABELNAME" ColumnName="LABELNAME" />
           <ScalarProperty Name="ADDRESS" ColumnName="ADDRESS" />
         </MappingFragment>
@@ -189,6 +178,7 @@
     <EntitySetMapping Name="LOCAL_ARGUMENT_INFO">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.LOCAL_ARGUMENT_INFO)">
         <MappingFragment StoreEntitySet="LOCAL_ARGUMENT_INFO">
+          <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="METHODLABELNAME" ColumnName="METHODLABELNAME" />
           <ScalarProperty Name="ISARGUMENT" ColumnName="ISARGUMENT" />
           <ScalarProperty Name="INDEXINMETHOD" ColumnName="INDEXINMETHOD" />
@@ -201,6 +191,7 @@
     <EntitySetMapping Name="Methods">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.Method)">
         <MappingFragment StoreEntitySet="Methods">
+          <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="MethodId" ColumnName="MethodId" />
           <ScalarProperty Name="LabelPrefix" ColumnName="LabelPrefix" />
         </MappingFragment>
@@ -209,6 +200,7 @@
     <EntitySetMapping Name="MLSYMBOLs">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.MLSYMBOL)">
         <MappingFragment StoreEntitySet="MLSYMBOLs">
+          <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="LABELNAME" ColumnName="LABELNAME" />
           <ScalarProperty Name="STACKDIFF" ColumnName="STACKDIFF" />
           <ScalarProperty Name="ILASMFILE" ColumnName="ILASMFILE" />
@@ -239,12 +231,12 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="DebugModel">
-        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="0.75" PointY="0.75" Height="1.59568359375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="2.75" PointY="0.75" Height="1.4033821614583335" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.75" PointY="3.75" Height="1.4033821614583322" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="2.75" PointY="3.75" Height="2.1725878906249996" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="1.5" PointX="4.75" PointY="0.75" Height="1.4033821614583317" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="4.75" PointY="3.75" Height="2.364889322916667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="0.75" PointY="0.75" Height="1.787985026041667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="2.75" PointY="0.75" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.75" PointY="3.75" Height="1.5956835937499996" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="2.75" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="1.5" PointX="4.75" PointY="0.75" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="4.75" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
       </Diagram>
     </Diagrams>
   </Designer>

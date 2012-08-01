@@ -18,8 +18,7 @@ namespace Cosmos.Build.MSBuild {
         Log.LogError("No SourceInfos found!");
         return false;
       }
-      using (var xDebugInfo = new DebugInfo()) {
-        xDebugInfo.OpenDB(DebugInfoFile);
+      using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
         xDebugInfo.WriteLabels(xSourceInfos);
       }
       return true;

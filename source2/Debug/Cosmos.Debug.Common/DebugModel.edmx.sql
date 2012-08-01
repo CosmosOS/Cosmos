@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 07/31/2012 15:30:37
+-- Date Created: 07/31/2012 23:03:01
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -25,20 +25,20 @@ GO
 IF OBJECT_ID(N'[dbo].[FIELD_INFO]', 'U') IS NOT NULL
     DROP TABLE [dbo].[FIELD_INFO];
 GO
-IF OBJECT_ID(N'[DebugModelStoreContainer].[FIELD_MAPPING]', 'U') IS NOT NULL
-    DROP TABLE [DebugModelStoreContainer].[FIELD_MAPPING];
+IF OBJECT_ID(N'[dbo].[FIELD_MAPPING]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[FIELD_MAPPING];
 GO
-IF OBJECT_ID(N'[DebugModelStoreContainer].[Label]', 'U') IS NOT NULL
-    DROP TABLE [DebugModelStoreContainer].[Label];
+IF OBJECT_ID(N'[dbo].[Labels]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Labels];
 GO
-IF OBJECT_ID(N'[DebugModelStoreContainer].[LOCAL_ARGUMENT_INFO]', 'U') IS NOT NULL
-    DROP TABLE [DebugModelStoreContainer].[LOCAL_ARGUMENT_INFO];
+IF OBJECT_ID(N'[dbo].[LOCAL_ARGUMENT_INFO]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[LOCAL_ARGUMENT_INFO];
 GO
-IF OBJECT_ID(N'[dbo].[Method]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Method];
+IF OBJECT_ID(N'[dbo].[Methods]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Methods];
 GO
-IF OBJECT_ID(N'[DebugModelStoreContainer].[MLSYMBOL]', 'U') IS NOT NULL
-    DROP TABLE [DebugModelStoreContainer].[MLSYMBOL];
+IF OBJECT_ID(N'[dbo].[MLSYMBOLs]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[MLSYMBOLs];
 GO
 
 -- --------------------------------------------------
@@ -49,21 +49,24 @@ GO
 CREATE TABLE [dbo].[FIELD_INFO] (
     [TYPE] nvarchar(4000)  NOT NULL,
     [OFFSET] int  NOT NULL,
-    [NAME] nvarchar(4000)  NOT NULL
+    [NAME] nvarchar(4000)  NOT NULL,
+    [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'FIELD_MAPPING'
 CREATE TABLE [dbo].[FIELD_MAPPING] (
     [TYPE_NAME] nvarchar(4000)  NOT NULL,
-    [FIELD_NAME] nvarchar(4000)  NOT NULL
+    [FIELD_NAME] nvarchar(4000)  NOT NULL,
+    [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'Labels'
 CREATE TABLE [dbo].[Labels] (
     [LABELNAME] nvarchar(4000)  NOT NULL,
-    [ADDRESS] bigint  NOT NULL
+    [ADDRESS] bigint  NOT NULL,
+    [ID] uniqueidentifier  NOT NULL
 );
 GO
 
@@ -74,14 +77,16 @@ CREATE TABLE [dbo].[LOCAL_ARGUMENT_INFO] (
     [INDEXINMETHOD] int  NOT NULL,
     [OFFSET] int  NOT NULL,
     [NAME] nvarchar(255)  NOT NULL,
-    [TYPENAME] nvarchar(4000)  NOT NULL
+    [TYPENAME] nvarchar(4000)  NOT NULL,
+    [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'Methods'
 CREATE TABLE [dbo].[Methods] (
     [MethodId] int  NOT NULL,
-    [LabelPrefix] nvarchar(255)  NOT NULL
+    [LabelPrefix] nvarchar(255)  NOT NULL,
+    [ID] uniqueidentifier  NOT NULL
 );
 GO
 
@@ -93,7 +98,8 @@ CREATE TABLE [dbo].[MLSYMBOLs] (
     [TYPETOKEN] int  NOT NULL,
     [METHODTOKEN] int  NOT NULL,
     [ILOFFSET] int  NOT NULL,
-    [METHODNAME] nvarchar(255)  NOT NULL
+    [METHODNAME] nvarchar(255)  NOT NULL,
+    [ID] uniqueidentifier  NOT NULL
 );
 GO
 
@@ -101,40 +107,40 @@ GO
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
 
--- Creating primary key on [NAME] in table 'FIELD_INFO'
+-- Creating primary key on [ID] in table 'FIELD_INFO'
 ALTER TABLE [dbo].[FIELD_INFO]
 ADD CONSTRAINT [PK_FIELD_INFO]
-    PRIMARY KEY CLUSTERED ([NAME] ASC);
+    PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
--- Creating primary key on [TYPE_NAME], [FIELD_NAME] in table 'FIELD_MAPPING'
+-- Creating primary key on [ID] in table 'FIELD_MAPPING'
 ALTER TABLE [dbo].[FIELD_MAPPING]
 ADD CONSTRAINT [PK_FIELD_MAPPING]
-    PRIMARY KEY CLUSTERED ([TYPE_NAME], [FIELD_NAME] ASC);
+    PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
--- Creating primary key on [LABELNAME], [ADDRESS] in table 'Labels'
+-- Creating primary key on [ID] in table 'Labels'
 ALTER TABLE [dbo].[Labels]
 ADD CONSTRAINT [PK_Labels]
-    PRIMARY KEY CLUSTERED ([LABELNAME], [ADDRESS] ASC);
+    PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
--- Creating primary key on [METHODLABELNAME], [ISARGUMENT], [INDEXINMETHOD], [OFFSET], [NAME], [TYPENAME] in table 'LOCAL_ARGUMENT_INFO'
+-- Creating primary key on [ID] in table 'LOCAL_ARGUMENT_INFO'
 ALTER TABLE [dbo].[LOCAL_ARGUMENT_INFO]
 ADD CONSTRAINT [PK_LOCAL_ARGUMENT_INFO]
-    PRIMARY KEY CLUSTERED ([METHODLABELNAME], [ISARGUMENT], [INDEXINMETHOD], [OFFSET], [NAME], [TYPENAME] ASC);
+    PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
--- Creating primary key on [MethodId] in table 'Methods'
+-- Creating primary key on [ID] in table 'Methods'
 ALTER TABLE [dbo].[Methods]
 ADD CONSTRAINT [PK_Methods]
-    PRIMARY KEY CLUSTERED ([MethodId] ASC);
+    PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
--- Creating primary key on [LABELNAME], [STACKDIFF], [ILASMFILE], [TYPETOKEN], [METHODTOKEN], [ILOFFSET], [METHODNAME] in table 'MLSYMBOLs'
+-- Creating primary key on [ID] in table 'MLSYMBOLs'
 ALTER TABLE [dbo].[MLSYMBOLs]
 ADD CONSTRAINT [PK_MLSYMBOLs]
-    PRIMARY KEY CLUSTERED ([LABELNAME], [STACKDIFF], [ILASMFILE], [TYPETOKEN], [METHODTOKEN], [ILOFFSET], [METHODNAME] ASC);
+    PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
 -- --------------------------------------------------

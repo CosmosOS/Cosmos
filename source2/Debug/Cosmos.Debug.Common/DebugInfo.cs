@@ -48,15 +48,9 @@ namespace Cosmos.Debug.Common {
     protected SqlConnection mConnection;
     protected Entities mEntities;
 
-    public DebugInfo() {
+    public DebugInfo(string aPathname, bool aCreate = false) {
       CurrentInstance = this;
-    }
 
-    public void OpenDB(string aPathname) {
-      OpenDB(aPathname, false);
-    }
-
-    private void OpenDB(string aPathname, bool aCreate) {
       string xDbName = Path.GetFileNameWithoutExtension(aPathname);
       // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
       string xConnStr = @"Data Source=(LocalDB)\v11.0;Integrated Security=True;MultipleActiveResultSets=True;";
@@ -81,23 +75,33 @@ namespace Cosmos.Debug.Common {
 
           // Delete actual files
           File.Delete(aPathname);
+          // EDM seems to create .ldf, while TSQL creates _Log.ldf. 
+          // Not sure why, but we scan for both...
+          File.Delete(Path.ChangeExtension(aPathname, "ldf"));
           File.Delete(Path.Combine(Path.GetDirectoryName(aPathname), Path.GetFileNameWithoutExtension(aPathname) + "_log.ldf"));
 
           // Create DB
-          using (var xCmd = xConn.CreateCommand()) {
-            xCmd.CommandText = String.Format("CREATE DATABASE {0} ON (NAME = N'{0}', FILENAME = '{1}')", xDbName, aPathname);
-            xCmd.ExecuteNonQuery();
-          }
+          //using (var xCmd = xConn.CreateCommand()) {
+          //  xCmd.CommandText = String.Format("CREATE DATABASE {0} ON (NAME = N'{0}', FILENAME = '{1}')", xDbName, aPathname);
+          //  xCmd.ExecuteNonQuery();
+          //}
         }
       }
 
-      xConnStr += "AttachDbFilename=" + aPathname + ";";
+      // Initial Catalog is necessary for EDM
+      xConnStr += "Initial Catalog=" + xDbName + ";AttachDbFilename=" + aPathname + ";";
       mConnection = new SqlConnection(xConnStr);
 
       var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
         new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
       var xEntConn = new EntityConnection(xWorkspace, mConnection);
       mEntities = new Entities(xEntConn);
+
+      if (aCreate) {
+        if (!mEntities.DatabaseExists()) {
+          mEntities.CreateDatabase();
+        }
+      }
 
       // Must do after Entity connection is created
       mConnection.Open();
@@ -110,59 +114,7 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void CreateDB(string aPathname) {
-      OpenDB(aPathname, true);
-      ExecSQL(
-          "CREATE TABLE Method ("
-          + "    MethodId      INT            NOT NULL PRIMARY KEY"
-          + "  , LabelPrefix   NVARCHAR(255)   NOT NULL"
-          + ");");
-      ExecSQL(
-          "CREATE TABLE MLSYMBOL ("
-          + "   LABELNAME   NVARCHAR(255)  NOT NULL"
-          + " , STACKDIFF   INT           NOT NULL"
-          + " , ILASMFILE   NVARCHAR(255)  NOT NULL"
-          + " , TYPETOKEN   INT           NOT NULL"
-          + " , METHODTOKEN INT           NOT NULL"
-          + " , ILOFFSET    INT           NOT NULL"
-          + " , METHODNAME  NVARCHAR(255)  NOT NULL"
-          + ");"
-      );
-
-      ExecSQL(
-          "CREATE TABLE FIELD_INFO ("
-          + "    TYPE      NVARCHAR(4000)     NOT NULL"
-          + " ,  OFFSET    INT               NOT NULL"
-          + " ,  NAME      NVARCHAR(4000)     NOT NULL PRIMARY KEY"
-          + ");"
-          );
-
-      ExecSQL(
-          "CREATE TABLE FIELD_MAPPING ("
-          + "    TYPE_NAME       NVARCHAR(4000)    NOT NULL"
-          + " ,  FIELD_NAME      NVARCHAR(4000)    NOT NULL"
-          + ");"
-          );
-
-      ExecSQL(
-          "CREATE TABLE Label ("
-          + "  LABELNAME NVARCHAR(4000)  NOT NULL"
-          + ", ADDRESS   BIGINT        NOT NULL"
-          + ");");
-
-      ExecSQL(
-          "CREATE TABLE LOCAL_ARGUMENT_INFO ("
-          + "  METHODLABELNAME NVARCHAR(255)      NOT NULL"
-          + ", ISARGUMENT      SMALLINT          NOT NULL"
-          + ", INDEXINMETHOD   INT               NOT NULL"
-          + ", OFFSET          INT               NOT NULL"
-          + ", NAME            NVARCHAR(255)      NOT NULL"
-          + ", TYPENAME        NVARCHAR(4000)     NOT NULL"
-          + ");"
-          );
-    }
-
-    private List<string> local_MappingTypeNames = new List<string>();
+    protected List<string> local_MappingTypeNames = new List<string>();
     public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping) {
       IEnumerable<Field_Map> xMaps = aMapping.Where(delegate(Field_Map mp) {
         if (local_MappingTypeNames.Contains(mp.TypeName)) {
@@ -174,8 +126,8 @@ namespace Cosmos.Debug.Common {
       });
 
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO FIELD_MAPPING (TYPE_NAME, FIELD_NAME)" +
-                             " VALUES (@TYPE_NAME, @FIELD_NAME)";
+        xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" +
+                             " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
         xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
         xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
         // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
@@ -236,8 +188,8 @@ namespace Cosmos.Debug.Common {
       });
 
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO FIELD_INFO (TYPE, OFFSET, NAME)" +
-                           " VALUES (@TYPE, @OFFSET, @NAME)";
+        xCmd.CommandText = "INSERT INTO FIELD_INFO (ID, TYPE, OFFSET, NAME)" +
+                           " VALUES (NEWID(), @TYPE, @OFFSET, @NAME)";
         xCmd.Parameters.Add("@TYPE", SqlDbType.NVarChar);
         xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
         xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
@@ -282,8 +234,8 @@ namespace Cosmos.Debug.Common {
 
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO MLSYMBOL (LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                     " VALUES (@LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
+        xCmd.CommandText = "INSERT INTO MLSYMBOLs (ID, LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                     " VALUES (NEWID(), @LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
         xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
         xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
         xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
@@ -307,7 +259,7 @@ namespace Cosmos.Debug.Common {
 
     public void ReadSymbolsList(List<MLDebugSymbol> aSymbols) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL";
+        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
             aSymbols.Add(new MLDebugSymbol {
@@ -326,7 +278,7 @@ namespace Cosmos.Debug.Common {
 
     public MLDebugSymbol ReadSymbolByLabelName(string labelName) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOL"
+        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs"
             + " WHERE LABELNAME = '" + labelName + "'";
         using (var xReader = xCmd.ExecuteReader()) {
           if (xReader.Read()) {
@@ -349,7 +301,7 @@ namespace Cosmos.Debug.Common {
     // tuple format: MethodLabel, IsArgument, Index, Offset
     public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (@METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
+        xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (ID, METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (NEWID(), @METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
         xCmd.Parameters.Add("@METHODLABELNAME", SqlDbType.NVarChar);
         xCmd.Parameters.Add("@ISARGUMENT", SqlDbType.SmallInt);
         xCmd.Parameters.Add("@INDEXINMETHOD", SqlDbType.Int);
@@ -413,7 +365,7 @@ namespace Cosmos.Debug.Common {
       oLabels = new List<KeyValuePair<uint, string>>();
       oLabelAddressMappings = new Dictionary<string, uint>();
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, ADDRESS from Label";
+        xCmd.CommandText = "select LABELNAME, ADDRESS from Labels";
         using (var xReader = xCmd.ExecuteReader()) {
           while (xReader.Read()) {
             oLabels.Add(new KeyValuePair<uint, string>((uint)xReader.GetInt64(1), xReader.GetString(0)));
@@ -429,7 +381,7 @@ namespace Cosmos.Debug.Common {
       mMethodId++;
 
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO Method (MethodId, LabelPrefix) values (@MethodId, @LabelPrefix)";
+        xCmd.CommandText = "INSERT INTO Methods (ID, MethodId, LabelPrefix) values (NEWID(), @MethodId, @LabelPrefix)";
         xCmd.Parameters.AddWithValue("@MethodId", mMethodId);
         xCmd.Parameters.AddWithValue("@LabelPrefix", aLabelPrefix);
         xCmd.ExecuteNonQuery();
@@ -440,7 +392,7 @@ namespace Cosmos.Debug.Common {
 
     public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
       using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "insert into Label (LABELNAME, ADDRESS) values (@LABELNAME, @ADDRESS)";
+        xCmd.CommandText = "insert into Labels (ID, LABELNAME, ADDRESS) values (NEWID(), @LABELNAME, @ADDRESS)";
         xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
         xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
         foreach (var xItem in aMap) {
@@ -453,12 +405,11 @@ namespace Cosmos.Debug.Common {
 
     public void Dispose() {
       if (mConnection != null) {
-        var xCon = mConnection;
+        var xConn = mConnection;
         mConnection = null;
-        xCon.Dispose();
+        xConn.Close();
+        CurrentInstance = null;
       }
-      // Why do we do this?
-      GC.SuppressFinalize(this);
     }
   }
 

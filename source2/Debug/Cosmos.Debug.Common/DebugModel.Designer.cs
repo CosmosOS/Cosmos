@@ -236,12 +236,14 @@ namespace Cosmos.Debug.Common
         /// <param name="tYPE">Initial value of the TYPE property.</param>
         /// <param name="oFFSET">Initial value of the OFFSET property.</param>
         /// <param name="nAME">Initial value of the NAME property.</param>
-        public static FIELD_INFO CreateFIELD_INFO(global::System.String tYPE, global::System.Int32 oFFSET, global::System.String nAME)
+        /// <param name="id">Initial value of the ID property.</param>
+        public static FIELD_INFO CreateFIELD_INFO(global::System.String tYPE, global::System.Int32 oFFSET, global::System.String nAME, global::System.Guid id)
         {
             FIELD_INFO fIELD_INFO = new FIELD_INFO();
             fIELD_INFO.TYPE = tYPE;
             fIELD_INFO.OFFSET = oFFSET;
             fIELD_INFO.NAME = nAME;
+            fIELD_INFO.ID = id;
             return fIELD_INFO;
         }
 
@@ -299,7 +301,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String NAME
         {
@@ -309,19 +311,43 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_NAME != value)
-                {
-                    OnNAMEChanging(value);
-                    ReportPropertyChanging("NAME");
-                    _NAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("NAME");
-                    OnNAMEChanged();
-                }
+                OnNAMEChanging(value);
+                ReportPropertyChanging("NAME");
+                _NAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("NAME");
+                OnNAMEChanged();
             }
         }
         private global::System.String _NAME;
         partial void OnNAMEChanging(global::System.String value);
         partial void OnNAMEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
 
         #endregion
     
@@ -342,11 +368,13 @@ namespace Cosmos.Debug.Common
         /// </summary>
         /// <param name="tYPE_NAME">Initial value of the TYPE_NAME property.</param>
         /// <param name="fIELD_NAME">Initial value of the FIELD_NAME property.</param>
-        public static FIELD_MAPPING CreateFIELD_MAPPING(global::System.String tYPE_NAME, global::System.String fIELD_NAME)
+        /// <param name="id">Initial value of the ID property.</param>
+        public static FIELD_MAPPING CreateFIELD_MAPPING(global::System.String tYPE_NAME, global::System.String fIELD_NAME, global::System.Guid id)
         {
             FIELD_MAPPING fIELD_MAPPING = new FIELD_MAPPING();
             fIELD_MAPPING.TYPE_NAME = tYPE_NAME;
             fIELD_MAPPING.FIELD_NAME = fIELD_NAME;
+            fIELD_MAPPING.ID = id;
             return fIELD_MAPPING;
         }
 
@@ -356,7 +384,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String TYPE_NAME
         {
@@ -366,14 +394,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_TYPE_NAME != value)
-                {
-                    OnTYPE_NAMEChanging(value);
-                    ReportPropertyChanging("TYPE_NAME");
-                    _TYPE_NAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("TYPE_NAME");
-                    OnTYPE_NAMEChanged();
-                }
+                OnTYPE_NAMEChanging(value);
+                ReportPropertyChanging("TYPE_NAME");
+                _TYPE_NAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("TYPE_NAME");
+                OnTYPE_NAMEChanged();
             }
         }
         private global::System.String _TYPE_NAME;
@@ -383,7 +408,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String FIELD_NAME
         {
@@ -393,19 +418,43 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_FIELD_NAME != value)
-                {
-                    OnFIELD_NAMEChanging(value);
-                    ReportPropertyChanging("FIELD_NAME");
-                    _FIELD_NAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("FIELD_NAME");
-                    OnFIELD_NAMEChanged();
-                }
+                OnFIELD_NAMEChanging(value);
+                ReportPropertyChanging("FIELD_NAME");
+                _FIELD_NAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("FIELD_NAME");
+                OnFIELD_NAMEChanged();
             }
         }
         private global::System.String _FIELD_NAME;
         partial void OnFIELD_NAMEChanging(global::System.String value);
         partial void OnFIELD_NAMEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
 
         #endregion
     
@@ -426,11 +475,13 @@ namespace Cosmos.Debug.Common
         /// </summary>
         /// <param name="lABELNAME">Initial value of the LABELNAME property.</param>
         /// <param name="aDDRESS">Initial value of the ADDRESS property.</param>
-        public static Label CreateLabel(global::System.String lABELNAME, global::System.Int64 aDDRESS)
+        /// <param name="id">Initial value of the ID property.</param>
+        public static Label CreateLabel(global::System.String lABELNAME, global::System.Int64 aDDRESS, global::System.Guid id)
         {
             Label label = new Label();
             label.LABELNAME = lABELNAME;
             label.ADDRESS = aDDRESS;
+            label.ID = id;
             return label;
         }
 
@@ -440,7 +491,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String LABELNAME
         {
@@ -450,14 +501,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_LABELNAME != value)
-                {
-                    OnLABELNAMEChanging(value);
-                    ReportPropertyChanging("LABELNAME");
-                    _LABELNAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("LABELNAME");
-                    OnLABELNAMEChanged();
-                }
+                OnLABELNAMEChanging(value);
+                ReportPropertyChanging("LABELNAME");
+                _LABELNAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LABELNAME");
+                OnLABELNAMEChanged();
             }
         }
         private global::System.String _LABELNAME;
@@ -467,7 +515,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int64 ADDRESS
         {
@@ -477,19 +525,43 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_ADDRESS != value)
-                {
-                    OnADDRESSChanging(value);
-                    ReportPropertyChanging("ADDRESS");
-                    _ADDRESS = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("ADDRESS");
-                    OnADDRESSChanged();
-                }
+                OnADDRESSChanging(value);
+                ReportPropertyChanging("ADDRESS");
+                _ADDRESS = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ADDRESS");
+                OnADDRESSChanged();
             }
         }
         private global::System.Int64 _ADDRESS;
         partial void OnADDRESSChanging(global::System.Int64 value);
         partial void OnADDRESSChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
 
         #endregion
     
@@ -514,7 +586,8 @@ namespace Cosmos.Debug.Common
         /// <param name="oFFSET">Initial value of the OFFSET property.</param>
         /// <param name="nAME">Initial value of the NAME property.</param>
         /// <param name="tYPENAME">Initial value of the TYPENAME property.</param>
-        public static LOCAL_ARGUMENT_INFO CreateLOCAL_ARGUMENT_INFO(global::System.String mETHODLABELNAME, global::System.Int16 iSARGUMENT, global::System.Int32 iNDEXINMETHOD, global::System.Int32 oFFSET, global::System.String nAME, global::System.String tYPENAME)
+        /// <param name="id">Initial value of the ID property.</param>
+        public static LOCAL_ARGUMENT_INFO CreateLOCAL_ARGUMENT_INFO(global::System.String mETHODLABELNAME, global::System.Int16 iSARGUMENT, global::System.Int32 iNDEXINMETHOD, global::System.Int32 oFFSET, global::System.String nAME, global::System.String tYPENAME, global::System.Guid id)
         {
             LOCAL_ARGUMENT_INFO lOCAL_ARGUMENT_INFO = new LOCAL_ARGUMENT_INFO();
             lOCAL_ARGUMENT_INFO.METHODLABELNAME = mETHODLABELNAME;
@@ -523,6 +596,7 @@ namespace Cosmos.Debug.Common
             lOCAL_ARGUMENT_INFO.OFFSET = oFFSET;
             lOCAL_ARGUMENT_INFO.NAME = nAME;
             lOCAL_ARGUMENT_INFO.TYPENAME = tYPENAME;
+            lOCAL_ARGUMENT_INFO.ID = id;
             return lOCAL_ARGUMENT_INFO;
         }
 
@@ -532,7 +606,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String METHODLABELNAME
         {
@@ -542,14 +616,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_METHODLABELNAME != value)
-                {
-                    OnMETHODLABELNAMEChanging(value);
-                    ReportPropertyChanging("METHODLABELNAME");
-                    _METHODLABELNAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("METHODLABELNAME");
-                    OnMETHODLABELNAMEChanged();
-                }
+                OnMETHODLABELNAMEChanging(value);
+                ReportPropertyChanging("METHODLABELNAME");
+                _METHODLABELNAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("METHODLABELNAME");
+                OnMETHODLABELNAMEChanged();
             }
         }
         private global::System.String _METHODLABELNAME;
@@ -559,7 +630,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int16 ISARGUMENT
         {
@@ -569,14 +640,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_ISARGUMENT != value)
-                {
-                    OnISARGUMENTChanging(value);
-                    ReportPropertyChanging("ISARGUMENT");
-                    _ISARGUMENT = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("ISARGUMENT");
-                    OnISARGUMENTChanged();
-                }
+                OnISARGUMENTChanging(value);
+                ReportPropertyChanging("ISARGUMENT");
+                _ISARGUMENT = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ISARGUMENT");
+                OnISARGUMENTChanged();
             }
         }
         private global::System.Int16 _ISARGUMENT;
@@ -586,7 +654,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 INDEXINMETHOD
         {
@@ -596,14 +664,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_INDEXINMETHOD != value)
-                {
-                    OnINDEXINMETHODChanging(value);
-                    ReportPropertyChanging("INDEXINMETHOD");
-                    _INDEXINMETHOD = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("INDEXINMETHOD");
-                    OnINDEXINMETHODChanged();
-                }
+                OnINDEXINMETHODChanging(value);
+                ReportPropertyChanging("INDEXINMETHOD");
+                _INDEXINMETHOD = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("INDEXINMETHOD");
+                OnINDEXINMETHODChanged();
             }
         }
         private global::System.Int32 _INDEXINMETHOD;
@@ -613,7 +678,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 OFFSET
         {
@@ -623,14 +688,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_OFFSET != value)
-                {
-                    OnOFFSETChanging(value);
-                    ReportPropertyChanging("OFFSET");
-                    _OFFSET = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("OFFSET");
-                    OnOFFSETChanged();
-                }
+                OnOFFSETChanging(value);
+                ReportPropertyChanging("OFFSET");
+                _OFFSET = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("OFFSET");
+                OnOFFSETChanged();
             }
         }
         private global::System.Int32 _OFFSET;
@@ -640,7 +702,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String NAME
         {
@@ -650,14 +712,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_NAME != value)
-                {
-                    OnNAMEChanging(value);
-                    ReportPropertyChanging("NAME");
-                    _NAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("NAME");
-                    OnNAMEChanged();
-                }
+                OnNAMEChanging(value);
+                ReportPropertyChanging("NAME");
+                _NAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("NAME");
+                OnNAMEChanged();
             }
         }
         private global::System.String _NAME;
@@ -667,7 +726,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String TYPENAME
         {
@@ -677,19 +736,43 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_TYPENAME != value)
-                {
-                    OnTYPENAMEChanging(value);
-                    ReportPropertyChanging("TYPENAME");
-                    _TYPENAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("TYPENAME");
-                    OnTYPENAMEChanged();
-                }
+                OnTYPENAMEChanging(value);
+                ReportPropertyChanging("TYPENAME");
+                _TYPENAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("TYPENAME");
+                OnTYPENAMEChanged();
             }
         }
         private global::System.String _TYPENAME;
         partial void OnTYPENAMEChanging(global::System.String value);
         partial void OnTYPENAMEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
 
         #endregion
     
@@ -710,11 +793,13 @@ namespace Cosmos.Debug.Common
         /// </summary>
         /// <param name="methodId">Initial value of the MethodId property.</param>
         /// <param name="labelPrefix">Initial value of the LabelPrefix property.</param>
-        public static Method CreateMethod(global::System.Int32 methodId, global::System.String labelPrefix)
+        /// <param name="id">Initial value of the ID property.</param>
+        public static Method CreateMethod(global::System.Int32 methodId, global::System.String labelPrefix, global::System.Guid id)
         {
             Method method = new Method();
             method.MethodId = methodId;
             method.LabelPrefix = labelPrefix;
+            method.ID = id;
             return method;
         }
 
@@ -724,7 +809,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 MethodId
         {
@@ -734,14 +819,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_MethodId != value)
-                {
-                    OnMethodIdChanging(value);
-                    ReportPropertyChanging("MethodId");
-                    _MethodId = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("MethodId");
-                    OnMethodIdChanged();
-                }
+                OnMethodIdChanging(value);
+                ReportPropertyChanging("MethodId");
+                _MethodId = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("MethodId");
+                OnMethodIdChanged();
             }
         }
         private global::System.Int32 _MethodId;
@@ -771,6 +853,33 @@ namespace Cosmos.Debug.Common
         private global::System.String _LabelPrefix;
         partial void OnLabelPrefixChanging(global::System.String value);
         partial void OnLabelPrefixChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
 
         #endregion
     
@@ -796,7 +905,8 @@ namespace Cosmos.Debug.Common
         /// <param name="mETHODTOKEN">Initial value of the METHODTOKEN property.</param>
         /// <param name="iLOFFSET">Initial value of the ILOFFSET property.</param>
         /// <param name="mETHODNAME">Initial value of the METHODNAME property.</param>
-        public static MLSYMBOL CreateMLSYMBOL(global::System.String lABELNAME, global::System.Int32 sTACKDIFF, global::System.String iLASMFILE, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 iLOFFSET, global::System.String mETHODNAME)
+        /// <param name="id">Initial value of the ID property.</param>
+        public static MLSYMBOL CreateMLSYMBOL(global::System.String lABELNAME, global::System.Int32 sTACKDIFF, global::System.String iLASMFILE, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 iLOFFSET, global::System.String mETHODNAME, global::System.Guid id)
         {
             MLSYMBOL mLSYMBOL = new MLSYMBOL();
             mLSYMBOL.LABELNAME = lABELNAME;
@@ -806,6 +916,7 @@ namespace Cosmos.Debug.Common
             mLSYMBOL.METHODTOKEN = mETHODTOKEN;
             mLSYMBOL.ILOFFSET = iLOFFSET;
             mLSYMBOL.METHODNAME = mETHODNAME;
+            mLSYMBOL.ID = id;
             return mLSYMBOL;
         }
 
@@ -815,7 +926,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String LABELNAME
         {
@@ -825,14 +936,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_LABELNAME != value)
-                {
-                    OnLABELNAMEChanging(value);
-                    ReportPropertyChanging("LABELNAME");
-                    _LABELNAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("LABELNAME");
-                    OnLABELNAMEChanged();
-                }
+                OnLABELNAMEChanging(value);
+                ReportPropertyChanging("LABELNAME");
+                _LABELNAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LABELNAME");
+                OnLABELNAMEChanged();
             }
         }
         private global::System.String _LABELNAME;
@@ -842,7 +950,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 STACKDIFF
         {
@@ -852,14 +960,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_STACKDIFF != value)
-                {
-                    OnSTACKDIFFChanging(value);
-                    ReportPropertyChanging("STACKDIFF");
-                    _STACKDIFF = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("STACKDIFF");
-                    OnSTACKDIFFChanged();
-                }
+                OnSTACKDIFFChanging(value);
+                ReportPropertyChanging("STACKDIFF");
+                _STACKDIFF = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("STACKDIFF");
+                OnSTACKDIFFChanged();
             }
         }
         private global::System.Int32 _STACKDIFF;
@@ -869,7 +974,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String ILASMFILE
         {
@@ -879,14 +984,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_ILASMFILE != value)
-                {
-                    OnILASMFILEChanging(value);
-                    ReportPropertyChanging("ILASMFILE");
-                    _ILASMFILE = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("ILASMFILE");
-                    OnILASMFILEChanged();
-                }
+                OnILASMFILEChanging(value);
+                ReportPropertyChanging("ILASMFILE");
+                _ILASMFILE = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("ILASMFILE");
+                OnILASMFILEChanged();
             }
         }
         private global::System.String _ILASMFILE;
@@ -896,7 +998,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 TYPETOKEN
         {
@@ -906,14 +1008,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_TYPETOKEN != value)
-                {
-                    OnTYPETOKENChanging(value);
-                    ReportPropertyChanging("TYPETOKEN");
-                    _TYPETOKEN = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("TYPETOKEN");
-                    OnTYPETOKENChanged();
-                }
+                OnTYPETOKENChanging(value);
+                ReportPropertyChanging("TYPETOKEN");
+                _TYPETOKEN = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("TYPETOKEN");
+                OnTYPETOKENChanged();
             }
         }
         private global::System.Int32 _TYPETOKEN;
@@ -923,7 +1022,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 METHODTOKEN
         {
@@ -933,14 +1032,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_METHODTOKEN != value)
-                {
-                    OnMETHODTOKENChanging(value);
-                    ReportPropertyChanging("METHODTOKEN");
-                    _METHODTOKEN = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("METHODTOKEN");
-                    OnMETHODTOKENChanged();
-                }
+                OnMETHODTOKENChanging(value);
+                ReportPropertyChanging("METHODTOKEN");
+                _METHODTOKEN = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("METHODTOKEN");
+                OnMETHODTOKENChanged();
             }
         }
         private global::System.Int32 _METHODTOKEN;
@@ -950,7 +1046,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.Int32 ILOFFSET
         {
@@ -960,14 +1056,11 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_ILOFFSET != value)
-                {
-                    OnILOFFSETChanging(value);
-                    ReportPropertyChanging("ILOFFSET");
-                    _ILOFFSET = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("ILOFFSET");
-                    OnILOFFSETChanged();
-                }
+                OnILOFFSETChanging(value);
+                ReportPropertyChanging("ILOFFSET");
+                _ILOFFSET = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ILOFFSET");
+                OnILOFFSETChanged();
             }
         }
         private global::System.Int32 _ILOFFSET;
@@ -977,7 +1070,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
         public global::System.String METHODNAME
         {
@@ -987,19 +1080,43 @@ namespace Cosmos.Debug.Common
             }
             set
             {
-                if (_METHODNAME != value)
-                {
-                    OnMETHODNAMEChanging(value);
-                    ReportPropertyChanging("METHODNAME");
-                    _METHODNAME = StructuralObject.SetValidValue(value, false);
-                    ReportPropertyChanged("METHODNAME");
-                    OnMETHODNAMEChanged();
-                }
+                OnMETHODNAMEChanging(value);
+                ReportPropertyChanging("METHODNAME");
+                _METHODNAME = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("METHODNAME");
+                OnMETHODNAMEChanged();
             }
         }
         private global::System.String _METHODNAME;
         partial void OnMETHODNAMEChanging(global::System.String value);
         partial void OnMETHODNAMEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
 
         #endregion
     
