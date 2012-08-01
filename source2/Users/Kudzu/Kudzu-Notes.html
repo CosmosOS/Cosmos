@@ -4,6 +4,13 @@
     <h3>
     Kudzu</h3>
     <ul>
+                                    <li>Drop Database after debugging too, not just ebfore. comment why..code chagnes, 
+                                        disk space, etc</li>
+                                    <li>DB access horribly slow when debugging hive???? 
+                                        <ul>
+                                            <li>SQL debugging? MSBuild debugging? how to disable/enable easily?</li>
+                                        </ul>
+                                    </li>
                                     <li>Double runs and DB in use problem</li>
                                     <li>Asm stepping<ul>
                                         <li>Disable asm stepping button till refresh - comment why.. concurrency</li>
@@ -23,15 +30,7 @@
                                     </li>
                                     <li>Plugs<ul>
                                         <li>Allow plug attrib to specify asm name and link to X# directly.</ul>
-                                    <li>OutputDebug Catcher with filters, categories, timestamps<li>Asm stepping<ul>
-                                    <li>Historical panels</li>
-                                    </ul>
-                                    </li>
-                                    <li>Convert cxdb to sql compact and edm<ul>
-                                        <li><a href="http://www.microsoft.com/download/en/details.aspx?id=17876">http://www.microsoft.com/download/en/details.aspx?id=17876</a></li>
-                                        </ul>
-                                    </li>
-                                    <li>Increase speed of DebugStub / lower impact</li>
+                                    <li>OutputDebug Catcher with filters, categories, timestamps<li>Increase speed of DebugStub / lower impact</li>
                                     <li>DS Ping or set a breakpoint while not in a break state will hang VS.<ul>
                                         <li>This is because its waiting on some other command to release?</li>
                                         </ul>

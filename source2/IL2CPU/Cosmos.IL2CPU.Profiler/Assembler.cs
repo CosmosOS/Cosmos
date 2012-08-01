@@ -11,8 +11,7 @@ namespace Cosmos.IL2CPU.Profiler {
     
     protected override void InitILOps() {
       var xILOp = new ILOp(this.Assembler);
-      this.DebugInfo = new Debug.Common.DebugInfo();
-      this.DebugInfo.CreateDB(AppDomain.CurrentDomain.BaseDirectory + "DebugInfo");
+      DebugInfo = new Debug.Common.DebugInfo(AppDomain.CurrentDomain.BaseDirectory + "DebugInfo.mdf", true);
       // Don't change the type in the foreach to a var, its necessary as it is now
       // to typecast it, so we can then recast to an int.
       foreach (ILOpCode.Code xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
