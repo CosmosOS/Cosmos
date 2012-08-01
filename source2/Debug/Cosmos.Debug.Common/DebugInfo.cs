@@ -53,37 +53,31 @@ namespace Cosmos.Debug.Common {
 
       string xDbName = Path.GetFileNameWithoutExtension(aPathname);
       // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
-      string xConnStr = @"Data Source=(LocalDB)\v11.0;Integrated Security=True;MultipleActiveResultSets=True;";
+      string xDataSouce = @"(LocalDB)\v11.0";
+      //xDataSouce = @".\SQLEXPRESS";
+      string xConnStr = @"Data Source=" + xDataSouce + ";Integrated Security=True;MultipleActiveResultSets=True;";
 
       if (aCreate) {
         using (var xConn = new SqlConnection(xConnStr)) {
           xConn.Open();
 
-          bool xDetach = false;
+          bool xExists = false;
           using (var xCmd = xConn.CreateCommand()) {
             xCmd.CommandText = "select * from sys.databases where name = '" + xDbName + "'";
             using (var xReader = xCmd.ExecuteReader()) {
-              xDetach = xReader.Read();
+              xExists = xReader.Read();
             }
           }
-          if (xDetach) {
+
+          if (xExists) {
+            // Yes this throws an exception if the database doesnt exist, so we have to
+            // run it only if we know it exists.
+            // This will detach and also delete the physica files.
             using (var xCmd = xConn.CreateCommand()) {
-              xCmd.CommandText = String.Format("exec sp_detach_db '{0}'", xDbName);
+              xCmd.CommandText = "DROP DATABASE " + xDbName;
               xCmd.ExecuteNonQuery();
             }
           }
-
-          // Delete actual files
-          File.Delete(aPathname);
-          // EDM seems to create .ldf, while TSQL creates _Log.ldf. 
-          // Not sure why, but we scan for both...
-          File.Delete(Path.ChangeExtension(aPathname, "ldf"));
-          File.Delete(Path.Combine(Path.GetDirectoryName(aPathname), Path.GetFileNameWithoutExtension(aPathname) + "_log.ldf"));
-
-          //using (var xCmd = xConn.CreateCommand()) {
-          //  xCmd.CommandText = String.Format("CREATE DATABASE {0} ON (NAME = N'{0}', FILENAME = '{1}')", xDbName, aPathname);
-          //  xCmd.ExecuteNonQuery();
-          //}
         }
       }
 
@@ -98,6 +92,7 @@ namespace Cosmos.Debug.Common {
 
       // Do not open mConnection before mEntities.CreateDatabase
       if (aCreate) {
+        // DatabaseExists checks if the DBName exists, not physical files.
         if (!mEntities.DatabaseExists()) {
           mEntities.CreateDatabase();
         }
@@ -442,6 +437,10 @@ namespace Cosmos.Debug.Common {
         // Dont set to null... causes problems because of bad code :(
         // Need to fix the whole class, but its here for now.
         //CurrentInstance = null;
+
+        // Why do we have this? 
+        // Dont remove though - when removed we cant run Cosmos stuff in hive for some reason?
+        GC.SuppressFinalize(this);
       }
     }
   }
