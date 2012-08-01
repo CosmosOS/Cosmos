@@ -130,6 +130,21 @@ namespace Cosmos.Build.Builder {
       }
     }
 
+    protected void CheckOS() {
+      Echo("Checking Operating System");
+      var xOsInfo = System.Environment.OSVersion;
+      if (xOsInfo.Platform != PlatformID.Win32NT) {
+        NotFound("Supported OS");
+      }
+      decimal xVer = decimal.Parse(xOsInfo.Version.Major + "." + xOsInfo.Version.Minor, System.Globalization.CultureInfo.InvariantCulture);
+      // 6.0 Vista
+      // 6.1 2008
+      // 6.2 Windows 7  
+      if (xVer < 6.0m) {
+        NotFound("Minimum Supported OS is Vista/2008");
+      }
+    }
+
     protected void CheckIfBuilderRunning() {
       Echo("Checking if Builder is already running.");
       var xList = Process.GetProcessesByName("Cosmos.Build.Builder");
@@ -173,6 +188,7 @@ namespace Cosmos.Build.Builder {
       // We assume they have normal .NET stuff if user was able to build the builder...
       //Visual Studio 2010
 
+      CheckOS();
       CheckIsVsRunning();
       CheckIfBuilderRunning();
 
