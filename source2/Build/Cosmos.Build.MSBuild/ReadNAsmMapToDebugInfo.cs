@@ -9,8 +9,11 @@ using Cosmos.Debug.Common;
 namespace Cosmos.Build.MSBuild {
   
   public class ReadNAsmMapToDebugInfo : AppDomainIsolatedTask {
-    [Required] public string InputBaseDir { get; set; }
-    [Required] public string DebugInfoFile { get; set; }
+    [Required]
+    public string InputBaseDir { get; set; }
+    
+    [Required]
+    public string DebugInfoFile { get; set; }
 
     public override bool Execute() {
       var xSourceInfos = SourceInfo.ParseMapFile(InputBaseDir);
