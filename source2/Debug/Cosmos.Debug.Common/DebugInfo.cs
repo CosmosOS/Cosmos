@@ -80,7 +80,6 @@ namespace Cosmos.Debug.Common {
           File.Delete(Path.ChangeExtension(aPathname, "ldf"));
           File.Delete(Path.Combine(Path.GetDirectoryName(aPathname), Path.GetFileNameWithoutExtension(aPathname) + "_log.ldf"));
 
-          // Create DB
           //using (var xCmd = xConn.CreateCommand()) {
           //  xCmd.CommandText = String.Format("CREATE DATABASE {0} ON (NAME = N'{0}', FILENAME = '{1}')", xDbName, aPathname);
           //  xCmd.ExecuteNonQuery();
@@ -97,21 +96,13 @@ namespace Cosmos.Debug.Common {
       var xEntConn = new EntityConnection(xWorkspace, mConnection);
       mEntities = new Entities(xEntConn);
 
+      // Do not open mConnection before mEntities.CreateDatabase
       if (aCreate) {
         if (!mEntities.DatabaseExists()) {
           mEntities.CreateDatabase();
         }
       }
-
-      // Must do after Entity connection is created
       mConnection.Open();
-    }
-
-    protected void ExecSQL(string aSQL) {
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = aSQL;
-        xCmd.ExecuteNonQuery();
-      }
     }
 
     protected List<string> local_MappingTypeNames = new List<string>();
@@ -125,19 +116,27 @@ namespace Cosmos.Debug.Common {
         }
       });
 
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" +
-                             " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
-        xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
-        // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-        foreach (var xItem in xMaps) {
-          xCmd.Parameters[0].Value = xItem.TypeName;
-          foreach (var xFieldName in xItem.FieldNames) {
-            xCmd.Parameters[1].Value = xFieldName;
-            xCmd.ExecuteNonQuery();
+      var xTx = mConnection.BeginTransaction(); 
+      try {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTx;
+          xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" +
+                               " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
+          xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
+          // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+          foreach (var xItem in xMaps) {
+            xCmd.Parameters[0].Value = xItem.TypeName;
+            foreach (var xFieldName in xItem.FieldNames) {
+              xCmd.Parameters[1].Value = xFieldName;
+              xCmd.ExecuteNonQuery();
+            }
           }
         }
+        xTx.Commit();
+      } catch (Exception) {
+        xTx.Rollback();
+        throw;
       }
     }
 
@@ -187,19 +186,27 @@ namespace Cosmos.Debug.Common {
         }
       });
 
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO FIELD_INFO (ID, TYPE, OFFSET, NAME)" +
-                           " VALUES (NEWID(), @TYPE, @OFFSET, @NAME)";
-        xCmd.Parameters.Add("@TYPE", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
-        xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
-        // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-        foreach (var xItem in xFields) {
-          xCmd.Parameters[0].Value = xItem.Type;
-          xCmd.Parameters[1].Value = xItem.Offset;
-          xCmd.Parameters[2].Value = xItem.Name;
-          xCmd.ExecuteNonQuery();
+      var xTx = mConnection.BeginTransaction(); 
+      try {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTx;
+          xCmd.CommandText = "INSERT INTO FIELD_INFO (ID, TYPE, OFFSET, NAME)" +
+                             " VALUES (NEWID(), @TYPE, @OFFSET, @NAME)";
+          xCmd.Parameters.Add("@TYPE", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
+          xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
+          // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+          foreach (var xItem in xFields) {
+            xCmd.Parameters[0].Value = xItem.Type;
+            xCmd.Parameters[1].Value = xItem.Offset;
+            xCmd.Parameters[2].Value = xItem.Name;
+            xCmd.ExecuteNonQuery();
+          }
         }
+        xTx.Commit();
+      } catch (Exception) {
+        xTx.Rollback();
+        throw;
       }
     }
 
@@ -233,27 +240,35 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO MLSYMBOLs (ID, LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                     " VALUES (NEWID(), @LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
-        xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
-        xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
-        xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
-        xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
-        xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
-        // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-        foreach (var xItem in aSymbols) {
-          xCmd.Parameters[0].Value = xItem.LabelName;
-          xCmd.Parameters[1].Value = xItem.StackDifference;
-          xCmd.Parameters[2].Value = xItem.AssemblyFile;
-          xCmd.Parameters[3].Value = xItem.TypeToken;
-          xCmd.Parameters[4].Value = xItem.MethodToken;
-          xCmd.Parameters[5].Value = xItem.ILOffset;
-          xCmd.Parameters[6].Value = xItem.MethodName;
-          xCmd.ExecuteNonQuery();
+      var xTx = mConnection.BeginTransaction(); 
+      try {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTx;
+          xCmd.CommandText = "INSERT INTO MLSYMBOLs (ID, LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                       " VALUES (NEWID(), @LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
+          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
+          xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
+          xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
+          xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
+          xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
+          // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
+          foreach (var xItem in aSymbols) {
+            xCmd.Parameters[0].Value = xItem.LabelName;
+            xCmd.Parameters[1].Value = xItem.StackDifference;
+            xCmd.Parameters[2].Value = xItem.AssemblyFile;
+            xCmd.Parameters[3].Value = xItem.TypeToken;
+            xCmd.Parameters[4].Value = xItem.MethodToken;
+            xCmd.Parameters[5].Value = xItem.ILOffset;
+            xCmd.Parameters[6].Value = xItem.MethodName;
+            xCmd.ExecuteNonQuery();
+          }
         }
+        xTx.Commit();
+      } catch (Exception) {
+        xTx.Rollback();
+        throw;
       }
     }
 
@@ -321,22 +336,30 @@ namespace Cosmos.Debug.Common {
     }
 
     public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfos() {
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO";
-        using (var xReader = xCmd.ExecuteReader()) {
-          var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
-          while (xReader.Read()) {
-            xResult.Add(new Local_Argument_Info {
-              MethodLabelName = xReader.GetString(0),
-              IsArgument = xReader.GetInt16(1) == 1,
-              Index = xReader.GetInt32(2),
-              Offset = xReader.GetInt32(3),
-              Name = xReader.GetString(4),
-              Type = xReader.GetString(5)
-            });
+      var xTx = mConnection.BeginTransaction(); 
+      try {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTx;
+          xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO";
+          using (var xReader = xCmd.ExecuteReader()) {
+            var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
+            while (xReader.Read()) {
+              xResult.Add(new Local_Argument_Info {
+                MethodLabelName = xReader.GetString(0),
+                IsArgument = xReader.GetInt16(1) == 1,
+                Index = xReader.GetInt32(2),
+                Offset = xReader.GetInt32(3),
+                Name = xReader.GetString(4),
+                Type = xReader.GetString(5)
+              });
+            }
+            return xResult;
           }
-          return xResult;
         }
+        xTx.Commit();
+      } catch (Exception) {
+        xTx.Rollback();
+        throw;
       }
     }
 
@@ -391,15 +414,23 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "insert into Labels (ID, LABELNAME, ADDRESS) values (NEWID(), @LABELNAME, @ADDRESS)";
-        xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
-        foreach (var xItem in aMap) {
-          xCmd.Parameters[0].Value = xItem.Value;
-          xCmd.Parameters[1].Value = xItem.Key;
-          xCmd.ExecuteNonQuery();
+      var xTx = mConnection.BeginTransaction(); 
+      try {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTx;
+          xCmd.CommandText = "insert into Labels (ID, LABELNAME, ADDRESS) values (NEWID(), @LABELNAME, @ADDRESS)";
+          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
+          foreach (var xItem in aMap) {
+            xCmd.Parameters[0].Value = xItem.Value;
+            xCmd.Parameters[1].Value = xItem.Key;
+            xCmd.ExecuteNonQuery();
+          }
         }
+        xTx.Commit();
+      } catch (Exception) {
+        xTx.Rollback();
+        throw;
       }
     }
 
@@ -408,7 +439,9 @@ namespace Cosmos.Debug.Common {
         var xConn = mConnection;
         mConnection = null;
         xConn.Close();
-        CurrentInstance = null;
+        // Dont set to null... causes problems because of bad code :(
+        // Need to fix the whole class, but its here for now.
+        //CurrentInstance = null;
       }
     }
   }
