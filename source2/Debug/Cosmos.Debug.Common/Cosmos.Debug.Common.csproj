@@ -77,7 +77,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\source\libraries\MDbg\corapi.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\..\source\packages\EntityFramework.5.0.0-rc\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -108,6 +112,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DebugModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="EntityDataReader.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />
     <Compile Include="ObjDump.cs" />
     <Compile Include="PipeClient.cs" />
@@ -124,6 +129,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DebugModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">

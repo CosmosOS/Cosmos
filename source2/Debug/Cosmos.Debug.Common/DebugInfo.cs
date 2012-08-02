@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.EntityClient;
 using System.Data.SqlClient;
 using System.Data.Common;
+using System.Data.Objects;
 using System.Reflection;
 using Microsoft.Win32;
 
@@ -51,6 +52,7 @@ namespace Cosmos.Debug.Common {
     protected string mDataSouce = @"(LocalDB)\v11.0";
     //protected mDataSouce = @".\SQLEXPRESS";
     protected string mConnStrBase;
+    protected string mConnStr;
     protected EntityConnection mEntConn;
 
     public void DeleteDB() {
@@ -92,11 +94,11 @@ namespace Cosmos.Debug.Common {
       }
 
       // Initial Catalog is necessary for EDM
-      string xConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
+      mConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
 
       var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
         new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
-      mEntConn = new EntityConnection(xWorkspace, new SqlConnection(xConnStr));
+      mEntConn = new EntityConnection(xWorkspace, new SqlConnection(mConnStr));
       // Do not open mConnection before mEntities.CreateDatabase
       if (aCreate) {
         using (var xEntities = new Entities(mEntConn)) {
@@ -107,7 +109,7 @@ namespace Cosmos.Debug.Common {
         }
       }
 
-      mConnection = new SqlConnection(xConnStr);
+      mConnection = new SqlConnection(mConnStr);
       mConnection.Open();
     }
 
@@ -368,7 +370,7 @@ namespace Cosmos.Debug.Common {
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
       using (var xDB = new Entities(mEntConn)) {
-        var xRow = new Method();
+       var xRow = new Method();
         xRow.MethodId = mMethodId;
         xRow.LabelPrefix = aLabelPrefix;
         xDB.Methods.AddObject(xRow);
@@ -378,31 +380,45 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
-      //using (var xDB = new Entities(mEntConn)) {
-      //  foreach (var xItem in ..) {
-      //    var xRow = new FIELD_INFO();
-      //    xDB.FIELD_INFO.AddObject(xRow);
-      //  }
-      //  xDB.SaveChanges();
-      //}
+      // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
+      // SqlBulk operations are average 15x faster. So we use a hybrid approach by using the entities as containers
+      // and EntityDataReader to bridge the gap to SqlBulk.
 
-      var xTx = mConnection.BeginTransaction(); 
-      try {
-        using (var xCmd = mConnection.CreateCommand()) {
-          xCmd.Transaction = xTx;
-          xCmd.CommandText = "insert into Labels (ID, LABELNAME, ADDRESS) values (NEWID(), @LABELNAME, @ADDRESS)";
-          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
-          foreach (var xItem in aMap) {
-            xCmd.Parameters[0].Value = xItem.Value;
-            xCmd.Parameters[1].Value = xItem.Key;
-            xCmd.ExecuteNonQuery();
-          }
+      if (true) {
+
+        var xLabels = new List<Label>();
+        foreach (var xItem in aMap) {
+          var xRow = new Label();
+          xRow.LABELNAME = xItem.Value;
+          xRow.ADDRESS = xItem.Key;
+          xLabels.Add(xRow);
         }
-        xTx.Commit();
-      } catch (Exception) {
-        xTx.Rollback();
-        throw;
+        using (var xBulkCopy = new SqlBulkCopy(mConnStr)) {
+          xBulkCopy.DestinationTableName = "Labels";
+          xBulkCopy.WriteToServer(xLabels.AsDataReader());
+        }
+
+      } else {
+
+        var xTx = mConnection.BeginTransaction();
+        try {
+          using (var xCmd = mConnection.CreateCommand()) {
+            xCmd.Transaction = xTx;
+            xCmd.CommandText = "insert into Labels (ID, LABELNAME, ADDRESS) values (NEWID(), @LABELNAME, @ADDRESS)";
+            xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
+            xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
+            foreach (var xItem in aMap) {
+              xCmd.Parameters[0].Value = xItem.Value;
+              xCmd.Parameters[1].Value = xItem.Key;
+              xCmd.ExecuteNonQuery();
+            }
+          }
+          xTx.Commit();
+        } catch (Exception) {
+          xTx.Rollback();
+          throw;
+        }
+
       }
     }
 
