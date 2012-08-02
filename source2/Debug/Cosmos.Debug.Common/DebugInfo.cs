@@ -16,12 +16,6 @@ namespace Cosmos.Debug.Common {
     // Please beware this field, it may cause issues if used incorrectly.
     public static DebugInfo CurrentInstance { get; private set; }
   
-    public class Field_Info {
-      public string Type { get; set; }
-      public int Offset { get; set; }
-      public string Name { get; set; }
-    }
-
     public class Field_Map {
       public string TypeName { get; set; }
       public List<string> FieldNames = new List<string>();
@@ -161,49 +155,15 @@ namespace Cosmos.Debug.Common {
     }
 
     protected List<string> mLocalFieldInfoNames = new List<string>();
-    public void WriteFieldInfoToFile(IEnumerable<Field_Info> aFields) {
-      var xFields = aFields.Where(delegate(Field_Info mp) {
-        if (mLocalFieldInfoNames.Contains(mp.Name)) {
-          return false;
-        } else {
-          mLocalFieldInfoNames.Add(mp.Name);
-          return true;
-        }
-      });
-
-      // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+    public void WriteFieldInfoToFile(IEnumerable<FIELD_INFO> aFields) {
       using (var xDB = DB()) {
-        foreach (var xItem in xFields) {
-          var xRow = new FIELD_INFO();
-          xRow.TYPE = xItem.Type;
-          xRow.OFFSET = xItem.Offset;
-          xRow.NAME = xItem.Name;
-          xDB.FIELD_INFO.AddObject(xRow);
+        foreach (var xItem in aFields) {
+          if (!mLocalFieldInfoNames.Contains(xItem.NAME)) {
+            mLocalFieldInfoNames.Add(xItem.NAME);
+            xDB.FIELD_INFO.AddObject(xItem);
+          }
         }
         xDB.SaveChanges();
-      }
-    }
-
-    public Field_Info GetFieldInfo(string aName) {
-      var xInf = new Field_Info();
-      using (var xDB = DB()) {
-        var xRow = xDB.FIELD_INFO.Where(q => q.NAME == aName).First();
-        xInf.Type = xRow.TYPE;
-        xInf.Offset = xRow.OFFSET;
-        xInf.Name = xRow.NAME;
-      }
-      return xInf;
-    }
-
-    public void ReadFieldInfoList(List<Field_Info> aSymbols) {
-      using (var xDB = DB()) {
-        foreach (var xRow in xDB.FIELD_INFO) {
-          aSymbols.Add(new Field_Info {
-            Type = xRow.TYPE,
-            Offset = xRow.OFFSET,
-            Name = xRow.NAME,
-          });
-        }
       }
     }
 

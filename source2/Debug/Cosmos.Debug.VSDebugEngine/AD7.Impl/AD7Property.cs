@@ -262,13 +262,16 @@ namespace Cosmos.Debug.VSDebugEngine {
           } else {
             var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.Type);
             foreach (string str in mp.FieldNames) {
-              var fInf = mProcess.mDebugInfoDb.GetFieldInfo(str);
+              Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
+              using (var xDB = mProcess.mDebugInfoDb.DB()) {
+                xFieldInfo = xDB.FIELD_INFO.Where(q => q.NAME == str).First();
+              }
 
               var inf = new DebugLocalInfo();
               inf.IsArrayElement = true;
-              inf.ArrayElementType = fInf.Type;
-              inf.ArrayElementLocation = (int)(xPointer + fInf.Offset + 12);
-              inf.Name = GetFieldName(fInf);
+              inf.ArrayElementType = xFieldInfo.TYPE;
+              inf.ArrayElementLocation = (int)(xPointer + xFieldInfo.OFFSET + 12);
+              inf.Name = GetFieldName(xFieldInfo);
               this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
             }
             propertyInfo.bstrValue = String.Format("{0} (0x{1})", xPointer, xPointer.ToString("X").ToUpper());
@@ -300,15 +303,14 @@ namespace Cosmos.Debug.VSDebugEngine {
       return propertyInfo;
     }
 
-    private static string GetFieldName(DebugInfo.Field_Info fInf) {
-      string s = fInf.Name;
+    private static string GetFieldName(Cosmos.Debug.Common.FIELD_INFO fInf) {
+      string s = fInf.NAME;
       int i = s.LastIndexOf('.');
       if (i > 0) {
         s = s.Substring(i + 1, s.Length - i - 1);
         return s;
-      } else {
-        return s;
       }
+      return s;
     }
 
     #region IDebugProperty2 Members
