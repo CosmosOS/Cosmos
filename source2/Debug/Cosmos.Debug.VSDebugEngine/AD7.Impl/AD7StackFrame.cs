@@ -67,8 +67,8 @@ namespace Cosmos.Debug.VSDebugEngine {
           if (xSymbolInfo != null) {
             using (var xDB = xProcess.mDebugInfoDb.DB()) {
               var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME).ToArray();
-              mLocalInfos = xAllInfos.Where(q => q.ISARGUMENT == 0).ToArray();
-              mArgumentInfos = xAllInfos.Where(q => q.ISARGUMENT != 0).ToArray();
+              mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
+              mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
             }
             m_numLocals = mLocalInfos.Length;
             m_numParameters = mArgumentInfos.Length;

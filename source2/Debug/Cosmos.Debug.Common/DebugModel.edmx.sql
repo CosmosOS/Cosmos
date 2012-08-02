@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/02/2012 14:51:27
+-- Date Created: 08/02/2012 14:55:28
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -70,7 +70,7 @@ GO
 -- Creating table 'LOCAL_ARGUMENT_INFO'
 CREATE TABLE [dbo].[LOCAL_ARGUMENT_INFO] (
     [METHODLABELNAME] nvarchar(512)  NOT NULL,
-    [ISARGUMENT] smallint  NOT NULL,
+    [IsArgument] bit  NOT NULL,
     [INDEXINMETHOD] int  NOT NULL,
     [OFFSET] int  NOT NULL,
     [NAME] nvarchar(64)  NOT NULL,

@@ -557,17 +557,17 @@ namespace Cosmos.Debug.Common
         /// Create a new LOCAL_ARGUMENT_INFO object.
         /// </summary>
         /// <param name="mETHODLABELNAME">Initial value of the METHODLABELNAME property.</param>
-        /// <param name="iSARGUMENT">Initial value of the ISARGUMENT property.</param>
+        /// <param name="isArgument">Initial value of the IsArgument property.</param>
         /// <param name="iNDEXINMETHOD">Initial value of the INDEXINMETHOD property.</param>
         /// <param name="oFFSET">Initial value of the OFFSET property.</param>
         /// <param name="nAME">Initial value of the NAME property.</param>
         /// <param name="tYPENAME">Initial value of the TYPENAME property.</param>
         /// <param name="id">Initial value of the ID property.</param>
-        public static LOCAL_ARGUMENT_INFO CreateLOCAL_ARGUMENT_INFO(global::System.String mETHODLABELNAME, global::System.Int16 iSARGUMENT, global::System.Int32 iNDEXINMETHOD, global::System.Int32 oFFSET, global::System.String nAME, global::System.String tYPENAME, global::System.Guid id)
+        public static LOCAL_ARGUMENT_INFO CreateLOCAL_ARGUMENT_INFO(global::System.String mETHODLABELNAME, global::System.Boolean isArgument, global::System.Int32 iNDEXINMETHOD, global::System.Int32 oFFSET, global::System.String nAME, global::System.String tYPENAME, global::System.Guid id)
         {
             LOCAL_ARGUMENT_INFO lOCAL_ARGUMENT_INFO = new LOCAL_ARGUMENT_INFO();
             lOCAL_ARGUMENT_INFO.METHODLABELNAME = mETHODLABELNAME;
-            lOCAL_ARGUMENT_INFO.ISARGUMENT = iSARGUMENT;
+            lOCAL_ARGUMENT_INFO.IsArgument = isArgument;
             lOCAL_ARGUMENT_INFO.INDEXINMETHOD = iNDEXINMETHOD;
             lOCAL_ARGUMENT_INFO.OFFSET = oFFSET;
             lOCAL_ARGUMENT_INFO.NAME = nAME;
@@ -608,24 +608,24 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int16 ISARGUMENT
+        public global::System.Boolean IsArgument
         {
             get
             {
-                return _ISARGUMENT;
+                return _IsArgument;
             }
             set
             {
-                OnISARGUMENTChanging(value);
-                ReportPropertyChanging("ISARGUMENT");
-                _ISARGUMENT = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("ISARGUMENT");
-                OnISARGUMENTChanged();
+                OnIsArgumentChanging(value);
+                ReportPropertyChanging("IsArgument");
+                _IsArgument = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("IsArgument");
+                OnIsArgumentChanged();
             }
         }
-        private global::System.Int16 _ISARGUMENT;
-        partial void OnISARGUMENTChanging(global::System.Int16 value);
-        partial void OnISARGUMENTChanged();
+        private global::System.Boolean _IsArgument;
+        partial void OnIsArgumentChanging(global::System.Boolean value);
+        partial void OnIsArgumentChanged();
     
         /// <summary>
         /// No Metadata Documentation available.

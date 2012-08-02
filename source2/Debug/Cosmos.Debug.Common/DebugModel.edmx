@@ -42,7 +42,7 @@
       <PropertyRef Name="ID" />
     </Key>
     <Property Name="METHODLABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="ISARGUMENT" Type="smallint" Nullable="false" />
+    <Property Name="IsArgument" Type="bit" Nullable="false" />
     <Property Name="INDEXINMETHOD" Type="int" Nullable="false" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="64" />
@@ -103,7 +103,7 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="METHODLABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
-          <Property Name="ISARGUMENT" Type="Int16" Nullable="false" />
+          <Property Name="IsArgument" Type="Boolean" Nullable="false" />
           <Property Name="INDEXINMETHOD" Type="Int32" Nullable="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="64" Unicode="true" FixedLength="false" />
@@ -162,7 +162,7 @@
         <MappingFragment StoreEntitySet="LOCAL_ARGUMENT_INFO">
           <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="METHODLABELNAME" ColumnName="METHODLABELNAME" />
-          <ScalarProperty Name="ISARGUMENT" ColumnName="ISARGUMENT" />
+          <ScalarProperty Name="IsArgument" ColumnName="IsArgument" />
           <ScalarProperty Name="INDEXINMETHOD" ColumnName="INDEXINMETHOD" />
           <ScalarProperty Name="OFFSET" ColumnName="OFFSET" />
           <ScalarProperty Name="NAME" ColumnName="NAME" />
