@@ -329,43 +329,19 @@ namespace Cosmos.Debug.Common {
 
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
       // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-      //using (var xDB = new Entities(mEntConn)) {
-      //  foreach (var xItem in ..) {
-      //    var xRow = new FIELD_INFO();
-      //    xDB.FIELD_INFO.AddObject(xRow);
-      //  }
-      //  xDB.SaveChanges();
-      //}
-
-      var xTx = mConnection.BeginTransaction();
-      try {
-        using (var xCmd = mConnection.CreateCommand()) {
-          xCmd.Transaction = xTx;
-          xCmd.CommandText = "INSERT INTO MLSYMBOLs (ID, LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                       " VALUES (NEWID(), @LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
-          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
-          xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
-          xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
-          xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
-          xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-          foreach (var xItem in aSymbols) {
-            xCmd.Parameters[0].Value = xItem.LabelName;
-            xCmd.Parameters[1].Value = xItem.StackDifference;
-            xCmd.Parameters[2].Value = xItem.AssemblyFile;
-            xCmd.Parameters[3].Value = xItem.TypeToken;
-            xCmd.Parameters[4].Value = xItem.MethodToken;
-            xCmd.Parameters[5].Value = xItem.ILOffset;
-            xCmd.Parameters[6].Value = xItem.MethodName;
-            xCmd.ExecuteNonQuery();
-          }
+      using (var xDB = new Entities(mEntConn)) {
+        foreach (var xItem in aSymbols) {
+          var xRow = new MLSYMBOL();
+          xRow.LABELNAME = xItem.LabelName;
+          xRow.STACKDIFF = xItem.StackDifference;
+          xRow.ILASMFILE = xItem.AssemblyFile;
+          xRow.TYPETOKEN = xItem.TypeToken;
+          xRow.METHODTOKEN = xItem.MethodToken;
+          xRow.ILOFFSET = xItem.ILOffset;
+          xRow.METHODNAME = xItem.MethodName;
+          xDB.MLSYMBOLs.AddObject(xRow);
         }
-        xTx.Commit();
-      } catch (Exception) {
-        xTx.Rollback();
-        throw;
+        xDB.SaveChanges();
       }
     }
 
