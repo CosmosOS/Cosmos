@@ -196,21 +196,21 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public Field_Info GetFieldInfo(string name) {
-      var inf = new Field_Info();
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO where NAME='" + name + "'";
-        using (var xReader = xCmd.ExecuteReader()) {
-          xReader.Read();
-          inf.Type = xReader.GetString(0);
-          inf.Offset = xReader.GetInt32(1);
-          inf.Name = xReader.GetString(2);
-        }
+    public Field_Info GetFieldInfo(string aName) {
+      var xInf = new Field_Info();
+      using (var xDB = new Entities(mEntConn)) {
+        var xRow = xDB.FIELD_INFO.Where(q => q.NAME == aName).First();
+        xInf.Type = xRow.TYPE;
+        xInf.Offset = xRow.OFFSET;
+        xInf.Name = xRow.NAME;
       }
-      return inf;
+      return xInf;
     }
 
     public void ReadFieldInfoList(List<Field_Info> aSymbols) {
+      using (var xDB = new Entities(mEntConn)) {
+      }
+
       using (var xCmd = mConnection.CreateCommand()) {
         xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO";
         using (var xReader = xCmd.ExecuteReader()) {
@@ -226,6 +226,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadSymbolsList(List<MLDebugSymbol> aSymbols) {
+      using (var xDB = new Entities(mEntConn)) {
+      }
+
       using (var xCmd = mConnection.CreateCommand()) {
         xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs";
         using (var xReader = xCmd.ExecuteReader()) {
@@ -245,6 +248,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public MLDebugSymbol ReadSymbolByLabelName(string labelName) {
+      using (var xDB = new Entities(mEntConn)) {
+      }
+
       using (var xCmd = mConnection.CreateCommand()) {
         xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs"
             + " WHERE LABELNAME = '" + labelName + "'";
@@ -267,6 +273,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfos() {
+      using (var xDB = new Entities(mEntConn)) {
+      }
+
       var xTx = mConnection.BeginTransaction(); 
       try {
         using (var xCmd = mConnection.CreateCommand()) {
@@ -295,6 +304,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfosByMethodLabelName(string methodLabelName) {
+      using (var xDB = new Entities(mEntConn)) {
+      }
+
       using (var xCmd = mConnection.CreateCommand()) {
         xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO"
             + " WHERE METHODLABELNAME = '" + methodLabelName + "'";
@@ -316,6 +328,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
+      using (var xDB = new Entities(mEntConn)) {
+      }
+
       oLabels = new List<KeyValuePair<uint, string>>();
       oLabelAddressMappings = new Dictionary<string, uint>();
       using (var xCmd = mConnection.CreateCommand()) {
