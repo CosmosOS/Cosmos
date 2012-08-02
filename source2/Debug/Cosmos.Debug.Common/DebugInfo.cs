@@ -389,6 +389,7 @@ namespace Cosmos.Debug.Common {
         var xLabels = new List<Label>();
         foreach (var xItem in aMap) {
           var xRow = new Label();
+          xRow.ID = Guid.NewGuid();
           xRow.LABELNAME = xItem.Value;
           xRow.ADDRESS = xItem.Key;
           xLabels.Add(xRow);
