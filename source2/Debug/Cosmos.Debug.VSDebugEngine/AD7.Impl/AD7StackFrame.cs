@@ -23,8 +23,8 @@ namespace Cosmos.Debug.VSDebugEngine {
     private int m_numParameters;
     private int m_numLocals;
 
-    internal DebugInfo.Local_Argument_Info[] mLocalInfos;
-    internal DebugInfo.Local_Argument_Info[] mArgumentInfos;
+    internal LOCAL_ARGUMENT_INFO[] mLocalInfos;
+    internal LOCAL_ARGUMENT_INFO[] mArgumentInfos;
 
     // An array of this frame's parameters
     private DebugLocalInfo[] m_parameters;
@@ -65,20 +65,18 @@ namespace Cosmos.Debug.VSDebugEngine {
           }
 
           if (xSymbolInfo != null) {
-            var xAllInfos = xProcess.mDebugInfoDb.ReadLocalArgumentsInfos(xSymbolInfo.METHODNAME);
-            mLocalInfos = (from item in xAllInfos
-                           where !item.IsArgument
-                           select item).ToArray();
-            mArgumentInfos = (from item in xAllInfos
-                              where item.IsArgument
-                              select item).ToArray();
+            using (var xDB = xProcess.mDebugInfoDb.DB()) {
+              var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME).ToArray();
+              mLocalInfos = xAllInfos.Where(q => q.ISARGUMENT == 0).ToArray();
+              mArgumentInfos = xAllInfos.Where(q => q.ISARGUMENT != 0).ToArray();
+            }
             m_numLocals = mLocalInfos.Length;
             m_numParameters = mArgumentInfos.Length;
             if (m_numParameters > 0) {
               m_parameters = new DebugLocalInfo[m_numParameters];
               for (int i = 0; i < m_numParameters; i++) {
                 m_parameters[i] = new DebugLocalInfo {
-                  Name = mArgumentInfos[i].Name,
+                  Name = mArgumentInfos[i].NAME,
                   Index = i,
                   IsLocal = false
                 };
@@ -89,7 +87,7 @@ namespace Cosmos.Debug.VSDebugEngine {
               m_locals = new DebugLocalInfo[m_numLocals];
               for (int i = 0; i < m_numLocals; i++) {
                 m_locals[i] = new DebugLocalInfo {
-                  Name = mLocalInfos[i].Name,
+                  Name = mLocalInfos[i].NAME,
                   Index = i,
                   IsLocal = true
                 };

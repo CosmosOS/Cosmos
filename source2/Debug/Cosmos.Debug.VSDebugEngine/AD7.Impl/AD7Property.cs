@@ -16,7 +16,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     private DebugLocalInfo m_variableInformation;
     private AD7Process mProcess;
     private AD7StackFrame mStackFrame;
-    private DebugInfo.Local_Argument_Info mDebugInfo;
+    private LOCAL_ARGUMENT_INFO mDebugInfo;
     const uint xArrayLengthOffset = 8;
     const uint xArrayFirstElementOffset = 16;
     private const string NULL = "null";
@@ -29,10 +29,10 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (localInfo.IsLocal) {
         mDebugInfo = mStackFrame.mLocalInfos[m_variableInformation.Index];
       } else if (localInfo.IsArrayElement) {
-        mDebugInfo = new DebugInfo.Local_Argument_Info() {
-          Type = localInfo.ArrayElementType,
-          Name = localInfo.Name,
-          Offset = localInfo.ArrayElementLocation
+        mDebugInfo = new LOCAL_ARGUMENT_INFO() {
+          TYPENAME = localInfo.ArrayElementType,
+          NAME = localInfo.Name,
+          OFFSET = localInfo.ArrayElementLocation
         };
       } else {
         mDebugInfo = mStackFrame.mArgumentInfos[m_variableInformation.Index];
@@ -43,11 +43,11 @@ namespace Cosmos.Debug.VSDebugEngine {
     public void ReadData<T>(ref DEBUG_PROPERTY_INFO propertyInfo, Func<byte[], int, T> ByteToTypeAction) {
       byte[] xData;
       if (m_variableInformation.IsArrayElement) {
-        xData = mProcess.mDbgConnector.GetMemoryData((uint)mDebugInfo.Offset, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+        xData = mProcess.mDbgConnector.GetMemoryData((uint)mDebugInfo.OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
         var xTypedIntValue = ByteToTypeAction(xData, 0);
         propertyInfo.bstrValue = String.Format("{0}", xTypedIntValue);
       } else {
-        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
         var xTypedIntValue = ByteToTypeAction(xData, 0);
         propertyInfo.bstrValue = String.Format("{0}", xTypedIntValue);
       }
@@ -56,7 +56,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public void ReadDataArray<T>(ref DEBUG_PROPERTY_INFO propertyInfo, string typeAsString) {
       byte[] xData;
 
-      xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+      xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
       uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
       if (xArrayPointer == 0) {
         propertyInfo.bstrValue = NULL;
@@ -99,7 +99,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE)) {
-        propertyInfo.bstrType = mDebugInfo.Type;
+        propertyInfo.bstrType = mDebugInfo.TYPENAME;
         propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
       }
 
@@ -107,10 +107,10 @@ namespace Cosmos.Debug.VSDebugEngine {
         byte[] xData;
 
         #region String
-        if (mDebugInfo.Type == typeof(string).AssemblyQualifiedName) {
+        if (mDebugInfo.TYPENAME == typeof(string).AssemblyQualifiedName) {
           const uint xStringLengthOffset = 12;
           const uint xStringFirstCharOffset = 16;
-          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
           uint xStrPointer = BitConverter.ToUInt32(xData, 0);
           if (xStrPointer == 0) {
             propertyInfo.bstrValue = NULL;
@@ -132,26 +132,26 @@ namespace Cosmos.Debug.VSDebugEngine {
         #endregion
 
           // Byte
-        else if (mDebugInfo.Type == typeof(byte).AssemblyQualifiedName) {
+        else if (mDebugInfo.TYPENAME == typeof(byte).AssemblyQualifiedName) {
           ReadData<byte>(ref propertyInfo, new Func<byte[], int, byte>(delegate(byte[] barr, int ind) { return barr[ind]; }));
-        } else if (mDebugInfo.Type == typeof(byte[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(byte[]).AssemblyQualifiedName) {
           ReadDataArray<byte>(ref propertyInfo, "byte");
         }
 
           // SByte
-          else if (mDebugInfo.Type == typeof(sbyte).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(sbyte).AssemblyQualifiedName) {
           ReadData<sbyte>(ref propertyInfo, new Func<byte[], int, sbyte>(delegate(byte[] barr, int ind) { return unchecked((sbyte)barr[ind]); }));
-        } else if (mDebugInfo.Type == typeof(sbyte[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(sbyte[]).AssemblyQualifiedName) {
           ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
         }
 
         #region Char
- else if (mDebugInfo.Type == typeof(char).AssemblyQualifiedName) {
-          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 2);
+ else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName) {
+          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 2);
           var xTypedCharValue = BitConverter.ToChar(xData, 0);
           propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
-        } else if (mDebugInfo.Type == typeof(char[]).AssemblyQualifiedName) {
-          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+        } else if (mDebugInfo.TYPENAME == typeof(char[]).AssemblyQualifiedName) {
+          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
           uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
           if (xArrayPointer == 0) {
             propertyInfo.bstrValue = NULL;
@@ -193,73 +193,73 @@ namespace Cosmos.Debug.VSDebugEngine {
         #endregion
 
           // Short
-          else if (mDebugInfo.Type == typeof(short).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(short).AssemblyQualifiedName) {
           ReadData<short>(ref propertyInfo, new Func<byte[], int, short>(BitConverter.ToInt16));
-        } else if (mDebugInfo.Type == typeof(short[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(short[]).AssemblyQualifiedName) {
           ReadDataArray<short>(ref propertyInfo, "short");
         }
 
           // UShort
-          else if (mDebugInfo.Type == typeof(ushort).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(ushort).AssemblyQualifiedName) {
           ReadData<ushort>(ref propertyInfo, new Func<byte[], int, ushort>(BitConverter.ToUInt16));
-        } else if (mDebugInfo.Type == typeof(ushort[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(ushort[]).AssemblyQualifiedName) {
           ReadDataArray<ushort>(ref propertyInfo, "ushort");
         }
 
           // Int32
-          else if (mDebugInfo.Type == typeof(int).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(int).AssemblyQualifiedName) {
           ReadData<int>(ref propertyInfo, new Func<byte[], int, int>(BitConverter.ToInt32));
-        } else if (mDebugInfo.Type == typeof(int[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(int[]).AssemblyQualifiedName) {
           ReadDataArray<int>(ref propertyInfo, "int");
         }
 
           // UInt32
-          else if (mDebugInfo.Type == typeof(uint).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(uint).AssemblyQualifiedName) {
           ReadData<uint>(ref propertyInfo, new Func<byte[], int, uint>(BitConverter.ToUInt32));
-        } else if (mDebugInfo.Type == typeof(uint[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(uint[]).AssemblyQualifiedName) {
           ReadDataArray<uint>(ref propertyInfo, "uint");
         }
 
           // Long
-          else if (mDebugInfo.Type == typeof(long).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(long).AssemblyQualifiedName) {
           ReadData<long>(ref propertyInfo, new Func<byte[], int, long>(BitConverter.ToInt64));
-        } else if (mDebugInfo.Type == typeof(long[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(long[]).AssemblyQualifiedName) {
           ReadDataArray<long>(ref propertyInfo, "long");
         }
 
           // ULong
-          else if (mDebugInfo.Type == typeof(ulong).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(ulong).AssemblyQualifiedName) {
           ReadData<ulong>(ref propertyInfo, new Func<byte[], int, ulong>(BitConverter.ToUInt64));
-        } else if (mDebugInfo.Type == typeof(ulong[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(ulong[]).AssemblyQualifiedName) {
           ReadDataArray<ulong>(ref propertyInfo, "ulong");
         }
 
           // Float
-          else if (mDebugInfo.Type == typeof(float).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(float).AssemblyQualifiedName) {
           ReadData<float>(ref propertyInfo, new Func<byte[], int, float>(BitConverter.ToSingle));
-        } else if (mDebugInfo.Type == typeof(float[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(float[]).AssemblyQualifiedName) {
           ReadDataArray<float>(ref propertyInfo, "float");
         }
 
           // Double
-          else if (mDebugInfo.Type == typeof(double).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(double).AssemblyQualifiedName) {
           ReadData<double>(ref propertyInfo, new Func<byte[], int, double>(BitConverter.ToDouble));
-        } else if (mDebugInfo.Type == typeof(double[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(double[]).AssemblyQualifiedName) {
           ReadDataArray<double>(ref propertyInfo, "double");
         }
 
           // Bool
-          else if (mDebugInfo.Type == typeof(bool).AssemblyQualifiedName) {
+          else if (mDebugInfo.TYPENAME == typeof(bool).AssemblyQualifiedName) {
           ReadData<bool>(ref propertyInfo, new Func<byte[], int, bool>(BitConverter.ToBoolean));
-        } else if (mDebugInfo.Type == typeof(bool[]).AssemblyQualifiedName) {
+        } else if (mDebugInfo.TYPENAME == typeof(bool[]).AssemblyQualifiedName) {
           ReadDataArray<bool>(ref propertyInfo, "bool");
         } else {
-          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.Offset, 4);
+          xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
           var xPointer = BitConverter.ToUInt32(xData, 0);
           if (xPointer == 0) {
             propertyInfo.bstrValue = NULL;
           } else {
-            var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.Type);
+            var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
             foreach (string str in mp.FieldNames) {
               Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
               using (var xDB = mProcess.mDebugInfoDb.DB()) {

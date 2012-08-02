@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86 {
       InitILOps(typeof(ILOp));
     }
 
-    private IList<DebugInfo.Local_Argument_Info> mLocals_Arguments_Infos = new List<DebugInfo.Local_Argument_Info>();
+    private IList<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
@@ -84,13 +84,13 @@ namespace Cosmos.IL2CPU.X86 {
         if (xBody != null) {
           var xLocalsOffset = mLocals_Arguments_Infos.Count;
           foreach (var xLocal in xBody.LocalVariables) {
-            var xInfo = new DebugInfo.Local_Argument_Info {
-              MethodLabelName = xMethodLabel,
-              IsArgument = false,
-              Index = xLocal.LocalIndex,
-              Name = "Local" + xLocal.LocalIndex,
-              Offset = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
-              Type = xLocal.LocalType.AssemblyQualifiedName
+            var xInfo = new LOCAL_ARGUMENT_INFO {
+              METHODLABELNAME = xMethodLabel,
+              ISARGUMENT = 0,
+              INDEXINMETHOD = xLocal.LocalIndex,
+              NAME = "Local" + xLocal.LocalIndex,
+              OFFSET = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
+              TYPENAME = xLocal.LocalType.AssemblyQualifiedName
             };
             mLocals_Arguments_Infos.Add(xInfo);
 
@@ -105,10 +105,10 @@ namespace Cosmos.IL2CPU.X86 {
           if (xCecilMethod != null && xCecilMethod.Body != null) {
             // mLocals_Arguments_Infos is one huge list, so ourlatest additions are at the end
             for (int i = 0; i < xCecilMethod.Body.Variables.Count; i++) {
-              mLocals_Arguments_Infos[xLocalsOffset + i].Name = xCecilMethod.Body.Variables[i].Name;
+              mLocals_Arguments_Infos[xLocalsOffset + i].NAME = xCecilMethod.Body.Variables[i].Name;
             }
             for (int i = xLocalsOffset + xCecilMethod.Body.Variables.Count - 1; i >= xLocalsOffset; i--) {
-              if (mLocals_Arguments_Infos[i].Name.Contains('$')) {
+              if (mLocals_Arguments_Infos[i].NAME.Contains('$')) {
                 mLocals_Arguments_Infos.RemoveAt(i);
               }
             }
@@ -118,13 +118,13 @@ namespace Cosmos.IL2CPU.X86 {
         // debug info:
         var xIdxOffset = 0u;
         if (!aMethod.MethodBase.IsStatic) {
-          mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info {
-            MethodLabelName = xMethodLabel,
-            IsArgument = true,
-            Name = "this:" + IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
-            Index = 0,
-            Offset = IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
-            Type = aMethod.MethodBase.DeclaringType.AssemblyQualifiedName
+          mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
+            METHODLABELNAME = xMethodLabel,
+            ISARGUMENT = 1,
+            NAME = "this:" + IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
+            INDEXINMETHOD = 0,
+            OFFSET = IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
+            TYPENAME = aMethod.MethodBase.DeclaringType.AssemblyQualifiedName
           });
 
           xIdxOffset++;
@@ -137,13 +137,13 @@ namespace Cosmos.IL2CPU.X86 {
           var xOffset = IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
           // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
           xOffset -= (int)Cosmos.IL2CPU.X86.ILOp.Align(Cosmos.IL2CPU.X86.ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;
-          mLocals_Arguments_Infos.Add(new DebugInfo.Local_Argument_Info {
-            MethodLabelName = xMethodLabel,
-            IsArgument = true,
-            Index = (int)(i + xIdxOffset),
-            Name = xParams[i].Name,
-            Offset = xOffset,
-            Type = xParams[i].ParameterType.AssemblyQualifiedName
+          mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
+            METHODLABELNAME = xMethodLabel,
+            ISARGUMENT = 1,
+            INDEXINMETHOD = (int)(i + xIdxOffset),
+            NAME = xParams[i].Name,
+            OFFSET = xOffset,
+            TYPENAME = xParams[i].ParameterType.AssemblyQualifiedName
           });
         }
       }
@@ -396,7 +396,6 @@ namespace Cosmos.IL2CPU.X86 {
       
       if (mSymbols != null) {
         var xMLSymbol = new MLSYMBOL();
-        xMLSymbol.ID = Guid.NewGuid();
         xMLSymbol.LABELNAME = TmpPosLabel(aMethod, aOpCode);
         xMLSymbol.METHODNAME = aMethod.MethodBase.GetFullName();
 

@@ -81,7 +81,6 @@ namespace Cosmos.Build.MSBuild {
           continue;
         }
         xResult.Add(new Label() {
-          ID = Guid.NewGuid(),
           LABELNAME = xLabel,
           ADDRESS = xAddress
         });

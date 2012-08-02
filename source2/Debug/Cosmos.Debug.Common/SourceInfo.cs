@@ -72,7 +72,6 @@ namespace Cosmos.Debug.Common {
         if (xLineParts.Length == 3) {
           uint xAddress = UInt32.Parse(xLineParts[0], System.Globalization.NumberStyles.HexNumber);
           xSource.Add(new Label() {
-            ID = Guid.NewGuid(),
             LABELNAME = xLineParts[2],
             ADDRESS = xAddress
           });

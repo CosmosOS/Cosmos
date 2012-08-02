@@ -21,15 +21,6 @@ namespace Cosmos.Debug.Common {
       public List<string> FieldNames = new List<string>();
     }
 
-    public class Local_Argument_Info {
-      public bool IsArgument { get; set; }
-      public string MethodLabelName { get; set; }
-      public int Index { get; set; }
-      public int Offset { get; set; }
-      public string Name { get; set; }
-      public string Type { get; set; }
-    }
-
     protected SqlConnection mConnection;
     protected string mDbName;
     // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
@@ -170,23 +161,6 @@ namespace Cosmos.Debug.Common {
       return new Entities(mEntConn);
     }
 
-    public IList<Local_Argument_Info> ReadLocalArgumentsInfos(string aMethodLabelName) {
-      var xResult = new List<Local_Argument_Info>();
-      using (var xDB = DB()) {
-        foreach (var xRow in xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == aMethodLabelName)) {
-          xResult.Add(new Local_Argument_Info {
-            MethodLabelName = xRow.METHODLABELNAME,
-            IsArgument = xRow.ISARGUMENT == 1,
-            Index = xRow.INDEXINMETHOD,
-            Offset = xRow.OFFSET,
-            Name = xRow.NAME,
-            Type = xRow.TYPENAME
-          });
-        }
-      }
-      return xResult;
-    }
-
     public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
       oLabels = new List<KeyValuePair<uint, string>>();
       oLabelAddressMappings = new Dictionary<string, uint>();
@@ -199,24 +173,18 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteSymbolsListToFile(IEnumerable<MLSYMBOL> aSymbols) {
+      foreach (var x in aSymbols) {
+        x.ID = Guid.NewGuid();
+      }
       BulkInsert("MLSYMBOLs", aSymbols.AsDataReader());
     }
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
-    public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> aInfos) {
-      using (var xDB = DB()) {
-        foreach (var xInfo in aInfos) {
-          var xRow = new LOCAL_ARGUMENT_INFO();
-          xRow.METHODLABELNAME = xInfo.MethodLabelName;
-          xRow.ISARGUMENT = (short)(xInfo.IsArgument ? 1 : 0);
-          xRow.INDEXINMETHOD = xInfo.Index;
-          xRow.OFFSET = xInfo.Offset;
-          xRow.NAME = xInfo.Name;
-          xRow.TYPENAME = xInfo.Type;
-          xDB.LOCAL_ARGUMENT_INFO.AddObject(xRow);
-        }
-        xDB.SaveChanges();
+    public void WriteAllLocalsArgumentsInfos(IEnumerable<LOCAL_ARGUMENT_INFO> aInfos) {
+      foreach (var x in aInfos) {
+        x.ID = Guid.NewGuid();
       }
+      BulkInsert("LOCAL_ARGUMENT_INFO", aInfos.AsDataReader());
     }
 
     // This is a heck of a lot easier than using sequences.
@@ -245,6 +213,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteLabels(List<Label> aLabels) {
+      foreach (var x in aLabels) {
+        x.ID = Guid.NewGuid();
+      }
       BulkInsert("Labels", aLabels.AsDataReader());
     }
 
