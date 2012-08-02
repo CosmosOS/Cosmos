@@ -58,7 +58,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         if (xLabelsForAddr.Length > 0) {
           var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xLabelsForAddr[0]);
           if (xSymbolInfo != null) {
-            var xAllInfos = xProcess.mDebugInfoDb.ReadAllLocalsArgumentsInfosByMethodLabelName(xSymbolInfo.MethodName);
+            var xAllInfos = xProcess.mDebugInfoDb.ReadLocalArgumentsInfos(xSymbolInfo.MethodName);
             mLocalInfos = (from item in xAllInfos
                            where !item.IsArgument
                            select item).ToArray();

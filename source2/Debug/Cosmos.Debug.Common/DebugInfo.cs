@@ -153,10 +153,8 @@ namespace Cosmos.Debug.Common {
 
     public void ReadFieldMappingList(List<Field_Map> aSymbols) {
       using (var xDB = new Entities(mEntConn)) {
-        var xRows = from x in xDB.FIELD_MAPPING
-                    select x;
         var xMap = new Field_Map();
-        foreach (var xRow in xRows) {
+        foreach (var xRow in xDB.FIELD_MAPPING) {
           string xTypeName = xRow.TYPE_NAME;
           if (xTypeName != xMap.TypeName) {
             if (xMap.FieldNames.Count > 0) {
@@ -208,9 +206,7 @@ namespace Cosmos.Debug.Common {
 
     public void ReadFieldInfoList(List<Field_Info> aSymbols) {
       using (var xDB = new Entities(mEntConn)) {
-        var xRows = from x in xDB.FIELD_INFO
-                    select x;
-        foreach (var xRow in xRows) {
+        foreach (var xRow in xDB.FIELD_INFO) {
           aSymbols.Add(new Field_Info {
             Type = xRow.TYPE,
             Offset = xRow.OFFSET,
@@ -220,26 +216,22 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void ReadSymbolsList(List<MLDebugSymbol> aSymbols) {
+    public List<MLDebugSymbol> ReadSymbolsList() {
+      var xResult = new List<MLDebugSymbol>();
       using (var xDB = new Entities(mEntConn)) {
-      }
-
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs";
-        using (var xReader = xCmd.ExecuteReader()) {
-          while (xReader.Read()) {
-            aSymbols.Add(new MLDebugSymbol {
-              LabelName = xReader.GetString(0),
-              StackDifference = xReader.GetInt32(1),
-              AssemblyFile = xReader.GetString(2),
-              TypeToken = xReader.GetInt32(3),
-              MethodToken = xReader.GetInt32(4),
-              ILOffset = xReader.GetInt32(5),
-              MethodName = xReader.GetString(6)
-            });
-          }
+        foreach (var xRow in xDB.MLSYMBOLs) {
+          xResult.Add(new MLDebugSymbol {
+            LabelName = xRow.LABELNAME,
+            StackDifference = xRow.STACKDIFF,
+            AssemblyFile = xRow.ILASMFILE,
+            TypeToken = xRow.TYPETOKEN,
+            MethodToken = xRow.METHODTOKEN,
+            ILOffset = xRow.ILOFFSET,
+            MethodName = xRow.METHODNAME
+          });
         }
       }
+      return xResult;
     }
 
     public MLDebugSymbol ReadSymbolByLabelName(string aLabelName) {
@@ -260,74 +252,30 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfos() {
+    public IList<Local_Argument_Info> ReadLocalArgumentsInfos(string aMethodLabelName) {
+      var xResult = new List<Local_Argument_Info>();
       using (var xDB = new Entities(mEntConn)) {
-      }
-
-      var xTx = mConnection.BeginTransaction(); 
-      try {
-        using (var xCmd = mConnection.CreateCommand()) {
-          xCmd.Transaction = xTx;
-          xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO";
-          using (var xReader = xCmd.ExecuteReader()) {
-            var xResult = new List<Local_Argument_Info>(xReader.RecordsAffected);
-            while (xReader.Read()) {
-              xResult.Add(new Local_Argument_Info {
-                MethodLabelName = xReader.GetString(0),
-                IsArgument = xReader.GetInt16(1) == 1,
-                Index = xReader.GetInt32(2),
-                Offset = xReader.GetInt32(3),
-                Name = xReader.GetString(4),
-                Type = xReader.GetString(5)
-              });
-            }
-            return xResult;
-          }
-        }
-        xTx.Commit();
-      } catch (Exception) {
-        xTx.Rollback();
-        throw;
-      }
-    }
-
-    public IList<Local_Argument_Info> ReadAllLocalsArgumentsInfosByMethodLabelName(string methodLabelName) {
-      using (var xDB = new Entities(mEntConn)) {
-      }
-
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME from LOCAL_ARGUMENT_INFO"
-            + " WHERE METHODLABELNAME = '" + methodLabelName + "'";
-        using (var xReader = xCmd.ExecuteReader()) {
-          var xResult = new List<Local_Argument_Info>();
-          while (xReader.Read()) {
-            xResult.Add(new Local_Argument_Info {
-              MethodLabelName = xReader.GetString(0),
-              IsArgument = xReader.GetInt16(1) == 1,
-              Index = xReader.GetInt32(2),
-              Offset = xReader.GetInt32(3),
-              Name = xReader.GetString(4),
-              Type = xReader.GetString(5)
-            });
-          }
-          return xResult;
+        foreach (var xRow in xDB.LOCAL_ARGUMENT_INFO) {
+          xResult.Add(new Local_Argument_Info {
+            MethodLabelName = xRow.METHODLABELNAME,
+            IsArgument = xRow.ISARGUMENT == 1,
+            Index = xRow.INDEXINMETHOD,
+            Offset = xRow.OFFSET,
+            Name = xRow.NAME,
+            Type = xRow.TYPENAME
+          });
         }
       }
+      return xResult;
     }
 
     public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
-      using (var xDB = new Entities(mEntConn)) {
-      }
-
       oLabels = new List<KeyValuePair<uint, string>>();
       oLabelAddressMappings = new Dictionary<string, uint>();
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, ADDRESS from Labels";
-        using (var xReader = xCmd.ExecuteReader()) {
-          while (xReader.Read()) {
-            oLabels.Add(new KeyValuePair<uint, string>((uint)xReader.GetInt64(1), xReader.GetString(0)));
-            oLabelAddressMappings.Add(xReader.GetString(0), (uint)xReader.GetInt64(1));
-          }
+      using (var xDB = new Entities(mEntConn)) {
+        foreach (var xRow in xDB.Labels) {
+          oLabels.Add(new KeyValuePair<uint, string>((uint)xRow.ADDRESS, xRow.LABELNAME));
+          oLabelAddressMappings.Add(xRow.LABELNAME, (uint)xRow.ADDRESS);
         }
       }
     }

@@ -90,8 +90,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public static SourceInfos GetSourceInfo(List<KeyValuePair<uint, string>> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, DebugInfo debugInfo) {
-      var xSymbolsList = new List<DebugInfo.MLDebugSymbol>();
-      debugInfo.ReadSymbolsList(xSymbolsList);
+      var xSymbolsList = debugInfo.ReadSymbolsList();
 
       // Sort
       xSymbolsList.Sort(delegate(DebugInfo.MLDebugSymbol a, DebugInfo.MLDebugSymbol b) {
