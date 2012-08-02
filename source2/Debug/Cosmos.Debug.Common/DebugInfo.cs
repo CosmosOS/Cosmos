@@ -331,7 +331,7 @@ namespace Cosmos.Debug.Common {
     }
 
     // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
-    // SqlBulk operations are average 15x faster. So we use a hybrid approach by using the entities as containers
+    // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
     // and EntityDataReader to bridge the gap to SqlBulk.
     public void BulkInsert(string aTableName, IDataReader aReader) {
       using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
@@ -340,16 +340,8 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
-      var xLabels = new List<Label>();
-      foreach (var xItem in aMap) {
-        var xRow = new Label();
-        xRow.ID = Guid.NewGuid();
-        xRow.LABELNAME = xItem.Value;
-        xRow.ADDRESS = xItem.Key;
-        xLabels.Add(xRow);
-      }
-      BulkInsert("Labels", xLabels.AsDataReader());
+    public void WriteLabels(List<Label> aLabels) {
+      BulkInsert("Labels", aLabels.AsDataReader());
     }
 
     public void Dispose() {

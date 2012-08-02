@@ -47,7 +47,7 @@ namespace Cosmos.Build.MSBuild {
         return false;
       }
 
-      var xResult = new List<KeyValuePair<uint, string>>();
+      var xResult = new List<Label>();
       var xLines = xSymbolString.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
       
       // Parse file
@@ -80,7 +80,11 @@ namespace Cosmos.Build.MSBuild {
           // Non label, skip
           continue;
         }
-        xResult.Add(new KeyValuePair<uint, string>(xAddress, xLabel));
+        xResult.Add(new Label() {
+          ID = Guid.NewGuid(),
+          LABELNAME = xLabel,
+          ADDRESS = xAddress
+        });
       }
 
       using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {

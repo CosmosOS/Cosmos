@@ -49,9 +49,9 @@ namespace Cosmos.Debug.Common {
       set;
     }
 
-    public static List<KeyValuePair<uint, string>> ParseMapFile(String buildPath) {
+    public static List<Label> ParseMapFile(String buildPath) {
       var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
-      var xSource = new List<KeyValuePair<uint, string>>();
+      var xSource = new List<Label>();
       uint xIndex = 0;
       for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++) {
         if (xSourceStrings[xIndex].StartsWith("Real ")) {
@@ -71,7 +71,11 @@ namespace Cosmos.Debug.Common {
 
         if (xLineParts.Length == 3) {
           uint xAddress = UInt32.Parse(xLineParts[0], System.Globalization.NumberStyles.HexNumber);
-          xSource.Add(new KeyValuePair<uint, string>(xAddress, xLineParts[2]));
+          xSource.Add(new Label() {
+            ID = Guid.NewGuid(),
+            LABELNAME = xLineParts[2],
+            ADDRESS = xAddress
+          });
         }
       }
       return xSource;
