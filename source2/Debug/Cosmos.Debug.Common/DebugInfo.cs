@@ -367,22 +367,13 @@ namespace Cosmos.Debug.Common {
     protected int mMethodId = 0;
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
-
-      //using (var xDB = new Entities(mEntConn)) {
-      //  foreach (var xItem in ..) {
-      //    var xRow = new FIELD_INFO();
-      //    xDB.FIELD_INFO.AddObject(xRow);
-      //  }
-      //  xDB.SaveChanges();
-      //}
-
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "INSERT INTO Methods (ID, MethodId, LabelPrefix) values (NEWID(), @MethodId, @LabelPrefix)";
-        xCmd.Parameters.AddWithValue("@MethodId", mMethodId);
-        xCmd.Parameters.AddWithValue("@LabelPrefix", aLabelPrefix);
-        xCmd.ExecuteNonQuery();
+      using (var xDB = new Entities(mEntConn)) {
+        var xRow = new Method();
+        xRow.MethodId = mMethodId;
+        xRow.LabelPrefix = aLabelPrefix;
+        xDB.Methods.AddObject(xRow);
+        xDB.SaveChanges();
       }
-
       return mMethodId;
     }
 
