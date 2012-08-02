@@ -214,7 +214,7 @@ namespace Cosmos.Debug.Common {
     public IList<Local_Argument_Info> ReadLocalArgumentsInfos(string aMethodLabelName) {
       var xResult = new List<Local_Argument_Info>();
       using (var xDB = DB()) {
-        foreach (var xRow in xDB.LOCAL_ARGUMENT_INFO) {
+        foreach (var xRow in xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == aMethodLabelName) {
           xResult.Add(new Local_Argument_Info {
             MethodLabelName = xRow.METHODLABELNAME,
             IsArgument = xRow.ISARGUMENT == 1,
