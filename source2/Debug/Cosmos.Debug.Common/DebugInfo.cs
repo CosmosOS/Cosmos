@@ -209,18 +209,14 @@ namespace Cosmos.Debug.Common {
 
     public void ReadFieldInfoList(List<Field_Info> aSymbols) {
       using (var xDB = new Entities(mEntConn)) {
-      }
-
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select TYPE, OFFSET, NAME from FIELD_INFO";
-        using (var xReader = xCmd.ExecuteReader()) {
-          while (xReader.Read()) {
-            aSymbols.Add(new Field_Info {
-              Type = xReader.GetString(0),
-              Offset = xReader.GetInt32(1),
-              Name = xReader.GetString(2),
-            });
-          }
+        var xRows = from x in xDB.FIELD_INFO
+                    select x;
+        foreach (var xRow in xRows) {
+          aSymbols.Add(new Field_Info {
+            Type = xRow.TYPE,
+            Offset = xRow.OFFSET,
+            Name = xRow.NAME,
+          });
         }
       }
     }
