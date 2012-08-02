@@ -70,6 +70,11 @@ namespace Cosmos.Debug.Common {
           }
 
           if (xExists) {
+            // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
+            using (var xCmd = xConn.CreateCommand()) {
+              xCmd.CommandText = "ALTER DATABASE " + xDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
+              xCmd.ExecuteNonQuery();
+            }
             // Yes this throws an exception if the database doesnt exist, so we have to
             // run it only if we know it exists.
             // This will detach and also delete the physica files.
@@ -430,6 +435,10 @@ namespace Cosmos.Debug.Common {
     }
 
     public void Dispose() {
+      if (mEntities != null) {
+        mEntities.Dispose();
+        mEntities = null;
+      }
       if (mConnection != null) {
         var xConn = mConnection;
         mConnection = null;
