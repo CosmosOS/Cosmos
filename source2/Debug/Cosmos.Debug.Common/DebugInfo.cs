@@ -223,39 +223,6 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
-      var xTx = mConnection.BeginTransaction(); 
-      try {
-        using (var xCmd = mConnection.CreateCommand()) {
-          xCmd.Transaction = xTx;
-          xCmd.CommandText = "INSERT INTO MLSYMBOLs (ID, LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
-                       " VALUES (NEWID(), @LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
-          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
-          xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
-          xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
-          xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
-          xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-          foreach (var xItem in aSymbols) {
-            xCmd.Parameters[0].Value = xItem.LabelName;
-            xCmd.Parameters[1].Value = xItem.StackDifference;
-            xCmd.Parameters[2].Value = xItem.AssemblyFile;
-            xCmd.Parameters[3].Value = xItem.TypeToken;
-            xCmd.Parameters[4].Value = xItem.MethodToken;
-            xCmd.Parameters[5].Value = xItem.ILOffset;
-            xCmd.Parameters[6].Value = xItem.MethodName;
-            xCmd.ExecuteNonQuery();
-          }
-        }
-        xTx.Commit();
-      } catch (Exception) {
-        xTx.Rollback();
-        throw;
-      }
-    }
-
     public void ReadSymbolsList(List<MLDebugSymbol> aSymbols) {
       using (var xCmd = mConnection.CreateCommand()) {
         xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs";
@@ -293,28 +260,6 @@ namespace Cosmos.Debug.Common {
           } else {
             return null;
           }
-        }
-      }
-    }
-
-    // tuple format: MethodLabel, IsArgument, Index, Offset
-    public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (ID, METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (NEWID(), @METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
-        xCmd.Parameters.Add("@METHODLABELNAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@ISARGUMENT", SqlDbType.SmallInt);
-        xCmd.Parameters.Add("@INDEXINMETHOD", SqlDbType.Int);
-        xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
-        xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@TYPENAME", SqlDbType.NVarChar);
-        foreach (var xInfo in infos) {
-          xCmd.Parameters[0].Value = xInfo.MethodLabelName;
-          xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
-          xCmd.Parameters[2].Value = xInfo.Index;
-          xCmd.Parameters[3].Value = xInfo.Offset;
-          xCmd.Parameters[4].Value = xInfo.Name;
-          xCmd.Parameters[5].Value = xInfo.Type;
-          xCmd.ExecuteNonQuery();
         }
       }
     }
@@ -382,10 +327,90 @@ namespace Cosmos.Debug.Common {
       }
     }
 
+    public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
+      // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
+      //using (var xDB = new Entities(mEntConn)) {
+      //  foreach (var xItem in ..) {
+      //    var xRow = new FIELD_INFO();
+      //    xDB.FIELD_INFO.AddObject(xRow);
+      //  }
+      //  xDB.SaveChanges();
+      //}
+
+      var xTx = mConnection.BeginTransaction();
+      try {
+        using (var xCmd = mConnection.CreateCommand()) {
+          xCmd.Transaction = xTx;
+          xCmd.CommandText = "INSERT INTO MLSYMBOLs (ID, LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME)" +
+                       " VALUES (NEWID(), @LABELNAME, @STACKDIFF, @ILASMFILE, @TYPETOKEN, @METHODTOKEN, @ILOFFSET, @METHODNAME)";
+          xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@STACKDIFF", SqlDbType.Int);
+          xCmd.Parameters.Add("@ILASMFILE", SqlDbType.NVarChar);
+          xCmd.Parameters.Add("@TYPETOKEN", SqlDbType.Int);
+          xCmd.Parameters.Add("@METHODTOKEN", SqlDbType.Int);
+          xCmd.Parameters.Add("@ILOFFSET", SqlDbType.Int);
+          xCmd.Parameters.Add("@METHODNAME", SqlDbType.NVarChar);
+          // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
+          foreach (var xItem in aSymbols) {
+            xCmd.Parameters[0].Value = xItem.LabelName;
+            xCmd.Parameters[1].Value = xItem.StackDifference;
+            xCmd.Parameters[2].Value = xItem.AssemblyFile;
+            xCmd.Parameters[3].Value = xItem.TypeToken;
+            xCmd.Parameters[4].Value = xItem.MethodToken;
+            xCmd.Parameters[5].Value = xItem.ILOffset;
+            xCmd.Parameters[6].Value = xItem.MethodName;
+            xCmd.ExecuteNonQuery();
+          }
+        }
+        xTx.Commit();
+      } catch (Exception) {
+        xTx.Rollback();
+        throw;
+      }
+    }
+
+    // tuple format: MethodLabel, IsArgument, Index, Offset
+    public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
+      //using (var xDB = new Entities(mEntConn)) {
+      //  foreach (var xItem in ..) {
+      //    var xRow = new FIELD_INFO();
+      //    xDB.FIELD_INFO.AddObject(xRow);
+      //  }
+      //  xDB.SaveChanges();
+      //}
+      
+      using (var xCmd = mConnection.CreateCommand()) {
+        xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (ID, METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (NEWID(), @METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
+        xCmd.Parameters.Add("@METHODLABELNAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@ISARGUMENT", SqlDbType.SmallInt);
+        xCmd.Parameters.Add("@INDEXINMETHOD", SqlDbType.Int);
+        xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
+        xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
+        xCmd.Parameters.Add("@TYPENAME", SqlDbType.NVarChar);
+        foreach (var xInfo in infos) {
+          xCmd.Parameters[0].Value = xInfo.MethodLabelName;
+          xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
+          xCmd.Parameters[2].Value = xInfo.Index;
+          xCmd.Parameters[3].Value = xInfo.Offset;
+          xCmd.Parameters[4].Value = xInfo.Name;
+          xCmd.Parameters[5].Value = xInfo.Type;
+          xCmd.ExecuteNonQuery();
+        }
+      }
+    }
+
     // This is a heck of a lot easier than using sequences
     protected int mMethodId = 0;
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
+
+      //using (var xDB = new Entities(mEntConn)) {
+      //  foreach (var xItem in ..) {
+      //    var xRow = new FIELD_INFO();
+      //    xDB.FIELD_INFO.AddObject(xRow);
+      //  }
+      //  xDB.SaveChanges();
+      //}
 
       using (var xCmd = mConnection.CreateCommand()) {
         xCmd.CommandText = "INSERT INTO Methods (ID, MethodId, LabelPrefix) values (NEWID(), @MethodId, @LabelPrefix)";
@@ -398,6 +423,14 @@ namespace Cosmos.Debug.Common {
     }
 
     public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
+      //using (var xDB = new Entities(mEntConn)) {
+      //  foreach (var xItem in ..) {
+      //    var xRow = new FIELD_INFO();
+      //    xDB.FIELD_INFO.AddObject(xRow);
+      //  }
+      //  xDB.SaveChanges();
+      //}
+
       var xTx = mConnection.BeginTransaction(); 
       try {
         using (var xCmd = mConnection.CreateCommand()) {
@@ -426,11 +459,6 @@ namespace Cosmos.Debug.Common {
         // Dont set to null... causes problems because of bad code :(
         // Need to fix the whole class, but its here for now.
         //CurrentInstance = null;
-
-        // Why do we have this? 
-        // Dont remove though - when removed we cant run Cosmos stuff in hive for some reason?
-        // Was Intellisense :(
-        //GC.SuppressFinalize(this);
       }
     }
   }
