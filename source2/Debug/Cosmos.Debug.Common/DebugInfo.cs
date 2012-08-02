@@ -47,47 +47,52 @@ namespace Cosmos.Debug.Common {
 
     protected SqlConnection mConnection;
     protected Entities mEntities;
+    protected string mDbName;
+    // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
+    protected string mDataSouce = @"(LocalDB)\v11.0";
+    //protected mDataSouce = @".\SQLEXPRESS";
+    protected string mConnStrBase;
 
-    public DebugInfo(string aPathname, bool aCreate = false) {
-      CurrentInstance = this;
+    public void DeleteDB() {
+      using (var xConn = new SqlConnection(mConnStrBase)) {
+        xConn.Open();
 
-      string xDbName = Path.GetFileNameWithoutExtension(aPathname);
-      // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
-      string xDataSouce = @"(LocalDB)\v11.0";
-      //xDataSouce = @".\SQLEXPRESS";
-      string xConnStr = @"Data Source=" + xDataSouce + ";Integrated Security=True;MultipleActiveResultSets=True;";
-
-      if (aCreate) {
-        using (var xConn = new SqlConnection(xConnStr)) {
-          xConn.Open();
-
-          bool xExists = false;
-          using (var xCmd = xConn.CreateCommand()) {
-            xCmd.CommandText = "select * from sys.databases where name = '" + xDbName + "'";
-            using (var xReader = xCmd.ExecuteReader()) {
-              xExists = xReader.Read();
-            }
+        bool xExists = false;
+        using (var xCmd = xConn.CreateCommand()) {
+          xCmd.CommandText = "select * from sys.databases where name = '" + mDbName + "'";
+          using (var xReader = xCmd.ExecuteReader()) {
+            xExists = xReader.Read();
           }
+        }
 
-          if (xExists) {
-            // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
-            using (var xCmd = xConn.CreateCommand()) {
-              xCmd.CommandText = "ALTER DATABASE " + xDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
-              xCmd.ExecuteNonQuery();
-            }
-            // Yes this throws an exception if the database doesnt exist, so we have to
-            // run it only if we know it exists.
-            // This will detach and also delete the physica files.
-            using (var xCmd = xConn.CreateCommand()) {
-              xCmd.CommandText = "DROP DATABASE " + xDbName;
-              xCmd.ExecuteNonQuery();
-            }
+        if (xExists) {
+          // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
+          using (var xCmd = xConn.CreateCommand()) {
+            xCmd.CommandText = "ALTER DATABASE " + mDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
+            xCmd.ExecuteNonQuery();
+          }
+          // Yes this throws an exception if the database doesnt exist, so we have to
+          // run it only if we know it exists.
+          // This will detach and also delete the physica files.
+          using (var xCmd = xConn.CreateCommand()) {
+            xCmd.CommandText = "DROP DATABASE " + mDbName;
+            xCmd.ExecuteNonQuery();
           }
         }
       }
+    }
+
+    public DebugInfo(string aPathname, bool aCreate = false) {
+      CurrentInstance = this;
+      mDbName = Path.GetFileNameWithoutExtension(aPathname);
+      mConnStrBase = @"Data Source=" + mDataSouce + ";Integrated Security=True;MultipleActiveResultSets=True;";
+
+      if (aCreate) {
+        DeleteDB();
+      }
 
       // Initial Catalog is necessary for EDM
-      xConnStr += "Initial Catalog=" + xDbName + ";AttachDbFilename=" + aPathname + ";";
+      string xConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
       mConnection = new SqlConnection(xConnStr);
 
       var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
@@ -120,8 +125,8 @@ namespace Cosmos.Debug.Common {
       try {
         using (var xCmd = mConnection.CreateCommand()) {
           xCmd.Transaction = xTx;
-          xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" +
-                               " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
+          xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" 
+            + " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
           xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
           xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
           // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.

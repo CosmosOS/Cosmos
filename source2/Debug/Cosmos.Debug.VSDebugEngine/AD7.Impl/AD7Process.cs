@@ -401,6 +401,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDbgConnector = null;
       }
       if (mDebugInfoDb != null) {
+        mDebugInfoDb.DeleteDB();
         mDebugInfoDb.Dispose();
         mDebugInfoDb = null;
       }
