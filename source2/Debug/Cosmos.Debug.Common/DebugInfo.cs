@@ -151,23 +151,22 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadFieldMappingList(List<Field_Map> aSymbols) {
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select TYPE_NAME, FIELD_NAME from FIELD_MAPPING order by TYPE_NAME";
-        using (var xReader = xCmd.ExecuteReader()) {
-          var mp = new Field_Map();
-          while (xReader.Read()) {
-            string xTypeName = xReader.GetString(0);
-            if (xTypeName != mp.TypeName) {
-              if (mp.FieldNames.Count > 0) {
-                aSymbols.Add(mp);
-              }
-              mp = new Field_Map();
-              mp.TypeName = xTypeName;
+      using (var xDB = new Entities(mEntConn)) {
+        var xRows = from x in xDB.FIELD_MAPPING
+                    select x;
+        var xMap = new Field_Map();
+        foreach (var xRow in xRows) {
+          string xTypeName = xRow.TYPE_NAME;
+          if (xTypeName != xMap.TypeName) {
+            if (xMap.FieldNames.Count > 0) {
+              aSymbols.Add(xMap);
             }
-            mp.FieldNames.Add(xReader.GetString(1));
+            xMap = new Field_Map();
+            xMap.TypeName = xTypeName;
           }
-          aSymbols.Add(mp);
+          xMap.FieldNames.Add(xRow.FIELD_NAME);
         }
+        aSymbols.Add(xMap);
       }
     }
 
