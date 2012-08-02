@@ -187,21 +187,6 @@ namespace Cosmos.Debug.Common {
       BulkInsert("LOCAL_ARGUMENT_INFO", aInfos.AsDataReader());
     }
 
-    // This is a heck of a lot easier than using sequences.
-    // Can prob change to the new GUIDs we use.
-    protected int mMethodId = 0;
-    public int AddMethod(string aLabelPrefix) {
-      mMethodId++;
-      using (var xDB = DB()) {
-       var xRow = new Method();
-        xRow.MethodId = mMethodId;
-        xRow.LabelPrefix = aLabelPrefix;
-        xDB.Methods.AddObject(xRow);
-        xDB.SaveChanges();
-      }
-      return mMethodId;
-    }
-
     // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
     // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
     // and EntityDataReader to bridge the gap to SqlBulk.

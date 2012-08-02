@@ -25,12 +25,6 @@ namespace Cosmos.Assembler {
 
     public bool EmitAsmLabels { get; set; }
 
-    protected int mCurrentMethodID;
-    public int CurrentMethodID {
-      get { return mCurrentMethodID; }
-      set { mCurrentMethodID = value; }
-    }
-    //
     protected string mCurrentIlLabel;
     public string CurrentIlLabel {
       get { return mCurrentIlLabel; }

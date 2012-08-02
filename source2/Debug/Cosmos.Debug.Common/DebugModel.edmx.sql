@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/02/2012 14:17:54
+-- Date Created: 08/02/2012 14:51:27
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -33,9 +33,6 @@ IF OBJECT_ID(N'[dbo].[Labels]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[LOCAL_ARGUMENT_INFO]', 'U') IS NOT NULL
     DROP TABLE [dbo].[LOCAL_ARGUMENT_INFO];
-GO
-IF OBJECT_ID(N'[dbo].[Methods]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Methods];
 GO
 IF OBJECT_ID(N'[dbo].[MLSYMBOLs]', 'U') IS NOT NULL
     DROP TABLE [dbo].[MLSYMBOLs];
@@ -82,14 +79,6 @@ CREATE TABLE [dbo].[LOCAL_ARGUMENT_INFO] (
 );
 GO
 
--- Creating table 'Methods'
-CREATE TABLE [dbo].[Methods] (
-    [MethodId] int  NOT NULL,
-    [LabelPrefix] nvarchar(512)  NOT NULL,
-    [ID] uniqueidentifier  NOT NULL
-);
-GO
-
 -- Creating table 'MLSYMBOLs'
 CREATE TABLE [dbo].[MLSYMBOLs] (
     [LABELNAME] nvarchar(512)  NOT NULL,
@@ -128,12 +117,6 @@ GO
 -- Creating primary key on [ID] in table 'LOCAL_ARGUMENT_INFO'
 ALTER TABLE [dbo].[LOCAL_ARGUMENT_INFO]
 ADD CONSTRAINT [PK_LOCAL_ARGUMENT_INFO]
-    PRIMARY KEY CLUSTERED ([ID] ASC);
-GO
-
--- Creating primary key on [ID] in table 'Methods'
-ALTER TABLE [dbo].[Methods]
-ADD CONSTRAINT [PK_Methods]
     PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 

@@ -83,10 +83,6 @@ namespace Cosmos.IL2CPU {
         mLog.Flush();
         aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
       } else {
-        string xMethodLabelPrefix = ILOp.GetMethodLabel(aMethod.MethodBase);
-        int xMethodID = DebugInfo.AddMethod(xMethodLabelPrefix);
-        Cosmos.Assembler.Assembler.CurrentInstance.CurrentMethodID = xMethodID;
-
         foreach (var xOpCode in aOpCodes) {
           ushort xOpCodeVal = (ushort)xOpCode.OpCode;
           ILOp xILOp;

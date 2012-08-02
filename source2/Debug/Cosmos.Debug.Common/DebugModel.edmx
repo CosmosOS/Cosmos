@@ -10,7 +10,6 @@
     <EntitySet Name="FIELD_MAPPING" EntityType="DebugModel.Store.FIELD_MAPPING" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Labels" EntityType="DebugModel.Store.Labels" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="LOCAL_ARGUMENT_INFO" EntityType="DebugModel.Store.LOCAL_ARGUMENT_INFO" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Methods" EntityType="DebugModel.Store.Methods" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="MLSYMBOLs" EntityType="DebugModel.Store.MLSYMBOLs" store:Type="Tables" Schema="dbo" />
   </EntityContainer>
   <EntityType Name="FIELD_INFO">
@@ -50,14 +49,6 @@
     <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
-  <EntityType Name="Methods">
-    <Key>
-      <PropertyRef Name="ID" />
-    </Key>
-    <Property Name="MethodId" Type="int" Nullable="false" />
-    <Property Name="LabelPrefix" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
-  </EntityType>
   <EntityType Name="MLSYMBOLs">
     <Key>
       <PropertyRef Name="ID" />
@@ -80,7 +71,6 @@
           <EntitySet Name="FIELD_MAPPING" EntityType="DebugModel.FIELD_MAPPING" />
           <EntitySet Name="Labels" EntityType="DebugModel.Label" />
           <EntitySet Name="LOCAL_ARGUMENT_INFO" EntityType="DebugModel.LOCAL_ARGUMENT_INFO" />
-          <EntitySet Name="Methods" EntityType="DebugModel.Method" />
           <EntitySet Name="MLSYMBOLs" EntityType="DebugModel.MLSYMBOL" />
         </EntityContainer>
         <EntityType Name="FIELD_INFO">
@@ -118,14 +108,6 @@
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="64" Unicode="true" FixedLength="false" />
           <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-        </EntityType>
-        <EntityType Name="Method">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="MethodId" Type="Int32" Nullable="false" />
-          <Property Name="LabelPrefix" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="MLSYMBOL">
@@ -188,15 +170,6 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="Methods">
-      <EntityTypeMapping TypeName="IsTypeOf(DebugModel.Method)">
-        <MappingFragment StoreEntitySet="Methods">
-          <ScalarProperty Name="ID" ColumnName="ID" />
-          <ScalarProperty Name="MethodId" ColumnName="MethodId" />
-          <ScalarProperty Name="LabelPrefix" ColumnName="LabelPrefix" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="MLSYMBOLs">
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.MLSYMBOL)">
         <MappingFragment StoreEntitySet="MLSYMBOLs">
@@ -235,7 +208,6 @@
         <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="2.75" PointY="0.75" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.75" PointY="3.75" Height="1.5956835937499996" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="2.75" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="1.5" PointX="4.75" PointY="0.75" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="4.75" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
       </Diagram>
     </Diagrams>

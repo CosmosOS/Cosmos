@@ -132,22 +132,6 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        public ObjectSet<Method> Methods
-        {
-            get
-            {
-                if ((_Methods == null))
-                {
-                    _Methods = base.CreateObjectSet<Method>("Methods");
-                }
-                return _Methods;
-            }
-        }
-        private ObjectSet<Method> _Methods;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
         public ObjectSet<MLSYMBOL> MLSYMBOLs
         {
             get
@@ -194,14 +178,6 @@ namespace Cosmos.Debug.Common
         public void AddToLOCAL_ARGUMENT_INFO(LOCAL_ARGUMENT_INFO lOCAL_ARGUMENT_INFO)
         {
             base.AddObject("LOCAL_ARGUMENT_INFO", lOCAL_ARGUMENT_INFO);
-        }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the Methods EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToMethods(Method method)
-        {
-            base.AddObject("Methods", method);
         }
     
         /// <summary>
@@ -746,113 +722,6 @@ namespace Cosmos.Debug.Common
         private global::System.String _TYPENAME;
         partial void OnTYPENAMEChanging(global::System.String value);
         partial void OnTYPENAMEChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid ID
-        {
-            get
-            {
-                return _ID;
-            }
-            set
-            {
-                if (_ID != value)
-                {
-                    OnIDChanging(value);
-                    ReportPropertyChanging("ID");
-                    _ID = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("ID");
-                    OnIDChanged();
-                }
-            }
-        }
-        private global::System.Guid _ID;
-        partial void OnIDChanging(global::System.Guid value);
-        partial void OnIDChanged();
-
-        #endregion
-    
-    }
-    
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="DebugModel", Name="Method")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class Method : EntityObject
-    {
-        #region Factory Method
-    
-        /// <summary>
-        /// Create a new Method object.
-        /// </summary>
-        /// <param name="methodId">Initial value of the MethodId property.</param>
-        /// <param name="labelPrefix">Initial value of the LabelPrefix property.</param>
-        /// <param name="id">Initial value of the ID property.</param>
-        public static Method CreateMethod(global::System.Int32 methodId, global::System.String labelPrefix, global::System.Guid id)
-        {
-            Method method = new Method();
-            method.MethodId = methodId;
-            method.LabelPrefix = labelPrefix;
-            method.ID = id;
-            return method;
-        }
-
-        #endregion
-        #region Primitive Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 MethodId
-        {
-            get
-            {
-                return _MethodId;
-            }
-            set
-            {
-                OnMethodIdChanging(value);
-                ReportPropertyChanging("MethodId");
-                _MethodId = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("MethodId");
-                OnMethodIdChanged();
-            }
-        }
-        private global::System.Int32 _MethodId;
-        partial void OnMethodIdChanging(global::System.Int32 value);
-        partial void OnMethodIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String LabelPrefix
-        {
-            get
-            {
-                return _LabelPrefix;
-            }
-            set
-            {
-                OnLabelPrefixChanging(value);
-                ReportPropertyChanging("LabelPrefix");
-                _LabelPrefix = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("LabelPrefix");
-                OnLabelPrefixChanged();
-            }
-        }
-        private global::System.String _LabelPrefix;
-        partial void OnLabelPrefixChanging(global::System.String value);
-        partial void OnLabelPrefixChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
