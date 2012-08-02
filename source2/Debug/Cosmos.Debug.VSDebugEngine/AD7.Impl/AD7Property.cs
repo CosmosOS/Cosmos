@@ -32,7 +32,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDebugInfo = new DebugInfo.Local_Argument_Info() {
           Type = localInfo.ArrayElementType,
           Name = localInfo.Name,
-          IsArrayElement = true,
           Offset = localInfo.ArrayElementLocation
         };
       } else {

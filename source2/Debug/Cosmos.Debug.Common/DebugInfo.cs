@@ -23,7 +23,6 @@ namespace Cosmos.Debug.Common {
 
     public class Local_Argument_Info {
       public bool IsArgument { get; set; }
-      public bool IsArrayElement { get; set; }
       public string MethodLabelName { get; set; }
       public int Index { get; set; }
       public int Offset { get; set; }
