@@ -134,43 +134,20 @@ namespace Cosmos.Debug.Common {
         }
         xDB.SaveChanges();
       }
-
-      //var xTx = mConnection.BeginTransaction(); 
-      //try {
-      //  using (var xCmd = mConnection.CreateCommand()) {
-      //    xCmd.Transaction = xTx;
-      //    xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" 
-      //      + " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
-      //    xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
-      //    xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
-      //    // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-      //    foreach (var xItem in xMaps) {
-      //      xCmd.Parameters[0].Value = xItem.TypeName;
-      //      foreach (var xFieldName in xItem.FieldNames) {
-      //        xCmd.Parameters[1].Value = xFieldName;
-      //        xCmd.ExecuteNonQuery();
-      //      }
-      //    }
-      //  }
-      //  xTx.Commit();
-      //} catch (Exception) {
-      //  xTx.Rollback();
-      //  throw;
-      //}
     }
 
-    public Field_Map GetFieldMap(string name) {
-      var mp = new Field_Map();
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select TYPE_NAME, FIELD_NAME from FIELD_MAPPING where(TYPE_NAME='" + name + "')";
-        using (var xReader = xCmd.ExecuteReader()) {
-          mp.TypeName = name;
-          while (xReader.Read()) {
-            mp.FieldNames.Add(xReader.GetString(1));
-          }
+    public Field_Map GetFieldMap(string aName) {
+      var xMap = new Field_Map();
+      xMap.TypeName = aName;
+      using (var xDB = new Entities(mEntConn)) {
+        var xRows = from x in xDB.FIELD_MAPPING
+                    where x.TYPE_NAME == aName
+                    select x.FIELD_NAME;
+        foreach (var xFieldName in xRows) {
+          xMap.FieldNames.Add(xFieldName);
         }
       }
-      return mp;
+      return xMap;
     }
 
     public void ReadFieldMappingList(List<Field_Map> aSymbols) {
