@@ -20,7 +20,7 @@
     <Property Name="TYPE" Type="nvarchar" Nullable="false" MaxLength="4000" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
-    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="FIELD_MAPPING">
     <Key>
@@ -36,7 +36,7 @@
     </Key>
     <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
     <Property Name="ADDRESS" Type="bigint" Nullable="false" />
-    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="LOCAL_ARGUMENT_INFO">
     <Key>
@@ -48,7 +48,7 @@
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="255" />
     <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
-    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="Methods">
     <Key>
@@ -56,7 +56,7 @@
     </Key>
     <Property Name="MethodId" Type="int" Nullable="false" />
     <Property Name="LabelPrefix" Type="nvarchar" Nullable="false" MaxLength="255" />
-    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="MLSYMBOLs">
     <Key>
@@ -69,7 +69,7 @@
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="ILOFFSET" Type="int" Nullable="false" />
     <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
-    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
