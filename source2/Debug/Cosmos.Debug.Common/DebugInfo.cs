@@ -52,7 +52,6 @@ namespace Cosmos.Debug.Common {
     protected string mDataSouce = @"(LocalDB)\v11.0";
     //protected mDataSouce = @".\SQLEXPRESS";
     protected string mConnStrBase;
-    protected string mConnStr;
     protected EntityConnection mEntConn;
 
     public void DeleteDB() {
@@ -94,11 +93,11 @@ namespace Cosmos.Debug.Common {
       }
 
       // Initial Catalog is necessary for EDM
-      mConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
+      string xConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
 
       var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
         new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
-      mEntConn = new EntityConnection(xWorkspace, new SqlConnection(mConnStr));
+      mEntConn = new EntityConnection(xWorkspace, new SqlConnection(xConnStr));
       // Do not open mConnection before mEntities.CreateDatabase
       if (aCreate) {
         using (var xEntities = new Entities(mEntConn)) {
@@ -109,7 +108,7 @@ namespace Cosmos.Debug.Common {
         }
       }
 
-      mConnection = new SqlConnection(mConnStr);
+      mConnection = new SqlConnection(xConnStr);
       mConnection.Open();
     }
 
@@ -394,7 +393,7 @@ namespace Cosmos.Debug.Common {
     // SqlBulk operations are average 15x faster. So we use a hybrid approach by using the entities as containers
     // and EntityDataReader to bridge the gap to SqlBulk.
     public void BulkInsert(string aTableName, IDataReader aReader) {
-      using (var xBulkCopy = new SqlBulkCopy(mConnStr)) {
+      using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
         xBulkCopy.DestinationTableName = aTableName;
         xBulkCopy.WriteToServer(aReader);
       }
