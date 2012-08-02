@@ -331,9 +331,10 @@ namespace Cosmos.Debug.Common {
 
     public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
       // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-      using (var xDB = new Entities(mEntConn)) {
+        var xSymbols = new List<MLSYMBOL>();
         foreach (var xItem in aSymbols) {
           var xRow = new MLSYMBOL();
+          xRow.ID = Guid.NewGuid();
           xRow.LABELNAME = xItem.LabelName;
           xRow.STACKDIFF = xItem.StackDifference;
           xRow.ILASMFILE = xItem.AssemblyFile;
@@ -341,10 +342,9 @@ namespace Cosmos.Debug.Common {
           xRow.METHODTOKEN = xItem.MethodToken;
           xRow.ILOFFSET = xItem.ILOffset;
           xRow.METHODNAME = xItem.MethodName;
-          xDB.MLSYMBOLs.AddObject(xRow);
+          xSymbols.Add(xRow);
         }
-        xDB.SaveChanges();
-      }
+        BulkInsert("MLSYMBOLs", xSymbols.AsDataReader());
     }
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
@@ -379,48 +379,26 @@ namespace Cosmos.Debug.Common {
       return mMethodId;
     }
 
-    public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
-      // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
-      // SqlBulk operations are average 15x faster. So we use a hybrid approach by using the entities as containers
-      // and EntityDataReader to bridge the gap to SqlBulk.
-
-      if (true) {
-
-        var xLabels = new List<Label>();
-        foreach (var xItem in aMap) {
-          var xRow = new Label();
-          xRow.ID = Guid.NewGuid();
-          xRow.LABELNAME = xItem.Value;
-          xRow.ADDRESS = xItem.Key;
-          xLabels.Add(xRow);
-        }
-        using (var xBulkCopy = new SqlBulkCopy(mConnStr)) {
-          xBulkCopy.DestinationTableName = "Labels";
-          xBulkCopy.WriteToServer(xLabels.AsDataReader());
-        }
-
-      } else {
-
-        var xTx = mConnection.BeginTransaction();
-        try {
-          using (var xCmd = mConnection.CreateCommand()) {
-            xCmd.Transaction = xTx;
-            xCmd.CommandText = "insert into Labels (ID, LABELNAME, ADDRESS) values (NEWID(), @LABELNAME, @ADDRESS)";
-            xCmd.Parameters.Add("@LABELNAME", SqlDbType.NVarChar);
-            xCmd.Parameters.Add("@ADDRESS", SqlDbType.BigInt);
-            foreach (var xItem in aMap) {
-              xCmd.Parameters[0].Value = xItem.Value;
-              xCmd.Parameters[1].Value = xItem.Key;
-              xCmd.ExecuteNonQuery();
-            }
-          }
-          xTx.Commit();
-        } catch (Exception) {
-          xTx.Rollback();
-          throw;
-        }
-
+    // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
+    // SqlBulk operations are average 15x faster. So we use a hybrid approach by using the entities as containers
+    // and EntityDataReader to bridge the gap to SqlBulk.
+    public void BulkInsert(string aTableName, IDataReader aReader) {
+      using (var xBulkCopy = new SqlBulkCopy(mConnStr)) {
+        xBulkCopy.DestinationTableName = aTableName;
+        xBulkCopy.WriteToServer(aReader);
       }
+    }
+
+    public void WriteLabels(List<KeyValuePair<uint, string>> aMap) {
+      var xLabels = new List<Label>();
+      foreach (var xItem in aMap) {
+        var xRow = new Label();
+        xRow.ID = Guid.NewGuid();
+        xRow.LABELNAME = xItem.Value;
+        xRow.ADDRESS = xItem.Key;
+        xLabels.Add(xRow);
+      }
+      BulkInsert("Labels", xLabels.AsDataReader());
     }
 
     public void Dispose() {
