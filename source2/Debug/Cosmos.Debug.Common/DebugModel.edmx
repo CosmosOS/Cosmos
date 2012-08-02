@@ -17,24 +17,24 @@
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="TYPE" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="TYPE" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
-    <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="FIELD_MAPPING">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="TYPE_NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
-    <Property Name="FIELD_NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="TYPE_NAME" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="FIELD_NAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="Labels">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ADDRESS" Type="bigint" Nullable="false" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
@@ -42,12 +42,12 @@
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="METHODLABELNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="METHODLABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ISARGUMENT" Type="smallint" Nullable="false" />
     <Property Name="INDEXINMETHOD" Type="int" Nullable="false" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
-    <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="255" />
-    <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
+    <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="64" />
+    <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="Methods">
@@ -55,20 +55,20 @@
       <PropertyRef Name="ID" />
     </Key>
     <Property Name="MethodId" Type="int" Nullable="false" />
-    <Property Name="LabelPrefix" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="LabelPrefix" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="MLSYMBOLs">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="STACKDIFF" Type="int" Nullable="false" />
-    <Property Name="ILASMFILE" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="ILASMFILE" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="TYPETOKEN" Type="int" Nullable="false" />
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="ILOFFSET" Type="int" Nullable="false" />
-    <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
 </Schema></edmx:StorageModels>
@@ -87,24 +87,24 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="TYPE" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Name="TYPE" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
-          <Property Name="NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="FIELD_MAPPING">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
-          <Property Name="FIELD_NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
+          <Property Name="FIELD_NAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="Label">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Name="ADDRESS" Type="Int64" Nullable="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
@@ -112,12 +112,12 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="METHODLABELNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="METHODLABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Name="ISARGUMENT" Type="Int16" Nullable="false" />
           <Property Name="INDEXINMETHOD" Type="Int32" Nullable="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
-          <Property Name="NAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
-          <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="64" Unicode="true" FixedLength="false" />
+          <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="Method">
@@ -125,20 +125,20 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="MethodId" Type="Int32" Nullable="false" />
-          <Property Name="LabelPrefix" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="LabelPrefix" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="MLSYMBOL">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Name="STACKDIFF" Type="Int32" Nullable="false" />
-          <Property Name="ILASMFILE" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="ILASMFILE" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="TYPETOKEN" Type="Int32" Nullable="false" />
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="ILOFFSET" Type="Int32" Nullable="false" />
-          <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
       </Schema>

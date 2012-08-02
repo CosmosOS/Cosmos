@@ -92,7 +92,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "41520"
+		VWDPort = "64603"
 	EndProjectSection
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Playground.Kudzu.Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Playground.Kudzu.Breakpoints.Cosmos", "{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136}"

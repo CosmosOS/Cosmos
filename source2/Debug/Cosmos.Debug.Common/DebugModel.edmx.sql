@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/01/2012 23:11:07
+-- Date Created: 08/02/2012 14:17:54
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -47,24 +47,24 @@ GO
 
 -- Creating table 'FIELD_INFO'
 CREATE TABLE [dbo].[FIELD_INFO] (
-    [TYPE] nvarchar(4000)  NOT NULL,
+    [TYPE] nvarchar(512)  NOT NULL,
     [OFFSET] int  NOT NULL,
-    [NAME] nvarchar(4000)  NOT NULL,
+    [NAME] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'FIELD_MAPPING'
 CREATE TABLE [dbo].[FIELD_MAPPING] (
-    [TYPE_NAME] nvarchar(4000)  NOT NULL,
-    [FIELD_NAME] nvarchar(4000)  NOT NULL,
+    [TYPE_NAME] nvarchar(512)  NOT NULL,
+    [FIELD_NAME] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'Labels'
 CREATE TABLE [dbo].[Labels] (
-    [LABELNAME] nvarchar(4000)  NOT NULL,
+    [LABELNAME] nvarchar(512)  NOT NULL,
     [ADDRESS] bigint  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
@@ -72,12 +72,12 @@ GO
 
 -- Creating table 'LOCAL_ARGUMENT_INFO'
 CREATE TABLE [dbo].[LOCAL_ARGUMENT_INFO] (
-    [METHODLABELNAME] nvarchar(255)  NOT NULL,
+    [METHODLABELNAME] nvarchar(512)  NOT NULL,
     [ISARGUMENT] smallint  NOT NULL,
     [INDEXINMETHOD] int  NOT NULL,
     [OFFSET] int  NOT NULL,
-    [NAME] nvarchar(255)  NOT NULL,
-    [TYPENAME] nvarchar(4000)  NOT NULL,
+    [NAME] nvarchar(64)  NOT NULL,
+    [TYPENAME] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
@@ -85,20 +85,20 @@ GO
 -- Creating table 'Methods'
 CREATE TABLE [dbo].[Methods] (
     [MethodId] int  NOT NULL,
-    [LabelPrefix] nvarchar(255)  NOT NULL,
+    [LabelPrefix] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'MLSYMBOLs'
 CREATE TABLE [dbo].[MLSYMBOLs] (
-    [LABELNAME] nvarchar(255)  NOT NULL,
+    [LABELNAME] nvarchar(512)  NOT NULL,
     [STACKDIFF] int  NOT NULL,
-    [ILASMFILE] nvarchar(255)  NOT NULL,
+    [ILASMFILE] nvarchar(256)  NOT NULL,
     [TYPETOKEN] int  NOT NULL,
     [METHODTOKEN] int  NOT NULL,
     [ILOFFSET] int  NOT NULL,
-    [METHODNAME] nvarchar(255)  NOT NULL,
+    [METHODNAME] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
