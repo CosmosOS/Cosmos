@@ -242,28 +242,21 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public MLDebugSymbol ReadSymbolByLabelName(string labelName) {
+    public MLDebugSymbol ReadSymbolByLabelName(string aLabelName) {
       using (var xDB = new Entities(mEntConn)) {
-      }
-
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "select LABELNAME, STACKDIFF, ILASMFILE, TYPETOKEN, METHODTOKEN, ILOFFSET, METHODNAME from MLSYMBOLs"
-            + " WHERE LABELNAME = '" + labelName + "'";
-        using (var xReader = xCmd.ExecuteReader()) {
-          if (xReader.Read()) {
-            return new MLDebugSymbol {
-              LabelName = xReader.GetString(0),
-              StackDifference = xReader.GetInt32(1),
-              AssemblyFile = xReader.GetString(2),
-              TypeToken = xReader.GetInt32(3),
-              MethodToken = xReader.GetInt32(4),
-              ILOffset = xReader.GetInt32(5),
-              MethodName = xReader.GetString(6)
-            };
-          } else {
-            return null;
-          }
+        var xRow = xDB.MLSYMBOLs.Where(q => q.LABELNAME == aLabelName).FirstOrDefault();
+        if (xRow == null) {
+          return null;
         }
+        return new MLDebugSymbol {
+          LabelName = xRow.LABELNAME,
+          StackDifference = xRow.STACKDIFF,
+          AssemblyFile = xRow.ILASMFILE,
+          TypeToken = xRow.TYPETOKEN,
+          MethodToken = xRow.METHODTOKEN,
+          ILOffset = xRow.ILOFFSET,
+          MethodName = xRow.METHODNAME
+        };
       }
     }
 
