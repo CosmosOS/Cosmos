@@ -94,22 +94,24 @@ namespace Cosmos.Debug.Common {
     }
 
     public static SourceInfos GetSourceInfo(List<KeyValuePair<uint, string>> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, DebugInfo debugInfo) {
-      var xSymbolsList = debugInfo.ReadSymbolsList();
-
+      List<MLSYMBOL> xSymbols;
+      using (var xDB = debugInfo.DB()) {
+        xSymbols = xDB.MLSYMBOLs.ToList();
+      }
       // Sort
-      xSymbolsList.Sort(delegate(DebugInfo.MLDebugSymbol a, DebugInfo.MLDebugSymbol b) {
+      xSymbols.Sort(delegate(MLSYMBOL a, MLSYMBOL b) {
         if (a == null) {
           throw new ArgumentNullException("a");
         } else if (b == null) {
           throw new ArgumentNullException("b");
         }
-        int xCompareResult = StringComparer.InvariantCultureIgnoreCase.Compare(a.AssemblyFile, b.AssemblyFile);
+        int xCompareResult = StringComparer.InvariantCultureIgnoreCase.Compare(a.ILASMFILE, b.ILASMFILE);
         if (xCompareResult == 0) {
-          xCompareResult = a.TypeToken.CompareTo(b.TypeToken);
+          xCompareResult = a.TYPETOKEN.CompareTo(b.TYPETOKEN);
           if (xCompareResult == 0) {
-            xCompareResult = a.MethodToken.CompareTo(b.MethodToken);
+            xCompareResult = a.METHODTOKEN.CompareTo(b.METHODTOKEN);
             if (xCompareResult == 0) {
-              return a.ILOffset.CompareTo(b.ILOffset);
+              return a.ILOFFSET.CompareTo(b.ILOFFSET);
             }
 
           }
@@ -128,21 +130,21 @@ namespace Cosmos.Debug.Common {
       int[] xCodeEndColumns = null;
       int? xOldMethodToken = null;
       ISymbolMethod xMethodSymbol = null;
-      foreach (var xSymbol in xSymbolsList) {
-        if (!xSymbol.AssemblyFile.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
+      foreach (var xSymbol in xSymbols) {
+        if (!xSymbol.ILASMFILE.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
           try {
             xMethodSymbol = null;
-            xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.AssemblyFile);
+            xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.ILASMFILE);
           } catch {
             xSymbolReader = null;
             xMethodSymbol = null;
           }
-          xOldAssembly = xSymbol.AssemblyFile;
+          xOldAssembly = xSymbol.ILASMFILE;
         }
-        if (xOldMethodToken != xSymbol.MethodToken) {
+        if (xOldMethodToken != xSymbol.METHODTOKEN) {
           if (xSymbolReader != null) {
             try {
-              xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xSymbol.MethodToken));
+              xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xSymbol.METHODTOKEN));
               if (xMethodSymbol != null) {
                 xCodeOffsets = new int[xMethodSymbol.SequencePointCount];
                 xCodeDocuments = new ISymbolDocument[xMethodSymbol.SequencePointCount];
@@ -156,23 +158,23 @@ namespace Cosmos.Debug.Common {
               xMethodSymbol = null;
             }
           }
-          xOldMethodToken = xSymbol.MethodToken;
+          xOldMethodToken = xSymbol.METHODTOKEN;
         }
 
         if (xMethodSymbol != null) {
-          if (aLabelAddressMappings.ContainsKey(xSymbol.LabelName)) {
-            uint xAddress = aLabelAddressMappings[xSymbol.LabelName];
+          if (aLabelAddressMappings.ContainsKey(xSymbol.LABELNAME)) {
+            uint xAddress = aLabelAddressMappings[xSymbol.LABELNAME];
             // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
             // So we just ignore duplicate addresses.
             if (!xResult.ContainsKey(xAddress)) {
-              int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOffset);
+              int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOFFSET);
               var xSourceInfo = new SourceInfo() {
                 SourceFile = xCodeDocuments[xIdx].URL,
                 Line = xCodeLines[xIdx],
                 LineEnd = xCodeEndLines[xIdx],
                 Column = xCodeColumns[xIdx],
                 ColumnEnd = xCodeEndColumns[xIdx],
-                MethodName = xSymbol.MethodName
+                MethodName = xSymbol.METHODNAME
               };
               xResult.Add(xAddress, xSourceInfo);
             }

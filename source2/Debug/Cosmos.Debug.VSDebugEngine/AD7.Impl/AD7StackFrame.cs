@@ -56,9 +56,16 @@ namespace Cosmos.Debug.VSDebugEngine {
                              where x.Key == xProcess.mCurrentAddress.Value
                              select x.Value).ToArray();
         if (xLabelsForAddr.Length > 0) {
-          var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xLabelsForAddr[0]);
+          
+          //var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xLabelsForAddr[0]);
+          MLSYMBOL xSymbolInfo;
+          using (var xDB = xProcess.mDebugInfoDb.DB()) {
+            string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
+            xSymbolInfo = xDB.MLSYMBOLs.Where(q => q.LABELNAME == xLabel).FirstOrDefault();
+          }
+
           if (xSymbolInfo != null) {
-            var xAllInfos = xProcess.mDebugInfoDb.ReadLocalArgumentsInfos(xSymbolInfo.MethodName);
+            var xAllInfos = xProcess.mDebugInfoDb.ReadLocalArgumentsInfos(xSymbolInfo.METHODNAME);
             mLocalInfos = (from item in xAllInfos
                            where !item.IsArgument
                            select item).ToArray();

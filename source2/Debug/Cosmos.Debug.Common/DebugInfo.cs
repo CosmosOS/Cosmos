@@ -15,6 +15,7 @@ namespace Cosmos.Debug.Common {
 
     // Please beware this field, it may cause issues if used incorrectly.
     public static DebugInfo CurrentInstance { get; private set; }
+  
     public class Field_Info {
       public string Type { get; set; }
       public int Offset { get; set; }
@@ -24,16 +25,6 @@ namespace Cosmos.Debug.Common {
     public class Field_Map {
       public string TypeName { get; set; }
       public List<string> FieldNames = new List<string>();
-    }
-
-    public class MLDebugSymbol {
-      public string LabelName { get; set; }
-      public int StackDifference { get; set; }
-      public string AssemblyFile { get; set; }
-      public int TypeToken { get; set; }
-      public int MethodToken { get; set; }
-      public int ILOffset { get; set; }
-      public string MethodName { get; set; }
     }
 
     public class Local_Argument_Info {
@@ -114,7 +105,7 @@ namespace Cosmos.Debug.Common {
 
     protected List<string> local_MappingTypeNames = new List<string>();
     public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping) {
-      IEnumerable<Field_Map> xMaps = aMapping.Where(delegate(Field_Map mp) {
+      var xMaps = aMapping.Where(delegate(Field_Map mp) {
         if (local_MappingTypeNames.Contains(mp.TypeName)) {
           return false;
         } else {
@@ -124,7 +115,7 @@ namespace Cosmos.Debug.Common {
       });
 
       // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         foreach (var xItem in xMaps) {
           foreach (var xFieldName in xItem.FieldNames) {
             var xRow = new FIELD_MAPPING();
@@ -140,7 +131,7 @@ namespace Cosmos.Debug.Common {
     public Field_Map GetFieldMap(string aName) {
       var xMap = new Field_Map();
       xMap.TypeName = aName;
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         var xRows = from x in xDB.FIELD_MAPPING
                     where x.TYPE_NAME == aName
                     select x.FIELD_NAME;
@@ -152,7 +143,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadFieldMappingList(List<Field_Map> aSymbols) {
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         var xMap = new Field_Map();
         foreach (var xRow in xDB.FIELD_MAPPING) {
           string xTypeName = xRow.TYPE_NAME;
@@ -171,7 +162,7 @@ namespace Cosmos.Debug.Common {
 
     protected List<string> mLocalFieldInfoNames = new List<string>();
     public void WriteFieldInfoToFile(IEnumerable<Field_Info> aFields) {
-      IEnumerable<Field_Info> xFields = aFields.Where(delegate(Field_Info mp) {
+      var xFields = aFields.Where(delegate(Field_Info mp) {
         if (mLocalFieldInfoNames.Contains(mp.Name)) {
           return false;
         } else {
@@ -181,7 +172,7 @@ namespace Cosmos.Debug.Common {
       });
 
       // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         foreach (var xItem in xFields) {
           var xRow = new FIELD_INFO();
           xRow.TYPE = xItem.Type;
@@ -195,7 +186,7 @@ namespace Cosmos.Debug.Common {
 
     public Field_Info GetFieldInfo(string aName) {
       var xInf = new Field_Info();
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         var xRow = xDB.FIELD_INFO.Where(q => q.NAME == aName).First();
         xInf.Type = xRow.TYPE;
         xInf.Offset = xRow.OFFSET;
@@ -205,7 +196,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void ReadFieldInfoList(List<Field_Info> aSymbols) {
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         foreach (var xRow in xDB.FIELD_INFO) {
           aSymbols.Add(new Field_Info {
             Type = xRow.TYPE,
@@ -216,45 +207,13 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public List<MLDebugSymbol> ReadSymbolsList() {
-      var xResult = new List<MLDebugSymbol>();
-      using (var xDB = new Entities(mEntConn)) {
-        foreach (var xRow in xDB.MLSYMBOLs) {
-          xResult.Add(new MLDebugSymbol {
-            LabelName = xRow.LABELNAME,
-            StackDifference = xRow.STACKDIFF,
-            AssemblyFile = xRow.ILASMFILE,
-            TypeToken = xRow.TYPETOKEN,
-            MethodToken = xRow.METHODTOKEN,
-            ILOffset = xRow.ILOFFSET,
-            MethodName = xRow.METHODNAME
-          });
-        }
-      }
-      return xResult;
-    }
-
-    public MLDebugSymbol ReadSymbolByLabelName(string aLabelName) {
-      using (var xDB = new Entities(mEntConn)) {
-        var xRow = xDB.MLSYMBOLs.Where(q => q.LABELNAME == aLabelName).FirstOrDefault();
-        if (xRow == null) {
-          return null;
-        }
-        return new MLDebugSymbol {
-          LabelName = xRow.LABELNAME,
-          StackDifference = xRow.STACKDIFF,
-          AssemblyFile = xRow.ILASMFILE,
-          TypeToken = xRow.TYPETOKEN,
-          MethodToken = xRow.METHODTOKEN,
-          ILOffset = xRow.ILOFFSET,
-          MethodName = xRow.METHODNAME
-        };
-      }
+    public Entities DB() {
+      return new Entities(mEntConn);
     }
 
     public IList<Local_Argument_Info> ReadLocalArgumentsInfos(string aMethodLabelName) {
       var xResult = new List<Local_Argument_Info>();
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         foreach (var xRow in xDB.LOCAL_ARGUMENT_INFO) {
           xResult.Add(new Local_Argument_Info {
             MethodLabelName = xRow.METHODLABELNAME,
@@ -272,7 +231,7 @@ namespace Cosmos.Debug.Common {
     public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
       oLabels = new List<KeyValuePair<uint, string>>();
       oLabelAddressMappings = new Dictionary<string, uint>();
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         foreach (var xRow in xDB.Labels) {
           oLabels.Add(new KeyValuePair<uint, string>((uint)xRow.ADDRESS, xRow.LABELNAME));
           oLabelAddressMappings.Add(xRow.LABELNAME, (uint)xRow.ADDRESS);
@@ -280,27 +239,13 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols) {
-      // Is a real DB now, but we still store all in RAM. We dont need to. Need to change to query DB as needed instead.
-        var xSymbols = new List<MLSYMBOL>();
-        foreach (var xItem in aSymbols) {
-          var xRow = new MLSYMBOL();
-          xRow.ID = Guid.NewGuid();
-          xRow.LABELNAME = xItem.LabelName;
-          xRow.STACKDIFF = xItem.StackDifference;
-          xRow.ILASMFILE = xItem.AssemblyFile;
-          xRow.TYPETOKEN = xItem.TypeToken;
-          xRow.METHODTOKEN = xItem.MethodToken;
-          xRow.ILOFFSET = xItem.ILOffset;
-          xRow.METHODNAME = xItem.MethodName;
-          xSymbols.Add(xRow);
-        }
-        BulkInsert("MLSYMBOLs", xSymbols.AsDataReader());
+    public void WriteSymbolsListToFile(IEnumerable<MLSYMBOL> aSymbols) {
+      BulkInsert("MLSYMBOLs", aSymbols.AsDataReader());
     }
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
     public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> aInfos) {
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
         foreach (var xInfo in aInfos) {
           var xRow = new LOCAL_ARGUMENT_INFO();
           xRow.METHODLABELNAME = xInfo.MethodLabelName;
@@ -320,7 +265,7 @@ namespace Cosmos.Debug.Common {
     protected int mMethodId = 0;
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
-      using (var xDB = new Entities(mEntConn)) {
+      using (var xDB = DB()) {
        var xRow = new Method();
         xRow.MethodId = mMethodId;
         xRow.LabelPrefix = aLabelPrefix;

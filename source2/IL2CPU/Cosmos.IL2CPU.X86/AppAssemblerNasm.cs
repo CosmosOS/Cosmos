@@ -372,7 +372,7 @@ namespace Cosmos.IL2CPU.X86 {
       var xLine = String.Format("{0}\t{1}\t{2}", MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
 
     }
-    private List<DebugInfo.MLDebugSymbol> mSymbols = new List<DebugInfo.MLDebugSymbol>();
+    private List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
 
     // These are all temp functions until we move to the new assembler.
     // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
@@ -395,30 +395,31 @@ namespace Cosmos.IL2CPU.X86 {
       new Cosmos.Assembler.Label(xLabel, "IL");
       
       if (mSymbols != null) {
-        var xMLSymbol = new DebugInfo.MLDebugSymbol();
-        xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
-        xMLSymbol.MethodName = aMethod.MethodBase.GetFullName();
+        var xMLSymbol = new MLSYMBOL();
+        xMLSymbol.ID = Guid.NewGuid();
+        xMLSymbol.LABELNAME = TmpPosLabel(aMethod, aOpCode);
+        xMLSymbol.METHODNAME = aMethod.MethodBase.GetFullName();
 
         var xStackSize = (from item in mAssembler.Stack
                           let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))
                           select xSize).Sum();
-        xMLSymbol.StackDifference = -1;
+        xMLSymbol.STACKDIFF = -1;
         if (aMethod.MethodBase != null) {
           var xBody = aMethod.MethodBase.GetMethodBody();
           if (xBody != null) {
             var xLocalsSize = (from item in xBody.LocalVariables
                                select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
-            xMLSymbol.StackDifference = checked((int)(xLocalsSize + xStackSize));
+            xMLSymbol.STACKDIFF = checked((int)(xLocalsSize + xStackSize));
           }
         }
         try {
-          xMLSymbol.AssemblyFile = aMethod.MethodBase.DeclaringType.Assembly.Location;
+          xMLSymbol.ILASMFILE = aMethod.MethodBase.DeclaringType.Assembly.Location;
         } catch (NotSupportedException) {
-          xMLSymbol.AssemblyFile = "DYNAMIC: " + aMethod.MethodBase.DeclaringType.Assembly.FullName;
+          xMLSymbol.ILASMFILE = "DYNAMIC: " + aMethod.MethodBase.DeclaringType.Assembly.FullName;
         }
-        xMLSymbol.MethodToken = aMethod.MethodBase.MetadataToken;
-        xMLSymbol.TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken;
-        xMLSymbol.ILOffset = aOpCode.Position;
+        xMLSymbol.METHODTOKEN = aMethod.MethodBase.MetadataToken;
+        xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
+        xMLSymbol.ILOFFSET = aOpCode.Position;
         mSymbols.Add(xMLSymbol);
       }
       
