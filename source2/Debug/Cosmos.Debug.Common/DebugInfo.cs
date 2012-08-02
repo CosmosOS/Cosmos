@@ -170,38 +170,27 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    protected List<string> local_FieldInfoNames = new List<string>();
+    protected List<string> mLocalFieldInfoNames = new List<string>();
     public void WriteFieldInfoToFile(IEnumerable<Field_Info> aFields) {
       IEnumerable<Field_Info> xFields = aFields.Where(delegate(Field_Info mp) {
-        if (local_FieldInfoNames.Contains(mp.Name)) {
+        if (mLocalFieldInfoNames.Contains(mp.Name)) {
           return false;
         } else {
-          local_FieldInfoNames.Add(mp.Name);
+          mLocalFieldInfoNames.Add(mp.Name);
           return true;
         }
       });
 
-      var xTx = mConnection.BeginTransaction(); 
-      try {
-        using (var xCmd = mConnection.CreateCommand()) {
-          xCmd.Transaction = xTx;
-          xCmd.CommandText = "INSERT INTO FIELD_INFO (ID, TYPE, OFFSET, NAME)" +
-                             " VALUES (NEWID(), @TYPE, @OFFSET, @NAME)";
-          xCmd.Parameters.Add("@TYPE", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
-          xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-          foreach (var xItem in xFields) {
-            xCmd.Parameters[0].Value = xItem.Type;
-            xCmd.Parameters[1].Value = xItem.Offset;
-            xCmd.Parameters[2].Value = xItem.Name;
-            xCmd.ExecuteNonQuery();
-          }
+      // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+      using (var xDB = new Entities(mEntConn)) {
+        foreach (var xItem in xFields) {
+          var xRow = new FIELD_INFO();
+          xRow.TYPE = xItem.Type;
+          xRow.OFFSET = xItem.Offset;
+          xRow.NAME = xItem.Name;
+          xDB.FIELD_INFO.AddObject(xRow);
         }
-        xTx.Commit();
-      } catch (Exception) {
-        xTx.Rollback();
-        throw;
+        xDB.SaveChanges();
       }
     }
 
