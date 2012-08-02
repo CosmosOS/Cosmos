@@ -429,7 +429,8 @@ namespace Cosmos.Debug.Common {
 
         // Why do we have this? 
         // Dont remove though - when removed we cant run Cosmos stuff in hive for some reason?
-        GC.SuppressFinalize(this);
+        // Was Intellisense :(
+        //GC.SuppressFinalize(this);
       }
     }
   }
