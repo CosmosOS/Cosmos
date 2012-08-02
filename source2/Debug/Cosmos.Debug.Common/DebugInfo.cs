@@ -46,12 +46,12 @@ namespace Cosmos.Debug.Common {
     }
 
     protected SqlConnection mConnection;
-    protected Entities mEntities;
     protected string mDbName;
     // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
     protected string mDataSouce = @"(LocalDB)\v11.0";
     //protected mDataSouce = @".\SQLEXPRESS";
     protected string mConnStrBase;
+    protected EntityConnection mEntConn;
 
     public void DeleteDB() {
       using (var xConn = new SqlConnection(mConnStrBase)) {
@@ -93,20 +93,21 @@ namespace Cosmos.Debug.Common {
 
       // Initial Catalog is necessary for EDM
       string xConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
-      mConnection = new SqlConnection(xConnStr);
 
       var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
         new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
-      var xEntConn = new EntityConnection(xWorkspace, mConnection);
-      mEntities = new Entities(xEntConn);
-
+      mEntConn = new EntityConnection(xWorkspace, new SqlConnection(xConnStr));
       // Do not open mConnection before mEntities.CreateDatabase
       if (aCreate) {
-        // DatabaseExists checks if the DBName exists, not physical files.
-        if (!mEntities.DatabaseExists()) {
-          mEntities.CreateDatabase();
+        using (var xEntities = new Entities(mEntConn)) {
+          // DatabaseExists checks if the DBName exists, not physical files.
+          if (!xEntities.DatabaseExists()) {
+            xEntities.CreateDatabase();
+          }
         }
       }
+
+      mConnection = new SqlConnection(xConnStr);
       mConnection.Open();
     }
 
@@ -121,28 +122,41 @@ namespace Cosmos.Debug.Common {
         }
       });
 
-      var xTx = mConnection.BeginTransaction(); 
-      try {
-        using (var xCmd = mConnection.CreateCommand()) {
-          xCmd.Transaction = xTx;
-          xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" 
-            + " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
-          xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
-          xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
-          // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-          foreach (var xItem in xMaps) {
-            xCmd.Parameters[0].Value = xItem.TypeName;
-            foreach (var xFieldName in xItem.FieldNames) {
-              xCmd.Parameters[1].Value = xFieldName;
-              xCmd.ExecuteNonQuery();
-            }
+      // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+      using (var xDB = new Entities(mEntConn)) {
+        foreach (var xItem in xMaps) {
+          foreach (var xFieldName in xItem.FieldNames) {
+            var xRow = new FIELD_MAPPING();
+            xRow.TYPE_NAME = xItem.TypeName;
+            xRow.FIELD_NAME = xFieldName;
+            xDB.FIELD_MAPPING.AddObject(xRow);
           }
         }
-        xTx.Commit();
-      } catch (Exception) {
-        xTx.Rollback();
-        throw;
+        xDB.SaveChanges();
       }
+
+      //var xTx = mConnection.BeginTransaction(); 
+      //try {
+      //  using (var xCmd = mConnection.CreateCommand()) {
+      //    xCmd.Transaction = xTx;
+      //    xCmd.CommandText = "INSERT INTO FIELD_MAPPING (ID, TYPE_NAME, FIELD_NAME)" 
+      //      + " VALUES (NEWID(), @TYPE_NAME, @FIELD_NAME)";
+      //    xCmd.Parameters.Add("@TYPE_NAME", SqlDbType.NVarChar);
+      //    xCmd.Parameters.Add("@FIELD_NAME", SqlDbType.NVarChar);
+      //    // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+      //    foreach (var xItem in xMaps) {
+      //      xCmd.Parameters[0].Value = xItem.TypeName;
+      //      foreach (var xFieldName in xItem.FieldNames) {
+      //        xCmd.Parameters[1].Value = xFieldName;
+      //        xCmd.ExecuteNonQuery();
+      //      }
+      //    }
+      //  }
+      //  xTx.Commit();
+      //} catch (Exception) {
+      //  xTx.Rollback();
+      //  throw;
+      //}
     }
 
     public Field_Map GetFieldMap(string name) {
@@ -440,10 +454,6 @@ namespace Cosmos.Debug.Common {
     }
 
     public void Dispose() {
-      if (mEntities != null) {
-        mEntities.Dispose();
-        mEntities = null;
-      }
       if (mConnection != null) {
         var xConn = mConnection;
         mConnection = null;

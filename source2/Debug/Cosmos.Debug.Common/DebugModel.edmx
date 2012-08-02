@@ -28,7 +28,7 @@
     </Key>
     <Property Name="TYPE_NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
     <Property Name="FIELD_NAME" Type="nvarchar" Nullable="false" MaxLength="4000" />
-    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="Labels">
     <Key>
@@ -90,7 +90,7 @@
           <Property Name="TYPE" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="FIELD_MAPPING">
           <Key>
@@ -98,7 +98,7 @@
           </Key>
           <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
           <Property Name="FIELD_NAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="Label">
           <Key>
@@ -106,7 +106,7 @@
           </Key>
           <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
           <Property Name="ADDRESS" Type="Int64" Nullable="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="LOCAL_ARGUMENT_INFO">
           <Key>
@@ -118,7 +118,7 @@
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
           <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="4000" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="Method">
           <Key>
@@ -126,7 +126,7 @@
           </Key>
           <Property Name="MethodId" Type="Int32" Nullable="false" />
           <Property Name="LabelPrefix" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="MLSYMBOL">
           <Key>
@@ -139,7 +139,7 @@
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="ILOFFSET" Type="Int32" Nullable="false" />
           <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
