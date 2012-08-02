@@ -346,36 +346,24 @@ namespace Cosmos.Debug.Common {
     }
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
-    public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> infos) {
-      //using (var xDB = new Entities(mEntConn)) {
-      //  foreach (var xItem in ..) {
-      //    var xRow = new FIELD_INFO();
-      //    xDB.FIELD_INFO.AddObject(xRow);
-      //  }
-      //  xDB.SaveChanges();
-      //}
-      
-      using (var xCmd = mConnection.CreateCommand()) {
-        xCmd.CommandText = "insert into LOCAL_ARGUMENT_INFO (ID, METHODLABELNAME, ISARGUMENT, INDEXINMETHOD, OFFSET, NAME, TYPENAME) values (NEWID(), @METHODLABELNAME, @ISARGUMENT, @INDEXINMETHOD, @OFFSET, @NAME, @TYPENAME)";
-        xCmd.Parameters.Add("@METHODLABELNAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@ISARGUMENT", SqlDbType.SmallInt);
-        xCmd.Parameters.Add("@INDEXINMETHOD", SqlDbType.Int);
-        xCmd.Parameters.Add("@OFFSET", SqlDbType.Int);
-        xCmd.Parameters.Add("@NAME", SqlDbType.NVarChar);
-        xCmd.Parameters.Add("@TYPENAME", SqlDbType.NVarChar);
-        foreach (var xInfo in infos) {
-          xCmd.Parameters[0].Value = xInfo.MethodLabelName;
-          xCmd.Parameters[1].Value = xInfo.IsArgument ? 1 : 0;
-          xCmd.Parameters[2].Value = xInfo.Index;
-          xCmd.Parameters[3].Value = xInfo.Offset;
-          xCmd.Parameters[4].Value = xInfo.Name;
-          xCmd.Parameters[5].Value = xInfo.Type;
-          xCmd.ExecuteNonQuery();
+    public void WriteAllLocalsArgumentsInfos(IEnumerable<Local_Argument_Info> aInfos) {
+      using (var xDB = new Entities(mEntConn)) {
+        foreach (var xInfo in aInfos) {
+          var xRow = new LOCAL_ARGUMENT_INFO();
+          xRow.METHODLABELNAME = xInfo.MethodLabelName;
+          xRow.ISARGUMENT = (short)(xInfo.IsArgument ? 1 : 0);
+          xRow.INDEXINMETHOD = xInfo.Index;
+          xRow.OFFSET = xInfo.Offset;
+          xRow.NAME = xInfo.Name;
+          xRow.TYPENAME = xInfo.Type;
+          xDB.LOCAL_ARGUMENT_INFO.AddObject(xRow);
         }
+        xDB.SaveChanges();
       }
     }
 
-    // This is a heck of a lot easier than using sequences
+    // This is a heck of a lot easier than using sequences.
+    // Can prob change to the new GUIDs we use.
     protected int mMethodId = 0;
     public int AddMethod(string aLabelPrefix) {
       mMethodId++;
