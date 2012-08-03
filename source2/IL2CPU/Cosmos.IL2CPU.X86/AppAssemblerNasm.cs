@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86 {
       InitILOps(typeof(ILOp));
     }
 
-    private IList<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
+    private List<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);

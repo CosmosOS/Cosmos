@@ -7,6 +7,7 @@ using System.Data.EntityClient;
 using System.Data.SqlClient;
 using System.Data.Common;
 using System.Data.Objects;
+using System.Data.Objects.DataClasses;
 using System.Reflection;
 using Microsoft.Win32;
 
@@ -192,32 +193,32 @@ namespace Cosmos.Debug.Common {
       return new Entities(xEntConn);
     }
 
-    public void WriteSymbolsListToFile(IEnumerable<MLSYMBOL> aSymbols) {
+    public void WriteSymbolsListToFile(IList<MLSYMBOL> aSymbols) {
       foreach (var x in aSymbols) {
         x.ID = Guid.NewGuid();
       }
-      BulkInsert("MLSYMBOLs", aSymbols.AsDataReader());
+      BulkInsert("MLSYMBOLs", aSymbols);
     }
 
     // tuple format: MethodLabel, IsArgument, Index, Offset
-    public void WriteAllLocalsArgumentsInfos(IEnumerable<LOCAL_ARGUMENT_INFO> aInfos) {
+    public void WriteAllLocalsArgumentsInfos(IList<LOCAL_ARGUMENT_INFO> aInfos) {
       foreach (var x in aInfos) {
         x.ID = Guid.NewGuid();
       }
-      BulkInsert("LOCAL_ARGUMENT_INFO", aInfos.AsDataReader());
+      BulkInsert("LOCAL_ARGUMENT_INFO", aInfos);
     }
 
     // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
     // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
     // and EntityDataReader to bridge the gap to SqlBulk.
-    public void BulkInsert(string aTableName, IDataReader aReader) {
+    public void BulkInsert<T>(string aTableName, IList<T> aList) {
       using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
         xBulkCopy.DestinationTableName = aTableName;
-        xBulkCopy.WriteToServer(aReader);
+        xBulkCopy.WriteToServer(aList.AsDataReader());
       }
     }
 
-    public void WriteLabels(List<Label> aLabels, bool aFlush = false) {
+    public void WriteLabels(IList<Label> aLabels, bool aFlush = false) {
       // We dont want to issue individual inserts to SQL as this is very slow.
       // But accumulating too many records in RAM also is a problem. For example 
       // at time of writing the full structure would take up 11 MB of RAM just for this structure.
@@ -228,7 +229,7 @@ namespace Cosmos.Debug.Common {
           foreach (var x in aLabels) {
             x.ID = Guid.NewGuid();
           }
-          BulkInsert("Labels", aLabels.AsDataReader());
+          BulkInsert("Labels", aLabels);
           aLabels.Clear();
         }
       }
