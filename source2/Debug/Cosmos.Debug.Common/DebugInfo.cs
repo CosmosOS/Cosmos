@@ -211,28 +211,29 @@ namespace Cosmos.Debug.Common {
     // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
     // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
     // and EntityDataReader to bridge the gap to SqlBulk.
-    public void BulkInsert<T>(string aTableName, IList<T> aList) {
-      using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
-        xBulkCopy.DestinationTableName = aTableName;
-        xBulkCopy.WriteToServer(aList.AsDataReader());
+    //
+    // We dont want to issue individual inserts to SQL as this is very slow.
+    // But accumulating too many records in RAM also is a problem. For example 
+    // at time of writing the full structure would take up 11 MB of RAM just for this structure.
+    // This is not a huge amount, but as we compile in more and more this figure will grow.
+    // So as a compromise, we collect 2500 records then bulk insert.
+    public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = true) {
+      if (aList.Count >= aFlushSize || aFlush) {
+        if (aList.Count > 0) {
+          using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
+            xBulkCopy.DestinationTableName = aTableName;
+            xBulkCopy.WriteToServer(aList.AsDataReader());
+          }
+          aList.Clear();
+        }
       }
     }
 
     public void WriteLabels(IList<Label> aLabels, bool aFlush = false) {
-      // We dont want to issue individual inserts to SQL as this is very slow.
-      // But accumulating too many records in RAM also is a problem. For example 
-      // at time of writing the full structure would take up 11 MB of RAM just for this structure.
-      // This is not a huge amount, but as we compile in more and more this figure will grow.
-      // So as a compromise, we collect 2500 records then bulk insert.
-      if (aLabels.Count > 2500 || aFlush) {
-        if (aLabels.Count > 0) {
-          foreach (var x in aLabels) {
-            x.ID = Guid.NewGuid();
-          }
-          BulkInsert("Labels", aLabels);
-          aLabels.Clear();
-        }
+      foreach (var x in aLabels) {
+        x.ID = Guid.NewGuid();
       }
+      BulkInsert("Labels", aLabels, 2500, aFlush);
     }
 
     public void Dispose() {
