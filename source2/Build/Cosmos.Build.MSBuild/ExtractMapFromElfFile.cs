@@ -12,28 +12,16 @@ using Cosmos.Debug.Common;
 namespace Cosmos.Build.MSBuild {
   public class ExtractMapFromElfFile : BaseToolTask {
     [Required]
-    public string InputFile {
-      get;
-      set;
-    }
+    public string InputFile { get; set; }
 
     [Required]
-    public string DebugInfoFile {
-      get;
-      set;
-    }
+    public string DebugInfoFile { get; set; }
 
     [Required]
-    public string WorkingDir {
-      get;
-      set;
-    }
+    public string WorkingDir { get; set; }
 
     [Required]
-    public string CosmosBuildDir {
-      get;
-      set;
-    }
+    public string CosmosBuildDir { get; set; }
 
     public override bool Execute() {
       // Important! A given address can have more than one label.

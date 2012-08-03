@@ -30,6 +30,7 @@ namespace Cosmos.Debug.Common {
     public int LineEnd { get; set; }
     public int ColumnEnd { get; set; }
 
+    #region Old NASM Map parser
     //public static List<Label> ParseMapFile(String buildPath) {
     //  var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
     //  var xSource = new List<Label>();
@@ -60,6 +61,7 @@ namespace Cosmos.Debug.Common {
     //  }
     //  return xSource;
     //}
+    #endregion
 
     public static int GetIndexClosestSmallerMatch(IList<int> aList, int aValue) {
       int xIdx = -1;
