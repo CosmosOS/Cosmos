@@ -47,47 +47,59 @@ namespace Cosmos.Build.MSBuild {
         return false;
       }
 
-      var xResult = new List<Label>();
+      var xLabels = new List<Label>();
       var xLines = xSymbolString.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-      
-      // Parse file
-      bool xListStarted = false;
-      foreach (string xLine in xLines) {
-        if (String.IsNullOrEmpty(xLine)) {
-          continue;
-        } else if (!xListStarted) {
-          // Find start of the data
-          if (xLine == "SYMBOL TABLE:") {
-            xListStarted = true;
-          }
-          continue;
-        }
-
-        uint xAddress;
-        try {
-          xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
-        } catch (Exception) {
-          Log.LogError("Error processing line '" + xLine + "'");
-          throw;
-        }
-        
-        string xSection = xLine.Substring(17, 5);
-        if (xSection != ".text" && xSection != ".data") {
-          continue;
-        }
-        string xLabel = xLine.Substring(32);
-        if (xLabel == xSection) {
-          // Non label, skip
-          continue;
-        }
-        xResult.Add(new Label() {
-          LABELNAME = xLabel,
-          ADDRESS = xAddress
-        });
-      }
 
       using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
-        xDebugInfo.WriteLabels(xResult);
+        bool xListStarted = false;
+        foreach (string xLine in xLines) {
+          if (String.IsNullOrEmpty(xLine)) {
+            continue;
+          } else if (!xListStarted) {
+            // Find start of the data
+            if (xLine == "SYMBOL TABLE:") {
+              xListStarted = true;
+            }
+            continue;
+          }
+
+          uint xAddress;
+          try {
+            xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
+          } catch (Exception) {
+            Log.LogError("Error processing line '" + xLine + "'");
+            throw;
+          }
+
+          string xSection = xLine.Substring(17, 5);
+          if (xSection != ".text" && xSection != ".data") {
+            continue;
+          }
+          string xLabel = xLine.Substring(32);
+          if (xLabel == xSection) {
+            // Non label, skip
+            continue;
+          }
+
+          xLabels.Add(new Label() {
+            LABELNAME = xLabel,
+            ADDRESS = xAddress
+          });
+
+          // We dont want to issue individual inserts to SQL as this is very slow.
+          // But accumulating too many records in RAM also is a problem. For example 
+          // at time of writing the full structure would take up 11 MB of RAM just for this structure.
+          // This is not a huge amount, but as we compile in more and more this figure will grow.
+          // So as a compromise, we collect 2500 records then bulk insert.
+          if (xLabels.Count > 2500) {
+            xDebugInfo.WriteLabels(xLabels);
+            xLabels.Clear();
+          }
+        }
+
+        if (xLabels.Count > 0) {
+          xDebugInfo.WriteLabels(xLabels);
+        }
       }
       return true;
     }
