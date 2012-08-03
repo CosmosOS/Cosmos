@@ -16,15 +16,18 @@ namespace Cosmos.Build.MSBuild {
     public string DebugInfoFile { get; set; }
 
     public override bool Execute() {
-      var xSourceInfos = SourceInfo.ParseMapFile(InputBaseDir);
-      if (xSourceInfos.Count == 0) {
-        Log.LogError("No SourceInfos found!");
-        return false;
-      }
-      using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
-        xDebugInfo.WriteLabels(xSourceInfos);
-      }
-      return true;
+      // We dont use this action currently. We use elf instead.
+      throw new Exception("Not used currently");
+
+      //var xSourceInfos = SourceInfo.ParseMapFile(InputBaseDir);
+      //if (xSourceInfos.Count == 0) {
+      //  Log.LogError("No SourceInfos found!");
+      //  return false;
+      //}
+      //using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
+      //  xDebugInfo.WriteLabels(xSourceInfos);
+      //}
+      //return true;
     }
   
   }
