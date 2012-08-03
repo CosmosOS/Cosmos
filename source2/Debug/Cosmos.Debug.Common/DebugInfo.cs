@@ -193,14 +193,13 @@ namespace Cosmos.Debug.Common {
       return new Entities(xEntConn);
     }
 
-    public void WriteSymbolsListToFile(IList<MLSYMBOL> aSymbols) {
+    public void WriteSymbols(IList<MLSYMBOL> aSymbols, bool aFlush = false) {
       foreach (var x in aSymbols) {
         x.ID = Guid.NewGuid();
       }
-      BulkInsert("MLSYMBOLs", aSymbols);
+      BulkInsert("MLSYMBOLs", aSymbols, 2500, aFlush);
     }
 
-    // tuple format: MethodLabel, IsArgument, Index, Offset
     public void WriteAllLocalsArgumentsInfos(IList<LOCAL_ARGUMENT_INFO> aInfos) {
       foreach (var x in aInfos) {
         x.ID = Guid.NewGuid();

@@ -420,7 +420,9 @@ namespace Cosmos.IL2CPU.X86 {
         xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
         xMLSymbol.ILOFFSET = aOpCode.Position;
         mSymbols.Add(xMLSymbol);
+        DebugInfo.WriteSymbols(mSymbols);
       }
+      DebugInfo.WriteSymbols(mSymbols, true);
       
       EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
     }
@@ -510,7 +512,6 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     public void FinalizeDebugInfo() {
-      DebugInfo.WriteSymbolsListToFile(mSymbols);
       DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
     }
   }
