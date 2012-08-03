@@ -20,11 +20,11 @@ namespace Cosmos.Debug.VSDebugEngine {
     private string m_functionName;
     private uint m_lineNum;
     private bool m_hasSource;
-    private int m_numParameters;
-    private int m_numLocals;
 
-    internal LOCAL_ARGUMENT_INFO[] mLocalInfos;
-    internal LOCAL_ARGUMENT_INFO[] mArgumentInfos;
+    // Must have empty holders, some code looks at length and can run
+    // before we set them.
+    internal LOCAL_ARGUMENT_INFO[] mLocalInfos = new LOCAL_ARGUMENT_INFO[] {};
+    internal LOCAL_ARGUMENT_INFO[] mArgumentInfos = new LOCAL_ARGUMENT_INFO[] {};
 
     // An array of this frame's parameters
     private DebugLocalInfo[] m_parameters;
@@ -44,56 +44,46 @@ namespace Cosmos.Debug.VSDebugEngine {
         m_documentName = xSourceMapping.SourceFile;
         m_functionName = xSourceMapping.MethodName;
         m_lineNum = (uint)xSourceMapping.Line;
-        m_numLocals = 0;
-        m_numParameters = 0;
 
-        // Labels that point to a single address can happen because of exception handling exits etc.
+        // Multiple labels that point to a single address can happen because of exception handling exits etc.
         // Because of this given an address, we might find more than one label that matches the address.
         // Currently, the label we are looking for will always be the first one so we choose that one.
         // In the future this might "break", so be careful about this. In the future we may need to classify
         // labels in the output and mark them somehow.
-        var xLabelsForAddr = (from x in xProcess.mAddressLabelMappings
-                             where x.Key == xProcess.mCurrentAddress.Value
-                             select x.Value).ToArray();
+        var xLabelsForAddr = xProcess.mDebugInfoDb.GetLabels(xProcess.mCurrentAddress.Value);
         if (xLabelsForAddr.Length > 0) {
-          
           //var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xLabelsForAddr[0]);
           MLSYMBOL xSymbolInfo;
           using (var xDB = xProcess.mDebugInfoDb.DB()) {
             string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
             xSymbolInfo = xDB.MLSYMBOLs.Where(q => q.LABELNAME == xLabel).FirstOrDefault();
-          }
-
-          if (xSymbolInfo != null) {
-            using (var xDB = xProcess.mDebugInfoDb.DB()) {
-              var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME).ToArray();
+            if (xSymbolInfo != null) {
+              var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME);
               mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
               mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
-            }
-            m_numLocals = mLocalInfos.Length;
-            m_numParameters = mArgumentInfos.Length;
-            if (m_numParameters > 0) {
-              m_parameters = new DebugLocalInfo[m_numParameters];
-              for (int i = 0; i < m_numParameters; i++) {
-                m_parameters[i] = new DebugLocalInfo {
-                  Name = mArgumentInfos[i].NAME,
-                  Index = i,
-                  IsLocal = false
-                };
+              if (mArgumentInfos.Length > 0) {
+                m_parameters = new DebugLocalInfo[mArgumentInfos.Length];
+                for (int i = 0; i < mArgumentInfos.Length; i++) {
+                  m_parameters[i] = new DebugLocalInfo {
+                    Name = mArgumentInfos[i].NAME,
+                    Index = i,
+                    IsLocal = false
+                  };
+                }
               }
-            }
 
-            if (m_numLocals > 0) {
-              m_locals = new DebugLocalInfo[m_numLocals];
-              for (int i = 0; i < m_numLocals; i++) {
-                m_locals[i] = new DebugLocalInfo {
-                  Name = mLocalInfos[i].NAME,
-                  Index = i,
-                  IsLocal = true
-                };
+              if (mLocalInfos.Length > 0) {
+                m_locals = new DebugLocalInfo[mLocalInfos.Length];
+                for (int i = 0; i < mLocalInfos.Length; i++) {
+                  m_locals[i] = new DebugLocalInfo {
+                    Name = mLocalInfos[i].NAME,
+                    Index = i,
+                    IsLocal = true
+                  };
+                }
+                //m_locals = new VariableInformation[m_numLocals];
+                //m_engine.DebuggedProcess.GetFunctionLocalsByIP(m_threadContext.eip, m_threadContext.ebp, m_locals);
               }
-              //m_locals = new VariableInformation[m_numLocals];
-              //m_engine.DebuggedProcess.GetFunctionLocalsByIP(m_threadContext.eip, m_threadContext.ebp, m_locals);
             }
           }
         } else {
@@ -106,20 +96,17 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // If source information is available, create the collections of locals and parameters and populate them with
       // values from the debuggee.
-      if (m_hasSource) {
-        if (m_numParameters > 0) {
+      //if (m_hasSource) {
+        //if (mArgumentInfos.Length > 0) {
           //m_parameters = new VariableInformation[m_numParameters];
           //m_engine.DebuggedProcess.GetFunctionArgumentsByIP(m_threadContext.eip, m_threadContext.ebp, m_parameters);
-        }
+        //}
 
-        if (m_numLocals > 0) {
+        //if (mLocalInfos.Length > 0) {
           //m_locals = new VariableInformation[m_numLocals];
           //m_engine.DebuggedProcess.GetFunctionLocalsByIP(m_threadContext.eip, m_threadContext.ebp, m_locals);
-        }
-      }
-      System.Diagnostics.Debug.WriteLine("\tHasSource = " + m_hasSource);
-      System.Diagnostics.Debug.WriteLine("\tm_numParameters = " + m_numParameters);
-      System.Diagnostics.Debug.WriteLine("\tm_numLocals = " + m_numLocals);
+        //}
+      //}
     }
 
     #region Non-interface methods
@@ -149,7 +136,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
           frameInfo.m_bstrFuncName += m_functionName;
 
-          if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS) && m_numParameters > 0) {
+          if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS) && mArgumentInfos.Length > 0) {
             frameInfo.m_bstrFuncName += "(";
             for (int i = 0; i < m_parameters.Length; i++) {
               if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_TYPES) != 0) {
@@ -161,8 +148,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 frameInfo.m_bstrFuncName += m_parameters[i].Name;
               }
 
-              //    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_VALUES) != 0)
-              //    {
+              //    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_VALUES) != 0)  {
               //        frameInfo.m_bstrFuncName += "=" + m_parameters[i].m_value;
               //    }
 
@@ -242,7 +228,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (m_parameters != null) {
         elementsReturned += (uint)m_parameters.Length;
       }
-      DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[elementsReturned];
+      var propInfo = new DEBUG_PROPERTY_INFO[elementsReturned];
 
       if (m_locals != null) {
         for (int i = 0; i < m_locals.Length; i++) {
@@ -264,7 +250,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
     private void CreateLocalProperties(out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
       elementsReturned = (uint)m_locals.Length;
-      DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[m_locals.Length];
+      var propInfo = new DEBUG_PROPERTY_INFO[m_locals.Length];
 
       for (int i = 0; i < propInfo.Length; i++) {
         AD7Property property = new AD7Property(m_locals[i], mProcess, this);
@@ -277,7 +263,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
     private void CreateParameterProperties(out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
       elementsReturned = (uint)m_parameters.Length;
-      DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[m_parameters.Length];
+      var propInfo = new DEBUG_PROPERTY_INFO[m_parameters.Length];
 
       for (int i = 0; i < propInfo.Length; i++) {
         AD7Property property = new AD7Property(m_parameters[i], mProcess, this);

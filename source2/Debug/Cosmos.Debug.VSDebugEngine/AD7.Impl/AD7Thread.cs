@@ -14,8 +14,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     const string ThreadNameString = "Cosmos Kernel Main Thread";
     private AD7Process mProcess;
 
-    public AD7Thread(AD7Engine aEngine, AD7Process aProcess)//, DebuggedThread debuggedThread)
-    {
+    public AD7Thread(AD7Engine aEngine, AD7Process aProcess) { //, DebuggedThread debuggedThread)
       mEngine = aEngine;
       mProcess = aProcess;
     }
@@ -168,14 +167,12 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     int IDebugThread2.GetLogicalThread(IDebugStackFrame2 stackFrame, out IDebugLogicalThread2 logicalThread) {
       System.Diagnostics.Debug.Fail("This function is not called by the debugger");
-
       logicalThread = null;
       return VSConstants.E_NOTIMPL;
     }
 
     int IDebugThread2.SetThreadName(string name) {
       System.Diagnostics.Debug.Fail("This function is not called by the debugger");
-
       return VSConstants.E_NOTIMPL;
     }
 

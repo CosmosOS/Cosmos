@@ -4,17 +4,19 @@
     <h3>
     Kudzu</h3>
     <ul>
-                                    <li>SQL<ul>
-                                        <li>Shorten lengths of varchars</li>
-                                        </ul>
-                                    </li>
-                                    <li>Asm stepping<ul>
-                                        <li>Disable asm stepping button till refresh - comment why.. concurrency</li>
-                                        <li>Disable asm stepping if no step can occur</li>
-                                        <li>Historical registers and stack</li>
+                                    <li>Insert labels in batches to save ram - comment this - 11MB and will grow</li>
+                                    <li>SourceInfo / Reverse<ul>
+                                        <li>Put into DB</li>
+                                        <li>SourceInfos GetSourceInfo is wicked slow</li>
+                                        <li>Labelname - Use asm line number as a key? Then remove index on labelname - comment these 
+                                            about insert</li>
                                         </ul>
                                     </li>
                                     <li>ATA / FAT</li>
+                                    <li>Asm stepping<ul>
+                                        <li>Historical registers and stack</li>
+                                        </ul>
+                                    </li>
                                     <li>X#<ul>
                                         <li>use includes for compiling nasm</li>
                                         </ul>

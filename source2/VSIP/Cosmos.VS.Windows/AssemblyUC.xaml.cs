@@ -58,7 +58,7 @@ namespace Cosmos.VS.Windows {
     }
 
     void butnStepOver_Click(object sender, RoutedEventArgs e) {
-      // Disable until step is done to prevent user concurrently clicking
+      // Disable until step is done to prevent user concurrently clicking.
       butnStepOver.IsEnabled = false;
       Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, mStepToLabel.Label);
     }

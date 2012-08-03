@@ -92,90 +92,93 @@ namespace Cosmos.Debug.Common {
       return xIdx;
     }
 
-    public static SourceInfos GetSourceInfo(List<KeyValuePair<uint, string>> aAddressLabelMappings, IDictionary<string, uint> aLabelAddressMappings, DebugInfo debugInfo) {
-      List<MLSYMBOL> xSymbols;
-      using (var xDB = debugInfo.DB()) {
-        xSymbols = xDB.MLSYMBOLs.ToList();
-      }
-      // Sort
-      xSymbols.Sort(delegate(MLSYMBOL a, MLSYMBOL b) {
-        if (a == null) {
-          throw new ArgumentNullException("a");
-        } else if (b == null) {
-          throw new ArgumentNullException("b");
-        }
-        int xCompareResult = StringComparer.InvariantCultureIgnoreCase.Compare(a.ILASMFILE, b.ILASMFILE);
-        if (xCompareResult == 0) {
-          xCompareResult = a.TYPETOKEN.CompareTo(b.TYPETOKEN);
-          if (xCompareResult == 0) {
-            xCompareResult = a.METHODTOKEN.CompareTo(b.METHODTOKEN);
-            if (xCompareResult == 0) {
-              return a.ILOFFSET.CompareTo(b.ILOFFSET);
-            }
-
-          }
-        }
-        return xCompareResult;
-      });
-
+    public static SourceInfos GetSourceInfo(DebugInfo aDbgInfo) {
       var xResult = new SourceInfos();
-      string xOldAssembly = null;
-      ISymbolReader xSymbolReader = null;
-      int[] xCodeOffsets = null;
-      ISymbolDocument[] xCodeDocuments = null;
-      int[] xCodeLines = null;
-      int[] xCodeColumns = null;
-      int[] xCodeEndLines = null;
-      int[] xCodeEndColumns = null;
-      int? xOldMethodToken = null;
-      ISymbolMethod xMethodSymbol = null;
-      foreach (var xSymbol in xSymbols) {
-        if (!xSymbol.ILASMFILE.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
-          try {
-            xMethodSymbol = null;
-            xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.ILASMFILE);
-          } catch {
-            xSymbolReader = null;
-            xMethodSymbol = null;
+      List<MLSYMBOL> xSymbols;
+      using (var xDB = aDbgInfo.DB()) {
+        xSymbols = xDB.MLSYMBOLs.ToList();
+
+        // Sort
+        xSymbols.Sort(delegate(MLSYMBOL a, MLSYMBOL b) {
+          if (a == null) {
+            throw new ArgumentNullException("a");
+          } else if (b == null) {
+            throw new ArgumentNullException("b");
           }
-          xOldAssembly = xSymbol.ILASMFILE;
-        }
-        if (xOldMethodToken != xSymbol.METHODTOKEN) {
-          if (xSymbolReader != null) {
-            try {
-              xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xSymbol.METHODTOKEN));
-              if (xMethodSymbol != null) {
-                xCodeOffsets = new int[xMethodSymbol.SequencePointCount];
-                xCodeDocuments = new ISymbolDocument[xMethodSymbol.SequencePointCount];
-                xCodeLines = new int[xMethodSymbol.SequencePointCount];
-                xCodeColumns = new int[xMethodSymbol.SequencePointCount];
-                xCodeEndLines = new int[xMethodSymbol.SequencePointCount];
-                xCodeEndColumns = new int[xMethodSymbol.SequencePointCount];
-                xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+          int xCompareResult = StringComparer.InvariantCultureIgnoreCase.Compare(a.ILASMFILE, b.ILASMFILE);
+          if (xCompareResult == 0) {
+            xCompareResult = a.TYPETOKEN.CompareTo(b.TYPETOKEN);
+            if (xCompareResult == 0) {
+              xCompareResult = a.METHODTOKEN.CompareTo(b.METHODTOKEN);
+              if (xCompareResult == 0) {
+                return a.ILOFFSET.CompareTo(b.ILOFFSET);
               }
+
+            }
+          }
+          return xCompareResult;
+        });
+
+        string xOldAssembly = null;
+        ISymbolReader xSymbolReader = null;
+        int[] xCodeOffsets = null;
+        ISymbolDocument[] xCodeDocuments = null;
+        int[] xCodeLines = null;
+        int[] xCodeColumns = null;
+        int[] xCodeEndLines = null;
+        int[] xCodeEndColumns = null;
+        int? xOldMethodToken = null;
+        ISymbolMethod xMethodSymbol = null;
+
+        foreach (var xSymbol in xSymbols) {
+          if (!xSymbol.ILASMFILE.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
+            try {
+              xMethodSymbol = null;
+              xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.ILASMFILE);
             } catch {
+              xSymbolReader = null;
               xMethodSymbol = null;
             }
+            xOldAssembly = xSymbol.ILASMFILE;
           }
-          xOldMethodToken = xSymbol.METHODTOKEN;
-        }
+          if (xOldMethodToken != xSymbol.METHODTOKEN) {
+            if (xSymbolReader != null) {
+              try {
+                xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xSymbol.METHODTOKEN));
+                if (xMethodSymbol != null) {
+                  xCodeOffsets = new int[xMethodSymbol.SequencePointCount];
+                  xCodeDocuments = new ISymbolDocument[xMethodSymbol.SequencePointCount];
+                  xCodeLines = new int[xMethodSymbol.SequencePointCount];
+                  xCodeColumns = new int[xMethodSymbol.SequencePointCount];
+                  xCodeEndLines = new int[xMethodSymbol.SequencePointCount];
+                  xCodeEndColumns = new int[xMethodSymbol.SequencePointCount];
+                  xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+                }
+              } catch {
+                xMethodSymbol = null;
+              }
+            }
+            xOldMethodToken = xSymbol.METHODTOKEN;
+          }
 
-        if (xMethodSymbol != null) {
-          if (aLabelAddressMappings.ContainsKey(xSymbol.LABELNAME)) {
-            uint xAddress = aLabelAddressMappings[xSymbol.LABELNAME];
-            // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
-            // So we just ignore duplicate addresses.
-            if (!xResult.ContainsKey(xAddress)) {
-              int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOFFSET);
-              var xSourceInfo = new SourceInfo() {
-                SourceFile = xCodeDocuments[xIdx].URL,
-                Line = xCodeLines[xIdx],
-                LineEnd = xCodeEndLines[xIdx],
-                Column = xCodeColumns[xIdx],
-                ColumnEnd = xCodeEndColumns[xIdx],
-                MethodName = xSymbol.METHODNAME
-              };
-              xResult.Add(xAddress, xSourceInfo);
+          if (xMethodSymbol != null) {
+            var xRow = xDB.Labels.SingleOrDefault(q => q.LABELNAME == xSymbol.LABELNAME);
+            if (xRow != null) {
+              UInt32 xAddress = (UInt32)xRow.ADDRESS;
+              // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
+              // So we just ignore duplicate addresses.
+              if (!xResult.ContainsKey(xAddress)) {
+                int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOFFSET);
+                var xSourceInfo = new SourceInfo() {
+                  SourceFile = xCodeDocuments[xIdx].URL,
+                  Line = xCodeLines[xIdx],
+                  LineEnd = xCodeEndLines[xIdx],
+                  Column = xCodeColumns[xIdx],
+                  ColumnEnd = xCodeEndColumns[xIdx],
+                  MethodName = xSymbol.METHODNAME
+                };
+                xResult.Add(xAddress, xSourceInfo);
+              }
             }
           }
         }

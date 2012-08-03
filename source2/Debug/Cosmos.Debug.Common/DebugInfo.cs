@@ -27,7 +27,8 @@ namespace Cosmos.Debug.Common {
     protected string mDataSouce = @"(LocalDB)\v11.0";
     //protected mDataSouce = @".\SQLEXPRESS";
     protected string mConnStrBase;
-    protected EntityConnection mEntConn;
+    protected string mConnStr;
+    protected System.Data.Metadata.Edm.MetadataWorkspace mWorkspace;
 
     public void DeleteDB() {
       using (var xConn = new SqlConnection(mConnStrBase)) {
@@ -68,23 +69,49 @@ namespace Cosmos.Debug.Common {
       }
 
       // Initial Catalog is necessary for EDM
-      string xConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
-
-      var xWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
+      mConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
+      mWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
         new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
-      mEntConn = new EntityConnection(xWorkspace, new SqlConnection(xConnStr));
       // Do not open mConnection before mEntities.CreateDatabase
+      mConnection = new SqlConnection(mConnStr);
       if (aCreate) {
-        using (var xEntities = new Entities(mEntConn)) {
+        using (var xEntities = DB()) {
           // DatabaseExists checks if the DBName exists, not physical files.
           if (!xEntities.DatabaseExists()) {
             xEntities.CreateDatabase();
+            mConnection.Open();
+            var xSQL = new SQL(mConnection);
+
+            // Labels
+            // Labels is a big table. Avoid indexes when possible, because we need inserts to be fast.
+            // -ADDRESS - Dont index - We dont look up on it very much
+            // -LABELNAME - We do lookup a lot on this, but will change to asm line as key prob
+            xSQL.MakeIndex("Labels", "LABELNAME", true);
           }
         }
       }
+      if (mConnection.State == ConnectionState.Closed) {
+        mConnection.Open();
+      }
+    }
 
-      mConnection = new SqlConnection(xConnStr);
-      mConnection.Open();
+    public UInt32 AddressOfLabel(string aLabel) {
+      using (var xDB = DB()) {
+        var xRow = xDB.Labels.SingleOrDefault(q => q.LABELNAME == aLabel);
+        if (xRow == null) {
+          return 0;
+        }
+        return (UInt32)xRow.ADDRESS;
+      } 
+    }
+
+    public string[] GetLabels(UInt32 aAddress) {
+      using (var xDB = DB()) {
+        var xLabels = from x in xDB.Labels
+                      where x.ADDRESS == aAddress
+                      select x.LABELNAME;
+        return xLabels.ToArray();
+      }
     }
 
     protected List<string> local_MappingTypeNames = new List<string>();
@@ -158,18 +185,11 @@ namespace Cosmos.Debug.Common {
     }
 
     public Entities DB() {
-      return new Entities(mEntConn);
-    }
-
-    public void ReadLabels(out List<KeyValuePair<uint, string>> oLabels, out IDictionary<string, uint> oLabelAddressMappings) {
-      oLabels = new List<KeyValuePair<uint, string>>();
-      oLabelAddressMappings = new Dictionary<string, uint>();
-      using (var xDB = DB()) {
-        foreach (var xRow in xDB.Labels) {
-          oLabels.Add(new KeyValuePair<uint, string>((uint)xRow.ADDRESS, xRow.LABELNAME));
-          oLabelAddressMappings.Add(xRow.LABELNAME, (uint)xRow.ADDRESS);
-        }
-      }
+      // We have to create a new connection each time because threads can call this
+      // function and it causes issues for different threads to share the same connection, 
+      // even if they have different Entity (context) instances.
+      var xEntConn = new EntityConnection(mWorkspace, new SqlConnection(mConnStr));
+      return new Entities(xEntConn);
     }
 
     public void WriteSymbolsListToFile(IEnumerable<MLSYMBOL> aSymbols) {

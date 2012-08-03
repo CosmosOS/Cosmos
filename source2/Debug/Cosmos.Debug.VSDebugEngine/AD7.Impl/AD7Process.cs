@@ -23,12 +23,10 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected AD7Engine mEngine;
     public ReverseSourceInfos mReverseSourceMappings;
     public SourceInfos mSourceMappings;
-    public uint? mCurrentAddress = null;
+    public UInt32? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
     protected LaunchType mLaunch;
     internal DebugInfo mDebugInfoDb;
-    internal List<KeyValuePair<UInt32, string>> mAddressLabelMappings;
-    internal IDictionary<string, UInt32> mLabelAddressMappings;
     private int mProcessExitEventSent = 0;
 
     // Connection to target environment. Usually serial but is
@@ -82,7 +80,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         case Windows2Debugger.SetAsmBreak:
           string xLabel = Encoding.UTF8.GetString(aData);
-          UInt32 xAddress = mLabelAddressMappings[xLabel];
+          UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
           mDbgConnector.SetAsmBreakpoint(xAddress);
           mDbgConnector.Continue();
           //mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
@@ -171,12 +169,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mDebugInfoDb = new DebugInfo(xDbPath);
-      mDebugInfoDb.ReadLabels(out mAddressLabelMappings, out mLabelAddressMappings);
-      if (mAddressLabelMappings.Count == 0) {
-        throw new Exception("Debug data not found: LabelByAddressMapping");
-      }
-
-      mSourceMappings = Cosmos.Debug.Common.SourceInfo.GetSourceInfo(mAddressLabelMappings, mLabelAddressMappings, mDebugInfoDb);
+      mSourceMappings = SourceInfo.GetSourceInfo(mDebugInfoDb);
       if (mSourceMappings.Count == 0) {
         throw new Exception("Debug data not found: SourceMappings");
       }
@@ -258,11 +251,9 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     void DbgCmdBreak(UInt32 aAddress) {
-      DebugMsg("DbgCmdBreak " + aAddress);
-
-      // aAddress will be actaul address. Call and other methods push return to (after op), but DS
+      // aAddress will be actual address. Call and other methods push return to (after op), but DS
       // corrects for us and sends us actual op address.
-      DebugMsg("Breaking @" + aAddress.ToString("X8").ToUpper());
+      DebugMsg("DbgCmdBreak " + aAddress + " / " + aAddress.ToString("X8").ToUpper());
 
       var xActionPoints = new List<object>();
       var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
@@ -375,7 +366,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public int Terminate() {
       OutputText("Debugger terminating.");
-      
+
       mHost.Stop();
 
       OutputText("Debugger terminated.");
@@ -455,16 +446,13 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // Create list of asm labels that belong to this line of C#.
       var xMappings = from x in mSourceMappings
-                   where x.Value.SourceFile == xValue.SourceFile
-                     && x.Value.Line == xValue.Line
-                     && x.Value.Column == xValue.Column
-                   select x.Key;
+                      where x.Value.SourceFile == xValue.SourceFile
+                        && x.Value.Line == xValue.Line
+                        && x.Value.Column == xValue.Column
+                      select x.Key;
       var xLabels = new List<string>();
       foreach (uint xAddr in xMappings) {
-        var xLabelsForAddr = from x in mAddressLabelMappings
-                      where x.Key == xAddr
-                      select x.Value;
-        foreach (string xLabel in xLabelsForAddr) {
+        foreach (string xLabel in mDebugInfoDb.GetLabels(xAddr)) {
           xLabels.Add(xLabel + ":");
         }
       }
@@ -475,18 +463,14 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Get label for current address.
       // A single address can have multiple labels (IL, Asm). Because of this we search
       // for the one with the Asm tag. We dont have the tags in this debug info though,
-      // so instead if there is more than one label we use the last one which is the Asm tag.
-      var xCurrentLabelsQry = (from x in mAddressLabelMappings
-                           where (x.Key == (uint)mCurrentAddress)
-                           select x.Value);
-      var xCurrentLabels = xCurrentLabelsQry.ToArray();
-      if (xCurrentLabels.Length == 0) {
-        return;
+      // so instead if there is more than one label we use the longest one which is the Asm tag.
+      var xCurrentLabels = mDebugInfoDb.GetLabels(mCurrentAddress.Value);
+      if (xCurrentLabels.Length > 0) {
+        string xCurrentLabel = xCurrentLabels.OrderBy(q => q.Length).Last();
+        // Insert it to the first line of our data stream
+        xCode.Insert(0, xCurrentLabel + "\r\n");
+        mDebugDownPipe.SendCommand(Debugger2Windows.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
       }
-      // Insert it to the first line of our data stream
-      xCode.Insert(0, xCurrentLabels[xCurrentLabels.Length - 1] + "\r\n");                      
-
-      mDebugDownPipe.SendCommand(Debugger2Windows.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
     }
 
     //TODO: At some point this will probably need to be exposed for access outside of AD7Process
