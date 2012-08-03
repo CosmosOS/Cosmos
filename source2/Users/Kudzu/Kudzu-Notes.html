@@ -6,6 +6,13 @@
     <ul>
                                     <li>Batch insert MLSymbol (AppAssemblerNasm)</li>
                                     <li>ExtractMapFromElfFile.Execute - dont read into RAM</li>
+                                    <li>Lazy load sourceinfos!</li>
+                                    <li>Label type - IL / not... log only IL labels? Do we use asm labels?<ul>
+                                        <li>Keep map file and log line position for lookup to reduce insert times? needed at 
+                                            all?</li>
+                                        <li>Label as ID instead of big name - Do we parse them anywhere?</li>
+                                        </ul>
+                                    </li>
                                     <li>SourceInfo / Reverse<ul>
                                         <li>Put into DB</li>
                                         <li>SourceInfos GetSourceInfo is wicked slow</li>

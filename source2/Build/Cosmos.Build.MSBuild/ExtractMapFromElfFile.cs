@@ -74,20 +74,9 @@ namespace Cosmos.Build.MSBuild {
             ADDRESS = xAddress
           });
 
-          // We dont want to issue individual inserts to SQL as this is very slow.
-          // But accumulating too many records in RAM also is a problem. For example 
-          // at time of writing the full structure would take up 11 MB of RAM just for this structure.
-          // This is not a huge amount, but as we compile in more and more this figure will grow.
-          // So as a compromise, we collect 2500 records then bulk insert.
-          if (xLabels.Count > 2500) {
-            xDebugInfo.WriteLabels(xLabels);
-            xLabels.Clear();
-          }
-        }
-
-        if (xLabels.Count > 0) {
           xDebugInfo.WriteLabels(xLabels);
         }
+        xDebugInfo.WriteLabels(xLabels, true);
       }
       return true;
     }

@@ -217,11 +217,21 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteLabels(List<Label> aLabels) {
-      foreach (var x in aLabels) {
-        x.ID = Guid.NewGuid();
+    public void WriteLabels(List<Label> aLabels, bool aFlush = false) {
+      // We dont want to issue individual inserts to SQL as this is very slow.
+      // But accumulating too many records in RAM also is a problem. For example 
+      // at time of writing the full structure would take up 11 MB of RAM just for this structure.
+      // This is not a huge amount, but as we compile in more and more this figure will grow.
+      // So as a compromise, we collect 2500 records then bulk insert.
+      if (aLabels.Count > 2500 || aFlush) {
+        if (aLabels.Count > 0) {
+          foreach (var x in aLabels) {
+            x.ID = Guid.NewGuid();
+          }
+          BulkInsert("Labels", aLabels.AsDataReader());
+          aLabels.Clear();
+        }
       }
-      BulkInsert("Labels", aLabels.AsDataReader());
     }
 
     public void Dispose() {
