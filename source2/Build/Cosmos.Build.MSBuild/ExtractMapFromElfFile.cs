@@ -26,88 +26,69 @@ namespace Cosmos.Build.MSBuild {
     public override bool Execute() {
       // Important! A given address can have more than one label.
       // Do NOT filter by duplicate addresses as this causes serious lookup problems.
-
-      string xSymbolString;
-      //TODO: This reads the file (13MB currently) into RAM...
-      // Thats not needed.. read it line by line instead. Wait till we move to direct
-      // DB only use though as we can do this at one time.
-      if (!RunObjDump(out xSymbolString)) {
-        return false;
-      }
-
-      var xLabels = new List<Label>();
-      var xLines = xSymbolString.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-
-      using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
-        bool xListStarted = false;
-        foreach (string xLine in xLines) {
-          if (String.IsNullOrEmpty(xLine)) {
-            continue;
-          } else if (!xListStarted) {
-            // Find start of the data
-            if (xLine == "SYMBOL TABLE:") {
-              xListStarted = true;
+      string xFile = RunObjDump();
+      using (var xMapReader = new StreamReader(xFile)) {
+        var xLabels = new List<Label>();
+        using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
+          bool xListStarted = false;
+          string xLine;
+          while ((xLine = xMapReader.ReadLine()) != null) {
+            if (String.IsNullOrEmpty(xLine)) {
+              continue;
+            } else if (!xListStarted) {
+              // Find start of the data
+              if (xLine == "SYMBOL TABLE:") {
+                xListStarted = true;
+              }
+              continue;
             }
-            continue;
-          }
 
-          uint xAddress;
-          try {
-            xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
-          } catch (Exception) {
-            Log.LogError("Error processing line '" + xLine + "'");
-            throw;
-          }
+            uint xAddress;
+            try {
+              xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
+            } catch (Exception ex) {
+              Log.LogError("Error processing line '" + xLine + "' " + ex.Message);
+              throw;
+            }
 
-          string xSection = xLine.Substring(17, 5);
-          if (xSection != ".text" && xSection != ".data") {
-            continue;
-          }
-          string xLabel = xLine.Substring(32);
-          if (xLabel == xSection) {
-            // Non label, skip
-            continue;
-          }
+            string xSection = xLine.Substring(17, 5);
+            if (xSection != ".text" && xSection != ".data") {
+              continue;
+            }
+            string xLabel = xLine.Substring(32);
+            if (xLabel == xSection) {
+              // Non label, skip
+              continue;
+            }
 
-          xLabels.Add(new Label() {
-            LABELNAME = xLabel,
-            ADDRESS = xAddress
-          });
-
-          xDebugInfo.WriteLabels(xLabels);
+            xLabels.Add(new Label() {
+              LABELNAME = xLabel,
+              ADDRESS = xAddress
+            });
+            xDebugInfo.WriteLabels(xLabels);
+          }
+          xDebugInfo.WriteLabels(xLabels, true);
         }
-        xDebugInfo.WriteLabels(xLabels, true);
       }
       return true;
     }
 
-    private bool RunObjDump(out string result) {
-      result = "";
-      var xTempBatFile = Path.Combine(WorkingDir, "ExtractMapFromElfFileTemp.bat");
-      if (File.Exists(xTempBatFile)) {
-        File.Delete(xTempBatFile);
-        if (File.Exists(xTempBatFile)) {
-          Log.LogError("ExtractMapFromElfFileTemp.bat already exists!");
-          return false;
-        }
+    private string RunObjDump() {
+      var xMapFile = Path.ChangeExtension(InputFile, "map");
+      File.Delete(xMapFile);
+      if (File.Exists(xMapFile)) {
+        throw new Exception("Could not delete " + xMapFile);
       }
 
-      var xTempOutFile = Path.Combine(WorkingDir, "ExtractMapFromElfFileTemp.out");
-      if (File.Exists(xTempOutFile)) {
-        File.Delete(xTempOutFile);
-        if (File.Exists(xTempOutFile)) {
-          Log.LogError("ExtractMapFromElfFileTemp.out already exists!");
-          return false;
-        }
-      }
+      var xTempBatFile = Path.Combine(WorkingDir, "ExtractElfMap.bat");
+      File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" >" + Path.GetFileName(xMapFile));
 
-      File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" > ExtractMapFromElfFileTemp.out");
       if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump")) {
-        return false;
+        throw new Exception("Error extracting map from " + InputFile);
       }
-      result = File.ReadAllText(xTempOutFile);
+      File.Delete(xTempBatFile);
 
-      return true;
+      return xMapFile;
     }
   }
 }
