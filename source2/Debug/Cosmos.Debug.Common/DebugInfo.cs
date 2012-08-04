@@ -62,7 +62,11 @@ namespace Cosmos.Debug.Common {
 
     public DebugInfo(string aPathname, bool aCreate = false) {
       CurrentInstance = this;
+      
       mDbName = Path.GetFileNameWithoutExtension(aPathname);
+      // SQL doesnt like - in db names.
+      mDbName = mDbName.Replace("-", ""); ;
+
       mConnStrBase = @"Data Source=" + mDataSouce + ";Integrated Security=True;MultipleActiveResultSets=True;";
 
       if (aCreate) {
