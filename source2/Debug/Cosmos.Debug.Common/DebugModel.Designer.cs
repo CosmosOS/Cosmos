@@ -1049,48 +1049,48 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public Nullable<global::System.Int64> AddressStart
+        public Nullable<global::System.Int64> AddressStartFuture
         {
             get
             {
-                return _AddressStart;
+                return _AddressStartFuture;
             }
             set
             {
-                OnAddressStartChanging(value);
-                ReportPropertyChanging("AddressStart");
-                _AddressStart = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("AddressStart");
-                OnAddressStartChanged();
+                OnAddressStartFutureChanging(value);
+                ReportPropertyChanging("AddressStartFuture");
+                _AddressStartFuture = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("AddressStartFuture");
+                OnAddressStartFutureChanged();
             }
         }
-        private Nullable<global::System.Int64> _AddressStart;
-        partial void OnAddressStartChanging(Nullable<global::System.Int64> value);
-        partial void OnAddressStartChanged();
+        private Nullable<global::System.Int64> _AddressStartFuture;
+        partial void OnAddressStartFutureChanging(Nullable<global::System.Int64> value);
+        partial void OnAddressStartFutureChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public Nullable<global::System.Int64> AddressEnd
+        public Nullable<global::System.Int64> AddressEndFuture
         {
             get
             {
-                return _AddressEnd;
+                return _AddressEndFuture;
             }
             set
             {
-                OnAddressEndChanging(value);
-                ReportPropertyChanging("AddressEnd");
-                _AddressEnd = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("AddressEnd");
-                OnAddressEndChanged();
+                OnAddressEndFutureChanging(value);
+                ReportPropertyChanging("AddressEndFuture");
+                _AddressEndFuture = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("AddressEndFuture");
+                OnAddressEndFutureChanged();
             }
         }
-        private Nullable<global::System.Int64> _AddressEnd;
-        partial void OnAddressEndChanging(Nullable<global::System.Int64> value);
-        partial void OnAddressEndChanged();
+        private Nullable<global::System.Int64> _AddressEndFuture;
+        partial void OnAddressEndFutureChanging(Nullable<global::System.Int64> value);
+        partial void OnAddressEndFutureChanged();
     
         /// <summary>
         /// No Metadata Documentation available.

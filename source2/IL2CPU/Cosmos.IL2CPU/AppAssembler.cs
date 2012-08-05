@@ -12,8 +12,9 @@ namespace Cosmos.IL2CPU {
   public abstract class AppAssembler {
     protected ILOp[] mILOpsLo = new ILOp[256];
     protected ILOp[] mILOpsHi = new ILOp[256];
-
-    private System.IO.TextWriter mLog;
+    public bool ShouldOptimize = false;
+    public DebugInfo DebugInfo { get; set; }
+    protected System.IO.TextWriter mLog;
 
     protected Cosmos.Assembler.Assembler mAssembler;
     protected AppAssembler(Cosmos.Assembler.Assembler assembler) {
@@ -22,16 +23,9 @@ namespace Cosmos.IL2CPU {
       InitILOps();
     }
 
-    public bool ShouldOptimize = false;
-
     public Cosmos.Assembler.Assembler Assembler {
       get { return mAssembler; }
-        set { mAssembler = value; }
-    }
-
-    public DebugInfo DebugInfo {
-      get;
-      set;
+      set { mAssembler = value; }
     }
 
     protected virtual void MethodBegin(MethodInfo aMethod) {
@@ -206,8 +200,8 @@ namespace Cosmos.IL2CPU {
                                   select item).FirstOrDefault();
         if (xDataMember != null) {
           Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Remove((from item in Cosmos.Assembler.Assembler.CurrentInstance.DataMembers
-                                                        where item == xDataMember
-                                                        select item).First());
+                                                                         where item == xDataMember
+                                                                         select item).First());
         }
         var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
         var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
