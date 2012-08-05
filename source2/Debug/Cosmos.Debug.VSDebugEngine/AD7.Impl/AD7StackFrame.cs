@@ -33,10 +33,10 @@ namespace Cosmos.Debug.VSDebugEngine {
     private DebugLocalInfo[] mLocals;
     private AD7Process mProcess;
 
-    public AD7StackFrame(AD7Engine engine, AD7Thread thread, AD7Process process) {
-      mEngine = engine;
-      mThread = thread;
-      mProcess = process;
+    public AD7StackFrame(AD7Engine aEngine, AD7Thread aThread, AD7Process aProcess) {
+      mEngine = aEngine;
+      mThread = aThread;
+      mProcess = aProcess;
       var xProcess = mEngine.mProcess;
       mHasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceInfos.ContainsKey(xProcess.mCurrentAddress.Value);
       if (mHasSource) {
