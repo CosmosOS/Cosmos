@@ -10,13 +10,15 @@ using System.Data.Objects;
 using System.Data.Objects.DataClasses;
 using System.Reflection;
 using Microsoft.Win32;
+using Microsoft.Samples.Debugging.CorSymbolStore;
+using System.Diagnostics.SymbolStore;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
 
     // Please beware this field, it may cause issues if used incorrectly.
     public static DebugInfo CurrentInstance { get; private set; }
-  
+
     public class Field_Map {
       public string TypeName { get; set; }
       public List<string> FieldNames = new List<string>();
@@ -62,7 +64,7 @@ namespace Cosmos.Debug.Common {
 
     public DebugInfo(string aPathname, bool aCreate = false) {
       CurrentInstance = this;
-      
+
       mDbName = Path.GetFileNameWithoutExtension(aPathname);
       // SQL doesnt like - in db names.
       mDbName = mDbName.Replace("-", ""); ;
@@ -107,7 +109,7 @@ namespace Cosmos.Debug.Common {
           return 0;
         }
         return (UInt32)xRow.Address;
-      } 
+      }
     }
 
     public string[] GetLabels(UInt32 aAddress) {
@@ -256,6 +258,75 @@ namespace Cosmos.Debug.Common {
         //CurrentInstance = null;
       }
     }
+
+    public SourceInfos GetSourceInfo(UInt32 aAddress) {
+      var xResult = new SourceInfos();
+      using (var xDB = DB()) {
+        // The address we have is somewhere in the method, but we need to find 
+        // one that is also in MLSymbol. Asm labels for example wont be found.
+        // So we find ones that match or are before, and we walk till we fine one
+        // in MLSymbol.
+        var xLabels = from x in xDB.Labels
+                         where x.Address <= aAddress
+                         orderby x.Address descending
+                         select x.Name;
+
+        // Search till we find a matching label.
+        MLSYMBOL xInlineSymbol = null;
+        foreach (var xLabel in xLabels) {
+          xInlineSymbol = xDB.MLSYMBOLs.SingleOrDefault(q => q.LABELNAME == xLabel);
+          if (xInlineSymbol != null) {
+            break;
+          }
+        }
+        if (xInlineSymbol == null) {
+          throw new Exception("Label not found.");
+        }
+
+        // Now get all MLSymbols for the method.
+        var xSymbols = from x in xDB.MLSYMBOLs
+                       where
+                         x.METHODTOKEN == xInlineSymbol.METHODTOKEN
+                         && x.ILASMFILE == xInlineSymbol.ILASMFILE
+                       orderby x.ILOFFSET
+                       select x;
+                               
+        var xSymbolReader = SymbolAccess.GetReaderForFile(xInlineSymbol.ILASMFILE);
+        var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xInlineSymbol.METHODTOKEN));
+
+        int xSeqCount = xMethodSymbol.SequencePointCount;
+        var xCodeOffsets = new int[xSeqCount];
+        var xCodeDocuments = new ISymbolDocument[xSeqCount];
+        var xCodeLines = new int[xSeqCount];
+        var xCodeColumns = new int[xSeqCount];
+        var xCodeEndLines = new int[xSeqCount];
+        var xCodeEndColumns = new int[xSeqCount];
+        xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+
+        foreach (var xSymbol in xSymbols) {
+          var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LABELNAME);
+          if (xRow != null) {
+            UInt32 xAddress = (UInt32)xRow.Address;
+            // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
+            // So we just ignore duplicate addresses.
+            if (!xResult.ContainsKey(xAddress)) {
+              int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOFFSET);
+              var xSourceInfo = new SourceInfo() {
+                SourceFile = xCodeDocuments[xIdx].URL,
+                Line = xCodeLines[xIdx],
+                LineEnd = xCodeEndLines[xIdx],
+                Column = xCodeColumns[xIdx],
+                ColumnEnd = xCodeEndColumns[xIdx],
+                MethodName = xSymbol.METHODNAME
+              };
+              xResult.Add(xAddress, xSourceInfo);
+            }
+          }
+        }
+      }
+      return xResult;
+    }
+
   }
 
 }
