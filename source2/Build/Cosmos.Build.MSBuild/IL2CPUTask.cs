@@ -93,11 +93,6 @@ namespace Cosmos.Build.MSBuild {
       mSearchDirs.Add(CosmosPaths.Kernel);
       AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
-      // Try to load explicit path references.
-      // These are the references of our boot project. We dont actually ever load the boot
-      // project asm. Instead the references will contain plugs, and the kernel. We load
-      // them then find the entry point in the kernel.
-
       // This seems to be to try to load plugs on demand from their own dirs, but 
       // it often just causes load conflicts, and weird errors like "implementation not found" 
       // for a method, even when both the output user kit dir and local bin dir have up to date
@@ -146,13 +141,14 @@ namespace Cosmos.Build.MSBuild {
         if (!Initialize()) {
           return false;
         }
-
         LogTime("Engine execute started");
+
         // Find the kernel's entry point. We are looking for a public class Kernel, with public static void Boot()
-        var xInitMethod = RetrieveEntryPoint();
+        var xInitMethod = LoadAssemblies();
         if (xInitMethod == null) {
           return false;
         }
+
         var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
         if (!DebugEnabled) {
           // Default of 1 is in Cosmos.Targets. Need to change to use proj props.
@@ -206,34 +202,39 @@ namespace Cosmos.Build.MSBuild {
       }
     }
 
-    protected MethodBase RetrieveEntryPoint() {
-      Type xFoundType = null;
+    protected MethodBase LoadAssemblies() {
+      // Try to load explicit path references.
+      // These are the references of our boot project. We dont actually ever load the boot
+      // project asm. Instead the references will contain plugs, and the kernel. We load
+      // them then find the entry point in the kernel.
+
+      Type xKernelType = null;
       foreach (var xRef in References) {
         if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
           var xFile = xRef.GetMetadata("FullPath");
           if (File.Exists(xFile)) {
             var xAssembly = Assembly.LoadFile(xFile);
             foreach (var xType in xAssembly.GetExportedTypes()) {
-              if (xType.IsGenericTypeDefinition || xType.IsAbstract) {
-                continue;
-              } else if (xType.BaseType.FullName == FULLASSEMBLYNAME_KERNEL) {
-                // found kernel?
-                if (xFoundType != null) {
-                  // already a kernel found, which is not supported.
-                  LogError(string.Format("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xFoundType.AssemblyQualifiedName));
-                  return null;
+              if (!xType.IsGenericTypeDefinition && !xType.IsAbstract) {
+                if (xType.BaseType.FullName == FULLASSEMBLYNAME_KERNEL) {
+                  // found kernel?
+                  if (xKernelType != null) {
+                    // already a kernel found, which is not supported.
+                    LogError(string.Format("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xKernelType.AssemblyQualifiedName));
+                    return null;
+                  }
+                  xKernelType = xType;
                 }
-                xFoundType = xType;
               }
             }
           }
         }
       }
-      if (xFoundType == null) {
+      if (xKernelType == null) {
         LogError("No Kernel found!");
         return null;
       }
-      var xCtor = xFoundType.GetConstructor(Type.EmptyTypes);
+      var xCtor = xKernelType.GetConstructor(Type.EmptyTypes);
       if (xCtor == null) {
         LogError("Kernel has no public default constructor");
         return null;
