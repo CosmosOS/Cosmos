@@ -294,7 +294,7 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public SourceInfos GetSourceInfo(UInt32 aAddress) {
+    public SourceInfos GetSourceInfos(UInt32 aAddress) {
       var xResult = new SourceInfos();
       var xSymbols = GetSymbols(aAddress);
       var xSymbolReader = SymbolAccess.GetReaderForFile(xSymbols[0].ILASMFILE);

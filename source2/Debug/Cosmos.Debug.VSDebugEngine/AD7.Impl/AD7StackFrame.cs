@@ -38,56 +38,60 @@ namespace Cosmos.Debug.VSDebugEngine {
       mThread = aThread;
       mProcess = aProcess;
       var xProcess = mEngine.mProcess;
-      mHasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceInfos.ContainsKey(xProcess.mCurrentAddress.Value);
-      if (mHasSource) {
-        var xSourceMapping = xProcess.mSourceInfos[xProcess.mCurrentAddress.Value];
-        mDocName = xSourceMapping.SourceFile;
-        mFunctionName = xSourceMapping.MethodName;
-        mLineNum = (uint)xSourceMapping.Line;
+      if (mHasSource = xProcess.mCurrentAddress.HasValue) {
+        UInt32 xAddress = xProcess.mCurrentAddress.Value;
+        var xSourceInfos = xProcess.mDebugInfoDb.GetSourceInfos(xAddress);
+        if (mHasSource = xProcess.mSourceInfos.ContainsKey(xAddress)) {
+          var xSourceMapping = xProcess.mSourceInfos[xAddress];
+          mDocName = xSourceMapping.SourceFile;
+          mFunctionName = xSourceMapping.MethodName;
+          mLineNum = (uint)xSourceMapping.Line;
 
-        // Multiple labels that point to a single address can happen because of exception handling exits etc.
-        // Because of this given an address, we might find more than one label that matches the address.
-        // Currently, the label we are looking for will always be the first one so we choose that one.
-        // In the future this might "break", so be careful about this. In the future we may need to classify
-        // labels in the output and mark them somehow.
-        var xLabelsForAddr = xProcess.mDebugInfoDb.GetLabels(xProcess.mCurrentAddress.Value);
-        if (xLabelsForAddr.Length > 0) {
-          MLSYMBOL xSymbolInfo;
-          using (var xDB = xProcess.mDebugInfoDb.DB()) {
-            string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
-            xSymbolInfo = xDB.MLSYMBOLs.Where(q => q.LABELNAME == xLabel).FirstOrDefault();
-            if (xSymbolInfo != null) {
-              var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME);
-              mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
-              mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
-              if (mArgumentInfos.Length > 0) {
-                mParams = new DebugLocalInfo[mArgumentInfos.Length];
-                for (int i = 0; i < mArgumentInfos.Length; i++) {
-                  mParams[i] = new DebugLocalInfo {
-                    Name = mArgumentInfos[i].NAME,
-                    Index = i,
-                    IsLocal = false
-                  };
+          // Multiple labels that point to a single address can happen because of exception handling exits etc.
+          // Because of this given an address, we might find more than one label that matches the address.
+          // Currently, the label we are looking for will always be the first one so we choose that one.
+          // In the future this might "break", so be careful about this. In the future we may need to classify
+          // labels in the output and mark them somehow.
+          var xLabelsForAddr = xProcess.mDebugInfoDb.GetLabels(xProcess.mCurrentAddress.Value);
+          if (xLabelsForAddr.Length > 0) {
+            MLSYMBOL xSymbolInfo;
+            using (var xDB = xProcess.mDebugInfoDb.DB()) {
+              string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
+              xSymbolInfo = xDB.MLSYMBOLs.Where(q => q.LABELNAME == xLabel).FirstOrDefault();
+              if (xSymbolInfo != null) {
+                var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME);
+                mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
+                mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
+                if (mArgumentInfos.Length > 0) {
+                  mParams = new DebugLocalInfo[mArgumentInfos.Length];
+                  for (int i = 0; i < mArgumentInfos.Length; i++) {
+                    mParams[i] = new DebugLocalInfo {
+                      Name = mArgumentInfos[i].NAME,
+                      Index = i,
+                      IsLocal = false
+                    };
+                  }
                 }
-              }
 
-              if (mLocalInfos.Length > 0) {
-                mLocals = new DebugLocalInfo[mLocalInfos.Length];
-                for (int i = 0; i < mLocalInfos.Length; i++) {
-                  mLocals[i] = new DebugLocalInfo {
-                    Name = mLocalInfos[i].NAME,
-                    Index = i,
-                    IsLocal = true
-                  };
+                if (mLocalInfos.Length > 0) {
+                  mLocals = new DebugLocalInfo[mLocalInfos.Length];
+                  for (int i = 0; i < mLocalInfos.Length; i++) {
+                    mLocals[i] = new DebugLocalInfo {
+                      Name = mLocalInfos[i].NAME,
+                      Index = i,
+                      IsLocal = true
+                    };
+                  }
                 }
               }
             }
+          } else {
+            MessageBox.Show("No Symbol found for address 0x" + xProcess.mCurrentAddress.Value.ToString("X8").ToUpper());
           }
-        } else {
-          MessageBox.Show("No Symbol found for address 0x" + xProcess.mCurrentAddress.Value.ToString("X8").ToUpper());
+          xProcess.DebugMsg(String.Format("StackFrame: Returning: {0}#{1}[{2}]", mDocName, mFunctionName, mLineNum));
         }
-        xProcess.DebugMsg(String.Format("StackFrame: Returning: {0}#{1}[{2}]", mDocName, mFunctionName, mLineNum));
-      } else {
+      }
+      if (!mHasSource) {
         xProcess.DebugMsg("StackFrame: No Source available");
       }
 
