@@ -12,14 +12,6 @@ using System.Diagnostics;
 namespace Cosmos.Debug.Common {
 
   public class SourceInfos : SortedList<uint, SourceInfo> {
-    public SourceInfo GetMapping(uint aValue) {
-      for (int i = Count - 1; i >= 0; i--) {
-        if (Keys[i] <= aValue) {
-          return Values[i];
-        }
-      }
-      return null;
-    }
   }
 
   public class SourceInfo {
