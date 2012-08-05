@@ -60,8 +60,7 @@ namespace Cosmos.Build.MSBuild {
       }
     }
 
-    protected static string[] mSearchDirs = new string[0];
-
+    protected static List<string> mSearchDirs = new List<string>();
     static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
       var xShortName = args.Name;
       if (xShortName.Contains(',')) {
@@ -88,28 +87,29 @@ namespace Cosmos.Build.MSBuild {
     }
     
     protected bool Initialize() {
-      var xSearchDirs = new List<string>();
-      xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
-      xSearchDirs.Add(CosmosPaths.UserKit);
-      xSearchDirs.Add(CosmosPaths.Kernel);
-      mSearchDirs = xSearchDirs.ToArray();
+      mSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
+      mSearchDirs.Add(CosmosPaths.UserKit);
+      mSearchDirs.Add(CosmosPaths.Kernel);
       AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
       
       if (References != null) {
-        var xSearchPaths = new List<string>(mSearchDirs);
         foreach (var xRef in References) {
+          // Try to load explicit path references.
           if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
             var xName = xRef.GetMetadata("FullPath");
-            var xDir = Path.GetDirectoryName(xName);
-            if (!xSearchPaths.Contains(xDir)) {
-              // This seems to be to try to load plugs on demand from their own dirs, but 
-              // it often just causes load conflicts, and weird errors like "implementation not found" 
-              // for a method, even when both the output user kit dir and local bin dir have up to date
-              // and same assemblies. 
-              // So its removed for now and we should find a better way to dynamically load plugs in 
-              // future.
-              //xSearchPaths.Insert(0, xDir);
-            }
+            
+            // This seems to be to try to load plugs on demand from their own dirs, but 
+            // it often just causes load conflicts, and weird errors like "implementation not found" 
+            // for a method, even when both the output user kit dir and local bin dir have up to date
+            // and same assemblies. 
+            // So its removed for now and we should find a better way to dynamically load plugs in 
+            // future.
+            //
+            //var xDir = Path.GetDirectoryName(xName);
+            //if (!mSearchPaths.Contains(xDir)) {
+            //  mSearchPaths.Insert(0, xDir);
+            //}
+
             if (xName.Length > 0) {
               if (File.Exists(xName)) {
                 Assembly.LoadFile(xName);
@@ -119,7 +119,6 @@ namespace Cosmos.Build.MSBuild {
             }
           }
         }
-        mSearchDirs = xSearchPaths.ToArray();
       }
 
       mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
@@ -139,9 +138,10 @@ namespace Cosmos.Build.MSBuild {
     public bool DebugEnabled = false;
     protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
     protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
+
     protected void LogTime(string message) {
-      //
     }
+
     public bool Execute() {
       //System.Diagnostics.Debugger.Launch();
       try {
@@ -151,16 +151,17 @@ namespace Cosmos.Build.MSBuild {
         }
 
         LogTime("Engine execute started");
-        // find the kernel's entry point now. we are looking for a public class Kernel, with public static void Boot()
+        // Find the kernel's entry point. We are looking for a public class Kernel, with public static void Boot()
         var xInitMethod = RetrieveEntryPoint();
         if (xInitMethod == null) {
           return false;
         }
         var xOutputFilename = Path.Combine(Path.GetDirectoryName(OutputFilename), Path.GetFileNameWithoutExtension(OutputFilename));
         if (!DebugEnabled) {
-          // Default of 1 is in Cosmos.Targets. Need to change to use proj props
+          // Default of 1 is in Cosmos.Targets. Need to change to use proj props.
           DebugCom = 0;
         }
+
         var xAsm = new AppAssemblerNasm(DebugCom);
         using (var xDebugInfo = new DebugInfo(xOutputFilename + ".mdf", true)) {
           xAsm.DebugInfo = xDebugInfo;
@@ -194,8 +195,8 @@ namespace Cosmos.Build.MSBuild {
         }
         LogTime("Engine execute finished");
         return true;
-      } catch (Exception e) {
-        LogException(e);
+      } catch (Exception ex) {
+        LogException(ex);
         LogMessage("Loaded assemblies: ");
         foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
           // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
@@ -216,13 +217,9 @@ namespace Cosmos.Build.MSBuild {
           if (File.Exists(xFile)) {
             var xAssembly = Assembly.LoadFile(xFile);
             foreach (var xType in xAssembly.GetExportedTypes()) {
-              if (xType.IsGenericTypeDefinition) {
+              if (xType.IsGenericTypeDefinition || xType.IsAbstract) {
                 continue;
-              }
-              if (xType.IsAbstract) {
-                continue;
-              }
-              if (xType.BaseType.FullName == FULLASSEMBLYNAME_KERNEL) {
+              } else if (xType.BaseType.FullName == FULLASSEMBLYNAME_KERNEL) {
                 // found kernel?
                 if (xFoundType != null) {
                   // already a kernel found, which is not supported.
