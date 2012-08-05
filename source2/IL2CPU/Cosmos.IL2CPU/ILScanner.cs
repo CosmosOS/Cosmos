@@ -288,9 +288,10 @@ namespace Cosmos.IL2CPU {
 
       MethodAndTypeLabelsHolder.GC_IncRefLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef);
 
+      // Start scanning, return when complete.
       ScanQueue();
 
-      // Now everything is scanned, lets assemble
+      // Everything is scanned. Lets assemble what we have.
       foreach (var xItem in mItems) {
         if (xItem is MethodBase) {
           var xMethod = (MethodBase)xItem;

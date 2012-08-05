@@ -211,9 +211,9 @@ namespace Cosmos.Build.MSBuild {
           if (DebugEnabled == false) {
             xAsm.ShouldOptimize = true;
           }
-#if OUTPUT_ELF
-                xAsm.EmitELF = true;
-#endif
+          #if OUTPUT_ELF
+          xAsm.EmitELF = true;
+          #endif
 
           var xNasmAsm = (AssemblerNasm)xAsm.Assembler;
           xAsm.Assembler.Initialize();
@@ -222,17 +222,13 @@ namespace Cosmos.Build.MSBuild {
             if (EnableLogging) {
               xScanner.EnableLogging(xOutputFilename + ".log.html");
             }
-            // TODO: shouldn't be here?
             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
             xScanner.Execute(xInitMethod);
 
             using (var xOut = new StreamWriter(OutputFilename, false)) {
-              if (EmitDebugSymbols) {
-                xNasmAsm.FlushText(xOut);
-                xAsm.FinalizeDebugInfo();
-              } else {
-                xAsm.Assembler.FlushText(xOut);
-              }
+              //if (EmitDebugSymbols) {
+              xNasmAsm.FlushText(xOut);
+              xAsm.FinalizeDebugInfo();
             }
           }
         }
