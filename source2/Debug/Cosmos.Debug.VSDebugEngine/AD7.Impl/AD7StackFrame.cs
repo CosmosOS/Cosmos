@@ -38,9 +38,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       m_thread = thread;
       mProcess = process;
       var xProcess = m_engine.mProcess;
-      m_hasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceMappings.ContainsKey(xProcess.mCurrentAddress.Value);
+      m_hasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceInfos.ContainsKey(xProcess.mCurrentAddress.Value);
       if (m_hasSource) {
-        var xSourceMapping = xProcess.mSourceMappings[xProcess.mCurrentAddress.Value];
+        var xSourceMapping = xProcess.mSourceInfos[xProcess.mCurrentAddress.Value];
         m_documentName = xSourceMapping.SourceFile;
         m_functionName = xSourceMapping.MethodName;
         m_lineNum = (uint)xSourceMapping.Line;

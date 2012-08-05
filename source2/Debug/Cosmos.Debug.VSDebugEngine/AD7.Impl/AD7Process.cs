@@ -22,7 +22,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public AD7Thread mThread;
     protected AD7Engine mEngine;
     public ReverseSourceInfos mReverseSourceMappings;
-    public SourceInfos mSourceMappings;
+    public SourceInfos mSourceInfos;
     public UInt32? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
     protected LaunchType mLaunch;
@@ -169,11 +169,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mDebugInfoDb = new DebugInfo(xDbPath);
-      mSourceMappings = SourceInfo.GetSourceInfo(mDebugInfoDb);
-      if (mSourceMappings.Count == 0) {
+      mSourceInfos = SourceInfo.GetSourceInfo(mDebugInfoDb);
+      if (mSourceInfos.Count == 0) {
         throw new Exception("Debug data not found: SourceMappings");
       }
-      mReverseSourceMappings = new ReverseSourceInfos(mSourceMappings);
+      mReverseSourceMappings = new ReverseSourceInfos(mSourceInfos);
 
       CreateDebugConnector();
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
@@ -435,7 +435,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     public void SendAssembly() {
       // Because of Asm breakpoints the address we have might be in the middle of a C# line.
       // So we find the closest address to ours that is less or equal to ours.
-      var xQry = from x in mSourceMappings
+      var xQry = from x in mSourceInfos
                  where x.Key <= (uint)mCurrentAddress
                  orderby x.Key descending
                  select x.Value;
@@ -445,7 +445,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       // Create list of asm labels that belong to this line of C#.
-      var xMappings = from x in mSourceMappings
+      var xMappings = from x in mSourceInfos
                       where x.Value.SourceFile == xValue.SourceFile
                         && x.Value.Line == xValue.Line
                         && x.Value.Column == xValue.Column
