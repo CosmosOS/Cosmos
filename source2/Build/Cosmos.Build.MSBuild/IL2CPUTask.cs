@@ -104,6 +104,8 @@ namespace Cosmos.Build.MSBuild {
       // and same assemblies. 
       // So its removed for now and we should find a better way to dynamically load plugs in 
       // future.
+      // Furthermore, it only scanned plugs/asms reffed from the boot proj, not the kernel proj 
+      // so it was bugged there too.
       //if (References != null) {
       //  foreach (var xRef in References) {
       //    if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
