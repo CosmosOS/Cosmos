@@ -41,11 +41,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (mHasSource = xProcess.mCurrentAddress.HasValue) {
         UInt32 xAddress = xProcess.mCurrentAddress.Value;
         var xSourceInfos = xProcess.mDebugInfoDb.GetSourceInfos(xAddress);
-        if (mHasSource = xProcess.mSourceInfos.ContainsKey(xAddress)) {
-          var xSourceMapping = xProcess.mSourceInfos[xAddress];
-          mDocName = xSourceMapping.SourceFile;
-          mFunctionName = xSourceMapping.MethodName;
-          mLineNum = (uint)xSourceMapping.Line;
+        if (mHasSource = xSourceInfos.ContainsKey(xAddress)) {
+          var xSourceInfo = xSourceInfos[xAddress];
+          mDocName = xSourceInfo.SourceFile;
+          mFunctionName = xSourceInfo.MethodName;
+          mLineNum = (uint)xSourceInfo.Line;
 
           // Multiple labels that point to a single address can happen because of exception handling exits etc.
           // Because of this given an address, we might find more than one label that matches the address.
