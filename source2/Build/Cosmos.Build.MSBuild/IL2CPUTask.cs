@@ -87,39 +87,34 @@ namespace Cosmos.Build.MSBuild {
     }
     
     protected bool Initialize() {
+      // Add UserKit dirs for asms to load from.
       mSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
       mSearchDirs.Add(CosmosPaths.UserKit);
       mSearchDirs.Add(CosmosPaths.Kernel);
       AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
-      
-      if (References != null) {
-        foreach (var xRef in References) {
-          // Try to load explicit path references.
-          if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
-            var xName = xRef.GetMetadata("FullPath");
-            
-            // This seems to be to try to load plugs on demand from their own dirs, but 
-            // it often just causes load conflicts, and weird errors like "implementation not found" 
-            // for a method, even when both the output user kit dir and local bin dir have up to date
-            // and same assemblies. 
-            // So its removed for now and we should find a better way to dynamically load plugs in 
-            // future.
-            //
-            //var xDir = Path.GetDirectoryName(xName);
-            //if (!mSearchPaths.Contains(xDir)) {
-            //  mSearchPaths.Insert(0, xDir);
-            //}
 
-            if (xName.Length > 0) {
-              if (File.Exists(xName)) {
-                Assembly.LoadFile(xName);
-              } else {
-                LogWarning(string.Format("File {0} does not exist!", xName));
-              }
-            }
-          }
-        }
-      }
+      // Try to load explicit path references.
+      // These are the references of our boot project. We dont actually ever load the boot
+      // project asm. Instead the references will contain plugs, and the kernel. We load
+      // them then find the entry point in the kernel.
+
+      // This seems to be to try to load plugs on demand from their own dirs, but 
+      // it often just causes load conflicts, and weird errors like "implementation not found" 
+      // for a method, even when both the output user kit dir and local bin dir have up to date
+      // and same assemblies. 
+      // So its removed for now and we should find a better way to dynamically load plugs in 
+      // future.
+      //if (References != null) {
+      //  foreach (var xRef in References) {
+      //    if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
+      //      var xName = xRef.GetMetadata("FullPath");
+      //      var xDir = Path.GetDirectoryName(xName);
+      //      if (!mSearchPaths.Contains(xDir)) {
+      //        mSearchPaths.Insert(0, xDir);
+      //      }
+      //    }
+      //  }
+      //}
 
       mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
       if (String.IsNullOrEmpty(TraceAssemblies)) {
