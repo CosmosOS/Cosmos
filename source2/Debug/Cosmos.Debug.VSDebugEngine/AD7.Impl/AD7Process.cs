@@ -433,10 +433,13 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public void SendAssembly() {
+      UInt32 xAddress = mCurrentAddress.Value;
+      var xSourceInfos = mDebugInfoDb.GetSourceInfos(xAddress);
+
       // Because of Asm breakpoints the address we have might be in the middle of a C# line.
       // So we find the closest address to ours that is less or equal to ours.
-      var xQry = from x in mSourceInfos
-                 where x.Key <= (uint)mCurrentAddress
+      var xQry = from x in xSourceInfos
+                 where x.Key <= xAddress
                  orderby x.Key descending
                  select x.Value;
       var xValue = xQry.FirstOrDefault();
@@ -445,7 +448,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       // Create list of asm labels that belong to this line of C#.
-      var xMappings = from x in mSourceInfos
+      var xMappings = from x in xSourceInfos
                       where x.Value.SourceFile == xValue.SourceFile
                         && x.Value.Line == xValue.Line
                         && x.Value.Column == xValue.Column
