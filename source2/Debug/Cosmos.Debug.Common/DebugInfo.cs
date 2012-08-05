@@ -259,50 +259,57 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public SourceInfos GetSourceInfo(UInt32 aAddress) {
-      var xResult = new SourceInfos();
+    // Gets MLSymbols for a method, given an address within the method.
+    public MLSYMBOL[] GetSymbols(UInt32 aAddress) {
       using (var xDB = DB()) {
         // The address we have is somewhere in the method, but we need to find 
         // one that is also in MLSymbol. Asm labels for example wont be found.
         // So we find ones that match or are before, and we walk till we fine one
         // in MLSymbol.
         var xLabels = from x in xDB.Labels
-                         where x.Address <= aAddress
-                         orderby x.Address descending
-                         select x.Name;
+                      where x.Address <= aAddress
+                      orderby x.Address descending
+                      select x.Name;
 
         // Search till we find a matching label.
-        MLSYMBOL xInlineSymbol = null;
+        MLSYMBOL xSymbol = null;
         foreach (var xLabel in xLabels) {
-          xInlineSymbol = xDB.MLSYMBOLs.SingleOrDefault(q => q.LABELNAME == xLabel);
-          if (xInlineSymbol != null) {
+          xSymbol = xDB.MLSYMBOLs.SingleOrDefault(q => q.LABELNAME == xLabel);
+          if (xSymbol != null) {
             break;
           }
         }
-        if (xInlineSymbol == null) {
+        if (xSymbol == null) {
           throw new Exception("Label not found.");
         }
 
         // Now get all MLSymbols for the method.
         var xSymbols = from x in xDB.MLSYMBOLs
                        where
-                         x.METHODTOKEN == xInlineSymbol.METHODTOKEN
-                         && x.ILASMFILE == xInlineSymbol.ILASMFILE
+                         x.METHODTOKEN == xSymbol.METHODTOKEN
+                         && x.ILASMFILE == xSymbol.ILASMFILE
                        orderby x.ILOFFSET
                        select x;
-                               
-        var xSymbolReader = SymbolAccess.GetReaderForFile(xInlineSymbol.ILASMFILE);
-        var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xInlineSymbol.METHODTOKEN));
+        return xSymbols.ToArray();
+      }
+    }
 
-        int xSeqCount = xMethodSymbol.SequencePointCount;
-        var xCodeOffsets = new int[xSeqCount];
-        var xCodeDocuments = new ISymbolDocument[xSeqCount];
-        var xCodeLines = new int[xSeqCount];
-        var xCodeColumns = new int[xSeqCount];
-        var xCodeEndLines = new int[xSeqCount];
-        var xCodeEndColumns = new int[xSeqCount];
-        xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+    public SourceInfos GetSourceInfo(UInt32 aAddress) {
+      var xResult = new SourceInfos();
+      var xSymbols = GetSymbols(aAddress);
+      var xSymbolReader = SymbolAccess.GetReaderForFile(xSymbols[0].ILASMFILE);
+      var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xSymbols[0].METHODTOKEN));
 
+      int xSeqCount = xMethodSymbol.SequencePointCount;
+      var xCodeOffsets = new int[xSeqCount];
+      var xCodeDocuments = new ISymbolDocument[xSeqCount];
+      var xCodeLines = new int[xSeqCount];
+      var xCodeColumns = new int[xSeqCount];
+      var xCodeEndLines = new int[xSeqCount];
+      var xCodeEndColumns = new int[xSeqCount];
+      xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+
+      using (var xDB = DB()) {
         foreach (var xSymbol in xSymbols) {
           var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LABELNAME);
           if (xRow != null) {

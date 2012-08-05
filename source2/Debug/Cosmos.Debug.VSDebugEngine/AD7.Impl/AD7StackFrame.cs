@@ -52,7 +52,6 @@ namespace Cosmos.Debug.VSDebugEngine {
         // labels in the output and mark them somehow.
         var xLabelsForAddr = xProcess.mDebugInfoDb.GetLabels(xProcess.mCurrentAddress.Value);
         if (xLabelsForAddr.Length > 0) {
-          //var xSymbolInfo = xProcess.mDebugInfoDb.ReadSymbolByLabelName(xLabelsForAddr[0]);
           MLSYMBOL xSymbolInfo;
           using (var xDB = xProcess.mDebugInfoDb.DB()) {
             string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
@@ -81,8 +80,6 @@ namespace Cosmos.Debug.VSDebugEngine {
                     IsLocal = true
                   };
                 }
-                //m_locals = new VariableInformation[m_numLocals];
-                //m_engine.DebuggedProcess.GetFunctionLocalsByIP(m_threadContext.eip, m_threadContext.ebp, m_locals);
               }
             }
           }
