@@ -11,6 +11,12 @@
     <EntitySet Name="Labels" EntityType="DebugModel.Store.Labels" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="LOCAL_ARGUMENT_INFO" EntityType="DebugModel.Store.LOCAL_ARGUMENT_INFO" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="MLSYMBOLs" EntityType="DebugModel.Store.MLSYMBOLs" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AssemblyFiles" EntityType="DebugModel.Store.AssemblyFiles" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Methods" EntityType="DebugModel.Store.Methods" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="AssemblyFileMethod" Association="DebugModel.Store.AssemblyFileMethod">
+      <End Role="AssemblyFile" EntitySet="AssemblyFiles" />
+      <End Role="Method" EntitySet="Methods" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="FIELD_INFO">
     <Key>
@@ -33,9 +39,9 @@
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="ADDRESS" Type="bigint" Nullable="false" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="Address" Type="bigint" Nullable="false" />
   </EntityType>
   <EntityType Name="LOCAL_ARGUMENT_INFO">
     <Key>
@@ -62,6 +68,37 @@
     <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
+  <EntityType Name="AssemblyFiles">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Pathname" Type="nvarchar" Nullable="false" MaxLength="256" />
+  </EntityType>
+  <EntityType Name="Methods">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TypeToken" Type="int" Nullable="false" />
+    <Property Name="MethodToken" Type="int" Nullable="false" />
+    <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="AddressStart" Type="bigint" Nullable="true" />
+    <Property Name="AddressEnd" Type="bigint" Nullable="true" />
+    <Property Name="AssemblyFileID" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <Association Name="AssemblyFileMethod">
+    <End Role="AssemblyFile" Type="DebugModel.Store.AssemblyFiles" Multiplicity="1" />
+    <End Role="Method" Type="DebugModel.Store.Methods" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AssemblyFile">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Method">
+        <PropertyRef Name="AssemblyFileID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -72,6 +109,12 @@
           <EntitySet Name="Labels" EntityType="DebugModel.Label" />
           <EntitySet Name="LOCAL_ARGUMENT_INFO" EntityType="DebugModel.LOCAL_ARGUMENT_INFO" />
           <EntitySet Name="MLSYMBOLs" EntityType="DebugModel.MLSYMBOL" />
+          <EntitySet Name="AssemblyFiles" EntityType="DebugModel.AssemblyFile" />
+          <EntitySet Name="Methods" EntityType="DebugModel.Method" />
+          <AssociationSet Name="AssemblyFileMethod" Association="DebugModel.AssemblyFileMethod">
+            <End Role="AssemblyFile" EntitySet="AssemblyFiles" />
+            <End Role="Method" EntitySet="Methods" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="FIELD_INFO">
           <Key>
@@ -94,9 +137,9 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
-          <Property Name="ADDRESS" Type="Int64" Nullable="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="512" />
+          <Property Type="Int64" Name="Address" Nullable="false" />
         </EntityType>
         <EntityType Name="LOCAL_ARGUMENT_INFO">
           <Key>
@@ -123,6 +166,39 @@
           <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
+        <EntityType Name="AssemblyFile">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Pathname" Nullable="false" MaxLength="256" />
+          <NavigationProperty Name="Methods" Relationship="DebugModel.AssemblyFileMethod" FromRole="AssemblyFile" ToRole="Method" />
+        </EntityType>
+        <EntityType Name="Method">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="TypeToken" Nullable="false" />
+          <Property Type="Int32" Name="MethodToken" Nullable="false" />
+          <Property Type="String" Name="LabelName" Nullable="false" MaxLength="512" />
+          <Property Type="Int64" Name="AddressStart" Nullable="true" />
+          <Property Type="Int64" Name="AddressEnd" Nullable="true" />
+          <NavigationProperty Name="AssemblyFile" Relationship="DebugModel.AssemblyFileMethod" FromRole="Method" ToRole="AssemblyFile" />
+          <Property Type="Guid" Name="AssemblyFileID" Nullable="false" />
+        </EntityType>
+        <Association Name="AssemblyFileMethod">
+          <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
+          <End Type="DebugModel.Method" Role="Method" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssemblyFile">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Method">
+              <PropertyRef Name="AssemblyFileID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -152,8 +228,8 @@
       <EntityTypeMapping TypeName="IsTypeOf(DebugModel.Label)">
         <MappingFragment StoreEntitySet="Labels">
           <ScalarProperty Name="ID" ColumnName="ID" />
-          <ScalarProperty Name="LABELNAME" ColumnName="LABELNAME" />
-          <ScalarProperty Name="ADDRESS" ColumnName="ADDRESS" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Address" ColumnName="Address" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -184,6 +260,27 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="AssemblyFiles">
+      <EntityTypeMapping TypeName="IsTypeOf(DebugModel.AssemblyFile)">
+        <MappingFragment StoreEntitySet="AssemblyFiles">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Pathname" ColumnName="Pathname" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Methods">
+      <EntityTypeMapping TypeName="IsTypeOf(DebugModel.Method)">
+        <MappingFragment StoreEntitySet="Methods">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="TypeToken" ColumnName="TypeToken" />
+          <ScalarProperty Name="MethodToken" ColumnName="MethodToken" />
+          <ScalarProperty Name="LabelName" ColumnName="LabelName" />
+          <ScalarProperty Name="AddressStart" ColumnName="AddressStart" />
+          <ScalarProperty Name="AddressEnd" ColumnName="AddressEnd" />
+          <ScalarProperty Name="AssemblyFileID" ColumnName="AssemblyFileID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
   </EntityContainerMapping>
 </Mapping></edmx:Mappings>
   </edmx:Runtime>
@@ -204,11 +301,17 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="DebugModel">
-        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="0.75" PointY="0.75" Height="1.787985026041667" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="2.75" PointY="0.75" Height="1.59568359375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.75" PointY="3.75" Height="1.5956835937499996" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="2.75" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="6.75" PointY="4" Height="1.787985026041667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.375" PointY="4" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="4.75" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="2.5" PointY="0.5" Height="1.4033821614583333" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="1.5" PointX="4.625" PointY="0.5" Height="2.5571907552083331" />
+        <AssociationConnector Association="DebugModel.AssemblyFileMethod">
+          <ConnectorPoint PointX="4" PointY="1.297841796875" />
+          <ConnectorPoint PointX="4.625" PointY="1.297841796875" />
+        </AssociationConnector>
       </Diagram>
     </Diagrams>
   </Designer>

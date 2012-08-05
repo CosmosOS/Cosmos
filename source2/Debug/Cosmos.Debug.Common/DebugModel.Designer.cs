@@ -16,6 +16,11 @@ using System.Xml.Serialization;
 using System.Runtime.Serialization;
 
 [assembly: EdmSchemaAttribute()]
+#region EDM Relationship Metadata
+
+[assembly: EdmRelationshipAttribute("DebugModel", "AssemblyFileMethod", "AssemblyFile", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.AssemblyFile), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
+
+#endregion
 
 namespace Cosmos.Debug.Common
 {
@@ -144,6 +149,38 @@ namespace Cosmos.Debug.Common
             }
         }
         private ObjectSet<MLSYMBOL> _MLSYMBOLs;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<AssemblyFile> AssemblyFiles
+        {
+            get
+            {
+                if ((_AssemblyFiles == null))
+                {
+                    _AssemblyFiles = base.CreateObjectSet<AssemblyFile>("AssemblyFiles");
+                }
+                return _AssemblyFiles;
+            }
+        }
+        private ObjectSet<AssemblyFile> _AssemblyFiles;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<Method> Methods
+        {
+            get
+            {
+                if ((_Methods == null))
+                {
+                    _Methods = base.CreateObjectSet<Method>("Methods");
+                }
+                return _Methods;
+            }
+        }
+        private ObjectSet<Method> _Methods;
 
         #endregion
         #region AddTo Methods
@@ -187,6 +224,22 @@ namespace Cosmos.Debug.Common
         {
             base.AddObject("MLSYMBOLs", mLSYMBOL);
         }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the AssemblyFiles EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToAssemblyFiles(AssemblyFile assemblyFile)
+        {
+            base.AddObject("AssemblyFiles", assemblyFile);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the Methods EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToMethods(Method method)
+        {
+            base.AddObject("Methods", method);
+        }
 
         #endregion
     }
@@ -195,6 +248,112 @@ namespace Cosmos.Debug.Common
     #endregion
     
     #region Entities
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="DebugModel", Name="AssemblyFile")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class AssemblyFile : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new AssemblyFile object.
+        /// </summary>
+        /// <param name="id">Initial value of the ID property.</param>
+        /// <param name="pathname">Initial value of the Pathname property.</param>
+        public static AssemblyFile CreateAssemblyFile(global::System.Guid id, global::System.String pathname)
+        {
+            AssemblyFile assemblyFile = new AssemblyFile();
+            assemblyFile.ID = id;
+            assemblyFile.Pathname = pathname;
+            return assemblyFile;
+        }
+
+        #endregion
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String Pathname
+        {
+            get
+            {
+                return _Pathname;
+            }
+            set
+            {
+                OnPathnameChanging(value);
+                ReportPropertyChanging("Pathname");
+                _Pathname = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("Pathname");
+                OnPathnameChanged();
+            }
+        }
+        private global::System.String _Pathname;
+        partial void OnPathnameChanging(global::System.String value);
+        partial void OnPathnameChanged();
+
+        #endregion
+    
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "AssemblyFileMethod", "Method")]
+        public EntityCollection<Method> Methods
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Method>("DebugModel.AssemblyFileMethod", "Method");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Method>("DebugModel.AssemblyFileMethod", "Method", value);
+                }
+            }
+        }
+
+        #endregion
+    }
     
     /// <summary>
     /// No Metadata Documentation available.
@@ -449,68 +608,20 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// Create a new Label object.
         /// </summary>
-        /// <param name="lABELNAME">Initial value of the LABELNAME property.</param>
-        /// <param name="aDDRESS">Initial value of the ADDRESS property.</param>
         /// <param name="id">Initial value of the ID property.</param>
-        public static Label CreateLabel(global::System.String lABELNAME, global::System.Int64 aDDRESS, global::System.Guid id)
+        /// <param name="name">Initial value of the Name property.</param>
+        /// <param name="address">Initial value of the Address property.</param>
+        public static Label CreateLabel(global::System.Guid id, global::System.String name, global::System.Int64 address)
         {
             Label label = new Label();
-            label.LABELNAME = lABELNAME;
-            label.ADDRESS = aDDRESS;
             label.ID = id;
+            label.Name = name;
+            label.Address = address;
             return label;
         }
 
         #endregion
         #region Primitive Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String LABELNAME
-        {
-            get
-            {
-                return _LABELNAME;
-            }
-            set
-            {
-                OnLABELNAMEChanging(value);
-                ReportPropertyChanging("LABELNAME");
-                _LABELNAME = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("LABELNAME");
-                OnLABELNAMEChanged();
-            }
-        }
-        private global::System.String _LABELNAME;
-        partial void OnLABELNAMEChanging(global::System.String value);
-        partial void OnLABELNAMEChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int64 ADDRESS
-        {
-            get
-            {
-                return _ADDRESS;
-            }
-            set
-            {
-                OnADDRESSChanging(value);
-                ReportPropertyChanging("ADDRESS");
-                _ADDRESS = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("ADDRESS");
-                OnADDRESSChanged();
-            }
-        }
-        private global::System.Int64 _ADDRESS;
-        partial void OnADDRESSChanging(global::System.Int64 value);
-        partial void OnADDRESSChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -538,6 +649,54 @@ namespace Cosmos.Debug.Common
         private global::System.Guid _ID;
         partial void OnIDChanging(global::System.Guid value);
         partial void OnIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String Name
+        {
+            get
+            {
+                return _Name;
+            }
+            set
+            {
+                OnNameChanging(value);
+                ReportPropertyChanging("Name");
+                _Name = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("Name");
+                OnNameChanged();
+            }
+        }
+        private global::System.String _Name;
+        partial void OnNameChanging(global::System.String value);
+        partial void OnNameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int64 Address
+        {
+            get
+            {
+                return _Address;
+            }
+            set
+            {
+                OnAddressChanging(value);
+                ReportPropertyChanging("Address");
+                _Address = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("Address");
+                OnAddressChanged();
+            }
+        }
+        private global::System.Int64 _Address;
+        partial void OnAddressChanging(global::System.Int64 value);
+        partial void OnAddressChanged();
 
         #endregion
     
@@ -752,6 +911,254 @@ namespace Cosmos.Debug.Common
 
         #endregion
     
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="DebugModel", Name="Method")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class Method : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new Method object.
+        /// </summary>
+        /// <param name="id">Initial value of the ID property.</param>
+        /// <param name="typeToken">Initial value of the TypeToken property.</param>
+        /// <param name="methodToken">Initial value of the MethodToken property.</param>
+        /// <param name="labelName">Initial value of the LabelName property.</param>
+        /// <param name="assemblyFileID">Initial value of the AssemblyFileID property.</param>
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.String labelName, global::System.Guid assemblyFileID)
+        {
+            Method method = new Method();
+            method.ID = id;
+            method.TypeToken = typeToken;
+            method.MethodToken = methodToken;
+            method.LabelName = labelName;
+            method.AssemblyFileID = assemblyFileID;
+            return method;
+        }
+
+        #endregion
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 TypeToken
+        {
+            get
+            {
+                return _TypeToken;
+            }
+            set
+            {
+                OnTypeTokenChanging(value);
+                ReportPropertyChanging("TypeToken");
+                _TypeToken = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("TypeToken");
+                OnTypeTokenChanged();
+            }
+        }
+        private global::System.Int32 _TypeToken;
+        partial void OnTypeTokenChanging(global::System.Int32 value);
+        partial void OnTypeTokenChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 MethodToken
+        {
+            get
+            {
+                return _MethodToken;
+            }
+            set
+            {
+                OnMethodTokenChanging(value);
+                ReportPropertyChanging("MethodToken");
+                _MethodToken = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("MethodToken");
+                OnMethodTokenChanged();
+            }
+        }
+        private global::System.Int32 _MethodToken;
+        partial void OnMethodTokenChanging(global::System.Int32 value);
+        partial void OnMethodTokenChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String LabelName
+        {
+            get
+            {
+                return _LabelName;
+            }
+            set
+            {
+                OnLabelNameChanging(value);
+                ReportPropertyChanging("LabelName");
+                _LabelName = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LabelName");
+                OnLabelNameChanged();
+            }
+        }
+        private global::System.String _LabelName;
+        partial void OnLabelNameChanging(global::System.String value);
+        partial void OnLabelNameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int64> AddressStart
+        {
+            get
+            {
+                return _AddressStart;
+            }
+            set
+            {
+                OnAddressStartChanging(value);
+                ReportPropertyChanging("AddressStart");
+                _AddressStart = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("AddressStart");
+                OnAddressStartChanged();
+            }
+        }
+        private Nullable<global::System.Int64> _AddressStart;
+        partial void OnAddressStartChanging(Nullable<global::System.Int64> value);
+        partial void OnAddressStartChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int64> AddressEnd
+        {
+            get
+            {
+                return _AddressEnd;
+            }
+            set
+            {
+                OnAddressEndChanging(value);
+                ReportPropertyChanging("AddressEnd");
+                _AddressEnd = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("AddressEnd");
+                OnAddressEndChanged();
+            }
+        }
+        private Nullable<global::System.Int64> _AddressEnd;
+        partial void OnAddressEndChanging(Nullable<global::System.Int64> value);
+        partial void OnAddressEndChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid AssemblyFileID
+        {
+            get
+            {
+                return _AssemblyFileID;
+            }
+            set
+            {
+                OnAssemblyFileIDChanging(value);
+                ReportPropertyChanging("AssemblyFileID");
+                _AssemblyFileID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("AssemblyFileID");
+                OnAssemblyFileIDChanged();
+            }
+        }
+        private global::System.Guid _AssemblyFileID;
+        partial void OnAssemblyFileIDChanging(global::System.Guid value);
+        partial void OnAssemblyFileIDChanged();
+
+        #endregion
+    
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "AssemblyFileMethod", "AssemblyFile")]
+        public AssemblyFile AssemblyFile
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<AssemblyFile>("DebugModel.AssemblyFileMethod", "AssemblyFile").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<AssemblyFile>("DebugModel.AssemblyFileMethod", "AssemblyFile").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<AssemblyFile> AssemblyFileReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<AssemblyFile>("DebugModel.AssemblyFileMethod", "AssemblyFile");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<AssemblyFile>("DebugModel.AssemblyFileMethod", "AssemblyFile", value);
+                }
+            }
+        }
+
+        #endregion
     }
     
     /// <summary>

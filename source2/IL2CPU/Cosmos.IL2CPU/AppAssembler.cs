@@ -40,8 +40,13 @@ namespace Cosmos.IL2CPU {
       new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
       new Comment("Name: " + aMethod.MethodBase.Name);
       new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
-    }
 
+      //var xMethod = new Cosmos.Debug.Common.Method() {
+      //  MethodToken = aMethod.MethodBase.MetadataToken,
+      //  TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken
+      //};
+      //DebugInfo.AddMethod(xMethod);
+    }
     protected virtual void MethodBegin(string aMethodName) {
       new Comment("---------------------------------------------------------");
       new Comment("Name: " + aMethodName);
@@ -50,7 +55,6 @@ namespace Cosmos.IL2CPU {
     protected virtual void MethodEnd(string aMethodName) {
       new Comment("End Method: " + aMethodName);
     }
-
     protected virtual void MethodEnd(MethodInfo aMethod) {
       new Comment("End Method: " + aMethod.MethodBase.Name);
     }

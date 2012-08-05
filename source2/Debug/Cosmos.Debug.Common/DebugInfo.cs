@@ -91,7 +91,7 @@ namespace Cosmos.Debug.Common {
             // Labels is a big table. Avoid indexes when possible, because we need inserts to be fast.
             // -ADDRESS - Dont index - We dont look up on it very much
             // -LABELNAME - We do lookup a lot on this, but will change to asm line as key prob
-            xSQL.MakeIndex("Labels", "LABELNAME", true);
+            xSQL.MakeIndex("Labels", "Name", true);
           }
         }
       }
@@ -102,19 +102,19 @@ namespace Cosmos.Debug.Common {
 
     public UInt32 AddressOfLabel(string aLabel) {
       using (var xDB = DB()) {
-        var xRow = xDB.Labels.SingleOrDefault(q => q.LABELNAME == aLabel);
+        var xRow = xDB.Labels.SingleOrDefault(q => q.Name == aLabel);
         if (xRow == null) {
           return 0;
         }
-        return (UInt32)xRow.ADDRESS;
+        return (UInt32)xRow.Address;
       } 
     }
 
     public string[] GetLabels(UInt32 aAddress) {
       using (var xDB = DB()) {
         var xLabels = from x in xDB.Labels
-                      where x.ADDRESS == aAddress
-                      select x.LABELNAME;
+                      where x.Address == aAddress
+                      select x.Name;
         return xLabels.ToArray();
       }
     }
@@ -195,6 +195,13 @@ namespace Cosmos.Debug.Common {
       // even if they have different Entity (context) instances.
       var xEntConn = new EntityConnection(mWorkspace, new SqlConnection(mConnStr));
       return new Entities(xEntConn);
+    }
+
+    protected List<Method> mMethods = new List<Method>();
+    public void AddMethod(Method aMethod, bool aFlush = false) {
+      aMethod.ID = Guid.NewGuid();
+      mMethods.Add(aMethod);
+      BulkInsert("Methods", mMethods, 2500, aFlush);
     }
 
     public void WriteSymbols(IList<MLSYMBOL> aSymbols, bool aFlush = false) {

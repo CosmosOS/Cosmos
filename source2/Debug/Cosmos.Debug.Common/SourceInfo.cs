@@ -115,13 +115,8 @@ namespace Cosmos.Debug.Common {
 
         foreach (var xSymbol in xSymbols) {
           if (!xSymbol.ILASMFILE.Equals(xOldAssembly, StringComparison.InvariantCultureIgnoreCase)) {
-            try {
-              xMethodSymbol = null;
-              xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.ILASMFILE);
-            } catch {
-              xSymbolReader = null;
-              xMethodSymbol = null;
-            }
+            xMethodSymbol = null;
+            xSymbolReader = SymbolAccess.GetReaderForFile(xSymbol.ILASMFILE);
             xOldAssembly = xSymbol.ILASMFILE;
           }
           if (xOldMethodToken != xSymbol.METHODTOKEN) {
@@ -145,9 +140,9 @@ namespace Cosmos.Debug.Common {
           }
 
           if (xMethodSymbol != null) {
-            var xRow = xDB.Labels.SingleOrDefault(q => q.LABELNAME == xSymbol.LABELNAME);
+            var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LABELNAME);
             if (xRow != null) {
-              UInt32 xAddress = (UInt32)xRow.ADDRESS;
+              UInt32 xAddress = (UInt32)xRow.Address;
               // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
               // So we just ignore duplicate addresses.
               if (!xResult.ContainsKey(xAddress)) {

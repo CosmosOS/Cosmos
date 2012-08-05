@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/02/2012 23:07:48
+-- Date Created: 08/04/2012 19:00:46
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -37,6 +37,12 @@ GO
 IF OBJECT_ID(N'[dbo].[MLSYMBOLs]', 'U') IS NOT NULL
     DROP TABLE [dbo].[MLSYMBOLs];
 GO
+IF OBJECT_ID(N'[dbo].[AssemblyFiles]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[AssemblyFiles];
+GO
+IF OBJECT_ID(N'[dbo].[Methods]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Methods];
+GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -61,9 +67,9 @@ GO
 
 -- Creating table 'Labels'
 CREATE TABLE [dbo].[Labels] (
-    [LABELNAME] nvarchar(512)  NOT NULL,
-    [ADDRESS] bigint  NOT NULL,
-    [ID] uniqueidentifier  NOT NULL
+    [ID] uniqueidentifier  NOT NULL,
+    [Name] nvarchar(512)  NOT NULL,
+    [Address] bigint  NOT NULL
 );
 GO
 
@@ -89,6 +95,25 @@ CREATE TABLE [dbo].[MLSYMBOLs] (
     [ILOFFSET] int  NOT NULL,
     [METHODNAME] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
+);
+GO
+
+-- Creating table 'AssemblyFiles'
+CREATE TABLE [dbo].[AssemblyFiles] (
+    [ID] uniqueidentifier  NOT NULL,
+    [Pathname] nvarchar(256)  NOT NULL
+);
+GO
+
+-- Creating table 'Methods'
+CREATE TABLE [dbo].[Methods] (
+    [ID] uniqueidentifier  NOT NULL,
+    [TypeToken] int  NOT NULL,
+    [MethodToken] int  NOT NULL,
+    [LabelName] nvarchar(512)  NOT NULL,
+    [AddressStart] bigint  NULL,
+    [AddressEnd] bigint  NULL,
+    [AssemblyFileID] uniqueidentifier  NOT NULL
 );
 GO
 
@@ -126,9 +151,35 @@ ADD CONSTRAINT [PK_MLSYMBOLs]
     PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
+-- Creating primary key on [ID] in table 'AssemblyFiles'
+ALTER TABLE [dbo].[AssemblyFiles]
+ADD CONSTRAINT [PK_AssemblyFiles]
+    PRIMARY KEY CLUSTERED ([ID] ASC);
+GO
+
+-- Creating primary key on [ID] in table 'Methods'
+ALTER TABLE [dbo].[Methods]
+ADD CONSTRAINT [PK_Methods]
+    PRIMARY KEY CLUSTERED ([ID] ASC);
+GO
+
 -- --------------------------------------------------
 -- Creating all FOREIGN KEY constraints
 -- --------------------------------------------------
+
+-- Creating foreign key on [AssemblyFileID] in table 'Methods'
+ALTER TABLE [dbo].[Methods]
+ADD CONSTRAINT [FK_AssemblyFileMethod]
+    FOREIGN KEY ([AssemblyFileID])
+    REFERENCES [dbo].[AssemblyFiles]
+        ([ID])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_AssemblyFileMethod'
+CREATE INDEX [IX_FK_AssemblyFileMethod]
+ON [dbo].[Methods]
+    ([AssemblyFileID]);
+GO
 
 -- --------------------------------------------------
 -- Script has ended
