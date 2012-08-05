@@ -12,14 +12,14 @@ namespace Cosmos.Debug.VSDebugEngine {
   // Represents a logical stack frame on the thread stack. 
   // Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
   public class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2 {
-    readonly AD7Engine m_engine;
-    readonly AD7Thread m_thread;
+    readonly AD7Engine mEngine;
+    readonly AD7Thread mThread;
     //readonly X86ThreadContext m_threadContext;
 
-    private string m_documentName;
-    private string m_functionName;
-    private uint m_lineNum;
-    private bool m_hasSource;
+    private string mDocName;
+    private string mFunctionName;
+    private uint mLineNum;
+    private bool mHasSource;
 
     // Must have empty holders, some code looks at length and can run
     // before we set them.
@@ -27,23 +27,23 @@ namespace Cosmos.Debug.VSDebugEngine {
     internal LOCAL_ARGUMENT_INFO[] mArgumentInfos = new LOCAL_ARGUMENT_INFO[] {};
 
     // An array of this frame's parameters
-    private DebugLocalInfo[] m_parameters;
+    private DebugLocalInfo[] mParams;
 
     // An array of this frame's locals
-    private DebugLocalInfo[] m_locals;
+    private DebugLocalInfo[] mLocals;
     private AD7Process mProcess;
 
     public AD7StackFrame(AD7Engine engine, AD7Thread thread, AD7Process process) {
-      m_engine = engine;
-      m_thread = thread;
+      mEngine = engine;
+      mThread = thread;
       mProcess = process;
-      var xProcess = m_engine.mProcess;
-      m_hasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceInfos.ContainsKey(xProcess.mCurrentAddress.Value);
-      if (m_hasSource) {
+      var xProcess = mEngine.mProcess;
+      mHasSource = xProcess.mCurrentAddress.HasValue && xProcess.mSourceInfos.ContainsKey(xProcess.mCurrentAddress.Value);
+      if (mHasSource) {
         var xSourceMapping = xProcess.mSourceInfos[xProcess.mCurrentAddress.Value];
-        m_documentName = xSourceMapping.SourceFile;
-        m_functionName = xSourceMapping.MethodName;
-        m_lineNum = (uint)xSourceMapping.Line;
+        mDocName = xSourceMapping.SourceFile;
+        mFunctionName = xSourceMapping.MethodName;
+        mLineNum = (uint)xSourceMapping.Line;
 
         // Multiple labels that point to a single address can happen because of exception handling exits etc.
         // Because of this given an address, we might find more than one label that matches the address.
@@ -61,9 +61,9 @@ namespace Cosmos.Debug.VSDebugEngine {
               mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
               mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
               if (mArgumentInfos.Length > 0) {
-                m_parameters = new DebugLocalInfo[mArgumentInfos.Length];
+                mParams = new DebugLocalInfo[mArgumentInfos.Length];
                 for (int i = 0; i < mArgumentInfos.Length; i++) {
-                  m_parameters[i] = new DebugLocalInfo {
+                  mParams[i] = new DebugLocalInfo {
                     Name = mArgumentInfos[i].NAME,
                     Index = i,
                     IsLocal = false
@@ -72,9 +72,9 @@ namespace Cosmos.Debug.VSDebugEngine {
               }
 
               if (mLocalInfos.Length > 0) {
-                m_locals = new DebugLocalInfo[mLocalInfos.Length];
+                mLocals = new DebugLocalInfo[mLocalInfos.Length];
                 for (int i = 0; i < mLocalInfos.Length; i++) {
-                  m_locals[i] = new DebugLocalInfo {
+                  mLocals[i] = new DebugLocalInfo {
                     Name = mLocalInfos[i].NAME,
                     Index = i,
                     IsLocal = true
@@ -86,7 +86,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         } else {
           MessageBox.Show("No Symbol found for address 0x" + xProcess.mCurrentAddress.Value.ToString("X8").ToUpper());
         }
-        xProcess.DebugMsg(String.Format("StackFrame: Returning: {0}#{1}[{2}]", m_documentName, m_functionName, m_lineNum));
+        xProcess.DebugMsg(String.Format("StackFrame: Returning: {0}#{1}[{2}]", mDocName, mFunctionName, mLineNum));
       } else {
         xProcess.DebugMsg("StackFrame: No Source available");
       }
@@ -122,7 +122,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // The optional information is requested by setting flags in the dwFieldSpec parameter.
       if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME)) {
         // If there is source information, construct a string that contains the module name, function name, and optionally argument names and values.
-        if (m_hasSource) {
+        if (mHasSource) {
           frameInfo.m_bstrFuncName = "";
 
           if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE)) {
@@ -131,25 +131,25 @@ namespace Cosmos.Debug.VSDebugEngine {
             frameInfo.m_bstrFuncName = "module!";
           }
 
-          frameInfo.m_bstrFuncName += m_functionName;
+          frameInfo.m_bstrFuncName += mFunctionName;
 
           if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS) && mArgumentInfos.Length > 0) {
             frameInfo.m_bstrFuncName += "(";
-            for (int i = 0; i < m_parameters.Length; i++) {
+            for (int i = 0; i < mParams.Length; i++) {
               if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_TYPES) != 0) {
                 //frameInfo.m_bstrFuncName += m_parameters[i]. + " ";
                 frameInfo.m_bstrFuncName += "ParamType ";
               }
 
               if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_NAMES) != 0) {
-                frameInfo.m_bstrFuncName += m_parameters[i].Name;
+                frameInfo.m_bstrFuncName += mParams[i].Name;
               }
 
               //    if ((dwFieldSpec & (uint)enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS_VALUES) != 0)  {
               //        frameInfo.m_bstrFuncName += "=" + m_parameters[i].m_value;
               //    }
 
-              if (i < m_parameters.Length - 1) {
+              if (i < mParams.Length - 1) {
                 frameInfo.m_bstrFuncName += ", ";
               }
             }
@@ -157,7 +157,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           }
 
           if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_LINES)) {
-            frameInfo.m_bstrFuncName += " Line:" + m_lineNum.ToString();
+            frameInfo.m_bstrFuncName += " Line:" + mLineNum.ToString();
           }
         } else {
           // No source information, so only return the module name and the instruction pointer.
@@ -192,7 +192,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // Does this stack frame of symbols loaded?
       if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO)) {
-        frameInfo.m_fHasDebugInfo = m_hasSource ? 1 : 0;
+        frameInfo.m_fHasDebugInfo = mHasSource ? 1 : 0;
         frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO;
       }
 
@@ -204,8 +204,8 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       // The debugger would like a pointer to the IDebugModule2 that contains this stack frame.
       if (dwFieldSpec.HasFlag(enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP)) {
-        if (m_engine.mModule != null) {
-          frameInfo.m_pModule = m_engine.mModule;
+        if (mEngine.mModule != null) {
+          frameInfo.m_pModule = mEngine.mModule;
           frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
         }
       }
@@ -217,26 +217,26 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       int localsLength = 0;
 
-      if (m_locals != null) {
-        localsLength = m_locals.Length;
+      if (mLocals != null) {
+        localsLength = mLocals.Length;
         elementsReturned += (uint)localsLength;
       }
 
-      if (m_parameters != null) {
-        elementsReturned += (uint)m_parameters.Length;
+      if (mParams != null) {
+        elementsReturned += (uint)mParams.Length;
       }
       var propInfo = new DEBUG_PROPERTY_INFO[elementsReturned];
 
-      if (m_locals != null) {
-        for (int i = 0; i < m_locals.Length; i++) {
-          AD7Property property = new AD7Property(m_locals[i], this.mProcess, this);
+      if (mLocals != null) {
+        for (int i = 0; i < mLocals.Length; i++) {
+          AD7Property property = new AD7Property(mLocals[i], this.mProcess, this);
           propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
         }
       }
 
-      if (m_parameters != null) {
-        for (int i = 0; i < m_parameters.Length; i++) {
-          AD7Property property = new AD7Property(m_parameters[i], this.mProcess, this);
+      if (mParams != null) {
+        for (int i = 0; i < mParams.Length; i++) {
+          AD7Property property = new AD7Property(mParams[i], this.mProcess, this);
           propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
         }
       }
@@ -246,11 +246,11 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     // Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
     private void CreateLocalProperties(out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
-      elementsReturned = (uint)m_locals.Length;
-      var propInfo = new DEBUG_PROPERTY_INFO[m_locals.Length];
+      elementsReturned = (uint)mLocals.Length;
+      var propInfo = new DEBUG_PROPERTY_INFO[mLocals.Length];
 
       for (int i = 0; i < propInfo.Length; i++) {
-        AD7Property property = new AD7Property(m_locals[i], mProcess, this);
+        AD7Property property = new AD7Property(mLocals[i], mProcess, this);
         propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
       }
 
@@ -259,11 +259,11 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     // Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
     private void CreateParameterProperties(out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
-      elementsReturned = (uint)m_parameters.Length;
-      var propInfo = new DEBUG_PROPERTY_INFO[m_parameters.Length];
+      elementsReturned = (uint)mParams.Length;
+      var propInfo = new DEBUG_PROPERTY_INFO[mParams.Length];
 
       for (int i = 0; i < propInfo.Length; i++) {
-        AD7Property property = new AD7Property(m_parameters[i], mProcess, this);
+        AD7Property property = new AD7Property(mParams[i], mProcess, this);
         propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
       }
 
@@ -338,16 +338,16 @@ namespace Cosmos.Debug.VSDebugEngine {
     int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext) {
       docContext = null;
       try {
-        if (m_hasSource) {
+        if (mHasSource) {
           // Assume all lines begin and end at the beginning of the line.
           TEXT_POSITION begTp = new TEXT_POSITION();
           begTp.dwColumn = 0;
-          begTp.dwLine = m_lineNum - 1;
+          begTp.dwLine = mLineNum - 1;
           TEXT_POSITION endTp = new TEXT_POSITION();
           endTp.dwColumn = 0;
-          endTp.dwLine = m_lineNum - 1;
+          endTp.dwLine = mLineNum - 1;
 
-          docContext = new AD7DocumentContext(m_documentName, begTp, endTp, null);
+          docContext = new AD7DocumentContext(mDocName, begTp, endTp, null);
           return VSConstants.S_OK;
         }
       }
@@ -401,7 +401,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       name = null;
 
       try {
-        name = m_functionName;
+        name = mFunctionName;
         return VSConstants.S_OK;
       }
         //catch (ComponentException e)
@@ -423,7 +423,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     // Gets the thread associated with a stack frame.
     int IDebugStackFrame2.GetThread(out IDebugThread2 thread) {
-      thread = m_thread;
+      thread = mThread;
       return VSConstants.S_OK;
     }
 
@@ -448,8 +448,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       ppExpr = null;
 
       try {
-        if (m_parameters != null) {
-          foreach (DebugLocalInfo currVariable in m_parameters) {
+        if (mParams != null) {
+          foreach (DebugLocalInfo currVariable in mParams) {
             if (String.CompareOrdinal(currVariable.Name, pszCode) == 0) {
               ppExpr = new AD7Expression(currVariable, mProcess, this);
               return VSConstants.S_OK;
@@ -457,8 +457,8 @@ namespace Cosmos.Debug.VSDebugEngine {
           }
         }
 
-        if (m_locals != null) {
-          foreach (DebugLocalInfo currVariable in m_locals) {
+        if (mLocals != null) {
+          foreach (DebugLocalInfo currVariable in mLocals) {
             if (String.CompareOrdinal(currVariable.Name, pszCode) == 0) {
               ppExpr = new AD7Expression(currVariable, mProcess, this);
               return VSConstants.S_OK;
