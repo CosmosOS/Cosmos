@@ -93,27 +93,9 @@ namespace Cosmos.IL2CPU {
 
     //TODO: Look for Field plugs
 
-    // System.ThrowHelper exists in MS .NET twice... 
-    // Its an internal class that exists in both mscorlib and system assemblies.
-    // They are separate types though, so normally the scanner scans both and
-    // then we get conflicting labels. MS included it twice to make exception 
-    // throwing code smaller. They are internal though, so we cannot
-    // reference them directly and only via finding them as they come along.
-    // We find it here, not via QueueType so we only check it here. Later
-    // we might have to checkin QueueType also.
-    // For now we accept both types, and just emit code for only one. This works
-    // with the current Nasm assembler as we resolve by name in the assembler.
-    // However with other assemblers this approach may not work.
-    // If AssemblerNASM adds assembly name to the label, this will allow
-    // both to exist as they do in BCL.
-    // So in the future we might be able to remove this hack, or change
-    // how it works.
-    //  private Type mThrowHelper;
-
     public ILScanner(AppAssembler aAsmblr) {
       mAsmblr = aAsmblr;
       mReader = new ILReader();
-      //mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");
     }
 
     public void EnableLogging(string aPathname) {
@@ -125,13 +107,29 @@ namespace Cosmos.IL2CPU {
     protected void Queue(_MemberInfo aItem, object aSrc, string aSrcType, object sourceItem = null) {
       var xMemInfo = aItem as MemberInfo;
       //TODO: fix this, as each label/symbol should also contain an assembly specifier.
-      if (xMemInfo != null
-        && xMemInfo.DeclaringType != null
+
+      if (xMemInfo != null && xMemInfo.DeclaringType != null
         && xMemInfo.DeclaringType.FullName == "System.ThrowHelper"
         && xMemInfo.DeclaringType.Assembly.GetName().Name != "mscorlib") {
-        return;
-      }
-      if (!mItems.Contains(aItem)) {
+        // System.ThrowHelper exists in MS .NET twice... 
+        // Its an internal class that exists in both mscorlib and system assemblies.
+        // They are separate types though, so normally the scanner scans both and
+        // then we get conflicting labels. MS included it twice to make exception 
+        // throwing code smaller. They are internal though, so we cannot
+        // reference them directly and only via finding them as they come along.
+        // We find it here, not via QueueType so we only check it here. Later
+        // we might have to checkin QueueType also.
+        // So now we accept both types, but emit code for only one. This works
+        // with the current Nasm assembler as we resolve by name in the assembler.
+        // However with other assemblers this approach may not work.
+        // If AssemblerNASM adds assembly name to the label, this will allow
+        // both to exist as they do in BCL.
+        // So in the future we might be able to remove this hack, or change
+        // how it works.
+        //
+        // Do nothing
+        //
+      } else if (!mItems.Contains(aItem)) {
         if (mLogEnabled) {
           LogMapPoint(aSrc, aSrcType, aItem);
         }
@@ -255,7 +253,7 @@ namespace Cosmos.IL2CPU {
 
       ILOp.mPlugFields = mPlugFields;
 
-      //    // Pull in extra implementations, GC etc.
+      // Pull in extra implementations, GC etc.
       Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
       Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
       //Queue(typeof(CosmosAssembler).GetMethod("PrintException"), null, "Explicit Entry");
@@ -291,7 +289,20 @@ namespace Cosmos.IL2CPU {
       // Start scanning, return when complete.
       ScanQueue();
 
-      // Everything is scanned. Lets assemble what we have.
+      // It would be nice to keep DebugInfo output into assembler only but
+      // there is so much info that is available in scanner that is needed
+      // or can be used in a more efficient manner. So we output in both 
+      // scanner and assembler as needed.
+      //
+      // -SQL Inserts are slow when done individually.
+      // -Assemblies can only be uniquely identified by their names.
+      // -Assembly table must be written before dependent items like Method
+      // can be written.
+      // Because of this, we scan in a loop all at once instead of noticing
+      // assemblies as we use them.
+      //mAsmblr.DebugInfo
+
+      // Time to assemble
       foreach (var xItem in mItems) {
         if (xItem is MethodBase) {
           var xMethod = (MethodBase)xItem;
@@ -1196,8 +1207,6 @@ namespace Cosmos.IL2CPU {
       //}
       return xBaseMethod ?? aMethod;
     }
-
-
 
     protected uint GetMethodUID(MethodBase aMethod, bool aExact) {
       if (!aExact) {

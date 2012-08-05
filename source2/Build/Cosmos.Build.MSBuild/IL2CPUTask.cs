@@ -17,16 +17,24 @@ using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild {
   // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
-  // Class is separated from MSBuild task so we can call it from debugging and standalone applications.
   public class IL2CPUTask {
-
-    // FIX THIS: when the kernel class changes, fix the name below
     const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
 
     public Action<string> OnLogMessage;
     public Action<string> OnLogError;
     public Action<string> OnLogWarning;
     public Action<Exception> OnLogException;
+    protected static Action<string> mStaticLog = null;
+
+    public string DebugMode { get; set; }
+    public string TraceAssemblies { get; set; }
+    public byte DebugCom { get; set; }
+    public bool UseNAsm { get; set; }
+    public ITaskItem[] References { get; set; }
+    public string OutputFilename { get; set; }
+    public bool EnableLogging { get; set; }
+    public bool EmitDebugSymbols { get; set; }
+    public bool IgnoreDebugStubAttribute { get; set; }
 
     protected void LogMessage(string aMsg) {
       if (OnLogMessage != null) {
@@ -50,16 +58,6 @@ namespace Cosmos.Build.MSBuild {
       if (OnLogException != null) {
         OnLogException(e);
       }
-    }
-
-    protected static void CheckFirstTime() {
-      var xSearchDirs = new List<string>();
-      xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
-      xSearchDirs.Add(CosmosPaths.UserKit);
-      xSearchDirs.Add(CosmosPaths.Kernel);
-      mSearchDirs = xSearchDirs.ToArray();
-
-      AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
     }
 
     protected static string[] mSearchDirs = new string[0];
@@ -88,56 +86,15 @@ namespace Cosmos.Build.MSBuild {
       }
       return null;
     }
-
-    protected static Action<string> mStaticLog = null;
-
-    public string DebugMode {
-      get;
-      set;
-    }
-
-    public string TraceAssemblies {
-      get;
-      set;
-    }
-
-    public byte DebugCom {
-      get;
-      set;
-    }
-
-    public bool UseNAsm {
-      get;
-      set;
-    }
-
-    public ITaskItem[] References {
-      get;
-      set;
-    }
-
-    public string OutputFilename {
-      get;
-      set;
-    }
-
-    public bool EnableLogging {
-      get;
-      set;
-    }
-
-    public bool EmitDebugSymbols {
-      get;
-      set;
-    }
-
-    public bool IgnoreDebugStubAttribute {
-      get;
-      set;
-    }
-
+    
     protected bool Initialize() {
-      CheckFirstTime();
+      var xSearchDirs = new List<string>();
+      xSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
+      xSearchDirs.Add(CosmosPaths.UserKit);
+      xSearchDirs.Add(CosmosPaths.Kernel);
+      mSearchDirs = xSearchDirs.ToArray();
+      AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+      
       if (References != null) {
         var xSearchPaths = new List<string>(mSearchDirs);
         foreach (var xRef in References) {
@@ -146,7 +103,7 @@ namespace Cosmos.Build.MSBuild {
             var xDir = Path.GetDirectoryName(xName);
             if (!xSearchPaths.Contains(xDir)) {
               // This seems to be to try to load plugs on demand from their own dirs, but 
-              // it often just causes load conflicts, and weird errors like "implemnation not found" 
+              // it often just causes load conflicts, and weird errors like "implementation not found" 
               // for a method, even when both the output user kit dir and local bin dir have up to date
               // and same assemblies. 
               // So its removed for now and we should find a better way to dynamically load plugs in 
@@ -154,15 +111,17 @@ namespace Cosmos.Build.MSBuild {
               //xSearchPaths.Insert(0, xDir);
             }
             if (xName.Length > 0) {
-              if (File.Exists(xName))
+              if (File.Exists(xName)) {
                 Assembly.LoadFile(xName);
-              else
+              } else {
                 LogWarning(string.Format("File {0} does not exist!", xName));
+              }
             }
           }
         }
         mSearchDirs = xSearchPaths.ToArray();
       }
+
       mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
       if (String.IsNullOrEmpty(TraceAssemblies)) {
         mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
@@ -173,6 +132,7 @@ namespace Cosmos.Build.MSBuild {
         }
         mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
       }
+
       return true;
     }
 
