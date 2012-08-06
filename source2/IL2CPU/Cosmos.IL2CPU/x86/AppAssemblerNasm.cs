@@ -15,13 +15,9 @@ using System.IO;
 
 namespace Cosmos.IL2CPU.X86 {
   public class AppAssemblerNasm : IL2CPU.AppAssembler {
-    public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
-    public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
-    protected const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
-    protected List<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
 
     public AppAssemblerNasm(byte aComPort)
-      : base(new CosmosAssembler(aComPort)) {
+      : base(new CPU.Assembler(aComPort)) {
     }
 
     protected override void InitILOps() {
@@ -599,21 +595,21 @@ namespace Cosmos.IL2CPU.X86 {
       new Pop { DestinationReg = Registers.EBP };
       new Return();
 
-      new CPU.Label(CosmosAssembler.EntryPointName);
+      new CPU.Label(CPU.Assembler.EntryPointName);
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       new Call { DestinationLabel = InitVMTCodeLabel };
-      CosmosAssembler.WriteDebugVideo("Initializing string IDs.");
+      CPU.Assembler.WriteDebugVideo("Initializing string IDs.");
       new Call { DestinationLabel = InitStringIDsLabel };
 
       // we now need to do "newobj" on the entry point, and after that, call .Start on it
-      var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
+      var xCurLabel = CPU.Assembler.EntryPointName + ".CreateEntrypoint";
       new CPU.Label(xCurLabel);
       IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
-      xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
+      xCurLabel = CPU.Assembler.EntryPointName + ".CallStart";
       new CPU.Label(xCurLabel);
-      IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart");
-      new CPU.Label(CosmosAssembler.EntryPointName + ".AfterStart");
+      IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CPU.Assembler.EntryPointName + ".AfterStart");
+      new CPU.Label(CPU.Assembler.EntryPointName + ".AfterStart");
       new Pop { DestinationReg = Registers.EBP };
       new Return();
 

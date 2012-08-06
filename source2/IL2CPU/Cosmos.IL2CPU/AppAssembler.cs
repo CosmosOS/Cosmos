@@ -10,6 +10,10 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
   public abstract class AppAssembler {
+    public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
+    public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
+    protected const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
+    protected List<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
     protected ILOp[] mILOpsLo = new ILOp[256];
     protected ILOp[] mILOpsHi = new ILOp[256];
     public bool ShouldOptimize = false;
@@ -21,7 +25,7 @@ namespace Cosmos.IL2CPU {
     public Dictionary<Assembly, Guid> Assemblies = new Dictionary<Assembly, Guid>();
 
     protected Cosmos.Assembler.Assembler mAssembler;
-    protected AppAssembler(Cosmos.Assembler.Assembler assembler) {
+    protected AppAssembler(Cosmos.Assembler.Assembler assembler)  {
       mAssembler = assembler;
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();

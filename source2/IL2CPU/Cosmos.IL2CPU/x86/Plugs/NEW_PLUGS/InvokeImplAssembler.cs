@@ -10,7 +10,6 @@ using Cosmos.IL2CPU.X86.IL;
 using CPU = Cosmos.Assembler;
 using MethodBase = System.Reflection.MethodBase;
 using Cosmos.Assembler;
-using CosmosAssembler = Cosmos.IL2CPU.X86.CosmosAssembler;
 
 namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
   public class InvokeImplAssembler: AssemblerMethod {
@@ -19,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
     }
 
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      var xAssembler = (CosmosAssembler)aAssembler;
+      var xAssembler = (Cosmos.Assembler.Assembler)aAssembler;
       var xMethodInfo = (Cosmos.IL2CPU.MethodInfo)aMethodInfo;
       var xMethodBaseAsInfo = xMethodInfo.MethodBase as global::System.Reflection.MethodInfo;
       if (xMethodBaseAsInfo.ReturnType != typeof(void)) {
