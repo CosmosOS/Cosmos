@@ -1121,7 +1121,7 @@ namespace Cosmos.IL2CPU {
         };
         xAssemblies.Add(xRow);
 
-        mAsmblr.Assemblies.Add(xAsm, xRow.ID);
+        mAsmblr.AssemblyGUIDs.Add(xAsm, xRow.ID);
       }
       mAsmblr.DebugInfo.AddAssemblies(xAssemblies);
     }

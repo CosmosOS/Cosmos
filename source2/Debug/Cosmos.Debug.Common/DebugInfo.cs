@@ -201,8 +201,10 @@ namespace Cosmos.Debug.Common {
 
     protected List<Method> mMethods = new List<Method>();
     public void AddMethod(Method aMethod, bool aFlush = false) {
-      aMethod.ID = Guid.NewGuid();
-      mMethods.Add(aMethod);
+      if (aMethod != null) {
+        aMethod.ID = Guid.NewGuid();
+        mMethods.Add(aMethod);
+      }
       BulkInsert("Methods", mMethods, 2500, aFlush);
     }
 

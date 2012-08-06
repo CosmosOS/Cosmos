@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU {
     protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
 
     // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
-    public Dictionary<Assembly, Guid> Assemblies = new Dictionary<Assembly, Guid>();
+    public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
 
     public AppAssembler(int aComPort) {
       Assembler = new Cosmos.Assembler.Assembler(aComPort);
@@ -83,7 +83,8 @@ namespace Cosmos.IL2CPU {
       //    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
       //    Engine.QueueMethod(xTempMethod);
       //}
-      #region Load CodeOffset
+      
+      // Load CodeOffset
       ISymbolMethod xMethodSymbols;
       if (DebugMode == DebugMode.Source) {
         var xSymbolReader = GetSymbolReaderForAssembly(aMethod.MethodBase.DeclaringType.Assembly);
@@ -101,10 +102,18 @@ namespace Cosmos.IL2CPU {
             var xCodeEndColumns = new int[xMethodSymbols.SequencePointCount];
             xMethodSymbols.GetSequencePoints(mCodeOffsets, xCodeDocuments
              , mCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+
+            var xMethod = new Method() {
+              TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
+              MethodToken = aMethod.MethodBase.MetadataToken,
+              LabelName = xMethodLabel,
+              AssemblyFileID = AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly]
+            };
+            DebugInfo.AddMethod(xMethod);
           }
         }
       }
-      #endregion
+
       if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
         // the body of aMethod is getting emitted
         var xBody = aMethod.MethodBase.GetMethodBody();
@@ -263,6 +272,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public void FinalizeDebugInfo() {
+      DebugInfo.AddMethod(null, true);
       DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
     }
 
