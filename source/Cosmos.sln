@@ -205,9 +205,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.XSC", "..\XSharp\sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDbg", "MDbg", "{43291572-4714-44FD-BF37-F5C21A758C33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "raw", "..\source2\MDbg4\src\debugger\raw\raw.csproj", "{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeDebugWrappers", "..\source2\MDbg4\src\debugger\NativeDebugWrappers\NativeDebugWrappers.csproj", "{3991AB6C-468B-4C28-95FC-3188CFB34180}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "corapi", "..\source2\MDbg4\src\debugger\corapi\corapi.csproj", "{04EF9865-E1B1-403D-802B-E4FAEA50A634}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 54
+		SccNumberOfProjects = 57
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -425,6 +433,18 @@ Global
 		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
 		SccProjectName53 = ../XSharp/source/XSharp.Nasm
 		SccLocalPath53 = ..\\XSharp\\source\\XSharp.Nasm
+		SccProjectUniqueName54 = ..\\source2\\MDbg4\\src\\debugger\\raw\\raw.csproj
+		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
+		SccProjectName54 = ../source2/MDbg4/src/debugger/raw
+		SccLocalPath54 = ..\\source2\\MDbg4\\src\\debugger\\raw
+		SccProjectUniqueName55 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers\\NativeDebugWrappers.csproj
+		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
+		SccProjectName55 = ../source2/MDbg4/src/debugger/NativeDebugWrappers
+		SccLocalPath55 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers
+		SccProjectUniqueName56 = ..\\source2\\MDbg4\\src\\debugger\\corapi\\corapi.csproj
+		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
+		SccProjectName56 = ../source2/MDbg4/src/debugger/corapi
+		SccLocalPath56 = ..\\source2\\MDbg4\\src\\debugger\\corapi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1023,6 +1043,36 @@ Global
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}.Release|x86.ActiveCfg = Release|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3991AB6C-468B-4C28-95FC-3188CFB34180}.Release|x86.ActiveCfg = Release|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1042,6 +1092,7 @@ Global
 		{AB24E403-54F3-4F67-B5E0-119A7227AAC1} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{3370FC04-B669-46A4-A4AA-A89540318F8D} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{A7F3F078-CF99-4018-9A35-2D6DC9517ADB} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
+		{43291572-4714-44FD-BF37-F5C21A758C33} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{6D2688FE-6FD8-44A8-B96A-6037457F72A7} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
@@ -1092,5 +1143,8 @@ Global
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
+		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447} = {43291572-4714-44FD-BF37-F5C21A758C33}
+		{3991AB6C-468B-4C28-95FC-3188CFB34180} = {43291572-4714-44FD-BF37-F5C21A758C33}
+		{04EF9865-E1B1-403D-802B-E4FAEA50A634} = {43291572-4714-44FD-BF37-F5C21A758C33}
 	EndGlobalSection
 EndGlobal
