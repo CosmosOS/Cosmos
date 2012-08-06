@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using Cosmos.Assembler;
-using Cosmos.Debug.Common;
-using Cosmos.Build.Common;
-using Cosmos.IL2CPU.Plugs;
-using Mono.Cecil;
 using Cosmos.Assembler.x86;
-using System.Diagnostics.SymbolStore;
+using Cosmos.Build.Common;
+using Cosmos.Debug.Common;
+using Cosmos.IL2CPU.Plugs;
 using Microsoft.Samples.Debugging.CorSymbolStore;
-using System.IO;
+using Mono.Cecil;
 
 namespace Cosmos.IL2CPU {
   public class AppAssembler {
@@ -34,13 +34,12 @@ namespace Cosmos.IL2CPU {
     public bool IgnoreDebugStubAttribute;
     protected static HashSet<string> mDebugLines = new HashSet<string>();
     protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
+    protected Cosmos.Assembler.Assembler mAssembler;
 
-    // Quick look up of assemblies so we dont have to go to the database and compare
-    // by fullname.
+    // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
     public Dictionary<Assembly, Guid> Assemblies = new Dictionary<Assembly, Guid>();
 
-    protected Cosmos.Assembler.Assembler mAssembler;
-    public AppAssembler(int aComPort)  {
+    public AppAssembler(int aComPort) {
       mAssembler = new Cosmos.Assembler.Assembler(aComPort);
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();
@@ -535,14 +534,12 @@ namespace Cosmos.IL2CPU {
           // value contains true if the method is an interface method definition
           SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
           foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-            if (aMethodsSet.Contains(xMethod))//) && !xMethod.IsAbstract)
-                        {
+            if (aMethodsSet.Contains(xMethod)) { //) && !xMethod.IsAbstract) {
               xEmittedMethods.Add(xMethod, false);
             }
           }
           foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-            if (aMethodsSet.Contains(xCtor))// && !xCtor.IsAbstract)
-                        {
+            if (aMethodsSet.Contains(xCtor)) { // && !xCtor.IsAbstract) {
               xEmittedMethods.Add(xCtor, false);
             }
           }
@@ -572,8 +569,7 @@ namespace Cosmos.IL2CPU {
               }
               if (aMethodsSet.Contains(xMethodIntf)) {
                 if (!xEmittedMethods.ContainsKey(xMethodIntf)) {
-                  xEmittedMethods.Add(xMethodIntf,
-                                      true);
+                  xEmittedMethods.Add(xMethodIntf, true);
                 }
               }
 
@@ -785,7 +781,7 @@ namespace Cosmos.IL2CPU {
     public uint GetSizeOfType(Type aType) {
       return ILOp.SizeOfType(aType);
     }
-    
+
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
       // todo: completely get rid of this kind of trampoline code
       MethodBegin(aFrom);
