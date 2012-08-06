@@ -121,12 +121,12 @@ namespace Cosmos.IL2CPU {
               IsArgument = false,
               INDEXINMETHOD = xLocal.LocalIndex,
               NAME = "Local" + xLocal.LocalIndex,
-              OFFSET = 0 - (int)X86.ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
+              OFFSET = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
               TYPENAME = xLocal.LocalType.AssemblyQualifiedName
             };
             mLocals_Arguments_Infos.Add(xInfo);
 
-            var xSize = ILOp.Align(X86.ILOp.SizeOfType(xLocal.LocalType), 4);
+            var xSize = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4);
             new Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
             for (int i = 0; i < xSize / 4; i++) {
               new Push { DestinationValue = 0 };
@@ -168,7 +168,7 @@ namespace Cosmos.IL2CPU {
         for (ushort i = 0; i < xParamCount; i++) {
           var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
           // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
-          xOffset -= (int)Cosmos.IL2CPU.ILOp.Align(X86.ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;
+          xOffset -= (int)Cosmos.IL2CPU.ILOp.Align(ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;
           mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
             METHODLABELNAME = xMethodLabel,
             IsArgument = true,
@@ -203,19 +203,19 @@ namespace Cosmos.IL2CPU {
       uint xReturnSize = 0;
       var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
       if (xMethInfo != null) {
-        xReturnSize = ILOp.Align(X86.ILOp.SizeOfType(xMethInfo.ReturnType), 4);
+        xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
       }
       if (aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
         new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
       }
       new Mov { DestinationReg = Registers.ECX, SourceValue = 0 };
       var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
-                            select (int)ILOp.Align(X86.ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+                            select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
       if (!aMethod.MethodBase.IsStatic) {
         if (aMethod.MethodBase.DeclaringType.IsValueType) {
           xTotalArgsSize += 4; // only a reference is passed
         } else {
-          xTotalArgsSize += (int)ILOp.Align(X86.ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+          xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
         }
       }
 
@@ -223,15 +223,15 @@ namespace Cosmos.IL2CPU {
         xReturnSize = 0;
         xMethInfo = aMethod.PluggedMethod.MethodBase as System.Reflection.MethodInfo;
         if (xMethInfo != null) {
-          xReturnSize = ILOp.Align(X86.ILOp.SizeOfType(xMethInfo.ReturnType), 4);
+          xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
         }
         xTotalArgsSize = (from item in aMethod.PluggedMethod.MethodBase.GetParameters()
-                          select (int)ILOp.Align(X86.ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+                          select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
         if (!aMethod.PluggedMethod.MethodBase.IsStatic) {
           if (aMethod.PluggedMethod.MethodBase.DeclaringType.IsValueType) {
             xTotalArgsSize += 4; // only a reference is passed
           } else {
-            xTotalArgsSize += (int)ILOp.Align(X86.ILOp.SizeOfType(aMethod.PluggedMethod.MethodBase.DeclaringType), 4);
+            xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.PluggedMethod.MethodBase.DeclaringType), 4);
           }
         }
       }
@@ -255,7 +255,7 @@ namespace Cosmos.IL2CPU {
         if (xBody != null) {
           uint xLocalsSize = 0;
           for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--) {
-            xLocalsSize += ILOp.Align(X86.ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+            xLocalsSize += ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
 
             if (xLocalsSize >= 256) {
               new Add {
@@ -783,7 +783,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public uint GetSizeOfType(Type aType) {
-      return X86.ILOp.SizeOfType(aType);
+      return ILOp.SizeOfType(aType);
     }
     
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
@@ -922,7 +922,7 @@ namespace Cosmos.IL2CPU {
           var xBody = aMethod.MethodBase.GetMethodBody();
           if (xBody != null) {
             var xLocalsSize = (from item in xBody.LocalVariables
-                               select ILOp.Align(X86.ILOp.SizeOfType(item.LocalType), 4)).Sum();
+                               select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
             xMLSymbol.STACKDIFF = checked((int)(xLocalsSize + xStackSize));
           }
         }
