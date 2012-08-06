@@ -17,7 +17,8 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -89,204 +90,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppAssemblerNasm.cs" />
-    <Compile Include="CosmosAssembler.cs" />
-    <Compile Include="IL\FieldInfo.cs" />
-    <Compile Include="ILOp.cs" />
-    <Compile Include="IL\Add.cs" />
-    <Compile Include="IL\Add_Ovf.cs" />
-    <Compile Include="IL\Add_Ovf_Un.cs" />
-    <Compile Include="IL\And.cs" />
-    <Compile Include="IL\Arglist.cs" />
-    <Compile Include="IL\Branch.cs" />
-    <Compile Include="IL\Box.cs" />
-    <Compile Include="IL\Br.cs" />
-    <Compile Include="IL\Break.cs" />
-    <Compile Include="IL\Brfalse.cs" />
-    <Compile Include="IL\Brtrue.cs" />
-    <Compile Include="IL\Call.cs" />
-    <Compile Include="IL\Calli.cs" />
-    <Compile Include="IL\Callvirt.cs" />
-    <Compile Include="IL\Castclass.cs" />
-    <Compile Include="IL\Ceq.cs" />
-    <Compile Include="IL\Cgt.cs" />
-    <Compile Include="IL\Cgt_Un.cs" />
-    <Compile Include="IL\Ckfinite.cs" />
-    <Compile Include="IL\Clt.cs" />
-    <Compile Include="IL\Clt_Un.cs" />
-    <Compile Include="IL\Constrained.cs" />
-    <Compile Include="IL\Conv_I.cs" />
-    <Compile Include="IL\Conv_I1.cs" />
-    <Compile Include="IL\Conv_I2.cs" />
-    <Compile Include="IL\Conv_I4.cs" />
-    <Compile Include="IL\Conv_I8.cs" />
-    <Compile Include="IL\Conv_Ovf_I.cs" />
-    <Compile Include="IL\Conv_Ovf_I1.cs" />
-    <Compile Include="IL\Conv_Ovf_I1_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_I2.cs" />
-    <Compile Include="IL\Conv_Ovf_I2_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_I4.cs" />
-    <Compile Include="IL\Conv_Ovf_I4_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_I8.cs" />
-    <Compile Include="IL\Conv_Ovf_I8_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_I_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_U.cs" />
-    <Compile Include="IL\Conv_Ovf_U1.cs" />
-    <Compile Include="IL\Conv_Ovf_U1_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_U2.cs" />
-    <Compile Include="IL\Conv_Ovf_U2_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_U4.cs" />
-    <Compile Include="IL\Conv_Ovf_U4_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_U8.cs" />
-    <Compile Include="IL\Conv_Ovf_U8_Un.cs" />
-    <Compile Include="IL\Conv_Ovf_U_Un.cs" />
-    <Compile Include="IL\Conv_R4.cs" />
-    <Compile Include="IL\Conv_R8.cs" />
-    <Compile Include="IL\Conv_R_Un.cs" />
-    <Compile Include="IL\Conv_U.cs" />
-    <Compile Include="IL\Conv_U1.cs" />
-    <Compile Include="IL\Conv_U2.cs" />
-    <Compile Include="IL\Conv_U4.cs" />
-    <Compile Include="IL\Conv_U8.cs" />
-    <Compile Include="IL\Cpblk.cs" />
-    <Compile Include="IL\Cpobj.cs" />
-    <Compile Include="IL\Div.cs" />
-    <Compile Include="IL\Div_Un.cs" />
-    <Compile Include="IL\Dup.cs" />
-    <Compile Include="IL\Endfilter.cs" />
-    <Compile Include="IL\Endfinally.cs" />
-    <Compile Include="IL\Initblk.cs" />
-    <Compile Include="IL\Initobj.cs" />
-    <Compile Include="IL\Isinst.cs" />
-    <Compile Include="IL\Jmp.cs" />
-    <Compile Include="IL\Ldarg.cs" />
-    <Compile Include="IL\Ldarga.cs" />
-    <Compile Include="IL\Ldc_I4.cs" />
-    <Compile Include="IL\Ldc_I8.cs" />
-    <Compile Include="IL\Ldc_R4.cs" />
-    <Compile Include="IL\Ldc_R8.cs" />
-    <Compile Include="IL\Ldelem.cs" />
-    <Compile Include="IL\Ldelema.cs" />
-    <Compile Include="IL\Ldelem_I.cs" />
-    <Compile Include="IL\Ldelem_I1.cs" />
-    <Compile Include="IL\Ldelem_I2.cs" />
-    <Compile Include="IL\Ldelem_I4.cs" />
-    <Compile Include="IL\Ldelem_I8.cs" />
-    <Compile Include="IL\Ldelem_R4.cs" />
-    <Compile Include="IL\Ldelem_R8.cs" />
-    <Compile Include="IL\Ldelem_Ref.cs" />
-    <Compile Include="IL\Ldelem_U1.cs" />
-    <Compile Include="IL\Ldelem_U2.cs" />
-    <Compile Include="IL\Ldelem_U4.cs" />
-    <Compile Include="IL\Ldfld.cs" />
-    <Compile Include="IL\Ldflda.cs" />
-    <Compile Include="IL\Ldftn.cs" />
-    <Compile Include="IL\Ldind_I.cs" />
-    <Compile Include="IL\Ldind_I1.cs" />
-    <Compile Include="IL\Ldind_I2.cs" />
-    <Compile Include="IL\Ldind_I4.cs" />
-    <Compile Include="IL\Ldind_I8.cs" />
-    <Compile Include="IL\Ldind_R4.cs" />
-    <Compile Include="IL\Ldind_R8.cs" />
-    <Compile Include="IL\Ldind_Ref.cs" />
-    <Compile Include="IL\Ldind_U1.cs" />
-    <Compile Include="IL\Ldind_U2.cs" />
-    <Compile Include="IL\Ldind_U4.cs" />
-    <Compile Include="IL\Ldlen.cs" />
-    <Compile Include="IL\Ldloc.cs" />
-    <Compile Include="IL\Ldloca.cs" />
-    <Compile Include="IL\Ldnull.cs" />
-    <Compile Include="IL\Ldobj.cs" />
-    <Compile Include="IL\Ldsfld.cs" />
-    <Compile Include="IL\Ldsflda.cs" />
-    <Compile Include="IL\Ldstr.cs" />
-    <Compile Include="IL\Ldtoken.cs" />
-    <Compile Include="IL\Ldvirtftn.cs" />
-    <Compile Include="IL\Leave.cs" />
-    <Compile Include="IL\Localloc.cs" />
-    <Compile Include="IL\Mkrefany.cs" />
-    <Compile Include="IL\Mul.cs" />
-    <Compile Include="IL\Mul_Ovf.cs" />
-    <Compile Include="IL\Mul_Ovf_Un.cs" />
-    <Compile Include="IL\Neg.cs" />
-    <Compile Include="IL\Newarr.cs" />
-    <Compile Include="IL\Newobj.cs" />
-    <Compile Include="IL\Nop.cs" />
-    <Compile Include="IL\Not.cs" />
-    <Compile Include="IL\Or.cs" />
-    <Compile Include="IL\Pop.cs" />
-    <Compile Include="IL\Readonly.cs" />
-    <Compile Include="IL\Refanytype.cs" />
-    <Compile Include="IL\Refanyval.cs" />
-    <Compile Include="IL\Rem.cs" />
-    <Compile Include="IL\Rem_Un.cs" />
-    <Compile Include="IL\Ret.cs" />
-    <Compile Include="IL\Rethrow.cs" />
-    <Compile Include="IL\Shl.cs" />
-    <Compile Include="IL\Shr.cs" />
-    <Compile Include="IL\Shr_Un.cs" />
-    <Compile Include="IL\Sizeof.cs" />
-    <Compile Include="IL\Starg.cs" />
-    <Compile Include="IL\Stelem.cs" />
-    <Compile Include="IL\Stelem_I.cs" />
-    <Compile Include="IL\Stelem_I1.cs" />
-    <Compile Include="IL\Stelem_I2.cs" />
-    <Compile Include="IL\Stelem_I4.cs" />
-    <Compile Include="IL\Stelem_I8.cs" />
-    <Compile Include="IL\Stelem_R4.cs" />
-    <Compile Include="IL\Stelem_R8.cs" />
-    <Compile Include="IL\Stelem_Ref.cs" />
-    <Compile Include="IL\Stfld.cs" />
-    <Compile Include="IL\Stind_I.cs" />
-    <Compile Include="IL\Stind_I1.cs" />
-    <Compile Include="IL\Stind_I2.cs" />
-    <Compile Include="IL\Stind_I4.cs" />
-    <Compile Include="IL\Stind_I8.cs" />
-    <Compile Include="IL\Stind_R4.cs" />
-    <Compile Include="IL\Stind_R8.cs" />
-    <Compile Include="IL\Stind_Ref.cs" />
-    <Compile Include="IL\Stloc.cs" />
-    <Compile Include="IL\Stobj.cs" />
-    <Compile Include="IL\Stsfld.cs" />
-    <Compile Include="IL\Sub.cs" />
-    <Compile Include="IL\Sub_Ovf.cs" />
-    <Compile Include="IL\Sub_Ovf_Un.cs" />
-    <Compile Include="IL\Switch.cs" />
-    <Compile Include="IL\Throw.cs" />
-    <Compile Include="IL\Unaligned.cs" />
-    <Compile Include="IL\Unbox.cs" />
-    <Compile Include="IL\Unbox_Any.cs" />
-    <Compile Include="IL\Volatile.cs" />
-    <Compile Include="IL\Xor.cs" />
-    <Compile Include="Optimizer.cs" />
-    <Compile Include="Plugs\Diagnostics\BreakAssembler.cs" />
-    <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
-    <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
-    <Compile Include="Plugs\Diagnostics\DebugImplRefs.cs" />
-    <Compile Include="Plugs\MS\System\MathImpl.cs" />
-    <Compile Include="Plugs\MS\System\StringImpl.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\CtorImplAssembler.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\DelegateImpl.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\DoubleImpl.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\GetMulticastInvokeAssembler.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\InvokeImplAssembler.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\NormalDelegateImpl.cs" />
-    <Compile Include="Plugs\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
-    <Compile Include="Plugs\System\ArrayImpl.cs" />
-    <Compile Include="Plugs\System\Assemblers\Array_get_Length.cs" />
-    <Compile Include="Plugs\System\Assemblers\Array_InternalCopy.cs" />
-    <Compile Include="Plugs\System\Assemblers\Buffer_BlockCopy.cs" />
-    <Compile Include="Plugs\System\Assemblers\MulticastDelegate_Invoke.cs" />
-    <Compile Include="Plugs\System\Buffer.cs" />
-    <Compile Include="Plugs\System\DelegateImpl.cs" />
-    <Compile Include="Plugs\System\EnumImpl.cs" />
-    <Compile Include="Plugs\System\EventHandlerImpl.cs" />
-    <Compile Include="Plugs\System\EventHandlerImplRefs.cs" />
-    <Compile Include="Plugs\System\ExceptionImpl.cs" />
-    <Compile Include="Plugs\System\MulticastDelegateImpl.cs" />
-    <Compile Include="Plugs\System\MulticastDelegateImplRefs.cs" />
-    <Compile Include="Plugs\System\ObjectImplRefs.cs" />
-    <Compile Include="Plugs\System\OutOfMemoryExceptionImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -323,12 +126,7 @@
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Cosmos.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Plugs\Generic\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
