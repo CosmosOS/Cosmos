@@ -26,31 +26,27 @@ namespace Cosmos.IL2CPU {
     public DebugInfo DebugInfo { get; set; }
     protected System.IO.TextWriter mLog;
     protected Dictionary<string, ModuleDefinition> mLoadedModules = new Dictionary<string, ModuleDefinition>();
-    protected int[] xCodeOffsets;
-    protected int[] xCodeLineNumbers;
+    protected int[] mCodeOffsets;
+    protected int[] mCodeLineNumbers;
     public TraceAssemblies TraceAssemblies;
     public bool DebugEnabled = false;
     public DebugMode DebugMode;
     public bool IgnoreDebugStubAttribute;
     protected static HashSet<string> mDebugLines = new HashSet<string>();
     protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
-    protected Cosmos.Assembler.Assembler mAssembler;
 
     // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
     public Dictionary<Assembly, Guid> Assemblies = new Dictionary<Assembly, Guid>();
 
     public AppAssembler(int aComPort) {
-      mAssembler = new Cosmos.Assembler.Assembler(aComPort);
+      Assembler = new Cosmos.Assembler.Assembler(aComPort);
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();
     }
 
-    public Cosmos.Assembler.Assembler Assembler {
-      get { return mAssembler; }
-      set { mAssembler = value; }
-    }
+    public readonly Cosmos.Assembler.Assembler Assembler;
 
-    protected virtual void MethodBegin(MethodInfo aMethod) {
+    protected void MethodBegin(MethodInfo aMethod) {
       new Comment("---------------------------------------------------------");
       new Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
       new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
@@ -97,14 +93,14 @@ namespace Cosmos.IL2CPU {
           // Sequence Points are spots that identify what the compiler/debugger says is a spot
           // that a breakpoint can occur one. Essentially, an atomic source line in C#
           if (xMethodSymbols != null) {
-            xCodeOffsets = new int[xMethodSymbols.SequencePointCount];
+            mCodeOffsets = new int[xMethodSymbols.SequencePointCount];
             var xCodeDocuments = new ISymbolDocument[xMethodSymbols.SequencePointCount];
-            xCodeLineNumbers = new int[xMethodSymbols.SequencePointCount];
+            mCodeLineNumbers = new int[xMethodSymbols.SequencePointCount];
             var xCodeColumns = new int[xMethodSymbols.SequencePointCount];
             var xCodeEndLines = new int[xMethodSymbols.SequencePointCount];
             var xCodeEndColumns = new int[xMethodSymbols.SequencePointCount];
-            xMethodSymbols.GetSequencePoints(xCodeOffsets, xCodeDocuments
-             , xCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+            xMethodSymbols.GetSequencePoints(mCodeOffsets, xCodeDocuments
+             , mCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
           }
         }
       }
@@ -180,23 +176,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected virtual void MethodBegin(string aMethodName) {
-      new Comment("---------------------------------------------------------");
-      new Comment("Name: " + aMethodName);
-
-      new Cosmos.Assembler.Label(aMethodName);
-      new Push { DestinationReg = Registers.EBP };
-      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-      xCodeOffsets = new int[0];
-    }
-
-    protected virtual void MethodEnd(string aMethodName) {
-      new Comment("End Method: " + aMethodName);
-      new Cosmos.Assembler.Label("_END_OF_" + aMethodName);
-      new Pop { DestinationReg = Registers.EBP };
-      new Return();
-    }
-    protected virtual void MethodEnd(MethodInfo aMethod) {
+    protected void MethodEnd(MethodInfo aMethod) {
       new Comment("End Method: " + aMethod.MethodBase.Name);
 
       uint xReturnSize = 0;
@@ -318,14 +298,14 @@ namespace Cosmos.IL2CPU {
       }
 
       MethodBegin(aMethod);
-      mAssembler.Stack.Clear();
+      Assembler.Stack.Clear();
       mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
       mLog.Flush();
       if (aMethod.MethodAssembler != null) {
         mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
         var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
-        xAssembler.AssembleNew(mAssembler, aMethod.PluggedMethod);
+        xAssembler.AssembleNew(Assembler, aMethod.PluggedMethod);
       } else if (aMethod.IsInlineAssembler) {
         mLog.WriteLine("Emitted using Inline MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
@@ -339,7 +319,7 @@ namespace Cosmos.IL2CPU {
           } else {
             xILOp = mILOpsHi[xOpCodeVal & 0xFF];
           }
-          mLog.WriteLine("\t{0} {1}", mAssembler.Stack.Count, xILOp.GetType().Name);
+          mLog.WriteLine("\t{0} {1}", Assembler.Stack.Count, xILOp.GetType().Name);
           mLog.Flush();
 
           BeforeOp(aMethod, xOpCode);
@@ -393,7 +373,7 @@ namespace Cosmos.IL2CPU {
           var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
           if (xNeedsExceptionPush) {
             Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
-            mAssembler.Stack.Push(4, typeof(Exception));
+            Assembler.Stack.Push(4, typeof(Exception));
           }
 
           xILOp.Execute(aMethod, xOpCode);
@@ -442,7 +422,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void Pop() {
-      new Add { DestinationReg = Registers.ESP, SourceValue = (uint)mAssembler.Stack.Pop().Size };
+      new Add { DestinationReg = Registers.ESP, SourceValue = (uint)Assembler.Stack.Pop().Size };
     }
 
     protected void Push(string aLabelName, bool isIndirect = false) {
@@ -465,7 +445,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void Ldarg(MethodInfo aMethod, int aIndex) {
-      X86.IL.Ldarg.DoExecute(mAssembler, aMethod, (ushort)aIndex);
+      X86.IL.Ldarg.DoExecute(Assembler, aMethod, (ushort)aIndex);
     }
 
     protected void Call(MethodInfo aMethod, MethodInfo aTargetMethod) {
@@ -477,7 +457,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void Ldflda(MethodInfo aMethod, string aFieldId) {
-      X86.IL.Ldflda.DoExecute(mAssembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
+      X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
     }
 
     protected int GetVTableEntrySize() {
@@ -486,8 +466,12 @@ namespace Cosmos.IL2CPU {
 
     public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
     public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
-      // initialization
-      MethodBegin(InitVMTCodeLabel);
+      new Comment("---------------------------------------------------------");
+      new Cosmos.Assembler.Label(InitVMTCodeLabel);
+      new Push { DestinationReg = Registers.EBP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      mCodeOffsets = new int[0];
+
       {
         var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
         var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
@@ -693,7 +677,10 @@ namespace Cosmos.IL2CPU {
         }
 #endif
       }
-      MethodEnd(InitVMTCodeLabel);
+
+      new Cosmos.Assembler.Label("_END_OF_" + InitVMTCodeLabel);
+      new Pop { DestinationReg = Registers.EBP };
+      new Return();
     }
 
     public void ProcessField(FieldInfo aField) {
@@ -740,10 +727,10 @@ namespace Cosmos.IL2CPU {
           //        }
           //    }
           //}
-          //mAssembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
+          //Assembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
           //                                          "incbin",
           //                                          "\"" + xFileName + "\""));
-          //mAssembler.DataMembers.Add(new DataMember(xFieldName,
+          //Assembler.DataMembers.Add(new DataMember(xFieldName,
           //                                          "dd",
           //                                          "___" + xFieldName + "___Contents"));
           throw new NotImplementedException();
@@ -853,7 +840,7 @@ namespace Cosmos.IL2CPU {
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
-      foreach (var xDataMember in mAssembler.DataMembers) {
+      foreach (var xDataMember in Assembler.DataMembers) {
         if (!xDataMember.Name.StartsWith("StringLiteral")) {
           continue;
         }
@@ -878,7 +865,7 @@ namespace Cosmos.IL2CPU {
       X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
       xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
       new Cosmos.Assembler.Label(xCurLabel);
-      X86.IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
+      X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
       new Cosmos.Assembler.Label(Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
       new Pop { DestinationReg = Registers.EBP };
       new Return();
@@ -890,14 +877,14 @@ namespace Cosmos.IL2CPU {
 
     protected void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
       var xContents = "";
-      foreach (var xStackItem in mAssembler.Stack) {
+      foreach (var xStackItem in Assembler.Stack) {
         xContents += ILOp.Align((uint)xStackItem.Size, 4);
         xContents += ", ";
       }
       if (xContents.EndsWith(", ")) {
         xContents = xContents.Substring(0, xContents.Length - 2);
       }
-      new Comment("Stack contains " + mAssembler.Stack.Count + " items: (" + xContents + ")");
+      new Comment("Stack contains " + Assembler.Stack.Count + " items: (" + xContents + ")");
     }
 
     protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
@@ -910,7 +897,7 @@ namespace Cosmos.IL2CPU {
         xMLSymbol.LABELNAME = TmpPosLabel(aMethod, aOpCode);
         xMLSymbol.METHODNAME = aMethod.MethodBase.GetFullName();
 
-        var xStackSize = (from item in mAssembler.Stack
+        var xStackSize = (from item in Assembler.Stack
                           let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))
                           select xSize).Sum();
         xMLSymbol.STACKDIFF = -1;
@@ -935,7 +922,7 @@ namespace Cosmos.IL2CPU {
       }
       DebugInfo.WriteSymbols(mSymbols, true);
 
-      EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
+      EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, mCodeOffsets);
     }
 
     protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets) {
@@ -959,7 +946,7 @@ namespace Cosmos.IL2CPU {
           var xIndex = Array.IndexOf(aCodeOffsets, aOp.Position);
           if (xIndex == -1) {
             return;
-          } else if (xCodeLineNumbers[xIndex] == 0xFEEFEE) {
+          } else if (mCodeLineNumbers[xIndex] == 0xFEEFEE) {
             // 0xFEEFEE means hiddenline -> we dont want to stop there
             return;
           }
