@@ -175,9 +175,6 @@ namespace Cosmos.IL2CPU {
       MethodEnd(aMethod);
     }
 
-    protected virtual void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) { }
-    protected virtual void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) { }
-
     protected void InitILOps() {
       InitILOps(typeof(ILOp));
     }
@@ -662,6 +659,119 @@ namespace Cosmos.IL2CPU {
       if (ShouldOptimize) {
         Orvid.Optimizer.Optimize(Assembler);
       }
+    }
+
+    protected void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
+      var xContents = "";
+      foreach (var xStackItem in mAssembler.Stack) {
+        xContents += ILOp.Align((uint)xStackItem.Size, 4);
+        xContents += ", ";
+      }
+      if (xContents.EndsWith(", ")) {
+        xContents = xContents.Substring(0, xContents.Length - 2);
+      }
+      new Comment("Stack contains " + mAssembler.Stack.Count + " items: (" + xContents + ")");
+    }
+
+    protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
+      string xLabel = TmpPosLabel(aMethod, aOpCode);
+      Assembler.CurrentIlLabel = xLabel;
+      new Cosmos.Assembler.Label(xLabel, "IL");
+
+      if (mSymbols != null) {
+        var xMLSymbol = new MLSYMBOL();
+        xMLSymbol.LABELNAME = TmpPosLabel(aMethod, aOpCode);
+        xMLSymbol.METHODNAME = aMethod.MethodBase.GetFullName();
+
+        var xStackSize = (from item in mAssembler.Stack
+                          let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))
+                          select xSize).Sum();
+        xMLSymbol.STACKDIFF = -1;
+        if (aMethod.MethodBase != null) {
+          var xBody = aMethod.MethodBase.GetMethodBody();
+          if (xBody != null) {
+            var xLocalsSize = (from item in xBody.LocalVariables
+                               select ILOp.Align(X86.ILOp.SizeOfType(item.LocalType), 4)).Sum();
+            xMLSymbol.STACKDIFF = checked((int)(xLocalsSize + xStackSize));
+          }
+        }
+        try {
+          xMLSymbol.ILASMFILE = aMethod.MethodBase.DeclaringType.Assembly.Location;
+        } catch (NotSupportedException) {
+          xMLSymbol.ILASMFILE = "DYNAMIC: " + aMethod.MethodBase.DeclaringType.Assembly.FullName;
+        }
+        xMLSymbol.METHODTOKEN = aMethod.MethodBase.MetadataToken;
+        xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
+        xMLSymbol.ILOFFSET = aOpCode.Position;
+        mSymbols.Add(xMLSymbol);
+        DebugInfo.WriteSymbols(mSymbols);
+      }
+      DebugInfo.WriteSymbols(mSymbols, true);
+
+      EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
+    }
+
+    protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets) {
+      // NOTE - These if statements can be optimized down - but clarity is
+      // more important the optimizations. Furthermoer the optimazations available
+      // would not offer much benefit
+
+      // Determine if a new DebugStub should be emitted
+
+      if (aOp.OpCode == ILOpCode.Code.Nop) {
+        // Skip NOOP's so we dont have breakpoints on them
+        //TODO: Each IL op should exist in IL, and descendants in IL.X86.
+        // Because of this we have this hack
+        return;
+      } else if (DebugEnabled == false) {
+        return;
+      } else if (DebugMode == DebugMode.Source) {
+        // If the current position equals one of the offsets, then we have
+        // reached a new atomic C# statement
+        if (aCodeOffsets != null) {
+          var xIndex = Array.IndexOf(aCodeOffsets, aOp.Position);
+          if (xIndex == -1) {
+            return;
+          } else if (xCodeLineNumbers[xIndex] == 0xFEEFEE) {
+            // 0xFEEFEE means hiddenline -> we dont want to stop there
+            return;
+          }
+        }
+      }
+
+      // Check if the DebugStub has been disabled for this method
+      if ((!IgnoreDebugStubAttribute) && (aMethod.DebugStubOff)) {
+        return;
+      }
+
+      // Check options for Debug Level
+      // Set based on TracedAssemblies
+      if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User) {
+        if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
+          return;
+        } else if (aNamespace.ToLower() == "system") {
+          return;
+        } else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
+          return;
+        }
+        if (TraceAssemblies == TraceAssemblies.User) {
+          //TODO: Maybe an attribute that could be used to turn tracing on and off
+          //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user 
+          // could do Cosmos.KernelMine and it will fail. Need to fix this
+          if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase)) {
+            return;
+          } else if (aNamespace.StartsWith("Cosmos.Sys", StringComparison.InvariantCultureIgnoreCase)) {
+            return;
+          } else if (aNamespace.StartsWith("Cosmos.Hardware", StringComparison.InvariantCultureIgnoreCase)) {
+            return;
+          } else if (aNamespace.StartsWith("Cosmos.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
+            return;
+          }
+        }
+      }
+
+      // If we made it this far without a return, emit the Tracer
+      new INT3();
     }
 
   }
