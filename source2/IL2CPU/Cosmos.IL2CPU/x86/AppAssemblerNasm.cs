@@ -17,11 +17,7 @@ namespace Cosmos.IL2CPU.X86 {
   public class AppAssemblerNasm : IL2CPU.AppAssembler {
 
     public AppAssemblerNasm(byte aComPort)
-      : base(new CPU.Assembler(aComPort)) {
-    }
-
-    protected override void InitILOps() {
-      InitILOps(typeof(ILOp));
+      : base(aComPort) {
     }
 
     protected override void MethodBegin(MethodInfo aMethod) {
@@ -149,9 +145,6 @@ namespace Cosmos.IL2CPU.X86 {
       }
     }
 
-    private Dictionary<string, ModuleDefinition> mLoadedModules = new Dictionary<string, ModuleDefinition>();
-    //private Dictionary<Tuple<string, int>, MethodDefinition> mMethods = new 
-
     private MethodDefinition GetCecilMethodDefinitionForSymbolReading(MethodBase methodBase) {
       var xMethodBase = methodBase;
       if (xMethodBase.IsGenericMethod) {
@@ -231,17 +224,6 @@ namespace Cosmos.IL2CPU.X86 {
       }
 
       if (xReturnSize > 0) {
-        //var xArgSize = (from item in aArgs
-        //                let xSize = item.Size + item.Offset
-        //                select xSize).FirstOrDefault();
-        //new Comment(String.Format("ReturnSize = {0}, ArgumentSize = {1}",
-        //                          aReturnSize,
-        //                          xArgSize));
-        //int xOffset = 4;
-        //if(xArgSize>0) {
-        //    xArgSize -= xReturnSize;
-        //    xOffset = xArgSize;
-        //}
         var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
         for (int i = 0; i < xReturnSize / 4; i++) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -251,50 +233,10 @@ namespace Cosmos.IL2CPU.X86 {
             DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)),
             SourceReg = Registers.EAX
           };
-          //        new CPUx86.Move {
-          //            DestinationReg = CPUx86.Registers.EBP,
-          //            DestinationIsIndirect = true,
-          //            DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 4 - xReturnSize),
-          //            SourceReg = Registers.EAX
-          //        };
         }
         // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
       }
       new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException);
-      //for (int i = 0; i < aLocAllocItemCount; i++) {
-      //  new CPUx86.Call { DestinationLabel = aHeapFreeLabel };
-      //}
-      //if (aDebugMode && aIsNonDebuggable) {
-      //  new CPUx86.Call { DestinationLabel = "DebugPoint_DebugResume" };
-      //}
-
-      //if ((from xLocal in aLocals
-      //     where xLocal.IsReferenceType
-      //     select 1).Count() > 0 || (from xArg in aArgs
-      //                               where xArg.IsReferenceType
-      //                               select 1).Count() > 0) {
-      //  new CPUx86.Push { DestinationReg = Registers.ECX };
-      //  //foreach (MethodInformation.Variable xLocal in aLocals) {
-      //  //  if (xLocal.IsReferenceType) {
-      //  //    Op.Ldloc(aAssembler,
-      //  //             xLocal,
-      //  //             false,
-      //  //             aGetStorageSizeDelegate(xLocal.VariableType));
-      //  //    new CPUx86.Call { DestinationLabel = aDecRefLabel };
-      //  //  }
-      //  //}
-      //  //foreach (MethodInformation.Argument xArg in aArgs) {
-      //  //  if (xArg.IsReferenceType) {
-      //  //    Op.Ldarg(aAssembler,
-      //  //             xArg,
-      //  //             false);
-      //  //    //,                                 aGetStorageSizeDelegate(xArg.ArgumentType)
-      //  //    new CPUx86.Call { DestinationLabel = aDecRefLabel };
-      //  //  }
-      //  //}
-      //  // todo: add GC code
-      //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-      //}
       if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
         var xBody = aMethod.MethodBase.GetMethodBody();
         if (xBody != null) {
@@ -318,13 +260,6 @@ namespace Cosmos.IL2CPU.X86 {
           }
         }
       }
-      //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
-      //new CPUx86.Compare { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-      //new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException + "__2" };
-      //new CPUx86.Xchg { DestinationReg = Registers.BX, SourceReg = Registers.BX };
-      //new CPUx86.Halt();
-      // TODO: not nice coding, still a test
-      //new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
       new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
@@ -367,27 +302,6 @@ namespace Cosmos.IL2CPU.X86 {
       new CPUx86.Return();
     }
 
-    private static HashSet<string> mDebugLines = new HashSet<string>();
-    private static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {
-      var xLine = String.Format("{0}\t{1}\t{2}", CPU.MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
-
-    }
-    private List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
-
-    // These are all temp functions until we move to the new assembler.
-    // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
-    public static string TmpPosLabel(MethodInfo aMethod, int aOffset) {
-      return ILOp.GetLabel(aMethod, aOffset);
-    }
-
-    public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {
-      return TmpPosLabel(aMethod, aOpCode.Position);
-    }
-
-    public static string TmpBranchLabel(MethodInfo aMethod, ILOpCode aOpCode) {
-      return TmpPosLabel(aMethod, ((ILOpCodes.OpBranch)aOpCode).Value);
-    }
-
     protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
       base.BeforeOp(aMethod, aOpCode);
       string xLabel = TmpPosLabel(aMethod, aOpCode);
@@ -426,11 +340,6 @@ namespace Cosmos.IL2CPU.X86 {
       
       EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, xCodeOffsets);
     }
-
-    public TraceAssemblies TraceAssemblies;
-    public bool DebugEnabled = false;
-    public DebugMode DebugMode;
-    public bool IgnoreDebugStubAttribute;
 
     protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, int[] aCodeOffsets) {
       // NOTE - These if statements can be optimized down - but clarity is
@@ -496,8 +405,6 @@ namespace Cosmos.IL2CPU.X86 {
       new CPUx86.INT3();
     }
 
-    private int[] xCodeOffsets;
-    private int[] xCodeLineNumbers;
     protected override void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
       base.AfterOp(aMethod, aOpCode);
       var xContents = "";

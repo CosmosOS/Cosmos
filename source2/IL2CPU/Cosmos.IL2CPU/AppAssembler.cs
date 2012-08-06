@@ -6,10 +6,12 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Cosmos.Assembler;
 using Cosmos.Debug.Common;
+using Cosmos.Build.Common;
 using Cosmos.IL2CPU.Plugs;
+using Mono.Cecil;
 
 namespace Cosmos.IL2CPU {
-  public abstract class AppAssembler {
+  public class AppAssembler {
     public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
     public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
     protected const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
@@ -19,14 +21,23 @@ namespace Cosmos.IL2CPU {
     public bool ShouldOptimize = false;
     public DebugInfo DebugInfo { get; set; }
     protected System.IO.TextWriter mLog;
+    protected Dictionary<string, ModuleDefinition> mLoadedModules = new Dictionary<string, ModuleDefinition>();
+    protected int[] xCodeOffsets;
+    protected int[] xCodeLineNumbers;
+    public TraceAssemblies TraceAssemblies;
+    public bool DebugEnabled = false;
+    public DebugMode DebugMode;
+    public bool IgnoreDebugStubAttribute;
+    protected static HashSet<string> mDebugLines = new HashSet<string>();
+    protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
 
     // Quick look up of assemblies so we dont have to go to the database and compare
     // by fullname.
     public Dictionary<Assembly, Guid> Assemblies = new Dictionary<Assembly, Guid>();
 
     protected Cosmos.Assembler.Assembler mAssembler;
-    protected AppAssembler(Cosmos.Assembler.Assembler assembler)  {
-      mAssembler = assembler;
+    protected AppAssembler(int aComPort)  {
+      mAssembler = new Cosmos.Assembler.Assembler(aComPort);
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();
     }
@@ -165,7 +176,10 @@ namespace Cosmos.IL2CPU {
 
     protected virtual void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) { }
     protected virtual void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) { }
-    protected abstract void InitILOps();
+
+    protected void InitILOps() {
+      InitILOps(typeof(ILOp));
+    }
 
     protected virtual void InitILOps(Type aAssemblerBaseOp) {
       foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
@@ -540,6 +554,24 @@ namespace Cosmos.IL2CPU {
         Call(aFrom, aTo);
       }
       MethodEnd(aFrom);
+    }
+
+    protected static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {
+      var xLine = String.Format("{0}\t{1}\t{2}", MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
+    }
+
+    // These are all temp functions until we move to the new assembler.
+    // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
+    public static string TmpPosLabel(MethodInfo aMethod, int aOffset) {
+      return ILOp.GetLabel(aMethod, aOffset);
+    }
+
+    public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {
+      return TmpPosLabel(aMethod, aOpCode.Position);
+    }
+
+    public static string TmpBranchLabel(MethodInfo aMethod, ILOpCode aOpCode) {
+      return TmpPosLabel(aMethod, ((ILOpCodes.OpBranch)aOpCode).Value);
     }
 
   }
