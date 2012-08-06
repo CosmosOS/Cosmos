@@ -10,6 +10,8 @@ using Cosmos.Build.Common;
 using Cosmos.IL2CPU.Plugs;
 using Mono.Cecil;
 using Cosmos.Assembler.x86;
+using System.Diagnostics.SymbolStore;
+using Microsoft.Samples.Debugging.CorSymbolStore;
 
 namespace Cosmos.IL2CPU {
   public class AppAssembler {
@@ -61,16 +63,128 @@ namespace Cosmos.IL2CPU {
       //};
       //DebugInfo.AddMethod(xMethod);
     }
+
     protected virtual void MethodBegin(string aMethodName) {
       new Comment("---------------------------------------------------------");
       new Comment("Name: " + aMethodName);
+
+      new Cosmos.Assembler.Label(aMethodName);
+      new Push { DestinationReg = Registers.EBP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      xCodeOffsets = new int[0];
     }
 
     protected virtual void MethodEnd(string aMethodName) {
       new Comment("End Method: " + aMethodName);
+      new Cosmos.Assembler.Label("_END_OF_" + aMethodName);
+      new Pop { DestinationReg = Registers.EBP };
+      new Return();
     }
     protected virtual void MethodEnd(MethodInfo aMethod) {
       new Comment("End Method: " + aMethod.MethodBase.Name);
+
+      uint xReturnSize = 0;
+      var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+      if (xMethInfo != null) {
+        xReturnSize = ILOp.Align(X86.ILOp.SizeOfType(xMethInfo.ReturnType), 4);
+      }
+      if (aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
+        new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
+      }
+      new Mov { DestinationReg = Registers.ECX, SourceValue = 0 };
+      var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
+                            select (int)ILOp.Align(X86.ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+      if (!aMethod.MethodBase.IsStatic) {
+        if (aMethod.MethodBase.DeclaringType.IsValueType) {
+          xTotalArgsSize += 4; // only a reference is passed
+        } else {
+          xTotalArgsSize += (int)ILOp.Align(X86.ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+        }
+      }
+
+      if (aMethod.PluggedMethod != null) {
+        xReturnSize = 0;
+        xMethInfo = aMethod.PluggedMethod.MethodBase as System.Reflection.MethodInfo;
+        if (xMethInfo != null) {
+          xReturnSize = ILOp.Align(X86.ILOp.SizeOfType(xMethInfo.ReturnType), 4);
+        }
+        xTotalArgsSize = (from item in aMethod.PluggedMethod.MethodBase.GetParameters()
+                          select (int)ILOp.Align(X86.ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+        if (!aMethod.PluggedMethod.MethodBase.IsStatic) {
+          if (aMethod.PluggedMethod.MethodBase.DeclaringType.IsValueType) {
+            xTotalArgsSize += 4; // only a reference is passed
+          } else {
+            xTotalArgsSize += (int)ILOp.Align(X86.ILOp.SizeOfType(aMethod.PluggedMethod.MethodBase.DeclaringType), 4);
+          }
+        }
+      }
+
+      if (xReturnSize > 0) {
+        var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
+        for (int i = 0; i < xReturnSize / 4; i++) {
+          new Pop { DestinationReg = Registers.EAX };
+          new Mov {
+            DestinationReg = Registers.EBP,
+            DestinationIsIndirect = true,
+            DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)),
+            SourceReg = Registers.EAX
+          };
+        }
+        // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
+      }
+      new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException);
+      if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler) {
+        var xBody = aMethod.MethodBase.GetMethodBody();
+        if (xBody != null) {
+          uint xLocalsSize = 0;
+          for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--) {
+            xLocalsSize += ILOp.Align(X86.ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+
+            if (xLocalsSize >= 256) {
+              new Add {
+                DestinationReg = Registers.ESP,
+                SourceValue = 255
+              };
+              xLocalsSize -= 255;
+            }
+          }
+          if (xLocalsSize > 0) {
+            new Add {
+              DestinationReg = Registers.ESP,
+              SourceValue = xLocalsSize
+            };
+          }
+        }
+      }
+      new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
+      new Pop { DestinationReg = Registers.EBP };
+      var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
+      if (xRetSize < 0) {
+        xRetSize = 0;
+      }
+      WriteDebug(aMethod.MethodBase, (uint)xRetSize, X86.IL.Call.GetStackSizeToReservate(aMethod.MethodBase));
+      new Return { DestinationValue = (uint)xRetSize };
+    }
+
+    public void FinalizeDebugInfo() {
+      DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
+    }
+
+    public static uint GetResultCodeOffset(uint aResultSize, uint aTotalArgumentSize) {
+      uint xOffset = 8;
+      if ((aTotalArgumentSize > 0) && (aTotalArgumentSize >= aResultSize)) {
+        xOffset += aTotalArgumentSize;
+        xOffset -= aResultSize;
+      }
+      return xOffset;
+    }
+
+    protected static ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly) {
+      try {
+        return SymbolAccess.GetReaderForFile(aAssembly.Location);
+      } catch (NotSupportedException) {
+        return null;
+      }
     }
 
     public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes) {
