@@ -486,9 +486,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public abstract uint GetSizeOfType(Type aType);
-
-    public abstract void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods);
-
+    public abstract void EmitEntrypoint(MethodBase aEntrypoint);
     protected abstract void Ldarg(MethodInfo aMethod, int aIndex);
     protected abstract void Ldflda(MethodInfo aMethod, string aFieldId);
     protected abstract void Call(MethodInfo aMethod, MethodInfo aTargetMethod);

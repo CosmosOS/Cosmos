@@ -63,8 +63,7 @@ namespace Cosmos.IL2CPU.X86 {
     private const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
 
 
-    public override void EmitEntrypoint(MethodBase aEntrypoint, IEnumerable<MethodBase> aMethods) {
-      #region Literal strings fixup code
+    public override void EmitEntrypoint(MethodBase aEntrypoint) {
       // at the time the datamembers for literal strings are created, the type id for string is not yet determined. 
       // for now, we fix this at runtime.
       new Label(InitStringIDsLabel);
@@ -82,7 +81,7 @@ namespace Cosmos.IL2CPU.X86 {
       }
       new Pop { DestinationReg = Registers.EBP };
       new Return();
-      #endregion
+
       new Label(CosmosAssembler.EntryPointName);
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
@@ -101,9 +100,7 @@ namespace Cosmos.IL2CPU.X86 {
       new Pop { DestinationReg = Registers.EBP };
       new Return();
 
-
-      if (ShouldOptimize)
-      {
+      if (ShouldOptimize) {
           Orvid.Optimizer.Optimize(Assembler);
       }
     }
