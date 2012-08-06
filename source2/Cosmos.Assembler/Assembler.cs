@@ -15,6 +15,7 @@ using Cosmos.Assembler.x86;
 namespace Cosmos.Assembler {
   public class Assembler {
     public Assembler(int aComPort) {
+      mCurrentInstance = this;
       mComPort = aComPort;
     }
 
@@ -125,10 +126,6 @@ namespace Cosmos.Assembler {
 
     internal int AllAssemblerElementCount {
       get { return mInstructions.Count + mDataMembers.Count; }
-    }
-
-    protected Assembler() {
-      mCurrentInstance = this;
     }
 
     public BaseAssemblerElement GetAssemblerElement(int aIndex) {
