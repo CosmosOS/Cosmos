@@ -65,7 +65,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
 			else
 				throw new NotSupportedException("A size bigger 8 not supported at Shr!");
-            /*string xLabelName = AppAssemblerNasm.TmpPosLabel(aMethod, aOpCode);
+            /*string xLabelName = AppAssembler.TmpPosLabel(aMethod, aOpCode);
             var xStackItem_ShiftAmount = Assembler.Stack.Pop();
             var xStackItem_Value = Assembler.Stack.Peek();
             if( xStackItem_Value.Size <= 4 )

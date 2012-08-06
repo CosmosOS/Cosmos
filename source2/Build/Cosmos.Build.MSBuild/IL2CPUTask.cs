@@ -155,7 +155,7 @@ namespace Cosmos.Build.MSBuild {
           DebugCom = 0;
         }
 
-        var xAsm = new AppAssemblerNasm(DebugCom);
+        var xAsm = new AppAssembler(DebugCom);
         using (var xDebugInfo = new DebugInfo(xOutputFilename + ".mdf", true)) {
           xAsm.DebugInfo = xDebugInfo;
           xAsm.DebugEnabled = DebugEnabled;

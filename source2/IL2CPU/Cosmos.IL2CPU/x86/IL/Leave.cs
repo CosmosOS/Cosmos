@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Jump { DestinationLabel = AppAssemblerNasm.TmpBranchLabel( aMethod, aOpCode ) };
+            new CPUx86.Jump { DestinationLabel = AppAssembler.TmpBranchLabel( aMethod, aOpCode ) };
         }
 
 

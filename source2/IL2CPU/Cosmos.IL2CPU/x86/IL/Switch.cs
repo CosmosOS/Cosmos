@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( uint )i };
                 //string DestLabel = AssemblerNasm.TmpBranchLabel( aMethod, new ILOpCodes.OpBranch( ILOpCode.Code.Jmp, aOpCode.Position, OpSw.BranchLocations[ i ] ) );
-                string xDestLabel = AppAssemblerNasm.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
+                string xDestLabel = AppAssembler.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal
                   , DestinationLabel = xDestLabel
                 };

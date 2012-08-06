@@ -109,7 +109,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPU.Pop { DestinationReg = CPU.Registers.EAX };
                     new CPU.Pop { DestinationReg = CPU.Registers.EBX };
                     new CPU.Compare { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EAX };
-                    new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                    new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                     //}
                 }
                 else
@@ -133,64 +133,64 @@ namespace Cosmos.IL2CPU.X86.IL
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotEqual: // NotZero
                             new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
-                            new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
-                            new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         case ConditionalTestEnum.GreaterThanOrEqualTo:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = xNoJump };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump };
                             break;
                         case ConditionalTestEnum.GreaterThan:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = xNoJump };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump };
                             break;
                         case ConditionalTestEnum.LessThanOrEqualTo:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = xNoJump };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         case ConditionalTestEnum.LessThan:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = xNoJump };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         // from here all unsigned
                         case ConditionalTestEnum.AboveOrEqual:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump };
                             break;
                         case ConditionalTestEnum.Above:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump };
                             break;
                         case ConditionalTestEnum.BelowOrEqual:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         case ConditionalTestEnum.Below:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
-                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         default:
                             throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
@@ -216,12 +216,12 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (xTestOp == ConditionalTestEnum.Zero)
                 {
                     new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-                    new CPU.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                    new CPU.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                 }
                 else if (xTestOp == ConditionalTestEnum.NotZero)
                 {
                     new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-                    new CPU.ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+                    new CPU.ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                 }
                 else
                 {

@@ -24,11 +24,11 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected static void Jump_Exception(MethodInfo aMethod) {
       // todo: port to numeric labels
-      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssemblerNasm.EndOfMethodLabelNameException };
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException };
     }
 
     protected static void Jump_End(MethodInfo aMethod) {
-      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssemblerNasm.EndOfMethodLabelNameNormal };
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
     }
 
     public static uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField) {
@@ -221,13 +221,13 @@ namespace Cosmos.IL2CPU.X86 {
           new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };
           aCleanup();
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssemblerNasm.EndOfMethodLabelNameException };
+            new CPU.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
           } else {
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
           }
         } else {
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssemblerNasm.EndOfMethodLabelNameException };
+            new CPU.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
           } else {
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
           }

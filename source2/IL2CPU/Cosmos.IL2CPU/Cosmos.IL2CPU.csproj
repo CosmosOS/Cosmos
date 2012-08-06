@@ -181,7 +181,6 @@
     <Compile Include="SkipList.cs" />
     <Compile Include="VTablesImpl.cs" />
     <Compile Include="VTablesImplRefs.cs" />
-    <Compile Include="x86\AppAssemblerNasm.cs" />
     <Compile Include="x86\ILOp.cs" />
     <Compile Include="x86\IL\Add.cs" />
     <Compile Include="x86\IL\Add_Ovf.cs" />
