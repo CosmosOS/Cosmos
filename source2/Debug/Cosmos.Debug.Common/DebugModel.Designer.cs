@@ -931,7 +931,12 @@ namespace Cosmos.Debug.Common
         /// <param name="methodToken">Initial value of the MethodToken property.</param>
         /// <param name="labelName">Initial value of the LabelName property.</param>
         /// <param name="assemblyFileID">Initial value of the AssemblyFileID property.</param>
-        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.String labelName, global::System.Guid assemblyFileID)
+        /// <param name="document">Initial value of the Document property.</param>
+        /// <param name="lineStart">Initial value of the LineStart property.</param>
+        /// <param name="colStart">Initial value of the ColStart property.</param>
+        /// <param name="lineEnd">Initial value of the LineEnd property.</param>
+        /// <param name="colEnd">Initial value of the ColEnd property.</param>
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.String labelName, global::System.Guid assemblyFileID, global::System.String document, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd)
         {
             Method method = new Method();
             method.ID = id;
@@ -939,6 +944,11 @@ namespace Cosmos.Debug.Common
             method.MethodToken = methodToken;
             method.LabelName = labelName;
             method.AssemblyFileID = assemblyFileID;
+            method.Document = document;
+            method.LineStart = lineStart;
+            method.ColStart = colStart;
+            method.LineEnd = lineEnd;
+            method.ColEnd = colEnd;
             return method;
         }
 
@@ -1115,6 +1125,126 @@ namespace Cosmos.Debug.Common
         private global::System.Guid _AssemblyFileID;
         partial void OnAssemblyFileIDChanging(global::System.Guid value);
         partial void OnAssemblyFileIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String Document
+        {
+            get
+            {
+                return _Document;
+            }
+            set
+            {
+                OnDocumentChanging(value);
+                ReportPropertyChanging("Document");
+                _Document = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("Document");
+                OnDocumentChanged();
+            }
+        }
+        private global::System.String _Document;
+        partial void OnDocumentChanging(global::System.String value);
+        partial void OnDocumentChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 LineStart
+        {
+            get
+            {
+                return _LineStart;
+            }
+            set
+            {
+                OnLineStartChanging(value);
+                ReportPropertyChanging("LineStart");
+                _LineStart = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LineStart");
+                OnLineStartChanged();
+            }
+        }
+        private global::System.Int32 _LineStart;
+        partial void OnLineStartChanging(global::System.Int32 value);
+        partial void OnLineStartChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 ColStart
+        {
+            get
+            {
+                return _ColStart;
+            }
+            set
+            {
+                OnColStartChanging(value);
+                ReportPropertyChanging("ColStart");
+                _ColStart = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ColStart");
+                OnColStartChanged();
+            }
+        }
+        private global::System.Int32 _ColStart;
+        partial void OnColStartChanging(global::System.Int32 value);
+        partial void OnColStartChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 LineEnd
+        {
+            get
+            {
+                return _LineEnd;
+            }
+            set
+            {
+                OnLineEndChanging(value);
+                ReportPropertyChanging("LineEnd");
+                _LineEnd = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LineEnd");
+                OnLineEndChanged();
+            }
+        }
+        private global::System.Int32 _LineEnd;
+        partial void OnLineEndChanging(global::System.Int32 value);
+        partial void OnLineEndChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 ColEnd
+        {
+            get
+            {
+                return _ColEnd;
+            }
+            set
+            {
+                OnColEndChanging(value);
+                ReportPropertyChanging("ColEnd");
+                _ColEnd = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ColEnd");
+                OnColEndChanged();
+            }
+        }
+        private global::System.Int32 _ColEnd;
+        partial void OnColEndChanging(global::System.Int32 value);
+        partial void OnColEndChanged();
 
         #endregion
     

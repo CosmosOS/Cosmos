@@ -94,12 +94,13 @@ namespace Cosmos.IL2CPU {
           // Sequence Points are spots that identify what the compiler/debugger says is a spot
           // that a breakpoint can occur one. Essentially, an atomic source line in C#
           if (xMethodSymbols != null) {
-            mCodeOffsets = new int[xMethodSymbols.SequencePointCount];
-            var xCodeDocuments = new ISymbolDocument[xMethodSymbols.SequencePointCount];
-            mCodeLineNumbers = new int[xMethodSymbols.SequencePointCount];
-            var xCodeColumns = new int[xMethodSymbols.SequencePointCount];
-            var xCodeEndLines = new int[xMethodSymbols.SequencePointCount];
-            var xCodeEndColumns = new int[xMethodSymbols.SequencePointCount];
+            int xCount = xMethodSymbols.SequencePointCount;
+            mCodeOffsets = new int[xCount];
+            var xCodeDocuments = new ISymbolDocument[xCount];
+            mCodeLineNumbers = new int[xCount];
+            var xCodeColumns = new int[xCount];
+            var xCodeEndLines = new int[xCount];
+            var xCodeEndColumns = new int[xCount];
             xMethodSymbols.GetSequencePoints(mCodeOffsets, xCodeDocuments
              , mCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
 
@@ -107,7 +108,12 @@ namespace Cosmos.IL2CPU {
               TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
               MethodToken = aMethod.MethodBase.MetadataToken,
               LabelName = xMethodLabel,
-              AssemblyFileID = AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly]
+              AssemblyFileID = AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
+              Document = xCodeDocuments[0].URL,
+              LineStart = mCodeLineNumbers[0],
+              ColStart = xCodeColumns[0],
+              LineEnd = xCodeEndLines[xCount - 1],
+              ColEnd = xCodeEndColumns[xCount - 1]
             };
             DebugInfo.AddMethod(xMethod);
           }

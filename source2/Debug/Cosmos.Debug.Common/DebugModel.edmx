@@ -86,6 +86,11 @@
     <Property Name="AddressStartFuture" Type="bigint" Nullable="true" />
     <Property Name="AddressEndFuture" Type="bigint" Nullable="true" />
     <Property Name="AssemblyFileID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Document" Type="nvarchar" Nullable="false" MaxLength="256" />
+    <Property Name="LineStart" Type="int" Nullable="false" />
+    <Property Name="ColStart" Type="int" Nullable="false" />
+    <Property Name="LineEnd" Type="int" Nullable="false" />
+    <Property Name="ColEnd" Type="int" Nullable="false" />
   </EntityType>
   <Association Name="AssemblyFileMethod">
     <End Role="AssemblyFile" Type="DebugModel.Store.AssemblyFiles" Multiplicity="1" />
@@ -186,6 +191,11 @@
           <Property Type="Int64" Name="AddressEndFuture" Nullable="true" />
           <NavigationProperty Name="AssemblyFile" Relationship="DebugModel.AssemblyFileMethod" FromRole="Method" ToRole="AssemblyFile" />
           <Property Type="Guid" Name="AssemblyFileID" Nullable="false" />
+          <Property Type="String" Name="Document" Nullable="false" MaxLength="256" />
+          <Property Type="Int32" Name="LineStart" Nullable="false" />
+          <Property Type="Int32" Name="ColStart" Nullable="false" />
+          <Property Type="Int32" Name="LineEnd" Nullable="false" />
+          <Property Type="Int32" Name="ColEnd" Nullable="false" />
         </EntityType>
         <Association Name="AssemblyFileMethod">
           <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
@@ -278,6 +288,11 @@
           <ScalarProperty Name="AddressStartFuture" ColumnName="AddressStartFuture" />
           <ScalarProperty Name="AddressEndFuture" ColumnName="AddressEndFuture" />
           <ScalarProperty Name="AssemblyFileID" ColumnName="AssemblyFileID" />
+          <ScalarProperty Name="Document" ColumnName="Document" />
+          <ScalarProperty Name="LineStart" ColumnName="LineStart" />
+          <ScalarProperty Name="ColStart" ColumnName="ColStart" />
+          <ScalarProperty Name="LineEnd" ColumnName="LineEnd" />
+          <ScalarProperty Name="ColEnd" ColumnName="ColEnd" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -301,13 +316,13 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="DebugModel">
-        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="6.75" PointY="4" Height="1.787985026041667" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.375" PointY="4" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="8.5" PointY="5.375" Height="1.787985026041667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.625" PointY="3.625" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="4.75" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="2.5" PointY="0.5" Height="1.4033821614583333" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="2.5571907552083331" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.5186979166666665" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
           <ConnectorPoint PointX="4" PointY="1.297841796875" />
           <ConnectorPoint PointX="4.75" PointY="1.297841796875" />
