@@ -9,6 +9,7 @@ using Cosmos.Debug.Common;
 using Cosmos.Build.Common;
 using Cosmos.IL2CPU.Plugs;
 using Mono.Cecil;
+using Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU {
   public class AppAssembler {
@@ -199,12 +200,62 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected abstract void Push(uint aValue);
-    protected abstract void Push(string aLabelName, bool isIndirect = false);
-    protected abstract void Call(MethodBase aMethod);
-    protected abstract void Move(string aDestLabelName, int aValue);
-    protected abstract void Jump(string aLabelName);
-    protected abstract int GetVTableEntrySize();
+    protected void Move(string aDestLabelName, int aValue) {
+      new Mov {
+        DestinationRef = ElementReference.New(aDestLabelName),
+        DestinationIsIndirect = true,
+        SourceValue = (uint)aValue
+      };
+    }
+
+    protected void Push(uint aValue) {
+      new Push {
+        DestinationValue = aValue
+      };
+    }
+
+    protected void Pop() {
+      new Add { DestinationReg = Registers.ESP, SourceValue = (uint)mAssembler.Stack.Pop().Size };
+    }
+
+    protected void Push(string aLabelName, bool isIndirect = false) {
+      new Push {
+        DestinationRef = ElementReference.New(aLabelName),
+        DestinationIsIndirect = isIndirect
+      };
+    }
+
+    protected void Call(MethodBase aMethod) {
+      new Cosmos.Assembler.x86.Call {
+        DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod)
+      };
+    }
+
+    protected void Jump(string aLabelName) {
+      new Cosmos.Assembler.x86.Jump {
+        DestinationLabel = aLabelName
+      };
+    }
+
+    protected void Ldarg(MethodInfo aMethod, int aIndex) {
+      X86.IL.Ldarg.DoExecute(mAssembler, aMethod, (ushort)aIndex);
+    }
+
+    protected void Call(MethodInfo aMethod, MethodInfo aTargetMethod) {
+      var xSize = X86.IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
+      if (xSize > 0) {
+        new Sub { DestinationReg = Registers.ESP, SourceValue = xSize };
+      }
+      new Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
+    }
+
+    protected void Ldflda(MethodInfo aMethod, string aFieldId) {
+      X86.IL.Ldflda.DoExecute(mAssembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
+    }
+
+    protected int GetVTableEntrySize() {
+      return 16; // todo: retrieve from actual type info
+    }
 
     public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
     public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
@@ -503,13 +554,10 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public abstract uint GetSizeOfType(Type aType);
-    public abstract void EmitEntrypoint(MethodBase aEntrypoint);
-    protected abstract void Ldarg(MethodInfo aMethod, int aIndex);
-    protected abstract void Ldflda(MethodInfo aMethod, string aFieldId);
-    protected abstract void Call(MethodInfo aMethod, MethodInfo aTargetMethod);
-    protected abstract void Pop();
-
+    public uint GetSizeOfType(Type aType) {
+      return X86.ILOp.SizeOfType(aType);
+    }
+    
     internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
       // todo: completely get rid of this kind of trampoline code
       MethodBegin(aFrom);
@@ -572,6 +620,48 @@ namespace Cosmos.IL2CPU {
 
     public static string TmpBranchLabel(MethodInfo aMethod, ILOpCode aOpCode) {
       return TmpPosLabel(aMethod, ((ILOpCodes.OpBranch)aOpCode).Value);
+    }
+
+    public void EmitEntrypoint(MethodBase aEntrypoint) {
+      // at the time the datamembers for literal strings are created, the type id for string is not yet determined. 
+      // for now, we fix this at runtime.
+      new Cosmos.Assembler.Label(InitStringIDsLabel);
+      new Push { DestinationReg = Registers.EBP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
+      foreach (var xDataMember in mAssembler.DataMembers) {
+        if (!xDataMember.Name.StartsWith("StringLiteral")) {
+          continue;
+        }
+        if (xDataMember.Name.EndsWith("__Contents")) {
+          continue;
+        }
+        new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      }
+      new Pop { DestinationReg = Registers.EBP };
+      new Return();
+
+      new Cosmos.Assembler.Label(Cosmos.Assembler.Assembler.EntryPointName);
+      new Push { DestinationReg = Registers.EBP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Call { DestinationLabel = InitVMTCodeLabel };
+      Cosmos.Assembler.Assembler.WriteDebugVideo("Initializing string IDs.");
+      new Call { DestinationLabel = InitStringIDsLabel };
+
+      // we now need to do "newobj" on the entry point, and after that, call .Start on it
+      var xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CreateEntrypoint";
+      new Cosmos.Assembler.Label(xCurLabel);
+      X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+      xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
+      new Cosmos.Assembler.Label(xCurLabel);
+      X86.IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
+      new Cosmos.Assembler.Label(Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
+      new Pop { DestinationReg = Registers.EBP };
+      new Return();
+
+      if (ShouldOptimize) {
+        Orvid.Optimizer.Optimize(Assembler);
+      }
     }
 
   }
