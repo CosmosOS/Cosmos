@@ -1193,11 +1193,10 @@ namespace Cosmos.IL2CPU {
             foreach (PlugMethodAttribute attrib in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
               xAttrib = attrib;
             }
-            if (xAttrib != null && xAttrib.IsWildcard) {
-              continue;
-              //xPlugAssembler = xAttrib.Assembler;
-            }
             if (xAttrib != null) {
+              if (xAttrib.IsWildcard) {
+                continue;
+              }
               xPlugAssembler = xAttrib.Assembler;
             }
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
