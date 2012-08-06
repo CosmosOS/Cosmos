@@ -83,8 +83,8 @@
     <Property Name="TypeToken" Type="int" Nullable="false" />
     <Property Name="MethodToken" Type="int" Nullable="false" />
     <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="AddressStart" Type="bigint" Nullable="true" />
-    <Property Name="AddressEnd" Type="bigint" Nullable="true" />
+    <Property Name="AddressStartFuture" Type="bigint" Nullable="true" />
+    <Property Name="AddressEndFuture" Type="bigint" Nullable="true" />
     <Property Name="AssemblyFileID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <Association Name="AssemblyFileMethod">
@@ -275,8 +275,8 @@
           <ScalarProperty Name="TypeToken" ColumnName="TypeToken" />
           <ScalarProperty Name="MethodToken" ColumnName="MethodToken" />
           <ScalarProperty Name="LabelName" ColumnName="LabelName" />
-          <ScalarProperty Name="AddressStartFuture" ColumnName="AddressStart" />
-          <ScalarProperty Name="AddressEndFuture" ColumnName="AddressEnd" />
+          <ScalarProperty Name="AddressStartFuture" ColumnName="AddressStartFuture" />
+          <ScalarProperty Name="AddressEndFuture" ColumnName="AddressEndFuture" />
           <ScalarProperty Name="AssemblyFileID" ColumnName="AssemblyFileID" />
         </MappingFragment>
       </EntityTypeMapping>

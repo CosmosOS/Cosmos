@@ -294,26 +294,7 @@ namespace Cosmos.IL2CPU {
       // Start scanning, return when complete.
       ScanQueue();
 
-      // It would be nice to keep DebugInfo output into assembler only but
-      // there is so much info that is available in scanner that is needed
-      // or can be used in a more efficient manner. So we output in both 
-      // scanner and assembler as needed.
-      //
-      // -SQL Inserts are slow when done individually.
-      // -Assemblies can only be uniquely identified by their names or instance. ie there is no Token for example.
-      // -Assembly table must be written before dependent items like Method
-      // can be written.
-      var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
-      foreach (var xAsm in mUsedAssemblies) {
-        var xRow = new Cosmos.Debug.Common.AssemblyFile() {
-          ID = Guid.NewGuid(),
-          Pathname = xAsm.Location
-        };
-        xAssemblies.Add(xRow);
-
-        mAsmblr.Assemblies.Add(xAsm, xRow.ID);
-      }
-      mAsmblr.DebugInfo.AddAssemblies(xAssemblies);
+      UpdateAssemblies();
 
       // Time to assemble
       foreach (var xItem in mItems) {
@@ -1255,89 +1236,27 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    // === Old code and comments ======================================================
+    protected void UpdateAssemblies() {
+      // It would be nice to keep DebugInfo output into assembler only but
+      // there is so much info that is available in scanner that is needed
+      // or can be used in a more efficient manner. So we output in both 
+      // scanner and assembler as needed.
+      //
+      // -SQL Inserts are slow when done individually.
+      // -Assemblies can only be uniquely identified by their names or instance. ie there is no Token for example.
+      // -Assembly table must be written before dependent items like Method
+      // can be written.
+      var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+      foreach (var xAsm in mUsedAssemblies) {
+        var xRow = new Cosmos.Debug.Common.AssemblyFile() {
+          ID = Guid.NewGuid(),
+          Pathname = xAsm.Location
+        };
+        xAssemblies.Add(xRow);
 
-    //  //TODO: These store the MethodBase which also have the IL for the body in memory
-    //  // For large asms this could eat lot of RAM. Should convert this to remove
-    //  // items from the list after they are processed but keep them in HashSet so we
-    //  // know they are already done. Currently HashSet uses a reference though, so we
-    //  // need to hash on some UID instead of the refernce. Do not use strings, they are
-    //  // super slow.
-    //  //	TODO: We need to scan for static fields too. 
-
-    //  private void ScanMethod(MethodInfo aMethodInfo) {
-    //    var xMethodBase = aMethodInfo.MethodBase;
-
-
-    //      // Assemble the method
-    //TODO: We have to load the opcodes twice, this might be slow,
-    // but loading in RAM could consume lots of RAM
-    //      if (aMethodInfo.MethodBase.DeclaringType != mThrowHelper) {
-    //        mAsmblr.ProcessMethod(aMethodInfo, xOpCodes);
-    //      }
-    //    }
-    //  }
-
-    //  private void QueueField(object aSrc, string aSrcType, Cosmos.IL2CPU.ILOpCodes.OpField xOpField) {
-    //    // todo: add log map thing?
-    //    if (!mStaticFields.Contains(xOpField.Value)) {
-    //      mStaticFields.Add(xOpField.Value);
-    //      mAsmblr.ProcessField(xOpField.Value);
-
-    //      QueueType(xOpField.Value, "FieldType", xOpField.Value.FieldType);
-    //      QueueType(xOpField.Value, "DeclaringType", xOpField.Value.FieldType);
-    //    }
-    //  }
-
-    //  // QueueMethod should only queue the method, and do no processing of the
-    //  // body or resolution of its contents. It is called during plug resolution
-    //  // etc and all further resolution should wait until all plugs are loaded.
-    //  public uint QueueMethod(object aSrc, string aSrcType, MethodBase aMethodBase
-    //    , bool aIsPlug)
-    //  {
-    //    uint xResult;
-
-    //    xResult = (uint)mMethodsToProcess.Count;
-    //    mKnownMethods.Add(aMethodBase, xResult);
-    //    MethodInfo xPlug = null;
-    //    Type xPlugAssembler = null;
-    //    var xMethodType = MethodInfo.TypeEnum.Normal;
-    //    if (aIsPlug) {
-    //      xMethodType = MethodInfo.TypeEnum.Plug;
-    //    } else {
-    //      xMethodType = MethodInfo.TypeEnum.Normal;
-
-
-    //      if (xMethodType == MethodInfo.TypeEnum.NeedsPlug && xPlug == null && xPlugAssembler == null) {
-    //        throw new Exception("Method [" + aMethodBase.DeclaringType + "." + aMethodBase.Name + "] needs to be plugged, but wasn't");
-    //      }
-    //    }
-
-    //    var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug, xPlugAssembler);
-    //    mMethodsToProcess.Add(xMethod);
-
-    //    if(!aIsPlug) {
-    //      // Queue Types directly related to method
-    //      QueueType(aMethodBase, "Declaring Type", aMethodBase.DeclaringType);
-    //      if (aMethodBase is System.Reflection.MethodInfo) {
-    //        QueueType(aMethodBase, "Return Type", ((System.Reflection.MethodInfo)aMethodBase).ReturnType);
-    //      }
-    //      foreach (var xParam in aMethodBase.GetParameters()) {
-    //        QueueType(aMethodBase, "Parameter", xParam.ParameterType);
-    //      }
-    //    }
-    //    return xResult;
-    //  }
-
-    //  //protected void QueueStaticField(FieldInfo aFieldInfo) {
-    //  //  if (!mFieldsSet.Contains(aFieldInfo)) {
-    //  //    if (!aFieldInfo.IsStatic) {
-    //  //      throw new Exception("Cannot queue instance fields!");
-    //  //    }
-    //  //    mFieldsSet.Add(aFieldInfo);
-    //  //    QueueType(aFieldInfo.DeclaringType);
-    //  //    QueueType(aFieldInfo.FieldType);
-    //  //  }
-    //  //}
+        mAsmblr.Assemblies.Add(xAsm, xRow.ID);
+      }
+      mAsmblr.DebugInfo.AddAssemblies(xAssemblies);
+    }
   }
 }

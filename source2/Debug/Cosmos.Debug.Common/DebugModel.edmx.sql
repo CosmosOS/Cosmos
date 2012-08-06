@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/04/2012 19:00:46
+-- Date Created: 08/05/2012 20:29:02
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -17,6 +17,9 @@ GO
 -- Dropping existing FOREIGN KEY constraints
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[FK_AssemblyFileMethod]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_AssemblyFileMethod];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -111,8 +114,8 @@ CREATE TABLE [dbo].[Methods] (
     [TypeToken] int  NOT NULL,
     [MethodToken] int  NOT NULL,
     [LabelName] nvarchar(512)  NOT NULL,
-    [AddressStart] bigint  NULL,
-    [AddressEnd] bigint  NULL,
+    [AddressStartFuture] bigint  NULL,
+    [AddressEndFuture] bigint  NULL,
     [AssemblyFileID] uniqueidentifier  NOT NULL
 );
 GO
