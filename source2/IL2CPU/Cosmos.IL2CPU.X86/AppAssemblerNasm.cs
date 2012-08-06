@@ -18,15 +18,15 @@ namespace Cosmos.IL2CPU.X86 {
     public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
     public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
     protected const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
+    protected List<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
 
     public AppAssemblerNasm(byte aComPort)
       : base(new CosmosAssembler(aComPort)) {
     }
+
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
     }
-
-    private List<LOCAL_ARGUMENT_INFO> mLocals_Arguments_Infos = new List<LOCAL_ARGUMENT_INFO>();
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
