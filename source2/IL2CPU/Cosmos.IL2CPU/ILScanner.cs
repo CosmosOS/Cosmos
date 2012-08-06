@@ -1113,11 +1113,6 @@ namespace Cosmos.IL2CPU {
       // there is so much info that is available in scanner that is needed
       // or can be used in a more efficient manner. So we output in both 
       // scanner and assembler as needed.
-      //
-      // -SQL Inserts are slow when done individually.
-      // -Assemblies can only be uniquely identified by their names or instance. ie there is no Token for example.
-      // -Assembly table must be written before dependent items like Method
-      // can be written.
       var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
       foreach (var xAsm in mUsedAssemblies) {
         var xRow = new Cosmos.Debug.Common.AssemblyFile() {
@@ -1135,8 +1130,6 @@ namespace Cosmos.IL2CPU {
       foreach (var xItem in mItems) {
         if (xItem is MethodBase) {
           var xMethod = (MethodBase)xItem;
-
-          #region Method handling
           var xParams = xMethod.GetParameters();
           var xParamTypes = xParams.Select(q => q.ParameterType).ToArray();
           var xPlug = ResolvePlug(xMethod, xParamTypes);
@@ -1214,38 +1207,20 @@ namespace Cosmos.IL2CPU {
               mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
             }
           }
-          #endregion
-        }
-        if (xItem is FieldInfo) {
-          var xField = (FieldInfo)xItem;
-          mAsmblr.ProcessField(xField);
+        } else if (xItem is FieldInfo) {
+          mAsmblr.ProcessField((FieldInfo)xItem);
         }
       }
+    
       var xTypes = new HashSet<Type>();
       var xMethods = new HashSet<MethodBase>();
       foreach (var xItem in mItems) {
-        var xMethod = xItem as MethodBase;
-        if (xMethod != null) {
-          xMethods.Add(xMethod);
-          continue;
-        }
-        var xType = xItem as Type;
-        if (xType != null) {
-          xTypes.Add(xType);
-          continue;
+        if (xItem is MethodBase) {
+          xMethods.Add((MethodBase)xItem);
+        } else if (xItem is Type) {
+          xTypes.Add((Type)xItem);
         }
       }
-
-      // do dup check
-      foreach (var xItem in xTypes) {
-        var xType = xItem as Type;
-        if (xType != null) {
-          if (xType.FullName == "Cosmos.Kernel.Heap") {
-            Console.WriteLine("{0} - {1}", xType.FullName, xType.GetHashCode());
-          }
-        }
-      }
-
       mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, x => GetMethodUID(x, false));
     }
   }
