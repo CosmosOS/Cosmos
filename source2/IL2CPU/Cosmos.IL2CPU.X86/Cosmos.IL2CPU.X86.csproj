@@ -92,7 +92,6 @@
     <Compile Include="AppAssembler.cs" />
     <Compile Include="AppAssemblerNasm.cs" />
     <Compile Include="CosmosAssembler.cs" />
-    <Compile Include="AssemblerNasm.cs" />
     <Compile Include="IL\FieldInfo.cs" />
     <Compile Include="ILOp.cs" />
     <Compile Include="IL\Add.cs" />

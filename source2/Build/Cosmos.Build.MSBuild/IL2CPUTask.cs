@@ -169,7 +169,7 @@ namespace Cosmos.Build.MSBuild {
           xAsm.EmitELF = true;
           #endif
 
-          var xNasmAsm = (AssemblerNasm)xAsm.Assembler;
+          var xNasm = (CosmosAssembler)xAsm.Assembler;
           xAsm.Assembler.Initialize();
           using (var xScanner = new ILScanner(xAsm)) {
             xScanner.TempDebug += x => LogMessage(x);
@@ -181,7 +181,7 @@ namespace Cosmos.Build.MSBuild {
 
             using (var xOut = new StreamWriter(OutputFilename, false)) {
               //if (EmitDebugSymbols) {
-              xNasmAsm.FlushText(xOut);
+              xNasm.FlushText(xOut);
               xAsm.FinalizeDebugInfo();
             }
           }

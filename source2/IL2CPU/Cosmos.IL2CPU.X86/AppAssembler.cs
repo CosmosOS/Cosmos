@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86 {
 
 
     protected AppAssembler(byte comportNumber)
-      : base(new AssemblerNasm(comportNumber)) {
+      : base(new CosmosAssembler(comportNumber)) {
     }
 
     protected override void Move(string aDestLabelName, int aValue) {

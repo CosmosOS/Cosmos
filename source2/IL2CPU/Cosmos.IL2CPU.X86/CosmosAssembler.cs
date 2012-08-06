@@ -354,6 +354,12 @@ namespace Cosmos.IL2CPU.X86 {
 
     public override void FlushText(TextWriter aOutput) {
       base.FlushText(aOutput);
+      aOutput.WriteLine("%ifndef ELF_COMPILATION");
+      aOutput.WriteLine("use32");
+      aOutput.WriteLine("org 0x200000");
+      aOutput.WriteLine("[map all main.map]");
+      aOutput.WriteLine("%endif");
+      aOutput.WriteLine("global Kernel_Start");
     }
   }
 }
