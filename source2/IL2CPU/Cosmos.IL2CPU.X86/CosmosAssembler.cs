@@ -16,8 +16,6 @@ namespace Cosmos.IL2CPU.X86 {
   // Much of it is left over from the old build stuff, and info 
   // here actually belongs else where, not in the assembler
   public class CosmosAssembler : Cosmos.Assembler.Assembler {
-    //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
-    protected byte mComNumber = 0;
 
     public CosmosAssembler(byte aComNumber) {
       mComNumber = aComNumber;
@@ -346,20 +344,5 @@ namespace Cosmos.IL2CPU.X86 {
       Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
     }
 
-    protected override void OnBeforeFlush() {
-      base.OnBeforeFlush();
-      DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0])});
-      new Label("_end_code");
-    }
-
-    public override void FlushText(TextWriter aOutput) {
-      base.FlushText(aOutput);
-      aOutput.WriteLine("%ifndef ELF_COMPILATION");
-      aOutput.WriteLine("use32");
-      aOutput.WriteLine("org 0x200000");
-      aOutput.WriteLine("[map all main.map]");
-      aOutput.WriteLine("%endif");
-      aOutput.WriteLine("global Kernel_Start");
-    }
   }
 }

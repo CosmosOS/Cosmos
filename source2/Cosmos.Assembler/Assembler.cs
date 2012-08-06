@@ -12,9 +12,11 @@ using System.Runtime.InteropServices;
 using System.Xml;
 
 namespace Cosmos.Assembler {
-
   public abstract class Assembler {
     public virtual void Initialize() { }
+    public bool EmitAsmLabels { get; set; }
+    //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
+    protected byte mComNumber = 0;
     
     // Contains info on the current stack structure. What type are on the stack, etc
     public readonly StackContents Stack = new StackContents();
@@ -22,8 +24,6 @@ namespace Cosmos.Assembler {
     // This is a hack, hope to fix it in the future
     // as it will also cause problems when we thread the compiler
     private static Assembler mCurrentInstance;
-
-    public bool EmitAsmLabels { get; set; }
 
     protected string mCurrentIlLabel;
     public string CurrentIlLabel {
@@ -33,7 +33,7 @@ namespace Cosmos.Assembler {
         mAsmIlIdx = 0;
       }
     }
-    //
+
     protected int mAsmIlIdx;
     public int AsmIlIdx {
       get { return mAsmIlIdx; }
@@ -61,17 +61,6 @@ namespace Cosmos.Assembler {
 
     protected Assembler() {
       mCurrentInstance = this;
-    }
-
-    public void Dispose() {
-      // MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
-      //		Anyhow, we need a way to clear the CurrentInstance property
-      //mInstructions.Clear();
-      //mDataMembers.Clear();
-      //if (mAllAssemblerElements != null)
-      //{
-      //    mAllAssemblerElements.Clear();
-      //}
     }
 
     public BaseAssemblerElement GetAssemblerElement(int aIndex) {
@@ -120,8 +109,11 @@ namespace Cosmos.Assembler {
     }
 
     // Allows to emit footers to the code and datamember sections
-    protected virtual void OnBeforeFlush() {
+    protected void OnBeforeFlush() {
+      DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0]) });
+      new Label("_end_code");
     }
+    
     private uint mDataMemberCounter = 0;
     public string GetIdentifier(string aPrefix) {
       mDataMemberCounter++;
@@ -189,6 +181,13 @@ namespace Cosmos.Assembler {
           aOutput.WriteLine();
         }
       }
+
+      aOutput.WriteLine("%ifndef ELF_COMPILATION");
+      aOutput.WriteLine("use32");
+      aOutput.WriteLine("org 0x200000");
+      aOutput.WriteLine("[map all main.map]");
+      aOutput.WriteLine("%endif");
+      aOutput.WriteLine("global Kernel_Start");
     }
 
   }
