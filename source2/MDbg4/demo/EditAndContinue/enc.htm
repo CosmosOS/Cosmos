@@ -1,0 +1,85 @@
+
+<style>
+<!--
+div.Section1
+	{page:Section1;}
+h2
+	{margin:6.0pt 0in; line-height:24.0pt;
+	font-size:22.0pt;
+	font-family:Verdana;
+	color:gray;
+	font-weight:bold;
+	}
+p
+	{margin-right:0in;
+	margin-left:0in;
+	font-size:10.0pt;
+	font-family:Tahoma;
+	}
+p.Text
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	line-height:12.0pt;
+	font-size:10.0pt;
+	font-family:Verdana;
+	}
+h4
+	{margin:6.0pt 0in; line-height:20.0pt;
+	font-size:18.0pt;
+	font-family:Verdana;
+	font-weight:bold;
+	}
+p.MsoPlainText
+	{margin-bottom:.0001pt;
+	font-size:10.0pt;
+	font-family:"Courier New";
+	margin-left:0in; margin-right:0in; margin-top:0in}
+-->
+</style>
+
+<div class=Section1>
+
+<h2 style='line-height:24.0pt;mso-line-height-rule:exactly'>Debugger Feature: Edit And Continue </h2>
+
+<p class=Text><span style='mso-bookmark:version'>&nbsp;</span></p>
+
+<h4><span style='mso-bookmark:version'>Demo Overview</span></h4>
+
+<p class=MsoPlainText style='text-align:justify'><span style='mso-fareast-font-family:"MS Mincho"; mso-bookmark:version'>The &quot;Edit and Continue&quot; feature is demonstrated by performing edits on an application while it is running under the managed debugger.&nbsp; </span></p>
+
+<p class=MsoPlainText style='text-align:justify'>Edit and Continue requires cooperation between the compiler and debugger. The mdbg sample does not have its own compiler, so ilasm (the IL assembler utility) will be used as the compiler to emit edits.</p>
+
+<p class=MsoPlainText style='text-align:justify'>&nbsp;</p>
+
+<h4><span style='mso-bookmark:version'>Running the Demo</span></h4>
+
+<p class=MsoPlainText>cd demo\EditAndContinue</p>
+
+<p class=MsoPlainText>run.bat</p>
+
+<p class=MsoPlainText>&nbsp;</p>
+
+<p class=MsoPlainText>This script demonstrates Edit and Continue in three steps.  From the command output you can see all the interaction between the runtime and debugger that is required for the edit.  The commands given to mdbg are fed in on the command-line separated by the &quot;!&quot; character, but could just as well be typed in individually by a user. </p><p class=MsoPlainText>The run.bat script does following:</p>
+
+<ul>
+<li>
+
+<p class=MsoPlainText>It invokes the ilasm compiler that pre-creates edits that are later applied to the debugged program.</p>
+
+</li>
+<li>
+
+<p class=MsoPlainText>The first invocation of mdbg demonstrates an edit of an inactive function not on the stack.</p>
+
+</li>
+<li>
+
+<p class=MsoPlainText>The next invocation of mdbg demonstrates an edit of an active function already on the stack.</p>
+
+</li>
+
+</ul><p class=MsoPlainText>&nbsp;</p>
+
+</div>

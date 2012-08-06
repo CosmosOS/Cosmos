@@ -1,0 +1,149 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Demo for Pdb2Xml round-tripping</title>
+<style>
+<!--
+BODY{font:x-small 'Verdana';margin-right:1.5em}
+.k{margin-left:1em;text-indent:-1em;margin-right:1em}
+.b{color:red;font-family:'Courier New';font-weight:bold;text-decoration:none}
+.m{color:blue}
+.ci{font:small Courier;color:#888888}
+.e{margin-left:1em;text-indent:-1em;margin-right:1em}
+.c{cursor:hand}
+.t{color:#990000}
+.tx{font-weight:bold}
+-->
+</style>
+</head>
+
+<body>
+
+<p>Demo for Pdb2Xml round-tripping</p>
+<p><b>Overview</b>:</p>
+<p>The Pdb2Xml tool can convert a pdb file into xml, allow you to edit the xml, 
+and then convert back to a pdb file.&nbsp; </p>
+<p>Pdbs for managed code generally hold the source to IL mappings and the name 
+of the local variables. Pdbs can be created and viewed with the com-classic
+<a href="http://msdnwiki.microsoft.com/en-us/mtpswiki/ms231034(VS.80).aspx">
+CorSym APIs</a>. MDbg provides managed wrappers for these APIs in corapi\sym*.</p>
+<p>This tool originally started with this
+<a href="http://blogs.msdn.com/jmstall/archive/2005/08/25/pdb2xml.aspx">blog 
+entry</a> about converting Pdb to Xml, and then was expanded to 
+convert Xml back to Pdbs. </p>
+<p>&nbsp;</p>
+<p><b>Demo</b>:</p>
+<p><b>1) Start with a simple test.cs file</b>:</p>
+<pre>using System;
+
+class MyTest
+{
+static void Main()
+{
+    int myLocal = 5;
+    Console.WriteLine(&quot;Hi&quot;);
+    Console.WriteLine(&quot;Value:&quot; + myLocal);
+}
+}</pre>
+<p><b>2) Compile it</b>.<br>
+csc test.cs /debug+</p>
+<p>This should produce both test.exe and test.pdb. </p>
+<p><b>3) Run it under a debugger and we see</b>:</p>
+<pre>mdbg&gt; run test.exe
+STOP: Breakpoint Hit
+6:{
+[p#:0, t#:0] mdbg&gt; sh 10
+1 using System;
+2
+3 class MyTest
+4 {
+5 static void Main()
+6:*{
+7 int myLocal = 5;
+8 Console.WriteLine(&quot;Hi&quot;);
+9 Console.WriteLine(&quot;Value:&quot; + myLocal);
+10 }
+[p#:0, t#:0] mdbg&gt; print
+myLocal=0
+[p#:0, t#:0] mdbg&gt;</pre>
+<p>&nbsp;</p>
+<p><b>4) Run the pdb2xml tool to convert the pdb to an xml file</b>.</p>
+<pre>..\..\bin\Debug\pdb2xml.exe test.exe a.xml</pre>
+<p>The xml file looks like:</p>
+<pre><span color="black">
+</span><span style="COLOR: #0000ff">&lt;!--</span><span style="COLOR: #008000">This is an XML file representing the PDB for 'test.exe'</span><span style="COLOR: #0000ff">--&gt;
+&lt;</span><span style="COLOR: #800000">symbols</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">file</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">test.exe</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">&gt;
+  &lt;!--</span><span style="COLOR: #008000">This is a list of all source files referred by the PDB.</span><span style="COLOR: #0000ff">--&gt;
+  &lt;</span><span style="COLOR: #800000">files</span><span style="COLOR: #0000ff">&gt;
+    &lt;</span><span style="COLOR: #800000">file</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">id</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">name</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">c:\dev\mdbg_Sample3\mdbg\demo\pdb2xml\test.cs</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">language</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">3f5162f8-07c6-11d3-9053-00c04fa302a1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">languageVendor</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">994b45c4-e6e9-11d2-903f-00c04fa302a1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">documentType</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">5a869d0b-6611-11d3-bd2a-0000f80849bd</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+  &lt;/</span><span style="COLOR: #800000">files</span><span style="COLOR: #0000ff">&gt;
+  &lt;!--</span><span style="COLOR: #008000">This is the token for the 'entry point' method, which is the method that will be called when the assembly is loaded. This usually corresponds to 'Main'</span><span style="COLOR: #0000ff">--&gt;
+  &lt;</span><span style="COLOR: #800000">EntryPoint</span><span style="COLOR: #0000ff">&gt;
+    &lt;</span><span style="COLOR: #800000">methodref</span><span style="COLOR: #0000ff">&gt;</span><span style="COLOR: #000000">0x6000001</span><span style="COLOR: #0000ff">&lt;/</span><span style="COLOR: #800000">methodref</span><span style="COLOR: #0000ff">&gt;
+  &lt;/</span><span style="COLOR: #800000">EntryPoint</span><span style="COLOR: #0000ff">&gt;
+  &lt;!--</span><span style="COLOR: #008000">This is a list of all methods in the assembly that matches this PDB.</span><span style="COLOR: #0000ff">--&gt;
+  &lt;!--</span><span style="COLOR: #008000">For each method, we provide the sequence tables that map from IL offsets back to source.</span><span style="COLOR: #0000ff">--&gt;
+  &lt;</span><span style="COLOR: #800000">methods</span><span style="COLOR: #0000ff">&gt;
+    &lt;</span><span style="COLOR: #800000">method</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">name</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">MyTest.Main</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">token</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x6000001</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">localSigMetadataToken</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x11000001</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">&gt;
+      &lt;</span><span style="COLOR: #800000">sequencepoints</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">total</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">5</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">&gt;
+        &lt;</span><span style="COLOR: #800000">entry</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_offset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">6</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">6</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">2</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">file_ref</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+        &lt;</span><span style="COLOR: #800000">entry</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_offset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">7</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">2</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">7</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">18</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">file_ref</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+        &lt;</span><span style="COLOR: #800000">entry</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_offset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x3</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">8</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">2</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">8</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">26</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">file_ref</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+        &lt;</span><span style="COLOR: #800000">entry</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_offset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0xe</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">9</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">2</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">9</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">40</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">file_ref</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+        &lt;</span><span style="COLOR: #800000">entry</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_offset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x24</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">10</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">start_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_row</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">10</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">end_column</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">2</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">file_ref</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">1</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+      &lt;/</span><span style="COLOR: #800000">sequencepoints</span><span style="COLOR: #0000ff">&gt;
+      &lt;</span><span style="COLOR: #800000">locals</span><span style="COLOR: #0000ff">&gt;
+        &lt;</span><span style="COLOR: #800000">local</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">name</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">myLocal</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_index</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_start</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_end</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x25</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">attributes</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">signature</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">08</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+      &lt;/</span><span style="COLOR: #800000">locals</span><span style="COLOR: #0000ff">&gt;
+      &lt;</span><span style="COLOR: #800000">scope</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">startOffset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">endOffset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x25</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">&gt;
+        &lt;</span><span style="COLOR: #800000">local</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">name</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">myLocal</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_index</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_start</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_end</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x25</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">attributes</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">signature</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">08</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+      &lt;/</span><span style="COLOR: #800000">scope</span><span style="COLOR: #0000ff">&gt;
+    &lt;/</span><span style="COLOR: #800000">method</span><span style="COLOR: #0000ff">&gt;
+  &lt;/</span><span style="COLOR: #800000">methods</span><span style="COLOR: #0000ff">&gt;
+&lt;/</span><span style="COLOR: #800000">symbols</span><span style="COLOR: #0000ff">&gt;</pre>
+</span>
+<p>&nbsp;</p>
+<p><b>5) Edit the xml file</b>.</p>
+<p>We can now edit the XML file and convert it back to a pdb. First we'll just 
+rename the local:</p>
+<pre><span color="black">
+</span><span style="COLOR: #0000ff">      &lt;</span><span style="COLOR: #800000">locals</span><span style="COLOR: #0000ff">&gt;
+        &lt;</span><span style="COLOR: #800000">local</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">name</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="color: #0000ff; font-weight: 700; text-decoration: underline; background-color: #FFFF00">myNewLocal</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_index</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_start</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_end</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x25</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">attributes</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">signature</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">08</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+      &lt;/</span><span style="COLOR: #800000">locals</span><span style="COLOR: #0000ff">&gt;
+      &lt;</span><span style="COLOR: #800000">scope</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">startOffset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">endOffset</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x25</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">&gt;
+        &lt;</span><span style="COLOR: #800000">local</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">name</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="color: #0000ff; text-decoration: underline; background-color: #FFFF00">myNewLocal</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_index</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_start</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">il_end</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0x25</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">attributes</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">0</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> </span><span style="COLOR: #ff0000">signature</span><span style="COLOR: #0000ff">=</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff">08</span><span style="COLOR: #000000">&quot;</span><span style="COLOR: #0000ff"> /&gt;
+      &lt;/</span><span style="COLOR: #800000">scope</span><span style="COLOR: #0000ff">&gt;</pre>
+</span>
+<p>&nbsp;</p>
+<p><b>6) Convert back from xml to pdb</b>.</p>
+<blockquote>
+	<p>C:\dev\mdbg_Sample3\mdbg\demo\pdb2xml&gt;..\..\bin\Debug\pdb2xml.exe 
+	/reverse edit_local.xml test.exe<br>
+	Test harness for PDB2XML.</p>
+</blockquote>
+<p>This will update the executable image (test.exe)&nbsp; because an exe 
+contains a stamp for the pdb. When the pdb is changed, the exe's stamp must be 
+updated.</p>
+<p><b>7) Now when we run under a debugger, we see the local is updated</b>.</p>
+<pre>run test.exe
+STOP: Breakpoint Hit
+6:{
+sh
+3 class MyTest
+4 {
+5 static void Main()
+6:*{
+7 int myLocal = 5;
+8 Console.WriteLine(&quot;Hi&quot;);
+print
+<span style="background-color: #FFFF00">myNewLocal</span>=0</pre>
+<p>We can also reassign source mappings. </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

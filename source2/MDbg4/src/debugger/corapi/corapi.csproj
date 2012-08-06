@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{04EF9865-E1B1-403D-802B-E4FAEA50A634}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>corapi</RootNamespace>
+    <AssemblyName>corapi</AssemblyName>
+    <WarningLevel>4</WarningLevel>
+    <StartupObject>
+    </StartupObject>
+    <AssemblyOriginatorKeyFile>..\..\mdbg.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
+    <SignAssembly>true</SignAssembly>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AppDomain.cs" />
+    <Compile Include="AppDomainEnumerator.cs" />
+    <Compile Include="Assembly.cs" />
+    <Compile Include="AssemblyEnumerator.cs" />
+    <Compile Include="Breakpoint.cs" />
+    <Compile Include="BreakpointEnumerator.cs" />
+    <Compile Include="ChainEnumerator.cs" />
+    <Compile Include="Class.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="CorAPIAssemblyAttributes.cs" />
+    <Compile Include="CorMetadata.cs" />
+    <Compile Include="CorPublish.cs" />
+    <Compile Include="Debugger.cs" />
+    <Compile Include="ErrorInfoEnumerator.cs" />
+    <Compile Include="Eval.cs" />
+    <Compile Include="FunctionBreakpoint.cs" />
+    <Compile Include="HResults.cs" />
+    <Compile Include="IDiaReadExeAtRVACallback.cs" />
+    <Compile Include="IldbSymbols.cs" />
+    <Compile Include="ISymBinder2.cs" />
+    <Compile Include="ISymConstant.cs" />
+    <Compile Include="ISymEncMethod.cs" />
+    <Compile Include="ISymENCUpdate.cs" />
+    <Compile Include="ISymReader2.cs" />
+    <Compile Include="ISymScope2.cs" />
+    <Compile Include="ISymSearchInfo.cs" />
+    <Compile Include="ISymWriter2.cs" />
+    <Compile Include="MetadataFieldInfo.cs" />
+    <Compile Include="MetadataLocator.cs" />
+    <Compile Include="MetadataParameterInfo.cs" />
+    <Compile Include="MetadataType.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="ModuleBreakpoint.cs" />
+    <Compile Include="ModuleEnumerator.cs" />
+    <Compile Include="ModuleRVAReader.cs" />
+    <Compile Include="ObjectEnumerator.cs" />
+    <Compile Include="Process.cs" />
+    <Compile Include="ProcessEnumerator.cs" />
+    <Compile Include="RegisterSet.cs" />
+    <Compile Include="RemoteTarget.cs" />
+    <Compile Include="StackWalk.cs" />
+    <Compile Include="Stepper.cs" />
+    <Compile Include="StepperEnumerator.cs" />
+    <Compile Include="symbinder.cs" />
+    <Compile Include="SymAccess.cs" />
+    <Compile Include="SymConstant.cs" />
+    <Compile Include="SymDocument.cs" />
+    <Compile Include="SymDocumentWriter.cs" />
+    <Compile Include="symmethod.cs" />
+    <Compile Include="SymNamespace.cs" />
+    <Compile Include="SymReader.cs" />
+    <Compile Include="SymScope.cs" />
+    <Compile Include="SymSearchInfo.cs" />
+    <Compile Include="SymSearchPolicyAttributes.cs" />
+    <Compile Include="symvariable.cs" />
+    <Compile Include="SymWriter.cs" />
+    <Compile Include="Thread.cs" />
+    <Compile Include="ThreadEnumerator.cs" />
+    <Compile Include="Type.cs" />
+    <Compile Include="TypeEnumerator.cs" />
+    <Compile Include="utility.cs" />
+    <Compile Include="Value.cs" />
+    <Compile Include="ValueBreakpoint.cs" />
+    <Compile Include="WrapperBase.cs" />
+    <Compile Include="..\..\VersionInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\..\..\..\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\mdbg.snk" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NativeDebugWrappers\NativeDebugWrappers.csproj">
+      <Project>{3991AB6C-468B-4C28-95FC-3188CFB34180}</Project>
+      <Name>NativeDebugWrappers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\raw\raw.csproj">
+      <Project>{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}</Project>
+      <Name>raw</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
+  <PropertyGroup Condition="">
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>

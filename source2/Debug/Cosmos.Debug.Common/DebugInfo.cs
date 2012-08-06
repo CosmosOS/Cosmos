@@ -208,9 +208,39 @@ namespace Cosmos.Debug.Common {
       BulkInsert("Methods", mMethods, 2500, aFlush);
     }
 
-    public void AddAssemblies(IList<AssemblyFile> aAssemblies) {
-      // GUIDs by caller on AssemblyFiles, see caller to see why.
-      BulkInsert("AssemblyFiles", aAssemblies, 0, true);
+    // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
+    // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
+    public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
+    public void AddAssemblies(List<Assembly> aAssemblies) {
+      var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+      foreach (var xAsm in aAssemblies) {
+        var xRow = new Cosmos.Debug.Common.AssemblyFile() {
+          ID = Guid.NewGuid(),
+          Pathname = xAsm.Location
+        };
+        xAssemblies.Add(xRow);
+
+        AssemblyGUIDs.Add(xAsm, xRow.ID);
+      }
+      BulkInsert("AssemblyFiles", xAssemblies, 0, true);
+    }
+
+    public Dictionary<string, Guid> DocumentGUIDs = new Dictionary<string, Guid>();
+    public void AddDocument(string aPathname) {
+      if (!DocumentGUIDs.ContainsKey(aPathname)) {
+        var xRow = new Document() {
+          ID = Guid.NewGuid(),
+          Pathname = aPathname
+        };
+        DocumentGUIDs.Add(aPathname, xRow.ID);
+
+        // Even though we are inserting only one row, Bulk already has a connection
+        // open so its probably faster than using EF, and its about the same amount of code.
+        // Need to insert right away so RI will be ok when dependents are inserted.
+        var xDocuments = new List<Document>(1);
+        xDocuments.Add(xRow);
+        BulkInsert("Documents", xDocuments, 0, true);
+      }
     }
 
     public void WriteSymbols(IList<MLSYMBOL> aSymbols, bool aFlush = false) {

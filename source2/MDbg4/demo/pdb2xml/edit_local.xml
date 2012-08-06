@@ -1,0 +1,30 @@
+<!--This is an XML file representing the PDB for 'test.exe'-->
+<symbols file="test.exe">
+  <!--This is a list of all source files referred by the PDB.-->
+  <files>
+    <file id="1" name="c:\dev\mdbg_Sample3\mdbg\demo\pdb2xml\test.cs" language="3f5162f8-07c6-11d3-9053-00c04fa302a1" languageVendor="994b45c4-e6e9-11d2-903f-00c04fa302a1" documentType="5a869d0b-6611-11d3-bd2a-0000f80849bd" />
+  </files>
+  <!--This is the token for the 'entry point' method, which is the method that will be called when the assembly is loaded. This usually corresponds to 'Main'-->
+  <EntryPoint>
+    <methodref>0x6000001</methodref>
+  </EntryPoint>
+  <!--This is a list of all methods in the assembly that matches this PDB.-->
+  <!--For each method, we provide the sequence tables that map from IL offsets back to source.-->
+  <methods>
+    <method name="MyTest.Main" token="0x6000001" localSigMetadataToken="0x11000001">
+      <sequencepoints total="5">
+        <entry il_offset="0x0" start_row="6" start_column="1" end_row="6" end_column="2" file_ref="1" />
+        <entry il_offset="0x1" start_row="7" start_column="2" end_row="7" end_column="18" file_ref="1" />
+        <entry il_offset="0x3" start_row="8" start_column="2" end_row="8" end_column="26" file_ref="1" />
+        <entry il_offset="0xe" start_row="9" start_column="2" end_row="9" end_column="40" file_ref="1" />
+        <entry il_offset="0x24" start_row="10" start_column="1" end_row="10" end_column="2" file_ref="1" />
+      </sequencepoints>
+      <locals>
+        <local name="myNewLocal" il_index="0" il_start="0x0" il_end="0x25" attributes="0" signature="08" />
+      </locals>
+      <scope startOffset="0x0" endOffset="0x25">
+        <local name="myNewLocal" il_index="0" il_start="0x0" il_end="0x25" attributes="0" signature="08" />
+      </scope>
+    </method>
+  </methods>
+</symbols>

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/06/2012 03:13:30
+-- Date Created: 08/06/2012 16:55:09
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -19,6 +19,9 @@ GO
 
 IF OBJECT_ID(N'[dbo].[FK_AssemblyFileMethod]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_AssemblyFileMethod];
+GO
+IF OBJECT_ID(N'[dbo].[FK_DocumentMethod]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_DocumentMethod];
 GO
 
 -- --------------------------------------------------
@@ -45,6 +48,9 @@ IF OBJECT_ID(N'[dbo].[AssemblyFiles]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[Methods]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Methods];
+GO
+IF OBJECT_ID(N'[dbo].[Documents]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Documents];
 GO
 
 -- --------------------------------------------------
@@ -117,11 +123,18 @@ CREATE TABLE [dbo].[Methods] (
     [AddressStartFuture] bigint  NULL,
     [AddressEndFuture] bigint  NULL,
     [AssemblyFileID] uniqueidentifier  NOT NULL,
-    [Document] nvarchar(256)  NOT NULL,
     [LineStart] int  NOT NULL,
     [ColStart] int  NOT NULL,
     [LineEnd] int  NOT NULL,
-    [ColEnd] int  NOT NULL
+    [ColEnd] int  NOT NULL,
+    [DocumentID] uniqueidentifier  NOT NULL
+);
+GO
+
+-- Creating table 'Documents'
+CREATE TABLE [dbo].[Documents] (
+    [ID] uniqueidentifier  NOT NULL,
+    [Pathname] nvarchar(256)  NOT NULL
 );
 GO
 
@@ -171,6 +184,12 @@ ADD CONSTRAINT [PK_Methods]
     PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
+-- Creating primary key on [ID] in table 'Documents'
+ALTER TABLE [dbo].[Documents]
+ADD CONSTRAINT [PK_Documents]
+    PRIMARY KEY CLUSTERED ([ID] ASC);
+GO
+
 -- --------------------------------------------------
 -- Creating all FOREIGN KEY constraints
 -- --------------------------------------------------
@@ -187,6 +206,20 @@ ADD CONSTRAINT [FK_AssemblyFileMethod]
 CREATE INDEX [IX_FK_AssemblyFileMethod]
 ON [dbo].[Methods]
     ([AssemblyFileID]);
+GO
+
+-- Creating foreign key on [DocumentID] in table 'Methods'
+ALTER TABLE [dbo].[Methods]
+ADD CONSTRAINT [FK_DocumentMethod]
+    FOREIGN KEY ([DocumentID])
+    REFERENCES [dbo].[Documents]
+        ([ID])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_DocumentMethod'
+CREATE INDEX [IX_FK_DocumentMethod]
+ON [dbo].[Methods]
+    ([DocumentID]);
 GO
 
 -- --------------------------------------------------

@@ -1113,17 +1113,7 @@ namespace Cosmos.IL2CPU {
       // there is so much info that is available in scanner that is needed
       // or can be used in a more efficient manner. So we output in both 
       // scanner and assembler as needed.
-      var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
-      foreach (var xAsm in mUsedAssemblies) {
-        var xRow = new Cosmos.Debug.Common.AssemblyFile() {
-          ID = Guid.NewGuid(),
-          Pathname = xAsm.Location
-        };
-        xAssemblies.Add(xRow);
-
-        mAsmblr.AssemblyGUIDs.Add(xAsm, xRow.ID);
-      }
-      mAsmblr.DebugInfo.AddAssemblies(xAssemblies);
+      mAsmblr.DebugInfo.AddAssemblies(mUsedAssemblies);
     }
 
     protected void Assemble() {

@@ -19,6 +19,7 @@ using System.Runtime.Serialization;
 #region EDM Relationship Metadata
 
 [assembly: EdmRelationshipAttribute("DebugModel", "AssemblyFileMethod", "AssemblyFile", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.AssemblyFile), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
+[assembly: EdmRelationshipAttribute("DebugModel", "DocumentMethod", "Document", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.Document), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 
 #endregion
 
@@ -181,6 +182,22 @@ namespace Cosmos.Debug.Common
             }
         }
         private ObjectSet<Method> _Methods;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<Document> Documents
+        {
+            get
+            {
+                if ((_Documents == null))
+                {
+                    _Documents = base.CreateObjectSet<Document>("Documents");
+                }
+                return _Documents;
+            }
+        }
+        private ObjectSet<Document> _Documents;
 
         #endregion
         #region AddTo Methods
@@ -239,6 +256,14 @@ namespace Cosmos.Debug.Common
         public void AddToMethods(Method method)
         {
             base.AddObject("Methods", method);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the Documents EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToDocuments(Document document)
+        {
+            base.AddObject("Documents", document);
         }
 
         #endregion
@@ -348,6 +373,112 @@ namespace Cosmos.Debug.Common
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Method>("DebugModel.AssemblyFileMethod", "Method", value);
+                }
+            }
+        }
+
+        #endregion
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="DebugModel", Name="Document")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class Document : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new Document object.
+        /// </summary>
+        /// <param name="id">Initial value of the ID property.</param>
+        /// <param name="pathname">Initial value of the Pathname property.</param>
+        public static Document CreateDocument(global::System.Guid id, global::System.String pathname)
+        {
+            Document document = new Document();
+            document.ID = id;
+            document.Pathname = pathname;
+            return document;
+        }
+
+        #endregion
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid ID
+        {
+            get
+            {
+                return _ID;
+            }
+            set
+            {
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
+            }
+        }
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String Pathname
+        {
+            get
+            {
+                return _Pathname;
+            }
+            set
+            {
+                OnPathnameChanging(value);
+                ReportPropertyChanging("Pathname");
+                _Pathname = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("Pathname");
+                OnPathnameChanged();
+            }
+        }
+        private global::System.String _Pathname;
+        partial void OnPathnameChanging(global::System.String value);
+        partial void OnPathnameChanged();
+
+        #endregion
+    
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "DocumentMethod", "Method")]
+        public EntityCollection<Method> Methods
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Method>("DebugModel.DocumentMethod", "Method");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Method>("DebugModel.DocumentMethod", "Method", value);
                 }
             }
         }
@@ -931,12 +1062,12 @@ namespace Cosmos.Debug.Common
         /// <param name="methodToken">Initial value of the MethodToken property.</param>
         /// <param name="labelName">Initial value of the LabelName property.</param>
         /// <param name="assemblyFileID">Initial value of the AssemblyFileID property.</param>
-        /// <param name="document">Initial value of the Document property.</param>
         /// <param name="lineStart">Initial value of the LineStart property.</param>
         /// <param name="colStart">Initial value of the ColStart property.</param>
         /// <param name="lineEnd">Initial value of the LineEnd property.</param>
         /// <param name="colEnd">Initial value of the ColEnd property.</param>
-        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.String labelName, global::System.Guid assemblyFileID, global::System.String document, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd)
+        /// <param name="documentID">Initial value of the DocumentID property.</param>
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.String labelName, global::System.Guid assemblyFileID, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd, global::System.Guid documentID)
         {
             Method method = new Method();
             method.ID = id;
@@ -944,11 +1075,11 @@ namespace Cosmos.Debug.Common
             method.MethodToken = methodToken;
             method.LabelName = labelName;
             method.AssemblyFileID = assemblyFileID;
-            method.Document = document;
             method.LineStart = lineStart;
             method.ColStart = colStart;
             method.LineEnd = lineEnd;
             method.ColEnd = colEnd;
+            method.DocumentID = documentID;
             return method;
         }
 
@@ -1131,30 +1262,6 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.String Document
-        {
-            get
-            {
-                return _Document;
-            }
-            set
-            {
-                OnDocumentChanging(value);
-                ReportPropertyChanging("Document");
-                _Document = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Document");
-                OnDocumentChanged();
-            }
-        }
-        private global::System.String _Document;
-        partial void OnDocumentChanging(global::System.String value);
-        partial void OnDocumentChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
         public global::System.Int32 LineStart
         {
             get
@@ -1245,6 +1352,30 @@ namespace Cosmos.Debug.Common
         private global::System.Int32 _ColEnd;
         partial void OnColEndChanging(global::System.Int32 value);
         partial void OnColEndChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid DocumentID
+        {
+            get
+            {
+                return _DocumentID;
+            }
+            set
+            {
+                OnDocumentIDChanging(value);
+                ReportPropertyChanging("DocumentID");
+                _DocumentID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("DocumentID");
+                OnDocumentIDChanged();
+            }
+        }
+        private global::System.Guid _DocumentID;
+        partial void OnDocumentIDChanging(global::System.Guid value);
+        partial void OnDocumentIDChanged();
 
         #endregion
     
@@ -1284,6 +1415,44 @@ namespace Cosmos.Debug.Common
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<AssemblyFile>("DebugModel.AssemblyFileMethod", "AssemblyFile", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "DocumentMethod", "Document")]
+        public Document Document
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Document>("DebugModel.DocumentMethod", "Document").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Document>("DebugModel.DocumentMethod", "Document").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Document> DocumentReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Document>("DebugModel.DocumentMethod", "Document");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Document>("DebugModel.DocumentMethod", "Document", value);
                 }
             }
         }

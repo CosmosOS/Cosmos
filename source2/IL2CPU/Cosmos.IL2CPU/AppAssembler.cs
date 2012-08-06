@@ -11,7 +11,6 @@ using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.Plugs;
-using Microsoft.Samples.Debugging.CorSymbolStore;
 using Mono.Cecil;
 
 namespace Cosmos.IL2CPU {
@@ -27,16 +26,13 @@ namespace Cosmos.IL2CPU {
     protected System.IO.TextWriter mLog;
     protected Dictionary<string, ModuleDefinition> mLoadedModules = new Dictionary<string, ModuleDefinition>();
     protected int[] mCodeOffsets;
-    protected int[] mCodeLineNumbers;
+    protected int[] mStartLines;
     public TraceAssemblies TraceAssemblies;
     public bool DebugEnabled = false;
     public DebugMode DebugMode;
     public bool IgnoreDebugStubAttribute;
     protected static HashSet<string> mDebugLines = new HashSet<string>();
     protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
-
-    // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
-    public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
 
     public AppAssembler(int aComPort) {
       Assembler = new Cosmos.Assembler.Assembler(aComPort);
@@ -97,23 +93,28 @@ namespace Cosmos.IL2CPU {
             int xCount = xMethodSymbols.SequencePointCount;
             mCodeOffsets = new int[xCount];
             var xCodeDocuments = new ISymbolDocument[xCount];
-            mCodeLineNumbers = new int[xCount];
-            var xCodeColumns = new int[xCount];
-            var xCodeEndLines = new int[xCount];
-            var xCodeEndColumns = new int[xCount];
+            mStartLines = new int[xCount];
+            var xStartCols = new int[xCount];
+            var xEndLines = new int[xCount];
+            var xEndCols = new int[xCount];
             xMethodSymbols.GetSequencePoints(mCodeOffsets, xCodeDocuments
-             , mCodeLineNumbers, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+             , mStartLines, xStartCols, xEndLines, xEndCols);
 
+            xCodeDocuments = new ISymbolDocument[2];
+            xStartCols = new int[2];
+            xEndLines = new int[2];
+            xMethodSymbols.GetSourceStartEnd(xCodeDocuments, mStartLines, xStartCols);
+            DebugInfo.AddDocument(xCodeDocuments[0].URL);
             var xMethod = new Method() {
               TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
               MethodToken = aMethod.MethodBase.MetadataToken,
               LabelName = xMethodLabel,
-              AssemblyFileID = AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
-              Document = xCodeDocuments[0].URL,
-              LineStart = mCodeLineNumbers[0],
-              ColStart = xCodeColumns[0],
-              LineEnd = xCodeEndLines[xCount - 1],
-              ColEnd = xCodeEndColumns[xCount - 1]
+              AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
+              DocumentID = DebugInfo.DocumentGUIDs[xCodeDocuments[0].URL],
+              LineStart = mStartLines[0],
+              ColStart = xStartCols[0],
+              LineEnd = mStartLines[1],
+              ColEnd = xStartCols[1]
             };
             DebugInfo.AddMethod(xMethod);
           }
@@ -293,7 +294,7 @@ namespace Cosmos.IL2CPU {
 
     protected static ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly) {
       try {
-        return SymbolAccess.GetReaderForFile(aAssembly.Location);
+        return Microsoft.Samples.Debugging.CorSymbolStore.SymbolAccess.GetReaderForFile(aAssembly.Location);
       } catch (NotSupportedException) {
         return null;
       }
@@ -962,7 +963,7 @@ namespace Cosmos.IL2CPU {
           var xIndex = Array.IndexOf(aCodeOffsets, aOp.Position);
           if (xIndex == -1) {
             return;
-          } else if (mCodeLineNumbers[xIndex] == 0xFEEFEE) {
+          } else if (mStartLines[xIndex] == 0xFEEFEE) {
             // 0xFEEFEE means hiddenline -> we dont want to stop there
             return;
           }
