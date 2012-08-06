@@ -100,23 +100,23 @@ namespace Cosmos.IL2CPU {
             xMethodSymbols.GetSequencePoints(mCodeOffsets, xCodeDocuments
              , mStartLines, xStartCols, xEndLines, xEndCols);
 
-            xCodeDocuments = new ISymbolDocument[2];
-            xStartCols = new int[2];
-            xEndLines = new int[2];
-            xMethodSymbols.GetSourceStartEnd(xCodeDocuments, mStartLines, xStartCols);
-            DebugInfo.AddDocument(xCodeDocuments[0].URL);
-            var xMethod = new Method() {
-              TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
-              MethodToken = aMethod.MethodBase.MetadataToken,
-              LabelName = xMethodLabel,
-              AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
-              DocumentID = DebugInfo.DocumentGUIDs[xCodeDocuments[0].URL],
-              LineStart = mStartLines[0],
-              ColStart = xStartCols[0],
-              LineEnd = mStartLines[1],
-              ColEnd = xStartCols[1]
-            };
-            DebugInfo.AddMethod(xMethod);
+            //xCodeDocuments = new ISymbolDocument[2];
+            //xStartCols = new int[2];
+            //xEndLines = new int[2];
+            //xMethodSymbols.GetSourceStartEnd(xCodeDocuments, mStartLines, xStartCols);
+            //DebugInfo.AddDocument(xCodeDocuments[0].URL);
+            //var xMethod = new Method() {
+            //  TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
+            //  MethodToken = aMethod.MethodBase.MetadataToken,
+            //  LabelName = xMethodLabel,
+            //  AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
+            //  DocumentID = DebugInfo.DocumentGUIDs[xCodeDocuments[0].URL],
+            //  LineStart = mStartLines[0],
+            //  ColStart = xStartCols[0],
+            //  LineEnd = mStartLines[1],
+            //  ColEnd = xStartCols[1]
+            //};
+            //DebugInfo.AddMethod(xMethod);
           }
         }
       }
