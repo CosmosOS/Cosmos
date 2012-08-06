@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.Profiler {
-  public class Assembler : Cosmos.IL2CPU.X86.AppAssembler {
+  public class Assembler : Cosmos.IL2CPU.X86.AppAssemblerNasm {
 
     public Assembler() : base(0) {
     }

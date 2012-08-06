@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Assembler;
+using CPU = Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using System.Reflection;
 using System.Diagnostics.SymbolStore;
@@ -14,9 +14,13 @@ using Mono.Cecil;
 using System.IO;
 
 namespace Cosmos.IL2CPU.X86 {
-  public class AppAssemblerNasm : AppAssembler {
-    public AppAssemblerNasm(byte comNumber)
-      : base(comNumber) {
+  public class AppAssemblerNasm : IL2CPU.AppAssembler {
+    public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
+    public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
+    protected const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
+
+    public AppAssemblerNasm(byte aComPort)
+      : base(new CosmosAssembler(aComPort)) {
     }
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
@@ -27,15 +31,15 @@ namespace Cosmos.IL2CPU.X86 {
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
       if (aMethod.PluggedMethod != null) {
-        new Cosmos.Assembler.Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
+        new Cosmos.Assembler.Label("PLUG_FOR___" + CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
       } else {
         new Cosmos.Assembler.Label(aMethod.MethodBase);
       }
       var xMethodLabel = Cosmos.Assembler.Label.LastFullLabel;
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
-        new Comment("This is a static constructor. see if it has been called already, and if so, return.");
-        var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
-        var xAsmMember = new DataMember(xName, (byte)0);
+        new CPU.Comment("This is a static constructor. see if it has been called already, and if so, return.");
+        var xName = CPU.DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + CPU.MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
+        var xAsmMember = new CPU.DataMember(xName, (byte)0);
         Assembler.DataMembers.Add(xAsmMember);
         new Compare { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
         new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
@@ -95,7 +99,7 @@ namespace Cosmos.IL2CPU.X86 {
             mLocals_Arguments_Infos.Add(xInfo);
 
             var xSize = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4);
-            new Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
+            new CPU.Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
             for (int i = 0; i < xSize / 4; i++) {
               new Push { DestinationValue = 0 };
             }
@@ -369,7 +373,7 @@ namespace Cosmos.IL2CPU.X86 {
 
     private static HashSet<string> mDebugLines = new HashSet<string>();
     private static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {
-      var xLine = String.Format("{0}\t{1}\t{2}", MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
+      var xLine = String.Format("{0}\t{1}\t{2}", CPU.MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
 
     }
     private List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
@@ -508,11 +512,115 @@ namespace Cosmos.IL2CPU.X86 {
       if (xContents.EndsWith(", ")) {
         xContents = xContents.Substring(0, xContents.Length - 2);
       }
-      new Comment("Stack contains " + mAssembler.Stack.Count + " items: (" + xContents + ")");
+      new CPU.Comment("Stack contains " + mAssembler.Stack.Count + " items: (" + xContents + ")");
     }
 
     public void FinalizeDebugInfo() {
       DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
     }
+
+    protected override void Move(string aDestLabelName, int aValue) {
+      new CPUx86.Mov {
+        DestinationRef = CPU.ElementReference.New(aDestLabelName),
+        DestinationIsIndirect = true,
+        SourceValue = (uint)aValue
+      };
+    }
+
+    protected override void Push(uint aValue) {
+      new CPUx86.Push {
+        DestinationValue = aValue
+      };
+    }
+
+    protected override void Pop() {
+      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mAssembler.Stack.Pop().Size };
+    }
+
+    protected override void Push(string aLabelName, bool isIndirect = false) {
+      new CPUx86.Push {
+        DestinationRef = CPU.ElementReference.New(aLabelName),
+        DestinationIsIndirect = isIndirect
+      };
+    }
+
+    protected override void Call(MethodBase aMethod) {
+      new Cosmos.Assembler.x86.Call {
+        DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod)
+      };
+    }
+
+    protected override void Jump(string aLabelName) {
+      new Cosmos.Assembler.x86.Jump {
+        DestinationLabel = aLabelName
+      };
+    }
+
+    protected override int GetVTableEntrySize() {
+      return 16; // todo: retrieve from actual type info
+    }
+
+    protected override void Ldarg(MethodInfo aMethod, int aIndex) {
+      IL.Ldarg.DoExecute(mAssembler, aMethod, (ushort)aIndex);
+    }
+
+    protected override void Call(MethodInfo aMethod, MethodInfo aTargetMethod) {
+      var xSize = IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
+      if (xSize > 0) {
+        new CPUx86.Sub { DestinationReg = Registers.ESP, SourceValue = xSize };
+      }
+      new CPUx86.Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
+    }
+
+    protected override void Ldflda(MethodInfo aMethod, string aFieldId) {
+      IL.Ldflda.DoExecute(mAssembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
+    }
+
+    public override uint GetSizeOfType(Type aType) {
+      return ILOp.SizeOfType(aType);
+    }
+
+    public override void EmitEntrypoint(MethodBase aEntrypoint) {
+      // at the time the datamembers for literal strings are created, the type id for string is not yet determined. 
+      // for now, we fix this at runtime.
+      new CPU.Label(InitStringIDsLabel);
+      new Push { DestinationReg = Registers.EBP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
+      foreach (var xDataMember in mAssembler.DataMembers) {
+        if (!xDataMember.Name.StartsWith("StringLiteral")) {
+          continue;
+        }
+        if (xDataMember.Name.EndsWith("__Contents")) {
+          continue;
+        }
+        new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+      }
+      new Pop { DestinationReg = Registers.EBP };
+      new Return();
+
+      new CPU.Label(CosmosAssembler.EntryPointName);
+      new Push { DestinationReg = Registers.EBP };
+      new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
+      new Call { DestinationLabel = InitVMTCodeLabel };
+      CosmosAssembler.WriteDebugVideo("Initializing string IDs.");
+      new Call { DestinationLabel = InitStringIDsLabel };
+
+      // we now need to do "newobj" on the entry point, and after that, call .Start on it
+      var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
+      new CPU.Label(xCurLabel);
+      IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+      xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
+      new CPU.Label(xCurLabel);
+      IL.Call.DoExecute(mAssembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart");
+      new CPU.Label(CosmosAssembler.EntryPointName + ".AfterStart");
+      new Pop { DestinationReg = Registers.EBP };
+      new Return();
+
+      if (ShouldOptimize) {
+        Orvid.Optimizer.Optimize(Assembler);
+      }
+    }
+  
   }
 }
