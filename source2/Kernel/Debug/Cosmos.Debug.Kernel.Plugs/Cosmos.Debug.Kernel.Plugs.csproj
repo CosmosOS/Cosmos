@@ -82,10 +82,6 @@
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
-      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
-      <Name>Cosmos.IL2CPU.X86</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
