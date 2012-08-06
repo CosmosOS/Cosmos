@@ -12,79 +12,13 @@ using XSharp.Nasm;
 using Cosmos.Compiler.XSharp;
 
 namespace Cosmos.IL2CPU.X86 {
-  // TODO: I think we need to later elminate this class
-  // Much of it is left over from the old build stuff, and info 
-  // here actually belongs else where, not in the assembler
+  // Merge with base - started but there are circular refs when merging
   public class CosmosAssembler : Cosmos.Assembler.Assembler {
 
     public CosmosAssembler(byte aComNumber) {
       mComNumber = aComNumber;
     }
 
-    private static string GetValidGroupName(string aGroup) {
-      return aGroup.Replace('-', '_').Replace('.', '_');
-    }
-    public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
-
-    protected byte[] GdtDescriptor(UInt32 aBase, UInt32 aSize, bool aCode) {
-      // Limit is a confusing word. Is it the max physical address or size?
-      // In fact it is the size, and 286 docs actually refer to it as size 
-      // rather than limit.
-      // It is also size - 1, else there would be no way to specify
-      // all of RAM, and a limit of 0 is invalid.
-
-      var xResult = new byte[8];
-
-      // Check the limit to make sure that it can be encoded
-      if ((aSize > 65536) && (aSize & 0x0FFF) != 0x0FFF) {
-        // If larger than 16 bit, must be an even page (4kb) size
-        throw new Exception("Invalid size in GDT descriptor.");
-      }
-      // Flags nibble
-      // 7: Granularity 
-      //    0 = bytes
-      //    1 = 4kb pages
-      // 6: 1 = 32 bit mode
-      // 5: 0 - Reserved
-      // 4: 0 - Reserved 
-      xResult[6] = 0x40;
-      if (aSize > 65536) {
-        // Set page sizing instead of byte sizing
-        aSize = aSize >> 12;
-        xResult[6] = (byte)(xResult[6] | 0x80);
-      }
-
-      xResult[0] = (byte)(aSize & 0xFF);
-      xResult[1] = (byte)((aSize >> 8) & 0xFF);
-      xResult[6] = (byte)(xResult[6] | ((aSize >> 16) & 0x0F));
-
-      xResult[2] = (byte)(aBase & 0xFF);
-      xResult[3] = (byte)((aBase >> 8) & 0xFF);
-      xResult[4] = (byte)((aBase >> 16) & 0xFF);
-      xResult[7] = (byte)((aBase >> 24) & 0xFF);
-
-      xResult[5] = (byte)(
-        // Bit 7: Present, must be 1
-        0x80 |
-        // Bit 6-5: Privilege, 0=kernel, 3=user
-        0x00 |
-        // Reserved, must be 1
-        0x10 |
-        // Bit 3: 1=Code, 0=Data
-        (aCode ? 0x08 : 0x00) |
-        // Bit 2: Direction/Conforming
-        0x00 |
-        // Bit 1: R/W  Data (1=Writeable, 0=Read only) Code (1=Readable, 0=Not readable)
-        0x02 |
-        // Bit 0: Accessed - Set to 0. Updated by CPU later.       
-        0x00
-        );
-
-      return xResult;
-    }
-
-    UInt16 mGdCode;
-    UInt16 mGdData;
     public void CreateGDT() {
       new Comment(this, "BEGIN - Create GDT");
       var xGDT = new List<byte>();
@@ -172,28 +106,6 @@ namespace Cosmos.IL2CPU.X86 {
       new Lidt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
 
       new Comment(this, "END - Create IDT");
-    }
-
-    static public void WriteDebugVideo(string aText) {
-      // This method emits a lot of ASM, but thats what we want becuase
-      // at this point we need ASM as simple as possible and completely transparent.
-      // No stack changes, no register mods, etc.
-
-      // TODO: Add an option on the debug project properties to turn this off.
-      // Also see TokenPatterns.cs Checkpoint in X#
-      var xPreBootLogging = true;
-      if (xPreBootLogging) {
-        UInt32 xVideo = 0xB8000;
-        for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
-          new LiteralAssemblerCode("mov byte [0x" + i.ToString("X") + "], 0");
-          new LiteralAssemblerCode("mov byte [0x" + (i + 1).ToString("X") + "], 0x02");
-        }
-
-        foreach (var xChar in aText) {
-          new LiteralAssemblerCode("mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar);
-          xVideo = xVideo + 2;
-        }
-      }
     }
 
     public override void Initialize() {
