@@ -61,10 +61,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="corapi, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ebb8d478f63174c0, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\source\libraries\MDbg\corapi.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\..\..\source\packages\EntityFramework.5.0.0-rc\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
@@ -401,6 +397,10 @@
     <ProjectReference Include="..\..\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj">
       <Project>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</Project>
       <Name>Cosmos.Debug.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MDbg4\src\debugger\corapi\corapi.csproj">
+      <Project>{04EF9865-E1B1-403D-802B-E4FAEA50A634}</Project>
+      <Name>corapi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
