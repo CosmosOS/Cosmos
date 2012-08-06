@@ -207,6 +207,12 @@ namespace Cosmos.Build.MSBuild {
       // These are the references of our boot project. We dont actually ever load the boot
       // project asm. Instead the references will contain plugs, and the kernel. We load
       // them then find the entry point in the kernel.
+      //
+      // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
+      // will not be tried on them, but will on ASMs they reference.
+      //
+      // TODO - Update to use Load for Reflection only, but note that this wont load references
+      // and we have to do it manually (Probably better for us anyways)
 
       Type xKernelType = null;
       foreach (var xRef in References) {

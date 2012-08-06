@@ -16,6 +16,10 @@ namespace Cosmos.IL2CPU {
     public DebugInfo DebugInfo { get; set; }
     protected System.IO.TextWriter mLog;
 
+    // Quick look up of assemblies so we dont have to go to the database and compare
+    // by fullname.
+    public Dictionary<Assembly, Guid> Assemblies = new Dictionary<Assembly, Guid>();
+
     protected Cosmos.Assembler.Assembler mAssembler;
     protected AppAssembler(Cosmos.Assembler.Assembler assembler) {
       mAssembler = assembler;

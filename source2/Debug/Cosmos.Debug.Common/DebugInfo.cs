@@ -206,6 +206,11 @@ namespace Cosmos.Debug.Common {
       BulkInsert("Methods", mMethods, 2500, aFlush);
     }
 
+    public void AddAssemblies(IList<AssemblyFile> aAssemblies) {
+      // GUIDs by caller on AssemblyFiles, see caller to see why.
+      BulkInsert("AssemblyFiles", aAssemblies, 0, true);
+    }
+
     public void WriteSymbols(IList<MLSYMBOL> aSymbols, bool aFlush = false) {
       foreach (var x in aSymbols) {
         x.ID = Guid.NewGuid();

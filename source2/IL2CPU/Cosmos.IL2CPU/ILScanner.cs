@@ -57,6 +57,11 @@ namespace Cosmos.IL2CPU {
     protected ILReader mReader;
     protected AppAssembler mAsmblr;
 
+    // List of asssemblies found during scan. We cannot use the list of loaded
+    // assemblies because the loaded list includes compilers, etc, and also possibly
+    // other unused assemblies. So instead we collect a list of assemblies as we scan.
+    protected List<Assembly> mUsedAssemblies = new List<Assembly>();
+
     protected OurHashSet<object> mItems = new OurHashSet<object>();
     protected List<object> mItemsList = new List<object>();
     // Contains items to be scanned, both types and methods
@@ -295,12 +300,20 @@ namespace Cosmos.IL2CPU {
       // scanner and assembler as needed.
       //
       // -SQL Inserts are slow when done individually.
-      // -Assemblies can only be uniquely identified by their names.
+      // -Assemblies can only be uniquely identified by their names or instance. ie there is no Token for example.
       // -Assembly table must be written before dependent items like Method
       // can be written.
-      // Because of this, we scan in a loop all at once instead of noticing
-      // assemblies as we use them.
-      //mAsmblr.DebugInfo
+      var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+      foreach (var xAsm in mUsedAssemblies) {
+        var xRow = new Cosmos.Debug.Common.AssemblyFile() {
+          ID = Guid.NewGuid(),
+          Pathname = xAsm.Location
+        };
+        xAssemblies.Add(xRow);
+
+        mAsmblr.Assemblies.Add(xAsm, xRow.ID);
+      }
+      mAsmblr.DebugInfo.AddAssemblies(xAssemblies);
 
       // Time to assemble
       foreach (var xItem in mItems) {
@@ -816,7 +829,14 @@ namespace Cosmos.IL2CPU {
         if (xItem.Item is MethodBase) {
           ScanMethod((MethodBase)xItem.Item, false, xItem.SourceItem);
         } else if (xItem.Item is Type) {
-          ScanType((Type)xItem.Item);
+          var xType = (Type)xItem.Item;
+          ScanType(xType);
+
+          // Methods and fields cant exist without types, so we only update
+          // mUsedAssemblies in type branch.
+          if (!mUsedAssemblies.Contains(xType.Assembly)) {
+            mUsedAssemblies.Add(xType.Assembly);
+          }
         } else if (xItem.Item is FieldInfo) {
           // todo: static fields need more processing?
         } else {
@@ -843,14 +863,6 @@ namespace Cosmos.IL2CPU {
       xList.Add(xLogItem);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="aTargetType"></param>
-    /// <param name="aImpls"></param>
-    /// <param name="aMethod">The target method to be plugged</param>
-    /// <param name="aParamTypes"></param>
-    /// <returns></returns>
     protected MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes) {
       //TODO: This method is "reversed" from old - remember that when porting
       MethodBase xResult = null;
