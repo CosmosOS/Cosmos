@@ -21,34 +21,29 @@ namespace Cosmos.Assembler {
       return Final(GenerateFullName(aMethod));
     }
 
-    const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
-    static string FilterStringForIncorrectChars(string aName) {
-      // Comment DataMember.FilterStringForIncorrectChars
-      string xTempResult = aName;
-      foreach (char c in IllegalIdentifierChars) {
-        //TODO Use empty, not _. We need shorter names, and _ can be used for explicit demarkation.
-        // Need to add _ to illegal chars, and cant change currently as it goofs stuff up.
-        xTempResult = xTempResult.Replace(c, '_');
-      }
-      return String.Intern(xTempResult);
-    }
-
+    const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=_";
     public static string Final(string xName) {
-      xName = FilterStringForIncorrectChars(xName);
+      var xSB = new StringBuilder(xName);
 
-      if (xName.Length > MaxLengthWithoutSuffix) {
+      // DataMember.FilterStringForIncorrectChars also does some filtering but replacing empties or non _ chars
+      // causes issues with legacy hardcoded values. So we have a separate function.
+      foreach (char c in IllegalIdentifierChars) {
+        xSB.Replace(c.ToString(), "");
+      }
+
+      if (xSB.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
-          var xSB = new StringBuilder();
-          foreach (var xByte in xHash.ComputeHash(Encoding.Default.GetBytes(xName))) {
+          var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));
+          // Keep length max 200
+          xSB.Length = MaxLengthWithoutSuffix - xValue.Length * 2;
+          foreach (var xByte in xValue) {
             xSB.Append(xByte.ToString("X2"));
           }
-          // Keep length max 200
-          xName = xName.Substring(0, MaxLengthWithoutSuffix - xSB.Length) + xSB.ToString();
         }
       }
 
       LabelCount++;
-      return xName;
+      return xSB.ToString();
     }
 
     public static string GetFullName(Type aType) {
