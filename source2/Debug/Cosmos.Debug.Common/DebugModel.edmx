@@ -87,15 +87,14 @@
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TypeToken" Type="int" Nullable="false" />
     <Property Name="MethodToken" Type="int" Nullable="false" />
-    <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="AddressStartFuture" Type="bigint" Nullable="true" />
-    <Property Name="AddressEndFuture" Type="bigint" Nullable="true" />
     <Property Name="AssemblyFileID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="LineStart" Type="int" Nullable="false" />
     <Property Name="ColStart" Type="int" Nullable="false" />
     <Property Name="LineEnd" Type="int" Nullable="false" />
     <Property Name="ColEnd" Type="int" Nullable="false" />
     <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="LabelStart" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="LabelEnd" Type="nvarchar" Nullable="false" MaxLength="512" />
   </EntityType>
   <EntityType Name="Documents">
     <Key>
@@ -215,9 +214,6 @@
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="Int32" Name="TypeToken" Nullable="false" />
           <Property Type="Int32" Name="MethodToken" Nullable="false" />
-          <Property Type="String" Name="LabelName" Nullable="false" MaxLength="512" />
-          <Property Type="Int64" Name="AddressStartFuture" Nullable="true" />
-          <Property Type="Int64" Name="AddressEndFuture" Nullable="true" />
           <NavigationProperty Name="AssemblyFile" Relationship="DebugModel.AssemblyFileMethod" FromRole="Method" ToRole="AssemblyFile" />
           <Property Type="Guid" Name="AssemblyFileID" Nullable="false" />
           <Property Type="Int32" Name="LineStart" Nullable="false" />
@@ -226,6 +222,8 @@
           <Property Type="Int32" Name="ColEnd" Nullable="false" />
           <NavigationProperty Name="Document" Relationship="DebugModel.DocumentMethod" FromRole="Method" ToRole="Document" />
           <Property Type="Guid" Name="DocumentID" Nullable="false" />
+          <Property Type="String" Name="LabelStart" Nullable="false" MaxLength="512" />
+          <Property Type="String" Name="LabelEnd" Nullable="false" MaxLength="512" />
         </EntityType>
         <Association Name="AssemblyFileMethod">
           <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
@@ -334,15 +332,14 @@
           <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="TypeToken" ColumnName="TypeToken" />
           <ScalarProperty Name="MethodToken" ColumnName="MethodToken" />
-          <ScalarProperty Name="LabelName" ColumnName="LabelName" />
-          <ScalarProperty Name="AddressStartFuture" ColumnName="AddressStartFuture" />
-          <ScalarProperty Name="AddressEndFuture" ColumnName="AddressEndFuture" />
           <ScalarProperty Name="AssemblyFileID" ColumnName="AssemblyFileID" />
           <ScalarProperty Name="LineStart" ColumnName="LineStart" />
           <ScalarProperty Name="ColStart" ColumnName="ColStart" />
           <ScalarProperty Name="LineEnd" ColumnName="LineEnd" />
           <ScalarProperty Name="ColEnd" ColumnName="ColEnd" />
           <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
+          <ScalarProperty Name="LabelStart" ColumnName="LabelStart" />
+          <ScalarProperty Name="LabelEnd" ColumnName="LabelEnd" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -380,15 +377,15 @@
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="2.5" PointY="0.5" Height="1.4033821614583333" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.3263964843749996" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.5186979166666656" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
           <ConnectorPoint PointX="4" PointY="1.297841796875" />
           <ConnectorPoint PointX="4.75" PointY="1.297841796875" />
         </AssociationConnector>
         <EntityTypeShape EntityType="DebugModel.Document" Width="1.5" PointX="7.75" PointY="0.5" Height="1.59568359375" />
         <AssociationConnector Association="DebugModel.DocumentMethod">
-          <ConnectorPoint PointX="7.75" PointY="1.2978417968750002" />
-          <ConnectorPoint PointX="7" PointY="1.2978417968750002" />
+          <ConnectorPoint PointX="7.75" PointY="1.2978417968749998" />
+          <ConnectorPoint PointX="7" PointY="1.2978417968749998" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>

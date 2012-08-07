@@ -289,7 +289,7 @@ namespace Cosmos.IL2CPU {
       // Start from entry point of this program
       Queue(aStartMethod, null, "Entry Point");
 
-      MethodAndTypeLabelsHolder.GC_IncRefLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef);
+      //MethodAndTypeLabelsHolder.GC_IncRefLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef);
 
       ScanQueue();
       UpdateAssemblies();

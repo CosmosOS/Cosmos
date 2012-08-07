@@ -92,10 +92,7 @@ namespace Cosmos.Debug.Common {
             // Be careful with indexes, they slow down inserts. So on tables that we have a 
             // lot of inserts, but limited look ups, dont add them.
             //
-            // Labels
-            // Labels is a big table. Avoid indexes when possible, because we need inserts to be fast.
-            // -ADDRESS - Dont index - We dont look up on it very much
-            // -LABELNAME - We do lookup a lot on this, but will change to asm line as key prob
+            xSQL.MakeIndex("Labels", "Address", false);
             xSQL.MakeIndex("Labels", "Name", true);
             xSQL.MakeIndex("Methods", "DocumentID", false);
           }

@@ -169,6 +169,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
 
       mDebugInfoDb = new DebugInfo(xDbPath);
+      mDebugInfoDb.LoadLookups();
+
       mSourceInfos = SourceInfo.GetSourceInfo(mDebugInfoDb);
       if (mSourceInfos.Count == 0) {
         throw new Exception("Debug data not found: SourceMappings");

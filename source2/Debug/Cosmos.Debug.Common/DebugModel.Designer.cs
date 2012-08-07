@@ -1060,26 +1060,28 @@ namespace Cosmos.Debug.Common
         /// <param name="id">Initial value of the ID property.</param>
         /// <param name="typeToken">Initial value of the TypeToken property.</param>
         /// <param name="methodToken">Initial value of the MethodToken property.</param>
-        /// <param name="labelName">Initial value of the LabelName property.</param>
         /// <param name="assemblyFileID">Initial value of the AssemblyFileID property.</param>
         /// <param name="lineStart">Initial value of the LineStart property.</param>
         /// <param name="colStart">Initial value of the ColStart property.</param>
         /// <param name="lineEnd">Initial value of the LineEnd property.</param>
         /// <param name="colEnd">Initial value of the ColEnd property.</param>
         /// <param name="documentID">Initial value of the DocumentID property.</param>
-        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.String labelName, global::System.Guid assemblyFileID, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd, global::System.Guid documentID)
+        /// <param name="labelStart">Initial value of the LabelStart property.</param>
+        /// <param name="labelEnd">Initial value of the LabelEnd property.</param>
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd, global::System.Guid documentID, global::System.String labelStart, global::System.String labelEnd)
         {
             Method method = new Method();
             method.ID = id;
             method.TypeToken = typeToken;
             method.MethodToken = methodToken;
-            method.LabelName = labelName;
             method.AssemblyFileID = assemblyFileID;
             method.LineStart = lineStart;
             method.ColStart = colStart;
             method.LineEnd = lineEnd;
             method.ColEnd = colEnd;
             method.DocumentID = documentID;
+            method.LabelStart = labelStart;
+            method.LabelEnd = labelEnd;
             return method;
         }
 
@@ -1160,78 +1162,6 @@ namespace Cosmos.Debug.Common
         private global::System.Int32 _MethodToken;
         partial void OnMethodTokenChanging(global::System.Int32 value);
         partial void OnMethodTokenChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String LabelName
-        {
-            get
-            {
-                return _LabelName;
-            }
-            set
-            {
-                OnLabelNameChanging(value);
-                ReportPropertyChanging("LabelName");
-                _LabelName = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("LabelName");
-                OnLabelNameChanged();
-            }
-        }
-        private global::System.String _LabelName;
-        partial void OnLabelNameChanging(global::System.String value);
-        partial void OnLabelNameChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.Int64> AddressStartFuture
-        {
-            get
-            {
-                return _AddressStartFuture;
-            }
-            set
-            {
-                OnAddressStartFutureChanging(value);
-                ReportPropertyChanging("AddressStartFuture");
-                _AddressStartFuture = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("AddressStartFuture");
-                OnAddressStartFutureChanged();
-            }
-        }
-        private Nullable<global::System.Int64> _AddressStartFuture;
-        partial void OnAddressStartFutureChanging(Nullable<global::System.Int64> value);
-        partial void OnAddressStartFutureChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.Int64> AddressEndFuture
-        {
-            get
-            {
-                return _AddressEndFuture;
-            }
-            set
-            {
-                OnAddressEndFutureChanging(value);
-                ReportPropertyChanging("AddressEndFuture");
-                _AddressEndFuture = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("AddressEndFuture");
-                OnAddressEndFutureChanged();
-            }
-        }
-        private Nullable<global::System.Int64> _AddressEndFuture;
-        partial void OnAddressEndFutureChanging(Nullable<global::System.Int64> value);
-        partial void OnAddressEndFutureChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1376,6 +1306,54 @@ namespace Cosmos.Debug.Common
         private global::System.Guid _DocumentID;
         partial void OnDocumentIDChanging(global::System.Guid value);
         partial void OnDocumentIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String LabelStart
+        {
+            get
+            {
+                return _LabelStart;
+            }
+            set
+            {
+                OnLabelStartChanging(value);
+                ReportPropertyChanging("LabelStart");
+                _LabelStart = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LabelStart");
+                OnLabelStartChanged();
+            }
+        }
+        private global::System.String _LabelStart;
+        partial void OnLabelStartChanging(global::System.String value);
+        partial void OnLabelStartChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String LabelEnd
+        {
+            get
+            {
+                return _LabelEnd;
+            }
+            set
+            {
+                OnLabelEndChanging(value);
+                ReportPropertyChanging("LabelEnd");
+                _LabelEnd = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LabelEnd");
+                OnLabelEndChanged();
+            }
+        }
+        private global::System.String _LabelEnd;
+        partial void OnLabelEndChanging(global::System.String value);
+        partial void OnLabelEndChanged();
 
         #endregion
     

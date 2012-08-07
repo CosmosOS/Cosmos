@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -92,8 +93,22 @@ namespace Cosmos.Debug.VSDebugEngine {
           var xEndPos = new TEXT_POSITION[1];
           EngineUtils.CheckOk(xDocPos.GetRange(xStartPos, xEndPos));
 
+          bool xFoundAddress = false;
           UInt32 xAddress = 0;
-          if (mEngine.mProcess.mReverseSourceMappings.FindAddressForSourceLocation(xDocName, xStartPos[0].dwLine + 1, xStartPos[0].dwColumn, out xAddress)) {
+          if (false) {
+            var xDebugInfo = mEngine.mProcess.mDebugInfoDb;
+            var xDocID = xDebugInfo.DocumentGUIDs[xDocName];
+            using (var xDB = xDebugInfo.DB()) {
+              var xQry = from x in xDB.Methods
+                         where
+                           x.DocumentID == xDocID
+                         select x;
+            }
+          } else {
+            xFoundAddress = mEngine.mProcess.mReverseSourceMappings.FindAddressForSourceLocation(xDocName, xStartPos[0].dwLine + 1, xStartPos[0].dwColumn, out xAddress);
+          }
+
+          if (xFoundAddress) {
             var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
             var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
             mBoundBPs.Add(xBBP);

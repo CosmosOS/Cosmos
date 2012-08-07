@@ -92,7 +92,8 @@ namespace Cosmos.IL2CPU {
           var xMethod = new Method() {
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,
-            LabelName = xMethodLabel,
+            LabelStart = xMethodLabel,
+            LabelEnd = "",
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
             DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
             LineStart = mSequences[0].LineStart, 
