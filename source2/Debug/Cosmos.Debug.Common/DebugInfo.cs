@@ -263,7 +263,6 @@ namespace Cosmos.Debug.Common {
     protected List<Method> mMethods = new List<Method>();
     public void AddMethod(Method aMethod, bool aFlush = false) {
       if (aMethod != null) {
-        aMethod.ID = Guid.NewGuid();
         mMethods.Add(aMethod);
       }
       BulkInsert("Methods", mMethods, 2500, aFlush);
@@ -304,11 +303,11 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteSymbols(IList<MethodIlOp> aSymbols, bool aFlush = false) {
+    public void AddSymbols(IList<MethodIlOp> aSymbols, bool aFlush = false) {
       foreach (var x in aSymbols) {
         x.ID = Guid.NewGuid();
       }
-      BulkInsert("MLSYMBOLs", aSymbols, 2500, aFlush);
+      BulkInsert("MethodIlOps", aSymbols, 2500, aFlush);
     }
 
     public void WriteAllLocalsArgumentsInfos(IList<LOCAL_ARGUMENT_INFO> aInfos) {

@@ -33,8 +33,10 @@ namespace Cosmos.IL2CPU {
     protected static HashSet<string> mDebugLines = new HashSet<string>();
     protected List<MethodIlOp> mSymbols = new List<MethodIlOp>();
     public readonly Cosmos.Assembler.Assembler Assembler;
+    //
     protected string mCurrentMethodLabel;
     protected Guid mCurrentMethodLabelEndGuid;
+    protected Guid mCurrentMethodGuid;
 
     public AppAssembler(int aComPort) {
       Assembler = new Cosmos.Assembler.Assembler(aComPort);
@@ -89,7 +91,11 @@ namespace Cosmos.IL2CPU {
         if (mSequences.Length > 0) {
           DebugInfo.AddDocument(mSequences[0].Document);
 
+          // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
+          // so during debugging they can never be confused as to what they point to.
+          mCurrentMethodGuid = Guid.NewGuid();
           var xMethod = new Method() {
+            ID = mCurrentMethodGuid,
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,
             LabelStartID = xLabelGuid,
@@ -911,10 +917,12 @@ namespace Cosmos.IL2CPU {
         xMLSymbol.METHODTOKEN = aMethod.MethodBase.MetadataToken;
         xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
         xMLSymbol.IlOffset = aOpCode.Position;
+        xMLSymbol.MethodID = mCurrentMethodGuid;
+
         mSymbols.Add(xMLSymbol);
-        DebugInfo.WriteSymbols(mSymbols);
+        DebugInfo.AddSymbols(mSymbols);
       }
-      DebugInfo.WriteSymbols(mSymbols, true);
+      DebugInfo.AddSymbols(mSymbols, true);
 
       EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace);
     }

@@ -30,6 +30,10 @@
       <End Role="Label" EntitySet="Labels" />
       <End Role="Method" EntitySet="Methods" />
     </AssociationSet>
+    <AssociationSet Name="MethodIlOpMethod" Association="DebugModel.Store.MethodIlOpMethod">
+      <End Role="MethodIlOp" EntitySet="MethodIlOps" />
+      <End Role="Method" EntitySet="Methods" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="FIELD_INFO">
     <Key>
@@ -80,6 +84,7 @@
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="IlOffset" Type="int" Nullable="false" />
     <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
+    <Property Name="MethodID" Type="uniqueidentifier" Nullable="true" />
   </EntityType>
   <EntityType Name="AssemblyFiles">
     <Key>
@@ -159,6 +164,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="MethodIlOpMethod">
+    <End Role="MethodIlOp" Type="DebugModel.Store.MethodIlOps" Multiplicity="*" />
+    <End Role="Method" Type="DebugModel.Store.Methods" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Method">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="MethodIlOp">
+        <PropertyRef Name="MethodID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -186,6 +203,10 @@
           </AssociationSet>
           <AssociationSet Name="LabelMethodEnd" Association="DebugModel.LabelMethodEnd">
             <End Role="Label" EntitySet="Labels" />
+            <End Role="Method" EntitySet="Methods" />
+          </AssociationSet>
+          <AssociationSet Name="MethodIlOpMethod" Association="DebugModel.MethodIlOpMethod">
+            <End Role="MethodIlOp" EntitySet="MethodIlOps" />
             <End Role="Method" EntitySet="Methods" />
           </AssociationSet>
         </EntityContainer>
@@ -240,6 +261,8 @@
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="IlOffset" Type="Int32" Nullable="false" />
           <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Method" Relationship="DebugModel.MethodIlOpMethod" FromRole="MethodIlOp" ToRole="Method" />
+          <Property Type="Guid" Name="MethodID" Nullable="true" />
         </EntityType>
         <EntityType Name="AssemblyFile">
           <Key>
@@ -268,6 +291,7 @@
           <Property Type="Guid" Name="LabelStartID" Nullable="true" />
           <NavigationProperty Name="LabelEnd" Relationship="DebugModel.LabelMethodEnd" FromRole="Method" ToRole="Label" />
           <Property Type="Guid" Name="LabelEndID" Nullable="true" />
+          <NavigationProperty Name="MethodIlOps" Relationship="DebugModel.MethodIlOpMethod" FromRole="Method" ToRole="MethodIlOp" />
         </EntityType>
         <Association Name="AssemblyFileMethod">
           <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
@@ -322,6 +346,18 @@
             </Principal>
             <Dependent Role="Method">
               <PropertyRef Name="LabelEndID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="MethodIlOpMethod">
+          <End Type="DebugModel.MethodIlOp" Role="MethodIlOp" Multiplicity="*" />
+          <End Type="DebugModel.Method" Role="Method" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Method">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="MethodIlOp">
+              <PropertyRef Name="MethodID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -383,6 +419,7 @@
           <ScalarProperty Name="METHODTOKEN" ColumnName="METHODTOKEN" />
           <ScalarProperty Name="IlOffset" ColumnName="IlOffset" />
           <ScalarProperty Name="METHODNAME" ColumnName="METHODNAME" />
+          <ScalarProperty Name="MethodID" ColumnName="MethodID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -439,29 +476,33 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="DebugModel">
-        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="8.5" PointY="5.125" Height="1.787985026041667" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.5" PointY="3.375" Height="1.59568359375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="2.5" PointY="0.5" Height="1.4033821614583333" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.5186979166666665" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="11.375" PointY="0.5" Height="1.787985026041667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="11.5" PointY="5" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="5.875" PointY="0.5" Height="1.9802864583333335" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="11.375" PointY="2.375" Height="2.3648893229166656" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.5571907552083326" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.9033007812499996" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
-          <ConnectorPoint PointX="4" PointY="1.297841796875" />
-          <ConnectorPoint PointX="4.75" PointY="1.297841796875" />
+          <ConnectorPoint PointX="2" PointY="1.297841796875" />
+          <ConnectorPoint PointX="2.75" PointY="1.297841796875" />
         </AssociationConnector>
-        <EntityTypeShape EntityType="DebugModel.Document" Width="1.5" PointX="7.75" PointY="0.5" Height="1.59568359375" />
+        <EntityTypeShape EntityType="DebugModel.Document" Width="1.5" PointX="0.5" PointY="2.5" Height="1.59568359375" />
         <AssociationConnector Association="DebugModel.DocumentMethod">
-          <ConnectorPoint PointX="7.75" PointY="1.2978417968749998" />
-          <ConnectorPoint PointX="7" PointY="1.2978417968749998" />
+          <ConnectorPoint PointX="2" PointY="3.297841796875" />
+          <ConnectorPoint PointX="2.75" PointY="3.297841796875" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.LabelMethod">
-          <ConnectorPoint PointX="2" PointY="2.2230843098958335" />
-          <ConnectorPoint PointX="4.75" PointY="2.2230843098958335" />
+          <ConnectorPoint PointX="5.875" PointY="1.4901432291666668" />
+          <ConnectorPoint PointX="5" PointY="1.4901432291666668" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.LabelMethodEnd">
-          <ConnectorPoint PointX="2" PointY="2.1762093098958335" />
-          <ConnectorPoint PointX="4.75" PointY="2.1762093098958335" />
+          <ConnectorPoint PointX="5.875" PointY="0.93257161458333337" />
+          <ConnectorPoint PointX="5" PointY="0.93257161458333337" />
+        </AssociationConnector>
+        <AssociationConnector Association="DebugModel.MethodIlOpMethod">
+          <ConnectorPoint PointX="5.875" PointY="3.8603011067708328" />
+          <ConnectorPoint PointX="5" PointY="3.8603011067708328" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/07/2012 16:41:36
+-- Date Created: 08/07/2012 16:54:01
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -29,6 +29,9 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_LabelMethodEnd]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_LabelMethodEnd];
 GO
+IF OBJECT_ID(N'[dbo].[FK_MethodIlOpMethod]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[MethodIlOps] DROP CONSTRAINT [FK_MethodIlOpMethod];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -46,8 +49,8 @@ GO
 IF OBJECT_ID(N'[dbo].[LOCAL_ARGUMENT_INFO]', 'U') IS NOT NULL
     DROP TABLE [dbo].[LOCAL_ARGUMENT_INFO];
 GO
-IF OBJECT_ID(N'[dbo].[MLSYMBOLs]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[MLSYMBOLs];
+IF OBJECT_ID(N'[dbo].[MethodIlOps]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[MethodIlOps];
 GO
 IF OBJECT_ID(N'[dbo].[AssemblyFiles]', 'U') IS NOT NULL
     DROP TABLE [dbo].[AssemblyFiles];
@@ -109,7 +112,8 @@ CREATE TABLE [dbo].[MethodIlOps] (
     [TYPETOKEN] int  NOT NULL,
     [METHODTOKEN] int  NOT NULL,
     [IlOffset] int  NOT NULL,
-    [METHODNAME] nvarchar(256)  NOT NULL
+    [METHODNAME] nvarchar(256)  NOT NULL,
+    [MethodID] uniqueidentifier  NULL
 );
 GO
 
@@ -253,6 +257,20 @@ ADD CONSTRAINT [FK_LabelMethodEnd]
 CREATE INDEX [IX_FK_LabelMethodEnd]
 ON [dbo].[Methods]
     ([LabelEndID]);
+GO
+
+-- Creating foreign key on [MethodID] in table 'MethodIlOps'
+ALTER TABLE [dbo].[MethodIlOps]
+ADD CONSTRAINT [FK_MethodIlOpMethod]
+    FOREIGN KEY ([MethodID])
+    REFERENCES [dbo].[Methods]
+        ([ID])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_MethodIlOpMethod'
+CREATE INDEX [IX_FK_MethodIlOpMethod]
+ON [dbo].[MethodIlOps]
+    ([MethodID]);
 GO
 
 -- --------------------------------------------------

@@ -22,6 +22,7 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("DebugModel", "DocumentMethod", "Document", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.Document), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 [assembly: EdmRelationshipAttribute("DebugModel", "LabelMethod", "Label", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Cosmos.Debug.Common.Label), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 [assembly: EdmRelationshipAttribute("DebugModel", "LabelMethodEnd", "Label", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Cosmos.Debug.Common.Label), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
+[assembly: EdmRelationshipAttribute("DebugModel", "MethodIlOpMethod", "MethodIlOp", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.MethodIlOp), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Cosmos.Debug.Common.Method), true)]
 
 #endregion
 
@@ -1555,6 +1556,28 @@ namespace Cosmos.Debug.Common
                 }
             }
         }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "MethodIlOpMethod", "MethodIlOp")]
+        public EntityCollection<MethodIlOp> MethodIlOps
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<MethodIlOp>("DebugModel.MethodIlOpMethod", "MethodIlOp");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<MethodIlOp>("DebugModel.MethodIlOpMethod", "MethodIlOp", value);
+                }
+            }
+        }
 
         #endregion
     }
@@ -1791,9 +1814,74 @@ namespace Cosmos.Debug.Common
         private global::System.String _METHODNAME;
         partial void OnMETHODNAMEChanging(global::System.String value);
         partial void OnMETHODNAMEChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Guid> MethodID
+        {
+            get
+            {
+                return _MethodID;
+            }
+            set
+            {
+                OnMethodIDChanging(value);
+                ReportPropertyChanging("MethodID");
+                _MethodID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("MethodID");
+                OnMethodIDChanged();
+            }
+        }
+        private Nullable<global::System.Guid> _MethodID;
+        partial void OnMethodIDChanging(Nullable<global::System.Guid> value);
+        partial void OnMethodIDChanged();
 
         #endregion
     
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "MethodIlOpMethod", "Method")]
+        public Method Method
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Method>("DebugModel.MethodIlOpMethod", "Method").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Method>("DebugModel.MethodIlOpMethod", "Method").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Method> MethodReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Method>("DebugModel.MethodIlOpMethod", "Method");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Method>("DebugModel.MethodIlOpMethod", "Method", value);
+                }
+            }
+        }
+
+        #endregion
     }
 
     #endregion
