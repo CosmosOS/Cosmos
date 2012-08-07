@@ -289,8 +289,6 @@ namespace Cosmos.IL2CPU {
       // Start from entry point of this program
       Queue(aStartMethod, null, "Entry Point");
 
-      //MethodAndTypeLabelsHolder.GC_IncRefLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef);
-
       ScanQueue();
       UpdateAssemblies();
       Assemble();
@@ -302,11 +300,8 @@ namespace Cosmos.IL2CPU {
       Queue(method, null, "Explicit entry via QueueMethod");
     }
 
-    /// <summary>
     /// This method changes the opcodes. Changes are:
     /// * inserting the ValueUID for method ops.
-    /// </summary>
-    /// <param name="aOpCodes"></param>
     private void ProcessInstructions(List<ILOpCode> aOpCodes) {
       foreach (var xOpCode in aOpCodes) {
         var xOpMethod = xOpCode as ILOpCodes.OpMethod;
