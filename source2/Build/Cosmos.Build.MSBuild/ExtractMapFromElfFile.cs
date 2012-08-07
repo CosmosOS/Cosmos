@@ -67,10 +67,8 @@ namespace Cosmos.Build.MSBuild {
 
             Guid xGuid;
             // See if label has an embedded GUID. If so, use it.
-            if (xLabel.Contains(".GUID_")) {
-              var xParts = xLabel.Split('.');
-              string xPart = xParts.Single(q => q.StartsWith("GUID_"));
-              xGuid = new Guid(xPart.Substring(5));
+            if (xLabel.StartsWith("GUID_")) {
+              xGuid = new Guid(xLabel.Substring(5));
             } else {
               xGuid = Guid.NewGuid();
             }

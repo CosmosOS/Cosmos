@@ -51,17 +51,24 @@ namespace Cosmos.IL2CPU {
       new Comment("Name: " + aMethod.MethodBase.Name);
       new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
 
+      // Issue label that is used for calls etc.
+      string xMethodLabel;
       if (aMethod.PluggedMethod != null) {
-        mCurrentMethodLabel = "PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase);
+        xMethodLabel = "PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase);
       } else {
-        mCurrentMethodLabel = LabelName.Get(aMethod.MethodBase);
+        xMethodLabel = LabelName.Get(aMethod.MethodBase);
       }
-      new Cosmos.Assembler.Label(mCurrentMethodLabel);
+      new Cosmos.Assembler.Label(xMethodLabel);
+
       // We issue a second label for GUID. This is increases label count, but for now we need a master label first.
       // We issue a GUID label to reduce amount of work and time needed to construct debugging DB.
       var xLabelGuid = Guid.NewGuid();
+      new Cosmos.Assembler.Label("GUID_" + xLabelGuid.ToString("N"));
+
+      mCurrentMethodLabel = "METHOD_" + xLabelGuid.ToString("N");
+      Cosmos.Assembler.Label.LastFullLabel = mCurrentMethodLabel;
+
       mCurrentMethodLabelEndGuid = Guid.NewGuid();
-      new Cosmos.Assembler.Label(".GUID_" + xLabelGuid.ToString("N"));
 
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
         new Comment("Static constructor. See if it has been called already, return if so.");
@@ -268,7 +275,7 @@ namespace Cosmos.IL2CPU {
       new Return { DestinationValue = (uint)xRetSize };
 
       // Final, after all code. Points to op AFTER method.
-      new Cosmos.Assembler.Label(mCurrentMethodLabel + ".GUID_" + mCurrentMethodLabelEndGuid.ToString("N"));
+      new Cosmos.Assembler.Label("GUID_" + mCurrentMethodLabelEndGuid.ToString("N"));
     }
 
     public void FinalizeDebugInfo() {
