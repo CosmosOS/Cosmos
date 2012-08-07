@@ -18,6 +18,8 @@ namespace Cosmos.Assembler {
     // .GUID_xxxxxx
     // .IL_0000
     // .ASM_00
+    // Would be nice to combine IL and ASM into IL_0000_00, but the way we work with the assembler currently
+    // we cant because the ASM labels are issued as local labels.
     //
     // - Methods use a variety of alphanumeric suffixes for support code.
     // - .00 - asm markers at beginning of method
@@ -33,7 +35,7 @@ namespace Cosmos.Assembler {
     }
 
     public static string Get(string aMethodLabel, int aIlPos) {
-      return aMethodLabel + "." + aIlPos.ToString("X4");
+      return aMethodLabel + ".IL_" + aIlPos.ToString("X4");
     }
 
     public static string Final(string xName) {
