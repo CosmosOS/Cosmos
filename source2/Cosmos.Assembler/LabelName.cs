@@ -8,17 +8,22 @@ using System.Reflection.Emit;
 
 namespace Cosmos.Assembler {
   public static class LabelName {
+
+    // Label bases can be up to 200 chars. If larger they will be shortened with an included hash.
+    // This leaves up to 56 chars for suffix information.
+
     public static int LabelCount { get; private set; }
     // Max length of labels at 256. We use 220 here so that we still have room for suffixes
     // for IL positions, etc.
     public const int MaxLengthWithoutSuffix = 200;
 
     public static string Get(MethodBase aMethod) {
-      string xResult = DataMember.FilterStringForIncorrectChars(GenerateFullName(aMethod));
-      return Final(xResult);
+      return Final(GenerateFullName(aMethod));
     }
 
     public static string Final(string xName) {
+      xName = DataMember.FilterStringForIncorrectChars(xName);
+
       if (xName.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
           var xSB = new StringBuilder();
