@@ -89,16 +89,30 @@ namespace Cosmos.Debug.Common {
             mConnection.Open();
             var xSQL = new SQL(mConnection);
 
+            // Be careful with indexes, they slow down inserts. So on tables that we have a 
+            // lot of inserts, but limited look ups, dont add them.
+            //
             // Labels
             // Labels is a big table. Avoid indexes when possible, because we need inserts to be fast.
             // -ADDRESS - Dont index - We dont look up on it very much
             // -LABELNAME - We do lookup a lot on this, but will change to asm line as key prob
             xSQL.MakeIndex("Labels", "Name", true);
+            xSQL.MakeIndex("Methods", "DocumentID", false);
           }
         }
       }
       if (mConnection.State == ConnectionState.Closed) {
         mConnection.Open();
+      }
+    }
+
+    // The GUIDs etc are populated by the MSBuild task, so they wont be loaded when the debugger runs.
+    // Because of this, we also allow manual loading.
+    public void LoadLookups() {
+      using (var xDB = DB()) {
+        foreach (var xDoc in xDB.Documents) {
+          DocumentGUIDs.Add(xDoc.Pathname, xDoc.ID);
+        }
       }
     }
 
@@ -244,9 +258,8 @@ namespace Cosmos.Debug.Common {
       }
 
       if (aFilterHiddenLines) {
-        //xResult = xResult.Where(
+        return xResult.Where(q => q.LineStart != 0xFEEFEE).ToArray();
       }
-
       return xResult;
     }
 

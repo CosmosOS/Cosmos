@@ -85,13 +85,9 @@ namespace Cosmos.IL2CPU {
         //
         // This doesnt seem right to store as a field, but old code had it that way so we
         // continue using a field for now.
-        mSequences = DebugInfo.GetSequencePoints(aMethod.MethodBase, false);
+        mSequences = DebugInfo.GetSequencePoints(aMethod.MethodBase, true);
         if (mSequences.Length > 0) {
           DebugInfo.AddDocument(mSequences[0].Document);
-
-          if (mSequences[0].LineStart == 0xFEEFEE) {
-            int i = 1;
-          }
 
           var xMethod = new Method() {
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
@@ -99,7 +95,7 @@ namespace Cosmos.IL2CPU {
             LabelName = xMethodLabel,
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
             DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
-            LineStart = mSequences[0].LineStart,
+            LineStart = mSequences[0].LineStart, 
             ColStart = mSequences[0].ColStart,
             LineEnd = mSequences[mSequences.Length - 1].LineEnd,
             ColEnd = mSequences[mSequences.Length - 1].ColEnd
