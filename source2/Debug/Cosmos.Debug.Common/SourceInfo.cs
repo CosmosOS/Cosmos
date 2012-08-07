@@ -69,12 +69,12 @@ namespace Cosmos.Debug.Common {
 
     public static SourceInfos GetSourceInfo(DebugInfo aDbgInfo) {
       var xResult = new SourceInfos();
-      List<MLSYMBOL> xSymbols;
+      List<MethodIlOp> xSymbols;
       using (var xDB = aDbgInfo.DB()) {
-        xSymbols = xDB.MLSYMBOLs.ToList();
+        xSymbols = xDB.MethodIlOps.ToList();
 
         // Sort
-        xSymbols.Sort(delegate(MLSYMBOL a, MLSYMBOL b) {
+        xSymbols.Sort(delegate(MethodIlOp a, MethodIlOp b) {
           if (a == null) {
             throw new ArgumentNullException("a");
           } else if (b == null) {
@@ -86,7 +86,7 @@ namespace Cosmos.Debug.Common {
             if (xCompareResult == 0) {
               xCompareResult = a.METHODTOKEN.CompareTo(b.METHODTOKEN);
               if (xCompareResult == 0) {
-                return a.ILOFFSET.CompareTo(b.ILOFFSET);
+                return a.IlOffset.CompareTo(b.IlOffset);
               }
 
             }
@@ -132,13 +132,13 @@ namespace Cosmos.Debug.Common {
           }
 
           if (xMethodSymbol != null) {
-            var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LABELNAME);
+            var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LabelName);
             if (xRow != null) {
               UInt32 xAddress = (UInt32)xRow.Address;
               // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
               // So we just ignore duplicate addresses.
               if (!xResult.ContainsKey(xAddress)) {
-                int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOFFSET);
+                int xIdx = GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
                 var xSourceInfo = new SourceInfo() {
                   SourceFile = xCodeDocuments[xIdx].URL,
                   Line = xCodeLines[xIdx],

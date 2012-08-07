@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/07/2012 15:10:28
+-- Date Created: 08/07/2012 16:41:36
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -25,6 +25,9 @@ IF OBJECT_ID(N'[dbo].[FK_DocumentMethod]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_LabelMethod]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_LabelMethod];
+GO
+IF OBJECT_ID(N'[dbo].[FK_LabelMethodEnd]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_LabelMethodEnd];
 GO
 
 -- --------------------------------------------------
@@ -97,16 +100,16 @@ CREATE TABLE [dbo].[LOCAL_ARGUMENT_INFO] (
 );
 GO
 
--- Creating table 'MLSYMBOLs'
-CREATE TABLE [dbo].[MLSYMBOLs] (
-    [LABELNAME] nvarchar(256)  NOT NULL,
-    [STACKDIFF] int  NOT NULL,
+-- Creating table 'MethodIlOps'
+CREATE TABLE [dbo].[MethodIlOps] (
+    [ID] uniqueidentifier  NOT NULL,
+    [LabelName] nvarchar(256)  NOT NULL,
+    [StackDiff] int  NOT NULL,
     [ILASMFILE] nvarchar(256)  NOT NULL,
     [TYPETOKEN] int  NOT NULL,
     [METHODTOKEN] int  NOT NULL,
-    [ILOFFSET] int  NOT NULL,
-    [METHODNAME] nvarchar(256)  NOT NULL,
-    [ID] uniqueidentifier  NOT NULL
+    [IlOffset] int  NOT NULL,
+    [METHODNAME] nvarchar(256)  NOT NULL
 );
 GO
 
@@ -168,9 +171,9 @@ ADD CONSTRAINT [PK_LOCAL_ARGUMENT_INFO]
     PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 
--- Creating primary key on [ID] in table 'MLSYMBOLs'
-ALTER TABLE [dbo].[MLSYMBOLs]
-ADD CONSTRAINT [PK_MLSYMBOLs]
+-- Creating primary key on [ID] in table 'MethodIlOps'
+ALTER TABLE [dbo].[MethodIlOps]
+ADD CONSTRAINT [PK_MethodIlOps]
     PRIMARY KEY CLUSTERED ([ID] ASC);
 GO
 

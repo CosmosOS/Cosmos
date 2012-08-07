@@ -140,18 +140,18 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        public ObjectSet<MLSYMBOL> MLSYMBOLs
+        public ObjectSet<MethodIlOp> MethodIlOps
         {
             get
             {
-                if ((_MLSYMBOLs == null))
+                if ((_MethodIlOps == null))
                 {
-                    _MLSYMBOLs = base.CreateObjectSet<MLSYMBOL>("MLSYMBOLs");
+                    _MethodIlOps = base.CreateObjectSet<MethodIlOp>("MethodIlOps");
                 }
-                return _MLSYMBOLs;
+                return _MethodIlOps;
             }
         }
-        private ObjectSet<MLSYMBOL> _MLSYMBOLs;
+        private ObjectSet<MethodIlOp> _MethodIlOps;
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -237,11 +237,11 @@ namespace Cosmos.Debug.Common
         }
     
         /// <summary>
-        /// Deprecated Method for adding a new object to the MLSYMBOLs EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// Deprecated Method for adding a new object to the MethodIlOps EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
         /// </summary>
-        public void AddToMLSYMBOLs(MLSYMBOL mLSYMBOL)
+        public void AddToMethodIlOps(MethodIlOp methodIlOp)
         {
-            base.AddObject("MLSYMBOLs", mLSYMBOL);
+            base.AddObject("MethodIlOps", methodIlOp);
         }
     
         /// <summary>
@@ -1562,36 +1562,36 @@ namespace Cosmos.Debug.Common
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="DebugModel", Name="MLSYMBOL")]
+    [EdmEntityTypeAttribute(NamespaceName="DebugModel", Name="MethodIlOp")]
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
-    public partial class MLSYMBOL : EntityObject
+    public partial class MethodIlOp : EntityObject
     {
         #region Factory Method
     
         /// <summary>
-        /// Create a new MLSYMBOL object.
+        /// Create a new MethodIlOp object.
         /// </summary>
-        /// <param name="lABELNAME">Initial value of the LABELNAME property.</param>
-        /// <param name="sTACKDIFF">Initial value of the STACKDIFF property.</param>
+        /// <param name="id">Initial value of the ID property.</param>
+        /// <param name="labelName">Initial value of the LabelName property.</param>
+        /// <param name="stackDiff">Initial value of the StackDiff property.</param>
         /// <param name="iLASMFILE">Initial value of the ILASMFILE property.</param>
         /// <param name="tYPETOKEN">Initial value of the TYPETOKEN property.</param>
         /// <param name="mETHODTOKEN">Initial value of the METHODTOKEN property.</param>
-        /// <param name="iLOFFSET">Initial value of the ILOFFSET property.</param>
+        /// <param name="ilOffset">Initial value of the IlOffset property.</param>
         /// <param name="mETHODNAME">Initial value of the METHODNAME property.</param>
-        /// <param name="id">Initial value of the ID property.</param>
-        public static MLSYMBOL CreateMLSYMBOL(global::System.String lABELNAME, global::System.Int32 sTACKDIFF, global::System.String iLASMFILE, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 iLOFFSET, global::System.String mETHODNAME, global::System.Guid id)
+        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.String iLASMFILE, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 ilOffset, global::System.String mETHODNAME)
         {
-            MLSYMBOL mLSYMBOL = new MLSYMBOL();
-            mLSYMBOL.LABELNAME = lABELNAME;
-            mLSYMBOL.STACKDIFF = sTACKDIFF;
-            mLSYMBOL.ILASMFILE = iLASMFILE;
-            mLSYMBOL.TYPETOKEN = tYPETOKEN;
-            mLSYMBOL.METHODTOKEN = mETHODTOKEN;
-            mLSYMBOL.ILOFFSET = iLOFFSET;
-            mLSYMBOL.METHODNAME = mETHODNAME;
-            mLSYMBOL.ID = id;
-            return mLSYMBOL;
+            MethodIlOp methodIlOp = new MethodIlOp();
+            methodIlOp.ID = id;
+            methodIlOp.LabelName = labelName;
+            methodIlOp.StackDiff = stackDiff;
+            methodIlOp.ILASMFILE = iLASMFILE;
+            methodIlOp.TYPETOKEN = tYPETOKEN;
+            methodIlOp.METHODTOKEN = mETHODTOKEN;
+            methodIlOp.IlOffset = ilOffset;
+            methodIlOp.METHODNAME = mETHODNAME;
+            return methodIlOp;
         }
 
         #endregion
@@ -1600,50 +1600,77 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.String LABELNAME
+        public global::System.Guid ID
         {
             get
             {
-                return _LABELNAME;
+                return _ID;
             }
             set
             {
-                OnLABELNAMEChanging(value);
-                ReportPropertyChanging("LABELNAME");
-                _LABELNAME = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("LABELNAME");
-                OnLABELNAMEChanged();
+                if (_ID != value)
+                {
+                    OnIDChanging(value);
+                    ReportPropertyChanging("ID");
+                    _ID = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("ID");
+                    OnIDChanged();
+                }
             }
         }
-        private global::System.String _LABELNAME;
-        partial void OnLABELNAMEChanging(global::System.String value);
-        partial void OnLABELNAMEChanged();
+        private global::System.Guid _ID;
+        partial void OnIDChanging(global::System.Guid value);
+        partial void OnIDChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int32 STACKDIFF
+        public global::System.String LabelName
         {
             get
             {
-                return _STACKDIFF;
+                return _LabelName;
             }
             set
             {
-                OnSTACKDIFFChanging(value);
-                ReportPropertyChanging("STACKDIFF");
-                _STACKDIFF = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("STACKDIFF");
-                OnSTACKDIFFChanged();
+                OnLabelNameChanging(value);
+                ReportPropertyChanging("LabelName");
+                _LabelName = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LabelName");
+                OnLabelNameChanged();
             }
         }
-        private global::System.Int32 _STACKDIFF;
-        partial void OnSTACKDIFFChanging(global::System.Int32 value);
-        partial void OnSTACKDIFFChanged();
+        private global::System.String _LabelName;
+        partial void OnLabelNameChanging(global::System.String value);
+        partial void OnLabelNameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 StackDiff
+        {
+            get
+            {
+                return _StackDiff;
+            }
+            set
+            {
+                OnStackDiffChanging(value);
+                ReportPropertyChanging("StackDiff");
+                _StackDiff = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("StackDiff");
+                OnStackDiffChanged();
+            }
+        }
+        private global::System.Int32 _StackDiff;
+        partial void OnStackDiffChanging(global::System.Int32 value);
+        partial void OnStackDiffChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1722,24 +1749,24 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int32 ILOFFSET
+        public global::System.Int32 IlOffset
         {
             get
             {
-                return _ILOFFSET;
+                return _IlOffset;
             }
             set
             {
-                OnILOFFSETChanging(value);
-                ReportPropertyChanging("ILOFFSET");
-                _ILOFFSET = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("ILOFFSET");
-                OnILOFFSETChanged();
+                OnIlOffsetChanging(value);
+                ReportPropertyChanging("IlOffset");
+                _IlOffset = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("IlOffset");
+                OnIlOffsetChanged();
             }
         }
-        private global::System.Int32 _ILOFFSET;
-        partial void OnILOFFSETChanging(global::System.Int32 value);
-        partial void OnILOFFSETChanged();
+        private global::System.Int32 _IlOffset;
+        partial void OnIlOffsetChanging(global::System.Int32 value);
+        partial void OnIlOffsetChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1764,33 +1791,6 @@ namespace Cosmos.Debug.Common
         private global::System.String _METHODNAME;
         partial void OnMETHODNAMEChanging(global::System.String value);
         partial void OnMETHODNAMEChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid ID
-        {
-            get
-            {
-                return _ID;
-            }
-            set
-            {
-                if (_ID != value)
-                {
-                    OnIDChanging(value);
-                    ReportPropertyChanging("ID");
-                    _ID = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("ID");
-                    OnIDChanged();
-                }
-            }
-        }
-        private global::System.Guid _ID;
-        partial void OnIDChanging(global::System.Guid value);
-        partial void OnIDChanged();
 
         #endregion
     

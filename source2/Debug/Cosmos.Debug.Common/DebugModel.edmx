@@ -10,7 +10,7 @@
     <EntitySet Name="FIELD_MAPPING" EntityType="DebugModel.Store.FIELD_MAPPING" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Labels" EntityType="DebugModel.Store.Labels" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="LOCAL_ARGUMENT_INFO" EntityType="DebugModel.Store.LOCAL_ARGUMENT_INFO" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="MLSYMBOLs" EntityType="DebugModel.Store.MLSYMBOLs" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="MethodIlOps" EntityType="DebugModel.Store.MethodIlOps" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="AssemblyFiles" EntityType="DebugModel.Store.AssemblyFiles" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Methods" EntityType="DebugModel.Store.Methods" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Documents" EntityType="DebugModel.Store.Documents" store:Type="Tables" Schema="dbo" />
@@ -68,18 +68,18 @@
     <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
-  <EntityType Name="MLSYMBOLs">
+  <EntityType Name="MethodIlOps">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
-    <Property Name="STACKDIFF" Type="int" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="256" />
+    <Property Name="StackDiff" Type="int" Nullable="false" />
     <Property Name="ILASMFILE" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="TYPETOKEN" Type="int" Nullable="false" />
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
-    <Property Name="ILOFFSET" Type="int" Nullable="false" />
+    <Property Name="IlOffset" Type="int" Nullable="false" />
     <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="AssemblyFiles">
     <Key>
@@ -168,7 +168,7 @@
           <EntitySet Name="FIELD_MAPPING" EntityType="DebugModel.FIELD_MAPPING" />
           <EntitySet Name="Labels" EntityType="DebugModel.Label" />
           <EntitySet Name="LOCAL_ARGUMENT_INFO" EntityType="DebugModel.LOCAL_ARGUMENT_INFO" />
-          <EntitySet Name="MLSYMBOLs" EntityType="DebugModel.MLSYMBOL" />
+          <EntitySet Name="MethodIlOps" EntityType="DebugModel.MethodIlOp" />
           <EntitySet Name="AssemblyFiles" EntityType="DebugModel.AssemblyFile" />
           <EntitySet Name="Methods" EntityType="DebugModel.Method" />
           <AssociationSet Name="AssemblyFileMethod" Association="DebugModel.AssemblyFileMethod">
@@ -228,18 +228,18 @@
           <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
-        <EntityType Name="MLSYMBOL">
+        <EntityType Name="MethodIlOp">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
-          <Property Name="STACKDIFF" Type="Int32" Nullable="false" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LabelName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
+          <Property Name="StackDiff" Type="Int32" Nullable="false" />
           <Property Name="ILASMFILE" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="TYPETOKEN" Type="Int32" Nullable="false" />
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
-          <Property Name="ILOFFSET" Type="Int32" Nullable="false" />
+          <Property Name="IlOffset" Type="Int32" Nullable="false" />
           <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="AssemblyFile">
           <Key>
@@ -372,16 +372,16 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="MLSYMBOLs">
-      <EntityTypeMapping TypeName="IsTypeOf(DebugModel.MLSYMBOL)">
-        <MappingFragment StoreEntitySet="MLSYMBOLs">
+    <EntitySetMapping Name="MethodIlOps">
+      <EntityTypeMapping TypeName="IsTypeOf(DebugModel.MethodIlOp)">
+        <MappingFragment StoreEntitySet="MethodIlOps">
           <ScalarProperty Name="ID" ColumnName="ID" />
-          <ScalarProperty Name="LABELNAME" ColumnName="LABELNAME" />
-          <ScalarProperty Name="STACKDIFF" ColumnName="STACKDIFF" />
+          <ScalarProperty Name="LabelName" ColumnName="LabelName" />
+          <ScalarProperty Name="StackDiff" ColumnName="StackDiff" />
           <ScalarProperty Name="ILASMFILE" ColumnName="ILASMFILE" />
           <ScalarProperty Name="TYPETOKEN" ColumnName="TYPETOKEN" />
           <ScalarProperty Name="METHODTOKEN" ColumnName="METHODTOKEN" />
-          <ScalarProperty Name="ILOFFSET" ColumnName="ILOFFSET" />
+          <ScalarProperty Name="IlOffset" ColumnName="IlOffset" />
           <ScalarProperty Name="METHODNAME" ColumnName="METHODNAME" />
         </MappingFragment>
       </EntityTypeMapping>
@@ -443,7 +443,7 @@
         <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.5" PointY="3.375" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="2.5" PointY="0.5" Height="1.4033821614583333" />
         <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.5186979166666665" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">

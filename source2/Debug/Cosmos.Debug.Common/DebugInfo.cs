@@ -304,7 +304,7 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteSymbols(IList<MLSYMBOL> aSymbols, bool aFlush = false) {
+    public void WriteSymbols(IList<MethodIlOp> aSymbols, bool aFlush = false) {
       foreach (var x in aSymbols) {
         x.ID = Guid.NewGuid();
       }
@@ -356,7 +356,7 @@ namespace Cosmos.Debug.Common {
     }
 
     // Gets MLSymbols for a method, given an address within the method.
-    public MLSYMBOL[] GetSymbols(UInt32 aAddress) {
+    public MethodIlOp[] GetSymbols(UInt32 aAddress) {
       using (var xDB = DB()) {
         // The address we have is somewhere in the method, but we need to find 
         // one that is also in MLSymbol. Asm labels for example wont be found.
@@ -368,9 +368,9 @@ namespace Cosmos.Debug.Common {
                       select x.Name;
 
         // Search till we find a matching label.
-        MLSYMBOL xSymbol = null;
+        MethodIlOp xSymbol = null;
         foreach (var xLabel in xLabels) {
-          xSymbol = xDB.MLSYMBOLs.SingleOrDefault(q => q.LABELNAME == xLabel);
+          xSymbol = xDB.MethodIlOps.SingleOrDefault(q => q.LabelName == xLabel);
           if (xSymbol != null) {
             break;
           }
@@ -380,11 +380,11 @@ namespace Cosmos.Debug.Common {
         }
 
         // Now get all MLSymbols for the method.
-        var xSymbols = from x in xDB.MLSYMBOLs
+        var xSymbols = from x in xDB.MethodIlOps
                        where
                          x.METHODTOKEN == xSymbol.METHODTOKEN
                          && x.ILASMFILE == xSymbol.ILASMFILE
-                       orderby x.ILOFFSET
+                       orderby x.IlOffset
                        select x;
         return xSymbols.ToArray();
       }
@@ -407,13 +407,13 @@ namespace Cosmos.Debug.Common {
 
       using (var xDB = DB()) {
         foreach (var xSymbol in xSymbols) {
-          var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LABELNAME);
+          var xRow = xDB.Labels.SingleOrDefault(q => q.Name == xSymbol.LabelName);
           if (xRow != null) {
             UInt32 xAddress = (UInt32)xRow.Address;
             // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
             // So we just ignore duplicate addresses.
             if (!xResult.ContainsKey(xAddress)) {
-              int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.ILOFFSET);
+              int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
               var xSourceInfo = new SourceInfo() {
                 SourceFile = xCodeDocuments[xIdx].URL,
                 Line = xCodeLines[xIdx],

@@ -54,10 +54,10 @@ namespace Cosmos.Debug.VSDebugEngine {
           // labels in the output and mark them somehow.
           var xLabelsForAddr = xProcess.mDebugInfoDb.GetLabels(xProcess.mCurrentAddress.Value);
           if (xLabelsForAddr.Length > 0) {
-            MLSYMBOL xSymbolInfo;
+            MethodIlOp xSymbolInfo;
             using (var xDB = xProcess.mDebugInfoDb.DB()) {
               string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
-              xSymbolInfo = xDB.MLSYMBOLs.Where(q => q.LABELNAME == xLabel).FirstOrDefault();
+              xSymbolInfo = xDB.MethodIlOps.Where(q => q.LabelName == xLabel).FirstOrDefault();
               if (xSymbolInfo != null) {
                 var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME);
                 mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();

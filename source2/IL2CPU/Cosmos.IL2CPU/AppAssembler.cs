@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU {
     public DebugMode DebugMode;
     public bool IgnoreDebugStubAttribute;
     protected static HashSet<string> mDebugLines = new HashSet<string>();
-    protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
+    protected List<MethodIlOp> mSymbols = new List<MethodIlOp>();
     public readonly Cosmos.Assembler.Assembler Assembler;
     protected string mCurrentMethodLabel;
     protected Guid mCurrentMethodLabelEndGuid;
@@ -887,20 +887,20 @@ namespace Cosmos.IL2CPU {
       new Cosmos.Assembler.Label(xLabel);
 
       if (mSymbols != null) {
-        var xMLSymbol = new MLSYMBOL();
-        xMLSymbol.LABELNAME = TmpPosLabel(aMethod, aOpCode);
+        var xMLSymbol = new MethodIlOp();
+        xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
         xMLSymbol.METHODNAME = aMethod.MethodBase.GetFullName();
 
         var xStackSize = (from item in Assembler.Stack
                           let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))
                           select xSize).Sum();
-        xMLSymbol.STACKDIFF = -1;
+        xMLSymbol.StackDiff = -1;
         if (aMethod.MethodBase != null) {
           var xBody = aMethod.MethodBase.GetMethodBody();
           if (xBody != null) {
             var xLocalsSize = (from item in xBody.LocalVariables
                                select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
-            xMLSymbol.STACKDIFF = checked((int)(xLocalsSize + xStackSize));
+            xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
           }
         }
         try {
@@ -910,7 +910,7 @@ namespace Cosmos.IL2CPU {
         }
         xMLSymbol.METHODTOKEN = aMethod.MethodBase.MetadataToken;
         xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
-        xMLSymbol.ILOFFSET = aOpCode.Position;
+        xMLSymbol.IlOffset = aOpCode.Position;
         mSymbols.Add(xMLSymbol);
         DebugInfo.WriteSymbols(mSymbols);
       }
