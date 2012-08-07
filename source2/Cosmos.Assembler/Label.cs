@@ -6,10 +6,6 @@ using System.Text;
 
 namespace Cosmos.Assembler {
   public class Label : Instruction {
-    public static string GetFullName(MethodBase aMethod) {
-      return LabelName.Get(aMethod);
-    }
-
     public string Comment { get; set; }
 
     public Label(string aName)
@@ -36,8 +32,9 @@ namespace Cosmos.Assembler {
 
     public static string GetLabel(object aObject) {
       Label xLabel = aObject as Label;
-      if (xLabel == null)
+      if (xLabel == null) {
         return "";
+      }
       return xLabel.Name;
     }
 

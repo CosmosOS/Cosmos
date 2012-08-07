@@ -40,6 +40,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public readonly Cosmos.Assembler.Assembler Assembler;
+    protected string mCurrentMethodLabel;
 
     protected void MethodBegin(MethodInfo aMethod) {
       new Comment("---------------------------------------------------------");
@@ -48,13 +49,12 @@ namespace Cosmos.IL2CPU {
       new Comment("Name: " + aMethod.MethodBase.Name);
       new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
 
-      string xMethodLabel;
       if (aMethod.PluggedMethod != null) {
-        xMethodLabel = "PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase);
+        mCurrentMethodLabel = "PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase);
       } else {
-        xMethodLabel = LabelName.Get(aMethod.MethodBase);
+        mCurrentMethodLabel = LabelName.Get(aMethod.MethodBase);
       }
-      new Cosmos.Assembler.Label(xMethodLabel);
+      new Cosmos.Assembler.Label(mCurrentMethodLabel);
 
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
         new Comment("Static constructor. See if it has been called already, return if so.");
@@ -87,7 +87,7 @@ namespace Cosmos.IL2CPU {
           var xMethod = new Method() {
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,
-            LabelStart = xMethodLabel,
+            LabelStart = mCurrentMethodLabel,
             LabelEnd = "",
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
             DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
@@ -107,7 +107,7 @@ namespace Cosmos.IL2CPU {
           var xLocalsOffset = mLocals_Arguments_Infos.Count;
           foreach (var xLocal in xBody.LocalVariables) {
             var xInfo = new LOCAL_ARGUMENT_INFO {
-              METHODLABELNAME = xMethodLabel,
+              METHODLABELNAME = mCurrentMethodLabel,
               IsArgument = false,
               INDEXINMETHOD = xLocal.LocalIndex,
               NAME = "Local" + xLocal.LocalIndex,
@@ -141,7 +141,7 @@ namespace Cosmos.IL2CPU {
         var xIdxOffset = 0u;
         if (!aMethod.MethodBase.IsStatic) {
           mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
-            METHODLABELNAME = xMethodLabel,
+            METHODLABELNAME = mCurrentMethodLabel,
             IsArgument = true,
             NAME = "this:" + X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
             INDEXINMETHOD = 0,
@@ -160,7 +160,7 @@ namespace Cosmos.IL2CPU {
           // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
           xOffset -= (int)Cosmos.IL2CPU.ILOp.Align(ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;
           mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
-            METHODLABELNAME = xMethodLabel,
+            METHODLABELNAME = mCurrentMethodLabel,
             IsArgument = true,
             INDEXINMETHOD = (int)(i + xIdxOffset),
             NAME = xParams[i].Name,

@@ -100,8 +100,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             var xDocID = xDebugInfo.DocumentGUIDs[xDocName];
             using (var xDB = xDebugInfo.DB()) {
               var xQry = from x in xDB.Methods
-                         where
-                           x.DocumentID == xDocID
+                         where x.DocumentID == xDocID
                          select x;
             }
           } else {

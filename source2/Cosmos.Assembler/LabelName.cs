@@ -14,7 +14,11 @@ namespace Cosmos.Assembler {
     // Label bases can be up to 200 chars. If larger they will be shortened with an included hash.
     // This leaves up to 56 chars for suffix information.
     
-    // Suffixes:
+    // Suffixes are a series of tags and have their own prefixes to preserve backwards compat.
+    // .GUID_xxxxxx
+    // .IL_0000
+    // .ASM_00
+    //
     // - Methods use a variety of alphanumeric suffixes for support code.
     // - .00 - asm markers at beginning of method
     // - .0000.00 IL.ASM marker 
@@ -26,6 +30,10 @@ namespace Cosmos.Assembler {
 
     public static string Get(MethodBase aMethod) {
       return Final(GenerateFullName(aMethod));
+    }
+
+    public static string Get(string aMethodLabel, int aIlPos) {
+      return aMethodLabel + "." + aIlPos.ToString("X4");
     }
 
     public static string Final(string xName) {

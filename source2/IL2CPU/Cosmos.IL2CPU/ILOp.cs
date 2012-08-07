@@ -53,7 +53,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public static string GetLabel(MethodInfo aMethod, int aPos) {
-      return GetMethodLabel(aMethod) + "." + aPos.ToString("X4");
+      return LabelName.Get(GetMethodLabel(aMethod), aPos);
     }
 
     public override string ToString() {
@@ -167,7 +167,6 @@ namespace Cosmos.IL2CPU {
       xOffset += GetStackCountForLocal(aMethod, xField) * 4 - 4;
       return xOffset;
     }
-
 
     protected void ThrowNotImplementedException(string aMessage) {
       new CPU.Push {
