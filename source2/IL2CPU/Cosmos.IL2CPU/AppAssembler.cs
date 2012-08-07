@@ -58,6 +58,7 @@ namespace Cosmos.IL2CPU {
       // We issue a second label for GUID. This is increases label count, but for now we need a master label first.
       // We issue a GUID label to reduce amount of work and time needed to construct debugging DB.
       var xLabelGuid = Guid.NewGuid();
+      mCurrentMethodLabelEndGuid = Guid.NewGuid();
       new Cosmos.Assembler.Label(".GUID_" + xLabelGuid.ToString("N"));
 
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
@@ -88,7 +89,6 @@ namespace Cosmos.IL2CPU {
         if (mSequences.Length > 0) {
           DebugInfo.AddDocument(mSequences[0].Document);
 
-          mCurrentMethodLabelEndGuid = Guid.NewGuid();
           var xMethod = new Method() {
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,

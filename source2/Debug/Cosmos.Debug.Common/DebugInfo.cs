@@ -340,9 +340,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void AddLabels(IList<Label> aLabels, bool aFlush = false) {
-      foreach (var x in aLabels) {
-        x.ID = Guid.NewGuid();
-      }
+      // GUIDs inserted by caller
       BulkInsert("Labels", aLabels, 2500, aFlush);
     }
 
