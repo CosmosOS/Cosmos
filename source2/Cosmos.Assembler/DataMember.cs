@@ -97,8 +97,6 @@ namespace Cosmos.Assembler {
     public static string FilterStringForIncorrectChars(string aName) {
       string xTempResult = aName;
       foreach (char c in IllegalIdentifierChars) {
-        //TODO Use empty, not _. We need shorter names, and _ can be used for explicit demarkation.
-        // Need to add _ to illegal chars, and cant change currently as it goofs stuff up.
         xTempResult = xTempResult.Replace(c, '_');
       }
       return String.Intern(xTempResult);

@@ -15,14 +15,26 @@ namespace Cosmos.Assembler {
     public static int LabelCount { get; private set; }
     // Max length of labels at 256. We use 220 here so that we still have room for suffixes
     // for IL positions, etc.
-    public const int MaxLengthWithoutSuffix = 200;
+    const int MaxLengthWithoutSuffix = 200;
 
     public static string Get(MethodBase aMethod) {
       return Final(GenerateFullName(aMethod));
     }
 
+    const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
+    static string FilterStringForIncorrectChars(string aName) {
+      // Comment DataMember.FilterStringForIncorrectChars
+      string xTempResult = aName;
+      foreach (char c in IllegalIdentifierChars) {
+        //TODO Use empty, not _. We need shorter names, and _ can be used for explicit demarkation.
+        // Need to add _ to illegal chars, and cant change currently as it goofs stuff up.
+        xTempResult = xTempResult.Replace(c, '_');
+      }
+      return String.Intern(xTempResult);
+    }
+
     public static string Final(string xName) {
-      xName = DataMember.FilterStringForIncorrectChars(xName);
+      xName = FilterStringForIncorrectChars(xName);
 
       if (xName.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
