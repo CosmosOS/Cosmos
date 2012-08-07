@@ -6,29 +6,32 @@ using System.Security.Cryptography;
 using System.Diagnostics;
 using System.Reflection.Emit;
 
-
 namespace Cosmos.Assembler {
-  public static class MethodInfoLabelGenerator {
-    public static uint LabelCount {
-      get;
-      private set;
-    }
+  public static class LabelName {
+    public static int LabelCount { get; private set; }
+    // Max length of labels at 256. We use 220 here so that we still have room for suffixes
+    // for IL positions, etc.
+    public const int MaxLengthWithoutSuffix = 200;
 
-    public static string GenerateLabelName(MethodBase aMethod) {
+    public static string Get(MethodBase aMethod) {
       string xResult = DataMember.FilterStringForIncorrectChars(GenerateFullName(aMethod));
-      xResult = GenerateLabelFromFullName(xResult);
-      LabelCount++;
-      return xResult;
+      return Final(xResult);
     }
 
-    public static string GenerateLabelFromFullName(string xResult) {
-      if (xResult.Length > 245) {
+    public static string Final(string xName) {
+      if (xName.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
-          xResult = xHash.ComputeHash(
-              Encoding.Default.GetBytes(xResult)).Aggregate("_", (r, x) => r + x.ToString("X2"));
+          var xSB = new StringBuilder();
+          foreach (var xByte in xHash.ComputeHash(Encoding.Default.GetBytes(xName))) {
+            xSB.Append(xByte.ToString("X2"));
+          }
+          // Keep length max 200
+          xName = xName.Substring(0, MaxLengthWithoutSuffix - xSB.Length) + xSB.ToString();
         }
       }
-      return xResult;
+
+      LabelCount++;
+      return xName;
     }
 
     public static string GetFullName(Type aType) {
@@ -65,8 +68,6 @@ namespace Cosmos.Assembler {
         xSB.Append(GetFullName(xArgs.Last()));
         xSB.Append(">");
       }
-      //xSB.Append(", ");
-      //xSB.Append(aType.Assembly.FullName);
       return xSB.ToString();
     }
 

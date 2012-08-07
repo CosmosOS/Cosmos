@@ -7,7 +7,6 @@ using System.IO;
 
 namespace Cosmos.Assembler {
   public class DataMember : BaseAssemblerElement, IComparable<DataMember> {
-    public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
     public string Name { get; private set; }
     public bool IsComment { get; set; }
     public byte[] RawDefaultValue { get; set; }
@@ -91,12 +90,15 @@ namespace Cosmos.Assembler {
     }
 
     public static string GetStaticFieldName(FieldInfo aField) {
-      return FilterStringForIncorrectChars("static_field__" + MethodInfoLabelGenerator.GetFullName(aField.DeclaringType) + "." + aField.Name);
+      return FilterStringForIncorrectChars("static_field__" + LabelName.GetFullName(aField.DeclaringType) + "." + aField.Name);
     }
 
+    public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
     public static string FilterStringForIncorrectChars(string aName) {
       string xTempResult = aName;
       foreach (char c in IllegalIdentifierChars) {
+        //TODO Use empty, not _. We need shorter names, and _ can be used for explicit demarkation.
+        // Need to add _ to illegal chars, and cant change currently as it goofs stuff up.
         xTempResult = xTempResult.Replace(c, '_');
       }
       return String.Intern(xTempResult);

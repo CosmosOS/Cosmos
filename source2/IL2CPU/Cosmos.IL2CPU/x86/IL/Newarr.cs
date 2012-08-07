@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
           string xTypeID = GetTypeIDLabel(typeof(Array));
             MethodBase xCtor = typeof( Array ).GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance )[ 0 ];
-            string xCtorName = MethodInfoLabelGenerator.GenerateLabelName( xCtor );
+            string xCtorName = LabelName.Get( xCtor );
 
             new Comment( Assembler, "Element Size = " + xSize );
             // element count is on the stack
@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
             new Add( Assembler ).Execute( aMethod, aOpCode );
             // the total array size is now on the stack.
-            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
+            new CPUx86.Call { DestinationLabel = LabelName.Get( GCImplementationRefs.AllocNewObjectRef ) };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 

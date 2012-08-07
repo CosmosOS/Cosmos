@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
             uint xSize = Align(SizeOfType( xType.Value ), 4);
             string xTypeID = GetTypeIDLabel(xType.Value);
             new CPUx86.Push { DestinationValue = ( ObjectImpl.FieldDataOffset + xSize ) };
-            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
+            new CPUx86.Call { DestinationLabel = LabelName.Get( GCImplementationRefs.AllocNewObjectRef ) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };

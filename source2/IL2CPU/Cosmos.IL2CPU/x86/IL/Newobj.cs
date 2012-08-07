@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 var xCctor = (objectType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
                 if (xCctor != null)
                 {
-                    new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(xCctor) };
+                    new CPUx86.Call { DestinationLabel = LabelName.Get(xCctor) };
                     ILOp.EmitExceptionLogic(aAssembler, aMethod, xMethod, true, null, ".AfterCCTorExceptionCheck");
                     new Label(".AfterCCTorExceptionCheck");
                 }
@@ -158,7 +158,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 // todo: probably we want to check for exceptions after calling Alloc
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
+                new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
@@ -194,11 +194,11 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 }
 
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(constructor) };
+                new CPUx86.Call { DestinationLabel = LabelName.Get(constructor) };
                 if (aMethod != null)
                 {
                     new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
-                    string xNoErrorLabel = currentLabel + ".NoError" + MethodInfoLabelGenerator.LabelCount.ToString();
+                    string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
 
                     //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )

@@ -117,7 +117,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
         if (xHandler == null) {
           xHandler = GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
         }
-        new CPUx86.Call { DestinationLabel = CPUAll.MethodInfoLabelGenerator.GenerateLabelName(xHandler) };
+        new CPUx86.Call { DestinationLabel = CPUAll.LabelName.Get(xHandler) };
         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         new CPUx86.x87.FXStore { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 

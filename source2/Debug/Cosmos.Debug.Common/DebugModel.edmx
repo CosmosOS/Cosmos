@@ -45,7 +45,7 @@
       <PropertyRef Name="ID" />
     </Key>
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="Address" Type="bigint" Nullable="false" />
   </EntityType>
   <EntityType Name="LOCAL_ARGUMENT_INFO">
@@ -171,7 +171,7 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="String" Name="Name" Nullable="false" MaxLength="512" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="256" />
           <Property Type="Int64" Name="Address" Nullable="false" />
         </EntityType>
         <EntityType Name="LOCAL_ARGUMENT_INFO">

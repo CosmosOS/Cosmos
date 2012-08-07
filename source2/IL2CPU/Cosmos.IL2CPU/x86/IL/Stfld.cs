@@ -73,8 +73,8 @@ namespace Cosmos.IL2CPU.X86.IL {
           if (aNeedsGC) {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
-            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+            new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
+            new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
           }
 #endif
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };

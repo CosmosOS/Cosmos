@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/06/2012 21:20:56
+-- Date Created: 08/06/2012 22:45:00
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -77,7 +77,7 @@ GO
 -- Creating table 'Labels'
 CREATE TABLE [dbo].[Labels] (
     [ID] uniqueidentifier  NOT NULL,
-    [Name] nvarchar(512)  NOT NULL,
+    [Name] nvarchar(256)  NOT NULL,
     [Address] bigint  NOT NULL
 );
 GO

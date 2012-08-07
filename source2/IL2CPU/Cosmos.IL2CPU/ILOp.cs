@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU {
     public abstract void Execute(MethodInfo aMethod, ILOpCode aOpCode);
 
     public static string GetTypeIDLabel(Type aType) {
-      return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(aType) + " ASM_IS__" + aType.Assembly.GetName().Name);
+      return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aType) + " ASM_IS__" + aType.Assembly.GetName().Name);
     }
 
     public static uint Align(uint aSize, uint aAlign) {
@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public static string GetMethodLabel(MethodBase aMethod) {
-      return MethodInfoLabelGenerator.GenerateLabelName(aMethod);
+      return LabelName.Get(aMethod);
     }
 
     public static string GetMethodLabel(MethodInfo aMethod) {
@@ -174,13 +174,13 @@ namespace Cosmos.IL2CPU {
         DestinationRef = Cosmos.Assembler.ElementReference.New(LdStr.GetContentsArrayName(aMessage))
       };
       new CPU.Call {
-        DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
+        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
       };
     }
 
     protected void ThrowOverflowException() {
       new CPU.Call {
-        DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(
+        DestinationLabel = LabelName.Get(
             typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null, new Type[] { }, null))
       };
     }

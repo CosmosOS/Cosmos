@@ -450,7 +450,7 @@ namespace Cosmos.IL2CPU {
       // isn't guaranteed.
       for (int i = 0; i < xParams.Length; i++) {
         xParamTypes[i] = xParams[i].ParameterType;
-        Queue(xParamTypes[i], MethodInfoLabelGenerator.GenerateFullName(aMethod), "Parameter");
+        Queue(xParamTypes[i], LabelName.GenerateFullName(aMethod), "Parameter");
       }
       var xIsDynamicMethod = aMethod.DeclaringType == null;
       // Queue Types directly related to method
@@ -458,11 +458,11 @@ namespace Cosmos.IL2CPU {
         // Don't queue declaring types of plugs
         if (!xIsDynamicMethod) {
           // dont queue declaring types of dynamic methods either, those dont have a declaring type
-          Queue(aMethod.DeclaringType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Declaring Type");
+          Queue(aMethod.DeclaringType, LabelName.GenerateFullName(aMethod), "Declaring Type");
         }
       }
       if (aMethod is System.Reflection.MethodInfo) {
-        Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Return Type");
+        Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, LabelName.GenerateFullName(aMethod), "Return Type");
       }
 
       // Scan virtuals
@@ -509,7 +509,7 @@ namespace Cosmos.IL2CPU {
         // If it was already in mVirtuals, then ScanType will take
         // care of new additions.
         if (xVirtMethod != null) {
-          Queue(xVirtMethod, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Virtual Base");
+          Queue(xVirtMethod, LabelName.GenerateFullName(aMethod), "Virtual Base");
           mVirtuals.Add(xVirtMethod);
           if (aMethod.Name == "ToString") {
             Console.Write("");
@@ -525,7 +525,7 @@ namespace Cosmos.IL2CPU {
                   // We need to check IsVirtual, a non virtual could
                   // "replace" a virtual above it?
                   if (xNewMethod.IsVirtual) {
-                    Queue(xNewMethod, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Virtual Downscan");
+                    Queue(xNewMethod, LabelName.GenerateFullName(aMethod), "Virtual Downscan");
                   }
                 }
               }
@@ -557,7 +557,7 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (xNeedsPlug) {
-          throw new Exception("Native code encountered, plug required. Please see http://cosmos.codeplex.com/wikipage?title=Plugs). " + MethodInfoLabelGenerator.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
+          throw new Exception("Native code encountered, plug required. Please see http://cosmos.codeplex.com/wikipage?title=Plugs). " + LabelName.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
         }
 
         //TODO: As we scan each method, we could update or put in a new list
@@ -581,29 +581,29 @@ namespace Cosmos.IL2CPU {
           ProcessInstructions(xOpCodes);
           foreach (var xOpCode in xOpCodes) {
             if (xOpCode is ILOpCodes.OpMethod) {
-              Queue(((ILOpCodes.OpMethod)xOpCode).Value, MethodInfoLabelGenerator.GenerateFullName(aMethod), "Call", sourceItem);
+              Queue(((ILOpCodes.OpMethod)xOpCode).Value, LabelName.GenerateFullName(aMethod), "Call", sourceItem);
             } else if (xOpCode is ILOpCodes.OpType) {
-              Queue(((ILOpCodes.OpType)xOpCode).Value, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
+              Queue(((ILOpCodes.OpType)xOpCode).Value, LabelName.GenerateFullName(aMethod), "OpCode Value");
             } else if (xOpCode is ILOpCodes.OpField) {
               var xOpField = (ILOpCodes.OpField)xOpCode;
               //TODO: Need to do this? Will we get a ILOpCodes.OpType as well?
-              Queue(xOpField.Value.DeclaringType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
+              Queue(xOpField.Value.DeclaringType, LabelName.GenerateFullName(aMethod), "OpCode Value");
               if (xOpField.Value.IsStatic) {
                 //TODO: Why do we add static fields, but not instance?
                 // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                Queue(xOpField.Value, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
+                Queue(xOpField.Value, LabelName.GenerateFullName(aMethod), "OpCode Value");
               }
             } else if (xOpCode is ILOpCodes.OpToken) {
               var xTokenOp = (ILOpCodes.OpToken)xOpCode;
               if (xTokenOp.ValueIsType) {
-                Queue(xTokenOp.ValueType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
+                Queue(xTokenOp.ValueType, LabelName.GenerateFullName(aMethod), "OpCode Value");
               }
               if (xTokenOp.ValueIsField) {
-                Queue(xTokenOp.ValueField.DeclaringType, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
+                Queue(xTokenOp.ValueField.DeclaringType, LabelName.GenerateFullName(aMethod), "OpCode Value");
                 if (xTokenOp.ValueField.IsStatic) {
                   //TODO: Why do we add static fields, but not instance?
                   // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                  Queue(xTokenOp.ValueField, MethodInfoLabelGenerator.GenerateFullName(aMethod), "OpCode Value");
+                  Queue(xTokenOp.ValueField, LabelName.GenerateFullName(aMethod), "OpCode Value");
                 }
               }
             }
@@ -859,7 +859,7 @@ namespace Cosmos.IL2CPU {
                 break;
               }
               if (xAttrib != null && xAttrib.Signature != null) {
-                var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(aMethod));
+                var xName = DataMember.FilterStringForIncorrectChars(LabelName.GenerateFullName(aMethod));
                 if (string.Compare(xName, xAttrib.Signature, true) == 0) {
                   xResult = xSigMethod;
                   break;
@@ -967,7 +967,7 @@ namespace Cosmos.IL2CPU {
     #region Plug Caching
     private Orvid.Collections.SkipList ResolvedPlugs = new Orvid.Collections.SkipList();
     private static string BuildMethodKeyName(MethodBase m) {
-      return MethodInfoLabelGenerator.GenerateFullName(m);
+      return LabelName.GenerateFullName(m);
     }
     #endregion
 

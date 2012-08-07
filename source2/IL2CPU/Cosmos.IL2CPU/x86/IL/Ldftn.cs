@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( MethodInfoLabelGenerator.GenerateLabelName(((OpMethod)aOpCode).Value ) ) };
+            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( LabelName.Get(((OpMethod)aOpCode).Value ) ) };
 			Assembler.Stack.Push(new StackContents.Item(4, typeof(uint)));
         }
     }

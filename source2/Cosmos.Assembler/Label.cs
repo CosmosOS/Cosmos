@@ -7,12 +7,12 @@ using System.Text;
 namespace Cosmos.Assembler {
   public class Label : Instruction {
     public static string GetFullName(MethodBase aMethod) {
-      return MethodInfoLabelGenerator.GenerateLabelName(aMethod);
+      return LabelName.Get(aMethod);
     }
 
     public string Comment { get; set; }
 
-    public Label(MethodBase aMethod) : this(MethodInfoLabelGenerator.GenerateLabelName(aMethod), "") { }
+    public Label(MethodBase aMethod) : this(LabelName.Get(aMethod), "") { }
 
     public Label(string aName)
       : this(aName, "") {

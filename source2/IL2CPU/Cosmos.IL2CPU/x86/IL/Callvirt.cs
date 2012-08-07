@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
           //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
           string xNormalAddress = "";
           if (aTargetMethod.IsStatic || !aTargetMethod.IsVirtual || aTargetMethod.IsFinal) {
-            xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
+            xNormalAddress = LabelName.Get(aTargetMethod);
           }
           // mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
 
@@ -118,7 +118,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationValue = aTargetMethodUID };
             new CPUx86.Call {
-              DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef)
+              DestinationLabel = LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef)
             };
             if (xExtraStackSize > 0)
             {

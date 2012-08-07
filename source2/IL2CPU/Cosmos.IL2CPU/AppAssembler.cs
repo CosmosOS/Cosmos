@@ -49,14 +49,14 @@ namespace Cosmos.IL2CPU {
       new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
 
       if (aMethod.PluggedMethod != null) {
-        new Cosmos.Assembler.Label("PLUG_FOR___" + MethodInfoLabelGenerator.GenerateLabelName(aMethod.PluggedMethod.MethodBase));
+        new Cosmos.Assembler.Label("PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase));
       } else {
         new Cosmos.Assembler.Label(aMethod.MethodBase);
       }
       var xMethodLabel = Cosmos.Assembler.Label.LastFullLabel;
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
         new Comment("This is a static constructor. see if it has been called already, and if so, return.");
-        var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + MethodInfoLabelGenerator.GetFullName(aMethod.MethodBase.DeclaringType));
+        var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
         var xAsmMember = new DataMember(xName, (byte)0);
         Assembler.DataMembers.Add(xAsmMember);
         new Compare { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
@@ -427,7 +427,7 @@ namespace Cosmos.IL2CPU {
 
     protected void Call(MethodBase aMethod) {
       new Cosmos.Assembler.x86.Call {
-        DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod)
+        DestinationLabel = LabelName.Get(aMethod)
       };
     }
 
@@ -576,9 +576,9 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (!xType.IsInterface) {
-          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
+          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
           Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
-              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
+              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
           Push((uint)xBaseIndex.Value);
           xData = new byte[16 + (xEmittedMethods.Count * 4)];
           xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
@@ -589,10 +589,10 @@ namespace Cosmos.IL2CPU {
           Array.Copy(xTemp, 0, xData, 8, 4);
           xTemp = BitConverter.GetBytes(4); // embedded array
           Array.Copy(xTemp, 0, xData, 12, 4);
-          string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
+          string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
           Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push(xDataName);
-          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
+          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
           Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push(xDataName);
           xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
@@ -604,7 +604,7 @@ namespace Cosmos.IL2CPU {
           Array.Copy(xTemp, 0, xData, 8, 4);
           xTemp = BitConverter.GetBytes(2); // embedded array
           Array.Copy(xTemp, 0, xData, 12, 4);
-          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
+          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
           Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push("0" + xEmittedMethods.Count.ToString("X") + "h");
           Call(xSetTypeInfoRef);
@@ -675,7 +675,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public void ProcessField(FieldInfo aField) {
-      string xFieldName = MethodInfoLabelGenerator.GetFullName(aField);
+      string xFieldName = LabelName.GetFullName(aField);
       xFieldName = DataMember.GetStaticFieldName(aField);
       if (Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0) {
         var xItemList = (from item in aField.GetCustomAttributes(false)
@@ -807,7 +807,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected static void WriteDebug(MethodBase aMethod, uint aSize, uint aSize2) {
-      var xLine = String.Format("{0}\t{1}\t{2}", MethodInfoLabelGenerator.GenerateFullName(aMethod), aSize, aSize2);
+      var xLine = String.Format("{0}\t{1}\t{2}", LabelName.GenerateFullName(aMethod), aSize, aSize2);
     }
 
     // These are all temp functions until we move to the new assembler.

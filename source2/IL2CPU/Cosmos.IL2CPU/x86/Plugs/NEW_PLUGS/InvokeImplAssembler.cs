@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
       var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
       new CPU.Comment("push address of delgate to stack");
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };//addrof this
-      new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(xGetInvocationListMethod) };
+      new CPUx86.Call { DestinationLabel = CPU.LabelName.Get(xGetInvocationListMethod) };
       new CPU.Comment("get address from return value -> eax");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
       ;//list

@@ -69,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
-      DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase));
+      DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, LabelName.Get(aMethod.MethodBase));
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
@@ -87,9 +87,9 @@ namespace Cosmos.IL2CPU.X86.IL {
       //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
       string xNormalAddress = "";
       if (aTargetMethod.IsStatic || !aTargetMethod.IsVirtual || aTargetMethod.IsFinal) {
-        xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
+        xNormalAddress = LabelName.Get(aTargetMethod);
       } else {
-          xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod);
+          xNormalAddress = LabelName.Get(aTargetMethod);
         //throw new Exception("Call: non-concrete method called: '" + aTargetMethod.GetFullName() + "'");
       }
       var xParameters = aTargetMethod.GetParameters();
