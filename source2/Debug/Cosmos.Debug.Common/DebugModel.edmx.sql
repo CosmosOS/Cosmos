@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/06/2012 22:58:14
+-- Date Created: 08/07/2012 02:17:03
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -126,7 +126,8 @@ CREATE TABLE [dbo].[Methods] (
     [ColEnd] int  NOT NULL,
     [DocumentID] uniqueidentifier  NOT NULL,
     [LabelStart] nvarchar(256)  NOT NULL,
-    [LabelEnd] nvarchar(256)  NOT NULL
+    [LabelEnd] nvarchar(256)  NOT NULL,
+    [LabelID] uniqueidentifier  NULL
 );
 GO
 
@@ -219,6 +220,20 @@ ADD CONSTRAINT [FK_DocumentMethod]
 CREATE INDEX [IX_FK_DocumentMethod]
 ON [dbo].[Methods]
     ([DocumentID]);
+GO
+
+-- Creating foreign key on [LabelID] in table 'Methods'
+ALTER TABLE [dbo].[Methods]
+ADD CONSTRAINT [FK_LabelMethod]
+    FOREIGN KEY ([LabelID])
+    REFERENCES [dbo].[Labels]
+        ([ID])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_LabelMethod'
+CREATE INDEX [IX_FK_LabelMethod]
+ON [dbo].[Methods]
+    ([LabelID]);
 GO
 
 -- --------------------------------------------------

@@ -20,6 +20,7 @@ using System.Runtime.Serialization;
 
 [assembly: EdmRelationshipAttribute("DebugModel", "AssemblyFileMethod", "AssemblyFile", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.AssemblyFile), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 [assembly: EdmRelationshipAttribute("DebugModel", "DocumentMethod", "Document", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.Document), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
+[assembly: EdmRelationshipAttribute("DebugModel", "LabelMethod", "Label", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Cosmos.Debug.Common.Label), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 
 #endregion
 
@@ -831,6 +832,31 @@ namespace Cosmos.Debug.Common
 
         #endregion
     
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "LabelMethod", "Method")]
+        public EntityCollection<Method> Methods
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Method>("DebugModel.LabelMethod", "Method");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Method>("DebugModel.LabelMethod", "Method", value);
+                }
+            }
+        }
+
+        #endregion
     }
     
     /// <summary>
@@ -1354,6 +1380,30 @@ namespace Cosmos.Debug.Common
         private global::System.String _LabelEnd;
         partial void OnLabelEndChanging(global::System.String value);
         partial void OnLabelEndChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Guid> LabelID
+        {
+            get
+            {
+                return _LabelID;
+            }
+            set
+            {
+                OnLabelIDChanging(value);
+                ReportPropertyChanging("LabelID");
+                _LabelID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LabelID");
+                OnLabelIDChanged();
+            }
+        }
+        private Nullable<global::System.Guid> _LabelID;
+        partial void OnLabelIDChanging(Nullable<global::System.Guid> value);
+        partial void OnLabelIDChanged();
 
         #endregion
     
@@ -1431,6 +1481,44 @@ namespace Cosmos.Debug.Common
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Document>("DebugModel.DocumentMethod", "Document", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "LabelMethod", "Label")]
+        public Label Label
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Label>("DebugModel.LabelMethod", "Label").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Label>("DebugModel.LabelMethod", "Label").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Label> LabelReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Label>("DebugModel.LabelMethod", "Label");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Label>("DebugModel.LabelMethod", "Label", value);
                 }
             }
         }

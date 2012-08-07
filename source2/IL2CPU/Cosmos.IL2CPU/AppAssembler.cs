@@ -55,6 +55,10 @@ namespace Cosmos.IL2CPU {
         mCurrentMethodLabel = LabelName.Get(aMethod.MethodBase);
       }
       new Cosmos.Assembler.Label(mCurrentMethodLabel);
+      // We issue a second label for GUID. This is increases label count, but for now we need a master label first.
+      // We issue a GUID label to reduce amount of work and time needed to construct debugging DB.
+      var xLabelGuid = Guid.NewGuid();
+      new Cosmos.Assembler.Label(".GUID_" + xLabelGuid.ToString("N"));
 
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
         new Comment("Static constructor. See if it has been called already, return if so.");
@@ -87,6 +91,7 @@ namespace Cosmos.IL2CPU {
           var xMethod = new Method() {
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,
+            LabelID = xLabelGuid,
             LabelStart = mCurrentMethodLabel,
             LabelEnd = "",
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
@@ -876,7 +881,7 @@ namespace Cosmos.IL2CPU {
     protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
       string xLabel = TmpPosLabel(aMethod, aOpCode);
       Assembler.CurrentIlLabel = xLabel;
-      new Cosmos.Assembler.Label(xLabel, "IL");
+      new Cosmos.Assembler.Label(xLabel);
 
       if (mSymbols != null) {
         var xMLSymbol = new MLSYMBOL();

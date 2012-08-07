@@ -17,7 +17,7 @@ namespace Cosmos.Assembler {
     // Suffixes are a series of tags and have their own prefixes to preserve backwards compat.
     // .GUID_xxxxxx
     // .IL_0000
-    // .ASM_00
+    // .ASM_00 - future, currently is IL_0000 or IL_0000.00
     // Would be nice to combine IL and ASM into IL_0000_00, but the way we work with the assembler currently
     // we cant because the ASM labels are issued as local labels.
     //
