@@ -199,6 +199,57 @@ namespace Cosmos.Debug.Common {
       return new Entities(xEntConn);
     }
 
+    public class SequencePoint {
+      public int Offset;
+      public string Document;
+      public int LineStart;
+      public int ColStart;
+      public int LineEnd;
+      public int ColEnd;
+    }
+    // This gets the Sequence Points.
+    // Sequence Points are spots that identify what the compiler/debugger says is a spot
+    // that a breakpoint can occur one. Essentially, an atomic source line in C#
+    public SequencePoint[] GetSequencePoints(MethodBase aMethod, bool aFilterHiddenLines = false) {
+      var xReader = Microsoft.Samples.Debugging.CorSymbolStore.SymbolAccess.GetReaderForFile(aMethod.DeclaringType.Assembly.Location);
+      if (xReader == null) {
+        return new SequencePoint[0];
+      }
+
+      var xSymbols = xReader.GetMethod(new SymbolToken(aMethod.MetadataToken));
+      if (xSymbols == null) {
+        return new SequencePoint[0];
+      }
+      
+      int xCount = xSymbols.SequencePointCount;
+      var xOffsets = new int[xCount];
+      var xDocuments = new ISymbolDocument[xCount];
+      var xStartLines = new int[xCount];
+      var xStartCols = new int[xCount];
+      var xEndLines = new int[xCount];
+      var xEndCols = new int[xCount];
+      
+      xSymbols.GetSequencePoints(xOffsets, xDocuments, xStartLines, xStartCols, xEndLines, xEndCols);
+
+      var xResult = new SequencePoint[xCount];
+      for (int i = 0; i < xCount; i++) {
+        var xSP = new SequencePoint();
+        xResult[i] = xSP;
+        xSP.Offset = xOffsets[i];
+        xSP.Document = xDocuments[i].URL;
+        xSP.LineStart = xStartLines[i];
+        xSP.ColStart = xStartCols[i];
+        xSP.LineEnd = xEndLines[i];
+        xSP.ColEnd = xEndCols[i];
+      }
+
+      if (aFilterHiddenLines) {
+        //xResult = xResult.Where(
+      }
+
+      return xResult;
+    }
+
     protected List<Method> mMethods = new List<Method>();
     public void AddMethod(Method aMethod, bool aFlush = false) {
       if (aMethod != null) {
