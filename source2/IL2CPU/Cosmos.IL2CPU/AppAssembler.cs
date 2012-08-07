@@ -48,14 +48,16 @@ namespace Cosmos.IL2CPU {
       new Comment("Name: " + aMethod.MethodBase.Name);
       new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
 
+      string xMethodLabel;
       if (aMethod.PluggedMethod != null) {
-        new Cosmos.Assembler.Label("PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase));
+        xMethodLabel = "PLUG_FOR___" + LabelName.Get(aMethod.PluggedMethod.MethodBase);
       } else {
-        new Cosmos.Assembler.Label(aMethod.MethodBase);
+        xMethodLabel = LabelName.Get(aMethod.MethodBase);
       }
-      var xMethodLabel = Cosmos.Assembler.Label.LastFullLabel;
+      new Cosmos.Assembler.Label(xMethodLabel);
+
       if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo) {
-        new Comment("This is a static constructor. see if it has been called already, and if so, return.");
+        new Comment("Static constructor. See if it has been called already, return if so.");
         var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
         var xAsmMember = new DataMember(xName, (byte)0);
         Assembler.DataMembers.Add(xAsmMember);
@@ -71,13 +73,6 @@ namespace Cosmos.IL2CPU {
 
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
-      //new CPUx86.Push("0");
-      //if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
-      //    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
-      //    MethodBase xTempMethod = Engine.GetMethodBase(Engine.GetType("Cosmos.Kernel", "Cosmos.Kernel.Serial"), "Write", "System.Byte", "System.String");
-      //    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
-      //    Engine.QueueMethod(xTempMethod);
-      //}
 
       if (DebugMode == DebugMode.Source) {
         // Would be nice to use xMethodSymbols.GetSourceStartEnd but we cant

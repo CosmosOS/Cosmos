@@ -12,8 +12,6 @@ namespace Cosmos.Assembler {
 
     public string Comment { get; set; }
 
-    public Label(MethodBase aMethod) : this(LabelName.Get(aMethod), "") { }
-
     public Label(string aName)
       : this(aName, "") {
     }

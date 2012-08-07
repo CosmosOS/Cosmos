@@ -65,9 +65,9 @@ namespace Cosmos.Build.MSBuild {
               Name = xLabel,
               Address = xAddress
             });
-            xDebugInfo.WriteLabels(xLabels);
+            xDebugInfo.AddLabels(xLabels);
           }
-          xDebugInfo.WriteLabels(xLabels, true);
+          xDebugInfo.AddLabels(xLabels, true);
         }
       }
       return true;

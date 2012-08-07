@@ -339,7 +339,7 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public void WriteLabels(IList<Label> aLabels, bool aFlush = false) {
+    public void AddLabels(IList<Label> aLabels, bool aFlush = false) {
       foreach (var x in aLabels) {
         x.ID = Guid.NewGuid();
       }

@@ -9,8 +9,15 @@ using System.Reflection.Emit;
 namespace Cosmos.Assembler {
   public static class LabelName {
 
+    // All label naming code should be changed to use this class.
+
     // Label bases can be up to 200 chars. If larger they will be shortened with an included hash.
     // This leaves up to 56 chars for suffix information.
+    
+    // Suffixes:
+    // - Methods use a variety of alphanumeric suffixes for support code.
+    // - .00 - asm markers at beginning of method
+    // - .0000.00 IL.ASM marker 
 
     public static int LabelCount { get; private set; }
     // Max length of labels at 256. We use 220 here so that we still have room for suffixes
@@ -21,20 +28,22 @@ namespace Cosmos.Assembler {
       return Final(GenerateFullName(aMethod));
     }
 
-    const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=_";
     public static string Final(string xName) {
       var xSB = new StringBuilder(xName);
 
       // DataMember.FilterStringForIncorrectChars also does some filtering but replacing empties or non _ chars
       // causes issues with legacy hardcoded values. So we have a separate function.
-      foreach (char c in IllegalIdentifierChars) {
+      //
+      // For logging possibilities, we generate fuller names, and then strip out spacing/characters.
+      const string xIllegalChars = "&.,+$<>{}-`\'/\\ ()[]*!=_";
+      foreach (char c in xIllegalChars) {
         xSB.Replace(c.ToString(), "");
       }
 
       if (xSB.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
           var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));
-          // Keep length max 200
+          // Keep length max same as before.
           xSB.Length = MaxLengthWithoutSuffix - xValue.Length * 2;
           foreach (var xByte in xValue) {
             xSB.Append(xByte.ToString("X2"));

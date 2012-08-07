@@ -24,7 +24,7 @@ namespace Cosmos.Assembler {
     protected int mComPort = 0;
     protected UInt16 mGdCode;
     protected UInt16 mGdData;
-    
+
     // Contains info on the current stack structure. What type are on the stack, etc
     public readonly StackContents Stack = new StackContents();
 
@@ -111,13 +111,13 @@ namespace Cosmos.Assembler {
     protected List<DataMember> mDataMembers = new List<DataMember>();
     public List<DataMember> DataMembers {
       get { return mDataMembers; }
-        set { mDataMembers = value; }
+      set { mDataMembers = value; }
     }
 
     protected internal List<Instruction> mInstructions = new List<Instruction>();
     public List<Instruction> Instructions {
       get { return mInstructions; }
-        set { mInstructions = value; }
+      set { mInstructions = value; }
     }
 
     public static Assembler CurrentInstance {
@@ -154,14 +154,11 @@ namespace Cosmos.Assembler {
 
     public void Add(Instruction aReader) {
       if (aReader is Label || aReader is Comment) {
-      } else {
-        if (EmitAsmLabels) {
-          // Only issue label if its executable code.
-          // Also above if statement will prevent this new label
-          // from causing a stack overflow
-          new Label("." + AsmIlIdx.ToString("X2"), "Asm");
-          mAsmIlIdx++;
-        }
+      } else if (EmitAsmLabels) {
+        // Only issue label if its executable code.
+        // Also above if statement will prevent this new label from causing a stack overflow
+        new Label("." + AsmIlIdx.ToString("X2"), "Asm");
+        mAsmIlIdx++;
       }
       mInstructions.Add(aReader);
     }
@@ -178,7 +175,7 @@ namespace Cosmos.Assembler {
       DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0]) });
       new Label("_end_code");
     }
-    
+
     private uint mDataMemberCounter = 0;
     public string GetIdentifier(string aPrefix) {
       mDataMemberCounter++;
