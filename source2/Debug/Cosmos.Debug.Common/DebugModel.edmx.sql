@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/07/2012 02:17:03
+-- Date Created: 08/07/2012 15:10:28
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -22,6 +22,9 @@ IF OBJECT_ID(N'[dbo].[FK_AssemblyFileMethod]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_DocumentMethod]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_DocumentMethod];
+GO
+IF OBJECT_ID(N'[dbo].[FK_LabelMethod]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Methods] DROP CONSTRAINT [FK_LabelMethod];
 GO
 
 -- --------------------------------------------------
@@ -125,9 +128,8 @@ CREATE TABLE [dbo].[Methods] (
     [LineEnd] int  NOT NULL,
     [ColEnd] int  NOT NULL,
     [DocumentID] uniqueidentifier  NOT NULL,
-    [LabelStart] nvarchar(256)  NOT NULL,
-    [LabelEnd] nvarchar(256)  NOT NULL,
-    [LabelID] uniqueidentifier  NULL
+    [LabelStartID] uniqueidentifier  NULL,
+    [LabelEndID] uniqueidentifier  NULL
 );
 GO
 
@@ -222,10 +224,10 @@ ON [dbo].[Methods]
     ([DocumentID]);
 GO
 
--- Creating foreign key on [LabelID] in table 'Methods'
+-- Creating foreign key on [LabelStartID] in table 'Methods'
 ALTER TABLE [dbo].[Methods]
 ADD CONSTRAINT [FK_LabelMethod]
-    FOREIGN KEY ([LabelID])
+    FOREIGN KEY ([LabelStartID])
     REFERENCES [dbo].[Labels]
         ([ID])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -233,7 +235,21 @@ ADD CONSTRAINT [FK_LabelMethod]
 -- Creating non-clustered index for FOREIGN KEY 'FK_LabelMethod'
 CREATE INDEX [IX_FK_LabelMethod]
 ON [dbo].[Methods]
-    ([LabelID]);
+    ([LabelStartID]);
+GO
+
+-- Creating foreign key on [LabelEndID] in table 'Methods'
+ALTER TABLE [dbo].[Methods]
+ADD CONSTRAINT [FK_LabelMethodEnd]
+    FOREIGN KEY ([LabelEndID])
+    REFERENCES [dbo].[Labels]
+        ([ID])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_LabelMethodEnd'
+CREATE INDEX [IX_FK_LabelMethodEnd]
+ON [dbo].[Methods]
+    ([LabelEndID]);
 GO
 
 -- --------------------------------------------------

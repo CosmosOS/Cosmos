@@ -21,6 +21,7 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("DebugModel", "AssemblyFileMethod", "AssemblyFile", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.AssemblyFile), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 [assembly: EdmRelationshipAttribute("DebugModel", "DocumentMethod", "Document", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(Cosmos.Debug.Common.Document), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 [assembly: EdmRelationshipAttribute("DebugModel", "LabelMethod", "Label", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Cosmos.Debug.Common.Label), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
+[assembly: EdmRelationshipAttribute("DebugModel", "LabelMethodEnd", "Label", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Cosmos.Debug.Common.Label), "Method", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Cosmos.Debug.Common.Method), true)]
 
 #endregion
 
@@ -841,7 +842,7 @@ namespace Cosmos.Debug.Common
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("DebugModel", "LabelMethod", "Method")]
-        public EntityCollection<Method> Methods
+        public EntityCollection<Method> MethodStart
         {
             get
             {
@@ -852,6 +853,28 @@ namespace Cosmos.Debug.Common
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Method>("DebugModel.LabelMethod", "Method", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "LabelMethodEnd", "Method")]
+        public EntityCollection<Method> MethodEnd
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Method>("DebugModel.LabelMethodEnd", "Method");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Method>("DebugModel.LabelMethodEnd", "Method", value);
                 }
             }
         }
@@ -1092,9 +1115,7 @@ namespace Cosmos.Debug.Common
         /// <param name="lineEnd">Initial value of the LineEnd property.</param>
         /// <param name="colEnd">Initial value of the ColEnd property.</param>
         /// <param name="documentID">Initial value of the DocumentID property.</param>
-        /// <param name="labelStart">Initial value of the LabelStart property.</param>
-        /// <param name="labelEnd">Initial value of the LabelEnd property.</param>
-        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd, global::System.Guid documentID, global::System.String labelStart, global::System.String labelEnd)
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd, global::System.Guid documentID)
         {
             Method method = new Method();
             method.ID = id;
@@ -1106,8 +1127,6 @@ namespace Cosmos.Debug.Common
             method.LineEnd = lineEnd;
             method.ColEnd = colEnd;
             method.DocumentID = documentID;
-            method.LabelStart = labelStart;
-            method.LabelEnd = labelEnd;
             return method;
         }
 
@@ -1336,74 +1355,50 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.String LabelStart
+        public Nullable<global::System.Guid> LabelStartID
         {
             get
             {
-                return _LabelStart;
+                return _LabelStartID;
             }
             set
             {
-                OnLabelStartChanging(value);
-                ReportPropertyChanging("LabelStart");
-                _LabelStart = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("LabelStart");
-                OnLabelStartChanged();
+                OnLabelStartIDChanging(value);
+                ReportPropertyChanging("LabelStartID");
+                _LabelStartID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LabelStartID");
+                OnLabelStartIDChanged();
             }
         }
-        private global::System.String _LabelStart;
-        partial void OnLabelStartChanging(global::System.String value);
-        partial void OnLabelStartChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String LabelEnd
-        {
-            get
-            {
-                return _LabelEnd;
-            }
-            set
-            {
-                OnLabelEndChanging(value);
-                ReportPropertyChanging("LabelEnd");
-                _LabelEnd = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("LabelEnd");
-                OnLabelEndChanged();
-            }
-        }
-        private global::System.String _LabelEnd;
-        partial void OnLabelEndChanging(global::System.String value);
-        partial void OnLabelEndChanged();
+        private Nullable<global::System.Guid> _LabelStartID;
+        partial void OnLabelStartIDChanging(Nullable<global::System.Guid> value);
+        partial void OnLabelStartIDChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public Nullable<global::System.Guid> LabelID
+        public Nullable<global::System.Guid> LabelEndID
         {
             get
             {
-                return _LabelID;
+                return _LabelEndID;
             }
             set
             {
-                OnLabelIDChanging(value);
-                ReportPropertyChanging("LabelID");
-                _LabelID = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("LabelID");
-                OnLabelIDChanged();
+                OnLabelEndIDChanging(value);
+                ReportPropertyChanging("LabelEndID");
+                _LabelEndID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LabelEndID");
+                OnLabelEndIDChanged();
             }
         }
-        private Nullable<global::System.Guid> _LabelID;
-        partial void OnLabelIDChanging(Nullable<global::System.Guid> value);
-        partial void OnLabelIDChanged();
+        private Nullable<global::System.Guid> _LabelEndID;
+        partial void OnLabelEndIDChanging(Nullable<global::System.Guid> value);
+        partial void OnLabelEndIDChanged();
 
         #endregion
     
@@ -1492,7 +1487,7 @@ namespace Cosmos.Debug.Common
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("DebugModel", "LabelMethod", "Label")]
-        public Label Label
+        public Label LabelStart
         {
             get
             {
@@ -1508,7 +1503,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [BrowsableAttribute(false)]
         [DataMemberAttribute()]
-        public EntityReference<Label> LabelReference
+        public EntityReference<Label> LabelStartReference
         {
             get
             {
@@ -1519,6 +1514,44 @@ namespace Cosmos.Debug.Common
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Label>("DebugModel.LabelMethod", "Label", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("DebugModel", "LabelMethodEnd", "Label")]
+        public Label LabelEnd
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Label>("DebugModel.LabelMethodEnd", "Label").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Label>("DebugModel.LabelMethodEnd", "Label").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Label> LabelEndReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Label>("DebugModel.LabelMethodEnd", "Label");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Label>("DebugModel.LabelMethodEnd", "Label", value);
                 }
             }
         }

@@ -26,8 +26,7 @@ namespace Cosmos.Assembler {
     // - .0000.00 IL.ASM marker 
 
     public static int LabelCount { get; private set; }
-    // Max length of labels at 256. We use 220 here so that we still have room for suffixes
-    // for IL positions, etc.
+    // Max length of labels at 256. We use lower here so that we still have room for suffixes for IL positions, etc.
     const int MaxLengthWithoutSuffix = 200;
 
     public static string Get(MethodBase aMethod) {

@@ -32,15 +32,15 @@ namespace Cosmos.IL2CPU {
     public bool IgnoreDebugStubAttribute;
     protected static HashSet<string> mDebugLines = new HashSet<string>();
     protected List<MLSYMBOL> mSymbols = new List<MLSYMBOL>();
+    public readonly Cosmos.Assembler.Assembler Assembler;
+    protected string mCurrentMethodLabel;
+    protected Guid mCurrentMethodLabelEndGuid;
 
     public AppAssembler(int aComPort) {
       Assembler = new Cosmos.Assembler.Assembler(aComPort);
       mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
       InitILOps();
     }
-
-    public readonly Cosmos.Assembler.Assembler Assembler;
-    protected string mCurrentMethodLabel;
 
     protected void MethodBegin(MethodInfo aMethod) {
       new Comment("---------------------------------------------------------");
@@ -88,12 +88,12 @@ namespace Cosmos.IL2CPU {
         if (mSequences.Length > 0) {
           DebugInfo.AddDocument(mSequences[0].Document);
 
+          mCurrentMethodLabelEndGuid = Guid.NewGuid();
           var xMethod = new Method() {
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,
-            LabelID = xLabelGuid,
-            LabelStart = mCurrentMethodLabel,
-            LabelEnd = "",
+            LabelStartID = xLabelGuid,
+            LabelEndID = mCurrentMethodLabelEndGuid,
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
             DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
             LineStart = mSequences[0].LineStart, 
@@ -260,6 +260,9 @@ namespace Cosmos.IL2CPU {
       }
       WriteDebug(aMethod.MethodBase, (uint)xRetSize, X86.IL.Call.GetStackSizeToReservate(aMethod.MethodBase));
       new Return { DestinationValue = (uint)xRetSize };
+
+      // Final, after all code. Points to op AFTER method.
+      new Cosmos.Assembler.Label(mCurrentMethodLabel + ".GUID_" + mCurrentMethodLabelEndGuid.ToString("N"));
     }
 
     public void FinalizeDebugInfo() {

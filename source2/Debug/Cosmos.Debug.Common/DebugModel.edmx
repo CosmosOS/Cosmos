@@ -26,6 +26,10 @@
       <End Role="Label" EntitySet="Labels" />
       <End Role="Method" EntitySet="Methods" />
     </AssociationSet>
+    <AssociationSet Name="LabelMethodEnd" Association="DebugModel.Store.LabelMethodEnd">
+      <End Role="Label" EntitySet="Labels" />
+      <End Role="Method" EntitySet="Methods" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="FIELD_INFO">
     <Key>
@@ -97,9 +101,8 @@
     <Property Name="LineEnd" Type="int" Nullable="false" />
     <Property Name="ColEnd" Type="int" Nullable="false" />
     <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
-    <Property Name="LabelStart" Type="nvarchar" Nullable="false" MaxLength="256" />
-    <Property Name="LabelEnd" Type="nvarchar" Nullable="false" MaxLength="256" />
-    <Property Name="LabelID" Type="uniqueidentifier" Nullable="true" />
+    <Property Name="LabelStartID" Type="uniqueidentifier" Nullable="true" />
+    <Property Name="LabelEndID" Type="uniqueidentifier" Nullable="true" />
   </EntityType>
   <EntityType Name="Documents">
     <Key>
@@ -140,7 +143,19 @@
         <PropertyRef Name="ID" />
       </Principal>
       <Dependent Role="Method">
-        <PropertyRef Name="LabelID" />
+        <PropertyRef Name="LabelStartID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="LabelMethodEnd">
+    <End Role="Label" Type="DebugModel.Store.Labels" Multiplicity="0..1" />
+    <End Role="Method" Type="DebugModel.Store.Methods" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Label">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Method">
+        <PropertyRef Name="LabelEndID" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -169,6 +184,10 @@
             <End Role="Label" EntitySet="Labels" />
             <End Role="Method" EntitySet="Methods" />
           </AssociationSet>
+          <AssociationSet Name="LabelMethodEnd" Association="DebugModel.LabelMethodEnd">
+            <End Role="Label" EntitySet="Labels" />
+            <End Role="Method" EntitySet="Methods" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="FIELD_INFO">
           <Key>
@@ -194,7 +213,8 @@
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="Name" Nullable="false" MaxLength="256" />
           <Property Type="Int64" Name="Address" Nullable="false" />
-          <NavigationProperty Name="Methods" Relationship="DebugModel.LabelMethod" FromRole="Label" ToRole="Method" />
+          <NavigationProperty Name="MethodStart" Relationship="DebugModel.LabelMethod" FromRole="Label" ToRole="Method" />
+          <NavigationProperty Name="MethodEnd" Relationship="DebugModel.LabelMethodEnd" FromRole="Label" ToRole="Method" />
         </EntityType>
         <EntityType Name="LOCAL_ARGUMENT_INFO">
           <Key>
@@ -244,10 +264,10 @@
           <Property Type="Int32" Name="ColEnd" Nullable="false" />
           <NavigationProperty Name="Document" Relationship="DebugModel.DocumentMethod" FromRole="Method" ToRole="Document" />
           <Property Type="Guid" Name="DocumentID" Nullable="false" />
-          <Property Type="String" Name="LabelStart" Nullable="false" MaxLength="256" />
-          <Property Type="String" Name="LabelEnd" Nullable="false" MaxLength="256" />
-          <NavigationProperty Name="Label" Relationship="DebugModel.LabelMethod" FromRole="Method" ToRole="Label" />
-          <Property Type="Guid" Name="LabelID" Nullable="true" />
+          <NavigationProperty Name="LabelStart" Relationship="DebugModel.LabelMethod" FromRole="Method" ToRole="Label" />
+          <Property Type="Guid" Name="LabelStartID" Nullable="true" />
+          <NavigationProperty Name="LabelEnd" Relationship="DebugModel.LabelMethodEnd" FromRole="Method" ToRole="Label" />
+          <Property Type="Guid" Name="LabelEndID" Nullable="true" />
         </EntityType>
         <Association Name="AssemblyFileMethod">
           <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
@@ -289,7 +309,19 @@
               <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="Method">
-              <PropertyRef Name="LabelID" />
+              <PropertyRef Name="LabelStartID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="LabelMethodEnd">
+          <End Type="DebugModel.Label" Role="Label" Multiplicity="0..1" />
+          <End Type="DebugModel.Method" Role="Method" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Label">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Method">
+              <PropertyRef Name="LabelEndID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -374,9 +406,8 @@
           <ScalarProperty Name="LineEnd" ColumnName="LineEnd" />
           <ScalarProperty Name="ColEnd" ColumnName="ColEnd" />
           <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
-          <ScalarProperty Name="LabelStart" ColumnName="LabelStart" />
-          <ScalarProperty Name="LabelEnd" ColumnName="LabelEnd" />
-          <ScalarProperty Name="LabelID" ColumnName="LabelID" />
+          <ScalarProperty Name="LabelStartID" ColumnName="LabelStartID" />
+          <ScalarProperty Name="LabelEndID" ColumnName="LabelEndID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -414,7 +445,7 @@
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="2.5" PointY="0.5" Height="1.4033821614583333" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.5186979166666656" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="4.75" PointY="0.5" Height="3.5186979166666665" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
           <ConnectorPoint PointX="4" PointY="1.297841796875" />
           <ConnectorPoint PointX="4.75" PointY="1.297841796875" />
@@ -427,6 +458,10 @@
         <AssociationConnector Association="DebugModel.LabelMethod">
           <ConnectorPoint PointX="2" PointY="2.2230843098958335" />
           <ConnectorPoint PointX="4.75" PointY="2.2230843098958335" />
+        </AssociationConnector>
+        <AssociationConnector Association="DebugModel.LabelMethodEnd">
+          <ConnectorPoint PointX="2" PointY="2.1762093098958335" />
+          <ConnectorPoint PointX="4.75" PointY="2.1762093098958335" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>
