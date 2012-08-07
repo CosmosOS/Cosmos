@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/06/2012 22:45:00
+-- Date Created: 08/06/2012 22:58:14
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -84,25 +84,25 @@ GO
 
 -- Creating table 'LOCAL_ARGUMENT_INFO'
 CREATE TABLE [dbo].[LOCAL_ARGUMENT_INFO] (
-    [METHODLABELNAME] nvarchar(512)  NOT NULL,
+    [METHODLABELNAME] nvarchar(256)  NOT NULL,
     [IsArgument] bit  NOT NULL,
     [INDEXINMETHOD] int  NOT NULL,
     [OFFSET] int  NOT NULL,
     [NAME] nvarchar(64)  NOT NULL,
-    [TYPENAME] nvarchar(512)  NOT NULL,
+    [TYPENAME] nvarchar(256)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
 
 -- Creating table 'MLSYMBOLs'
 CREATE TABLE [dbo].[MLSYMBOLs] (
-    [LABELNAME] nvarchar(512)  NOT NULL,
+    [LABELNAME] nvarchar(256)  NOT NULL,
     [STACKDIFF] int  NOT NULL,
     [ILASMFILE] nvarchar(256)  NOT NULL,
     [TYPETOKEN] int  NOT NULL,
     [METHODTOKEN] int  NOT NULL,
     [ILOFFSET] int  NOT NULL,
-    [METHODNAME] nvarchar(512)  NOT NULL,
+    [METHODNAME] nvarchar(256)  NOT NULL,
     [ID] uniqueidentifier  NOT NULL
 );
 GO
@@ -125,8 +125,8 @@ CREATE TABLE [dbo].[Methods] (
     [LineEnd] int  NOT NULL,
     [ColEnd] int  NOT NULL,
     [DocumentID] uniqueidentifier  NOT NULL,
-    [LabelStart] nvarchar(512)  NOT NULL,
-    [LabelEnd] nvarchar(512)  NOT NULL
+    [LabelStart] nvarchar(256)  NOT NULL,
+    [LabelEnd] nvarchar(256)  NOT NULL
 );
 GO
 

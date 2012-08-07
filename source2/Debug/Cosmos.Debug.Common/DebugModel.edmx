@@ -52,25 +52,25 @@
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="METHODLABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="METHODLABELNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="IsArgument" Type="bit" Nullable="false" />
     <Property Name="INDEXINMETHOD" Type="int" Nullable="false" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="64" />
-    <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="MLSYMBOLs">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="LABELNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="STACKDIFF" Type="int" Nullable="false" />
     <Property Name="ILASMFILE" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="TYPETOKEN" Type="int" Nullable="false" />
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="ILOFFSET" Type="int" Nullable="false" />
-    <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
   </EntityType>
   <EntityType Name="AssemblyFiles">
@@ -93,8 +93,8 @@
     <Property Name="LineEnd" Type="int" Nullable="false" />
     <Property Name="ColEnd" Type="int" Nullable="false" />
     <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
-    <Property Name="LabelStart" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="LabelEnd" Type="nvarchar" Nullable="false" MaxLength="512" />
+    <Property Name="LabelStart" Type="nvarchar" Nullable="false" MaxLength="256" />
+    <Property Name="LabelEnd" Type="nvarchar" Nullable="false" MaxLength="256" />
   </EntityType>
   <EntityType Name="Documents">
     <Key>
@@ -178,25 +178,25 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="METHODLABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
+          <Property Name="METHODLABELNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="IsArgument" Type="Boolean" Nullable="false" />
           <Property Name="INDEXINMETHOD" Type="Int32" Nullable="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="64" Unicode="true" FixedLength="false" />
-          <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
+          <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="MLSYMBOL">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
+          <Property Name="LABELNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="STACKDIFF" Type="Int32" Nullable="false" />
           <Property Name="ILASMFILE" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="TYPETOKEN" Type="Int32" Nullable="false" />
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="ILOFFSET" Type="Int32" Nullable="false" />
-          <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
+          <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="AssemblyFile">
@@ -222,8 +222,8 @@
           <Property Type="Int32" Name="ColEnd" Nullable="false" />
           <NavigationProperty Name="Document" Relationship="DebugModel.DocumentMethod" FromRole="Method" ToRole="Document" />
           <Property Type="Guid" Name="DocumentID" Nullable="false" />
-          <Property Type="String" Name="LabelStart" Nullable="false" MaxLength="512" />
-          <Property Type="String" Name="LabelEnd" Nullable="false" MaxLength="512" />
+          <Property Type="String" Name="LabelStart" Nullable="false" MaxLength="256" />
+          <Property Type="String" Name="LabelEnd" Nullable="false" MaxLength="256" />
         </EntityType>
         <Association Name="AssemblyFileMethod">
           <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
@@ -371,8 +371,8 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="DebugModel">
-        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="8.5" PointY="5.375" Height="1.787985026041667" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.625" PointY="3.625" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="8.5" PointY="5.125" Height="1.787985026041667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="8.5" PointY="3.375" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="0.5" PointY="3.75" Height="2.3648893229166656" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.MLSYMBOL" Width="1.5" PointX="2.5" PointY="3.75" Height="2.5571907552083326" IsExpanded="true" />
