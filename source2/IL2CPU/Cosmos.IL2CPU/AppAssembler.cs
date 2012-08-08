@@ -60,6 +60,10 @@ namespace Cosmos.IL2CPU {
       }
       new Cosmos.Assembler.Label(xMethodLabel);
 
+      // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
+      // so during debugging they can never be confused as to what they point to.
+      mCurrentMethodGuid = Guid.NewGuid();
+
       // We issue a second label for GUID. This is increases label count, but for now we need a master label first.
       // We issue a GUID label to reduce amount of work and time needed to construct debugging DB.
       var xLabelGuid = Guid.NewGuid();
@@ -98,9 +102,6 @@ namespace Cosmos.IL2CPU {
         if (mSequences.Length > 0) {
           DebugInfo.AddDocument(mSequences[0].Document);
 
-          // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
-          // so during debugging they can never be confused as to what they point to.
-          mCurrentMethodGuid = Guid.NewGuid();
           var xMethod = new Method() {
             ID = mCurrentMethodGuid,
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
@@ -109,10 +110,13 @@ namespace Cosmos.IL2CPU {
             LabelEndID = mCurrentMethodLabelEndGuid,
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
             DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
+            
             // Storing Line + Col as one item makes comparisons MUCH easier, otherwise we have to 
             // check for things like col < start col but line > start line.
-            LineColStart = mSequences[0].LineStart << 32 + mSequences[0].ColStart,
-            LineColEnd = mSequences[mSequences.Length - 1].LineEnd << 32 + mSequences[mSequences.Length - 1].ColEnd
+            //
+            // () around << are VERY important.. + has precedence over <<
+            LineColStart = (Int64)mSequences[0].LineStart << 32 + mSequences[0].ColStart,
+            LineColEnd = ((Int64)(mSequences[mSequences.Length - 1].LineEnd) << 32) + mSequences[mSequences.Length - 1].ColEnd
           };
           DebugInfo.AddMethod(xMethod);
         }

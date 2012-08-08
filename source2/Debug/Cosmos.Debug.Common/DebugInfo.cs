@@ -215,19 +215,30 @@ namespace Cosmos.Debug.Common {
       public string Document;
       public int LineStart;
       public int ColStart;
+      public Int64 LineColStart {
+        get { return ((Int64)LineStart << 32) + ColStart; }
+      }
       public int LineEnd;
       public int ColEnd;
+      public Int64 LineColEnd {
+        get { return ((Int64)LineEnd << 32) + ColEnd; }
+      }
     }
+
     // This gets the Sequence Points.
     // Sequence Points are spots that identify what the compiler/debugger says is a spot
     // that a breakpoint can occur one. Essentially, an atomic source line in C#
     public SequencePoint[] GetSequencePoints(MethodBase aMethod, bool aFilterHiddenLines = false) {
-      var xReader = Microsoft.Samples.Debugging.CorSymbolStore.SymbolAccess.GetReaderForFile(aMethod.DeclaringType.Assembly.Location);
+      return GetSequencePoints(aMethod.DeclaringType.Assembly.Location, aMethod.MetadataToken, aFilterHiddenLines);
+    }
+
+    public SequencePoint[] GetSequencePoints(string aAsmPathname, int aMethodToken, bool aFilterHiddenLines = false) {
+      var xReader = Microsoft.Samples.Debugging.CorSymbolStore.SymbolAccess.GetReaderForFile(aAsmPathname);
       if (xReader == null) {
         return new SequencePoint[0];
       }
 
-      var xSymbols = xReader.GetMethod(new SymbolToken(aMethod.MetadataToken));
+      var xSymbols = xReader.GetMethod(new SymbolToken(aMethodToken));
       if (xSymbols == null) {
         return new SequencePoint[0];
       }

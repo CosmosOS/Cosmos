@@ -95,19 +95,31 @@ namespace Cosmos.Debug.VSDebugEngine {
 
           bool xFoundAddress = false;
           UInt32 xAddress = 0;
-          if (false) {
+          if (true) {
             var xDebugInfo = mEngine.mProcess.mDebugInfoDb;
             var xDocID = xDebugInfo.DocumentGUIDs[xDocName];
             using (var xDB = xDebugInfo.DB()) {
-              // Why do we use dwLine + 1?
-              int xPos = ((int)xStartPos[0].dwLine + 1) << 32 + (int)xStartPos[0].dwColumn;
+              // Find which Method the Doc, Line, Col are in.
+              // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
+              // () around << are VERY important.. + has precedence over <<
+              Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
               var xQry = from x in xDB.Methods
                          where x.DocumentID == xDocID
                             && x.LineColStart <= xPos
                             && x.LineColEnd >= xPos
-                         select x;
+                         select new { x.ID, x.AssemblyFile.Pathname, x.MethodToken };
               var xMethod = xQry.Single();
 
+              // We have the method. Now find out what Sequence Point it belongs to.
+              var xSPs = xDebugInfo.GetSequencePoints(xMethod.Pathname, xMethod.MethodToken);
+              var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
+
+              // We have the Sequence Point, find the MethodILOp
+              var xOp = xDB.MethodIlOps.Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset).Single();
+
+              // Get the address of the Label
+              xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
+              xFoundAddress = true;
             }
           } else {
             xFoundAddress = mEngine.mProcess.mReverseSourceMappings.FindAddressForSourceLocation(xDocName, xStartPos[0].dwLine + 1, xStartPos[0].dwColumn, out xAddress);
