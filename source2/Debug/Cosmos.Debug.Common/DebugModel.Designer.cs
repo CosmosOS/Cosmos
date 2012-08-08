@@ -1111,22 +1111,18 @@ namespace Cosmos.Debug.Common
         /// <param name="typeToken">Initial value of the TypeToken property.</param>
         /// <param name="methodToken">Initial value of the MethodToken property.</param>
         /// <param name="assemblyFileID">Initial value of the AssemblyFileID property.</param>
-        /// <param name="lineStart">Initial value of the LineStart property.</param>
-        /// <param name="colStart">Initial value of the ColStart property.</param>
-        /// <param name="lineEnd">Initial value of the LineEnd property.</param>
-        /// <param name="colEnd">Initial value of the ColEnd property.</param>
+        /// <param name="lineColStart">Initial value of the LineColStart property.</param>
+        /// <param name="lineColEnd">Initial value of the LineColEnd property.</param>
         /// <param name="documentID">Initial value of the DocumentID property.</param>
-        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int32 lineStart, global::System.Int32 colStart, global::System.Int32 lineEnd, global::System.Int32 colEnd, global::System.Guid documentID)
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int64 lineColStart, global::System.Int64 lineColEnd, global::System.Guid documentID)
         {
             Method method = new Method();
             method.ID = id;
             method.TypeToken = typeToken;
             method.MethodToken = methodToken;
             method.AssemblyFileID = assemblyFileID;
-            method.LineStart = lineStart;
-            method.ColStart = colStart;
-            method.LineEnd = lineEnd;
-            method.ColEnd = colEnd;
+            method.LineColStart = lineColStart;
+            method.LineColEnd = lineColEnd;
             method.DocumentID = documentID;
             return method;
         }
@@ -1238,96 +1234,48 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int32 LineStart
+        public global::System.Int64 LineColStart
         {
             get
             {
-                return _LineStart;
+                return _LineColStart;
             }
             set
             {
-                OnLineStartChanging(value);
-                ReportPropertyChanging("LineStart");
-                _LineStart = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("LineStart");
-                OnLineStartChanged();
+                OnLineColStartChanging(value);
+                ReportPropertyChanging("LineColStart");
+                _LineColStart = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LineColStart");
+                OnLineColStartChanged();
             }
         }
-        private global::System.Int32 _LineStart;
-        partial void OnLineStartChanging(global::System.Int32 value);
-        partial void OnLineStartChanged();
+        private global::System.Int64 _LineColStart;
+        partial void OnLineColStartChanging(global::System.Int64 value);
+        partial void OnLineColStartChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int32 ColStart
+        public global::System.Int64 LineColEnd
         {
             get
             {
-                return _ColStart;
+                return _LineColEnd;
             }
             set
             {
-                OnColStartChanging(value);
-                ReportPropertyChanging("ColStart");
-                _ColStart = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("ColStart");
-                OnColStartChanged();
+                OnLineColEndChanging(value);
+                ReportPropertyChanging("LineColEnd");
+                _LineColEnd = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("LineColEnd");
+                OnLineColEndChanged();
             }
         }
-        private global::System.Int32 _ColStart;
-        partial void OnColStartChanging(global::System.Int32 value);
-        partial void OnColStartChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 LineEnd
-        {
-            get
-            {
-                return _LineEnd;
-            }
-            set
-            {
-                OnLineEndChanging(value);
-                ReportPropertyChanging("LineEnd");
-                _LineEnd = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("LineEnd");
-                OnLineEndChanged();
-            }
-        }
-        private global::System.Int32 _LineEnd;
-        partial void OnLineEndChanging(global::System.Int32 value);
-        partial void OnLineEndChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 ColEnd
-        {
-            get
-            {
-                return _ColEnd;
-            }
-            set
-            {
-                OnColEndChanging(value);
-                ReportPropertyChanging("ColEnd");
-                _ColEnd = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("ColEnd");
-                OnColEndChanged();
-            }
-        }
-        private global::System.Int32 _ColEnd;
-        partial void OnColEndChanging(global::System.Int32 value);
-        partial void OnColEndChanged();
+        private global::System.Int64 _LineColEnd;
+        partial void OnLineColEndChanging(global::System.Int64 value);
+        partial void OnLineColEndChanged();
     
         /// <summary>
         /// No Metadata Documentation available.

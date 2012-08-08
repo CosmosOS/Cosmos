@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/07/2012 18:26:14
+-- Date Created: 08/07/2012 21:30:09
 -- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
@@ -130,10 +130,8 @@ CREATE TABLE [dbo].[Methods] (
     [TypeToken] int  NOT NULL,
     [MethodToken] int  NOT NULL,
     [AssemblyFileID] uniqueidentifier  NOT NULL,
-    [LineStart] int  NOT NULL,
-    [ColStart] int  NOT NULL,
-    [LineEnd] int  NOT NULL,
-    [ColEnd] int  NOT NULL,
+    [LineColStart] bigint  NOT NULL,
+    [LineColEnd] bigint  NOT NULL,
     [DocumentID] uniqueidentifier  NOT NULL,
     [LabelStartID] uniqueidentifier  NULL,
     [LabelEndID] uniqueidentifier  NULL

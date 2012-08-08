@@ -100,15 +100,11 @@ namespace Cosmos.Debug.VSDebugEngine {
             var xDocID = xDebugInfo.DocumentGUIDs[xDocName];
             using (var xDB = xDebugInfo.DB()) {
               // Why do we use dwLine + 1?
-              int xLine = (int)xStartPos[0].dwLine + 1;
-              // TODO - We currently dont look at column. We assume methos are on line boundaries.
-              // This is because column could be larger than the startcol but wihtin line boundaries still so it 
-              // complicates the comparison.
-              int xCol = (int)xStartPos[0].dwColumn;
+              int xPos = ((int)xStartPos[0].dwLine + 1) << 32 + (int)xStartPos[0].dwColumn;
               var xQry = from x in xDB.Methods
                          where x.DocumentID == xDocID
-                            && x.LineStart <= xLine 
-                            && x.LineEnd >= xLine
+                            && x.LineColStart <= xPos
+                            && x.LineColEnd >= xPos
                          select x;
               var xMethod = xQry.Single();
 

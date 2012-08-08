@@ -101,10 +101,8 @@
     <Property Name="TypeToken" Type="int" Nullable="false" />
     <Property Name="MethodToken" Type="int" Nullable="false" />
     <Property Name="AssemblyFileID" Type="uniqueidentifier" Nullable="false" />
-    <Property Name="LineStart" Type="int" Nullable="false" />
-    <Property Name="ColStart" Type="int" Nullable="false" />
-    <Property Name="LineEnd" Type="int" Nullable="false" />
-    <Property Name="ColEnd" Type="int" Nullable="false" />
+    <Property Name="LineColStart" Type="bigint" Nullable="false" />
+    <Property Name="LineColEnd" Type="bigint" Nullable="false" />
     <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="LabelStartID" Type="uniqueidentifier" Nullable="true" />
     <Property Name="LabelEndID" Type="uniqueidentifier" Nullable="true" />
@@ -281,10 +279,8 @@
           <Property Type="Int32" Name="MethodToken" Nullable="false" />
           <NavigationProperty Name="AssemblyFile" Relationship="DebugModel.AssemblyFileMethod" FromRole="Method" ToRole="AssemblyFile" />
           <Property Type="Guid" Name="AssemblyFileID" Nullable="false" />
-          <Property Type="Int32" Name="LineStart" Nullable="false" />
-          <Property Type="Int32" Name="ColStart" Nullable="false" />
-          <Property Type="Int32" Name="LineEnd" Nullable="false" />
-          <Property Type="Int32" Name="ColEnd" Nullable="false" />
+          <Property Type="Int64" Name="LineColStart" Nullable="false" />
+          <Property Type="Int64" Name="LineColEnd" Nullable="false" />
           <NavigationProperty Name="Document" Relationship="DebugModel.DocumentMethod" FromRole="Method" ToRole="Document" />
           <Property Type="Guid" Name="DocumentID" Nullable="false" />
           <NavigationProperty Name="LabelStart" Relationship="DebugModel.LabelMethod" FromRole="Method" ToRole="Label" />
@@ -438,10 +434,8 @@
           <ScalarProperty Name="TypeToken" ColumnName="TypeToken" />
           <ScalarProperty Name="MethodToken" ColumnName="MethodToken" />
           <ScalarProperty Name="AssemblyFileID" ColumnName="AssemblyFileID" />
-          <ScalarProperty Name="LineStart" ColumnName="LineStart" />
-          <ScalarProperty Name="ColStart" ColumnName="ColStart" />
-          <ScalarProperty Name="LineEnd" ColumnName="LineEnd" />
-          <ScalarProperty Name="ColEnd" ColumnName="ColEnd" />
+          <ScalarProperty Name="LineColStart" ColumnName="LineColStart" />
+          <ScalarProperty Name="LineColEnd" ColumnName="LineColEnd" />
           <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
           <ScalarProperty Name="LabelStartID" ColumnName="LabelStartID" />
           <ScalarProperty Name="LabelEndID" ColumnName="LabelEndID" />
@@ -482,10 +476,10 @@
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="11.375" PointY="2.375" Height="2.3648893229166656" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.5571907552083326" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.9033007812499996" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.7109993489583326" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
-          <ConnectorPoint PointX="2" PointY="1.297841796875" />
-          <ConnectorPoint PointX="2.75" PointY="1.297841796875" />
+          <ConnectorPoint PointX="2" PointY="1.2978417968749998" />
+          <ConnectorPoint PointX="2.75" PointY="1.2978417968749998" />
         </AssociationConnector>
         <EntityTypeShape EntityType="DebugModel.Document" Width="1.5" PointX="0.5" PointY="2.5" Height="1.59568359375" />
         <AssociationConnector Association="DebugModel.DocumentMethod">
@@ -493,16 +487,16 @@
           <ConnectorPoint PointX="2.75" PointY="3.297841796875" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.LabelMethod">
-          <ConnectorPoint PointX="5.875" PointY="1.4901432291666668" />
-          <ConnectorPoint PointX="5" PointY="1.4901432291666668" />
+          <ConnectorPoint PointX="5.875" PointY="1.8560496012369794" />
+          <ConnectorPoint PointX="5" PointY="1.8560496012369794" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.LabelMethodEnd">
-          <ConnectorPoint PointX="5.875" PointY="0.93257161458333337" />
-          <ConnectorPoint PointX="5" PointY="0.93257161458333337" />
+          <ConnectorPoint PointX="5.875" PointY="1.11552480061849" />
+          <ConnectorPoint PointX="5" PointY="1.11552480061849" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.MethodIlOpMethod">
-          <ConnectorPoint PointX="5.875" PointY="3.8603011067708328" />
-          <ConnectorPoint PointX="5" PointY="3.8603011067708328" />
+          <ConnectorPoint PointX="5.875" PointY="3.6679996744791663" />
+          <ConnectorPoint PointX="5" PointY="3.6679996744791663" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>
