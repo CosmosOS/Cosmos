@@ -381,7 +381,7 @@ namespace Cosmos.Debug.Common {
         // Now get all MLSymbols for the method.
         var xSymbols = from x in xDB.MethodIlOps
                        where
-                         x.METHODTOKEN == xSymbol.METHODTOKEN
+                         x.Method.MethodToken == xSymbol.METHODTOKEN
                          && x.ILASMFILE == xSymbol.ILASMFILE
                        orderby x.IlOffset
                        select x;
