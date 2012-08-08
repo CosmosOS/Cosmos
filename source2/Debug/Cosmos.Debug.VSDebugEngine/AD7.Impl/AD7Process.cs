@@ -21,7 +21,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected EngineCallback mCallback;
     public AD7Thread mThread;
     protected AD7Engine mEngine;
-    public ReverseSourceInfos mReverseSourceMappings;
     public SourceInfos mSourceInfos;
     public UInt32? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
@@ -175,7 +174,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (mSourceInfos.Count == 0) {
         throw new Exception("Debug data not found: SourceMappings");
       }
-      mReverseSourceMappings = new ReverseSourceInfos(mSourceInfos);
 
       CreateDebugConnector();
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);
