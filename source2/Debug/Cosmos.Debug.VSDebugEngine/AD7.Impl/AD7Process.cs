@@ -21,7 +21,6 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected EngineCallback mCallback;
     public AD7Thread mThread;
     protected AD7Engine mEngine;
-    public SourceInfos mSourceInfos;
     public UInt32? mCurrentAddress = null;
     protected readonly NameValueCollection mDebugInfo;
     protected LaunchType mLaunch;
@@ -169,11 +168,6 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       mDebugInfoDb = new DebugInfo(xDbPath);
       mDebugInfoDb.LoadLookups();
-
-      mSourceInfos = SourceInfo.GetSourceInfo(mDebugInfoDb);
-      if (mSourceInfos.Count == 0) {
-        throw new Exception("Debug data not found: SourceMappings");
-      }
 
       CreateDebugConnector();
       aEngine.BPMgr.SetDebugConnector(mDbgConnector);

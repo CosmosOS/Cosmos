@@ -95,45 +95,52 @@ namespace Cosmos.Debug.VSDebugEngine {
 
           UInt32 xAddress = 0;
           var xDebugInfo = mEngine.mProcess.mDebugInfoDb;
-          var xDocID = xDebugInfo.DocumentGUIDs[xDocName];
-          using (var xDB = xDebugInfo.DB()) {
-            // Find which Method the Doc, Line, Col are in.
-            // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
-            // () around << are VERY important.. + has precedence over <<
-            Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
-            var xQry = from x in xDB.Methods
-                       where x.DocumentID == xDocID
-                          && x.LineColStart <= xPos
-                          && x.LineColEnd >= xPos
-                       select new { x.ID, x.AssemblyFile.Pathname, x.MethodToken };
-            var xMethod = xQry.Single();
 
-            // We have the method. Now find out what Sequence Point it belongs to.
-            var xSPs = xDebugInfo.GetSequencePoints(xMethod.Pathname, xMethod.MethodToken);
-            var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
+          // We must check for DocID. This is important because in a solution that contains many projects,
+          // VS will send us BPs from other Cosmos projects (and possibly non Cosmos ones, didnt look that deep)
+          // but we wont have them in our doc list because it contains only ones from the currently project
+          // to run.
+          Guid xDocID;
+          if (xDebugInfo.DocumentGUIDs.TryGetValue(xDocName, out xDocID)) {
+            using (var xDB = xDebugInfo.DB()) {
+              // Find which Method the Doc, Line, Col are in.
+              // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
+              // () around << are VERY important.. + has precedence over <<
+              Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
+              var xQry = from x in xDB.Methods
+                         where x.DocumentID == xDocID
+                            && x.LineColStart <= xPos
+                            && x.LineColEnd >= xPos
+                         select new { x.ID, x.AssemblyFile.Pathname, x.MethodToken };
+              var xMethod = xQry.Single();
 
-            // We have the Sequence Point, find the MethodILOp
-            var xOp = xDB.MethodIlOps.Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset).Single();
+              // We have the method. Now find out what Sequence Point it belongs to.
+              var xSPs = xDebugInfo.GetSequencePoints(xMethod.Pathname, xMethod.MethodToken);
+              var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
 
-            // Get the address of the Label
-            xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
-          }
+              // We have the Sequence Point, find the MethodILOp
+              var xOp = xDB.MethodIlOps.Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset).Single();
 
-          if (xAddress > 0) {
-            var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
-            var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
-            mBoundBPs.Add(xBBP);
-          }
+              // Get the address of the Label
+              xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
+            }
 
-          // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
-          //uint[] addresses = mEngine.DebuggedProcess.GetAddressesForSourceLocation(null, documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn);
-          lock (mBoundBPs) {
-            //foreach (uint addr in addresses) {
-            //    AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(mEngine, addr, GetDocumentContext(addr));
-            //    AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(mEngine, addr, this, breakpointResolution);
-            //    m_boundBreakpoints.Add(boundBreakpoint);
-            //    mEngine.DebuggedProcess.SetBreakpoint(addr, boundBreakpoint);
-            //}
+            if (xAddress > 0) {
+              var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
+              var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
+              mBoundBPs.Add(xBBP);
+            }
+
+            // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
+            //uint[] addresses = mEngine.DebuggedProcess.GetAddressesForSourceLocation(null, documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn);
+            lock (mBoundBPs) {
+              //foreach (uint addr in addresses) {
+              //    AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(mEngine, addr, GetDocumentContext(addr));
+              //    AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(mEngine, addr, this, breakpointResolution);
+              //    m_boundBreakpoints.Add(boundBreakpoint);
+              //    mEngine.DebuggedProcess.SetBreakpoint(addr, boundBreakpoint);
+              //}
+            }
           }
           return VSConstants.S_OK;
         } else {
