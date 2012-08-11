@@ -920,11 +920,6 @@ namespace Cosmos.IL2CPU {
             xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
           }
         }
-        try {
-          xMLSymbol.ILASMFILE = aMethod.MethodBase.DeclaringType.Assembly.Location;
-        } catch (NotSupportedException) {
-          xMLSymbol.ILASMFILE = "DYNAMIC: " + aMethod.MethodBase.DeclaringType.Assembly.FullName;
-        }
         xMLSymbol.METHODTOKEN = aMethod.MethodBase.MetadataToken;
         xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
         xMLSymbol.IlOffset = aOpCode.Position;

@@ -1546,18 +1546,16 @@ namespace Cosmos.Debug.Common
         /// <param name="id">Initial value of the ID property.</param>
         /// <param name="labelName">Initial value of the LabelName property.</param>
         /// <param name="stackDiff">Initial value of the StackDiff property.</param>
-        /// <param name="iLASMFILE">Initial value of the ILASMFILE property.</param>
         /// <param name="tYPETOKEN">Initial value of the TYPETOKEN property.</param>
         /// <param name="mETHODTOKEN">Initial value of the METHODTOKEN property.</param>
         /// <param name="ilOffset">Initial value of the IlOffset property.</param>
         /// <param name="mETHODNAME">Initial value of the METHODNAME property.</param>
-        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.String iLASMFILE, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 ilOffset, global::System.String mETHODNAME)
+        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 ilOffset, global::System.String mETHODNAME)
         {
             MethodIlOp methodIlOp = new MethodIlOp();
             methodIlOp.ID = id;
             methodIlOp.LabelName = labelName;
             methodIlOp.StackDiff = stackDiff;
-            methodIlOp.ILASMFILE = iLASMFILE;
             methodIlOp.TYPETOKEN = tYPETOKEN;
             methodIlOp.METHODTOKEN = mETHODTOKEN;
             methodIlOp.IlOffset = ilOffset;
@@ -1642,30 +1640,6 @@ namespace Cosmos.Debug.Common
         private global::System.Int32 _StackDiff;
         partial void OnStackDiffChanging(global::System.Int32 value);
         partial void OnStackDiffChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String ILASMFILE
-        {
-            get
-            {
-                return _ILASMFILE;
-            }
-            set
-            {
-                OnILASMFILEChanging(value);
-                ReportPropertyChanging("ILASMFILE");
-                _ILASMFILE = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("ILASMFILE");
-                OnILASMFILEChanged();
-            }
-        }
-        private global::System.String _ILASMFILE;
-        partial void OnILASMFILEChanging(global::System.String value);
-        partial void OnILASMFILEChanged();
     
         /// <summary>
         /// No Metadata Documentation available.

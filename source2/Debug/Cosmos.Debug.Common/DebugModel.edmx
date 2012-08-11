@@ -79,7 +79,6 @@
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="StackDiff" Type="int" Nullable="false" />
-    <Property Name="ILASMFILE" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="TYPETOKEN" Type="int" Nullable="false" />
     <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="IlOffset" Type="int" Nullable="false" />
@@ -254,7 +253,6 @@
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="LabelName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="StackDiff" Type="Int32" Nullable="false" />
-          <Property Name="ILASMFILE" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="TYPETOKEN" Type="Int32" Nullable="false" />
           <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="IlOffset" Type="Int32" Nullable="false" />
@@ -410,7 +408,6 @@
           <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="LabelName" ColumnName="LabelName" />
           <ScalarProperty Name="StackDiff" ColumnName="StackDiff" />
-          <ScalarProperty Name="ILASMFILE" ColumnName="ILASMFILE" />
           <ScalarProperty Name="TYPETOKEN" ColumnName="TYPETOKEN" />
           <ScalarProperty Name="METHODTOKEN" ColumnName="METHODTOKEN" />
           <ScalarProperty Name="IlOffset" ColumnName="IlOffset" />
@@ -470,11 +467,11 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="DebugModel">
-        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="11.375" PointY="0.5" Height="1.787985026041667" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="11.5" PointY="5" Height="1.59568359375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_INFO" Width="1.5" PointX="9.625" PointY="0.5" Height="1.787985026041667" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="9.5" PointY="5" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="5.875" PointY="0.5" Height="1.9802864583333335" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="11.375" PointY="2.375" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.5571907552083326" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="9.625" PointY="2.5" Height="2.3648893229166656" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.7494921874999996" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" />
         <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.7109993489583326" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
@@ -495,8 +492,8 @@
           <ConnectorPoint PointX="5" PointY="1.11552480061849" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.MethodIlOpMethod">
-          <ConnectorPoint PointX="5.875" PointY="3.6679996744791663" />
-          <ConnectorPoint PointX="5" PointY="3.6679996744791663" />
+          <ConnectorPoint PointX="5.875" PointY="3.6679996744791659" />
+          <ConnectorPoint PointX="5" PointY="3.6679996744791659" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>
