@@ -25,7 +25,9 @@ namespace Cosmos.Debug.VSDebugEngine {
     protected readonly NameValueCollection mDebugInfo;
     protected LaunchType mLaunch;
     internal DebugInfo mDebugInfoDb;
-    private int mProcessExitEventSent = 0;
+    protected int mProcessExitEventSent = 0;
+    // Cached stack frame. See comments in AD7Thread regading this.
+    public IEnumDebugFrameInfo2 mStackFrame;
 
     // Connection to target environment. Usually serial but is
     // abstracted to allow other transports (ethernet, etc)
@@ -261,6 +263,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
 
+      mStackFrame = null;
       mCurrentAddress = aAddress;
       if (xBoundBreakpoints.Count == 0) {
         // if no matching breakpoints are found then its one of the following:
