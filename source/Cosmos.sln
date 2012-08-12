@@ -213,9 +213,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeDebugWrappers", "..\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "corapi", "..\source2\MDbg4\src\debugger\corapi\corapi.csproj", "{04EF9865-E1B1-403D-802B-E4FAEA50A634}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu.Hive", "..\source2\Users\Kudzu\Hive\Kudzu.Hive\Kudzu.Hive.csproj", "{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 57
+		SccNumberOfProjects = 58
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -445,6 +447,10 @@ Global
 		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
 		SccProjectName56 = ../source2/MDbg4/src/debugger/corapi
 		SccLocalPath56 = ..\\source2\\MDbg4\\src\\debugger\\corapi
+		SccProjectUniqueName57 = ..\\source2\\Users\\Kudzu\\Hive\\Kudzu.Hive\\Kudzu.Hive.csproj
+		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
+		SccProjectName57 = ../source2/Users/Kudzu/Hive/Kudzu.Hive
+		SccLocalPath57 = ..\\source2\\Users\\Kudzu\\Hive\\Kudzu.Hive
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1073,6 +1079,16 @@ Global
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1100,7 +1116,6 @@ Global
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{76CDB55D-55E3-4B53-AE33-12EC31430826} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{C4941654-3D7A-484B-9F5C-3D331AB8F585} = {1698DD83-72A3-44CD-B088-4320A4014A95}
-		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{2DF5F17F-4890-4856-ADFD-4DE23282C3B7} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{4831F868-2418-4277-A91F-4F599604CB29} = {A4478219-065D-4928-BB4D-4358CAD39A03}
@@ -1108,6 +1123,7 @@ Global
 		{CD291145-6AD0-41CD-9986-2044F41660DE} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{3EEE2ABA-87B3-4DD7-B6C5-BEF23D411136} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
+		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
