@@ -80,7 +80,6 @@
     <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="StackDiff" Type="int" Nullable="false" />
     <Property Name="IlOffset" Type="int" Nullable="false" />
-    <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="MethodID" Type="uniqueidentifier" Nullable="true" />
   </EntityType>
   <EntityType Name="AssemblyFiles">
@@ -253,7 +252,6 @@
           <Property Name="LabelName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="StackDiff" Type="Int32" Nullable="false" />
           <Property Name="IlOffset" Type="Int32" Nullable="false" />
-          <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="Method" Relationship="DebugModel.MethodIlOpMethod" FromRole="MethodIlOp" ToRole="Method" />
           <Property Type="Guid" Name="MethodID" Nullable="true" />
         </EntityType>
@@ -407,7 +405,6 @@
           <ScalarProperty Name="LabelName" ColumnName="LabelName" />
           <ScalarProperty Name="StackDiff" ColumnName="StackDiff" />
           <ScalarProperty Name="IlOffset" ColumnName="IlOffset" />
-          <ScalarProperty Name="METHODNAME" ColumnName="METHODNAME" />
           <ScalarProperty Name="MethodID" ColumnName="MethodID" />
         </MappingFragment>
       </EntityTypeMapping>
@@ -468,7 +465,7 @@
         <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="9.5" PointY="5" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="5.875" PointY="0.5" Height="1.9802864583333335" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="9.625" PointY="2.5" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.3648893229166665" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.1725878906249996" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" />
         <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.9033007812499996" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">

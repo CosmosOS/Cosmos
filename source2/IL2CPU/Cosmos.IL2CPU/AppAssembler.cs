@@ -909,7 +909,6 @@ namespace Cosmos.IL2CPU {
       if (mSymbols != null) {
         var xMLSymbol = new MethodIlOp();
         xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
-        xMLSymbol.METHODNAME = aMethod.MethodBase.GetFullName();
 
         var xStackSize = (from item in Assembler.Stack
                           let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))

@@ -1573,15 +1573,13 @@ namespace Cosmos.Debug.Common
         /// <param name="labelName">Initial value of the LabelName property.</param>
         /// <param name="stackDiff">Initial value of the StackDiff property.</param>
         /// <param name="ilOffset">Initial value of the IlOffset property.</param>
-        /// <param name="mETHODNAME">Initial value of the METHODNAME property.</param>
-        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.Int32 ilOffset, global::System.String mETHODNAME)
+        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.Int32 ilOffset)
         {
             MethodIlOp methodIlOp = new MethodIlOp();
             methodIlOp.ID = id;
             methodIlOp.LabelName = labelName;
             methodIlOp.StackDiff = stackDiff;
             methodIlOp.IlOffset = ilOffset;
-            methodIlOp.METHODNAME = mETHODNAME;
             return methodIlOp;
         }
 
@@ -1686,30 +1684,6 @@ namespace Cosmos.Debug.Common
         private global::System.Int32 _IlOffset;
         partial void OnIlOffsetChanging(global::System.Int32 value);
         partial void OnIlOffsetChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String METHODNAME
-        {
-            get
-            {
-                return _METHODNAME;
-            }
-            set
-            {
-                OnMETHODNAMEChanging(value);
-                ReportPropertyChanging("METHODNAME");
-                _METHODNAME = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("METHODNAME");
-                OnMETHODNAMEChanged();
-            }
-        }
-        private global::System.String _METHODNAME;
-        partial void OnMETHODNAMEChanging(global::System.String value);
-        partial void OnMETHODNAMEChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
