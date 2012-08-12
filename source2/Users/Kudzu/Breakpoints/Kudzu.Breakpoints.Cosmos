@@ -6,7 +6,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3eee2aba-87b3-4dd7-b6c5-bef23d411136}</ProjectGuid>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <Name>Playground.Kudzu.Breakpoints</Name>
+    <Name>Kudzu.Breakpoints</Name>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
@@ -58,8 +58,8 @@
       <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Breakpoints\Playground.Kudzu.BreakpointsKernel.csproj">
-      <Name>Playground.Kudzu.BreakpointsKernel</Name>
+    <ProjectReference Include="..\Breakpoints\Kudzu.BreakpointsKernel.csproj">
+      <Name>Kudzu.BreakpointsKernel</Name>
       <Project>{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</Project>
       <Private>True</Private>
     </ProjectReference>

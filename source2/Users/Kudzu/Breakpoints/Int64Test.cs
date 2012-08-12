@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Playground.Kudzu.BreakpointsKernel {
+namespace Kudzu.BreakpointsKernel {
   public class Int64Test : Test {
 
     public override void Run() {

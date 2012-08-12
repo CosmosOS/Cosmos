@@ -8,7 +8,7 @@ using Cosmos.Common.Extensions;
 using Cosmos.Hardware.BlockDevice;
 using FAT = Cosmos.System.Filesystem.FAT;
 
-namespace Playground.Kudzu.BreakpointsKernel {
+namespace Kudzu.BreakpointsKernel {
   public class BreakpointsOS : Sys.Kernel {
     public BreakpointsOS() {
       ClearScreen = false;
