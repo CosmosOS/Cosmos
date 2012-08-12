@@ -79,8 +79,6 @@
     <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="StackDiff" Type="int" Nullable="false" />
-    <Property Name="TYPETOKEN" Type="int" Nullable="false" />
-    <Property Name="METHODTOKEN" Type="int" Nullable="false" />
     <Property Name="IlOffset" Type="int" Nullable="false" />
     <Property Name="METHODNAME" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="MethodID" Type="uniqueidentifier" Nullable="true" />
@@ -105,6 +103,7 @@
     <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="LabelStartID" Type="uniqueidentifier" Nullable="true" />
     <Property Name="LabelEndID" Type="uniqueidentifier" Nullable="true" />
+    <Property Name="LabelCall" Type="nvarchar" Nullable="false" MaxLength="256" />
   </EntityType>
   <EntityType Name="Documents">
     <Key>
@@ -253,8 +252,6 @@
           <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="LabelName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="StackDiff" Type="Int32" Nullable="false" />
-          <Property Name="TYPETOKEN" Type="Int32" Nullable="false" />
-          <Property Name="METHODTOKEN" Type="Int32" Nullable="false" />
           <Property Name="IlOffset" Type="Int32" Nullable="false" />
           <Property Name="METHODNAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="Method" Relationship="DebugModel.MethodIlOpMethod" FromRole="MethodIlOp" ToRole="Method" />
@@ -286,6 +283,7 @@
           <NavigationProperty Name="LabelEnd" Relationship="DebugModel.LabelMethodEnd" FromRole="Method" ToRole="Label" />
           <Property Type="Guid" Name="LabelEndID" Nullable="true" />
           <NavigationProperty Name="MethodIlOps" Relationship="DebugModel.MethodIlOpMethod" FromRole="Method" ToRole="MethodIlOp" />
+          <Property Type="String" Name="LabelCall" Nullable="false" MaxLength="256" />
         </EntityType>
         <Association Name="AssemblyFileMethod">
           <End Type="DebugModel.AssemblyFile" Role="AssemblyFile" Multiplicity="1" />
@@ -408,8 +406,6 @@
           <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="LabelName" ColumnName="LabelName" />
           <ScalarProperty Name="StackDiff" ColumnName="StackDiff" />
-          <ScalarProperty Name="TYPETOKEN" ColumnName="TYPETOKEN" />
-          <ScalarProperty Name="METHODTOKEN" ColumnName="METHODTOKEN" />
           <ScalarProperty Name="IlOffset" ColumnName="IlOffset" />
           <ScalarProperty Name="METHODNAME" ColumnName="METHODNAME" />
           <ScalarProperty Name="MethodID" ColumnName="MethodID" />
@@ -436,6 +432,7 @@
           <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
           <ScalarProperty Name="LabelStartID" ColumnName="LabelStartID" />
           <ScalarProperty Name="LabelEndID" ColumnName="LabelEndID" />
+          <ScalarProperty Name="LabelCall" ColumnName="LabelCall" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -471,9 +468,9 @@
         <EntityTypeShape EntityType="DebugModel.FIELD_MAPPING" Width="1.5" PointX="9.5" PointY="5" Height="1.59568359375" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.Label" Width="1.5" PointX="5.875" PointY="0.5" Height="1.9802864583333335" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.LOCAL_ARGUMENT_INFO" Width="1.5" PointX="9.625" PointY="2.5" Height="2.3648893229166656" IsExpanded="true" />
-        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.7494921874999996" IsExpanded="true" />
+        <EntityTypeShape EntityType="DebugModel.MethodIlOp" Width="1.5" PointX="5.875" PointY="3.125" Height="2.3648893229166665" IsExpanded="true" />
         <EntityTypeShape EntityType="DebugModel.AssemblyFile" Width="1.5" PointX="0.5" PointY="0.5" Height="1.59568359375" />
-        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.7109993489583326" />
+        <EntityTypeShape EntityType="DebugModel.Method" Width="2.25" PointX="2.75" PointY="0.5" Height="3.9033007812499996" />
         <AssociationConnector Association="DebugModel.AssemblyFileMethod">
           <ConnectorPoint PointX="2" PointY="1.2978417968749998" />
           <ConnectorPoint PointX="2.75" PointY="1.2978417968749998" />
@@ -484,16 +481,16 @@
           <ConnectorPoint PointX="2.75" PointY="3.297841796875" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.LabelMethod">
-          <ConnectorPoint PointX="5.875" PointY="1.8560496012369794" />
-          <ConnectorPoint PointX="5" PointY="1.8560496012369794" />
+          <ConnectorPoint PointX="5.875" PointY="1.8604056294759117" />
+          <ConnectorPoint PointX="5" PointY="1.8604056294759117" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.LabelMethodEnd">
-          <ConnectorPoint PointX="5.875" PointY="1.11552480061849" />
-          <ConnectorPoint PointX="5" PointY="1.11552480061849" />
+          <ConnectorPoint PointX="5.875" PointY="1.1177028147379557" />
+          <ConnectorPoint PointX="5" PointY="1.1177028147379557" />
         </AssociationConnector>
         <AssociationConnector Association="DebugModel.MethodIlOpMethod">
-          <ConnectorPoint PointX="5.875" PointY="3.6679996744791659" />
-          <ConnectorPoint PointX="5" PointY="3.6679996744791659" />
+          <ConnectorPoint PointX="5.875" PointY="3.764150390625" />
+          <ConnectorPoint PointX="5" PointY="3.764150390625" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>

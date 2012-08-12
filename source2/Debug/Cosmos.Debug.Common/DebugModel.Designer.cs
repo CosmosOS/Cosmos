@@ -1114,7 +1114,8 @@ namespace Cosmos.Debug.Common
         /// <param name="lineColStart">Initial value of the LineColStart property.</param>
         /// <param name="lineColEnd">Initial value of the LineColEnd property.</param>
         /// <param name="documentID">Initial value of the DocumentID property.</param>
-        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int64 lineColStart, global::System.Int64 lineColEnd, global::System.Guid documentID)
+        /// <param name="labelCall">Initial value of the LabelCall property.</param>
+        public static Method CreateMethod(global::System.Guid id, global::System.Int32 typeToken, global::System.Int32 methodToken, global::System.Guid assemblyFileID, global::System.Int64 lineColStart, global::System.Int64 lineColEnd, global::System.Guid documentID, global::System.String labelCall)
         {
             Method method = new Method();
             method.ID = id;
@@ -1124,6 +1125,7 @@ namespace Cosmos.Debug.Common
             method.LineColStart = lineColStart;
             method.LineColEnd = lineColEnd;
             method.DocumentID = documentID;
+            method.LabelCall = labelCall;
             return method;
         }
 
@@ -1348,6 +1350,30 @@ namespace Cosmos.Debug.Common
         private Nullable<global::System.Guid> _LabelEndID;
         partial void OnLabelEndIDChanging(Nullable<global::System.Guid> value);
         partial void OnLabelEndIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String LabelCall
+        {
+            get
+            {
+                return _LabelCall;
+            }
+            set
+            {
+                OnLabelCallChanging(value);
+                ReportPropertyChanging("LabelCall");
+                _LabelCall = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("LabelCall");
+                OnLabelCallChanged();
+            }
+        }
+        private global::System.String _LabelCall;
+        partial void OnLabelCallChanging(global::System.String value);
+        partial void OnLabelCallChanged();
 
         #endregion
     
@@ -1546,18 +1572,14 @@ namespace Cosmos.Debug.Common
         /// <param name="id">Initial value of the ID property.</param>
         /// <param name="labelName">Initial value of the LabelName property.</param>
         /// <param name="stackDiff">Initial value of the StackDiff property.</param>
-        /// <param name="tYPETOKEN">Initial value of the TYPETOKEN property.</param>
-        /// <param name="mETHODTOKEN">Initial value of the METHODTOKEN property.</param>
         /// <param name="ilOffset">Initial value of the IlOffset property.</param>
         /// <param name="mETHODNAME">Initial value of the METHODNAME property.</param>
-        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.Int32 tYPETOKEN, global::System.Int32 mETHODTOKEN, global::System.Int32 ilOffset, global::System.String mETHODNAME)
+        public static MethodIlOp CreateMethodIlOp(global::System.Guid id, global::System.String labelName, global::System.Int32 stackDiff, global::System.Int32 ilOffset, global::System.String mETHODNAME)
         {
             MethodIlOp methodIlOp = new MethodIlOp();
             methodIlOp.ID = id;
             methodIlOp.LabelName = labelName;
             methodIlOp.StackDiff = stackDiff;
-            methodIlOp.TYPETOKEN = tYPETOKEN;
-            methodIlOp.METHODTOKEN = mETHODTOKEN;
             methodIlOp.IlOffset = ilOffset;
             methodIlOp.METHODNAME = mETHODNAME;
             return methodIlOp;
@@ -1640,54 +1662,6 @@ namespace Cosmos.Debug.Common
         private global::System.Int32 _StackDiff;
         partial void OnStackDiffChanging(global::System.Int32 value);
         partial void OnStackDiffChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 TYPETOKEN
-        {
-            get
-            {
-                return _TYPETOKEN;
-            }
-            set
-            {
-                OnTYPETOKENChanging(value);
-                ReportPropertyChanging("TYPETOKEN");
-                _TYPETOKEN = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("TYPETOKEN");
-                OnTYPETOKENChanged();
-            }
-        }
-        private global::System.Int32 _TYPETOKEN;
-        partial void OnTYPETOKENChanging(global::System.Int32 value);
-        partial void OnTYPETOKENChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Int32 METHODTOKEN
-        {
-            get
-            {
-                return _METHODTOKEN;
-            }
-            set
-            {
-                OnMETHODTOKENChanging(value);
-                ReportPropertyChanging("METHODTOKEN");
-                _METHODTOKEN = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("METHODTOKEN");
-                OnMETHODTOKENChanged();
-            }
-        }
-        private global::System.Int32 _METHODTOKEN;
-        partial void OnMETHODTOKENChanging(global::System.Int32 value);
-        partial void OnMETHODTOKENChanged();
     
         /// <summary>
         /// No Metadata Documentation available.

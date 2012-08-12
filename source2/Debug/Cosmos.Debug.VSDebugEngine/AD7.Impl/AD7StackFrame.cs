@@ -59,7 +59,7 @@ namespace Cosmos.Debug.VSDebugEngine {
               string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
               xSymbolInfo = xDB.MethodIlOps.Where(q => q.LabelName == xLabel).FirstOrDefault();
               if (xSymbolInfo != null) {
-                var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.METHODNAME);
+                var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.Method.LabelCall);
                 mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
                 mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
                 if (mArgumentInfos.Length > 0) {

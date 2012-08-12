@@ -106,8 +106,11 @@ namespace Cosmos.IL2CPU {
             ID = mCurrentMethodGuid,
             TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
             MethodToken = aMethod.MethodBase.MetadataToken,
+
             LabelStartID = xLabelGuid,
             LabelEndID = mCurrentMethodLabelEndGuid,
+            LabelCall = xMethodLabel,
+
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
             DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
             
@@ -920,8 +923,6 @@ namespace Cosmos.IL2CPU {
             xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
           }
         }
-        xMLSymbol.METHODTOKEN = aMethod.MethodBase.MetadataToken;
-        xMLSymbol.TYPETOKEN = aMethod.MethodBase.DeclaringType.MetadataToken;
         xMLSymbol.IlOffset = aOpCode.Position;
         xMLSymbol.MethodID = mCurrentMethodGuid;
 

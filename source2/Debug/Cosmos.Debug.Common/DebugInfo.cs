@@ -430,7 +430,7 @@ namespace Cosmos.Debug.Common {
                 LineEnd = xCodeEndLines[xIdx],
                 Column = xCodeColumns[xIdx],
                 ColumnEnd = xCodeEndColumns[xIdx],
-                MethodName = xSymbol.METHODNAME
+                MethodName = xSymbol.Method.LabelCall
               };
               xResult.Add(xAddress, xSourceInfo);
             }
