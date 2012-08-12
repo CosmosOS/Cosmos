@@ -12,7 +12,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     readonly AD7Engine mEngine;
     //readonly DebuggedThread m_debuggedThread;
     const string ThreadNameString = "Cosmos Kernel Main Thread";
-    private AD7Process mProcess;
+    protected AD7Process mProcess;
 
     public AD7Thread(AD7Engine aEngine, AD7Process aProcess) { //, DebuggedThread debuggedThread)
       mEngine = aEngine;
@@ -21,9 +21,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     string GetCurrentLocation(bool fIncludeModuleName) {
       uint ip = 0;// GetThreadContext().eip;
-      string location = mEngine.GetAddressDescription(ip);
-
-      return location;
+      return mEngine.GetAddressDescription(ip);
     }
 
     #region IDebugThread2 Members
@@ -39,44 +37,37 @@ namespace Cosmos.Debug.VSDebugEngine {
     // and coverting that to an implementation of IEnumDebugFrameInfo2. 
     // Real engines will most likely want to cache this information to avoid recomputing it each time it is asked for,
     // and or construct it on demand instead of walking the entire stack.
-    int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 enumObject) {
+    int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS aFieldSpec, uint aRadix, out IEnumDebugFrameInfo2 oEnumObject) {
       // Ask the lower-level to perform a stack walk on this thread
       //m_engine.DebuggedProcess.DoStackWalk(this.m_debuggedThread);
-      enumObject = null;
-
+      oEnumObject = null;
       try {
         //System.Collections.Generic.List<X86ThreadContext> stackFrames = this.m_debuggedThread.StackFrames;
         //int numStackFrames = stackFrames.Count;
-        FRAMEINFO[] frameInfoArray;
+        FRAMEINFO[] xFrameInfoArray;
 
-        //if (numStackFrames == 0)
-        {
-          // failed to walk any frames. Only return the top frame.
-          frameInfoArray = new FRAMEINFO[1];
-          AD7StackFrame frame = new AD7StackFrame(mEngine, this, mProcess);
-          frame.SetFrameInfo((enum_FRAMEINFO_FLAGS)dwFieldSpec, out frameInfoArray[0]);
-        }
-        //else
-        {
-          //frameInfoArray = new FRAMEINFO[numStackFrames];
+        //if (numStackFrames == 0) {
+        // failed to walk any frames. Only return the top frame.
+        xFrameInfoArray = new FRAMEINFO[1];
+        AD7StackFrame xFrame = new AD7StackFrame(mEngine, this, mProcess);
+        xFrame.SetFrameInfo((enum_FRAMEINFO_FLAGS)aFieldSpec, out xFrameInfoArray[0]);
+        //} else {
+        //frameInfoArray = new FRAMEINFO[numStackFrames];
 
-          //for (int i = 0; i < numStackFrames; i++)
-          {
-            //AD7StackFrame frame = new AD7StackFrame(m_engine, this, stackFrames[i]);
-            //frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
-          }
-        }
+        //for (int i = 0; i < numStackFrames; i++) {
+        //AD7StackFrame frame = new AD7StackFrame(m_engine, this, stackFrames[i]);
+        //frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
+        //}
+        //}
 
-        enumObject = new AD7FrameInfoEnum(frameInfoArray);
-        return VSConstants.S_OK;
-      }
-        //catch (ComponentException e)
-        //{
+        oEnumObject = new AD7FrameInfoEnum(xFrameInfoArray);
+      } catch (Exception e) {
+        //catch (ComponentException e) {
         //    return e.HResult;
         //}
-      catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
+      return VSConstants.S_OK;
     }
 
     // Get the name of the thread. For the sample engine, the name of the thread is always "Sample Engine Thread"
