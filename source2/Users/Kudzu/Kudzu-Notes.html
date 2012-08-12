@@ -4,21 +4,6 @@
     <h3>
     Kudzu</h3>
     <ul>
-                                    <li>Lazy load sourceinfos!</li>
-                                    <li>Find out which tables in EF are still used.</li>
-                                    <li>Label type - IL / not... log only IL labels? Do we use asm labels?<ul>
-                                        <li>Keep map file and log line position for lookup to reduce insert times? needed at 
-                                            all?</li>
-                                        <li>Label as ID instead of big name - Do we parse them anywhere?</li>
-                                        </ul>
-                                    </li>
-                                    <li>SourceInfo / Reverse<ul>
-                                        <li>Put into DB</li>
-                                        <li>SourceInfos GetSourceInfo is wicked slow</li>
-                                        <li>Labelname - Use asm line number as a key? Then remove index on labelname - comment these 
-                                            about insert</li>
-                                        </ul>
-                                    </li>
                                     <li>ATA / FAT</li>
                                     <li>Asm stepping<ul>
                                         <li>Historical registers and stack</li>
@@ -38,6 +23,22 @@
                                     <li>OutputDebug Catcher with filters, categories, timestamps<li>Increase speed of DebugStub / lower impact</li>
                                     <li>DS Ping or set a breakpoint while not in a break state will hang VS.<ul>
                                         <li>This is because its waiting on some other command to release?</li>
+                                        </ul>
+                                    </li>
+                                    <li>Compile / Build speed. Current slow areas. Time each of these.<ul>
+                                        <li>IL2CPUTask<ul>
+                                            <li>xScanner.Execute(xInitMethod); - This used to be faster... something has slowed 
+                                                this down. What?</li>
+                                            <li>Cosmos.Debug.Common - new DebugInfo(xOutputFilename + &quot;.mdf&quot;, true) - Takes 
+                                                longer than Id like. But its SQL... not sure if we can do much. Maybe could do a 
+                                                copy of raw file? Or is the problem SQL local startup time? If so would using 
+                                                express solve this?</li>
+                                            </ul>
+                                        </li>
+                                        <li>ExtractMapFromElfFile - SQL is slow on inserts. Only store GUID labels. Add .asm 
+                                            file position and when we need a label in between, parse just those parts of ASM 
+                                            to get them. Also if we do this, probably dont need to store actual label name 
+                                            at all.</li>
                                         </ul>
                                     </li>
                                     <li>Watches<ul>

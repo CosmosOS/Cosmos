@@ -165,9 +165,6 @@ namespace Cosmos.Build.MSBuild {
           if (DebugEnabled == false) {
             xAsm.ShouldOptimize = true;
           }
-          #if OUTPUT_ELF
-          xAsm.EmitELF = true;
-          #endif
 
           xAsm.Assembler.Initialize();
           using (var xScanner = new ILScanner(xAsm)) {
