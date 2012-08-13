@@ -62,15 +62,11 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
 		public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable) {
 		}
 
-        [PlugMethod(Assembler = typeof(Assemblers.Array_get_Length))]
-		public static int get_Length(Array aThis) {
+    //[PlugMethod(Assembler = typeof(Assemblers.Array_get_Length))]
+		//public static int get_Length(Array aThis) {
       //aThis += 2;
       //return *aThis;
-      //throw new NotImplementedException("Array.get_Length is not implemented!");
-            Console.WriteLine("Array.get_Length is not implemented!");
-            while (true) ;
-			//
-		}
+		//}
 
 		public static int get_Rank(int aThis) {
 			return 1;

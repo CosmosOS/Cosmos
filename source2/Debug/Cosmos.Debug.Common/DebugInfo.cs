@@ -33,13 +33,14 @@ namespace Cosmos.Debug.Common {
     protected string mConnStr;
     protected System.Data.Metadata.Edm.MetadataWorkspace mWorkspace;
 
-    public void DeleteDB() {
+    public void DeleteDB(string aDbName, string aPathname) {
       using (var xConn = new SqlConnection(mConnStrBase)) {
+        // Open connection to master
         xConn.Open();
 
         bool xExists = false;
         using (var xCmd = xConn.CreateCommand()) {
-          xCmd.CommandText = "select * from sys.databases where name = '" + mDbName + "'";
+          xCmd.CommandText = "select * from sys.databases where name = '" + aDbName + "'";
           using (var xReader = xCmd.ExecuteReader()) {
             xExists = xReader.Read();
           }
@@ -48,31 +49,39 @@ namespace Cosmos.Debug.Common {
         if (xExists) {
           // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
           using (var xCmd = xConn.CreateCommand()) {
-            xCmd.CommandText = "ALTER DATABASE " + mDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
+            xCmd.CommandText = "ALTER DATABASE " + aDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
             xCmd.ExecuteNonQuery();
           }
           // Yes this throws an exception if the database doesnt exist, so we have to
           // run it only if we know it exists.
           // This will detach and also delete the physica files.
           using (var xCmd = xConn.CreateCommand()) {
-            xCmd.CommandText = "DROP DATABASE " + mDbName;
+            xCmd.CommandText = "DROP DATABASE " + aDbName;
             xCmd.ExecuteNonQuery();
           }
         }
       }
+
+      // By now DB file should be gone. But sometimes when there are errors, it wont be in the catalog
+      // above, but the file will be there. So just in case, if it exsits we delete it here if found.
+      File.Delete(aPathname);
+      // SQL Express and Local create the log file differently. Once creates .ldf, while other does _log.ldf.
+      File.Delete(Path.ChangeExtension(aPathname, "ldf"));
+      File.Delete(Path.Combine(Path.GetDirectoryName(aPathname), Path.GetFileNameWithoutExtension(aPathname) + "_LOG.ldf"));
     }
 
     public DebugInfo(string aPathname, bool aCreate = false) {
       CurrentInstance = this;
 
       mDbName = Path.GetFileNameWithoutExtension(aPathname);
-      // SQL doesnt like - in db names.
-      mDbName = mDbName.Replace("-", ""); ;
+      // SQL doesnt like these in DB names.
+      mDbName = mDbName.Replace("-", "_"); ;
+      mDbName = mDbName.Replace(".", "_"); ;
 
       mConnStrBase = @"Data Source=" + mDataSouce + ";Integrated Security=True;MultipleActiveResultSets=True;";
 
       if (aCreate) {
-        DeleteDB();
+        DeleteDB(mDbName, aPathname);
       }
 
       // Initial Catalog is necessary for EDM
