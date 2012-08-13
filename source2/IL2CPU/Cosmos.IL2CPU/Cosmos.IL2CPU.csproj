@@ -414,7 +414,6 @@
   <ItemGroup>
     <Folder Include="CustomImplementation\System\Security\Permissions\" />
     <Folder Include="Plugs\Generic\" />
-    <Folder Include="x86\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
