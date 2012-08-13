@@ -30,14 +30,14 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
       return aThis.Length;
     }
 
-    //[PlugMethod(Assembler = typeof(Assemblers.Array_get_Length))]
-    //public static int get_Length(Array aThis) {
+    [PlugMethod(Assembler = typeof(Assemblers.Array_get_Length))]
+    public static int get_Length(Array aThis) {
       //aThis += 2;
       //return *aThis;
-    //}
+      return 0
+    }
 
-
-    [PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
+        [PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
     public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
       return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
     }
