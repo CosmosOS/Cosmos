@@ -203,7 +203,7 @@ namespace Cosmos.Build.Builder {
           NotFound("VMWare");
         }
       }
-      CheckForInstall("VMWare VIX", true);
+      //CheckForInstall("VMWare VIX", true);
     }
 
     void CheckForInno() {
