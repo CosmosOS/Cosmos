@@ -203,6 +203,9 @@ namespace Cosmos.Build.Builder {
           NotFound("VMWare");
         }
       }
+
+      // VIX is installed with newer VMware Workstations (8+ for sure). Not sure about player?
+      // We need to just watch this and adjust as needed.
       //CheckForInstall("VMWare VIX", true);
     }
 
