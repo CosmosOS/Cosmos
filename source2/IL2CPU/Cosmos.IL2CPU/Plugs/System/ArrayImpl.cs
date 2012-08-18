@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
     public static int get_Length(Array aThis) {
       //aThis += 2;
       //return *aThis;
-      return 0
+        return 0;
     }
 
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
