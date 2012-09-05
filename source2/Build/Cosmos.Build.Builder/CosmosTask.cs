@@ -353,7 +353,8 @@ namespace Cosmos.Build.Builder {
       }
 
       Echo("Launching Visual Studio");
-      Start(xVisualStudio, mCosmosDir + @"\source\Cosmos.sln", false, true);
+      // Fix issue #15565
+      Start(xVisualStudio, Quoted(mCosmosDir + @"\source\Cosmos.sln"), false, true);
     }
 
     void RunSetup() {
