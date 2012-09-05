@@ -200,7 +200,10 @@ namespace Cosmos.Build.Builder {
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
       if (!CheckForInstall("VMware Workstation", false)) {
         if (!CheckForInstall("VMware Player", false)) {
-          NotFound("VMWare");
+          // Fix issue #15553
+          if (!CheckForInstall("VMwarePlayer_x64", false)) {
+            NotFound("VMWare");
+          }
         }
       }
 
