@@ -60,7 +60,7 @@ namespace Cosmos.Build.Builder {
       if (!App.IsUserKit) {
         RunSetup();
         WriteDevKit();
-        LaunchVS();
+        if (!App.DoNotLaunchVS) { LaunchVS(); }
       }
 
       Done();

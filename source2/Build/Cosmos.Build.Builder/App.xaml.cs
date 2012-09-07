@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace Cosmos.Build.Builder {
   public partial class App : Application {
+    public static bool DoNotLaunchVS;
     public static bool IsUserKit;
     public static bool ResetHive;
     public static bool StayOpen;
@@ -27,6 +28,7 @@ namespace Cosmos.Build.Builder {
       StayOpen = xArgs.Contains("-STAYOPEN");
       UseTask = !xArgs.Contains("-NOTASK");
       InstallTask = xArgs.Contains("-INSTALLTASK");
+      DoNotLaunchVS = xArgs.Contains("-NOVSLAUNCH");
       // For use during dev of Builder only.
       IgnoreVS = xArgs.Contains("-IGNOREVS");
       base.OnStartup(e);
