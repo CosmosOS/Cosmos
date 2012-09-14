@@ -1,4 +1,7 @@
-﻿using System;
+﻿// The symbol defined below enables method call on LogUtility. Should you wish to disable logging
+// please DO NOT remove this code line and DO comment it out.
+#define FULL_DEBUG
+using System;
 using Path = System.IO.Path;
 using Marshal = System.Runtime.InteropServices.Marshal;
 using Microsoft.VisualStudio.Project;
@@ -21,6 +24,7 @@ namespace Cosmos.VS.Package {
     }
 
     public override int DebugLaunch(uint aLaunch) {
+      LogUtility.LogString("Cosmos.VS.Package.VSProjectConfig debugger launching");
       try {
         // Second param is ResetCache. Must be called one time. Dunno why.
         // Also dunno if this comment is still valid/needed:
@@ -28,7 +32,6 @@ namespace Cosmos.VS.Package {
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
         var xDeployment = (DeploymentType)Enum.Parse(typeof(DeploymentType), GetConfigurationProperty(BuildProperties.DeploymentString, true));
-        //
         var xLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), GetConfigurationProperty(BuildProperties.LaunchString, false));
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
@@ -56,8 +59,8 @@ namespace Cosmos.VS.Package {
           if (xDeployment == DeploymentType.ISO) {
             Process.Start(xOutputPath);
           }
-
-        } else {
+        }
+        else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
           var xInfo = new VsDebugTargetInfo();
           xInfo.cbSize = (uint)Marshal.SizeOf(xInfo);
@@ -78,12 +81,14 @@ namespace Cosmos.VS.Package {
           xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
 
           // Select the debugger
-          xInfo.clsidCustom = new Guid("{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}");
+          xInfo.clsidCustom = new Guid("{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}"); // Debug engine identifier.
+          // ??? This identifier doesn't seems to appear anywhere else in souce code.
           xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
 
           VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
         }
       } catch (Exception ex) {
+        LogUtility.LogException(ex, true);
         return Marshal.GetHRForException(ex);
       }
       return VSConstants.S_OK;

@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.Win32;
 using Vestris.VMWareLib;
 using Cosmos.Build.Common;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
   public class VMware : Base {

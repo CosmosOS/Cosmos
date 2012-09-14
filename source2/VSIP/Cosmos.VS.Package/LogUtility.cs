@@ -17,17 +17,44 @@ namespace Cosmos.VS.Package
 #if FULL_DEBUG
             lock (mLockObj)
             {
-                File.AppendAllText(@"m:\vsip.log", String.Format(message, args) + "\r\n");
+              File.AppendAllText(GetLogFilePath(), DateTime.Now.ToString() + " - " + String.Format(message, args) + "\r\n");
             }
 #endif
         }
 
-        public static void LogException(Exception e)
+        public static void LogException(Exception e, bool dontThrow = false)
         {
 #if FULL_DEBUG
-            LogString("Error: " + e.ToString());
+          if (null != e) {
+            do {
+              LogString("Error : {0}", e.Message);
+              LogString("Stack : {0}", e.StackTrace);
+              e = e.InnerException;
+            } while (null != e);
+          }
 #endif
-            throw new Exception("Error occurred", e);
+            if (!dontThrow) { throw new Exception("Error occurred", e); }
+        }
+
+        private static string _logFilePath;
+        private static string GetLogFilePath()
+        {
+          if (null != _logFilePath) { return _logFilePath; }
+          _logFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Cosmos", "CosmosPkg.log");
+          Stack<DirectoryInfo> missingDirectories = new Stack<DirectoryInfo>();
+          DirectoryInfo scannedDirectory = new FileInfo(_logFilePath).Directory;
+
+          while (!scannedDirectory.Exists) {
+            missingDirectories.Push(scannedDirectory);
+            scannedDirectory = scannedDirectory.Parent;
+          }
+          while (0 < missingDirectories.Count) {
+            try { Directory.CreateDirectory(missingDirectories.Pop().FullName); }
+            catch { break; }
+          }
+          return _logFilePath;
         }
     }
 }

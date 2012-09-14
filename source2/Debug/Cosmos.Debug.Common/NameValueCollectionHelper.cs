@@ -8,6 +8,8 @@ namespace Cosmos.Debug.Common
 {
     public static class NameValueCollectionHelper
     {
+      /// <summary>Build a string from collection content. Each collection item is used to produce
+      /// a 'key=value' string. Pairs are separated by a semi colon.</summary>
         public static string DumpToString(NameValueCollection value)
         {
             var xSB = new StringBuilder();

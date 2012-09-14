@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>VMware</Profile>
+    <Profile>ISO</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -29,8 +29,8 @@
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
     <Deployment>ISO</Deployment>
-    <Launch>VMware</Launch>
-    <DebugEnabled>True</DebugEnabled>
+    <Launch>None</Launch>
+    <DebugEnabled>False</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
@@ -80,8 +80,8 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>Guess</Name>
-    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Name>User 001</Name>
+    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
@@ -124,9 +124,13 @@
     <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
     <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
+    <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
+    <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
+    <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
+    <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>VMware</Profile>
+    <Profile>ISO</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -141,8 +145,8 @@
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
     <Deployment>ISO</Deployment>
-    <Launch>VMware</Launch>
-    <DebugEnabled>True</DebugEnabled>
+    <Launch>None</Launch>
+    <DebugEnabled>False</DebugEnabled>
     <TraceAssemblies />
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
@@ -192,8 +196,8 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>Guess</Name>
-    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Name>User 001</Name>
+    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
@@ -223,9 +227,9 @@
     <VMware_CosmosDebugPort />
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <ISO_CosmosDebugPort />
-    <ISO_VisualStudioDebugPort />
+    <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
     <PXE_CosmosDebugPort />
-    <PXE_VisualStudioDebugPort />
+    <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
     <USB_CosmosDebugPort />
     <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
     <PxeInterface>192.168.43.1</PxeInterface>
@@ -244,6 +248,8 @@
     <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
     <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
+    <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
+    <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">

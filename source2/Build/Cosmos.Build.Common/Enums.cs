@@ -21,7 +21,9 @@ namespace Cosmos.Build.Common {
     [Description("VMware")]
     VMware,
     [Description("Attached Slave (CanaKit)")]
-    Slave
+    Slave,
+    [Description("Bochs")]
+    Bochs
   }
 
   public enum VMwareEdition {

@@ -16,6 +16,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe</StartProgram>
-    <StartArguments>d:\source\Cosmos\source2\Guess.sln</StartArguments>
+    <StartArguments>"C:\Projects\Perso\Cosmos-OS\TFS\IL2CPU\source2\Users\BlueSkeye\GuessForBochs.sln" /RootSuffix exp /log</StartArguments>
   </PropertyGroup>
 </Project>

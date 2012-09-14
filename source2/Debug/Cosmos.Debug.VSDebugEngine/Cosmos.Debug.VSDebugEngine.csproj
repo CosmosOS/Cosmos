@@ -134,6 +134,7 @@
     <Compile Include="Engine.Impl\OperationThread.cs" />
     <Compile Include="AD7.Impl\AD7Engine.cs" />
     <Compile Include="Engine.Impl\EngineCallback.cs" />
+    <Compile Include="Host\Bochs.cs" />
     <Compile Include="Host\Slave.cs" />
     <Compile Include="Host\VMware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -47,6 +47,7 @@ namespace Cosmos.VS.Windows {
     Queue<byte> mCommand;
     Queue<byte[]> mMessage;
     System.Timers.Timer mTimer = new System.Timers.Timer(100);
+    /// <summary>A pipe server that will receive responses from the AD7Process</summary>
     Cosmos.Debug.Common.PipeServer mPipeDown;
 
     /// Default constructor of the package.

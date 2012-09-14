@@ -8,6 +8,10 @@ using System.Threading;
 using System.Windows.Forms;
 
 namespace Cosmos.Debug.Common {
+  /// <summary>Handles the dialog between the Debug Stub embedded in a debugged Cosmos Kernel and
+  /// our Debug Engine hosted in Visual Studio. This abstract class is communication protocol 
+  /// independent. Sub-classes exist that manage the wire level details of the communications.
+  /// </summary>
   public abstract class DebugConnector : IDisposable {
     public Action<Exception> ConnectionLost;
     public Action<UInt32> CmdTrace;
@@ -24,14 +28,23 @@ namespace Cosmos.Debug.Common {
     protected byte mCurrentMsgType;
     protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
-    //        private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
+    // private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
 
-    // Must be called from descendant via DoConnected
-    public Action Connected;
+    // This member used to be public. The SetConnectionHandler has been added.
+    private Action Connected;
+
+    /// <summary>Descendants must invoke this method whenever they detect an incoming connection.</summary>
     public void DoConnected() {
       if (Connected != null) {
         Connected();
       }
+    }
+
+    /// <summary>Defines the handler to be invoked when a connection occurs on this condector. This
+    /// method is for use by the AD7Process instance.</summary>
+    /// <param name="handler">The handler to be notified when a connection occur.</param>
+    public void SetConnectionHandler(Action handler) {
+      Connected = handler;
     }
 
     protected void DoDebugMsg(string aMsg) {

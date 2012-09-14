@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -61,6 +62,11 @@ namespace Cosmos.Build.Common {
         Description = "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
         Deployment = DeploymentType.PXE;
         Launch = LaunchType.None;
+
+      } else if (aName == "Bochs") {
+        Description = "Use Bochs emulatior to deploy and debug.";
+        Deployment = DeploymentType.ISO;
+        Launch = LaunchType.Bochs;
       }
     }
 
@@ -143,6 +149,18 @@ namespace Cosmos.Build.Common {
     public string SlavePort {
       get { return GetProperty(SlavePortString, "None"); }
       set { SetProperty(SlavePortString, value); }
+    }
+
+    // Bochs
+    public const string BochsDefaultConfigurationFileName = "Cosmos.bxrc";
+    public const string BochsEmulatorConfigurationFileString = "BochsConfig";
+    public string BochsEmulatorConfigurationFile
+    {
+      get {
+        return GetProperty(BochsEmulatorConfigurationFileString,
+          Path.Combine(OutputPath + BochsDefaultConfigurationFileName));
+      }
+      set { SetProperty(BochsEmulatorConfigurationFileString, value); }
     }
 
     // VMware

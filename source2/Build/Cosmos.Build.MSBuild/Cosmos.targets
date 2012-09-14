@@ -85,11 +85,11 @@
   <Target Name="CreateManifestResourceNames">
   </Target>
 
-
-
   <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
 
   <Target Name="CopyFilesToOutputDirectory">
     <!-- copy <AssemblyName>.exe from obj\Debug to bin\Debug-->
+      <Copy SourceFiles="Cosmos.bxrc"
+            DestinationFolder="$(TargetDir)"/>
   </Target>
 </Project>

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -36,9 +37,9 @@ namespace Cosmos.Debug.VSDebugEngine {
     // These are static because we need them persistent between debug
     // sessions to avoid reconnection issues. But they are not created
     // until the debug session is ready the first time so that we know
-    // the debug window pipes are already reayd.
+    // the debug window pipes are already ready.
     //
-    // Pipe to communicate with Cosmos.VS.Windows
+    // Pipe for writing responses to communicate with Cosmos.VS.Windows
     static private Cosmos.Debug.Common.PipeClient mDebugDownPipe = null;
     // Pipe to receive messages from Cosmos.VS.Windows
     static private Cosmos.Debug.Common.PipeServer mDebugUpPipe = null;
@@ -64,7 +65,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDebugDownPipe.SendCommand(Debugger2Windows.Stack, aData);
     }
 
-    void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData) {
+    private void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData) {
       switch (aCmd) {
         case Windows2Debugger.Noop:
           // do nothing
@@ -91,11 +92,15 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
-    protected void DebugConnectorConnected() {
+    private void DebugConnectorConnected() {
       OutputText("Connected to DebugStub.");
     }
 
-    void CreateDebugConnector() {
+    /// <summary>Instanciate the <see cref="DebugConnector"/> that will handle communications
+    /// between this debug engine hosted process and the emulation environment used to run the
+    /// debugged Cosmos kernel. Actual connector to be instanciated is discovered from Cosmos
+    /// project properties.</summary>
+    private void CreateDebugConnector() {
       mDbgConnector = null;
 
       string xPort = mDebugInfo[BuildProperties.VisualStudioDebugPortString];
@@ -113,7 +118,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (mDbgConnector == null) {
         throw new Exception("No debug connector found.");
       }
-      mDbgConnector.Connected = DebugConnectorConnected;
+      mDbgConnector.SetConnectionHandler(DebugConnectorConnected);
       mDbgConnector.CmdBreak += new Action<UInt32>(DbgCmdBreak);
       mDbgConnector.CmdTrace += new Action<UInt32>(DbgCmdTrace);
       mDbgConnector.CmdText += new Action<string>(DbgCmdText);
@@ -139,6 +144,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
         mDebugUpPipe.Start();
       }
+
       // Must be after mDebugDownPipe is initialized
       OutputClear();
       OutputText("Debugger process initialized.");
@@ -153,13 +159,31 @@ namespace Cosmos.Debug.VSDebugEngine {
       var xGDBClient = false;
       Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
 
-      string xHostArgs = "";
-      if (mLaunch == LaunchType.VMware) {
-        mHost = new Host.VMware(mDebugInfo, xUseGDB);
-      } else if (mLaunch == LaunchType.Slave) {
-        mHost = new Host.Slave(mDebugInfo, xUseGDB);
-      } else {
-        throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
+      switch (mLaunch)
+      {
+        case LaunchType.VMware:
+          mHost = new Host.VMware(mDebugInfo, xUseGDB);
+          break;
+        case LaunchType.Slave:
+          mHost = new Host.Slave(mDebugInfo, xUseGDB);
+          break;
+        case LaunchType.Bochs:
+          string bochsConfigurationFileName = mDebugInfo[BuildProperties.BochsEmulatorConfigurationFileString];
+          if (string.IsNullOrEmpty(bochsConfigurationFileName)) {
+            bochsConfigurationFileName = BuildProperties.BochsDefaultConfigurationFileName;
+          }
+          if (!Path.IsPathRooted(bochsConfigurationFileName)) {
+            // Assume the configuration file name is relative to project output path.
+            bochsConfigurationFileName = Path.Combine(new FileInfo(mDebugInfo["ProjectFile"]).Directory.FullName,
+              mDebugInfo["OutputPath"], bochsConfigurationFileName);
+          }
+          FileInfo bochsConfigurationFile = new FileInfo(bochsConfigurationFileName);
+          // TODO : What if the configuration file doesn't exist ? This will throw a FileNotFoundException in
+          // the Bochs class constructor. Is this appropriate behavior ?
+          mHost = new Host.Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
+          break;
+        default:
+          throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
       }
       mHost.OnShutDown += HostShutdown;
 
@@ -475,12 +499,15 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     //TODO: At some point this will probably need to be exposed for access outside of AD7Process
     protected void OutputText(string aText) {
+      // With Bochs this method may be invoked before the pipe is created.
+      if (null == mDebugDownPipe) { return; }
       mDebugDownPipe.SendCommand(Debugger2Windows.OutputPane, Encoding.UTF8.GetBytes(aText + "\r\n"));
     }
 
     protected void OutputClear() {
+      // With Bochs this method may be invoked before the pipe is created.
+      if (null == mDebugDownPipe) { return; }
       mDebugDownPipe.SendCommand(Debugger2Windows.OutputClear);
     }
-
   }
 }

@@ -6,6 +6,7 @@ using Cosmos.Debug.Common;
 
 namespace Cosmos.VS.Windows {
   static public class Global {
+    /// <summary>A pipe used to send requests to the AD7Process.</summary>
     static public Cosmos.Debug.Common.PipeClient PipeUp;
     static public EnvDTE.OutputWindowPane OutputPane;
 

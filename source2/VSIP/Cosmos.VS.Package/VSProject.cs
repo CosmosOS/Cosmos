@@ -1,4 +1,7 @@
-﻿using System;
+﻿// The symbol defined below enables method call on LogUtility. Should you wish to disable logging
+// please DO NOT remove this code line and DO comment it out.
+#define FULL_DEBUG
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -58,6 +61,7 @@ namespace Cosmos.VS.Package {
     /// not sited yet inside Visual Studio environment. The place to do all the other 
     /// initialization is the Initialize method.
     public VSProject() {
+      LogUtility.LogString("Cosmos.VS.Package.VSProject instanciated");
     }
 
     // This is used in the MSBuild files to locate Cosmos tasks
@@ -79,11 +83,14 @@ namespace Cosmos.VS.Package {
     /// Initialization of the package; this method is called right after the package is sited, so this is the place
     /// where you can put all the initilaization code that rely on services provided by VisualStudio.
     protected override void Initialize() {
+      LogUtility.LogString("Cosmos.VS.Package initializing");
       try {
         SetCosmosVar();
         base.Initialize();
         this.RegisterProjectFactory(new VSProjectFactory(this));
-      } catch (Exception E) {
+        LogUtility.LogString("Cosmos.VS.Package successfully initialized");
+      }
+      catch (Exception E) {
         LogUtility.LogException(E);
       }
     }
