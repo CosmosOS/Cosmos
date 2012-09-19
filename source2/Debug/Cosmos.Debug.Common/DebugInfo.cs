@@ -37,33 +37,64 @@ namespace Cosmos.Debug.Common {
       using (var xConn = new SqlConnection(mConnStrBase)) {
         // Open connection to master
         xConn.Open();
+        int databaseId = 0;
 
         bool xExists = false;
         using (var xCmd = xConn.CreateCommand()) {
-          xCmd.CommandText = "select * from sys.databases where name = '" + aDbName + "'";
-          using (var xReader = xCmd.ExecuteReader()) {
-            xExists = xReader.Read();
+          xCmd.CommandText = "select database_id from sys.databases where name = '" + aDbName + "'";
+          object rawId = xCmd.ExecuteScalar();
+          if (null != rawId) {
+            databaseId = (int)rawId;
+            xExists = true;
           }
         }
 
         if (xExists) {
-          // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
+          List<string> databaseFiles = new List<string>();
+          bool damagedDatabase = false;
+
           using (var xCmd = xConn.CreateCommand()) {
-            xCmd.CommandText = "ALTER DATABASE " + aDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
-            xCmd.ExecuteNonQuery();
+            xCmd.CommandText = "SELECT [physical_name] FROM [master].[sys].[master_files] WHERE [database_id] = " + databaseId;
+            using (SqlDataReader reader = xCmd.ExecuteReader()) {
+              if (reader.NextResult()) {
+                while(reader.Read()) {
+                  string filePath = reader.GetString(0);
+
+                  if (!File.Exists(filePath) { damagedDatabase = true; }
+                  else { databaseFiles.Add(filePath); }
+                }
+              }
+            }
           }
-          // Yes this throws an exception if the database doesnt exist, so we have to
-          // run it only if we know it exists.
-          // This will detach and also delete the physica files.
-          using (var xCmd = xConn.CreateCommand()) {
-            xCmd.CommandText = "DROP DATABASE " + aDbName;
-            xCmd.ExecuteNonQuery();
+          if (!damagedDatabase) {
+            // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
+            using (var xCmd = xConn.CreateCommand()) {
+              xCmd.CommandText = "ALTER DATABASE " + aDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
+              xCmd.ExecuteNonQuery();
+            }
+            // Yes this throws an exception if the database doesnt exist, so we have to run it only if we
+            // know it exists. This will detach and also delete the physical files.
+            using (var xCmd = xConn.CreateCommand()) {
+              xCmd.CommandText = "DROP DATABASE " + aDbName;
+              xCmd.ExecuteNonQuery();
+            }
+          }
+          else {
+            // Just detach database.
+            using (var xCmd = xConn.CreateCommand()) {
+              xCmd.CommandText = string.Format("sp_detach_db '{0}', 'true'" + aDbName);
+              xCmd.ExecuteNonQuery();
+            }
+            // And try to cleanup remaining files.
+            foreach (string filePath in databaseFiles) {
+              try { File.Delete(filePath); } catch { }
+            }
           }
         }
       }
 
       // By now DB file should be gone. But sometimes when there are errors, it wont be in the catalog
-      // above, but the file will be there. So just in case, if it exsits we delete it here if found.
+      // above, but the file will be there. So just in case, if it exists we delete it here if found.
       File.Delete(aPathname);
       // SQL Express and Local create the log file differently. Once creates .ldf, while other does _log.ldf.
       File.Delete(Path.ChangeExtension(aPathname, "ldf"));
