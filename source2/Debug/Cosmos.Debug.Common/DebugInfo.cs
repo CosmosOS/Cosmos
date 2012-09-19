@@ -60,7 +60,7 @@ namespace Cosmos.Debug.Common {
                 while(reader.Read()) {
                   string filePath = reader.GetString(0);
 
-                  if (!File.Exists(filePath) { damagedDatabase = true; }
+                  if (!File.Exists(filePath)) { damagedDatabase = true; }
                   else { databaseFiles.Add(filePath); }
                 }
               }
