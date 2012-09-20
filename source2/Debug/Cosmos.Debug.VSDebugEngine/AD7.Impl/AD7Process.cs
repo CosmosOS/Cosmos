@@ -104,7 +104,12 @@ namespace Cosmos.Debug.VSDebugEngine {
       mDbgConnector = null;
 
       string xPort = mDebugInfo[BuildProperties.VisualStudioDebugPortString];
-      var xParts = xPort.Split(' ');
+      var xParts = (null == xPort) ? null : xPort.Split(' ');
+      if ((null == xParts) || (2 > xParts.Length)) {
+          throw new Exception(string.Format(
+              "The '{0}' Cosmos project file property is either ill-formed or missing.",
+              BuildProperties.VisualStudioDebugPortString));
+      }
       string xPortType = xParts[0].ToLower();
       string xPortParam = xParts[1].ToLower();
 
@@ -168,6 +173,9 @@ namespace Cosmos.Debug.VSDebugEngine {
           mHost = new Host.Slave(mDebugInfo, xUseGDB);
           break;
         case LaunchType.Bochs:
+          // The project has been created on another machine or Bochs has been uninstalled since the project has
+          // been created.
+          if (!BochsSupport.BochsEnabled) { throw new Exception(ResourceStrings.BochsIsNotInstalled); }
           string bochsConfigurationFileName = mDebugInfo[BuildProperties.BochsEmulatorConfigurationFileString];
           if (string.IsNullOrEmpty(bochsConfigurationFileName)) {
             bochsConfigurationFileName = BuildProperties.BochsDefaultConfigurationFileName;
@@ -181,6 +189,9 @@ namespace Cosmos.Debug.VSDebugEngine {
           // TODO : What if the configuration file doesn't exist ? This will throw a FileNotFoundException in
           // the Bochs class constructor. Is this appropriate behavior ?
           mHost = new Host.Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
+          ((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[]
+            { new KeyValuePair<string, string>("IsoFileName", mISO) }
+          );
           break;
         default:
           throw new Exception("Invalid Launch value: '" + mLaunch + "'.");

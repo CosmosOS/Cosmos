@@ -64,7 +64,7 @@ namespace Cosmos.Build.Common {
         Launch = LaunchType.None;
 
       } else if (aName == "Bochs") {
-        Description = "Use Bochs emulatior to deploy and debug.";
+        Description = "Use Bochs emulator to deploy and debug.";
         Deployment = DeploymentType.ISO;
         Launch = LaunchType.Bochs;
       }
@@ -201,6 +201,13 @@ namespace Cosmos.Build.Common {
     public bool StartCosmosGDB {
       get { return GetProperty(StartCosmosGDBString, false); }
       set { SetProperty(StartCosmosGDBString, value); }
+    }
+
+    public const string EnableBochsDebugString = "EnableBochsDebug";
+    public Boolean EnableBochsDebug
+    {
+        get { return GetProperty(EnableBochsDebugString, false); }
+        set { SetProperty(EnableBochsDebugString, value); }
     }
   }
 }

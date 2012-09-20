@@ -68,6 +68,8 @@
       this.lboxDeployment = new System.Windows.Forms.ListBox();
       this.tabLaunch = new System.Windows.Forms.TabPage();
       this.lboxLaunch = new System.Windows.Forms.ListBox();
+      this.tabBochs = new System.Windows.Forms.TabPage();
+      this.checkEnableBochsDebug = new System.Windows.Forms.CheckBox();
       this.tabVMware = new System.Windows.Forms.TabPage();
       this.checkEnableGDB = new System.Windows.Forms.CheckBox();
       this.checkStartCosmosGDB = new System.Windows.Forms.CheckBox();
@@ -99,6 +101,7 @@
       this.tabUSB.SuspendLayout();
       this.tabISO.SuspendLayout();
       this.tabSlave.SuspendLayout();
+      this.tabBochs.SuspendLayout();
       this.SuspendLayout();
       // 
       // panel1
@@ -138,6 +141,7 @@
       this.TabControl1.Controls.Add(this.tabDeployment);
       this.TabControl1.Controls.Add(this.tabLaunch);
       this.TabControl1.Controls.Add(this.tabVMware);
+      this.TabControl1.Controls.Add(this.tabBochs);
       this.TabControl1.Controls.Add(this.tabPXE);
       this.TabControl1.Controls.Add(this.tabUSB);
       this.TabControl1.Controls.Add(this.tabISO);
@@ -546,6 +550,27 @@
       this.lboxLaunch.Sorted = true;
       this.lboxLaunch.TabIndex = 3;
       // 
+      // tabBochs
+      // 
+      this.tabBochs.Controls.Add(this.checkEnableBochsDebug);
+      this.tabBochs.Location = new System.Drawing.Point(4, 22);
+      this.tabBochs.Name = "tabBochs";
+      this.tabBochs.Padding = new System.Windows.Forms.Padding(3);
+      this.tabBochs.Size = new System.Drawing.Size(627, 387);
+      this.tabBochs.TabIndex = 5;
+      this.tabBochs.Text = "Bochs";
+      this.tabBochs.UseVisualStyleBackColor = true;
+      // 
+      // checkEnableBochsDebug
+      // 
+      this.checkEnableBochsDebug.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.checkEnableBochsDebug.Location = new System.Drawing.Point(9, 12);
+      this.checkEnableBochsDebug.Name = "checkEnableBochsDebug";
+      this.checkEnableBochsDebug.Size = new System.Drawing.Size(218, 20);
+      this.checkEnableBochsDebug.TabIndex = 25;
+      this.checkEnableBochsDebug.Text = "Enable Bochs Debugger";
+      this.checkEnableBochsDebug.UseVisualStyleBackColor = true;
+      // 
       // tabVMware
       // 
       this.tabVMware.Controls.Add(this.checkEnableGDB);
@@ -609,7 +634,7 @@
       this.tabPXE.Name = "tabPXE";
       this.tabPXE.Padding = new System.Windows.Forms.Padding(3);
       this.tabPXE.Size = new System.Drawing.Size(627, 387);
-      this.tabPXE.TabIndex = 5;
+      this.tabPXE.TabIndex = 6;
       this.tabPXE.Text = "PXE";
       this.tabPXE.UseVisualStyleBackColor = true;
       // 
@@ -636,7 +661,7 @@
       this.tabUSB.Name = "tabUSB";
       this.tabUSB.Padding = new System.Windows.Forms.Padding(3);
       this.tabUSB.Size = new System.Drawing.Size(627, 387);
-      this.tabUSB.TabIndex = 6;
+      this.tabUSB.TabIndex = 7;
       this.tabUSB.Text = "USB";
       this.tabUSB.UseVisualStyleBackColor = true;
       // 
@@ -656,7 +681,7 @@
       this.tabISO.Name = "tabISO";
       this.tabISO.Padding = new System.Windows.Forms.Padding(3);
       this.tabISO.Size = new System.Drawing.Size(627, 387);
-      this.tabISO.TabIndex = 7;
+      this.tabISO.TabIndex = 8;
       this.tabISO.Text = "ISO";
       this.tabISO.UseVisualStyleBackColor = true;
       // 
@@ -733,6 +758,8 @@
       this.panlDebugSettings.PerformLayout();
       this.tabDeployment.ResumeLayout(false);
       this.tabLaunch.ResumeLayout(false);
+      this.tabBochs.ResumeLayout(false);
+      this.tabBochs.PerformLayout();
       this.tabVMware.ResumeLayout(false);
       this.tabVMware.PerformLayout();
       this.tabPXE.ResumeLayout(false);
@@ -779,6 +806,8 @@
     private System.Windows.Forms.Label label5;
     private System.Windows.Forms.Label label9;
     private System.Windows.Forms.CheckBox checkIgnoreDebugStubAttribute;
+    private System.Windows.Forms.TabPage tabBochs;
+    private System.Windows.Forms.CheckBox checkEnableBochsDebug;
     private System.Windows.Forms.TabPage tabVMware;
     private System.Windows.Forms.CheckBox checkEnableGDB;
     private System.Windows.Forms.CheckBox checkStartCosmosGDB;

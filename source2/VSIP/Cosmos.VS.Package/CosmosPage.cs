@@ -45,8 +45,11 @@ namespace Cosmos.VS.Package {
     }
 
     protected ProfilePresets mPresets = new ProfilePresets();
-    protected int mVMwareDebugPipe;
+    /// <summary>The index in the <see cref="cmboVisualStudioDebugPort"/> combo for the pipe name used by both
+    /// Bochs and VMware environment to communicate with Vsiual Studio debugger.</summary>
+    protected int mVMwareAndBochsDebugPipe;
 
+    protected bool mShowTabBochs;
     protected bool mShowTabDebug;
     protected bool mShowTabDeployment;
     protected bool mShowTabLaunch;
@@ -81,6 +84,7 @@ namespace Cosmos.VS.Package {
       RemoveTab(tabUSB);
       RemoveTab(tabISO);
       RemoveTab(tabSlave);
+      RemoveTab(tabBochs);
 
       if (mShowTabDebug) {
         TabControl1.TabPages.Add(tabDebug);
@@ -108,6 +112,9 @@ namespace Cosmos.VS.Package {
       if (mShowTabSlave) {
         TabControl1.TabPages.Add(tabSlave);
       }
+      if (mShowTabBochs) {
+        TabControl1.TabPages.Add(tabBochs);
+      }
 
       if (TabControl1.TabPages.Contains(xTab)) {
         TabControl1.SelectedTab = xTab;
@@ -133,10 +140,17 @@ namespace Cosmos.VS.Package {
         chckEnableDebugStub.Checked = true;
         cmboCosmosDebugPort.Enabled = false;
         cmboVisualStudioDebugPort.Enabled = false;
-        cmboVisualStudioDebugPort.SelectedIndex = mVMwareDebugPipe;
+        cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
 
       } else if (mProps.Profile == "PXE") {
         chckEnableDebugStub.Checked = false;
+
+      } else if (mProps.Profile == "Bochs") {
+          mShowTabBochs = true;
+          chckEnableDebugStub.Checked = true;
+          cmboCosmosDebugPort.Enabled = false;
+          cmboVisualStudioDebugPort.Enabled = false;
+          cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
 
       }
     }
@@ -173,6 +187,7 @@ namespace Cosmos.VS.Package {
       checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
       checkEnableGDB.Checked = mProps.EnableGDB;
       checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
+      checkEnableBochsDebug.Checked = mProps.EnableBochsDebug;
       // Locked to COM1 for now.
       cmboCosmosDebugPort.SelectedIndex = 0;
 
@@ -199,6 +214,7 @@ namespace Cosmos.VS.Package {
       //
       mShowTabVMware = mProps.Launch == LaunchType.VMware;
       mShowTabSlave = mProps.Launch == LaunchType.Slave;
+      mShowTabBochs = (LaunchType.Bochs == mProps.Launch);
       //
       UpdateTabs();
     }
@@ -274,6 +290,18 @@ namespace Cosmos.VS.Package {
         if (xValue != mProps.Launch) {
           mProps.Launch = xValue;
           IsDirty = true;
+          // Bochs requires an ISO. Force Deployment property.
+          if (LaunchType.Bochs == xValue) {
+            if (DeploymentType.ISO != mProps.Deployment) {
+              foreach (EnumValue scannedValue in lboxDeployment.Items)
+              {
+                if (DeploymentType.ISO == (DeploymentType)scannedValue.Value) {
+                  lboxDeployment.SelectedItem = scannedValue;
+                  break;
+                }
+              }
+            }
+          }
         }
       };
       #endregion
@@ -399,6 +427,16 @@ namespace Cosmos.VS.Package {
           mProps.StartCosmosGDB = x;
           IsDirty = true;
         }
+      };
+
+      checkEnableBochsDebug.CheckedChanged += delegate(Object sender, EventArgs e)
+      {
+          bool x = checkEnableBochsDebug.Checked;
+          if (x != mProps.EnableBochsDebug)
+          {
+              mProps.EnableBochsDebug = x;
+              IsDirty = true;
+          }
       };
     }
 
@@ -532,7 +570,7 @@ namespace Cosmos.VS.Package {
 
       cmboVisualStudioDebugPort.Items.Clear();
       FillComPorts(cmboVisualStudioDebugPort.Items);
-      mVMwareDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
+      mVMwareAndBochsDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
 
       comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
       comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));

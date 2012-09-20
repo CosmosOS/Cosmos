@@ -85,10 +85,28 @@ namespace Cosmos.Build.MSBuild {
       }
       return null;
     }
+
+    private bool EnsureCosmosPathsInitialization() {
+      try {
+        CosmosPaths.Initialize(); 
+        return true;
+      } catch (Exception e)
+      {
+        StringBuilder builder = new StringBuilder();
+        builder.Append("Error while initializing Cosmos paths");
+        for (Exception scannedException = e; null != scannedException; scannedException = scannedException.InnerException)
+        {
+          builder.Append(" | " + scannedException.Message);
+        }
+        LogError(builder.ToString());
+        return false;
+      }
+    }
     
     protected bool Initialize() {
       // Add UserKit dirs for asms to load from.
       mSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
+      if (!EnsureCosmosPathsInitialization()) { return false; }
       mSearchDirs.Add(CosmosPaths.UserKit);
       mSearchDirs.Add(CosmosPaths.Kernel);
       AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
@@ -135,7 +153,6 @@ namespace Cosmos.Build.MSBuild {
     }
 
     public bool Execute() {
-      //System.Diagnostics.Debugger.Launch();
       try {
         LogMessage("Executing IL2CPU on assembly");
         if (!Initialize()) {

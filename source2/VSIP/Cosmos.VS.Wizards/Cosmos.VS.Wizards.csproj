@@ -64,6 +64,7 @@
     <EmbeddedResource Include="CosmosProject.Cosmos" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Cosmos.bxrc" />
     <None Include="Key.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

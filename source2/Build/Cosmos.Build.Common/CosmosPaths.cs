@@ -25,11 +25,17 @@ namespace Cosmos.Build.Common {
     }
 
     static CosmosPaths() {
-      using (var xReg = Registry.LocalMachine.OpenSubKey(@"Software\Cosmos", false)) {
-        if (xReg == null) {
-          throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos was not found.");
+      using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+      {
+        using (var xReg = baseKey.OpenSubKey(@"Software\Cosmos", false)) {
+          if (xReg == null) {
+            throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos was not found.");
+          }
+          UserKit = (string)xReg.GetValue("UserKit");
+          if (null == UserKit) {
+            throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos\@UserKit was not found.");
+          }
         }
-        UserKit = (string)xReg.GetValue("UserKit");
       }
       Build = CheckPath(UserKit, @"Build");
       Vsip = CheckPath(UserKit, @"Build\VSIP");
@@ -41,9 +47,20 @@ namespace Cosmos.Build.Common {
       using (var xReg = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos", false)) {
         if (xReg != null) {
           DevKit = (string)xReg.GetValue("DevKit");
-          DebugStubSrc = CheckPath(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub");
+          if (null == DevKit) {
+            throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos\@DevKit was not found.");
+          }
+          try { DebugStubSrc = CheckPath(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub"); }
+          // Not finding this one is not an issue. We will fallback to already retrieved stun from UserKit
+          catch { }
         }
       }
+    }
+
+    /// <summary>This method is intentionally empty. It's sole purpose is to be able to trigger
+    /// class initialization in a controlled manner so as to intercept initializer thrown
+    /// exceptions.</summary>
+    public static void Initialize() {
     }
   }
 }

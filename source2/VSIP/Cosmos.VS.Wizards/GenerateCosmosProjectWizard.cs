@@ -8,14 +8,18 @@ using EnvDTE;
 
 namespace Cosmos.VS.Package.Templates {
   public class GenerateCosmosProjectWizard : IWizard {
+    private const string BochsConfigurationFileName = "Cosmos.bxrc";
+
     public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem) {
     }
 
-    private static string GetTemplateString() {
+    private static string GetTemplate(string templateName)
+    {
       var xAsm = typeof(GenerateCosmosProjectWizard).Assembly;
-      using (var xStream = xAsm.GetManifestResourceStream(typeof(Cosmos.VS.Wizards.ResHelper), "CosmosProject.Cosmos")) {
+      using (var xStream = xAsm.GetManifestResourceStream(typeof(Cosmos.VS.Wizards.ResHelper), templateName))
+      {
         if (xStream == null) {
-          MessageBox.Show("Could not find template manifest stream!");
+          MessageBox.Show("Could not find template manifest stream : " + templateName);
           return null;
         }
         using (var xReader = new StreamReader(xStream)) {
@@ -24,10 +28,18 @@ namespace Cosmos.VS.Package.Templates {
       }
     }
 
+    private static string GetBochsConfigurationFileTemplate() {
+      return GetTemplate(BochsConfigurationFileName);
+    }
+
+    private static string GetProjectFileTemplate() {
+      return GetTemplate("CosmosProject.Cosmos");
+    }
+
     public void ProjectFinishedGenerating(EnvDTE.Project project) {
       // add Cosmos template to solution
       // read embedded template file
-      var xInputString = GetTemplateString();
+      var xInputString = GetProjectFileTemplate();
       if (xInputString == null) {
         return;
       }
@@ -59,6 +71,16 @@ namespace Cosmos.VS.Package.Templates {
           break;
         }
       }
+
+      // Copy Bochs configuration file.
+      xInputString = GetBochsConfigurationFileTemplate();
+      if (xInputString == null) {
+        return;
+      }
+      xInputString = xInputString.Replace("$CosmosProjectName$", project.Name + "Boot");
+      xFilename = Path.GetDirectoryName(project.FullName);
+      xFilename = Path.Combine(xFilename, BochsConfigurationFileName);
+      File.WriteAllText(xFilename, xInputString);
 
       // set Cosmos Boot as startup project
       project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();

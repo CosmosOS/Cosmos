@@ -96,6 +96,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BochsSupport.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="DebugConnector.cs" />
     <Compile Include="DebugConnectorPipeServer.cs" />
