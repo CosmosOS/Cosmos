@@ -198,6 +198,11 @@ namespace Cosmos.Build.MSBuild {
               xAsm.FinalizeDebugInfo();
             }
           }
+          // If you want to uncomment this line make sure to enable PERSISTANCE_PROFILING symbol in
+          // DebugInfo.cs file.
+          //LogMessage(string.Format("DebugInfo flatening {0} seconds, persistance : {1} seconds",
+          //    (int)xDebugInfo.FlateningDuration.TotalSeconds,
+          //    (int)xDebugInfo.PersistanceDuration.TotalSeconds));
         }
         LogTime("Engine execute finished");
         return true;
@@ -215,7 +220,11 @@ namespace Cosmos.Build.MSBuild {
       }
     }
 
-    protected MethodBase LoadAssemblies() {
+    /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
+    /// the kernel default constructor.</summary>
+    /// <returns>The kernel default constructor or a null reference if either none or several such
+    /// constructor could be found.</returns>
+    private MethodBase LoadAssemblies() {
       // Try to load explicit path references.
       // These are the references of our boot project. We dont actually ever load the boot
       // project asm. Instead the references will contain plugs, and the kernel. We load
