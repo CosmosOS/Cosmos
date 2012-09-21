@@ -118,7 +118,7 @@ namespace Cosmos.IL2CPU {
             // check for things like col < start col but line > start line.
             //
             // () around << are VERY important.. + has precedence over <<
-            LineColStart = (Int64)mSequences[0].LineStart << 32 + mSequences[0].ColStart,
+            LineColStart = ((Int64)mSequences[0].LineStart << 32) + mSequences[0].ColStart,
             LineColEnd = ((Int64)(mSequences[mSequences.Length - 1].LineEnd) << 32) + mSequences[mSequences.Length - 1].ColEnd
           };
           DebugInfo.AddMethod(xMethod);
