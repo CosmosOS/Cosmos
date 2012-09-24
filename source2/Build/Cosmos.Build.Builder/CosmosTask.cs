@@ -198,18 +198,64 @@ namespace Cosmos.Build.Builder {
       CheckLocalDb2012();
       CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
+      bool vmWareInstalled = true;
+      bool bochsInstalled = IsBochsInstalled();
       if (!CheckForInstall("VMware Workstation", false)) {
         if (!CheckForInstall("VMware Player", false)) {
           // Fix issue #15553
           if (!CheckForInstall("VMwarePlayer_x64", false)) {
-            NotFound("VMWare");
+            vmWareInstalled = false;
           }
         }
       }
+      if (!vmWareInstalled && !bochsInstalled) { NotFound("VMWare or Bochs"); }
 
       // VIX is installed with newer VMware Workstations (8+ for sure). Not sure about player?
       // We need to just watch this and adjust as needed.
       //CheckForInstall("VMWare VIX", true);
+    }
+
+    /// <summary>Check for Bochs being installed.</summary>
+    private static bool IsBochsInstalled()
+    {
+        try
+        {
+            using (var runCommandRegistryKey = Registry.ClassesRoot.OpenSubKey(@"BochsConfigFile\shell\Run\command", false))
+            {
+                if (null == runCommandRegistryKey) { return false; }
+                string commandLine = (string)runCommandRegistryKey.GetValue(null, null);
+                if (null != commandLine) { commandLine = commandLine.Trim(); }
+                if (string.IsNullOrEmpty(commandLine)) { return false; }
+                // Now perform some parsing on command line to discover full exe path.
+                string candidateFilePath;
+                int commandLineLength = commandLine.Length;
+                if ('"' == commandLine[0])
+                {
+                    // Seek for a non escaped double quote.
+                    int lastDoubleQuoteIndex = 1;
+                    for (; lastDoubleQuoteIndex < commandLineLength; lastDoubleQuoteIndex++)
+                    {
+                        if ('"' != commandLine[lastDoubleQuoteIndex]) { continue; }
+                        if ('\\' != commandLine[lastDoubleQuoteIndex - 1]) { break; }
+                    }
+                    if (lastDoubleQuoteIndex >= commandLineLength) { return false; }
+                    candidateFilePath = commandLine.Substring(1, lastDoubleQuoteIndex - 1);
+                }
+                else
+                {
+                    // Seek for first separator character.
+                    int firstSeparatorIndex = 0;
+                    for (; firstSeparatorIndex < commandLineLength; firstSeparatorIndex++)
+                    {
+                        if (char.IsSeparator(commandLine[firstSeparatorIndex])) { break; }
+                    }
+                    if (firstSeparatorIndex >= commandLineLength) { return false; }
+                    candidateFilePath = commandLine.Substring(0, firstSeparatorIndex);
+                }
+                return File.Exists(candidateFilePath);
+            }
+        }
+        catch { return false; }
     }
 
     void CheckForInno() {
