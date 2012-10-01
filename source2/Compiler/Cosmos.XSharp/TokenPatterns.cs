@@ -359,7 +359,9 @@ namespace Cosmos.Compiler.XSharp {
       });
       AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
         // , 0 adds null term to our strings.
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " db \"" + aTokens[3].Value + "\", 0");
+        // Fix issue #15660 by using backquotes for string surrounding and escaping embedded
+        // back quotes.
+        aAsm.Data.Add(GetLabel(aTokens[1]) + " db `" + EscapeBackQuotes(aTokens[3].Value) + "`, 0");
       });
       AddPattern(new string[] {
         "var _ABC byte[123]",
@@ -617,6 +619,38 @@ namespace Cosmos.Compiler.XSharp {
           }
         }
       });
+    }
+
+    /// <summary>Fix issue #15660. This method escapes double quotes in the candidate string.</summary>
+    /// <param name="from">The string to be sanitized.</param>
+    /// <returns>The original string with escaped double quotes.</returns>
+    private static string EscapeBackQuotes(string from)
+    {
+        StringBuilder builder = new StringBuilder();
+        bool sanitized = false;
+        bool escaped = false;
+        foreach (char scannedCharacter in from)
+        {
+            switch (scannedCharacter)
+            {
+                case '\\':
+                    escaped = !escaped;
+                    break;
+                case '`':
+                    if (!escaped)
+                    {
+                        sanitized = true;
+                        builder.Append('\\');
+                    }
+                    escaped = false;
+                    break;
+                default:
+                    escaped = false;
+                    break;
+            }
+            builder.Append(scannedCharacter);
+        }
+        return (sanitized) ? builder.ToString() : from;
     }
 
     protected Pattern FindMatch(TokenList aTokens) {
