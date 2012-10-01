@@ -5,13 +5,16 @@ using System.Text;
 
 namespace Cosmos.Compiler.XSharp {
   public class Parser {
+    /// <summary>Index in <see cref="mData"/> of the first yet unconsumed character.</summary>
     protected int mStart = 0;
+    /// <summary>Initial text provided as a constructor parameter.</summary>
     protected string mData;
     protected bool mIncludeWhiteSpace;
     protected bool mAllWhitespace;
     protected bool mAllowPatterns;
 
     protected TokenList mTokens;
+    /// <summary>Get a list of tokens that has been built at class instanciation.</summary>
     public TokenList Tokens {
       get { return mTokens; }
     }
@@ -177,7 +180,9 @@ namespace Cosmos.Compiler.XSharp {
       return char.IsLetterOrDigit(aChar) || aChar == '_' || aChar == '.' || aChar == '$';
     }
 
-    // Initial Parse to convert text to tokens
+    /// <summary>Consume text that has been provided to the class constructor, splitting it into
+    /// a list of tokens.</summary>
+    /// <returns>The resulting tokens list.</returns>
     protected TokenList Parse() {
       // Save in comment, might be useful in future. Already had to dig it out of TFS once
       //var xRegex = new Regex(@"(\W)");
@@ -190,14 +195,27 @@ namespace Cosmos.Compiler.XSharp {
       int i = 0;
       for (i = 0; i < mData.Length; i++) {
         xChar = mData[i];
+        // Extract string literal (surrounded with single quote characters).
         if (xChar == '\'') {
           // Take data before the ' as a token.
           NewToken(xResult, ref i);
-          // Now scan to the next '
+          // Now scan to the next ' taking into account escaped single quotes.
+          bool escapedCharacter = false;
           for (i = i + 1; i < mData.Length; i++) {
-            if (mData[i] == '\'') {
-              break;
+            bool done = false;
+            switch(mData[i])
+            {
+              case '\'':
+                if (!escapedCharacter) { done = true; }
+                break;
+              case '\\':
+                escapedCharacter = !escapedCharacter;
+                break;
+              default:
+                escapedCharacter = false;
+                break;
             }
+            if (done) { break; }
           }
           if (i == mData.Length) {
             throw new Exception("Unterminated string.");
@@ -233,6 +251,12 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    /// <summary>Create a new Parser instance and immediately consume the given <paramref name="aData"/>
+    /// string. On return the <seealso cref="Tokens"/> property is available for enumeration.</summary>
+    /// <param name="aData">The text to be parsed.</param>
+    /// <param name="aIncludeWhiteSpace"></param>
+    /// <param name="aAllowPatterns"></param>
+    /// <exception cref="Exception">At least one unrecognized token has been parsed.</exception>
     public Parser(string aData, bool aIncludeWhiteSpace, bool aAllowPatterns) {
       mData = aData;
       mIncludeWhiteSpace = aIncludeWhiteSpace;
