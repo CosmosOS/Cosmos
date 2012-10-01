@@ -964,30 +964,41 @@ namespace Cosmos.IL2CPU {
         return;
       }
 
-      // Check options for Debug Level
-      // Set based on TracedAssemblies
-      if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User) {
-        if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
-          return;
-        } else if (aNamespace.ToLower() == "system") {
-          return;
-        } else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
-          return;
-        }
-        if (TraceAssemblies == TraceAssemblies.User) {
-          //TODO: Maybe an attribute that could be used to turn tracing on and off
-          //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user 
-          // could do Cosmos.KernelMine and it will fail. Need to fix this
-          if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase)) {
-            return;
-          } else if (aNamespace.StartsWith("Cosmos.Sys", StringComparison.InvariantCultureIgnoreCase)) {
-            return;
-          } else if (aNamespace.StartsWith("Cosmos.Hardware", StringComparison.InvariantCultureIgnoreCase)) {
-            return;
-          } else if (aNamespace.StartsWith("Cosmos.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
-            return;
+      // This test fixes issue #15638
+      if (null != aNamespace)
+      {
+          // Check options for Debug Level
+          // Set based on TracedAssemblies
+          if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User)
+          {
+              if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
+                  return;
+              }
+              else if (aNamespace.ToLower() == "system") {
+                  return;
+              }
+              else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
+                  return;
+              }
+              if (TraceAssemblies == TraceAssemblies.User)
+              {
+                  //TODO: Maybe an attribute that could be used to turn tracing on and off
+                  //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user 
+                  // could do Cosmos.KernelMine and it will fail. Need to fix this
+                  if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase)) {
+                      return;
+                  }
+                  else if (aNamespace.StartsWith("Cosmos.Sys", StringComparison.InvariantCultureIgnoreCase)) {
+                      return;
+                  }
+                  else if (aNamespace.StartsWith("Cosmos.Hardware", StringComparison.InvariantCultureIgnoreCase)) {
+                      return;
+                  }
+                  else if (aNamespace.StartsWith("Cosmos.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
+                      return;
+                  }
+              }
           }
-        }
       }
 
       // If we made it this far without a return, emit the Tracer
