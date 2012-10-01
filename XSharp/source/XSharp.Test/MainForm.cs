@@ -8,12 +8,13 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
+using Cosmos.Build.Common;
+
 namespace XSharp.Test {
   public partial class MainForm : Form {
-    // TODO convert to app path + relative
     // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
     // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
-    protected string mPath = @"D:\source\Cosmos\source2\Compiler\Cosmos.Compiler.DebugStub\";
+    protected string mPath;
 
     public MainForm() {
       InitializeComponent();
@@ -51,6 +52,7 @@ namespace XSharp.Test {
     }
 
     private void MainForm_Load(object sender, EventArgs e) {
+      mPath = CosmosPaths.DebugStubSrc;
       // For testing
       Test(Path.Combine(mPath, "Serial.xs"));
 
