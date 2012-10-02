@@ -104,7 +104,9 @@ namespace Cosmos.Compiler.XSharp {
         // So ToString/Format wont generate error
         xString = xString.Replace("{", "{{");
         xString = xString.Replace("}", "}}");
-        if (xChar1 == '/' && xString.Substring(0, 1) == @"/") {
+        // Fix issue #15662 with string length check.
+        // Fix issue #15663 with comparing from mData and not from xString anymore.
+        if (('/' == xChar1) && (2 <= xString.Length) && ('/' == mData[mStart + 1])) {
           xString = xString.Substring(1);
           xToken.Type = TokenType.Comment;
         } else if (xChar1 == '!') {
