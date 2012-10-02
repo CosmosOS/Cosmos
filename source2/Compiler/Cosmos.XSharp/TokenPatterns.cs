@@ -176,6 +176,10 @@ namespace Cosmos.Compiler.XSharp {
     /// labels' name construction.</summary>
     /// <param name="aName">Function name.</param>
     protected void StartFunc(string aName) {
+      if (InFunctionBody) {
+        throw new Exception(
+            "Found a function/interrupt handler definition embedded inside another function/interrupt handler.");
+      }
       mFuncName = aName;
       mFuncExitFound = false;
       mBlocks.Reset();
