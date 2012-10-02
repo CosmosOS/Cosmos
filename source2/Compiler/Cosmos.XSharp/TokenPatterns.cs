@@ -163,6 +163,13 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    /// <summary>Get a flag that tell if we are in a function body or not. This is used by the
+    /// assembler generator when end of source file is reached to make sure the last function
+    /// or interrupt handler is properly closed (see issue #15666)</summary>
+    internal bool InFunctionBody
+    {
+        get { return !string.IsNullOrEmpty(mFuncName); }
+    }
 
     /// <summary>Start a new function having the given name. The current blocks collection is
     /// reset to an empty state and the function name is saved for later reuse in local to function
@@ -199,9 +206,11 @@ namespace Cosmos.Compiler.XSharp {
     protected string GetDestRegister(TokenList aTokens, int aIdx) {
       return GetRegister("Destination", aTokens, aIdx);
     }
+
     protected string GetSrcRegister(TokenList aTokens, int aIdx) {
       return GetRegister("Source", aTokens, aIdx);
     }
+
     protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx) {
       var xToken = aTokens[aIdx].Type;
       Token xNext = null;
@@ -279,6 +288,7 @@ namespace Cosmos.Compiler.XSharp {
     protected string GetJump(string aComparison) {
       return GetJump(aComparison, false);
     }
+
     protected string GetJump(string aComparison, bool aInvert) {
       if (aInvert) {
         if (aComparison == "<") {
