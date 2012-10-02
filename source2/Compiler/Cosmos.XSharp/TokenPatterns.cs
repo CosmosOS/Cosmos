@@ -6,7 +6,15 @@ using System.Text;
 using XSharp.Nasm;
 
 namespace Cosmos.Compiler.XSharp {
+  /// <summary>This class is able to translate a single X# source code line into one or more
+  /// target assembler source code and data lines. The class is a group of pattern each of
+  /// which defines a transformation function from the X# syntax to the target assembler
+  /// syntax.</summary>
   public class TokenPatterns {
+    /// <summary>Describe a single pattern with its list of tokens that might include pattern
+    /// reserved syntax token and a transformation function. For ease of search and performance
+    /// an hashcode value is computed on the tokens list content and later used for searching
+    /// a pattern matching an actual line of X# code source.</summary>
     protected class Pattern {
       public readonly TokenList Tokens;
       public readonly int Hash;
@@ -19,7 +27,10 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+    /// <summary>The set of blocks for the currently assembled function. Each time we begin
+    /// assembling a new function this blocks collection is reset to an empty state.</summary>
     protected Blocks mBlocks = new Blocks();
+
     protected class Blocks : List<Block> {
       protected int mCurrentLabelID = 0;
 
@@ -118,15 +129,19 @@ namespace Cosmos.Compiler.XSharp {
     protected string ConstLabel(Token aToken) {
       return GroupLabel("Const_" + aToken);
     }
+
     protected string GroupLabel(string aLabel) {
       return GetNamespace() + "_" + aLabel;
     }
+
     protected string FuncLabel(string aLabel) {
       return GetNamespace() + "_" + mFuncName + "_" + aLabel;
     }
+
     protected string BlockLabel(string aLabel) {
       return FuncLabel("Block" + mBlocks.Current().LabelID + "_" + aLabel);
     }
+
     protected string GetLabel(Token aToken) {
       if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("exit")) {
         throw new Exception("Label must be AlphaNum.");
@@ -148,14 +163,29 @@ namespace Cosmos.Compiler.XSharp {
       }
     }
 
+
+    /// <summary>Start a new function having the given name. The current blocks collection is
+    /// reset to an empty state and the function name is saved for later reuse in local to function
+    /// labels' name construction.</summary>
+    /// <param name="aName">Function name.</param>
     protected void StartFunc(string aName) {
       mFuncName = aName;
       mFuncExitFound = false;
       mBlocks.Reset();
     }
 
+    /// <summary>Terminate assembling current function. If a local to function exit label has not
+    /// been explicitly defined a new one is automatically created. This is because some "return"
+    /// keyword might have been used in function X# code. This keyword requires an exit label to
+    /// be defined at function level. This method also automatically insert an IRET or RET instruction
+    /// depending on whether the function is an interrupt handler or a standard function.</summary>
+    /// <param name="aAsm"></param>
     protected void EndFunc(Assembler aAsm) {
-      if (!mFuncExitFound) {
+      if (null == mFuncName) {
+        throw new Exception("Found a closing curly brace that doesn't match an opening curly brace.");
+      }
+      if (!mFuncExitFound)
+      {
         aAsm += GetNamespace() + "_" + mFuncName + "_Exit:";
       }
       if (mInIntHandler) {
@@ -542,7 +572,8 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
 
-      // End block
+      // End block. This handle both terminating a standard block as well as a function or an
+      // interrupt handler.
       AddPattern("}", delegate(TokenList aTokens, Assembler aAsm) {
         if (mBlocks.Count == 0) {
           EndFunc(aAsm);
@@ -726,26 +757,50 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
+    /// <summary>Register a single pattern with its associated transformation handler.</summary>
+    /// <param name="aPattern">A single line of X# code that define the pattern optionally using
+    /// pattern reserved syntax.</param>
+    /// <param name="aCode">The associated code transformation handler.</param>
     protected void AddPattern(string aPattern, CodeFunc aCode) {
       var xParser = new Parser(aPattern, false, true);
       var xPattern = new Pattern(xParser.Tokens, aCode);
       mPatterns.Add(xPattern);
     }
+
+    /// <summary>Register a collection of patterns that share a single transformation handler.
+    /// </summary>
+    /// <param name="aPatterns">A collection of X# lines of code. Each line of code define a
+    /// pattern optionally using the pattern reserved syntax.</param>
+    /// <param name="aCode">The code transformation handler that is common abmongst all the
+    /// patterns from the collection.</param>
     protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
       foreach (var xPattern in aPatterns) {
         AddPattern(xPattern, aCode);
       }
     }
-    protected void AddPattern(string aPattern, string aCode) {
+
+    /// <summary>Register a single pattern with a fixed transformation result.</summary>
+    /// <param name="aPattern">A single line of X# code that define the pattern optionally using
+    /// pattern reserved syntax.</param>
+    /// <param name="aCode">The constant transformation result.</param>
+    protected void AddPattern(string aPattern, string aCode)
+    {
       AddPattern(aPattern, delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += aCode;
       });
     }
-    protected void AddPattern(string[] aPatterns, string aCode) {
+
+    /// <summary>Register a collection of patterns that share a single constant transformation
+    /// handler.</summary>
+    /// <param name="aPatterns">A collection of X# lines of code. Each line of code define a
+    /// pattern optionally using the pattern reserved syntax.</param>
+    /// <param name="aCode">The constant transformation resultthat is common abmongst all the
+    /// patterns from the collection.
+    protected void AddPattern(string[] aPatterns, string aCode)
+    {
       foreach (var xPattern in aPatterns) {
         AddPattern(xPattern, aCode);
       }
     }
-
   }
 }
