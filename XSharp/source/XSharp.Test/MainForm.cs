@@ -14,11 +14,12 @@ namespace XSharp.Test {
   public partial class MainForm : Form {
     // D:\source\Cosmos\source2\Tests\XSharpCompilerTester\bin\Debug
     // D:\source\Cosmos\source2\Users\Matthijs\MatthijsPlayground
-    protected string mPath;
 
     public MainForm() {
       InitializeComponent();
     }
+
+    internal DirectoryInfo RootDirectory { get; set; }
 
     protected void Test(string aFilename) {
       tabsMain.TabPages.Add(Path.GetFileNameWithoutExtension(aFilename));
@@ -52,11 +53,11 @@ namespace XSharp.Test {
     }
 
     private void MainForm_Load(object sender, EventArgs e) {
-      mPath = CosmosPaths.DebugStubSrc;
+      if (null == RootDirectory) { RootDirectory = new DirectoryInfo(CosmosPaths.DebugStubSrc); }
       // For testing
-      Test(Path.Combine(mPath, "Serial.xs"));
+      // Test(Path.Combine(RootDirectory.FullName, "Serial.xs"));
 
-      var xFiles = Directory.GetFiles(mPath, "*.xs");
+      var xFiles = Directory.GetFiles(RootDirectory.FullName, "*.xs");
       foreach (var xFile in xFiles) {
         Test(xFile);
       }
