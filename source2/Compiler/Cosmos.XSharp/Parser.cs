@@ -9,18 +9,25 @@ namespace Cosmos.Compiler.XSharp {
     protected int mStart = 0;
     /// <summary>Initial text provided as a constructor parameter.</summary>
     protected string mData;
+    /// <summary>true if whitespace tokens should be kept and propagated to the next parsing
+    /// stage.</summary>
     protected bool mIncludeWhiteSpace;
+    /// <summary>true while every token encountered until so far by this parser are whitespace
+    /// tokens.</summary>
     protected bool mAllWhitespace;
+    /// <summary>true if the parser supports patterns recognition.</summary>
     protected bool mAllowPatterns;
 
+    /// <summary>Tokens retrieved so far by the parser.</summary>
     protected TokenList mTokens;
+
     /// <summary>Get a list of tokens that has been built at class instanciation.</summary>
     public TokenList Tokens {
       get { return mTokens; }
     }
 
-    protected static readonly char[] mComma = ",".ToCharArray();
-    protected static readonly char[] mSpace = " ".ToCharArray();
+    protected static readonly char[] mComma = new char[] { ',' };
+    protected static readonly char[] mSpace = new char[] { ' ' };
     public static string[] mKeywords = (
       "As,All"
       + ",BYTE"
@@ -65,6 +72,12 @@ namespace Cosmos.Compiler.XSharp {
       RegistersAddr = xRegistersAddr.ToArray();
     }
 
+    /// <summary>Parse next token from currently parsed line, starting at given position and
+    /// add the retrieved token at end of given token list.</summary>
+    /// <param name="aList">The token list where to add the newly recognized token.</param>
+    /// <param name="rPos">The index in current source code line of the first not yet consumed
+    /// character. On return this parameter will be updated to account for characters that would
+    /// have been consumed.</param>
     protected void NewToken(TokenList aList, ref int rPos) {
       #region Pattern Notes
       // All patterns start with _, this makes them reserved. User can use too, but at own risk of conflict.
@@ -98,6 +111,7 @@ namespace Cosmos.Compiler.XSharp {
       char xChar1 = mData[mStart];
       var xToken = new Token();
 
+      // Recognize comments and literal assembler code.
       if (mAllWhitespace && "/!".Contains(xChar1)) {
         rPos = mData.Length; // This will account for the dummy whitespace at the end.
         xString = mData.Substring(mStart + 1, rPos - mStart - 1).Trim();
@@ -110,6 +124,7 @@ namespace Cosmos.Compiler.XSharp {
           xString = xString.Substring(1);
           xToken.Type = TokenType.Comment;
         } else if (xChar1 == '!') {
+          // Literal assembler code.
           xToken.Type = TokenType.LiteralAsm;
         }
       } else {
@@ -133,6 +148,8 @@ namespace Cosmos.Compiler.XSharp {
         } else if (IsAlphaNum(xChar1)) { // This must be after check for ValueInt
           string xUpper = xString.ToUpper();
 
+          // Special parsing when in pattern mode. We recognize some special strings
+          // which would otherwise be considered as simple AlphaNum token otherwise.
           if (mAllowPatterns) {
             if (RegisterPatterns.Contains(xUpper)) {
               xToken.Type = TokenType.Register;
@@ -166,12 +183,12 @@ namespace Cosmos.Compiler.XSharp {
       xToken.Value = xString;
       xToken.SrcPosStart = mStart;
       xToken.SrcPosEnd = rPos - 1;
-      if (mAllWhitespace && xToken.Type != TokenType.WhiteSpace) {
+      if (mAllWhitespace && (xToken.Type != TokenType.WhiteSpace)) {
         mAllWhitespace = false;
       }
       mStart = rPos;
 
-      if (mIncludeWhiteSpace || xToken.Type != TokenType.WhiteSpace) {
+      if (mIncludeWhiteSpace || (xToken.Type != TokenType.WhiteSpace)) {
         aList.Add(xToken);
       }
     }
@@ -190,7 +207,6 @@ namespace Cosmos.Compiler.XSharp {
       //var xRegex = new Regex(@"(\W)");
 
       var xResult = new TokenList();
-      char xLastChar = ' ';
       CharType xLastCharType = CharType.WhiteSpace;
       char xChar;
       CharType xCharType = CharType.WhiteSpace;
@@ -237,11 +253,10 @@ namespace Cosmos.Compiler.XSharp {
 
         // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.
         // But its faster as the second short circuit rather than a separate if.
-        if (xCharType != xLastCharType && i > 0) {
+        if ((xCharType != xLastCharType) && (0 < i)) {
           NewToken(xResult, ref i);
         }
 
-        xLastChar = xChar;
         xLastCharType = xCharType;
       }
 
@@ -255,9 +270,11 @@ namespace Cosmos.Compiler.XSharp {
 
     /// <summary>Create a new Parser instance and immediately consume the given <paramref name="aData"/>
     /// string. On return the <seealso cref="Tokens"/> property is available for enumeration.</summary>
-    /// <param name="aData">The text to be parsed.</param>
+    /// <param name="aData">The text to be parsed. WARNING : This is expected to be a single full line
+    /// of text. The parser can be create with a special "pattern recognition" mode.</param>
     /// <param name="aIncludeWhiteSpace"></param>
-    /// <param name="aAllowPatterns"></param>
+    /// <param name="aAllowPatterns">True if <paramref name="aData"/> is a pattern and thus the parsing
+    /// should be performed specifically.</param>
     /// <exception cref="Exception">At least one unrecognized token has been parsed.</exception>
     public Parser(string aData, bool aIncludeWhiteSpace, bool aAllowPatterns) {
       mData = aData;

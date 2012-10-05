@@ -69,6 +69,7 @@
     <Content Include="Docs\index.html" />
     <Content Include="Docs\Old.html" />
     <Content Include="Docs\ToDo.html" />
+    <Content Include="Docs\XSharp.htm" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

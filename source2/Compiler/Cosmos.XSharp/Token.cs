@@ -27,7 +27,6 @@ namespace Cosmos.Compiler.XSharp {
       return Value;
     }
 
-
     static public implicit operator string(Token aToken) {
       return aToken.Value;
     }

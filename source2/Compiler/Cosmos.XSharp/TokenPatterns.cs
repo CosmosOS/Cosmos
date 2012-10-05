@@ -85,6 +85,9 @@ namespace Cosmos.Compiler.XSharp {
     public TokenPatterns() {
       mCompareOps = "< > = != <= >= 0 !0".Split(" ".ToCharArray());
       var xSizes = "byte , word , dword ".Split(",".ToCharArray()).ToList();
+      // We must add this empty size so that we allow constructs where the size is not
+      // explicitly defined in source code. For example : while eax < 0
+      // otherwise we would have to write : while dword eax < 0
       xSizes.Add("");
       foreach (var xSize in xSizes) {
         foreach (var xComparison in mCompareOps) {
@@ -114,41 +117,62 @@ namespace Cosmos.Compiler.XSharp {
       AddPatterns();
     }
 
-    protected string Quoted(string aString) {
-      return "\"" + aString + "\"";
-    }
+    // BlueSkeye : Seems to be unused. Quoted out.
+    //protected string Quoted(string aString) {
+    //  return "\"" + aString + "\"";
+    //}
 
-    protected int IntValue(Token aToken) {
-      if (aToken.Value.StartsWith("0x")) {
-        return int.Parse(aToken.Value.Substring(2), NumberStyles.AllowHexSpecifier);
-      } else {
-        return int.Parse(aToken.Value);
-      }
-    }
+    // BlueSkeye : Seems to be unused. Quoted out.
+    //protected int IntValue(Token aToken)
+    //{
+    //  if (aToken.Value.StartsWith("0x")) {
+    //    return int.Parse(aToken.Value.Substring(2), NumberStyles.AllowHexSpecifier);
+    //  } else {
+    //    return int.Parse(aToken.Value);
+    //  }
+    //}
 
+    /// <summary>Builds a label that is suitable to denote a constant which name is given by the
+    /// token.</summary>
+    /// <param name="aToken"></param>
+    /// <returns></returns>
     protected string ConstLabel(Token aToken) {
       return GroupLabel("Const_" + aToken);
     }
 
+    /// <summary>Builds a label at namespace level having the given name.</summary>
+    /// <param name="aLabel">Local label name at namespace level.</param>
+    /// <returns>The label name</returns>
     protected string GroupLabel(string aLabel) {
       return GetNamespace() + "_" + aLabel;
     }
 
-    protected string FuncLabel(string aLabel) {
+    /// <summary>Builds a label at function level having the given name.</summary>
+    /// <param name="aLabel">Local label name at function level.</param>
+    /// <returns>The label name</returns>
+    protected string FuncLabel(string aLabel)
+    {
       return GetNamespace() + "_" + mFuncName + "_" + aLabel;
     }
 
+    /// <summary>Builds a label having the given name at current function block level.</summary>
+    /// <param name="aLabel">Local label name at function block level.</param>
+    /// <returns>The label name.</returns>
     protected string BlockLabel(string aLabel) {
       return FuncLabel("Block" + mBlocks.Current().LabelID + "_" + aLabel);
     }
 
+    /// <summary>Build a label name for the given token. This method enforce the rule for .
+    /// and .. prefixes and build the label at appropriate level.</summary>
+    /// <param name="aToken"></param>
+    /// <returns></returns>
     protected string GetLabel(Token aToken) {
-      if (aToken.Type != TokenType.AlphaNum && !aToken.Matches("exit")) {
+      if ((aToken.Type != TokenType.AlphaNum) && !aToken.Matches("exit")) {
         throw new Exception("Label must be AlphaNum.");
       }
 
       string xValue = aToken;
-      if (mFuncName == null) {
+      if (!InFunctionBody) {
         if (xValue.StartsWith(".")) {
           return xValue.Substring(1);
         }
@@ -207,35 +231,39 @@ namespace Cosmos.Compiler.XSharp {
       mFuncName = null;
     }
 
-    protected string GetDestRegister(TokenList aTokens, int aIdx) {
-      return GetRegister("Destination", aTokens, aIdx);
-    }
+    // BlueSkeye : Seems to be unused. Commented out.
+    //protected string GetDestRegister(TokenList aTokens, int aIdx) {
+    //  return GetRegister("Destination", aTokens, aIdx);
+    //}
 
-    protected string GetSrcRegister(TokenList aTokens, int aIdx) {
-      return GetRegister("Source", aTokens, aIdx);
-    }
+    // BlueSkeye : Seems to be unused. Commented out.
+    //protected string GetSrcRegister(TokenList aTokens, int aIdx) {
+    //  return GetRegister("Source", aTokens, aIdx);
+    //}
 
-    protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx) {
-      var xToken = aTokens[aIdx].Type;
-      Token xNext = null;
-      if (aIdx + 1 < aTokens.Count) {
-        xNext = aTokens[aIdx + 1];
-      }
+    // BlueSkeye : Seems to be unused. Commented out.
+    //protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx)
+    //{
+    //  var xToken = aTokens[aIdx].Type;
+    //  Token xNext = null;
+    //  if (aIdx + 1 < aTokens.Count) {
+    //    xNext = aTokens[aIdx + 1];
+    //  }
 
-      string xResult = aPrefix + "Reg = RegistersEnum." + aTokens[aIdx].Value;
-      if (xNext != null) {
-        if (xNext.Value == "[") {
-          string xDisplacement;
-          if (aTokens[aIdx + 2].Value == "-") {
-            xDisplacement = "-" + aTokens[aIdx + 2].Value;
-          } else {
-            xDisplacement = aTokens[aIdx + 2].Value;
-          }
-          xResult = xResult + ", " + aPrefix + "IsIndirect = true, " + aPrefix + "Displacement = " + xDisplacement;
-        }
-      }
-      return xResult;
-    }
+    //  string xResult = aPrefix + "Reg = RegistersEnum." + aTokens[aIdx].Value;
+    //  if (xNext != null) {
+    //    if (xNext.Value == "[") {
+    //      string xDisplacement;
+    //      if (aTokens[aIdx + 2].Value == "-") {
+    //        xDisplacement = "-" + aTokens[aIdx + 2].Value;
+    //      } else {
+    //        xDisplacement = aTokens[aIdx + 2].Value;
+    //      }
+    //      xResult = xResult + ", " + aPrefix + "IsIndirect = true, " + aPrefix + "Displacement = " + xDisplacement;
+    //    }
+    //  }
+    //  return xResult;
+    //}
 
     protected string GetRef(TokenList aTokens, ref int rIdx) {
       var xToken1 = aTokens[rIdx];
@@ -375,10 +403,14 @@ namespace Cosmos.Compiler.XSharp {
       // ..Name: - Global level. Emitted exactly as is.
       // .Name: - Group level. Group_Name
       // Name: - Function level. Group_ProcName_Name
+
+      // The Exit label is a special one that is used as a target for the return instruction.
+      // It deserve special handling.
       AddPattern("Exit:", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += GetLabel(aTokens[0]) + ":";
         mFuncExitFound = true;
       });
+      // Regular label recognition.
       AddPattern("_ABC:", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += GetLabel(aTokens[0]) + ":";
       });
@@ -391,22 +423,31 @@ namespace Cosmos.Compiler.XSharp {
         aAsm += "Jmp " + GetLabel(aTokens[1]);
       });
 
+      // Defines a constant having the given name and initial value.
       AddPattern("const _ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += ConstLabel(aTokens[1]) + " equ " + aTokens[3];
       });
 
+      // Declare a double word variable having the given name and initialized to 0. The
+      // variable is declared at namespace level.
       AddPattern("var _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Data.Add(GetLabel(aTokens[1]) + " dd 0");
       });
+      // Declare a doubleword variable having the given name and an explicit initial value. The
+      // variable is declared at namespace level.
       AddPattern("var _ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Data.Add(GetLabel(aTokens[1]) + " dd " + aTokens[3].Value);
       });
+      // Declare a textual variable having the given name and value. The variable is defined at
+      // namespace level and a null terminating byte is automatically added after the textual
+      // value.
       AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
-        // , 0 adds null term to our strings.
         // Fix issue #15660 by using backquotes for string surrounding and escaping embedded
         // back quotes.
         aAsm.Data.Add(GetLabel(aTokens[1]) + " db `" + EscapeBackQuotes(aTokens[3].Value) + "`, 0");
       });
+      // Declare a one-dimension array of bytes, words or doublewords. All members are initialized to 0.
+      // _ABC is array name. 123 is the total number of items in the array.
       AddPattern(new string[] {
         "var _ABC byte[123]",
         "var _ABC word[123]",

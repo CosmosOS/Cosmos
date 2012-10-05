@@ -55,10 +55,12 @@ namespace Cosmos.Compiler.XSharp {
       return true;
     }
 
-    public bool PatternMatches(string aPattern) {
-      var xParser = new Parser(aPattern, false, true);
-      return PatternMatches(xParser.Tokens);
-    }
+    // BlueSkeye : Seems to be unused. Commented out.
+    //public bool PatternMatches(string aPattern) {
+    //  var xParser = new Parser(aPattern, false, true);
+    //  return PatternMatches(xParser.Tokens);
+    //}
+
     public bool PatternMatches(TokenList aObj) {
       // Dont compare TokenHashCodes, they take just as long to calculate
       // as a full comparison. Besides this function is often called after
@@ -101,14 +103,15 @@ namespace Cosmos.Compiler.XSharp {
       return true;
     }
 
-    public int IndexOf(string aValue) {
-      for (int i = 0; i < Count; i++) {
-        if (this[i].Value == aValue) {
-          return i;
-        }
-      }
-      return -1;
-    }
+    // BlueSkeye : Seems to be unused. Commented out.
+    //public int IndexOf(string aValue) {
+    //  for (int i = 0; i < Count; i++) {
+    //    if (this[i].Value == aValue) {
+    //      return i;
+    //    }
+    //  }
+    //  return -1;
+    //}
 
     // We could use values to further differntiate, however
     // with types alone it still provides a decent and fash hash.
