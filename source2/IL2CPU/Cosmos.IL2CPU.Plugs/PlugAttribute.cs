@@ -5,12 +5,28 @@ namespace Cosmos.IL2CPU.Plugs
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
   public sealed class PlugAttribute : Attribute 
   {
-    public Type Target;
-    public bool Inheritable = false;
-    public string TargetName;
-    public bool IsMonoOnly = false;
-    public bool IsMicrosoftdotNETOnly = false;
-	public FrameworkVersion TargetFramework = FrameworkVersion.v4_0;
+      public PlugAttribute(Type target)
+      {
+          if (null == target) { throw new ArgumentNullException(); }
+          Target = target;
+          return;
+      }
+
+      public PlugAttribute(string targetName)
+      {
+          if (string.IsNullOrEmpty(targetName)) { throw new ArgumentNullException(); }
+          TargetName = targetName;
+          return;
+      }
+
+      public Type Target { get; private set; }
+
+      public string TargetName { get; private set; }
+      
+      public bool Inheritable = false;
+      public bool IsMonoOnly = false;
+      public bool IsMicrosoftdotNETOnly = false;
+      public FrameworkVersion TargetFramework = FrameworkVersion.v4_0;
   }
   
   [Flags]
