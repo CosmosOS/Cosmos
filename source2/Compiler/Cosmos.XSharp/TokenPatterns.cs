@@ -624,6 +624,10 @@ namespace Cosmos.Compiler.XSharp {
         "_REG - 1",
         "_REG - _REG"
       }, "Sub {0}, {2}");
+      AddPattern(new string[] {
+        "_REG * 1",
+        "_REG * _REG"
+      }, "Imul {0}, {2}");
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
 
@@ -818,7 +822,7 @@ namespace Cosmos.Compiler.XSharp {
     /// <param name="aCode">The associated code transformation handler.</param>
     protected void AddPattern(string aPattern, CodeFunc aCode) {
         Parser xParser = null;
-        try { new Parser(aPattern, 1, false, true); }
+        try { xParser = new Parser(aPattern, 1, false, true); }
         catch (Exception e)
         {
             throw new Exception(string.Format("Invalid pattern '{0}'", aPattern ?? "NULL"), e);
