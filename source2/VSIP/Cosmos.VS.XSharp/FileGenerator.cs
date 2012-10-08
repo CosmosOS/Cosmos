@@ -29,9 +29,15 @@ namespace Cosmos.VS.XSharp {
               xResult = xOutputData.ToString() + "\r\n"
                 + xOutputCode.ToString() + "\r\n";
             } catch (Exception ex) {
-              xResult = xOutputData.ToString() + "\r\n"
-                + xOutputCode.ToString() + "\r\n"
-                + ex.Message + "\r\n";
+              StringBuilder builder = new StringBuilder();
+
+              builder.AppendLine(xOutputData.ToString());
+              builder.AppendLine(xOutputCode.ToString());
+              for (Exception e = ex; null != e; e = e.InnerException)
+              {
+                  builder.AppendLine(e.Message);
+              }
+              xResult = builder.ToString();
             }
           }
         }

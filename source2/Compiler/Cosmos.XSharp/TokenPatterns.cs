@@ -817,7 +817,12 @@ namespace Cosmos.Compiler.XSharp {
     /// pattern reserved syntax.</param>
     /// <param name="aCode">The associated code transformation handler.</param>
     protected void AddPattern(string aPattern, CodeFunc aCode) {
-      var xParser = new Parser(aPattern, 1, false, true);
+        Parser xParser = null;
+        try { new Parser(aPattern, 1, false, true); }
+        catch (Exception e)
+        {
+            throw new Exception(string.Format("Invalid pattern '{0}'", aPattern ?? "NULL"), e);
+        }
       var xPattern = new Pattern(xParser.Tokens, aCode);
       mPatterns.Add(xPattern);
     }

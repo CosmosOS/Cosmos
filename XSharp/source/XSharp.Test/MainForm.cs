@@ -78,8 +78,11 @@ namespace XSharp.Test {
             {
                 xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
                 {
-                    errorEncountered = true;
-                    if (null != e.Data) { resultCollector.WriteLine("ERROR : " + e.Data); }
+                    if (null != e.Data)
+                    {
+                        errorEncountered = true;
+                        resultCollector.WriteLine("ERROR : " + e.Data);
+                    }
                 };
                 xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
                 {
@@ -158,24 +161,28 @@ namespace XSharp.Test {
                           xOutputCode.WriteLine("============================");
                           xOutputCode.WriteLine("Compiling");
                           compilationError = !LaunchNasm(inputFile.FullName, xOutputCode);
+                          if (compilationError) { xOutputCode.WriteLine("Some compilation error."); }
+                          else { xOutputCode.WriteLine("Successfully compiled."); }
                       }
                       finally
                       {
                           inputFile.Refresh();
-                          if (!compilationError)
-                          {
-                              xOutputCode.WriteLine("Successfully compiled.");
-                              if (inputFile.Exists) { inputFile.Delete(); }
-                          }
+                          if (!compilationError && inputFile.Exists) { inputFile.Delete(); }
                       }
                   }
               }
               xTbox.Text = xOutputData.ToString() + "\r\n" + xOutputCode.ToString();
             } catch (Exception ex) {
               xTab.Text = "* " + xTab.Text;
-              xTbox.Text = xOutputData.ToString() + "\r\n"
-                + xOutputCode.ToString() + "\r\n"
-                + ex.Message + "\r\n";
+              StringBuilder builder = new StringBuilder();
+
+              builder.AppendLine(xOutputData.ToString());
+              builder.AppendLine(xOutputCode.ToString());
+              for (Exception e = ex; null != e; e = e.InnerException)
+              {
+                  builder.AppendLine(e.Message);
+              }
+              xTbox.Text = builder.ToString();
             }
           }
         }
