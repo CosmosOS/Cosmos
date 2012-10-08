@@ -241,6 +241,16 @@ For example :<br />
 EAX++<br />
 // Decrement ECX register<br />
 ECX--</code></p>
+<p>X# also support a restricted subset of the signed integer multiplication. The expression is a
+register name followed by the * operator and a multiplicand that can be either an integer literal
+or a register of the same size than the first register. The first register is the one that will
+receive the result of the multiplication of the first operand by the second one. For example :<br />
+<code>// Multiply EAX register by 0x1234<br />
+EAX * $1234<br />
+// Multiply DX by CX<br />
+DX * CX</code></p>
+<p>If you use the second syntax involving two registers, they must be of the same size.</p>
+<p><b>WARNING : You cannot use a byte sized register (AH, AL, BH, BL, CH, CL, DH or DL) for the first operand.</b></p>
 
 <h2>Register shifting and rolling</h2>
 <p>Shifting a register to the right or to the left is performed with <code>&gt;&gt;</code> and

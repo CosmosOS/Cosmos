@@ -627,7 +627,43 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern(new string[] {
         "_REG * 1",
         "_REG * _REG"
-      }, "Imul {0}, {2}");
+      }, delegate(TokenList aTokens, Assembler aAsm) {
+          int targetRegisterSize = 0;
+          for (int index = 0; index < 2; index++)
+          {
+              Token scannedToken = (0 == index) ? aTokens[0] : aTokens[2];
+
+              if (TokenType.Register != scannedToken.Type) { continue; }
+              string canonicScannedTokenValue = scannedToken.Value.ToUpper();
+
+              if (Parser.Registers8.Contains<string>(scannedToken.Value.ToUpper()))
+              {
+                  throw new Exception(string.Format(
+                      "Multiplication is not supported on byte sized register '{0}' at line {1}, col {2}",
+                      scannedToken.Value, scannedToken.LineNumber, scannedToken.SrcPosStart));
+              }
+              if (0 == index)
+              {
+                  if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 16; }
+                  else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 32; }
+                  else { throw new Exception("Algorithmic error."); }
+              }
+              else
+              {
+                  int sourceRegisterSize;
+                  if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 16; }
+                  else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 32; }
+                  else { throw new Exception("Algorithmic error."); }
+
+                  if (sourceRegisterSize != targetRegisterSize)
+                  {
+                      throw new Exception(string.Format("Register '{0}' and '{1}' must be of the same size for multiplication on line {2}.",
+                          aTokens[0], aTokens[2], aTokens[0].LineNumber));
+                  }
+              }
+          }
+          aAsm += string.Format("Imul {0}, {1}", aTokens[0], aTokens[2]);
+      });
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
 
