@@ -797,8 +797,8 @@ namespace Cosmos.Compiler.XSharp {
       return xResult;
     }
 
-    public Assembler GetCode(string aLine) {
-      var xParser = new Parser(aLine, false, false);
+    public Assembler GetCode(string aLine, int lineNumber) {
+      var xParser = new Parser(aLine, lineNumber, false, false);
       var xTokens = xParser.Tokens;
       var xResult = GetPatternCode(xTokens);
       if (xResult == null) {
@@ -817,7 +817,7 @@ namespace Cosmos.Compiler.XSharp {
     /// pattern reserved syntax.</param>
     /// <param name="aCode">The associated code transformation handler.</param>
     protected void AddPattern(string aPattern, CodeFunc aCode) {
-      var xParser = new Parser(aPattern, false, true);
+      var xParser = new Parser(aPattern, 1, false, true);
       var xPattern = new Pattern(xParser.Tokens, aCode);
       mPatterns.Add(xPattern);
     }

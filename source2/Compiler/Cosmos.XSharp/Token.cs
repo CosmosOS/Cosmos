@@ -23,6 +23,14 @@ namespace Cosmos.Compiler.XSharp {
     public int SrcPosStart;
     public int SrcPosEnd;
 
+    /// <summary>Get line number this token belongs to.</summary>
+    public int LineNumber { get; private set; }
+
+    public Token(int lineNumber) {
+        LineNumber = lineNumber;
+        return;
+    }
+
     public override string ToString() {
       return Value;
     }

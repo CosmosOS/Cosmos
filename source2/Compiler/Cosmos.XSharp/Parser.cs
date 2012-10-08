@@ -75,10 +75,11 @@ namespace Cosmos.Compiler.XSharp {
     /// <summary>Parse next token from currently parsed line, starting at given position and
     /// add the retrieved token at end of given token list.</summary>
     /// <param name="aList">The token list where to add the newly recognized token.</param>
+    /// <param name="lineNumber">Line number for diagnostics and debugging purpose.</param>
     /// <param name="rPos">The index in current source code line of the first not yet consumed
     /// character. On return this parameter will be updated to account for characters that would
     /// have been consumed.</param>
-    protected void NewToken(TokenList aList, ref int rPos) {
+    protected void NewToken(TokenList aList, int lineNumber, ref int rPos) {
       #region Pattern Notes
       // All patterns start with _, this makes them reserved. User can use too, but at own risk of conflict.
       //
@@ -109,7 +110,7 @@ namespace Cosmos.Compiler.XSharp {
 
       string xString = null;
       char xChar1 = mData[mStart];
-      var xToken = new Token();
+      var xToken = new Token(lineNumber);
 
       // Recognize comments and literal assembler code.
       if (mAllWhitespace && "/!".Contains(xChar1)) {
@@ -201,8 +202,9 @@ namespace Cosmos.Compiler.XSharp {
 
     /// <summary>Consume text that has been provided to the class constructor, splitting it into
     /// a list of tokens.</summary>
+    /// <param name="lineNumber">Line number for diagnostics and debugging.</param>
     /// <returns>The resulting tokens list.</returns>
-    protected TokenList Parse() {
+    protected TokenList Parse(int lineNumber) {
       // Save in comment, might be useful in future. Already had to dig it out of TFS once
       //var xRegex = new Regex(@"(\W)");
 
@@ -216,7 +218,7 @@ namespace Cosmos.Compiler.XSharp {
         // Extract string literal (surrounded with single quote characters).
         if (xChar == '\'') {
           // Take data before the ' as a token.
-          NewToken(xResult, ref i);
+          NewToken(xResult, lineNumber, ref i);
           // Now scan to the next ' taking into account escaped single quotes.
           bool escapedCharacter = false;
           for (i = i + 1; i < mData.Length; i++) {
@@ -254,7 +256,7 @@ namespace Cosmos.Compiler.XSharp {
         // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.
         // But its faster as the second short circuit rather than a separate if.
         if ((xCharType != xLastCharType) && (0 < i)) {
-          NewToken(xResult, ref i);
+          NewToken(xResult, lineNumber, ref i);
         }
 
         xLastCharType = xCharType;
@@ -262,7 +264,7 @@ namespace Cosmos.Compiler.XSharp {
 
       // Last token
       if (mStart < mData.Length) {
-        NewToken(xResult, ref i);
+        NewToken(xResult, lineNumber, ref i);
       }
 
       return xResult;
@@ -276,15 +278,22 @@ namespace Cosmos.Compiler.XSharp {
     /// <param name="aAllowPatterns">True if <paramref name="aData"/> is a pattern and thus the parsing
     /// should be performed specifically.</param>
     /// <exception cref="Exception">At least one unrecognized token has been parsed.</exception>
-    public Parser(string aData, bool aIncludeWhiteSpace, bool aAllowPatterns) {
+    public Parser(string aData, int lineNumber, bool aIncludeWhiteSpace, bool aAllowPatterns) {
       mData = aData;
       mIncludeWhiteSpace = aIncludeWhiteSpace;
       mAllowPatterns = aAllowPatterns;
       mAllWhitespace = true;
 
-      mTokens = Parse();
+      mTokens = Parse(lineNumber);
       if (mTokens.Count(q => q.Type == TokenType.Unknown) > 0) {
-        throw new Exception("Unknown tokens found.");
+        
+        foreach(Token token in mTokens)
+        {
+          if (TokenType.Unknown == token.Type) {
+            throw new Exception(string.Format("Unknown token '{0}' found at {1}/{2}.",
+              token.Value ?? "NULL", token.LineNumber, token.SrcPosStart));
+          }
+        }
       }
     }
   }

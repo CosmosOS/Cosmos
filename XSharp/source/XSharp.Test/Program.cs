@@ -15,6 +15,7 @@ namespace XSharp.Test
             builder.AppendFormat("{0} [-h] [-d <directory path>]\r\n",
                 Assembly.GetExecutingAssembly().GetName().Name);
             builder.AppendFormat("-h : display this notice.\r\n");
+            builder.AppendFormat("-a : Launch NASM on generated source code.\r\n");
             builder.AppendFormat("-d : names a directory that will be searched for .xs file.\r\n");
             MessageBox.Show(builder.ToString());
             return;
@@ -32,6 +33,7 @@ namespace XSharp.Test
             Application.SetCompatibleTextRenderingDefault(false);
             MainForm form = new MainForm();
             form.RootDirectory = _rootDirectory;
+            form.Compile = _launchNasm;
             Application.Run(form);
         }
 
@@ -58,8 +60,8 @@ namespace XSharp.Test
                 }
                 switch (scannedArgument.ToLower())
                 {
-                    case "h":
-                        _displayUsage = true;
+                    case "a":
+                        _launchNasm = true;
                         break;
                     case "d":
                         if (++index >= args.Length)
@@ -85,6 +87,9 @@ namespace XSharp.Test
                             }
                         }
                         break;
+                    case "h":
+                        _displayUsage = true;
+                        break;
                     default:
                         // Must reinitialize scannedArgument to its original value.
                         scannedArgument = args[index];
@@ -97,6 +102,7 @@ namespace XSharp.Test
         }
 
         private static bool _displayUsage = false;
+        private static bool _launchNasm = false;
         private static DirectoryInfo _rootDirectory;
     }
 }

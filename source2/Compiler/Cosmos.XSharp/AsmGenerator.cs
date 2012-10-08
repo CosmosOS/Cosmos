@@ -45,7 +45,7 @@ namespace Cosmos.Compiler.XSharp {
             break;
           }
 
-          var xAsm = ProcessLine(xLine);
+          var xAsm = ProcessLine(xLine, mLineNo);
           xResult.Data.AddRange(xAsm.Data);
           xResult.Code.AddRange(xAsm.Code);
         }
@@ -86,7 +86,7 @@ namespace Cosmos.Compiler.XSharp {
           break;
         }
 
-        var xAsm = ProcessLine(xLine);
+        var xAsm = ProcessLine(xLine, mLineNo);
         foreach (var x in xAsm.Data) {
           aOutputData.WriteLine(x);
         }
@@ -100,9 +100,10 @@ namespace Cosmos.Compiler.XSharp {
     /// <summary>Process a single X# source code line and translate it into the target
     /// assembler syntax.</summary>
     /// <param name="aLine">The processed X# source code line.</param>
+    /// <param name="lineNumber">Line number for debugging and diagnostic messages.</param>
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
-    protected Assembler ProcessLine(string aLine)
+    protected Assembler ProcessLine(string aLine, int lineNumber)
     {
       Assembler xAsm;
 
@@ -115,7 +116,7 @@ namespace Cosmos.Compiler.XSharp {
 
       // Currently we use a new assembler for every line.
       // If we dont it could create a really large in memory object.
-      xAsm = mPatterns.GetCode(aLine);
+      xAsm = mPatterns.GetCode(aLine, lineNumber);
       if (xAsm == null) {
         var xMsg = new StringBuilder();
         if (mPathname != "") {
