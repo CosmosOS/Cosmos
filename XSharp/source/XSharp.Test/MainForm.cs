@@ -178,9 +178,15 @@ namespace XSharp.Test {
 
               builder.AppendLine(xOutputData.ToString());
               builder.AppendLine(xOutputCode.ToString());
+              Exception innerMostException = null;
               for (Exception e = ex; null != e; e = e.InnerException)
               {
                   builder.AppendLine(e.Message);
+                  innerMostException = e;
+              }
+              if (null != innerMostException)
+              {
+                  builder.AppendLine(innerMostException.StackTrace);
               }
               xTbox.Text = builder.ToString();
             }
