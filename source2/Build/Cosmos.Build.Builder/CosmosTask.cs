@@ -285,6 +285,9 @@ namespace Cosmos.Build.Builder {
           key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0";
       using (var xKey = Registry.LocalMachine.OpenSubKey(key)) {
         string xDir = (string)xKey.GetValue("InstallDir");
+        if (String.IsNullOrWhiteSpace(xDir)) {
+            throw new Exception("Visual Studio 2010 not detected!");
+        }
         var xInfo = FileVersionInfo.GetVersionInfo(Path.Combine(xDir, "devenv.exe"));
         if (xInfo.ProductPrivatePart < 1) {
           throw new Exception("Visual Studio 2010 **SP1** not detected.");
