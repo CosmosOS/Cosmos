@@ -96,17 +96,26 @@ namespace Cosmos.Build.Builder {
       ITaskFolder xFolder = xService.GetFolder(@"\");
       foreach (IRegisteredTask xTask in xFolder.GetTasks(0)) {
         if (string.Equals(xTask.Name, "CosmosSetup")) {
-          // Wanted to make code to see if user moves setup after task is created
-          // but it didnt work....
-          //IAction xAction = xTask.Definition.Actions[0];
-          //if (xAction is IExecAction) {
-          //  IExecAction xAction2 = xAction as IExecAction;
-          //  if (xAction2.Path == null) {
-          //  }
-          //} else {
-          //  throw new Exception("Task is of unkonwn type.");
-          //}
-          return true;
+          if(xTask.Definition.Actions.Count > 0)
+          {
+              IAction xAction = xTask.Definition.Actions[1];
+              if (xAction is IExecAction)
+              {
+                  IExecAction xAction2 = xAction as IExecAction;
+                  if (xAction2.Path == null || xAction2.Arguments != "/SILENT" || xAction2.Path != mSetupPath)
+                      return false;
+                  // when commenting out the return false; statement above, suddenly it'll use the Console.Wrteline
+                  // statement as line for the if statement
+                  // obviously, this situation is a bit pointless, but in normal circumstances where the if is used to do
+                  // somehtingreal, you can get funky behaviour
+                  // ok
+              }
+              else
+              {
+                  throw new Exception("Task is of unkonwn type.");
+              }
+          }
+          return false;
         }
       }
       return false;
