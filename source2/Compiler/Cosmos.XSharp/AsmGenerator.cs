@@ -33,25 +33,32 @@ namespace Cosmos.Compiler.XSharp {
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
     public Assembler Generate(string aSrcPathname) {
-      mPatterns.EmitUserComments = EmitUserComments;
-      mLineNo = 0;
-      var xResult = new Assembler();
-      using (var xInput = new StreamReader(aSrcPathname)) {
-        // Read one X# source code line at a time and process it.
-        while (true) {
-          mLineNo++;
-          string xLine = xInput.ReadLine();
-          if (xLine == null) {
-            break;
-          }
+            mPatterns.EmitUserComments = EmitUserComments;
+            mLineNo = 0;
+            var xResult = new Assembler();
+            using (var xInput = new StreamReader(aSrcPathname))
+            {
+                // Read one X# source code line at a time and process it.
+                while (true)
+                {
+                    mLineNo++;
+                    string xLine = xInput.ReadLine();
+                    if (xLine == null)
+                    {
+                        break;
+                    }
+                    if (xLine.Trim() == "//")
+                    {
+                        continue;
+                    }
 
-          var xAsm = ProcessLine(xLine, mLineNo);
-          xResult.Data.AddRange(xAsm.Data);
-          xResult.Code.AddRange(xAsm.Code);
-        }
-      }
-      AssertLastFunctionComplete();
-      return xResult;
+                    var xAsm = ProcessLine(xLine, mLineNo);
+                    xResult.Data.AddRange(xAsm.Data);
+                    xResult.Code.AddRange(xAsm.Code);
+                }
+            }
+            AssertLastFunctionComplete();
+            return xResult;
     }
 
     /// <summary>Parse the input X# source code file and generate two new files with target
@@ -84,6 +91,10 @@ namespace Cosmos.Compiler.XSharp {
         string xLine = aInput.ReadLine();
         if (xLine == null) {
           break;
+        }
+        if (xLine.Trim() == "" || xLine.Trim() == "//")
+        {
+            continue;
         }
 
         var xAsm = ProcessLine(xLine, mLineNo);
