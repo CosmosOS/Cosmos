@@ -103,12 +103,10 @@ namespace Cosmos.Build.Builder {
               {
                   IExecAction xAction2 = xAction as IExecAction;
                   if (xAction2.Path == null || xAction2.Arguments != "/SILENT" || xAction2.Path != mSetupPath)
+                  { 
                       return false;
-                  // when commenting out the return false; statement above, suddenly it'll use the Console.Wrteline
-                  // statement as line for the if statement
-                  // obviously, this situation is a bit pointless, but in normal circumstances where the if is used to do
-                  // somehtingreal, you can get funky behaviour
-                  // ok
+                  }
+                  return true;
               }
               else
               {
