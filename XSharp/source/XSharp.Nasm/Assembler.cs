@@ -26,5 +26,27 @@ namespace XSharp.Nasm {
     public void Cmp(string aSize, string aDst, string aSrc) {
       Code.Add("Cmp " + (aSize + " ").TrimStart() + aDst + ", " + aSrc);
     }
+
+    public string GetCode(bool endNewLine = true) { 
+        string ret = "";
+
+        foreach (string c in Code)
+            ret += c + Environment.NewLine;
+        if (!endNewLine)
+            ret = ret.Remove(ret.Length - Environment.NewLine.Length);
+        
+        return ret;
+    }
+    public string GetData(bool endNewLine = true)
+    {
+        string ret = "";
+
+        foreach (string d in Data)
+            ret += d + Environment.NewLine;
+        if (!endNewLine)
+            ret = ret.Remove(ret.Length - Environment.NewLine.Length);
+
+        return ret;
+    }
   }
 }
