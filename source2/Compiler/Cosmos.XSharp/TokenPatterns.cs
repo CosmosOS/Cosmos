@@ -418,10 +418,35 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("Call _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Call " + GetLabel(aTokens[1]);
       });
+      AddPattern("_PCALL", delegate(TokenList aTokens, Assembler aAsm) {
+          if (aTokens.Count != 1 || aTokens[0].Type != TokenType.Call)
+              throw new Exception("Error occured in parametrized call parsing");
+          else
+          {
+              string[] mparts = aTokens[0].Value.Split('(');
+              if (mparts.Length != 2)
+                  throw new Exception("Error occured in parametrized call parsing");
+              else
+              {
+                  string[] prams = mparts[1].Remove(mparts[1].Length - 1).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                  for (int i = 0; i < prams.Length; i++)
+                      prams[i] = prams[i].Trim();
+                  Parser par;
+                  foreach (string p in prams.Reverse())
+                  {
+                      par = new Parser(p, 0, false, false);
+                      int idx = 0;
+                      aAsm += "Push " + GetRef(par.Tokens, ref idx);
+                  }
+                  aAsm += "Call " + GroupLabel(mparts[0]);
+              }
+          }
+      });
 
       AddPattern("Goto _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Jmp " + GetLabel(aTokens[1]);
       });
+      
 
       // Defines a constant having the given name and initial value.
       AddPattern("const _ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {

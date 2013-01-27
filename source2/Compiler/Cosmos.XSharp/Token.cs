@@ -13,6 +13,7 @@ namespace Cosmos.Compiler.XSharp {
     , ValueInt, ValueString
     // 
     , WhiteSpace, Operator, Delimiter
+    , Call
     // For now used during scanning while user is typing, but in future could be user methods we have to find etc
     , Unknown
     }

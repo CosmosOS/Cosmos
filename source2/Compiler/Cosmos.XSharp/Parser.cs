@@ -161,6 +161,10 @@ namespace Cosmos.Compiler.XSharp {
               xToken.Type = TokenType.AlphaNum;
               xString = null;
             }
+            else if (xUpper == "_PCALL") {
+              xString = null;
+              xToken.Type = TokenType.Call;
+            }
           }
 
           if (xToken.Type == TokenType.Unknown) {
@@ -168,6 +172,8 @@ namespace Cosmos.Compiler.XSharp {
               xToken.Type = TokenType.Register;
             } else if (mKeywords.Contains(xUpper)) {
               xToken.Type = TokenType.Keyword;
+            } else if(xString.Contains("(") && xString.Contains(")") && IsAlphaNum(xChar1)) {
+                xToken.Type = TokenType.Call;
             } else {
               xToken.Type = TokenType.AlphaNum;
             }
@@ -183,11 +189,11 @@ namespace Cosmos.Compiler.XSharp {
 
       xToken.Value = xString;
       xToken.SrcPosStart = mStart;
-      xToken.SrcPosEnd = rPos - 1;
+      xToken.SrcPosEnd = xToken.Type == TokenType.Call ? rPos : rPos - 1;
       if (mAllWhitespace && (xToken.Type != TokenType.WhiteSpace)) {
         mAllWhitespace = false;
       }
-      mStart = rPos;
+      mStart = xToken.Type == TokenType.Call ? rPos + 1 : rPos;
 
       if (mIncludeWhiteSpace || (xToken.Type != TokenType.WhiteSpace)) {
         aList.Add(xToken);
@@ -206,7 +212,7 @@ namespace Cosmos.Compiler.XSharp {
     /// <returns>The resulting tokens list.</returns>
     protected TokenList Parse(int lineNumber) {
       // Save in comment, might be useful in future. Already had to dig it out of TFS once
-      //var xRegex = new Regex(@"(\W)");
+      //var xRegex = new System.Text.RegularExpressions.Regex(@"(\W)");
 
       var xResult = new TokenList();
       CharType xLastCharType = CharType.WhiteSpace;
@@ -242,15 +248,33 @@ namespace Cosmos.Compiler.XSharp {
           }
           i++;
           xCharType = CharType.String;
-        } else if (char.IsWhiteSpace(xChar)) {
-          xCharType = CharType.WhiteSpace;
-        } else if (IsAlphaNum(xChar)) {
-          // _ and . were never likely to stand on their own. ie ESP _ 2 and ESP . 2 are never likely to be used.
-          // Having them on their own required a lot of code
-          // to treat them as a single unit where we did use them. So we treat them as AlphaNum.
-          xCharType = CharType.Identifier;
-        } else {
-          xCharType = CharType.Symbol;
+        }
+        else if (xChar == '(')
+        {
+            for (i += 1; i < mData.Length; i++)
+            {
+                if (mData[i] == ')')
+                {
+                    i++;
+                    NewToken(xResult, lineNumber, ref i);
+                    break;
+                }
+            }
+        }
+        else if (char.IsWhiteSpace(xChar))
+        {
+            xCharType = CharType.WhiteSpace;
+        }
+        else if (IsAlphaNum(xChar))
+        {
+            // _ and . were never likely to stand on their own. ie ESP _ 2 and ESP . 2 are never likely to be used.
+            // Having them on their own required a lot of code
+            // to treat them as a single unit where we did use them. So we treat them as AlphaNum.
+            xCharType = CharType.Identifier;
+        }
+        else
+        {
+            xCharType = CharType.Symbol;
         }
 
         // i > 0 - Never do NewToken on first char. i = 0 is just a pass to get char and set lastchar.

@@ -47,10 +47,6 @@ namespace Cosmos.Compiler.XSharp {
                     {
                         break;
                     }
-                    if (xLine.Trim() == "//")
-                    {
-                        continue;
-                    }
 
                     var xAsm = ProcessLine(xLine, mLineNo);
                     xResult.Data.AddRange(xAsm.Data);
@@ -92,10 +88,6 @@ namespace Cosmos.Compiler.XSharp {
         if (xLine == null) {
           break;
         }
-        if (xLine.Trim() == "" || xLine.Trim() == "//")
-        {
-            continue;
-        }
 
         var xAsm = ProcessLine(xLine, mLineNo);
         foreach (var x in xAsm.Data) {
@@ -119,7 +111,7 @@ namespace Cosmos.Compiler.XSharp {
       Assembler xAsm;
 
       aLine = aLine.Trim();
-      if (String.IsNullOrEmpty(aLine)) {
+      if (String.IsNullOrEmpty(aLine) || aLine == "//") {
         xAsm = new Assembler();
         xAsm += "";
         return xAsm;
