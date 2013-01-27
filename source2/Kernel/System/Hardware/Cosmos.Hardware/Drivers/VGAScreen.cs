@@ -191,6 +191,25 @@ namespace Cosmos.Hardware
         }
 
         public enum TextSize { Size40x25, Size40x50, Size80x25, Size80x50, Size90x30, Size90x60 };
+        public enum ScreenSize 
+        { 
+            /// <summary>
+            /// 640x480 graphics mode  - 2 and 4 bit color depth avaible
+            /// </summary>
+            Size640x480,
+            /// <summary>
+            /// 720x480 graphics mode  - 16 bit color depth avaible
+            /// </summary>
+            Size720x480,
+            /// <summary>
+            /// 320x200 graphics mode  - 4 and 8 bit color depth avaible
+            /// </summary>
+            Size320x200
+        };
+        public enum ColorDepth 
+        {
+            BitDepth2, BitDepth4, BitDepth8, BitDepth16
+        };
 
         public void SetTextMode(TextSize aSize)
         {
@@ -224,44 +243,86 @@ namespace Cosmos.Hardware
                     throw new Exception("Invalid text size.");
             }
         }
-        /*
-        //TODO: Change this to be like SetTextmode, but take two enums. One for size, one for bit depth
-        public void SetMode640x480x2()
+        public void SetGraphicsMode(ScreenSize aSize, ColorDepth aDepth)
         {
-            WriteVGARegisters(g_640x480x2);
-        }
-        public void SetMode320x240x4()
-        {
-            WriteVGARegisters(g_320x200x4);
-        }
-        public void SetMode720x480x16()
-        {
-            WriteVGARegisters(g_720x480x16);
-        }
-        */
-        public void SetMode320x200x8()
-        {
-            WriteVGARegisters(g_320x200x256);
+            switch (aSize)
+            { 
+                case ScreenSize.Size320x200:
+                    if (aDepth == ColorDepth.BitDepth8)
+                    {
+                        WriteVGARegisters(g_320x200x8);
 
-            PixelWidth = 320;
-            PixelHeight = 200;
-            Colors = 256;
-            SetPixel = new SetPixelDelegate(SetPixel320x200x8);
-            GetPixel = new GetPixelDelegate(GetPixel320x200x8);
+                        PixelWidth = 320;
+                        PixelHeight = 200;
+                        Colors = 256;
+                        SetPixel = new SetPixelDelegate(SetPixel320x200x8);
+                        GetPixel = new GetPixelDelegate(GetPixel320x200x8);
+                    }
+                    else if (aDepth == ColorDepth.BitDepth4)
+                    {
+                        WriteVGARegisters(g_320x200x4);
+
+                        PixelWidth = 320;
+                        PixelHeight = 200;
+                        Colors = 16;
+                        SetPixel = new SetPixelDelegate(SetPixel320x200x4);
+                        GetPixel = new GetPixelDelegate(GetPixel320x200x4);
+                    }
+                    else throw new Exception("Unsupported color depth passed for specified screen size");
+                    break;
+                case ScreenSize.Size640x480:
+                    if (aDepth == ColorDepth.BitDepth2)
+                    {
+                        WriteVGARegisters(g_640x480x2);
+
+                        PixelWidth = 640;
+                        PixelHeight = 480;
+                        Colors = 4;
+                        SetPixel = new SetPixelDelegate(SetPixel640x480x2);
+                        GetPixel = new GetPixelDelegate(GetPixel640x480x2);
+                    }
+                    else if (aDepth == ColorDepth.BitDepth4)
+                    {
+                        WriteVGARegisters(g_640x480x4);
+
+                        PixelWidth = 640;
+                        PixelHeight = 480;
+                        Colors = 16;
+                        SetPixel = new SetPixelDelegate(SetPixel640x480x4);
+                        GetPixel = new GetPixelDelegate(GetPixel640x480x4);
+                    }
+                    else throw new Exception("Unsupported color depth passed for specified screen size");
+                    break;
+                case ScreenSize.Size720x480:
+                    if (aDepth == ColorDepth.BitDepth16)
+                    {
+                        WriteVGARegisters(g_720x480x16);
+
+                        PixelWidth = 720;
+                        PixelHeight = 480;
+                        Colors = 0xFFFF;
+                        SetPixel = new SetPixelDelegate(SetPixel720x480x16);
+                        GetPixel = new GetPixelDelegate(GetPixel720x480x16);
+                    }
+                    else throw new Exception("Unsupported color depth passed for specified screen size");
+                    break;
+                default:
+                    throw new Exception("Unknown screen size");
+                    break;
+            }
         }
-        /*
-        public void SetMode640x480x4()
+        public void SetPixel320x200x4(uint x, uint y, uint c);
+        public uint GetPixel320x200x4(uint x, uint y);
+        public void SetPixel320x200x8(uint x, uint y, uint c)
         {
-            WriteVGARegisters(g_640x480x16);
-
-            PixelWidth = 640;
-            PixelHeight = 480;
-            Colors = 16;
-            SetPixel = new SetPixelDelegate(SetPixel640x480x4);
+            mIO.VGAMemoryBlock[(y * 320) + x] = (byte)(c & 0xFF);
         }
-
-        
-
+        public uint GetPixel320x200x8(uint x, uint y)
+        {
+            return mIO.VGAMemoryBlock[(y * 320) + x];
+        }
+        public void SetPixel640x480x2(uint x, uint y, uint c);
+        public uint GetPixel640x480x2(uint x, uint y);
         public void SetPixel640x480x4(uint x, uint y, uint c)
         {
             var xSegment = GetFramebufferSegment();
@@ -278,8 +339,10 @@ namespace Cosmos.Hardware
                 xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf0) | c);
             }
         }
-        */
-
+        public uint GetPixel640x480x4(uint x, uint y);
+        public void SetPixel720x480x16(uint x, uint y, uint c);
+        public uint GetPixel720x480x16(uint x, uint y);
+        
         private void SetPixelNoMode(uint x, uint y, uint c)
         {
             throw new Exception("No video mode set!");
@@ -289,22 +352,11 @@ namespace Cosmos.Hardware
             throw new Exception("No video mode set!");
         }
 
-        public void SetPixel320x200x8(uint x, uint y, uint c)
-        {
-            mIO.VGAMemoryBlock[(y * 320) + x] = (byte)(c & 0xFF);
-        }
-
-        public uint GetPixel320x200x8(uint x, uint y)
-        {            
-            return mIO.VGAMemoryBlock[(y * 320) + x];
-        }
-
         public int PixelWidth
         {
             private set;
             get;
         }
-
         public int PixelHeight
         {
             private set;
@@ -318,7 +370,7 @@ namespace Cosmos.Hardware
 
         public void TestMode320x200x8()
         {
-            SetMode320x200x8();
+            SetGraphicsMode(ScreenSize.Size320x200, ColorDepth.BitDepth8);
 
             for (byte i = 0; i < 64; i++)
             {
@@ -342,24 +394,22 @@ namespace Cosmos.Hardware
             for (uint i = 0; i < PixelHeight * PixelWidth; i++)            
                 xSegment[i] = (byte)(color & 0xFF);            
         }
-
         private Color[] _Palette = new Color[256];
         public Color GetPaletteEntry(int index)
         {
             return _Palette[index];
         }
+
+        public void SetPalette(int index, byte[] pallete)
+        {
+            mIO.DACIndex_Write.Byte = (byte)index;
+            for (int i = 0; i < pallete.Length; i++)
+                mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
+        }
         public void SetPaletteEntry(int index, Color color)
         {
             SetPaletteEntry(index, color.R, color.G, color.B);
         }
-
-        public void SetPalette(int index, byte[] pallete)
-        {
-            mIO.DACIndex_Write.Byte=(byte)index;
-            for (int i = 0; i < pallete.Length; i++)            
-                mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);            
-        }
-
         public void SetPaletteEntry(int index, byte r, byte g, byte b)
         {
             mIO.DACIndex_Write.Byte = (byte)index;
@@ -902,7 +952,7 @@ namespace Cosmos.Hardware
         #endregion
 
         #region MODES
-        private static byte[] g_640x480x16 = new byte[]
+        private static byte[] g_640x480x4 = new byte[]
 {
 /* MISC */
 	0xE3,
@@ -921,7 +971,7 @@ namespace Cosmos.Hardware
 	0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F,
 	0x01, 0x00, 0x0F, 0x00, 0x00
 };
-        private static byte[] g_320x200x256 = new byte[]
+        private static byte[] g_320x200x8 = new byte[]
 {
 /* MISC */
 	0x63,
