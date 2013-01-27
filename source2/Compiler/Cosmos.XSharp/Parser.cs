@@ -253,7 +253,7 @@ namespace Cosmos.Compiler.XSharp {
         {
             for (i += 1; i < mData.Length; i++)
             {
-                if (mData[i] == ')')
+                if (mData[i] == ')' && mData.LastIndexOf(")") <= i)
                 {
                     i++;
                     NewToken(xResult, lineNumber, ref i);

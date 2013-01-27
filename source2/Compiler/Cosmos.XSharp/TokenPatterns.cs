@@ -291,6 +291,9 @@ namespace Cosmos.Compiler.XSharp {
         rIdx += 1;
         return xToken1;
 
+      } else if(xToken1.Type==TokenType.Call) {
+          rIdx += 1;
+          return "@ret_on_stack@";
       } else if (xToken1.Value == "#") {
         rIdx += 2;
         return ConstLabel(xToken2);
@@ -423,23 +426,56 @@ namespace Cosmos.Compiler.XSharp {
               throw new Exception("Error occured in parametrized call parsing");
           else
           {
-              string[] mparts = aTokens[0].Value.Split('(');
-              if (mparts.Length != 2)
+              List<string> mparts = aTokens[0].Value.Remove(aTokens[0].Value.Length-1).Split('(').ToList();
+              if (mparts.Count < 2)
                   throw new Exception("Error occured in parametrized call parsing");
-              else
+              string fname = mparts[0];
+              mparts.RemoveAt(0);
+              aTokens[0].Value = String.Join("(", mparts).Trim();
+              string val = "";
+              int idx;
+
+              List<string> prams = new List<string>();
+              int level = 0;
+              foreach (char c in aTokens[0].Value)
               {
-                  string[] prams = mparts[1].Remove(mparts[1].Length - 1).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                  for (int i = 0; i < prams.Length; i++)
-                      prams[i] = prams[i].Trim();
-                  Parser par;
-                  foreach (string p in prams.Reverse())
-                  {
-                      par = new Parser(p, 0, false, false);
-                      int idx = 0;
-                      aAsm += "Push " + GetRef(par.Tokens, ref idx);
+                  switch (c) {
+                      case ',':
+                          if (level == 0)
+                          {
+                              prams.Add(val.Trim());
+                              val = "";
+                          }
+                          break;
+                      case '(':
+                          level++;
+                          val += c;
+                          break;
+                      case ')':
+                          level--;
+                          val += c;
+                          break;
+                      default:
+                          val += c;
+                          break;
                   }
-                  aAsm += "Call " + GroupLabel(mparts[0]);
               }
+              if(!String.IsNullOrEmpty(val.Trim()))
+                prams.Add(val);
+              if(level!=0)
+                  throw new Exception("'(' occured without closing equivalent ')' in parametrized function call");
+
+              Parser par; prams.Reverse();
+              foreach (string p in prams)
+              {
+                  par = new Parser(p, 0, false, false);
+                  idx = 0;
+                  val = GetRef(par.Tokens, ref idx);
+                  if (val != "@ret_on_stack@")
+                      aAsm += "Push " + val;
+                  else aAsm += GetPatternCode(par.Tokens).GetCode(false);
+              }
+              aAsm += "Call " + GroupLabel(fname);
           }
       });
 
