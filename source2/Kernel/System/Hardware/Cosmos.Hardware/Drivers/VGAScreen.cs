@@ -265,8 +265,8 @@ namespace Cosmos.Hardware
                         PixelWidth = 320;
                         PixelHeight = 200;
                         Colors = 16;
-                        SetPixel = new SetPixelDelegate(SetPixel320x200x4);
-                        GetPixel = new GetPixelDelegate(GetPixel320x200x4);
+                        //SetPixel = new SetPixelDelegate(SetPixel320x200x4);
+                        //GetPixel = new GetPixelDelegate(GetPixel320x200x4);
                     }
                     else throw new Exception("Unsupported color depth passed for specified screen size");
                     break;
@@ -278,8 +278,8 @@ namespace Cosmos.Hardware
                         PixelWidth = 640;
                         PixelHeight = 480;
                         Colors = 4;
-                        SetPixel = new SetPixelDelegate(SetPixel640x480x2);
-                        GetPixel = new GetPixelDelegate(GetPixel640x480x2);
+                        //SetPixel = new SetPixelDelegate(SetPixel640x480x2);
+                        //GetPixel = new GetPixelDelegate(GetPixel640x480x2);
                     }
                     else if (aDepth == ColorDepth.BitDepth4)
                     {
@@ -301,8 +301,8 @@ namespace Cosmos.Hardware
                         PixelWidth = 720;
                         PixelHeight = 480;
                         Colors = 0xFFFF;
-                        SetPixel = new SetPixelDelegate(SetPixel720x480x16);
-                        GetPixel = new GetPixelDelegate(GetPixel720x480x16);
+                        //SetPixel = new SetPixelDelegate(SetPixel720x480x16);
+                        //GetPixel = new GetPixelDelegate(GetPixel720x480x16);
                     }
                     else throw new Exception("Unsupported color depth passed for specified screen size");
                     break;
@@ -311,8 +311,8 @@ namespace Cosmos.Hardware
                     break;
             }
         }
-        public void SetPixel320x200x4(uint x, uint y, uint c);
-        public uint GetPixel320x200x4(uint x, uint y);
+        //public void SetPixel320x200x4(uint x, uint y, uint c);
+        //public uint GetPixel320x200x4(uint x, uint y);
         public void SetPixel320x200x8(uint x, uint y, uint c)
         {
             mIO.VGAMemoryBlock[(y * 320) + x] = (byte)(c & 0xFF);
@@ -321,8 +321,8 @@ namespace Cosmos.Hardware
         {
             return mIO.VGAMemoryBlock[(y * 320) + x];
         }
-        public void SetPixel640x480x2(uint x, uint y, uint c);
-        public uint GetPixel640x480x2(uint x, uint y);
+        //public void SetPixel640x480x2(uint x, uint y, uint c);
+        //public uint GetPixel640x480x2(uint x, uint y);
         public void SetPixel640x480x4(uint x, uint y, uint c)
         {
             var xSegment = GetFramebufferSegment();
@@ -339,9 +339,22 @@ namespace Cosmos.Hardware
                 xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf0) | c);
             }
         }
-        public uint GetPixel640x480x4(uint x, uint y);
-        public void SetPixel720x480x16(uint x, uint y, uint c);
-        public uint GetPixel720x480x16(uint x, uint y);
+        public uint GetPixel640x480x4(uint x, uint y)
+        {
+            var xSegment = GetFramebufferSegment();
+            var xOffset = (y * 32) + x >> 1;
+
+            if ((x & 1) == 0)
+            {
+                return (byte)(xSegment[xOffset] & 0xf);
+            }
+            else
+            {
+                return (byte)(xSegment[xOffset] & 0xf0);
+            }
+        }
+        //public void SetPixel720x480x16(uint x, uint y, uint c);
+        //public uint GetPixel720x480x16(uint x, uint y);
         
         private void SetPixelNoMode(uint x, uint y, uint c)
         {

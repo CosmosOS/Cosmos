@@ -5,6 +5,9 @@ namespace Cosmos.IL2CPU.Plugs
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
   public sealed class PlugAttribute : Attribute 
   {
+      public PlugAttribute()
+      {
+      }
       public PlugAttribute(Type target)
       {
           if (null == target) { throw new ArgumentNullException(); }
@@ -19,9 +22,9 @@ namespace Cosmos.IL2CPU.Plugs
           return;
       }
 
-      public Type Target { get; private set; }
+      public Type Target { get; set; }
 
-      public string TargetName { get; private set; }
+      public string TargetName { get; set; }
       
       public bool Inheritable = false;
       public bool IsMonoOnly = false;
