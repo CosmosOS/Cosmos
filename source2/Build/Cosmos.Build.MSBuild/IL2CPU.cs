@@ -113,7 +113,7 @@ namespace Cosmos.Build.MSBuild {
         mTask.EmitDebugSymbols = EmitDebugSymbols;
         mTask.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
         Log.LogMessage(MessageImportance.High,
-          string.Format("IL2CPU invoked with DebugMode='{0}', DebugEnabled='{1}', TraceAssemvlies='{2}', IgnoreDebugStub='{3}'",
+          string.Format("IL2CPU invoked with DebugMode='{0}', DebugEnabled='{1}', TraceAssemblies='{2}', IgnoreDebugStub='{3}'",
             DebugMode, DebugEnabled, TraceAssemblies ?? "{NULL}", IgnoreDebugStubAttribute
           ));
         return mTask.Execute();
