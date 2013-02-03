@@ -10,9 +10,9 @@ namespace Cosmos.VS.Windows {
     protected byte[] mData = new byte[0];
 
     public void Update(string aTag, byte[] aData) {
-        mData = aData;
       Dispatcher.Invoke(DispatcherPriority.Normal, 
         (Action)delegate() {
+            mData = aData;
           DoUpdate(aTag);    
         }
       );

@@ -36,19 +36,20 @@ namespace Cosmos.Assembler {
     public static string Get(string aMethodLabel, int aIlPos) {
       return aMethodLabel + ".IL_" + aIlPos.ToString("X4");
     }
-
+    public static System.Text.RegularExpressions.Regex IllegalCharsReplace = new System.Text.RegularExpressions.Regex(@"[&.,+$<>{}\-\`\\'/\\ \(\)\[\]\*!=_]", System.Text.RegularExpressions.RegexOptions.Compiled);
     public static string Final(string xName) {
-      var xSB = new StringBuilder(xName);
-
+      //var xSB = new StringBuilder(xName);
+      
       // DataMember.FilterStringForIncorrectChars also does some filtering but replacing empties or non _ chars
       // causes issues with legacy hardcoded values. So we have a separate function.
       //
       // For logging possibilities, we generate fuller names, and then strip out spacing/characters.
-      const string xIllegalChars = "&.,+$<>{}-`\'/\\ ()[]*!=_";
+      /*const string xIllegalChars = "&.,+$<>{}-`\'/\\ ()[]*!=_";
       foreach (char c in xIllegalChars) {
         xSB.Replace(c.ToString(), "");
-      }
-
+      }*/
+      xName = IllegalCharsReplace.Replace(xName, "");
+      var xSB = new StringBuilder(xName);
       if (xSB.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
           var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));

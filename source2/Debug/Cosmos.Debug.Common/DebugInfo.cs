@@ -82,10 +82,16 @@ namespace Cosmos.Debug.Common {
                 }
                 // Yes this throws an exception if the database doesnt exist, so we have to run it only if we
                 // know it exists. This will detach and also delete the physical files.
-                using (var xCmd = xConn.CreateCommand())
+                try
                 {
-                    xCmd.CommandText = "DROP DATABASE " + aDbName;
-                    xCmd.ExecuteNonQuery();
+                    using (var xCmd = xConn.CreateCommand())
+                    {
+                        xCmd.CommandText = "DROP DATABASE " + aDbName;
+                        xCmd.ExecuteNonQuery();
+                    }
+                }
+                catch
+                {
                 }
                 if (damagedDatabase)
                 {
@@ -409,8 +415,9 @@ namespace Cosmos.Debug.Common {
     public void Dispose() {
       if (mConnection != null) {
         var xConn = mConnection;
-        mConnection = null;
         xConn.Close();
+        xConn = null;
+        mConnection = null;
         // Dont set to null... causes problems because of bad code :(
         // Need to fix the whole class, but its here for now.
         //CurrentInstance = null;

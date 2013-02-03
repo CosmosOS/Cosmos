@@ -372,7 +372,7 @@ namespace Cosmos.IL2CPU {
 
     public int MethodCount {
       get {
-        return 0;
+          return mMethodUIDs.Count;
       }
     }
 

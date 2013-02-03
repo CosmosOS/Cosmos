@@ -88,7 +88,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "64695"
+		VWDPort = "1739"
 	EndProjectSection
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Kudzu.Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Kudzu.Breakpoints.Cosmos", "{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}"
@@ -228,6 +228,11 @@ EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GeramysTestBoot", "GeramysTest\GeramysTestBoot.Cosmos", "{0A7DF241-1000-405D-A09B-9E2C51A5CB95}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DA4198CA-59DF-41B3-9884-867647900D76} = {DA4198CA-59DF-41B3-9884-867647900D76}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21D9A04D-C5CC-4162-B7B4-C28940042A64}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
 	EndProjectSection
 EndProject
 Global

@@ -59,25 +59,38 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    public void UpdateFrame(byte[] aData) {
-      var xValues = MemoryViewUC.Split(aData);
-      int xCount = xValues.Count;
-      memvEBP.Clear();
-      for (int i = 0; i < xCount; i++) {
-        // We start at EBP + 8, because lower is not transmitted
-        // [EBP] is old EBP - not needed
-        // [EBP + 4] is saved EIP - not needed
-        memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
-      }
+    public void UpdateFrame(byte[] aData)
+    {
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                var xValues = MemoryViewUC.Split(aData);
+                int xCount = xValues.Count;
+                memvEBP.Clear();
+                for (int i = 0; i < xCount; i++)
+                {
+                    // We start at EBP + 8, because lower is not transmitted
+                    // [EBP] is old EBP - not needed
+                    // [EBP + 4] is saved EIP - not needed
+                    memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
+                }
+            }
+        );
     }
 
     public void UpdateStack(byte[] aData) {
-      var xValues = MemoryViewUC.Split(aData);
-      int xCount = xValues.Count;
-      memvESP.Clear();
-      for (int i = 0; i < xCount; i++) {
-        memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
-      }
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                var xValues = MemoryViewUC.Split(aData);
+                int xCount = xValues.Count;
+                memvESP.Clear();
+                for (int i = 0; i < xCount; i++)
+                {
+                    memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
+                }
+            }
+        );
     }
   }
 }
