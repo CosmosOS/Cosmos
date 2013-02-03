@@ -88,24 +88,49 @@ namespace Cosmos.VS.Windows {
     }
 
     protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData) {
-      var xWindow = FindWindow(aWindowType);
-      xWindow.UserControl.Update(aTag, aData);
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                var xWindow = FindWindow(aWindowType);
+                xWindow.UserControl.Update(aTag, aData);
+            }
+        );
     }
 
     private void ShowWindowAssembly(object aCommand, EventArgs e) {
-      ShowWindow(typeof(AssemblyTW));
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                ShowWindow(typeof(AssemblyTW));
+            }
+        );
     }
 
     private void ShowWindowInternal(object aCommand, EventArgs e) {
-      ShowWindow(typeof(InternalTW));
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                ShowWindow(typeof(InternalTW));
+            }
+        );
     }
 
     private void ShowWindowRegisters(object aCommand, EventArgs e) {
-      ShowWindow(typeof(RegistersTW));
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                ShowWindow(typeof(RegistersTW));
+            }
+        );
     }
 
     private void ShowWindowStack(object aCommand, EventArgs e) {
-      ShowWindow(typeof(StackTW));
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                ShowWindow(typeof(StackTW));
+            }
+        );
     }
 
     private void ShowWindowAll(object aCommand, EventArgs e) {
@@ -159,17 +184,32 @@ namespace Cosmos.VS.Windows {
         switch (xCmd) {
           case Debugger2Windows.Noop:
             break;
-
+            
           case Debugger2Windows.Stack:
-            UpdateWindow(typeof(StackTW), "STACK", xMsg);
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateWindow(typeof(StackTW), "STACK", xMsg);
+                }
+            );
             break;
 
           case Debugger2Windows.Frame:
-            UpdateWindow(typeof(StackTW), "FRAME", xMsg);
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateWindow(typeof(StackTW), "FRAME", xMsg);
+                }
+            );
             break;
 
           case Debugger2Windows.Registers:
-            UpdateWindow(typeof(RegistersTW), null, xMsg);
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateWindow(typeof(RegistersTW), null, xMsg);
+                }
+            );
             break;
 
           case Debugger2Windows.Quit:
@@ -177,7 +217,12 @@ namespace Cosmos.VS.Windows {
             break;
 
           case Debugger2Windows.AssemblySource:
-            UpdateWindow(typeof(AssemblyTW), null, xMsg);
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateWindow(typeof(AssemblyTW), null, xMsg);
+                }
+            );
             break;
 
           case Debugger2Windows.PongVSIP:
