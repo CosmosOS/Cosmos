@@ -73,15 +73,20 @@ namespace Cosmos.VS.Windows {
       // ESP 32
       // EIP 36
       //
-      UpdateRegisters(mData, 28, dataEAX, dataAX, dataAH, dataAL);
-      UpdateRegisters(mData, 16, dataEBX, dataBX, dataBH, dataBL);
-      UpdateRegisters(mData, 24, dataECX, dataCX, dataCH, dataCL);
-      UpdateRegisters(mData, 20, dataEDX, dataDX, dataDH, dataDL);
-      UpdateRegister32(mData, 8, dataEBP);
-      UpdateRegister32(mData, 4, dataESI);
-      UpdateRegister32(mData, 0, dataEDI);
-      UpdateRegister32(mData, 32, dataESP);
-      UpdateRegister32(mData, 36, dataEIP);
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                UpdateRegisters(mData, 28, dataEAX, dataAX, dataAH, dataAL);
+                UpdateRegisters(mData, 16, dataEBX, dataBX, dataBH, dataBL);
+                UpdateRegisters(mData, 24, dataECX, dataCX, dataCH, dataCL);
+                UpdateRegisters(mData, 20, dataEDX, dataDX, dataDH, dataDL);
+                UpdateRegister32(mData, 8, dataEBP);
+                UpdateRegister32(mData, 4, dataESI);
+                UpdateRegister32(mData, 0, dataEDI);
+                UpdateRegister32(mData, 32, dataESP);
+                UpdateRegister32(mData, 36, dataEIP);
+            }
+        );
       //TODO: Flags
     }
   }

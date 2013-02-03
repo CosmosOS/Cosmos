@@ -42,9 +42,20 @@ namespace Cosmos.VS.Windows {
 
     protected override void DoUpdate(string aTag) {
       if (aTag == "STACK") {
-        UpdateStack(mData);
+          System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateStack(mData);
+                }
+            );
+        
       } else if (aTag == "FRAME") {
-        UpdateFrame(mData);
+          System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+              (Action)delegate()
+              {
+                  UpdateFrame(mData);
+              }
+          );
       }
     }
 
