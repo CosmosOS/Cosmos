@@ -63,6 +63,8 @@ namespace Cosmos.System {
       mStopped = true;
     }
 
+    public Kernel() { }
+
     // Shutdown and restart
     public void Restart() {
     }

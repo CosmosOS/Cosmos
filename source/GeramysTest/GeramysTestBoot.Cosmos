@@ -20,8 +20,8 @@
     <DebugEnabled>True</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
-    <EnableGDB>True</EnableGDB>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <EnableGDB>False</EnableGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>GeramysTestBoot</Name>
@@ -38,8 +38,8 @@
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_VMwareEdition>Player</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <USB_Name>GeramysTestBoot</USB_Name>
     <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
     <USB_Deployment>USB</USB_Deployment>
