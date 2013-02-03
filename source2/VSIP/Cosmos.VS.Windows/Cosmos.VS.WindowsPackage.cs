@@ -88,13 +88,8 @@ namespace Cosmos.VS.Windows {
     }
 
     protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData) {
-        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-            (Action)delegate()
-            {
-                var xWindow = FindWindow(aWindowType);
-                xWindow.UserControl.Update(aTag, aData);
-            }
-        );
+        var xWindow = FindWindow(aWindowType);
+        xWindow.UserControl.Update(aTag, aData);
     }
 
     private void ShowWindowAssembly(object aCommand, EventArgs e) {
@@ -226,11 +221,21 @@ namespace Cosmos.VS.Windows {
             break;
 
           case Debugger2Windows.PongVSIP:
-            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
+                }
+            );
             break;
 
           case Debugger2Windows.PongDebugStub:
-            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
+                }
+            );
             break;
 
           case Debugger2Windows.OutputPane:
