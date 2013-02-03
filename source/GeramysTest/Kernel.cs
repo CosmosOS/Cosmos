@@ -15,7 +15,12 @@ namespace GeramysTest
         protected override void Run()
         {
             Console.Write("Input: ");
-            var input = Console.ReadLine();
+            string input = Console.ReadLine();
+            int i = 0;
+            i++;
+            i++;
+            string test = "something";
+            test += ", me.";
             Console.Write("Text typed: ");
             Console.WriteLine(input);
         }
