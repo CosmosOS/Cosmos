@@ -212,30 +212,15 @@ namespace Cosmos.VS.Windows {
             break;
 
           case Debugger2Windows.AssemblySource:
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
                     UpdateWindow(typeof(AssemblyTW), null, xMsg);
-                }
-            );
             break;
 
           case Debugger2Windows.PongVSIP:
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
                     UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
-                }
-            );
             break;
 
           case Debugger2Windows.PongDebugStub:
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
                     UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
-                }
-            );
             break;
 
           case Debugger2Windows.OutputPane:
