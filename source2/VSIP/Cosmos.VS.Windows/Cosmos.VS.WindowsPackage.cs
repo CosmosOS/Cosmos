@@ -71,6 +71,16 @@ namespace Cosmos.VS.Windows {
     }
 
     protected ToolWindowPane2 FindWindow(Type aWindowType) {
+        try
+        {
+
+        }
+        catch (System.Reflection.TargetInvocationException e)
+        {
+            Exception innerException = e.InnerException;
+            Global.OutputPane.OutputString(innerException.Message + "\r\n");
+            Global.OutputPane.OutputString(innerException.StackTrace + "\r\n");
+        }
       // Get the instance number 0 of this tool window.
       // Our windows are single instance so this instance will be the only one.
       // The last flag is set to true so that if the tool window does not exists it will be created.
