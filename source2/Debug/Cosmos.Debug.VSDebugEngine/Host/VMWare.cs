@@ -36,7 +36,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       }
 
       // Try alternate if selected one is not installed
-      if (mEdition == VMwareEdition.Player && mPlayerPath == null) {
+      if (mEdition == VMwareEdition.Player && mPlayerPath == null && mWorkstationPath != null) {
         mEdition = VMwareEdition.Workstation;
       } else if (mEdition == VMwareEdition.Workstation && mWorkstationPath == null) {
         mEdition = VMwareEdition.Player;
@@ -44,7 +44,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     }
 
     protected void ConnectToVMWare(VMWareVirtualHost aHost) {
-      if (mEdition == VMwareEdition.Player) {
+      if (mEdition != VMwareEdition.Player) {
         aHost.ConnectToVMWareWorkstation();
       } else {
         aHost.ConnectToVMWarePlayer();

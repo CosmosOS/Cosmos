@@ -44,8 +44,8 @@ namespace Cosmos.Debug.Common {
     }
 
     protected override void SendRawData(byte[] aBytes) {
-      System.Diagnostics.Debug.WriteLine(String.Format("DC - sending: {0}", BytesToString(aBytes, 0, aBytes.Length)));
-      mStream.Write(aBytes, 0, aBytes.Length);
+        System.Diagnostics.Debug.WriteLine(String.Format("DC - sending: {0}", BytesToString(aBytes, 0, aBytes.Length)));
+        mStream.Write(aBytes, 0, aBytes.Length);
     }
 
     public override bool IsConnected {

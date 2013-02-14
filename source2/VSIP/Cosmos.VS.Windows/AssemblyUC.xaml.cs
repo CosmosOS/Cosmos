@@ -7,6 +7,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Collections.Generic;
 using Cosmos.Debug.Common;
+using System.Windows.Threading;
 
 namespace Cosmos.VS.Windows {
   /// This class implements the tool window exposed by this package and hosts a user control.
@@ -252,22 +253,30 @@ namespace Cosmos.VS.Windows {
       }
     }
 
-    protected override void DoUpdate(string aTag) {
-      mLines.Clear();
-      if (mData.Length == 0) {
-        Display(false);
-      } else {
-        // Used for creating a test file for Cosmos.VS.Windows.Test
-        if (false) {
-          System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
-        }
-
-        Parse();
-        FindStepToLabel();
-        butnStepOver.IsEnabled = mStepToLabel != null;
-        Display(mFilter);
-      }
+    protected override void DoUpdate(string aTag)
+    {
+        mLines.Clear();
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                if (mData.Length == 0)
+                {
+                    Display(false);
+                }
+                else
+                {
+                    // Used for creating a test file for Cosmos.VS.Windows.Test
+                    if (false)
+                    {
+                        System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
+                    }
+                }
+                Parse();
+                FindStepToLabel();
+                butnStepOver.IsEnabled = mStepToLabel != null;
+                Display(mFilter);
+            }
+        );
     }
-
   }
 }

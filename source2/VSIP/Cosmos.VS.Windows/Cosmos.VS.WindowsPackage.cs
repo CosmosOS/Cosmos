@@ -98,8 +98,13 @@ namespace Cosmos.VS.Windows {
     }
 
     protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData) {
-        var xWindow = FindWindow(aWindowType);
-        xWindow.UserControl.Update(aTag, aData);
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            (Action)delegate()
+            {
+                var xWindow = FindWindow(aWindowType);
+                xWindow.UserControl.Update(aTag, aData);
+            }
+        );
     }
 
     private void ShowWindowAssembly(object aCommand, EventArgs e) {
