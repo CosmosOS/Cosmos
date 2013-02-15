@@ -22,20 +22,28 @@ namespace Kudzu.BreakpointsKernel {
         , Cosmos.Hardware.BlockDevice.Ata.BusPositionEnum.Master);
       UInt64 xBlockSize = xATA.BlockSize;
 
+      Console.WriteLine("Running FieldInitTest");
       xTest = new FieldInitTest();
       xTest.Run();
 
+      Console.WriteLine("Running NullableTest");
       xTest = new NullableTest();
       xTest.Run();
 
+      Console.WriteLine("Running Int64Test");
       xTest = new Int64Test();
       xTest.Run();
 
+      Console.WriteLine("Running Trace1");
       Trace1();
-      TestSB(); 
+      Console.WriteLine("Running TestSB");
+      TestSB();
+      Console.WriteLine("Running TestStringCtor");
       TestStringCtor();
+      Console.WriteLine("Running TestCompare");
       TestCompare();
-      
+
+      Console.WriteLine("Running TestATA");
       TestATA();
 
       Console.WriteLine("Press enter.");
@@ -44,10 +52,19 @@ namespace Kudzu.BreakpointsKernel {
     }
 
     protected override void BeforeRun() {
-      Console.WriteLine("Cosmos boot complete.");
+      Console.WriteLine("Cosmos boot complete. KudzuPlayground");
     }
 
     protected void TestSB() {
+      if (String.Empty == null)
+      {
+        Console.WriteLine("String.Empty is not even assigned!");
+        return;
+      }
+      Console.Write("String.Empty.Length: ");
+      Console.WriteLine(String.Empty.Length);
+      Console.Write("\"Test\".Length: ");
+      Console.WriteLine("Test".Length);
       var xSB = new StringBuilder();
       xSB.Append("Hello");
       xSB.Append("Hello");

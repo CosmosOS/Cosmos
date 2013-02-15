@@ -854,6 +854,8 @@ namespace Cosmos.IL2CPU {
       new Push { DestinationReg = Registers.EBP };
       new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
       new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
+      new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(X86.IL.LdStr.GetContentsArrayName("")) };
+
       foreach (var xDataMember in Assembler.DataMembers) {
         if (!xDataMember.Name.StartsWith("StringLiteral")) {
           continue;

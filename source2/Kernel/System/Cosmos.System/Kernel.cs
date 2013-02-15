@@ -22,6 +22,11 @@ namespace Cosmos.System {
         }
         mStarted = true;
 
+        if (String.Empty == null)
+        {
+          throw new Exception("Compiler didn't initialize System.String.Empty!");          
+        }
+
         Global.Dbg.Send("HW Bootstrap Init");
         Hardware.Bootstrap.Init();
 

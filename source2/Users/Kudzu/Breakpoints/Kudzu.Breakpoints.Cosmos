@@ -18,19 +18,19 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>false</StartCosmosGDB>
-    <VMwareEdition>Player</VMwareEdition>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute />
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <DebugEnabled>True</DebugEnabled>
-    <TraceAssemblies />
+    <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
@@ -60,13 +60,13 @@
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute />
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_TraceAssemblies />
-    <VMware_EnableGDB>False</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
+    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>
@@ -123,7 +123,6 @@
     <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
     <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
-
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -132,13 +131,101 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
-    <TraceAssemblies>Cosmos</TraceAssemblies>
+    <TraceAssemblies>All</TraceAssemblies>
     <StartCosmosASMDBG>False</StartCosmosASMDBG>
+    <Profile>VMware</Profile>
+    <Name>Guess</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
+    <ShowLaunchConsole>False</ShowLaunchConsole>
+    <DebugEnabled>True</DebugEnabled>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <PxeInterface>192.168.43.1</PxeInterface>
+    <SlavePort>Serial: COM3</SlavePort>
+    <VMwareEdition>Workstation</VMwareEdition>
+    <ISO_Name>User 001</ISO_Name>
+    <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
+    <ISO_Deployment>ISO</ISO_Deployment>
+    <ISO_Launch>None</ISO_Launch>
+    <ISO_DebugEnabled>False</ISO_DebugEnabled>
+    <ISO_DebugMode>Source</ISO_DebugMode>
+    <ISO_PxeInterface>192.168.43.1</ISO_PxeInterface>
+    <ISO_SlavePort>Serial: COM3</ISO_SlavePort>
+    <ISO_VMwareEdition>Player</ISO_VMwareEdition>
+    <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
+    <ISO_Framework>MicrosoftNET</ISO_Framework>
+    <ISO_UseInternalAssembler>False</ISO_UseInternalAssembler>
+    <ISO_EnableGDB>False</ISO_EnableGDB>
+    <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
+    <USB_Name>Guess</USB_Name>
+    <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
+    <USB_Deployment>USB</USB_Deployment>
+    <USB_Launch>None</USB_Launch>
+    <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
+    <USB_DebugEnabled>False</USB_DebugEnabled>
+    <USB_DebugMode>Source</USB_DebugMode>
+    <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
+    <USB_PxeInterface>192.168.43.1</USB_PxeInterface>
+    <USB_SlavePort>Serial: COM3</USB_SlavePort>
+    <USB_VMwareEdition>Player</USB_VMwareEdition>
+    <USB_OutputPath>bin\Debug\</USB_OutputPath>
+    <USB_Framework>MicrosoftNET</USB_Framework>
+    <USB_UseInternalAssembler>False</USB_UseInternalAssembler>
+    <USB_EnableGDB>False</USB_EnableGDB>
+    <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
+    <PXE_Name>PXE with Slave (Kudzu)</PXE_Name>
+    <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
+    <PXE_Deployment>PXE</PXE_Deployment>
+    <PXE_Launch>None</PXE_Launch>
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
+    <PXE_DebugMode>Source</PXE_DebugMode>
+    <PXE_PxeInterface>192.168.43.1</PXE_PxeInterface>
+    <PXE_SlavePort>Serial: COM3</PXE_SlavePort>
+    <PXE_VMwareEdition>Player</PXE_VMwareEdition>
+    <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
+    <PXE_Framework>MicrosoftNET</PXE_Framework>
+    <PXE_UseInternalAssembler>False</PXE_UseInternalAssembler>
+    <PXE_EnableGDB>False</PXE_EnableGDB>
+    <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
+    <VMware_Name>Guess</VMware_Name>
+    <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
+    <VMware_Deployment>ISO</VMware_Deployment>
+    <VMware_Launch>VMware</VMware_Launch>
+    <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
+    <VMware_PxeInterface>192.168.43.1</VMware_PxeInterface>
+    <VMware_SlavePort>Serial: COM3</VMware_SlavePort>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_Framework>MicrosoftNET</VMware_Framework>
+    <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
+    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
+    <User001_Name>PXE with Slave (Kudzu)</User001_Name>
+    <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
+    <User001_Deployment>PXE</User001_Deployment>
+    <User001_Launch>Slave</User001_Launch>
+    <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
+    <User001_DebugEnabled>True</User001_DebugEnabled>
+    <User001_DebugMode>Source</User001_DebugMode>
+    <User001_VisualStudioDebugPort>Serial: COM1</User001_VisualStudioDebugPort>
+    <User001_PxeInterface>192.168.43.1</User001_PxeInterface>
+    <User001_SlavePort>Serial: COM3</User001_SlavePort>
+    <User001_VMwareEdition>Player</User001_VMwareEdition>
+    <User001_OutputPath>bin\Debug\</User001_OutputPath>
+    <User001_Framework>MicrosoftNET</User001_Framework>
+    <User001_UseInternalAssembler>False</User001_UseInternalAssembler>
+    <User001_EnableGDB>False</User001_EnableGDB>
+    <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Compile last with NASM.bat">
@@ -167,6 +254,11 @@
       <Name>Cosmos.Debug.Kernel.Plugs</Name>
       <AssemblyName>Cosmos.Debug.Kernel.Plugs.dll</AssemblyName>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cosmos.bxrc">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
