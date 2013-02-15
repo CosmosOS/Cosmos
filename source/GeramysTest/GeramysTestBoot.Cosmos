@@ -52,8 +52,8 @@
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <TraceAssemblies>All</TraceAssemblies>
-    <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
-    <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
+    <IgnoreDebugStubAttribute>True</IgnoreDebugStubAttribute>
+    <VMware_IgnoreDebugStubAttribute>True</VMware_IgnoreDebugStubAttribute>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
