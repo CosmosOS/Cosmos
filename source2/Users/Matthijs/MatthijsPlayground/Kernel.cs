@@ -31,11 +31,14 @@ namespace MatthijsPlayground
 
         protected override void Run()
         {
-            var xDict = new Dictionary<int, string>(new TestComparer());
-            xDict.Add(1, "One");
-            xDict.Add(2, "Two");
-            DoSomething();
-            Stop();
+            var line = Console.ReadLine();
+            Console.Write("Line: ");
+            Console.WriteLine(line);
+            //var xDict = new Dictionary<int, string>(new TestComparer());
+            //xDict.Add(1, "One");
+            //xDict.Add(2, "Two");
+            //DoSomething();
+            //Stop();
         }
 
         private static void DoSomething()

@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>ISO</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -25,13 +25,13 @@
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
-    <VMwareEdition>Player</VMwareEdition>
+    <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
-    <IgnoreDebugStubAttribute />
+    <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
-    <Launch>None</Launch>
-    <DebugEnabled>False</DebugEnabled>
-    <TraceAssemblies />
+    <Launch>VMware</Launch>
+    <DebugEnabled>True</DebugEnabled>
+    <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
@@ -60,12 +60,12 @@
     <VMware_Launch>VMware</VMware_Launch>
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
-    <VMware_IgnoreDebugStubAttribute />
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_TraceAssemblies />
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
@@ -80,8 +80,8 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>User 001</Name>
-    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
+    <Name>Guess</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
@@ -130,7 +130,7 @@
     <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Profile>ISO</Profile>
+    <Profile>VMware</Profile>
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
@@ -141,13 +141,13 @@
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>false</StartCosmosGDB>
-    <VMwareEdition>Player</VMwareEdition>
+    <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
-    <IgnoreDebugStubAttribute />
+    <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
-    <Launch>None</Launch>
-    <DebugEnabled>False</DebugEnabled>
-    <TraceAssemblies />
+    <Launch>VMware</Launch>
+    <DebugEnabled>True</DebugEnabled>
+    <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
@@ -176,12 +176,12 @@
     <VMware_Launch>VMware</VMware_Launch>
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
-    <VMware_IgnoreDebugStubAttribute />
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_TraceAssemblies />
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
@@ -196,8 +196,8 @@
     <ISO_TraceAssemblies />
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <Name>User 001</Name>
-    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
+    <Name>Guess</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <ISO_Name>User 001</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
     <USB_Name>Guess</USB_Name>
@@ -272,6 +272,11 @@
       <Project>{73cf15c1-0ab6-4b3a-8142-d326ada72970}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cosmos.bxrc">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
