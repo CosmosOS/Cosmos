@@ -13,6 +13,7 @@ using System.Text;
 using Microsoft.Win32;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
+using System.Threading;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
@@ -131,6 +132,10 @@ namespace Cosmos.Debug.Common {
 
       if (aCreate) {
         DeleteDB(mDbName, aPathname);
+        if (File.Exists(aPathname))
+        {
+          throw new Exception("Databasename still exists!");
+        }
       }
 
       // Initial Catalog is necessary for EDM
@@ -340,36 +345,51 @@ namespace Cosmos.Debug.Common {
     // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
     // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
     public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
-    public void AddAssemblies(List<Assembly> aAssemblies) {
-      var xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
-      foreach (var xAsm in aAssemblies) {
-        var xRow = new Cosmos.Debug.Common.AssemblyFile() {
-          ID = Guid.NewGuid(),
-          Pathname = xAsm.Location
-        };
-        xAssemblies.Add(xRow);
+    List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+    public void AddAssemblies(List<Assembly> aAssemblies, bool aFlush = false) {
+        if (aAssemblies != null)
+        {
+            
+            foreach (var xAsm in aAssemblies)
+            {
+                var xRow = new Cosmos.Debug.Common.AssemblyFile()
+                {
+                    ID = Guid.NewGuid(),
+                    Pathname = xAsm.Location
+                };
+                xAssemblies.Add(xRow);
 
-        AssemblyGUIDs.Add(xAsm, xRow.ID);
-      }
-      BulkInsert("AssemblyFiles", xAssemblies, 0, true);
+                AssemblyGUIDs.Add(xAsm, xRow.ID);
+            }
+        }
+        BulkInsert("AssemblyFiles", xAssemblies, 2500, aFlush);
     }
 
     public Dictionary<string, Guid> DocumentGUIDs = new Dictionary<string, Guid>();
-    public void AddDocument(string aPathname) {
-      if (!DocumentGUIDs.ContainsKey(aPathname)) {
-        var xRow = new Document() {
-          ID = Guid.NewGuid(),
-          Pathname = aPathname
-        };
-        DocumentGUIDs.Add(aPathname, xRow.ID);
-
-        // Even though we are inserting only one row, Bulk already has a connection
-        // open so its probably faster than using EF, and its about the same amount of code.
-        // Need to insert right away so RI will be ok when dependents are inserted.
-        var xDocuments = new List<Document>(1);
-        xDocuments.Add(xRow);
-        BulkInsert("Documents", xDocuments, 0, true);
-      }
+    List<Document> xDocuments = new List<Document>(1);
+    public void AddDocument(string aPathname, bool aFlush = false)
+    {
+        if (aPathname != null)
+        {
+            if (!DocumentGUIDs.ContainsKey(aPathname))
+            {
+                var xRow = new Document()
+                {
+                    ID = Guid.NewGuid(),
+                    Pathname = aPathname
+                };
+                DocumentGUIDs.Add(aPathname, xRow.ID);
+                // Even though we are inserting only one row, Bulk already has a connection
+                // open so its probably faster than using EF, and its about the same amount of code.
+                // Need to insert right away so RI will be ok when dependents are inserted.
+                xDocuments.Add(xRow);
+                BulkInsert("Documents", xDocuments, 2500, aFlush);
+            }
+        }
+        else
+        {
+            BulkInsert("Documents", xDocuments, 2500, aFlush);
+        }
     }
 
     public void AddSymbols(IList<MethodIlOp> aSymbols, bool aFlush = false) {
@@ -395,17 +415,55 @@ namespace Cosmos.Debug.Common {
     // at time of writing the full structure would take up 11 MB of RAM just for this structure.
     // This is not a huge amount, but as we compile in more and more this figure will grow.
     // So as a compromise, we collect 2500 records then bulk insert.
-    public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = true) {
-      if (aList.Count >= aFlushSize || aFlush) {
+    public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = false) {
+      if (aList.Count >= aFlushSize /*|| aFlush*/) {
         if (aList.Count > 0) {
           using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
             xBulkCopy.DestinationTableName = aTableName;
+            // for now dump to disk:
+            //using (var reader = aList.AsDataReader())
+            //{
+            //  var dumpIdx = Interlocked.Increment(ref DataDumpIndex);
+            //  using (var writer = new StreamWriter(@"c:\temp\dataout\" + dumpIdx + ".dmp"))
+            //  {
+            //    writer.WriteLine(typeof(T).FullName);
+            //    writer.WriteLine("Flush = {0}", aFlush);
+            //    bool first = true;
+            //    while (reader.Read())
+            //    {
+            //      if (first)
+            //      {
+            //        first = false;
+            //        for (int i = 0; i < reader.FieldCount; i++)
+            //        {
+            //          writer.Write(reader.GetName(i));
+            //          if (i < (reader.FieldCount - 1))
+            //          {
+            //            writer.Write("\t");
+            //          }
+            //        }
+            //        writer.WriteLine();
+            //      }
+            //      for (int i = 0; i < reader.FieldCount; i++)
+            //      {
+            //        writer.Write(reader.GetValue(i));
+            //        if (i < (reader.FieldCount - 1))
+            //        {
+            //          writer.Write("\t");
+            //        }
+            //      }
+            //      writer.WriteLine();
+            //    }
+            //  }
+            //}
             xBulkCopy.WriteToServer(aList.AsDataReader());
           }
           aList.Clear();
         }
       }
     }
+
+    private static int DataDumpIndex = 0;
 
     public void AddLabels(IList<Label> aLabels, bool aFlush = false) {
       // GUIDs inserted by caller

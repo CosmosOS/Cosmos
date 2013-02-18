@@ -286,6 +286,8 @@ namespace Cosmos.IL2CPU {
     }
 
     public void FinalizeDebugInfo() {
+        DebugInfo.AddDocument(null, true);
+        DebugInfo.AddAssemblies(null, true);
       DebugInfo.AddMethod(null, true);
       DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
     }
@@ -930,7 +932,7 @@ namespace Cosmos.IL2CPU {
         mSymbols.Add(xMLSymbol);
         DebugInfo.AddSymbols(mSymbols);
       }
-      DebugInfo.AddSymbols(mSymbols, true);
+      DebugInfo.AddSymbols(mSymbols, false);
 
       EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace);
     }
