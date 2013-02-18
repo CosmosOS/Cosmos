@@ -113,7 +113,7 @@ namespace Cosmos.Build.MSBuild {
             });
             xDebugInfo.AddLabels(xLabels);
           }
-          xDebugInfo.AddLabels(xLabels, true);
+          xDebugInfo.AddLabels(xLabels, false);
         }
 
         // All labels are in DB, now go back and match up Method.LabelStart
