@@ -16,16 +16,16 @@ namespace Cosmos.Hardware {
       var xIO = aControllerID == BlockDevice.Ata.ControllerIdEnum.Primary ? Cosmos.Core.Global.BaseIOGroups.ATA1 : Cosmos.Core.Global.BaseIOGroups.ATA2;
       var xATA = new BlockDevice.AtaPio(xIO, aControllerID, aBusPosition);
       if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
-        BlockDevice.BlockDevice.Devices.Add(xATA);
-        var xMbrData = new byte[512];
-        xATA.ReadBlock(0, 1, xMbrData);
-        var xMBR = new BlockDevice.MBR(xMbrData);
-        // TODO Change this to foreach when foreach is supported
-        for (int i = 0; i < xMBR.Partitions.Count; i++) {
-          var xPart = xMBR.Partitions[i];
-          var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-          BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-        }
+        BlockDevice.BlockDevice.Devices.Add(xATA);        
+          var xMbrData = new byte[512];
+          xATA.ReadBlock(0, 1, xMbrData);
+          var xMBR = new BlockDevice.MBR(xMbrData);
+          // TODO Change this to foreach when foreach is supported
+          for (int i = 0; i < xMBR.Partitions.Count; i++) {
+            var xPart = xMBR.Partitions[i];
+            var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+            BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+          }
       }
     }
 
@@ -43,9 +43,10 @@ namespace Cosmos.Hardware {
 
       // Find hardcoded ATA controllers
       Global.Dbg.Send("ATA Master");
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
+      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
+
       Global.Dbg.Send("ATA Slave");
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
+      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
 
       //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum? 
       // They do show up in PCI space as well as the fixed space. 

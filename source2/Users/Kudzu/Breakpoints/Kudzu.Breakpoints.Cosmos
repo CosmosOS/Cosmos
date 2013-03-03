@@ -18,7 +18,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
@@ -52,7 +52,7 @@
     <USB_OutputPath>bin\Debug\</USB_OutputPath>
     <USB_Framework>MicrosoftNET</USB_Framework>
     <USB_UseInternalAssembler>False</USB_UseInternalAssembler>
-    <USB_TraceAssemblies />
+    <USB_TraceAssemblies>All</USB_TraceAssemblies>
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
@@ -65,7 +65,7 @@
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
@@ -76,7 +76,7 @@
     <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
     <ISO_Framework>MicrosoftNET</ISO_Framework>
     <ISO_UseInternalAssembler>False</ISO_UseInternalAssembler>
-    <ISO_TraceAssemblies />
+    <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
     <Name>Guess</Name>
@@ -123,6 +123,8 @@
     <User001_ShowLaunchConsole>False</User001_ShowLaunchConsole>
     <USB_ShowLaunchConsole>False</USB_ShowLaunchConsole>
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
+    <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
+    <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -131,7 +133,7 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
@@ -207,7 +209,7 @@
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
@@ -226,6 +228,10 @@
     <User001_EnableGDB>False</User001_EnableGDB>
     <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
+    <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
+    <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
+    <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
+    <USB_TraceAssemblies>All</USB_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Compile last with NASM.bat">
@@ -233,6 +239,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\source\Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj">
+      <Name>Cosmos.Hardware2</Name>
+      <Project>{ce50fe98-9ac4-4b4d-adc7-31f6dcd28755}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
       <Name>Cosmos.System.Plugs.System</Name>
       <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
