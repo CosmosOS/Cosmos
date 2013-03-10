@@ -265,8 +265,6 @@ namespace Kudzu.BreakpointsKernel {
                 if (xDevice is AtaPio)
                 {
                     xATA = (AtaPio)xDevice;
-                    Console.WriteLine("Device: " + i);
-                    //break;
                 }
             }
 
@@ -282,107 +280,75 @@ namespace Kudzu.BreakpointsKernel {
             //Partition Detecting
             Partition xPartition = null;
             if (BlockDevice.Devices.Count > 0)
-            {
+            {                
                 for (int i = 0; i < BlockDevice.Devices.Count; i++)
                 {
                     var xDevice = BlockDevice.Devices[i];
                     if (xDevice is Partition)
-                    {
+                    {                                          
                         xPartition = (Partition)xDevice;
-                    }
-                }
 
-                Console.WriteLine("FAT FS");
-                var xFS = new FAT.FatFileSystem(xPartition);
+                        Console.WriteLine("FAT FS");
+                        var xFS = new FAT.FatFileSystem(xPartition);
 
-                Console.WriteLine("Mapping...");
-                Sys.Filesystem.FileSystem.AddMapping("C", xFS);
+                        Console.WriteLine("Mapping...");
+                        Sys.Filesystem.FileSystem.AddMapping("C", xFS);
 
 
-                Console.WriteLine();
-                Console.WriteLine("Root directory");
+                        Console.WriteLine();
+                        Console.WriteLine("Root directory");
 
-                var xListing = xFS.GetRoot();
-                FAT.Listing.FatFile xRootFile = null;
-                FAT.Listing.FatFile xKudzuFile = null;
+                        var xListing = xFS.GetRoot();
+                        FAT.Listing.FatFile xRootFile = null;
+                        FAT.Listing.FatFile xKudzuFile = null;
 
-                for (int i = 0; i < xListing.Count; i++)
-                {
-                    var xItem = xListing[i];
-                    if (xItem is Sys.Filesystem.Listing.Directory)
-                    {
-                        //Detecting Dir in HDD
-                        Console.WriteLine("<DIR> " + xListing[i].Name);
-                    }
-                    else if (xItem is Sys.Filesystem.Listing.File)
-                    {
-                        //Detecting File in HDD
-                        Console.WriteLine("<FILE> " + xListing[i].Name + " (" + xListing[i].Size + ")");
-                        if (xListing[i].Name == "Root.txt")
+
+                        for (int j = 0; j < xListing.Count; j++)
                         {
-                            xRootFile = (FAT.Listing.FatFile)xListing[i];
+                            var xItem = xListing[j];
+                            if (xItem is Sys.Filesystem.Listing.Directory)
+                            {
+                                //Detecting Dir in HDD
+                                Console.WriteLine("<DIR> " + xListing[j].Name);
+                            }
+                            else if (xItem is Sys.Filesystem.Listing.File)
+                            {
+                                //Detecting File in HDD
+                                Console.WriteLine("<FILE> " + xListing[j].Name + " (" + xListing[j].Size + ")");
+                                if (xListing[j].Name == "Root.txt")
+                                {
+                                    xRootFile = (FAT.Listing.FatFile)xListing[j];
+                                }
+                                else if (xListing[j].Name == "Kudzu.txt")
+                                {
+                                    xKudzuFile = (FAT.Listing.FatFile)xListing[j];
+                                }
+                            }   
                         }
-                        else if (xListing[i].Name == "Kudzu.txt")
+
+                        try
                         {
-                            xKudzuFile = (FAT.Listing.FatFile)xListing[i];
+                            Console.WriteLine();
+                            Console.WriteLine("StreamReader - Root File");
+                            var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+                            var xData = new byte[xRootFile.Size];
+                            xStream.Read(xData, 0, (int)xRootFile.Size);
+                            var xText = Encoding.ASCII.GetString(xData);
+                            Console.WriteLine(xText);
                         }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error: " + e.Message);
+                        }
+                        
+                        var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
+                        var xKudzuData = new byte[xKudzuFile.Size];
+                        xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
+
+                        var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
+                                        
                     }
                 }
-
-
-                try
-                {
-                    var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
-                    var xData = new byte[xRootFile.Size];
-                    xStream.Read(xData, 0, (int)xRootFile.Size);
-                    var xText = Encoding.ASCII.GetString(xData);
-                    Console.WriteLine(xText);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                }
-
-
-                try
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("StreamReader");
-                    //var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
-                    //var xReader = new System.IO.StreamReader(xStream);
-                    //string xText = xReader.ReadToEnd();
-                    //Console.WriteLine(xText);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                }
-
-
-                var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
-                var xKudzuData = new byte[xKudzuFile.Size];
-                xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
-
-                var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
-
-                //int dummy = 42;
-
-                var xWrite = new byte[512];
-                for (int i = 0; i < 512; i++)
-                {
-                    xWrite[i] = (byte)i;
-                }
-                xATA.WriteBlock(0, 1U, xWrite);
-
-                var xRead = xATA.NewBlockArray(1);
-                xATA.ReadBlock(0, 1, xRead);
-                string xDisplay = "";
-                for (int i = 0; i < 512; i++)
-                {
-                    xDisplay = xDisplay + xRead[i].ToHex();
-                }
-                Console.WriteLine(xDisplay);
-
             }
             else
             {

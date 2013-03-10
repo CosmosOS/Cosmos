@@ -84,60 +84,74 @@ namespace Cosmos.System.Filesystem.FAT {
         return aSector.ToUInt32(aOffset) & 0x0FFFFFFF;
       }
     }
-
-    public FatFileSystem(Cosmos.Hardware.BlockDevice.BlockDevice aDevice) {
+    
+    public FatFileSystem(Cosmos.Hardware.BlockDevice.BlockDevice aDevice)
+    {
+      
       mDevice = aDevice;
+      byte[] xBPB = mDevice.NewBlockArray(1);
+      
+          mDevice.ReadBlock(0UL, 1U, xBPB);
 
-      var xBPB = aDevice.NewBlockArray(1);
-      mDevice.ReadBlock(0, 1, xBPB);
+          UInt16 xSig = xBPB.ToUInt16(510);
+          if (xSig != 0xAA55)
+          {
+              throw new Exception("FAT signature not found.");
+          }
 
-      UInt16 xSig = xBPB.ToUInt16(510);
-      if (xSig != 0xAA55) {
-        throw new Exception("FAT signature not found.");
-      }
+          BytesPerSector = xBPB.ToUInt16(11);
+          SectorsPerCluster = xBPB[13];
+          BytesPerCluster = BytesPerSector * SectorsPerCluster;
+          ReservedSectorCount = xBPB.ToUInt16(14);
+          NumberOfFATs = xBPB[16];
+          RootEntryCount = xBPB.ToUInt16(17);
 
-      BytesPerSector = xBPB.ToUInt16(11);
-      SectorsPerCluster = xBPB[13];
-      BytesPerCluster = BytesPerSector * SectorsPerCluster;
-      ReservedSectorCount = xBPB.ToUInt16(14);
-      NumberOfFATs = xBPB[16];
-      RootEntryCount = xBPB.ToUInt16(17);
+          TotalSectorCount = xBPB.ToUInt16(19);
+          if (TotalSectorCount == 0)
+          {
+              TotalSectorCount = xBPB.ToUInt32(32);
+          }
 
-      TotalSectorCount = xBPB.ToUInt16(19);
-      if (TotalSectorCount == 0) {
-        TotalSectorCount = xBPB.ToUInt32(32);
-      }
+          // FATSz
+          FatSectorCount = xBPB.ToUInt16(22);
+          if (FatSectorCount == 0)
+          {
+              FatSectorCount = xBPB.ToUInt32(36);
+          }
+          //Global.Dbg.Send("FAT Sector Count: " + FatSectorCount);
 
-      // FATSz
-      FatSectorCount = xBPB.ToUInt16(22);
-      if (FatSectorCount == 0) {
-        FatSectorCount = xBPB.ToUInt32(36);
-      }
-      Global.Dbg.Send("FAT Sector Count: " + FatSectorCount);
+          DataSectorCount = TotalSectorCount - (ReservedSectorCount + (NumberOfFATs * FatSectorCount) + ReservedSectorCount);
 
-      DataSectorCount = TotalSectorCount - (ReservedSectorCount + (NumberOfFATs * FatSectorCount) + ReservedSectorCount);
- 
-      // Computation rounds down. 
-      ClusterCount = DataSectorCount / SectorsPerCluster;
-      // Determine the FAT type. Do not use another method - this IS the official and
-      // proper way to determine FAT type.
-      // Comparisons are purposefully < and not <=
-      // FAT16 starts at 4085, FAT32 starts at 65525 
-      if (ClusterCount < 4085) {
-        FatType = FatTypeEnum.Fat12;
-      } else if(ClusterCount < 65525) {
-        FatType = FatTypeEnum.Fat16;
-      } else {
-        FatType = FatTypeEnum.Fat32;
-      }
+          // Computation rounds down. 
+          ClusterCount = DataSectorCount / SectorsPerCluster;
+          // Determine the FAT type. Do not use another method - this IS the official and
+          // proper way to determine FAT type.
+          // Comparisons are purposefully < and not <=
+          // FAT16 starts at 4085, FAT32 starts at 65525 
+          if (ClusterCount < 4085)
+          {
+              FatType = FatTypeEnum.Fat12;
+          }
+          else if (ClusterCount < 65525)
+          {
+              FatType = FatTypeEnum.Fat16;
+          }
+          else
+          {
+              FatType = FatTypeEnum.Fat32;
+          }
 
-      if (FatType == FatTypeEnum.Fat32) {
-        RootCluster = xBPB.ToUInt32(44);
-      } else {
-        RootSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount);
-        RootSectorCount = (RootEntryCount * 32 + (BytesPerSector - 1)) / BytesPerSector;
-      }
-      DataSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount) + RootSectorCount;
+          if (FatType == FatTypeEnum.Fat32)
+          {
+              RootCluster = xBPB.ToUInt32(44);
+          }
+          else
+          {
+              RootSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount);
+              RootSectorCount = (RootEntryCount * 32 + (BytesPerSector - 1)) / BytesPerSector;
+          }
+          DataSector = ReservedSectorCount + (NumberOfFATs * FatSectorCount) + RootSectorCount;
+      
     }
 
     public byte[] NewClusterArray() {

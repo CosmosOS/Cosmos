@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="BlockDevice\Ata.cs" />
     <Compile Include="BlockDevice\BlockDevice.cs" />
+    <Compile Include="BlockDevice\EBR.cs" />
     <Compile Include="BlockDevice\MBR.cs" />
     <Compile Include="BlockDevice\Partition.cs" />
     <Compile Include="Bootstrap.cs" />

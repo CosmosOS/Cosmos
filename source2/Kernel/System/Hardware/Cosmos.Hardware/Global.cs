@@ -18,8 +18,24 @@ namespace Cosmos.Hardware {
       if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
         BlockDevice.BlockDevice.Devices.Add(xATA);        
           var xMbrData = new byte[512];
-          xATA.ReadBlock(0, 1, xMbrData);
+          xATA.ReadBlock(0UL, 1U, xMbrData);
           var xMBR = new BlockDevice.MBR(xMbrData);
+
+          if (xMBR.EBRLocation != 0)
+          {
+              //EBR Detected
+              var xEbrData = new byte[512];
+              xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
+              var xEBR = new BlockDevice.EBR(xEbrData);
+
+              for (int i = 0; i < xEBR.Partitions.Count; i++)
+              {
+                  var xPart = xEBR.Partitions[i];
+                  var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+                  BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+              }
+          }
+
           // TODO Change this to foreach when foreach is supported
           for (int i = 0; i < xMBR.Partitions.Count; i++) {
             var xPart = xMBR.Partitions[i];

@@ -13,6 +13,7 @@ namespace Cosmos.Hardware.BlockDevice {
     // TODO Lock this so other code cannot add/remove/modify the list
     // Can make a locked list class which wraps a list<>
     public List<PartInfo> Partitions = new List<PartInfo>();
+    public UInt32 EBRLocation = 0;
 
     public class PartInfo {
       public readonly byte SystemID;
@@ -36,10 +37,19 @@ namespace Cosmos.Hardware.BlockDevice {
     protected void ParsePartition(byte[] aMBR, UInt32 aLoc) {
       byte xSystemID = aMBR[aLoc + 4];
       // SystemID = 0 means no partition
-      if (xSystemID != 0) {
+
+      if (xSystemID == 0x5 || xSystemID == 0xF || xSystemID == 0x85)
+      {
+          //Extended Partition Detected
+          //DOS only knows about 05, Windows 95 introduced 0F, Linux introduced 85 
+          //Search for logical volumes
+          //http://thestarman.pcministry.com/asm/mbr/PartTables2.htm
+          EBRLocation = aMBR.ToUInt32(aLoc + 8);
+      }
+      else if (xSystemID != 0) {
         UInt32 xStartSector = aMBR.ToUInt32(aLoc + 8);
         UInt32 xSectorCount = aMBR.ToUInt32(aLoc + 12);
-
+        
         var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
         Partitions.Add(xPartInfo);
       }
