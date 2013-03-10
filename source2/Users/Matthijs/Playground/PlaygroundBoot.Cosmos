@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7d29d57d-a78b-4e67-bbc3-df84bd10fc6d}</ProjectGuid>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>PlaygroundBoot</Name>
+    <BinFormat>elf</BinFormat>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <Profile>VMware</Profile>
+    <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
+    <DebugEnable>true</DebugEnable>
+    -->
+    <DebugEnabled>True</DebugEnabled>
+    <DebugMode>Source</DebugMode>
+    <TraceMode>User</TraceMode>
+    <EnableGDB>False</EnableGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <VMWareEdition>Player</VMWareEdition>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Name>PlaygroundBoot</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <TraceAssemblies>User</TraceAssemblies>
+    <VMware_Name>PlaygroundBoot</VMware_Name>
+    <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
+    <VMware_Deployment>ISO</VMware_Deployment>
+    <VMware_Launch>VMware</VMware_Launch>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_TraceAssemblies>User</VMware_TraceAssemblies>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
+      <Name>Cosmos.System.Plugs.System</Name>
+      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Name>Cosmos.Core.Plugs</Name>
+      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include=".\Playground.">
+      <Name>Playground</Name>
+      <Project>{380cbca2-3283-4667-a824-196036f95ced}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+</Project>

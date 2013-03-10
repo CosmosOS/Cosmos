@@ -172,37 +172,44 @@ namespace Cosmos.Build.MSBuild {
           DebugCom = 0;
         }
 
-        var xAsm = new AppAssembler(DebugCom);
-        using (var xDebugInfo = new DebugInfo(xOutputFilename + ".mdf", true)) {
-          xAsm.DebugInfo = xDebugInfo;
-          xAsm.DebugEnabled = DebugEnabled;
-          xAsm.DebugMode = mDebugMode;
-          xAsm.TraceAssemblies = mTraceAssemblies;
-          xAsm.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
-          if (DebugEnabled == false) {
-            xAsm.ShouldOptimize = true;
-          }
-
-          xAsm.Assembler.Initialize();
-          using (var xScanner = new ILScanner(xAsm)) {
-            xScanner.TempDebug += x => LogMessage(x);
-            if (EnableLogging) {
-              xScanner.EnableLogging(xOutputFilename + ".log.html");
+        using (var xAsm = new AppAssembler(DebugCom))
+        {
+          using (var xDebugInfo = new DebugInfo(xOutputFilename + ".mdf", true))
+          {
+            xAsm.DebugInfo = xDebugInfo;
+            xAsm.DebugEnabled = DebugEnabled;
+            xAsm.DebugMode = mDebugMode;
+            xAsm.TraceAssemblies = mTraceAssemblies;
+            xAsm.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
+            if (DebugEnabled == false)
+            {
+              xAsm.ShouldOptimize = true;
             }
-            xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
-            xScanner.Execute(xInitMethod);
 
-            using (var xOut = new StreamWriter(OutputFilename, false)) {
-              //if (EmitDebugSymbols) {
-              xAsm.Assembler.FlushText(xOut);
-              xAsm.FinalizeDebugInfo();
+            xAsm.Assembler.Initialize();
+            using (var xScanner = new ILScanner(xAsm))
+            {
+              xScanner.TempDebug += x => LogMessage(x);
+              if (EnableLogging)
+              {
+                xScanner.EnableLogging(xOutputFilename + ".log.html");
+              }
+              xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
+              xScanner.Execute(xInitMethod);
+
+              using (var xOut = new StreamWriter(OutputFilename, false))
+              {
+                //if (EmitDebugSymbols) {
+                xAsm.Assembler.FlushText(xOut);
+                xAsm.FinalizeDebugInfo();
+              }
             }
+            // If you want to uncomment this line make sure to enable PERSISTANCE_PROFILING symbol in
+            // DebugInfo.cs file.
+            //LogMessage(string.Format("DebugInfo flatening {0} seconds, persistance : {1} seconds",
+            //    (int)xDebugInfo.FlateningDuration.TotalSeconds,
+            //    (int)xDebugInfo.PersistanceDuration.TotalSeconds));
           }
-          // If you want to uncomment this line make sure to enable PERSISTANCE_PROFILING symbol in
-          // DebugInfo.cs file.
-          //LogMessage(string.Format("DebugInfo flatening {0} seconds, persistance : {1} seconds",
-          //    (int)xDebugInfo.FlateningDuration.TotalSeconds,
-          //    (int)xDebugInfo.PersistanceDuration.TotalSeconds));
         }
         LogTime("Engine execute finished");
         return true;

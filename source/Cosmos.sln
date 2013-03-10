@@ -232,9 +232,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Performance1.psess = Performance1.psess
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground", "..\source2\users\Matthijs\Playground\Playground.csproj", "{89868CAD-AAFC-45F1-81B3-C323F87D5742}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "PlaygroundBoot", "..\source2\users\Matthijs\Playground\PlaygroundBoot.Cosmos", "{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742} = {89868CAD-AAFC-45F1-81B3-C323F87D5742}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugCompiler", "..\source2\users\Matthijs\DebugCompiler\DebugCompiler.csproj", "{3720749F-1519-4A35-B944-FF05AD01F8DC}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 59
+		SccNumberOfProjects = 62
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -472,6 +481,18 @@ Global
 		SccProjectName58 = ../Docs
 		SccLocalPath58 = ..\\Docs
 		SccProjectEnlistmentChoice58 = 2
+		SccProjectUniqueName59 = ..\\source2\\users\\Matthijs\\Playground\\Playground.csproj
+		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
+		SccProjectName59 = ../source2/users/Matthijs/Playground
+		SccLocalPath59 = ..\\source2\\users\\Matthijs\\Playground
+		SccProjectUniqueName60 = ..\\source2\\users\\Matthijs\\Playground\\PlaygroundBoot.Cosmos
+		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
+		SccProjectName60 = ../source2/users/Matthijs/Playground
+		SccLocalPath60 = ..\\source2\\users\\Matthijs\\Playground
+		SccProjectUniqueName61 = ..\\source2\\users\\Matthijs\\DebugCompiler\\DebugCompiler.csproj
+		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
+		SccProjectName61 = ../source2/users/Matthijs/DebugCompiler
+		SccLocalPath61 = ..\\source2\\users\\Matthijs\\DebugCompiler
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1127,6 +1148,37 @@ Global
 		{0A7DF241-1000-405D-A09B-9E2C51A5CB95}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{0A7DF241-1000-405D-A09B-9E2C51A5CB95}.Release|x86.ActiveCfg = Debug|x86
 		{0A7DF241-1000-405D-A09B-9E2C51A5CB95}.Release|x86.Build.0 = Debug|x86
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742}.Release|x86.ActiveCfg = Release|Any CPU
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Debug|Any CPU.Build.0 = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Debug|x86.ActiveCfg = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Debug|x86.Build.0 = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Release|Any CPU.ActiveCfg = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Release|Mixed Platforms.ActiveCfg = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Release|Mixed Platforms.Build.0 = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Release|x86.ActiveCfg = Debug|x86
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}.Release|x86.Build.0 = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|x86.ActiveCfg = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|x86.Build.0 = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|Any CPU.ActiveCfg = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|x86.ActiveCfg = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1167,6 +1219,9 @@ Global
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
+		{89868CAD-AAFC-45F1-81B3-C323F87D5742} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
+		{3720749F-1519-4A35-B944-FF05AD01F8DC} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{1116130E-28E0-428A-A597-F4B3B676C0CA} = {576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23}
 		{693C6704-6934-410F-97E0-4B6900730E63} = {426E77A5-80AA-48DC-97F9-037071345778}
 		{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2} = {426E77A5-80AA-48DC-97F9-037071345778}

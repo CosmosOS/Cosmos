@@ -125,6 +125,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DebugModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="Entities2.datasource" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

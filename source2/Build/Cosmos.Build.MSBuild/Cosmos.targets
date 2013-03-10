@@ -6,6 +6,7 @@
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
     <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
+    <PlatformTarget>x86</PlatformTarget>
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
   </PropertyGroup>
 

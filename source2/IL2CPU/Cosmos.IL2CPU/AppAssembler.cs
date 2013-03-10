@@ -14,7 +14,7 @@ using Cosmos.IL2CPU.Plugs;
 using Mono.Cecil;
 
 namespace Cosmos.IL2CPU {
-  public class AppAssembler {
+  public class AppAssembler: IDisposable {
     public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
     public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
     protected const string InitStringIDsLabel = "___INIT__STRINGS_TYPE_ID_S___";
@@ -40,8 +40,18 @@ namespace Cosmos.IL2CPU {
 
     public AppAssembler(int aComPort) {
       Assembler = new Cosmos.Assembler.Assembler(aComPort);
-      mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log");
+      mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log", false);
       InitILOps();
+    }
+
+    public void Dispose()
+    {
+      if (mLog != null)
+      {
+        mLog.Dispose();
+        mLog = null;
+      }
+      GC.SuppressFinalize(this);
     }
 
     protected void MethodBegin(MethodInfo aMethod) {
