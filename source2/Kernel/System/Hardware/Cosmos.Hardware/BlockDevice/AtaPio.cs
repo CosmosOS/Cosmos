@@ -43,7 +43,6 @@ namespace Cosmos.Hardware.BlockDevice
             get { return mModelNo; }
         }
         #endregion
-
         #region Enums
         [Flags]
         public enum Status : byte
@@ -207,6 +206,8 @@ namespace Cosmos.Hardware.BlockDevice
             return SendCmd(aCmd, true);
         }
 
+
+
         public Status SendCmd(Cmd aCmd, bool aThrowOnError)
         {
             IO.Command.Byte = (byte)aCmd;
@@ -216,7 +217,7 @@ namespace Cosmos.Hardware.BlockDevice
                 Wait();
                 xStatus = (Status)IO.Status.Byte;
             } while ((xStatus & Status.Busy) != 0);
-
+                     
             // Error occurred
             if (aThrowOnError && (xStatus & Status.Error) != 0)
             {
@@ -304,18 +305,19 @@ namespace Cosmos.Hardware.BlockDevice
         public override void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData)
         {
             CheckDataSize(aData, aBlockCount);
-            SelectSector(aBlockNo, aBlockCount);
-            SendCmd(Cmd.ReadPio);
-            IO.Data.Read8(aData);
+            SelectSector(aBlockNo, aBlockCount); 
+            SendCmd(Cmd.ReadPio); 
+            IO.Data.Read8(aData); 
         }
 
         public override void WriteBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData)
         {
-            CheckDataSize(aData, 1);
-            SelectSector(aBlockNo, 1);
+            CheckDataSize(aData, aBlockCount);
+            SelectSector(aBlockNo, aBlockCount); 
             SendCmd(Cmd.WritePio);
 
             UInt16 xValue;
+            
             for (int i = 0; i < aData.Length / 2; i++)
             {
                 xValue = (UInt16)((aData[i * 2 + 1] << 8) | aData[i * 2]);
@@ -323,7 +325,7 @@ namespace Cosmos.Hardware.BlockDevice
                 // There must be a tiny delay between each OUTSW output word. A jmp $+2 size of delay.
                 // But that delay is cpu specific? so how long of a delay?
             }
-
+            
             SendCmd(Cmd.CacheFlush);
         }
     }

@@ -12,8 +12,8 @@ namespace Cosmos.Hardware.BlockDevice {
 
   public abstract class BlockDevice : Device {
     // TODO: Need to protect this from changes except by Hardware ring 
-    static public List<BlockDevice> Devices = new List<BlockDevice>();
-
+      static public List<BlockDevice> Devices = new List<BlockDevice>();
+    
     public byte[] NewBlockArray(UInt32 aBlockCount) {
       return new byte[aBlockCount * mBlockSize];
     }
@@ -34,9 +34,9 @@ namespace Cosmos.Hardware.BlockDevice {
     public abstract void WriteBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
 
     protected void CheckDataSize(byte[] aData, UInt32 aBlockCount) {
-      var xBlockSize = mBlockSize;
-      var xDataLength = aData.Length;
-      var xDataSize = aBlockCount * mBlockSize;
+      //var xBlockSize = mBlockSize;
+      //var xDataLength = aData.Length;
+      //var xDataSize = aBlockCount * mBlockSize;
       if ((ulong)aData.Length != aBlockCount * mBlockSize) {
         throw new Exception("Invalid data size.");
       }
