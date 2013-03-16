@@ -7,24 +7,59 @@ namespace StandAloneDebug
 {
     class Debugger
     {
+        public enum printtype
+        {
+            error,
+            warrning,
+            message
+        }
+
         public static void Run()
         {
-            if (Program.type == Program.types.Vmware)
+            while (Program.running)
             {
-                //execute vmware debugger
-            }
-            else if (Program.type == Program.types.Broche)
-            {
-                //execute broche debugger`
+                if (Program.type == Program.types.Vmware)
+                {
+                    //execute vmware debugger     
+                }
+                else if (Program.type == Program.types.Broche)
+                {
+                    //execute broche debugger
+                }      
             }
         }
 
-        static void Print(string message)
+        public static void Print(string message, printtype type)
         {
-            Console.WriteLine(message);
+            if (type == printtype.error)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(message);
+            }
+            else if (type == printtype.warrning)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(message);
+            }
+            else if (type == printtype.message)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(message);
+            }
             if (Program.printtofile == true)
             {
-                Program.output += message + '\n';
+                if (type == printtype.error)
+                {
+                    Program.output += "[error] " + message + '\n';
+                }
+                else if (type == printtype.message)
+                {
+                    Program.output += "[message] " + message + '\n';
+                }
+                else if (type == printtype.warrning)
+                {
+                    Program.output += "[warrning] " + message + '\n';
+                }
             }
         }
     }

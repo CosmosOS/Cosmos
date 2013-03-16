@@ -22,23 +22,26 @@ namespace StandAloneDebug
 
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit); 
-
-            if (args[1] == "vmware")
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+            if (args.Length < 2)
             {
-                running = true;
-                type = types.Vmware;
+                if (args[1] == "vmware")
+                {
+                    running = true;
+                    type = types.Vmware;
+                }
+                else if (args[1] == "broche")
+                {
+                    running = true;
+                    type = types.Broche;
+                }
+                else
+                {
+                    throw new ArgumentNullException("Not a correct argument");
+                }
             }
-            else if (args[1] == "broche")
-            {
-                running = true;
-                type = types.Broche;
-            }
-          
-            if (args[2] == "printtofile")
-            {
-                printtofile = true;
-            }
+ 
+            Debugger.Run();
         }
 
         static void OnProcessExit(object sender, EventArgs e)
