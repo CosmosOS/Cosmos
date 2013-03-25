@@ -93,5 +93,10 @@ namespace Cosmos.System
         // Shutdown and restart
         public void Restart() {
         }
+
+        public static void PrintDebug(string message)
+        {
+            Global.Dbg.Send(message);
+        }
     }
 }
