@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Objects;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Data.SQLite;
+using System.IO;
 
 namespace Cosmos.Debug.Common {
   public class SQL {
-    public readonly SqlConnection Connection;
+    public readonly SQLiteConnection Connection;
 
-    public SQL(SqlConnection aConnection) {
+    public SQL(SQLiteConnection aConnection)
+    {
       Connection = aConnection;
     }
 
@@ -50,7 +52,21 @@ namespace Cosmos.Debug.Common {
       } else {
         Exec("CREATE UNIQUE INDEX Idx" + xIdxName + " ON " + aTable + "(" + aCol + ");");
       }
-    }
+    }    
 
+    internal void CreateDB()
+    {
+      using (var strm = typeof(SQL).Assembly.GetManifestResourceStream(typeof(SQL), "SQLite.sql"))
+      {
+        if (strm == null)
+        {
+          throw new Exception("Sql resource not found!");
+        }
+        using (var reader = new StreamReader(strm))
+        {
+          Exec(reader.ReadToEnd());
+        }
+      }          
+    }
   }
 }

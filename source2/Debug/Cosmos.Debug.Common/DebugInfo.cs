@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Data;
 using System.Data.EntityClient;
-using System.Data.SqlClient;
 using System.Data.Common;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
@@ -14,6 +13,7 @@ using Microsoft.Win32;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using System.Threading;
+using System.Data.SQLite;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
@@ -26,131 +26,40 @@ namespace Cosmos.Debug.Common {
       public List<string> FieldNames = new List<string>();
     }
 
-    protected SqlConnection mConnection;
+    protected SQLiteConnection mConnection;
     protected string mDbName;
     // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
-    protected string mDataSouce = @"(LocalDB)\v11.0";
     //protected mDataSouce = @".\SQLEXPRESS";
-    protected string mConnStrBase;
     protected string mConnStr;
     protected System.Data.Metadata.Edm.MetadataWorkspace mWorkspace;
 
     public void DeleteDB(string aDbName, string aPathname) {
-      using (var xConn = new SqlConnection(mConnStrBase)) {
-        // Open connection to master
-        xConn.Open();
-        int databaseId = 0;
-
-        bool xExists = false;
-            using (var xCmd = xConn.CreateCommand())
-            {
-                xCmd.CommandText = "select database_id from sys.databases where name = '" + aDbName + "'";
-                object rawId = xCmd.ExecuteScalar();
-                if (null != rawId)
-                {
-                    databaseId = (int)rawId;
-                    xExists = true;
-                }
-            }
-
-            if (xExists)
-            {
-                List<string> databaseFiles = new List<string>();
-                bool damagedDatabase = false;
-
-                using (var xCmd = xConn.CreateCommand())
-                {
-                    xCmd.CommandText = "SELECT [physical_name] FROM [master].[sys].[master_files] WHERE [database_id] = " + databaseId.ToString();
-                    using (SqlDataReader reader = xCmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string filePath = reader.GetString(0);
-
-                            if (!File.Exists(filePath)) { damagedDatabase = true; }
-                            else { databaseFiles.Add(filePath); }
-                        }
-                    }
-                }
-                if (!damagedDatabase)
-                {
-                    // Necessary to because of SQL pooled connections etc, even if all our connections are closed.
-                    using (var xCmd = xConn.CreateCommand())
-                    {
-                        xCmd.CommandText = "ALTER DATABASE " + aDbName + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
-                        xCmd.ExecuteNonQuery();
-                    }
-                }
-                // Yes this throws an exception if the database doesnt exist, so we have to run it only if we
-                // know it exists. This will detach and also delete the physical files.
-                try
-                {
-                    using (var xCmd = xConn.CreateCommand())
-                    {
-                        xCmd.CommandText = "DROP DATABASE " + aDbName;
-                        xCmd.ExecuteNonQuery();
-                    }
-                }
-                catch
-                {
-                }
-                if (damagedDatabase)
-                {
-                    //// Just detach database.
-                    //using (var xCmd = xConn.CreateCommand())
-                    //{
-                    //    xCmd.CommandText = string.Format("sp_detach_db '{0}', 'true'", aDbName);
-                    //    xCmd.ExecuteNonQuery();
-                    //}
-                    // And try to cleanup remaining files.
-                    foreach (string filePath in databaseFiles)
-                    {
-                        try { File.Delete(filePath); }
-                        catch { }
-                    }
-                }
-            }
-      }
-
-      // By now DB file should be gone. But sometimes when there are errors, it wont be in the catalog
-      // above, but the file will be there. So just in case, if it exists we delete it here if found.
-      File.Delete(aPathname);
-      // SQL Express and Local create the log file differently. Once creates .ldf, while other does _log.ldf.
-      File.Delete(Path.ChangeExtension(aPathname, "ldf"));
-      File.Delete(Path.Combine(Path.GetDirectoryName(aPathname), Path.GetFileNameWithoutExtension(aPathname) + "_LOG.ldf"));
+      File.Delete(aDbName);
     }
 
     public DebugInfo(string aPathname, bool aCreate = false) {
       CurrentInstance = this;
 
-      mDbName = Path.GetFileNameWithoutExtension(aPathname);
-      // SQL doesnt like these in DB names.
-      mDbName = mDbName.Replace("-", "_"); ;
-      mDbName = mDbName.Replace(".", "_"); ;
-
-      mConnStrBase = @"Data Source=" + mDataSouce + ";Integrated Security=True;MultipleActiveResultSets=True;";
-
-      if (aCreate) {
-        DeleteDB(mDbName, aPathname);
-        if (File.Exists(aPathname))
-        {
-          throw new Exception("Databasename still exists!");
-        }
+      if (aCreate)
+      {
+        File.Delete(aPathname);
       }
+      aCreate = !File.Exists(aPathname);
+
+      mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
 
       // Initial Catalog is necessary for EDM
-      mConnStr = mConnStrBase + "Initial Catalog=" + mDbName + ";AttachDbFilename=" + aPathname + ";";
       mWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
         new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
       // Do not open mConnection before mEntities.CreateDatabase
-      mConnection = new SqlConnection(mConnStr);
+      mConnection = new SQLiteConnection(mConnStr);
       if (aCreate) {
         using (var xEntities = DB()) {
           // DatabaseExists checks if the DBName exists, not physical files.
-          if (!xEntities.DatabaseExists()) {
-            xEntities.CreateDatabase();
+          if (aCreate) {
             mConnection.Open();
             var xSQL = new SQL(mConnection);
+            xSQL.CreateDB();
 
             // Be careful with indexes, they slow down inserts. So on tables that we have a 
             // lot of inserts, but limited look ups, dont add them.
@@ -211,6 +120,7 @@ namespace Cosmos.Debug.Common {
         foreach (var xItem in xMaps) {
           foreach (var xFieldName in xItem.FieldNames) {
             var xRow = new FIELD_MAPPING();
+            xRow.ID = NewGuid();
             xRow.TYPE_NAME = xItem.TypeName;
             xRow.FIELD_NAME = xFieldName;
             xDB.FIELD_MAPPING.AddObject(xRow);
@@ -252,11 +162,17 @@ namespace Cosmos.Debug.Common {
       }
     }
 
+    private static Guid NewGuid()
+    {
+      return Guid.NewGuid();
+    }
+
     protected List<string> mLocalFieldInfoNames = new List<string>();
     public void WriteFieldInfoToFile(IEnumerable<FIELD_INFO> aFields) {
       using (var xDB = DB()) {
         foreach (var xItem in aFields) {
           if (!mLocalFieldInfoNames.Contains(xItem.NAME)) {
+            xItem.ID = NewGuid();
             mLocalFieldInfoNames.Add(xItem.NAME);
             xDB.FIELD_INFO.AddObject(xItem);
           }
@@ -269,7 +185,7 @@ namespace Cosmos.Debug.Common {
       // We have to create a new connection each time because threads can call this
       // function and it causes issues for different threads to share the same connection, 
       // even if they have different Entity (context) instances.
-      var xEntConn = new EntityConnection(mWorkspace, new SqlConnection(mConnStr));
+      var xEntConn = new EntityConnection(mWorkspace, new SQLiteConnection(mConnStr));
       return new Entities(xEntConn);
     }
 
@@ -418,7 +334,7 @@ namespace Cosmos.Debug.Common {
     public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = false) {
       if (aList.Count >= aFlushSize /*|| aFlush*/) {
         if (aList.Count > 0) {
-          using (var xBulkCopy = new SqlBulkCopy(mConnection)) {
+          using (var xBulkCopy = new SqliteBulkCopy(mConnection)) {
             xBulkCopy.DestinationTableName = aTableName;
             // for now dump to disk:
             //using (var reader = aList.AsDataReader())

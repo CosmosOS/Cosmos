@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="DebugModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+    <Schema Namespace="DebugModel.Store" Alias="Self" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
   <EntityContainer Name="DebugModelStoreContainer">
     <EntitySet Name="FIELD_INFO" EntityType="DebugModel.Store.FIELD_INFO" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="FIELD_MAPPING" EntityType="DebugModel.Store.FIELD_MAPPING" store:Type="Tables" Schema="dbo" />
@@ -42,7 +42,7 @@
     <Property Name="TYPE" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="FIELD_MAPPING">
     <Key>
@@ -50,15 +50,15 @@
     </Key>
     <Property Name="TYPE_NAME" Type="nvarchar" Nullable="false" MaxLength="512" />
     <Property Name="FIELD_NAME" Type="nvarchar" Nullable="false" MaxLength="512" />
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="Labels">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="256" />
-    <Property Name="Address" Type="bigint" Nullable="false" />
+    <Property Name="Address" Type="integer" Nullable="false" />
   </EntityType>
   <EntityType Name="LOCAL_ARGUMENT_INFO">
     <Key>
@@ -70,13 +70,13 @@
     <Property Name="OFFSET" Type="int" Nullable="false" />
     <Property Name="NAME" Type="nvarchar" Nullable="false" MaxLength="64" />
     <Property Name="TYPENAME" Type="nvarchar" Nullable="false" MaxLength="256" />
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
   </EntityType>
   <EntityType Name="MethodIlOps">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="LabelName" Type="nvarchar" Nullable="false" MaxLength="256" />
     <Property Name="StackDiff" Type="int" Nullable="false" />
     <Property Name="IlOffset" Type="int" Nullable="false" />
@@ -86,19 +86,19 @@
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="Pathname" Type="nvarchar" Nullable="false" MaxLength="256" />
   </EntityType>
   <EntityType Name="Methods">
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="TypeToken" Type="int" Nullable="false" />
     <Property Name="MethodToken" Type="int" Nullable="false" />
     <Property Name="AssemblyFileID" Type="uniqueidentifier" Nullable="false" />
-    <Property Name="LineColStart" Type="bigint" Nullable="false" />
-    <Property Name="LineColEnd" Type="bigint" Nullable="false" />
+    <Property Name="LineColStart" Type="integer" Nullable="false" />
+    <Property Name="LineColEnd" Type="integer" Nullable="false" />
     <Property Name="DocumentID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="LabelStartID" Type="uniqueidentifier" Nullable="true" />
     <Property Name="LabelEndID" Type="uniqueidentifier" Nullable="true" />
@@ -108,7 +108,7 @@
     <Key>
       <PropertyRef Name="ID" />
     </Key>
-    <Property Name="ID" Type="uniqueidentifier" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
     <Property Name="Pathname" Type="nvarchar" Nullable="false" MaxLength="256" />
   </EntityType>
   <Association Name="AssemblyFileMethod">
@@ -212,7 +212,7 @@
           <Property Name="TYPE" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
         </EntityType>
         <EntityType Name="FIELD_MAPPING">
           <Key>
@@ -220,13 +220,13 @@
           </Key>
           <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
           <Property Name="FIELD_NAME" Type="String" Nullable="false" MaxLength="512" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
         </EntityType>
         <EntityType Name="Label">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
           <Property Type="String" Name="Name" Nullable="false" MaxLength="256" />
           <Property Type="Int64" Name="Address" Nullable="false" />
           <NavigationProperty Name="MethodStart" Relationship="DebugModel.LabelMethod" FromRole="Label" ToRole="Method" />
@@ -242,13 +242,13 @@
           <Property Name="OFFSET" Type="Int32" Nullable="false" />
           <Property Name="NAME" Type="String" Nullable="false" MaxLength="64" Unicode="true" FixedLength="false" />
           <Property Name="TYPENAME" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
         </EntityType>
         <EntityType Name="MethodIlOp">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
           <Property Name="LabelName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
           <Property Name="StackDiff" Type="Int32" Nullable="false" />
           <Property Name="IlOffset" Type="Int32" Nullable="false" />
@@ -259,7 +259,7 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
           <Property Type="String" Name="Pathname" Nullable="false" MaxLength="256" />
           <NavigationProperty Name="Methods" Relationship="DebugModel.AssemblyFileMethod" FromRole="AssemblyFile" ToRole="Method" />
         </EntityType>
@@ -267,7 +267,7 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
           <Property Type="Int32" Name="TypeToken" Nullable="false" />
           <Property Type="Int32" Name="MethodToken" Nullable="false" />
           <NavigationProperty Name="AssemblyFile" Relationship="DebugModel.AssemblyFileMethod" FromRole="Method" ToRole="AssemblyFile" />
@@ -299,7 +299,7 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Guid" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="None" />
           <NavigationProperty Name="Methods" Relationship="DebugModel.DocumentMethod" FromRole="Document" ToRole="Method" />
           <Property Type="String" Name="Pathname" Nullable="false" MaxLength="256" />
         </EntityType>

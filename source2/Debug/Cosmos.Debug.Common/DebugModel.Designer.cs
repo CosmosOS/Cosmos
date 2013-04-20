@@ -8,12 +8,13 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
+using System.Data.EntityClient;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
-using System.Data.EntityClient;
-using System.ComponentModel;
-using System.Xml.Serialization;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 [assembly: EdmSchemaAttribute()]
 #region EDM Relationship Metadata
@@ -203,6 +204,7 @@ namespace Cosmos.Debug.Common
         private ObjectSet<Document> _Documents;
 
         #endregion
+
         #region AddTo Methods
     
         /// <summary>
@@ -270,11 +272,11 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
     }
-    
 
     #endregion
-    
+
     #region Entities
     
     /// <summary>
@@ -301,6 +303,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -355,6 +358,7 @@ namespace Cosmos.Debug.Common
         partial void OnPathnameChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -381,6 +385,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -407,6 +412,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -461,6 +467,7 @@ namespace Cosmos.Debug.Common
         partial void OnPathnameChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -487,6 +494,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -517,6 +525,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -619,6 +628,7 @@ namespace Cosmos.Debug.Common
         partial void OnIDChanged();
 
         #endregion
+
     
     }
     
@@ -648,6 +658,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -726,6 +737,7 @@ namespace Cosmos.Debug.Common
         partial void OnIDChanged();
 
         #endregion
+
     
     }
     
@@ -755,6 +767,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -833,6 +846,7 @@ namespace Cosmos.Debug.Common
         partial void OnAddressChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -881,6 +895,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -917,6 +932,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1091,6 +1107,7 @@ namespace Cosmos.Debug.Common
         partial void OnIDChanged();
 
         #endregion
+
     
     }
     
@@ -1130,6 +1147,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1376,6 +1394,7 @@ namespace Cosmos.Debug.Common
         partial void OnLabelCallChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -1554,6 +1573,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -1584,6 +1604,7 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
         #region Primitive Properties
     
         /// <summary>
@@ -1710,6 +1731,7 @@ namespace Cosmos.Debug.Common
         partial void OnMethodIDChanged();
 
         #endregion
+
     
         #region Navigation Properties
     
@@ -1752,8 +1774,10 @@ namespace Cosmos.Debug.Common
         }
 
         #endregion
+
     }
 
     #endregion
+
     
 }

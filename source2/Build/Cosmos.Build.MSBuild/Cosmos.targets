@@ -53,7 +53,7 @@
              Condition="$(IsELF) == 'true'"/>
 
     <ExtractMapFromElfFile  InputFile="$(TargetDir)$(MSBuildProjectName).bin"
-                            DebugInfoFile="$(TargetDir)$(MSBuildProjectName).mdf"
+                            DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb"
                             WorkingDir="$(TargetDir)"
                             CosmosBuildDir="$(CosmosDir)\Build"
                             Condition="$(IsELF) == 'true'"/>
@@ -67,7 +67,7 @@
 
     <!--binary only-->
     <ReadNAsmMapToCosmosMap InputBaseDir="$(TargetDir)"
-                            DebugInfoFile="$(TargetDir)$(MSBuildProjectName).mdf"
+                            DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb"
                             Condition="$(IsELF) == 'false'"/>
     <!--end of binary only-->
 

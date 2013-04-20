@@ -2,13 +2,11 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
 -- --------------------------------------------------
--- Date Created: 08/11/2012 20:31:32
--- Generated from EDMX file: D:\source\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
+-- Date Created: 04/20/2013 10:32:22
+-- Generated from EDMX file: C:\Data\Sources\Cosmos\source2\Debug\Cosmos.Debug.Common\DebugModel.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
-GO
-USE [Guess];
 GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 GO
@@ -87,7 +85,7 @@ GO
 CREATE TABLE [dbo].[Labels] (
     [ID] uniqueidentifier  NOT NULL,
     [Name] nvarchar(256)  NOT NULL,
-    [Address] bigint  NOT NULL
+    [Address] integer  NOT NULL
 );
 GO
 
@@ -126,8 +124,8 @@ CREATE TABLE [dbo].[Methods] (
     [TypeToken] int  NOT NULL,
     [MethodToken] int  NOT NULL,
     [AssemblyFileID] uniqueidentifier  NOT NULL,
-    [LineColStart] bigint  NOT NULL,
-    [LineColEnd] bigint  NOT NULL,
+    [LineColStart] integer  NOT NULL,
+    [LineColEnd] integer  NOT NULL,
     [DocumentID] uniqueidentifier  NOT NULL,
     [LabelStartID] uniqueidentifier  NULL,
     [LabelEndID] uniqueidentifier  NULL,

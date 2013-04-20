@@ -5,6 +5,7 @@ using System.Text;
 using Cosmos.Build.MSBuild;
 using Microsoft.Build.Framework;
 using System.Diagnostics;
+using System.Data.SQLite;
 
 namespace DebugCompiler
 {
@@ -14,7 +15,7 @@ namespace DebugCompiler
     {
       var xTimespans = new List<TimeSpan>();
       #region Bench
-      for (int i = 0; i < 3; i++)
+      for (int i = 0; i < 1; i++)
       {
         var xSW = Stopwatch.StartNew();
         try
@@ -34,7 +35,11 @@ namespace DebugCompiler
           xTask.OnLogError = (m) => Console.WriteLine("Error: {0}", m);
           xTask.OnLogWarning = (m) => Console.WriteLine("Warning: {0}", m);
           xTask.OnLogMessage = (m) => Console.WriteLine("Message: {0}", m);
-          xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
+          xTask.OnLogException = (m) =>
+          {
+            Console.WriteLine("Exception: {0}", m.ToString());
+            Console.ReadLine();
+          };
           if (xTask.Execute())
           {
             Console.WriteLine("Executed OK");
@@ -59,6 +64,11 @@ namespace DebugCompiler
       {
         Console.WriteLine("Run {0} took {1}", i + 1, xTimespans[i].ToString());
       }
+    }
+
+    static void SQLiteLog_Log(object sender, LogEventArgs e)
+    {
+      Console.WriteLine("SQL: {0}", e.Message);
     }
 
     private static ITaskItem[] GetReferences()

@@ -227,11 +227,6 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GeramysTestBoot", "GeramysT
 		{DA4198CA-59DF-41B3-9884-867647900D76} = {DA4198CA-59DF-41B3-9884-867647900D76}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21D9A04D-C5CC-4162-B7B4-C28940042A64}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground", "..\source2\users\Matthijs\Playground\Playground.csproj", "{89868CAD-AAFC-45F1-81B3-C323F87D5742}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "PlaygroundBoot", "..\source2\users\Matthijs\Playground\PlaygroundBoot.Cosmos", "{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D}"
