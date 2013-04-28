@@ -177,6 +177,15 @@ Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 ; XSharp Source
 Source: ".\source2\Compiler\Cosmos.Compiler.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
 
+; System.Data.SQLite library
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.dll"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.pdb"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.dll"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.pdb"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.pdb"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.pdb"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
