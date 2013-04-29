@@ -87,6 +87,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Resources\Dependencies\SQLite\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\..\..\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
@@ -122,9 +126,9 @@
     <Compile Include="SourceInfo.cs" />
     <Compile Include="SQL.cs" />
     <Compile Include="SqliteBulkCopy.cs" />
+    <Compile Include="SQLiteConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
     <None Include="Cosmos.snk" />
     <EntityDeploy Include="DebugModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>

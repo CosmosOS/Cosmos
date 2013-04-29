@@ -14,6 +14,7 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using System.Threading;
 using System.Data.SQLite;
+using System.Data.Entity;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
@@ -47,10 +48,11 @@ namespace Cosmos.Debug.Common {
       aCreate = !File.Exists(aPathname);
 
       mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
-
+      // Use the SQLiteConnectionFactory as the default database connection
+      Database.DefaultConnectionFactory = new SQLiteConnectionFactory();
       // Initial Catalog is necessary for EDM
       mWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
-        new string[] { "res://*/" }, new Assembly[] { Assembly.GetExecutingAssembly() });
+        new string[] { "res://*/" }, new Assembly[] {Assembly.GetExecutingAssembly()});
       // Do not open mConnection before mEntities.CreateDatabase
       mConnection = new SQLiteConnection(mConnStr);
       if (aCreate) {

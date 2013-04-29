@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Data;
+using System.Configuration;
+using System.Data.SQLite;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -171,6 +174,11 @@ namespace Cosmos.Build.MSBuild {
           // Default of 1 is in Cosmos.Targets. Need to change to use proj props.
           DebugCom = 0;
         }
+        
+        // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
+        var data = (DataSet)ConfigurationManager.GetSection("system.data");
+        var providerFactories = data.Tables["DbProviderFactories"];
+        providerFactories.Rows.Add("System.Data.SQLite", "System.Data.SQLite", "System.Data.SQLite", typeof(SQLiteFactory).AssemblyQualifiedName);
 
         using (var xAsm = new AppAssembler(DebugCom))
         {
