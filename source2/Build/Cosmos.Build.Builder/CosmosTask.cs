@@ -195,7 +195,6 @@ namespace Cosmos.Build.Builder {
       CheckVs2010Sp1();
       CheckNet35Sp1(); // Required by VMWareLib
       CheckNet402();
-      CheckLocalDb2012();
       CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
       bool vmWareInstalled = true;
