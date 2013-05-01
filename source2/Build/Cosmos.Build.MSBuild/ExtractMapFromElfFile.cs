@@ -7,6 +7,10 @@ using Microsoft.Build.Framework;
 using System.IO;
 using Microsoft.Build.Utilities;
 using System.Diagnostics;
+using System.Data;
+using System.Configuration;
+using System.Data.Common;
+using System.Data.SQLite;
 using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild {

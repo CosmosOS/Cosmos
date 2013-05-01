@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.Win32;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
+using System.Configuration;
 using System.Threading;
 using System.Data.SQLite;
 using System.Data.Entity;
@@ -46,6 +47,11 @@ namespace Cosmos.Debug.Common {
         File.Delete(aPathname);
       }
       aCreate = !File.Exists(aPathname);
+
+      // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
+      var data = (DataSet)ConfigurationManager.GetSection("system.data");
+      var providerFactories = data.Tables["DbProviderFactories"];
+      providerFactories.Rows.Add("System.Data.SQLite", "System.Data.SQLite", "System.Data.SQLite", typeof(SQLiteFactory).AssemblyQualifiedName);
 
       mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
       // Use the SQLiteConnectionFactory as the default database connection

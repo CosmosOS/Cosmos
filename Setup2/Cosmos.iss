@@ -186,6 +186,10 @@ Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.dll"; DestDir: "{app
 Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.pdb"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.pdb"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+
+; EntityFramework library
+Source: ".\source\packages\EntityFramework.5.0.0-rc\lib\net40\EntityFramework.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
