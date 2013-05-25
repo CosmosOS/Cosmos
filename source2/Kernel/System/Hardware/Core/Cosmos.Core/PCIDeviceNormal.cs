@@ -39,7 +39,7 @@ namespace Cosmos.Core
 
             ExpansionROMBaseAddress = ReadRegister32(0x30);
 
-            CapabilitiesPointer = ReadRegister8(0x37);
+            CapabilitiesPointer = ReadRegister8(0x34);
 
             MinGrant = ReadRegister8(0x3E);
             MaxLatency = ReadRegister8(0x3F);

@@ -389,6 +389,7 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
+Filename: "{app}\Build\Tools\sqllite.exe"; Flags: waituntilterminated
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
