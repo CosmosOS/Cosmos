@@ -61,78 +61,104 @@ namespace Cosmos.Build.MSBuild {
     #endregion
 
     public override bool Execute() {
-      // Important! A given address can have more than one label.
-      // Do NOT filter by duplicate addresses as this causes serious lookup problems.
-      string xFile = RunObjDump();
+        try
+        {
+            // Important! A given address can have more than one label.
+            // Do NOT filter by duplicate addresses as this causes serious lookup problems.
+            string xFile = RunObjDump();
 
-      using (var xDebugInfo = new DebugInfo(DebugInfoFile)) {
-        // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
-        // Then code can find major lables, and use position markers into the map file to parse in between 
-        // as needed.
-        using (var xMapReader = new StreamReader(xFile)) {
-          var xLabels = new List<Label>();
-          bool xListStarted = false;
-          string xLine;
-          while ((xLine = xMapReader.ReadLine()) != null) {
-            if (String.IsNullOrEmpty(xLine)) {
-              continue;
-            } else if (!xListStarted) {
-              // Find start of the data
-              if (xLine == "SYMBOL TABLE:") {
-                xListStarted = true;
-              }
-              continue;
+            using (var xDebugInfo = new DebugInfo(DebugInfoFile))
+            {
+                // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
+                // Then code can find major lables, and use position markers into the map file to parse in between 
+                // as needed.
+                using (var xMapReader = new StreamReader(xFile))
+                {
+                    var xLabels = new List<Label>();
+                    bool xListStarted = false;
+                    string xLine;
+                    while ((xLine = xMapReader.ReadLine()) != null)
+                    {
+                        if (String.IsNullOrEmpty(xLine))
+                        {
+                            continue;
+                        }
+                        else if (!xListStarted)
+                        {
+                            // Find start of the data
+                            if (xLine == "SYMBOL TABLE:")
+                            {
+                                xListStarted = true;
+                            }
+                            continue;
+                        }
+
+                        uint xAddress;
+                        try
+                        {
+                            xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.LogError("Error processing line '" + xLine + "' " + ex.Message);
+                            throw;
+                        }
+
+                        string xSection = xLine.Substring(17, 5);
+                        if (xSection != ".text" && xSection != ".data")
+                        {
+                            continue;
+                        }
+                        string xLabel = xLine.Substring(32);
+                        if (xLabel == xSection)
+                        {
+                            // Non label, skip
+                            continue;
+                        }
+
+                        Guid xGuid;
+                        // See if label has an embedded GUID. If so, use it.
+                        if (xLabel.StartsWith("GUID_"))
+                        {
+                            xGuid = new Guid(xLabel.Substring(5));
+                        }
+                        else
+                        {
+                            xGuid = Guid.NewGuid();
+                        }
+
+                        xLabels.Add(new Label()
+                        {
+                            ID = xGuid,
+                            Name = xLabel,
+                            Address = xAddress
+                        });
+                        xDebugInfo.AddLabels(xLabels);
+                    }
+                    xDebugInfo.AddLabels(xLabels, false);
+                }
+
+                //// All labels are in DB, now go back and match up Method.LabelStart
+                //using (var xDB = xDebugInfo.DB())
+                //{
+                //    //TODO: EF keeps all items in RAM, even after AcceptChanges.
+                //    // Right now we only have a few hundred methods, but when this grows we 
+                //    // need to find a way around this. Future EF versions might addresst this better.
+                //    // Current EF versions require us to destroy the context and create a new one.
+                //    foreach (var xMethod in xDB.Methods)
+                //    {
+                //        //xMethod
+                //    }
+                //}
             }
 
-            uint xAddress;
-            try {
-              xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
-            } catch (Exception ex) {
-              Log.LogError("Error processing line '" + xLine + "' " + ex.Message);
-              throw;
-            }
-
-            string xSection = xLine.Substring(17, 5);
-            if (xSection != ".text" && xSection != ".data") {
-              continue;
-            }
-            string xLabel = xLine.Substring(32);
-            if (xLabel == xSection) {
-              // Non label, skip
-              continue;
-            }
-
-            Guid xGuid;
-            // See if label has an embedded GUID. If so, use it.
-            if (xLabel.StartsWith("GUID_")) {
-              xGuid = new Guid(xLabel.Substring(5));
-            } else {
-              xGuid = Guid.NewGuid();
-            }
-
-            xLabels.Add(new Label() {
-              ID = xGuid,
-              Name = xLabel,
-              Address = xAddress
-            });
-            xDebugInfo.AddLabels(xLabels);
-          }
-          xDebugInfo.AddLabels(xLabels, false);
+            return true;
         }
-
-        // All labels are in DB, now go back and match up Method.LabelStart
-        using (var xDB = xDebugInfo.DB()) {
-          //TODO: EF keeps all items in RAM, even after AcceptChanges.
-          // Right now we only have a few hundred methods, but when this grows we 
-          // need to find a way around this. Future EF versions might addresst this better.
-          // Current EF versions require us to destroy the context and create a new one.
-          foreach (var xMethod in xDB.Methods) {
-            //xMethod
-          }
+        catch (Exception E)
+        {
+            base.Log.LogError("An error occurred: {0}", E.ToString());
+            return false;
         }
-      }
-
-      return true;
     }
 
     private string RunObjDump() {

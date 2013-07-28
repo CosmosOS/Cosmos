@@ -26,7 +26,7 @@ namespace DebugCompiler
           xTask.TraceAssemblies = "User";
           xTask.DebugCom = 1;
           xTask.UseNAsm = true;
-          xTask.OutputFilename = @"C:\Data\Sources\Cosmos\source2\users\Matthijs\Playground\bin\Debug\PlaygroundBoot.asm";
+          xTask.OutputFilename = @"e:\cosmos\source2\users\Matthijs\Playground\bin\Debug\PlaygroundBoot.asm";
           xTask.EnableLogging = true;
           xTask.EnableLogging = false;
           xTask.EmitDebugSymbols = true;
@@ -74,10 +74,10 @@ namespace DebugCompiler
     private static ITaskItem[] GetReferences()
     {
       return new ITaskItem[]{
-        new TaskItemImpl(@"c:\Data\Sources\Cosmos\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll"),
-        new TaskItemImpl(@"c:\Data\Sources\Cosmos\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll"),
-        new TaskItemImpl(@"c:\Data\Sources\Cosmos\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
-        new TaskItemImpl(@"c:\Data\Sources\Cosmos\source2\Kernel\System\Cosmos.System.Plugs.System\bin\x86\Debug\Cosmos.System.Plugs.System.dll")
+        new TaskItemImpl(@"e:\cosmos\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll"),
+        new TaskItemImpl(@"e:\cosmos\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll"),
+        new TaskItemImpl(@"e:\cosmos\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
+        new TaskItemImpl(@"e:\cosmos\source2\Kernel\System\Cosmos.System.Plugs.System\bin\x86\Debug\Cosmos.System.Plugs.System.dll")
       };
     }
 

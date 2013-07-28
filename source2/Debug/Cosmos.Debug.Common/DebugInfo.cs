@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Data;
-using System.Data.EntityClient;
 using System.Data.Common;
-using System.Data.Objects;
-using System.Data.Objects.DataClasses;
 using System.Reflection;
 using System.Text;
 using Microsoft.Win32;
@@ -33,7 +30,6 @@ namespace Cosmos.Debug.Common {
     // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
     //protected mDataSouce = @".\SQLEXPRESS";
     protected string mConnStr;
-    protected System.Data.Metadata.Edm.MetadataWorkspace mWorkspace;
 
     public void DeleteDB(string aDbName, string aPathname) {
       File.Delete(aDbName);
@@ -49,16 +45,9 @@ namespace Cosmos.Debug.Common {
       aCreate = !File.Exists(aPathname);
 
       // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
-      var data = (DataSet)ConfigurationManager.GetSection("system.data");
-      var providerFactories = data.Tables["DbProviderFactories"];
-      providerFactories.Rows.Add("System.Data.SQLite", "System.Data.SQLite", "System.Data.SQLite", typeof(SQLiteFactory).AssemblyQualifiedName);
-
       mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
       // Use the SQLiteConnectionFactory as the default database connection
       Database.DefaultConnectionFactory = new SQLiteConnectionFactory();
-      // Initial Catalog is necessary for EDM
-      mWorkspace = new System.Data.Metadata.Edm.MetadataWorkspace(
-        new string[] { "res://*/" }, new Assembly[] {Assembly.GetExecutingAssembly()});
       // Do not open mConnection before mEntities.CreateDatabase
       mConnection = new SQLiteConnection(mConnStr);
       if (aCreate) {
@@ -131,7 +120,7 @@ namespace Cosmos.Debug.Common {
             xRow.ID = NewGuid();
             xRow.TYPE_NAME = xItem.TypeName;
             xRow.FIELD_NAME = xFieldName;
-            xDB.FIELD_MAPPING.AddObject(xRow);
+            xDB.FIELD_MAPPING.Add(xRow);
           }
         }
         xDB.SaveChanges();
@@ -182,7 +171,7 @@ namespace Cosmos.Debug.Common {
           if (!mLocalFieldInfoNames.Contains(xItem.NAME)) {
             xItem.ID = NewGuid();
             mLocalFieldInfoNames.Add(xItem.NAME);
-            xDB.FIELD_INFO.AddObject(xItem);
+            xDB.FIELD_INFO.Add(xItem);
           }
         }
         xDB.SaveChanges();
@@ -193,8 +182,7 @@ namespace Cosmos.Debug.Common {
       // We have to create a new connection each time because threads can call this
       // function and it causes issues for different threads to share the same connection, 
       // even if they have different Entity (context) instances.
-      var xEntConn = new EntityConnection(mWorkspace, new SQLiteConnection(mConnStr));
-      return new Entities(xEntConn);
+        return new Entities(new SQLiteConnection(mConnStr), true);
     }
 
     public class SequencePoint {
@@ -344,6 +332,7 @@ namespace Cosmos.Debug.Common {
         if (aList.Count > 0) {
           using (var xBulkCopy = new SqliteBulkCopy(mConnection)) {
             xBulkCopy.DestinationTableName = aTableName;
+            #region debug
             // for now dump to disk:
             //using (var reader = aList.AsDataReader())
             //{
@@ -380,7 +369,13 @@ namespace Cosmos.Debug.Common {
             //    }
             //  }
             //}
-            xBulkCopy.WriteToServer(aList.AsDataReader());
+            #endregion region debug
+            using (var db = DB())
+            {
+                db.Set(typeof(T)).AddRange(aList);
+                db.SaveChanges();
+            }
+            //xBulkCopy.WriteToServer(aList.AsDataReader());
           }
           aList.Clear();
         }

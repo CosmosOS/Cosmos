@@ -160,6 +160,9 @@ Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversi
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\EntityFramework.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\System.Data.SQLite.LinqEx.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 
@@ -169,7 +172,6 @@ Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignorevers
 Source: ".\Build\VSIP\Cosmos.Hardware.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common.Extensions.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\FirebirdSql.Data.FirebirdClient.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 
 ; Icon
 Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
@@ -178,17 +180,12 @@ Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 Source: ".\source2\Compiler\Cosmos.Compiler.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
 
 ; System.Data.SQLite library
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.dll"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.pdb"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.dll"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.pdb"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.pdb"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\SQLite\System.Data.SQLite.Linq.pdb"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-
-; EntityFramework library
-Source: ".\source\packages\EntityFramework.5.0.0-rc\lib\net40\EntityFramework.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\EntityFramework.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\System.Data.SQLite.LinqEx.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\EntityFramework.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\System.Data.SQLite.LinqEx.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
@@ -389,7 +386,6 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2010_PATH}\VSIXInstaller.exe; Parameters: "/quiet ""{app}\Build\VSIP\Cosmos.VS.XSharp.vsix"""; Flags: waituntilterminated
-Filename: "{app}\Build\Tools\sqllite.exe"; Flags: waituntilterminated
 
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
