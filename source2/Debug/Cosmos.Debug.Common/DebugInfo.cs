@@ -370,12 +370,12 @@ namespace Cosmos.Debug.Common {
             //  }
             //}
             #endregion region debug
-            using (var db = DB())
-            {
-                db.Set(typeof(T)).AddRange(aList);
-                db.SaveChanges();
-            }
-            //xBulkCopy.WriteToServer(aList.AsDataReader());
+            //using (var db = DB())
+            //{
+            //    db.Set(typeof(T)).AddRange(aList);
+            //    db.SaveChanges();
+            //}
+            xBulkCopy.WriteToServer(aList.AsDataReader());
           }
           aList.Clear();
         }
