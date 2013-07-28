@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:source="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator"
+           targetNamespace="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator">
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+            Common Data Model Schema Definition Language.
+            Copyright (c) Microsoft Corp. All rights reserved.
+        </xs:documentation>
+    </xs:annotation>
+
+
+  <xs:attribute name="Type" type="source:TSourceType"/>
+  <xs:attribute name="Schema" type="xs:string"/>
+  <xs:attribute name="Name" type="xs:string"/>
+
+    <xs:simpleType name="TSourceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Tables" />
+            <xs:enumeration value="Views" />
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

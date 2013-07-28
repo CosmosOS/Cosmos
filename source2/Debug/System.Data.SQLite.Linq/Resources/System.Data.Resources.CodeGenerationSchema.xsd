@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<xs:schema id="CodeGenerationSchema" 
+                  targetNamespace="http://schemas.microsoft.com/ado/2006/04/codegeneration"
+                  elementFormDefault="unqualified"
+                  xmlns="http://schemas.microsoft.com/ado/2006/04/codegeneration"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+    <xs:attribute name="SetterAccess" type="TAccess"/>
+    <xs:attribute name="GetterAccess" type="TAccess"/>
+    <xs:attribute name="TypeAccess" type="TPublicOrInternalAccess"/>
+    <xs:attribute name="MethodAccess" type="TAccess"/>
+  
+    <xs:simpleType name="TAccess">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Public" />
+            <xs:enumeration value="Internal" />
+			      <xs:enumeration value="Protected" />
+            <xs:enumeration value="Private" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TPublicOrInternalAccess">
+        <xs:restriction base="TAccess">
+            <xs:enumeration value="Public" />
+            <xs:enumeration value="Internal" />
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+ *
+ * System.Data.SQLite.Linq.2012.csproj -
+ *
+ * Written by Joe Mistachkin.
+ * Released to the public domain, use at your own risk!
+ *
+-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E6BF9F74-58E2-413B-A7CE-EA653ECB728D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>System.Data.SQLite.Linq</RootNamespace>
+    <AssemblyName>System.Data.SQLite.LinqEx</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <BuildPackage>true</BuildPackage>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET_40;USE_INTEROP_DLL;INTEROP_EXTENSION_FUNCTIONS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET_40;USE_INTEROP_DLL;INTEROP_EXTENSION_FUNCTIONS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>System.Data.SQLite.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\source\packages\EntityFramework.6.0.0-beta1-20710\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\source\packages\EntityFramework.6.0.0-beta1-20710\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.87.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <HintPath>..\..\..\source\packages\System.Data.SQLite.x86.1.0.87.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\..\..\source\packages\System.Data.SQLite.x86.1.0.87.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SQL Generation\DmlSqlGenerator.cs" />
+    <Compile Include="SQL Generation\InternalBase.cs" />
+    <Compile Include="SQL Generation\ISqlFragment.cs" />
+    <Compile Include="SQL Generation\JoinSymbol.cs" />
+    <Compile Include="SQL Generation\KeyToListMap.cs" />
+    <Compile Include="SQL Generation\MetadataHelpers.cs" />
+    <Compile Include="SQL Generation\SkipClause.cs" />
+    <Compile Include="SQL Generation\SqlBuilder.cs" />
+    <Compile Include="SQL Generation\SqlChecker.cs" />
+    <Compile Include="SQL Generation\SqlGenerator.cs" />
+    <Compile Include="SQL Generation\SqlSelectStatement.cs" />
+    <Compile Include="SQL Generation\SqlWriter.cs" />
+    <Compile Include="SQL Generation\StringUtil.cs" />
+    <Compile Include="SQL Generation\Symbol.cs" />
+    <Compile Include="SQL Generation\SymbolPair.cs" />
+    <Compile Include="SQL Generation\SymbolTable.cs" />
+    <Compile Include="SQL Generation\TopClause.cs" />
+    <Compile Include="SQLiteProviderManifest.cs" />
+    <Compile Include="SQLiteProviderServices.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SQLiteProviderServices.StoreSchemaDefinition.ssdl" />
+    <EmbeddedResource Include="Resources\SQLiteProviderServices.StoreSchemaMapping.msl" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>System.Data.SQLite.Properties</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SQLiteProviderServices.ProviderManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App.config.transform" />
+    <Content Include="Web.config.transform" />
+    <None Include="App.config" />
+    <None Include="install.ps1" />
+    <None Include="packages.config" />
+    <None Include="System.Data.SQLite.Linq.nuspec" />
+    <None Include="System.Data.SQLite.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

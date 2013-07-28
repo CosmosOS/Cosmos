@@ -102,7 +102,7 @@ namespace Cosmos.Build.Builder {
               if (xAction is IExecAction)
               {
                   IExecAction xAction2 = xAction as IExecAction;
-                  if (xAction2.Path == null || xAction2.Arguments != "/SILENT" || xAction2.Path != mSetupPath)
+                  if (xAction2.Path == null || xAction2.Arguments != "/SILENT" || !String.Equals(xAction2.Path, mSetupPath, StringComparison.OrdinalIgnoreCase))
                   { 
                       return false;
                   }
