@@ -22,6 +22,10 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <BuildPackage>true</BuildPackage>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -103,11 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config.transform" />
-    <Content Include="Web.config.transform" />
-    <None Include="App.config" />
-    <None Include="install.ps1" />
     <None Include="packages.config" />
-    <None Include="System.Data.SQLite.Linq.nuspec" />
     <None Include="System.Data.SQLite.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
