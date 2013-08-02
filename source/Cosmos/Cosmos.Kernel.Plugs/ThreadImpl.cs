@@ -6,6 +6,8 @@ using System.Threading;
 namespace Cosmos.Kernel.Plugs {
 	[Plug(Target=typeof(System.Threading.Thread))]
 	public static class ThreadImpl {
+        private bool running = true;
+
 		public static IntPtr InternalGetCurrentThread() {
 			return IntPtr.Zero;
 
@@ -15,6 +17,22 @@ namespace Cosmos.Kernel.Plugs {
             //Cosmos.Hardware.Global.Sleep((uint) millisecondsTimeout);
             Kernel.CPU.Halt();
         }
+        public static void Start()
+        {
+            if (SetMethod == null)
+                throw new Exception("SetMethod can't equal null");
 
+            do
+            {
+               SetMethood();
+            } while (running);
+        }
+
+        public delegate void SetMethod();
+
+        public static void Stop()
+        {
+            running = false;
+        }
 	}
 }
