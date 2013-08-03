@@ -262,10 +262,8 @@ namespace Cosmos.Debug.VSDebugEngine {
             var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
             foreach (string str in mp.FieldNames) {
               Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
-              using (var xDB = mProcess.mDebugInfoDb.DB()) {
-                xFieldInfo = xDB.FIELD_INFO.Where(q => q.NAME == str).First();
-              }
-
+                xFieldInfo = mProcess.mDebugInfoDb.FIELD_INFO.Where(q => q.NAME == str).First();
+              
               var inf = new DebugLocalInfo();
               inf.IsArrayElement = true;
               inf.ArrayElementType = xFieldInfo.TYPE;

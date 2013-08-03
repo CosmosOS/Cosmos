@@ -102,12 +102,11 @@ namespace Cosmos.Debug.VSDebugEngine {
           // to run.
           Guid xDocID;
           if (xDebugInfo.DocumentGUIDs.TryGetValue(xDocName, out xDocID)) {
-            using (var xDB = xDebugInfo.DB()) {
               // Find which Method the Doc, Line, Col are in.
               // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
               // () around << are VERY important.. + has precedence over <<
               Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
-              var xQry = from x in xDB.Methods
+              var xQry = from x in xDebugInfo.Methods
                          where x.DocumentID == xDocID
                             && x.LineColStart <= xPos
                             && x.LineColEnd >= xPos
@@ -119,11 +118,11 @@ namespace Cosmos.Debug.VSDebugEngine {
               var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
 
               // We have the Sequence Point, find the MethodILOp
-              var xOp = xDB.MethodIlOps.Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset).Single();
+              var xOp = xDebugInfo.MethodIlOps.Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset).Single();
 
               // Get the address of the Label
               xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
-            }
+            
 
             if (xAddress > 0) {
               var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));

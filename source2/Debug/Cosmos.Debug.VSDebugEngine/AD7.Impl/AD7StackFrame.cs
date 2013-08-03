@@ -55,36 +55,41 @@ namespace Cosmos.Debug.VSDebugEngine {
           var xLabelsForAddr = xProcess.mDebugInfoDb.GetLabels(xProcess.mCurrentAddress.Value);
           if (xLabelsForAddr.Length > 0) {
             MethodIlOp xSymbolInfo;
-            using (var xDB = xProcess.mDebugInfoDb.DB()) {
               string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
-              xSymbolInfo = xDB.MethodIlOps.Where(q => q.LabelName == xLabel).FirstOrDefault();
-              if (xSymbolInfo != null) {
-                var xAllInfos = xDB.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.Method.LabelCall);
-                mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
-                mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
-                if (mArgumentInfos.Length > 0) {
-                  mParams = new DebugLocalInfo[mArgumentInfos.Length];
-                  for (int i = 0; i < mArgumentInfos.Length; i++) {
-                    mParams[i] = new DebugLocalInfo {
-                      Name = mArgumentInfos[i].NAME,
-                      Index = i,
-                      IsLocal = false
-                    };
+              xSymbolInfo = aProcess.mDebugInfoDb.MethodIlOps.Where(q => q.LabelName == xLabel).FirstOrDefault();
+              if (xSymbolInfo != null)
+              {
+                  var xAllInfos = aProcess.mDebugInfoDb.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.Method.LabelCall);
+                  mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
+                  mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
+                  if (mArgumentInfos.Length > 0)
+                  {
+                      mParams = new DebugLocalInfo[mArgumentInfos.Length];
+                      for (int i = 0; i < mArgumentInfos.Length; i++)
+                      {
+                          mParams[i] = new DebugLocalInfo
+                          {
+                              Name = mArgumentInfos[i].NAME,
+                              Index = i,
+                              IsLocal = false
+                          };
+                      }
                   }
-                }
 
-                if (mLocalInfos.Length > 0) {
-                  mLocals = new DebugLocalInfo[mLocalInfos.Length];
-                  for (int i = 0; i < mLocalInfos.Length; i++) {
-                    mLocals[i] = new DebugLocalInfo {
-                      Name = mLocalInfos[i].NAME,
-                      Index = i,
-                      IsLocal = true
-                    };
+                  if (mLocalInfos.Length > 0)
+                  {
+                      mLocals = new DebugLocalInfo[mLocalInfos.Length];
+                      for (int i = 0; i < mLocalInfos.Length; i++)
+                      {
+                          mLocals[i] = new DebugLocalInfo
+                          {
+                              Name = mLocalInfos[i].NAME,
+                              Index = i,
+                              IsLocal = true
+                          };
+                      }
                   }
-                }
               }
-            }
           } else {
             MessageBox.Show("No Symbol found for address 0x" + xProcess.mCurrentAddress.Value.ToString("X8").ToUpper());
           }
