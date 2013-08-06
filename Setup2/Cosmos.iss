@@ -1,11 +1,12 @@
 ; Do NOT change this next line in Dev Kit
-#define ChangeSetVersion "7"
+#define ChangeSetVersion "103291"
 
 #ifndef BuildConfiguration   
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
 ; IDE so that we don't get an undefined error.
 ; We default to devkit so we dont have to wait on compression.
-  #define BuildConfiguration "devkit"
+  ;#define BuildConfiguration "devkit"
+  #define BuildConfiguration "userkit"
 #endif
 
 #if BuildConfiguration == "Devkit"
@@ -26,7 +27,7 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright © 2007-2012 The Cosmos Project
+AppCopyright=Copyright © 2007-2013 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
