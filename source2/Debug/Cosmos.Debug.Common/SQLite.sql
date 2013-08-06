@@ -3,7 +3,7 @@
 -- --------------------------------------------------
 
 -- Creating table 'FIELD_INFO'
-CREATE TABLE [FIELD_INFO] (
+CREATE TABLE [FIELD_INFOS] (
     [TYPE] nvarchar(512)  NOT NULL,
     [OFFSET] int  NOT NULL,
     [NAME] nvarchar(512)  NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE [FIELD_INFO] (
 
 
 -- Creating table 'FIELD_MAPPING'
-CREATE TABLE [FIELD_MAPPING] (
+CREATE TABLE [FIELD_MAPPINGS] (
     [TYPE_NAME] nvarchar(512)  NOT NULL,
     [FIELD_NAME] nvarchar(512)  NOT NULL,
     [ID] uniqueidentifier  primary key
@@ -28,7 +28,7 @@ CREATE TABLE [Labels] (
 
 
 -- Creating table 'LOCAL_ARGUMENT_INFO'
-CREATE TABLE [LOCAL_ARGUMENT_INFO] (
+CREATE TABLE [LOCAL_ARGUMENT_INFOS] (
     [METHODLABELNAME] nvarchar(256)  NOT NULL,
     [IsArgument] bit  NOT NULL,
     [INDEXINMETHOD] int  NOT NULL,
@@ -60,8 +60,8 @@ CREATE TABLE [Methods] (
     [ID] uniqueidentifier primary key,
     [TypeToken] int  NOT NULL,
     [MethodToken] int  NOT NULL,
-    [LineColStart] uniqueidentifier  NOT NULL,
-    [LineColEnd] uniqueidentifier  NOT NULL,
+    [LineColStart] int  NOT NULL,
+    [LineColEnd] int  NOT NULL,
     [LabelCall] nvarchar(256)  NOT NULL
 );
 

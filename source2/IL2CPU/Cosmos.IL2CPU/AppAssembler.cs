@@ -300,6 +300,7 @@ namespace Cosmos.IL2CPU {
         DebugInfo.AddAssemblies(null, true);
       DebugInfo.AddMethod(null, true);
       DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
+      DebugInfo.AddSymbols(mSymbols, true);
     }
 
     public static uint GetResultCodeOffset(uint aResultSize, uint aTotalArgumentSize) {

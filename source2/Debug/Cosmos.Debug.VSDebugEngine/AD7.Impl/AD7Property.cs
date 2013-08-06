@@ -5,6 +5,9 @@ using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Cosmos.Debug.Common;
+using Dapper;
+using SQLinq.Dapper;
+using SQLinq;
 
 namespace Cosmos.Debug.VSDebugEngine {
   // An implementation of IDebugProperty2
@@ -262,7 +265,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
             foreach (string str in mp.FieldNames) {
               Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
-                xFieldInfo = mProcess.mDebugInfoDb.FIELD_INFO.Where(q => q.NAME == str).First();
+              xFieldInfo = mProcess.mDebugInfoDb.Connection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == str)).First();
               
               var inf = new DebugLocalInfo();
               inf.IsArrayElement = true;

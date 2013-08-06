@@ -3,135 +3,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using System.Data.Entity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Entity.Core.EntityClient;
-using System.Data.Common;
-using System.Data.Entity.Infrastructure;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Config;
+using SQLinq;
 
 namespace Cosmos.Debug.Common
 {
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [DbConfigurationType(typeof(DebugModelConfiguration))]
-    public partial class Entities : DbContext
-    {
-        /// <summary>
-        /// Initializes a new Entities object using the connection string found in the 'Entities' section of the application configuration file.
-        /// </summary>
-        public Entities() : base("Entities")
-        {
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            this.Configuration.LazyLoadingEnabled = true;
-            
-        }
-
-        private ObjectContext ObjectContext
-        {
-            get
-            {
-                return ((IObjectContextAdapter)this).ObjectContext;
-            }
-        }
-    
-        /// <summary>
-        /// Initialize a new Entities object.
-        /// </summary>
-        public Entities(string connectionString) : base(connectionString)
-        {
-            Initialize();
-        }
-    
-        /// <summary>
-        /// Initialize a new Entities object.
-        /// </summary>
-        public Entities(DbConnection connection, bool ownsConnection) : base(connection, ownsConnection)
-        {
-            Initialize();
-        }
-                      
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<FIELD_INFO> FIELD_INFO
-        {
-            get;
-            set;
-        }
-            
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<FIELD_MAPPING> FIELD_MAPPING
-        {
-           get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<Label> Labels
-        {
-           get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<LOCAL_ARGUMENT_INFO> LOCAL_ARGUMENT_INFO
-        {
-           get;
-            set;
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<MethodIlOp> MethodIlOps
-        {
-           get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<AssemblyFile> AssemblyFiles
-        {
-           get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<Method> Methods
-        {
-            get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public DbSet<Document> Documents
-        {
-            get;
-            set;
-        }
-    }
-
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("AssemblyFiles")]
     public partial class AssemblyFile
     {
         
@@ -139,6 +19,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;set;
@@ -148,19 +29,11 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("PATHNAME")]
         public global::System.String Pathname
         {
           get;set;
         }
-
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual IList<Method> Methods
-        {
-            get;set;
-        }
-
     }
     
     /// <summary>
@@ -168,10 +41,12 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("DOCUMENTS")]
     public partial class Document 
     {
         [Key]
-                [DataMemberAttribute()]
+        [DataMemberAttribute()]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
@@ -180,21 +55,12 @@ namespace Cosmos.Debug.Common
     
         
         [DataMemberAttribute()]
+        [SQLinqColumn("PATHNAME")]
         public global::System.String Pathname
         {
             get;
             set;
         }
-
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual IList<Method> Methods
-        {
-            get;
-            set;
-        }
-
     }
     
     /// <summary>
@@ -202,12 +68,14 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("FIELD_INFOS")]
     public partial class FIELD_INFO
     {
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("TYPE")]
         public global::System.String TYPE
         {
             get;
@@ -218,6 +86,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("OFFSET")]
         public global::System.Int32 OFFSET
         {
             get;
@@ -227,6 +96,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
+        [SQLinqColumn("NAME")]
         [DataMemberAttribute()]
         public global::System.String NAME
         {
@@ -239,6 +109,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [Key]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
@@ -252,14 +123,14 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("FIELD_MAPPINGS")]
     public partial class FIELD_MAPPING
     {
-        #region Primitive Properties
-    
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("TYPE_NAME")]
         public global::System.String TYPE_NAME
         {
             get;
@@ -270,6 +141,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("FIELD_NAME")]
         public global::System.String FIELD_NAME
         {
             get;
@@ -281,15 +153,12 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [Key]
         [DataMemberAttribute()]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
             set;
         }
-
-        #endregion
-
-    
     }
     
     /// <summary>
@@ -297,12 +166,14 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("LABELS")]
     public partial class Label 
     {
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
@@ -313,6 +184,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("NAME")]
         public global::System.String Name
         {
             get;
@@ -323,36 +195,12 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("ADDRESS")]
         public global::System.Int64 Address
         {
             get;
             set;
         }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual IList<Method> MethodStart
-        {
-            get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual IList<Method> MethodEnd
-        {
-            get;
-            set;
-        }
-
     }
     
     /// <summary>
@@ -360,12 +208,14 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("LOCAL_ARGUMENT_INFOS")]
     public partial class LOCAL_ARGUMENT_INFO
     {
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("METHODLABELNAME")]
         public global::System.String METHODLABELNAME
         {
             get;
@@ -376,6 +226,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("ISARGUMENT")]
         public global::System.Boolean IsArgument
         {
             get;
@@ -386,6 +237,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("INDEXINMETHOD")]
         public global::System.Int32 INDEXINMETHOD
         {
             get;
@@ -396,6 +248,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("OFFSET")]
         public global::System.Int32 OFFSET
         {
             get;
@@ -406,6 +259,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("NAME")]
         public global::System.String NAME
         {
             get;
@@ -416,6 +270,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("TYPENAME")]
         public global::System.String TYPENAME
         {
             get;
@@ -427,6 +282,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [Key]
         [DataMemberAttribute()]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
@@ -439,6 +295,7 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("METHODS")]
     public partial class Method
     {
         /// <summary>
@@ -446,6 +303,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [Key]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
@@ -456,6 +314,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("TYPETOKEN")]
         public global::System.Int32 TypeToken
         {
             get;
@@ -466,6 +325,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("METHODTOKEN")]
         public global::System.Int32 MethodToken
         {
             get;
@@ -476,6 +336,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("ASSEMBLYFILEID")]
         public global::System.Guid AssemblyFileID
         {
             get;
@@ -486,6 +347,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("LINECOLSTART")]
         public global::System.Int64 LineColStart
         {
             get;
@@ -496,6 +358,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("LINECOLEND")]
         public global::System.Int64 LineColEnd
         {
             get;
@@ -506,6 +369,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("DOCUMENTID")]
         public global::System.Guid DocumentID
         {
             get;
@@ -516,6 +380,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("LABELSTARTID")]
         public Nullable<global::System.Guid> LabelStartID
         {
             get;
@@ -526,6 +391,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("LABELENDID")]
         public Nullable<global::System.Guid> LabelEndID
         {
             get;
@@ -536,67 +402,8 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("LABELCALL")]
         public global::System.String LabelCall
-        {
-            get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual AssemblyFile AssemblyFile
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual Document Document
-        {
-            get;
-            set;
-        }
-            
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual Label LabelStart
-        {
-            get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual Label LabelEnd
-        {
-            get;
-            set;
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual IList<MethodIlOp> MethodIlOps
         {
             get;
             set;
@@ -608,6 +415,7 @@ namespace Cosmos.Debug.Common
     /// </summary>
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
+    [SQLinqTable("METHODILOPs")]
     public partial class MethodIlOp
     {
         /// <summary>
@@ -615,6 +423,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [Key]
         [DataMemberAttribute()]
+        [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
             get;
@@ -625,6 +434,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("LABELNAME")]
         public global::System.String LabelName
         {
             get;
@@ -635,6 +445,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("STACKDIFF")]
         public global::System.Int32 StackDiff
         {
             get;
@@ -645,6 +456,7 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("ILOFFSET")]
         public global::System.Int32 IlOffset
         {
             get;
@@ -655,19 +467,8 @@ namespace Cosmos.Debug.Common
         /// No Metadata Documentation available.
         /// </summary>
         [DataMemberAttribute()]
+        [SQLinqColumn("METHODID")]
         public Nullable<global::System.Guid> MethodID
-        {
-            get;
-            set;
-        }
-            
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        public virtual Method Method
         {
             get;
             set;

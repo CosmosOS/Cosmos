@@ -7,6 +7,10 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using Cosmos.Debug.Common;
 using System.Windows.Forms;
+using Dapper;
+using DapperExtensions;
+using SQLinq;
+using SQLinq.Dapper;
 
 namespace Cosmos.Debug.VSDebugEngine {
   // Represents a logical stack frame on the thread stack. 
@@ -56,10 +60,11 @@ namespace Cosmos.Debug.VSDebugEngine {
           if (xLabelsForAddr.Length > 0) {
             MethodIlOp xSymbolInfo;
               string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
-              xSymbolInfo = aProcess.mDebugInfoDb.MethodIlOps.Where(q => q.LabelName == xLabel).FirstOrDefault();
+              xSymbolInfo = aProcess.mDebugInfoDb.Connection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(q => q.LabelName == xLabel)).FirstOrDefault();
+              var xMethod = mProcess.mDebugInfoDb.Connection.Get<Method>(xSymbolInfo.MethodID);
               if (xSymbolInfo != null)
               {
-                  var xAllInfos = aProcess.mDebugInfoDb.LOCAL_ARGUMENT_INFO.Where(q => q.METHODLABELNAME == xSymbolInfo.Method.LabelCall);
+                  var xAllInfos = aProcess.mDebugInfoDb.Connection.Query<LOCAL_ARGUMENT_INFO>(new SQLinq<LOCAL_ARGUMENT_INFO>().Where(q => q.METHODLABELNAME == xMethod.LabelCall));
                   mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
                   mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
                   if (mArgumentInfos.Length > 0)

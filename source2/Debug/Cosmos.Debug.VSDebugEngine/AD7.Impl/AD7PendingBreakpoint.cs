@@ -6,6 +6,11 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Windows.Forms;
+using Dapper;
+using DapperExtensions;
+using SQLinq.Dapper;
+using SQLinq;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine {
   // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
@@ -106,19 +111,18 @@ namespace Cosmos.Debug.VSDebugEngine {
               // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
               // () around << are VERY important.. + has precedence over <<
               Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
-              var xQry = from x in xDebugInfo.Methods
-                         where x.DocumentID == xDocID
-                            && x.LineColStart <= xPos
-                            && x.LineColEnd >= xPos
-                         select new { x.ID, x.AssemblyFile.Pathname, x.MethodToken };
-              var xMethod = xQry.Single();
 
+              var xMethod = xDebugInfo.Connection.Query(new SQLinq<Method>().Where(x => x.DocumentID == xDocID
+                            && x.LineColStart <= xPos
+                            && x.LineColEnd >= xPos)).Single();
+              var asm = xDebugInfo.Connection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+        
               // We have the method. Now find out what Sequence Point it belongs to.
-              var xSPs = xDebugInfo.GetSequencePoints(xMethod.Pathname, xMethod.MethodToken);
+              var xSPs = xDebugInfo.GetSequencePoints(asm.Pathname, xMethod.MethodToken);
               var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
 
               // We have the Sequence Point, find the MethodILOp
-              var xOp = xDebugInfo.MethodIlOps.Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset).Single();
+              var xOp = xDebugInfo.Connection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset)).First();
 
               // Get the address of the Label
               xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);

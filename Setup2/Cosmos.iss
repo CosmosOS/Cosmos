@@ -160,9 +160,8 @@ Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversi
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\EntityFramework.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\System.Data.SQLite.LinqEx.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 
@@ -180,12 +179,10 @@ Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 Source: ".\source2\Compiler\Cosmos.Compiler.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
 
 ; System.Data.SQLite library
-Source: ".\Build\VSIP\EntityFramework.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\System.Data.SQLite.LinqEx.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\EntityFramework.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\System.Data.SQLite.LinqEx.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly

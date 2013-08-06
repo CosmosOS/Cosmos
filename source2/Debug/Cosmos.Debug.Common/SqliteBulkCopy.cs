@@ -57,7 +57,7 @@ namespace Cosmos.Debug.Common
 
             command.Transaction = trans;
             command.CommandText = String.Format("insert into \"{0}\" ({1}) values ({2})", DestinationTableName, fieldNames, paramNames);
-
+            command.Prepare();
             do
             {
               for (int i = 0; i < reader.FieldCount; i++)

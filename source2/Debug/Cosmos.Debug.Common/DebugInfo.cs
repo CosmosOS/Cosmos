@@ -12,7 +12,12 @@ using System.Diagnostics.SymbolStore;
 using System.Configuration;
 using System.Threading;
 using System.Data.SQLite;
-using System.Data.Entity;
+using Dapper;
+using SQLinq;
+using SQLinq.Dapper;
+using DapperExtensions;
+using DapperExtensions.Mapper;
+using DapperExtensions.Sql;
 
 namespace Cosmos.Debug.Common {
   public class DebugInfo : IDisposable {
@@ -30,8 +35,7 @@ namespace Cosmos.Debug.Common {
     // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
     //protected mDataSouce = @".\SQLEXPRESS";
     protected string mConnStr;
-    private Entities mContext;
-
+    
     public void DeleteDB(string aDbName, string aPathname) {
       File.Delete(aDbName);
     }
@@ -48,10 +52,10 @@ namespace Cosmos.Debug.Common {
       // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
       mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
       // Use the SQLiteConnectionFactory as the default database connection
-      Database.DefaultConnectionFactory = new SQLiteConnectionFactory();
       // Do not open mConnection before mEntities.CreateDatabase
       mConnection = new SQLiteConnection(mConnStr);
-        mContext = new Entities(mConnection, true);
+      DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
+      DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
       if (aCreate) {
           // DatabaseExists checks if the DBName exists, not physical files.
           if (aCreate) {
@@ -72,42 +76,18 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public IQueryable<MethodIlOp> MethodIlOps
+    public IDbConnection Connection
     {
         get
         {
-            return mContext.MethodIlOps;
-        }
-    }
-
-    public IQueryable<LOCAL_ARGUMENT_INFO> LOCAL_ARGUMENT_INFO
-    {
-        get
-        {
-            return mContext.LOCAL_ARGUMENT_INFO;
-        }
-    }
-
-    public IQueryable<Method> Methods
-    {
-        get
-        {
-            return mContext.Methods;
-        }
-    }
-
-    public IQueryable<FIELD_INFO> FIELD_INFO
-    {
-        get
-        {
-            return mContext.FIELD_INFO;
+            return mConnection;
         }
     }
 
     // The GUIDs etc are populated by the MSBuild task, so they wont be loaded when the debugger runs.
     // Because of this, we also allow manual loading.
     public void LoadLookups() {
-        foreach (var xDoc in mContext.Documents)
+        foreach (var xDoc in Connection.Query<Document>(new SQLinq<Document>().ToSQL().ToQuery()))
         {
             DocumentGUIDs.Add(xDoc.Pathname, xDoc.ID);
         }
@@ -115,7 +95,8 @@ namespace Cosmos.Debug.Common {
 
     public UInt32 AddressOfLabel(string aLabel)
     {
-        var xRow = mContext.Labels.SingleOrDefault(q => q.Name == aLabel);
+        var xRow = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == aLabel)).FirstOrDefault();
+        
         if (xRow == null)
         {
             return 0;
@@ -125,10 +106,8 @@ namespace Cosmos.Debug.Common {
 
     public string[] GetLabels(UInt32 aAddress)
     {
-        var xLabels = from x in mContext.Labels
-                      where x.Address == aAddress
-                      select x.Name;
-        return xLabels.ToArray();
+        var xLabels = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Address == aAddress)).Select(i => i.Name).ToArray();
+        return xLabels;
     }
 
     protected List<string> local_MappingTypeNames = new List<string>();
@@ -148,6 +127,7 @@ namespace Cosmos.Debug.Common {
         });
 
         // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+        var xItemsToAdd = new List<FIELD_MAPPING>(1024);
         foreach (var xItem in xMaps)
         {
             foreach (var xFieldName in xItem.FieldNames)
@@ -156,22 +136,20 @@ namespace Cosmos.Debug.Common {
                 xRow.ID = NewGuid();
                 xRow.TYPE_NAME = xItem.TypeName;
                 xRow.FIELD_NAME = xFieldName;
-                mContext.FIELD_MAPPING.Add(xRow);
+                xItemsToAdd.Add(xRow);
             }
         }
-        mContext.SaveChanges();
+        BulkInsert<FIELD_MAPPING>("FIELD_MAPPINGS", xItemsToAdd);
     }
 
     public Field_Map GetFieldMap(string aName)
     {
         var xMap = new Field_Map();
         xMap.TypeName = aName;
-        var xRows = from x in mContext.FIELD_MAPPING
-                    where x.TYPE_NAME == aName
-                    select x.FIELD_NAME;
+        var xRows = mConnection.Query<FIELD_MAPPING>(new SQLinq<FIELD_MAPPING>().Where(i => i.TYPE_NAME == aName).ToSQL().ToQuery());
         foreach (var xFieldName in xRows)
         {
-            xMap.FieldNames.Add(xFieldName);
+            xMap.FieldNames.Add(xFieldName.FIELD_NAME);
         }
         return xMap;
     }
@@ -179,7 +157,7 @@ namespace Cosmos.Debug.Common {
     public void ReadFieldMappingList(List<Field_Map> aSymbols)
     {
         var xMap = new Field_Map();
-        foreach (var xRow in mContext.FIELD_MAPPING)
+        foreach (var xRow in mConnection.GetList<FIELD_MAPPING>())
         {
             string xTypeName = xRow.TYPE_NAME;
             if (xTypeName != xMap.TypeName)
@@ -202,18 +180,19 @@ namespace Cosmos.Debug.Common {
     }
 
     protected List<string> mLocalFieldInfoNames = new List<string>();
-    public void WriteFieldInfoToFile(IEnumerable<FIELD_INFO> aFields)
+    public void WriteFieldInfoToFile(IList<FIELD_INFO> aFields)
     {
+        var itemsToAdd = new List<FIELD_INFO>(aFields.Count);
         foreach (var xItem in aFields)
         {
             if (!mLocalFieldInfoNames.Contains(xItem.NAME))
             {
                 xItem.ID = NewGuid();
                 mLocalFieldInfoNames.Add(xItem.NAME);
-                mContext.FIELD_INFO.Add(xItem);
+                itemsToAdd.Add(xItem);
             }
         }
-        mContext.SaveChanges();
+        BulkInsert<FIELD_INFO>("FIELD_INFOS", itemsToAdd, 2500, true);        
     }
 
     public class SequencePoint {
@@ -346,7 +325,7 @@ namespace Cosmos.Debug.Common {
       foreach (var x in aInfos) {
         x.ID = Guid.NewGuid();
       }
-      BulkInsert("LOCAL_ARGUMENT_INFO", aInfos);
+      BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
     }
 
     // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
@@ -358,8 +337,8 @@ namespace Cosmos.Debug.Common {
     // at time of writing the full structure would take up 11 MB of RAM just for this structure.
     // This is not a huge amount, but as we compile in more and more this figure will grow.
     // So as a compromise, we collect 2500 records then bulk insert.
-    public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = false) {
-      if (aList.Count >= aFlushSize /*|| aFlush*/) {
+    public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = false) where T: class {
+      if (aList.Count >= aFlushSize || aFlush) {
         if (aList.Count > 0) {
           using (var xBulkCopy = new SqliteBulkCopy(mConnection)) {
             xBulkCopy.DestinationTableName = aTableName;
@@ -406,7 +385,22 @@ namespace Cosmos.Debug.Common {
             //    db.Set(typeof(T)).AddRange(aList);
             //    db.SaveChanges();
             //}
-            xBulkCopy.WriteToServer(aList.AsDataReader());
+            //using (var trans = mConnection.BeginTransaction())
+            //{
+            //    try
+            //    {
+            //        mConnection.Insert<T>(aList);
+            //        trans.Commit();
+            //    }
+            //    catch(Exception E)
+            //    {
+            //        trans.Rollback();
+            //    }
+            //}
+            using (var reader = new ObjectReader<T>(aList.ToArray()))
+            {
+                xBulkCopy.WriteToServer(reader);
+            }
           }
           aList.Clear();
         }
@@ -422,6 +416,9 @@ namespace Cosmos.Debug.Common {
 
     public void Dispose() {
       if (mConnection != null) {
+          AddAssemblies(null, true);
+          AddDocument(null, true);
+          AddMethod(null, true);
         var xConn = mConnection;
         xConn.Close();
         xConn = null;
@@ -437,15 +434,13 @@ namespace Cosmos.Debug.Common {
         // one that is also in MLSymbol. Asm labels for example wont be found.
         // So we find ones that match or are before, and we walk till we fine one
         // in MLSymbol.
-        var xLabels = from x in mContext.Labels
-                      where x.Address <= aAddress
-                      orderby x.Address descending
-                      select x.Name;
+      var xAddress = (long)aAddress;
+        var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i=>i.Address)).Select(i => i.Name).ToArray();
 
         // Search till we find a matching label.
         MethodIlOp xSymbol = null;
         foreach (var xLabel in xLabels) {
-            xSymbol = mContext.MethodIlOps.SingleOrDefault(q => q.LabelName == xLabel);
+            xSymbol = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i=>i.LabelName==xLabel)).FirstOrDefault();
           if (xSymbol != null) {
             break;
           }
@@ -454,15 +449,12 @@ namespace Cosmos.Debug.Common {
         if (xSymbol == null) {
           throw new Exception("Label not found.");
         }
-        return xSymbol.Method;
+        return mConnection.Get<Method>(xSymbol.MethodID);
     }
 
     // Gets MLSymbols for a method, given an address within the method.
     public IEnumerable<MethodIlOp> GetSymbols(Method aMethod) {
-        var xSymbols = from x in mContext.MethodIlOps
-                       where x.MethodID == aMethod.ID
-                       orderby x.IlOffset
-                       select x;
+        var xSymbols = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.MethodID == aMethod.ID).OrderBy(i => i.IlOffset));
         return xSymbols;
     }
 
@@ -471,7 +463,8 @@ namespace Cosmos.Debug.Common {
         var xResult = new SourceInfos();
         var xMethod = GetMethod(aAddress);
         var xSymbols = GetSymbols(xMethod);
-        var xSymbolReader = SymbolAccess.GetReaderForFile(xMethod.AssemblyFile.Pathname);
+        var xAssemblyFile = mConnection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+        var xSymbolReader = SymbolAccess.GetReaderForFile(xAssemblyFile.Pathname);
         var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xMethod.MethodToken));
 
         int xSeqCount = xMethodSymbol.SequencePointCount;
@@ -485,7 +478,7 @@ namespace Cosmos.Debug.Common {
 
         foreach (var xSymbol in xSymbols)
         {
-            var xRow = mContext.Labels.SingleOrDefault(q => q.Name == xSymbol.LabelName);
+            var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
             if (xRow != null)
             {
                 UInt32 xAddress = (UInt32)xRow.Address;
@@ -501,7 +494,7 @@ namespace Cosmos.Debug.Common {
                         LineEnd = xCodeEndLines[xIdx],
                         Column = xCodeColumns[xIdx],
                         ColumnEnd = xCodeEndColumns[xIdx],
-                        MethodName = xSymbol.Method.LabelCall
+                        MethodName = xMethod.LabelCall
                     };
                     xResult.Add(xAddress, xSourceInfo);
                 }
