@@ -141,7 +141,7 @@ namespace Cosmos.Core
             public uint UserESP;
         }
         #endregion
-
+        
         private static InterruptDelegate[] mIRQ_Handlers = new InterruptDelegate[256];
 
         // We used to use:
@@ -191,8 +191,7 @@ namespace Cosmos.Core
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(ref IRQContext aContext)
         {
-            //TODO New Kernel
-            //PIT.HandleInterrupt();
+            IRQ(0x20, ref aContext);
             Global.PIC.EoiMaster();
         }
 
@@ -200,34 +199,52 @@ namespace Cosmos.Core
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         public static void HandleInterrupt_21(ref IRQContext aContext)
         {
-            ////Change area
-            ////
-            //// Triggers IL2CPU error
-            //DebugUtil.LogInterruptOccurred(ref aContext);
+
             IRQ(0x21, ref aContext);
-            ////mIRQ_Handlers[1](ref aContext);
-            ////
-            //// Old keyboard
-            ////Cosmos.Hardware2.Keyboard.HandleKeyboardInterrupt();
-            ////
-            //// New Keyboard
-            ////Cosmos.Hardware2.PC
-            ////
-            //// - End change area
-            //Console.WriteLine("Signal PIC primary");
             Global.PIC.EoiMaster();
         }
+        public static void HandleInterrupt_22(ref IRQContext aContext)
+        {
 
-        //IRQ 5 - (Added for ES1370 AudioPCI)
-        //public static InterruptDelegate IRQ05;
+            IRQ(0x22, ref aContext);
+            Global.PIC.EoiMaster();
+        }
+        public static void HandleInterrupt_23(ref IRQContext aContext)
+        {
 
+            IRQ(0x21, ref aContext);
+            Global.PIC.EoiMaster();
+        }
+        public static void HandleInterrupt_24(ref IRQContext aContext)
+        {
+
+            IRQ(0x24, ref aContext);
+            Global.PIC.EoiMaster();
+        }
         public static void HandleInterrupt_25(ref IRQContext aContext)
         {
             IRQ(0x25, ref aContext);
+            Global.PIC.EoiMaster();
+        }
+        public static void HandleInterrupt_26(ref IRQContext aContext)
+        {
 
-            Global.PIC.EoiSlave();
+            IRQ(0x26, ref aContext);
+            Global.PIC.EoiMaster();
+        }
+        public static void HandleInterrupt_27(ref IRQContext aContext)
+        {
+
+            IRQ(0x27, ref aContext);
+            Global.PIC.EoiMaster();
         }
 
+        public static void HandleInterrupt_28(ref IRQContext aContext)
+        {
+
+            IRQ(0x21, ref aContext);
+            Global.PIC.EoiSlave();
+        }
         //IRQ 09 - (Added for AMD PCNet network card)
         //public static InterruptDelegate IRQ09;
 
@@ -242,13 +259,7 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_2A(ref IRQContext aContext)
         {
-            //Debugging....
-            //DebugUtil.LogInterruptOccurred_Old(aContext);
-            //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
-            //Console.WriteLine("IRQ 11 raised!");
-
             IRQ(0x2A, ref aContext);
-
             Global.PIC.EoiSlave();
         }
 
@@ -269,24 +280,30 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_2C(ref IRQContext aContext)
         {
-            //Debugging....
-            //DebugUtil.LogInterruptOccurred_Old(aContext);
-            //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
-            //A> Vermeulen
-            //Commented out below
-            //Console.WriteLine("IRQ 12 raised!");
 
             IRQ(0x2C, ref aContext);
-
             Global.PIC.EoiSlave();
         }
 
+
+        public static void HandleInterrupt_2D(ref IRQContext aContext)
+        {
+            IRQ(0x2D, ref aContext);
+            Global.PIC.EoiSlave();
+        }
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static void HandleInterrupt_2E(ref IRQContext aContext)
         {
             Global.Dbg.SendMessage("IRQ", "Primary IDE");
             //Storage.ATAOld.HandleInterruptPrimary();
             //Storage.ATA.ATA.HandleInterruptPrimary();
+            Global.PIC.EoiSlave();
+        }
+        //IRQ 15 - Secondary IDE
+        public static void HandleInterrupt_2F(ref IRQContext aContext)
+        {
+            //Storage.ATA.ATA.HandleInterruptSecondary();
+            Global.Dbg.SendMessage("IRQ", "Secondary IDE");
             Global.PIC.EoiSlave();
         }
 
@@ -309,39 +326,56 @@ namespace Cosmos.Core
             aContext.EDX *= 2;
         }
 
-        //IRQ 15 - Secondary IDE
-        public static void HandleInterrupt_2F(ref IRQContext aContext)
+        public static void HandleInterrupt_40(ref IRQContext aContext)
         {
-            //Storage.ATA.ATA.HandleInterruptSecondary();
-            Global.Dbg.SendMessage("IRQ", "Secondary IDE");
-            Global.PIC.EoiSlave();
+            IRQ(0x40, ref aContext);
         }
+        public static void HandleInterrupt_41(ref IRQContext aContext)
+        {
+            IRQ(0x41, ref aContext);
+        }
+        public static void HandleInterrupt_42(ref IRQContext aContext)
+        {
+            IRQ(0x42, ref aContext);
+        }
+        public static void HandleInterrupt_43(ref IRQContext aContext)
+        {
+            IRQ(0x43, ref aContext);
+        }
+        public static void HandleInterrupt_44(ref IRQContext aContext)
+        {
+            IRQ(0x44, ref aContext);
+        }
+        public static void HandleInterrupt_45(ref IRQContext aContext)
+        {
+            IRQ(0x45, ref aContext);
+        }
+        public static void HandleInterrupt_46(ref IRQContext aContext)
+        {
+            IRQ(0x46, ref aContext);
+        }
+        public static void HandleInterrupt_47(ref IRQContext aContext)
+        {
+            IRQ(0x47, ref aContext);
+        }
+        public static void HandleInterrupt_48(ref IRQContext aContext)
+        {
+            IRQ(0x48, ref aContext);
+        }
+        public static void HandleInterrupt_49(ref IRQContext aContext)
+        {
+            IRQ(0x49, ref aContext);
+        }
+
         #endregion
 
         #region CPU Exceptions
+
+        public static InterruptDelegate GeneralProtectionFault;
+
         public static void HandleInterrupt_00(ref IRQContext aContext)
         {
             HandleException(aContext.EIP, "Divide by zero", "EDivideByZero", ref aContext);
-        }
-
-        public static void HandleInterrupt_06(ref IRQContext aContext)
-        {
-            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext);
-        }
-
-        public static event ExceptionInterruptDelegate GeneralProtectionFault;
-
-        public static void HandleInterrupt_0D(ref IRQContext aContext)
-        {
-            bool xHandled = false;
-            if (GeneralProtectionFault != null)
-            {
-                GeneralProtectionFault(ref aContext, ref xHandled);
-            }
-            if (!xHandled)
-            {
-                HandleException(aContext.EIP, "General Protection Fault", "GPF", ref aContext);
-            }
         }
 
         public static void HandleInterrupt_01(ref IRQContext aContext)
@@ -367,6 +401,11 @@ namespace Cosmos.Core
         public static void HandleInterrupt_05(ref IRQContext aContext)
         {
             HandleException(aContext.EIP, "Out of Bounds Exception", "Out of Bounds Exception", ref aContext);
+        }
+
+        public static void HandleInterrupt_06(ref IRQContext aContext)
+        {
+            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext);
         }
 
         public static void HandleInterrupt_07(ref IRQContext aContext)
@@ -398,6 +437,17 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Stack Fault Exception", "Stack Fault Exception", ref aContext);
         }
+        public static void HandleInterrupt_0D(ref IRQContext aContext)
+        {
+            if (GeneralProtectionFault != null)
+            {
+                GeneralProtectionFault(ref aContext);
+            }
+            else
+            {
+                HandleException(aContext.EIP, "General Protection Fault", "GPF", ref aContext);
+            }
+        }
 
         public static void HandleInterrupt_0E(ref IRQContext aContext)
         {
@@ -408,10 +458,10 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", ref aContext);
         }
-
+   
         public static void HandleInterrupt_10(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP, "Coprocessor Fault Exception", "Coprocessor Fault Exception", ref aContext);
+            HandleException(aContext.EIP, "x87 Floating Point Exception", "Coprocessor Fault Exception", ref aContext);
         }
 
         public static void HandleInterrupt_11(ref IRQContext aContext)
@@ -423,6 +473,12 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Machine Check Exception", "Machine Check Exception", ref aContext);
         }
+        public static void HandleInterrupt_13(ref IRQContext aContext)
+        {
+            HandleException(aContext.EIP, "SIMD Floating Point Exception", "SIMD Floating Point Exception", ref aContext);
+        }
+
+
         #endregion
 
         private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx)
@@ -534,17 +590,35 @@ namespace Cosmos.Core
                     HandleInterrupt_10(ref xCtx);
                     HandleInterrupt_11(ref xCtx);
                     HandleInterrupt_12(ref xCtx);
+                    HandleInterrupt_13(ref xCtx);
                     HandleInterrupt_20(ref xCtx);
                     HandleInterrupt_21(ref xCtx);
+                    HandleInterrupt_22(ref xCtx);
+                    HandleInterrupt_23(ref xCtx);
+                    HandleInterrupt_24(ref xCtx);
                     HandleInterrupt_25(ref xCtx);
+                    HandleInterrupt_26(ref xCtx);
+                    HandleInterrupt_27(ref xCtx);
+                    HandleInterrupt_28(ref xCtx);
                     HandleInterrupt_29(ref xCtx);
                     HandleInterrupt_2A(ref xCtx);
                     HandleInterrupt_2B(ref xCtx);
                     HandleInterrupt_2C(ref xCtx);
+                    HandleInterrupt_2D(ref xCtx);
                     HandleInterrupt_2E(ref xCtx);
                     HandleInterrupt_2F(ref xCtx);
                     HandleInterrupt_30(ref xCtx);
                     HandleInterrupt_35(ref xCtx);
+                    HandleInterrupt_40(ref xCtx);
+                    HandleInterrupt_41(ref xCtx);
+                    HandleInterrupt_42(ref xCtx);
+                    HandleInterrupt_43(ref xCtx);
+                    HandleInterrupt_44(ref xCtx);
+                    HandleInterrupt_45(ref xCtx);
+                    HandleInterrupt_46(ref xCtx);
+                    HandleInterrupt_47(ref xCtx);
+                    HandleInterrupt_48(ref xCtx);
+                    HandleInterrupt_49(ref xCtx);
                 }
             }
         }
