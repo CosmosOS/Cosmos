@@ -73,13 +73,13 @@ namespace Cosmos.Core {
                 {
                     mStartAddress += aLength;
                     Cosmos.Core.Global.CPU.ZeroFill(xAddr, aLength);
-                    if (HMI.IsInitalised == true)//Prevent it from interfering with unmanaged memory
+                    if (HMI.IsInitalised == true)//Prevent it from interfering with unmanaged memory before boot
                     {
                         HMI.AddBlock(xAddr, aLength);
                     }
                     if (SkipRalloc == false)
                     {
-                        LastMallocAddr = xAddr;//Update this when we allocate a new block not an extend a block
+                        LastMallocAddr = xAddr;//Update this when we allocate a new block not extend an old block
                     }
                     SkipRalloc = false; 
                    
