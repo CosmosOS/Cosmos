@@ -162,7 +162,9 @@ namespace Cosmos.Core
             var xCallback = mIRQ_Handlers[irq];
             if (xCallback != null)
             {
+                HMI.GCMonitor();
                 xCallback(ref aContext);
+                HMI.GCFreeAll();
             }
         }
 
