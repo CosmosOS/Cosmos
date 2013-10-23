@@ -50,7 +50,7 @@ namespace Cosmos.Core
 
      
 
-        public unsafe static void HandleGPF(ref Cosmos.Core.INTs.IRQContext aContext, ref bool Handled)
+        public unsafe static void HandleGPF(ref Cosmos.Core.INTs.IRQContext aContext)
         {
             Console.Clear();
 
@@ -116,7 +116,7 @@ namespace Cosmos.Core
 
         public static bool Init()
         {
-            Cosmos.Core.INTs.GeneralProtectionFault += new Cosmos.Core.INTs.ExceptionInterruptDelegate(HandleGPF);
+            Cosmos.Core.INTs.GeneralProtectionFault = new Cosmos.Core.INTs.InterruptDelegate(HandleGPF);
             ProtectArea = Cosmos.Core.CPU.GetEndOfKernel();
 
             TotalMemory = ((Cosmos.Core.CPU.GetAmountOfRAM() - 1) * 1048576);
