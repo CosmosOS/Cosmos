@@ -1,0 +1,1 @@
+HMI.Init() needs to be called after Cosmos has finished booted.
