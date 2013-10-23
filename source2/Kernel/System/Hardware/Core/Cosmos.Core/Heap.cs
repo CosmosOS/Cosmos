@@ -57,7 +57,7 @@ namespace Cosmos.Core {
 
             if (SkipRalloc == false)
             {
-                xAddr = HMI.RAlloc(aLength);
+                xAddr = HMI.ReAlloc(aLength);
             }
 
             if (xAddr == 0)
