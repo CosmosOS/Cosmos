@@ -142,17 +142,17 @@ namespace Cosmos.Core
         }
         #endregion
         
-        private static InterruptDelegate[] mIRQ_Handlers = new InterruptDelegate[256];
+        private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
         // We used to use:
         //Interrupts.IRQ01 += HandleKeyboardInterrupt;
         // But at one point we had issues with multi cast delegates, so we changed to this single cast option.
         // [1:48:37 PM] Matthijs ter Woord: the issues were: "they didn't work, would crash kernel". not sure if we still have them..
-        public static void SetIntHandler(byte aIntNo, InterruptDelegate aHandler)
+        public static void SetIntHandler(byte aIntNo, IRQDelegate aHandler)
         {
             mIRQ_Handlers[aIntNo] = aHandler;
         }
-        public static void SetIrqHandler(byte aIrqNo, InterruptDelegate aHandler)
+        public static void SetIrqHandler(byte aIrqNo, IRQDelegate aHandler)
         {
             SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
         }
@@ -183,7 +183,7 @@ namespace Cosmos.Core
             }
         }
 
-        public delegate void InterruptDelegate(ref IRQContext aContext);
+        public delegate void IRQDelegate(ref IRQContext aContext);
         public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
 
         #region Default Interrupt Handlers
@@ -191,11 +191,11 @@ namespace Cosmos.Core
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(ref IRQContext aContext)
         {
-            IRQ(0x20, ref aContext);
+            IRQ(0x20, ref aContext);  
             Global.PIC.EoiMaster();
         }
 
-        //public static InterruptDelegate IRQ01;
+        //public static IRQDelegate IRQ01;
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         public static void HandleInterrupt_21(ref IRQContext aContext)
         {
@@ -212,7 +212,7 @@ namespace Cosmos.Core
         public static void HandleInterrupt_23(ref IRQContext aContext)
         {
 
-            IRQ(0x21, ref aContext);
+            IRQ(0x23, ref aContext);
             Global.PIC.EoiMaster();
         }
         public static void HandleInterrupt_24(ref IRQContext aContext)
@@ -242,11 +242,11 @@ namespace Cosmos.Core
         public static void HandleInterrupt_28(ref IRQContext aContext)
         {
 
-            IRQ(0x21, ref aContext);
+            IRQ(0x28, ref aContext);
             Global.PIC.EoiSlave();
         }
         //IRQ 09 - (Added for AMD PCNet network card)
-        //public static InterruptDelegate IRQ09;
+        //public static IRQDelegate IRQ09;
 
         public static void HandleInterrupt_29(ref IRQContext aContext)
         {
@@ -255,7 +255,7 @@ namespace Cosmos.Core
         }
 
         //IRQ 10 - (Added for VIA Rhine network card)
-        //public static InterruptDelegate IRQ10;
+        //public static IRQDelegate IRQ10;
 
         public static void HandleInterrupt_2A(ref IRQContext aContext)
         {
@@ -264,17 +264,11 @@ namespace Cosmos.Core
         }
 
         //IRQ 11 - (Added for RTL8139 network card)
-        //public static InterruptDelegate IRQ11;
+        //public static IRQDelegate IRQ11;
 
         public static void HandleInterrupt_2B(ref IRQContext aContext)
         {
-            //Debugging....
-            //DebugUtil.LogInterruptOccurred_Old(aContext);
-            //Cosmos.Debug.Debugger.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
-            //Console.WriteLine("IRQ 11 raised!");
-
             IRQ(0x2B, ref aContext);
-
             Global.PIC.EoiSlave();
         }
 
@@ -294,20 +288,17 @@ namespace Cosmos.Core
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static void HandleInterrupt_2E(ref IRQContext aContext)
         {
-            Global.Dbg.SendMessage("IRQ", "Primary IDE");
-            //Storage.ATAOld.HandleInterruptPrimary();
-            //Storage.ATA.ATA.HandleInterruptPrimary();
+            IRQ(0x2E, ref aContext);
             Global.PIC.EoiSlave();
         }
         //IRQ 15 - Secondary IDE
         public static void HandleInterrupt_2F(ref IRQContext aContext)
         {
-            //Storage.ATA.ATA.HandleInterruptSecondary();
-            Global.Dbg.SendMessage("IRQ", "Secondary IDE");
+            IRQ(0x2F, ref aContext);
             Global.PIC.EoiSlave();
         }
 
-        public static event InterruptDelegate Interrupt30;
+        public static event IRQDelegate Interrupt30;
         // Interrupt 0x30, enter VMM
         public static void HandleInterrupt_30(ref IRQContext aContext)
         {
@@ -371,7 +362,7 @@ namespace Cosmos.Core
 
         #region CPU Exceptions
 
-        public static InterruptDelegate GeneralProtectionFault;
+        public static IRQDelegate GeneralProtectionFault;
 
         public static void HandleInterrupt_00(ref IRQContext aContext)
         {
