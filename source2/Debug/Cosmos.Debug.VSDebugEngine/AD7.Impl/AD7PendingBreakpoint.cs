@@ -92,6 +92,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           // Get the name of the document that the breakpoint was put in
           string xDocName;
           EngineUtils.CheckOk(xDocPos.GetFileName(out xDocName));
+          xDocName = xDocName.ToLower(); //Bug: Some filenames were returned with the drive letter as lower case but in DocumentGUIDs it was captialised so file-not-found!
 
           // Get the location in the document that the breakpoint is in.
           var xStartPos = new TEXT_POSITION[1];
@@ -112,38 +113,49 @@ namespace Cosmos.Debug.VSDebugEngine {
               // () around << are VERY important.. + has precedence over <<
               Int64 xPos = (((Int64)xStartPos[0].dwLine + 1) << 32) + xStartPos[0].dwColumn + 1;
 
-              var xMethod = xDebugInfo.Connection.Query(new SQLinq<Method>().Where(x => x.DocumentID == xDocID
-                            && x.LineColStart <= xPos
-                            && x.LineColEnd >= xPos)).Single();
-              var asm = xDebugInfo.Connection.Get<AssemblyFile>(xMethod.AssemblyFileID);
-        
-              // We have the method. Now find out what Sequence Point it belongs to.
-              var xSPs = xDebugInfo.GetSequencePoints(asm.Pathname, xMethod.MethodToken);
-              var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
+              try
+              {
+                  var potXMethods = xDebugInfo.Connection.Query(new SQLinq<Method>().Where(x => x.DocumentID == xDocID
+                                && x.LineColStart <= xPos
+                                && x.LineColEnd >= xPos));
+                  var xMethod = potXMethods.Single();
+                  var asm = xDebugInfo.Connection.Get<AssemblyFile>(xMethod.AssemblyFileID);
 
-              // We have the Sequence Point, find the MethodILOp
-              var xOp = xDebugInfo.Connection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset)).First();
+                  // We have the method. Now find out what Sequence Point it belongs to.
+                  var xSPs = xDebugInfo.GetSequencePoints(asm.Pathname, xMethod.MethodToken);
+                  var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
 
-              // Get the address of the Label
-              xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
-            
+                  // We have the Sequence Point, find the MethodILOp
+                  var xOp = xDebugInfo.Connection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset)).First();
 
-            if (xAddress > 0) {
-              var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
-              var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
-              mBoundBPs.Add(xBBP);
-            }
+                  // Get the address of the Label
+                  xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
 
-            // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
-            //uint[] addresses = mEngine.DebuggedProcess.GetAddressesForSourceLocation(null, documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn);
-            lock (mBoundBPs) {
-              //foreach (uint addr in addresses) {
-              //    AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(mEngine, addr, GetDocumentContext(addr));
-              //    AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(mEngine, addr, this, breakpointResolution);
-              //    m_boundBreakpoints.Add(boundBreakpoint);
-              //    mEngine.DebuggedProcess.SetBreakpoint(addr, boundBreakpoint);
-              //}
-            }
+
+                  if (xAddress > 0)
+                  {
+                      var xBPR = new AD7BreakpointResolution(mEngine, xAddress, GetDocumentContext(xAddress));
+                      var xBBP = new AD7BoundBreakpoint(mEngine, xAddress, this, xBPR);
+                      mBoundBPs.Add(xBBP);
+                  }
+
+                  // Ask the symbol engine to find all addresses in all modules with symbols that match this source and line number.
+                  //uint[] addresses = mEngine.DebuggedProcess.GetAddressesForSourceLocation(null, documentName, startPosition[0].dwLine + 1, startPosition[0].dwColumn);
+                  lock (mBoundBPs)
+                  {
+                      //foreach (uint addr in addresses) {
+                      //    AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(mEngine, addr, GetDocumentContext(addr));
+                      //    AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(mEngine, addr, this, breakpointResolution);
+                      //    m_boundBreakpoints.Add(boundBreakpoint);
+                      //    mEngine.DebuggedProcess.SetBreakpoint(addr, boundBreakpoint);
+                      //}
+                  }
+              }
+              catch(InvalidOperationException ex)
+              { 
+                  //No elements in potXMethods sequence!
+                  return VSConstants.S_FALSE;
+              }
           }
           return VSConstants.S_OK;
         } else {

@@ -56,25 +56,51 @@ namespace Cosmos.Build.Builder
         protected override void DoRun()
         {
             mOutputDir = Path.Combine(mCosmosDir, @"Build\VSIP");
-
-            CheckPrereqs();
-            Cleanup();
-
-            CompileCosmos();
-            CopyTemplates();
-            if (App.IsUserKit)
+            
+            if (!App.TestMode)
             {
-                CreateUserKitScript();
-            }
-            CreateSetup();
-            if (!App.IsUserKit)
-            {
-                RunSetup();
-                WriteDevKit();
-                if (!App.DoNotLaunchVS) { LaunchVS(); }
-            }
+                CheckPrereqs();                                 //Working
+                Cleanup();                                      //Working
 
-            Done();
+                CompileCosmos();                                //Working
+                CopyTemplates();
+                if (App.IsUserKit)
+                {
+                    CreateUserKitScript();
+                }
+                CreateSetup();                                  //Working
+                if (!App.IsUserKit)
+                {
+                    RunSetup();                                 //Working - forgot to run as user kit first
+                    WriteDevKit();                              //Working
+                    if (!App.DoNotLaunchVS) { LaunchVS(); }     //Working
+                }
+
+                Done();
+            }
+            else
+            {
+                Section("Testing...");
+                //Uncomment bits that you want to test...
+                CheckForInno(); //CheckPrereqs();                               //Working
+                //Cleanup();                                    //Working
+
+                //CompileCosmos();                              //Working
+                //CopyTemplates();                              //Working
+                //if (App.IsUserKit)
+                //{
+                //    CreateUserKitScript();                    //Working
+                //}
+                //CreateSetup();                                //Working
+                //if (!App.IsUserKit)
+                //{
+                //    RunSetup();                               //Working
+                //    WriteDevKit();                            //Working
+                //    if (!App.DoNotLaunchVS) { LaunchVS(); }   //Working
+                //}
+
+                //Done();
+            }
         }
 
         protected void MsBuild(string aSlnFile, string aBuildCfg)
@@ -226,17 +252,23 @@ namespace Cosmos.Build.Builder
             }
 
             // We assume they have normal .NET stuff if user was able to build the builder...
-            //Visual Studio 2010
+            //Visual Studio 2013
+            //Comment Mod
 
             CheckOS();
             CheckIsVsRunning();
             CheckIfBuilderRunning();
 
-            CheckVs2012();
+            //CheckVs2012();
+            //Mod
+            CheckVs2013();
+            
             CheckNet35Sp1(); // Required by VMWareLib
             CheckNet402();
             CheckForInno();
-            CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
+            //CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
+            //Mod
+            CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
             bool vmWareInstalled = true;
             bool bochsInstalled = IsBochsInstalled();
             if (!CheckForInstall("VMware Workstation", false))
@@ -255,6 +287,9 @@ namespace Cosmos.Build.Builder
             // VIX is installed with newer VMware Workstations (8+ for sure). Not sure about player?
             // We need to just watch this and adjust as needed.
             //CheckForInstall("VMWare VIX", true);
+            
+            //Mod
+            //throw new Exception("Forced abort");
         }
 
         /// <summary>Check for Bochs being installed.</summary>
@@ -337,6 +372,25 @@ namespace Cosmos.Build.Builder
                 if (String.IsNullOrWhiteSpace(xDir))
                 {
                     throw new Exception("Visual Studio 2012 not detected!");
+                }
+            }
+        }
+
+        //Mod
+        void CheckVs2013()
+        {
+            // If user got this far, we know they have VS 2010. But we need to make sure
+            // that its SP1.
+            Echo("Checking for Visual Studio 2013");
+            string key = @"SOFTWARE\Microsoft\VisualStudio\12.0";
+            if (Environment.Is64BitOperatingSystem)
+                key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0";
+            using (var xKey = Registry.LocalMachine.OpenSubKey(key))
+            {
+                string xDir = (string)xKey.GetValue("InstallDir");
+                if (String.IsNullOrWhiteSpace(xDir))
+                {
+                    throw new Exception("Visual Studio 2013 not detected!");
                 }
             }
         }
@@ -456,7 +510,7 @@ namespace Cosmos.Build.Builder
         {
             Section("Launching Visual Studio");
 
-            string xVisualStudio = Paths.ProgFiles32 + @"\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe";
+            string xVisualStudio = Paths.ProgFiles32 + @"\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe";
             if (!File.Exists(xVisualStudio))
             {
                 throw new Exception("Cannot find Visual Studio.");

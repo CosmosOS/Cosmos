@@ -122,7 +122,7 @@ namespace Cosmos.IL2CPU {
             LabelCall = xMethodLabel,
 
             AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
-            DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document],
+            DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document.ToLower()],
             
             // Storing Line + Col as one item makes comparisons MUCH easier, otherwise we have to 
             // check for things like col < start col but line > start line.

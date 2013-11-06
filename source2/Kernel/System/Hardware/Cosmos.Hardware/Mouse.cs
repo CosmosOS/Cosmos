@@ -24,11 +24,23 @@ namespace Cosmos.Hardware
         public MouseState Buttons;
 
         /// <summary>
+        /// The screen width (i.e. max value of X)
+        /// </summary>
+        public uint ScreenWidth;
+        /// <summary>
+        /// The screen height (i.e. max value of Y)
+        /// </summary>
+        public uint ScreenHeight;
+
+        /// <summary>
         /// This is the required call to start
         /// the mouse receiving interrupts.
         /// </summary>
-        public void Initialize()
+        public void Initialize(uint screenWidth, uint screenHeight)
         {
+            ScreenWidth = screenWidth;
+            ScreenHeight = screenHeight;
+
             ////enable mouse
             WaitSignal();
             BaseIOGroups.Mouse.p64.Byte = (byte)0xA8;
@@ -141,13 +153,13 @@ namespace Cosmos.Hardware
 
                     if (X < 0)
                         X = 0;
-                    else if (X > 319)
-                        X = 319;
+                    else if (X > ScreenWidth - 1)
+                        X = (int)ScreenWidth - 1;
 
                     if (Y < 0)
                         Y = 0;
-                    else if (Y > 199)
-                        Y = 199;
+                    else if (Y > ScreenHeight - 1)
+                        Y = (int)ScreenHeight - 1;
 
                     Buttons = (MouseState)(mouse_byte[0] & 0x7);
 

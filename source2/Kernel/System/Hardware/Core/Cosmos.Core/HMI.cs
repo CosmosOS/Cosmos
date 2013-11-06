@@ -116,7 +116,7 @@ namespace Cosmos.Core
 
         public static bool Init()
         {
-            Cosmos.Core.INTs.GeneralProtectionFault = new Cosmos.Core.INTs.InterruptDelegate(HandleGPF);
+            Cosmos.Core.INTs.GeneralProtectionFault = new Cosmos.Core.INTs.IRQDelegate(HandleGPF);
             ProtectArea = Cosmos.Core.CPU.GetEndOfKernel();
 
             TotalMemory = ((Cosmos.Core.CPU.GetAmountOfRAM() - 1) * 1048576);

@@ -7,7 +7,7 @@ using System.Text;
 namespace Cosmos.Compiler.XSharp {
   public class TokenList : List<Token> {
 
-    public Token this[int aIdx] {
+    public new Token this[int aIdx] {
       get {
         if (aIdx < 0) {
           aIdx = Count + aIdx;

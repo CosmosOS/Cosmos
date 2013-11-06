@@ -202,10 +202,19 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             return -1;
         }
 
-        //public static char[] ToCharArray(string aThis)
-        //{
-        //    return GetStorageArray(aThis);
-        //}
+        // HACK: TODO - improve efficiency of this.
+        //How do we access the raw memory to copy it into a char array?
+        public static char[] ToCharArray(string aThis)
+        {
+            char[] result = new char[aThis.Length];
+
+            for (int i = 0; i < aThis.Length; i++)
+            {
+                result[i] = aThis[i];
+            }
+
+            return result;
+        }
 
         [PlugMethod(Enabled = false)]
         public static uint GetStorage(string aString)

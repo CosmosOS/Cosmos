@@ -31,7 +31,7 @@ namespace Cosmos.VS.Package {
   // when you debug your package you want to register it in the experimental hive. This
   // attribute specifies the registry root to use if no one is provided to regpkg.exe with
   // the /root switch.
-  [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\10.0")]
+  [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\12.0")]
   // This attribute is used to register the informations needed to show the this package
   // in the Help/About dialog of Visual Studio.
   [InstalledProductRegistration("Cosmos Visual Studio Integration Package", "www.gocosmos.org", "1.0", IconResourceID = 400,

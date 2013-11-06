@@ -1,40 +1,22 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware2", "Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old Sort", "Old Sort", "{0D558E33-78B0-47DB-B5EF-B7C2F3114D75}"
 	ProjectSection(SolutionItems) = preProject
 		IntegrationTests.testsettings = IntegrationTests.testsettings
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs", "Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj", "{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys", "Cosmos\Cosmos.System\Cosmos.Sys.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.Plugs", "Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj", "{6110AD07-EB07-4A99-BB73-7A69AF5732F1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 	ProjectSection(SolutionItems) = preProject
 		Cosmos.Build.ReadMe.html = Cosmos.Build.ReadMe.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common", "..\source2\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{FF5BAFDE-AE9D-438D-935A-86B33EE0A758}"
 	ProjectSection(SolutionItems) = preProject
 		Cosmos.Debug.ReadMe.html = Cosmos.Debug.ReadMe.html
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Common", "..\source2\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{AB24E403-54F3-4F67-B5E0-119A7227AAC1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.VSDebugEngine", "..\source2\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj", "{6D2688FE-6FD8-44A8-B96A-6037457F72A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{1698DD83-72A3-44CD-B088-4320A4014A95}"
 EndProject
@@ -51,17 +33,79 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Stu
 		Cosmos.VS.ReadMe.html = Cosmos.VS.ReadMe.html
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landmann", "{2DF5F17F-4890-4856-ADFD-4DE23282C3B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{ADDA07A5-ADA8-4D71-831B-0A421F04A546}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hardware", "Hardware", "{677B6C6A-14DC-4C0B-ACDB-C04696DF77A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System", "System", "{693C6704-6934-410F-97E0-4B6900730E63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{426E77A5-80AA-48DC-97F9-037071345778}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{C4941654-3D7A-484B-9F5C-3D331AB8F585}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CDF13174-7897-4334-9AE4-B1DCC013F6BD}"
+	ProjectSection(SolutionItems) = preProject
+		..\source2\Kernel\Common\ReadMe.html = ..\source2\Kernel\Common\ReadMe.html
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{B521E2A2-81E4-4B2D-A471-7AB550E9551E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23}"
+	ProjectSection(SolutionItems) = preProject
+		Cosmos.Assembler.html = Cosmos.Assembler.html
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{6A15C540-8278-4B9C-B890-FA57FB6AE6A6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sebastian Schocke", "Sebastian Schocke", "{4831F868-2418-4277-A91F-4F599604CB29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HKS", "HKS", "{9588D51E-243F-4ABA-AED2-A77DA0634209}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geramy Loveless", "Geramy Loveless", "{CD291145-6AD0-41CD-9986-2044F41660DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDbg", "MDbg", "{43291572-4714-44FD-BF37-F5C21A758C33}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlueSkeye", "BlueSkeye", "{CB974478-09B8-4907-980F-6B7889645D93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GuessForBochs", "GuessForBochs", "{138FA8BF-3728-430F-B17D-6CBCA7ADEE2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware2", "Cosmos\Cosmos.Hardware\Cosmos.Hardware2.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs", "Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj", "{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys", "Cosmos\Cosmos.System\Cosmos.Sys.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.Plugs", "Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj", "{6110AD07-EB07-4A99-BB73-7A69AF5732F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common", "..\source2\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Common", "..\source2\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{AB24E403-54F3-4F67-B5E0-119A7227AAC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.VSDebugEngine", "..\source2\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj", "{6D2688FE-6FD8-44A8-B96A-6037457F72A7}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2CPU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS", "Cosmos.Hardware.SMBIOS\Cosmos.Hardware.SMBIOS.csproj", "{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landmann", "{2DF5F17F-4890-4856-ADFD-4DE23282C3B7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source2\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
@@ -89,6 +133,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "8987"
+		SlnRelativePath = "..\Docs\"
 	EndProjectSection
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Kudzu.Breakpoints", "..\source2\Users\Kudzu\Breakpoints\Kudzu.Breakpoints.Cosmos", "{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}"
@@ -100,16 +145,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugStub", "..\source2\Compiler\Cosmos.Compiler.DebugStub\Cosmos.Debug.DebugStub.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Cosmos.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{ADDA07A5-ADA8-4D71-831B-0A421F04A546}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hardware", "Hardware", "{677B6C6A-14DC-4C0B-ACDB-C04696DF77A8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System", "System", "{693C6704-6934-410F-97E0-4B6900730E63}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{426E77A5-80AA-48DC-97F9-037071345778}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{C4941654-3D7A-484B-9F5C-3D331AB8F585}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
 EndProject
@@ -125,37 +160,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "..\sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessKernel", "..\source2\Demos\Guess\GuessKernel.csproj", "{73CF15C1-0AB6-4B3A-8142-D326ADA72970}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Guess", "..\source2\Demos\Guess\Guess.Cosmos", "{5B2C0369-7A84-4113-892C-F71B50E1DA12}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CDF13174-7897-4334-9AE4-B1DCC013F6BD}"
-	ProjectSection(SolutionItems) = preProject
-		..\source2\Kernel\Common\ReadMe.html = ..\source2\Kernel\Common\ReadMe.html
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "..\source2\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows", "..\source2\VSIP\Cosmos.VS.Windows\Cosmos.VS.Windows.csproj", "{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{B521E2A2-81E4-4B2D-A471-7AB550E9551E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "File2ByteArray Converter", "..\source2\Tools\File2ByteArray Converter\File2ByteArray Converter.csproj", "{9C96A7B5-19E5-4923-9569-DB9454E69C82}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23}"
-	ProjectSection(SolutionItems) = preProject
-		Cosmos.Assembler.html = Cosmos.Assembler.html
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{6A15C540-8278-4B9C-B890-FA57FB6AE6A6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows.Test", "..\source2\VSIP\Cosmos.VS.Windows.Test\Cosmos.VS.Windows.Test.csproj", "{EA63FDF9-057F-4E67-9060-74F4E7A09AE0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sebastian Schocke", "Sebastian Schocke", "{4831F868-2418-4277-A91F-4F599604CB29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSchockeTest", "..\source2\Users\SSchocke\SSchockeTest\SSchockeTest.csproj", "{0AAD9114-6F08-4344-A282-CD6BC77595E5}"
 EndProject
@@ -166,11 +183,7 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SSchockeTestBoot", "..\sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Profiler", "..\source2\IL2CPU\Cosmos.IL2CPU.Profiler\Cosmos.IL2CPU.Profiler.csproj", "{F708C866-1C9B-4579-8C28-0728ECCFC1ED}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HKS", "HKS", "{9588D51E-243F-4ABA-AED2-A77DA0634209}"
-EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "HKSplaygroundBoot", "..\source2\Users\HKSplayground\HKSplaygroundBoot.Cosmos", "{D048E0B1-8B2B-4A99-8376-7FC8A0656A05}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geramy Loveless", "Geramy Loveless", "{CD291145-6AD0-41CD-9986-2044F41660DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeramyLovelessTest", "..\source2\Users\GeramyLovelessTest\GeramyLovelessTest.csproj", "{6C14B7D1-CACB-4049-A0BD-9CAC5CFCF2C2}"
 EndProject
@@ -186,21 +199,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.XSharp", "..\sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "..\source2\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\source2\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Test", "..\XSharp\source\XSharp.Test\XSharp.Test.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.XSC", "..\XSharp\source\XSharp.XSC\XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDbg", "MDbg", "{43291572-4714-44FD-BF37-F5C21A758C33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "raw", "..\source2\MDbg4\src\debugger\raw\raw.csproj", "{C18D303B-2C55-43EB-A3DF-39CF3FB1D447}"
 EndProject
@@ -211,10 +218,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu.Hive", "..\source2\Users\Kudzu\Hive\Kudzu.Hive\Kudzu.Hive.csproj", "{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu.BreakpointsKernel", "..\source2\Users\Kudzu\Breakpoints\Kudzu.BreakpointsKernel.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlueSkeye", "BlueSkeye", "{CB974478-09B8-4907-980F-6B7889645D93}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GuessForBochs", "GuessForBochs", "{138FA8BF-3728-430F-B17D-6CBCA7ADEE2F}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessForBochs", "..\source2\Users\BlueSkeye\GuessForBochs\GuessForBochs.Cosmos", "{5DE37AE3-3F59-4D15-851B-945C23DBB633}"
 EndProject
@@ -305,183 +308,183 @@ Global
 		SccProjectTopLevelParentUniqueName15 = Cosmos.sln
 		SccProjectName15 = ../source2/Debug/Cosmos.Debug.GDB
 		SccLocalPath15 = ..\\source2\\Debug\\Cosmos.Debug.GDB
-		SccWebProject16 = true
-		SccProjectUniqueName16 = ..\\Docs
-		SccProjectName16 = ../Docs
-		SccLocalPath16 = ..\\Docs
-		SccProjectEnlistmentChoice16 = 2
-		SccProjectUniqueName17 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Kudzu.Breakpoints.Cosmos
-		SccProjectName17 = ../source2/Users/Kudzu/Breakpoints
-		SccLocalPath17 = ..\\source2\\Users\\Kudzu\\Breakpoints
-		SccProjectUniqueName18 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub\\Cosmos.Debug.DebugStub.csproj
+		SccProjectUniqueName16 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Kudzu.Breakpoints.Cosmos
+		SccProjectName16 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath16 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName17 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub\\Cosmos.Debug.DebugStub.csproj
+		SccProjectTopLevelParentUniqueName17 = Cosmos.sln
+		SccProjectName17 = ../source2/Compiler/Cosmos.Compiler.DebugStub
+		SccLocalPath17 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub
+		SccProjectUniqueName18 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core\\Cosmos.Core.csproj
 		SccProjectTopLevelParentUniqueName18 = Cosmos.sln
-		SccProjectName18 = ../source2/Compiler/Cosmos.Compiler.DebugStub
-		SccLocalPath18 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub
-		SccProjectUniqueName19 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core\\Cosmos.Core.csproj
+		SccProjectName18 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core
+		SccLocalPath18 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core
+		SccProjectUniqueName19 = ..\\source2\\Kernel\\System\\Hardware\\Cosmos.Hardware\\Cosmos.Hardware.csproj
 		SccProjectTopLevelParentUniqueName19 = Cosmos.sln
-		SccProjectName19 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core
-		SccLocalPath19 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core
-		SccProjectUniqueName20 = ..\\source2\\Kernel\\System\\Hardware\\Cosmos.Hardware\\Cosmos.Hardware.csproj
+		SccProjectName19 = ../source2/Kernel/System/Hardware/Cosmos.Hardware
+		SccLocalPath19 = ..\\source2\\Kernel\\System\\Hardware\\Cosmos.Hardware
+		SccProjectUniqueName20 = ..\\source2\\Kernel\\System\\Cosmos.System\\Cosmos.System.csproj
 		SccProjectTopLevelParentUniqueName20 = Cosmos.sln
-		SccProjectName20 = ../source2/Kernel/System/Hardware/Cosmos.Hardware
-		SccLocalPath20 = ..\\source2\\Kernel\\System\\Hardware\\Cosmos.Hardware
-		SccProjectUniqueName21 = ..\\source2\\Kernel\\System\\Cosmos.System\\Cosmos.System.csproj
+		SccProjectName20 = ../source2/Kernel/System/Cosmos.System
+		SccLocalPath20 = ..\\source2\\Kernel\\System\\Cosmos.System
+		SccProjectUniqueName21 = ..\\source2\\Kernel\\System\\Cosmos.System.Plugs.System\\Cosmos.System.Plugs.System.csproj
 		SccProjectTopLevelParentUniqueName21 = Cosmos.sln
-		SccProjectName21 = ../source2/Kernel/System/Cosmos.System
-		SccLocalPath21 = ..\\source2\\Kernel\\System\\Cosmos.System
-		SccProjectUniqueName22 = ..\\source2\\Kernel\\System\\Cosmos.System.Plugs.System\\Cosmos.System.Plugs.System.csproj
+		SccProjectName21 = ../source2/Kernel/System/Cosmos.System.Plugs.System
+		SccLocalPath21 = ..\\source2\\Kernel\\System\\Cosmos.System.Plugs.System
+		SccProjectUniqueName22 = ..\\source2\\VSIP\\Cosmos.VS.Wizards\\Cosmos.VS.Wizards.csproj
 		SccProjectTopLevelParentUniqueName22 = Cosmos.sln
-		SccProjectName22 = ../source2/Kernel/System/Cosmos.System.Plugs.System
-		SccLocalPath22 = ..\\source2\\Kernel\\System\\Cosmos.System.Plugs.System
-		SccProjectUniqueName23 = ..\\source2\\VSIP\\Cosmos.VS.Wizards\\Cosmos.VS.Wizards.csproj
+		SccProjectName22 = ../source2/VSIP/Cosmos.VS.Wizards
+		SccLocalPath22 = ..\\source2\\VSIP\\Cosmos.VS.Wizards
+		SccProjectUniqueName23 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
-		SccProjectName23 = ../source2/VSIP/Cosmos.VS.Wizards
-		SccLocalPath23 = ..\\source2\\VSIP\\Cosmos.VS.Wizards
-		SccProjectUniqueName24 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
+		SccProjectName23 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core.Plugs
+		SccLocalPath23 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
+		SccProjectUniqueName24 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel\\Cosmos.Debug.Kernel.csproj
 		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
-		SccProjectName24 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core.Plugs
-		SccLocalPath24 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
-		SccProjectUniqueName25 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel\\Cosmos.Debug.Kernel.csproj
+		SccProjectName24 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel
+		SccLocalPath24 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel
+		SccProjectUniqueName25 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
 		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
-		SccProjectName25 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel
-		SccLocalPath25 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel
-		SccProjectUniqueName26 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
+		SccProjectName25 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel.Plugs
+		SccLocalPath25 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
+		SccProjectUniqueName26 = ..\\source2\\Demos\\Guess\\GuessKernel.csproj
 		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
-		SccProjectName26 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel.Plugs
-		SccLocalPath26 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
-		SccProjectUniqueName27 = ..\\source2\\Demos\\Guess\\GuessKernel.csproj
-		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
+		SccProjectName26 = ../source2/Demos/Guess
+		SccLocalPath26 = ..\\source2\\Demos\\Guess
+		SccProjectUniqueName27 = ..\\source2\\Demos\\Guess\\Guess.Cosmos
 		SccProjectName27 = ../source2/Demos/Guess
 		SccLocalPath27 = ..\\source2\\Demos\\Guess
-		SccProjectUniqueName28 = ..\\source2\\Demos\\Guess\\Guess.Cosmos
-		SccProjectName28 = ../source2/Demos/Guess
-		SccLocalPath28 = ..\\source2\\Demos\\Guess
-		SccProjectUniqueName29 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
+		SccProjectUniqueName28 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
+		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
+		SccProjectName28 = ../source2/Kernel/Common/Cosmos.Common.Extensions
+		SccLocalPath28 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions
+		SccProjectUniqueName29 = ..\\source2\\VSIP\\Cosmos.VS.Windows\\Cosmos.VS.Windows.csproj
 		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
-		SccProjectName29 = ../source2/Kernel/Common/Cosmos.Common.Extensions
-		SccLocalPath29 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions
-		SccProjectUniqueName30 = ..\\source2\\VSIP\\Cosmos.VS.Windows\\Cosmos.VS.Windows.csproj
+		SccProjectName29 = ../source2/VSIP/Cosmos.VS.Windows
+		SccLocalPath29 = ..\\source2\\VSIP\\Cosmos.VS.Windows
+		SccProjectUniqueName30 = ..\\source2\\Tools\\File2ByteArray\u0020Converter\\File2ByteArray\u0020Converter.csproj
 		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
-		SccProjectName30 = ../source2/VSIP/Cosmos.VS.Windows
-		SccLocalPath30 = ..\\source2\\VSIP\\Cosmos.VS.Windows
-		SccProjectUniqueName31 = ..\\source2\\Tools\\File2ByteArray\u0020Converter\\File2ByteArray\u0020Converter.csproj
+		SccProjectName30 = ../source2/Tools/File2ByteArray\u0020Converter
+		SccLocalPath30 = ..\\source2\\Tools\\File2ByteArray\u0020Converter
+		SccProjectUniqueName31 = ..\\source2\\Cosmos.Assembler\\Cosmos.Assembler.csproj
 		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
-		SccProjectName31 = ../source2/Tools/File2ByteArray\u0020Converter
-		SccLocalPath31 = ..\\source2\\Tools\\File2ByteArray\u0020Converter
-		SccProjectUniqueName32 = ..\\source2\\Cosmos.Assembler\\Cosmos.Assembler.csproj
+		SccProjectName31 = ../source2/Cosmos.Assembler
+		SccLocalPath31 = ..\\source2\\Cosmos.Assembler
+		SccProjectUniqueName32 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
 		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
-		SccProjectName32 = ../source2/Cosmos.Assembler
-		SccLocalPath32 = ..\\source2\\Cosmos.Assembler
-		SccProjectUniqueName33 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
+		SccProjectName32 = ../source2/IL2CPU/Cosmos.IL2CPU
+		SccLocalPath32 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU
+		SccProjectUniqueName33 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test\\Cosmos.VS.Windows.Test.csproj
 		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
-		SccProjectName33 = ../source2/IL2CPU/Cosmos.IL2CPU
-		SccLocalPath33 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU
-		SccProjectUniqueName34 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test\\Cosmos.VS.Windows.Test.csproj
+		SccProjectName33 = ../source2/VSIP/Cosmos.VS.Windows.Test
+		SccLocalPath33 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test
+		SccProjectUniqueName34 = ..\\source2\\Users\\SSchocke\\SSchockeTest\\SSchockeTest.csproj
 		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
-		SccProjectName34 = ../source2/VSIP/Cosmos.VS.Windows.Test
-		SccLocalPath34 = ..\\source2\\VSIP\\Cosmos.VS.Windows.Test
-		SccProjectUniqueName35 = ..\\source2\\Users\\SSchocke\\SSchockeTest\\SSchockeTest.csproj
-		SccProjectTopLevelParentUniqueName35 = Cosmos.sln
+		SccProjectName34 = ../source2/Users/SSchocke/SSchockeTest
+		SccLocalPath34 = ..\\source2\\Users\\SSchocke\\SSchockeTest
+		SccProjectUniqueName35 = ..\\source2\\Users\\SSchocke\\SSchockeTest\\SSchockeTestBoot.Cosmos
 		SccProjectName35 = ../source2/Users/SSchocke/SSchockeTest
 		SccLocalPath35 = ..\\source2\\Users\\SSchocke\\SSchockeTest
-		SccProjectUniqueName36 = ..\\source2\\Users\\SSchocke\\SSchockeTest\\SSchockeTestBoot.Cosmos
-		SccProjectName36 = ../source2/Users/SSchocke/SSchockeTest
-		SccLocalPath36 = ..\\source2\\Users\\SSchocke\\SSchockeTest
-		SccProjectUniqueName37 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
-		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
-		SccProjectName37 = ../source2/IL2CPU/Cosmos.IL2CPU.Profiler
-		SccLocalPath37 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler
-		SccProjectUniqueName38 = ..\\source2\\Users\\HKSplayground\\HKSplaygroundBoot.Cosmos
-		SccProjectName38 = ../source2/Users/HKSplayground
-		SccLocalPath38 = ..\\source2\\Users\\HKSplayground
-		SccProjectUniqueName39 = ..\\source2\\Users\\GeramyLovelessTest\\GeramyLovelessTest.csproj
-		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
+		SccProjectUniqueName36 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
+		SccProjectTopLevelParentUniqueName36 = Cosmos.sln
+		SccProjectName36 = ../source2/IL2CPU/Cosmos.IL2CPU.Profiler
+		SccLocalPath36 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler
+		SccProjectUniqueName37 = ..\\source2\\Users\\HKSplayground\\HKSplaygroundBoot.Cosmos
+		SccProjectName37 = ../source2/Users/HKSplayground
+		SccLocalPath37 = ..\\source2\\Users\\HKSplayground
+		SccProjectUniqueName38 = ..\\source2\\Users\\GeramyLovelessTest\\GeramyLovelessTest.csproj
+		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
+		SccProjectName38 = ../source2/Users/GeramyLovelessTest
+		SccLocalPath38 = ..\\source2\\Users\\GeramyLovelessTest
+		SccProjectUniqueName39 = ..\\source2\\Users\\GeramyLovelessTest\\GeramyLovelessTestBoot.Cosmos
 		SccProjectName39 = ../source2/Users/GeramyLovelessTest
 		SccLocalPath39 = ..\\source2\\Users\\GeramyLovelessTest
-		SccProjectUniqueName40 = ..\\source2\\Users\\GeramyLovelessTest\\GeramyLovelessTestBoot.Cosmos
-		SccProjectName40 = ../source2/Users/GeramyLovelessTest
-		SccLocalPath40 = ..\\source2\\Users\\GeramyLovelessTest
-		SccProjectUniqueName41 = ..\\source2\\Build\\Cosmos.Build.Builder\\Cosmos.Build.Builder.csproj
+		SccProjectUniqueName40 = ..\\source2\\Build\\Cosmos.Build.Builder\\Cosmos.Build.Builder.csproj
+		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
+		SccProjectName40 = ../source2/Build/Cosmos.Build.Builder
+		SccLocalPath40 = ..\\source2\\Build\\Cosmos.Build.Builder
+		SccProjectUniqueName41 = ..\\source2\\Build\\Cosmos.Build.Installer\\Cosmos.Build.Installer.csproj
 		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
-		SccProjectName41 = ../source2/Build/Cosmos.Build.Builder
-		SccLocalPath41 = ..\\source2\\Build\\Cosmos.Build.Builder
-		SccProjectUniqueName42 = ..\\source2\\Build\\Cosmos.Build.Installer\\Cosmos.Build.Installer.csproj
+		SccProjectName41 = ../source2/Build/Cosmos.Build.Installer
+		SccLocalPath41 = ..\\source2\\Build\\Cosmos.Build.Installer
+		SccProjectUniqueName42 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\Cosmos.VS.XSharp.csproj
 		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
-		SccProjectName42 = ../source2/Build/Cosmos.Build.Installer
-		SccLocalPath42 = ..\\source2\\Build\\Cosmos.Build.Installer
-		SccProjectUniqueName43 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\Cosmos.VS.XSharp.csproj
+		SccProjectName42 = ../source2/VSIP/Cosmos.VS.XSharp
+		SccLocalPath42 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
+		SccProjectUniqueName43 = ..\\source2\\VMWareLib\\VMWareLib.csproj
 		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
-		SccProjectName43 = ../source2/VSIP/Cosmos.VS.XSharp
-		SccLocalPath43 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
-		SccProjectUniqueName44 = ..\\source2\\VMWareLib\\VMWareLib.csproj
+		SccProjectName43 = ../source2/VMWareLib
+		SccLocalPath43 = ..\\source2\\VMWareLib
+		SccProjectUniqueName44 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
 		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
-		SccProjectName44 = ../source2/VMWareLib
-		SccLocalPath44 = ..\\source2\\VMWareLib
-		SccProjectUniqueName45 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
+		SccProjectName44 = ../source2/Cosmos.Deploy.USB
+		SccLocalPath44 = ..\\source2\\Cosmos.Deploy.USB
+		SccProjectUniqueName45 = ..\\source2\\Cosmos.Deploy.Pixie\\Cosmos.Deploy.Pixie.csproj
 		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = ../source2/Cosmos.Deploy.USB
-		SccLocalPath45 = ..\\source2\\Cosmos.Deploy.USB
-		SccProjectUniqueName46 = ..\\source2\\Cosmos.Deploy.Pixie\\Cosmos.Deploy.Pixie.csproj
+		SccProjectName45 = ../source2/Cosmos.Deploy.Pixie
+		SccLocalPath45 = ..\\source2\\Cosmos.Deploy.Pixie
+		SccProjectUniqueName46 = ..\\source2\\Compiler\\Cosmos.XSharp\\Cosmos.Compiler.XSharp.csproj
 		SccProjectTopLevelParentUniqueName46 = Cosmos.sln
-		SccProjectName46 = ../source2/Cosmos.Deploy.Pixie
-		SccLocalPath46 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName47 = ..\\source2\\Compiler\\Cosmos.XSharp\\Cosmos.Compiler.XSharp.csproj
+		SccProjectName46 = ../source2/Compiler/Cosmos.XSharp
+		SccLocalPath46 = ..\\source2\\Compiler\\Cosmos.XSharp
+		SccProjectUniqueName47 = ..\\XSharp\\source\\XSharp.Test\\XSharp.Test.csproj
 		SccProjectTopLevelParentUniqueName47 = Cosmos.sln
-		SccProjectName47 = ../source2/Compiler/Cosmos.XSharp
-		SccLocalPath47 = ..\\source2\\Compiler\\Cosmos.XSharp
-		SccProjectUniqueName48 = ..\\XSharp\\source\\XSharp.Test\\XSharp.Test.csproj
+		SccProjectName47 = ../XSharp/source/XSharp.Test
+		SccLocalPath47 = ..\\XSharp\\source\\XSharp.Test
+		SccProjectUniqueName48 = ..\\XSharp\\source\\XSharp.XSC\\XSharp.XSC.csproj
 		SccProjectTopLevelParentUniqueName48 = Cosmos.sln
-		SccProjectName48 = ../XSharp/source/XSharp.Test
-		SccLocalPath48 = ..\\XSharp\\source\\XSharp.Test
-		SccProjectUniqueName49 = ..\\XSharp\\source\\XSharp.XSC\\XSharp.XSC.csproj
+		SccProjectName48 = ../XSharp/source/XSharp.XSC
+		SccLocalPath48 = ..\\XSharp\\source\\XSharp.XSC
+		SccProjectUniqueName49 = ..\\XSharp\\source\\XSharp.Nasm\\XSharp.Nasm.csproj
 		SccProjectTopLevelParentUniqueName49 = Cosmos.sln
-		SccProjectName49 = ../XSharp/source/XSharp.XSC
-		SccLocalPath49 = ..\\XSharp\\source\\XSharp.XSC
-		SccProjectUniqueName50 = ..\\XSharp\\source\\XSharp.Nasm\\XSharp.Nasm.csproj
+		SccProjectName49 = ../XSharp/source/XSharp.Nasm
+		SccLocalPath49 = ..\\XSharp\\source\\XSharp.Nasm
+		SccProjectUniqueName50 = ..\\source2\\MDbg4\\src\\debugger\\raw\\raw.csproj
 		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
-		SccProjectName50 = ../XSharp/source/XSharp.Nasm
-		SccLocalPath50 = ..\\XSharp\\source\\XSharp.Nasm
-		SccProjectUniqueName51 = ..\\source2\\MDbg4\\src\\debugger\\raw\\raw.csproj
+		SccProjectName50 = ../source2/MDbg4/src/debugger/raw
+		SccLocalPath50 = ..\\source2\\MDbg4\\src\\debugger\\raw
+		SccProjectUniqueName51 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers\\NativeDebugWrappers.csproj
 		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
-		SccProjectName51 = ../source2/MDbg4/src/debugger/raw
-		SccLocalPath51 = ..\\source2\\MDbg4\\src\\debugger\\raw
-		SccProjectUniqueName52 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers\\NativeDebugWrappers.csproj
+		SccProjectName51 = ../source2/MDbg4/src/debugger/NativeDebugWrappers
+		SccLocalPath51 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers
+		SccProjectUniqueName52 = ..\\source2\\MDbg4\\src\\debugger\\corapi\\corapi.csproj
 		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
-		SccProjectName52 = ../source2/MDbg4/src/debugger/NativeDebugWrappers
-		SccLocalPath52 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers
-		SccProjectUniqueName53 = ..\\source2\\MDbg4\\src\\debugger\\corapi\\corapi.csproj
+		SccProjectName52 = ../source2/MDbg4/src/debugger/corapi
+		SccLocalPath52 = ..\\source2\\MDbg4\\src\\debugger\\corapi
+		SccProjectUniqueName53 = ..\\source2\\Users\\Kudzu\\Hive\\Kudzu.Hive\\Kudzu.Hive.csproj
 		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
-		SccProjectName53 = ../source2/MDbg4/src/debugger/corapi
-		SccLocalPath53 = ..\\source2\\MDbg4\\src\\debugger\\corapi
-		SccProjectUniqueName54 = ..\\source2\\Users\\Kudzu\\Hive\\Kudzu.Hive\\Kudzu.Hive.csproj
+		SccProjectName53 = ../source2/Users/Kudzu/Hive/Kudzu.Hive
+		SccLocalPath53 = ..\\source2\\Users\\Kudzu\\Hive\\Kudzu.Hive
+		SccProjectUniqueName54 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Kudzu.BreakpointsKernel.csproj
 		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
-		SccProjectName54 = ../source2/Users/Kudzu/Hive/Kudzu.Hive
-		SccLocalPath54 = ..\\source2\\Users\\Kudzu\\Hive\\Kudzu.Hive
-		SccProjectUniqueName55 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Kudzu.BreakpointsKernel.csproj
-		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
-		SccProjectName55 = ../source2/Users/Kudzu/Breakpoints
-		SccLocalPath55 = ..\\source2\\Users\\Kudzu\\Breakpoints
-		SccProjectUniqueName56 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs\\GuessForBochs.Cosmos
-		SccProjectName56 = ../source2/Users/BlueSkeye/GuessForBochs
-		SccLocalPath56 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs
-		SccProjectUniqueName57 = GeramysTest\\GeramysTest.csproj
-		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
+		SccProjectName54 = ../source2/Users/Kudzu/Breakpoints
+		SccLocalPath54 = ..\\source2\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName55 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs\\GuessForBochs.Cosmos
+		SccProjectName55 = ../source2/Users/BlueSkeye/GuessForBochs
+		SccLocalPath55 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs
+		SccProjectUniqueName56 = GeramysTest\\GeramysTest.csproj
+		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
+		SccProjectName56 = GeramysTest
+		SccLocalPath56 = GeramysTest
+		SccProjectUniqueName57 = GeramysTest\\GeramysTestBoot.Cosmos
 		SccProjectName57 = GeramysTest
 		SccLocalPath57 = GeramysTest
-		SccProjectUniqueName58 = GeramysTest\\GeramysTestBoot.Cosmos
-		SccProjectName58 = GeramysTest
-		SccLocalPath58 = GeramysTest
-		SccProjectUniqueName59 = ..\\source2\\Users\\Matthijs\\Playground\\Playground.csproj
-		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
+		SccProjectUniqueName58 = ..\\source2\\Users\\Matthijs\\Playground\\Playground.csproj
+		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
+		SccProjectName58 = ../source2/Users/Matthijs/Playground
+		SccLocalPath58 = ..\\source2\\Users\\Matthijs\\Playground
+		SccProjectUniqueName59 = ..\\source2\\Users\\Matthijs\\Playground\\PlaygroundBoot.Cosmos
 		SccProjectName59 = ../source2/Users/Matthijs/Playground
 		SccLocalPath59 = ..\\source2\\Users\\Matthijs\\Playground
-		SccProjectUniqueName60 = ..\\source2\\Users\\Matthijs\\Playground\\PlaygroundBoot.Cosmos
-		SccProjectName60 = ../source2/Users/Matthijs/Playground
-		SccLocalPath60 = ..\\source2\\Users\\Matthijs\\Playground
-		SccProjectUniqueName61 = ..\\source2\\Users\\Matthijs\\DebugCompiler\\DebugCompiler.csproj
-		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
-		SccProjectName61 = ../source2/Users/Matthijs/DebugCompiler
-		SccLocalPath61 = ..\\source2\\Users\\Matthijs\\DebugCompiler
+		SccProjectUniqueName60 = ..\\source2\\Users\\Matthijs\\DebugCompiler\\DebugCompiler.csproj
+		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
+		SccProjectName60 = ../source2/Users/Matthijs/DebugCompiler
+		SccLocalPath60 = ..\\source2\\Users\\Matthijs\\DebugCompiler
+		SccWebProject61 = true
+		SccProjectUniqueName61 = ..\\Docs
+		SccProjectName61 = ../Docs
+		SccLocalPath61 = ..\\Docs
+		SccProjectEnlistmentChoice61 = 2
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1175,16 +1178,10 @@ Global
 		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{74A9329A-2B0B-4C0A-976C-E4FB7228D8B2} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{27D94586-FE88-4203-BE6A-C99013FD5018} = {D95021E1-A2C9-4829-819E-ED433AF13162}
+		{43291572-4714-44FD-BF37-F5C21A758C33} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{AB24E403-54F3-4F67-B5E0-119A7227AAC1} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{3370FC04-B669-46A4-A4AA-A89540318F8D} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{A7F3F078-CF99-4018-9A35-2D6DC9517ADB} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
-		{43291572-4714-44FD-BF37-F5C21A758C33} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
-		{6D2688FE-6FD8-44A8-B96A-6037457F72A7} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
-		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
-		{47E8F3DC-FF3F-4CC7-8643-1807260B0B18} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
-		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
-		{76CDB55D-55E3-4B53-AE33-12EC31430826} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{C4941654-3D7A-484B-9F5C-3D331AB8F585} = {1698DD83-72A3-44CD-B088-4320A4014A95}
 		{2DF5F17F-4890-4856-ADFD-4DE23282C3B7} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{0CF14D0F-6054-4D3D-9062-E3D2EB064A4E} = {A4478219-065D-4928-BB4D-4358CAD39A03}
@@ -1194,13 +1191,15 @@ Global
 		{CB974478-09B8-4907-980F-6B7889645D93} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
-		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
-		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
-		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
+		{6D2688FE-6FD8-44A8-B96A-6037457F72A7} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{47E8F3DC-FF3F-4CC7-8643-1807260B0B18} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{76CDB55D-55E3-4B53-AE33-12EC31430826} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{89868CAD-AAFC-45F1-81B3-C323F87D5742} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
 		{3720749F-1519-4A35-B944-FF05AD01F8DC} = {0CF14D0F-6054-4D3D-9062-E3D2EB064A4E}
-		{1116130E-28E0-428A-A597-F4B3B676C0CA} = {576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23}
 		{693C6704-6934-410F-97E0-4B6900730E63} = {426E77A5-80AA-48DC-97F9-037071345778}
 		{E3779B95-E47B-4CAD-B8C1-0549E30AA4F2} = {426E77A5-80AA-48DC-97F9-037071345778}
 		{CDF13174-7897-4334-9AE4-B1DCC013F6BD} = {426E77A5-80AA-48DC-97F9-037071345778}
@@ -1216,16 +1215,20 @@ Global
 		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
 		{9C96A7B5-19E5-4923-9569-DB9454E69C82} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
+		{1116130E-28E0-428A-A597-F4B3B676C0CA} = {576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23}
+		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
+		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
+		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5} = {4831F868-2418-4277-A91F-4F599604CB29}
 		{6C14B7D1-CACB-4049-A0BD-9CAC5CFCF2C2} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{DA4198CA-59DF-41B3-9884-867647900D76} = {CD291145-6AD0-41CD-9986-2044F41660DE}
-		{FB71E8EF-E229-4D81-984A-B9170D752BF9} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
+		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
+		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
+		{FB71E8EF-E229-4D81-984A-B9170D752BF9} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{2A59517C-356E-4B55-B155-50335BF482FB} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{7B8499A7-0A8D-44FC-8181-9666CC198025} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
-		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
-		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{C18D303B-2C55-43EB-A3DF-39CF3FB1D447} = {43291572-4714-44FD-BF37-F5C21A758C33}
 		{3991AB6C-468B-4C28-95FC-3188CFB34180} = {43291572-4714-44FD-BF37-F5C21A758C33}
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634} = {43291572-4714-44FD-BF37-F5C21A758C33}

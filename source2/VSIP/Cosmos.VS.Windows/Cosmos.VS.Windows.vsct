@@ -15,13 +15,13 @@
         defining some of the constants that we will use inside the file. -->
 
   <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
-  <Extern href="stdidcmd.h"/>
+  <Extern href="stdidcmd.h" />
 
   <!--This header contains the command ids for the menus provided by the shell. -->
-  <Extern href="vsshlids.h"/>
+  <Extern href="vsshlids.h" />
 
   <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
-  <Extern href="msobtnid.h"/>
+  <!--<Extern href="msobtnid.h" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" />-->
 
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
@@ -46,7 +46,7 @@
         </Strings>
       </Menu>
       
-      <Menu guid="guidIDEToolbarCmdSet" id="Toolbar" type="Toolbar" >
+      <Menu guid="guidIDEToolbarCmdSet" id="Toolbar" type="Toolbar">
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
           <ButtonText>Cosmos</ButtonText>
@@ -54,7 +54,7 @@
         </Strings>
       </Menu>
       
-      <Menu guid="guidAsmToolbarCmdSet" id="AsmToolbar" type="ToolWindowToolbar" >
+      <Menu guid="guidAsmToolbarCmdSet" id="AsmToolbar" type="ToolWindowToolbar">
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
           <ButtonText>Cosmos Assembly</ButtonText>
@@ -69,15 +69,15 @@
          must be a menu. -->
     <Groups>
       <Group guid="guidCosmosMenu" id="TopLevelMenuGroup" priority="0x0600">
-        <Parent guid="guidCosmosMenu" id="TopLevelMenu"/>
+        <Parent guid="guidCosmosMenu" id="TopLevelMenu" />
       </Group>
 
       <Group guid="guidIDEToolbarCmdSet" id="ToolbarGroup" priority="0x0000">
-        <Parent guid="guidIDEToolbarCmdSet" id="Toolbar"/>
+        <Parent guid="guidIDEToolbarCmdSet" id="Toolbar" />
       </Group>
       
       <Group guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup" priority="0x0000">
-        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbar"/>
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbar" />
       </Group>
     </Groups>
 
@@ -143,7 +143,7 @@
         </Strings>
       </Button>
       <Button guid="guidCosmosMenu" id="cmdidCosmosRegisters" priority="0x0100" type="Button">
-        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup" />
         <Icon guid="guidImages" id="bmpRegisterIcon" />
         <Strings>
           <CommandName>cmdidCosmosRegisters</CommandName>
@@ -151,7 +151,7 @@
         </Strings>
       </Button>
       <Button guid="guidCosmosMenu" id="cmdidCosmosStack" priority="0x0100" type="Button">
-        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup" />
         <Icon guid="guidImages" id="bmpStackIcon" />
         <Strings>
           <CommandName>cmdidCosmosStack</CommandName>
@@ -159,7 +159,7 @@
         </Strings>
       </Button>
       <Button guid="guidCosmosMenu" id="cmdidCosmosShowAll" priority="0x0100" type="Button">
-        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup"/>
+        <Parent guid="guidIDEToolbarCmdSet" id="ToolbarGroup" />
         <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidCosmosShowAll</CommandName>
@@ -168,7 +168,7 @@
       </Button>
       
       <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmFilter" priority="0x0100" type="Button">
-        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup" />
         <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidAsmFilter</CommandName>
@@ -176,7 +176,7 @@
         </Strings>
       </Button>
       <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmStep" priority="0x0100" type="Button">
-        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup" />
         <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidAsmStep</CommandName>
@@ -184,7 +184,7 @@
         </Strings>
       </Button>
       <Button guid="guidAsmToolbarCmdSet" id="cmdidAsmCopy" priority="0x0100" type="Button">
-        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup"/>
+        <Parent guid="guidAsmToolbarCmdSet" id="AsmToolbarGroup" />
         <Icon guid="guidImages" id="bmpAllIcon" />
         <Strings>
           <CommandName>cmdidAsmCopy</CommandName>
@@ -200,7 +200,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Cosmos.png" usedList="bmpCosmosIcon, bmpAssemblyIcon, bmpRegisterIcon, bmpStackIcon, bmpAllIcon"/>
+      <Bitmap guid="guidImages" href="Resources\Cosmos.png" usedList="bmpCosmosIcon, bmpAssemblyIcon, bmpRegisterIcon, bmpStackIcon, bmpAllIcon" />
     </Bitmaps>
   </Commands>
 
@@ -215,32 +215,31 @@
       <IDSymbol name="cmdidCosmosRegisters" value="0x0102" />
       <IDSymbol name="cmdidCosmosStack" value="0x0103" />
       <IDSymbol name="cmdidCosmosInternal" value="0x0108" />
-      <IDSymbol name="cmdidCosmosShowAll" value="0x0104"/>
+      <IDSymbol name="cmdidCosmosShowAll" value="0x0104" />
     </GuidSymbol>
 
     <GuidSymbol name="guidIDEToolbarCmdSet" value="{3d4b3f35-36e7-4cea-8acc-d9601e45c0b5}">
       <IDSymbol name="Toolbar" value="0x1000" />
       <IDSymbol name="ToolbarGroup" value="0x1050" />
     </GuidSymbol>
-    <GuidSymbol name ="guidAsmToolbarCmdSet" value="{A875EA24-689A-4EAB-B9C2-DAC3EACB9501}">
-      <IDSymbol name ="AsmToolbar" value="0x1001" />
-      <IDSymbol name ="AsmToolbarGroup" value="0x1002" />
-      <IDSymbol name ="cmdidAsmFilter" value="0x0105" />
-      <IDSymbol name ="cmdidAsmStep" value="0x0106" />
-      <IDSymbol name ="cmdidAsmCopy" value="0x0107" />
+    <GuidSymbol name="guidAsmToolbarCmdSet" value="{A875EA24-689A-4EAB-B9C2-DAC3EACB9501}">
+      <IDSymbol name="AsmToolbar" value="0x1001" />
+      <IDSymbol name="AsmToolbarGroup" value="0x1002" />
+      <IDSymbol name="cmdidAsmFilter" value="0x0105" />
+      <IDSymbol name="cmdidAsmStep" value="0x0106" />
+      <IDSymbol name="cmdidAsmCopy" value="0x0107" />
     </GuidSymbol>
                                     
-    <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}" >
-      <IDSymbol name="bmpCosmosIcon" value="1"/>
-      <IDSymbol name="bmpAssemblyIcon" value="2"/>
-      <IDSymbol name="bmpRegisterIcon" value="3"/>
-      <IDSymbol name="bmpStackIcon" value="4"/>
-      <IDSymbol name="bmpAllIcon" value="5"/>
+    <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}">
+      <IDSymbol name="bmpCosmosIcon" value="1" />
+      <IDSymbol name="bmpAssemblyIcon" value="2" />
+      <IDSymbol name="bmpRegisterIcon" value="3" />
+      <IDSymbol name="bmpStackIcon" value="4" />
+      <IDSymbol name="bmpAllIcon" value="5" />
     </GuidSymbol>
   </Symbols>
 
   <KeyBindings>
-    <KeyBinding guid="guidCosmosMenu" id="cmdidCosmosShowAll"
-                mod1="CTRL ALT SHIFT" key1="G" key2="A" editor="guidVSStd97"/>
+    <KeyBinding guid="guidCosmosMenu" id="cmdidCosmosShowAll" mod1="CTRL ALT SHIFT" key1="G" key2="A" editor="guidVSStd97" />
   </KeyBindings>
 </CommandTable>

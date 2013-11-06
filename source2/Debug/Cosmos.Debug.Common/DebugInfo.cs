@@ -89,7 +89,7 @@ namespace Cosmos.Debug.Common {
     public void LoadLookups() {
         foreach (var xDoc in Connection.Query<Document>(new SQLinq<Document>().ToSQL().ToQuery()))
         {
-            DocumentGUIDs.Add(xDoc.Pathname, xDoc.ID);
+            DocumentGUIDs.Add(xDoc.Pathname.ToLower(), xDoc.ID);
         }
     }
 
@@ -293,6 +293,8 @@ namespace Cosmos.Debug.Common {
     {
         if (aPathname != null)
         {
+            aPathname = aPathname.ToLower();
+
             if (!DocumentGUIDs.ContainsKey(aPathname))
             {
                 var xRow = new Document()

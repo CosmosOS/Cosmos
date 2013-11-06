@@ -176,12 +176,12 @@ namespace Microsoft.Samples.Debugging.Native
         }
 
         /// <summary>
-        /// Copy numberBytesToCopy from the DumpPointer into &destinationBuffer[indexDestination].
+        /// Copy numberBytesToCopy from the DumpPointer into &amp;destinationBuffer[indexDestination].
         /// </summary>
         /// <param name="destinationBuffer">buffer for memory</param>
         /// <param name="destinationBufferSizeInBytes">size of allocated buffer</param>
         /// <param name="indexDestination">index into buffer</param>
-        /// <param name="cbBytesToCopy">number of bytes to copy</param>
+        /// <param name="numberBytesToCopy">number of bytes to copy</param>
         public void Copy(IntPtr destinationBuffer, uint destinationBufferSizeInBytes, uint indexDestination, uint numberBytesToCopy)
         {
             // Esnure that both source and destination are large enough.
@@ -2142,7 +2142,7 @@ namespace Microsoft.Samples.Debugging.Native
         }
 
         /// <summary>
-        /// Marshal a structure from the given buffer. Effectively returns ((T*) &buffer[offset]).
+        /// Marshal a structure from the given buffer. Effectively returns ((T*) &amp;buffer[offset]).
         /// </summary>
         /// <typeparam name="T">type of structure to marshal</typeparam>
         /// <param name="buffer">array of bytes representing binary buffer to marshal</param>

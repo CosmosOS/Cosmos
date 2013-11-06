@@ -124,7 +124,7 @@ namespace Cosmos.Build.Builder {
       using (var xProcess = new Process()) {
         var xPSI = xProcess.StartInfo;
         xPSI.UseShellExecute = true;
-        xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase;
+        xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
         xPSI.Arguments = "-InstallTask";
         xPSI.Verb = "runas";
         xProcess.Start();

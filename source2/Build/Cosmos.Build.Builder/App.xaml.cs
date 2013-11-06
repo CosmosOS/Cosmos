@@ -14,6 +14,7 @@ namespace Cosmos.Build.Builder {
     public static bool UseTask;
     public static bool InstallTask;
     public static bool IgnoreVS;
+    public static bool TestMode = false;
     public static bool HasParams = false;
 
     protected override void OnStartup(StartupEventArgs e) {
@@ -31,6 +32,7 @@ namespace Cosmos.Build.Builder {
       DoNotLaunchVS = xArgs.Contains("-NOVSLAUNCH");
       // For use during dev of Builder only.
       IgnoreVS = xArgs.Contains("-IGNOREVS");
+      TestMode = xArgs.Contains("-TESTMODE");
       base.OnStartup(e);
     }
   }

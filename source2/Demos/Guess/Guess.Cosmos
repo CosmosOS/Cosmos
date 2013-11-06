@@ -12,6 +12,7 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>
@@ -24,8 +25,8 @@
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>false</StartCosmosGDB>
-    <VMwareEdition>Workstation</VMwareEdition>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
@@ -48,12 +49,12 @@
     <USB_Launch>None</USB_Launch>
     <USB_DebugEnabled>False</USB_DebugEnabled>
     <USB_DebugMode>Source</USB_DebugMode>
-    <USB_IgnoreDebugStubAttribute />
+    <USB_IgnoreDebugStubAttribute>False</USB_IgnoreDebugStubAttribute>
     <USB_VMwareEdition>Player</USB_VMwareEdition>
     <USB_OutputPath>bin\Debug\</USB_OutputPath>
     <USB_Framework>MicrosoftNET</USB_Framework>
     <USB_UseInternalAssembler>False</USB_UseInternalAssembler>
-    <USB_TraceAssemblies />
+    <USB_TraceAssemblies>All</USB_TraceAssemblies>
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
@@ -61,23 +62,23 @@
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
-    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>
     <ISO_DebugMode>Source</ISO_DebugMode>
-    <ISO_IgnoreDebugStubAttribute />
+    <ISO_IgnoreDebugStubAttribute>False</ISO_IgnoreDebugStubAttribute>
     <ISO_VMwareEdition>Player</ISO_VMwareEdition>
     <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
     <ISO_Framework>MicrosoftNET</ISO_Framework>
     <ISO_UseInternalAssembler>False</ISO_UseInternalAssembler>
-    <ISO_TraceAssemblies />
+    <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
     <Name>Guess</Name>
@@ -140,8 +141,8 @@
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>false</StartCosmosGDB>
-    <VMwareEdition>Workstation</VMwareEdition>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <VMwareEdition>Player</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
@@ -164,12 +165,12 @@
     <USB_Launch>None</USB_Launch>
     <USB_DebugEnabled>False</USB_DebugEnabled>
     <USB_DebugMode>Source</USB_DebugMode>
-    <USB_IgnoreDebugStubAttribute />
+    <USB_IgnoreDebugStubAttribute>False</USB_IgnoreDebugStubAttribute>
     <USB_VMwareEdition>Player</USB_VMwareEdition>
     <USB_OutputPath>bin\Debug\</USB_OutputPath>
     <USB_Framework>MicrosoftNET</USB_Framework>
     <USB_UseInternalAssembler>False</USB_UseInternalAssembler>
-    <USB_TraceAssemblies />
+    <USB_TraceAssemblies>All</USB_TraceAssemblies>
     <USB_EnableGDB>False</USB_EnableGDB>
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
@@ -177,23 +178,23 @@
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
-    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>
     <ISO_DebugMode>Source</ISO_DebugMode>
-    <ISO_IgnoreDebugStubAttribute />
+    <ISO_IgnoreDebugStubAttribute>False</ISO_IgnoreDebugStubAttribute>
     <ISO_VMwareEdition>Player</ISO_VMwareEdition>
     <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
     <ISO_Framework>MicrosoftNET</ISO_Framework>
     <ISO_UseInternalAssembler>False</ISO_UseInternalAssembler>
-    <ISO_TraceAssemblies />
+    <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
     <Name>Guess</Name>
@@ -252,6 +253,11 @@
     <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Cosmos.bxrc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
       <Name>Cosmos.Debug.Kernel.Plugs</Name>
       <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
@@ -272,11 +278,6 @@
       <Project>{73cf15c1-0ab6-4b3a-8142-d326ada72970}</Project>
       <Private>True</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Cosmos.bxrc">
-      <SubType>Content</SubType>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <Target Name="BeforeBuild">
