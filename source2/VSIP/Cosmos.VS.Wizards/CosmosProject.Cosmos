@@ -38,10 +38,10 @@
     <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>
   </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">
       <SubType>Content</SubType>
     </Content>
-  </ItemGroup>
+  </ItemGroup>-->
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 </Project>

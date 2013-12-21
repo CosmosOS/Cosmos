@@ -33,7 +33,7 @@ namespace Cosmos.Build.Common {
           }
           UserKit = (string)xReg.GetValue("UserKit");
           if (null == UserKit) {
-            throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos\@UserKit was not found.");
+            throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos\@UserKit was not found but UserKit must be installed!");
           }
         }
       }
@@ -48,7 +48,7 @@ namespace Cosmos.Build.Common {
         if (xReg != null) {
           DevKit = (string)xReg.GetValue("DevKit");
           if (null == DevKit) {
-            throw new Exception(@"HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos\@DevKit was not found.");
+            throw new Exception(@"HKEY_CURRENT_USER\SOFTWARE\Cosmos\@DevKit was not found but DevKit is installed!");
           }
           try { DebugStubSrc = CheckPath(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub"); }
           // Not finding this one is not an issue. We will fallback to already retrieved stun from UserKit

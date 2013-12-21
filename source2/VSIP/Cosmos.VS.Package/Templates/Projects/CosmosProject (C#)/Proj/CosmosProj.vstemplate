@@ -13,7 +13,7 @@
     </TemplateData>
     <TemplateContent>
         <Project File="CosmosProject.Cosmos" ReplaceParameters="true">
-            <ProjectItem SubType="Content" TargetFileName="Cosmos.bxrc" ReplaceParameters="false">Cosmos.bxrc</ProjectItem>
+            <!--<ProjectItem SubType="Content" TargetFileName="Cosmos.bxrc" ReplaceParameters="false">Cosmos.bxrc</ProjectItem>-->
         </Project>
     </TemplateContent>
     <WizardExtension>

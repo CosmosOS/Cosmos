@@ -142,7 +142,7 @@ namespace Cosmos.IL2CPU {
           var xLocalsOffset = mLocals_Arguments_Infos.Count;
           foreach (var xLocal in xBody.LocalVariables) {
             var xInfo = new LOCAL_ARGUMENT_INFO {
-              METHODLABELNAME = mCurrentMethodLabel,
+              METHODLABELNAME = xMethodLabel,
               IsArgument = false,
               INDEXINMETHOD = xLocal.LocalIndex,
               NAME = "Local" + xLocal.LocalIndex,
@@ -176,7 +176,7 @@ namespace Cosmos.IL2CPU {
         var xIdxOffset = 0u;
         if (!aMethod.MethodBase.IsStatic) {
           mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
-            METHODLABELNAME = mCurrentMethodLabel,
+            METHODLABELNAME = xMethodLabel,
             IsArgument = true,
             NAME = "this:" + X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0),
             INDEXINMETHOD = 0,
@@ -195,7 +195,7 @@ namespace Cosmos.IL2CPU {
           // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
           xOffset -= (int)Cosmos.IL2CPU.ILOp.Align(ILOp.SizeOfType(xParams[i].ParameterType), 4) - 4;
           mLocals_Arguments_Infos.Add(new LOCAL_ARGUMENT_INFO {
-            METHODLABELNAME = mCurrentMethodLabel,
+            METHODLABELNAME = xMethodLabel,
             IsArgument = true,
             INDEXINMETHOD = (int)(i + xIdxOffset),
             NAME = xParams[i].Name,

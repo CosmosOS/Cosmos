@@ -26,7 +26,8 @@ namespace Cosmos.Build.Builder {
     protected List<TextBlock> mTailLines = new List<TextBlock>();
     protected string mCosmosDir;
     protected string mSetupPath;
-    protected int mReleaseNo = 7;
+      //Needs updating with each new release.
+    protected int mReleaseNo = 105304;
 
     public MainWindow() {
       InitializeComponent();

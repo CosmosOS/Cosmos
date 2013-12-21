@@ -31,7 +31,7 @@ namespace Cosmos.Debug.Common {
       public Action<byte[]> Completed;
     }
 
-    private static string BytesToString(byte[] bytes, int index, int count) {
+    internal static string BytesToString(byte[] bytes, int index, int count) {
       if (count > 100) {
         return String.Empty;
       }
@@ -92,6 +92,9 @@ namespace Cosmos.Debug.Common {
       }
       xIncoming.Packet = new byte[aPacketSize];
       xIncoming.Stream = mStream;
+
+      System.Diagnostics.Debug.WriteLine(String.Format("DC - Next: Expecting: {0}", aPacketSize));
+
 #if TRACK_PENDING
       try {
         Interlocked.Increment(ref _pendingReadsCount);
@@ -134,7 +137,10 @@ namespace Cosmos.Debug.Common {
           }
 #endif
         }
-        else {
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(String.Format("DC - Full packet received - Received: {0}", BytesToString(xIncoming.Packet, 0, xIncoming.Packet.Length)));
+
           // Full packet received, process it
           xIncoming.Completed(xIncoming.Packet);
         }

@@ -58,29 +58,37 @@ namespace Cosmos.VS.Package.Templates {
       File.WriteAllText(xFilename, xInputString);
       var xCosmosProject = project.DTE.Solution.AddFromFile(xFilename, false);
 
-      // make .Cosmos project dependent on library project.
-      var xEnu = project.DTE.Solution.SolutionBuild.BuildDependencies.GetEnumerator();
-      dynamic xCosmosBootProjectObj = xCosmosProject.Object; // VSProjectNode
-      var xCosmosBootGuid = xCosmosBootProjectObj.ProjectIDGuid;
-      while (xEnu.MoveNext()) {
-        EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency)xEnu.Current;
+      //This throws an error - ProjectIDGuid not found on xCosmosBootProjectObj
+      //Also this doesn't seem to do anything... and the reference from Boot proj to Library proj makes it dependant anyway...
+      //try
+      //{       // make .Cosmos project dependent on library project.
+      //    var xEnu = project.DTE.Solution.SolutionBuild.BuildDependencies.GetEnumerator();
+      //    dynamic xCosmosBootProjectObj = xCosmosProject.Object; // VSProjectNode
+      //    var xCosmosBootGuid = xCosmosBootProjectObj.ProjectIDGuid;
+      //    while (xEnu.MoveNext())
+      //    {
+      //        EnvDTE.BuildDependency bd = (EnvDTE.BuildDependency)xEnu.Current;
 
-        dynamic xDependencyGUID = bd.Project.Object;
-        if (xDependencyGUID.ProjectIDGuid == xCosmosBootGuid) {
-          bd.AddProject(project.UniqueName);
-          break;
-        }
-      }
+      //        dynamic xDependencyGUID = bd.Project.Object;
+      //        if (xDependencyGUID.ProjectIDGuid == xCosmosBootGuid)
+      //        {
+      //            bd.AddProject(project.UniqueName);
+      //            break;
+      //        }
+      //    }
+      //}
+      //catch { MessageBox.Show("Failed to make Boot project dependant on Library project."); }
 
+      //Bochs file removed...
       // Copy Bochs configuration file.
-      xInputString = GetBochsConfigurationFileTemplate();
-      if (xInputString == null) {
-        return;
-      }
-      xInputString = xInputString.Replace("$CosmosProjectName$", project.Name + "Boot");
-      xFilename = Path.GetDirectoryName(project.FullName);
-      xFilename = Path.Combine(xFilename, BochsConfigurationFileName);
-      File.WriteAllText(xFilename, xInputString);
+      //xInputString = GetBochsConfigurationFileTemplate();
+      //if (xInputString == null) {
+      //  return;
+      //}
+      //xInputString = xInputString.Replace("$CosmosProjectName$", project.Name + "Boot");
+      //xFilename = Path.GetDirectoryName(project.FullName);
+      //xFilename = Path.Combine(xFilename, BochsConfigurationFileName);
+      //File.WriteAllText(xFilename, xInputString);
 
       // set Cosmos Boot as startup project
       project.DTE.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer).Activate();

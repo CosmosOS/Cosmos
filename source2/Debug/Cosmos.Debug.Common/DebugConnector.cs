@@ -95,7 +95,7 @@ namespace Cosmos.Debug.Common {
           //}
           //System.Windows.Forms.MessageBox.Show(xSB.ToString());
           DoDebugMsg("DC Send: " + aCmd.ToString());
-
+            
           if (aCmd == Vs2Ds.Noop) {
             // Noops dont have any data.
             // This is becuase Noops are used to clear out the 
@@ -129,7 +129,7 @@ namespace Cosmos.Debug.Common {
               // with an ACK. The ACK will set the event and allow us to proceed.
               // This wait causes this method to wait on the ACK to be receive back from
               // DebugStub.
-              mCmdWait.WaitOne();
+              mCmdWait.WaitOne(60000);
             }
           }
         }
@@ -190,7 +190,9 @@ namespace Cosmos.Debug.Common {
     }
 
     public byte[] GetMemoryData(uint address, uint size, int dataElementSize = 1) {
-      // from debugstub:
+        return new byte[size];
+        
+        // from debugstub:
       //// sends a stack value
       //// Serial Params:
       ////  1: x32 - offset relative to EBP
@@ -210,15 +212,18 @@ namespace Cosmos.Debug.Common {
       Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
       Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
       SendCmd(Vs2Ds.SendMemory, xData);
-      var xResult = mData;
-      mData = null;
+      var xResult = xData;
+      xData = null;
       if (xResult.Length != size) {
         throw new Exception("Retrieved a different size than requested!");
       }
       return xResult;
     }
 
-    public byte[] GetStackData(int offsetToEBP, uint size) {
+    public byte[] GetStackData(int offsetToEBP, uint size)
+    {
+        return new byte[size];
+
       // from debugstub:
       //// sends a stack value
       //// Serial Params:
@@ -243,8 +248,8 @@ namespace Cosmos.Debug.Common {
 
       byte[] xResult;
 
-      xResult = mData;
-      mData = null;
+      xResult = xData;
+      xData = null;
       return xResult;
     }
 
@@ -266,6 +271,10 @@ namespace Cosmos.Debug.Common {
 
     protected void PacketMsg(byte[] aPacket) {
       mCurrentMsgType = aPacket[0];
+
+      System.Diagnostics.Debug.WriteLine(String.Format("DC - PacketMsg: {0}", DebugConnectorStream.BytesToString(aPacket, 0, aPacket.Length)));
+      System.Diagnostics.Debug.WriteLine("DC - " + mCurrentMsgType.ToString());
+                    
       // Could change to an array, but really not much benefit
       switch (mCurrentMsgType) {
         case Ds2Vs.TracePoint:

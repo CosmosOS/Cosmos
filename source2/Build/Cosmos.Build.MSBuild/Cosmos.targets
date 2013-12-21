@@ -90,7 +90,7 @@
 
   <Target Name="CopyFilesToOutputDirectory">
     <!-- copy <AssemblyName>.exe from obj\Debug to bin\Debug-->
-      <Copy SourceFiles="Cosmos.bxrc"
-            DestinationFolder="$(TargetDir)"/>
+    <!--  <Copy SourceFiles="Cosmos.bxrc"
+            DestinationFolder="$(TargetDir)"/>-->
   </Target>
 </Project>
