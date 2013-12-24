@@ -28,11 +28,13 @@ namespace Cosmos.Debug.VSDebugEngine
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_NAME))
                 {
                     //info.m_bstrName = System.IO.Path.GetFileName(this.DebuggedModule.Name);
+                    info.m_bstrName = "DEADBEEF";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_NAME;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URL))
                 {
                     //info.m_bstrUrl = this.DebuggedModule.Name;
+                    info.m_bstrUrl = "DEADBEEF";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URL;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADADDRESS))

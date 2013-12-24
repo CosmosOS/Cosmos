@@ -59,17 +59,18 @@ function SendMethodContext {
     AL = #Ds2Vs_MethodContext
     ComWriteAL()
 
-    // offset relative to ebp
+    ESI = .CallerEBP
+    
+	// offset relative to ebp
     // size of data to send
     ComReadEAX()
-    ECX = EAX
+    ESI + EAX
     ComReadEAX()
+	ECX = EAX
 
     // now ECX contains size of data (count)
-    // EAX contains relative to EBP
-    ESI = .CallerEBP
-    ESI + EAX
-
+    // ESI contains relative to EBP
+    
 	while ECX != 0 {
 		ComWrite8()
 		ECX--
@@ -85,18 +86,18 @@ Exit:
 //
 // sends a stack value
 // Serial Params:
-//  1: x32 - offset relative to EBP
+//  1: x32 - address
 //  2: x32 - size of data to send
 function SendMemory {
 	+All
 
-    ComReadEAX()
-    ECX = EAX
-    AL = #Ds2Vs_MemoryData
+	AL = #Ds2Vs_MemoryData
     ComWriteAL()
-
+	
     ComReadEAX()
     ESI = EAX
+    ComReadEAX()
+    ECX = EAX
 
     // now ECX contains size of data (count)
     // ESI contains address

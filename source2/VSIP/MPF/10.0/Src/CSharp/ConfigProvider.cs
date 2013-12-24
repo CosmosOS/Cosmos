@@ -93,6 +93,11 @@ namespace Microsoft.VisualStudio.Project
         /// <returns>An instance of a ProjectConfig object.</returns>
         protected ProjectConfig GetProjectConfiguration(string configName)
         {
+            if (configName == null)
+            {
+                return null;
+            }
+
             // if we already created it, return the cached one
             if(configurationsList.ContainsKey(configName))
             {

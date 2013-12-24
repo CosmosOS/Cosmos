@@ -39,6 +39,7 @@ Mov EAX, [DebugStub_CallerEBP]
 Sub EAX, ESI
 Call DebugStub_ComWriteAX
 
+
 Mov ESI, [DebugStub_CallerESP]
 DebugStub_SendStack_Block1_Begin:
 Cmp ESI, [DebugStub_CallerEBP]
@@ -55,12 +56,13 @@ Pushad
 Mov AL, DebugStub_Const_Ds2Vs_MethodContext
 Call DebugStub_ComWriteAL
 
+Mov ESI, [DebugStub_CallerEBP]
+
+Call DebugStub_ComReadEAX
+Add ESI, EAX
 Call DebugStub_ComReadEAX
 Mov ECX, EAX
-Call DebugStub_ComReadEAX
 
-Mov ESI, [DebugStub_CallerEBP]
-Add ESI, EAX
 
 DebugStub_SendMethodContext_Block1_Begin:
 Cmp ECX, 0
@@ -74,16 +76,17 @@ DebugStub_SendMethodContext_Exit:
 Popad
 Ret
 
+
 DebugStub_SendMemory:
 Pushad
 
-Call DebugStub_ComReadEAX
-Mov ECX, EAX
 Mov AL, DebugStub_Const_Ds2Vs_MemoryData
 Call DebugStub_ComWriteAL
 
 Call DebugStub_ComReadEAX
 Mov ESI, EAX
+Call DebugStub_ComReadEAX
+Mov ECX, EAX
 
 DebugStub_SendMemory_Block1_Begin:
 Cmp ECX, 0
@@ -99,7 +102,7 @@ Ret
 
 DebugStub_SendTrace:
 Mov AL, DebugStub_Const_Ds2Vs_BreakPoint
-Cmp dword[DebugStub_DebugStatus], DebugStub_Const_Status_Run
+Cmp dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run
 JNE DebugStub_SendTrace_Block1_End
 Mov AL, DebugStub_Const_Ds2Vs_TracePoint
 DebugStub_SendTrace_Block1_End:

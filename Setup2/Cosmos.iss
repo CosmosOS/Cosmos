@@ -1,5 +1,5 @@
 ; Do NOT change this next line in Dev Kit
-#define ChangeSetVersion "104960"
+#define ChangeSetVersion "105955"
 
 #ifndef BuildConfiguration   
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
@@ -143,7 +143,7 @@ Type: files; Name: "{code:VSNET2013_PATH}\PrivateAssemblies\Cosmos.*"
 Type: filesandordirs; Name: "{code:VSNET2013_PATH}\ProjectTemplates\Cosmos"
 Type: filesandordirs; Name: "{userdocs}\Visual Studio 2013\Templates\ProjectTemplates\Cosmos"; 
 Type: filesandordirs; Name: "{userdocs}\Visual Studio 2013\Templates\ItemTemplates\Visual C#\Cosmos";
-Type: filesandordirs; Name: "{code:GetCSharpExpress2013ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2013Installed('dummy') and (not csharp2013_Installed('dummy'))
+Type: filesandordirs; Name: "{code:GetCSharpExpress2013ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2013Installed('dummy')
 
 [Files]
 ; Cecil dll, pdb

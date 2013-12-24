@@ -27,7 +27,7 @@ namespace Cosmos.Build.Builder {
     protected string mCosmosDir;
     protected string mSetupPath;
       //Needs updating with each new release.
-    protected int mReleaseNo = 105304;
+    protected int mReleaseNo = 105955;
 
     public MainWindow() {
       InitializeComponent();

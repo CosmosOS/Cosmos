@@ -64,7 +64,7 @@ namespace Cosmos.Build.Builder
 
                 CompileCosmos();                                //Working
                 CopyTemplates();
-                if (App.IsUserKit)
+                //if (App.IsUserKit)
                 {
                     CreateUserKitScript();
                 }
