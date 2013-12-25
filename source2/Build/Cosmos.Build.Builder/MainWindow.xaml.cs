@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Cosmos.Build.Builder {
     protected string mCosmosDir;
     protected string mSetupPath;
       //Needs updating with each new release.
-    protected int mReleaseNo = 105955;
+    protected int mReleaseNo = 106027;
 
     public MainWindow() {
       InitializeComponent();
@@ -43,21 +44,21 @@ namespace Cosmos.Build.Builder {
       // GetInstallList();
     }
 
-    protected void GetInstallList() {
-      var xSB = new StringBuilder();
+    //protected void GetInstallList() {
+    //  var xSB = new StringBuilder();
 
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\", false)) {
-        var xSubKeyNames = xKey.GetSubKeyNames();
-        foreach (string xSubKeyName in xSubKeyNames) {
-          using (var xSubKey = xKey.OpenSubKey(xSubKeyName, false)) {
-            string xValue = (string)xSubKey.GetValue("ProductName");
-            xSB.AppendLine(xValue);
-          }
-        }
-      }
+    //  using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Products\", false)) {
+    //    var xSubKeyNames = xKey.GetSubKeyNames();
+    //    foreach (string xSubKeyName in xSubKeyNames) {
+    //      using (var xSubKey = xKey.OpenSubKey(xSubKeyName, false)) {
+    //        string xValue = (string)xSubKey.GetValue("ProductName");
+    //        xSB.AppendLine(xValue);
+    //      }
+    //    }
+    //  }
 
-      Clipboard.SetText(xSB.ToString());
-    }
+    //  Clipboard.SetText(xSB.ToString());
+    //}
 
     bool mPreventAutoClose = false;
     App mApp;
@@ -66,9 +67,20 @@ namespace Cosmos.Build.Builder {
     StringBuilder mClipboard = new StringBuilder();
     DispatcherTimer mCloseTimer;
 
-    void InstallScheduledTask() {
+    const string InstallScheduledTaskName = "CosmosSetup";
+
+    // Install the UAC bypass CosmosTask. This must be performed while the program is running under
+    // administrator credentials with elevation.
+     void InstallScheduledTask() {
       ITaskService xService = new TaskScheduler.TaskScheduler();
       xService.Connect();
+      ITaskFolder xFolder = xService.GetFolder(@"\");
+      IRegisteredTask xTask = TryGetInstallScheduledTask(xFolder);
+
+      if (null != xTask) {
+        // The first parameter MUST NOT be prefixed with the folder path.
+        xFolder.DeleteTask(InstallScheduledTaskName, 0);
+      }
 
       ITaskDefinition xTaskDef = xService.NewTask(0);
       xTaskDef.RegistrationInfo.Description = "Cosmos DevKit UAC Bypass";
@@ -82,42 +94,52 @@ namespace Cosmos.Build.Builder {
       xExecAction.Path = mSetupPath;
       xExecAction.Arguments = @"/SILENT";
 
-      ITaskFolder xFolder = xService.GetFolder(@"\");
       // 6 as argument means this task can be created or updated ["CreateOrUpdate" flag]
       // if Name id empty or null, System will create a task with name as GUID
-      xFolder.RegisterTaskDefinition("CosmosSetup", xTaskDef, 6, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
+      xTask = xFolder.RegisterTaskDefinition(InstallScheduledTaskName, xTaskDef, 6, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
     }
 
+    // Check for task path change. This is invoked in normal user mode (not administrator) and is intended
+    // to fix issue #15528
+    bool IsInstallScheduledTaskPathFixRequired(IRegisteredTask existingTask, string expectedPath)
+    {
+      // This is a defensive programming test. This should never happen unless someone modifies
+      // the task creation code and forget to fix the task update part.
+      if (1 != existingTask.Definition.Actions.Count) { return true; }
+      IExecAction xExistingExecAction = null;
+      IActionCollection xActions;
+
+      try {
+        xActions = existingTask.Definition.Actions;
+        IEnumerator xActionsEnumerator = xActions.GetEnumerator();
+        if (!xActionsEnumerator.MoveNext()) { return true; }
+        xExistingExecAction = xActionsEnumerator.Current as IExecAction;
+      }
+      catch { return true; }
+
+      if (null == xExistingExecAction) { return true; }
+      if (0 != string.Compare(xExistingExecAction.Path, expectedPath, true)) { return true; }
+      return false;
+    }
+      
     // http://yoursandmyideas.wordpress.com/2012/01/07/task-scheduler-in-c-net/
     bool ScheduledTaskIsInstalled() {
       ITaskService xService = new TaskScheduler.TaskScheduler();
       xService.Connect();
 
-      var xTasks = new List<IRegisteredTask>();
       ITaskFolder xFolder = xService.GetFolder(@"\");
-      foreach (IRegisteredTask xTask in xFolder.GetTasks(0)) {
-        if (string.Equals(xTask.Name, "CosmosSetup")) {
-          if(xTask.Definition.Actions.Count > 0)
-          {
-              IAction xAction = xTask.Definition.Actions[1];
-              if (xAction is IExecAction)
-              {
-                  IExecAction xAction2 = xAction as IExecAction;
-                  if (xAction2.Path == null || xAction2.Arguments != "/SILENT" || !String.Equals(xAction2.Path, mSetupPath, StringComparison.OrdinalIgnoreCase))
-                  { 
-                      return false;
-                  }
-                  return true;
-              }
-              else
-              {
-                  throw new Exception("Task is of unkonwn type.");
-              }
-          }
-          return false;
-        }
-      }
-      return false;
+      IRegisteredTask xExistingTask = TryGetInstallScheduledTask(xFolder);
+
+      if (null == xExistingTask) { return false; }
+      return (!IsInstallScheduledTaskPathFixRequired(xExistingTask, mSetupPath));
+    }
+
+    // Attempt to retrieve the CosmosSetup UAC bypass task. If the task can't be retrieved either
+    // because it doesn't exist or because access is denied, return a null reference.
+    IRegisteredTask TryGetInstallScheduledTask(ITaskFolder folder)
+    {
+        try { return folder.GetTask(InstallScheduledTaskName); }
+        catch { return null; }
     }
 
     void InstallTaskAsAdmin() {

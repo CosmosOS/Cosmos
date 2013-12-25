@@ -71,7 +71,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public static void RequireOk(int hr) {
       if (hr != 0) {
-        throw new InvalidOperationException();
+        //throw new InvalidOperationException();
       }
     }
 

@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
                     Console.WriteLine("' not found!");
                     throw new FormatException();
                 }
-                result = (short)((result * 10) + ind);
+                result = (Int16)((result * 10) + ind);
             }
 
             if (neg)

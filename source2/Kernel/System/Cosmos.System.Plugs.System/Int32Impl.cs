@@ -7,17 +7,39 @@ namespace Cosmos.System.Plugs.System {
   [Plug(Target = typeof(Int32))]
   public class Int32Impl {
     // for instance ones still declare as static but add a aThis argument first of same type as target
-    public static int Parse(string s) {
-      int xResult = 0;
-      for (int i = 0; i < s.Length; i++) {
-        xResult = xResult * 10;
-        int j = s[i] - '0';
-        if (j < 0 || j > 9) {
-          throw new Exception("Non numeric digit found in int.parse");
-        }
-        xResult = xResult + j;
+      public static Int32 Parse(string s)
+      {
+          const string digits = "0123456789";
+          Int32 result = 0;
+
+          int z = 0;
+          bool neg = false;
+
+          if (s.Length >= 1)
+          {
+              if (s[0] == '+')
+                  z = 1;
+              if (s[0] == '-')
+              {
+                  z = 1;
+                  neg = true;
+              }
+          }
+
+          for (int i = z; i < s.Length; i++)
+          {
+              Int32 ind = (Int32)digits.IndexOf(s[i]);
+              if (ind == -1)
+              {
+                  throw new FormatException();
+              }
+              result = (Int32)((result * 10) + ind);
+          }
+
+          if (neg)
+              result *= -1;
+
+          return result;
       }
-      return xResult;
-    }
   }
 }

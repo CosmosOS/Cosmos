@@ -24,7 +24,7 @@ namespace Cosmos.Build.Builder
             mCosmosDir = aCosmosDir;
             mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
             mReleaseNo = aReleaseNo;
-            mInnoFile = mCosmosDir + @"\Setup2\Cosmos.iss";
+            mInnoFile = Path.Combine(mCosmosDir, @"Setup2\Cosmos.iss");
         }
 
         void Cleanup()
@@ -112,6 +112,11 @@ namespace Cosmos.Build.Builder
             StartConsole(xMsBuild, "/t:Build " + xParams);
         }
 
+        protected int NumProcessesContainingName(string name)
+        {
+            return (from x in Process.GetProcesses() where x.ProcessName.Contains(name) select x).Count();
+        }
+
         protected bool CheckForInstall(string aCheck, bool aCanThrow)
         {
             return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Classes\Installer\Products\", "ProductName");
@@ -173,17 +178,7 @@ namespace Cosmos.Build.Builder
                 NotFound(".NET 4.03 Full Install (not client)");
             }
         }
-
-        protected void CheckLocalDb2012()
-        {
-            Echo("Checking for SQL Server Express 2012 LocalDB");
-            // Can also check file version and presence of this file: C:\WINDOWS\system32\sqlncli.dll
-            if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server Local DB\Installed Versions\11.0") == null)
-            {
-                NotFound("SQL Server Express 2012 LocalDB");
-            }
-        }
-
+        
         protected void CheckOS()
         {
             Echo("Checking Operating System");
@@ -204,18 +199,27 @@ namespace Cosmos.Build.Builder
 
         protected void CheckIfBuilderRunning()
         {
+            //Check for builder process
             Echo("Checking if Builder is already running.");
-            var xList = Process.GetProcessesByName("Cosmos.Build.Builder");
             // Check > 1 so we exclude ourself.
-            if (xList.Length > 1)
+            if (NumProcessesContainingName("Cosmos.Build.Builder") > 1)
             {
                 throw new Exception("Another instance of builder is running.");
             }
         }
 
+        protected void CheckIfUserKitRunning()
+        {
+            Echo("Check if User Kit Installer is already running.");
+            if (NumProcessesContainingName("CosmosUserKit") > 1)
+            {
+                throw new Exception("Another instance of the user kit installer is running.");
+            }
+        }
+
         protected void CheckIsVsRunning()
         {
-            int xSeconds = 5;
+            int xSeconds = 500;
             if (App.IgnoreVS)
             {
                 return;
@@ -252,22 +256,17 @@ namespace Cosmos.Build.Builder
             }
 
             // We assume they have normal .NET stuff if user was able to build the builder...
-            //Visual Studio 2013
-            //Comment Mod
-
+            
             CheckOS();
+            CheckIfUserKitRunning();
             CheckIsVsRunning();
             CheckIfBuilderRunning();
-
-            //CheckVs2012();
-            //Mod
+            
             CheckVs2013();
             
             CheckNet35Sp1(); // Required by VMWareLib
             CheckNet402();
             CheckForInno();
-            //CheckForInstall("Microsoft Visual Studio 2010 SDK SP1", true);
-            //Mod
             CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
             bool vmWareInstalled = true;
             bool bochsInstalled = IsBochsInstalled();
@@ -287,9 +286,6 @@ namespace Cosmos.Build.Builder
             // VIX is installed with newer VMware Workstations (8+ for sure). Not sure about player?
             // We need to just watch this and adjust as needed.
             //CheckForInstall("VMWare VIX", true);
-            
-            //Mod
-            //throw new Exception("Forced abort");
         }
 
         /// <summary>Check for Bochs being installed.</summary>
@@ -358,25 +354,6 @@ namespace Cosmos.Build.Builder
             }
         }
 
-        void CheckVs2012()
-        {
-            // If user got this far, we know they have VS 2010. But we need to make sure
-            // that its SP1.
-            Echo("Checking for Visual Studio 2012");
-            string key = @"SOFTWARE\Microsoft\VisualStudio\11.0";
-            if (Environment.Is64BitOperatingSystem)
-                key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0";
-            using (var xKey = Registry.LocalMachine.OpenSubKey(key))
-            {
-                string xDir = (string)xKey.GetValue("InstallDir");
-                if (String.IsNullOrWhiteSpace(xDir))
-                {
-                    throw new Exception("Visual Studio 2012 not detected!");
-                }
-            }
-        }
-
-        //Mod
         void CheckVs2013()
         {
             // If user got this far, we know they have VS 2010. But we need to make sure
