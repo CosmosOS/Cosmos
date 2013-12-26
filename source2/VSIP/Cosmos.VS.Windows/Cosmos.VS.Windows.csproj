@@ -188,6 +188,7 @@
     <Compile Include="StackUC.xaml.cs">
       <DependentUpon>StackUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StateStorer.cs" />
     <Compile Include="ToolWindowPane2.cs" />
   </ItemGroup>
   <ItemGroup>

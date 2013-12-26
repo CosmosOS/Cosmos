@@ -95,15 +95,22 @@ namespace Cosmos.VS.Windows
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
-                    var xValues = MemoryViewUC.Split(aData);
-                    int xCount = xValues.Count;
-                    memvEBP.Clear();
-                    for (int i = 0; i < xCount; i++)
+                    if (aData == null)
                     {
-                        // We start at EBP + 8, because lower is not transmitted
-                        // [EBP] is old EBP - not needed
-                        // [EBP + 4] is saved EIP - not needed
-                        memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
+                        memvEBP.Clear();
+                    }
+                    else
+                    {
+                        var xValues = MemoryViewUC.Split(aData);
+                        int xCount = xValues.Count;
+                        memvEBP.Clear();
+                        for (int i = 0; i < xCount; i++)
+                        {
+                            // We start at EBP + 8, because lower is not transmitted
+                            // [EBP] is old EBP - not needed
+                            // [EBP + 4] is saved EIP - not needed
+                            memvEBP.Add("[EBP + " + (i * 4 + 8) + "]", xValues[i]);
+                        }
                     }
                 }
             );
@@ -114,15 +121,48 @@ namespace Cosmos.VS.Windows
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
-                    var xValues = MemoryViewUC.Split(aData);
-                    int xCount = xValues.Count;
-                    memvESP.Clear();
-                    for (int i = 0; i < xCount; i++)
+                    if (aData == null)
                     {
-                        memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
+                        memvESP.Clear();
+                    }
+                    else
+                    {
+                        var xValues = MemoryViewUC.Split(aData);
+                        int xCount = xValues.Count;
+                        memvESP.Clear();
+                        for (int i = 0; i < xCount; i++)
+                        {
+                            memvESP.Add(("[EBP - " + ((xCount - i) * 4) + "]").PadRight(10) + " [ESP + " + (i * 4) + "]", xValues[i]);
+                        }
                     }
                 }
             );
+        }
+
+
+        public override byte[] GetCurrentState()
+        {
+            byte[] aFrameData = mData == null ? new byte[0] : mData;
+            byte[] aStackData = stackData == null ? new byte[0] : stackData;
+            return BitConverter.GetBytes(aFrameData.Length).Concat(aFrameData.Concat(aStackData)).ToArray();
+        }
+        public override void SetCurrentState(byte[] aData)
+        {
+            if (aData == null)
+            {
+                Update("FRAME", null);
+                Update("STACK", null);
+            }
+            else
+            {
+                int mDataLength = BitConverter.ToInt32(aData, 0);
+                byte[] aFrameData = new byte[mDataLength];
+                byte[] aStackData = new byte[aData.Length - mDataLength - 4];
+                Array.Copy(aData, 4, aFrameData, 0, aFrameData.Length);
+                Array.Copy(aData, 4 + mDataLength, aStackData, 0, aStackData.Length);
+                Update("FRAME", aFrameData);
+                Update("STACK", aStackData);
+            }
         }
     }
 }

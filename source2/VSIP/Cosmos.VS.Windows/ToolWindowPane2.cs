@@ -5,14 +5,19 @@ using System.Text;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Cosmos.VS.Windows {
-  public class ToolWindowPane2 : ToolWindowPane {
-    protected DebuggerUC mUserControl;
-    public DebuggerUC UserControl {
-      get { return mUserControl; }
+namespace Cosmos.VS.Windows
+{
+    public class ToolWindowPane2 : ToolWindowPane
+    {
+        protected DebuggerUC mUserControl;
+        public DebuggerUC UserControl
+        {
+            get { return mUserControl; }
+        }
+        
+        public ToolWindowPane2()
+            : base(null)
+        {
+        }
     }
- 
-    public ToolWindowPane2() : base(null) {
-    }
-  }
 }

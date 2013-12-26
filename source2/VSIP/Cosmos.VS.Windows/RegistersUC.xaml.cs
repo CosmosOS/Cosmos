@@ -76,15 +76,52 @@ namespace Cosmos.VS.Windows {
         System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
             (Action)delegate()
             {
-                UpdateRegisters(mData, 28, dataEAX, dataAX, dataAH, dataAL);
-                UpdateRegisters(mData, 16, dataEBX, dataBX, dataBH, dataBL);
-                UpdateRegisters(mData, 24, dataECX, dataCX, dataCH, dataCL);
-                UpdateRegisters(mData, 20, dataEDX, dataDX, dataDH, dataDL);
-                UpdateRegister32(mData, 8, dataEBP);
-                UpdateRegister32(mData, 4, dataESI);
-                UpdateRegister32(mData, 0, dataEDI);
-                UpdateRegister32(mData, 32, dataESP);
-                UpdateRegister32(mData, 36, dataEIP);
+                if (mData == null)
+                {
+                    dataEAX.Value = null;
+                    dataAX.Value = null;
+                    dataAH.Value = null;
+                    dataAL.Value = null;
+
+                    dataEBX.Value = null;
+                    dataBX.Value = null;
+                    dataBH.Value = null;
+                    dataBL.Value = null;
+
+                    dataECX.Value = null;
+                    dataCX.Value = null;
+                    dataCH.Value = null;
+                    dataCL.Value = null;
+
+                    dataEDX.Value = null;
+                    dataDX.Value = null;
+                    dataDH.Value = null;
+                    dataDL.Value = null;
+
+                    dataEBP.Value = null;
+                    dataESI.Value = null;
+                    dataEDI.Value = null;
+                    dataESP.Value = null;
+                    dataEIP.Value = null;
+                }
+                else
+                {
+                    try
+                    { 
+                        UpdateRegisters(mData, 28, dataEAX, dataAX, dataAH, dataAL);
+                        UpdateRegisters(mData, 16, dataEBX, dataBX, dataBH, dataBL);
+                        UpdateRegisters(mData, 24, dataECX, dataCX, dataCH, dataCL);
+                        UpdateRegisters(mData, 20, dataEDX, dataDX, dataDH, dataDL);
+                        UpdateRegister32(mData, 8, dataEBP);
+                        UpdateRegister32(mData, 4, dataESI);
+                        UpdateRegister32(mData, 0, dataEDI);
+                        UpdateRegister32(mData, 32, dataESP);
+                        UpdateRegister32(mData, 36, dataEIP);
+                    }
+                    catch
+                    { 
+                    }
+                }
             }
         );
       //TODO: Flags
