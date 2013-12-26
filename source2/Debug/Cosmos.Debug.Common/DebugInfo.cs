@@ -146,7 +146,7 @@ namespace Cosmos.Debug.Common {
     {
         var xMap = new Field_Map();
         xMap.TypeName = aName;
-        var xRows = mConnection.Query<FIELD_MAPPING>(new SQLinq<FIELD_MAPPING>().Where(i => i.TYPE_NAME == aName).ToSQL().ToQuery());
+        var xRows = mConnection.Query<FIELD_MAPPING>(new SQLinq<FIELD_MAPPING>().Where(i => i.TYPE_NAME == aName));
         foreach (var xFieldName in xRows)
         {
             xMap.FieldNames.Add(xFieldName.FIELD_NAME);

@@ -9,7 +9,7 @@ namespace Cosmos.VS.Windows {
   public class DebuggerUC : UserControl {
     protected byte[] mData = new byte[0];
 
-    public void Update(string aTag, byte[] aData) {
+    public virtual void Update(string aTag, byte[] aData) {
       Dispatcher.Invoke(DispatcherPriority.Normal, 
         (Action)delegate() {
             mData = aData;
