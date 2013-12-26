@@ -309,6 +309,7 @@ Global
 		SccProjectName15 = ../source2/Debug/Cosmos.Debug.GDB
 		SccLocalPath15 = ..\\source2\\Debug\\Cosmos.Debug.GDB
 		SccProjectUniqueName16 = ..\\source2\\Users\\Kudzu\\Breakpoints\\Kudzu.Breakpoints.Cosmos
+		SccProjectTopLevelParentUniqueName16 = Cosmos.sln
 		SccProjectName16 = ../source2/Users/Kudzu/Breakpoints
 		SccLocalPath16 = ..\\source2\\Users\\Kudzu\\Breakpoints
 		SccProjectUniqueName17 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub\\Cosmos.Debug.DebugStub.csproj
@@ -352,6 +353,7 @@ Global
 		SccProjectName26 = ../source2/Demos/Guess
 		SccLocalPath26 = ..\\source2\\Demos\\Guess
 		SccProjectUniqueName27 = ..\\source2\\Demos\\Guess\\Guess.Cosmos
+		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
 		SccProjectName27 = ../source2/Demos/Guess
 		SccLocalPath27 = ..\\source2\\Demos\\Guess
 		SccProjectUniqueName28 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
@@ -383,6 +385,7 @@ Global
 		SccProjectName34 = ../source2/Users/SSchocke/SSchockeTest
 		SccLocalPath34 = ..\\source2\\Users\\SSchocke\\SSchockeTest
 		SccProjectUniqueName35 = ..\\source2\\Users\\SSchocke\\SSchockeTest\\SSchockeTestBoot.Cosmos
+		SccProjectTopLevelParentUniqueName35 = Cosmos.sln
 		SccProjectName35 = ../source2/Users/SSchocke/SSchockeTest
 		SccLocalPath35 = ..\\source2\\Users\\SSchocke\\SSchockeTest
 		SccProjectUniqueName36 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
@@ -390,6 +393,7 @@ Global
 		SccProjectName36 = ../source2/IL2CPU/Cosmos.IL2CPU.Profiler
 		SccLocalPath36 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Profiler
 		SccProjectUniqueName37 = ..\\source2\\Users\\HKSplayground\\HKSplaygroundBoot.Cosmos
+		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
 		SccProjectName37 = ../source2/Users/HKSplayground
 		SccLocalPath37 = ..\\source2\\Users\\HKSplayground
 		SccProjectUniqueName38 = ..\\source2\\Users\\GeramyLovelessTest\\GeramyLovelessTest.csproj
@@ -397,6 +401,7 @@ Global
 		SccProjectName38 = ../source2/Users/GeramyLovelessTest
 		SccLocalPath38 = ..\\source2\\Users\\GeramyLovelessTest
 		SccProjectUniqueName39 = ..\\source2\\Users\\GeramyLovelessTest\\GeramyLovelessTestBoot.Cosmos
+		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
 		SccProjectName39 = ../source2/Users/GeramyLovelessTest
 		SccLocalPath39 = ..\\source2\\Users\\GeramyLovelessTest
 		SccProjectUniqueName40 = ..\\source2\\Build\\Cosmos.Build.Builder\\Cosmos.Build.Builder.csproj
@@ -460,6 +465,7 @@ Global
 		SccProjectName54 = ../source2/Users/Kudzu/Breakpoints
 		SccLocalPath54 = ..\\source2\\Users\\Kudzu\\Breakpoints
 		SccProjectUniqueName55 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs\\GuessForBochs.Cosmos
+		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
 		SccProjectName55 = ../source2/Users/BlueSkeye/GuessForBochs
 		SccLocalPath55 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs
 		SccProjectUniqueName56 = GeramysTest\\GeramysTest.csproj
@@ -467,6 +473,7 @@ Global
 		SccProjectName56 = GeramysTest
 		SccLocalPath56 = GeramysTest
 		SccProjectUniqueName57 = GeramysTest\\GeramysTestBoot.Cosmos
+		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
 		SccProjectName57 = GeramysTest
 		SccLocalPath57 = GeramysTest
 		SccProjectUniqueName58 = ..\\source2\\Users\\Matthijs\\Playground\\Playground.csproj
@@ -474,6 +481,7 @@ Global
 		SccProjectName58 = ../source2/Users/Matthijs/Playground
 		SccLocalPath58 = ..\\source2\\Users\\Matthijs\\Playground
 		SccProjectUniqueName59 = ..\\source2\\Users\\Matthijs\\Playground\\PlaygroundBoot.Cosmos
+		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
 		SccProjectName59 = ../source2/Users/Matthijs/Playground
 		SccLocalPath59 = ..\\source2\\Users\\Matthijs\\Playground
 		SccProjectUniqueName60 = ..\\source2\\Users\\Matthijs\\DebugCompiler\\DebugCompiler.csproj
@@ -1189,8 +1197,10 @@ Global
 		{9588D51E-243F-4ABA-AED2-A77DA0634209} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{CD291145-6AD0-41CD-9986-2044F41660DE} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{CB974478-09B8-4907-980F-6B7889645D93} = {A4478219-065D-4928-BB4D-4358CAD39A03}
+		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{6D2688FE-6FD8-44A8-B96A-6037457F72A7} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
@@ -1211,6 +1221,8 @@ Global
 		{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
 		{73CF15C1-0AB6-4B3A-8142-D326ADA72970} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
+		{5B2C0369-7A84-4113-892C-F71B50E1DA12} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
+		{5DE37AE3-3F59-4D15-851B-945C23DBB633} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
 		{61607F1E-58F9-41CF-972F-128384F3E115} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
@@ -1220,8 +1232,12 @@ Global
 		{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{0AAD9114-6F08-4344-A282-CD6BC77595E5} = {4831F868-2418-4277-A91F-4F599604CB29}
+		{4527D60E-25F4-4617-B463-7CDA3C219097} = {4831F868-2418-4277-A91F-4F599604CB29}
+		{D048E0B1-8B2B-4A99-8376-7FC8A0656A05} = {9588D51E-243F-4ABA-AED2-A77DA0634209}
 		{6C14B7D1-CACB-4049-A0BD-9CAC5CFCF2C2} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{DA4198CA-59DF-41B3-9884-867647900D76} = {CD291145-6AD0-41CD-9986-2044F41660DE}
+		{0A7DF241-1000-405D-A09B-9E2C51A5CB95} = {CD291145-6AD0-41CD-9986-2044F41660DE}
+		{86F88A09-6801-4474-BFC8-EF09F3A9B89D} = {CD291145-6AD0-41CD-9986-2044F41660DE}
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A} = {9C8A3E55-9045-44CA-BFD4-16D5B4343A90}
