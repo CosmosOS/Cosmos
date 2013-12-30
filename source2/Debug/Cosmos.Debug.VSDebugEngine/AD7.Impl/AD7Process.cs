@@ -399,10 +399,19 @@ namespace Cosmos.Debug.VSDebugEngine {
     public int Terminate() {
       OutputText("Debugger terminating.");
 
-      mHost.Stop();
+      try
+      {
+          mHost.Stop();
 
-      OutputText("Debugger terminated.");
-      return VSConstants.S_OK;
+          OutputText("Debugger terminated.");
+          return VSConstants.S_OK;
+      }
+      catch(Exception ex)
+      {
+          OutputText("Failed to stop debugger! Exception message: " + ex.Message);
+      }
+
+      return VSConstants.E_FAIL;
     }
 
     internal void ResumeFromLaunch() {

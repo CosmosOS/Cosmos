@@ -224,6 +224,7 @@
     <Resource Include="Images\filter-small.png" />
     <Resource Include="Images\Copy_Icon_2.jpg" />
     <Resource Include="Images\StepOver.png" />
+    <Resource Include="Images\StepOut.png" />
     <Content Include="Resources\Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>

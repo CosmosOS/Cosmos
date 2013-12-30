@@ -60,6 +60,7 @@ namespace Cosmos.VS.Windows
             butnFilter.Click += new RoutedEventHandler(butnFilter_Click);
             butnCopy.Click += new RoutedEventHandler(mitmCopy_Click);
             butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
+            butnStepOut.Click += new RoutedEventHandler(butnStepOut_Click);
 
             Update(null, mData);
         }
@@ -69,6 +70,12 @@ namespace Cosmos.VS.Windows
             // Disable until step is done to prevent user concurrently clicking.
             butnStepOver.IsEnabled = false;
             Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, mStepToLabel.Label);
+        }
+        void butnStepOut_Click(object sender, RoutedEventArgs e)
+        {
+            // Disable until step is done to prevent user concurrently clicking.
+            butnStepOut.IsEnabled = false;
+            Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, mStepOutLabel.Label);
         }
 
         protected AsmLabel mStepToLabel = null;
@@ -88,6 +95,35 @@ namespace Cosmos.VS.Windows
                     mStepToLabel = xCodeLines[i + 1].AsmLabel;
                     break;
                 }
+            }
+        }
+
+        protected AsmLabel mStepOutLabel = null;
+        protected void FindStepOutLabel()
+        {
+            try
+            {
+                mStepOutLabel = null;
+                var xCodeLinesQry = from x in mLines
+                                    where x is AsmCode
+                                    select (AsmCode)x;
+                // Remove Int3 calls.
+                var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToList();
+                var mCurrAsmLine = xCodeLines.Where(q => q.LabelMatches(mCurrentLabel)).First();
+
+                // We check against Length - 1 because when we find it, we go one more.
+                //Find the idnex of the current code line then find the index of the next RET command from there (inc. test of current line!)
+                for (int i = xCodeLines.IndexOf(mCurrAsmLine); i < xCodeLines.Count - 1; i++)
+                {
+                    if (xCodeLines[i].Text.ToLower().Trim().StartsWith("ret"))
+                    {
+                        mStepOutLabel = xCodeLines[i].AsmLabel;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
             }
         }
 
@@ -406,7 +442,9 @@ namespace Cosmos.VS.Windows
                     }
                     Parse();
                     FindStepToLabel();
+                    FindStepOutLabel();
                     butnStepOver.IsEnabled = mStepToLabel != null;
+                    butnStepOut.IsEnabled = mStepOutLabel != null;
                     Display(mFilter);
                 }
             );

@@ -155,7 +155,7 @@ namespace Cosmos.Debug.Common
                                 // with an ACK. The ACK will set the event and allow us to proceed.
                                 // This wait causes this method to wait on the ACK to be receive back from
                                 // DebugStub.
-                                mCmdWait.WaitOne(/*2000*/60000);
+                                mCmdWait.WaitOne(2000/*60000*/);
                             }
                         }
                     }
