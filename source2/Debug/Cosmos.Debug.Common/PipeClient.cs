@@ -53,21 +53,28 @@ namespace Cosmos.Debug.Common {
           mPipe = xPipe;
         }
       }
+      try
+      {
+          mPipe.WriteByte(aCmd);
 
-      mPipe.WriteByte(aCmd);
+          byte[] xData = aData;
+          if (xData == null)
+          {
+              xData = new byte[0];
+          }
+          int xLength = Math.Min(xData.Length, 32768);
+          mPipe.WriteByte((byte)(xLength >> 8));
+          mPipe.WriteByte((byte)(xLength & 0xFF));
+          if (xLength > 0)
+          {
+              mPipe.Write(xData, 0, xLength);
+          }
 
-      byte[] xData = aData;
-      if (xData == null) {
-        xData = new byte[0];
+          mPipe.Flush();
       }
-      int xLength = Math.Min(xData.Length, 32768);
-      mPipe.WriteByte((byte)(xLength >> 8));
-      mPipe.WriteByte((byte)(xLength & 0xFF));
-      if (xLength > 0) {
-        mPipe.Write(xData, 0, xLength);
+      catch
+      {
       }
-
-      mPipe.Flush();
     }
 
   }
