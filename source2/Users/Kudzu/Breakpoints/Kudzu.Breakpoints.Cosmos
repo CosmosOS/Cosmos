@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <BinFormat>elf</BinFormat>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,6 +7,7 @@
     <ProjectGuid>{e5647bfd-1507-4f02-a7d5-e0f9d6aece3a}</ProjectGuid>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>Kudzu.Breakpoints</Name>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
@@ -256,7 +257,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Breakpoints\Kudzu.BreakpointsKernel.csproj">
       <Name>Kudzu.BreakpointsKernel</Name>
-      <Project>{f5e47127-0070-4815-b7f3-56a2f19e043f}</Project>
+      <Project>{91cbd640-c07d-4556-b4cb-6f8cd88c67c9}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
