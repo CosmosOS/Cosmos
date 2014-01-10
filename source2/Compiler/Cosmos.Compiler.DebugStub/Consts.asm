@@ -31,7 +31,8 @@ DebugStub_Const_Vs2Ds_SendFrame equ 14
 DebugStub_Const_Vs2Ds_SendStack equ 15
 DebugStub_Const_Vs2Ds_SetAsmBreak equ 16
 DebugStub_Const_Vs2Ds_Ping equ 17
-DebugStub_Const_Vs2Ds_Max equ 18
+DebugStub_Const_Vs2Ds_AsmStepInto equ 18
+DebugStub_Const_Vs2Ds_Max equ 19
 
 DebugStub_Const_Ds2Vs_Noop equ 0
 DebugStub_Const_Ds2Vs_TracePoint equ 1

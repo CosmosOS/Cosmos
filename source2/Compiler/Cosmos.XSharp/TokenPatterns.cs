@@ -607,8 +607,15 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("_REGADDR[1] = _REG",  "Mov [{0} + {2}], {5}");
       AddPattern("_REGADDR[-1] = _REG", "Mov [{0} - {2}], {5}");
       AddPattern("_REG = _REGADDR[1]", "Mov {0}, [{2} + {4}]");
-      AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {5}]");
+      AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {4}]");
 
+      AddPattern("_REG = [_REG]", "Mov {0}, [{3}]");
+      AddPattern("_REG = [_REG + 1]", "Mov {0}, [{3} + {5}]");
+      AddPattern("_REG = [_REG - 1]", "Mov {0}, [{3} - {5}]");
+      AddPattern("[_REG] = _REG", "Mov [{1}], {4}");
+      AddPattern("[_REG + 1] = _REG", "Mov [{1} + {3}], {4}");
+      AddPattern("[_REG - 1] = _REG", "Mov [{1} - {3}], {4}");
+      
       AddPattern("_REG = _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Mov(aTokens[0], "[" + GetLabel(aTokens[2]) + "]");
       });
@@ -727,6 +734,19 @@ namespace Cosmos.Compiler.XSharp {
       });
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
+      
+      AddPattern(new string[] {
+        "_REG & 1",
+        "_REG & _REG"
+      }, "And {0}, {2}");
+      AddPattern(new string[] {
+        "_REG | 1",
+        "_REG | _REG"
+      }, "Or {0}, {2}");
+      AddPattern(new string[] {
+        "_REG ^ 1",
+        "_REG ^ _REG"
+      }, "Xor {0}, {2}");
 
       // End block. This handle both terminating a standard block as well as a function or an
       // interrupt handler.

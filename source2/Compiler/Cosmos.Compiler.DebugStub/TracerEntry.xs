@@ -12,6 +12,8 @@
 //   -Looks good and also allows testing intead of waiting
 //   -Wont require us to disable / enable IRQs
 
+//This method also handles INT1
+
 namespace DebugStub
 
 Interrupt TracerEntry {
@@ -38,11 +40,19 @@ Interrupt TracerEntry {
 	// Note - when we used call it was 5 (size of our call + address)
 	// so we get the EIP as IL2CPU records it. Its also useful for when we
 	// wil be changing ops that call this stub.
-	EAX--
+	
+	//Check whether this call is result of (i.e. after) INT1. If so, don't subtract 1!
+	EBX = EAX
+	! MOV EAX, DR6
+	EAX & $4000
+	if EAX != $4000 {
+		EBX--
+	}
+	EAX = EBX
 
 	// Store it for later use.
 	.CallerEIP = EAX
-
+	
 	Executing()
 
 	-All

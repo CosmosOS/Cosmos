@@ -140,352 +140,358 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             DEBUG_PROPERTY_INFO propertyInfo = new DEBUG_PROPERTY_INFO();
 
-            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME))
+            try
             {
-                propertyInfo.bstrFullName = m_variableInformation.Name;
-                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME;
-            }
-
-            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME))
-            {
-                propertyInfo.bstrName = m_variableInformation.Name;
-                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME;
-            }
-
-            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE))
-            {
-                propertyInfo.bstrType = mDebugInfo.TYPENAME;
-                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
-            }
-
-            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
-            {
-                byte[] xData;
-
-                #region String
-                if (mDebugInfo.TYPENAME == typeof(string).AssemblyQualifiedName)
+                if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME))
                 {
-                    const uint xStringLengthOffset = 12;
-                    const uint xStringFirstCharOffset = 16;
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
-                    if (xData == null)
+                    propertyInfo.bstrFullName = m_variableInformation.Name;
+                    propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME;
+                }
+
+                if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME))
+                {
+                    propertyInfo.bstrName = m_variableInformation.Name;
+                    propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME;
+                }
+
+                if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE))
+                {
+                    propertyInfo.bstrType = mDebugInfo.TYPENAME;
+                    propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
+                }
+
+                if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
+                {
+                    byte[] xData;
+
+                    #region String
+                    if (mDebugInfo.TYPENAME == typeof(string).AssemblyQualifiedName)
                     {
-                        propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
-                    }
-                    else
-                    {
-                        uint xStrPointer = BitConverter.ToUInt32(xData, 0);
-                        if (xStrPointer == 0)
+                        const uint xStringLengthOffset = 12;
+                        const uint xStringFirstCharOffset = 16;
+                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+                        if (xData == null)
                         {
-                            propertyInfo.bstrValue = NULL;
+                            propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
                         }
                         else
                         {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
-                            if (xData == null)
+                            uint xStrPointer = BitConverter.ToUInt32(xData, 0);
+                            if (xStrPointer == 0)
                             {
-                                propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
+                                propertyInfo.bstrValue = NULL;
                             }
                             else
                             {
-                                uint xStringLength = BitConverter.ToUInt32(xData, 0);
-                                propertyInfo.bstrValue = "String of length: " + xStringLength;
-                                if (xStringLength > 100)
+                                xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
+                                if (xData == null)
                                 {
-                                    propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
-                                }
-                                else if (xStringLength == 0)
-                                {
-                                    propertyInfo.bstrValue = "\"\"";
+                                    propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
                                 }
                                 else
                                 {
-                                    xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharOffset, xStringLength * 2, 2);
-                                    if (xData == null)
+                                    uint xStringLength = BitConverter.ToUInt32(xData, 0);
+                                    propertyInfo.bstrValue = "String of length: " + xStringLength;
+                                    if (xStringLength > 100)
                                     {
-                                        propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
+                                        propertyInfo.bstrValue = "For now, strings larger than 100 chars are not supported..";
+                                    }
+                                    else if (xStringLength == 0)
+                                    {
+                                        propertyInfo.bstrValue = "\"\"";
                                     }
                                     else
                                     {
-                                        propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-#warning TODO: String[]
-                #endregion
-
-                // Byte
-                else if (mDebugInfo.TYPENAME == typeof(byte).AssemblyQualifiedName)
-                {
-                    ReadData<byte>(ref propertyInfo, new Func<byte[], int, byte>(delegate(byte[] barr, int ind) { return barr[ind]; }));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(byte[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<byte>(ref propertyInfo, "byte");
-                }
-
-                // SByte
-                else if (mDebugInfo.TYPENAME == typeof(sbyte).AssemblyQualifiedName)
-                {
-                    ReadData<sbyte>(ref propertyInfo, new Func<byte[], int, sbyte>(delegate(byte[] barr, int ind) { return unchecked((sbyte)barr[ind]); }));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(sbyte[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
-                }
-
-                #region Char
-                else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
-                {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 2);
-                    if (xData == null)
-                    {
-                        propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
-                    }
-                    else
-                    {
-                        var xTypedCharValue = BitConverter.ToChar(xData, 0);
-                        propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
-                    }
-                }
-                else if (mDebugInfo.TYPENAME == typeof(char[]).AssemblyQualifiedName)
-                {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
-                    if (xData == null)
-                    {
-                        propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
-                    }
-                    else
-                    {
-                        uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                        if (xArrayPointer == 0)
-                        {
-                            propertyInfo.bstrValue = NULL;
-                        }
-                        else
-                        {
-                            xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
-                            if (xData == null)
-                            {
-                                propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
-                            }
-                            else
-                            {
-                                uint xDataLength = BitConverter.ToUInt32(xData, 0);
-                                bool xIsTooLong = xDataLength > 512;
-                                var xSB = new StringBuilder();
-                                xSB.AppendFormat("Char[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
-                                if (xIsTooLong)
-                                {
-                                    xDataLength = 512;
-                                }
-                                if (xDataLength > 0)
-                                {
-                                    xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 2);
-                                    if (xData == null)
-                                    {
-                                        xSB.Append(String.Format("Error! Memory data received was null!"));
-                                    }
-                                    else
-                                    {
-                                        bool first = true;
-                                        for (int i = 0; (i / 2) < xDataLength; i += 2)
+                                        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharOffset, xStringLength * 2, 2);
+                                        if (xData == null)
                                         {
-                                            if (!first)
-                                                xSB.Append(", ");
-                                            char c = BitConverter.ToChar(xData, i);
-                                            xSB.Append('\'');
-                                            if (c == '\0')
-                                            {
-                                                xSB.Append("\\0");
-                                            }
-                                            else
-                                            {
-                                                xSB.Append(c);
-                                            }
-                                            xSB.Append('\'');
-
-                                            first = false;
+                                            propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
+                                        }
+                                        else
+                                        {
+                                            propertyInfo.bstrValue = "\"" + Encoding.Unicode.GetString(xData) + "\"";
                                         }
                                     }
                                 }
-                                if (xIsTooLong)
-                                {
-                                    xSB.Append(", ..");
-                                }
-
-                                xSB.Append(" }");
-                                propertyInfo.bstrValue = xSB.ToString();
                             }
                         }
                     }
-                }
-                #endregion
+#warning TODO: String[]
+                    #endregion
 
-                // Short
-                else if (mDebugInfo.TYPENAME == typeof(short).AssemblyQualifiedName)
-                {
-                    ReadData<short>(ref propertyInfo, new Func<byte[], int, short>(BitConverter.ToInt16));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(short[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<short>(ref propertyInfo, "short");
-                }
-
-                // UShort
-                else if (mDebugInfo.TYPENAME == typeof(ushort).AssemblyQualifiedName)
-                {
-                    ReadData<ushort>(ref propertyInfo, new Func<byte[], int, ushort>(BitConverter.ToUInt16));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(ushort[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<ushort>(ref propertyInfo, "ushort");
-                }
-
-                // Int32
-                else if (mDebugInfo.TYPENAME == typeof(int).AssemblyQualifiedName)
-                {
-                    ReadData<int>(ref propertyInfo, new Func<byte[], int, int>(BitConverter.ToInt32));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(int[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<int>(ref propertyInfo, "int");
-                }
-
-                // UInt32
-                else if (mDebugInfo.TYPENAME == typeof(uint).AssemblyQualifiedName)
-                {
-                    ReadData<uint>(ref propertyInfo, new Func<byte[], int, uint>(BitConverter.ToUInt32));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(uint[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<uint>(ref propertyInfo, "uint");
-                }
-
-                // Long
-                else if (mDebugInfo.TYPENAME == typeof(long).AssemblyQualifiedName)
-                {
-                    ReadData<long>(ref propertyInfo, new Func<byte[], int, long>(BitConverter.ToInt64));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(long[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<long>(ref propertyInfo, "long");
-                }
-
-                // ULong
-                else if (mDebugInfo.TYPENAME == typeof(ulong).AssemblyQualifiedName)
-                {
-                    ReadData<ulong>(ref propertyInfo, new Func<byte[], int, ulong>(BitConverter.ToUInt64));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(ulong[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<ulong>(ref propertyInfo, "ulong");
-                }
-
-                // Float
-                else if (mDebugInfo.TYPENAME == typeof(float).AssemblyQualifiedName)
-                {
-                    ReadData<float>(ref propertyInfo, new Func<byte[], int, float>(BitConverter.ToSingle));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(float[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<float>(ref propertyInfo, "float");
-                }
-
-                // Double
-                else if (mDebugInfo.TYPENAME == typeof(double).AssemblyQualifiedName)
-                {
-                    ReadData<double>(ref propertyInfo, new Func<byte[], int, double>(BitConverter.ToDouble));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(double[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<double>(ref propertyInfo, "double");
-                }
-
-                // Bool
-                else if (mDebugInfo.TYPENAME == typeof(bool).AssemblyQualifiedName)
-                {
-                    ReadData<bool>(ref propertyInfo, new Func<byte[], int, bool>(BitConverter.ToBoolean));
-                }
-                else if (mDebugInfo.TYPENAME == typeof(bool[]).AssemblyQualifiedName)
-                {
-                    ReadDataArray<bool>(ref propertyInfo, "bool");
-                }
-                else
-                {
-                    xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
-                    if (xData == null)
+                    // Byte
+                    else if (mDebugInfo.TYPENAME == typeof(byte).AssemblyQualifiedName)
                     {
-                        propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
+                        ReadData<byte>(ref propertyInfo, new Func<byte[], int, byte>(delegate(byte[] barr, int ind) { return barr[ind]; }));
                     }
-                    else
+                    else if (mDebugInfo.TYPENAME == typeof(byte[]).AssemblyQualifiedName)
                     {
-                        var xPointer = BitConverter.ToUInt32(xData, 0);
-                        if (xPointer == 0)
+                        ReadDataArray<byte>(ref propertyInfo, "byte");
+                    }
+
+                    // SByte
+                    else if (mDebugInfo.TYPENAME == typeof(sbyte).AssemblyQualifiedName)
+                    {
+                        ReadData<sbyte>(ref propertyInfo, new Func<byte[], int, sbyte>(delegate(byte[] barr, int ind) { return unchecked((sbyte)barr[ind]); }));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(sbyte[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
+                    }
+
+                    #region Char
+                    else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
+                    {
+                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 2);
+                        if (xData == null)
                         {
-                            propertyInfo.bstrValue = NULL;
+                            propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
                         }
                         else
                         {
-                            try
+                            var xTypedCharValue = BitConverter.ToChar(xData, 0);
+                            propertyInfo.bstrValue = String.Format("{0} '{1}'", (ushort)xTypedCharValue, xTypedCharValue);
+                        }
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(char[]).AssemblyQualifiedName)
+                    {
+                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+                        if (xData == null)
+                        {
+                            propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
+                        }
+                        else
+                        {
+                            uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
+                            if (xArrayPointer == 0)
                             {
-                                var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
-                                foreach (string str in mp.FieldNames)
-                                {
-                                    Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
-                                    xFieldInfo = mProcess.mDebugInfoDb.Connection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == str)).First();
-
-                                    var inf = new DebugLocalInfo();
-                                    inf.IsArrayElement = true;
-                                    inf.ArrayElementType = xFieldInfo.TYPE;
-                                    inf.ArrayElementLocation = (int)(xPointer + xFieldInfo.OFFSET + 12);
-                                    inf.Name = GetFieldName(xFieldInfo);
-                                    this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
-                                }
-                                propertyInfo.bstrValue = String.Format("{0} (0x{1})", xPointer, xPointer.ToString("X").ToUpper());
+                                propertyInfo.bstrValue = NULL;
                             }
-                            catch(Exception ex)
+                            else
                             {
-                                if(ex.GetType().Name == "SQLiteException")
+                                xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
+                                if (xData == null)
                                 {
-                                    //Ignore but warn user
-                                    propertyInfo.bstrValue = "SQLiteException. Could not get type information for " + mDebugInfo.TYPENAME;
+                                    propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
                                 }
                                 else
                                 {
-                                    throw new Exception("Unexpected error in AD7Property.cs:459", ex);
+                                    uint xDataLength = BitConverter.ToUInt32(xData, 0);
+                                    bool xIsTooLong = xDataLength > 512;
+                                    var xSB = new StringBuilder();
+                                    xSB.AppendFormat("Char[{0}] at 0x{1} {{ ", xDataLength, xArrayPointer.ToString("X"));
+                                    if (xIsTooLong)
+                                    {
+                                        xDataLength = 512;
+                                    }
+                                    if (xDataLength > 0)
+                                    {
+                                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 2);
+                                        if (xData == null)
+                                        {
+                                            xSB.Append(String.Format("Error! Memory data received was null!"));
+                                        }
+                                        else
+                                        {
+                                            bool first = true;
+                                            for (int i = 0; (i / 2) < xDataLength; i += 2)
+                                            {
+                                                if (!first)
+                                                    xSB.Append(", ");
+                                                char c = BitConverter.ToChar(xData, i);
+                                                xSB.Append('\'');
+                                                if (c == '\0')
+                                                {
+                                                    xSB.Append("\\0");
+                                                }
+                                                else
+                                                {
+                                                    xSB.Append(c);
+                                                }
+                                                xSB.Append('\'');
+
+                                                first = false;
+                                            }
+                                        }
+                                    }
+                                    if (xIsTooLong)
+                                    {
+                                        xSB.Append(", ..");
+                                    }
+
+                                    xSB.Append(" }");
+                                    propertyInfo.bstrValue = xSB.ToString();
                                 }
                             }
                         }
                     }
+                    #endregion
+
+                    // Short
+                    else if (mDebugInfo.TYPENAME == typeof(short).AssemblyQualifiedName)
+                    {
+                        ReadData<short>(ref propertyInfo, new Func<byte[], int, short>(BitConverter.ToInt16));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(short[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<short>(ref propertyInfo, "short");
+                    }
+
+                    // UShort
+                    else if (mDebugInfo.TYPENAME == typeof(ushort).AssemblyQualifiedName)
+                    {
+                        ReadData<ushort>(ref propertyInfo, new Func<byte[], int, ushort>(BitConverter.ToUInt16));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(ushort[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<ushort>(ref propertyInfo, "ushort");
+                    }
+
+                    // Int32
+                    else if (mDebugInfo.TYPENAME == typeof(int).AssemblyQualifiedName)
+                    {
+                        ReadData<int>(ref propertyInfo, new Func<byte[], int, int>(BitConverter.ToInt32));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(int[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<int>(ref propertyInfo, "int");
+                    }
+
+                    // UInt32
+                    else if (mDebugInfo.TYPENAME == typeof(uint).AssemblyQualifiedName)
+                    {
+                        ReadData<uint>(ref propertyInfo, new Func<byte[], int, uint>(BitConverter.ToUInt32));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(uint[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<uint>(ref propertyInfo, "uint");
+                    }
+
+                    // Long
+                    else if (mDebugInfo.TYPENAME == typeof(long).AssemblyQualifiedName)
+                    {
+                        ReadData<long>(ref propertyInfo, new Func<byte[], int, long>(BitConverter.ToInt64));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(long[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<long>(ref propertyInfo, "long");
+                    }
+
+                    // ULong
+                    else if (mDebugInfo.TYPENAME == typeof(ulong).AssemblyQualifiedName)
+                    {
+                        ReadData<ulong>(ref propertyInfo, new Func<byte[], int, ulong>(BitConverter.ToUInt64));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(ulong[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<ulong>(ref propertyInfo, "ulong");
+                    }
+
+                    // Float
+                    else if (mDebugInfo.TYPENAME == typeof(float).AssemblyQualifiedName)
+                    {
+                        ReadData<float>(ref propertyInfo, new Func<byte[], int, float>(BitConverter.ToSingle));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(float[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<float>(ref propertyInfo, "float");
+                    }
+
+                    // Double
+                    else if (mDebugInfo.TYPENAME == typeof(double).AssemblyQualifiedName)
+                    {
+                        ReadData<double>(ref propertyInfo, new Func<byte[], int, double>(BitConverter.ToDouble));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(double[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<double>(ref propertyInfo, "double");
+                    }
+
+                    // Bool
+                    else if (mDebugInfo.TYPENAME == typeof(bool).AssemblyQualifiedName)
+                    {
+                        ReadData<bool>(ref propertyInfo, new Func<byte[], int, bool>(BitConverter.ToBoolean));
+                    }
+                    else if (mDebugInfo.TYPENAME == typeof(bool[]).AssemblyQualifiedName)
+                    {
+                        ReadDataArray<bool>(ref propertyInfo, "bool");
+                    }
+                    else
+                    {
+                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+                        if (xData == null)
+                        {
+                            propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
+                        }
+                        else
+                        {
+                            var xPointer = BitConverter.ToUInt32(xData, 0);
+                            if (xPointer == 0)
+                            {
+                                propertyInfo.bstrValue = NULL;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
+                                    foreach (string str in mp.FieldNames)
+                                    {
+                                        Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
+                                        xFieldInfo = mProcess.mDebugInfoDb.Connection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == str)).First();
+
+                                        var inf = new DebugLocalInfo();
+                                        inf.IsArrayElement = true;
+                                        inf.ArrayElementType = xFieldInfo.TYPE;
+                                        inf.ArrayElementLocation = (int)(xPointer + xFieldInfo.OFFSET + 12);
+                                        inf.Name = GetFieldName(xFieldInfo);
+                                        this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
+                                    }
+                                    propertyInfo.bstrValue = String.Format("{0} (0x{1})", xPointer, xPointer.ToString("X").ToUpper());
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (ex.GetType().Name == "SQLiteException")
+                                    {
+                                        //Ignore but warn user
+                                        propertyInfo.bstrValue = "SQLiteException. Could not get type information for " + mDebugInfo.TYPENAME;
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Unexpected error in AD7Property.cs:459", ex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
                 }
-                propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
-            }
 
-            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB))
-            {
-                // The sample does not support writing of values displayed in the debugger, so mark them all as read-only.
-                propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
-
-                if (this.m_variableInformation.Children.Count > 0)
+                if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB))
                 {
-                    propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
-                }
-            }
+                    // The sample does not support writing of values displayed in the debugger, so mark them all as read-only.
+                    propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
 
-            propertyInfo.pProperty = (IDebugProperty2)this;
-            propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
-            // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
-            // then set the pProperty field so the debugger can call back when the children are enumerated.
-            //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
-            //|| (this.m_variableInformation.child != null))
-            //{
-            //    propertyInfo.pProperty = (IDebugProperty2)this;
-            //    propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
-            //}
+                    if (this.m_variableInformation.Children.Count > 0)
+                    {
+                        propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
+                    }
+                }
+
+                propertyInfo.pProperty = (IDebugProperty2)this;
+                propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
+                // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
+                // then set the pProperty field so the debugger can call back when the children are enumerated.
+                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
+                //|| (this.m_variableInformation.child != null))
+                //{
+                //    propertyInfo.pProperty = (IDebugProperty2)this;
+                //    propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
+                //}
+            }
+            catch
+            {
+            }
 
             return propertyInfo;
         }

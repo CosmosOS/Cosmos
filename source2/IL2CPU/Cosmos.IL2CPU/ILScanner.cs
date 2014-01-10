@@ -212,7 +212,7 @@ namespace Cosmos.IL2CPU {
       // They typically end up being inefficient, overly complex, or both.
       //
       // -We would like to scan all types/methods so we can plug them.
-      // -But we can't scan them utnil we plug them, becuase we will scan things
+      // -But we can't scan them until we plug them, because we will scan things
       // that plugs would remove/change the paths of.
       // -Plugs may also call methods which are also plugged.
       // -We cannot resolve plugs ahead of time but must do on the fly during

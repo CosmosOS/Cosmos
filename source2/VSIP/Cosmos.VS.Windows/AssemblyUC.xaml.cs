@@ -59,74 +59,43 @@ namespace Cosmos.VS.Windows
             mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
             butnFilter.Click += new RoutedEventHandler(butnFilter_Click);
             butnCopy.Click += new RoutedEventHandler(mitmCopy_Click);
-            butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
-            butnStepOut.Click += new RoutedEventHandler(butnStepOut_Click);
+            //butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
+            //butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
+            butnStepMode.Click += new RoutedEventHandler(butnStepMode_Click);
 
             Update(null, mData);
         }
 
+        void butnStepMode_Click(object sender, RoutedEventArgs e)
+        {
+            if(butnStepMode.BorderBrush == Brushes.Black)
+            {
+                butnStepMode.BorderBrush = Brushes.LightBlue;
+            }
+            else
+            {
+                butnStepMode.BorderBrush = Brushes.Black;
+            }
+            Global.PipeUp.SendCommand(Windows2Debugger.ToggleStepMode);
+        }
+
+        void butnStepInto_Click(object sender, RoutedEventArgs e)
+        {
+            // Disable until step is done to prevent user concurrently clicking.
+            //butnStepOver.IsEnabled = false;
+            //butnStepInto.IsEnabled = false;
+            Global.PipeUp.SendCommand(Windows2Debugger.AsmStepInto);
+        }
         void butnStepOver_Click(object sender, RoutedEventArgs e)
         {
             // Disable until step is done to prevent user concurrently clicking.
-            butnStepOver.IsEnabled = false;
-            Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, mStepToLabel.Label);
-        }
-        void butnStepOut_Click(object sender, RoutedEventArgs e)
-        {
-            // Disable until step is done to prevent user concurrently clicking.
-            butnStepOut.IsEnabled = false;
-            Global.PipeUp.SendCommand(Windows2Debugger.SetAsmBreak, mStepOutLabel.Label);
+            //butnStepOver.IsEnabled = false;
+            //butnStepInto.IsEnabled = false;
+            Global.PipeUp.SendCommand(Windows2Debugger.Continue);
         }
 
-        protected AsmLabel mStepToLabel = null;
-        protected void FindStepToLabel()
-        {
-            mStepToLabel = null;
-            var xCodeLinesQry = from x in mLines
-                                where x is AsmCode
-                                select (AsmCode)x;
-            // Remove Int3 calls.
-            var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToArray();
-            // We check against Length - 1 because when we find it, we go one more.
-            for (int i = 0; i < xCodeLines.Length - 1; i++)
-            {
-                if (xCodeLines[i].LabelMatches(mCurrentLabel))
-                {
-                    mStepToLabel = xCodeLines[i + 1].AsmLabel;
-                    break;
-                }
-            }
-        }
-
-        protected AsmLabel mStepOutLabel = null;
-        protected void FindStepOutLabel()
-        {
-            try
-            {
-                mStepOutLabel = null;
-                var xCodeLinesQry = from x in mLines
-                                    where x is AsmCode
-                                    select (AsmCode)x;
-                // Remove Int3 calls.
-                var xCodeLines = xCodeLinesQry.Where(q => !q.IsDebugCode).ToList();
-                var mCurrAsmLine = xCodeLines.Where(q => q.LabelMatches(mCurrentLabel)).First();
-
-                // We check against Length - 1 because when we find it, we go one more.
-                //Find the idnex of the current code line then find the index of the next RET command from there (inc. test of current line!)
-                for (int i = xCodeLines.IndexOf(mCurrAsmLine); i < xCodeLines.Count - 1; i++)
-                {
-                    if (xCodeLines[i].Text.ToLower().Trim().StartsWith("ret"))
-                    {
-                        mStepOutLabel = xCodeLines[i].AsmLabel;
-                        break;
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
+        protected bool canStepOver = false;
+        
         void butnFilter_Click(object sender, RoutedEventArgs e)
         {
             mFilter = !mFilter;
@@ -149,9 +118,11 @@ namespace Cosmos.VS.Windows
                 return;
             }
 
+            int nextCodeDistFromCurrent = 0;
+            bool foundCurrentLine = false;
+
             var xFont = new FontFamily("Consolas");
             string xLabelPrefix = null;
-            int distFromLastLabel = 0;
             foreach (var xLine in mLines)
             {
                 string xDisplayLine = xLine.ToString();
@@ -182,7 +153,7 @@ namespace Cosmos.VS.Windows
                             var xAsmCode = (AsmCode)xLine;
                             if (xAsmCode.IsDebugCode)
                             {
-                                continue;
+                                //continue;
                             }
                         }
                         xDisplayLine = xLine.ToString();
@@ -220,31 +191,42 @@ namespace Cosmos.VS.Windows
                 // Set colour of line
                 if (xLine is AsmLabel)
                 {
-                    distFromLastLabel = 0;
-
                     xRun.Foreground = Brushes.Black;
                 }
                 else if (xLine is AsmComment)
                 {
-                    distFromLastLabel++;
-
                     xRun.Foreground = Brushes.Green;
                 }
                 else if (xLine is AsmCode)
                 {
-                    distFromLastLabel++;
-
                     var xAsmCode = (AsmCode)xLine;
                     if (xAsmCode.LabelMatches(mCurrentLabel))
                     {
                         xRun.Foreground = Brushes.WhiteSmoke;
                         xRun.Background = Brushes.DarkRed;
 
+                        Global.PipeUp.SendCommand(Windows2Debugger.CurrentASMLine, xAsmCode.Text);
+                        Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, new byte[0]);
+                        
                         Package.StateStorer.CurrLineId = GetLineId(xAsmCode);
                         Package.StoreAllStates();
+
+                        foundCurrentLine = true;
+                        nextCodeDistFromCurrent = 0;
                     }
                     else
                     {
+                        if (foundCurrentLine)
+                        {
+                            nextCodeDistFromCurrent++;
+                        }
+
+                        if(nextCodeDistFromCurrent == 1)
+                        {
+                            Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, xAsmCode.Text);
+                            Global.PipeUp.SendCommand(Windows2Debugger.NextLabel1, xAsmCode.AsmLabel.Label);
+                        }
+
                         if(Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.LightYellow;
@@ -355,7 +337,7 @@ namespace Cosmos.VS.Windows
             // First line of packet is not code, but the current label and inserted by caller.
             mCurrentLabel = xLines[0];
             bool xSetNextLabelToCurrent = false;
-
+            
             AsmLabel xLastAsmAsmLabel = null;
             for (int i = 1; i < xLines.Length; i++)
             {
@@ -407,14 +389,14 @@ namespace Cosmos.VS.Windows
                     }
 
                     // If its Int3 or so, we need to set the current label to the next non debug op.
-                    if (xAsmCode.IsDebugCode)
-                    {
-                        if (xAsmCode.LabelMatches(mCurrentLabel))
-                        {
-                            xSetNextLabelToCurrent = true;
-                        }
-                        continue;
-                    }
+                    //if (xAsmCode.IsDebugCode)
+                    //{
+                    //    if (xAsmCode.LabelMatches(mCurrentLabel))
+                    //    {
+                    //        xSetNextLabelToCurrent = true;
+                    //    }
+                    //    continue;
+                    //}
 
                     mLines.Add(xAsmCode);
                 }
@@ -441,10 +423,6 @@ namespace Cosmos.VS.Windows
                         }
                     }
                     Parse();
-                    FindStepToLabel();
-                    FindStepOutLabel();
-                    butnStepOver.IsEnabled = mStepToLabel != null;
-                    butnStepOut.IsEnabled = mStepOutLabel != null;
                     Display(mFilter);
                 }
             );

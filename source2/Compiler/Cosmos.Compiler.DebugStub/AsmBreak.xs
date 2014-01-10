@@ -48,3 +48,45 @@ function ClearAsmBreak {
     .AsmBreakEIP = 0
 }
 
+function SetINT1_TrapFLAG {
+	//Push EAX to make sure whatever we do below doesn't affect code afterwards
+	+EBP
+	+EAX
+
+	//Set base pointer to the caller ESP
+	EBP = .CallerESP
+	
+	//Set the Trap Flag (http://en.wikipedia.org/wiki/Trap_flag)
+	//For EFLAGS we want - the interrupt frame = ESP + 12
+	//					 - The interrupt frame - 8 for correct byte = ESP + 12 - 8 = ESP + 4
+	//					 - Therefore, ESP - 4 to get to the correct position
+	EBP - 4
+	EAX = [EBP]
+	EAX | $0100
+	[EBP] = EAX
+
+	//Restore the base pointer
+	
+	//Pop EAX - see +EAX at start of method
+	-EAX
+	-EBP
+}
+function ResetINT1_TrapFLAG {
+	//Push EAX to make sure whatever we do below doesn't affect code afterwards
+	+EBP
+	+EAX
+
+	//Set base pointer to the caller ESP
+	EBP = .CallerESP
+	
+	//Clear the Trap Flag (http://en.wikipedia.org/wiki/Trap_flag)
+	//See comment in SetINT1_TrapFlag
+	EBP - 4
+	EAX = [EBP]
+	EAX & $FEFF
+	[EBP] = EAX
+	
+	//Pop EAX - see +EAX at start of method
+	-EAX
+	-EBP
+}

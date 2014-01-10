@@ -225,6 +225,8 @@
     <Resource Include="Images\Copy_Icon_2.jpg" />
     <Resource Include="Images\StepOver.png" />
     <Resource Include="Images\StepOut.png" />
+    <Resource Include="Images\StepInto.png" />
+    <Resource Include="Images\StepMode.png" />
     <Content Include="Resources\Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>

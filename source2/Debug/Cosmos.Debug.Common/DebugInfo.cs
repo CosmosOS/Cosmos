@@ -431,25 +431,40 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public Method GetMethod(UInt32 aAddress) {
+    public Method GetMethod(UInt32 aAddress)
+    {
         // The address we have is somewhere in the method, but we need to find 
         // one that is also in MLSymbol. Asm labels for example wont be found.
-        // So we find ones that match or are before, and we walk till we fine one
-        // in MLSymbol.
-      var xAddress = (long)aAddress;
-        var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i=>i.Address)).Select(i => i.Name).ToArray();
+        //So we find the method header for current address by finding labels of address <= supplied address
+        //Then search down from the header to first IL OP
+        
+        var xAddress = (long)aAddress;
+        var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
 
-        // Search till we find a matching label.
+        Label methodHeaderLabel = null;
+        foreach (var xLabel in xLabels)
+        {
+            if (xLabel.Name.StartsWith("METHOD_"))
+            {
+                methodHeaderLabel = xLabel;
+                break;
+            }
+        }
+        xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= methodHeaderLabel.Address).OrderBy(i => i.Address)).ToArray();
+        
         MethodIlOp xSymbol = null;
-        foreach (var xLabel in xLabels) {
-            xSymbol = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i=>i.LabelName==xLabel)).FirstOrDefault();
-          if (xSymbol != null) {
-            break;
-          }
+        foreach (var xLabel in xLabels)
+        {
+            xSymbol = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.LabelName == xLabel.Name)).FirstOrDefault();
+            if (xSymbol != null)
+            {
+                break;
+            }
         }
 
-        if (xSymbol == null) {
-          throw new Exception("Label not found.");
+        if (xSymbol == null)
+        {
+            throw new Exception("Label not found.");
         }
         return mConnection.Get<Method>(xSymbol.MethodID);
     }
@@ -463,44 +478,53 @@ namespace Cosmos.Debug.Common {
     public SourceInfos GetSourceInfos(UInt32 aAddress)
     {
         var xResult = new SourceInfos();
-        var xMethod = GetMethod(aAddress);
-        var xSymbols = GetSymbols(xMethod);
-        var xAssemblyFile = mConnection.Get<AssemblyFile>(xMethod.AssemblyFileID);
-        var xSymbolReader = SymbolAccess.GetReaderForFile(xAssemblyFile.Pathname);
-        var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xMethod.MethodToken));
-
-        int xSeqCount = xMethodSymbol.SequencePointCount;
-        var xCodeOffsets = new int[xSeqCount];
-        var xCodeDocuments = new ISymbolDocument[xSeqCount];
-        var xCodeLines = new int[xSeqCount];
-        var xCodeColumns = new int[xSeqCount];
-        var xCodeEndLines = new int[xSeqCount];
-        var xCodeEndColumns = new int[xSeqCount];
-        xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-
-        foreach (var xSymbol in xSymbols)
+        try
         {
-            var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
-            if (xRow != null)
+            var xMethod = GetMethod(aAddress);
+            if (xMethod != null)
             {
-                UInt32 xAddress = (UInt32)xRow.Address;
-                // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
-                // So we just ignore duplicate addresses.
-                if (!xResult.ContainsKey(xAddress))
+                var xSymbols = GetSymbols(xMethod);
+                var xAssemblyFile = mConnection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+                var xSymbolReader = SymbolAccess.GetReaderForFile(xAssemblyFile.Pathname);
+                var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xMethod.MethodToken));
+
+                int xSeqCount = xMethodSymbol.SequencePointCount;
+                var xCodeOffsets = new int[xSeqCount];
+                var xCodeDocuments = new ISymbolDocument[xSeqCount];
+                var xCodeLines = new int[xSeqCount];
+                var xCodeColumns = new int[xSeqCount];
+                var xCodeEndLines = new int[xSeqCount];
+                var xCodeEndColumns = new int[xSeqCount];
+                xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+
+                foreach (var xSymbol in xSymbols)
                 {
-                    int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
-                    var xSourceInfo = new SourceInfo()
+                    var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
+                    if (xRow != null)
                     {
-                        SourceFile = xCodeDocuments[xIdx].URL,
-                        Line = xCodeLines[xIdx],
-                        LineEnd = xCodeEndLines[xIdx],
-                        Column = xCodeColumns[xIdx],
-                        ColumnEnd = xCodeEndColumns[xIdx],
-                        MethodName = xMethod.LabelCall
-                    };
-                    xResult.Add(xAddress, xSourceInfo);
+                        UInt32 xAddress = (UInt32)xRow.Address;
+                        // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
+                        // So we just ignore duplicate addresses.
+                        if (!xResult.ContainsKey(xAddress))
+                        {
+                            int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
+                            var xSourceInfo = new SourceInfo()
+                            {
+                                SourceFile = xCodeDocuments[xIdx].URL,
+                                Line = xCodeLines[xIdx],
+                                LineEnd = xCodeEndLines[xIdx],
+                                Column = xCodeColumns[xIdx],
+                                ColumnEnd = xCodeEndColumns[xIdx],
+                                MethodName = xMethod.LabelCall
+                            };
+                            xResult.Add(xAddress, xSourceInfo);
+                        }
+                    }
                 }
             }
+        }
+        catch(Exception ex)
+        { 
         }
         return xResult;
     }

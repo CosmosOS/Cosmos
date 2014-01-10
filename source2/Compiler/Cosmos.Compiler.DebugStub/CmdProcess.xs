@@ -71,6 +71,12 @@ function ProcessCommand {
 		AckCommand()
 		return
 	}
+	if AL = #Vs2Ds_AsmStepInto {
+		SetINT1_TrapFLAG()
+		AckCommand()
+		return
+	}
+
 
 Exit:
     // Restore AL for callers who check the command and do

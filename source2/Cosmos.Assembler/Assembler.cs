@@ -154,11 +154,12 @@ namespace Cosmos.Assembler {
 
     public void Add(Instruction aReader) {
       if (aReader is Label || aReader is Comment) {
-      } else if (EmitAsmLabels) {
-        // Only issue label if its executable code.
-        // Also above if statement will prevent this new label from causing a stack overflow
-        new Label("." + AsmIlIdx.ToString("X2"), "Asm");
-        mAsmIlIdx++;
+      }
+      else if (EmitAsmLabels)
+      {
+          // Only issue label if its executable code.
+          new Label("." + AsmIlIdx.ToString("X2"), "Asm");
+          mAsmIlIdx++;
       }
       mInstructions.Add(aReader);
     }

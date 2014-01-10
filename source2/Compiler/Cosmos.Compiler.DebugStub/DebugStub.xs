@@ -31,7 +31,7 @@ function BreakOnAddress {
     ECX = EAX
 
     // BP ID Number
-    // BP ID Number is sent after BP Address, becuase
+    // BP ID Number is sent after BP Address, because
     // reading BP address uses AL (EAX).
     EAX = 0
     ComReadAL()
@@ -51,6 +51,22 @@ function Executing {
 	// This is the secondary stub routine. After the primary has decided we should do some debug
 	// activities, this one is called.
 	// Each of these checks a flag, and if it processes then it jumps to .Normal.
+
+	//Check whether this call is result of (i.e. after) INT1
+	 ! MOV EAX, DR6
+	 EAX & $4000
+	 if EAX = $4000 {
+	   //This was INT1
+
+	   //Reset the debug register
+	   EAX ^ $4000
+	   ! MOV DR6, EAX
+	   
+	   ResetINT1_TrapFLAG()
+
+	   Break()
+	   goto Normal
+	 }
 
     // CheckForAsmBreak must come before CheckForBreakpoint. They could exist for the same EIP.
 	// Check for asm break
@@ -159,7 +175,7 @@ WaitCmd:
 	    AckCommand()
 	    goto WaitCmd
 	}
-
+	
     if AL = #Vs2Ds_StepInto {
         .DebugBreakOnNextTrace = #StepTrigger_Into
 		// Not used, but set for consistency
