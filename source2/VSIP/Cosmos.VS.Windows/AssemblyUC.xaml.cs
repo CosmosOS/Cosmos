@@ -388,15 +388,15 @@ namespace Cosmos.VS.Windows
                         xSetNextLabelToCurrent = false;
                     }
 
-                    // If its Int3 or so, we need to set the current label to the next non debug op.
-                    //if (xAsmCode.IsDebugCode)
-                    //{
-                    //    if (xAsmCode.LabelMatches(mCurrentLabel))
-                    //    {
-                    //        xSetNextLabelToCurrent = true;
-                    //    }
-                    //    continue;
-                    //}
+                    //If its Int3 or so, we need to set the current label to the next non debug op.
+                    if (xAsmCode.IsDebugCode)
+                    {
+                        if (xAsmCode.LabelMatches(mCurrentLabel))
+                        {
+                            xSetNextLabelToCurrent = true;
+                        }
+                        continue;
+                    }
 
                     mLines.Add(xAsmCode);
                 }

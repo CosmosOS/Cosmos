@@ -170,6 +170,11 @@ WaitCmd:
 
     if AL = #Vs2Ds_Continue goto Done
 
+	//If Asm step into, we need to continue execution
+	if AL = #Vs2Ds_AsmStepInto {
+		goto Done
+	}
+
     if AL = #Vs2Ds_SetAsmBreak {
         SetAsmBreak()
 	    AckCommand()

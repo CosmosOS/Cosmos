@@ -119,35 +119,40 @@ Call DebugStub_ProcessCommand
 Cmp AL, DebugStub_Const_Vs2Ds_Continue
 JE DebugStub_Break_Done
 
-Cmp AL, DebugStub_Const_Vs2Ds_SetAsmBreak
+Cmp AL, DebugStub_Const_Vs2Ds_AsmStepInto
 JNE DebugStub_Break_Block1_End
+Jmp DebugStub_Break_Done
+DebugStub_Break_Block1_End:
+
+Cmp AL, DebugStub_Const_Vs2Ds_SetAsmBreak
+JNE DebugStub_Break_Block2_End
 Call DebugStub_SetAsmBreak
 Call DebugStub_AckCommand
 Jmp DebugStub_Break_WaitCmd
-DebugStub_Break_Block1_End:
-
-Cmp AL, DebugStub_Const_Vs2Ds_StepInto
-JNE DebugStub_Break_Block2_End
-Mov dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Into
-Mov [DebugStub_BreakEBP], EAX
-Jmp DebugStub_Break_Done
 DebugStub_Break_Block2_End:
 
-Cmp AL, DebugStub_Const_Vs2Ds_StepOver
+Cmp AL, DebugStub_Const_Vs2Ds_StepInto
 JNE DebugStub_Break_Block3_End
-Mov dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Over
-Mov EAX, [DebugStub_CallerEBP]
+Mov dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Into
 Mov [DebugStub_BreakEBP], EAX
 Jmp DebugStub_Break_Done
 DebugStub_Break_Block3_End:
 
-Cmp AL, DebugStub_Const_Vs2Ds_StepOut
+Cmp AL, DebugStub_Const_Vs2Ds_StepOver
 JNE DebugStub_Break_Block4_End
-Mov dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Out
+Mov dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Over
 Mov EAX, [DebugStub_CallerEBP]
 Mov [DebugStub_BreakEBP], EAX
 Jmp DebugStub_Break_Done
 DebugStub_Break_Block4_End:
+
+Cmp AL, DebugStub_Const_Vs2Ds_StepOut
+JNE DebugStub_Break_Block5_End
+Mov dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Out
+Mov EAX, [DebugStub_CallerEBP]
+Mov [DebugStub_BreakEBP], EAX
+Jmp DebugStub_Break_Done
+DebugStub_Break_Block5_End:
 
 Jmp DebugStub_Break_WaitCmd
 
