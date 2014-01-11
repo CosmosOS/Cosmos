@@ -431,27 +431,65 @@ namespace Cosmos.Debug.Common {
       }
     }
 
-    public Method GetMethod(UInt32 aAddress)
+    public Label GetMethodHeaderLabel(UInt32 aAddress)
     {
-        // The address we have is somewhere in the method, but we need to find 
-        // one that is also in MLSymbol. Asm labels for example wont be found.
-        //So we find the method header for current address by finding labels of address <= supplied address
-        //Then search down from the header to first IL OP
-        
         var xAddress = (long)aAddress;
         var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
 
         Label methodHeaderLabel = null;
+        //The first label we find searching upwards with "GUID_" at the start will be the very start of the method header
         foreach (var xLabel in xLabels)
         {
-            if (xLabel.Name.StartsWith("METHOD_"))
+            if (xLabel.Name.StartsWith("GUID_"))
             {
                 methodHeaderLabel = xLabel;
                 break;
             }
         }
-        xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= methodHeaderLabel.Address).OrderBy(i => i.Address)).ToArray();
+        return methodHeaderLabel;
+    }
+    public Label[] GetMethodLabels(UInt32 aAddress)
+    {
+        Label methodHeaderLabel = GetMethodHeaderLabel(aAddress);
+        if (methodHeaderLabel == null)
+        {
+            return null;
+        }
+
+        var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= methodHeaderLabel.Address).OrderBy(i => i.Address)).ToArray();
+        List<Label> result = new List<Label>();
+
+        //There are always two END__OF__METHOD_EXCEPTION__2 labels at the end of the method footer.
+        int endOfMethodException2LabelsFound = 0;
+        foreach (var label in xLabels)
+        {
+            if(label.Name.Contains("END__OF__METHOD_EXCEPTION__2"))
+            {
+                endOfMethodException2LabelsFound++;
+            }
+            result.Add(label);
+            if(endOfMethodException2LabelsFound >= 2)
+            {
+                break;
+            }
+        }
+
+        return result.ToArray();
+    }
+    public Method GetMethod(UInt32 aAddress)
+    {
+        // The address we have is somewhere in the method, but we need to find 
+        // one that is also in MLSymbol. Asm labels for example wont be found.
+        // So we find all the labels for the method header
+        // Then search through the list for the first IL OP
+
+        var xLabels = GetMethodLabels(aAddress);
         
+        if(xLabels == null)
+        {
+            return null;
+        }
+
         MethodIlOp xSymbol = null;
         foreach (var xLabel in xLabels)
         {

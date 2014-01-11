@@ -122,7 +122,13 @@ namespace Cosmos.VS.Windows
             bool foundCurrentLine = false;
 
             var xFont = new FontFamily("Consolas");
-            string xLabelPrefix = null;
+            //We need multiple prefix filters because method header has different prefix to IL labels.
+            //We use:
+            // - First "Method_" label prefix
+            // - First label without "GUID_" or "METHOD_" on it as that will be the name of the current method
+            List<string> xLabelPrefixes = new List<string>();
+            bool foundMETHOD_Prefix = false;
+            bool foundMethodName = false;
             foreach (var xLine in mLines)
             {
                 string xDisplayLine = xLine.ToString();
@@ -140,10 +146,18 @@ namespace Cosmos.VS.Windows
                             continue;
                         }
 
-                        if (xLabelPrefix == null)
+                        if (!foundMETHOD_Prefix && xAsmLabel.Label.StartsWith("METHOD_"))
                         {
                             var xLabelParts = xAsmLabel.Label.Split('.');
-                            xLabelPrefix = xLabelParts[0] + ".";
+                            xLabelPrefixes.Add(xLabelParts[0] + ".");
+                            foundMETHOD_Prefix = true;
+                        }
+                        else if(!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_") 
+                                                 && !xAsmLabel.Label.StartsWith("GUID_"))
+                        {
+                            var xLabelParts = xAsmLabel.Label.Split(':');
+                            xLabelPrefixes.Add(xLabelParts[0] + ".");
+                            foundMethodName = true;
                         }
                     }
                     else
@@ -160,7 +174,7 @@ namespace Cosmos.VS.Windows
                     }
 
                     // Replace all and not just labels so we get jumps, calls etc
-                    if (xLabelPrefix != null)
+                    foreach(string xLabelPrefix in xLabelPrefixes)
                     {
                         xDisplayLine = xDisplayLine.Replace(xLabelPrefix, "");
                     }

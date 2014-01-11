@@ -687,47 +687,30 @@ namespace Cosmos.Debug.VSDebugEngine
             var xSourceInfos = mDebugInfoDb.GetSourceInfos(xAddress);
             if (xSourceInfos.Count > 0)
             {
-                // Because of Asm breakpoints the address we have might be in the middle of a C# line.
-                // So we find the closest address to ours that is less or equal to ours.
-                var xQry = from x in xSourceInfos
-                           where x.Key <= xAddress
-                           orderby x.Key descending
-                           select x.Value;
-                var xValue = xQry.FirstOrDefault();
-                bool FindCurrentLabel = true;
-                if (xValue == null)
-                {
-                    //If there actually isn't an IL OP for current ASM line, then at least show the code for the current method.
-                    //Do not highlight the current line though.
-                    xValue = xSourceInfos.OrderBy(x => x.Key).First().Value;
-                    FindCurrentLabel = false;
-                }
+                //We should be able to display the asesembler source for any address regardless of whether a C#
+                //line is associated with it.
+                //However, we do not store all labels in the debug database because that would make the compile
+                //time insane. 
+                //So:
+                // - We take the current address amd find the method it is part of
+                // - We use the method header label as a start point and find all asm labels till the method footer label
+                // - We then find all the asm for these labels and display it.
 
-                // Create list of asm labels that belong to this line of C#.
-                var xMappings = from x in xSourceInfos
-                                where x.Value.SourceFile == xValue.SourceFile
-                                  && x.Value.Line == xValue.Line
-                                  && x.Value.Column == xValue.Column
-                                select x.Key;
-                var xLabels = new List<string>();
-                foreach (uint xAddr in xMappings)
-                {
-                    foreach (string xLabel in mDebugInfoDb.GetLabels(xAddr))
-                    {
-                        xLabels.Add(xLabel + ":");
-                    }
-                }
+                var xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
+                //The ":" has to be added in because labels in asm code have it on the end - it's easier to add it here than
+                //strip them out of the read asm
+                var xLabelNames = xLabels.ToList().ConvertAll<string>(x => x.Name + ":").ToList();
 
                 // Get assembly source
-                var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabels);
+                var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabelNames);
 
                 // Get label for current address.
                 // A single address can have multiple labels (IL, Asm). Because of this we search
                 // for the one with the Asm tag. We dont have the tags in this debug info though,
                 // so instead if there is more than one label we use the longest one which is the Asm tag.
                 string xCurrentLabel = "";
-                var xCurrentLabels = mDebugInfoDb.GetLabels(mCurrentAddress.Value);
-                if (xCurrentLabels.Length > 0 && FindCurrentLabel)
+                var xCurrentLabels = mDebugInfoDb.GetLabels(xAddress);
+                if (xCurrentLabels.Length > 0)
                 {
                     xCurrentLabel = xCurrentLabels.OrderBy(q => q.Length).Last();
                 }

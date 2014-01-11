@@ -55,9 +55,9 @@ namespace Cosmos.System
                 }
 
                 AfterRun();
-                bool xTest = 1 != 3;
-                while (xTest) {
-                }
+                //bool xTest = 1 != 3;
+                //while (xTest) {
+                //}
             }
             catch (Exception E) {
                 // todo: better ways to handle?
