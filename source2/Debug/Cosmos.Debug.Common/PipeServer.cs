@@ -29,6 +29,11 @@ namespace Cosmos.Debug.Common {
       }
     }
 
+    public void CleanHandlers()
+    {
+        DataPacketReceived = null;
+    }
+
     // See comment in ctor as to why we have to make this new ReadByte replacement
     protected byte ReadByte() {
       byte[] xByte = new byte[1];
@@ -75,7 +80,10 @@ namespace Cosmos.Debug.Common {
               byte[] xMsg = new byte[xSize];
               mPipe.Read(xMsg, 0, xSize);
 
-              DataPacketReceived(xCmd, xMsg);
+              if (DataPacketReceived != null)
+              {
+                  DataPacketReceived(xCmd, xMsg);
+              }
             }
           }
         }

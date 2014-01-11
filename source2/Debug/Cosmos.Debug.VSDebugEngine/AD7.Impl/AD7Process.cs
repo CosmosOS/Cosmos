@@ -80,67 +80,74 @@ namespace Cosmos.Debug.VSDebugEngine
 
         private void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData)
         {
-            switch (aCmd)
+            try
             {
-                case Windows2Debugger.Noop:
-                    // do nothing
-                    break;
+                switch (aCmd)
+                {
+                    case Windows2Debugger.Noop:
+                        // do nothing
+                        break;
 
-                case Windows2Debugger.PingVSIP:
-                    mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
-                    break;
+                    case Windows2Debugger.PingVSIP:
+                        mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
+                        break;
 
-                case Windows2Debugger.PingDebugStub:
-                    mDbgConnector.Ping();
-                    break;
+                    case Windows2Debugger.PingDebugStub:
+                        mDbgConnector.Ping();
+                        break;
 
-                case Windows2Debugger.SetAsmBreak:
-                    {
-                        string xLabel = Encoding.UTF8.GetString(aData);
-                        UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
-                        mDbgConnector.SetAsmBreakpoint(xAddress);
-                        mDbgConnector.Continue();
-                        //mDebugDownPipe.SendCommand(VsipUi.OutputPane, xAddress.ToString());
-                    }
-                    break;
-                    
-                case Windows2Debugger.Continue:
-                    {
-                        mDbgConnector.Continue();
-                    }
-                    break;
-
-                case Windows2Debugger.ToggleStepMode:
-                    ASMSteppingMode = !ASMSteppingMode;
-                    break;
-
-                case Windows2Debugger.CurrentASMLine:
-                    {
-                        mCurrentASMLine = Encoding.UTF8.GetString(aData);
-                    }
-                    break;
-                case Windows2Debugger.NextASMLine1:
-                    {
-                        if (aData.Length == 0)
+                    case Windows2Debugger.SetAsmBreak:
                         {
-                            mNextASMLine1 = null;
-                            mNextAddress1 = null;
+                            string xLabel = Encoding.UTF8.GetString(aData);
+                            UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
+                            mDbgConnector.SetAsmBreakpoint(xAddress);
+                            mDbgConnector.Continue();
                         }
-                        else
-                        {
-                            mNextASMLine1 = Encoding.UTF8.GetString(aData);
-                        }
-                    }
-                    break;
-                case Windows2Debugger.NextLabel1:
-                    {
-                        string nextLabel = Encoding.UTF8.GetString(aData);
-                        mNextAddress1 = mDebugInfoDb.AddressOfLabel(nextLabel);
-                    }
-                    break;
+                        break;
 
-                default:
-                    throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
+                    case Windows2Debugger.Continue:
+                        {
+                            mDbgConnector.Continue();
+                        }
+                        break;
+
+                    case Windows2Debugger.ToggleStepMode:
+                        ASMSteppingMode = !ASMSteppingMode;
+                        break;
+
+                    case Windows2Debugger.CurrentASMLine:
+                        {
+                            mCurrentASMLine = Encoding.UTF8.GetString(aData);
+                        }
+                        break;
+                    case Windows2Debugger.NextASMLine1:
+                        {
+                            if (aData.Length == 0)
+                            {
+                                mNextASMLine1 = null;
+                                mNextAddress1 = null;
+                            }
+                            else
+                            {
+                                mNextASMLine1 = Encoding.UTF8.GetString(aData);
+                            }
+                        }
+                        break;
+                    case Windows2Debugger.NextLabel1:
+                        {
+                            string nextLabel = Encoding.UTF8.GetString(aData);
+                            mNextAddress1 = mDebugInfoDb.AddressOfLabel(nextLabel);
+                        }
+                        break;
+
+                    default:
+                        throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
+                }
+            }
+            catch(Exception ex)
+            {
+                //We cannot afford to silently break the pipe!
+                OutputText("AD7Process UpPipe receive error! " + ex.Message);
             }
         }
 
@@ -210,7 +217,11 @@ namespace Cosmos.Debug.VSDebugEngine
                 mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
                 mDebugUpPipe.Start();
             }
-
+            else
+            {
+                mDebugUpPipe.CleanHandlers();
+                mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
+            }
             // Must be after mDebugDownPipe is initialized
             OutputClear();
             OutputText("Debugger process initialized.");
