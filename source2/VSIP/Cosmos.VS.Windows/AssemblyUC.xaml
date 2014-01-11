@@ -30,7 +30,7 @@
             </Button>-->
             <Rectangle Width="8" />
         </ToolBar>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Name="ASMScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <TextBlock Name="tblkSource">
         <TextBlock.ContextMenu>
           <ContextMenu>
